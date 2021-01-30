@@ -1,7 +1,7 @@
 {
-  "name": "obsidian-sample-plugin",
-  "version": "0.9.7",
-  "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+  "name": "notes-review",
+  "version": "0.0.1",
+  "description": "Spaced repetition plugin for notes review.",
   "main": "main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
