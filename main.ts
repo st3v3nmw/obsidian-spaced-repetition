@@ -85,7 +85,7 @@ export default class MyPlugin extends Plugin {
 			let file_text = await this.app.vault.read(note);
 
 			if (!/<!--IGNORE-->/.test(file_text)) { // checks if note should be ignored 
-				if (file_text.split(/\r\n|\r|\n/).length >= 3) { // file should have more than 3 or more lines
+				if (file_text.split(/\r\n|\r|\n/).length >= 4) { // file should have more than 3 or more lines
 					if (!SCHEDULING_INFO_REGEX.test(file_text)) { // file has no scheduling information
 						temp_new.push([note, file_text]);
 						continue;
@@ -94,7 +94,7 @@ export default class MyPlugin extends Plugin {
 					let scheduling_info = SCHEDULING_INFO_REGEX.exec(file_text);
 					let due_unix = parseInt(scheduling_info[1]);
 					let interval = parseInt(scheduling_info[2]);
-					let ease = parseFloat(scheduling_info[3]);
+					let ease = parseInt(scheduling_info[3]);
 					scheduled_notes[note.path] = [note, due_unix, interval, ease];
 				}
 			}
@@ -130,7 +130,7 @@ export default class MyPlugin extends Plugin {
 		let file_text = await this.app.vault.read(note);
 
 		if (!/<!--IGNORE-->/.test(file_text)) { // checks if note should be ignored 
-			if (file_text.split(/\r\n|\r|\n/).length >= 3) { // file should have more than 3 or more lines
+			if (file_text.split(/\r\n|\r|\n/).length >= 4) { // file should have more than 3 or more lines
 				let scheduling_info = SCHEDULING_INFO_REGEX.exec(file_text);
 				let interval = parseInt(scheduling_info[2]);
 				let ease = parseFloat(scheduling_info[3]);
