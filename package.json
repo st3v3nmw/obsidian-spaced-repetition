@@ -1,6 +1,6 @@
 {
   "name": "notes-review",
-  "version": "0.0.1",
+  "version": "0.2",
   "description": "Spaced repetition plugin for notes review.",
   "main": "main.js",
   "scripts": {

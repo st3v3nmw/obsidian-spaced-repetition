@@ -1,9 +1,9 @@
 {
 	"id": "notes-review",
 	"name": "Notes Review",
-	"version": "0.0.1",
+	"version": "0.2",
 	"minAppVersion": "0.9.12",
-	"description": "Spaced repetition plugin for notes review.",
+	"description": "Spaced repetition plugin for notes review using a variant of Supermemo's SM2 algorithm.",
 	"author": "Stephen Mwangi",
 	"authorUrl": "https://github.com/st3v3nmw/note-review",
 	"isDesktopOnly": false
