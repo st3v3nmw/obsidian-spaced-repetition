@@ -1,6 +1,6 @@
 import { Notice, Plugin, addIcon, iterateCacheRefs, getLinkpath, ItemView } from 'obsidian';
 
-const SCHEDULING_INFO_REGEX = /<!--DUE: ([0-9]+), INTERVAL: ([0-9]+), EASE: ([0-9]+), READABLE: ([0-z ]+)-->/;
+const SCHEDULING_INFO_REGEX = /---\n((?:.*\n)*)due: ([0-9]+)\ninterval: ([0-9]+)\nease: ([0-9]+)\nreadable: ([0-z ]+)\n((?:.*\n)*)---/;
 
 export default class MyPlugin extends Plugin {
 	private overdue_notes: [];
@@ -73,7 +73,7 @@ export default class MyPlugin extends Plugin {
 		notes.forEach(n_file => {
 			iterateCacheRefs(this.app.metadataCache.getFileCache(n_file), cb => {
 				let txt = this.app.metadataCache.getFirstLinkpathDest(getLinkpath(cb.link), n_file.path);
-				if (txt != null) {
+				if (txt != null && txt.extension == "md") {
 					links[n_file.path].push(txt.path);
 					links[txt.path].push(n_file.path);
 				}
@@ -112,7 +112,12 @@ export default class MyPlugin extends Plugin {
 			let interval = 1;
 			let due = new Date((Math.floor(+new Date / (24 * 3600 * 1000)) + interval) * 24 * 3600 * 1000);
 			let ease = (count == 0 ? 250 : Math.floor((250 + total / count) / 2));
-			file_text = `<!--DUE: ${+due}, INTERVAL: ${interval}, EASE: ${ease}, READABLE: ${due.toDateString()}-->\n\n${new_note[1]}`;
+			if (/---((?:.*\n)*)---/.test(new_note[1])) {
+				let info = /---((?:.*\n)*)---/.exec(new_note[1]);
+				file_text = new_note[1].replace(/---((?:.*\n)*)---/, `---${info[1]}due: ${+due}\ninterval: ${interval}\nease: ${ease}\nreadable: ${due.toDateString()}\n---`);
+			} else {
+				file_text = `---\ndue: ${+due}\ninterval: ${interval}\nease: ${ease}\nreadable: ${due.toDateString()}\n---\n\n${new_note[1]}`;z
+			}
 			this.app.vault.modify(new_note[0], file_text);
 		}
 
@@ -132,8 +137,10 @@ export default class MyPlugin extends Plugin {
 		if (!/<!--IGNORE-->/.test(file_text)) { // checks if note should be ignored 
 			if (file_text.split(/\r\n|\r|\n/).length >= 4) { // file should have more than 3 or more lines
 				let scheduling_info = SCHEDULING_INFO_REGEX.exec(file_text);
-				let interval = parseInt(scheduling_info[2]);
-				let ease = parseFloat(scheduling_info[3]);
+				console.log(scheduling_info);
+
+				let interval = parseInt(scheduling_info[3]);
+				let ease = parseInt(scheduling_info[4]);
 
 				ease = (quality == 1 ? ease + 20 : Math.max(130, ease - 20));
 				interval = Math.max(1, Math.floor(quality == 1 ? interval * ease / 100 : interval * 0.5));
@@ -144,7 +151,7 @@ export default class MyPlugin extends Plugin {
 				}
 
 				let due = new Date((Math.floor(+new Date / (24 * 3600 * 1000)) + interval) * 24 * 3600 * 1000);
-				file_text = file_text.replace(SCHEDULING_INFO_REGEX, `<!--DUE: ${+due}, INTERVAL: ${interval}, EASE: ${ease}, READABLE: ${due.toDateString()}-->`);
+				file_text = file_text.replace(SCHEDULING_INFO_REGEX, `---\n${scheduling_info[1]}due: ${+due}\ninterval: ${interval}\nease: ${ease}\nreadable: ${due.toDateString()}\n${scheduling_info[6]}---`);
 				this.app.vault.modify(note, file_text);
 
 				new Notice("Response received.");
