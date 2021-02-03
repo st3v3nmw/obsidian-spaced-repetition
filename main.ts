@@ -17,19 +17,7 @@ export default class NotesReviewPlugin extends Plugin {
 		this.statusBar = this.addStatusBarItem();
 		this.statusBar.classList.add("mod-clickable");
 		this.statusBar.addEventListener("click", _ => {
-			if (this.overdue_notes.length == 0) {
-				new Notice("You're done for the day :D.");
-				return;
-			}
-
-			if (this.overdue_notes.length > 0) {
-				let cNote = this.overdue_notes[Math.floor(Math.random() * this.overdue_notes.length)];
-				for (let note of this.overdue_notes) {
-					if (note['due_unix'] < cNote['due_unix'])
-						cNote = note;
-				}
-				this.app.workspace.activeLeaf.openFile(cNote['note']);
-			}
+			this.reviewNextNote();
 		});
 
 		this.addRibbonIcon('crosshairs', 'Sync notes scheduling', async () => {
@@ -54,6 +42,14 @@ export default class NotesReviewPlugin extends Plugin {
 				});
 			})
 		}));
+
+		this.addCommand({
+			id: "note-review-open-note",
+			name: "Open most overdue note for review",
+			callback: () => {
+				this.reviewNextNote();
+			}
+		});
 
 		await sleep(2000);
 		await this.sync();
@@ -182,6 +178,23 @@ export default class NotesReviewPlugin extends Plugin {
 			new Notice("Note marked as IGNORE.");
 		}
 		await this.sync();
+		this.reviewNextNote();
+	}
+
+	async reviewNextNote() {
+		if (this.overdue_notes.length == 0) {
+			new Notice("You're done for the day :D.");
+			return;
+		}
+
+		if (this.overdue_notes.length > 0) {
+			let cNote = this.overdue_notes[Math.floor(Math.random() * this.overdue_notes.length)];
+			for (let note of this.overdue_notes) {
+				if (note['due_unix'] < cNote['due_unix'])
+					cNote = note;
+			}
+			this.app.workspace.activeLeaf.openFile(cNote['note']);
+		}
 	}
 }
 

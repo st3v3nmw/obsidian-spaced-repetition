@@ -12,9 +12,9 @@
         - interval += random_choice({-fuzz, 0, +fuzz})
             - where fuzz = ceil(0.05 * interval)
             - and random_choice uses a uniform probability distribution
-    - Scheduling information stored in YAML header
+    - Scheduling information stored in YAML headers
 
-# TODO
+## TODO
 
 - Add settings for:
     - Initial ease calculation
@@ -23,4 +23,6 @@
         - i_factor
     - Initial interval
     - Minimum file length in # of lines
+    - Lapses interval change (default = 50%)
+- Add list of notes and their due dates on right panel
 - Help & documentation
