@@ -13,3 +13,14 @@
             - where fuzz = ceil(0.05 * interval)
             - and random_choice uses a uniform probability distribution
     - Scheduling information stored in YAML header
+
+# TODO
+
+- Add settings for:
+    - Initial ease calculation
+        - constant
+        - o_factor
+        - i_factor
+    - Initial interval
+    - Minimum file length in # of lines
+- Help & documentation

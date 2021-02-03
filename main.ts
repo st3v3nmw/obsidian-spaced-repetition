@@ -2,7 +2,7 @@ import { Notice, Plugin, addIcon, iterateCacheRefs, getLinkpath, ItemView } from
 
 const SCHEDULING_INFO_REGEX = /^---\n((?:.*\n)*)due: ([0-9]+)\ninterval: ([0-9]+)\nease: ([0-9]+)\nreadable: ([0-z ]+)\n((?:.*\n)*)---/;
 const YAML_HEADER_REGEX = /^---((?:.*\n)*)---/;
-const IGNORE_REGEX = /ignore: true/;
+const IGNORE_REGEX = /review: ignore/;
 
 export default class NotesReviewPlugin extends Plugin {
 	private overdue_notes: [];
