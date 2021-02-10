@@ -14,9 +14,12 @@
         - interval += random_choice({-fuzz, 0, +fuzz})
             - where fuzz = ceil(0.05 * interval)
             - and random_choice uses a uniform probability distribution
-    - Scheduling information stored in YAML headers
+    - Scheduling information stored in YAML front matter
 
 ## TODO
 
-- Add list of notes and their due dates on right panel
+- Right pane
+  - Groups items by dates (collapsible)
+  - Handle file renames and file open events
+- Refactor code
 - Help & documentation
