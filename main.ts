@@ -1,7 +1,7 @@
 import { Notice, Plugin, addIcon, iterateCacheRefs, getLinkpath, ItemView, PluginSettingTab, Setting, WorkspaceLeaf } from 'obsidian';
 
 const SCHEDULING_INFO_REGEX = /^---\n((?:.*\n)*)due: ([0-9]+)\ninterval: ([0-9]+)\nease: ([0-9]+)\nreadable: ([0-z ]+)\n((?:.*\n)*)---/;
-const YAML_HEADER_REGEX = /^---((?:.*\n)*)---/;
+const YAML_HEADER_REGEX = /^---\n((?:.*\n)*)---/;
 const IGNORE_REGEX = /review: ignore/;
 const DUE_DATES_VIEW_TYPE = 'due-dates-list-view';
 
@@ -164,12 +164,12 @@ export default class ConceptsReviewPlugin extends Plugin {
 
 			if (YAML_HEADER_REGEX.test(new_note[1])) {
 				let info = YAML_HEADER_REGEX.exec(new_note[1]);
-				file_text = new_note[1].replace(YAML_HEADER_REGEX, `---${info[1]}due: ${+due}\ninterval: ${interval}\nease: ${initial_ease}\nreadable: ${due.toDateString()}\n---`);
+				file_text = new_note[1].replace(YAML_HEADER_REGEX, `---\n${info[1]}due: ${+due}\ninterval: ${interval}\nease: ${initial_ease}\nreadable: ${due.toDateString()}\n---`);
 			} else {
 				file_text = `---\ndue: ${+due}\ninterval: ${interval}\nease: ${ease}\nreadable: ${due.toDateString()}\n---\n\n${new_note[1]}`;
 			}
 			this.app.vault.modify(new_note[0], file_text);
-			this.scheduled_notes[new_note.path] = [new_note, +due, interval, initial_ease];
+			this.scheduled_notes[new_note[0].path] = [new_note, +due, interval, initial_ease];
 		}
 
 		let now = +new Date();
@@ -178,7 +178,7 @@ export default class ConceptsReviewPlugin extends Plugin {
 			if (note[1] <= now)
 				this.overdue_notes.push({note: note[0], due_unix, interval, ease});
 		}
-		this.statusBar.setText(`Review: ${this.overdue_notes.length} due, ${temp_new.length + Object.keys(this.scheduled_notes).length} total`);
+		this.statusBar.setText(`Review: ${this.overdue_notes.length} due, ${Object.keys(this.scheduled_notes).length} total`);
 		this.due_view.redraw();
 	}
 
@@ -252,7 +252,7 @@ function sleep(ms) {
 }
 
 function getFileLength(file_text: string) {
-	let yaml_header = /^---\n((?:.*\n)*)---/.exec(file_text);
+	let yaml_header = YAML_HEADER_REGEX.exec(file_text);
 	let yaml_header_length = (yaml_header == null ? 0 : yaml_header[0].split(/\r\n|\r|\n/).length);
 	return file_text.split(/\r\n|\r|\n/).length - yaml_header_length;
 }
@@ -391,7 +391,7 @@ class DueDatesListView extends ItemView {
 			navFile.onClickEvent(_ => {
 				this.app.workspace.activeLeaf.openFile(currentFile[0]);
 			});
-		});
+		}
 
 		const contentEl = this.containerEl.children[1];
 		contentEl.empty();

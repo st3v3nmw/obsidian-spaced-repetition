@@ -21,5 +21,6 @@
 - Right pane
   - Groups items by dates (collapsible)
   - Handle file renames and file open events
+- Fix date timezone issue
 - Refactor code
 - Help & documentation
