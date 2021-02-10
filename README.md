@@ -1,4 +1,4 @@
-# Notes Review Obsidian plugin
+# Concepts Review Obsidian plugin
 
 - Notes should be atomic i.e. focus on a single concept
 - SM2 Spaced Repetition Algorithm
@@ -22,7 +22,7 @@
         - o_factor
         - i_factor
     - Initial interval
-    - Minimum file length in # of lines
+    - Minimum file length in # of lines --> remove
     - Lapses interval change (default = 50%)
 - Add list of notes and their due dates on right panel
 - Help & documentation
