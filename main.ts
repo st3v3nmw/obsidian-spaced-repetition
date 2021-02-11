@@ -1,6 +1,6 @@
 import { Notice, Plugin, addIcon, iterateCacheRefs, getLinkpath, ItemView, PluginSettingTab, Setting, WorkspaceLeaf } from 'obsidian';
 
-const SCHEDULING_INFO_REGEX = /^---\n((?:.*\n)*)due: ([0-9]+)\ninterval: ([0-9]+)\nease: ([0-9]+)\nreadable: ([0-z ]+)\n((?:.*\n)*)---/;
+const SCHEDULING_INFO_REGEX = /^---\n((?:.*\n)*)due: ([0-9A-Za-z ]+)\ninterval: ([0-9]+)\nease: ([0-9]+)\n((?:.*\n)*)---/;
 const YAML_HEADER_REGEX = /^---\n((?:.*\n)*)---/;
 const IGNORE_REGEX = /review: ignore/;
 const DUE_DATES_VIEW_TYPE = 'due-dates-list-view';
@@ -121,12 +121,15 @@ export default class ConceptsReviewPlugin extends Plugin {
 				}
 
 				let scheduling_info = SCHEDULING_INFO_REGEX.exec(file_text);
-				let due_unix = parseInt(scheduling_info[2]);
+				let due_unix = Date.parse(scheduling_info[2]);
 				let interval = parseInt(scheduling_info[3]);
 				let ease = parseInt(scheduling_info[4]);
 				this.scheduled_notes[note.path] = [note, due_unix, interval, ease];
 			}
 		}
+
+		let interval = this.settings.initial_interval;
+		let due = new Date(+new Date + interval * 24 * 3600 * 1000);
 
 		for (let new_note of temp_new) {
 			let outgoing_link_total = 0, outgoing_link_count = 0;
@@ -144,29 +147,27 @@ export default class ConceptsReviewPlugin extends Plugin {
 				}
 			}
 
-			let interval = this.settings.initial_interval;
-			let due = new Date((Math.floor(+new Date / (24 * 3600 * 1000)) + interval) * 24 * 3600 * 1000);
-
 			let initial_ease;
-			let constant_factor = 1.0 - (this.settings.o_factor + this.settings.i_factor);	
-			if (outgoing_link_count > 0 && incoming_link_count > 0)
+			let constant_factor = 1.0 - (this.settings.o_factor + this.settings.i_factor);
+			if (outgoing_link_count > 0 && incoming_link_count > 0) {
 				initial_ease = constant_factor * this.settings.default_ease
 								+ Math.floor(this.settings.o_factor * outgoing_link_total / outgoing_link_count
 								+ this.settings.i_factor * incoming_link_total / incoming_link_count);
-			else if (outgoing_link_count > 0)
+			} else if (outgoing_link_count > 0) {
 				initial_ease = constant_factor * this.settings.default_ease
 								+ Math.floor((1.0 - constant_factor) * outgoing_link_total / outgoing_link_count);
-			else if (incoming_link_count > 0)
+			} else if (incoming_link_count > 0) {
 				initial_ease = constant_factor * this.settings.default_ease
 								+ Math.floor((1.0 - constant_factor) * incoming_link_total / incoming_link_count);
-			else
+			} else {
 				initial_ease = this.settings.default_ease;
+			}
 
 			if (YAML_HEADER_REGEX.test(new_note[1])) {
 				let info = YAML_HEADER_REGEX.exec(new_note[1]);
-				file_text = new_note[1].replace(YAML_HEADER_REGEX, `---\n${info[1]}due: ${+due}\ninterval: ${interval}\nease: ${initial_ease}\nreadable: ${due.toDateString()}\n---`);
+				file_text = new_note[1].replace(YAML_HEADER_REGEX, `---\n${info[1]}due: ${due.toDateString()}\ninterval: ${interval}\nease: ${initial_ease}\n---`);
 			} else {
-				file_text = `---\ndue: ${+due}\ninterval: ${interval}\nease: ${ease}\nreadable: ${due.toDateString()}\n---\n\n${new_note[1]}`;
+				file_text = `---\ndue: ${due.toDateString()}\ninterval: ${interval}\nease: ${initial_ease}\n---\n\n${new_note[1]}`;
 			}
 			this.app.vault.modify(new_note[0], file_text);
 			this.scheduled_notes[new_note[0].path] = [new_note, +due, interval, initial_ease];
@@ -176,7 +177,7 @@ export default class ConceptsReviewPlugin extends Plugin {
 		for (let note in this.scheduled_notes) {
 			note = this.scheduled_notes[note];
 			if (note[1] <= now)
-				this.overdue_notes.push({note: note[0], due_unix, interval, ease});
+				this.overdue_notes.push({note: note[0], due_unix: note[1], interval: note[2], ease: note[3]});
 		}
 		this.statusBar.setText(`Review: ${this.overdue_notes.length} due, ${Object.keys(this.scheduled_notes).length} total`);
 		this.due_view.redraw();
@@ -199,8 +200,8 @@ export default class ConceptsReviewPlugin extends Plugin {
 				interval += (r < 0.33 ? -fuzz : (r < 0.67 ? 0 : fuzz));
 			}
 
-			let due = new Date((Math.floor(+new Date / (24 * 3600 * 1000)) + interval) * 24 * 3600 * 1000);
-			file_text = file_text.replace(SCHEDULING_INFO_REGEX, `---\n${scheduling_info[1]}due: ${+due}\ninterval: ${interval}\nease: ${ease}\nreadable: ${due.toDateString()}\n${scheduling_info[6]}---`);
+			let due = new Date(+new Date + interval * 24 * 3600 * 1000);
+			file_text = file_text.replace(SCHEDULING_INFO_REGEX, `---\n${scheduling_info[1]}due: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n${scheduling_info[6]}---`);
 			this.app.vault.modify(note, file_text);
 
 			new Notice("Response received.");

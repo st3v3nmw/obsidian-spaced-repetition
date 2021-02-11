@@ -21,6 +21,8 @@
 - Right pane
   - Groups items by dates (collapsible)
   - Handle file renames and file open events
-- Fix date timezone issue
+- Fix workflow
 - Refactor code
 - Help & documentation
+- Dealing with large vaults for the 1st time
+  - Distribute existing notes over N days for 1st time review
