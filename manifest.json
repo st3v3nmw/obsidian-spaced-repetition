@@ -1,9 +1,9 @@
 {
 	"id": "concepts-review",
 	"name": "Concepts Review",
-	"version": "0.3.8",
+	"version": "0.4.0",
 	"minAppVersion": "0.9.12",
-	"description": "Spaced repetition plugin for notes review using a variant of Supermemo's SM2 algorithm.",
+	"description": "Review notes using SM-2 spaced repetition algorithm on Obsidian. Fight the forgetting curve & note aging!",
 	"author": "Stephen Mwangi",
 	"authorUrl": "https://github.com/st3v3nmw/concepts-review",
 	"isDesktopOnly": false

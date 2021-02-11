@@ -1,7 +1,7 @@
 {
   "name": "notes-review",
-  "version": "0.3.8",
-  "description": "Spaced repetition plugin for notes review.",
+  "version": "0.4.0",
+  "description": "Review notes using SM-2 spaced repetition algorithm on Obsidian. Fight the forgetting curve & note aging!",
   "main": "main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
