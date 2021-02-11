@@ -15,8 +15,8 @@ interface ConceptsReviewSettings {
 
 const DEFAULT_SETTINGS: ConceptsReviewSettings = {
 	default_ease: 250,
-	o_factor: 0.4,
-	i_factor: 0.2,
+	o_factor: 0.5,
+	i_factor: 0.3,
 	initial_interval: 1,
 	lapses_interval_change: 0.5
 }
@@ -147,21 +147,10 @@ export default class ConceptsReviewPlugin extends Plugin {
 				}
 			}
 
-			let initial_ease;
-			let constant_factor = 1.0 - (this.settings.o_factor + this.settings.i_factor);
-			if (outgoing_link_count > 0 && incoming_link_count > 0) {
-				initial_ease = constant_factor * this.settings.default_ease
-								+ Math.floor(this.settings.o_factor * outgoing_link_total / outgoing_link_count
-								+ this.settings.i_factor * incoming_link_total / incoming_link_count);
-			} else if (outgoing_link_count > 0) {
-				initial_ease = constant_factor * this.settings.default_ease
-								+ Math.floor((1.0 - constant_factor) * outgoing_link_total / outgoing_link_count);
-			} else if (incoming_link_count > 0) {
-				initial_ease = constant_factor * this.settings.default_ease
-								+ Math.floor((1.0 - constant_factor) * incoming_link_total / incoming_link_count);
-			} else {
-				initial_ease = this.settings.default_ease;
-			}
+			let initial_ease = (1.0 - this.settings.o_factor - this.settings.i_factor) * this.settings.default_ease;
+			initial_ease += (outgoing_link_count > 0 ? this.settings.o_factor * outgoing_link_total / outgoing_link_count : this.settings.o_factor * this.settings.default_ease);
+			initial_ease += (incoming_link_count > 0 ? this.settings.i_factor * incoming_link_total / incoming_link_count : this.settings.i_factor * this.settings.default_ease);
+			initial_ease = Math.floor(initial_ease);
 
 			if (YAML_HEADER_REGEX.test(new_note[1])) {
 				let info = YAML_HEADER_REGEX.exec(new_note[1]);
@@ -170,7 +159,7 @@ export default class ConceptsReviewPlugin extends Plugin {
 				file_text = `---\ndue: ${due.toDateString()}\ninterval: ${interval}\nease: ${initial_ease}\n---\n\n${new_note[1]}`;
 			}
 			this.app.vault.modify(new_note[0], file_text);
-			this.scheduled_notes[new_note[0].path] = [new_note, +due, interval, initial_ease];
+			this.scheduled_notes[new_note[0].path] = [new_note[0], +due, interval, initial_ease];
 		}
 
 		let now = +new Date();
@@ -270,11 +259,11 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
 		let {containerEl} = this;
 
 		containerEl.empty();
-
 		containerEl.createEl('h2', {text: 'Concepts Review - Settings'});
+		containerEl.createEl('a', {text: 'For more information check the wiki', href: `https://github.com/st3v3nmw/concepts-review/blob/master/README.md`});
 
 		new Setting(containerEl)
-			.setName('Default ease')
+			.setName('Base ease')
 			.setDesc('(minimum = 130, preferrably approx. 250)')
 			.addText(text => text
 				.setValue(`${this.plugin.settings.default_ease}`)
