@@ -1,6 +1,6 @@
 {
   "name": "notes-review",
-  "version": "0.4.0",
+  "version": "0.4.5",
   "description": "Review notes using SM-2 spaced repetition algorithm on Obsidian. Fight the forgetting curve & note aging!",
   "main": "main.js",
   "scripts": {
@@ -19,5 +19,8 @@
     "rollup": "^2.32.1",
     "tslib": "^2.0.3",
     "typescript": "^4.0.3"
+  },
+  "dependencies": {
+    "pagerank.js": "^1.0.2"
   }
 }

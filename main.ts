@@ -1,4 +1,5 @@
 import { Notice, Plugin, addIcon, iterateCacheRefs, getLinkpath, ItemView, PluginSettingTab, Setting, WorkspaceLeaf } from 'obsidian';
+import * as graph from 'pagerank.js';
 
 const SCHEDULING_INFO_REGEX = /^---\n((?:.*\n)*)due: ([0-9A-Za-z ]+)\ninterval: ([0-9]+)\nease: ([0-9]+)\n((?:.*\n)*)---/;
 const YAML_FRONT_MATTER_REGEX = /^---\n((?:.*\n)*)---/;
@@ -6,17 +7,15 @@ const IGNORE_REGEX = /review: ignore/;
 const DUE_DATES_VIEW_TYPE = 'due-dates-list-view';
 
 interface ConceptsReviewSettings {
-	default_ease: number;
-	o_factor: number;
-	i_factor: number;
+	base_ease: number;
+	link_factor: number;
 	initial_interval: number;
 	lapses_interval_change: number;
 }
 
 const DEFAULT_SETTINGS: ConceptsReviewSettings = {
-	default_ease: 250,
-	o_factor: 0.5,
-	i_factor: 0.25,
+	base_ease: 250,
+	link_factor: 0.5,
 	initial_interval: 1,
 	lapses_interval_change: 0.5
 }
@@ -89,19 +88,10 @@ export default class ConceptsReviewPlugin extends Plugin {
 		this.scheduled_notes = {};
 		this.overdue_notes = [];
 
-		let links = {};
-		notes.forEach(n_file => {
-			links[n_file.path] = {"list": []};
-		});
-
-		notes.forEach(n_file => {
-			iterateCacheRefs(this.app.metadataCache.getFileCache(n_file), cb => {
-				let txt = this.app.metadataCache.getFirstLinkpathDest(getLinkpath(cb.link), n_file.path);
-				if (txt != null && txt.extension == "md") {
-					links[n_file.path]["list"].push([txt.path, "out"]);
-					links[txt.path]["list"].push([n_file.path, "in"]);
-				}
-			});
+		let incoming_links = {}, outgoing_links = {};
+		notes.forEach(file => {
+			incoming_links[file.path] = {"list": {}};
+			outgoing_links[file.path] = {"list": {}};
 		});
 		
 		let now = +new Date();
@@ -123,7 +113,8 @@ export default class ConceptsReviewPlugin extends Plugin {
 				if (!(due_unix in this.scheduled_notes))
 					this.scheduled_notes[due_unix] = {};
 				this.scheduled_notes[due_unix][note.path] = [note, due_unix, interval, ease];
-				links[note.path]["ease"] = ease;
+				incoming_links[note.path]["ease"] = ease;
+				outgoing_links[note.path]["ease"] = ease;
 
 				if (due_unix <= now)
 					this.overdue_notes.push({note: note[0], due_unix: note[1], interval: note[2], ease: note[3]});
@@ -135,38 +126,67 @@ export default class ConceptsReviewPlugin extends Plugin {
 		let date_str = due.toDateString();
 		let due_unix = Date.parse(date_str); // cause timezones
 
-		for (let new_note of temp_new) {
-			let outgoing_link_total = 0, outgoing_link_count = 0;
-			let incoming_link_total = 0, incoming_link_count = 0;
-			for (let linked_file of links[new_note[0].path]["list"]) {
-				let ease = links[linked_file[0]]["ease"];
-				if (ease) {
-					if (linked_file[1] == "out") {
-						outgoing_link_total += ease;
-						outgoing_link_count += 1;
-					} else {
-						incoming_link_total += ease;
-						incoming_link_count += 1;
+		if (temp_new.length > 0) {
+			notes.forEach(source => {
+				iterateCacheRefs(this.app.metadataCache.getFileCache(source), cb => {
+					let target = this.app.metadataCache.getFirstLinkpathDest(getLinkpath(cb.link), source.path);
+					if (target != null && target.extension == "md") {
+						if (!(target.path in outgoing_links[source.path]["list"]))
+							outgoing_links[source.path]["list"][target.path] = 0;
+						outgoing_links[source.path]["list"][target.path]++;
+
+						if (!(target.path in incoming_links[target.path]["list"]))
+							incoming_links[target.path]["list"][source.path] = 0;
+						incoming_links[target.path]["list"][source.path]++;
+					}
+				});
+			});
+
+			graph.reset();
+			for (let source in outgoing_links) {
+				for (let target in outgoing_links[source]["list"])
+					graph.link(source, target, outgoing_links[source]["list"][target]);
+			}
+
+			let pageranks = {};
+			graph.rank(0.85, 0.000001, (node, rank) => {
+				pageranks[node] = rank;
+			});
+
+			for (let new_note of temp_new) {
+				let link_total = 0, link_count = 0;
+				let seen_links = {};
+				for (let linked_file in incoming_links[new_note[0].path]["list"]) {
+					let ease = pageranks[linked_file] * incoming_links[linked_file]["ease"];
+					if (ease) {
+						link_total += ease;
+						link_count += pageranks[linked_file];
+						seen_links[linked_file] = true;
 					}
 				}
+
+				for (let linked_file in outgoing_links[new_note[0].path]["list"]) {
+					let ease = pageranks[linked_file] * outgoing_links[linked_file]["ease"];
+					if (!(linked_file in seen_links) && ease) {
+						link_total += ease;
+						link_count += pageranks[linked_file];
+					}
+				}
+
+				let initial_ease = Math.floor((1.0 - this.settings.link_factor) * this.settings.base_ease + (link_count > 0 ? this.settings.link_factor * link_total / link_count : this.settings.link_factor * this.settings.base_ease));
+
+				if (YAML_FRONT_MATTER_REGEX.test(new_note[1])) {
+					let info = YAML_FRONT_MATTER_REGEX.exec(new_note[1]);
+					file_text = new_note[1].replace(YAML_FRONT_MATTER_REGEX, `---\n${info[1]}due: ${date_str}\ninterval: ${interval}\nease: ${initial_ease}\n---`);
+				} else {
+					file_text = `---\ndue: ${due.toDateString()}\ninterval: ${interval}\nease: ${initial_ease}\n---\n\n${new_note[1]}`;
+				}
+				this.app.vault.modify(new_note[0], file_text);
+
+				if (!(due_unix in this.scheduled_notes))
+					this.scheduled_notes[due_unix] = {};
+				this.scheduled_notes[due_unix][new_note.path] = [new_note, due_unix, interval, initial_ease];
 			}
-
-			let initial_ease = (1.0 - this.settings.o_factor - this.settings.i_factor) * this.settings.default_ease;
-			initial_ease += (outgoing_link_count > 0 ? this.settings.o_factor * outgoing_link_total / outgoing_link_count : this.settings.o_factor * this.settings.default_ease);
-			initial_ease += (incoming_link_count > 0 ? this.settings.i_factor * incoming_link_total / incoming_link_count : this.settings.i_factor * this.settings.default_ease);
-			initial_ease = Math.floor(initial_ease);
-
-			if (YAML_FRONT_MATTER_REGEX.test(new_note[1])) {
-				let info = YAML_FRONT_MATTER_REGEX.exec(new_note[1]);
-				file_text = new_note[1].replace(YAML_FRONT_MATTER_REGEX, `---\n${info[1]}due: ${date_str}\ninterval: ${interval}\nease: ${initial_ease}\n---`);
-			} else {
-				file_text = `---\ndue: ${due.toDateString()}\ninterval: ${interval}\nease: ${initial_ease}\n---\n\n${new_note[1]}`;
-			}
-			this.app.vault.modify(new_note[0], file_text);
-
-			if (!(due_unix in this.scheduled_notes))
-				this.scheduled_notes[due_unix] = {};
-			this.scheduled_notes[due_unix][new_note.path] = [note, due_unix, interval, initial_ease];
 		}
 
 		this.scheduled_notes = Object.keys(this.scheduled_notes).sort().reduce((obj, key) => { 
@@ -271,41 +291,31 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Base ease')
-			.setDesc('(minimum = 130, preferrably approx. 250)')
+			.setDesc('(minimum = 130, preferrably approximately 250)')
 			.addText(text => text
-				.setValue(`${this.plugin.settings.default_ease}`)
+				.setValue(`${this.plugin.settings.base_ease}`)
 				.onChange(async (value) => {
-					this.plugin.settings.default_ease = Math.max(130, Number.parseInt(value));
+					value = Number.parseInt(value);
+					if (value < 130) {
+						new Notice("The base ease must be at least 130");
+						return;
+					}
+					this.plugin.settings.base_ease = value;
 					await this.plugin.saveSettings();
 				}));
 
 		new Setting(containerEl)
-			.setName('o_factor')
-			.setDesc('Weighting for outgoing links (0% <= i_factor + o_factor <= 100%)')
+			.setName('Link factor')
+			.setDesc('Contribution of average ease of linked notes to the initial ease (0% <= link_factor <= 100%)')
 			.addText(text => text
-				.setValue(`${this.plugin.settings.o_factor * 100}`)
+				.setValue(`${this.plugin.settings.link_factor * 100}`)
 				.onChange(async (value) => {
 					value = Number.parseInt(value) / 100;
-					if (this.plugin.settings.i_factor + value > 1.0) {
-						new Notice("i_factor + o_factor must be less than 100");
+					if (value < 0 || value > 1.0) {
+						new Notice("link_factor must be in the range (0% <= link_factor <= 100%)");
 						return;
 					}
-					this.plugin.settings.o_factor = Math.max(0.0, Math.min(1.0, value));
-					await this.plugin.saveSettings();
-				}));
-
-		new Setting(containerEl)
-			.setName('i_factor')
-			.setDesc('Weighting for incoming links (0% <= i_factor + o_factor <= 100%)')
-			.addText(text => text
-				.setValue(`${this.plugin.settings.i_factor * 100}`)
-				.onChange(async (value) => {
-					value = Number.parseInt(value) / 100;
-					if (this.plugin.settings.i_factor + value > 1.0) {
-						new Notice("i_factor + o_factor must be less than 100");
-						return;
-					}
-					this.plugin.settings.i_factor = Math.max(0.0, Math.min(1.0, value));
+					this.plugin.settings.link_factor = value;
 					await this.plugin.saveSettings();
 				}));
 		
