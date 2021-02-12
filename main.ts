@@ -1,10 +1,20 @@
-import { Notice, Plugin, addIcon, iterateCacheRefs, getLinkpath, ItemView, PluginSettingTab, Setting, WorkspaceLeaf } from 'obsidian';
-import * as graph from 'pagerank.js';
+import {
+	Notice,
+	Plugin,
+	addIcon,
+	iterateCacheRefs,
+	getLinkpath,
+	ItemView,
+	PluginSettingTab,
+	Setting,
+	WorkspaceLeaf,
+} from "obsidian";
+import * as graph from "pagerank.js";
 
 const SCHEDULING_INFO_REGEX = /^---\n((?:.*\n)*)due: ([0-9A-Za-z ]+)\ninterval: ([0-9]+)\nease: ([0-9]+)\n((?:.*\n)*)---/;
 const YAML_FRONT_MATTER_REGEX = /^---\n((?:.*\n)*)---/;
 const IGNORE_REGEX = /review: ignore/;
-const DUE_DATES_VIEW_TYPE = 'due-dates-list-view';
+const DUE_DATES_VIEW_TYPE = "due-dates-list-view";
 
 interface ConceptsReviewSettings {
 	base_ease: number;
@@ -26,13 +36,13 @@ const DEFAULT_SETTINGS: ConceptsReviewSettings = {
 	load_balancing_threshold: 8,
 	open_random_note: true,
 	lapses_interval_change: 0.5,
-	auto_next_note: true
-}
+	auto_next_note: true,
+};
 
 const DEFAULT_DATA: PluginData = {
 	settings: DEFAULT_SETTINGS,
-	pageranks: {}
-}
+	pageranks: {},
+};
 
 export default class ConceptsReviewPlugin extends Plugin {
 	private scheduled_notes: [];
@@ -44,54 +54,67 @@ export default class ConceptsReviewPlugin extends Plugin {
 	async onload(): void {
 		await this.loadPluginData();
 
-		addIcon('crosshairs', crossHairsIcon);
+		addIcon("crosshairs", crossHairsIcon);
 
 		this.scheduled_notes = {};
 		this.overdue_notes = [];
 
 		this.statusBar = this.addStatusBarItem();
 		this.statusBar.classList.add("mod-clickable");
-		this.statusBar.setAttribute('aria-label', 'Open an overdue note for review');
-		this.statusBar.setAttribute('aria-label-position', 'top');
-		this.statusBar.addEventListener("click", _ => {
+		this.statusBar.setAttribute(
+			"aria-label",
+			"Open an overdue note for review"
+		);
+		this.statusBar.setAttribute("aria-label-position", "top");
+		this.statusBar.addEventListener("click", (_) => {
 			this.reviewNextNote();
 		});
 
-		this.addRibbonIcon('crosshairs', 'Sync notes scheduling', async () => {
+		this.addRibbonIcon("crosshairs", "Sync notes scheduling", async () => {
 			await this.sync();
 			new Notice("Sync done.");
 		});
 
-		this.registerView(DUE_DATES_VIEW_TYPE, (leaf) => this.due_view = new DueDatesListView(leaf, this, this.scheduled_notes));
-		if (this.app.workspace.layoutReady)
-			this.initView();
+		this.registerView(
+			DUE_DATES_VIEW_TYPE,
+			(leaf) =>
+				(this.due_view = new DueDatesListView(leaf, this, this.scheduled_notes))
+		);
+
+		if (this.app.workspace.layoutReady) this.initView();
 		else
-			this.registerEvent(this.app.workspace.on('layout-ready', _ => this.initView()));
+			this.registerEvent(
+				this.app.workspace.on("layout-ready", (_) => this.initView())
+			);
 
-		this.app.workspace.on("file-menu", ((menu, file: TFile) => {
-			menu.addItem((item) =>{
-				item.setTitle("Concept Review: Easy").setIcon("crosshairs")
-					.onClick(evt => {
+		this.app.workspace.on("file-menu", (menu, file: TFile) => {
+			menu.addItem((item) => {
+				item
+					.setTitle("Concept Review: Easy")
+					.setIcon("crosshairs")
+					.onClick((evt) => {
 						this.saveReviewResponse(file, 1);
-				});
-			})
-		}));
+					});
+			});
+		});
 
-		this.app.workspace.on("file-menu", ((menu, file: TFile) => {
-			menu.addItem((item) =>{
-				item.setTitle("Concept Review: Hard").setIcon("crosshairs")
-					.onClick(evt => {
+		this.app.workspace.on("file-menu", (menu, file: TFile) => {
+			menu.addItem((item) => {
+				item
+					.setTitle("Concept Review: Hard")
+					.setIcon("crosshairs")
+					.onClick((evt) => {
 						this.saveReviewResponse(file, 0);
-				});
-			})
-		}));
+					});
+			});
+		});
 
 		this.addCommand({
 			id: "note-review-open-note",
 			name: "Open an overdue note for review",
 			callback: () => {
 				this.reviewNextNote();
-			}
+			},
 		});
 
 		this.addCommand({
@@ -99,7 +122,7 @@ export default class ConceptsReviewPlugin extends Plugin {
 			name: "Recalculate PageRanks",
 			callback: () => {
 				this.sync(true);
-			}
+			},
 		});
 
 		this.addSettingTab(new ConceptsReviewSettingTab(this.app, this));
@@ -113,19 +136,22 @@ export default class ConceptsReviewPlugin extends Plugin {
 		this.scheduled_notes = {};
 		this.overdue_notes = [];
 
-		let incoming_links = {}, outgoing_links = {};
-		notes.forEach(file => {
-			incoming_links[file.path] = {"list": {}};
-			outgoing_links[file.path] = {"list": {}};
+		let incoming_links = {},
+			outgoing_links = {};
+		notes.forEach((file) => {
+			incoming_links[file.path] = { list: {} };
+			outgoing_links[file.path] = { list: {} };
 		});
-		
+
 		let now = +new Date();
 		let temp_new = [];
 		for (let note of notes) {
 			let file_text = await this.app.vault.read(note);
 
-			if (!IGNORE_REGEX.test(file_text) && getFileLength(file_text) > 1) { // checks if note should be ignored
-				if (!SCHEDULING_INFO_REGEX.test(file_text)) { // file has no scheduling information
+			if (!IGNORE_REGEX.test(file_text) && getFileLength(file_text) > 1) {
+				// checks if note should be ignored
+				if (!SCHEDULING_INFO_REGEX.test(file_text)) {
+					// file has no scheduling information
 					temp_new.push([note, file_text]);
 					continue;
 				}
@@ -137,19 +163,27 @@ export default class ConceptsReviewPlugin extends Plugin {
 
 				if (!(due_unix in this.scheduled_notes))
 					this.scheduled_notes[due_unix] = {};
-				this.scheduled_notes[due_unix][note.path] = [note, due_unix, interval, ease];
+				this.scheduled_notes[due_unix][note.path] = [
+					note,
+					due_unix,
+					interval,
+					ease,
+				];
 				incoming_links[note.path]["ease"] = ease;
 				outgoing_links[note.path]["ease"] = ease;
 
 				if (due_unix <= now)
-					this.overdue_notes.push({note, due_unix, interval, ease});
+					this.overdue_notes.push({ note, due_unix, interval, ease });
 			}
 		}
 
 		if (temp_new.length > 0 || recalculate_pageranks) {
-			notes.forEach(source => {
-				iterateCacheRefs(this.app.metadataCache.getFileCache(source), cb => {
-					let target = this.app.metadataCache.getFirstLinkpathDest(getLinkpath(cb.link), source.path);
+			notes.forEach((source) => {
+				iterateCacheRefs(this.app.metadataCache.getFileCache(source), (cb) => {
+					let target = this.app.metadataCache.getFirstLinkpathDest(
+						getLinkpath(cb.link),
+						source.path
+					);
 					if (target != null && target.extension == "md") {
 						if (!(target.path in outgoing_links[source.path]["list"]))
 							outgoing_links[source.path]["list"][target.path] = 0;
@@ -183,17 +217,24 @@ export default class ConceptsReviewPlugin extends Plugin {
 
 			for (let new_note of temp_new) {
 				let i = 0;
-				while (Object.keys(this.scheduled_notes[due_unix + i * 24 * 3600 * 1000] || {}).length >= this.data.settings.load_balancing_threshold)
+				while (
+					Object.keys(
+						this.scheduled_notes[due_unix + i * 24 * 3600 * 1000] || {}
+					).length >= this.data.settings.load_balancing_threshold
+				)
 					i++;
+
 				if (i > 0) {
 					n += i;
-					[date_str, due_unix] = getLocalDateTimeOffset(n);	
+					[date_str, due_unix] = getLocalDateTimeOffset(n);
 				}
 
-				let link_total = 0, link_count = 0;
-				let seen_links = {};
+				let link_total = 0,
+					link_count = 0,
+					seen_links = {};
 				for (let linked_file in incoming_links[new_note[0].path]["list"]) {
-					let ease = pageranks[linked_file] * incoming_links[linked_file]["ease"];
+					let ease =
+						pageranks[linked_file] * incoming_links[linked_file]["ease"];
 					if (ease) {
 						link_total += ease;
 						link_count += pageranks[linked_file];
@@ -202,18 +243,28 @@ export default class ConceptsReviewPlugin extends Plugin {
 				}
 
 				for (let linked_file in outgoing_links[new_note[0].path]["list"]) {
-					let ease = pageranks[linked_file] * outgoing_links[linked_file]["ease"];
+					let ease =
+						pageranks[linked_file] * outgoing_links[linked_file]["ease"];
 					if (!(linked_file in seen_links) && ease) {
 						link_total += ease;
 						link_count += pageranks[linked_file];
 					}
 				}
 
-				let initial_ease = Math.round((1.0 - this.data.settings.link_factor) * this.data.settings.base_ease + (link_count > 0 ? this.data.settings.link_factor * link_total / link_count : this.data.settings.link_factor * this.data.settings.base_ease));
+				let initial_ease = Math.round(
+					(1.0 - this.data.settings.link_factor) *
+						this.data.settings.base_ease +
+						(link_count > 0
+							? (this.data.settings.link_factor * link_total) / link_count
+							: this.data.settings.link_factor * this.data.settings.base_ease)
+				);
 
 				if (YAML_FRONT_MATTER_REGEX.test(new_note[1])) {
 					let existing_yaml = YAML_FRONT_MATTER_REGEX.exec(new_note[1]);
-					file_text = new_note[1].replace(YAML_FRONT_MATTER_REGEX, `---\n${existing_yaml[1]}due: ${date_str}\ninterval: 1\nease: ${initial_ease}\n---`);
+					file_text = new_note[1].replace(
+						YAML_FRONT_MATTER_REGEX,
+						`---\n${existing_yaml[1]}due: ${date_str}\ninterval: 1\nease: ${initial_ease}\n---`
+					);
 				} else {
 					file_text = `---\ndue: ${date_str}\ninterval: 1\nease: ${initial_ease}\n---\n\n${new_note[1]}`;
 				}
@@ -221,17 +272,24 @@ export default class ConceptsReviewPlugin extends Plugin {
 
 				if (!(due_unix in this.scheduled_notes))
 					this.scheduled_notes[due_unix] = {};
-				this.scheduled_notes[due_unix][new_note[0].path] = [new_note[0], due_unix, 1, initial_ease];
+				this.scheduled_notes[due_unix][new_note[0].path] = [
+					new_note[0],
+					due_unix,
+					1,
+					initial_ease,
+				];
 				incoming_links[new_note[0].path]["ease"] = initial_ease;
 				outgoing_links[new_note[0].path]["ease"] = initial_ease;
 			}
 		}
 
-		this.scheduled_notes = Object.keys(this.scheduled_notes).sort().reduce((obj, key) => { 
-			obj[key] = this.scheduled_notes[key]; 
-			return obj;
-		}, {});
-		
+		this.scheduled_notes = Object.keys(this.scheduled_notes)
+			.sort()
+			.reduce((obj, key) => {
+				obj[key] = this.scheduled_notes[key];
+				return obj;
+			}, {});
+
 		this.statusBar.setText(`Review: ${this.overdue_notes.length} due`);
 		this.due_view.redraw();
 	}
@@ -239,22 +297,38 @@ export default class ConceptsReviewPlugin extends Plugin {
 	async saveReviewResponse(note: TFile, quality: number): void {
 		let file_text = await this.app.vault.read(note);
 
-		if (!IGNORE_REGEX.test(file_text) && getFileLength(file_text) > 1) { // checks if note should be ignored 
+		if (!IGNORE_REGEX.test(file_text) && getFileLength(file_text) > 1) {
+			// checks if note should be ignored
 			let scheduling_info = SCHEDULING_INFO_REGEX.exec(file_text);
 
 			let interval = parseInt(scheduling_info[3]);
 			let ease = parseInt(scheduling_info[4]);
 
-			ease = (quality == 1 ? ease + 20 : Math.max(130, ease - 20));
-			interval = Math.max(1, Math.round(quality == 1 ? interval * ease / 100 : interval * this.data.settings.lapses_interval_change));
-			if (interval >= 8) { // fuzz
+			ease = quality == 1 ? ease + 20 : Math.max(130, ease - 20);
+			interval = Math.max(
+				1,
+				Math.round(
+					quality == 1
+						? (interval * ease) / 100
+						: interval * this.data.settings.lapses_interval_change
+				)
+			);
+			if (interval >= 8) {
+				// fuzz
 				let fuzz = Math.ceil(0.05 * interval);
 				let r = Math.random();
-				interval += (r < 0.33 ? -fuzz : (r < 0.67 ? 0 : fuzz));
+				interval += r < 0.33 ? -fuzz : r < 0.67 ? 0 : fuzz;
 			}
 
-			let due = new Date(+new Date + interval * 24 * 3600 * 1000);
-			file_text = file_text.replace(SCHEDULING_INFO_REGEX, `---\n${scheduling_info[1]}due: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n${scheduling_info[5]}---`);
+			let due = new Date(+new Date() + interval * 24 * 3600 * 1000);
+			file_text = file_text.replace(
+				SCHEDULING_INFO_REGEX,
+				`---\n${
+					scheduling_info[1]
+				}due: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n${
+					scheduling_info[5]
+				}---`
+			);
 			this.app.vault.modify(note, file_text);
 
 			new Notice("Response received.");
@@ -263,8 +337,7 @@ export default class ConceptsReviewPlugin extends Plugin {
 		}
 
 		await this.sync();
-		if (this.settings.auto_next_note)
-			this.reviewNextNote();
+		if (this.settings.auto_next_note) this.reviewNextNote();
 	}
 
 	async reviewNextNote(): void {
@@ -274,12 +347,15 @@ export default class ConceptsReviewPlugin extends Plugin {
 		}
 
 		if (this.overdue_notes.length > 0) {
-			let cNote = this.overdue_notes[(this.data.settings.open_random_note ? Math.floor(Math.random() * this.overdue_notes.length): 0)];
+			let cNote = this.overdue_notes[
+				this.data.settings.open_random_note
+					? Math.floor(Math.random() * this.overdue_notes.length)
+					: 0
+			];
 			for (let note of this.overdue_notes) {
-				if (note['due_unix'] < cNote['due_unix'])
-					cNote = note;
+				if (note["due_unix"] < cNote["due_unix"]) cNote = note;
 			}
-			this.app.workspace.activeLeaf.openFile(cNote['note']);
+			this.app.workspace.activeLeaf.openFile(cNote["note"]);
 		}
 	}
 
@@ -300,21 +376,26 @@ export default class ConceptsReviewPlugin extends Plugin {
 			type: DUE_DATES_VIEW_TYPE,
 			active: true,
 		});
-	};
+	}
 }
 
 function sleep(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
+	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function getFileLength(file_text: string) {
 	let yaml_front_matter = YAML_FRONT_MATTER_REGEX.exec(file_text);
-	let yaml_front_matter_length = (yaml_front_matter == null ? 0 : yaml_front_matter[0].split(/\r\n|\r|\n/).length);
+	let yaml_front_matter_length =
+		yaml_front_matter == null
+			? 0
+			: yaml_front_matter[0].split(/\r\n|\r|\n/).length;
 	return file_text.split(/\r\n|\r|\n/).length - yaml_front_matter_length;
 }
 
 function getLocalDateTimeOffset(n_days: number) {
-	let date_str = new Date(+new Date + n_days * 24 * 3600 * 1000).toDateString();
+	let date_str = new Date(
+		+new Date() + n_days * 24 * 3600 * 1000
+	).toDateString();
 	let due_unix = Date.parse(date_str); // cause timezones
 	return [date_str, due_unix];
 }
@@ -328,82 +409,142 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
 	}
 
 	display(): void {
-		let {containerEl} = this;
+		let { containerEl } = this;
 
 		containerEl.empty();
-		containerEl.createEl('h2', {text: 'Concepts Review Plugin - Settings'});
-		let helpEl = containerEl.createEl('div', {cls: "help-div"});
-		helpEl.innerHTML = '<a href="https://github.com/st3v3nmw/concepts-review/blob/master/README.md">For more information, check the README.</a>';
+		containerEl.createEl("h2", { text: "Concepts Review Plugin - Settings" });
+		let helpEl = containerEl.createEl("div", { cls: "help-div" });
+		helpEl.innerHTML =
+			'<a href="https://github.com/st3v3nmw/concepts-review/blob/master/README.md">For more information, check the README.</a>';
 
 		new Setting(containerEl)
-			.setName('Base ease')
-			.setDesc('minimum = 130, preferrably approximately 250')
-			.addText(text => text
-				.setValue(`${this.plugin.data.settings.base_ease}`)
-				.onChange(async (value) => {
-					value = Number.parseInt(value);
-					if (value < 130) {
-						new Notice("The base ease must be at least 130");
-						return;
-					}
-					this.plugin.data.settings.base_ease = value;
-					await this.plugin.savePluginData();
-				}));
+			.setName("Base ease")
+			.setDesc("minimum = 130, preferrably approximately 250")
+			.addText((text) =>
+				text
+					.setValue(`${this.plugin.data.settings.base_ease}`)
+					.onChange(async (value) => {
+						value = Number.parseInt(value);
+						if (!isNaN(value)) {
+							if (value < 130) {
+								new Notice("The base ease must be at least 130.");
+								text.setValue(`${this.plugin.data.settings.base_ease}`);
+								return;
+							}
+
+							this.plugin.data.settings.base_ease = value;
+							await this.plugin.savePluginData();
+						} else {
+							new Notice("Please provide a valid number.");
+						}
+					})
+			);
 
 		new Setting(containerEl)
-			.setName('Link factor')
-			.setDesc('Contribution of average ease of linked notes to the initial ease (0% <= link_factor <= 100%)')
-			.addText(text => text
-				.setValue(`${this.plugin.data.settings.link_factor * 100}`)
-				.onChange(async (value) => {
-					value = Number.parseInt(value) / 100;
-					if (value < 0 || value > 1.0) {
-						new Notice("link_factor must be in the range (0% <= link_factor <= 100%)");
-						return;
-					}
-					this.plugin.data.settings.link_factor = value;
-					await this.plugin.savePluginData();
-				}));
+			.setName("Link factor")
+			.setDesc(
+				"Contribution of average ease of linked notes to the initial ease (0% <= link_factor <= 100%)"
+			)
+			.addText((text) =>
+				text
+					.setValue(`${this.plugin.data.settings.link_factor * 100}`)
+					.onChange(async (value) => {
+						value = Number.parseInt(value) / 100;
+						if (!isNaN(value)) {
+							if (value < 0 || value > 1.0) {
+								new Notice(
+									"The link factor must be in the range 0% <= link_factor <= 100%."
+								);
+								text.setValue(`${this.plugin.data.settings.link_factor * 100}`);
+								return;
+							}
+
+							this.plugin.data.settings.link_factor = value;
+							await this.plugin.savePluginData();
+						} else {
+							new Notice("Please provide a valid number.");
+						}
+					})
+			);
 
 		new Setting(containerEl)
-			.setName('Load balancing threshold')
-			.setDesc('Helps distribute pending 1st time reviews hence controlling load spikes (in # of notes)')
-			.addText(text => text
-				.setValue(`${this.plugin.data.settings.load_balancing_threshold}`)
-				.onChange(async (value) => {
-					this.plugin.data.settings.load_balancing_threshold = Math.max(1, Number.parseInt(value));
-					await this.plugin.savePluginData();
-				}));
+			.setName("Load balancing threshold")
+			.setDesc(
+				"Helps distribute pending 1st time reviews hence controlling load spikes (in # of notes)"
+			)
+			.addText((text) =>
+				text
+					.setValue(`${this.plugin.data.settings.load_balancing_threshold}`)
+					.onChange(async (value) => {
+						value = Number.parseInt(value);
+						if (!isNaN(value)) {
+							if (value < 1) {
+								new Notice("The load balancing threshold must be at least 1.");
+								return;
+							}
+
+							this.plugin.data.settings.load_balancing_threshold = value;
+							await this.plugin.savePluginData();
+						} else {
+							new Notice("Please provide a valid number.");
+						}
+					})
+			);
 
 		new Setting(containerEl)
-			.setName('Open a random overdue note for review')
-			.setDesc('When you turn this off, notes are ordered by importance (PageRank)')
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.data.settings.open_random_note)
-				.onChange(async (value) => {
-					this.plugin.data.settings.open_random_note = value;
-					await this.plugin.savePluginData();
-				}));
+			.setName("Open a random overdue note for review")
+			.setDesc(
+				"When you turn this off, notes are ordered by importance (PageRank)"
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.data.settings.open_random_note)
+					.onChange(async (value) => {
+						this.plugin.data.settings.open_random_note = value;
+						await this.plugin.savePluginData();
+					})
+			);
 
 		new Setting(containerEl)
-			.setName('Interval change when you review a notes/concept as hard')
-			.setDesc('new_interval = old_interval * interval_change / 100, 0% < interval_change < 100%')
-			.addText(text => text
-				.setValue(`${this.plugin.data.settings.lapses_interval_change * 100}`)
-				.onChange(async (value) => {
-					this.plugin.data.settings.lapses_interval_change = Math.max(0.01, Math.min(0.99, Number.parseInt(value) / 100));
-					await this.plugin.savePluginData();
-				}));
+			.setName("Interval change when you review a notes/concept as hard")
+			.setDesc(
+				"new_interval = old_interval * interval_change / 100, 0% < interval_change < 100%"
+			)
+			.addText((text) =>
+				text
+					.setValue(`${this.plugin.data.settings.lapses_interval_change * 100}`)
+					.onChange(async (value) => {
+						value = Number.parseInt(value) / 100;
+						if (!isNaN(value)) {
+							if (value < 0.01 || value > 0.99) {
+								new Notice(
+									"The load balancing threshold must be in the range 0% < interval_change < 100%."
+								);
+								text.setValue(
+									`${this.plugin.data.settings.lapses_interval_change * 100}`
+								);
+								return;
+							}
+
+							this.plugin.data.settings.lapses_interval_change = value;
+							await this.plugin.savePluginData();
+						} else {
+							new Notice("Please provide a valid number.");
+						}
+					})
+			);
 
 		new Setting(containerEl)
-			.setName('Open next overdue note automatically after a review')
-			.setDesc('Turn this off to open next note manually')
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.data.settings.auto_next_note)
-				.onChange(async (value) => {
-					this.plugin.data.settings.auto_next_note = value;
-					await this.plugin.savePluginData();
-				}));
+			.setName("Open next overdue note automatically after a review")
+			.setDesc("Turn this off to open next note manually")
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.data.settings.auto_next_note)
+					.onChange(async (value) => {
+						this.plugin.data.settings.auto_next_note = value;
+						await this.plugin.savePluginData();
+					})
+			);
 	}
 }
 
@@ -414,9 +555,11 @@ class DueDatesListView extends ItemView {
 		super(leaf);
 
 		this.plugin = plugin;
-		this.active_date = '';
-		this.registerEvent(this.app.workspace.on('file-open', _ => this.redraw()));
-		this.registerEvent(this.app.vault.on('rename', _ => this.redraw()));
+		this.active_date = "";
+		this.registerEvent(
+			this.app.workspace.on("file-open", (_) => this.redraw())
+		);
+		this.registerEvent(this.app.vault.on("rename", (_) => this.redraw()));
 		this.redraw();
 	}
 
@@ -425,17 +568,18 @@ class DueDatesListView extends ItemView {
 	}
 
 	public getDisplayText(): string {
-		return 'Due Dates';
+		return "Due Dates";
 	}
 
 	public getIcon(): string {
-		return 'crosshairs';
+		return "crosshairs";
 	}
 
 	public onHeaderMenu(menu: Menu): void {
-		menu.addItem(item => {
-			item.setTitle('Close')
-				.setIcon('cross')
+		menu.addItem((item) => {
+			item
+				.setTitle("Close")
+				.setIcon("cross")
 				.onClick(() => {
 					this.app.workspace.detachLeavesOfType(DUE_DATES_VIEW_TYPE);
 				});
@@ -445,52 +589,77 @@ class DueDatesListView extends ItemView {
 	public redraw(): void {
 		const openFile = this.app.workspace.getActiveFile();
 
-		const rootEl = createDiv({cls: 'nav-folder mod-root'});
-		const childrenEl = rootEl.createDiv({cls: 'nav-folder-children'});
+		const rootEl = createDiv({ cls: "nav-folder mod-root" });
+		const childrenEl = rootEl.createDiv({ cls: "nav-folder-children" });
 
 		let now = +new Date();
 		let count = 0;
 		for (let due_unix in this.plugin.scheduled_notes) {
 			let due_on_date_unsorted = this.plugin.scheduled_notes[due_unix];
 			let due = new Date(Number.parseInt(due_unix));
-			const dateFolderEl = childrenEl.createDiv({cls: 'nav-folder'});
-			const dateFolderTitleEl = dateFolderEl.createDiv({cls: 'nav-folder-title'});
-			const dateChildrenEl = dateFolderEl.createDiv({cls: 'nav-folder-children'});
-			const collapseIconEl = dateFolderTitleEl.createDiv({cls: 'nav-folder-collapse-indicator collapse-icon'});
+			const dateFolderEl = childrenEl.createDiv({ cls: "nav-folder" });
+			const dateFolderTitleEl = dateFolderEl.createDiv({
+				cls: "nav-folder-title",
+			});
+			const dateChildrenEl = dateFolderEl.createDiv({
+				cls: "nav-folder-children",
+			});
+			const collapseIconEl = dateFolderTitleEl.createDiv({
+				cls: "nav-folder-collapse-indicator collapse-icon",
+			});
 			collapseIconEl.innerHTML = collapseIcon;
 
 			if (count > 0 || this.active_date == due_unix)
-				collapseIconEl.childNodes[0].style.transform = 'rotate(-90deg)';
+				collapseIconEl.childNodes[0].style.transform = "rotate(-90deg)";
 
 			let n_days = Math.ceil((due_unix - now) / (24 * 3600 * 1000));
-			dateFolderTitleEl.createDiv({cls: 'nav-folder-title-content', text: (n_days == -1 ? 'Yesterday' : (n_days == 0 ? 'Today' : n_days == 1 ? 'Tomorrow' : due.toDateString()))});
+			dateFolderTitleEl.createDiv({
+				cls: "nav-folder-title-content",
+				text:
+					n_days == -1
+						? "Yesterday"
+						: n_days == 0
+						? "Today"
+						: n_days == 1
+						? "Tomorrow"
+						: due.toDateString(),
+			});
 
-			dateFolderTitleEl.onClickEvent(_ => {
+			dateFolderTitleEl.onClickEvent((_) => {
 				for (let child of dateChildrenEl.childNodes) {
 					if (child.style.display == "block" || child.style.display == "") {
 						child.style.display = "none";
-						collapseIconEl.childNodes[0].style.transform = 'rotate(-90deg)';
+						collapseIconEl.childNodes[0].style.transform = "rotate(-90deg)";
 					} else {
 						child.style.display = "block";
-						collapseIconEl.childNodes[0].style.transform = '';
+						collapseIconEl.childNodes[0].style.transform = "";
 					}
 				}
 			});
 
-			let due_on_date = Object.fromEntries(Object.entries(due_on_date_unsorted).sort(([,a],[,b]) => (this.plugin.data.pageranks[b[0].path] || 0) - (this.plugin.data.pageranks[a[0].path] || 0)));
-		
+			let due_on_date = Object.fromEntries(
+				Object.entries(due_on_date_unsorted).sort(
+					([, a], [, b]) =>
+						(this.plugin.data.pageranks[b[0].path] || 0) -
+						(this.plugin.data.pageranks[a[0].path] || 0)
+				)
+			);
+
 			for (let currentFile in due_on_date) {
 				currentFile = due_on_date[currentFile];
 
-				const navFile = dateChildrenEl.createDiv({cls: 'nav-file'});
+				const navFile = dateChildrenEl.createDiv({ cls: "nav-file" });
 				if (count > 0 && this.active_date != due_unix)
 					navFile.style.display = "none";
-				
-				const navFileTitle = navFile.createDiv({cls: 'nav-file-title'});
+
+				const navFileTitle = navFile.createDiv({ cls: "nav-file-title" });
 				if (openFile && currentFile[0].path === openFile.path)
-					navFileTitle.addClass('is-active');
-				navFileTitle.createDiv({cls: 'nav-file-title-content', text: currentFile[0].basename});
-				navFileTitle.onClickEvent(_ => {
+					navFileTitle.addClass("is-active");
+				navFileTitle.createDiv({
+					cls: "nav-file-title-content",
+					text: currentFile[0].basename,
+				});
+				navFileTitle.onClickEvent((_) => {
 					this.app.workspace.activeLeaf.openFile(currentFile[0]);
 					this.active_date = due_unix;
 				});

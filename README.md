@@ -1,6 +1,6 @@
 # Concepts Review Obsidian Plugin
 
-Version 0.4.5
+Version 0.4.6
 
 ## "Philosophy"
 
@@ -9,6 +9,9 @@ Version 0.4.5
 - Reviews should start only after properly understanding a concept.
 
 ## Guide
+
+- Note that running this plugin for the first time will cause modifications to all existing notes with content.
+  - The modifications add scheduling information to the notes.
 
 ### Installation
 
@@ -31,10 +34,10 @@ Version 0.4.5
     - The 0.5 can be modified in settings
     - Minimum ease = 130
   - For 8 or more days:
-      - interval += random_choice({-fuzz, 0, +fuzz})
-          - where fuzz = ceil(0.05 * interval)
-          - Anki docs:
-            > "[...] Anki also applies a small amount of random “fuzz” to prevent cards that were introduced at the same time and given the same ratings from sticking together and always coming up for review on the same day."
+    - interval += random_choice({-fuzz, 0, +fuzz})
+      - where fuzz = ceil(0.05 \* interval)
+      - Anki docs:
+        > "[...] Anki also applies a small amount of random “fuzz” to prevent cards that were introduced at the same time and given the same ratings from sticking together and always coming up for review on the same day."
 - The scheduling information is stored in YAML front matter
 
 ## TODO
