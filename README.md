@@ -41,6 +41,5 @@ Version 0.4.5
 
 - Refactor code
 - Help & documentation
-- Use PageRank for node size
-- Dealing with large vaults for the 1st time
-  - Distribute existing notes over N days for 1st time review
+- After the official API provides a mechanism:
+  - Use PageRank for node size
