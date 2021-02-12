@@ -10,32 +10,49 @@ interface ConceptsReviewSettings {
 	base_ease: number;
 	link_factor: number;
 	initial_interval: number;
+	open_random_note: boolean;
 	lapses_interval_change: number;
+	auto_next_note: boolean;
+}
+
+interface PluginData {
+	settings: ConceptsReviewSettings;
+	pageranks: object;
 }
 
 const DEFAULT_SETTINGS: ConceptsReviewSettings = {
 	base_ease: 250,
 	link_factor: 0.5,
 	initial_interval: 1,
-	lapses_interval_change: 0.5
+	open_random_note: true,
+	lapses_interval_change: 0.5,
+	auto_next_note: true
+}
+
+const DEFAULT_DATA: PluginData = {
+	settings: DEFAULT_SETTINGS,
+	pageranks: {}
 }
 
 export default class ConceptsReviewPlugin extends Plugin {
 	private scheduled_notes: [];
 	private overdue_notes: [];
 	private statusBar;
-	settings: ConceptsReviewSettings;
-	due_view: DueDatesListView;
+	private data: PluginData;
+	private due_view: DueDatesListView;
 
 	async onload(): void {
-		await this.loadSettings();
+		await this.loadPluginData();
 
 		addIcon('crosshairs', crossHairsIcon);
 
 		this.scheduled_notes = {};
 		this.overdue_notes = [];
+		
 		this.statusBar = this.addStatusBarItem();
 		this.statusBar.classList.add("mod-clickable");
+		this.statusBar.setAttribute('aria-label', 'Open an overdue note for review');
+		this.statusBar.setAttribute('aria-label-position', 'top');
 		this.statusBar.addEventListener("click", _ => {
 			this.reviewNextNote();
 		});
@@ -71,19 +88,27 @@ export default class ConceptsReviewPlugin extends Plugin {
 
 		this.addCommand({
 			id: "note-review-open-note",
-			name: "Open most overdue note for review",
+			name: "Open an overdue note for review",
 			callback: () => {
 				this.reviewNextNote();
+			}
+		});
+
+		this.addCommand({
+			id: "note-review-recalculate-pageranks",
+			name: "Recalculate PageRanks",
+			callback: () => {
+				this.sync(true);
 			}
 		});
 
 		this.addSettingTab(new ConceptsReviewSettingTab(this.app, this));
 
 		await sleep(2000);
-		await this.sync();
+		await this.sync(true); // recalculate pageranks at startup
 	}
 
-	async sync(): void {
+	async sync(recalculate_pageranks: boolean = false): void {
 		let notes = this.app.vault.getMarkdownFiles();
 		this.scheduled_notes = {};
 		this.overdue_notes = [];
@@ -117,16 +142,16 @@ export default class ConceptsReviewPlugin extends Plugin {
 				outgoing_links[note.path]["ease"] = ease;
 
 				if (due_unix <= now)
-					this.overdue_notes.push({note: note[0], due_unix: note[1], interval: note[2], ease: note[3]});
+					this.overdue_notes.push({note, due_unix, interval, ease});
 			}
 		}
 
-		let interval = this.settings.initial_interval;
+		let interval = this.data.settings.initial_interval;
 		let due = new Date(+new Date + interval * 24 * 3600 * 1000);
 		let date_str = due.toDateString();
 		let due_unix = Date.parse(date_str); // cause timezones
 
-		if (temp_new.length > 0) {
+		if (temp_new.length > 0 || recalculate_pageranks) {
 			notes.forEach(source => {
 				iterateCacheRefs(this.app.metadataCache.getFileCache(source), cb => {
 					let target = this.app.metadataCache.getFirstLinkpathDest(getLinkpath(cb.link), source.path);
@@ -153,6 +178,11 @@ export default class ConceptsReviewPlugin extends Plugin {
 				pageranks[node] = rank;
 			});
 
+			console.log(pageranks);
+
+			this.data.pageranks = pageranks;
+			this.savePluginData();
+
 			for (let new_note of temp_new) {
 				let link_total = 0, link_count = 0;
 				let seen_links = {};
@@ -173,7 +203,7 @@ export default class ConceptsReviewPlugin extends Plugin {
 					}
 				}
 
-				let initial_ease = Math.floor((1.0 - this.settings.link_factor) * this.settings.base_ease + (link_count > 0 ? this.settings.link_factor * link_total / link_count : this.settings.link_factor * this.settings.base_ease));
+				let initial_ease = Math.floor((1.0 - this.data.settings.link_factor) * this.data.settings.base_ease + (link_count > 0 ? this.data.settings.link_factor * link_total / link_count : this.data.settings.link_factor * this.data.settings.base_ease));
 
 				if (YAML_FRONT_MATTER_REGEX.test(new_note[1])) {
 					let info = YAML_FRONT_MATTER_REGEX.exec(new_note[1]);
@@ -194,7 +224,7 @@ export default class ConceptsReviewPlugin extends Plugin {
 			return obj;
 		}, {});
 		
-		this.statusBar.setText(`Review: ${this.overdue_notes.length} due, ${Object.keys(this.scheduled_notes).length} total`);
+		this.statusBar.setText(`Review: ${this.overdue_notes.length} due`);
 		this.due_view.redraw();
 	}
 
@@ -208,7 +238,7 @@ export default class ConceptsReviewPlugin extends Plugin {
 			let ease = parseInt(scheduling_info[4]);
 
 			ease = (quality == 1 ? ease + 20 : Math.max(130, ease - 20));
-			interval = Math.max(1, Math.floor(quality == 1 ? interval * ease / 100 : interval * this.settings.lapses_interval_change));
+			interval = Math.max(1, Math.floor(quality == 1 ? interval * ease / 100 : interval * this.data.settings.lapses_interval_change));
 			if (interval >= 8) { // fuzz
 				let fuzz = Math.ceil(0.05 * interval);
 				let r = Math.random();
@@ -216,15 +246,17 @@ export default class ConceptsReviewPlugin extends Plugin {
 			}
 
 			let due = new Date(+new Date + interval * 24 * 3600 * 1000);
-			file_text = file_text.replace(SCHEDULING_INFO_REGEX, `---\n${scheduling_info[1]}due: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n${scheduling_info[6]}---`);
+			file_text = file_text.replace(SCHEDULING_INFO_REGEX, `---\n${scheduling_info[1]}due: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n${scheduling_info[5]}---`);
 			this.app.vault.modify(note, file_text);
 
 			new Notice("Response received.");
 		} else {
 			new Notice("Note marked as IGNORE or has no content.");
 		}
+
 		await this.sync();
-		this.reviewNextNote();
+		if (this.settings.auto_next_note)
+			this.reviewNextNote();
 	}
 
 	async reviewNextNote(): void {
@@ -234,7 +266,7 @@ export default class ConceptsReviewPlugin extends Plugin {
 		}
 
 		if (this.overdue_notes.length > 0) {
-			let cNote = this.overdue_notes[Math.floor(Math.random() * this.overdue_notes.length)];
+			let cNote = this.overdue_notes[(this.data.settings.open_random_note ? Math.floor(Math.random() * this.overdue_notes.length): 0)];
 			for (let note of this.overdue_notes) {
 				if (note['due_unix'] < cNote['due_unix'])
 					cNote = note;
@@ -243,12 +275,12 @@ export default class ConceptsReviewPlugin extends Plugin {
 		}
 	}
 
-	async loadSettings(): void {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	async loadPluginData(): void {
+		this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
 	}
 
-	async saveSettings(): void {
-		await this.saveData(this.settings);
+	async savePluginData(): void {
+		await this.saveData(this.data);
 	}
 
 	initView(): void {
@@ -291,52 +323,72 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Base ease')
-			.setDesc('(minimum = 130, preferrably approximately 250)')
+			.setDesc('minimum = 130, preferrably approximately 250')
 			.addText(text => text
-				.setValue(`${this.plugin.settings.base_ease}`)
+				.setValue(`${this.plugin.data.settings.base_ease}`)
 				.onChange(async (value) => {
 					value = Number.parseInt(value);
 					if (value < 130) {
 						new Notice("The base ease must be at least 130");
 						return;
 					}
-					this.plugin.settings.base_ease = value;
-					await this.plugin.saveSettings();
+					this.plugin.data.settings.base_ease = value;
+					await this.plugin.savePluginData();
 				}));
 
 		new Setting(containerEl)
 			.setName('Link factor')
 			.setDesc('Contribution of average ease of linked notes to the initial ease (0% <= link_factor <= 100%)')
 			.addText(text => text
-				.setValue(`${this.plugin.settings.link_factor * 100}`)
+				.setValue(`${this.plugin.data.settings.link_factor * 100}`)
 				.onChange(async (value) => {
 					value = Number.parseInt(value) / 100;
 					if (value < 0 || value > 1.0) {
 						new Notice("link_factor must be in the range (0% <= link_factor <= 100%)");
 						return;
 					}
-					this.plugin.settings.link_factor = value;
-					await this.plugin.saveSettings();
+					this.plugin.data.settings.link_factor = value;
+					await this.plugin.savePluginData();
 				}));
 		
 		new Setting(containerEl)
 			.setName('Initial interval')
 			.setDesc('Delay in # of days before reviewing concept for the 1st time (minimum = 1)')
 			.addText(text => text
-				.setValue(`${this.plugin.settings.initial_interval}`)
+				.setValue(`${this.plugin.data.settings.initial_interval}`)
 				.onChange(async (value) => {
-					this.plugin.settings.initial_interval = Math.max(1, Number.parseInt(value));
-					await this.plugin.saveSettings();
+					this.plugin.data.settings.initial_interval = Math.max(1, Number.parseInt(value));
+					await this.plugin.savePluginData();
+				}));
+
+		new Setting(containerEl)
+			.setName('Open a random overdue note for review')
+			.setDesc('When you turn this off, notes are ordered by importance (PageRank)')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.data.settings.open_random_note)
+				.onChange(async (value) => {
+					this.plugin.data.settings.open_random_note = value;
+					await this.plugin.savePluginData();
 				}));
 
 		new Setting(containerEl)
 			.setName('Interval change when you review a concept as hard')
-			.setDesc('(new_interval = old_interval * interval_change / 100, 0% < interval_change < 100%)')
+			.setDesc('new_interval = old_interval * interval_change / 100, 0% < interval_change < 100%')
 			.addText(text => text
-				.setValue(`${this.plugin.settings.lapses_interval_change * 100}`)
+				.setValue(`${this.plugin.data.settings.lapses_interval_change * 100}`)
 				.onChange(async (value) => {
-					this.plugin.settings.lapses_interval_change = Math.max(0.01, Math.min(0.99, Number.parseInt(value) / 100));
-					await this.plugin.saveSettings();
+					this.plugin.data.settings.lapses_interval_change = Math.max(0.01, Math.min(0.99, Number.parseInt(value) / 100));
+					await this.plugin.savePluginData();
+				}));
+
+		new Setting(containerEl)
+			.setName('Open next overdue note automatically during review')
+			.setDesc('Turn this off to open next note manually')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.data.settings.auto_next_note)
+				.onChange(async (value) => {
+					this.plugin.data.settings.auto_next_note = value;
+					await this.plugin.savePluginData();
 				}));
 	}
 }
@@ -385,7 +437,7 @@ class DueDatesListView extends ItemView {
 		let now = +new Date();
 		let count = 0;
 		for (let due_unix in this.plugin.scheduled_notes) {
-			let due_on_date = this.plugin.scheduled_notes[due_unix];
+			let due_on_date_unsorted = this.plugin.scheduled_notes[due_unix];
 			let due = new Date(Number.parseInt(due_unix));
 			const dateFolderEl = childrenEl.createDiv({cls: 'nav-folder'});
 			const dateFolderTitleEl = dateFolderEl.createDiv({cls: 'nav-folder-title'});
@@ -410,6 +462,8 @@ class DueDatesListView extends ItemView {
 					}
 				}
 			});
+
+			let due_on_date = Object.fromEntries(Object.entries(due_on_date_unsorted).sort(([,a],[,b]) => this.plugin.data.pageranks[b[0].path] - this.plugin.data.pageranks[a[0].path]));
 		
 			for (let currentFile in due_on_date) {
 				currentFile = due_on_date[currentFile];

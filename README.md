@@ -1,19 +1,31 @@
-# Concepts Review Obsidian plugin
+# Concepts Review Obsidian Plugin
 
-## Note Taking
+Version 0.4.5
+
+## "Philosophy"
 
 - Notes should be atomic i.e. focus on a single concept.
-- High linking
+- Notes should be highly linked.
 - Reviews should start only after properly understanding a concept.
+
+## Guide
+
+### Installation
+
+### Usage
+
+#### Right Panel
+
+- Per day entries are sorted by importance (PageRank)
 
 ## Spaced Repetition Algorithm
 
 - Spaced repetition? [basics](https://ncase.me/remember/), [detailed](https://www.gwern.net/Spaced-repetition)
 - The algorithm is a variant of [Anki's algorithm](https://faqs.ankiweb.net/what-spaced-repetition-algorithm.html) which is based on the [SM-2 algorithm](https://www.supermemo.com/en/archives1990-2015/english/ol/sm2).
 - It supports binary reviews i.e. a concept is either hard or easy at the time of review.
-- initial ease is weighted depending on the average ease of outgoing links (link_factor), and the base ease.
-  - The importance of the difference concepts is determined using the PageRank algorithm
-- If the user reviews a concept as:
+- initial ease is weighted (using link_factor) depending on the average ease of linked notes, note importance, and the base ease.
+  - The importance of the difference concepts/notes is determined using the PageRank algorithm
+- If the user reviews a concept/note as:
   - easy, the ease increases by 20 and the interval changes to `old_interval * new_ease / 100`
   - hard, the ease decreases by 20 and the interval changes to `old_interval * 0.5`
     - The 0.5 can be modified in settings
@@ -23,12 +35,12 @@
           - where fuzz = ceil(0.05 * interval)
           - Anki docs:
             > "[...] Anki also applies a small amount of random “fuzz” to prevent cards that were introduced at the same time and given the same ratings from sticking together and always coming up for review on the same day."
-- Scheduling information stored in YAML front matter
+- The scheduling information is stored in YAML front matter
 
 ## TODO
 
-- Fix workflow
 - Refactor code
 - Help & documentation
+- Use PageRank for node size
 - Dealing with large vaults for the 1st time
   - Distribute existing notes over N days for 1st time review
