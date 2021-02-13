@@ -371,7 +371,7 @@ export default class ConceptsReviewPlugin extends Plugin {
         }
 
         await this.sync();
-        if (this.settings.auto_next_note) this.reviewNextNote();
+        if (this.data.settings.auto_next_note) this.reviewNextNote();
     }
 
     async reviewNextNote(): void {
@@ -446,12 +446,6 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
         let { containerEl } = this;
 
         containerEl.empty();
-        containerEl.createEl("h2", {
-            text: "Concepts Review Plugin - Settings",
-        });
-        let helpEl = containerEl.createEl("div", { cls: "help-div" });
-        helpEl.innerHTML =
-            '<a href="https://github.com/st3v3nmw/concepts-review/blob/master/README.md">For more information, check the README.</a>';
 
         new Setting(containerEl)
             .setName("Base ease")
@@ -483,7 +477,7 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .setName("Link factor")
             .setDesc(
-                "Contribution of average ease of linked notes to the initial ease (0% <= link_factor <= 100%)"
+                "Contribution of weighted ease of linked notes to the initial ease (0% <= link_factor <= 100%)"
             )
             .addText((text) =>
                 text
@@ -593,7 +587,6 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName("Open next overdue note automatically after a review")
-            .setDesc("Turn this off to open next note manually")
             .addToggle((toggle) =>
                 toggle
                     .setValue(this.plugin.data.settings.auto_next_note)
@@ -602,6 +595,10 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
                         await this.plugin.savePluginData();
                     })
             );
+
+        let helpEl = containerEl.createEl("div", { cls: "help-div" });
+        helpEl.innerHTML =
+            '<a href="https://github.com/st3v3nmw/concepts-review/blob/master/README.md">For more information, check the README.</a>';
     }
 }
 

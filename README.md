@@ -27,7 +27,7 @@ Version 0.4.6
 - The algorithm is a variant of [Anki's algorithm](https://faqs.ankiweb.net/what-spaced-repetition-algorithm.html) which is based on the [SM-2 algorithm](https://www.supermemo.com/en/archives1990-2015/english/ol/sm2).
 - It supports binary reviews i.e. a concept is either hard or easy at the time of review.
 - initial ease is weighted (using link_factor) depending on the average ease of linked notes, note importance, and the base ease.
-  - The importance of the difference concepts/notes is determined using the PageRank algorithm
+  - The importance of the difference concepts/notes is determined using the PageRank algorithm (not all notes are created equal xD)
 - If the user reviews a concept/note as:
   - easy, the ease increases by 20 and the interval changes to `old_interval * new_ease / 100`
   - hard, the ease decreases by 20 and the interval changes to `old_interval * 0.5`
