@@ -7,11 +7,13 @@ Version 0.4.6
 - Notes should be atomic i.e. focus on a single concept.
 - Notes should be highly linked.
 - Reviews should start only after properly understanding a concept.
+- Reviews should be [Feynman-technique](https://fs.blog/2021/02/feynman-learning-technique/)-esque.
 
-## Guide
+## Warning
 
 - Note that running this plugin for the first time will cause modifications to all existing notes with content.
   - The modifications add scheduling information to the notes.
+- Will be fixed later.
 
 ### Installation
 

@@ -34,7 +34,7 @@ const DEFAULT_SETTINGS: ConceptsReviewSettings = {
     base_ease: 250,
     link_factor: 0.5,
     load_balancing_threshold: 8,
-    open_random_note: true,
+    open_random_note: false,
     lapses_interval_change: 0.5,
     auto_next_note: true,
 };
