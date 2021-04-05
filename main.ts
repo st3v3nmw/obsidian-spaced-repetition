@@ -13,7 +13,7 @@ import * as graph from "pagerank.js";
 
 const SCHEDULING_INFO_REGEX = /^---\n((?:.*\n)*)due: ([0-9A-Za-z ]+)\ninterval: ([0-9]+)\nease: ([0-9]+)\n((?:.*\n)*)---/;
 const YAML_FRONT_MATTER_REGEX = /^---\n((?:.*\n)*)---/;
-const IGNORE_REGEX = /review: ignore/;
+const IGNORE_REGEX = /review: false/;
 const DUE_DATES_VIEW_TYPE = "due-dates-list-view";
 
 interface ConceptsReviewSettings {

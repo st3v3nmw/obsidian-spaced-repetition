@@ -19,6 +19,13 @@ Version 0.4.7
 
 ### Usage
 
+Add the following frontmatter to the very top of the note so that scheduling information won't be added to the file:
+```yaml
+---
+review: false
+---
+```
+
 #### Right Panel
 
 - Per day entries are sorted by importance (PageRank)
@@ -47,6 +54,8 @@ Version 0.4.7
 ## TODO
 
 - Fix onboarding process
+  - Add means to remove all scheduling.
+- Means to quickly add `review: false` frontmatter
 - Refactor code
 - Help & documentation
 - After the official API provides a mechanism:
