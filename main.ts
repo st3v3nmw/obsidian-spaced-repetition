@@ -227,11 +227,12 @@ export default class ConceptsReviewPlugin extends Plugin {
 
             let pageranks = {};
             graph.rank(0.85, 0.000001, (node, rank) => {
-                pageranks[node] = rank;
+                pageranks[node] = rank * 10000;
             });
 
+            console.log(pageranks);
+
             this.data.pageranks = pageranks;
-            this.savePluginData();
 
             let n = 1;
             let [date_str, due_unix] = getLocalDateTimeOffset(n);
@@ -315,13 +316,35 @@ export default class ConceptsReviewPlugin extends Plugin {
             }
         }
 
+        // sort dates
         this.scheduled_notes = Object.keys(this.scheduled_notes)
             .sort()
             .reduce((obj, key) => {
                 obj[key] = this.scheduled_notes[key];
                 return obj;
             }, {});
+        
+        // sort per day entries by importance
+        console.log(this.scheduled_notes);
+        let temp = {};
+        for (let due_unix in this.scheduled_notes) {
+            temp[due_unix] = Object.fromEntries(
+                Object.entries(this.scheduled_notes[due_unix]).sort(
+                    ([, a], [, b]) =>
+                        (this.data.pageranks[b[0].path] || 0) -
+                        (this.data.pageranks[a[0].path] || 0)
+                )
+            );
+        }
+        this.scheduled_notes = temp;
 
+        // sort overdue notes by importance
+        this.overdue_notes = this.overdue_notes.sort((a, b) => 
+            (this.data.pageranks[b.note.path] || 0) -
+            (this.data.pageranks[a.note.path] || 0)
+        )
+
+        this.savePluginData();
         this.statusBar.setText(`Review: ${this.overdue_notes.length} due`);
         this.due_view.redraw();
     }
@@ -385,7 +408,8 @@ export default class ConceptsReviewPlugin extends Plugin {
                     : 0
             ];
             for (let note of this.overdue_notes) {
-                if (note["due_unix"] < cNote["due_unix"]) cNote = note;
+                if (note["due_unix"] < cNote["due_unix"])
+                    cNote = note;
             }
             this.app.workspace.activeLeaf.openFile(cNote["note"]);
         }
@@ -646,7 +670,7 @@ class DueDatesListView extends ItemView {
         let now = +new Date();
         let count = 0;
         for (let due_unix in this.plugin.scheduled_notes) {
-            let due_on_date_unsorted = this.plugin.scheduled_notes[due_unix];
+            let due_on_date = this.plugin.scheduled_notes[due_unix];
             let due = new Date(Number.parseInt(due_unix));
             const dateFolderEl = childrenEl.createDiv({ cls: "nav-folder" });
             const dateFolderTitleEl = dateFolderEl.createDiv({
@@ -691,14 +715,6 @@ class DueDatesListView extends ItemView {
                     }
                 }
             });
-
-            let due_on_date = Object.fromEntries(
-                Object.entries(due_on_date_unsorted).sort(
-                    ([, a], [, b]) =>
-                        (this.plugin.data.pageranks[b[0].path] || 0) -
-                        (this.plugin.data.pageranks[a[0].path] || 0)
-                )
-            );
 
             for (let currentFile in due_on_date) {
                 currentFile = due_on_date[currentFile];
