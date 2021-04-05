@@ -18,7 +18,7 @@ const DUE_DATES_VIEW_TYPE = "due-dates-list-view";
 
 interface ConceptsReviewSettings {
     base_ease: number;
-    link_factor: number;
+    max_link_factor: number;
     load_balancing_threshold: number;
     open_random_note: boolean;
     lapses_interval_change: number;
@@ -32,7 +32,7 @@ interface PluginData {
 
 const DEFAULT_SETTINGS: ConceptsReviewSettings = {
     base_ease: 250,
-    link_factor: 0.5,
+    max_link_factor: 1.0,
     load_balancing_threshold: 8,
     open_random_note: false,
     lapses_interval_change: 0.5,
@@ -227,10 +227,8 @@ export default class ConceptsReviewPlugin extends Plugin {
 
             let pageranks = {};
             graph.rank(0.85, 0.000001, (node, rank) => {
-                pageranks[node] = rank * 10000;
+                pageranks[node] = rank;
             });
-
-            console.log(pageranks);
 
             this.data.pageranks = pageranks;
 
@@ -253,8 +251,9 @@ export default class ConceptsReviewPlugin extends Plugin {
                 }
 
                 let link_total = 0,
-                    link_count = 0,
-                    seen_links = {};
+                    link_pg_total = 0,
+                    seen_links = {},
+                    link_count = 0;
                 for (let linked_file in incoming_links[new_note[0].path][
                     "list"
                 ]) {
@@ -263,8 +262,9 @@ export default class ConceptsReviewPlugin extends Plugin {
                         incoming_links[linked_file]["ease"];
                     if (ease) {
                         link_total += ease;
-                        link_count += pageranks[linked_file];
+                        link_pg_total += pageranks[linked_file];
                         seen_links[linked_file] = true;
+                        link_count++;
                     }
                 }
 
@@ -276,18 +276,19 @@ export default class ConceptsReviewPlugin extends Plugin {
                         outgoing_links[linked_file]["ease"];
                     if (!(linked_file in seen_links) && ease) {
                         link_total += ease;
-                        link_count += pageranks[linked_file];
+                        link_pg_total += pageranks[linked_file];
+                        link_count++;
                     }
                 }
 
+                let link_contribution =
+                    this.data.settings.max_link_factor *
+                    Math.min(1.0, Math.log(link_count + 0.5) / Math.log(64));
                 let initial_ease = Math.round(
-                    (1.0 - this.data.settings.link_factor) *
-                        this.data.settings.base_ease +
+                    (1.0 - link_contribution) * this.data.settings.base_ease +
                         (link_count > 0
-                            ? (this.data.settings.link_factor * link_total) /
-                              link_count
-                            : this.data.settings.link_factor *
-                              this.data.settings.base_ease)
+                            ? (link_contribution * link_total) / link_pg_total
+                            : link_contribution * this.data.settings.base_ease)
                 );
 
                 if (YAML_FRONT_MATTER_REGEX.test(new_note[1])) {
@@ -323,9 +324,8 @@ export default class ConceptsReviewPlugin extends Plugin {
                 obj[key] = this.scheduled_notes[key];
                 return obj;
             }, {});
-        
+
         // sort per day entries by importance
-        console.log(this.scheduled_notes);
         let temp = {};
         for (let due_unix in this.scheduled_notes) {
             temp[due_unix] = Object.fromEntries(
@@ -339,10 +339,11 @@ export default class ConceptsReviewPlugin extends Plugin {
         this.scheduled_notes = temp;
 
         // sort overdue notes by importance
-        this.overdue_notes = this.overdue_notes.sort((a, b) => 
-            (this.data.pageranks[b.note.path] || 0) -
-            (this.data.pageranks[a.note.path] || 0)
-        )
+        this.overdue_notes = this.overdue_notes.sort(
+            (a, b) =>
+                (this.data.pageranks[b.note.path] || 0) -
+                (this.data.pageranks[a.note.path] || 0)
+        );
 
         this.savePluginData();
         this.statusBar.setText(`Review: ${this.overdue_notes.length} due`);
@@ -352,8 +353,8 @@ export default class ConceptsReviewPlugin extends Plugin {
     async saveReviewResponse(note: TFile, quality: number): void {
         let file_text = await this.app.vault.read(note);
 
+        // checks if note should be ignored
         if (!IGNORE_REGEX.test(file_text) && getFileLength(file_text) > 1) {
-            // checks if note should be ignored
             let scheduling_info = SCHEDULING_INFO_REGEX.exec(file_text);
 
             let interval = parseInt(scheduling_info[3]);
@@ -408,8 +409,7 @@ export default class ConceptsReviewPlugin extends Plugin {
                     : 0
             ];
             for (let note of this.overdue_notes) {
-                if (note["due_unix"] < cNote["due_unix"])
-                    cNote = note;
+                if (note["due_unix"] < cNote["due_unix"]) cNote = note;
             }
             this.app.workspace.activeLeaf.openFile(cNote["note"]);
         }
@@ -497,38 +497,6 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Link factor")
-            .setDesc(
-                "Contribution of weighted ease of linked notes to the initial ease (0% <= link_factor <= 100%)"
-            )
-            .addText((text) =>
-                text
-                    .setValue(`${this.plugin.data.settings.link_factor * 100}`)
-                    .onChange(async (value) => {
-                        value = Number.parseInt(value) / 100;
-                        if (!isNaN(value)) {
-                            if (value < 0 || value > 1.0) {
-                                new Notice(
-                                    "The link factor must be in the range 0% <= link_factor <= 100%."
-                                );
-                                text.setValue(
-                                    `${
-                                        this.plugin.data.settings.link_factor *
-                                        100
-                                    }`
-                                );
-                                return;
-                            }
-
-                            this.plugin.data.settings.link_factor = value;
-                            await this.plugin.savePluginData();
-                        } else {
-                            new Notice("Please provide a valid number.");
-                        }
-                    })
-            );
-
-        new Setting(containerEl)
             .setName("Load balancing threshold")
             .setDesc(
                 "Helps distribute pending 1st time reviews hence controlling load spikes (in # of notes)"
@@ -553,20 +521,6 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
                         } else {
                             new Notice("Please provide a valid number.");
                         }
-                    })
-            );
-
-        new Setting(containerEl)
-            .setName("Open a random overdue note for review")
-            .setDesc(
-                "When you turn this off, notes are ordered by importance (PageRank)"
-            )
-            .addToggle((toggle) =>
-                toggle
-                    .setValue(this.plugin.data.settings.open_random_note)
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.open_random_note = value;
-                        await this.plugin.savePluginData();
                     })
             );
 
@@ -604,6 +558,54 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
                         } else {
                             new Notice("Please provide a valid number.");
                         }
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Maximum link contribution")
+            .setDesc(
+                "Max. contribution of the weighted ease of linked notes to the initial ease (0% <= max_link_factor <= 100%)"
+            )
+            .addText((text) =>
+                text
+                    .setValue(
+                        `${this.plugin.data.settings.max_link_factor * 100}`
+                    )
+                    .onChange(async (value) => {
+                        value = Number.parseInt(value) / 100;
+                        if (!isNaN(value)) {
+                            if (value < 0 || value > 1.0) {
+                                new Notice(
+                                    "The link factor must be in the range 0% <= max_link_factor <= 100%."
+                                );
+                                text.setValue(
+                                    `${
+                                        this.plugin.data.settings
+                                            .max_link_factor * 100
+                                    }`
+                                );
+                                return;
+                            }
+
+                            this.plugin.data.settings.max_link_factor = value;
+                            await this.plugin.savePluginData();
+                        } else {
+                            new Notice("Please provide a valid number.");
+                        }
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Open a random overdue note for review")
+            .setDesc(
+                "When you turn this off, notes are ordered by importance (PageRank)"
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.open_random_note)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.open_random_note = value;
+                        await this.plugin.savePluginData();
                     })
             );
 
