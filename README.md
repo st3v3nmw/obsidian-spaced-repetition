@@ -9,7 +9,7 @@ Version 0.4.6
 - Reviews should start only after properly understanding a concept.
 - Reviews should be [Feynman-technique](https://fs.blog/2021/02/feynman-learning-technique/)-esque.
 
-## Warning
+## Guide
 
 - Note that running this plugin for the first time will cause modifications to all existing notes with content.
   - The modifications add scheduling information to the notes.
