@@ -227,8 +227,10 @@ export default class ConceptsReviewPlugin extends Plugin {
 
             let pageranks = {};
             graph.rank(0.85, 0.000001, (node, rank) => {
-                pageranks[node] = rank;
+                pageranks[node] = rank * 10000;
             });
+
+            console.log(pageranks);
 
             this.data.pageranks = pageranks;
 

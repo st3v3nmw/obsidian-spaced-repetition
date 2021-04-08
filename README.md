@@ -56,6 +56,8 @@ review: false
 
 - Fix onboarding process
   - Add means to remove all scheduling.
+- Change some settings to a slider
+- Handle new notes better (separate "stream")
 - Means to quickly add `review: false` frontmatter
 - Refactor code
 - Help & documentation
