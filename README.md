@@ -1,6 +1,6 @@
 # Concepts Review Obsidian Plugin
 
-Version 0.4.7
+Version 0.5.0
 
 ## "Philosophy"
 
@@ -10,10 +10,6 @@ Version 0.4.7
 - Reviews should be [Feynman-technique](https://fs.blog/2021/02/feynman-learning-technique/)-esque.
 
 ## Guide
-
-- Note that running this plugin for the first time will cause modifications to all existing notes with content.
-  - The modifications add scheduling information to the notes.
-- Will be fixed later.
 
 ### Installation
 
@@ -54,11 +50,5 @@ review: false
 
 ## TODO
 
-- Fix onboarding process
-  - Add means to remove all scheduling.
-- Change some settings to a slider
-- Handle new notes better (separate "stream")
 - Refactor code
 - Help & documentation
-- After the official API provides a mechanism:
-  - Use PageRank for node size

@@ -13,7 +13,7 @@ import * as graph from "pagerank.js";
 
 const SCHEDULING_INFO_REGEX = /^---\n((?:.*\n)*)due: ([0-9A-Za-z ]+)\ninterval: ([0-9]+)\nease: ([0-9]+)\n((?:.*\n)*)---/;
 const YAML_FRONT_MATTER_REGEX = /^---\n((?:.*\n)*)---/;
-const DUE_DATES_VIEW_TYPE = "due-dates-list-view";
+const REVIEW_QUEUE_VIEW_TYPE = "due-dates-list-view";
 
 interface ConceptsReviewSettings {
     base_ease: number;
@@ -26,7 +26,6 @@ interface ConceptsReviewSettings {
 
 interface PluginData {
     settings: ConceptsReviewSettings;
-    pageranks: object;
 }
 
 const DEFAULT_SETTINGS: ConceptsReviewSettings = {
@@ -40,7 +39,6 @@ const DEFAULT_SETTINGS: ConceptsReviewSettings = {
 
 const DEFAULT_DATA: PluginData = {
     settings: DEFAULT_SETTINGS,
-    pageranks: {},
 };
 
 export default class ConceptsReviewPlugin extends Plugin {
@@ -48,7 +46,7 @@ export default class ConceptsReviewPlugin extends Plugin {
     private overdue_notes: [];
     private statusBar;
     private data: PluginData;
-    private due_view: DueDatesListView;
+    private due_view: ReviewQueueListView;
 
     async onload(): void {
         await this.loadPluginData();
@@ -57,6 +55,10 @@ export default class ConceptsReviewPlugin extends Plugin {
 
         this.scheduled_notes = {};
         this.overdue_notes = [];
+        this.new_notes = [];
+        this.pageranks = {};
+        this.incoming_links = {};
+        this.outgoing_links = {};
 
         this.statusBar = this.addStatusBarItem();
         this.statusBar.classList.add("mod-clickable");
@@ -75,9 +77,9 @@ export default class ConceptsReviewPlugin extends Plugin {
         });
 
         this.registerView(
-            DUE_DATES_VIEW_TYPE,
+            REVIEW_QUEUE_VIEW_TYPE,
             (leaf) =>
-                (this.due_view = new DueDatesListView(
+                (this.due_view = new ReviewQueueListView(
                     leaf,
                     this,
                     this.scheduled_notes
@@ -118,40 +120,33 @@ export default class ConceptsReviewPlugin extends Plugin {
             },
         });
 
-        this.addCommand({
-            id: "note-review-recalculate-pageranks",
-            name: "Recalculate PageRanks",
-            callback: () => {
-                this.sync(true);
-            },
-        });
-
         this.addSettingTab(new ConceptsReviewSettingTab(this.app, this));
 
         await sleep(2000);
-        await this.sync(true); // recalculate pageranks at startup
+        await this.sync();
     }
 
-    async sync(recalculate_pageranks: boolean = false): void {
+    async sync(): void {
         let notes = this.app.vault.getMarkdownFiles();
         this.scheduled_notes = {};
         this.overdue_notes = [];
+        this.new_notes = [];
+        this.pageranks = {};
+        this.incoming_links = {};
+        this.outgoing_links = {};
 
-        let incoming_links = {},
-            outgoing_links = {};
         notes.forEach((file) => {
-            incoming_links[file.path] = { list: {} };
-            outgoing_links[file.path] = { list: {} };
+            this.incoming_links[file.path] = { list: {} };
+            this.outgoing_links[file.path] = { list: {} };
         });
 
         let now = +new Date();
-        let temp_new = [];
+        let file_text;
         for (let note of notes) {
-            let file_text = await this.app.vault.read(note);
+            file_text = await this.app.vault.read(note);
             let { frontmatter } =
                 this.app.metadataCache.getCache(note.path) || {};
             frontmatter = frontmatter || {};
-            let entry_count = Object.entries(frontmatter).length;
 
             // checks if note should be ignored
             if (
@@ -160,11 +155,11 @@ export default class ConceptsReviewPlugin extends Plugin {
             ) {
                 // file has no scheduling information
                 if (
-                    frontmatter["due"] == undefined ||
-                    frontmatter["interval"] == undefined ||
-                    frontmatter["ease"] == undefined
+                    !["due", "interval", "ease"].every((key) =>
+                        Object.keys(frontmatter).includes(key)
+                    )
                 ) {
-                    temp_new.push([note, file_text]);
+                    this.new_notes.push([note, file_text]);
                     continue;
                 }
 
@@ -180,161 +175,62 @@ export default class ConceptsReviewPlugin extends Plugin {
                     interval,
                     ease,
                 ];
-                incoming_links[note.path]["ease"] = ease;
-                outgoing_links[note.path]["ease"] = ease;
+                this.incoming_links[note.path]["ease"] = ease;
+                this.outgoing_links[note.path]["ease"] = ease;
 
                 if (due_unix <= now)
                     this.overdue_notes.push({ note, due_unix, interval, ease });
             }
         }
 
-        if (temp_new.length > 0 || recalculate_pageranks) {
-            notes.forEach((source) => {
-                iterateCacheRefs(
-                    this.app.metadataCache.getFileCache(source),
-                    (cb) => {
-                        let target = this.app.metadataCache.getFirstLinkpathDest(
-                            getLinkpath(cb.link),
-                            source.path
-                        );
-                        if (target != null && target.extension == "md") {
-                            if (
-                                !(
-                                    target.path in
-                                    outgoing_links[source.path]["list"]
-                                )
+        notes.forEach((source) => {
+            iterateCacheRefs(
+                this.app.metadataCache.getFileCache(source),
+                (cb) => {
+                    let target = this.app.metadataCache.getFirstLinkpathDest(
+                        getLinkpath(cb.link),
+                        source.path
+                    );
+                    if (target != null && target.extension == "md") {
+                        if (
+                            !(
+                                target.path in
+                                this.outgoing_links[source.path]["list"]
                             )
-                                outgoing_links[source.path]["list"][
-                                    target.path
-                                ] = 0;
-                            outgoing_links[source.path]["list"][target.path]++;
+                        )
+                            this.outgoing_links[source.path]["list"][
+                                target.path
+                            ] = 0;
+                        this.outgoing_links[source.path]["list"][target.path]++;
 
-                            if (
-                                !(
-                                    target.path in
-                                    incoming_links[target.path]["list"]
-                                )
+                        if (
+                            !(
+                                target.path in
+                                this.incoming_links[target.path]["list"]
                             )
-                                incoming_links[target.path]["list"][
-                                    source.path
-                                ] = 0;
-                            incoming_links[target.path]["list"][source.path]++;
-                        }
+                        )
+                            this.incoming_links[target.path]["list"][
+                                source.path
+                            ] = 0;
+                        this.incoming_links[target.path]["list"][source.path]++;
                     }
+                }
+            );
+        });
+
+        graph.reset();
+        for (let source in this.outgoing_links) {
+            for (let target in this.outgoing_links[source]["list"])
+                graph.link(
+                    source,
+                    target,
+                    this.outgoing_links[source]["list"][target]
                 );
-            });
-
-            graph.reset();
-            for (let source in outgoing_links) {
-                for (let target in outgoing_links[source]["list"])
-                    graph.link(
-                        source,
-                        target,
-                        outgoing_links[source]["list"][target]
-                    );
-            }
-
-            let pageranks = {};
-            graph.rank(0.85, 0.000001, (node, rank) => {
-                pageranks[node] = rank * 10000;
-            });
-
-            this.data.pageranks = pageranks;
-
-            let n = 1;
-            let [date_str, due_unix] = getLocalDateTimeOffset(n);
-
-            for (let new_note of temp_new) {
-                let i = 0;
-                while (
-                    Object.keys(
-                        this.scheduled_notes[due_unix + i * 24 * 3600 * 1000] ||
-                            {}
-                    ).length >= this.data.settings.load_balancing_threshold
-                )
-                    i++;
-
-                if (i > 0) {
-                    n += i;
-                    [date_str, due_unix] = getLocalDateTimeOffset(n);
-                }
-
-                let link_total = 0,
-                    link_pg_total = 0,
-                    total_link_count = 0;
-                for (let linked_file in incoming_links[new_note[0].path][
-                    "list"
-                ]) {
-                    let ease =
-                        pageranks[linked_file] *
-                        incoming_links[linked_file]["ease"];
-                    if (ease) {
-                        let link_count =
-                            incoming_links[new_note[0].path]["list"][
-                                linked_file
-                            ];
-                        link_total += ease * link_count;
-                        link_pg_total += pageranks[linked_file] * link_count;
-                        total_link_count += link_count;
-                    }
-                }
-
-                for (let linked_file in outgoing_links[new_note[0].path][
-                    "list"
-                ]) {
-                    let ease =
-                        pageranks[linked_file] *
-                        outgoing_links[linked_file]["ease"];
-                    if (ease) {
-                        let link_count =
-                            outgoing_links[new_note[0].path]["list"][
-                                linked_file
-                            ];
-                        link_total += ease * link_count;
-                        link_pg_total += pageranks[linked_file] * link_count;
-                        total_link_count += link_count;
-                    }
-                }
-
-                let link_contribution =
-                    this.data.settings.max_link_factor *
-                    Math.min(
-                        1.0,
-                        Math.log(total_link_count + 0.5) / Math.log(64)
-                    );
-                let initial_ease = Math.round(
-                    (1.0 - link_contribution) * this.data.settings.base_ease +
-                        (total_link_count > 0
-                            ? (link_contribution * link_total) / link_pg_total
-                            : link_contribution * this.data.settings.base_ease)
-                );
-
-                // check if there's any existing YAML front matter
-                if (YAML_FRONT_MATTER_REGEX.test(new_note[1])) {
-                    let existing_yaml = YAML_FRONT_MATTER_REGEX.exec(
-                        new_note[1]
-                    );
-                    file_text = new_note[1].replace(
-                        YAML_FRONT_MATTER_REGEX,
-                        `---\n${existing_yaml[1]}due: ${date_str}\ninterval: 1\nease: ${initial_ease}\n---`
-                    );
-                } else {
-                    file_text = `---\ndue: ${date_str}\ninterval: 1\nease: ${initial_ease}\n---\n\n${new_note[1]}`;
-                }
-                this.app.vault.modify(new_note[0], file_text);
-
-                if (!(due_unix in this.scheduled_notes))
-                    this.scheduled_notes[due_unix] = {};
-                this.scheduled_notes[due_unix][new_note[0].path] = [
-                    new_note[0],
-                    due_unix,
-                    1,
-                    initial_ease,
-                ];
-                incoming_links[new_note[0].path]["ease"] = initial_ease;
-                outgoing_links[new_note[0].path]["ease"] = initial_ease;
-            }
         }
+
+        graph.rank(0.85, 0.000001, (node, rank) => {
+            this.pageranks[node] = rank * 10000;
+        });
 
         // sort dates
         this.scheduled_notes = Object.keys(this.scheduled_notes)
@@ -350,8 +246,8 @@ export default class ConceptsReviewPlugin extends Plugin {
             temp[due_unix] = Object.fromEntries(
                 Object.entries(this.scheduled_notes[due_unix]).sort(
                     ([, a], [, b]) =>
-                        (this.data.pageranks[b[0].path] || 0) -
-                        (this.data.pageranks[a[0].path] || 0)
+                        (this.pageranks[b[0].path] || 0) -
+                        (this.pageranks[a[0].path] || 0)
                 )
             );
         }
@@ -360,11 +256,10 @@ export default class ConceptsReviewPlugin extends Plugin {
         // sort overdue notes by importance
         this.overdue_notes = this.overdue_notes.sort(
             (a, b) =>
-                (this.data.pageranks[b.note.path] || 0) -
-                (this.data.pageranks[a.note.path] || 0)
+                (this.pageranks[b.note.path] || 0) -
+                (this.pageranks[a.note.path] || 0)
         );
 
-        this.savePluginData();
         this.statusBar.setText(`Review: ${this.overdue_notes.length} due`);
         this.due_view.redraw();
     }
@@ -374,10 +269,74 @@ export default class ConceptsReviewPlugin extends Plugin {
         let { frontmatter } = this.app.metadataCache.getCache(note.path) || {};
         frontmatter = frontmatter || {};
 
-        // checks if note should be ignored
-        if (frontmatter != false && getFileLength(file_text, frontmatter) > 1) {
-            let interval = frontmatter["interval"];
-            let ease = frontmatter["ease"];
+        // check if note should be ignored
+        if (
+            frontmatter["review"] != false &&
+            getFileLength(file_text, frontmatter) > 1
+        ) {
+            let ease, interval;
+            // new note
+            if (
+                !["due", "interval", "ease"].every((key) =>
+                    Object.keys(frontmatter).includes(key)
+                )
+            ) {
+                let link_total = 0,
+                    link_pg_total = 0,
+                    total_link_count = 0;
+                for (let linked_file in this.incoming_links[note.path][
+                    "list"
+                ]) {
+                    let ease =
+                        this.pageranks[linked_file] *
+                        this.incoming_links[linked_file]["ease"];
+                    if (ease) {
+                        let link_count = this.incoming_links[note.path]["list"][
+                            linked_file
+                        ];
+                        link_total += ease * link_count;
+                        link_pg_total +=
+                            this.pageranks[linked_file] * link_count;
+                        total_link_count += link_count;
+                    }
+                }
+
+                for (let linked_file in this.outgoing_links[note.path][
+                    "list"
+                ]) {
+                    let ease =
+                        this.pageranks[linked_file] *
+                        this.outgoing_links[linked_file]["ease"];
+                    if (ease) {
+                        let link_count = this.outgoing_links[note.path]["list"][
+                            linked_file
+                        ];
+                        link_total += ease * link_count;
+                        link_pg_total +=
+                            this.pageranks[linked_file] * link_count;
+                        total_link_count += link_count;
+                    }
+                }
+
+                let link_contribution =
+                    this.data.settings.max_link_factor *
+                    Math.min(
+                        1.0,
+                        Math.log(total_link_count + 0.5) / Math.log(64)
+                    );
+                ease = Math.round(
+                    (1.0 - link_contribution) * this.data.settings.base_ease +
+                        (total_link_count > 0
+                            ? (link_contribution * link_total) / link_pg_total
+                            : link_contribution * this.data.settings.base_ease)
+                );
+                interval = 1;
+            } else {
+                interval = frontmatter["interval"];
+                ease = frontmatter["ease"];
+            }
+
+            console.log(ease, interval);
 
             ease = quality == 1 ? ease + 20 : Math.max(130, ease - 20);
             interval = Math.max(
@@ -395,14 +354,32 @@ export default class ConceptsReviewPlugin extends Plugin {
             interval = Math.round(interval);
 
             let due = new Date(+new Date() + interval * 24 * 3600 * 1000);
-            file_text = file_text.replace(
-                SCHEDULING_INFO_REGEX,
-                `---\n${
-                    scheduling_info[1]
-                }due: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n${
-                    scheduling_info[5]
-                }---`
-            );
+
+            // check if scheduling info exists
+            if (SCHEDULING_INFO_REGEX.test(file_text)) {
+                let scheduling_info = SCHEDULING_INFO_REGEX.exec(file_text);
+                file_text = file_text.replace(
+                    SCHEDULING_INFO_REGEX,
+                    `---\n${
+                        scheduling_info[1]
+                    }due: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n${
+                        scheduling_info[5]
+                    }---`
+                );
+
+                // new note with existing YAML front matter
+            } else if (YAML_FRONT_MATTER_REGEX.test(file_text)) {
+                let existing_yaml = YAML_FRONT_MATTER_REGEX.exec(file_text);
+                file_text = file_text.replace(
+                    YAML_FRONT_MATTER_REGEX,
+                    `---\n${
+                        existing_yaml[1]
+                    }due: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n---`
+                );
+            } else {
+                file_text = `---\ndue: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n---\n\n${file_text}`;
+            }
+
             this.app.vault.modify(note, file_text);
 
             new Notice("Response received.");
@@ -410,6 +387,7 @@ export default class ConceptsReviewPlugin extends Plugin {
             new Notice("Note marked as IGNORE or has no content.");
         }
 
+        // await sleep(2000);
         await this.sync();
         if (this.data.settings.auto_next_note) this.reviewNextNote();
     }
@@ -442,12 +420,12 @@ export default class ConceptsReviewPlugin extends Plugin {
     }
 
     initView(): void {
-        if (this.app.workspace.getLeavesOfType(DUE_DATES_VIEW_TYPE).length) {
+        if (this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).length) {
             return;
         }
 
         this.app.workspace.getRightLeaf(false).setViewState({
-            type: DUE_DATES_VIEW_TYPE,
+            type: REVIEW_QUEUE_VIEW_TYPE,
             active: true,
         });
     }
@@ -641,7 +619,7 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
     }
 }
 
-class DueDatesListView extends ItemView {
+class ReviewQueueListView extends ItemView {
     plugin: ConceptsReviewPlugin;
 
     constructor(leaf: WorkspaceLeaf, plugin: ConceptsReviewPlugin) {
@@ -649,6 +627,7 @@ class DueDatesListView extends ItemView {
 
         this.plugin = plugin;
         this.active_date = "";
+        this.new_open = false;
         this.registerEvent(
             this.app.workspace.on("file-open", (_) => this.redraw())
         );
@@ -657,7 +636,7 @@ class DueDatesListView extends ItemView {
     }
 
     public getViewType(): string {
-        return DUE_DATES_VIEW_TYPE;
+        return REVIEW_QUEUE_VIEW_TYPE;
     }
 
     public getDisplayText(): string {
@@ -673,7 +652,7 @@ class DueDatesListView extends ItemView {
             item.setTitle("Close")
                 .setIcon("cross")
                 .onClick(() => {
-                    this.app.workspace.detachLeavesOfType(DUE_DATES_VIEW_TYPE);
+                    this.app.workspace.detachLeavesOfType(REVIEW_QUEUE_VIEW_TYPE);
                 });
         });
     }
@@ -684,77 +663,62 @@ class DueDatesListView extends ItemView {
         const rootEl = createDiv({ cls: "nav-folder mod-root" });
         const childrenEl = rootEl.createDiv({ cls: "nav-folder-children" });
 
-        // const newNotesEl = childrenEl.createDiv({ cls: "nav-folder" });
-        // newNotesEl.createDiv({ cls: "nav-folder-title "});
+        if (this.plugin.new_notes.length > 0) {
+            let newNotesFolderEl = this.createRightPaneFolder(
+                childrenEl,
+                "New",
+                !this.new_open
+            );
+
+            for (let currentFile of this.plugin.new_notes) {
+                let navFileTitle = this.createRightPaneFile(
+                    newNotesFolderEl,
+                    currentFile,
+                    openFile,
+                    !this.new_open
+                );
+                navFileTitle.onClickEvent((_) => {
+                    this.app.workspace.activeLeaf.openFile(currentFile[0]);
+                    this.new_open = true;
+                });
+            }
+        }
 
         let now = +new Date();
         let count = 0;
         for (let due_unix in this.plugin.scheduled_notes) {
             let due_on_date = this.plugin.scheduled_notes[due_unix];
             let due = new Date(Number.parseInt(due_unix));
-            const dateFolderEl = childrenEl.createDiv({ cls: "nav-folder" });
-            const dateFolderTitleEl = dateFolderEl.createDiv({
-                cls: "nav-folder-title",
-            });
-            const dateChildrenEl = dateFolderEl.createDiv({
-                cls: "nav-folder-children",
-            });
-            const collapseIconEl = dateFolderTitleEl.createDiv({
-                cls: "nav-folder-collapse-indicator collapse-icon",
-            });
-            collapseIconEl.innerHTML = collapseIcon;
-
-            if (count > 0 || this.active_date == due_unix)
-                collapseIconEl.childNodes[0].style.transform = "rotate(-90deg)";
 
             let n_days = Math.ceil((due_unix - now) / (24 * 3600 * 1000));
-            dateFolderTitleEl.createDiv({
-                cls: "nav-folder-title-content",
-                text:
-                    n_days == -1
-                        ? "Yesterday"
-                        : n_days == 0
-                        ? "Today"
-                        : n_days == 1
-                        ? "Tomorrow"
-                        : due.toDateString(),
-            });
+            let folderTitle =
+                n_days == -1
+                    ? "Yesterday"
+                    : n_days == 0
+                    ? "Today"
+                    : n_days == 1
+                    ? "Tomorrow"
+                    : due.toDateString();
 
-            dateFolderTitleEl.onClickEvent((_) => {
-                for (let child of dateChildrenEl.childNodes) {
-                    if (
-                        child.style.display == "block" ||
-                        child.style.display == ""
-                    ) {
-                        child.style.display = "none";
-                        collapseIconEl.childNodes[0].style.transform =
-                            "rotate(-90deg)";
-                    } else {
-                        child.style.display = "block";
-                        collapseIconEl.childNodes[0].style.transform = "";
-                    }
-                }
-            });
+            let folderEl = this.createRightPaneFolder(
+                childrenEl,
+                folderTitle,
+                count >= 0 || this.active_date == due_unix
+            );
 
             for (let currentFile in due_on_date) {
-                currentFile = due_on_date[currentFile];
-
-                const navFile = dateChildrenEl.createDiv({ cls: "nav-file" });
-                if (count > 0 && this.active_date != due_unix)
-                    navFile.style.display = "none";
-
-                const navFileTitle = navFile.createDiv({
-                    cls: "nav-file-title",
-                });
-                if (openFile && currentFile[0].path === openFile.path)
-                    navFileTitle.addClass("is-active");
-                navFileTitle.createDiv({
-                    cls: "nav-file-title-content",
-                    text: currentFile[0].basename,
-                });
+                let navFileTitle = this.createRightPaneFile(
+                    folderEl,
+                    due_on_date[currentFile],
+                    openFile,
+                    this.active_date != due_unix
+                );
                 navFileTitle.onClickEvent((_) => {
-                    this.app.workspace.activeLeaf.openFile(currentFile[0]);
+                    this.app.workspace.activeLeaf.openFile(
+                        due_on_date[currentFile][0]
+                    );
                     this.active_date = due_unix;
+                    this.new_open = false;
                 });
             }
 
@@ -764,6 +728,72 @@ class DueDatesListView extends ItemView {
         const contentEl = this.containerEl.children[1];
         contentEl.empty();
         contentEl.appendChild(rootEl);
+    }
+
+    private createRightPaneFolder(
+        childrenEl: any,
+        folderTitle: string,
+        collapsed: boolean
+    ): any {
+        const folderEl = childrenEl.createDiv({ cls: "nav-folder" });
+        const folderTitleEl = folderEl.createDiv({
+            cls: "nav-folder-title",
+        });
+        const childrenEl = folderEl.createDiv({
+            cls: "nav-folder-children",
+        });
+        const collapseIconEl = folderTitleEl.createDiv({
+            cls: "nav-folder-collapse-indicator collapse-icon",
+        });
+        collapseIconEl.innerHTML = collapseIcon;
+
+        if (collapsed)
+            collapseIconEl.childNodes[0].style.transform = "rotate(-90deg)";
+
+        folderTitleEl.createDiv({
+            cls: "nav-folder-title-content",
+            text: folderTitle,
+        });
+
+        folderTitleEl.onClickEvent((_) => {
+            for (let child of childrenEl.childNodes) {
+                if (
+                    child.style.display == "block" ||
+                    child.style.display == ""
+                ) {
+                    child.style.display = "none";
+                    collapseIconEl.childNodes[0].style.transform =
+                        "rotate(-90deg)";
+                } else {
+                    child.style.display = "block";
+                    collapseIconEl.childNodes[0].style.transform = "";
+                }
+            }
+        });
+
+        return childrenEl;
+    }
+
+    private createRightPaneFile(
+        folderEl: any,
+        file: TFile,
+        openFile: any,
+        hidden: boolean
+    ) {
+        const navFile = folderEl.createDiv({ cls: "nav-file" });
+        if (hidden) navFile.style.display = "none";
+
+        const navFileTitle = navFile.createDiv({
+            cls: "nav-file-title",
+        });
+        if (openFile && file[0].path === openFile.path)
+            navFileTitle.addClass("is-active");
+        navFileTitle.createDiv({
+            cls: "nav-file-title-content",
+            text: file[0].basename,
+        });
+
+        return navFileTitle;
     }
 }
 

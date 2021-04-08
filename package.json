@@ -1,6 +1,6 @@
 {
   "name": "notes-review",
-  "version": "0.4.7",
+  "version": "0.5.0",
   "description": "Review notes using spaced repetition on Obsidian. Fight the forgetting curve & note aging!",
   "main": "main.js",
   "scripts": {
