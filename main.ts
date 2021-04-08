@@ -260,7 +260,10 @@ export default class ConceptsReviewPlugin extends Plugin {
                         pageranks[linked_file] *
                         incoming_links[linked_file]["ease"];
                     if (ease) {
-                        let link_count = incoming_links[new_note[0].path]["list"][linked_file];
+                        let link_count =
+                            incoming_links[new_note[0].path]["list"][
+                                linked_file
+                            ];
                         link_total += ease * link_count;
                         link_pg_total += pageranks[linked_file] * link_count;
                         total_link_count += link_count;
@@ -274,7 +277,10 @@ export default class ConceptsReviewPlugin extends Plugin {
                         pageranks[linked_file] *
                         outgoing_links[linked_file]["ease"];
                     if (ease) {
-                        let link_count = outgoing_links[new_note[0].path]["list"][linked_file];
+                        let link_count =
+                            outgoing_links[new_note[0].path]["list"][
+                                linked_file
+                            ];
                         link_total += ease * link_count;
                         link_pg_total += pageranks[linked_file] * link_count;
                         total_link_count += link_count;
@@ -283,7 +289,10 @@ export default class ConceptsReviewPlugin extends Plugin {
 
                 let link_contribution =
                     this.data.settings.max_link_factor *
-                    Math.min(1.0, Math.log(total_link_count + 0.5) / Math.log(64));
+                    Math.min(
+                        1.0,
+                        Math.log(total_link_count + 0.5) / Math.log(64)
+                    );
                 let initial_ease = Math.round(
                     (1.0 - link_contribution) * this.data.settings.base_ease +
                         (total_link_count > 0
@@ -363,18 +372,17 @@ export default class ConceptsReviewPlugin extends Plugin {
             ease = quality == 1 ? ease + 20 : Math.max(130, ease - 20);
             interval = Math.max(
                 1,
-                Math.round(
-                    quality == 1
-                        ? (interval * ease) / 100
-                        : interval * this.data.settings.lapses_interval_change
-                )
+                quality == 1
+                    ? (interval * ease) / 100
+                    : interval * this.data.settings.lapses_interval_change
             );
             if (interval >= 8) {
                 // fuzz
-                let fuzz = Math.ceil(0.05 * interval);
+                let fuzz = 0.05 * interval;
                 let r = Math.random();
                 interval += r < 0.33 ? -fuzz : r < 0.67 ? 0 : fuzz;
             }
+            interval = Math.round(interval);
 
             let due = new Date(+new Date() + interval * 24 * 3600 * 1000);
             file_text = file_text.replace(

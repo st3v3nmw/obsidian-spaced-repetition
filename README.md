@@ -39,6 +39,7 @@ review: false
   - `if link_count > 0: initial_ease = (1 - link_contribution) * base_ease + link_contribution * average_ease`
     - `link_contribution = max_link_factor * min(1.0, log(link_count + 0.5) / log(64))` (cater for uncertainty by slowly increasing link_contribution by `log(number of links)`)
   - The importance of the difference concepts/notes is determined using the PageRank algorithm (not all notes are created equal xD)
+    - On most occasions, the most fundamental concepts/notes have higher importance
 - If the user reviews a concept/note as:
   - easy, the ease increases by `20` and the interval changes to `old_interval * new_ease / 100`
   - hard, the ease decreases by `20` and the interval changes to `old_interval * 0.5`
