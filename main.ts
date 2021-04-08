@@ -13,7 +13,6 @@ import * as graph from "pagerank.js";
 
 const SCHEDULING_INFO_REGEX = /^---\n((?:.*\n)*)due: ([0-9A-Za-z ]+)\ninterval: ([0-9]+)\nease: ([0-9]+)\n((?:.*\n)*)---/;
 const YAML_FRONT_MATTER_REGEX = /^---\n((?:.*\n)*)---/;
-const IGNORE_REGEX = /review: false/;
 const DUE_DATES_VIEW_TYPE = "due-dates-list-view";
 
 interface ConceptsReviewSettings {
@@ -149,19 +148,29 @@ export default class ConceptsReviewPlugin extends Plugin {
         let temp_new = [];
         for (let note of notes) {
             let file_text = await this.app.vault.read(note);
+            let { frontmatter } =
+                this.app.metadataCache.getCache(note.path) || {};
+            frontmatter = frontmatter || {};
+            let entry_count = Object.entries(frontmatter).length;
 
-            if (!IGNORE_REGEX.test(file_text) && getFileLength(file_text) > 1) {
-                // checks if note should be ignored
-                if (!SCHEDULING_INFO_REGEX.test(file_text)) {
-                    // file has no scheduling information
+            // checks if note should be ignored
+            if (
+                frontmatter["review"] != false &&
+                getFileLength(file_text, frontmatter) > 1
+            ) {
+                // file has no scheduling information
+                if (
+                    frontmatter["due"] == undefined ||
+                    frontmatter["interval"] == undefined ||
+                    frontmatter["ease"] == undefined
+                ) {
                     temp_new.push([note, file_text]);
                     continue;
                 }
 
-                let scheduling_info = SCHEDULING_INFO_REGEX.exec(file_text);
-                let due_unix = Date.parse(scheduling_info[2]);
-                let interval = parseInt(scheduling_info[3]);
-                let ease = parseInt(scheduling_info[4]);
+                let due_unix = Date.parse(frontmatter["due"]);
+                let interval = frontmatter["interval"];
+                let ease = frontmatter["ease"];
 
                 if (!(due_unix in this.scheduled_notes))
                     this.scheduled_notes[due_unix] = {};
@@ -229,8 +238,6 @@ export default class ConceptsReviewPlugin extends Plugin {
             graph.rank(0.85, 0.000001, (node, rank) => {
                 pageranks[node] = rank * 10000;
             });
-
-            console.log(pageranks);
 
             this.data.pageranks = pageranks;
 
@@ -302,6 +309,7 @@ export default class ConceptsReviewPlugin extends Plugin {
                             : link_contribution * this.data.settings.base_ease)
                 );
 
+                // check if there's any existing YAML front matter
                 if (YAML_FRONT_MATTER_REGEX.test(new_note[1])) {
                     let existing_yaml = YAML_FRONT_MATTER_REGEX.exec(
                         new_note[1]
@@ -363,13 +371,13 @@ export default class ConceptsReviewPlugin extends Plugin {
 
     async saveReviewResponse(note: TFile, quality: number): void {
         let file_text = await this.app.vault.read(note);
+        let { frontmatter } = this.app.metadataCache.getCache(note.path) || {};
+        frontmatter = frontmatter || {};
 
         // checks if note should be ignored
-        if (!IGNORE_REGEX.test(file_text) && getFileLength(file_text) > 1) {
-            let scheduling_info = SCHEDULING_INFO_REGEX.exec(file_text);
-
-            let interval = parseInt(scheduling_info[3]);
-            let ease = parseInt(scheduling_info[4]);
+        if (frontmatter != false && getFileLength(file_text, frontmatter) > 1) {
+            let interval = frontmatter["interval"];
+            let ease = frontmatter["ease"];
 
             ease = quality == 1 ? ease + 20 : Math.max(130, ease - 20);
             interval = Math.max(
@@ -449,13 +457,10 @@ function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function getFileLength(file_text: string) {
-    let yaml_front_matter = YAML_FRONT_MATTER_REGEX.exec(file_text);
-    let yaml_front_matter_length =
-        yaml_front_matter == null
-            ? 0
-            : yaml_front_matter[0].split(/\r\n|\r|\n/).length;
-    return file_text.split(/\r\n|\r|\n/).length - yaml_front_matter_length;
+function getFileLength(file_text: string, frontmatter: any): number {
+    let frontmatter_len = Object.entries(frontmatter).length;
+    if (frontmatter_len > 0) frontmatter_len += 2;
+    return file_text.split(/\r\n|\r|\n/).length - frontmatter_len;
 }
 
 function getLocalDateTimeOffset(n_days: number) {
@@ -678,6 +683,9 @@ class DueDatesListView extends ItemView {
 
         const rootEl = createDiv({ cls: "nav-folder mod-root" });
         const childrenEl = rootEl.createDiv({ cls: "nav-folder-children" });
+
+        // const newNotesEl = childrenEl.createDiv({ cls: "nav-folder" });
+        // newNotesEl.createDiv({ cls: "nav-folder-title "});
 
         let now = +new Date();
         let count = 0;

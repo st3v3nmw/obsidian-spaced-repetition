@@ -28,11 +28,11 @@ review: false
 
 #### Right Panel
 
-- Per day entries are sorted by importance (PageRank)
+- Per day review entries are sorted by importance (PageRank)
 
 ## Spaced Repetition Algorithm
 
-- Spaced repetition? [basics](https://ncase.me/remember/), [detailed](https://www.gwern.net/Spaced-repetition)
+- Spaced repetition? [Basics](https://ncase.me/remember/), [Detailed](https://www.gwern.net/Spaced-repetition).
 - The algorithm is a variant of [Anki's algorithm](https://faqs.ankiweb.net/what-spaced-repetition-algorithm.html) which is based on the [SM-2 algorithm](https://www.supermemo.com/en/archives1990-2015/english/ol/sm2).
 - It supports binary reviews i.e. a concept is either hard or easy at the time of review.
 - initial ease is weighted (using max_link_factor) depending on the average ease of linked notes, note importance, and the base ease.
@@ -58,7 +58,6 @@ review: false
   - Add means to remove all scheduling.
 - Change some settings to a slider
 - Handle new notes better (separate "stream")
-- Means to quickly add `review: false` frontmatter
 - Refactor code
 - Help & documentation
 - After the official API provides a mechanism:
