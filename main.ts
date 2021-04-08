@@ -649,7 +649,9 @@ class ReviewQueueListView extends ItemView {
             item.setTitle("Close")
                 .setIcon("cross")
                 .onClick(() => {
-                    this.app.workspace.detachLeavesOfType(REVIEW_QUEUE_VIEW_TYPE);
+                    this.app.workspace.detachLeavesOfType(
+                        REVIEW_QUEUE_VIEW_TYPE
+                    );
                 });
         });
     }
