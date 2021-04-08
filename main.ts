@@ -336,8 +336,6 @@ export default class ConceptsReviewPlugin extends Plugin {
                 ease = frontmatter["ease"];
             }
 
-            console.log(ease, interval);
-
             ease = quality == 1 ? ease + 20 : Math.max(130, ease - 20);
             interval = Math.max(
                 1,
@@ -441,12 +439,12 @@ function getFileLength(file_text: string, frontmatter: any): number {
     return file_text.split(/\r\n|\r|\n/).length - frontmatter_len;
 }
 
-function getLocalDateTimeOffset(n_days: number) {
+function getLocalDateTimeOffset(n_days: number): number {
     let date_str = new Date(
         +new Date() + n_days * 24 * 3600 * 1000
     ).toDateString();
     let due_unix = Date.parse(date_str); // cause timezones
-    return [date_str, due_unix];
+    return due_unix;
 }
 
 class ConceptsReviewSettingTab extends PluginSettingTab {
@@ -626,8 +624,7 @@ class ReviewQueueListView extends ItemView {
         super(leaf);
 
         this.plugin = plugin;
-        this.active_date = "";
-        this.new_open = false;
+        this.activeFolders = new Set(["Today"]);
         this.registerEvent(
             this.app.workspace.on("file-open", (_) => this.redraw())
         );
@@ -667,7 +664,7 @@ class ReviewQueueListView extends ItemView {
             let newNotesFolderEl = this.createRightPaneFolder(
                 childrenEl,
                 "New",
-                !this.new_open
+                !this.activeFolders.has("New")
             );
 
             for (let currentFile of this.plugin.new_notes) {
@@ -675,11 +672,10 @@ class ReviewQueueListView extends ItemView {
                     newNotesFolderEl,
                     currentFile,
                     openFile,
-                    !this.new_open
+                    !this.activeFolders.has("New")
                 );
                 navFileTitle.onClickEvent((_) => {
                     this.app.workspace.activeLeaf.openFile(currentFile[0]);
-                    this.new_open = true;
                 });
             }
         }
@@ -703,7 +699,7 @@ class ReviewQueueListView extends ItemView {
             let folderEl = this.createRightPaneFolder(
                 childrenEl,
                 folderTitle,
-                count >= 0 || this.active_date == due_unix
+                !this.activeFolders.has(folderTitle)
             );
 
             for (let currentFile in due_on_date) {
@@ -711,14 +707,12 @@ class ReviewQueueListView extends ItemView {
                     folderEl,
                     due_on_date[currentFile],
                     openFile,
-                    this.active_date != due_unix
+                    !this.activeFolders.has(folderTitle)
                 );
                 navFileTitle.onClickEvent((_) => {
                     this.app.workspace.activeLeaf.openFile(
                         due_on_date[currentFile][0]
                     );
-                    this.active_date = due_unix;
-                    this.new_open = false;
                 });
             }
 
@@ -764,9 +758,11 @@ class ReviewQueueListView extends ItemView {
                     child.style.display = "none";
                     collapseIconEl.childNodes[0].style.transform =
                         "rotate(-90deg)";
+                    this.activeFolders.delete(folderTitle);
                 } else {
                     child.style.display = "block";
                     collapseIconEl.childNodes[0].style.transform = "";
+                    this.activeFolders.add(folderTitle);
                 }
             }
         });

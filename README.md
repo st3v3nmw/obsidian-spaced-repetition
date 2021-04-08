@@ -50,5 +50,6 @@ review: false
 
 ## TODO
 
+- Limit number of new notes on panel
 - Refactor code
 - Help & documentation
