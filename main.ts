@@ -252,8 +252,7 @@ export default class ConceptsReviewPlugin extends Plugin {
 
                 let link_total = 0,
                     link_pg_total = 0,
-                    seen_links = {},
-                    link_count = 0;
+                    total_link_count = 0;
                 for (let linked_file in incoming_links[new_note[0].path][
                     "list"
                 ]) {
@@ -261,10 +260,10 @@ export default class ConceptsReviewPlugin extends Plugin {
                         pageranks[linked_file] *
                         incoming_links[linked_file]["ease"];
                     if (ease) {
-                        link_total += ease;
-                        link_pg_total += pageranks[linked_file];
-                        seen_links[linked_file] = true;
-                        link_count++;
+                        let link_count = incoming_links[new_note[0].path]["list"][linked_file];
+                        link_total += ease * link_count;
+                        link_pg_total += pageranks[linked_file] * link_count;
+                        total_link_count += link_count;
                     }
                 }
 
@@ -274,19 +273,20 @@ export default class ConceptsReviewPlugin extends Plugin {
                     let ease =
                         pageranks[linked_file] *
                         outgoing_links[linked_file]["ease"];
-                    if (!(linked_file in seen_links) && ease) {
-                        link_total += ease;
-                        link_pg_total += pageranks[linked_file];
-                        link_count++;
+                    if (ease) {
+                        let link_count = outgoing_links[new_note[0].path]["list"][linked_file];
+                        link_total += ease * link_count;
+                        link_pg_total += pageranks[linked_file] * link_count;
+                        total_link_count += link_count;
                     }
                 }
 
                 let link_contribution =
                     this.data.settings.max_link_factor *
-                    Math.min(1.0, Math.log(link_count + 0.5) / Math.log(64));
+                    Math.min(1.0, Math.log(total_link_count + 0.5) / Math.log(64));
                 let initial_ease = Math.round(
                     (1.0 - link_contribution) * this.data.settings.base_ease +
-                        (link_count > 0
+                        (total_link_count > 0
                             ? (link_contribution * link_total) / link_pg_total
                             : link_contribution * this.data.settings.base_ease)
                 );
