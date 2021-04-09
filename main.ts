@@ -544,7 +544,7 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Interval change when you review a notes/concept as hard")
+            .setName("Interval change when you review a note/concept as hard")
             .setDesc(
                 "new_interval = old_interval * interval_change / 100, 0% < interval_change < 100%"
             )
