@@ -11,20 +11,34 @@ Version 0.5.1
 
 ## Guide
 
-### Installation
+### Reviewing
 
-### Usage
+#### New Notes
 
-Add the following frontmatter to the very top of the note so that scheduling information won't be added to the file:
+All "new" notes with content are listed under `New` on the right panel. To review, click on the file to open it, then choose either the `Review: Easy` or `Review: Hard` option on the file menu. The notes will then scheduled appropriately.
+
+#### Scheduled notes
+
+`Review: N due` on the status bar at the bottom of the screen shows how many notes one has to review today. Clicking on that opens one of the notes for review. Alternatively, one can use the `Open a note for review` command.
+
+### Settings
+
+Available settings are:
+- Choosing whether to open a note by random or the most important note
+- Choosing whether to open the next note automatically after reviewing another
+
+### Ignoring some notes
+
+Click the `Review: Ignore file` option on the file menu or add the following frontmatter to the very top of the note:
 ```yaml
 ---
 review: false
 ---
 ```
 
-#### Right Panel
+### Right Panel
 
-- Per day review entries are sorted by importance (PageRank)
+- Daily review entries are sorted by importance (PageRank)
 
 ## Spaced Repetition Algorithm
 
