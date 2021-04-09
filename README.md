@@ -1,5 +1,7 @@
 # Concepts Review Obsidian Plugin
 
+Fight the forgetting curve & note aging by reviewing notes using spaced repetition on Obsidian.md 
+
 Version 1.0.0
 
 ## "Philosophy"
