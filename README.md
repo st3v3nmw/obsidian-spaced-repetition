@@ -1,6 +1,6 @@
 # Concepts Review Obsidian Plugin
 
-Version 0.5.1
+Version 1.0.0
 
 ## "Philosophy"
 

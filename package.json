@@ -1,6 +1,6 @@
 {
   "name": "concepts-review",
-  "version": "0.5.1",
+  "version": "1.0.0",
   "description": "Fight the forgetting curve & note aging by reviewing notes using spaced repetition on Obsidian.md",
   "main": "main.js",
   "scripts": {
