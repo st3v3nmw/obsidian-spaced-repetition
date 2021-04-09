@@ -18,7 +18,6 @@ const REVIEW_QUEUE_VIEW_TYPE = "due-dates-list-view";
 interface ConceptsReviewSettings {
     base_ease: number;
     max_link_factor: number;
-    max_display_new: number;
     open_random_note: boolean;
     lapses_interval_change: number;
     auto_next_note: boolean;
@@ -31,7 +30,6 @@ interface PluginData {
 const DEFAULT_SETTINGS: ConceptsReviewSettings = {
     base_ease: 250,
     max_link_factor: 1.0,
-    max_display_new: 8,
     open_random_note: false,
     lapses_interval_change: 0.5,
     auto_next_note: false,
@@ -91,7 +89,7 @@ export default class ConceptsReviewPlugin extends Plugin {
 
         this.app.workspace.on("file-menu", (menu, file: TFile) => {
             menu.addItem((item) => {
-                item.setTitle("Concept Review: Easy")
+                item.setTitle("Review: Easy")
                     .setIcon("crosshairs")
                     .onClick((evt) => {
                         this.saveReviewResponse(file, 1);
@@ -101,10 +99,20 @@ export default class ConceptsReviewPlugin extends Plugin {
 
         this.app.workspace.on("file-menu", (menu, file: TFile) => {
             menu.addItem((item) => {
-                item.setTitle("Concept Review: Hard")
+                item.setTitle("Review: Hard")
                     .setIcon("crosshairs")
                     .onClick((evt) => {
                         this.saveReviewResponse(file, 0);
+                    });
+            });
+        });
+
+        this.app.workspace.on("file-menu", (menu, file: TFile) => {
+            menu.addItem((item) => {
+                item.setTitle("Review: Ignore file")
+                    .setIcon("crosshairs")
+                    .onClick((evt) => {
+                        this.ignoreFile(file);
                     });
             });
         });
@@ -347,11 +355,10 @@ export default class ConceptsReviewPlugin extends Plugin {
                     ? (interval * ease) / 100
                     : interval * this.data.settings.lapses_interval_change
             );
+            // fuzz
             if (interval >= 8) {
-                // fuzz
-                let fuzz = 0.05 * interval;
-                let r = Math.random();
-                interval += r < 0.33 ? -fuzz : r < 0.67 ? 0 : fuzz;
+                let fuzz = [-0.05 * interval, 0, 0.05 * interval];
+                interval += fuzz[Math.floor(Math.random() * fuzz.length)];
             }
             interval = Math.round(interval);
 
@@ -389,7 +396,6 @@ export default class ConceptsReviewPlugin extends Plugin {
             new Notice("Note marked as IGNORE or has no content.");
         }
 
-        // await sleep(2000);
         await this.sync();
         if (this.data.settings.auto_next_note) this.reviewNextNote();
     }
@@ -423,6 +429,25 @@ export default class ConceptsReviewPlugin extends Plugin {
         }
     }
 
+    async ignoreFile(note: TFile): void {
+        let file_text = await this.app.vault.read(note);
+        let { frontmatter } = this.app.metadataCache.getCache(note.path) || {};
+        frontmatter = frontmatter || {};
+
+        if (Object.entries(frontmatter).length == 0) {
+            file_text = `---\nreview: false\n---\n\n${file_text}`;
+        } else if (frontmatter["review"] == undefined) {
+            let existing_yaml = YAML_FRONT_MATTER_REGEX.exec(file_text);
+            file_text = file_text.replace(
+                YAML_FRONT_MATTER_REGEX,
+                `---\n${existing_yaml[1]}review: false\n---`
+            );
+        } else if (frontmatter["review"] != false) {
+            file_text = file_text.replace(/review: [0-9A-Za-z ]+/, "review: false");
+        }
+        this.app.vault.modify(note, file_text);
+    }
+
     async loadPluginData(): void {
         this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
     }
@@ -453,14 +478,6 @@ function getFileLength(file_text: string, frontmatter: any): number {
     return file_text.split(/\r\n|\r|\n/).length - frontmatter_len;
 }
 
-function getLocalDateTimeOffset(n_days: number): number {
-    let date_str = new Date(
-        +new Date() + n_days * 24 * 3600 * 1000
-    ).toDateString();
-    let due_unix = Date.parse(date_str); // cause timezones
-    return due_unix;
-}
-
 class ConceptsReviewSettingTab extends PluginSettingTab {
     plugin: ConceptsReviewPlugin;
 
@@ -473,6 +490,31 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
         let { containerEl } = this;
 
         containerEl.empty();
+
+        new Setting(containerEl)
+            .setName("Open a random note for review")
+            .setDesc(
+                "When you turn this off, notes are ordered by importance (PageRank)"
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.open_random_note)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.open_random_note = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Open next note automatically after a review")
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.auto_next_note)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.auto_next_note = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
 
         new Setting(containerEl)
             .setName("Base ease")
@@ -494,28 +536,6 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
                             }
 
                             this.plugin.data.settings.base_ease = value;
-                            await this.plugin.savePluginData();
-                        } else {
-                            new Notice("Please provide a valid number.");
-                        }
-                    })
-            );
-
-        new Setting(containerEl)
-            .setName("Max. number of new notes to display on right panel")
-            .setDesc("Show be a number > 0")
-            .addText((text) =>
-                text
-                    .setValue(`${this.plugin.data.settings.max_display_new}`)
-                    .onChange(async (value) => {
-                        value = Number.parseInt(value);
-                        if (!isNaN(value)) {
-                            if (value < 1) {
-                                new Notice("The number must be at least 1.");
-                                return;
-                            }
-
-                            this.plugin.data.settings.max_display_new = value;
                             await this.plugin.savePluginData();
                         } else {
                             new Notice("Please provide a valid number.");
@@ -591,31 +611,6 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
                         } else {
                             new Notice("Please provide a valid number.");
                         }
-                    })
-            );
-
-        new Setting(containerEl)
-            .setName("Open a random note for review")
-            .setDesc(
-                "When you turn this off, notes are ordered by importance (PageRank)"
-            )
-            .addToggle((toggle) =>
-                toggle
-                    .setValue(this.plugin.data.settings.open_random_note)
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.open_random_note = value;
-                        await this.plugin.savePluginData();
-                    })
-            );
-
-        new Setting(containerEl)
-            .setName("Open next note automatically after a review")
-            .addToggle((toggle) =>
-                toggle
-                    .setValue(this.plugin.data.settings.auto_next_note)
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.auto_next_note = value;
-                        await this.plugin.savePluginData();
                     })
             );
 
