@@ -11,11 +11,15 @@ Version 0.5.1
 
 ## Guide
 
+![Sample screenshot](assets/screenshot.png)
+
 ### Reviewing
 
 #### New Notes
 
-All "new" notes with content are listed under `New` on the right panel. To review, click on the file to open it, then choose either the `Review: Easy` or `Review: Hard` option on the file menu. The notes will then scheduled appropriately.
+All "new" notes with content are listed under `New` on the right pane (Review Queue). To review, click on the file to open it, then choose either the `Review: Easy` or `Review: Hard` option on the file menu. The notes will then scheduled appropriately.
+
+The file menu can found on the `More options` three dots menu or by right clicking on the file on the file manager (left pane).
 
 #### Scheduled notes
 
@@ -36,7 +40,7 @@ review: false
 ---
 ```
 
-### Right Panel
+### Right Pane (Review Queue)
 
 - Daily review entries are sorted by importance (PageRank)
 
@@ -58,10 +62,6 @@ review: false
   - For `8` or more days:
     - `interval += random_choice({-fuzz, 0, +fuzz})`
       - where `fuzz = ceil(0.05 * interval)`
-      - Anki docs:
+      - [Anki docs]((https://faqs.ankiweb.net/what-spaced-repetition-algorithm.html)):
         > "[...] Anki also applies a small amount of random “fuzz” to prevent cards that were introduced at the same time and given the same ratings from sticking together and always coming up for review on the same day."
 - The scheduling information is stored in YAML front matter
-
-## TODO
-
-- Help & documentation

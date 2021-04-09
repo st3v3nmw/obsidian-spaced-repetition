@@ -443,7 +443,10 @@ export default class ConceptsReviewPlugin extends Plugin {
                 `---\n${existing_yaml[1]}review: false\n---`
             );
         } else if (frontmatter["review"] != false) {
-            file_text = file_text.replace(/review: [0-9A-Za-z ]+/, "review: false");
+            file_text = file_text.replace(
+                /review: [0-9A-Za-z ]+/,
+                "review: false"
+            );
         }
         this.app.vault.modify(note, file_text);
     }
@@ -640,7 +643,7 @@ class ReviewQueueListView extends ItemView {
     }
 
     public getDisplayText(): string {
-        return "Due Dates";
+        return "Review Queue";
     }
 
     public getIcon(): string {
