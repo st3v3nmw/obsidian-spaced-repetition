@@ -19,13 +19,13 @@ Version 1.0.0
 
 All "new" notes with content are listed under `New` on the right pane (Review Queue). To review, click on the file to open it, then choose either the `Review: Easy` or `Review: Hard` option on the file menu. The notes will then scheduled appropriately.
 
-The file menu can found on the `More options` three dots menu or by right clicking on the file on the file manager (left pane).
+The file menu can be found on the `More options` three dots menu or by right clicking on the file on the file manager (left pane).
 
 #### Scheduled notes
 
-`Review: N due` on the status bar at the bottom of the screen shows how many notes one has to review today. Clicking on that opens one of the notes for review. Alternatively, one can use the `Open a note for review` command.
+`Review: N due` on the status bar at the bottom of the screen shows how many notes one has to review today (+ overdue notes). Clicking on that opens one of the notes for review. Alternatively, one can use the `Open a note for review` command.
 
-### Settings
+#### Review Settings
 
 Available settings are:
 - Choosing whether to open a note by random or the most important note
