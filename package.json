@@ -1,7 +1,7 @@
 {
-  "name": "notes-review",
+  "name": "concepts-review",
   "version": "0.5.1",
-  "description": "Review notes using spaced repetition on Obsidian. Fight the forgetting curve & note aging!",
+  "description": "Fight the forgetting curve & note aging by reviewing notes using spaced repetition on Obsidian.md",
   "main": "main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",

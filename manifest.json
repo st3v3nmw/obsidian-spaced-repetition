@@ -3,7 +3,7 @@
 	"name": "Concepts Review",
 	"version": "0.5.1",
 	"minAppVersion": "0.9.12",
-	"description": "Review notes using spaced repetition on Obsidian. Fight the forgetting curve & note aging!",
+	"description": "Fight the forgetting curve & note aging by reviewing notes using spaced repetition on Obsidian.md",
 	"author": "Stephen Mwangi",
 	"authorUrl": "https://github.com/st3v3nmw/concepts-review",
 	"isDesktopOnly": false
