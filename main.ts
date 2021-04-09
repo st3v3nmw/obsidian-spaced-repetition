@@ -18,7 +18,7 @@ const REVIEW_QUEUE_VIEW_TYPE = "due-dates-list-view";
 interface ConceptsReviewSettings {
     base_ease: number;
     max_link_factor: number;
-    load_balancing_threshold: number;
+    max_display_new: number;
     open_random_note: boolean;
     lapses_interval_change: number;
     auto_next_note: boolean;
@@ -31,10 +31,10 @@ interface PluginData {
 const DEFAULT_SETTINGS: ConceptsReviewSettings = {
     base_ease: 250,
     max_link_factor: 1.0,
-    load_balancing_threshold: 8,
+    max_display_new: 8,
     open_random_note: false,
     lapses_interval_change: 0.5,
-    auto_next_note: true,
+    auto_next_note: false,
 };
 
 const DEFAULT_DATA: PluginData = {
@@ -43,7 +43,7 @@ const DEFAULT_DATA: PluginData = {
 
 export default class ConceptsReviewPlugin extends Plugin {
     private scheduled_notes: [];
-    private overdue_notes: [];
+    private due_notes: [];
     private statusBar;
     private data: PluginData;
     private due_view: ReviewQueueListView;
@@ -54,7 +54,7 @@ export default class ConceptsReviewPlugin extends Plugin {
         addIcon("crosshairs", crossHairsIcon);
 
         this.scheduled_notes = {};
-        this.overdue_notes = [];
+        this.due_notes = [];
         this.new_notes = [];
         this.pageranks = {};
         this.incoming_links = {};
@@ -62,10 +62,7 @@ export default class ConceptsReviewPlugin extends Plugin {
 
         this.statusBar = this.addStatusBarItem();
         this.statusBar.classList.add("mod-clickable");
-        this.statusBar.setAttribute(
-            "aria-label",
-            "Open an overdue note for review"
-        );
+        this.statusBar.setAttribute("aria-label", "Open a note for review");
         this.statusBar.setAttribute("aria-label-position", "top");
         this.statusBar.addEventListener("click", (_) => {
             this.reviewNextNote();
@@ -114,7 +111,7 @@ export default class ConceptsReviewPlugin extends Plugin {
 
         this.addCommand({
             id: "note-review-open-note",
-            name: "Open an overdue note for review",
+            name: "Open a note for review",
             callback: () => {
                 this.reviewNextNote();
             },
@@ -129,7 +126,7 @@ export default class ConceptsReviewPlugin extends Plugin {
     async sync(): void {
         let notes = this.app.vault.getMarkdownFiles();
         this.scheduled_notes = {};
-        this.overdue_notes = [];
+        this.due_notes = [];
         this.new_notes = [];
         this.pageranks = {};
         this.incoming_links = {};
@@ -179,7 +176,7 @@ export default class ConceptsReviewPlugin extends Plugin {
                 this.outgoing_links[note.path]["ease"] = ease;
 
                 if (due_unix <= now)
-                    this.overdue_notes.push({ note, due_unix, interval, ease });
+                    this.due_notes.push({ note, due_unix, interval, ease });
             }
         }
 
@@ -253,14 +250,21 @@ export default class ConceptsReviewPlugin extends Plugin {
         }
         this.scheduled_notes = temp;
 
-        // sort overdue notes by importance
-        this.overdue_notes = this.overdue_notes.sort(
+        // sort due notes by importance
+        this.due_notes = this.due_notes.sort(
             (a, b) =>
                 (this.pageranks[b.note.path] || 0) -
                 (this.pageranks[a.note.path] || 0)
         );
 
-        this.statusBar.setText(`Review: ${this.overdue_notes.length} due`);
+        // sort new notes by importance
+        this.new_notes = this.new_notes.sort(
+            (a, b) =>
+                (this.pageranks[b[0].path] || 0) -
+                (this.pageranks[a[0].path] || 0)
+        );
+
+        this.statusBar.setText(`Review: ${this.due_notes.length} due`);
         this.due_view.redraw();
     }
 
@@ -391,21 +395,31 @@ export default class ConceptsReviewPlugin extends Plugin {
     }
 
     async reviewNextNote(): void {
-        if (this.overdue_notes.length == 0) {
+        if (this.due_notes.length == 0 && this.new_notes.length == 0) {
             new Notice("You're done for the day :D.");
             return;
         }
 
-        if (this.overdue_notes.length > 0) {
-            let cNote = this.overdue_notes[
+        if (this.due_notes.length > 0) {
+            let cNote = this.due_notes[
                 this.data.settings.open_random_note
-                    ? Math.floor(Math.random() * this.overdue_notes.length)
+                    ? Math.floor(Math.random() * this.due_notes.length)
                     : 0
             ];
-            for (let note of this.overdue_notes) {
+            for (let note of this.due_notes) {
                 if (note["due_unix"] < cNote["due_unix"]) cNote = note;
             }
             this.app.workspace.activeLeaf.openFile(cNote["note"]);
+            return;
+        }
+
+        if (this.new_notes.length > 0) {
+            let note = this.new_notes[
+                this.data.settings.open_random_note
+                    ? Math.floor(Math.random() * this.new_notes.length)
+                    : 0
+            ];
+            this.app.workspace.activeLeaf.openFile(note[0]);
         }
     }
 
@@ -488,26 +502,20 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Load balancing threshold")
-            .setDesc(
-                "Helps distribute pending 1st time reviews hence controlling load spikes (in # of notes)"
-            )
+            .setName("Max. number of new notes to display on right panel")
+            .setDesc("Show be a number > 0")
             .addText((text) =>
                 text
-                    .setValue(
-                        `${this.plugin.data.settings.load_balancing_threshold}`
-                    )
+                    .setValue(`${this.plugin.data.settings.max_display_new}`)
                     .onChange(async (value) => {
                         value = Number.parseInt(value);
                         if (!isNaN(value)) {
                             if (value < 1) {
-                                new Notice(
-                                    "The load balancing threshold must be at least 1."
-                                );
+                                new Notice("The number must be at least 1.");
                                 return;
                             }
 
-                            this.plugin.data.settings.load_balancing_threshold = value;
+                            this.plugin.data.settings.max_display_new = value;
                             await this.plugin.savePluginData();
                         } else {
                             new Notice("Please provide a valid number.");
@@ -587,7 +595,7 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Open a random overdue note for review")
+            .setName("Open a random note for review")
             .setDesc(
                 "When you turn this off, notes are ordered by importance (PageRank)"
             )
@@ -601,7 +609,7 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Open next overdue note automatically after a review")
+            .setName("Open next note automatically after a review")
             .addToggle((toggle) =>
                 toggle
                     .setValue(this.plugin.data.settings.auto_next_note)

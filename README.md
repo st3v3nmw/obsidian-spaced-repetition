@@ -50,6 +50,7 @@ review: false
 
 ## TODO
 
-- Limit number of new notes on panel
+- Refactor settings
+- Better fuzz
 - Refactor code
 - Help & documentation
