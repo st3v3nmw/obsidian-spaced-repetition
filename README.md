@@ -1,4 +1,4 @@
-# Concepts Review Obsidian Plugin
+# Obsidian Spaced Repetition Plugin
 
 Fight the forgetting curve & note aging by reviewing notes using spaced repetition on Obsidian.md 
 
