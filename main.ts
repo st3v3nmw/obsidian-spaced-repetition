@@ -648,20 +648,16 @@ class ReviewQueueListView extends ItemView {
             );
 
             for (let currentFile of this.plugin.new_notes) {
-                let navFileTitle = this.createRightPaneFile(
+                this.createRightPaneFile(
                     newNotesFolderEl,
                     currentFile[0],
                     openFile,
                     !this.activeFolders.has("New")
                 );
-                navFileTitle.onClickEvent((_: any) => {
-                    this.app.workspace.activeLeaf.openFile(currentFile[0]);
-                });
             }
         }
 
         let now: number = Date.now();
-        let count: number = 0;
         for (let due_unix in this.plugin.scheduled_notes) {
             let due_on_date = this.plugin.scheduled_notes[due_unix];
             let due = new Date(Number.parseInt(due_unix));
@@ -689,42 +685,7 @@ class ReviewQueueListView extends ItemView {
                     openFile,
                     !this.activeFolders.has(folderTitle)
                 );
-
-                navFileTitle.addEventListener(
-                    "click",
-                    (event) => {
-                        event.preventDefault();
-                        this.app.workspace.activeLeaf.openFile(
-                            due_on_date[currentFile].note
-                        );
-                        return false;
-                    },
-                    false
-                );
-
-                navFileTitle.addEventListener(
-                    "contextmenu",
-                    (event) => {
-                        event.preventDefault();
-                        const fileMenu = new Menu(this.app);
-                        this.app.workspace.trigger(
-                            "file-menu",
-                            fileMenu,
-                            due_on_date[currentFile].note,
-                            "my-context-menu",
-                            null
-                        );
-                        fileMenu.showAtPosition({
-                            x: event.pageX,
-                            y: event.pageY,
-                        });
-                        return false;
-                    },
-                    false
-                );
             }
-
-            count++;
         }
 
         const contentEl = this.containerEl.children[1];
@@ -785,8 +746,38 @@ class ReviewQueueListView extends ItemView {
         const navFileTitle = navFile.createDiv("nav-file-title");
         if (openFile && file.path === openFile.path)
             navFileTitle.addClass("is-active");
-        navFileTitle.createDiv("nav-file-title-content").setText(file.basename);
 
+        navFileTitle.createDiv("nav-file-title-content").setText(file.basename);
+        navFileTitle.addEventListener(
+            "click",
+            (event) => {
+                event.preventDefault();
+                this.app.workspace.activeLeaf.openFile(file);
+                return false;
+            },
+            false
+        );
+
+        navFileTitle.addEventListener(
+            "contextmenu",
+            (event) => {
+                event.preventDefault();
+                const fileMenu = new Menu(this.app);
+                this.app.workspace.trigger(
+                    "file-menu",
+                    fileMenu,
+                    file,
+                    "my-context-menu",
+                    null
+                );
+                fileMenu.showAtPosition({
+                    x: event.pageX,
+                    y: event.pageY,
+                });
+                return false;
+            },
+            false
+        );
         return navFileTitle;
     }
 }
