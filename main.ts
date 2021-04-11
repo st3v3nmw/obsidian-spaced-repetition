@@ -49,7 +49,7 @@ export default class SRPlugin extends Plugin {
 
     public scheduled_notes;
     public due_notes: SchedNote[];
-    public new_notes: Array<[TFile, string]>;
+    public new_notes: TFile[];
     private incoming_links;
     private outgoing_links;
     private pageranks: Map<string, number>;
@@ -155,11 +155,13 @@ export default class SRPlugin extends Plugin {
                 let file_text = await this.app.vault.cachedRead(note);
                 // file has no scheduling information
                 if (
-                    !["due", "interval", "ease"].every((key) =>
-                        Object.keys(frontmatter).includes(key)
+                    !(
+                        frontmatter.hasOwnProperty("due") &&
+                        frontmatter.hasOwnProperty("interval") &&
+                        frontmatter.hasOwnProperty("ease")
                     )
                 ) {
-                    this.new_notes.push([note, file_text]);
+                    this.new_notes.push(note);
                     continue;
                 }
 
@@ -182,7 +184,7 @@ export default class SRPlugin extends Plugin {
             let links = this.app.metadataCache.resolvedLinks[source.path];
             for (let target_path in links) {
                 // Markdown files only
-                if (target_path.split(".").pop() == "md") {
+                if (target_path.split(".").pop().toLowerCase() == "md") {
                     this.outgoing_links[source.path]["list"][target_path] =
                         links[target_path];
                     this.incoming_links[target_path]["list"][source.path] =
@@ -235,9 +237,9 @@ export default class SRPlugin extends Plugin {
 
         // sort new notes by importance
         this.new_notes = this.new_notes.sort(
-            (a: [TFile, string], b: [TFile, string]) =>
-                (this.pageranks.get(b[0].path) || 0) -
-                (this.pageranks.get(a[0].path) || 0)
+            (a: TFile, b: TFile) =>
+                (this.pageranks.get(b.path) || 0) -
+                (this.pageranks.get(a.path) || 0)
         );
 
         this.statusBar.setText(`Review: ${this.due_notes.length} due`);
@@ -250,12 +252,14 @@ export default class SRPlugin extends Plugin {
 
         // check if note should be ignored
         if (frontmatter["review"] != false) {
-            let file_text = await this.app.vault.cachedRead(note);
+            let file_text = await this.app.vault.read(note);
             let ease, interval;
             // new note
             if (
-                !["due", "interval", "ease"].every((key) =>
-                    Object.keys(frontmatter).includes(key)
+                !(
+                    frontmatter.hasOwnProperty("due") &&
+                    frontmatter.hasOwnProperty("interval") &&
+                    frontmatter.hasOwnProperty("ease")
                 )
             ) {
                 let link_total = 0,
@@ -398,7 +402,7 @@ export default class SRPlugin extends Plugin {
         let { frontmatter } = this.app.metadataCache.getFileCache(note) || {};
         frontmatter = frontmatter || {};
 
-        let file_text = await this.app.vault.cachedRead(note);
+        let file_text = await this.app.vault.read(note);
         if (Object.entries(frontmatter).length == 0) {
             file_text = `---\nreview: false\n---\n\n${file_text}`;
         } else if (frontmatter["review"] == undefined) {
@@ -648,20 +652,16 @@ class ReviewQueueListView extends ItemView {
             );
 
             for (let currentFile of this.plugin.new_notes) {
-                let navFileTitle = this.createRightPaneFile(
+                this.createRightPaneFile(
                     newNotesFolderEl,
-                    currentFile[0],
+                    currentFile,
                     openFile,
                     !this.activeFolders.has("New")
                 );
-                navFileTitle.onClickEvent((_: any) => {
-                    this.app.workspace.activeLeaf.openFile(currentFile[0]);
-                });
             }
         }
 
         let now: number = Date.now();
-        let count: number = 0;
         for (let due_unix in this.plugin.scheduled_notes) {
             let due_on_date = this.plugin.scheduled_notes[due_unix];
             let due = new Date(Number.parseInt(due_unix));
@@ -689,42 +689,7 @@ class ReviewQueueListView extends ItemView {
                     openFile,
                     !this.activeFolders.has(folderTitle)
                 );
-
-                navFileTitle.addEventListener(
-                    "click",
-                    (event) => {
-                        event.preventDefault();
-                        this.app.workspace.activeLeaf.openFile(
-                            due_on_date[currentFile].note
-                        );
-                        return false;
-                    },
-                    false
-                );
-
-                navFileTitle.addEventListener(
-                    "contextmenu",
-                    (event) => {
-                        event.preventDefault();
-                        const fileMenu = new Menu(this.app);
-                        this.app.workspace.trigger(
-                            "file-menu",
-                            fileMenu,
-                            due_on_date[currentFile].note,
-                            "my-context-menu",
-                            null
-                        );
-                        fileMenu.showAtPosition({
-                            x: event.pageX,
-                            y: event.pageY,
-                        });
-                        return false;
-                    },
-                    false
-                );
             }
-
-            count++;
         }
 
         const contentEl = this.containerEl.children[1];
@@ -785,8 +750,38 @@ class ReviewQueueListView extends ItemView {
         const navFileTitle = navFile.createDiv("nav-file-title");
         if (openFile && file.path === openFile.path)
             navFileTitle.addClass("is-active");
-        navFileTitle.createDiv("nav-file-title-content").setText(file.basename);
 
+        navFileTitle.createDiv("nav-file-title-content").setText(file.basename);
+        navFileTitle.addEventListener(
+            "click",
+            (event) => {
+                event.preventDefault();
+                this.app.workspace.activeLeaf.openFile(file);
+                return false;
+            },
+            false
+        );
+
+        navFileTitle.addEventListener(
+            "contextmenu",
+            (event) => {
+                event.preventDefault();
+                const fileMenu = new Menu(this.app);
+                this.app.workspace.trigger(
+                    "file-menu",
+                    fileMenu,
+                    file,
+                    "my-context-menu",
+                    null
+                );
+                fileMenu.showAtPosition({
+                    x: event.pageX,
+                    y: event.pageY,
+                });
+                return false;
+            },
+            false
+        );
         return navFileTitle;
     }
 }
