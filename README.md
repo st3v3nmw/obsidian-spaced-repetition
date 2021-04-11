@@ -30,7 +30,7 @@ All "new" notes are listed under `New` on the right pane (Review Queue). Like so
 
 #### Reviewing
 
-Open the file & review it. Once done, choose either the `Review: Easy` or the `Review: Hard` option on the file menu (the three dots):
+Open the file & review it. Once done, choose either the `Review: Easy` or the `Review: Hard` option on the file menu (the three dots). The `Easy` or `Hard` depend on how well you comprehend the material being reviewed.
 
 ![Reviewing - More Options](assets/more_options.png)
 
@@ -38,7 +38,7 @@ Alternatively, you can right click on the file and access the same options:
 
 ![Reviewing - File context menu](assets/file_context_menu.png)
 
-The notes will then scheduled appropriately:
+The note will then scheduled appropriately:
 
 ![Scheduled](assets/scheduled.png)
 
@@ -51,16 +51,16 @@ Alternatively, one can use the `Open a note for review` command.
 #### Review Settings
 
 Available settings are:
-- Choosing whether to open a note by random or the most important note
+- Choosing whether to open a note at random or the most important note
 - Choosing whether to open the next note automatically after reviewing another
 
 ### Ignoring some notes
 
-To exclude some notes from the scheduling process, click the `Review: Ignore file` option on the file menu:
+To exclude some notes from the scheduling & review process, click the `Review: Ignore file` option on the file menu:
 
 ![Exclusion - More Options](assets/more_options.png)
 
-Alternaticely, add the following frontmatter to the very top of the note:
+Alternatively, add the following frontmatter to the very top of the note:
 
 ```yaml
 ---
