@@ -18,19 +18,35 @@ Version 1.1.0
 ### Installation
 
 Once the plugin goes through the review process, you can easily install the plugin from Obsidian's community plugin section in the Obsidian app.
-For now, create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your vault. Add the `main.js`, `manifest.json`, and the `styles.css` files from the [latest release](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases) to the folder. & enjoy!
+For now, create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your vault. Add the `main.js`, `manifest.json`, and the `styles.css` files from the [latest release](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases) to the folder.
 
-### Reviewing
+### Usage
 
 #### New Notes
 
-All "new" notes with content are listed under `New` on the right pane (Review Queue). To review, click on the file to open it, then choose either the `Review: Easy` or `Review: Hard` option on the file menu. The notes will then scheduled appropriately.
+All "new" notes are listed under `New` on the right pane (Review Queue). Like so:
 
-The file menu can be found on the `More options` three dots menu or by right clicking on the file on the file manager (left pane).
+![New notes](assets/new_notes.png)
+
+#### Reviewing
+
+Open the file & review it. Once done, choose either the `Review: Easy` or the `Review: Hard` option on the file menu (the three dots):
+
+![Reviewing - More Options](assets/more_options.png)
+
+Alternatively, you can right click on the file and access the same options:
+
+![Reviewing - File context menu](assets/file_context_menu.png)
+
+The notes will then scheduled appropriately:
+
+![Scheduled](assets/scheduled.png)
 
 #### Scheduled notes
 
-`Review: N due` on the status bar at the bottom of the screen shows how many notes one has to review today (+ overdue notes). Clicking on that opens one of the notes for review. Alternatively, one can use the `Open a note for review` command.
+`Review: N due` on the status bar at the bottom of the screen shows how many notes one has to review today (Today's notes + overdue notes). Clicking on that opens one of the notes for review.
+
+Alternatively, one can use the `Open a note for review` command.
 
 #### Review Settings
 
@@ -40,7 +56,12 @@ Available settings are:
 
 ### Ignoring some notes
 
-Click the `Review: Ignore file` option on the file menu or add the following frontmatter to the very top of the note:
+To exclude some notes from the scheduling process, click the `Review: Ignore file` option on the file menu:
+
+![Exclusion - More Options](assets/more_options.png)
+
+Alternaticely, add the following frontmatter to the very top of the note:
+
 ```yaml
 ---
 review: false
