@@ -13,9 +13,9 @@ import * as graph from "pagerank.js";
 
 const SCHEDULING_INFO_REGEX = /^---\n((?:.*\n)*)due: ([0-9A-Za-z ]+)\ninterval: ([0-9]+)\nease: ([0-9]+)\n((?:.*\n)*)---/;
 const YAML_FRONT_MATTER_REGEX = /^---\n((?:.*\n)*)---/;
-const REVIEW_QUEUE_VIEW_TYPE = "due-dates-list-view";
+const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
 
-interface ConceptsReviewSettings {
+interface SRSettings {
     base_ease: number;
     max_link_factor: number;
     open_random_note: boolean;
@@ -24,10 +24,10 @@ interface ConceptsReviewSettings {
 }
 
 interface PluginData {
-    settings: ConceptsReviewSettings;
+    settings: SRSettings;
 }
 
-const DEFAULT_SETTINGS: ConceptsReviewSettings = {
+const DEFAULT_SETTINGS: SRSettings = {
     base_ease: 250,
     max_link_factor: 1.0,
     open_random_note: false,
@@ -39,7 +39,7 @@ const DEFAULT_DATA: PluginData = {
     settings: DEFAULT_SETTINGS,
 };
 
-export default class ConceptsReviewPlugin extends Plugin {
+export default class SRPlugin extends Plugin {
     private scheduled_notes: [];
     private due_notes: [];
     private statusBar;
@@ -125,7 +125,7 @@ export default class ConceptsReviewPlugin extends Plugin {
             },
         });
 
-        this.addSettingTab(new ConceptsReviewSettingTab(this.app, this));
+        this.addSettingTab(new SRSettingTab(this.app, this));
 
         await sleep(2000);
         await this.sync();
@@ -481,10 +481,10 @@ function getFileLength(file_text: string, frontmatter: any): number {
     return file_text.split(/\r\n|\r|\n/).length - frontmatter_len;
 }
 
-class ConceptsReviewSettingTab extends PluginSettingTab {
-    plugin: ConceptsReviewPlugin;
+class SRSettingTab extends PluginSettingTab {
+    plugin: SRPlugin;
 
-    constructor(app: App, plugin: ConceptsReviewPlugin) {
+    constructor(app: App, plugin: SRPlugin) {
         super(app, plugin);
         this.plugin = plugin;
     }
@@ -624,9 +624,9 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
 }
 
 class ReviewQueueListView extends ItemView {
-    plugin: ConceptsReviewPlugin;
+    plugin: SRPlugin;
 
-    constructor(leaf: WorkspaceLeaf, plugin: ConceptsReviewPlugin) {
+    constructor(leaf: WorkspaceLeaf, plugin: SRPlugin) {
         super(leaf);
 
         this.plugin = plugin;
