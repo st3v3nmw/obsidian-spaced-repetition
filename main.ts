@@ -393,10 +393,10 @@ export default class SRPlugin extends Plugin {
     }
 
     async ignoreFile(note: TFile) {
-        let file_text = await this.app.vault.read(note);
-        let { frontmatter } = this.app.metadataCache.getCache(note.path) || {};
+        let { frontmatter } = this.app.metadataCache.getFileCache(note) || {};
         frontmatter = frontmatter || {};
 
+        let file_text = await this.app.vault.cachedRead(note);
         if (Object.entries(frontmatter).length == 0) {
             file_text = `---\nreview: false\n---\n\n${file_text}`;
         } else if (frontmatter["review"] == undefined) {
