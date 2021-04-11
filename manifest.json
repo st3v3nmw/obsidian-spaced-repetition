@@ -1,10 +1,10 @@
 {
-	"id": "concepts-review",
-	"name": "Concepts Review",
+	"id": "obsidian-spaced-repetition",
+	"name": "Spaced Repetition",
 	"version": "1.0.0",
 	"minAppVersion": "0.9.12",
 	"description": "Fight the forgetting curve & note aging by reviewing notes using spaced repetition on Obsidian.md",
 	"author": "Stephen Mwangi",
-	"authorUrl": "https://github.com/st3v3nmw/concepts-review",
+	"authorUrl": "https://github.com/st3v3nmw/obsidian-spaced-repetition",
 	"isDesktopOnly": false
 }

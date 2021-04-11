@@ -619,7 +619,7 @@ class ConceptsReviewSettingTab extends PluginSettingTab {
 
         let helpEl = containerEl.createEl("div", { cls: "help-div" });
         helpEl.innerHTML =
-            '<a href="https://github.com/st3v3nmw/concepts-review/blob/master/README.md">For more information, check the README.</a>';
+            '<a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/README.md">For more information, check the README.</a>';
     }
 }
 
