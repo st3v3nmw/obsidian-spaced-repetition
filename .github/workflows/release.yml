@@ -7,7 +7,7 @@ on:
     - '*' # Push events to matching any tag format, i.e. 1.0, 20.15.10
 
 env:
-  PLUGIN_NAME: concepts-review
+  PLUGIN_NAME: obsidian-spaced-repetition
 
 jobs:
   build:
