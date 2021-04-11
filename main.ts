@@ -46,7 +46,7 @@ export default class SRPlugin extends Plugin {
     private data: PluginData;
     private due_view: ReviewQueueListView;
 
-    async onload(): void {
+    async onload() {
         await this.loadPluginData();
 
         addIcon("crosshairs", crossHairsIcon);
@@ -81,41 +81,33 @@ export default class SRPlugin extends Plugin {
                 ))
         );
 
-        if (this.app.workspace.layoutReady) this.initView();
-        else
-            this.registerEvent(
-                this.app.workspace.on("layout-ready", (_) => this.initView())
-            );
+        this.registerEvent(
+            this.app.workspace.on("file-menu", (menu, file: TFile) => {
+                menu.addItem((item) => {
+                    item.setTitle("Review: Easy")
+                        .setIcon("crosshairs")
+                        .onClick((evt) => {
+                            this.saveReviewResponse(file, 1);
+                        });
+                });
 
-        this.app.workspace.on("file-menu", (menu, file: TFile) => {
-            menu.addItem((item) => {
-                item.setTitle("Review: Easy")
-                    .setIcon("crosshairs")
-                    .onClick((evt) => {
-                        this.saveReviewResponse(file, 1);
-                    });
-            });
-        });
+                menu.addItem((item) => {
+                    item.setTitle("Review: Hard")
+                        .setIcon("crosshairs")
+                        .onClick((evt) => {
+                            this.saveReviewResponse(file, 0);
+                        });
+                });
 
-        this.app.workspace.on("file-menu", (menu, file: TFile) => {
-            menu.addItem((item) => {
-                item.setTitle("Review: Hard")
-                    .setIcon("crosshairs")
-                    .onClick((evt) => {
-                        this.saveReviewResponse(file, 0);
-                    });
-            });
-        });
-
-        this.app.workspace.on("file-menu", (menu, file: TFile) => {
-            menu.addItem((item) => {
-                item.setTitle("Review: Ignore file")
-                    .setIcon("crosshairs")
-                    .onClick((evt) => {
-                        this.ignoreFile(file);
-                    });
-            });
-        });
+                menu.addItem((item) => {
+                    item.setTitle("Review: Ignore file")
+                        .setIcon("crosshairs")
+                        .onClick((evt) => {
+                            this.ignoreFile(file);
+                        });
+                });
+            })
+        );
 
         this.addCommand({
             id: "note-review-open-note",
@@ -127,11 +119,13 @@ export default class SRPlugin extends Plugin {
 
         this.addSettingTab(new SRSettingTab(this.app, this));
 
-        await sleep(2000);
-        await this.sync();
+        this.app.workspace.onLayoutReady((_) => {
+            this.initView();
+            this.sync();
+        });
     }
 
-    async sync(): void {
+    async sync() {
         let notes = this.app.vault.getMarkdownFiles();
         this.scheduled_notes = {};
         this.due_notes = [];
@@ -140,24 +134,20 @@ export default class SRPlugin extends Plugin {
         this.incoming_links = {};
         this.outgoing_links = {};
 
-        notes.forEach((file) => {
+        for (let file of notes) {
             this.incoming_links[file.path] = { list: {} };
             this.outgoing_links[file.path] = { list: {} };
-        });
+        }
 
-        let now = +new Date();
-        let file_text;
+        let now = Date.now();
         for (let note of notes) {
-            file_text = await this.app.vault.read(note);
             let { frontmatter } =
-                this.app.metadataCache.getCache(note.path) || {};
+                this.app.metadataCache.getFileCache(note) || {};
             frontmatter = frontmatter || {};
 
             // checks if note should be ignored
-            if (
-                frontmatter["review"] != false &&
-                getFileLength(file_text, frontmatter) > 1
-            ) {
+            if (frontmatter["review"] != false) {
+                let file_text = await this.app.vault.cachedRead(note);
                 // file has no scheduling information
                 if (
                     !["due", "interval", "ease"].every((key) =>
@@ -188,40 +178,18 @@ export default class SRPlugin extends Plugin {
             }
         }
 
-        notes.forEach((source) => {
-            iterateCacheRefs(
-                this.app.metadataCache.getFileCache(source),
-                (cb) => {
-                    let target = this.app.metadataCache.getFirstLinkpathDest(
-                        getLinkpath(cb.link),
-                        source.path
-                    );
-                    if (target != null && target.extension == "md") {
-                        if (
-                            !(
-                                target.path in
-                                this.outgoing_links[source.path]["list"]
-                            )
-                        )
-                            this.outgoing_links[source.path]["list"][
-                                target.path
-                            ] = 0;
-                        this.outgoing_links[source.path]["list"][target.path]++;
-
-                        if (
-                            !(
-                                target.path in
-                                this.incoming_links[target.path]["list"]
-                            )
-                        )
-                            this.incoming_links[target.path]["list"][
-                                source.path
-                            ] = 0;
-                        this.incoming_links[target.path]["list"][source.path]++;
-                    }
+        for (let source of notes) {
+            let links = this.app.metadataCache.resolvedLinks[source.path];
+            for (let target_path in links) {
+                // Markdown files only
+                if (target_path.split(".").pop() == "md") {
+                    this.outgoing_links[source.path]["list"][target_path] =
+                        links[target_path];
+                    this.incoming_links[target_path]["list"][source.path] =
+                        links[target_path];
                 }
-            );
-        });
+            }
+        }
 
         graph.reset();
         for (let source in this.outgoing_links) {
@@ -276,16 +244,13 @@ export default class SRPlugin extends Plugin {
         this.due_view.redraw();
     }
 
-    async saveReviewResponse(note: TFile, quality: number): void {
-        let file_text = await this.app.vault.read(note);
-        let { frontmatter } = this.app.metadataCache.getCache(note.path) || {};
+    async saveReviewResponse(note: TFile, quality: number) {
+        let { frontmatter } = this.app.metadataCache.getFileCache(note) || {};
         frontmatter = frontmatter || {};
 
         // check if note should be ignored
-        if (
-            frontmatter["review"] != false &&
-            getFileLength(file_text, frontmatter) > 1
-        ) {
+        if (frontmatter["review"] != false) {
+            let file_text = await this.app.vault.cachedRead(note);
             let ease, interval;
             // new note
             if (
@@ -362,7 +327,7 @@ export default class SRPlugin extends Plugin {
             }
             interval = Math.round(interval);
 
-            let due = new Date(+new Date() + interval * 24 * 3600 * 1000);
+            let due = new Date(Date.now() + interval * 24 * 3600 * 1000);
 
             // check if scheduling info exists
             if (SCHEDULING_INFO_REGEX.test(file_text)) {
@@ -400,7 +365,7 @@ export default class SRPlugin extends Plugin {
         if (this.data.settings.auto_next_note) this.reviewNextNote();
     }
 
-    async reviewNextNote(): void {
+    async reviewNextNote() {
         if (this.due_notes.length == 0 && this.new_notes.length == 0) {
             new Notice("You're done for the day :D.");
             return;
@@ -429,7 +394,7 @@ export default class SRPlugin extends Plugin {
         }
     }
 
-    async ignoreFile(note: TFile): void {
+    async ignoreFile(note: TFile) {
         let file_text = await this.app.vault.read(note);
         let { frontmatter } = this.app.metadataCache.getCache(note.path) || {};
         frontmatter = frontmatter || {};
@@ -451,11 +416,11 @@ export default class SRPlugin extends Plugin {
         this.app.vault.modify(note, file_text);
     }
 
-    async loadPluginData(): void {
+    async loadPluginData() {
         this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
     }
 
-    async savePluginData(): void {
+    async savePluginData() {
         await this.saveData(this.data);
     }
 
@@ -469,16 +434,6 @@ export default class SRPlugin extends Plugin {
             active: true,
         });
     }
-}
-
-function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function getFileLength(file_text: string, frontmatter: any): number {
-    let frontmatter_len = Object.entries(frontmatter).length;
-    if (frontmatter_len > 0) frontmatter_len += 2;
-    return file_text.split(/\r\n|\r|\n/).length - frontmatter_len;
 }
 
 class SRSettingTab extends PluginSettingTab {
@@ -617,7 +572,7 @@ class SRSettingTab extends PluginSettingTab {
                     })
             );
 
-        let helpEl = containerEl.createEl("div", { cls: "help-div" });
+        let helpEl = containerEl.createDiv("help-div");
         helpEl.innerHTML =
             '<a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/README.md">For more information, check the README.</a>';
     }
@@ -665,8 +620,8 @@ class ReviewQueueListView extends ItemView {
     public redraw(): void {
         const openFile = this.app.workspace.getActiveFile();
 
-        const rootEl = createDiv({ cls: "nav-folder mod-root" });
-        const childrenEl = rootEl.createDiv({ cls: "nav-folder-children" });
+        const rootEl = createDiv("nav-folder mod-root");
+        const childrenEl = rootEl.createDiv("nav-folder-children");
 
         if (this.plugin.new_notes.length > 0) {
             let newNotesFolderEl = this.createRightPaneFolder(
@@ -688,7 +643,7 @@ class ReviewQueueListView extends ItemView {
             }
         }
 
-        let now = +new Date();
+        let now = Date.now();
         let count = 0;
         for (let due_unix in this.plugin.scheduled_notes) {
             let due_on_date = this.plugin.scheduled_notes[due_unix];
@@ -737,25 +692,20 @@ class ReviewQueueListView extends ItemView {
         folderTitle: string,
         collapsed: boolean
     ): any {
-        const folderEl = childrenEl.createDiv({ cls: "nav-folder" });
-        const folderTitleEl = folderEl.createDiv({
-            cls: "nav-folder-title",
-        });
-        const childrenEl = folderEl.createDiv({
-            cls: "nav-folder-children",
-        });
-        const collapseIconEl = folderTitleEl.createDiv({
-            cls: "nav-folder-collapse-indicator collapse-icon",
-        });
+        const folderEl = childrenEl.createDiv("nav-folder");
+        const folderTitleEl = folderEl.createDiv("nav-folder-title");
+        const childrenEl = folderEl.createDiv("nav-folder-children");
+        const collapseIconEl = folderTitleEl.createDiv(
+            "nav-folder-collapse-indicator collapse-icon"
+        );
         collapseIconEl.innerHTML = collapseIcon;
 
         if (collapsed)
             collapseIconEl.childNodes[0].style.transform = "rotate(-90deg)";
 
-        folderTitleEl.createDiv({
-            cls: "nav-folder-title-content",
-            text: folderTitle,
-        });
+        folderTitleEl
+            .createDiv("nav-folder-title-content")
+            .setText(folderTitle);
 
         folderTitleEl.onClickEvent((_) => {
             for (let child of childrenEl.childNodes) {
@@ -784,18 +734,15 @@ class ReviewQueueListView extends ItemView {
         openFile: any,
         hidden: boolean
     ) {
-        const navFile = folderEl.createDiv({ cls: "nav-file" });
+        const navFile = folderEl.createDiv("nav-file");
         if (hidden) navFile.style.display = "none";
 
-        const navFileTitle = navFile.createDiv({
-            cls: "nav-file-title",
-        });
+        const navFileTitle = navFile.createDiv("nav-file-title");
         if (openFile && file[0].path === openFile.path)
             navFileTitle.addClass("is-active");
-        navFileTitle.createDiv({
-            cls: "nav-file-title-content",
-            text: file[0].basename,
-        });
+        navFileTitle
+            .createDiv("nav-file-title-content")
+            .setText(file[0].basename);
 
         return navFileTitle;
     }
