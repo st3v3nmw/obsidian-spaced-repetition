@@ -15,6 +15,11 @@ Version 1.0.1
 
 ![Sample screenshot](assets/screenshot.png)
 
+## Installation
+
+Once the plugin goes through the review process, you can easily install the plugin from Obsidian's community plugin section in the Obsidian app.
+For now, create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your vault. Add the `main.js`, `manifest.json`, and the `styles.css` files from the latest release to the folder. & enjoy!
+
 ### Reviewing
 
 #### New Notes
