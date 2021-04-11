@@ -90,7 +90,8 @@ export default class SRPlugin extends Plugin {
                     item.setTitle("Review: Easy")
                         .setIcon("crosshairs")
                         .onClick((evt) => {
-                            this.saveReviewResponse(file, 1);
+                            if (file.extension == "md")
+                                this.saveReviewResponse(file, 1);
                         });
                 });
 
@@ -98,7 +99,8 @@ export default class SRPlugin extends Plugin {
                     item.setTitle("Review: Hard")
                         .setIcon("crosshairs")
                         .onClick((evt) => {
-                            this.saveReviewResponse(file, 0);
+                            if (file.extension == "md")
+                                this.saveReviewResponse(file, 0);
                         });
                 });
 
@@ -106,7 +108,7 @@ export default class SRPlugin extends Plugin {
                     item.setTitle("Review: Ignore file")
                         .setIcon("crosshairs")
                         .onClick((evt) => {
-                            this.ignoreFile(file);
+                            if (file.extension == "md") this.ignoreFile(file);
                         });
                 });
             })
@@ -687,11 +689,39 @@ class ReviewQueueListView extends ItemView {
                     openFile,
                     !this.activeFolders.has(folderTitle)
                 );
-                navFileTitle.onClickEvent((_: any) => {
-                    this.app.workspace.activeLeaf.openFile(
-                        due_on_date[currentFile].note
-                    );
-                });
+
+                navFileTitle.addEventListener(
+                    "click",
+                    (event) => {
+                        event.preventDefault();
+                        this.app.workspace.activeLeaf.openFile(
+                            due_on_date[currentFile].note
+                        );
+                        return false;
+                    },
+                    false
+                );
+
+                navFileTitle.addEventListener(
+                    "contextmenu",
+                    (event) => {
+                        event.preventDefault();
+                        const fileMenu = new Menu(this.app);
+                        this.app.workspace.trigger(
+                            "file-menu",
+                            fileMenu,
+                            due_on_date[currentFile].note,
+                            "my-context-menu",
+                            null
+                        );
+                        fileMenu.showAtPosition({
+                            x: event.pageX,
+                            y: event.pageY,
+                        });
+                        return false;
+                    },
+                    false
+                );
             }
 
             count++;
