@@ -782,7 +782,6 @@ class ReviewQueueListView extends ItemView {
             },
             false
         );
-        return navFileTitle;
     }
 }
 
