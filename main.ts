@@ -8,6 +8,9 @@ import {
     PluginSettingTab,
     Setting,
     WorkspaceLeaf,
+    Menu,
+    App,
+    TFile,
 } from "obsidian";
 import * as graph from "pagerank.js";
 
@@ -40,21 +43,26 @@ const DEFAULT_DATA: PluginData = {
 };
 
 export default class SRPlugin extends Plugin {
-    private scheduled_notes: [];
-    private due_notes: [];
-    private statusBar;
-    private data: PluginData;
+    private statusBar: HTMLElement;
+    public data: PluginData;
     private due_view: ReviewQueueListView;
+
+    public scheduled_notes;
+    public due_notes: SchedNote[];
+    public new_notes: Array<[TFile, string]>;
+    private incoming_links;
+    private outgoing_links;
+    private pageranks: Map<string, number>;
 
     async onload() {
         await this.loadPluginData();
 
         addIcon("crosshairs", crossHairsIcon);
 
-        this.scheduled_notes = {};
+        this.scheduled_notes = new Map();
         this.due_notes = [];
         this.new_notes = [];
-        this.pageranks = {};
+        this.pageranks = new Map();
         this.incoming_links = {};
         this.outgoing_links = {};
 
@@ -62,7 +70,7 @@ export default class SRPlugin extends Plugin {
         this.statusBar.classList.add("mod-clickable");
         this.statusBar.setAttribute("aria-label", "Open a note for review");
         this.statusBar.setAttribute("aria-label-position", "top");
-        this.statusBar.addEventListener("click", (_) => {
+        this.statusBar.addEventListener("click", (_: any) => {
             this.reviewNextNote();
         });
 
@@ -73,12 +81,7 @@ export default class SRPlugin extends Plugin {
 
         this.registerView(
             REVIEW_QUEUE_VIEW_TYPE,
-            (leaf) =>
-                (this.due_view = new ReviewQueueListView(
-                    leaf,
-                    this,
-                    this.scheduled_notes
-                ))
+            (leaf) => (this.due_view = new ReviewQueueListView(leaf, this))
         );
 
         this.registerEvent(
@@ -119,7 +122,7 @@ export default class SRPlugin extends Plugin {
 
         this.addSettingTab(new SRSettingTab(this.app, this));
 
-        this.app.workspace.onLayoutReady((_) => {
+        this.app.workspace.onLayoutReady(() => {
             this.initView();
             this.sync();
         });
@@ -130,7 +133,7 @@ export default class SRPlugin extends Plugin {
         this.scheduled_notes = {};
         this.due_notes = [];
         this.new_notes = [];
-        this.pageranks = {};
+        this.pageranks = new Map();
         this.incoming_links = {};
         this.outgoing_links = {};
 
@@ -164,17 +167,12 @@ export default class SRPlugin extends Plugin {
 
                 if (!(due_unix in this.scheduled_notes))
                     this.scheduled_notes[due_unix] = {};
-                this.scheduled_notes[due_unix][note.path] = [
-                    note,
-                    due_unix,
-                    interval,
-                    ease,
-                ];
+                let note_obj = new SchedNote(note, due_unix, interval, ease);
+                this.scheduled_notes[due_unix][note.path] = note_obj;
                 this.incoming_links[note.path]["ease"] = ease;
                 this.outgoing_links[note.path]["ease"] = ease;
 
-                if (due_unix <= now)
-                    this.due_notes.push({ note, due_unix, interval, ease });
+                if (due_unix <= now) this.due_notes.push(note_obj);
             }
         }
 
@@ -201,8 +199,8 @@ export default class SRPlugin extends Plugin {
                 );
         }
 
-        graph.rank(0.85, 0.000001, (node, rank) => {
-            this.pageranks[node] = rank * 10000;
+        graph.rank(0.85, 0.000001, (node: string, rank: number) => {
+            this.pageranks.set(node, rank * 10000);
         });
 
         // sort dates
@@ -219,8 +217,8 @@ export default class SRPlugin extends Plugin {
             temp[due_unix] = Object.fromEntries(
                 Object.entries(this.scheduled_notes[due_unix]).sort(
                     ([, a], [, b]) =>
-                        (this.pageranks[b[0].path] || 0) -
-                        (this.pageranks[a[0].path] || 0)
+                        (this.pageranks.get(b.note.path) || 0) -
+                        (this.pageranks.get(a.note.path) || 0)
                 )
             );
         }
@@ -228,16 +226,16 @@ export default class SRPlugin extends Plugin {
 
         // sort due notes by importance
         this.due_notes = this.due_notes.sort(
-            (a, b) =>
-                (this.pageranks[b.note.path] || 0) -
-                (this.pageranks[a.note.path] || 0)
+            (a: SchedNote, b: SchedNote) =>
+                (this.pageranks.get(b.note.path) || 0) -
+                (this.pageranks.get(a.note.path) || 0)
         );
 
         // sort new notes by importance
         this.new_notes = this.new_notes.sort(
-            (a, b) =>
-                (this.pageranks[b[0].path] || 0) -
-                (this.pageranks[a[0].path] || 0)
+            (a: [TFile, string], b: [TFile, string]) =>
+                (this.pageranks.get(b[0].path) || 0) -
+                (this.pageranks.get(a[0].path) || 0)
         );
 
         this.statusBar.setText(`Review: ${this.due_notes.length} due`);
@@ -265,7 +263,7 @@ export default class SRPlugin extends Plugin {
                     "list"
                 ]) {
                     let ease =
-                        this.pageranks[linked_file] *
+                        this.pageranks.get(linked_file) *
                         this.incoming_links[linked_file]["ease"];
                     if (ease) {
                         let link_count = this.incoming_links[note.path]["list"][
@@ -273,7 +271,7 @@ export default class SRPlugin extends Plugin {
                         ];
                         link_total += ease * link_count;
                         link_pg_total +=
-                            this.pageranks[linked_file] * link_count;
+                            this.pageranks.get(linked_file) * link_count;
                         total_link_count += link_count;
                     }
                 }
@@ -282,7 +280,7 @@ export default class SRPlugin extends Plugin {
                     "list"
                 ]) {
                     let ease =
-                        this.pageranks[linked_file] *
+                        this.pageranks.get(linked_file) *
                         this.outgoing_links[linked_file]["ease"];
                     if (ease) {
                         let link_count = this.outgoing_links[note.path]["list"][
@@ -290,7 +288,7 @@ export default class SRPlugin extends Plugin {
                         ];
                         link_total += ease * link_count;
                         link_pg_total +=
-                            this.pageranks[linked_file] * link_count;
+                            this.pageranks.get(linked_file) * link_count;
                         total_link_count += link_count;
                     }
                 }
@@ -378,9 +376,9 @@ export default class SRPlugin extends Plugin {
                     : 0
             ];
             for (let note of this.due_notes) {
-                if (note["due_unix"] < cNote["due_unix"]) cNote = note;
+                if (note.due_unix < cNote.due_unix) cNote = note;
             }
-            this.app.workspace.activeLeaf.openFile(cNote["note"]);
+            this.app.workspace.activeLeaf.openFile(cNote.note);
             return;
         }
 
@@ -424,7 +422,7 @@ export default class SRPlugin extends Plugin {
         await this.saveData(this.data);
     }
 
-    initView(): void {
+    initView() {
         if (this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).length) {
             return;
         }
@@ -436,6 +434,20 @@ export default class SRPlugin extends Plugin {
     }
 }
 
+class SchedNote {
+    public note: TFile;
+    public due_unix: number;
+    public interval: number;
+    public ease: number;
+
+    constructor(note: TFile, due_unix: number, interval: number, ease: number) {
+        this.note = note;
+        this.due_unix = due_unix;
+        this.interval = interval;
+        this.ease = ease;
+    }
+}
+
 class SRSettingTab extends PluginSettingTab {
     plugin: SRPlugin;
 
@@ -444,7 +456,7 @@ class SRSettingTab extends PluginSettingTab {
         this.plugin = plugin;
     }
 
-    display(): void {
+    display() {
         let { containerEl } = this;
 
         containerEl.empty();
@@ -481,9 +493,9 @@ class SRSettingTab extends PluginSettingTab {
                 text
                     .setValue(`${this.plugin.data.settings.base_ease}`)
                     .onChange(async (value) => {
-                        value = Number.parseInt(value);
-                        if (!isNaN(value)) {
-                            if (value < 130) {
+                        let num_value: number = Number.parseInt(value);
+                        if (!isNaN(num_value)) {
+                            if (num_value < 130) {
                                 new Notice(
                                     "The base ease must be at least 130."
                                 );
@@ -493,7 +505,7 @@ class SRSettingTab extends PluginSettingTab {
                                 return;
                             }
 
-                            this.plugin.data.settings.base_ease = value;
+                            this.plugin.data.settings.base_ease = num_value;
                             await this.plugin.savePluginData();
                         } else {
                             new Notice("Please provide a valid number.");
@@ -515,9 +527,9 @@ class SRSettingTab extends PluginSettingTab {
                         }`
                     )
                     .onChange(async (value) => {
-                        value = Number.parseInt(value) / 100;
-                        if (!isNaN(value)) {
-                            if (value < 0.01 || value > 0.99) {
+                        let num_value: number = Number.parseInt(value) / 100;
+                        if (!isNaN(num_value)) {
+                            if (num_value < 0.01 || num_value > 0.99) {
                                 new Notice(
                                     "The load balancing threshold must be in the range 0% < interval_change < 100%."
                                 );
@@ -530,7 +542,7 @@ class SRSettingTab extends PluginSettingTab {
                                 return;
                             }
 
-                            this.plugin.data.settings.lapses_interval_change = value;
+                            this.plugin.data.settings.lapses_interval_change = num_value;
                             await this.plugin.savePluginData();
                         } else {
                             new Notice("Please provide a valid number.");
@@ -549,9 +561,9 @@ class SRSettingTab extends PluginSettingTab {
                         `${this.plugin.data.settings.max_link_factor * 100}`
                     )
                     .onChange(async (value) => {
-                        value = Number.parseInt(value) / 100;
-                        if (!isNaN(value)) {
-                            if (value < 0 || value > 1.0) {
+                        let num_value: number = Number.parseInt(value) / 100;
+                        if (!isNaN(num_value)) {
+                            if (num_value < 0 || num_value > 1.0) {
                                 new Notice(
                                     "The link factor must be in the range 0% <= max_link_factor <= 100%."
                                 );
@@ -564,7 +576,7 @@ class SRSettingTab extends PluginSettingTab {
                                 return;
                             }
 
-                            this.plugin.data.settings.max_link_factor = value;
+                            this.plugin.data.settings.max_link_factor = num_value;
                             await this.plugin.savePluginData();
                         } else {
                             new Notice("Please provide a valid number.");
@@ -580,6 +592,7 @@ class SRSettingTab extends PluginSettingTab {
 
 class ReviewQueueListView extends ItemView {
     plugin: SRPlugin;
+    activeFolders: Set<string>;
 
     constructor(leaf: WorkspaceLeaf, plugin: SRPlugin) {
         super(leaf);
@@ -587,9 +600,11 @@ class ReviewQueueListView extends ItemView {
         this.plugin = plugin;
         this.activeFolders = new Set(["Today"]);
         this.registerEvent(
-            this.app.workspace.on("file-open", (_) => this.redraw())
+            this.app.workspace.on("file-open", (_: any) => this.redraw())
         );
-        this.registerEvent(this.app.vault.on("rename", (_) => this.redraw()));
+        this.registerEvent(
+            this.app.vault.on("rename", (_: any) => this.redraw())
+        );
         this.redraw();
     }
 
@@ -605,7 +620,7 @@ class ReviewQueueListView extends ItemView {
         return "crosshairs";
     }
 
-    public onHeaderMenu(menu: Menu): void {
+    public onHeaderMenu(menu: Menu) {
         menu.addItem((item) => {
             item.setTitle("Close")
                 .setIcon("cross")
@@ -617,7 +632,7 @@ class ReviewQueueListView extends ItemView {
         });
     }
 
-    public redraw(): void {
+    public redraw() {
         const openFile = this.app.workspace.getActiveFile();
 
         const rootEl = createDiv("nav-folder mod-root");
@@ -633,18 +648,18 @@ class ReviewQueueListView extends ItemView {
             for (let currentFile of this.plugin.new_notes) {
                 let navFileTitle = this.createRightPaneFile(
                     newNotesFolderEl,
-                    currentFile,
+                    currentFile[0],
                     openFile,
                     !this.activeFolders.has("New")
                 );
-                navFileTitle.onClickEvent((_) => {
+                navFileTitle.onClickEvent((_: any) => {
                     this.app.workspace.activeLeaf.openFile(currentFile[0]);
                 });
             }
         }
 
-        let now = Date.now();
-        let count = 0;
+        let now: number = Date.now();
+        let count: number = 0;
         for (let due_unix in this.plugin.scheduled_notes) {
             let due_on_date = this.plugin.scheduled_notes[due_unix];
             let due = new Date(Number.parseInt(due_unix));
@@ -668,13 +683,13 @@ class ReviewQueueListView extends ItemView {
             for (let currentFile in due_on_date) {
                 let navFileTitle = this.createRightPaneFile(
                     folderEl,
-                    due_on_date[currentFile],
+                    due_on_date[currentFile].note,
                     openFile,
                     !this.activeFolders.has(folderTitle)
                 );
-                navFileTitle.onClickEvent((_) => {
+                navFileTitle.onClickEvent((_: any) => {
                     this.app.workspace.activeLeaf.openFile(
-                        due_on_date[currentFile][0]
+                        due_on_date[currentFile].note
                     );
                 });
             }
@@ -688,11 +703,11 @@ class ReviewQueueListView extends ItemView {
     }
 
     private createRightPaneFolder(
-        childrenEl: any,
+        parentEl: any,
         folderTitle: string,
         collapsed: boolean
     ): any {
-        const folderEl = childrenEl.createDiv("nav-folder");
+        const folderEl = parentEl.createDiv("nav-folder");
         const folderTitleEl = folderEl.createDiv("nav-folder-title");
         const childrenEl = folderEl.createDiv("nav-folder-children");
         const collapseIconEl = folderTitleEl.createDiv(
@@ -707,7 +722,7 @@ class ReviewQueueListView extends ItemView {
             .createDiv("nav-folder-title-content")
             .setText(folderTitle);
 
-        folderTitleEl.onClickEvent((_) => {
+        folderTitleEl.onClickEvent((_: any) => {
             for (let child of childrenEl.childNodes) {
                 if (
                     child.style.display == "block" ||
@@ -731,18 +746,16 @@ class ReviewQueueListView extends ItemView {
     private createRightPaneFile(
         folderEl: any,
         file: TFile,
-        openFile: any,
+        openFile: TFile,
         hidden: boolean
     ) {
         const navFile = folderEl.createDiv("nav-file");
         if (hidden) navFile.style.display = "none";
 
         const navFileTitle = navFile.createDiv("nav-file-title");
-        if (openFile && file[0].path === openFile.path)
+        if (openFile && file.path === openFile.path)
             navFileTitle.addClass("is-active");
-        navFileTitle
-            .createDiv("nav-file-title-content")
-            .setText(file[0].basename);
+        navFileTitle.createDiv("nav-file-title-content").setText(file.basename);
 
         return navFileTitle;
     }
