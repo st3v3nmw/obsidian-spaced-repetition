@@ -152,7 +152,7 @@ export default class SRPlugin extends Plugin {
                 if (this.incomingLinks[targetPath] == undefined)
                     this.incomingLinks[targetPath] = [];
 
-                // Markdown files only
+                // markdown files only
                 if (targetPath.split(".").pop().toLowerCase() == "md") {
                     this.incomingLinks[targetPath].push({
                         sourcePath: note.path,
@@ -343,11 +343,11 @@ export default class SRPlugin extends Plugin {
     async reviewNextNote() {
         if (this.dueNotesCount > 0) {
             this.app.workspace.activeLeaf.openFile(
-                this.scheduledNotes[
+                Object.entries(this.scheduledNotes)[
                     this.data.settings.openRandomNote
                         ? Math.floor(Math.random() * this.dueNotesCount)
                         : 0
-                ].note
+                ][1].note
             );
             return;
         }
