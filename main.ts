@@ -144,8 +144,8 @@ export default class SRPlugin extends Plugin {
 
         let now = Date.now();
         for (let note of notes) {
-            let frontmatter =
-                this.app.metadataCache.getFileCache(note).frontmatter || {};
+            if (this.incomingLinks[note.path] == undefined)
+                this.incomingLinks[note.path] = [];
 
             let links = this.app.metadataCache.resolvedLinks[note.path] || {};
             for (let targetPath in links) {
@@ -162,6 +162,9 @@ export default class SRPlugin extends Plugin {
                     graph.link(note.path, targetPath, links[targetPath]);
                 }
             }
+
+            let frontmatter =
+                this.app.metadataCache.getFileCache(note).frontmatter || {};
 
             // checks if note should be ignored
             if (frontmatter["review"] != false) {
@@ -235,15 +238,13 @@ export default class SRPlugin extends Plugin {
                     totalLinkCount = 0;
 
                 for (let statObj of this.incomingLinks[note.path]) {
-                    // target note is scheduled
-                    if (this.scheduledNotes[statObj.sourcePath]) {
-                        let linkedFile = this.scheduledNotes[
-                            statObj.sourcePath
-                        ];
-                        let ease =
+                    let linkedFile = this.scheduledNotes[statObj.sourcePath];
+                    // source note is scheduled
+                    if (linkedFile) {
+                        linkTotal +=
+                            statObj.linkCount *
                             this.pageranks[statObj.sourcePath] *
                             linkedFile.ease;
-                        linkTotal += statObj.linkCount * linkedFile.ease;
                         linkPGTotal +=
                             this.pageranks[statObj.sourcePath] *
                             statObj.linkCount;
@@ -254,12 +255,12 @@ export default class SRPlugin extends Plugin {
                 let outgoingLinks =
                     this.app.metadataCache.resolvedLinks[note.path] || {};
                 for (let linkedFilePath in outgoingLinks) {
-                    if (this.scheduledNotes[linkedFilePath]) {
-                        let linkedFile = this.scheduledNotes[linkedFilePath];
-                        let ease =
-                            this.pageranks[linkedFilePath] * linkedFile.ease;
+                    let linkedFile = this.scheduledNotes[linkedFilePath];
+                    if (linkedFile) {
                         linkTotal +=
-                            outgoingLinks[linkedFilePath] * linkedFile.ease;
+                            outgoingLinks[linkedFilePath] *
+                            this.pageranks[linkedFilePath] *
+                            linkedFile.ease;
                         linkPGTotal +=
                             this.pageranks[linkedFilePath] *
                             outgoingLinks[linkedFilePath];
