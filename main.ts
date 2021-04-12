@@ -2,8 +2,6 @@ import {
     Notice,
     Plugin,
     addIcon,
-    iterateCacheRefs,
-    getLinkpath,
     ItemView,
     PluginSettingTab,
     Setting,
@@ -19,11 +17,11 @@ const YAML_FRONT_MATTER_REGEX = /^---\n((?:.*\n)*)---/;
 const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
 
 interface SRSettings {
-    base_ease: number;
-    max_link_factor: number;
-    open_random_note: boolean;
-    lapses_interval_change: number;
-    auto_next_note: boolean;
+    baseEase: number;
+    maxLinkFactor: number;
+    openRandomNote: boolean;
+    lapsesIntervalChange: number;
+    autoNextNote: boolean;
 }
 
 interface PluginData {
@@ -31,40 +29,43 @@ interface PluginData {
 }
 
 const DEFAULT_SETTINGS: SRSettings = {
-    base_ease: 250,
-    max_link_factor: 1.0,
-    open_random_note: false,
-    lapses_interval_change: 0.5,
-    auto_next_note: false,
+    baseEase: 250,
+    maxLinkFactor: 1.0,
+    openRandomNote: false,
+    lapsesIntervalChange: 0.5,
+    autoNextNote: false,
 };
 
 const DEFAULT_DATA: PluginData = {
     settings: DEFAULT_SETTINGS,
 };
 
+interface SchedNote {
+    note: TFile;
+    dueUnix: number;
+    ease: number;
+}
+
+interface LinkStat {
+    sourcePath: string;
+    linkCount: number;
+}
+
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
+    private reviewQueueView: ReviewQueueListView;
     public data: PluginData;
-    private due_view: ReviewQueueListView;
 
-    public scheduled_notes;
-    public due_notes: SchedNote[];
-    public new_notes: TFile[];
-    private incoming_links;
-    private outgoing_links;
-    private pageranks: Map<string, number>;
+    public newNotes: TFile[] = [];
+    public scheduledNotes: Record<string, SchedNote> = {};
+    private incomingLinks: Record<string, LinkStat[]> = {};
+    private pageranks: Record<string, number> = {};
+    private dueNotesCount: number = 0;
 
     async onload() {
         await this.loadPluginData();
 
         addIcon("crosshairs", crossHairsIcon);
-
-        this.scheduled_notes = new Map();
-        this.due_notes = [];
-        this.new_notes = [];
-        this.pageranks = new Map();
-        this.incoming_links = {};
-        this.outgoing_links = {};
 
         this.statusBar = this.addStatusBarItem();
         this.statusBar.classList.add("mod-clickable");
@@ -74,6 +75,7 @@ export default class SRPlugin extends Plugin {
             this.reviewNextNote();
         });
 
+        // TODO: remove this
         this.addRibbonIcon("crosshairs", "Sync notes scheduling", async () => {
             await this.sync();
             new Notice("Sync done.");
@@ -81,7 +83,8 @@ export default class SRPlugin extends Plugin {
 
         this.registerView(
             REVIEW_QUEUE_VIEW_TYPE,
-            (leaf) => (this.due_view = new ReviewQueueListView(leaf, this))
+            (leaf) =>
+                (this.reviewQueueView = new ReviewQueueListView(leaf, this))
         );
 
         this.registerEvent(
@@ -91,7 +94,7 @@ export default class SRPlugin extends Plugin {
                         .setIcon("crosshairs")
                         .onClick((evt) => {
                             if (file.extension == "md")
-                                this.saveReviewResponse(file, 1);
+                                this.saveReviewResponse(file, true);
                         });
                 });
 
@@ -100,7 +103,7 @@ export default class SRPlugin extends Plugin {
                         .setIcon("crosshairs")
                         .onClick((evt) => {
                             if (file.extension == "md")
-                                this.saveReviewResponse(file, 0);
+                                this.saveReviewResponse(file, false);
                         });
                 });
 
@@ -126,33 +129,43 @@ export default class SRPlugin extends Plugin {
 
         this.app.workspace.onLayoutReady(() => {
             this.initView();
-            this.sync();
+            setTimeout(() => this.sync(), 2000);
         });
     }
 
     async sync() {
         let notes = this.app.vault.getMarkdownFiles();
-        this.scheduled_notes = {};
-        this.due_notes = [];
-        this.new_notes = [];
-        this.pageranks = new Map();
-        this.incoming_links = {};
-        this.outgoing_links = {};
 
-        for (let file of notes) {
-            this.incoming_links[file.path] = { list: {} };
-            this.outgoing_links[file.path] = { list: {} };
-        }
+        graph.reset();
+        this.scheduledNotes = {};
+        this.newNotes = [];
+        this.incomingLinks = {};
+        this.pageranks = {};
+        this.dueNotesCount = 0;
 
         let now = Date.now();
         for (let note of notes) {
-            let { frontmatter } =
-                this.app.metadataCache.getFileCache(note) || {};
-            frontmatter = frontmatter || {};
+            let frontmatter =
+                this.app.metadataCache.getFileCache(note).frontmatter || {};
+
+            let links = this.app.metadataCache.resolvedLinks[note.path] || {};
+            for (let targetPath in links) {
+                if (this.incomingLinks[targetPath] == undefined)
+                    this.incomingLinks[targetPath] = [];
+
+                // Markdown files only
+                if (targetPath.split(".").pop().toLowerCase() == "md") {
+                    this.incomingLinks[targetPath].push({
+                        sourcePath: note.path,
+                        linkCount: links[targetPath],
+                    });
+
+                    graph.link(note.path, targetPath, links[targetPath]);
+                }
+            }
 
             // checks if note should be ignored
             if (frontmatter["review"] != false) {
-                let file_text = await this.app.vault.cachedRead(note);
                 // file has no scheduling information
                 if (
                     !(
@@ -161,98 +174,54 @@ export default class SRPlugin extends Plugin {
                         frontmatter.hasOwnProperty("ease")
                     )
                 ) {
-                    this.new_notes.push(note);
+                    this.newNotes.push(note);
                     continue;
                 }
 
-                let due_unix = Date.parse(frontmatter["due"]);
-                let interval = frontmatter["interval"];
-                let ease = frontmatter["ease"];
+                let dueUnix = Date.parse(frontmatter["due"]);
+                this.scheduledNotes[note.path] = {
+                    note,
+                    dueUnix,
+                    ease: frontmatter["ease"],
+                };
 
-                if (!(due_unix in this.scheduled_notes))
-                    this.scheduled_notes[due_unix] = {};
-                let note_obj = new SchedNote(note, due_unix, interval, ease);
-                this.scheduled_notes[due_unix][note.path] = note_obj;
-                this.incoming_links[note.path]["ease"] = ease;
-                this.outgoing_links[note.path]["ease"] = ease;
-
-                if (due_unix <= now) this.due_notes.push(note_obj);
+                if (dueUnix <= now) this.dueNotesCount++;
             }
-        }
-
-        for (let source of notes) {
-            let links = this.app.metadataCache.resolvedLinks[source.path];
-            for (let target_path in links) {
-                // Markdown files only
-                if (target_path.split(".").pop().toLowerCase() == "md") {
-                    this.outgoing_links[source.path]["list"][target_path] =
-                        links[target_path];
-                    this.incoming_links[target_path]["list"][source.path] =
-                        links[target_path];
-                }
-            }
-        }
-
-        graph.reset();
-        for (let source in this.outgoing_links) {
-            for (let target in this.outgoing_links[source]["list"])
-                graph.link(
-                    source,
-                    target,
-                    this.outgoing_links[source]["list"][target]
-                );
         }
 
         graph.rank(0.85, 0.000001, (node: string, rank: number) => {
-            this.pageranks.set(node, rank * 10000);
+            this.pageranks[node] = rank * 10000;
         });
 
-        // sort dates
-        this.scheduled_notes = Object.keys(this.scheduled_notes)
-            .sort()
-            .reduce((obj, key) => {
-                obj[key] = this.scheduled_notes[key];
-                return obj;
-            }, {});
-
-        // sort per day entries by importance
-        let temp = {};
-        for (let due_unix in this.scheduled_notes) {
-            temp[due_unix] = Object.fromEntries(
-                Object.entries(this.scheduled_notes[due_unix]).sort(
-                    ([, a], [, b]) =>
-                        (this.pageranks.get(b.note.path) || 0) -
-                        (this.pageranks.get(a.note.path) || 0)
-                )
-            );
-        }
-        this.scheduled_notes = temp;
-
-        // sort due notes by importance
-        this.due_notes = this.due_notes.sort(
-            (a: SchedNote, b: SchedNote) =>
-                (this.pageranks.get(b.note.path) || 0) -
-                (this.pageranks.get(a.note.path) || 0)
-        );
-
         // sort new notes by importance
-        this.new_notes = this.new_notes.sort(
+        this.newNotes = this.newNotes.sort(
             (a: TFile, b: TFile) =>
-                (this.pageranks.get(b.path) || 0) -
-                (this.pageranks.get(a.path) || 0)
+                (this.pageranks[b.path] || 0) - (this.pageranks[a.path] || 0)
         );
 
-        this.statusBar.setText(`Review: ${this.due_notes.length} due`);
-        this.due_view.redraw();
+        // sort scheduled notes by date & within those days, sort them by importance
+        this.scheduledNotes = Object.fromEntries(
+            Object.entries(this.scheduledNotes).sort(([, a], [, b]) => {
+                let result = a.dueUnix - b.dueUnix;
+                if (result != 0) return result;
+                return (
+                    (this.pageranks[b.note.path] || 0) -
+                    (this.pageranks[a.note.path] || 0)
+                );
+            })
+        );
+
+        this.statusBar.setText(`Review: ${this.dueNotesCount} due`);
+        this.reviewQueueView.redraw();
     }
 
-    async saveReviewResponse(note: TFile, quality: number) {
-        let { frontmatter } = this.app.metadataCache.getFileCache(note) || {};
-        frontmatter = frontmatter || {};
+    async saveReviewResponse(note: TFile, easy: boolean) {
+        let frontmatter =
+            this.app.metadataCache.getFileCache(note).frontmatter || {};
 
         // check if note should be ignored
         if (frontmatter["review"] != false) {
-            let file_text = await this.app.vault.read(note);
+            let fileText = await this.app.vault.read(note);
             let ease, interval;
             // new note
             if (
@@ -262,54 +231,54 @@ export default class SRPlugin extends Plugin {
                     frontmatter.hasOwnProperty("ease")
                 )
             ) {
-                let link_total = 0,
-                    link_pg_total = 0,
-                    total_link_count = 0;
-                for (let linked_file in this.incoming_links[note.path][
-                    "list"
-                ]) {
-                    let ease =
-                        this.pageranks.get(linked_file) *
-                        this.incoming_links[linked_file]["ease"];
-                    if (ease) {
-                        let link_count = this.incoming_links[note.path]["list"][
-                            linked_file
+                let linkTotal = 0,
+                    linkPGTotal = 0,
+                    totalLinkCount = 0;
+
+                for (let statObj of this.incomingLinks[note.path]) {
+                    // target note is scheduled
+                    if (this.scheduledNotes[statObj.sourcePath]) {
+                        let linkedFile = this.scheduledNotes[
+                            statObj.sourcePath
                         ];
-                        link_total += ease * link_count;
-                        link_pg_total +=
-                            this.pageranks.get(linked_file) * link_count;
-                        total_link_count += link_count;
+                        let ease =
+                            this.pageranks[statObj.sourcePath] *
+                            linkedFile.ease;
+                        linkTotal += statObj.linkCount * linkedFile.ease;
+                        linkPGTotal +=
+                            this.pageranks[statObj.sourcePath] *
+                            statObj.linkCount;
+                        totalLinkCount += statObj.linkCount;
                     }
                 }
 
-                for (let linked_file in this.outgoing_links[note.path][
-                    "list"
-                ]) {
-                    let ease =
-                        this.pageranks.get(linked_file) *
-                        this.outgoing_links[linked_file]["ease"];
-                    if (ease) {
-                        let link_count = this.outgoing_links[note.path]["list"][
-                            linked_file
-                        ];
-                        link_total += ease * link_count;
-                        link_pg_total +=
-                            this.pageranks.get(linked_file) * link_count;
-                        total_link_count += link_count;
+                let outgoingLinks =
+                    this.app.metadataCache.resolvedLinks[note.path] || {};
+                for (let linkedFilePath in outgoingLinks) {
+                    if (this.scheduledNotes[linkedFilePath]) {
+                        let linkedFile = this.scheduledNotes[linkedFilePath];
+                        let ease =
+                            this.pageranks[linkedFilePath] * linkedFile.ease;
+                        linkTotal +=
+                            outgoingLinks[linkedFilePath] * linkedFile.ease;
+                        linkPGTotal +=
+                            this.pageranks[linkedFilePath] *
+                            outgoingLinks[linkedFilePath];
+                        totalLinkCount += outgoingLinks[linkedFilePath];
                     }
                 }
 
-                let link_contribution =
-                    this.data.settings.max_link_factor *
+                let linkContribution =
+                    this.data.settings.maxLinkFactor *
                     Math.min(
                         1.0,
-                        Math.log(total_link_count + 0.5) / Math.log(64)
+                        Math.log(totalLinkCount + 0.5) / Math.log(64)
                     );
                 ease = Math.round(
-                    (1.0 - link_contribution) * this.data.settings.base_ease +
-                        (total_link_count > 0
-                            ? (link_contribution * link_total) / link_pg_total
-                            : link_contribution * this.data.settings.base_ease)
+                    (1.0 - linkContribution) * this.data.settings.baseEase +
+                        (totalLinkCount > 0
+                            ? (linkContribution * linkTotal) / linkPGTotal
+                            : linkContribution * this.data.settings.baseEase)
                 );
                 interval = 1;
             } else {
@@ -317,12 +286,12 @@ export default class SRPlugin extends Plugin {
                 ease = frontmatter["ease"];
             }
 
-            ease = quality == 1 ? ease + 20 : Math.max(130, ease - 20);
+            ease = easy ? ease + 20 : Math.max(130, ease - 20);
             interval = Math.max(
                 1,
-                quality == 1
+                easy
                     ? (interval * ease) / 100
-                    : interval * this.data.settings.lapses_interval_change
+                    : interval * this.data.settings.lapsesIntervalChange
             );
             // fuzz
             if (interval >= 8) {
@@ -334,90 +303,91 @@ export default class SRPlugin extends Plugin {
             let due = new Date(Date.now() + interval * 24 * 3600 * 1000);
 
             // check if scheduling info exists
-            if (SCHEDULING_INFO_REGEX.test(file_text)) {
-                let scheduling_info = SCHEDULING_INFO_REGEX.exec(file_text);
-                file_text = file_text.replace(
+            if (SCHEDULING_INFO_REGEX.test(fileText)) {
+                let schedulingInfo = SCHEDULING_INFO_REGEX.exec(fileText);
+                fileText = fileText.replace(
                     SCHEDULING_INFO_REGEX,
                     `---\n${
-                        scheduling_info[1]
+                        schedulingInfo[1]
                     }due: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n${
-                        scheduling_info[5]
+                        schedulingInfo[5]
                     }---`
                 );
 
                 // new note with existing YAML front matter
-            } else if (YAML_FRONT_MATTER_REGEX.test(file_text)) {
-                let existing_yaml = YAML_FRONT_MATTER_REGEX.exec(file_text);
-                file_text = file_text.replace(
+            } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
+                let existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
+                fileText = fileText.replace(
                     YAML_FRONT_MATTER_REGEX,
                     `---\n${
-                        existing_yaml[1]
+                        existingYaml[1]
                     }due: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n---`
                 );
             } else {
-                file_text = `---\ndue: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n---\n\n${file_text}`;
+                fileText = `---\ndue: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n---\n\n${fileText}`;
             }
 
-            this.app.vault.modify(note, file_text);
+            this.app.vault.modify(note, fileText);
 
             new Notice("Response received.");
         } else {
             new Notice("Note marked as IGNORE or has no content.");
         }
 
-        await this.sync();
-        if (this.data.settings.auto_next_note) this.reviewNextNote();
+        setTimeout(() => {
+            this.sync();
+            if (this.data.settings.autoNextNote) this.reviewNextNote();
+        }, 500);
     }
 
     async reviewNextNote() {
-        if (this.due_notes.length == 0 && this.new_notes.length == 0) {
-            new Notice("You're done for the day :D.");
+        if (this.dueNotesCount > 0) {
+            this.app.workspace.activeLeaf.openFile(
+                this.scheduledNotes[
+                    this.data.settings.openRandomNote
+                        ? Math.floor(Math.random() * this.dueNotesCount)
+                        : 0
+                ].note
+            );
             return;
         }
 
-        if (this.due_notes.length > 0) {
-            let cNote = this.due_notes[
-                this.data.settings.open_random_note
-                    ? Math.floor(Math.random() * this.due_notes.length)
-                    : 0
-            ];
-            for (let note of this.due_notes) {
-                if (note.due_unix < cNote.due_unix) cNote = note;
-            }
-            this.app.workspace.activeLeaf.openFile(cNote.note);
+        if (this.newNotes.length > 0) {
+            this.app.workspace.activeLeaf.openFile(
+                this.newNotes[
+                    this.data.settings.openRandomNote
+                        ? Math.floor(Math.random() * this.newNotes.length)
+                        : 0
+                ]
+            );
             return;
         }
 
-        if (this.new_notes.length > 0) {
-            let note = this.new_notes[
-                this.data.settings.open_random_note
-                    ? Math.floor(Math.random() * this.new_notes.length)
-                    : 0
-            ];
-            this.app.workspace.activeLeaf.openFile(note[0]);
-        }
+        new Notice("You're done for the day :D.");
     }
 
     async ignoreFile(note: TFile) {
-        let { frontmatter } = this.app.metadataCache.getFileCache(note) || {};
-        frontmatter = frontmatter || {};
+        let frontmatter =
+            this.app.metadataCache.getFileCache(note).frontmatter || {};
 
-        let file_text = await this.app.vault.read(note);
+        let fileText = await this.app.vault.read(note);
         if (Object.entries(frontmatter).length == 0) {
-            file_text = `---\nreview: false\n---\n\n${file_text}`;
+            fileText = `---\nreview: false\n---\n\n${fileText}`;
         } else if (frontmatter["review"] == undefined) {
-            let existing_yaml = YAML_FRONT_MATTER_REGEX.exec(file_text);
-            file_text = file_text.replace(
+            let existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
+            fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
-                `---\n${existing_yaml[1]}review: false\n---`
+                `---\n${existingYaml[1]}review: false\n---`
             );
         } else if (frontmatter["review"] != false) {
-            file_text = file_text.replace(
+            fileText = fileText.replace(
                 /review: [0-9A-Za-z ]+/,
                 "review: false"
             );
         }
-        this.app.vault.modify(note, file_text);
+
+        this.app.vault.modify(note, fileText);
+        setTimeout(() => this.sync(), 500);
     }
 
     async loadPluginData() {
@@ -437,20 +407,6 @@ export default class SRPlugin extends Plugin {
             type: REVIEW_QUEUE_VIEW_TYPE,
             active: true,
         });
-    }
-}
-
-class SchedNote {
-    public note: TFile;
-    public due_unix: number;
-    public interval: number;
-    public ease: number;
-
-    constructor(note: TFile, due_unix: number, interval: number, ease: number) {
-        this.note = note;
-        this.due_unix = due_unix;
-        this.interval = interval;
-        this.ease = ease;
     }
 }
 
@@ -474,9 +430,9 @@ class SRSettingTab extends PluginSettingTab {
             )
             .addToggle((toggle) =>
                 toggle
-                    .setValue(this.plugin.data.settings.open_random_note)
+                    .setValue(this.plugin.data.settings.openRandomNote)
                     .onChange(async (value) => {
-                        this.plugin.data.settings.open_random_note = value;
+                        this.plugin.data.settings.openRandomNote = value;
                         await this.plugin.savePluginData();
                     })
             );
@@ -485,9 +441,9 @@ class SRSettingTab extends PluginSettingTab {
             .setName("Open next note automatically after a review")
             .addToggle((toggle) =>
                 toggle
-                    .setValue(this.plugin.data.settings.auto_next_note)
+                    .setValue(this.plugin.data.settings.autoNextNote)
                     .onChange(async (value) => {
-                        this.plugin.data.settings.auto_next_note = value;
+                        this.plugin.data.settings.autoNextNote = value;
                         await this.plugin.savePluginData();
                     })
             );
@@ -497,21 +453,21 @@ class SRSettingTab extends PluginSettingTab {
             .setDesc("minimum = 130, preferrably approximately 250")
             .addText((text) =>
                 text
-                    .setValue(`${this.plugin.data.settings.base_ease}`)
+                    .setValue(`${this.plugin.data.settings.baseEase}`)
                     .onChange(async (value) => {
-                        let num_value: number = Number.parseInt(value);
-                        if (!isNaN(num_value)) {
-                            if (num_value < 130) {
+                        let numValue: number = Number.parseInt(value);
+                        if (!isNaN(numValue)) {
+                            if (numValue < 130) {
                                 new Notice(
                                     "The base ease must be at least 130."
                                 );
                                 text.setValue(
-                                    `${this.plugin.data.settings.base_ease}`
+                                    `${this.plugin.data.settings.baseEase}`
                                 );
                                 return;
                             }
 
-                            this.plugin.data.settings.base_ease = num_value;
+                            this.plugin.data.settings.baseEase = numValue;
                             await this.plugin.savePluginData();
                         } else {
                             new Notice("Please provide a valid number.");
@@ -522,33 +478,32 @@ class SRSettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .setName("Interval change when you review a note/concept as hard")
             .setDesc(
-                "new_interval = old_interval * interval_change / 100, 0% < interval_change < 100%"
+                "newInterval = oldInterval * intervalChange / 100, 0% < intervalChange < 100%"
             )
             .addText((text) =>
                 text
                     .setValue(
                         `${
-                            this.plugin.data.settings.lapses_interval_change *
-                            100
+                            this.plugin.data.settings.lapsesIntervalChange * 100
                         }`
                     )
                     .onChange(async (value) => {
-                        let num_value: number = Number.parseInt(value) / 100;
-                        if (!isNaN(num_value)) {
-                            if (num_value < 0.01 || num_value > 0.99) {
+                        let numValue: number = Number.parseInt(value) / 100;
+                        if (!isNaN(numValue)) {
+                            if (numValue < 0.01 || numValue > 0.99) {
                                 new Notice(
-                                    "The load balancing threshold must be in the range 0% < interval_change < 100%."
+                                    "The load balancing threshold must be in the range 0% < intervalChange < 100%."
                                 );
                                 text.setValue(
                                     `${
                                         this.plugin.data.settings
-                                            .lapses_interval_change * 100
+                                            .lapsesIntervalChange * 100
                                     }`
                                 );
                                 return;
                             }
 
-                            this.plugin.data.settings.lapses_interval_change = num_value;
+                            this.plugin.data.settings.lapsesIntervalChange = numValue;
                             await this.plugin.savePluginData();
                         } else {
                             new Notice("Please provide a valid number.");
@@ -559,30 +514,30 @@ class SRSettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .setName("Maximum link contribution")
             .setDesc(
-                "Max. contribution of the weighted ease of linked notes to the initial ease (0% <= max_link_factor <= 100%)"
+                "Max. contribution of the weighted ease of linked notes to the initial ease (0% <= maxLinkFactor <= 100%)"
             )
             .addText((text) =>
                 text
                     .setValue(
-                        `${this.plugin.data.settings.max_link_factor * 100}`
+                        `${this.plugin.data.settings.maxLinkFactor * 100}`
                     )
                     .onChange(async (value) => {
-                        let num_value: number = Number.parseInt(value) / 100;
-                        if (!isNaN(num_value)) {
-                            if (num_value < 0 || num_value > 1.0) {
+                        let numValue: number = Number.parseInt(value) / 100;
+                        if (!isNaN(numValue)) {
+                            if (numValue < 0 || numValue > 1.0) {
                                 new Notice(
-                                    "The link factor must be in the range 0% <= max_link_factor <= 100%."
+                                    "The link factor must be in the range 0% <= maxLinkFactor <= 100%."
                                 );
                                 text.setValue(
                                     `${
                                         this.plugin.data.settings
-                                            .max_link_factor * 100
+                                            .maxLinkFactor * 100
                                     }`
                                 );
                                 return;
                             }
 
-                            this.plugin.data.settings.max_link_factor = num_value;
+                            this.plugin.data.settings.maxLinkFactor = numValue;
                             await this.plugin.savePluginData();
                         } else {
                             new Notice("Please provide a valid number.");
@@ -611,7 +566,6 @@ class ReviewQueueListView extends ItemView {
         this.registerEvent(
             this.app.vault.on("rename", (_: any) => this.redraw())
         );
-        this.redraw();
     }
 
     public getViewType(): string {
@@ -644,49 +598,55 @@ class ReviewQueueListView extends ItemView {
         const rootEl = createDiv("nav-folder mod-root");
         const childrenEl = rootEl.createDiv("nav-folder-children");
 
-        if (this.plugin.new_notes.length > 0) {
+        if (this.plugin.newNotes.length > 0) {
             let newNotesFolderEl = this.createRightPaneFolder(
                 childrenEl,
                 "New",
                 !this.activeFolders.has("New")
             );
 
-            for (let currentFile of this.plugin.new_notes) {
+            for (let newFile of this.plugin.newNotes) {
                 this.createRightPaneFile(
                     newNotesFolderEl,
-                    currentFile,
-                    openFile,
+                    newFile,
+                    openFile && newFile.path === openFile.path,
                     !this.activeFolders.has("New")
                 );
             }
         }
 
-        let now: number = Date.now();
-        for (let due_unix in this.plugin.scheduled_notes) {
-            let due_on_date = this.plugin.scheduled_notes[due_unix];
-            let due = new Date(Number.parseInt(due_unix));
+        if (Object.entries(this.plugin.scheduledNotes).length > 0) {
+            let now: number = Date.now();
+            let currUnix = -1;
+            let folderEl, folderTitle;
 
-            let n_days = Math.ceil((due_unix - now) / (24 * 3600 * 1000));
-            let folderTitle =
-                n_days == -1
-                    ? "Yesterday"
-                    : n_days == 0
-                    ? "Today"
-                    : n_days == 1
-                    ? "Tomorrow"
-                    : due.toDateString();
+            for (let notePath in this.plugin.scheduledNotes) {
+                let sNote = this.plugin.scheduledNotes[notePath];
+                if (sNote.dueUnix != currUnix) {
+                    let nDays = Math.ceil(
+                        (sNote.dueUnix - now) / (24 * 3600 * 1000)
+                    );
+                    folderTitle =
+                        nDays == -1
+                            ? "Yesterday"
+                            : nDays == 0
+                            ? "Today"
+                            : nDays == 1
+                            ? "Tomorrow"
+                            : new Date(sNote.dueUnix).toDateString();
 
-            let folderEl = this.createRightPaneFolder(
-                childrenEl,
-                folderTitle,
-                !this.activeFolders.has(folderTitle)
-            );
+                    folderEl = this.createRightPaneFolder(
+                        childrenEl,
+                        folderTitle,
+                        !this.activeFolders.has(folderTitle)
+                    );
+                    currUnix = sNote.dueUnix;
+                }
 
-            for (let currentFile in due_on_date) {
-                let navFileTitle = this.createRightPaneFile(
+                this.createRightPaneFile(
                     folderEl,
-                    due_on_date[currentFile].note,
-                    openFile,
+                    sNote.note,
+                    openFile && sNote.note.path === openFile.path,
                     !this.activeFolders.has(folderTitle)
                 );
             }
@@ -741,20 +701,19 @@ class ReviewQueueListView extends ItemView {
     private createRightPaneFile(
         folderEl: any,
         file: TFile,
-        openFile: TFile,
+        fileElActive: boolean,
         hidden: boolean
     ) {
-        const navFile = folderEl.createDiv("nav-file");
-        if (hidden) navFile.style.display = "none";
+        const navFileEl = folderEl.createDiv("nav-file");
+        if (hidden) navFileEl.style.display = "none";
 
-        const navFileTitle = navFile.createDiv("nav-file-title");
-        if (openFile && file.path === openFile.path)
-            navFileTitle.addClass("is-active");
+        const navFileTitle = navFileEl.createDiv("nav-file-title");
+        if (fileElActive) navFileTitle.addClass("is-active");
 
         navFileTitle.createDiv("nav-file-title-content").setText(file.basename);
         navFileTitle.addEventListener(
             "click",
-            (event) => {
+            (event: MouseEvent) => {
                 event.preventDefault();
                 this.app.workspace.activeLeaf.openFile(file);
                 return false;
@@ -764,7 +723,7 @@ class ReviewQueueListView extends ItemView {
 
         navFileTitle.addEventListener(
             "contextmenu",
-            (event) => {
+            (event: MouseEvent) => {
                 event.preventDefault();
                 const fileMenu = new Menu(this.app);
                 this.app.workspace.trigger(
