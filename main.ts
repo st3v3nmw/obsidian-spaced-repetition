@@ -75,7 +75,6 @@ export default class SRPlugin extends Plugin {
             this.reviewNextNote();
         });
 
-        // TODO: remove this
         this.addRibbonIcon("crosshairs", "Sync notes scheduling", async () => {
             await this.sync();
             new Notice("Sync done.");
