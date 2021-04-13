@@ -15,7 +15,7 @@ Fight the forgetting curve & note aging by reviewing notes using spaced repetiti
 
 Spaced repetition? [Basics](https://ncase.me/remember/), [Detailed](https://www.gwern.net/Spaced-repetition).
 
-![Sample screenshot](assets/screenshot.png)
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/screenshot.png" />
 
 ### Installation
 
@@ -28,21 +28,21 @@ For now, create an `obsidian-spaced-repetition` folder under `.obsidian/plugins`
 
 All "new" notes are listed under `New` on the right pane (Review Queue). Like so:
 
-![New notes](assets/new_notes.png)
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/new_notes.png" />
 
 #### Reviewing
 
 Open the file & review it. Once done, choose either the `Review: Easy` or the `Review: Hard` option on the file menu (the three dots). The `Easy` or `Hard` depend on how well you comprehend the material being reviewed.
 
-![Reviewing - More Options](assets/more_options.png)
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/more_options.png" />
 
 Alternatively, you can right click on the file and access the same options:
 
-![Reviewing - File context menu](assets/file_context_menu.png)
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/file_context_menu.png" />
 
 The note will then scheduled appropriately:
 
-![Scheduled](assets/scheduled.png)
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/scheduled.png" />
 
 #### Scheduled notes
 
@@ -60,7 +60,7 @@ Available settings are:
 
 To exclude some notes from the scheduling & review process, click the `Review: Ignore file` option on the file menu:
 
-![Exclusion - More Options](assets/more_options.png)
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/more_options.png" />
 
 Alternatively, add the following frontmatter to the very top of the note:
 
