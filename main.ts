@@ -43,7 +43,6 @@ const DEFAULT_DATA: PluginData = {
 interface SchedNote {
     note: TFile;
     dueUnix: number;
-    ease: number;
 }
 
 interface LinkStat {
@@ -57,7 +56,8 @@ export default class SRPlugin extends Plugin {
     public data: PluginData;
 
     public newNotes: TFile[] = [];
-    public scheduledNotes: Record<string, SchedNote> = {};
+    public scheduledNotes: SchedNote[] = [];
+    private easeByPath: Record<string, number> = {};
     private incomingLinks: Record<string, LinkStat[]> = {};
     private pageranks: Record<string, number> = {};
     private dueNotesCount: number = 0;
@@ -136,7 +136,8 @@ export default class SRPlugin extends Plugin {
         let notes = this.app.vault.getMarkdownFiles();
 
         graph.reset();
-        this.scheduledNotes = {};
+        this.scheduledNotes = [];
+        this.easeByPath = {};
         this.newNotes = [];
         this.incomingLinks = {};
         this.pageranks = {};
@@ -181,11 +182,12 @@ export default class SRPlugin extends Plugin {
                 }
 
                 let dueUnix = Date.parse(frontmatter["due"]);
-                this.scheduledNotes[note.path] = {
+                this.scheduledNotes.push({
                     note,
                     dueUnix,
-                    ease: frontmatter["ease"],
-                };
+                });
+
+                this.easeByPath[note.path] = frontmatter["ease"];
 
                 if (dueUnix <= now) this.dueNotesCount++;
             }
@@ -202,15 +204,15 @@ export default class SRPlugin extends Plugin {
         );
 
         // sort scheduled notes by date & within those days, sort them by importance
-        this.scheduledNotes = Object.fromEntries(
-            Object.entries(this.scheduledNotes).sort(([, a], [, b]) => {
+        this.scheduledNotes = this.scheduledNotes.sort(
+            (a: SchedNote, b: SchedNote) => {
                 let result = a.dueUnix - b.dueUnix;
                 if (result != 0) return result;
                 return (
                     (this.pageranks[b.note.path] || 0) -
                     (this.pageranks[a.note.path] || 0)
                 );
-            })
+            }
         );
 
         this.statusBar.setText(`Review: ${this.dueNotesCount} due`);
@@ -238,13 +240,12 @@ export default class SRPlugin extends Plugin {
                     totalLinkCount = 0;
 
                 for (let statObj of this.incomingLinks[note.path]) {
-                    let linkedFile = this.scheduledNotes[statObj.sourcePath];
-                    // source note is scheduled
-                    if (linkedFile) {
+                    let ease = this.easeByPath[statObj.sourcePath];
+                    if (ease) {
                         linkTotal +=
                             statObj.linkCount *
                             this.pageranks[statObj.sourcePath] *
-                            linkedFile.ease;
+                            ease;
                         linkPGTotal +=
                             this.pageranks[statObj.sourcePath] *
                             statObj.linkCount;
@@ -255,12 +256,12 @@ export default class SRPlugin extends Plugin {
                 let outgoingLinks =
                     this.app.metadataCache.resolvedLinks[note.path] || {};
                 for (let linkedFilePath in outgoingLinks) {
-                    let linkedFile = this.scheduledNotes[linkedFilePath];
-                    if (linkedFile) {
+                    let ease = this.easeByPath[linkedFilePath];
+                    if (ease) {
                         linkTotal +=
                             outgoingLinks[linkedFilePath] *
                             this.pageranks[linkedFilePath] *
-                            linkedFile.ease;
+                            ease;
                         linkPGTotal +=
                             this.pageranks[linkedFilePath] *
                             outgoingLinks[linkedFilePath];
@@ -342,24 +343,20 @@ export default class SRPlugin extends Plugin {
 
     async reviewNextNote() {
         if (this.dueNotesCount > 0) {
+            let index = this.data.settings.openRandomNote
+                ? Math.floor(Math.random() * this.dueNotesCount)
+                : 0;
             this.app.workspace.activeLeaf.openFile(
-                Object.entries(this.scheduledNotes)[
-                    this.data.settings.openRandomNote
-                        ? Math.floor(Math.random() * this.dueNotesCount)
-                        : 0
-                ][1].note
+                this.scheduledNotes[index].note
             );
             return;
         }
 
         if (this.newNotes.length > 0) {
-            this.app.workspace.activeLeaf.openFile(
-                this.newNotes[
-                    this.data.settings.openRandomNote
-                        ? Math.floor(Math.random() * this.newNotes.length)
-                        : 0
-                ]
-            );
+            let index = this.data.settings.openRandomNote
+                ? Math.floor(Math.random() * this.newNotes.length)
+                : 0;
+            this.app.workspace.activeLeaf.openFile(this.newNotes[index]);
             return;
         }
 
@@ -371,7 +368,7 @@ export default class SRPlugin extends Plugin {
             this.app.metadataCache.getFileCache(note).frontmatter || {};
 
         let fileText = await this.app.vault.read(note);
-        if (Object.entries(frontmatter).length == 0) {
+        if (Object.keys(frontmatter).length == 0) {
             fileText = `---\nreview: false\n---\n\n${fileText}`;
         } else if (frontmatter["review"] == undefined) {
             let existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
@@ -615,13 +612,12 @@ class ReviewQueueListView extends ItemView {
             }
         }
 
-        if (Object.entries(this.plugin.scheduledNotes).length > 0) {
+        if (this.plugin.scheduledNotes.length > 0) {
             let now: number = Date.now();
             let currUnix = -1;
             let folderEl, folderTitle;
 
-            for (let notePath in this.plugin.scheduledNotes) {
-                let sNote = this.plugin.scheduledNotes[notePath];
+            for (let sNote of this.plugin.scheduledNotes) {
                 if (sNote.dueUnix != currUnix) {
                     let nDays = Math.ceil(
                         (sNote.dueUnix - now) / (24 * 3600 * 1000)
