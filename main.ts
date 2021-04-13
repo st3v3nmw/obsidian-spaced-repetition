@@ -467,6 +467,7 @@ class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         this.plugin.data.settings.reviewCertainTags = value;
                         await this.plugin.savePluginData();
+                        this.plugin.sync();
                     })
             );
 
