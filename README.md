@@ -9,7 +9,14 @@ Fight the forgetting curve & note aging by reviewing notes using spaced repetiti
 - Reviews should start only after properly understanding a concept.
 - Reviews should be [Feynman-technique](https://fs.blog/2021/02/feynman-learning-technique/)-esque.
 
-## Version 1.1.1 and lower
+## Notices
+
+### Version 1.2.0 and lower
+
+The behavior to ignore files has been changed from opt-in to the more reasonable opt-out scheme. This caters for people with hundreds of notes. Now you need to tag the notes that you'd like to review (use `#review` by default).
+The `sr-review` YAML attribute is now obsolete and should be deleted from the YAML headers that it appears in.
+
+### Version 1.1.1 and lower
 
 If you had versions 1.1.1 and lower installed, please fix any scheduled/ignored notes by changing the YAML attributes from:
 
@@ -19,7 +26,6 @@ If you had versions 1.1.1 and lower installed, please fix any scheduled/ignored 
 4. `review: false` to `sr-review: false`
 
 This has been done to avoid attribute clashes with other plugins detailed [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/7).
-Otherwise, the plugin should work as expected.
 
 ## Guide
 
@@ -36,6 +42,11 @@ You can easily install the plugin from Obsidian's community plugin section in th
 Create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your vault. Add the `main.js`, `manifest.json`, and the `styles.css` files from the [latest release](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases) to the folder.
 
 ### Usage
+
+#### Getting started
+
+Tag any notes that you'd like to review as `#review`. This default tag can be changed in the settings. (You can also use multiple tags)
+Once done, click the crosshairs icon the the left ribbon to "sync" the notes.
 
 #### New Notes
 
@@ -68,26 +79,6 @@ Alternatively, one can use the `Open a note for review` command.
 Available settings are:
 - Choosing whether to open a note at random or the most important note
 - Choosing whether to open the next note automatically after reviewing another
-
-### Ignoring some notes
-
-#### Using tags
-
-You can review only files with certain tags, this is available in the settings (version 1.2.0 upwards). This is convenient for people with hundreds of notes.
-
-#### Other
-
-To exclude some notes from the scheduling & review process, click the `Review: Ignore file` option on the file menu:
-
-<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/more_options.png" />
-
-Alternatively, add the following frontmatter to the very top of the note:
-
-```yaml
----
-review: false
----
-```
 
 ### Review Queue
 
