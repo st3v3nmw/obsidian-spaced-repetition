@@ -11,6 +11,8 @@ Fight the forgetting curve & note aging by reviewing notes using spaced repetiti
 
 ## Guide
 
+Spaced repetition? [Basics](https://ncase.me/remember/), [Detailed](https://www.gwern.net/Spaced-repetition).
+
 ![Sample screenshot](assets/screenshot.png)
 
 ### Installation
@@ -66,13 +68,12 @@ review: false
 ---
 ```
 
-### Right Pane (Review Queue)
+### Review Queue
 
 - Daily review entries are sorted by importance (PageRank)
 
 ## Spaced Repetition Algorithm
 
-- Spaced repetition? [Basics](https://ncase.me/remember/), [Detailed](https://www.gwern.net/Spaced-repetition).
 - The algorithm is a variant of [Anki's algorithm](https://faqs.ankiweb.net/what-spaced-repetition-algorithm.html) which is based on the [SM-2 algorithm](https://www.supermemo.com/en/archives1990-2015/english/ol/sm2).
 - It supports binary reviews i.e. a concept is either hard or easy at the time of review.
 - initial ease is weighted (using max_link_factor) depending on the average ease of linked notes, note importance, and the base ease.
