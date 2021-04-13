@@ -22,7 +22,6 @@ interface SRSettings {
     openRandomNote: boolean;
     lapsesIntervalChange: number;
     autoNextNote: boolean;
-    reviewCertainTags: boolean;
     tagsToReview: string[];
 }
 
@@ -36,8 +35,7 @@ const DEFAULT_SETTINGS: SRSettings = {
     openRandomNote: false,
     lapsesIntervalChange: 0.5,
     autoNextNote: false,
-    reviewCertainTags: false,
-    tagsToReview: [],
+    tagsToReview: ["#review"],
 };
 
 const DEFAULT_DATA: PluginData = {
@@ -109,14 +107,6 @@ export default class SRPlugin extends Plugin {
                                 this.saveReviewResponse(file, false);
                         });
                 });
-
-                menu.addItem((item) => {
-                    item.setTitle("Review: Ignore file")
-                        .setIcon("crosshairs")
-                        .onClick((evt) => {
-                            if (file.extension == "md") this.ignoreFile(file);
-                        });
-                });
             })
         );
 
@@ -172,43 +162,38 @@ export default class SRPlugin extends Plugin {
                 this.app.metadataCache.getFileCache(note) || {};
             let frontmatter = fileCachedData.frontmatter || {};
 
-            if (this.data.settings.reviewCertainTags) {
-                let tags = fileCachedData.tags || [];
-                let shouldIgnore = true;
-                for (let tagObj of tags) {
-                    if (this.data.settings.tagsToReview.includes(tagObj.tag)) {
-                        shouldIgnore = false;
-                        break;
-                    }
+            let tags = fileCachedData.tags || [];
+            let shouldIgnore = true;
+            for (let tagObj of tags) {
+                if (this.data.settings.tagsToReview.includes(tagObj.tag)) {
+                    shouldIgnore = false;
+                    break;
                 }
-
-                if (shouldIgnore) continue;
             }
 
-            // checks if note should be ignored
-            if (frontmatter["sr-review"] != false) {
-                // file has no scheduling information
-                if (
-                    !(
-                        frontmatter.hasOwnProperty("sr-due") &&
-                        frontmatter.hasOwnProperty("sr-interval") &&
-                        frontmatter.hasOwnProperty("sr-ease")
-                    )
-                ) {
-                    this.newNotes.push(note);
-                    continue;
-                }
+            if (shouldIgnore) continue;
 
-                let dueUnix = Date.parse(frontmatter["sr-due"]);
-                this.scheduledNotes.push({
-                    note,
-                    dueUnix,
-                });
-
-                this.easeByPath[note.path] = frontmatter["sr-ease"];
-
-                if (dueUnix <= now) this.dueNotesCount++;
+            // file has no scheduling information
+            if (
+                !(
+                    frontmatter.hasOwnProperty("sr-due") &&
+                    frontmatter.hasOwnProperty("sr-interval") &&
+                    frontmatter.hasOwnProperty("sr-ease")
+                )
+            ) {
+                this.newNotes.push(note);
+                continue;
             }
+
+            let dueUnix = Date.parse(frontmatter["sr-due"]);
+            this.scheduledNotes.push({
+                note,
+                dueUnix,
+            });
+
+            this.easeByPath[note.path] = frontmatter["sr-ease"];
+
+            if (dueUnix <= now) this.dueNotesCount++;
         }
 
         graph.rank(0.85, 0.000001, (node: string, rank: number) => {
@@ -241,135 +226,128 @@ export default class SRPlugin extends Plugin {
         let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         let frontmatter = fileCachedData.frontmatter || {};
 
-        if (this.data.settings.reviewCertainTags) {
-            let tags = fileCachedData.tags || [];
-            let shouldIgnore = true;
-            for (let tagObj of tags) {
-                if (this.data.settings.tagsToReview.includes(tagObj.tag)) {
-                    shouldIgnore = false;
-                    break;
-                }
-            }
-
-            if (shouldIgnore) {
-                new Notice(
-                    "Please tag the note appropriately since you have the `Review notes with certain tags` turned on in settings"
-                );
-                return;
+        let tags = fileCachedData.tags || [];
+        let shouldIgnore = true;
+        for (let tagObj of tags) {
+            if (this.data.settings.tagsToReview.includes(tagObj.tag)) {
+                shouldIgnore = false;
+                break;
             }
         }
 
-        // check if note should be ignored
-        if (frontmatter["sr-review"] != false) {
-            let fileText = await this.app.vault.read(note);
-            let ease, interval;
-            // new note
-            if (
-                !(
-                    frontmatter.hasOwnProperty("sr-due") &&
-                    frontmatter.hasOwnProperty("sr-interval") &&
-                    frontmatter.hasOwnProperty("sr-ease")
-                )
-            ) {
-                let linkTotal = 0,
-                    linkPGTotal = 0,
-                    totalLinkCount = 0;
-
-                for (let statObj of this.incomingLinks[note.path]) {
-                    let ease = this.easeByPath[statObj.sourcePath];
-                    if (ease) {
-                        linkTotal +=
-                            statObj.linkCount *
-                            this.pageranks[statObj.sourcePath] *
-                            ease;
-                        linkPGTotal +=
-                            this.pageranks[statObj.sourcePath] *
-                            statObj.linkCount;
-                        totalLinkCount += statObj.linkCount;
-                    }
-                }
-
-                let outgoingLinks =
-                    this.app.metadataCache.resolvedLinks[note.path] || {};
-                for (let linkedFilePath in outgoingLinks) {
-                    let ease = this.easeByPath[linkedFilePath];
-                    if (ease) {
-                        linkTotal +=
-                            outgoingLinks[linkedFilePath] *
-                            this.pageranks[linkedFilePath] *
-                            ease;
-                        linkPGTotal +=
-                            this.pageranks[linkedFilePath] *
-                            outgoingLinks[linkedFilePath];
-                        totalLinkCount += outgoingLinks[linkedFilePath];
-                    }
-                }
-
-                let linkContribution =
-                    this.data.settings.maxLinkFactor *
-                    Math.min(
-                        1.0,
-                        Math.log(totalLinkCount + 0.5) / Math.log(64)
-                    );
-                ease = Math.round(
-                    (1.0 - linkContribution) * this.data.settings.baseEase +
-                        (totalLinkCount > 0
-                            ? (linkContribution * linkTotal) / linkPGTotal
-                            : linkContribution * this.data.settings.baseEase)
-                );
-                interval = 1;
-            } else {
-                interval = frontmatter["sr-interval"];
-                ease = frontmatter["sr-ease"];
-            }
-
-            ease = easy ? ease + 20 : Math.max(130, ease - 20);
-            interval = Math.max(
-                1,
-                easy
-                    ? (interval * ease) / 100
-                    : interval * this.data.settings.lapsesIntervalChange
+        if (shouldIgnore) {
+            new Notice(
+                "Please tag the note appropriately for reviewing (in settings)."
             );
-            // fuzz
-            if (interval >= 8) {
-                let fuzz = [-0.05 * interval, 0, 0.05 * interval];
-                interval += fuzz[Math.floor(Math.random() * fuzz.length)];
-            }
-            interval = Math.round(interval);
-
-            let due = new Date(Date.now() + interval * 24 * 3600 * 1000);
-
-            // check if scheduling info exists
-            if (SCHEDULING_INFO_REGEX.test(fileText)) {
-                let schedulingInfo = SCHEDULING_INFO_REGEX.exec(fileText);
-                fileText = fileText.replace(
-                    SCHEDULING_INFO_REGEX,
-                    `---\n${
-                        schedulingInfo[1]
-                    }sr-due: ${due.toDateString()}\nsr-interval: ${interval}\nsr-ease: ${ease}\n${
-                        schedulingInfo[5]
-                    }---`
-                );
-
-                // new note with existing YAML front matter
-            } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
-                let existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
-                fileText = fileText.replace(
-                    YAML_FRONT_MATTER_REGEX,
-                    `---\n${
-                        existingYaml[1]
-                    }sr-due: ${due.toDateString()}\nsr-interval: ${interval}\nsr-ease: ${ease}\n---`
-                );
-            } else {
-                fileText = `---\nsr-due: ${due.toDateString()}\nsr-interval: ${interval}\nsr-ease: ${ease}\n---\n\n${fileText}`;
-            }
-
-            this.app.vault.modify(note, fileText);
-
-            new Notice("Response received.");
-        } else {
-            new Notice("Note marked as IGNORE or has no content.");
+            return;
         }
+
+        let fileText = await this.app.vault.read(note);
+        let ease, interval;
+        // new note
+        if (
+            !(
+                frontmatter.hasOwnProperty("sr-due") &&
+                frontmatter.hasOwnProperty("sr-interval") &&
+                frontmatter.hasOwnProperty("sr-ease")
+            )
+        ) {
+            let linkTotal = 0,
+                linkPGTotal = 0,
+                totalLinkCount = 0;
+
+            for (let statObj of this.incomingLinks[note.path]) {
+                let ease = this.easeByPath[statObj.sourcePath];
+                if (ease) {
+                    linkTotal +=
+                        statObj.linkCount *
+                        this.pageranks[statObj.sourcePath] *
+                        ease;
+                    linkPGTotal +=
+                        this.pageranks[statObj.sourcePath] *
+                        statObj.linkCount;
+                    totalLinkCount += statObj.linkCount;
+                }
+            }
+
+            let outgoingLinks =
+                this.app.metadataCache.resolvedLinks[note.path] || {};
+            for (let linkedFilePath in outgoingLinks) {
+                let ease = this.easeByPath[linkedFilePath];
+                if (ease) {
+                    linkTotal +=
+                        outgoingLinks[linkedFilePath] *
+                        this.pageranks[linkedFilePath] *
+                        ease;
+                    linkPGTotal +=
+                        this.pageranks[linkedFilePath] *
+                        outgoingLinks[linkedFilePath];
+                    totalLinkCount += outgoingLinks[linkedFilePath];
+                }
+            }
+
+            let linkContribution =
+                this.data.settings.maxLinkFactor *
+                Math.min(
+                    1.0,
+                    Math.log(totalLinkCount + 0.5) / Math.log(64)
+                );
+            ease = Math.round(
+                (1.0 - linkContribution) * this.data.settings.baseEase +
+                    (totalLinkCount > 0
+                        ? (linkContribution * linkTotal) / linkPGTotal
+                        : linkContribution * this.data.settings.baseEase)
+            );
+            interval = 1;
+        } else {
+            interval = frontmatter["sr-interval"];
+            ease = frontmatter["sr-ease"];
+        }
+
+        ease = easy ? ease + 20 : Math.max(130, ease - 20);
+        interval = Math.max(
+            1,
+            easy
+                ? (interval * ease) / 100
+                : interval * this.data.settings.lapsesIntervalChange
+        );
+        // fuzz
+        if (interval >= 8) {
+            let fuzz = [-0.05 * interval, 0, 0.05 * interval];
+            interval += fuzz[Math.floor(Math.random() * fuzz.length)];
+        }
+        interval = Math.round(interval);
+
+        let due = new Date(Date.now() + interval * 24 * 3600 * 1000);
+
+        // check if scheduling info exists
+        if (SCHEDULING_INFO_REGEX.test(fileText)) {
+            let schedulingInfo = SCHEDULING_INFO_REGEX.exec(fileText);
+            fileText = fileText.replace(
+                SCHEDULING_INFO_REGEX,
+                `---\n${
+                    schedulingInfo[1]
+                }sr-due: ${due.toDateString()}\nsr-interval: ${interval}\nsr-ease: ${ease}\n${
+                    schedulingInfo[5]
+                }---`
+            );
+
+            // new note with existing YAML front matter
+        } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
+            let existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
+            fileText = fileText.replace(
+                YAML_FRONT_MATTER_REGEX,
+                `---\n${
+                    existingYaml[1]
+                }sr-due: ${due.toDateString()}\nsr-interval: ${interval}\nsr-ease: ${ease}\n---`
+            );
+        } else {
+            fileText = `---\nsr-due: ${due.toDateString()}\nsr-interval: ${interval}\nsr-ease: ${ease}\n---\n\n${fileText}`;
+        }
+
+        this.app.vault.modify(note, fileText);
+
+        new Notice("Response received.");
 
         setTimeout(() => {
             this.sync();
@@ -397,30 +375,6 @@ export default class SRPlugin extends Plugin {
         }
 
         new Notice("You're done for the day :D.");
-    }
-
-    async ignoreFile(note: TFile) {
-        let frontmatter =
-            this.app.metadataCache.getFileCache(note).frontmatter || {};
-
-        let fileText = await this.app.vault.read(note);
-        if (Object.keys(frontmatter).length == 0) {
-            fileText = `---\nsr-review: false\n---\n\n${fileText}`;
-        } else if (frontmatter["sr-review"] == undefined) {
-            let existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
-            fileText = fileText.replace(
-                YAML_FRONT_MATTER_REGEX,
-                `---\n${existingYaml[1]}sr-review: false\n---`
-            );
-        } else if (frontmatter["sr-review"] != false) {
-            fileText = fileText.replace(
-                /sr-review: [0-9A-Za-z ]+/,
-                "sr-review: false"
-            );
-        }
-
-        this.app.vault.modify(note, fileText);
-        setTimeout(() => this.sync(), 500);
     }
 
     async loadPluginData() {
@@ -457,24 +411,9 @@ class SRSettingTab extends PluginSettingTab {
         containerEl.empty();
 
         new Setting(containerEl)
-            .setName("Review notes with certain tags")
-            .setDesc(
-                "When you turn this on, only notes with certain tags will be available for review"
-            )
-            .addToggle((toggle) =>
-                toggle
-                    .setValue(this.plugin.data.settings.reviewCertainTags)
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.reviewCertainTags = value;
-                        await this.plugin.savePluginData();
-                        this.plugin.sync();
-                    })
-            );
-
-        new Setting(containerEl)
             .setName("Tags to review")
             .setDesc(
-                "Enter tags separated by spaces i.e. #review #tag2 #tag3. For this to work, the setting above must be turned on"
+                "Enter tags separated by spaces i.e. #review #tag2 #tag3."
             )
             .addTextArea((text) =>
                 text
