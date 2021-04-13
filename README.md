@@ -2,8 +2,6 @@
 
 Fight the forgetting curve & note aging by reviewing notes using spaced repetition on Obsidian.md 
 
-Version 1.1.1
-
 ## "Philosophy"
 
 - Notes should be atomic i.e. focus on a single concept.
