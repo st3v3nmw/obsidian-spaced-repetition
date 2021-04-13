@@ -29,8 +29,11 @@ Spaced repetition? [Basics](https://ncase.me/remember/), [Detailed](https://www.
 
 ### Installation
 
-Once the plugin goes through the review process, you can easily install the plugin from Obsidian's community plugin section in the Obsidian app.
-For now, create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your vault. Add the `main.js`, `manifest.json`, and the `styles.css` files from the [latest release](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases) to the folder.
+You can easily install the plugin from Obsidian's community plugin section in the Obsidian app.
+
+#### Manual Installation
+
+Create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your vault. Add the `main.js`, `manifest.json`, and the `styles.css` files from the [latest release](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases) to the folder.
 
 ### Usage
 
@@ -67,6 +70,12 @@ Available settings are:
 - Choosing whether to open the next note automatically after reviewing another
 
 ### Ignoring some notes
+
+#### Using tags
+
+You can review only files with certain tags, this is available in the settings (version 1.2.0 upwards). This is convenient for people with hundreds of notes.
+
+#### Other
 
 To exclude some notes from the scheduling & review process, click the `Review: Ignore file` option on the file menu:
 
