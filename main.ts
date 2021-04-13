@@ -22,6 +22,8 @@ interface SRSettings {
     openRandomNote: boolean;
     lapsesIntervalChange: number;
     autoNextNote: boolean;
+    reviewCertainTags: boolean;
+    tagsToReview: string[];
 }
 
 interface PluginData {
@@ -34,6 +36,8 @@ const DEFAULT_SETTINGS: SRSettings = {
     openRandomNote: false,
     lapsesIntervalChange: 0.5,
     autoNextNote: false,
+    reviewCertainTags: false,
+    tagsToReview: [],
 };
 
 const DEFAULT_DATA: PluginData = {
@@ -164,8 +168,22 @@ export default class SRPlugin extends Plugin {
                 }
             }
 
-            let frontmatter =
-                this.app.metadataCache.getFileCache(note).frontmatter || {};
+            let fileCachedData =
+                this.app.metadataCache.getFileCache(note) || {};
+            let frontmatter = fileCachedData.frontmatter || {};
+
+            if (this.data.settings.reviewCertainTags) {
+                let tags = fileCachedData.tags || [];
+                let shouldIgnore = true;
+                for (let tagObj of tags) {
+                    if (this.data.settings.tagsToReview.includes(tagObj.tag)) {
+                        shouldIgnore = false;
+                        break;
+                    }
+                }
+
+                if (shouldIgnore) continue;
+            }
 
             // checks if note should be ignored
             if (frontmatter["sr-review"] != false) {
@@ -220,8 +238,26 @@ export default class SRPlugin extends Plugin {
     }
 
     async saveReviewResponse(note: TFile, easy: boolean) {
-        let frontmatter =
-            this.app.metadataCache.getFileCache(note).frontmatter || {};
+        let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
+        let frontmatter = fileCachedData.frontmatter || {};
+
+        if (this.data.settings.reviewCertainTags) {
+            let tags = fileCachedData.tags || [];
+            let shouldIgnore = true;
+            for (let tagObj of tags) {
+                if (this.data.settings.tagsToReview.includes(tagObj.tag)) {
+                    shouldIgnore = false;
+                    break;
+                }
+            }
+
+            if (shouldIgnore) {
+                new Notice(
+                    "Please tag the note appropriately since you have the `Review notes with certain tags` turned on in settings"
+                );
+                return;
+            }
+        }
 
         // check if note should be ignored
         if (frontmatter["sr-review"] != false) {
@@ -419,6 +455,38 @@ class SRSettingTab extends PluginSettingTab {
         let { containerEl } = this;
 
         containerEl.empty();
+
+        new Setting(containerEl)
+            .setName("Review notes with certain tags")
+            .setDesc(
+                "When you turn this on, only notes with certain tags will be available for review"
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.reviewCertainTags)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.reviewCertainTags = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Tags to review")
+            .setDesc(
+                "Enter tags separated by spaces i.e. #review #tag2 #tag3. For this to work, the setting above must be turned on"
+            )
+            .addTextArea((text) =>
+                text
+                    .setValue(
+                        `${this.plugin.data.settings.tagsToReview.join(" ")}`
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.tagsToReview = value.split(
+                            " "
+                        );
+                        await this.plugin.savePluginData();
+                    })
+            );
 
         new Setting(containerEl)
             .setName("Open a random note for review")
