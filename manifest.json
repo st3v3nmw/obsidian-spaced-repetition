@@ -1,7 +1,7 @@
 {
 	"id": "obsidian-spaced-repetition",
 	"name": "Spaced Repetition",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"minAppVersion": "0.9.12",
 	"description": "Fight the forgetting curve & note aging by reviewing notes using spaced repetition on Obsidian.md",
 	"author": "Stephen Mwangi",
