@@ -12,7 +12,7 @@ import {
 } from "obsidian";
 import * as graph from "pagerank.js";
 
-const SCHEDULING_INFO_REGEX = /^---\n((?:.*\n)*)due: ([0-9A-Za-z ]+)\ninterval: ([0-9]+)\nease: ([0-9]+)\n((?:.*\n)*)---/;
+const SCHEDULING_INFO_REGEX = /^---\n((?:.*\n)*)sr-due: ([0-9A-Za-z ]+)\nsr-interval: ([0-9]+)\nsr-ease: ([0-9]+)\n((?:.*\n)*)---/;
 const YAML_FRONT_MATTER_REGEX = /^---\n((?:.*\n)*)---/;
 const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
 
@@ -168,26 +168,26 @@ export default class SRPlugin extends Plugin {
                 this.app.metadataCache.getFileCache(note).frontmatter || {};
 
             // checks if note should be ignored
-            if (frontmatter["review"] != false) {
+            if (frontmatter["sr-review"] != false) {
                 // file has no scheduling information
                 if (
                     !(
-                        frontmatter.hasOwnProperty("due") &&
-                        frontmatter.hasOwnProperty("interval") &&
-                        frontmatter.hasOwnProperty("ease")
+                        frontmatter.hasOwnProperty("sr-due") &&
+                        frontmatter.hasOwnProperty("sr-interval") &&
+                        frontmatter.hasOwnProperty("sr-ease")
                     )
                 ) {
                     this.newNotes.push(note);
                     continue;
                 }
 
-                let dueUnix = Date.parse(frontmatter["due"]);
+                let dueUnix = Date.parse(frontmatter["sr-due"]);
                 this.scheduledNotes.push({
                     note,
                     dueUnix,
                 });
 
-                this.easeByPath[note.path] = frontmatter["ease"];
+                this.easeByPath[note.path] = frontmatter["sr-ease"];
 
                 if (dueUnix <= now) this.dueNotesCount++;
             }
@@ -224,15 +224,15 @@ export default class SRPlugin extends Plugin {
             this.app.metadataCache.getFileCache(note).frontmatter || {};
 
         // check if note should be ignored
-        if (frontmatter["review"] != false) {
+        if (frontmatter["sr-review"] != false) {
             let fileText = await this.app.vault.read(note);
             let ease, interval;
             // new note
             if (
                 !(
-                    frontmatter.hasOwnProperty("due") &&
-                    frontmatter.hasOwnProperty("interval") &&
-                    frontmatter.hasOwnProperty("ease")
+                    frontmatter.hasOwnProperty("sr-due") &&
+                    frontmatter.hasOwnProperty("sr-interval") &&
+                    frontmatter.hasOwnProperty("sr-ease")
                 )
             ) {
                 let linkTotal = 0,
@@ -283,8 +283,8 @@ export default class SRPlugin extends Plugin {
                 );
                 interval = 1;
             } else {
-                interval = frontmatter["interval"];
-                ease = frontmatter["ease"];
+                interval = frontmatter["sr-interval"];
+                ease = frontmatter["sr-ease"];
             }
 
             ease = easy ? ease + 20 : Math.max(130, ease - 20);
@@ -310,7 +310,7 @@ export default class SRPlugin extends Plugin {
                     SCHEDULING_INFO_REGEX,
                     `---\n${
                         schedulingInfo[1]
-                    }due: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n${
+                    }sr-due: ${due.toDateString()}\nsr-interval: ${interval}\nsr-ease: ${ease}\n${
                         schedulingInfo[5]
                     }---`
                 );
@@ -322,10 +322,10 @@ export default class SRPlugin extends Plugin {
                     YAML_FRONT_MATTER_REGEX,
                     `---\n${
                         existingYaml[1]
-                    }due: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n---`
+                    }sr-due: ${due.toDateString()}\nsr-interval: ${interval}\nsr-ease: ${ease}\n---`
                 );
             } else {
-                fileText = `---\ndue: ${due.toDateString()}\ninterval: ${interval}\nease: ${ease}\n---\n\n${fileText}`;
+                fileText = `---\nsr-due: ${due.toDateString()}\nsr-interval: ${interval}\nsr-ease: ${ease}\n---\n\n${fileText}`;
             }
 
             this.app.vault.modify(note, fileText);
@@ -369,17 +369,17 @@ export default class SRPlugin extends Plugin {
 
         let fileText = await this.app.vault.read(note);
         if (Object.keys(frontmatter).length == 0) {
-            fileText = `---\nreview: false\n---\n\n${fileText}`;
-        } else if (frontmatter["review"] == undefined) {
+            fileText = `---\nsr-review: false\n---\n\n${fileText}`;
+        } else if (frontmatter["sr-review"] == undefined) {
             let existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
             fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
-                `---\n${existingYaml[1]}review: false\n---`
+                `---\n${existingYaml[1]}sr-review: false\n---`
             );
-        } else if (frontmatter["review"] != false) {
+        } else if (frontmatter["sr-review"] != false) {
             fileText = fileText.replace(
-                /review: [0-9A-Za-z ]+/,
-                "review: false"
+                /sr-review: [0-9A-Za-z ]+/,
+                "sr-review: false"
             );
         }
 
