@@ -1,5 +1,7 @@
 # Obsidian Spaced Repetition Plugin
 
+![Github All Releases](https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/total?style=flat)
+
 Fight the forgetting curve & note aging by reviewing notes using spaced repetition on Obsidian.md 
 
 ## "Philosophy"
