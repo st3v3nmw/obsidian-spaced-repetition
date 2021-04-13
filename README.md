@@ -13,12 +13,12 @@ Fight the forgetting curve & note aging by reviewing notes using spaced repetiti
 
 ### Version 1.2.0 and lower
 
-Reviewing files has been changed from opt-out to the more reasonable opt-in scheme. This caters for people with hundreds of notes. Now you need to tag the notes that you'd like to review (use `#review` by default).
-The `sr-review` YAML attribute is now obsolete and should be deleted from the YAML headers that it appears in.
+Reviewing files has changed from opt-out to the more reasonable opt-in scheme. This caters for people with hundreds of notes. Now you need to tag the notes that you'd like to review (use `#review` by default).
+The `sr-review` YAML attribute is now obsolete and should be deleted from the YAML headers that it appears in (previously ignored notes).
 
 ### Version 1.1.1 and lower
 
-If you had versions 1.1.1 and lower installed, please fix any scheduled/ignored notes by changing the YAML attributes from:
+Please fix any scheduled/ignored notes by changing the YAML attributes from:
 
 1. `due` to `sr-due`
 2. `interval` to `sr-interval`
