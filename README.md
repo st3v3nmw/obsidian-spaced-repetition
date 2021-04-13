@@ -13,7 +13,7 @@ Fight the forgetting curve & note aging by reviewing notes using spaced repetiti
 
 ### Version 1.2.0 and lower
 
-The behavior to ignore files has been changed from opt-in to the more reasonable opt-out scheme. This caters for people with hundreds of notes. Now you need to tag the notes that you'd like to review (use `#review` by default).
+Reviewing files has been changed from opt-out to the more reasonable opt-in scheme. This caters for people with hundreds of notes. Now you need to tag the notes that you'd like to review (use `#review` by default).
 The `sr-review` YAML attribute is now obsolete and should be deleted from the YAML headers that it appears in.
 
 ### Version 1.1.1 and lower
