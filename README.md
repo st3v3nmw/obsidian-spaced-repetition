@@ -9,6 +9,18 @@ Fight the forgetting curve & note aging by reviewing notes using spaced repetiti
 - Reviews should start only after properly understanding a concept.
 - Reviews should be [Feynman-technique](https://fs.blog/2021/02/feynman-learning-technique/)-esque.
 
+## Version 1.1.1 and lower
+
+If you had versions 1.1.1 and lower installed, please fix any scheduled/ignored notes by changing the YAML attributes from:
+
+1. `due` to `sr-due`
+2. `interval` to `sr-interval`
+3. `ease` to `sr-ease`
+4. `review: false` to `sr-review: false`
+
+This has been done to avoid attribute clashes with other plugins detailed [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/7).
+Otherwise, the plugin should work as expected.
+
 ## Guide
 
 Spaced repetition? [Basics](https://ncase.me/remember/), [Detailed](https://www.gwern.net/Spaced-repetition).
@@ -38,7 +50,7 @@ Alternatively, you can right click on the file and access the same options:
 
 <img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/file_context_menu.png" />
 
-The note will then scheduled appropriately:
+The note will then be scheduled appropriately:
 
 <img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/scheduled.png" />
 
