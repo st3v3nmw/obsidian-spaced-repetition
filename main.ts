@@ -123,7 +123,7 @@ export default class SRPlugin extends Plugin {
             name: "Review note as easy",
             callback: () => {
                 const openFile = this.app.workspace.getActiveFile();
-                if (openFile.extension == "md")
+                if (openFile && openFile.extension == "md")
                     this.saveReviewResponse(openFile, true);
             }
         });
@@ -133,7 +133,7 @@ export default class SRPlugin extends Plugin {
             name: "Review note as hard",
             callback: () => {
                 const openFile = this.app.workspace.getActiveFile();
-                if (openFile.extension == "md")
+                if (openFile && openFile.extension == "md")
                     this.saveReviewResponse(openFile, false);
             }
         });
