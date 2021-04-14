@@ -118,6 +118,26 @@ export default class SRPlugin extends Plugin {
             },
         });
 
+        this.addCommand({
+            id: "note-review-easy",
+            name: "Review note as easy",
+            callback: () => {
+                const openFile = this.app.workspace.getActiveFile();
+                if (openFile.extension == "md")
+                    this.saveReviewResponse(openFile, true);
+            }
+        });
+
+        this.addCommand({
+            id: "note-review-hard",
+            name: "Review note as hard",
+            callback: () => {
+                const openFile = this.app.workspace.getActiveFile();
+                if (openFile.extension == "md")
+                    this.saveReviewResponse(openFile, false);
+            }
+        });
+
         this.addSettingTab(new SRSettingTab(this.app, this));
 
         this.app.workspace.onLayoutReady(() => {
