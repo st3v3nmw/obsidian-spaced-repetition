@@ -35,7 +35,7 @@ Spaced repetition? [Basics](https://ncase.me/remember/), [Detailed](https://www.
 
 ### Installation
 
-You can easily install the plugin from Obsidian's community plugin section in the Obsidian app.
+You can easily install the plugin from Obsidian's community plugin section in the Obsidian app (Search `Spaced Repetition`).
 
 #### Manual Installation
 
