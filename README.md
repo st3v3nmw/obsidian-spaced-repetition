@@ -68,6 +68,10 @@ The note will then be scheduled appropriately:
 
 <img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/scheduled.png" />
 
+##### Faster Review
+
+Commands to open a note for review, and making review responses are provided. You can create custom hotkeys for them in `Settings -> HotKeys`. This allows for much faster review.
+
 #### Scheduled notes
 
 `Review: N due` on the status bar at the bottom of the screen shows how many notes one has to review today (Today's notes + overdue notes). Clicking on that opens one of the notes for review.
