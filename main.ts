@@ -52,6 +52,12 @@ interface LinkStat {
     linkCount: number;
 }
 
+enum ReviewResponse {
+    Easy,
+    Good,
+    Hard,
+}
+
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     private reviewQueueView: ReviewQueueListView;
@@ -95,7 +101,22 @@ export default class SRPlugin extends Plugin {
                         .setIcon("crosshairs")
                         .onClick((evt) => {
                             if (file.extension == "md")
-                                this.saveReviewResponse(file, true);
+                                this.saveReviewResponse(
+                                    file,
+                                    ReviewResponse.Easy
+                                );
+                        });
+                });
+
+                menu.addItem((item) => {
+                    item.setTitle("Review: Good")
+                        .setIcon("crosshairs")
+                        .onClick((evt) => {
+                            if (file.extension == "md")
+                                this.saveReviewResponse(
+                                    file,
+                                    ReviewResponse.Good
+                                );
                         });
                 });
 
@@ -104,7 +125,10 @@ export default class SRPlugin extends Plugin {
                         .setIcon("crosshairs")
                         .onClick((evt) => {
                             if (file.extension == "md")
-                                this.saveReviewResponse(file, false);
+                                this.saveReviewResponse(
+                                    file,
+                                    ReviewResponse.Hard
+                                );
                         });
                 });
             })
@@ -124,8 +148,18 @@ export default class SRPlugin extends Plugin {
             callback: () => {
                 const openFile = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension == "md")
-                    this.saveReviewResponse(openFile, true);
-            }
+                    this.saveReviewResponse(openFile, ReviewResponse.Easy);
+            },
+        });
+
+        this.addCommand({
+            id: "note-review-good",
+            name: "Review note as good",
+            callback: () => {
+                const openFile = this.app.workspace.getActiveFile();
+                if (openFile && openFile.extension == "md")
+                    this.saveReviewResponse(openFile, ReviewResponse.Good);
+            },
         });
 
         this.addCommand({
@@ -134,8 +168,8 @@ export default class SRPlugin extends Plugin {
             callback: () => {
                 const openFile = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension == "md")
-                    this.saveReviewResponse(openFile, false);
-            }
+                    this.saveReviewResponse(openFile, ReviewResponse.Hard);
+            },
         });
 
         this.addSettingTab(new SRSettingTab(this.app, this));
@@ -242,7 +276,7 @@ export default class SRPlugin extends Plugin {
         this.reviewQueueView.redraw();
     }
 
-    async saveReviewResponse(note: TFile, easy: boolean) {
+    async saveReviewResponse(note: TFile, response: ReviewResponse) {
         let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         let frontmatter = fileCachedData.frontmatter || {};
 
@@ -284,8 +318,7 @@ export default class SRPlugin extends Plugin {
                         this.pageranks[statObj.sourcePath] *
                         ease;
                     linkPGTotal +=
-                        this.pageranks[statObj.sourcePath] *
-                        statObj.linkCount;
+                        this.pageranks[statObj.sourcePath] * statObj.linkCount;
                     totalLinkCount += statObj.linkCount;
                 }
             }
@@ -308,10 +341,7 @@ export default class SRPlugin extends Plugin {
 
             let linkContribution =
                 this.data.settings.maxLinkFactor *
-                Math.min(
-                    1.0,
-                    Math.log(totalLinkCount + 0.5) / Math.log(64)
-                );
+                Math.min(1.0, Math.log(totalLinkCount + 0.5) / Math.log(64));
             ease = Math.round(
                 (1.0 - linkContribution) * this.data.settings.baseEase +
                     (totalLinkCount > 0
@@ -324,13 +354,20 @@ export default class SRPlugin extends Plugin {
             ease = frontmatter["sr-ease"];
         }
 
-        ease = easy ? ease + 20 : Math.max(130, ease - 20);
+        if (response != ReviewResponse.Good) {
+            ease =
+                response == ReviewResponse.Easy
+                    ? ease + 20
+                    : Math.max(130, ease - 20);
+        }
+
         interval = Math.max(
             1,
-            easy
+            response != ReviewResponse.Hard
                 ? (interval * ease) / 100
                 : interval * this.data.settings.lapsesIntervalChange
         );
+
         // fuzz
         if (interval >= 8) {
             let fuzz = [-0.05 * interval, 0, 0.05 * interval];
@@ -432,9 +469,7 @@ class SRSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName("Tags to review")
-            .setDesc(
-                "Enter tags separated by spaces i.e. #review #tag2 #tag3."
-            )
+            .setDesc("Enter tags separated by spaces i.e. #review #tag2 #tag3.")
             .addTextArea((text) =>
                 text
                     .setValue(
