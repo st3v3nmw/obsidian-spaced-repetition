@@ -56,7 +56,7 @@ All "new" notes are listed under `New` on the right pane (Review Queue). Like so
 
 #### Reviewing
 
-Open the file & review it. Once done, choose either the `Review: Easy` or the `Review: Hard` option on the file menu (the three dots). The `Easy` or `Hard` depend on how well you comprehend the material being reviewed.
+Open the file & review it. Once done, choose either the `Review: Easy`, `Review: Good`, or the `Review: Hard` option on the file menu (the three dots). The `Easy`, `Good`, or `Hard` depend on how well you comprehend the material being reviewed.
 
 <img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/more_options.png" />
 
@@ -91,7 +91,7 @@ Available settings are:
 ## Spaced Repetition Algorithm
 
 - The algorithm is a variant of [Anki's algorithm](https://faqs.ankiweb.net/what-spaced-repetition-algorithm.html) which is based on the [SM-2 algorithm](https://www.supermemo.com/en/archives1990-2015/english/ol/sm2).
-- It supports binary reviews i.e. a concept is either hard or easy at the time of review.
+- It supports ternary reviews i.e. a concept is either hard, good, or easy at the time of review.
 - initial ease is weighted (using max_link_factor) depending on the average ease of linked notes, note importance, and the base ease.
   - `if link_count > 0: initial_ease = (1 - link_contribution) * base_ease + link_contribution * average_ease`
     - `link_contribution = max_link_factor * min(1.0, log(link_count + 0.5) / log(64))` (cater for uncertainty)
@@ -99,6 +99,7 @@ Available settings are:
     - On most occasions, the most fundamental concepts/notes have higher importance
 - If the user reviews a concept/note as:
   - easy, the ease increases by `20` and the interval changes to `old_interval * new_ease / 100`
+  - good, the ease remains unchanged and the interval changes to `old_interval * old_ease / 100`
   - hard, the ease decreases by `20` and the interval changes to `old_interval * 0.5`
     - The `0.5` can be modified in settings
     - `minimum ease = 130`
