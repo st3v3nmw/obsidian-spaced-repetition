@@ -1,12 +1,13 @@
 import { Notice, Plugin, addIcon, TFile } from "obsidian";
 import * as graph from "pagerank.js";
 import { SRSettings, SRSettingTab, DEFAULT_SETTINGS } from "./settings";
-import { ReviewQueueListView } from "./sidebar";
+import { FlashcardModal } from "./flashcard-modal";
+import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "./sidebar";
 import {
     CROSS_HAIRS_ICON,
     SCHEDULING_INFO_REGEX,
     YAML_FRONT_MATTER_REGEX,
-    REVIEW_QUEUE_VIEW_TYPE,
+    REMNOTE_STYLE_REGEX,
 } from "./constants";
 
 interface PluginData {
@@ -33,6 +34,21 @@ enum ReviewResponse {
     Hard,
 }
 
+interface Card {
+    dueUnix?: number;
+    ease?: number;
+    interval?: number;
+    context: string;
+    note: TFile;
+}
+
+export interface BasicCard extends Card {
+    front: string;
+    back: string;
+}
+
+export interface ClozeCard extends Card {}
+
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     private reviewQueueView: ReviewQueueListView;
@@ -44,6 +60,10 @@ export default class SRPlugin extends Plugin {
     private incomingLinks: Record<string, LinkStat[]> = {};
     private pageranks: Record<string, number> = {};
     private dueNotesCount: number = 0;
+
+    public newFlashcards: (BasicCard | ClozeCard)[] = [];
+    public scheduledFlashcards: (BasicCard | ClozeCard)[] = [];
+    public dueFlashcardsCount: number = 0;
 
     async onload() {
         await this.loadPluginData();
@@ -166,6 +186,10 @@ export default class SRPlugin extends Plugin {
         this.pageranks = {};
         this.dueNotesCount = 0;
 
+        this.newFlashcards = [];
+        this.scheduledFlashcards = [];
+        this.dueFlashcardsCount = 0;
+
         let now = Date.now();
         for (let note of notes) {
             if (this.incomingLinks[note.path] == undefined)
@@ -195,6 +219,11 @@ export default class SRPlugin extends Plugin {
             let tags = fileCachedData.tags || [];
             let shouldIgnore = true;
             for (let tagObj of tags) {
+                if (tagObj.tag == "#flashcards") {
+                    await this.findFlashcards(note);
+                    break;
+                }
+
                 if (this.data.settings.tagsToReview.includes(tagObj.tag)) {
                     shouldIgnore = false;
                     break;
@@ -250,6 +279,8 @@ export default class SRPlugin extends Plugin {
 
         this.statusBar.setText(`Review: ${this.dueNotesCount} due`);
         this.reviewQueueView.redraw();
+
+        new FlashcardModal(this.app, this).open();
     }
 
     async saveReviewResponse(note: TFile, response: ReviewResponse) {
@@ -408,6 +439,30 @@ export default class SRPlugin extends Plugin {
         }
 
         new Notice("You're done for the day :D.");
+    }
+
+    async findFlashcards(note: TFile) {
+        let fileText = await this.app.vault.read(note);
+
+        for (let match of fileText.matchAll(REMNOTE_STYLE_REGEX)) {
+            let cardObj: BasicCard = {
+                front: match[1],
+                back: match[2],
+                context: "write > context > function",
+                note,
+            };
+
+            // note has scheduling information
+            if (match[3]) {
+                cardObj.dueUnix = Number.parseInt(match[3]);
+                cardObj.ease = Number.parseInt(match[4]);
+                cardObj.interval = Number.parseInt(match[5]);
+
+                this.scheduledFlashcards.push(cardObj);
+            } else {
+                this.newFlashcards.push(cardObj);
+            }
+        }
     }
 
     async loadPluginData() {

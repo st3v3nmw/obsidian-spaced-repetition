@@ -3,3 +3,19 @@
     text-align: center;
     margin-top: 16px;
 }
+
+.link {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#show-answer {
+    height: 48px;
+    line-height: 48px;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    backdrop-filter: invert(4%);
+}
