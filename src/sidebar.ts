@@ -26,7 +26,7 @@ export class ReviewQueueListView extends ItemView {
     }
 
     public getDisplayText(): string {
-        return "Review Queue";
+        return "Notes Review Queue";
     }
 
     public getIcon(): string {

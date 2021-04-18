@@ -1,2 +1,0 @@
-1. Change to /^(.+)::(.+)(?:\n<!--SR:(ID)-->)?/gm (ID points to some stored id for ref. to the cards., generate ID using ms timestamps)
-2. Document flashcard review shortcuts (Space/Enter => Show answer, 1 => Hard, 2 => Good, 3 => Easy)

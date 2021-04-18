@@ -8,14 +8,26 @@ import {
     SCHEDULING_INFO_REGEX,
     YAML_FRONT_MATTER_REGEX,
     REMNOTE_STYLE_REGEX,
+    RULED_STYLE_REGEX,
+    DELETE_CARD_REGEX,
 } from "./constants";
+
+interface BasicCard {
+    due?: string;
+    ease?: number;
+    interval?: number;
+}
 
 interface PluginData {
     settings: SRSettings;
+    basicCards: Record<number, BasicCard>;
+    clozeCards: Record<number, BasicCard[]>;
 }
 
 const DEFAULT_DATA: PluginData = {
     settings: DEFAULT_SETTINGS,
+    basicCards: {},
+    clozeCards: {},
 };
 
 interface SchedNote {
@@ -34,14 +46,12 @@ enum ReviewResponse {
     Hard,
 }
 
-export interface Card {
-    dueUnix?: number;
-    ease?: number;
-    interval?: number;
+export interface CardExtra extends BasicCard {
     context?: string;
     note: TFile;
     front: string;
     back: string;
+    id: number;
 }
 
 export default class SRPlugin extends Plugin {
@@ -56,8 +66,8 @@ export default class SRPlugin extends Plugin {
     private pageranks: Record<string, number> = {};
     private dueNotesCount: number = 0;
 
-    public newFlashcards: Card[] = [];
-    public dueFlashcards: Card[] = [];
+    public newFlashcards: CardExtra[] = [];
+    public dueFlashcards: CardExtra[] = [];
 
     async onload() {
         await this.loadPluginData();
@@ -72,9 +82,9 @@ export default class SRPlugin extends Plugin {
             this.reviewNextNote();
         });
 
-        this.addRibbonIcon("crosshairs", "Sync notes scheduling", async () => {
+        this.addRibbonIcon("crosshairs", "Review flashcards", async () => {
             await this.sync();
-            new Notice("Sync done.");
+            new FlashcardModal(this.app, this).open();
         });
 
         this.registerView(
@@ -270,10 +280,8 @@ export default class SRPlugin extends Plugin {
             }
         );
 
-        this.statusBar.setText(`Review: ${this.dueNotesCount} due`);
+        this.statusBar.setText(`Review: ${this.dueNotesCount} notes due`);
         this.reviewQueueView.redraw();
-
-        new FlashcardModal(this.app, this).open();
     }
 
     async saveReviewResponse(note: TFile, response: ReviewResponse) {
@@ -360,13 +368,15 @@ export default class SRPlugin extends Plugin {
                     ? ease + 20
                     : Math.max(130, ease - 20);
         }
-        
+
         if (response == ReviewResponse.Hard)
-            interval = Math.max(1, interval * this.data.settings.lapsesIntervalChange);
+            interval = Math.max(
+                1,
+                interval * this.data.settings.lapsesIntervalChange
+            );
         else if (response == ReviewResponse.Good)
             interval = (interval * ease) / 100;
-        else
-            interval = 1.3 * (interval * ease) / 100;
+        else interval = (1.3 * (interval * ease)) / 100;
 
         // fuzz
         if (interval >= 8) {
@@ -440,52 +450,99 @@ export default class SRPlugin extends Plugin {
         let headings = fileCachedData.headings || [];
 
         let now = Date.now();
-        for (let match of fileText.matchAll(REMNOTE_STYLE_REGEX)) {
-            let cardObj: Card;
-            // flashcard has scheduling information
-            if (match[3]) {
-                // flashcard due for review
-                if (Number.parseInt(match[3]) <= now) {
+        for (let regex of [REMNOTE_STYLE_REGEX, RULED_STYLE_REGEX]) {
+            let fileChanges = [];
+            for (let match of fileText.matchAll(regex)) {
+                // TODO: Fix this
+                // clean up
+                if (match[0][match[0].length - 1] == "\n")
+                    match[0] = match[0].slice(0, -1);
+                if (match[1][match[1].length - 1] == "\n")
+                    match[1] = match[1].slice(0, -1);
+                if (match[2][match[2].length - 1] == "\n")
+                    match[2] = match[2].slice(0, -1);
+
+                let cardObj: CardExtra;
+                // flashcard already seen i.e. has an assigned ID
+                if (match[3]) {
+                    let id = Number.parseInt(match[3]);
+                    let card = this.data.basicCards[id];
+                    // card scheduled
+                    if (card.due) {
+                        if (Date.parse(card.due) <= now) {
+                            cardObj = {
+                                front: match[1],
+                                back: match[2],
+                                note,
+                                due: card.due,
+                                ease: card.ease,
+                                interval: card.interval,
+                                id,
+                            };
+                            this.dueFlashcards.push(cardObj);
+                        } else {
+                            continue;
+                        }
+                    } else {
+                        cardObj = {
+                            front: match[1],
+                            back: match[2],
+                            note,
+                            id,
+                        };
+                        this.newFlashcards.push(cardObj);
+                    }
+                } else {
+                    // sleep to ensure we have unique ids
+                    await sleep(4);
+                    let id = Date.now();
                     cardObj = {
                         front: match[1],
                         back: match[2],
                         note,
-                        dueUnix: Number.parseInt(match[3]),
-                        ease: Number.parseInt(match[4]),
-                        interval: Number.parseInt(match[5]),
+                        id,
                     };
-                    this.dueFlashcards.push(cardObj);
-                } else {
-                    continue;
+                    this.newFlashcards.push(cardObj);
+                    this.data.basicCards[id] = {};
+
+                    let pos = match.index + match[0].length;
+                    fileChanges.push([pos, id]);
                 }
-            } else {
-                cardObj = {
-                    front: match[1],
-                    back: match[2],
-                    note,
-                };
-                this.newFlashcards.push(cardObj);
+
+                let cardOffset = match.index;
+                let stack: HeadingCache[] = [];
+                for (let heading of headings) {
+                    if (heading.position.start.offset > cardOffset) break;
+
+                    while (
+                        stack.length > 0 &&
+                        stack[stack.length - 1].level >= heading.level
+                    )
+                        stack.pop();
+
+                    stack.push(heading);
+                }
+
+                cardObj.context = "";
+                for (let headingObj of stack)
+                    cardObj.context += headingObj.heading + " > ";
+                cardObj.context = cardObj.context.slice(0, -3);
             }
 
-            let cardOffset = match.index;
-            let stack: HeadingCache[] = [];
-            for (let heading of headings) {
-                if (heading.position.start.offset > cardOffset) break;
-
-                while (
-                    stack.length > 0 &&
-                    stack[stack.length - 1].level >= heading.level
-                )
-                    stack.pop();
-
-                stack.push(heading);
+            if (fileChanges.length > 0) {
+                fileChanges.reverse();
+                for (let fileChange of fileChanges)
+                    fileText = `${fileText.substring(
+                        0,
+                        fileChange[0]
+                    )}\n<!--SR:${fileChange[1]}-->${fileText.substring(
+                        fileChange[0]
+                    )}`;
             }
-
-            cardObj.context = "";
-            for (let headingObj of stack)
-                cardObj.context += headingObj.heading + " > ";
-            cardObj.context = cardObj.context.slice(0, -3);
         }
+
+        this.app.vault.modify(note, fileText);
+        await this.savePluginData();
     }
 
     async loadPluginData() {
@@ -506,4 +563,8 @@ export default class SRPlugin extends Plugin {
             active: true,
         });
     }
+}
+
+function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
