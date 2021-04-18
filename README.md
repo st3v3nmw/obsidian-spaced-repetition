@@ -6,17 +6,29 @@ Spaced repetition? [Basics](https://ncase.me/remember/), [Detailed](https://www.
 
 Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/1) for upcoming features. Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues) if you have a feature request, a bug-report, or some feedback.
 
+## Installation
+
+You can easily install the plugin from Obsidian's community plugin section in the Obsidian app (Search `Spaced Repetition`).
+
+### Manual Installation
+
+Create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your vault. Add the `main.js`, `manifest.json`, and the `styles.css` files from the [latest release](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases) to the folder.
+
 ## Flashcards
 
 Tag any notes that you'd like to put flashcards in as `#flashcards`. 
 
 ### Remnote single-line style
 
+The prompt and the answer are separated by `::`.
+
 ```markdown
 the prompt goes here::the answer goes here!
 ```
 
 ### Ruled style
+
+The front and the back of the card are separated by `---`.
 
 ```markdown
 Ruled card front
@@ -105,14 +117,6 @@ Alternatively, one can use the `Open a note for review` command.
 ### Review Queue
 
 - Daily review entries are sorted by importance (PageRank)
-
-## Installation
-
-You can easily install the plugin from Obsidian's community plugin section in the Obsidian app (Search `Spaced Repetition`).
-
-### Manual Installation
-
-Create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your vault. Add the `main.js`, `manifest.json`, and the `styles.css` files from the [latest release](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases) to the folder.
 
 ## Notices
 
