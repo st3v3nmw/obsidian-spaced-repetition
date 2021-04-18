@@ -360,13 +360,13 @@ export default class SRPlugin extends Plugin {
                     ? ease + 20
                     : Math.max(130, ease - 20);
         }
-
-        interval = Math.max(
-            1,
-            response != ReviewResponse.Hard
-                ? (interval * ease) / 100
-                : interval * this.data.settings.lapsesIntervalChange
-        );
+        
+        if (response == ReviewResponse.Hard)
+            interval = Math.max(1, interval * this.data.settings.lapsesIntervalChange);
+        else if (response == ReviewResponse.Good)
+            interval = (interval * ease) / 100;
+        else
+            interval = 1.3 * (interval * ease) / 100;
 
         // fuzz
         if (interval >= 8) {

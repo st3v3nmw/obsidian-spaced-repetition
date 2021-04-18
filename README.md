@@ -103,7 +103,7 @@ Available settings are:
   - The importance of the difference concepts/notes is determined using the PageRank algorithm (not all notes are created equal xD)
     - On most occasions, the most fundamental concepts/notes have higher importance
 - If the user reviews a concept/note as:
-  - easy, the ease increases by `20` and the interval changes to `old_interval * new_ease / 100`
+  - easy, the ease increases by `20` and the interval changes to `old_interval * new_ease / 100 * 1.3` (the 1.3 is the easy bonus)
   - good, the ease remains unchanged and the interval changes to `old_interval * old_ease / 100`
   - hard, the ease decreases by `20` and the interval changes to `old_interval * 0.5`
     - The `0.5` can be modified in settings

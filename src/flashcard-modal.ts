@@ -139,7 +139,7 @@ export class FlashcardModal extends Modal {
             );
             this.hardBtn.setText("Hard - 1.0 day(s)");
             this.goodBtn.setText("Good - 2.5 day(s)");
-            this.easyBtn.setText("Easy - 2.7 day(s)");
+            this.easyBtn.setText("Easy - 3.5 day(s)");
         } else if (this.plugin.dueFlashcards.length > 0) {
             this.currentCard = this.plugin.dueFlashcards[0];
             MarkdownRenderer.renderMarkdown(
@@ -226,12 +226,12 @@ export class FlashcardModal extends Modal {
                     : Math.max(130, ease - 20);
         }
 
-        interval = Math.max(
-            1,
-            response != UserResponse.ReviewHard
-                ? (interval * ease) / 100
-                : interval * this.plugin.data.settings.lapsesIntervalChange
-        );
+        if (response == UserResponse.ReviewHard)
+            interval = Math.max(1, interval * this.plugin.data.settings.lapsesIntervalChange);
+        else if (response == UserResponse.ReviewGood)
+            interval = (interval * ease) / 100;
+        else
+            interval = 1.3 * (interval * ease) / 100;
 
         return { ease, interval: Math.round(interval * 10) / 10 };
     }
