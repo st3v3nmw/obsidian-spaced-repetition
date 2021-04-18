@@ -1,5 +1,63 @@
-.help-div {
+.sr-help-div {
     width: 100%;
     text-align: center;
     margin-top: 16px;
+}
+
+.sr-link {
+    color: var(--text-accent);
+    text-decoration: underline;
+    cursor: pointer;
+    margin-bottom: 16px;
+}
+
+.sr-response {
+    display: inline-grid;
+    width: 100%;
+    grid-template-columns: auto auto auto;
+    position: absolute;
+    bottom: 0;
+}
+
+.sr-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#sr-show-answer {
+    height: 48px;
+    line-height: 48px;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    cursor: pointer;
+    backdrop-filter: invert(4%);
+}
+
+#sr-hr-card-divide {
+    backdrop-filter: invert(40%);
+    border: none;
+    height: 2px;
+}
+
+#sr-hard-btn {
+    height: 48px;
+    background-color: #f44336;
+}
+
+#sr-good-btn {
+    height: 48px;
+    background-color: #2196f3;
+}
+
+#sr-easy-btn {
+    height: 48px;
+    background-color: #4caf50;
+}
+
+#sr-context {
+    font-style: italic;
+    font-weight: bold;
 }

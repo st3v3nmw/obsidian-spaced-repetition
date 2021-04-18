@@ -1,12 +1,13 @@
-import { Notice, Plugin, addIcon, TFile } from "obsidian";
+import { Notice, Plugin, addIcon, TFile, HeadingCache } from "obsidian";
 import * as graph from "pagerank.js";
 import { SRSettings, SRSettingTab, DEFAULT_SETTINGS } from "./settings";
-import { ReviewQueueListView } from "./sidebar";
+import { FlashcardModal } from "./flashcard-modal";
+import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "./sidebar";
 import {
     CROSS_HAIRS_ICON,
     SCHEDULING_INFO_REGEX,
     YAML_FRONT_MATTER_REGEX,
-    REVIEW_QUEUE_VIEW_TYPE,
+    REMNOTE_STYLE_REGEX,
 } from "./constants";
 
 interface PluginData {
@@ -33,6 +34,16 @@ enum ReviewResponse {
     Hard,
 }
 
+export interface Card {
+    dueUnix?: number;
+    ease?: number;
+    interval?: number;
+    context?: string;
+    note: TFile;
+    front: string;
+    back: string;
+}
+
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     private reviewQueueView: ReviewQueueListView;
@@ -44,6 +55,9 @@ export default class SRPlugin extends Plugin {
     private incomingLinks: Record<string, LinkStat[]> = {};
     private pageranks: Record<string, number> = {};
     private dueNotesCount: number = 0;
+
+    public newFlashcards: Card[] = [];
+    public dueFlashcards: Card[] = [];
 
     async onload() {
         await this.loadPluginData();
@@ -166,6 +180,9 @@ export default class SRPlugin extends Plugin {
         this.pageranks = {};
         this.dueNotesCount = 0;
 
+        this.newFlashcards = [];
+        this.dueFlashcards = [];
+
         let now = Date.now();
         for (let note of notes) {
             if (this.incomingLinks[note.path] == undefined)
@@ -195,6 +212,11 @@ export default class SRPlugin extends Plugin {
             let tags = fileCachedData.tags || [];
             let shouldIgnore = true;
             for (let tagObj of tags) {
+                if (tagObj.tag == "#flashcards") {
+                    await this.findFlashcards(note);
+                    break;
+                }
+
                 if (this.data.settings.tagsToReview.includes(tagObj.tag)) {
                     shouldIgnore = false;
                     break;
@@ -250,6 +272,8 @@ export default class SRPlugin extends Plugin {
 
         this.statusBar.setText(`Review: ${this.dueNotesCount} due`);
         this.reviewQueueView.redraw();
+
+        new FlashcardModal(this.app, this).open();
     }
 
     async saveReviewResponse(note: TFile, response: ReviewResponse) {
@@ -408,6 +432,60 @@ export default class SRPlugin extends Plugin {
         }
 
         new Notice("You're done for the day :D.");
+    }
+
+    async findFlashcards(note: TFile) {
+        let fileText = await this.app.vault.read(note);
+        let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
+        let headings = fileCachedData.headings || [];
+
+        let now = Date.now();
+        for (let match of fileText.matchAll(REMNOTE_STYLE_REGEX)) {
+            let cardObj: Card;
+            // flashcard has scheduling information
+            if (match[3]) {
+                // flashcard due for review
+                if (Number.parseInt(match[3]) <= now) {
+                    cardObj = {
+                        front: match[1],
+                        back: match[2],
+                        note,
+                        dueUnix: Number.parseInt(match[3]),
+                        ease: Number.parseInt(match[4]),
+                        interval: Number.parseInt(match[5]),
+                    };
+                    this.dueFlashcards.push(cardObj);
+                } else {
+                    continue;
+                }
+            } else {
+                cardObj = {
+                    front: match[1],
+                    back: match[2],
+                    note,
+                };
+                this.newFlashcards.push(cardObj);
+            }
+
+            let cardOffset = match.index;
+            let stack: HeadingCache[] = [];
+            for (let heading of headings) {
+                if (heading.position.start.offset > cardOffset) break;
+
+                while (
+                    stack.length > 0 &&
+                    stack[stack.length - 1].level >= heading.level
+                )
+                    stack.pop();
+
+                stack.push(heading);
+            }
+
+            cardObj.context = "";
+            for (let headingObj of stack)
+                cardObj.context += headingObj.heading + " > ";
+            cardObj.context = cardObj.context.slice(0, -3);
+        }
     }
 
     async loadPluginData() {

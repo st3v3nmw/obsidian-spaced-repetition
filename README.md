@@ -11,6 +11,9 @@ Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/proje
 - Reviews should start only after properly understanding a concept.
 - Reviews should be [Feynman-technique](https://fs.blog/2021/02/feynman-learning-technique/)-esque.
 
+Flashcard support is in the works :tada:!
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/flashcard.png" />
+
 ## Notices
 
 ### Version 1.2.0 and lower

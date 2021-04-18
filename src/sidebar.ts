@@ -1,6 +1,8 @@
 import { ItemView, WorkspaceLeaf, Menu, TFile } from "obsidian";
 import type SRPlugin from "./main";
-import { COLLAPSE_ICON, REVIEW_QUEUE_VIEW_TYPE } from "./constants";
+import { COLLAPSE_ICON } from "./constants";
+
+export const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
 
 export class ReviewQueueListView extends ItemView {
     private plugin: SRPlugin;
