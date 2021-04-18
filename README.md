@@ -16,6 +16,8 @@ Create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your 
 
 ## Flashcards
 
+https://user-images.githubusercontent.com/43380836/115158585-9083e180-a097-11eb-98a3-4a7934a682e3.mp4
+
 Tag any notes that you'd like to put flashcards in as `#flashcards`. 
 
 ### Remnote single-line style
