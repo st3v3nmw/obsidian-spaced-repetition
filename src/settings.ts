@@ -170,7 +170,7 @@ export class SRSettingTab extends PluginSettingTab {
                     })
             );
 
-        let helpEl = containerEl.createDiv("help-div");
+        let helpEl = containerEl.createDiv("sr-help-div");
         helpEl.innerHTML =
             '<a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/README.md">For more information, check the README.</a>';
     }
