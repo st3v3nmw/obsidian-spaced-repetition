@@ -1,6 +1,6 @@
 import { Modal, App, MarkdownRenderer, Notice } from "obsidian";
 import type SRPlugin from "./main";
-import { Card } from "./main";
+import { CardExtra } from "./main";
 
 enum UserResponse {
     ShowAnswer,
@@ -25,7 +25,7 @@ export class FlashcardModal extends Modal {
     private responseDiv: HTMLElement;
     private fileLinkView: HTMLElement;
     private contextView: HTMLElement;
-    private currentCard: Card;
+    private currentCard: CardExtra;
     private mode: Mode;
 
     constructor(app: App, plugin: SRPlugin) {
@@ -129,18 +129,7 @@ export class FlashcardModal extends Modal {
         this.flashcardView.innerHTML = "";
         this.mode = Mode.Front;
 
-        if (this.plugin.newFlashcards.length > 0) {
-            this.currentCard = this.plugin.newFlashcards[0];
-            MarkdownRenderer.renderMarkdown(
-                this.currentCard.front,
-                this.flashcardView,
-                this.currentCard.note.path,
-                this.plugin
-            );
-            this.hardBtn.setText("Hard - 1.0 day(s)");
-            this.goodBtn.setText("Good - 2.5 day(s)");
-            this.easyBtn.setText("Easy - 3.5 day(s)");
-        } else if (this.plugin.dueFlashcards.length > 0) {
+        if (this.plugin.dueFlashcards.length > 0) {
             this.currentCard = this.plugin.dueFlashcards[0];
             MarkdownRenderer.renderMarkdown(
                 this.currentCard.front,
@@ -168,6 +157,17 @@ export class FlashcardModal extends Modal {
             this.hardBtn.setText(`Hard - ${hardInterval} day(s)`);
             this.goodBtn.setText(`Good - ${goodInterval} day(s)`);
             this.easyBtn.setText(`Easy - ${easyInterval} day(s)`);
+        } else if (this.plugin.newFlashcards.length > 0) {
+            this.currentCard = this.plugin.newFlashcards[0];
+            MarkdownRenderer.renderMarkdown(
+                this.currentCard.front,
+                this.flashcardView,
+                this.currentCard.note.path,
+                this.plugin
+            );
+            this.hardBtn.setText("Hard - 1.0 day(s)");
+            this.goodBtn.setText("Good - 2.5 day(s)");
+            this.easyBtn.setText("Easy - 3.5 day(s)");
         }
 
         this.contextView.setText(this.currentCard.context);
@@ -179,7 +179,7 @@ export class FlashcardModal extends Modal {
         });
     }
 
-    processResponse(response: UserResponse) {
+    async processResponse(response: UserResponse) {
         if (response == UserResponse.ShowAnswer) {
             this.mode = Mode.Back;
 
@@ -200,20 +200,42 @@ export class FlashcardModal extends Modal {
             response == UserResponse.ReviewGood ||
             response == UserResponse.ReviewEasy
         ) {
-            let interval, ease;
+            let intervalOuter, easeOuter;
             // scheduled card
-            if (this.currentCard.dueUnix) {
-                interval = this.currentCard.interval;
-                ease = this.currentCard.ease;
+            if (this.currentCard.due) {
                 this.plugin.dueFlashcards.splice(0, 1);
+                let { interval, ease } = this.nextState(
+                    response,
+                    this.currentCard.interval,
+                    this.currentCard.ease
+                );
+                // don't look too closely lol
+                intervalOuter = interval;
+                easeOuter = ease;
             } else {
-                interval = 250;
-                ease = 1;
+                let { interval, ease } = this.nextState(response, 1, 250);
                 this.plugin.newFlashcards.splice(0, 1);
+                // don't look too closely lol
+                intervalOuter = interval;
+                easeOuter = ease;
             }
 
-            // TODO: save responses
+            // fuzz
+            if (intervalOuter >= 8) {
+                let fuzz = [-0.05 * intervalOuter, 0, 0.05 * intervalOuter];
+                intervalOuter += fuzz[Math.floor(Math.random() * fuzz.length)];
+            }
+            intervalOuter = Math.round(intervalOuter);
 
+            let due = new Date(Date.now() + intervalOuter * 24 * 3600 * 1000);
+
+            this.plugin.data.basicCards[this.currentCard.id] = {
+                due: due.toDateString(),
+                ease: easeOuter,
+                interval: intervalOuter,
+            };
+
+            await this.plugin.savePluginData();
             this.nextCard();
         }
     }
@@ -227,11 +249,13 @@ export class FlashcardModal extends Modal {
         }
 
         if (response == UserResponse.ReviewHard)
-            interval = Math.max(1, interval * this.plugin.data.settings.lapsesIntervalChange);
+            interval = Math.max(
+                1,
+                interval * this.plugin.data.settings.lapsesIntervalChange
+            );
         else if (response == UserResponse.ReviewGood)
             interval = (interval * ease) / 100;
-        else
-            interval = 1.3 * (interval * ease) / 100;
+        else interval = (1.3 * (interval * ease)) / 100;
 
         return { ease, interval: Math.round(interval * 10) / 10 };
     }
