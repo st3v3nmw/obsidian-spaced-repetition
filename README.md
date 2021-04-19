@@ -99,6 +99,10 @@ The flashcard for `Kenya::Nairobi` will have `Trivia > Capitals > Africa` as the
 
 The `Open file` link in the review modal allows you to open the file that contains the flashcard being reviewed.
 
+### Deleting cards
+
+To delete a card, simply delete the scheduling information & the card text.
+
 ## Notes
 
 ### "Philosophy"
