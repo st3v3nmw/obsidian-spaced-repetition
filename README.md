@@ -22,44 +22,46 @@ https://user-images.githubusercontent.com/43380836/115158585-9083e180-a097-11eb-
 
 Tag any notes that you'd like to put flashcards in as `#flashcards`. 
 
-### Remnote single-line style
+### Single-line (Remnote style)
 
 The prompt and the answer are separated by `::`.
 
 ```markdown
-the prompt goes here::the answer goes here!
+the question goes on this side::answer goes here!
 ```
 
 ### Ruled style
 
-The front and the back of the card are separated by `---`.
+The front and the back of the card are separated by `?`.
 
 ```markdown
-Ruled card front
----
-Backside of ruled card
+Front of multiline
+?
+Backside of multiline card
 ```
 
-These can also span over multiple lines as long as both sides "touch" the `---`:
+These can also span over multiple lines as long as both sides "touch" the `?`:
 
 ```
-This is a ruled flashcard
-that can go on multiple lines
----
+As per the definition
+of "multiline" the prompt
+can be on multiple lines
+?
+same goes for
 the answer
-can also be
-on multiple lines
 ```
 
 ### Reviewing
 
-Once done creating cards, click on the crosshairs button on the left ribbon to generate IDs for the flashcards. These IDs are in the form:
-```
-<!--SR:1618771534552-->
-```
-They are wrapped in a HTML comment so that they aren't visible during notes preview.
+Once done creating cards, click on the crosshairs button on the left ribbon to start reviewing the flashcards. After a card is reviewed, a HTML comment is added containing the next review day, the interval, and the card's ease.
 
-Once the IDs are generated, the plugin with queue them and create a modal where you can start reviewing.
+```
+<!--SR:Thu Apr 22 2021,3,250-->
+```
+
+Wrapping in a HTML comment makes the scheduling information not visible in the notes preview.
+
+Note that you can skip a card by simply pressing `S` (case doesn't matter).
 
 #### Faster Review
 
@@ -68,6 +70,32 @@ To review faster, use the following keyboard shortcuts:
 - `1` => Review as `Hard`
 - `2` => Review as `Good`
 - `3` => Review as `Easy`
+
+### Context
+
+If the parent note has heading, the flashcard will have a title containing the context.
+
+Taking the following note:
+
+```markdown
+# Trivia
+
+## Capitals
+
+### Africa
+
+Kenya::Nairobi
+
+### North America
+
+Canada::Ottawa
+```
+
+The flashcard for `Kenya::Nairobi` will have `Trivia > Capitals > Africa` as the context/title whereas the flashcard for `Canada::Ottawa` will have `Trivia > Capitals > North America` as the context/title.
+
+### Open parent file
+
+The `Open file` link in the review modal allows you to open the file that contains the flashcard being reviewed.
 
 ## Notes
 
