@@ -7,27 +7,16 @@ import {
     CROSS_HAIRS_ICON,
     SCHEDULING_INFO_REGEX,
     YAML_FRONT_MATTER_REGEX,
-    REMNOTE_STYLE_REGEX,
-    RULED_STYLE_REGEX,
-    DELETE_CARD_REGEX,
+    SINGLELINE_CARD_REGEX,
+    MULTILINE_CARD_REGEX,
 } from "./constants";
-
-interface BasicCard {
-    due?: string;
-    ease?: number;
-    interval?: number;
-}
 
 interface PluginData {
     settings: SRSettings;
-    basicCards: Record<number, BasicCard>;
-    clozeCards: Record<number, BasicCard[]>;
 }
 
 const DEFAULT_DATA: PluginData = {
     settings: DEFAULT_SETTINGS,
-    basicCards: {},
-    clozeCards: {},
 };
 
 interface SchedNote {
@@ -46,12 +35,16 @@ enum ReviewResponse {
     Hard,
 }
 
-export interface CardExtra extends BasicCard {
+export interface Card {
+    due?: string;
+    ease?: number;
+    interval?: number;
     context?: string;
     note: TFile;
     front: string;
     back: string;
-    id: number;
+    match: any;
+    isSingleLine: boolean;
 }
 
 export default class SRPlugin extends Plugin {
@@ -66,8 +59,8 @@ export default class SRPlugin extends Plugin {
     private pageranks: Record<string, number> = {};
     private dueNotesCount: number = 0;
 
-    public newFlashcards: CardExtra[] = [];
-    public dueFlashcards: CardExtra[] = [];
+    public newFlashcards: Card[] = [];
+    public dueFlashcards: Card[] = [];
 
     async onload() {
         await this.loadPluginData();
@@ -450,63 +443,38 @@ export default class SRPlugin extends Plugin {
         let headings = fileCachedData.headings || [];
 
         let now = Date.now();
-        for (let regex of [REMNOTE_STYLE_REGEX, RULED_STYLE_REGEX]) {
-            let fileChanges = [];
+        for (let regex of [SINGLELINE_CARD_REGEX, MULTILINE_CARD_REGEX]) {
+            let isSingleLine = regex == SINGLELINE_CARD_REGEX;
             for (let match of fileText.matchAll(regex)) {
-                // TODO: Fix this
-                // clean up
-                if (match[0][match[0].length - 1] == "\n")
-                    match[0] = match[0].slice(0, -1);
-                if (match[1][match[1].length - 1] == "\n")
-                    match[1] = match[1].slice(0, -1);
-                if (match[2][match[2].length - 1] == "\n")
-                    match[2] = match[2].slice(0, -1);
+                match[0] = match[0].trim();
+                match[1] = match[1].trim();
+                match[2] = match[2].trim();
 
-                let cardObj: CardExtra;
-                // flashcard already seen i.e. has an assigned ID
+                let cardObj: Card;
+                // flashcard already scheduled
                 if (match[3]) {
-                    let id = Number.parseInt(match[3]);
-                    let card = this.data.basicCards[id];
-                    // card scheduled
-                    if (card.due) {
-                        if (Date.parse(card.due) <= now) {
-                            cardObj = {
-                                front: match[1],
-                                back: match[2],
-                                note,
-                                due: card.due,
-                                ease: card.ease,
-                                interval: card.interval,
-                                id,
-                            };
-                            this.dueFlashcards.push(cardObj);
-                        } else {
-                            continue;
-                        }
-                    } else {
+                    if (Date.parse(match[3]) <= now) {
                         cardObj = {
                             front: match[1],
                             back: match[2],
                             note,
-                            id,
+                            due: match[3],
+                            interval: parseInt(match[4]),
+                            ease: parseInt(match[5]),
+                            match,
+                            isSingleLine,
                         };
-                        this.newFlashcards.push(cardObj);
-                    }
+                        this.dueFlashcards.push(cardObj);
+                    } else continue;
                 } else {
-                    // sleep to ensure we have unique ids
-                    await sleep(4);
-                    let id = Date.now();
                     cardObj = {
                         front: match[1],
                         back: match[2],
+                        match,
                         note,
-                        id,
+                        isSingleLine,
                     };
                     this.newFlashcards.push(cardObj);
-                    this.data.basicCards[id] = {};
-
-                    let pos = match.index + match[0].length;
-                    fileChanges.push([pos, id]);
                 }
 
                 let cardOffset = match.index;
@@ -528,21 +496,7 @@ export default class SRPlugin extends Plugin {
                     cardObj.context += headingObj.heading + " > ";
                 cardObj.context = cardObj.context.slice(0, -3);
             }
-
-            if (fileChanges.length > 0) {
-                fileChanges.reverse();
-                for (let fileChange of fileChanges)
-                    fileText = `${fileText.substring(
-                        0,
-                        fileChange[0]
-                    )}\n<!--SR:${fileChange[1]}-->${fileText.substring(
-                        fileChange[0]
-                    )}`;
-            }
         }
-
-        this.app.vault.modify(note, fileText);
-        await this.savePluginData();
     }
 
     async loadPluginData() {
@@ -563,8 +517,4 @@ export default class SRPlugin extends Plugin {
             active: true,
         });
     }
-}
-
-function sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
 }

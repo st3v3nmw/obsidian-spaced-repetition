@@ -1,6 +1,6 @@
 import { Modal, App, MarkdownRenderer, Notice } from "obsidian";
 import type SRPlugin from "./main";
-import { CardExtra } from "./main";
+import { Card } from "./main";
 
 enum UserResponse {
     ShowAnswer,
@@ -25,7 +25,7 @@ export class FlashcardModal extends Modal {
     private responseDiv: HTMLElement;
     private fileLinkView: HTMLElement;
     private contextView: HTMLElement;
-    private currentCard: CardExtra;
+    private currentCard: Card;
     private mode: Mode;
 
     constructor(app: App, plugin: SRPlugin) {
@@ -42,6 +42,12 @@ export class FlashcardModal extends Modal {
 
         this.fileLinkView = createDiv("sr-link");
         this.fileLinkView.setText("Open file");
+        this.fileLinkView.addEventListener("click", (_) => {
+            this.close();
+            this.plugin.app.workspace.activeLeaf.openFile(
+                this.currentCard.note
+            );
+        });
         this.contentEl.appendChild(this.fileLinkView);
 
         this.contextView = document.createElement("div");
@@ -89,7 +95,9 @@ export class FlashcardModal extends Modal {
         this.contentEl.appendChild(this.answerBtn);
 
         document.body.onkeypress = (e) => {
-            if (
+            if (e.code == "KeyS") {
+                this.processResponse(UserResponse.Skip);
+            } else if (
                 this.mode == Mode.Front &&
                 (e.code == "Space" || e.code == "Enter")
             )
@@ -171,12 +179,6 @@ export class FlashcardModal extends Modal {
         }
 
         this.contextView.setText(this.currentCard.context);
-        this.fileLinkView.addEventListener("click", (_) => {
-            this.close();
-            this.plugin.app.workspace.activeLeaf.openFile(
-                this.currentCard.note
-            );
-        });
     }
 
     async processResponse(response: UserResponse) {
@@ -229,13 +231,32 @@ export class FlashcardModal extends Modal {
 
             let due = new Date(Date.now() + intervalOuter * 24 * 3600 * 1000);
 
-            this.plugin.data.basicCards[this.currentCard.id] = {
-                due: due.toDateString(),
-                ease: easeOuter,
-                interval: intervalOuter,
-            };
+            let fileText = await this.app.vault.read(this.currentCard.note);
+            let replacementRegex = new RegExp(
+                escapeRegExp(this.currentCard.match[0]),
+                "gm"
+            );
+            if (this.currentCard.isSingleLine) {
+                fileText = fileText.replace(
+                    replacementRegex,
+                    `${this.currentCard.front}::${
+                        this.currentCard.back
+                    }\n<!--SR:${due.toDateString()},${intervalOuter},${easeOuter}-->`
+                );
+            } else {
+                fileText = fileText.replace(
+                    replacementRegex,
+                    `${this.currentCard.front}\n?\n${
+                        this.currentCard.back
+                    }\n<!--SR:${due.toDateString()},${intervalOuter},${easeOuter}-->`
+                );
+            }
 
-            await this.plugin.savePluginData();
+            await this.app.vault.modify(this.currentCard.note, fileText);
+            this.nextCard();
+        } else if (response == UserResponse.Skip) {
+            if (this.currentCard.due) this.plugin.dueFlashcards.splice(0, 1);
+            else this.plugin.newFlashcards.splice(0, 1);
             this.nextCard();
         }
     }
@@ -259,4 +280,8 @@ export class FlashcardModal extends Modal {
 
         return { ease, interval: Math.round(interval * 10) / 10 };
     }
+}
+
+function escapeRegExp(str: string) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }
