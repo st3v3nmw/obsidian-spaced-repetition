@@ -18,7 +18,7 @@ Create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your 
 
 The flashcards will be available in the next release (I have to make a workflow change for data integrity - See [this](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/20#issuecomment-822069731) and [this](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/20#issuecomment-822157941)).
 
-https://user-images.githubusercontent.com/43380836/115158585-9083e180-a097-11eb-98a3-4a7934a682e3.mp4
+https://user-images.githubusercontent.com/43380836/115256965-5d455f00-a138-11eb-988f-27ba29f328a0.mp4
 
 Tag any notes that you'd like to put flashcards in as `#flashcards`. 
 
