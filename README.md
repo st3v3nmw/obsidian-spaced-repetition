@@ -30,7 +30,7 @@ The prompt and the answer are separated by `::`.
 the question goes on this side::answer goes here!
 ```
 
-### Ruled style
+### Multi-line
 
 The front and the back of the card are separated by `?`.
 
@@ -73,11 +73,13 @@ To review faster, use the following keyboard shortcuts:
 
 ### Context
 
-If the parent note has heading, the flashcard will have a title containing the context.
+If the parent note has heading(s), the flashcard will have a title containing the context.
 
 Taking the following note:
 
 ```markdown
+#flashcards
+
 # Trivia
 
 ## Capitals
