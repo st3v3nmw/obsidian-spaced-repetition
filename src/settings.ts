@@ -8,6 +8,7 @@ export interface SRSettings {
     lapsesIntervalChange: number;
     autoNextNote: boolean;
     tagsToReview: string[];
+    flashcardsTag: string;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
@@ -17,6 +18,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     lapsesIntervalChange: 0.5,
     autoNextNote: false,
     tagsToReview: ["#review"],
+    flashcardsTag: "#flashcards",
 };
 
 export class SRSettingTab extends PluginSettingTab {
@@ -31,6 +33,18 @@ export class SRSettingTab extends PluginSettingTab {
         let { containerEl } = this;
 
         containerEl.empty();
+
+        new Setting(containerEl)
+            .setName("Flashcards tag")
+            .setDesc("Enter one tag i.e. #flashcards.")
+            .addText((text) =>
+                text
+                    .setValue(`${this.plugin.data.settings.flashcardsTag}`)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.flashcardsTag = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
 
         new Setting(containerEl)
             .setName("Tags to review")

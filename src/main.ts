@@ -72,11 +72,12 @@ export default class SRPlugin extends Plugin {
         this.statusBar.setAttribute("aria-label", "Open a note for review");
         this.statusBar.setAttribute("aria-label-position", "top");
         this.statusBar.addEventListener("click", (_: any) => {
+            this.sync();
             this.reviewNextNote();
         });
 
         this.addRibbonIcon("crosshairs", "Review flashcards", async () => {
-            await this.sync();
+            await this.sync(true);
             new FlashcardModal(this.app, this).open();
         });
 
@@ -130,6 +131,7 @@ export default class SRPlugin extends Plugin {
             id: "note-review-open-note",
             name: "Open a note for review",
             callback: () => {
+                this.sync();
                 this.reviewNextNote();
             },
         });
@@ -172,7 +174,7 @@ export default class SRPlugin extends Plugin {
         });
     }
 
-    async sync() {
+    async sync(find_flashcards: boolean = false) {
         let notes = this.app.vault.getMarkdownFiles();
 
         graph.reset();
@@ -215,8 +217,8 @@ export default class SRPlugin extends Plugin {
             let tags = fileCachedData.tags || [];
             let shouldIgnore = true;
             for (let tagObj of tags) {
-                if (tagObj.tag == "#flashcards") {
-                    await this.findFlashcards(note);
+                if (tagObj.tag == this.data.settings.flashcardsTag) {
+                    if (find_flashcards) await this.findFlashcards(note);
                     break;
                 }
 
