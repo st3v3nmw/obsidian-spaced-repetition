@@ -3,7 +3,7 @@
 	"name": "Spaced Repetition",
 	"version": "1.3.2",
 	"minAppVersion": "0.9.12",
-	"description": "Fight the forgetting curve & note aging by reviewing notes using spaced repetition on Obsidian.md",
+	"description": "Fight the forgetting curve & note aging by reviewing flashcards & notes using spaced repetition on Obsidian.md",
 	"author": "Stephen Mwangi",
 	"authorUrl": "https://github.com/st3v3nmw/obsidian-spaced-repetition",
 	"isDesktopOnly": false
