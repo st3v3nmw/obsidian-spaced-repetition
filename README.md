@@ -57,7 +57,7 @@ Once done creating cards, click on the crosshairs button on the left ribbon to s
 <!--SR:Thu Apr 22 2021,3,250-->
 ```
 
-Wrapping in a HTML comment makes the scheduling information not visible in the notes preview. For single-line cards, you can choose whether you want the HTML comment on the same line or on a separate line in the settings. Putting them on the same line is prevents breaking of list structures especially if you use auto-formatting tools.
+Wrapping in a HTML comment makes the scheduling information not visible in the notes preview. For single-line cards, you can choose whether you want the HTML comment on the same line or on a separate line in the settings. Putting them on the same line prevents breaking of list structures in the preview or after auto-formatting.
 
 Note that you can skip a card by simply pressing `S` (case doesn't matter).
 
