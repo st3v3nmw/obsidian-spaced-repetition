@@ -9,6 +9,7 @@ export interface SRSettings {
     autoNextNote: boolean;
     tagsToReview: string[];
     flashcardsTag: string;
+    singleLineCommentOnSameLine: boolean;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
@@ -19,6 +20,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     autoNextNote: false,
     tagsToReview: ["#review"],
     flashcardsTag: "#flashcards",
+    singleLineCommentOnSameLine: false,
 };
 
 export class SRSettingTab extends PluginSettingTab {
@@ -58,6 +60,22 @@ export class SRSettingTab extends PluginSettingTab {
                         this.plugin.data.settings.tagsToReview = value.split(
                             " "
                         );
+                        await this.plugin.savePluginData();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Save comment for single-line notes on the same line?")
+            .setDesc(
+                "Turning this on will make the HTML comments not break list formatting"
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(
+                        this.plugin.data.settings.singleLineCommentOnSameLine
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.singleLineCommentOnSameLine = value;
                         await this.plugin.savePluginData();
                     })
             );

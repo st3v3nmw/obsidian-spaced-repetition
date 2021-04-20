@@ -210,13 +210,33 @@ export default class SRPlugin extends Plugin {
                 this.app.metadataCache.getFileCache(note) || {};
             let frontmatter =
                 fileCachedData.frontmatter || <Record<string, any>>{};
-
             let tags = fileCachedData.tags || [];
+
             let shouldIgnore = true;
             for (let tagObj of tags) {
                 if (this.data.settings.tagsToReview.includes(tagObj.tag)) {
                     shouldIgnore = false;
                     break;
+                }
+            }
+
+            if (frontmatter.tags) {
+                if (typeof frontmatter.tags == "string") {
+                    if (
+                        this.data.settings.tagsToReview.includes(
+                            "#" + frontmatter.tags
+                        )
+                    )
+                        shouldIgnore = false;
+                } else {
+                    for (let tag of frontmatter.tags) {
+                        if (
+                            this.data.settings.tagsToReview.includes("#" + tag)
+                        ) {
+                            shouldIgnore = false;
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -269,25 +289,6 @@ export default class SRPlugin extends Plugin {
 
         this.statusBar.setText(`Review: ${this.dueNotesCount} notes due`);
         this.reviewQueueView.redraw();
-    }
-
-    async flashcards_sync() {
-        let notes = this.app.vault.getMarkdownFiles();
-
-        this.newFlashcards = [];
-        this.dueFlashcards = [];
-
-        for (let note of notes) {
-            let fileCachedData =
-                this.app.metadataCache.getFileCache(note) || {};
-            let tags = fileCachedData.tags || [];
-            for (let tagObj of tags) {
-                if (tagObj.tag == this.data.settings.flashcardsTag) {
-                    await this.findFlashcards(note);
-                    break;
-                }
-            }
-        }
     }
 
     async saveReviewResponse(note: TFile, response: ReviewResponse) {
@@ -448,6 +449,45 @@ export default class SRPlugin extends Plugin {
         }
 
         new Notice("You're done for the day :D.");
+    }
+
+    async flashcards_sync() {
+        let notes = this.app.vault.getMarkdownFiles();
+
+        this.newFlashcards = [];
+        this.dueFlashcards = [];
+
+        for (let note of notes) {
+            let fileCachedData =
+                this.app.metadataCache.getFileCache(note) || {};
+            let frontmatter =
+                fileCachedData.frontmatter || <Record<string, any>>{};
+            let tags = fileCachedData.tags || [];
+
+            for (let tagObj of tags) {
+                if (tagObj.tag == this.data.settings.flashcardsTag) {
+                    await this.findFlashcards(note);
+                    break;
+                }
+            }
+
+            if (frontmatter.tags) {
+                if (typeof frontmatter.tags == "string") {
+                    if (
+                        this.data.settings.flashcardsTag ==
+                        "#" + frontmatter.tags
+                    )
+                        await this.findFlashcards(note);
+                } else {
+                    for (let tag of frontmatter.tags) {
+                        if (this.data.settings.flashcardsTag == "#" + tag) {
+                            await this.findFlashcards(note);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     async findFlashcards(note: TFile) {
