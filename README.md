@@ -171,3 +171,5 @@ Please fix any scheduled/ignored notes by changing the YAML attributes from:
 4. `review: false` to `sr-review: false`
 
 This has been done to avoid attribute clashes with other plugins detailed [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/7).
+
+<a href='https://ko-fi.com/M4M44DEN6' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi3.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
