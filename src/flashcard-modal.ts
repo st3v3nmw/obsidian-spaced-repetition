@@ -249,7 +249,8 @@ export class FlashcardModal extends Modal {
 
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${this.currentCard.front}::${this.currentCard.back}${sep}<!--SR:${dueString},${intervalOuter},${easeOuter}-->`;
+                    `${this.currentCard.front}::${this.currentCard.back}${sep}<!--SR:${dueString},${intervalOuter},${easeOuter}-->`
+                );
             } else {
                 fileText = fileText.replace(
                     replacementRegex,
