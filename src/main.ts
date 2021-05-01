@@ -185,6 +185,12 @@ export default class SRPlugin extends Plugin {
         });
     }
 
+    onunload(): void {
+        this.app.workspace
+            .getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE)
+            .forEach((leaf) => leaf.detach());
+    }
+
     async sync() {
         let notes = this.app.vault.getMarkdownFiles();
 
