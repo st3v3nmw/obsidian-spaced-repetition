@@ -3,6 +3,7 @@
     text-decoration: underline;
     cursor: pointer;
     margin-bottom: 16px;
+    display: inline-block;
 }
 
 .sr-response {
@@ -54,4 +55,5 @@
 #sr-context {
     font-style: italic;
     font-weight: bold;
+    margin-top: 16px;
 }
