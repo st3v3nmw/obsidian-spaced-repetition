@@ -143,11 +143,12 @@ export class FlashcardModal extends Modal {
         this.titleEl.setText(`Queue - ${count}`);
 
         if (count == 0) {
+            this.answerBtn.style.display = "none";
             this.fileLinkView.innerHTML = "";
             this.resetLinkView.innerHTML = "";
             this.contextView.innerHTML = "";
             this.flashcardView.innerHTML =
-                "<h3 style='text-align: center; margin-top: 50%;'>You're done for the day :D.</h3>";
+                "<h3 style='text-align: center; margin-top: 45%;'>You're done for the day :D.</h3>";
             return;
         }
 
