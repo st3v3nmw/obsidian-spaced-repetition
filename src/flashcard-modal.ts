@@ -284,6 +284,8 @@ export class FlashcardModal extends Modal {
                 fileText = fileText.replace(replacementRegex, cardText);
                 for (let relatedCard of this.currentCard.relatedCards)
                     relatedCard.match[0] = cardText;
+                if (this.plugin.data.settings.buryRelatedCards)
+                    this.buryRelatedCards(this.currentCard.relatedCards);
             } else {
                 if (this.currentCard.isSingleLine) {
                     let sep = this.plugin.data.settings
@@ -308,15 +310,7 @@ export class FlashcardModal extends Modal {
         } else if (response == UserResponse.Skip) {
             if (this.currentCard.isDue) this.plugin.dueFlashcards.splice(0, 1);
             else this.plugin.newFlashcards.splice(0, 1);
-
-            for (let relatedCard of this.currentCard.relatedCards) {
-                let dueIdx = this.plugin.dueFlashcards.indexOf(relatedCard);
-                let newIdx = this.plugin.newFlashcards.indexOf(relatedCard);
-
-                if (dueIdx != -1) this.plugin.dueFlashcards.splice(dueIdx, 1);
-                else if (newIdx != -1)
-                    this.plugin.newFlashcards.splice(newIdx, 1);
-            }
+            this.buryRelatedCards(this.currentCard.relatedCards);
             this.nextCard();
         }
     }
@@ -341,5 +335,15 @@ export class FlashcardModal extends Modal {
                 (this.plugin.data.settings.easyBonus * interval * ease) / 100;
 
         return { ease, interval: Math.round(interval * 10) / 10 };
+    }
+
+    buryRelatedCards(arr: Card[]) {
+        for (let relatedCard of arr) {
+            let dueIdx = this.plugin.dueFlashcards.indexOf(relatedCard);
+            let newIdx = this.plugin.newFlashcards.indexOf(relatedCard);
+
+            if (dueIdx != -1) this.plugin.dueFlashcards.splice(dueIdx, 1);
+            else if (newIdx != -1) this.plugin.newFlashcards.splice(newIdx, 1);
+        }
     }
 }
