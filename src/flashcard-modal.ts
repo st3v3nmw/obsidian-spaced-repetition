@@ -1,6 +1,7 @@
 import { Modal, App, MarkdownRenderer, Notice } from "obsidian";
 import type SRPlugin from "./main";
 import { Card } from "./main";
+import { CLOZE_SCHEDULING_EXTRACTOR } from "./constants";
 
 enum UserResponse {
     ShowAnswer,
@@ -191,9 +192,12 @@ export class FlashcardModal extends Modal {
             this.answerBtn.style.display = "none";
             this.responseDiv.style.display = "grid";
 
-            let hr = document.createElement("hr");
-            hr.setAttribute("id", "sr-hr-card-divide");
-            this.flashcardView.appendChild(hr);
+            if (!this.currentCard.isCloze) {
+                let hr = document.createElement("hr");
+                hr.setAttribute("id", "sr-hr-card-divide");
+                this.flashcardView.appendChild(hr);
+            } else this.flashcardView.innerHTML = "";
+
             MarkdownRenderer.renderMarkdown(
                 this.currentCard.back,
                 this.flashcardView,
@@ -239,23 +243,64 @@ export class FlashcardModal extends Modal {
 
             let fileText = await this.app.vault.read(this.currentCard.note);
             let replacementRegex = new RegExp(
-                escapeRegExp(this.currentCard.match[0]),
+                this.currentCard.match[0].replace(
+                    /[.*+?^${}()|[\]\\]/g,
+                    "\\$&"
+                ), // escape string
                 "gm"
             );
-            if (this.currentCard.isSingleLine) {
-                let sep = this.plugin.data.settings.singleLineCommentOnSameLine
-                    ? " "
-                    : "\n";
 
-                fileText = fileText.replace(
-                    replacementRegex,
-                    `${this.currentCard.front}::${this.currentCard.back}${sep}<!--SR:${dueString},${intervalOuter},${easeOuter}-->`
-                );
+            if (this.currentCard.isCloze) {
+                let cardText = this.currentCard.match[0];
+
+                let schedIdx = cardText.lastIndexOf("<!--SR:");
+                if (schedIdx == -1) {
+                    // first time adding scheduling information to flashcard
+                    cardText = `${cardText}\n<!--SR:!${dueString},${intervalOuter},${easeOuter}-->`;
+                } else {
+                    let scheduling = [
+                        ...cardText.matchAll(CLOZE_SCHEDULING_EXTRACTOR),
+                    ];
+
+                    let deletionSched = [
+                        "0",
+                        dueString,
+                        `${intervalOuter}`,
+                        `${easeOuter}`,
+                    ];
+                    if (this.currentCard.isDue)
+                        scheduling[
+                            this.currentCard.clozeDeletionIdx
+                        ] = deletionSched;
+                    else scheduling.push(deletionSched);
+
+                    cardText = cardText.replace(/<!--SR:.+-->/gm, "");
+                    cardText += "<!--SR:";
+                    for (let i = 0; i < scheduling.length; i++)
+                        cardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
+                    cardText += "-->";
+                }
+
+                fileText = fileText.replace(replacementRegex, cardText);
+                for (let relatedCard of this.currentCard.relatedCards)
+                    relatedCard.match[0] = cardText;
             } else {
-                fileText = fileText.replace(
-                    replacementRegex,
-                    `${this.currentCard.front}\n?\n${this.currentCard.back}\n<!--SR:${dueString},${intervalOuter},${easeOuter}-->`
-                );
+                if (this.currentCard.isSingleLine) {
+                    let sep = this.plugin.data.settings
+                        .singleLineCommentOnSameLine
+                        ? " "
+                        : "\n";
+
+                    fileText = fileText.replace(
+                        replacementRegex,
+                        `${this.currentCard.front}::${this.currentCard.back}${sep}<!--SR:${dueString},${intervalOuter},${easeOuter}-->`
+                    );
+                } else {
+                    fileText = fileText.replace(
+                        replacementRegex,
+                        `${this.currentCard.front}\n?\n${this.currentCard.back}\n<!--SR:${dueString},${intervalOuter},${easeOuter}-->`
+                    );
+                }
             }
 
             await this.app.vault.modify(this.currentCard.note, fileText);
@@ -263,6 +308,15 @@ export class FlashcardModal extends Modal {
         } else if (response == UserResponse.Skip) {
             if (this.currentCard.isDue) this.plugin.dueFlashcards.splice(0, 1);
             else this.plugin.newFlashcards.splice(0, 1);
+
+            for (let relatedCard of this.currentCard.relatedCards) {
+                let dueIdx = this.plugin.dueFlashcards.indexOf(relatedCard);
+                let newIdx = this.plugin.newFlashcards.indexOf(relatedCard);
+
+                if (dueIdx != -1) this.plugin.dueFlashcards.splice(dueIdx, 1);
+                else if (newIdx != -1)
+                    this.plugin.newFlashcards.splice(newIdx, 1);
+            }
             this.nextCard();
         }
     }
@@ -286,8 +340,4 @@ export class FlashcardModal extends Modal {
 
         return { ease, interval: Math.round(interval * 10) / 10 };
     }
-}
-
-function escapeRegExp(str: string) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }
