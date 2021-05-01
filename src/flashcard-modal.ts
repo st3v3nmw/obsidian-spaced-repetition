@@ -207,7 +207,7 @@ export class FlashcardModal extends Modal {
         ) {
             let intervalOuter, easeOuter;
             // scheduled card
-            if (this.currentCard.due) {
+            if (this.currentCard.isDue) {
                 this.plugin.dueFlashcards.splice(0, 1);
                 let { interval, ease } = this.nextState(
                     response,
@@ -232,7 +232,10 @@ export class FlashcardModal extends Modal {
             }
             intervalOuter = Math.round(intervalOuter);
 
-            let due = new Date(Date.now() + intervalOuter * 24 * 3600 * 1000);
+            let due = window.moment(
+                Date.now() + intervalOuter * 24 * 3600 * 1000
+            );
+            let dueString = due.format("DD-MM-YYYY");
 
             let fileText = await this.app.vault.read(this.currentCard.note);
             let replacementRegex = new RegExp(
@@ -246,23 +249,18 @@ export class FlashcardModal extends Modal {
 
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${this.currentCard.front}::${
-                        this.currentCard.back
-                    }${sep}<!--SR:${due.toDateString()},${intervalOuter},${easeOuter}-->`
-                );
+                    `${this.currentCard.front}::${this.currentCard.back}${sep}<!--SR:${dueString},${intervalOuter},${easeOuter}-->`;
             } else {
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${this.currentCard.front}\n?\n${
-                        this.currentCard.back
-                    }\n<!--SR:${due.toDateString()},${intervalOuter},${easeOuter}-->`
+                    `${this.currentCard.front}\n?\n${this.currentCard.back}\n<!--SR:${dueString},${intervalOuter},${easeOuter}-->`
                 );
             }
 
             await this.app.vault.modify(this.currentCard.note, fileText);
             this.nextCard();
         } else if (response == UserResponse.Skip) {
-            if (this.currentCard.due) this.plugin.dueFlashcards.splice(0, 1);
+            if (this.currentCard.isDue) this.plugin.dueFlashcards.splice(0, 1);
             else this.plugin.newFlashcards.splice(0, 1);
             this.nextCard();
         }
