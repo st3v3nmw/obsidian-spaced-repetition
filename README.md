@@ -31,6 +31,10 @@ https://user-images.githubusercontent.com/43380836/115256965-5d455f00-a138-11eb-
 
 <img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/cloze_sample.png" />
 
+### Rich text
+
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/card_with_latex.png" />
+
 ## Installation
 
 You can easily install the plugin from Obsidian's community plugin section in the Obsidian app (Search `Spaced Repetition`).
