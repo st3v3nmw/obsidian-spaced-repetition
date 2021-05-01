@@ -336,7 +336,9 @@ export class FlashcardModal extends Modal {
             );
         else if (response == UserResponse.ReviewGood)
             interval = (interval * ease) / 100;
-        else interval = (1.3 * (interval * ease)) / 100;
+        else
+            interval =
+                (this.plugin.data.settings.easyBonus * interval * ease) / 100;
 
         return { ease, interval: Math.round(interval * 10) / 10 };
     }

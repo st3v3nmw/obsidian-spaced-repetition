@@ -2,25 +2,35 @@ import { Notice, PluginSettingTab, Setting, App } from "obsidian";
 import type SRPlugin from "./main";
 
 export interface SRSettings {
-    baseEase: number;
-    maxLinkFactor: number;
-    openRandomNote: boolean;
-    lapsesIntervalChange: number;
-    autoNextNote: boolean;
-    tagsToReview: string[];
+    // flashcards
     flashcardsTag: string;
     singleLineCommentOnSameLine: boolean;
+    buryRelatedCards: boolean;
+    // notes
+    tagsToReview: string[];
+    openRandomNote: boolean;
+    autoNextNote: boolean;
+    // algorithm
+    baseEase: number;
+    maxLinkFactor: number;
+    lapsesIntervalChange: number;
+    easyBonus: number;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
-    baseEase: 250,
-    maxLinkFactor: 1.0,
-    openRandomNote: false,
-    lapsesIntervalChange: 0.5,
-    autoNextNote: false,
-    tagsToReview: ["#review"],
+    // flashcards
     flashcardsTag: "#flashcards",
     singleLineCommentOnSameLine: false,
+    buryRelatedCards: false,
+    // notes
+    tagsToReview: ["#review"],
+    openRandomNote: false,
+    autoNextNote: false,
+    // algorithm
+    baseEase: 250,
+    maxLinkFactor: 1.0,
+    lapsesIntervalChange: 0.5,
+    easyBonus: 1.3,
 };
 
 export class SRSettingTab extends PluginSettingTab {
@@ -36,6 +46,14 @@ export class SRSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
+        containerEl.createDiv().innerHTML =
+            "<h2>Spaced Repetition Plugin - Settings</h2>";
+
+        containerEl.createDiv().innerHTML =
+            'For more information, check the <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/README.md">README</a>.';
+
+        containerEl.createDiv().innerHTML = "<h3>Flashcards</h3>";
+
         new Setting(containerEl)
             .setName("Flashcards tag")
             .setDesc("Enter one tag i.e. #flashcards.")
@@ -49,6 +67,38 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
+            .setName(
+                "Save scheduling comment for single-line flashcards on the same line?"
+            )
+            .setDesc(
+                "Turning this on will make the HTML comments not break list formatting"
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(
+                        this.plugin.data.settings.singleLineCommentOnSameLine
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.singleLineCommentOnSameLine = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Bury related cards until the next day?")
+            .setDesc("This applies to other cloze deletions in cloze cards")
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.buryRelatedCards)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.buryRelatedCards = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
+
+        containerEl.createDiv().innerHTML = "<h3>Notes</h3>";
+
+        new Setting(containerEl)
             .setName("Tags to review")
             .setDesc("Enter tags separated by spaces i.e. #review #tag2 #tag3.")
             .addTextArea((text) =>
@@ -60,22 +110,6 @@ export class SRSettingTab extends PluginSettingTab {
                         this.plugin.data.settings.tagsToReview = value.split(
                             " "
                         );
-                        await this.plugin.savePluginData();
-                    })
-            );
-
-        new Setting(containerEl)
-            .setName("Save comment for single-line notes on the same line?")
-            .setDesc(
-                "Turning this on will make the HTML comments not break list formatting"
-            )
-            .addToggle((toggle) =>
-                toggle
-                    .setValue(
-                        this.plugin.data.settings.singleLineCommentOnSameLine
-                    )
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.singleLineCommentOnSameLine = value;
                         await this.plugin.savePluginData();
                     })
             );
@@ -96,6 +130,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName("Open next note automatically after a review")
+            .setDesc("For faster reviews")
             .addToggle((toggle) =>
                 toggle
                     .setValue(this.plugin.data.settings.autoNextNote)
@@ -104,6 +139,11 @@ export class SRSettingTab extends PluginSettingTab {
                         await this.plugin.savePluginData();
                     })
             );
+
+        containerEl.createDiv().innerHTML = "<h3>Algorithm</h3>";
+
+        containerEl.createDiv().innerHTML =
+            'For more information, check the <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/docs/Algorithm.md">algorithm implementation</a>.';
 
         new Setting(containerEl)
             .setName("Base ease")
@@ -168,6 +208,40 @@ export class SRSettingTab extends PluginSettingTab {
                     })
             );
 
+        console.log(this.plugin.data);
+
+        new Setting(containerEl)
+            .setName("Easy bonus")
+            .setDesc(
+                "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a card (minimum = 100%)"
+            )
+            .addText((text) =>
+                text
+                    .setValue(`${this.plugin.data.settings.easyBonus * 100}`)
+                    .onChange(async (value) => {
+                        let numValue: number = Number.parseInt(value) / 100;
+                        if (!isNaN(numValue)) {
+                            if (numValue < 1.0) {
+                                new Notice(
+                                    "The easy bonus must be at least 100."
+                                );
+                                text.setValue(
+                                    `${
+                                        this.plugin.data.settings.easyBonus *
+                                        100
+                                    }`
+                                );
+                                return;
+                            }
+
+                            this.plugin.data.settings.easyBonus = numValue;
+                            await this.plugin.savePluginData();
+                        } else {
+                            new Notice("Please provide a valid number.");
+                        }
+                    })
+            );
+
         new Setting(containerEl)
             .setName("Maximum link contribution")
             .setDesc(
@@ -201,9 +275,5 @@ export class SRSettingTab extends PluginSettingTab {
                         }
                     })
             );
-
-        let helpEl = containerEl.createDiv("sr-help-div");
-        helpEl.innerHTML =
-            '<a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/README.md">For more information, check the README.</a>';
     }
 }
