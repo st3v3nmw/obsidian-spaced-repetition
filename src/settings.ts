@@ -85,7 +85,7 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Bury related cards until the next day?")
+            .setName("Bury related cards until the next review session?")
             .setDesc("This applies to other cloze deletions in cloze cards")
             .addToggle((toggle) =>
                 toggle
@@ -207,8 +207,6 @@ export class SRSettingTab extends PluginSettingTab {
                         }
                     })
             );
-
-        console.log(this.plugin.data);
 
         new Setting(containerEl)
             .setName("Easy bonus")

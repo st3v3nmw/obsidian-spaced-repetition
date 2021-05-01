@@ -8,6 +8,7 @@ enum UserResponse {
     ReviewHard,
     ReviewGood,
     ReviewEasy,
+    ResetCardProgress,
     Skip,
 }
 
@@ -26,6 +27,7 @@ export class FlashcardModal extends Modal {
     private easyBtn: HTMLElement;
     private responseDiv: HTMLElement;
     private fileLinkView: HTMLElement;
+    private resetLinkView: HTMLElement;
     private contextView: HTMLElement;
     private currentCard: Card;
     private mode: Mode;
@@ -51,6 +53,14 @@ export class FlashcardModal extends Modal {
             );
         });
         this.contentEl.appendChild(this.fileLinkView);
+
+        this.resetLinkView = createDiv("sr-link");
+        this.resetLinkView.setText("Reset card's progress");
+        this.resetLinkView.addEventListener("click", (_) => {
+            this.processResponse(UserResponse.ResetCardProgress);
+        });
+        this.resetLinkView.style.float = "right";
+        this.contentEl.appendChild(this.resetLinkView);
 
         this.contextView = document.createElement("div");
         this.contextView.setAttribute("id", "sr-context");
@@ -111,6 +121,8 @@ export class FlashcardModal extends Modal {
                     this.processResponse(UserResponse.ReviewGood);
                 else if (e.code == "Numpad3" || e.code == "Digit3")
                     this.processResponse(UserResponse.ReviewEasy);
+                else if (e.code == "Numpad0" || e.code == "Digit0")
+                    this.processResponse(UserResponse.ResetCardProgress);
             }
         };
     }
@@ -125,12 +137,14 @@ export class FlashcardModal extends Modal {
 
     nextCard() {
         this.responseDiv.style.display = "none";
+        this.resetLinkView.style.display = "none";
         let count =
             this.plugin.newFlashcards.length + this.plugin.dueFlashcards.length;
         this.titleEl.setText(`Queue - ${count}`);
 
         if (count == 0) {
             this.fileLinkView.innerHTML = "";
+            this.resetLinkView.innerHTML = "";
             this.contextView.innerHTML = "";
             this.flashcardView.innerHTML =
                 "<h3 style='text-align: center; margin-top: 50%;'>You're done for the day :D.</h3>";
@@ -192,6 +206,9 @@ export class FlashcardModal extends Modal {
             this.answerBtn.style.display = "none";
             this.responseDiv.style.display = "grid";
 
+            if (this.currentCard.isDue)
+                this.resetLinkView.style.display = "inline-block";
+
             if (!this.currentCard.isCloze) {
                 let hr = document.createElement("hr");
                 hr.setAttribute("id", "sr-hr-card-divide");
@@ -207,38 +224,54 @@ export class FlashcardModal extends Modal {
         } else if (
             response == UserResponse.ReviewHard ||
             response == UserResponse.ReviewGood ||
-            response == UserResponse.ReviewEasy
+            response == UserResponse.ReviewEasy ||
+            response == UserResponse.ResetCardProgress
         ) {
-            let intervalOuter, easeOuter;
-            // scheduled card
-            if (this.currentCard.isDue) {
-                this.plugin.dueFlashcards.splice(0, 1);
-                let { interval, ease } = this.nextState(
-                    response,
-                    this.currentCard.interval,
-                    this.currentCard.ease
+            let intervalOuter, easeOuter, due;
+
+            if (response != UserResponse.ResetCardProgress) {
+                // scheduled card
+                if (this.currentCard.isDue) {
+                    this.plugin.dueFlashcards.splice(0, 1);
+                    let { interval, ease } = this.nextState(
+                        response,
+                        this.currentCard.interval,
+                        this.currentCard.ease
+                    );
+                    // don't look too closely lol
+                    intervalOuter = interval;
+                    easeOuter = ease;
+                } else {
+                    let { interval, ease } = this.nextState(
+                        response,
+                        1,
+                        this.plugin.data.settings.baseEase
+                    );
+                    this.plugin.newFlashcards.splice(0, 1);
+                    // don't look too closely lol
+                    intervalOuter = interval;
+                    easeOuter = ease;
+                }
+
+                // fuzz
+                if (intervalOuter >= 8) {
+                    let fuzz = [-0.05 * intervalOuter, 0, 0.05 * intervalOuter];
+                    intervalOuter +=
+                        fuzz[Math.floor(Math.random() * fuzz.length)];
+                }
+                intervalOuter = Math.round(intervalOuter);
+                due = window.moment(
+                    Date.now() + intervalOuter * 24 * 3600 * 1000
                 );
-                // don't look too closely lol
-                intervalOuter = interval;
-                easeOuter = ease;
             } else {
-                let { interval, ease } = this.nextState(response, 1, 250);
-                this.plugin.newFlashcards.splice(0, 1);
-                // don't look too closely lol
-                intervalOuter = interval;
-                easeOuter = ease;
+                intervalOuter = 1.0;
+                easeOuter = this.plugin.data.settings.baseEase;
+                this.plugin.dueFlashcards.splice(0, 1);
+                this.plugin.dueFlashcards.push(this.currentCard);
+                due = window.moment(Date.now());
+                new Notice("Card's progress has been reset");
             }
 
-            // fuzz
-            if (intervalOuter >= 8) {
-                let fuzz = [-0.05 * intervalOuter, 0, 0.05 * intervalOuter];
-                intervalOuter += fuzz[Math.floor(Math.random() * fuzz.length)];
-            }
-            intervalOuter = Math.round(intervalOuter);
-
-            let due = window.moment(
-                Date.now() + intervalOuter * 24 * 3600 * 1000
-            );
             let dueString = due.format("DD-MM-YYYY");
 
             let fileText = await this.app.vault.read(this.currentCard.note);
@@ -284,6 +317,8 @@ export class FlashcardModal extends Modal {
                 fileText = fileText.replace(replacementRegex, cardText);
                 for (let relatedCard of this.currentCard.relatedCards)
                     relatedCard.match[0] = cardText;
+                if (this.plugin.data.settings.buryRelatedCards)
+                    this.buryRelatedCards(this.currentCard.relatedCards);
             } else {
                 if (this.currentCard.isSingleLine) {
                     let sep = this.plugin.data.settings
@@ -308,15 +343,8 @@ export class FlashcardModal extends Modal {
         } else if (response == UserResponse.Skip) {
             if (this.currentCard.isDue) this.plugin.dueFlashcards.splice(0, 1);
             else this.plugin.newFlashcards.splice(0, 1);
-
-            for (let relatedCard of this.currentCard.relatedCards) {
-                let dueIdx = this.plugin.dueFlashcards.indexOf(relatedCard);
-                let newIdx = this.plugin.newFlashcards.indexOf(relatedCard);
-
-                if (dueIdx != -1) this.plugin.dueFlashcards.splice(dueIdx, 1);
-                else if (newIdx != -1)
-                    this.plugin.newFlashcards.splice(newIdx, 1);
-            }
+            if (this.currentCard.isCloze)
+                this.buryRelatedCards(this.currentCard.relatedCards);
             this.nextCard();
         }
     }
@@ -341,5 +369,15 @@ export class FlashcardModal extends Modal {
                 (this.plugin.data.settings.easyBonus * interval * ease) / 100;
 
         return { ease, interval: Math.round(interval * 10) / 10 };
+    }
+
+    buryRelatedCards(arr: Card[]) {
+        for (let relatedCard of arr) {
+            let dueIdx = this.plugin.dueFlashcards.indexOf(relatedCard);
+            let newIdx = this.plugin.newFlashcards.indexOf(relatedCard);
+
+            if (dueIdx != -1) this.plugin.dueFlashcards.splice(dueIdx, 1);
+            else if (newIdx != -1) this.plugin.newFlashcards.splice(newIdx, 1);
+        }
     }
 }

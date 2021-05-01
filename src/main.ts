@@ -185,6 +185,12 @@ export default class SRPlugin extends Plugin {
         });
     }
 
+    onunload(): void {
+        this.app.workspace
+            .getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE)
+            .forEach((leaf) => leaf.detach());
+    }
+
     async sync() {
         let notes = this.app.vault.getMarkdownFiles();
 
@@ -601,22 +607,23 @@ export default class SRPlugin extends Plugin {
                     let dueUnix: number = window
                         .moment(scheduling[i][1], "DD-MM-YYYY")
                         .valueOf();
-                    cardObj = {
-                        front,
-                        back,
-                        note,
-                        isDue: true,
-                        interval: parseInt(scheduling[i][2]),
-                        ease: parseInt(scheduling[i][3]),
-                        match,
-                        isSingleLine: false,
-                        isCloze: true,
-                        clozeDeletionIdx: i,
-                    };
-                    relatedCards.push(cardObj);
 
-                    if (dueUnix <= now) this.dueFlashcards.push(cardObj);
-                    else continue;
+                    if (dueUnix <= now) {
+                        this.dueFlashcards.push(cardObj);
+                        cardObj = {
+                            front,
+                            back,
+                            note,
+                            isDue: true,
+                            interval: parseInt(scheduling[i][2]),
+                            ease: parseInt(scheduling[i][3]),
+                            match,
+                            isSingleLine: false,
+                            isCloze: true,
+                            clozeDeletionIdx: i,
+                            relatedCards,
+                        };
+                    } else continue;
                 } else {
                     // new card
                     cardObj = {
@@ -628,12 +635,13 @@ export default class SRPlugin extends Plugin {
                         isDue: false,
                         isCloze: true,
                         clozeDeletionIdx: i,
+                        relatedCards,
                     };
-                    relatedCards.push(cardObj);
+
                     this.newFlashcards.push(cardObj);
                 }
 
-                cardObj.relatedCards = relatedCards;
+                relatedCards.push(cardObj);
                 addContextToCard(cardObj, match, headings);
             }
         }
