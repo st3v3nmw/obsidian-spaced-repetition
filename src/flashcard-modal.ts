@@ -148,7 +148,7 @@ export class FlashcardModal extends Modal {
             this.resetLinkView.innerHTML = "";
             this.contextView.innerHTML = "";
             this.flashcardView.innerHTML =
-                "<h3 style='text-align: center; margin-top: 50%;'>You're done for the day :D.</h3>";
+                "<h3 style='text-align: center; margin-top: 45%;'>You're done for the day :D.</h3>";
             return;
         }
 

@@ -182,6 +182,7 @@ export default class SRPlugin extends Plugin {
         this.app.workspace.onLayoutReady(() => {
             this.initView();
             setTimeout(() => this.sync(), 2000);
+            setTimeout(() => this.flashcards_sync(), 2000);
         });
     }
 
@@ -309,7 +310,7 @@ export default class SRPlugin extends Plugin {
             }
         );
 
-        this.statusBar.setText(`Review: ${this.dueNotesCount} notes due`);
+        this.statusBar.setText(`Review: ${this.dueNotesCount} notes, ${this.dueFlashcards.length} cards due`);
         this.reviewQueueView.redraw();
     }
 
@@ -505,6 +506,8 @@ export default class SRPlugin extends Plugin {
                 }
             }
         }
+
+        this.statusBar.setText(`Review: ${this.dueNotesCount} notes, ${this.dueFlashcards.length} cards due`);
     }
 
     async findFlashcards(note: TFile) {
