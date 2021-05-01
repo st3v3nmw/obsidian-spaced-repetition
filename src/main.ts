@@ -9,6 +9,9 @@ import {
     YAML_FRONT_MATTER_REGEX,
     SINGLELINE_CARD_REGEX,
     MULTILINE_CARD_REGEX,
+    CLOZE_CARD_DETECTOR,
+    CLOZE_DELETIONS_EXTRACTOR,
+    CLOZE_SCHEDULING_EXTRACTOR,
 } from "./constants";
 
 interface PluginData {
@@ -35,6 +38,11 @@ enum ReviewResponse {
     Hard,
 }
 
+/*
+    Card Object
+    There's too much in here,
+    but never tell the user about this abomination! xD
+*/
 export interface Card {
     isDue: boolean;
     ease?: number;
@@ -45,6 +53,9 @@ export interface Card {
     back: string;
     match: any;
     isSingleLine: boolean;
+    isCloze: boolean;
+    clozeDeletionIdx?: number;
+    relatedCards?: Card[];
 }
 
 export default class SRPlugin extends Plugin {
@@ -494,8 +505,10 @@ export default class SRPlugin extends Plugin {
         let fileText = await this.app.vault.read(note);
         let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         let headings = fileCachedData.headings || [];
+        let fileChanged = false;
 
         let now = Date.now();
+        // basic cards
         for (let regex of [SINGLELINE_CARD_REGEX, MULTILINE_CARD_REGEX]) {
             let isSingleLine = regex == SINGLELINE_CARD_REGEX;
             for (let match of fileText.matchAll(regex)) {
@@ -519,6 +532,7 @@ export default class SRPlugin extends Plugin {
                             ease: parseInt(match[5]),
                             match,
                             isSingleLine,
+                            isCloze: false,
                         };
                         this.dueFlashcards.push(cardObj);
                     } else continue;
@@ -530,30 +544,101 @@ export default class SRPlugin extends Plugin {
                         note,
                         isSingleLine,
                         isDue: false,
+                        isCloze: false,
                     };
                     this.newFlashcards.push(cardObj);
                 }
 
-                let cardOffset = match.index;
-                let stack: HeadingCache[] = [];
-                for (let heading of headings) {
-                    if (heading.position.start.offset > cardOffset) break;
-
-                    while (
-                        stack.length > 0 &&
-                        stack[stack.length - 1].level >= heading.level
-                    )
-                        stack.pop();
-
-                    stack.push(heading);
-                }
-
-                cardObj.context = "";
-                for (let headingObj of stack)
-                    cardObj.context += headingObj.heading + " > ";
-                cardObj.context = cardObj.context.slice(0, -3);
+                addContextToCard(cardObj, match, headings);
             }
         }
+
+        // cloze deletion cards
+        for (let match of fileText.matchAll(CLOZE_CARD_DETECTOR)) {
+            match[0] = match[0].trim();
+
+            let cardText = match[0];
+            let deletions = [...cardText.matchAll(CLOZE_DELETIONS_EXTRACTOR)];
+            let scheduling = [...cardText.matchAll(CLOZE_SCHEDULING_EXTRACTOR)];
+
+            // we have some extra scheduling dates to delete
+            if (scheduling.length > deletions.length) {
+                let idxSched = cardText.lastIndexOf("<!--SR:") + 7;
+                let newCardText = cardText.substring(0, idxSched);
+                for (let i = 0; i < deletions.length; i++)
+                    newCardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
+                newCardText += "-->\n";
+
+                let replacementRegex = new RegExp(
+                    cardText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), // escape string
+                    "gm"
+                );
+                fileText = fileText.replace(replacementRegex, newCardText);
+                fileChanged = true;
+            }
+
+            let relatedCards: Card[] = [];
+            for (let i = 0; i < deletions.length; i++) {
+                let cardObj: Card;
+
+                let deletionStart = deletions[i].index;
+                let deletionEnd = deletionStart + deletions[i][0].length;
+                let front =
+                    cardText.substring(0, deletionStart) +
+                    "<span style='color:#2196f3'>[...]</span>" +
+                    cardText.substring(deletionEnd);
+                front = front.replace(/==/gm, "");
+                let back =
+                    cardText.substring(0, deletionStart) +
+                    "<span style='color:#2196f3'>" +
+                    cardText.substring(deletionStart, deletionEnd) +
+                    "</span>" +
+                    cardText.substring(deletionEnd);
+                back = back.replace(/==/gm, "");
+
+                // card deletion scheduled
+                if (i < scheduling.length) {
+                    let dueUnix: number = window
+                        .moment(scheduling[i][1], "DD-MM-YYYY")
+                        .valueOf();
+                    cardObj = {
+                        front,
+                        back,
+                        note,
+                        isDue: true,
+                        interval: parseInt(scheduling[i][2]),
+                        ease: parseInt(scheduling[i][3]),
+                        match,
+                        isSingleLine: false,
+                        isCloze: true,
+                        clozeDeletionIdx: i,
+                    };
+                    relatedCards.push(cardObj);
+
+                    if (dueUnix <= now) this.dueFlashcards.push(cardObj);
+                    else continue;
+                } else {
+                    // new card
+                    cardObj = {
+                        front,
+                        back,
+                        note,
+                        match,
+                        isSingleLine: false,
+                        isDue: false,
+                        isCloze: true,
+                        clozeDeletionIdx: i,
+                    };
+                    relatedCards.push(cardObj);
+                    this.newFlashcards.push(cardObj);
+                }
+
+                cardObj.relatedCards = relatedCards;
+                addContextToCard(cardObj, match, headings);
+            }
+        }
+
+        if (fileChanged) await this.app.vault.modify(note, fileText);
     }
 
     async loadPluginData() {
@@ -574,4 +659,24 @@ export default class SRPlugin extends Plugin {
             active: true,
         });
     }
+}
+
+function addContextToCard(cardObj: Card, match: any, headings: HeadingCache[]) {
+    let cardOffset = match.index;
+    let stack: HeadingCache[] = [];
+    for (let heading of headings) {
+        if (heading.position.start.offset > cardOffset) break;
+
+        while (
+            stack.length > 0 &&
+            stack[stack.length - 1].level >= heading.level
+        )
+            stack.pop();
+
+        stack.push(heading);
+    }
+
+    cardObj.context = "";
+    for (let headingObj of stack) cardObj.context += headingObj.heading + " > ";
+    cardObj.context = cardObj.context.slice(0, -3);
 }
