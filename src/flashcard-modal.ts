@@ -13,6 +13,7 @@ enum UserResponse {
 enum Mode {
     Front,
     Back,
+    Closed,
 }
 
 export class FlashcardModal extends Modal {
@@ -95,7 +96,7 @@ export class FlashcardModal extends Modal {
         this.contentEl.appendChild(this.answerBtn);
 
         document.body.onkeypress = (e) => {
-            if (e.code == "KeyS") {
+            if (this.mode != Mode.Closed && e.code == "KeyS") {
                 this.processResponse(UserResponse.Skip);
             } else if (
                 this.mode == Mode.Front &&
@@ -117,7 +118,9 @@ export class FlashcardModal extends Modal {
         this.nextCard();
     }
 
-    onClose() {}
+    onClose() {
+        this.mode = Mode.Closed;
+    }
 
     nextCard() {
         this.responseDiv.style.display = "none";
@@ -240,10 +243,13 @@ export class FlashcardModal extends Modal {
                 "gm"
             );
             if (this.currentCard.isSingleLine) {
+                let sep = this.plugin.data.settings.singleLineCommentOnSameLine
+                    ? " "
+                    : "\n";
+
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${this.currentCard.front}::${this.currentCard.back}${sep}<!--SR:${dueString},${intervalOuter},${easeOuter}-->`
-                );
+                    `${this.currentCard.front}::${this.currentCard.back}${sep}<!--SR:${dueString},${intervalOuter},${easeOuter}-->`;
             } else {
                 fileText = fileText.replace(
                     replacementRegex,

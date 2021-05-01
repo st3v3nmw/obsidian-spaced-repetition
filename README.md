@@ -6,6 +6,11 @@ Spaced repetition? [Basics](https://ncase.me/remember/), [Detailed](https://www.
 
 Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/1) for upcoming features. Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues) if you have a feature request, a bug-report, or some feedback.
 
+## Quick links
+
+1. [Guide on reviewing flashcards](https://github.com/st3v3nmw/obsidian-spaced-repetition#Flashcards)
+2. [Guide on reviewing entire notes](https://github.com/st3v3nmw/obsidian-spaced-repetition#notes)
+
 ## Installation
 
 You can easily install the plugin from Obsidian's community plugin section in the Obsidian app (Search `Spaced Repetition`).
@@ -49,6 +54,8 @@ same goes for
 the answer
 ```
 
+Note that multi-line flashcards should have a blank line after them.
+
 ### Reviewing
 
 Once done creating cards, click on the crosshairs button on the left ribbon to start reviewing the flashcards. After a card is reviewed, a HTML comment is added containing the next review day, the interval, and the card's ease.
@@ -57,7 +64,7 @@ Once done creating cards, click on the crosshairs button on the left ribbon to s
 <!--SR:Thu Apr 22 2021,3,250-->
 ```
 
-Wrapping in a HTML comment makes the scheduling information not visible in the notes preview.
+Wrapping in a HTML comment makes the scheduling information not visible in the notes preview. For single-line cards, you can choose whether you want the HTML comment on the same line or on a separate line in the settings. Putting them on the same line prevents breaking of list structures in the preview or after auto-formatting.
 
 Note that you can skip a card by simply pressing `S` (case doesn't matter).
 
@@ -171,3 +178,5 @@ Please fix any scheduled/ignored notes by changing the YAML attributes from:
 4. `review: false` to `sr-review: false`
 
 This has been done to avoid attribute clashes with other plugins detailed [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/7).
+
+<a href='https://ko-fi.com/M4M44DEN6' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi3.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
