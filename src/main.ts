@@ -36,7 +36,7 @@ enum ReviewResponse {
 }
 
 export interface Card {
-    due?: string;
+    isDue: boolean;
     ease?: number;
     interval?: number;
     context?: string;
@@ -242,7 +242,12 @@ export default class SRPlugin extends Plugin {
                 continue;
             }
 
-            let dueUnix: number = Date.parse(frontmatter["sr-due"]);
+            let dueUnix: number = window
+                .moment(frontmatter["sr-due"], [
+                    "DD-MM-YYYY",
+                    "ddd MMM DD YYYY",
+                ])
+                .valueOf();
             this.scheduledNotes.push({
                 note,
                 dueUnix,
@@ -380,18 +385,15 @@ export default class SRPlugin extends Plugin {
         }
         interval = Math.round(interval);
 
-        let due = new Date(Date.now() + interval * 24 * 3600 * 1000);
+        let due = window.moment(Date.now() + interval * 24 * 3600 * 1000);
+        let dueString = due.format("DD-MM-YYYY");
 
         // check if scheduling info exists
         if (SCHEDULING_INFO_REGEX.test(fileText)) {
             let schedulingInfo = SCHEDULING_INFO_REGEX.exec(fileText);
             fileText = fileText.replace(
                 SCHEDULING_INFO_REGEX,
-                `---\n${
-                    schedulingInfo[1]
-                }sr-due: ${due.toDateString()}\nsr-interval: ${interval}\nsr-ease: ${ease}\n${
-                    schedulingInfo[5]
-                }---`
+                `---\n${schedulingInfo[1]}sr-due: ${dueString}\nsr-interval: ${interval}\nsr-ease: ${ease}\n${schedulingInfo[5]}---`
             );
 
             // new note with existing YAML front matter
@@ -399,12 +401,10 @@ export default class SRPlugin extends Plugin {
             let existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
             fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
-                `---\n${
-                    existingYaml[1]
-                }sr-due: ${due.toDateString()}\nsr-interval: ${interval}\nsr-ease: ${ease}\n---`
+                `---\n${existingYaml[1]}sr-due: ${dueString}\nsr-interval: ${interval}\nsr-ease: ${ease}\n---`
             );
         } else {
-            fileText = `---\nsr-due: ${due.toDateString()}\nsr-interval: ${interval}\nsr-ease: ${ease}\n---\n\n${fileText}`;
+            fileText = `---\nsr-due: ${dueString}\nsr-interval: ${interval}\nsr-ease: ${ease}\n---\n\n${fileText}`;
         }
 
         this.app.vault.modify(note, fileText);
@@ -455,12 +455,15 @@ export default class SRPlugin extends Plugin {
                 let cardObj: Card;
                 // flashcard already scheduled
                 if (match[3]) {
-                    if (Date.parse(match[3]) <= now) {
+                    let dueUnix: number = window
+                        .moment(match[3], ["DD-MM-YYYY", "ddd MMM DD YYYY"])
+                        .valueOf();
+                    if (dueUnix <= now) {
                         cardObj = {
                             front: match[1],
                             back: match[2],
                             note,
-                            due: match[3],
+                            isDue: true,
                             interval: parseInt(match[4]),
                             ease: parseInt(match[5]),
                             match,
@@ -475,6 +478,7 @@ export default class SRPlugin extends Plugin {
                         match,
                         note,
                         isSingleLine,
+                        isDue: false,
                     };
                     this.newFlashcards.push(cardObj);
                 }
