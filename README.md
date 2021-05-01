@@ -54,6 +54,8 @@ same goes for
 the answer
 ```
 
+Note that multi-line flashcards should have a blank line after them.
+
 ### Reviewing
 
 Once done creating cards, click on the crosshairs button on the left ribbon to start reviewing the flashcards. After a card is reviewed, a HTML comment is added containing the next review day, the interval, and the card's ease.
