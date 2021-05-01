@@ -1,6 +1,6 @@
 # Flashcard-Based and Note-Based Spaced Repetition Plugin
 
-Fight the forgetting curve & note aging by reviewing flashcards & notes using [spaced repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/docs/Algorithm.md) on Obsidian.md
+Fight the forgetting curve & note aging by reviewing flashcards & notes using [spaced repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Spaced-Repetition-Algorithm) on Obsidian.md
 
 Spaced repetition? [Basics](https://ncase.me/remember/), [Detailed](https://www.gwern.net/Spaced-repetition).
 
