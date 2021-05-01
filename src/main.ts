@@ -399,7 +399,7 @@ export default class SRPlugin extends Plugin {
             );
         else if (response == ReviewResponse.Good)
             interval = (interval * ease) / 100;
-        else interval = (1.3 * (interval * ease)) / 100;
+        else interval = (this.data.settings.easyBonus * interval * ease) / 100;
 
         // fuzz
         if (interval >= 8) {
