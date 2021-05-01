@@ -143,7 +143,7 @@ export class SRSettingTab extends PluginSettingTab {
         containerEl.createDiv().innerHTML = "<h3>Algorithm</h3>";
 
         containerEl.createDiv().innerHTML =
-            'For more information, check the <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/docs/Algorithm.md">algorithm implementation</a>.';
+            'For more information, check the <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Spaced-Repetition-Algorithm">algorithm implementation</a>.';
 
         new Setting(containerEl)
             .setName("Base ease")
