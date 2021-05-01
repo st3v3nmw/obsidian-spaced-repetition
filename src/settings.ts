@@ -50,7 +50,7 @@ export class SRSettingTab extends PluginSettingTab {
             "<h2>Spaced Repetition Plugin - Settings</h2>";
 
         containerEl.createDiv().innerHTML =
-            'For more information, check the <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/README.md">README</a>.';
+            'For more information, check the <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki">wiki</a>.';
 
         containerEl.createDiv().innerHTML = "<h3>Flashcards</h3>";
 
