@@ -19,7 +19,7 @@ Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/proje
       - Footnotes
 - Notes
   - [Reviewing entire notes](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Notes)
-  - [Incremental writing](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Incremental-writing)
+  - Possible use case: [Incremental writing](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Incremental-writing)
 
 ## Quick Demo
 
