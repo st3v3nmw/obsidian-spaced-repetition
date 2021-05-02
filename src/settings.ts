@@ -10,6 +10,7 @@ export interface SRSettings {
     tagsToReview: string[];
     openRandomNote: boolean;
     autoNextNote: boolean;
+    disableFileMenuReviewOptions: boolean;
     // algorithm
     baseEase: number;
     maxLinkFactor: number;
@@ -26,6 +27,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     tagsToReview: ["#review"],
     openRandomNote: false,
     autoNextNote: false,
+    disableFileMenuReviewOptions: false,
     // algorithm
     baseEase: 250,
     maxLinkFactor: 1.0,
@@ -136,6 +138,24 @@ export class SRSettingTab extends PluginSettingTab {
                     .setValue(this.plugin.data.settings.autoNextNote)
                     .onChange(async (value) => {
                         this.plugin.data.settings.autoNextNote = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName(
+                "Disable review options in the file menu i.e. Review: Easy Good Hard"
+            )
+            .setDesc(
+                "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this."
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(
+                        this.plugin.data.settings.disableFileMenuReviewOptions
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.disableFileMenuReviewOptions = value;
                         await this.plugin.savePluginData();
                     })
             );

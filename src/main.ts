@@ -98,45 +98,47 @@ export default class SRPlugin extends Plugin {
                 (this.reviewQueueView = new ReviewQueueListView(leaf, this))
         );
 
-        this.registerEvent(
-            this.app.workspace.on("file-menu", (menu, file: TFile) => {
-                menu.addItem((item) => {
-                    item.setTitle("Review: Easy")
-                        .setIcon("crosshairs")
-                        .onClick((evt) => {
-                            if (file.extension == "md")
-                                this.saveReviewResponse(
-                                    file,
-                                    ReviewResponse.Easy
-                                );
-                        });
-                });
+        if (!this.data.settings.disableFileMenuReviewOptions) {
+            this.registerEvent(
+                this.app.workspace.on("file-menu", (menu, file: TFile) => {
+                    menu.addItem((item) => {
+                        item.setTitle("Review: Easy")
+                            .setIcon("crosshairs")
+                            .onClick((evt) => {
+                                if (file.extension == "md")
+                                    this.saveReviewResponse(
+                                        file,
+                                        ReviewResponse.Easy
+                                    );
+                            });
+                    });
 
-                menu.addItem((item) => {
-                    item.setTitle("Review: Good")
-                        .setIcon("crosshairs")
-                        .onClick((evt) => {
-                            if (file.extension == "md")
-                                this.saveReviewResponse(
-                                    file,
-                                    ReviewResponse.Good
-                                );
-                        });
-                });
+                    menu.addItem((item) => {
+                        item.setTitle("Review: Good")
+                            .setIcon("crosshairs")
+                            .onClick((evt) => {
+                                if (file.extension == "md")
+                                    this.saveReviewResponse(
+                                        file,
+                                        ReviewResponse.Good
+                                    );
+                            });
+                    });
 
-                menu.addItem((item) => {
-                    item.setTitle("Review: Hard")
-                        .setIcon("crosshairs")
-                        .onClick((evt) => {
-                            if (file.extension == "md")
-                                this.saveReviewResponse(
-                                    file,
-                                    ReviewResponse.Hard
-                                );
-                        });
-                });
-            })
-        );
+                    menu.addItem((item) => {
+                        item.setTitle("Review: Hard")
+                            .setIcon("crosshairs")
+                            .onClick((evt) => {
+                                if (file.extension == "md")
+                                    this.saveReviewResponse(
+                                        file,
+                                        ReviewResponse.Hard
+                                    );
+                            });
+                    });
+                })
+            );
+        }
 
         this.addCommand({
             id: "note-review-open-note",
@@ -310,7 +312,9 @@ export default class SRPlugin extends Plugin {
             }
         );
 
-        this.statusBar.setText(`Review: ${this.dueNotesCount} notes, ${this.dueFlashcards.length} cards due`);
+        this.statusBar.setText(
+            `Review: ${this.dueNotesCount} notes, ${this.dueFlashcards.length} cards due`
+        );
         this.reviewQueueView.redraw();
     }
 
@@ -507,7 +511,9 @@ export default class SRPlugin extends Plugin {
             }
         }
 
-        this.statusBar.setText(`Review: ${this.dueNotesCount} notes, ${this.dueFlashcards.length} cards due`);
+        this.statusBar.setText(
+            `Review: ${this.dueNotesCount} notes, ${this.dueFlashcards.length} cards due`
+        );
     }
 
     async findFlashcards(note: TFile) {
