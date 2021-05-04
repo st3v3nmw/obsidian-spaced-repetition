@@ -3,6 +3,8 @@ import * as graph from "pagerank.js";
 import { SRSettings, SRSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { FlashcardModal } from "./flashcard-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "./sidebar";
+import { ReviewResponse, schedule } from "./sched";
+import { Card, CardType } from "./types";
 import {
     CROSS_HAIRS_ICON,
     SCHEDULING_INFO_REGEX,
@@ -30,32 +32,6 @@ interface SchedNote {
 interface LinkStat {
     sourcePath: string;
     linkCount: number;
-}
-
-enum ReviewResponse {
-    Easy,
-    Good,
-    Hard,
-}
-
-/*
-    Card Object
-    There's too much in here,
-    but never tell the user about this abomination! xD
-*/
-export interface Card {
-    isDue: boolean;
-    ease?: number;
-    interval?: number;
-    context?: string;
-    note: TFile;
-    front: string;
-    back: string;
-    match: any;
-    isSingleLine: boolean;
-    isCloze: boolean;
-    clozeDeletionIdx?: number;
-    relatedCards?: Card[];
 }
 
 export default class SRPlugin extends Plugin {
@@ -396,28 +372,9 @@ export default class SRPlugin extends Plugin {
             ease = frontmatter["sr-ease"];
         }
 
-        if (response != ReviewResponse.Good) {
-            ease =
-                response == ReviewResponse.Easy
-                    ? ease + 20
-                    : Math.max(130, ease - 20);
-        }
-
-        if (response == ReviewResponse.Hard)
-            interval = Math.max(
-                1,
-                interval * this.data.settings.lapsesIntervalChange
-            );
-        else if (response == ReviewResponse.Good)
-            interval = (interval * ease) / 100;
-        else interval = (this.data.settings.easyBonus * interval * ease) / 100;
-
-        // fuzz
-        if (interval >= 8) {
-            let fuzz = [-0.05 * interval, 0, 0.05 * interval];
-            interval += fuzz[Math.floor(Math.random() * fuzz.length)];
-        }
-        interval = Math.round(interval);
+        let schedObj = schedule(response, interval, ease);
+        interval = Math.round(schedObj.interval);
+        ease = schedObj.ease;
 
         let due = window.moment(Date.now() + interval * 24 * 3600 * 1000);
         let dueString = due.format("DD-MM-YYYY");
@@ -488,7 +445,7 @@ export default class SRPlugin extends Plugin {
 
             for (let tagObj of tags) {
                 if (tagObj.tag == this.data.settings.flashcardsTag) {
-                    await this.findFlashcards(note);
+                    await this.findFlashcards(note, "#" + frontmatter.tags);
                     break;
                 }
             }
@@ -499,11 +456,14 @@ export default class SRPlugin extends Plugin {
                         this.data.settings.flashcardsTag ==
                         "#" + frontmatter.tags
                     )
-                        await this.findFlashcards(note);
+                        await this.findFlashcards(note, "#" + frontmatter.tags);
                 } else {
                     for (let tag of frontmatter.tags) {
                         if (this.data.settings.flashcardsTag == "#" + tag) {
-                            await this.findFlashcards(note);
+                            await this.findFlashcards(
+                                note,
+                                "#" + frontmatter.tags
+                            );
                             break;
                         }
                     }
@@ -516,7 +476,7 @@ export default class SRPlugin extends Plugin {
         );
     }
 
-    async findFlashcards(note: TFile) {
+    async findFlashcards(note: TFile, deck: string) {
         let fileText = await this.app.vault.read(note);
         let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         let headings = fileCachedData.headings || [];
@@ -525,12 +485,14 @@ export default class SRPlugin extends Plugin {
         let now = Date.now();
         // basic cards
         for (let regex of [SINGLELINE_CARD_REGEX, MULTILINE_CARD_REGEX]) {
-            let isSingleLine = regex == SINGLELINE_CARD_REGEX;
+            let cardType: CardType =
+                regex == SINGLELINE_CARD_REGEX
+                    ? CardType.SingleLineBasic
+                    : CardType.MultiLineBasic;
             for (let match of fileText.matchAll(regex)) {
                 match[0] = match[0].trim();
                 match[1] = match[1].trim();
                 match[2] = match[2].trim();
-
                 let cardObj: Card;
                 // flashcard already scheduled
                 if (match[3]) {
@@ -539,32 +501,34 @@ export default class SRPlugin extends Plugin {
                         .valueOf();
                     if (dueUnix <= now) {
                         cardObj = {
-                            front: match[1],
-                            back: match[2],
-                            note,
                             isDue: true,
                             interval: parseInt(match[4]),
                             ease: parseInt(match[5]),
-                            match,
-                            isSingleLine,
-                            isCloze: false,
+                            note,
+                            front: match[1],
+                            back: match[2],
+                            cardText: match[0],
+                            context: "",
+                            deck,
+                            cardType,
                         };
                         this.dueFlashcards.push(cardObj);
                     } else continue;
                 } else {
                     cardObj = {
+                        isDue: false,
+                        note,
                         front: match[1],
                         back: match[2],
-                        match,
-                        note,
-                        isSingleLine,
-                        isDue: false,
-                        isCloze: false,
+                        cardText: match[0],
+                        context: "",
+                        cardType,
+                        deck,
                     };
                     this.newFlashcards.push(cardObj);
                 }
 
-                addContextToCard(cardObj, match, headings);
+                addContextToCard(cardObj, match.index, headings);
             }
         }
 
@@ -616,33 +580,35 @@ export default class SRPlugin extends Plugin {
                     let dueUnix: number = window
                         .moment(scheduling[i][1], "DD-MM-YYYY")
                         .valueOf();
-
                     if (dueUnix <= now) {
-                        this.dueFlashcards.push(cardObj);
                         cardObj = {
-                            front,
-                            back,
-                            note,
                             isDue: true,
                             interval: parseInt(scheduling[i][2]),
                             ease: parseInt(scheduling[i][3]),
-                            match,
-                            isSingleLine: false,
-                            isCloze: true,
+                            note,
+                            front,
+                            back,
+                            cardText: match[0],
+                            context: "",
+                            deck,
+                            cardType: CardType.Cloze,
                             clozeDeletionIdx: i,
                             relatedCards,
                         };
+
+                        this.dueFlashcards.push(cardObj);
                     } else continue;
                 } else {
                     // new card
                     cardObj = {
+                        isDue: false,
+                        note,
                         front,
                         back,
-                        note,
-                        match,
-                        isSingleLine: false,
-                        isDue: false,
-                        isCloze: true,
+                        cardText: match[0],
+                        context: "",
+                        deck,
+                        cardType: CardType.Cloze,
                         clozeDeletionIdx: i,
                         relatedCards,
                     };
@@ -651,7 +617,7 @@ export default class SRPlugin extends Plugin {
                 }
 
                 relatedCards.push(cardObj);
-                addContextToCard(cardObj, match, headings);
+                addContextToCard(cardObj, match.index, headings);
             }
         }
 
@@ -678,8 +644,11 @@ export default class SRPlugin extends Plugin {
     }
 }
 
-function addContextToCard(cardObj: Card, match: any, headings: HeadingCache[]) {
-    let cardOffset = match.index;
+function addContextToCard(
+    cardObj: Card,
+    cardOffset: number,
+    headings: HeadingCache[]
+) {
     let stack: HeadingCache[] = [];
     for (let heading of headings) {
         if (heading.position.start.offset > cardOffset) break;
@@ -693,7 +662,6 @@ function addContextToCard(cardObj: Card, match: any, headings: HeadingCache[]) {
         stack.push(heading);
     }
 
-    cardObj.context = "";
     for (let headingObj of stack) cardObj.context += headingObj.heading + " > ";
     cardObj.context = cardObj.context.slice(0, -3);
 }
