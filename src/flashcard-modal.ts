@@ -59,6 +59,7 @@ export class FlashcardModal extends Modal {
         this.contentEl.appendChild(this.contextView);
 
         this.flashcardView = document.createElement("div");
+        this.flashcardView.setAttribute("id", "sr-flashcard-view");
         this.contentEl.appendChild(this.flashcardView);
 
         this.responseDiv = createDiv("sr-response");
@@ -103,7 +104,7 @@ export class FlashcardModal extends Modal {
                 if (this.currentCard.isDue)
                     this.plugin.dueFlashcards.splice(0, 1);
                 else this.plugin.newFlashcards.splice(0, 1);
-                if ((this.currentCard.cardType = CardType.Cloze))
+                if (this.currentCard.cardType == CardType.Cloze)
                     this.buryRelatedCards(this.currentCard.relatedCards);
                 this.nextCard();
             } else if (
@@ -159,7 +160,7 @@ export class FlashcardModal extends Modal {
                 this.currentCard.front,
                 this.flashcardView,
                 this.currentCard.note.path,
-                this.plugin
+                null
             );
 
             let hardInterval = schedule(
@@ -196,7 +197,7 @@ export class FlashcardModal extends Modal {
                 this.currentCard.front,
                 this.flashcardView,
                 this.currentCard.note.path,
-                this.plugin
+                null
             );
             this.hardBtn.setText("Hard - 1.0 day(s)");
             this.goodBtn.setText("Good - 2.5 day(s)");
@@ -225,7 +226,7 @@ export class FlashcardModal extends Modal {
             this.currentCard.back,
             this.flashcardView,
             this.currentCard.note.path,
-            this.plugin
+            null
         );
     }
 

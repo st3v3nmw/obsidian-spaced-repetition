@@ -1,5 +1,3 @@
-import type SRPlugin from "./main";
-
 export enum ReviewResponse {
     Easy,
     Good,

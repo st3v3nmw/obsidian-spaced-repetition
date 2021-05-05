@@ -57,3 +57,8 @@
     font-weight: bold;
     margin-top: 16px;
 }
+
+#sr-flashcard-view {
+    overflow-y: scroll;
+    height: 80%;
+}
