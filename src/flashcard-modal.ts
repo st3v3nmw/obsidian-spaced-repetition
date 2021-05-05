@@ -166,18 +166,24 @@ export class FlashcardModal extends Modal {
                 ReviewResponse.Hard,
                 this.currentCard.interval,
                 this.currentCard.ease,
+                this.plugin.data.settings.lapsesIntervalChange,
+                this.plugin.data.settings.easyBonus,
                 false
             ).interval;
             let goodInterval = schedule(
                 ReviewResponse.Good,
                 this.currentCard.interval,
                 this.currentCard.ease,
+                this.plugin.data.settings.lapsesIntervalChange,
+                this.plugin.data.settings.easyBonus,
                 false
             ).interval;
             let easyInterval = schedule(
                 ReviewResponse.Easy,
                 this.currentCard.interval,
                 this.currentCard.ease,
+                this.plugin.data.settings.lapsesIntervalChange,
+                this.plugin.data.settings.easyBonus,
                 false
             ).interval;
 
@@ -233,7 +239,9 @@ export class FlashcardModal extends Modal {
                 let schedObj = schedule(
                     response,
                     this.currentCard.interval,
-                    this.currentCard.ease
+                    this.currentCard.ease,
+                    this.plugin.data.settings.lapsesIntervalChange,
+                    this.plugin.data.settings.easyBonus
                 );
                 interval = Math.round(schedObj.interval);
                 ease = schedObj.ease;
@@ -241,7 +249,9 @@ export class FlashcardModal extends Modal {
                 let schedObj = schedule(
                     response,
                     1,
-                    this.plugin.data.settings.baseEase
+                    this.plugin.data.settings.baseEase,
+                    this.plugin.data.settings.lapsesIntervalChange,
+                    this.plugin.data.settings.easyBonus
                 );
                 this.plugin.newFlashcards.splice(0, 1);
                 interval = Math.round(schedObj.interval);

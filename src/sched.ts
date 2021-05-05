@@ -11,7 +11,9 @@ export function schedule(
     response: ReviewResponse,
     interval: number,
     ease: number,
-    fuzz: boolean = true
+    lapsesIntervalChange: number,
+    easyBonus: number,
+    fuzz: boolean = true,
 ) {
     if (response != ReviewResponse.Good) {
         ease =
@@ -23,12 +25,12 @@ export function schedule(
     if (response == ReviewResponse.Hard)
         interval = Math.max(
             1,
-            interval * this.plugin.data.settings.lapsesIntervalChange
+            interval * lapsesIntervalChange
         );
     else interval = (interval * ease) / 100;
 
     if (response == ReviewResponse.Easy)
-        interval *= this.plugin.settings.easyBonus;
+        interval *= easyBonus;
 
     if (fuzz) {
         // fuzz

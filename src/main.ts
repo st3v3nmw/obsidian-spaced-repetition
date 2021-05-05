@@ -1,4 +1,11 @@
-import { Notice, Plugin, addIcon, TFile, HeadingCache } from "obsidian";
+import {
+    Notice,
+    Plugin,
+    addIcon,
+    TFile,
+    HeadingCache,
+    getAllTags,
+} from "obsidian";
 import * as graph from "pagerank.js";
 import { SRSettings, SRSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { FlashcardModal } from "./flashcard-modal";
@@ -204,35 +211,16 @@ export default class SRPlugin extends Plugin {
 
             let fileCachedData =
                 this.app.metadataCache.getFileCache(note) || {};
+
             let frontmatter =
                 fileCachedData.frontmatter || <Record<string, any>>{};
-            let tags = fileCachedData.tags || [];
+            let tags = getAllTags(fileCachedData) || [];
 
             let shouldIgnore = true;
-            for (let tagObj of tags) {
-                if (this.data.settings.tagsToReview.includes(tagObj.tag)) {
+            for (let tag of tags) {
+                if (this.data.settings.tagsToReview.includes(tag)) {
                     shouldIgnore = false;
                     break;
-                }
-            }
-
-            if (frontmatter.tags) {
-                if (typeof frontmatter.tags == "string") {
-                    if (
-                        this.data.settings.tagsToReview.includes(
-                            "#" + frontmatter.tags
-                        )
-                    )
-                        shouldIgnore = false;
-                } else {
-                    for (let tag of frontmatter.tags) {
-                        if (
-                            this.data.settings.tagsToReview.includes("#" + tag)
-                        ) {
-                            shouldIgnore = false;
-                            break;
-                        }
-                    }
                 }
             }
 
@@ -372,7 +360,13 @@ export default class SRPlugin extends Plugin {
             ease = frontmatter["sr-ease"];
         }
 
-        let schedObj = schedule(response, interval, ease);
+        let schedObj = schedule(
+            response,
+            interval,
+            ease,
+            this.data.settings.lapsesIntervalChange,
+            this.data.settings.easyBonus
+        );
         interval = Math.round(schedObj.interval);
         ease = schedObj.ease;
 
@@ -441,32 +435,12 @@ export default class SRPlugin extends Plugin {
                 this.app.metadataCache.getFileCache(note) || {};
             let frontmatter =
                 fileCachedData.frontmatter || <Record<string, any>>{};
-            let tags = fileCachedData.tags || [];
+            let tags = getAllTags(fileCachedData) || [];
 
-            for (let tagObj of tags) {
-                if (tagObj.tag == this.data.settings.flashcardsTag) {
-                    await this.findFlashcards(note, "#" + frontmatter.tags);
+            for (let tag of tags) {
+                if (tag == this.data.settings.flashcardsTag) {
+                    await this.findFlashcards(note, "#" + tag);
                     break;
-                }
-            }
-
-            if (frontmatter.tags) {
-                if (typeof frontmatter.tags == "string") {
-                    if (
-                        this.data.settings.flashcardsTag ==
-                        "#" + frontmatter.tags
-                    )
-                        await this.findFlashcards(note, "#" + frontmatter.tags);
-                } else {
-                    for (let tag of frontmatter.tags) {
-                        if (this.data.settings.flashcardsTag == "#" + tag) {
-                            await this.findFlashcards(
-                                note,
-                                "#" + frontmatter.tags
-                            );
-                            break;
-                        }
-                    }
                 }
             }
         }
