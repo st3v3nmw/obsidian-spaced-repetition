@@ -1,14 +1,8 @@
 import { Modal, App, MarkdownRenderer, Notice } from "obsidian";
 import type SRPlugin from "./main";
-import { Card, CardType } from "./types";
-import { schedule, ReviewResponse } from "./sched";
+import { Card, CardType, FlashcardModalMode, ReviewResponse } from "./types";
+import { schedule } from "./sched";
 import { CLOZE_SCHEDULING_EXTRACTOR } from "./constants";
-
-enum Mode {
-    Front,
-    Back,
-    Closed,
-}
 
 export class FlashcardModal extends Modal {
     private plugin: SRPlugin;
@@ -22,7 +16,7 @@ export class FlashcardModal extends Modal {
     private resetLinkView: HTMLElement;
     private contextView: HTMLElement;
     private currentCard: Card;
-    private mode: Mode;
+    private mode: FlashcardModalMode;
 
     constructor(app: App, plugin: SRPlugin) {
         super(app);
@@ -100,7 +94,7 @@ export class FlashcardModal extends Modal {
         this.contentEl.appendChild(this.answerBtn);
 
         document.body.onkeypress = (e) => {
-            if (this.mode != Mode.Closed && e.code == "KeyS") {
+            if (this.mode != FlashcardModalMode.Closed && e.code == "KeyS") {
                 if (this.currentCard.isDue)
                     this.plugin.dueFlashcards.splice(0, 1);
                 else this.plugin.newFlashcards.splice(0, 1);
@@ -108,11 +102,11 @@ export class FlashcardModal extends Modal {
                     this.buryRelatedCards(this.currentCard.relatedCards);
                 this.nextCard();
             } else if (
-                this.mode == Mode.Front &&
+                this.mode == FlashcardModalMode.Front &&
                 (e.code == "Space" || e.code == "Enter")
             )
                 this.showAnswer();
-            else if (this.mode == Mode.Back) {
+            else if (this.mode == FlashcardModalMode.Back) {
                 if (e.code == "Numpad1" || e.code == "Digit1")
                     this.processReview(ReviewResponse.Hard);
                 else if (e.code == "Numpad2" || e.code == "Digit2")
@@ -130,7 +124,7 @@ export class FlashcardModal extends Modal {
     }
 
     onClose() {
-        this.mode = Mode.Closed;
+        this.mode = FlashcardModalMode.Closed;
     }
 
     nextCard() {
@@ -152,7 +146,7 @@ export class FlashcardModal extends Modal {
 
         this.answerBtn.style.display = "initial";
         this.flashcardView.innerHTML = "";
-        this.mode = Mode.Front;
+        this.mode = FlashcardModalMode.Front;
 
         if (this.plugin.dueFlashcards.length > 0) {
             this.currentCard = this.plugin.dueFlashcards[0];
@@ -208,7 +202,7 @@ export class FlashcardModal extends Modal {
     }
 
     showAnswer() {
-        this.mode = Mode.Back;
+        this.mode = FlashcardModalMode.Back;
 
         this.answerBtn.style.display = "none";
         this.responseDiv.style.display = "grid";

@@ -1,22 +1,6 @@
 import { Notice, PluginSettingTab, Setting, App } from "obsidian";
 import type SRPlugin from "./main";
-
-export interface SRSettings {
-    // flashcards
-    flashcardsTag: string;
-    singleLineCommentOnSameLine: boolean;
-    buryRelatedCards: boolean;
-    // notes
-    tagsToReview: string[];
-    openRandomNote: boolean;
-    autoNextNote: boolean;
-    disableFileMenuReviewOptions: boolean;
-    // algorithm
-    baseEase: number;
-    maxLinkFactor: number;
-    lapsesIntervalChange: number;
-    easyBonus: number;
-}
+import { SRSettings } from "./types";
 
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards

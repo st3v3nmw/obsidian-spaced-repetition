@@ -1,10 +1,43 @@
 import { TFile } from "obsidian";
 
-/*
-    Card Object
-    There's too much in here,
-    but never tell the user about this abomination! xD
-*/
+export interface SRSettings {
+    // flashcards
+    flashcardsTag: string;
+    singleLineCommentOnSameLine: boolean;
+    buryRelatedCards: boolean;
+    // notes
+    tagsToReview: string[];
+    openRandomNote: boolean;
+    autoNextNote: boolean;
+    disableFileMenuReviewOptions: boolean;
+    // algorithm
+    baseEase: number;
+    maxLinkFactor: number;
+    lapsesIntervalChange: number;
+    easyBonus: number;
+}
+
+export enum ReviewResponse {
+    Easy,
+    Good,
+    Hard,
+    Reset,
+}
+
+// Notes
+
+export interface SchedNote {
+    note: TFile;
+    dueUnix: number;
+}
+
+export interface LinkStat {
+    sourcePath: string;
+    linkCount: number;
+}
+
+// Flashcards
+
 export interface Card {
     // scheduling
     isDue: boolean;
@@ -30,4 +63,10 @@ export enum CardType {
     SingleLineBasic,
     MultiLineBasic,
     Cloze,
+}
+
+export enum FlashcardModalMode {
+    Front,
+    Back,
+    Closed,
 }

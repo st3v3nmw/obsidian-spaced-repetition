@@ -1,9 +1,4 @@
-export enum ReviewResponse {
-    Easy,
-    Good,
-    Hard,
-    Reset,
-}
+import { ReviewResponse } from "./types";
 
 export function schedule(
     response: ReviewResponse,
@@ -11,7 +6,7 @@ export function schedule(
     ease: number,
     lapsesIntervalChange: number,
     easyBonus: number,
-    fuzz: boolean = true,
+    fuzz: boolean = true
 ) {
     if (response != ReviewResponse.Good) {
         ease =
@@ -21,14 +16,10 @@ export function schedule(
     }
 
     if (response == ReviewResponse.Hard)
-        interval = Math.max(
-            1,
-            interval * lapsesIntervalChange
-        );
+        interval = Math.max(1, interval * lapsesIntervalChange);
     else interval = (interval * ease) / 100;
 
-    if (response == ReviewResponse.Easy)
-        interval *= easyBonus;
+    if (response == ReviewResponse.Easy) interval *= easyBonus;
 
     if (fuzz) {
         // fuzz

@@ -7,11 +7,18 @@ import {
     getAllTags,
 } from "obsidian";
 import * as graph from "pagerank.js";
-import { SRSettings, SRSettingTab, DEFAULT_SETTINGS } from "./settings";
+import { SRSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { FlashcardModal } from "./flashcard-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "./sidebar";
-import { ReviewResponse, schedule } from "./sched";
-import { Card, CardType } from "./types";
+import { schedule } from "./sched";
+import {
+    SchedNote,
+    LinkStat,
+    Card,
+    CardType,
+    ReviewResponse,
+    SRSettings,
+} from "./types";
 import {
     CROSS_HAIRS_ICON,
     SCHEDULING_INFO_REGEX,
@@ -30,16 +37,6 @@ interface PluginData {
 const DEFAULT_DATA: PluginData = {
     settings: DEFAULT_SETTINGS,
 };
-
-interface SchedNote {
-    note: TFile;
-    dueUnix: number;
-}
-
-interface LinkStat {
-    sourcePath: string;
-    linkCount: number;
-}
 
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
