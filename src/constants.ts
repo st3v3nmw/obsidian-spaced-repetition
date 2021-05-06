@@ -1,5 +1,5 @@
 export const SCHEDULING_INFO_REGEX = /^---\n((?:.*\n)*)sr-due: (.+)\nsr-interval: (\d+)\nsr-ease: (\d+)\n((?:.*\n)*)---/;
-export const YAML_FRONT_MATTER_REGEX = /^---\n((?:.*\n)*)---/;
+export const YAML_FRONT_MATTER_REGEX = /^---\n((?:.*\n)*?)---/;
 export const SINGLELINE_CARD_REGEX = /^(.+)::(.+?)\n?(?:<!--SR:(.+),(\d+),(\d+)-->|$)/gm;
 export const MULTILINE_CARD_REGEX = /^((?:.+\n)+)\?\n((?:.+\n)+?)(?:<!--SR:(.+),(\d+),(\d+)-->|$)/gm;
 export const CLOZE_CARD_DETECTOR = /(?:.+\n)*^.*?==.*?==.*\n(?:.+\n?)*/gm; // card must have at least one cloze
