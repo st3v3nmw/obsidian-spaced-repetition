@@ -21,9 +21,13 @@
 }
 
 .sr-deck {
-    height: 25px;
+    height: 48px;
+    line-height: 48px;
     width: 100%;
     cursor: pointer;
+    display: inline-grid;
+    grid-template-columns: auto 64px 64px;
+    border-bottom: 1px solid grey;
 }
 
 #sr-show-answer {

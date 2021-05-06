@@ -30,6 +30,7 @@ export class FlashcardModal extends Modal {
 
         this.contentEl.style.position = "relative";
         this.contentEl.style.height = "92%";
+        this.contentEl.style.overflowY = "scroll";
 
         document.body.onkeypress = (e) => {
             if (this.mode != FlashcardModalMode.DecksList) {
@@ -81,14 +82,16 @@ export class FlashcardModal extends Modal {
         this.mode = FlashcardModalMode.DecksList;
         this.titleEl.setText("Decks");
         this.contentEl.innerHTML = "";
+        let colHeading = this.contentEl.createDiv("sr-deck");
+        colHeading.innerHTML =
+            "<i></i><span style='text-align:right;'>Due</span>" +
+            "<span style='text-align:right;'>New</span>";
         for (let deckName in this.plugin.dueFlashcards) {
             let deckView = this.contentEl.createDiv("sr-deck");
             deckView.setText(deckName);
             deckView.innerHTML +=
-                `<span style="float: right">` +
-                `<span style="color:#4caf50;">${this.plugin.dueFlashcards[deckName].length}</span> + ` +
-                `<span style="color:#2196f3;">${this.plugin.newFlashcards[deckName].length}</span>` +
-                `</span>`;
+                `<span style="color:#4caf50;text-align:right;">${this.plugin.dueFlashcards[deckName].length}</span>` +
+                `<span style="color:#2196f3;text-align:right;">${this.plugin.newFlashcards[deckName].length}</span>`;
             deckView.addEventListener("click", (_) => {
                 this.currentDeck = deckName;
                 this.setupCardsView();
