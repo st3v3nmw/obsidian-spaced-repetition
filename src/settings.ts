@@ -1,26 +1,10 @@
 import { Notice, PluginSettingTab, Setting, App } from "obsidian";
 import type SRPlugin from "./main";
-
-export interface SRSettings {
-    // flashcards
-    flashcardsTag: string;
-    singleLineCommentOnSameLine: boolean;
-    buryRelatedCards: boolean;
-    // notes
-    tagsToReview: string[];
-    openRandomNote: boolean;
-    autoNextNote: boolean;
-    disableFileMenuReviewOptions: boolean;
-    // algorithm
-    baseEase: number;
-    maxLinkFactor: number;
-    lapsesIntervalChange: number;
-    easyBonus: number;
-}
+import { SRSettings } from "./types";
 
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
-    flashcardsTag: "#flashcards",
+    flashcardTags: ["#flashcards"],
     singleLineCommentOnSameLine: false,
     buryRelatedCards: false,
     // notes
@@ -57,13 +41,19 @@ export class SRSettingTab extends PluginSettingTab {
         containerEl.createDiv().innerHTML = "<h3>Flashcards</h3>";
 
         new Setting(containerEl)
-            .setName("Flashcards tag")
-            .setDesc("Enter one tag i.e. #flashcards.")
-            .addText((text) =>
+            .setName("Flashcard tags")
+            .setDesc(
+                "Enter tags separated by spaces i.e. #flashcards #deck2 #deck3."
+            )
+            .addTextArea((text) =>
                 text
-                    .setValue(`${this.plugin.data.settings.flashcardsTag}`)
+                    .setValue(
+                        `${this.plugin.data.settings.flashcardTags.join(" ")}`
+                    )
                     .onChange(async (value) => {
-                        this.plugin.data.settings.flashcardsTag = value;
+                        this.plugin.data.settings.flashcardTags = value.split(
+                            " "
+                        );
                         await this.plugin.savePluginData();
                     })
             );

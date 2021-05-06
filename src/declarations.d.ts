@@ -1,1 +1,1 @@
-declare module 'pagerank.js'
+declare module "pagerank.js";

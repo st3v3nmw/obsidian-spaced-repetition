@@ -1,16 +1,11 @@
-import type SRPlugin from "./main";
-
-export enum ReviewResponse {
-    Easy,
-    Good,
-    Hard,
-    Reset,
-}
+import { ReviewResponse } from "./types";
 
 export function schedule(
     response: ReviewResponse,
     interval: number,
     ease: number,
+    lapsesIntervalChange: number,
+    easyBonus: number,
     fuzz: boolean = true
 ) {
     if (response != ReviewResponse.Good) {
@@ -21,14 +16,10 @@ export function schedule(
     }
 
     if (response == ReviewResponse.Hard)
-        interval = Math.max(
-            1,
-            interval * this.plugin.data.settings.lapsesIntervalChange
-        );
+        interval = Math.max(1, interval * lapsesIntervalChange);
     else interval = (interval * ease) / 100;
 
-    if (response == ReviewResponse.Easy)
-        interval *= this.plugin.settings.easyBonus;
+    if (response == ReviewResponse.Easy) interval *= easyBonus;
 
     if (fuzz) {
         // fuzz
