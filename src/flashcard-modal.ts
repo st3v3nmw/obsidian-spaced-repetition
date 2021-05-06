@@ -16,6 +16,7 @@ export class FlashcardModal extends Modal {
     private resetLinkView: HTMLElement;
     private contextView: HTMLElement;
     private currentCard: Card;
+    private currentDeck: string;
     private mode: FlashcardModalMode;
 
     constructor(app: App, plugin: SRPlugin) {
@@ -23,12 +24,81 @@ export class FlashcardModal extends Modal {
 
         this.plugin = plugin;
 
-        this.titleEl.setText("Queue");
+        this.titleEl.setText("Decks");
         this.modalEl.style.height = "80%";
         this.modalEl.style.width = "40%";
 
         this.contentEl.style.position = "relative";
         this.contentEl.style.height = "92%";
+
+        document.body.onkeypress = (e) => {
+            if (this.mode != FlashcardModalMode.DecksList) {
+                if (
+                    this.mode != FlashcardModalMode.Closed &&
+                    e.code == "KeyS"
+                ) {
+                    if (this.currentCard.isDue)
+                        this.plugin.dueFlashcards[this.currentDeck].splice(
+                            0,
+                            1
+                        );
+                    else
+                        this.plugin.newFlashcards[this.currentDeck].splice(
+                            0,
+                            1
+                        );
+                    if (this.currentCard.cardType == CardType.Cloze)
+                        this.buryRelatedCards(this.currentCard.relatedCards);
+                    this.nextCard();
+                } else if (
+                    this.mode == FlashcardModalMode.Front &&
+                    (e.code == "Space" || e.code == "Enter")
+                )
+                    this.showAnswer();
+                else if (this.mode == FlashcardModalMode.Back) {
+                    if (e.code == "Numpad1" || e.code == "Digit1")
+                        this.processReview(ReviewResponse.Hard);
+                    else if (e.code == "Numpad2" || e.code == "Digit2")
+                        this.processReview(ReviewResponse.Good);
+                    else if (e.code == "Numpad3" || e.code == "Digit3")
+                        this.processReview(ReviewResponse.Easy);
+                    else if (e.code == "Numpad0" || e.code == "Digit0")
+                        this.processReview(ReviewResponse.Reset);
+                }
+            }
+        };
+    }
+
+    onOpen() {
+        this.decksList();
+    }
+
+    onClose() {
+        this.mode = FlashcardModalMode.Closed;
+    }
+
+    decksList() {
+        this.mode = FlashcardModalMode.DecksList;
+        this.titleEl.setText("Decks");
+        this.contentEl.innerHTML = "";
+        for (let deckName in this.plugin.dueFlashcards) {
+            let deckView = this.contentEl.createDiv("sr-deck");
+            deckView.setText(deckName);
+            deckView.innerHTML +=
+                `<span style="float: right">` +
+                `<span style="color:#4caf50;">${this.plugin.dueFlashcards[deckName].length}</span> + ` +
+                `<span style="color:#2196f3;">${this.plugin.newFlashcards[deckName].length}</span>` +
+                `</span>`;
+            deckView.addEventListener("click", (_) => {
+                this.currentDeck = deckName;
+                this.setupCardsView();
+                this.nextCard();
+            });
+        }
+    }
+
+    setupCardsView() {
+        this.contentEl.innerHTML = "";
 
         this.fileLinkView = createDiv("sr-link");
         this.fileLinkView.setText("Open file");
@@ -92,55 +162,18 @@ export class FlashcardModal extends Modal {
             this.showAnswer();
         });
         this.contentEl.appendChild(this.answerBtn);
-
-        document.body.onkeypress = (e) => {
-            if (this.mode != FlashcardModalMode.Closed && e.code == "KeyS") {
-                if (this.currentCard.isDue)
-                    this.plugin.dueFlashcards.splice(0, 1);
-                else this.plugin.newFlashcards.splice(0, 1);
-                if (this.currentCard.cardType == CardType.Cloze)
-                    this.buryRelatedCards(this.currentCard.relatedCards);
-                this.nextCard();
-            } else if (
-                this.mode == FlashcardModalMode.Front &&
-                (e.code == "Space" || e.code == "Enter")
-            )
-                this.showAnswer();
-            else if (this.mode == FlashcardModalMode.Back) {
-                if (e.code == "Numpad1" || e.code == "Digit1")
-                    this.processReview(ReviewResponse.Hard);
-                else if (e.code == "Numpad2" || e.code == "Digit2")
-                    this.processReview(ReviewResponse.Good);
-                else if (e.code == "Numpad3" || e.code == "Digit3")
-                    this.processReview(ReviewResponse.Easy);
-                else if (e.code == "Numpad0" || e.code == "Digit0")
-                    this.processReview(ReviewResponse.Reset);
-            }
-        };
-    }
-
-    onOpen() {
-        this.nextCard();
-    }
-
-    onClose() {
-        this.mode = FlashcardModalMode.Closed;
     }
 
     nextCard() {
         this.responseDiv.style.display = "none";
         this.resetLinkView.style.display = "none";
         let count =
-            this.plugin.newFlashcards.length + this.plugin.dueFlashcards.length;
+            this.plugin.newFlashcards[this.currentDeck].length +
+            this.plugin.dueFlashcards[this.currentDeck].length;
         this.titleEl.setText(`Queue - ${count}`);
 
         if (count == 0) {
-            this.answerBtn.style.display = "none";
-            this.fileLinkView.innerHTML = "";
-            this.resetLinkView.innerHTML = "";
-            this.contextView.innerHTML = "";
-            this.flashcardView.innerHTML =
-                "<h3 style='text-align: center; margin-top: 45%;'>You're done for the day :D.</h3>";
+            this.decksList();
             return;
         }
 
@@ -148,8 +181,8 @@ export class FlashcardModal extends Modal {
         this.flashcardView.innerHTML = "";
         this.mode = FlashcardModalMode.Front;
 
-        if (this.plugin.dueFlashcards.length > 0) {
-            this.currentCard = this.plugin.dueFlashcards[0];
+        if (this.plugin.dueFlashcardsCount > 0) {
+            this.currentCard = this.plugin.dueFlashcards[this.currentDeck][0];
             MarkdownRenderer.renderMarkdown(
                 this.currentCard.front,
                 this.flashcardView,
@@ -185,8 +218,8 @@ export class FlashcardModal extends Modal {
             this.hardBtn.setText(`Hard - ${hardInterval} day(s)`);
             this.goodBtn.setText(`Good - ${goodInterval} day(s)`);
             this.easyBtn.setText(`Easy - ${easyInterval} day(s)`);
-        } else if (this.plugin.newFlashcards.length > 0) {
-            this.currentCard = this.plugin.newFlashcards[0];
+        } else if (this.plugin.newFlashcardsCount > 0) {
+            this.currentCard = this.plugin.newFlashcards[this.currentDeck][0];
             MarkdownRenderer.renderMarkdown(
                 this.currentCard.front,
                 this.flashcardView,
@@ -230,7 +263,7 @@ export class FlashcardModal extends Modal {
         if (response != ReviewResponse.Reset) {
             // scheduled card
             if (this.currentCard.isDue) {
-                this.plugin.dueFlashcards.splice(0, 1);
+                this.plugin.dueFlashcards[this.currentDeck].splice(0, 1);
                 let schedObj = schedule(
                     response,
                     this.currentCard.interval,
@@ -248,7 +281,7 @@ export class FlashcardModal extends Modal {
                     this.plugin.data.settings.lapsesIntervalChange,
                     this.plugin.data.settings.easyBonus
                 );
-                this.plugin.newFlashcards.splice(0, 1);
+                this.plugin.newFlashcards[this.currentDeck].splice(0, 1);
                 interval = Math.round(schedObj.interval);
                 ease = schedObj.ease;
             }
@@ -257,8 +290,8 @@ export class FlashcardModal extends Modal {
         } else {
             interval = 1.0;
             ease = this.plugin.data.settings.baseEase;
-            this.plugin.dueFlashcards.splice(0, 1);
-            this.plugin.dueFlashcards.push(this.currentCard);
+            this.plugin.dueFlashcards[this.currentDeck].splice(0, 1);
+            this.plugin.dueFlashcards[this.currentDeck].push(this.currentCard);
             due = window.moment(Date.now());
             new Notice("Card's progress has been reset");
         }
@@ -285,9 +318,7 @@ export class FlashcardModal extends Modal {
 
                 let deletionSched = ["0", dueString, `${interval}`, `${ease}`];
                 if (this.currentCard.isDue)
-                    scheduling[
-                        this.currentCard.clozeDeletionIdx
-                    ] = deletionSched;
+                    scheduling[this.currentCard.subCardIdx] = deletionSched;
                 else scheduling.push(deletionSched);
 
                 this.currentCard.cardText = this.currentCard.cardText.replace(
@@ -332,11 +363,17 @@ export class FlashcardModal extends Modal {
 
     buryRelatedCards(arr: Card[]) {
         for (let relatedCard of arr) {
-            let dueIdx = this.plugin.dueFlashcards.indexOf(relatedCard);
-            let newIdx = this.plugin.newFlashcards.indexOf(relatedCard);
+            let dueIdx = this.plugin.dueFlashcards[this.currentDeck].indexOf(
+                relatedCard
+            );
+            let newIdx = this.plugin.newFlashcards[this.currentDeck].indexOf(
+                relatedCard
+            );
 
-            if (dueIdx != -1) this.plugin.dueFlashcards.splice(dueIdx, 1);
-            else if (newIdx != -1) this.plugin.newFlashcards.splice(newIdx, 1);
+            if (dueIdx != -1)
+                this.plugin.dueFlashcards[this.currentDeck].splice(dueIdx, 1);
+            else if (newIdx != -1)
+                this.plugin.newFlashcards[this.currentDeck].splice(newIdx, 1);
         }
     }
 }

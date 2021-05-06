@@ -20,6 +20,12 @@
     align-items: center;
 }
 
+.sr-deck {
+    height: 25px;
+    width: 100%;
+    cursor: pointer;
+}
+
 #sr-show-answer {
     height: 48px;
     line-height: 48px;

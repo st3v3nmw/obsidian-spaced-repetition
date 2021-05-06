@@ -50,8 +50,10 @@ export default class SRPlugin extends Plugin {
     private pageranks: Record<string, number> = {};
     private dueNotesCount: number = 0;
 
-    public newFlashcards: Card[] = [];
-    public dueFlashcards: Card[] = [];
+    public newFlashcards: Record<string, Card[]> = {}; // <deck name, Card[]>
+    public newFlashcardsCount: number = 0;
+    public dueFlashcards: Record<string, Card[]> = {}; // <deck name, Card[]>
+    public dueFlashcardsCount: number = 0;
 
     async onload() {
         await this.loadPluginData();
@@ -274,7 +276,7 @@ export default class SRPlugin extends Plugin {
         );
 
         this.statusBar.setText(
-            `Review: ${this.dueNotesCount} notes, ${this.dueFlashcards.length} cards due`
+            `Review: ${this.dueNotesCount} notes, ${this.dueFlashcardsCount} cards due`
         );
         this.reviewQueueView.redraw();
     }
@@ -283,10 +285,10 @@ export default class SRPlugin extends Plugin {
         let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         let frontmatter = fileCachedData.frontmatter || <Record<string, any>>{};
 
-        let tags = fileCachedData.tags || [];
+        let tags = getAllTags(fileCachedData) || [];
         let shouldIgnore = true;
-        for (let tagObj of tags) {
-            if (this.data.settings.tagsToReview.includes(tagObj.tag)) {
+        for (let tag of tags) {
+            if (this.data.settings.tagsToReview.includes(tag)) {
                 shouldIgnore = false;
                 break;
             }
@@ -424,8 +426,10 @@ export default class SRPlugin extends Plugin {
     async flashcards_sync() {
         let notes = this.app.vault.getMarkdownFiles();
 
-        this.newFlashcards = [];
-        this.dueFlashcards = [];
+        this.newFlashcards = {};
+        this.newFlashcardsCount = 0;
+        this.dueFlashcards = {};
+        this.dueFlashcardsCount = 0;
 
         for (let note of notes) {
             let fileCachedData =
@@ -435,15 +439,29 @@ export default class SRPlugin extends Plugin {
             let tags = getAllTags(fileCachedData) || [];
 
             for (let tag of tags) {
-                if (tag == this.data.settings.flashcardsTag) {
-                    await this.findFlashcards(note, "#" + tag);
+                if (this.data.settings.flashcardTags.includes(tag)) {
+                    await this.findFlashcards(note, tag);
                     break;
                 }
             }
         }
 
+        // sort the deck names
+        this.dueFlashcards = Object.keys(this.dueFlashcards)
+            .sort()
+            .reduce((obj: Record<string, Card[]>, key: string) => {
+                obj[key] = this.dueFlashcards[key];
+                return obj;
+            }, {});
+        this.newFlashcards = Object.keys(this.newFlashcards)
+            .sort()
+            .reduce((obj: Record<string, Card[]>, key: string) => {
+                obj[key] = this.newFlashcards[key];
+                return obj;
+            }, {});
+
         this.statusBar.setText(
-            `Review: ${this.dueNotesCount} notes, ${this.dueFlashcards.length} cards due`
+            `Review: ${this.dueNotesCount} notes, ${this.dueFlashcardsCount} cards due`
         );
     }
 
@@ -452,6 +470,11 @@ export default class SRPlugin extends Plugin {
         let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         let headings = fileCachedData.headings || [];
         let fileChanged = false;
+
+        if (!this.dueFlashcards.hasOwnProperty(deck)) {
+            this.dueFlashcards[deck] = [];
+            this.newFlashcards[deck] = [];
+        }
 
         let now = Date.now();
         // basic cards
@@ -480,10 +503,10 @@ export default class SRPlugin extends Plugin {
                             back: match[2],
                             cardText: match[0],
                             context: "",
-                            deck,
                             cardType,
                         };
-                        this.dueFlashcards.push(cardObj);
+                        this.dueFlashcards[deck].push(cardObj);
+                        this.dueFlashcardsCount++;
                     } else continue;
                 } else {
                     cardObj = {
@@ -494,9 +517,9 @@ export default class SRPlugin extends Plugin {
                         cardText: match[0],
                         context: "",
                         cardType,
-                        deck,
                     };
-                    this.newFlashcards.push(cardObj);
+                    this.newFlashcards[deck].push(cardObj);
+                    this.newFlashcardsCount++;
                 }
 
                 addContextToCard(cardObj, match.index, headings);
@@ -561,13 +584,13 @@ export default class SRPlugin extends Plugin {
                             back,
                             cardText: match[0],
                             context: "",
-                            deck,
                             cardType: CardType.Cloze,
-                            clozeDeletionIdx: i,
+                            subCardIdx: i,
                             relatedCards,
                         };
 
-                        this.dueFlashcards.push(cardObj);
+                        this.dueFlashcards[deck].push(cardObj);
+                        this.dueFlashcardsCount++;
                     } else continue;
                 } else {
                     // new card
@@ -578,13 +601,13 @@ export default class SRPlugin extends Plugin {
                         back,
                         cardText: match[0],
                         context: "",
-                        deck,
                         cardType: CardType.Cloze,
-                        clozeDeletionIdx: i,
+                        subCardIdx: i,
                         relatedCards,
                     };
 
-                    this.newFlashcards.push(cardObj);
+                    this.newFlashcards[deck].push(cardObj);
+                    this.newFlashcardsCount++;
                 }
 
                 relatedCards.push(cardObj);
@@ -597,6 +620,17 @@ export default class SRPlugin extends Plugin {
 
     async loadPluginData() {
         this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
+
+        // misbehaving settings
+        // after changes to flashcardTags, save the setting the user already has
+        // remove in future (Say, 15th June 2021)
+        if (this.data.settings.flashcardTags == undefined) {
+            this.data.settings.flashcardTags = [
+                //@ts-ignore
+                this.data.settings.flashcardsTag,
+            ];
+            await this.savePluginData();
+        }
     }
 
     async savePluginData() {

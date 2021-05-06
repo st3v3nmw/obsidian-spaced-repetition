@@ -2,7 +2,7 @@ import { TFile } from "obsidian";
 
 export interface SRSettings {
     // flashcards
-    flashcardsTag: string;
+    flashcardTags: string[];
     singleLineCommentOnSameLine: boolean;
     buryRelatedCards: boolean;
     // notes
@@ -50,12 +50,10 @@ export interface Card {
     back: string;
     cardText: string;
     context: string;
-    // deck
-    deck: string;
     // types
     cardType: CardType;
-    // cloze stuff
-    clozeDeletionIdx?: number;
+    // stuff for cards with sub-cards
+    subCardIdx?: number;
     relatedCards?: Card[];
 }
 
@@ -66,6 +64,7 @@ export enum CardType {
 }
 
 export enum FlashcardModalMode {
+    DecksList,
     Front,
     Back,
     Closed,
