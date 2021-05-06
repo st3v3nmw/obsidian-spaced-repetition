@@ -9,9 +9,9 @@ Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/proje
 ## Features
 
 - Flashcards
-    - [Remnote single-line style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcards-Types#single-line-remnote-style) (`Question::Answer`)
-    - [Multi-line style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcards-Types#multi-line) (Separated by `?`)
-    - [Cloze cards](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcards-Types#cloze-cards) (`==highlight==` your cloze deletions!)
+    - [Remnote single-line style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#single-line-remnote-style) (`Question::Answer`)
+    - [Multi-line style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#multi-line) (Separated by `?`)
+    - [Cloze cards](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#cloze-cards) (`==highlight==` your cloze deletions!)
     - [Card context - automatic titles based on headings](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Reviewing-flashcards#context) (i.e. `Note title > Heading 1 > Subheading`)
     - Rich text support in flashcards (inherited from Obsidian)
       - LaTeX
