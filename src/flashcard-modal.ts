@@ -221,7 +221,7 @@ export class FlashcardModal extends Modal {
             this.hardBtn.setText(`Hard - ${hardInterval} day(s)`);
             this.goodBtn.setText(`Good - ${goodInterval} day(s)`);
             this.easyBtn.setText(`Easy - ${easyInterval} day(s)`);
-        } else if (this.plugin.newFlashcards[this.currentDeck].length) {
+        } else if (this.plugin.newFlashcards[this.currentDeck].length > 0) {
             this.currentCard = this.plugin.newFlashcards[this.currentDeck][0];
             MarkdownRenderer.renderMarkdown(
                 this.currentCard.front,
