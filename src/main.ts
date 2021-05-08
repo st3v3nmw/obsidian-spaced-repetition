@@ -277,7 +277,7 @@ export default class SRPlugin extends Plugin {
         );
 
         this.statusBar.setText(
-            `Review: ${this.dueNotesCount} notes, ${this.dueFlashcardsCount} cards due`
+            `Review: ${this.dueNotesCount} note(s), ${this.dueFlashcardsCount} card(s) due`
         );
         this.reviewQueueView.redraw();
     }
@@ -462,7 +462,7 @@ export default class SRPlugin extends Plugin {
             }, {});
 
         this.statusBar.setText(
-            `Review: ${this.dueNotesCount} notes, ${this.dueFlashcardsCount} cards due`
+            `Review: ${this.dueNotesCount} note(s), ${this.dueFlashcardsCount} card(s) due`
         );
     }
 
