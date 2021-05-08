@@ -47,18 +47,22 @@
     height: 2px;
 }
 
-#sr-hard-btn {
+#sr-hard-btn,
+#sr-good-btn,
+#sr-easy-btn {
     height: 48px;
+    margin: auto;
+}
+
+#sr-hard-btn {
     background-color: #f44336;
 }
 
 #sr-good-btn {
-    height: 48px;
     background-color: #2196f3;
 }
 
 #sr-easy-btn {
-    height: 48px;
     background-color: #4caf50;
 }
 
@@ -71,4 +75,21 @@
 #sr-flashcard-view {
     overflow-y: scroll;
     height: 80%;
+}
+
+@media only screen and (max-width: 600px) {
+    .sr-modal-content::-webkit-scrollbar,
+    #sr-flashcard-view::-webkit-scrollbar {
+        display: none;
+    }
+
+    .sr-response {
+        width: 96% !important;
+    }
+
+    #sr-hard-btn,
+    #sr-good-btn,
+    #sr-easy-btn {
+        width: 100px;
+    }
 }
