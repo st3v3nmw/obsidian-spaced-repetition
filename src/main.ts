@@ -239,6 +239,7 @@ export default class SRPlugin extends Plugin {
 
             let dueUnix: number = window
                 .moment(frontmatter["sr-due"], [
+                    "YYYY-MM-DD",
                     "DD-MM-YYYY",
                     "ddd MMM DD YYYY",
                 ])
@@ -370,7 +371,7 @@ export default class SRPlugin extends Plugin {
         ease = schedObj.ease;
 
         let due = window.moment(Date.now() + interval * 24 * 3600 * 1000);
-        let dueString = due.format("DD-MM-YYYY");
+        let dueString = due.format("YYYY-MM-DD");
 
         // check if scheduling info exists
         if (SCHEDULING_INFO_REGEX.test(fileText)) {
@@ -491,7 +492,7 @@ export default class SRPlugin extends Plugin {
                 // flashcard already scheduled
                 if (match[3]) {
                     let dueUnix: number = window
-                        .moment(match[3], ["DD-MM-YYYY", "ddd MMM DD YYYY"])
+                        .moment(match[3], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
                         .valueOf();
                     if (dueUnix <= now) {
                         cardObj = {
@@ -572,7 +573,7 @@ export default class SRPlugin extends Plugin {
                 // card deletion scheduled
                 if (i < scheduling.length) {
                     let dueUnix: number = window
-                        .moment(scheduling[i][1], "DD-MM-YYYY")
+                        .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY"])
                         .valueOf();
                     if (dueUnix <= now) {
                         cardObj = {
