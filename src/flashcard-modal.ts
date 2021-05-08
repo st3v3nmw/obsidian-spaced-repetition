@@ -184,7 +184,7 @@ export class FlashcardModal extends Modal {
         this.flashcardView.innerHTML = "";
         this.mode = FlashcardModalMode.Front;
 
-        if (this.plugin.dueFlashcardsCount > 0) {
+        if (this.plugin.dueFlashcards[this.currentDeck].length > 0) {
             this.currentCard = this.plugin.dueFlashcards[this.currentDeck][0];
             MarkdownRenderer.renderMarkdown(
                 this.currentCard.front,
@@ -221,7 +221,7 @@ export class FlashcardModal extends Modal {
             this.hardBtn.setText(`Hard - ${hardInterval} day(s)`);
             this.goodBtn.setText(`Good - ${goodInterval} day(s)`);
             this.easyBtn.setText(`Easy - ${easyInterval} day(s)`);
-        } else if (this.plugin.newFlashcardsCount > 0) {
+        } else if (this.plugin.newFlashcards[this.currentDeck].length > 0) {
             this.currentCard = this.plugin.newFlashcards[this.currentDeck][0];
             MarkdownRenderer.renderMarkdown(
                 this.currentCard.front,
@@ -299,7 +299,7 @@ export class FlashcardModal extends Modal {
             new Notice("Card's progress has been reset");
         }
 
-        let dueString = due.format("DD-MM-YYYY");
+        let dueString = due.format("YYYY-MM-DD");
 
         let fileText = await this.app.vault.read(this.currentCard.note);
         let replacementRegex = new RegExp(
