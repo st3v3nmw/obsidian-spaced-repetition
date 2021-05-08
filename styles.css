@@ -83,8 +83,9 @@
         display: none;
     }
 
-    .sr-response {
-        width: 96% !important;
+    .sr-response,
+    #sr-show-answer {
+        width: 95% !important;
     }
 
     #sr-hard-btn,
