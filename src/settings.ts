@@ -20,10 +20,20 @@ export const DEFAULT_SETTINGS: SRSettings = {
     maxLinkFactor: 1.0,
 };
 
-export function getSetting(settingName: string, settingsObj: SRSettings): any {
+export function getSetting(
+    settingName: keyof SRSettings,
+    settingsObj: SRSettings
+): any {
     let value: any = settingsObj[settingName];
     value ??= DEFAULT_SETTINGS[settingName];
     return value;
+}
+
+// https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
+let applyDebounceTimer: number = 0;
+function applySettingsUpdate(callback: Function) {
+    clearTimeout(applyDebounceTimer);
+    applyDebounceTimer = window.setTimeout(callback, 512);
 }
 
 export class SRSettingTab extends PluginSettingTab {
@@ -60,10 +70,12 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings
                         ).join(" ")}`
                     )
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.flashcardTags =
-                            value.split(" ");
-                        await this.plugin.savePluginData();
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.flashcardTags =
+                                value.split(" ");
+                            await this.plugin.savePluginData();
+                        });
                     })
             );
 
@@ -72,7 +84,7 @@ export class SRSettingTab extends PluginSettingTab {
                 "Save scheduling comment for single-line flashcards on the same line?"
             )
             .setDesc(
-                "Turning this on will make the HTML comments not break list formatting"
+                "Turning this on will make the HTML comments not break list formatting."
             )
             .addToggle((toggle) =>
                 toggle
@@ -91,7 +103,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName("Bury related cards until the next review session?")
-            .setDesc("This applies to other cloze deletions in cloze cards")
+            .setDesc("This applies to other cloze deletions in cloze cards.")
             .addToggle((toggle) =>
                 toggle
                     .setValue(
@@ -119,17 +131,19 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings
                         ).join(" ")}`
                     )
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.tagsToReview =
-                            value.split(" ");
-                        await this.plugin.savePluginData();
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.tagsToReview =
+                                value.split(" ");
+                            await this.plugin.savePluginData();
+                        });
                     })
             );
 
         new Setting(containerEl)
             .setName("Open a random note for review")
             .setDesc(
-                "When you turn this off, notes are ordered by importance (PageRank)"
+                "When you turn this off, notes are ordered by importance (PageRank)."
             )
             .addToggle((toggle) =>
                 toggle
@@ -144,7 +158,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName("Open next note automatically after a review")
-            .setDesc("For faster reviews")
+            .setDesc("For faster reviews.")
             .addToggle((toggle) =>
                 toggle
                     .setValue(
@@ -185,77 +199,80 @@ export class SRSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName("Base ease")
-            .setDesc("minimum = 130, preferrably approximately 250")
+            .setDesc("minimum = 130, preferrably approximately 250.")
             .addText((text) =>
                 text
                     .setValue(
                         `${getSetting("baseEase", this.plugin.data.settings)}`
                     )
-                    .onChange(async (value) => {
-                        let numValue: number = Number.parseInt(value);
-                        if (!isNaN(numValue)) {
-                            if (numValue < 130) {
-                                new Notice(
-                                    "The base ease must be at least 130."
-                                );
-                                text.setValue(
-                                    `${this.plugin.data.settings.baseEase}`
-                                );
-                                return;
-                            }
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            let numValue: number = Number.parseInt(value);
+                            if (!isNaN(numValue)) {
+                                if (numValue < 130) {
+                                    new Notice(
+                                        "The base ease must be at least 130."
+                                    );
+                                    text.setValue(
+                                        `${this.plugin.data.settings.baseEase}`
+                                    );
+                                    return;
+                                }
 
-                            this.plugin.data.settings.baseEase = numValue;
-                            await this.plugin.savePluginData();
-                        } else {
-                            new Notice("Please provide a valid number.");
-                        }
+                                this.plugin.data.settings.baseEase = numValue;
+                                await this.plugin.savePluginData();
+                            } else {
+                                new Notice("Please provide a valid number.");
+                            }
+                        });
                     })
-            );
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.baseEase =
+                            DEFAULT_SETTINGS.baseEase;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
         new Setting(containerEl)
-            .setName("Interval change when you review a note/concept as hard")
-            .setDesc(
-                "newInterval = oldInterval * intervalChange / 100, 0% < intervalChange < 100%"
-            )
-            .addText((text) =>
-                text
+            .setName("Interval change when you review a flashcard/note as hard")
+            .setDesc("newInterval = oldInterval * intervalChange / 100.")
+            .addSlider((slider) =>
+                slider
+                    .setLimits(1, 99, 1)
                     .setValue(
-                        `${
-                            getSetting(
-                                "lapsesIntervalChange",
-                                this.plugin.data.settings
-                            ) * 100
-                        }`
+                        getSetting(
+                            "lapsesIntervalChange",
+                            this.plugin.data.settings
+                        ) * 100
                     )
-                    .onChange(async (value) => {
-                        let numValue: number = Number.parseInt(value) / 100;
-                        if (!isNaN(numValue)) {
-                            if (numValue < 0.01 || numValue > 0.99) {
-                                new Notice(
-                                    "The load balancing threshold must be in the range 0% < intervalChange < 100%."
-                                );
-                                text.setValue(
-                                    `${
-                                        this.plugin.data.settings
-                                            .lapsesIntervalChange * 100
-                                    }`
-                                );
-                                return;
-                            }
-
-                            this.plugin.data.settings.lapsesIntervalChange =
-                                numValue;
-                            await this.plugin.savePluginData();
-                        } else {
-                            new Notice("Please provide a valid number.");
-                        }
+                    .setDynamicTooltip()
+                    .onChange(async (value: number) => {
+                        this.plugin.data.settings.lapsesIntervalChange = value;
+                        await this.plugin.savePluginData();
                     })
-            );
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.lapsesIntervalChange =
+                            DEFAULT_SETTINGS.lapsesIntervalChange;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
         new Setting(containerEl)
             .setName("Easy bonus")
             .setDesc(
-                "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a card (minimum = 100%)"
+                "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%)."
             )
             .addText((text) =>
                 text
@@ -265,34 +282,47 @@ export class SRSettingTab extends PluginSettingTab {
                             100
                         }`
                     )
-                    .onChange(async (value) => {
-                        let numValue: number = Number.parseInt(value) / 100;
-                        if (!isNaN(numValue)) {
-                            if (numValue < 1.0) {
-                                new Notice(
-                                    "The easy bonus must be at least 100."
-                                );
-                                text.setValue(
-                                    `${
-                                        this.plugin.data.settings.easyBonus *
-                                        100
-                                    }`
-                                );
-                                return;
-                            }
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            let numValue: number = Number.parseInt(value) / 100;
+                            if (!isNaN(numValue)) {
+                                if (numValue < 1.0) {
+                                    new Notice(
+                                        "The easy bonus must be at least 100."
+                                    );
+                                    text.setValue(
+                                        `${
+                                            this.plugin.data.settings
+                                                .easyBonus * 100
+                                        }`
+                                    );
+                                    return;
+                                }
 
-                            this.plugin.data.settings.easyBonus = numValue;
-                            await this.plugin.savePluginData();
-                        } else {
-                            new Notice("Please provide a valid number.");
-                        }
+                                this.plugin.data.settings.easyBonus = numValue;
+                                await this.plugin.savePluginData();
+                            } else {
+                                new Notice("Please provide a valid number.");
+                            }
+                        });
                     })
-            );
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.easyBonus =
+                            DEFAULT_SETTINGS.easyBonus;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
         new Setting(containerEl)
             .setName("Maximum Interval")
             .setDesc(
-                "Allows you to place an upper limit on the interval (default = 100 years)"
+                "Allows you to place an upper limit on the interval (default = 100 years)."
             )
             .addText((text) =>
                 text
@@ -302,65 +332,69 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings
                         )}`
                     )
-                    .onChange(async (value) => {
-                        let numValue: number = Number.parseInt(value);
-                        if (!isNaN(numValue)) {
-                            if (numValue < 1) {
-                                new Notice(
-                                    "The maximum interval must be at least 1 day."
-                                );
-                                text.setValue(
-                                    `${this.plugin.data.settings.maximumInterval}`
-                                );
-                                return;
-                            }
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            let numValue: number = Number.parseInt(value);
+                            if (!isNaN(numValue)) {
+                                if (numValue < 1) {
+                                    new Notice(
+                                        "The maximum interval must be at least 1 day."
+                                    );
+                                    text.setValue(
+                                        `${this.plugin.data.settings.maximumInterval}`
+                                    );
+                                    return;
+                                }
 
-                            this.plugin.data.settings.maximumInterval =
-                                numValue;
-                            await this.plugin.savePluginData();
-                        } else {
-                            new Notice("Please provide a valid number.");
-                        }
+                                this.plugin.data.settings.maximumInterval =
+                                    numValue;
+                                await this.plugin.savePluginData();
+                            } else {
+                                new Notice("Please provide a valid number.");
+                            }
+                        });
                     })
-            );
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.maximumInterval =
+                            DEFAULT_SETTINGS.maximumInterval;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
         new Setting(containerEl)
             .setName("Maximum link contribution")
             .setDesc(
-                "Max. contribution of the weighted ease of linked notes to the initial ease (0% <= maxLinkFactor <= 100%)"
+                "Maximum contribution of the weighted ease of linked notes to the initial ease."
             )
-            .addText((text) =>
-                text
+            .addSlider((slider) =>
+                slider
+                    .setLimits(0, 100, 1)
                     .setValue(
-                        `${
-                            getSetting(
-                                "maxLinkFactor",
-                                this.plugin.data.settings
-                            ) * 100
-                        }`
+                        getSetting("maxLinkFactor", this.plugin.data.settings) *
+                            100
                     )
-                    .onChange(async (value) => {
-                        let numValue: number = Number.parseInt(value) / 100;
-                        if (!isNaN(numValue)) {
-                            if (numValue < 0 || numValue > 1.0) {
-                                new Notice(
-                                    "The link factor must be in the range 0% <= maxLinkFactor <= 100%."
-                                );
-                                text.setValue(
-                                    `${
-                                        this.plugin.data.settings
-                                            .maxLinkFactor * 100
-                                    }`
-                                );
-                                return;
-                            }
-
-                            this.plugin.data.settings.maxLinkFactor = numValue;
-                            await this.plugin.savePluginData();
-                        } else {
-                            new Notice("Please provide a valid number.");
-                        }
+                    .setDynamicTooltip()
+                    .onChange(async (value: number) => {
+                        this.plugin.data.settings.maxLinkFactor = value;
+                        await this.plugin.savePluginData();
                     })
-            );
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.maxLinkFactor =
+                            DEFAULT_SETTINGS.maxLinkFactor;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
     }
 }

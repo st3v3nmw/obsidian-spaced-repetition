@@ -7,7 +7,7 @@ import {
     getAllTags,
 } from "obsidian";
 import * as graph from "pagerank.js";
-import { SRSettingTab, DEFAULT_SETTINGS, getSetting } from "./settings";
+import { SRSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { FlashcardModal } from "./flashcard-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "./sidebar";
 import { schedule } from "./sched";
