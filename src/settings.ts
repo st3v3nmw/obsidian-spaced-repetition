@@ -20,7 +20,10 @@ export const DEFAULT_SETTINGS: SRSettings = {
     maxLinkFactor: 1.0,
 };
 
-export function getSetting(settingName: string, settingsObj: SRSettings): any {
+export function getSetting(
+    settingName: keyof SRSettings,
+    settingsObj: SRSettings
+): any {
     let value: any = settingsObj[settingName];
     value ??= DEFAULT_SETTINGS[settingName];
     return value;
@@ -210,7 +213,18 @@ export class SRSettingTab extends PluginSettingTab {
                             new Notice("Please provide a valid number.");
                         }
                     })
-            );
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.baseEase =
+                            DEFAULT_SETTINGS.baseEase;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
         new Setting(containerEl)
             .setName("Interval change when you review a note/concept as hard")
@@ -250,7 +264,18 @@ export class SRSettingTab extends PluginSettingTab {
                             new Notice("Please provide a valid number.");
                         }
                     })
-            );
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.lapsesIntervalChange =
+                            DEFAULT_SETTINGS.lapsesIntervalChange;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
         new Setting(containerEl)
             .setName("Easy bonus")
@@ -287,7 +312,18 @@ export class SRSettingTab extends PluginSettingTab {
                             new Notice("Please provide a valid number.");
                         }
                     })
-            );
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.easyBonus =
+                            DEFAULT_SETTINGS.easyBonus;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
         new Setting(containerEl)
             .setName("Maximum Interval")
@@ -322,7 +358,18 @@ export class SRSettingTab extends PluginSettingTab {
                             new Notice("Please provide a valid number.");
                         }
                     })
-            );
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.maximumInterval =
+                            DEFAULT_SETTINGS.maximumInterval;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
         new Setting(containerEl)
             .setName("Maximum link contribution")
@@ -361,6 +408,17 @@ export class SRSettingTab extends PluginSettingTab {
                             new Notice("Please provide a valid number.");
                         }
                     })
-            );
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.maxLinkFactor =
+                            DEFAULT_SETTINGS.maxLinkFactor;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
     }
 }

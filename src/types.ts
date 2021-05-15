@@ -1,8 +1,6 @@
 import { TFile } from "obsidian";
 
 export interface SRSettings {
-    [key: string]: any;
-
     // flashcards
     flashcardTags: string[];
     singleLineCommentOnSameLine: boolean;
