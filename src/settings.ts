@@ -227,42 +227,21 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName("Interval change when you review a note/concept as hard")
-            .setDesc(
-                "newInterval = oldInterval * intervalChange / 100, 0% < intervalChange < 100%"
-            )
-            .addText((text) =>
-                text
+            .setName("Interval change when you review a flashcard/note as hard")
+            .setDesc("newInterval = oldInterval * intervalChange / 100")
+            .addSlider((slider) =>
+                slider
+                    .setLimits(1, 99, 1)
                     .setValue(
-                        `${
-                            getSetting(
-                                "lapsesIntervalChange",
-                                this.plugin.data.settings
-                            ) * 100
-                        }`
+                        getSetting(
+                            "lapsesIntervalChange",
+                            this.plugin.data.settings
+                        ) * 100
                     )
-                    .onChange(async (value) => {
-                        let numValue: number = Number.parseInt(value) / 100;
-                        if (!isNaN(numValue)) {
-                            if (numValue < 0.01 || numValue > 0.99) {
-                                new Notice(
-                                    "The load balancing threshold must be in the range 0% < intervalChange < 100%."
-                                );
-                                text.setValue(
-                                    `${
-                                        this.plugin.data.settings
-                                            .lapsesIntervalChange * 100
-                                    }`
-                                );
-                                return;
-                            }
-
-                            this.plugin.data.settings.lapsesIntervalChange =
-                                numValue;
-                            await this.plugin.savePluginData();
-                        } else {
-                            new Notice("Please provide a valid number.");
-                        }
+                    .setDynamicTooltip()
+                    .onChange(async (value: number) => {
+                        this.plugin.data.settings.lapsesIntervalChange = value;
+                        await this.plugin.savePluginData();
                     })
             )
             .addExtraButton((button) => {
@@ -280,7 +259,7 @@ export class SRSettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .setName("Easy bonus")
             .setDesc(
-                "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a card (minimum = 100%)"
+                "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%)"
             )
             .addText((text) =>
                 text
@@ -374,39 +353,19 @@ export class SRSettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .setName("Maximum link contribution")
             .setDesc(
-                "Max. contribution of the weighted ease of linked notes to the initial ease (0% <= maxLinkFactor <= 100%)"
+                "Max. contribution of the weighted ease of linked notes to the initial ease"
             )
-            .addText((text) =>
-                text
+            .addSlider((slider) =>
+                slider
+                    .setLimits(0, 100, 1)
                     .setValue(
-                        `${
-                            getSetting(
-                                "maxLinkFactor",
-                                this.plugin.data.settings
-                            ) * 100
-                        }`
+                        getSetting("maxLinkFactor", this.plugin.data.settings) *
+                            100
                     )
-                    .onChange(async (value) => {
-                        let numValue: number = Number.parseInt(value) / 100;
-                        if (!isNaN(numValue)) {
-                            if (numValue < 0 || numValue > 1.0) {
-                                new Notice(
-                                    "The link factor must be in the range 0% <= maxLinkFactor <= 100%."
-                                );
-                                text.setValue(
-                                    `${
-                                        this.plugin.data.settings
-                                            .maxLinkFactor * 100
-                                    }`
-                                );
-                                return;
-                            }
-
-                            this.plugin.data.settings.maxLinkFactor = numValue;
-                            await this.plugin.savePluginData();
-                        } else {
-                            new Notice("Please provide a valid number.");
-                        }
+                    .setDynamicTooltip()
+                    .onChange(async (value: number) => {
+                        this.plugin.data.settings.maxLinkFactor = value;
+                        await this.plugin.savePluginData();
                     })
             )
             .addExtraButton((button) => {
