@@ -33,7 +33,7 @@ export function getSetting(
 let applyDebounceTimer: number = 0;
 function applySettingsUpdate(callback: Function) {
     clearTimeout(applyDebounceTimer);
-    applyDebounceTimer = window.setTimeout(callback, 256);
+    applyDebounceTimer = window.setTimeout(callback, 512);
 }
 
 export class SRSettingTab extends PluginSettingTab {
