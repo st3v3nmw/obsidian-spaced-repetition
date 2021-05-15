@@ -1,13 +1,20 @@
-import { ReviewResponse } from "./types";
+import { ReviewResponse, SRSettings } from "./types";
+import { getSetting } from "./settings";
 
 export function schedule(
     response: ReviewResponse,
     interval: number,
     ease: number,
-    lapsesIntervalChange: number,
-    easyBonus: number,
-    fuzz: boolean = true
+    fuzz: boolean,
+    settingsObj: SRSettings
 ) {
+    let lapsesIntervalChange: number = getSetting(
+        "lapsesIntervalChange",
+        settingsObj
+    );
+    let easyBonus: number = getSetting("easyBonus", settingsObj);
+    let maximumInterval: number = getSetting("maximumInterval", settingsObj);
+
     if (response != ReviewResponse.Good) {
         ease =
             response == ReviewResponse.Easy
@@ -28,6 +35,8 @@ export function schedule(
             interval += fuzz[Math.floor(Math.random() * fuzz.length)];
         }
     }
+
+    interval = Math.min(interval, maximumInterval);
 
     return { interval: Math.round(interval * 10) / 10, ease };
 }

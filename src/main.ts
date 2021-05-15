@@ -7,7 +7,7 @@ import {
     getAllTags,
 } from "obsidian";
 import * as graph from "pagerank.js";
-import { SRSettingTab, DEFAULT_SETTINGS } from "./settings";
+import { SRSettingTab, DEFAULT_SETTINGS, getSetting } from "./settings";
 import { FlashcardModal } from "./flashcard-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "./sidebar";
 import { schedule } from "./sched";
@@ -375,8 +375,8 @@ export default class SRPlugin extends Plugin {
             response,
             interval,
             ease,
-            this.data.settings.lapsesIntervalChange,
-            this.data.settings.easyBonus
+            true,
+            this.data.settings
         );
         interval = Math.round(schedObj.interval);
         ease = schedObj.ease;
@@ -638,17 +638,6 @@ export default class SRPlugin extends Plugin {
 
     async loadPluginData() {
         this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
-
-        // misbehaving settings
-        // after changes to flashcardTags, save the setting the user already has
-        // remove in future (Say, 15th June 2021)
-        if (this.data.settings.flashcardTags == undefined) {
-            this.data.settings.flashcardTags = [
-                //@ts-ignore
-                this.data.settings.flashcardsTag,
-            ];
-            await this.savePluginData();
-        }
     }
 
     async savePluginData() {

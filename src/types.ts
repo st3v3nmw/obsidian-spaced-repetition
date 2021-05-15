@@ -1,6 +1,8 @@
 import { TFile } from "obsidian";
 
 export interface SRSettings {
+    [key: string]: any;
+
     // flashcards
     flashcardTags: string[];
     singleLineCommentOnSameLine: boolean;
@@ -12,9 +14,10 @@ export interface SRSettings {
     disableFileMenuReviewOptions: boolean;
     // algorithm
     baseEase: number;
-    maxLinkFactor: number;
     lapsesIntervalChange: number;
     easyBonus: number;
+    maximumInterval: number;
+    maxLinkFactor: number;
 }
 
 export enum ReviewResponse {
