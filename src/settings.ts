@@ -12,6 +12,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     openRandomNote: false,
     autoNextNote: false,
     disableFileMenuReviewOptions: false,
+    maxNDaysNotesReviewQueue: 365,
     // algorithm
     baseEase: 250,
     lapsesIntervalChange: 0.5,
@@ -31,7 +32,7 @@ export function getSetting(
 
 // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
 let applyDebounceTimer: number = 0;
-function applySettingsUpdate(callback: Function) {
+function applySettingsUpdate(callback: Function): void {
     clearTimeout(applyDebounceTimer);
     applyDebounceTimer = window.setTimeout(callback, 512);
 }
@@ -191,6 +192,52 @@ export class SRSettingTab extends PluginSettingTab {
                         await this.plugin.savePluginData();
                     })
             );
+
+        new Setting(containerEl)
+            .setName("Maximum number of days to display on right panel")
+            .setDesc("Reduce this for a cleaner interface.")
+            .addText((text) =>
+                text
+                    .setValue(
+                        `${getSetting(
+                            "maxNDaysNotesReviewQueue",
+                            this.plugin.data.settings
+                        )}`
+                    )
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            let numValue: number = Number.parseInt(value);
+                            if (!isNaN(numValue)) {
+                                if (numValue < 1) {
+                                    new Notice(
+                                        "The number of days must be at least 1."
+                                    );
+                                    text.setValue(
+                                        `${this.plugin.data.settings.maxNDaysNotesReviewQueue}`
+                                    );
+                                    return;
+                                }
+
+                                this.plugin.data.settings.maxNDaysNotesReviewQueue =
+                                    numValue;
+                                await this.plugin.savePluginData();
+                            } else {
+                                new Notice("Please provide a valid number.");
+                            }
+                        });
+                    })
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.maxNDaysNotesReviewQueue =
+                            DEFAULT_SETTINGS.maxNDaysNotesReviewQueue;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
         containerEl.createDiv().innerHTML = "<h3>Algorithm</h3>";
 

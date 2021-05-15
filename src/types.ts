@@ -10,6 +10,7 @@ export interface SRSettings {
     openRandomNote: boolean;
     autoNextNote: boolean;
     disableFileMenuReviewOptions: boolean;
+    maxNDaysNotesReviewQueue: number;
     // algorithm
     baseEase: number;
     lapsesIntervalChange: number;
