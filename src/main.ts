@@ -123,7 +123,7 @@ export default class SRPlugin extends Plugin {
         }
 
         this.addCommand({
-            id: "note-review-open-note",
+            id: "srs-note-review-open-note",
             name: "Open a note for review",
             callback: () => {
                 this.sync();
@@ -132,7 +132,7 @@ export default class SRPlugin extends Plugin {
         });
 
         this.addCommand({
-            id: "note-review-easy",
+            id: "srs-note-review-easy",
             name: "Review note as easy",
             callback: () => {
                 const openFile = this.app.workspace.getActiveFile();
@@ -142,7 +142,7 @@ export default class SRPlugin extends Plugin {
         });
 
         this.addCommand({
-            id: "note-review-good",
+            id: "srs-note-review-good",
             name: "Review note as good",
             callback: () => {
                 const openFile = this.app.workspace.getActiveFile();
@@ -152,12 +152,21 @@ export default class SRPlugin extends Plugin {
         });
 
         this.addCommand({
-            id: "note-review-hard",
+            id: "srs-note-review-hard",
             name: "Review note as hard",
             callback: () => {
                 const openFile = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension == "md")
                     this.saveReviewResponse(openFile, ReviewResponse.Hard);
+            },
+        });
+
+        this.addCommand({
+            id: "srs-note-review-flashcards",
+            name: "Review flashcards",
+            callback: () => {
+                this.flashcards_sync();
+                new FlashcardModal(this.app, this).open();
             },
         });
 
@@ -492,7 +501,11 @@ export default class SRPlugin extends Plugin {
                 // flashcard already scheduled
                 if (match[3]) {
                     let dueUnix: number = window
-                        .moment(match[3], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
+                        .moment(match[3], [
+                            "YYYY-MM-DD",
+                            "DD-MM-YYYY",
+                            "ddd MMM DD YYYY",
+                        ])
                         .valueOf();
                     if (dueUnix <= now) {
                         cardObj = {
