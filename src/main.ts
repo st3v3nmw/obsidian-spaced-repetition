@@ -28,6 +28,8 @@ import {
     CLOZE_CARD_DETECTOR,
     CLOZE_DELETIONS_EXTRACTOR,
     CLOZE_SCHEDULING_EXTRACTOR,
+    WIKILINK_MEDIA_REGEX,
+    MARKDOWN_LINK_MEDIA_REGEX,
 } from "./constants";
 
 interface PluginData {
@@ -499,8 +501,14 @@ export default class SRPlugin extends Plugin {
                     : CardType.MultiLineBasic;
             for (let match of fileText.matchAll(regex)) {
                 match[0] = match[0].trim();
-                match[1] = match[1].trim();
-                match[2] = match[2].trim();
+                match[1] = await this.fixCardMediaLinks(
+                    match[1].trim(),
+                    note.path
+                );
+                match[2] = await this.fixCardMediaLinks(
+                    match[2].trim(),
+                    note.path
+                );
                 let cardObj: Card;
                 // flashcard already scheduled
                 if (match[3]) {
@@ -578,14 +586,19 @@ export default class SRPlugin extends Plugin {
                     cardText.substring(0, deletionStart) +
                     "<span style='color:#2196f3'>[...]</span>" +
                     cardText.substring(deletionEnd);
-                front = front.replace(/==/gm, "");
+                front = (
+                    await this.fixCardMediaLinks(front, note.path)
+                ).replace(/==/gm, "");
                 let back =
                     cardText.substring(0, deletionStart) +
                     "<span style='color:#2196f3'>" +
                     cardText.substring(deletionStart, deletionEnd) +
                     "</span>" +
                     cardText.substring(deletionEnd);
-                back = back.replace(/==/gm, "");
+                back = (await this.fixCardMediaLinks(back, note.path)).replace(
+                    /==/gm,
+                    ""
+                );
 
                 // card deletion scheduled
                 if (i < scheduling.length) {
@@ -636,6 +649,27 @@ export default class SRPlugin extends Plugin {
         if (fileChanged) await this.app.vault.modify(note, fileText);
     }
 
+    async fixCardMediaLinks(
+        cardText: string,
+        filePath: string
+    ): Promise<string> {
+        for (let regex of [WIKILINK_MEDIA_REGEX, MARKDOWN_LINK_MEDIA_REGEX]) {
+            cardText = cardText.replace(regex, (match, imagePath) => {
+                let fullImagePath = this.app.metadataCache.getFirstLinkpathDest(
+                    decodeURIComponent(imagePath),
+                    filePath
+                ).path;
+                return (
+                    '<img src="' +
+                    this.app.vault.adapter.getResourcePath(fullImagePath) +
+                    '" />'
+                );
+            });
+        }
+
+        return cardText;
+    }
+
     async loadPluginData() {
         this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
     }
@@ -660,7 +694,7 @@ function addContextToCard(
     cardObj: Card,
     cardOffset: number,
     headings: HeadingCache[]
-) {
+): void {
     let stack: HeadingCache[] = [];
     for (let heading of headings) {
         if (heading.position.start.offset > cardOffset) break;
