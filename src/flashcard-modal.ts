@@ -1,7 +1,7 @@
 import { Modal, App, MarkdownRenderer, Notice, Platform } from "obsidian";
 import type SRPlugin from "./main";
 import { Card, CardType, FlashcardModalMode, ReviewResponse } from "./types";
-import { schedule } from "./sched";
+import { schedule, textInterval } from "./sched";
 import { CLOZE_SCHEDULING_EXTRACTOR } from "./constants";
 
 export class FlashcardModal extends Modal {
@@ -226,13 +226,19 @@ export class FlashcardModal extends Modal {
             ).interval;
 
             if (Platform.isMobile) {
-                this.hardBtn.setText(`${hardInterval}d`);
-                this.goodBtn.setText(`${goodInterval}d`);
-                this.easyBtn.setText(`${easyInterval}d`);
+                this.hardBtn.setText(textInterval(hardInterval, true));
+                this.goodBtn.setText(textInterval(goodInterval, true));
+                this.easyBtn.setText(textInterval(easyInterval, true));
             } else {
-                this.hardBtn.setText(`Hard - ${hardInterval} day(s)`);
-                this.goodBtn.setText(`Good - ${goodInterval} day(s)`);
-                this.easyBtn.setText(`Easy - ${easyInterval} day(s)`);
+                this.hardBtn.setText(
+                    `Hard - ${textInterval(hardInterval, false)}`
+                );
+                this.goodBtn.setText(
+                    `Good - ${textInterval(goodInterval, false)}`
+                );
+                this.easyBtn.setText(
+                    `Easy - ${textInterval(easyInterval, false)}`
+                );
             }
         } else if (this.plugin.newFlashcards[this.currentDeck].length > 0) {
             this.currentCard = this.plugin.newFlashcards[this.currentDeck][0];
@@ -248,9 +254,9 @@ export class FlashcardModal extends Modal {
                 this.goodBtn.setText("2.5d");
                 this.easyBtn.setText("3.5d");
             } else {
-                this.hardBtn.setText("Hard - 1.0 day(s)");
-                this.goodBtn.setText("Good - 2.5 day(s)");
-                this.easyBtn.setText("Easy - 3.5 day(s)");
+                this.hardBtn.setText("Hard - 1.0 day");
+                this.goodBtn.setText("Good - 2.5 days");
+                this.easyBtn.setText("Easy - 3.5 days");
             }
         }
 
@@ -386,12 +392,14 @@ export class FlashcardModal extends Modal {
 
     buryRelatedCards(arr: Card[]) {
         for (let relatedCard of arr) {
-            let dueIdx = this.plugin.dueFlashcards[this.currentDeck].indexOf(
-                relatedCard
-            );
-            let newIdx = this.plugin.newFlashcards[this.currentDeck].indexOf(
-                relatedCard
-            );
+            let dueIdx =
+                this.plugin.dueFlashcards[this.currentDeck].indexOf(
+                    relatedCard
+                );
+            let newIdx =
+                this.plugin.newFlashcards[this.currentDeck].indexOf(
+                    relatedCard
+                );
 
             if (dueIdx != -1)
                 this.plugin.dueFlashcards[this.currentDeck].splice(dueIdx, 1);
