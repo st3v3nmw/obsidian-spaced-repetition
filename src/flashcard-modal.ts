@@ -3,6 +3,7 @@ import type SRPlugin from "./main";
 import { Card, CardType, FlashcardModalMode, ReviewResponse } from "./types";
 import { schedule, textInterval } from "./sched";
 import { CLOZE_SCHEDULING_EXTRACTOR } from "./constants";
+import { getSetting } from "./settings";
 
 export class FlashcardModal extends Modal {
     private plugin: SRPlugin;
@@ -204,25 +205,22 @@ export class FlashcardModal extends Modal {
                 ReviewResponse.Hard,
                 this.currentCard.interval,
                 this.currentCard.ease,
-                this.plugin.data.settings.lapsesIntervalChange,
-                this.plugin.data.settings.easyBonus,
-                false
+                false,
+                this.plugin.data.settings
             ).interval;
             let goodInterval = schedule(
                 ReviewResponse.Good,
                 this.currentCard.interval,
                 this.currentCard.ease,
-                this.plugin.data.settings.lapsesIntervalChange,
-                this.plugin.data.settings.easyBonus,
-                false
+                false,
+                this.plugin.data.settings
             ).interval;
             let easyInterval = schedule(
                 ReviewResponse.Easy,
                 this.currentCard.interval,
                 this.currentCard.ease,
-                this.plugin.data.settings.lapsesIntervalChange,
-                this.plugin.data.settings.easyBonus,
-                false
+                false,
+                this.plugin.data.settings
             ).interval;
 
             if (Platform.isMobile) {
@@ -297,8 +295,8 @@ export class FlashcardModal extends Modal {
                     response,
                     this.currentCard.interval,
                     this.currentCard.ease,
-                    this.plugin.data.settings.lapsesIntervalChange,
-                    this.plugin.data.settings.easyBonus
+                    true,
+                    this.plugin.data.settings
                 );
                 interval = Math.round(schedObj.interval);
                 ease = schedObj.ease;
@@ -306,9 +304,9 @@ export class FlashcardModal extends Modal {
                 let schedObj = schedule(
                     response,
                     1,
-                    this.plugin.data.settings.baseEase,
-                    this.plugin.data.settings.lapsesIntervalChange,
-                    this.plugin.data.settings.easyBonus
+                    getSetting("baseEase", this.plugin.data.settings),
+                    true,
+                    this.plugin.data.settings
                 );
                 this.plugin.newFlashcards[this.currentDeck].splice(0, 1);
                 interval = Math.round(schedObj.interval);

@@ -14,10 +14,17 @@ export const DEFAULT_SETTINGS: SRSettings = {
     disableFileMenuReviewOptions: false,
     // algorithm
     baseEase: 250,
-    maxLinkFactor: 1.0,
     lapsesIntervalChange: 0.5,
     easyBonus: 1.3,
+    maximumInterval: 36525,
+    maxLinkFactor: 1.0,
 };
+
+export function getSetting(settingName: string, settingsObj: SRSettings): any {
+    let value: any = settingsObj[settingName];
+    value ??= DEFAULT_SETTINGS[settingName];
+    return value;
+}
 
 export class SRSettingTab extends PluginSettingTab {
     private plugin: SRPlugin;
@@ -48,12 +55,14 @@ export class SRSettingTab extends PluginSettingTab {
             .addTextArea((text) =>
                 text
                     .setValue(
-                        `${this.plugin.data.settings.flashcardTags.join(" ")}`
+                        `${getSetting(
+                            "flashcardTags",
+                            this.plugin.data.settings
+                        ).join(" ")}`
                     )
                     .onChange(async (value) => {
-                        this.plugin.data.settings.flashcardTags = value.split(
-                            " "
-                        );
+                        this.plugin.data.settings.flashcardTags =
+                            value.split(" ");
                         await this.plugin.savePluginData();
                     })
             );
@@ -68,10 +77,14 @@ export class SRSettingTab extends PluginSettingTab {
             .addToggle((toggle) =>
                 toggle
                     .setValue(
-                        this.plugin.data.settings.singleLineCommentOnSameLine
+                        getSetting(
+                            "singleLineCommentOnSameLine",
+                            this.plugin.data.settings
+                        )
                     )
                     .onChange(async (value) => {
-                        this.plugin.data.settings.singleLineCommentOnSameLine = value;
+                        this.plugin.data.settings.singleLineCommentOnSameLine =
+                            value;
                         await this.plugin.savePluginData();
                     })
             );
@@ -81,7 +94,12 @@ export class SRSettingTab extends PluginSettingTab {
             .setDesc("This applies to other cloze deletions in cloze cards")
             .addToggle((toggle) =>
                 toggle
-                    .setValue(this.plugin.data.settings.buryRelatedCards)
+                    .setValue(
+                        getSetting(
+                            "buryRelatedCards",
+                            this.plugin.data.settings
+                        )
+                    )
                     .onChange(async (value) => {
                         this.plugin.data.settings.buryRelatedCards = value;
                         await this.plugin.savePluginData();
@@ -96,12 +114,14 @@ export class SRSettingTab extends PluginSettingTab {
             .addTextArea((text) =>
                 text
                     .setValue(
-                        `${this.plugin.data.settings.tagsToReview.join(" ")}`
+                        `${getSetting(
+                            "tagsToReview",
+                            this.plugin.data.settings
+                        ).join(" ")}`
                     )
                     .onChange(async (value) => {
-                        this.plugin.data.settings.tagsToReview = value.split(
-                            " "
-                        );
+                        this.plugin.data.settings.tagsToReview =
+                            value.split(" ");
                         await this.plugin.savePluginData();
                     })
             );
@@ -113,7 +133,9 @@ export class SRSettingTab extends PluginSettingTab {
             )
             .addToggle((toggle) =>
                 toggle
-                    .setValue(this.plugin.data.settings.openRandomNote)
+                    .setValue(
+                        getSetting("openRandomNote", this.plugin.data.settings)
+                    )
                     .onChange(async (value) => {
                         this.plugin.data.settings.openRandomNote = value;
                         await this.plugin.savePluginData();
@@ -125,7 +147,9 @@ export class SRSettingTab extends PluginSettingTab {
             .setDesc("For faster reviews")
             .addToggle((toggle) =>
                 toggle
-                    .setValue(this.plugin.data.settings.autoNextNote)
+                    .setValue(
+                        getSetting("autoNextNote", this.plugin.data.settings)
+                    )
                     .onChange(async (value) => {
                         this.plugin.data.settings.autoNextNote = value;
                         await this.plugin.savePluginData();
@@ -142,10 +166,14 @@ export class SRSettingTab extends PluginSettingTab {
             .addToggle((toggle) =>
                 toggle
                     .setValue(
-                        this.plugin.data.settings.disableFileMenuReviewOptions
+                        getSetting(
+                            "disableFileMenuReviewOptions",
+                            this.plugin.data.settings
+                        )
                     )
                     .onChange(async (value) => {
-                        this.plugin.data.settings.disableFileMenuReviewOptions = value;
+                        this.plugin.data.settings.disableFileMenuReviewOptions =
+                            value;
                         await this.plugin.savePluginData();
                     })
             );
@@ -160,7 +188,9 @@ export class SRSettingTab extends PluginSettingTab {
             .setDesc("minimum = 130, preferrably approximately 250")
             .addText((text) =>
                 text
-                    .setValue(`${this.plugin.data.settings.baseEase}`)
+                    .setValue(
+                        `${getSetting("baseEase", this.plugin.data.settings)}`
+                    )
                     .onChange(async (value) => {
                         let numValue: number = Number.parseInt(value);
                         if (!isNaN(numValue)) {
@@ -191,7 +221,10 @@ export class SRSettingTab extends PluginSettingTab {
                 text
                     .setValue(
                         `${
-                            this.plugin.data.settings.lapsesIntervalChange * 100
+                            getSetting(
+                                "lapsesIntervalChange",
+                                this.plugin.data.settings
+                            ) * 100
                         }`
                     )
                     .onChange(async (value) => {
@@ -210,7 +243,8 @@ export class SRSettingTab extends PluginSettingTab {
                                 return;
                             }
 
-                            this.plugin.data.settings.lapsesIntervalChange = numValue;
+                            this.plugin.data.settings.lapsesIntervalChange =
+                                numValue;
                             await this.plugin.savePluginData();
                         } else {
                             new Notice("Please provide a valid number.");
@@ -225,7 +259,12 @@ export class SRSettingTab extends PluginSettingTab {
             )
             .addText((text) =>
                 text
-                    .setValue(`${this.plugin.data.settings.easyBonus * 100}`)
+                    .setValue(
+                        `${
+                            getSetting("easyBonus", this.plugin.data.settings) *
+                            100
+                        }`
+                    )
                     .onChange(async (value) => {
                         let numValue: number = Number.parseInt(value) / 100;
                         if (!isNaN(numValue)) {
@@ -251,6 +290,41 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
+            .setName("Maximum Interval")
+            .setDesc(
+                "Allows you to place an upper limit on the interval (default = 100 years)"
+            )
+            .addText((text) =>
+                text
+                    .setValue(
+                        `${getSetting(
+                            "maximumInterval",
+                            this.plugin.data.settings
+                        )}`
+                    )
+                    .onChange(async (value) => {
+                        let numValue: number = Number.parseInt(value);
+                        if (!isNaN(numValue)) {
+                            if (numValue < 1) {
+                                new Notice(
+                                    "The maximum interval must be at least 1 day."
+                                );
+                                text.setValue(
+                                    `${this.plugin.data.settings.maximumInterval}`
+                                );
+                                return;
+                            }
+
+                            this.plugin.data.settings.maximumInterval =
+                                numValue;
+                            await this.plugin.savePluginData();
+                        } else {
+                            new Notice("Please provide a valid number.");
+                        }
+                    })
+            );
+
+        new Setting(containerEl)
             .setName("Maximum link contribution")
             .setDesc(
                 "Max. contribution of the weighted ease of linked notes to the initial ease (0% <= maxLinkFactor <= 100%)"
@@ -258,7 +332,12 @@ export class SRSettingTab extends PluginSettingTab {
             .addText((text) =>
                 text
                     .setValue(
-                        `${this.plugin.data.settings.maxLinkFactor * 100}`
+                        `${
+                            getSetting(
+                                "maxLinkFactor",
+                                this.plugin.data.settings
+                            ) * 100
+                        }`
                     )
                     .onChange(async (value) => {
                         let numValue: number = Number.parseInt(value) / 100;
