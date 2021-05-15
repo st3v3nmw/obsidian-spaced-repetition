@@ -31,3 +31,19 @@ export function schedule(
 
     return { interval: Math.round(interval * 10) / 10, ease };
 }
+
+export function textInterval(interval: number, isMobile: boolean): string {
+    let m = Math.round(interval / 3) / 10;
+    let y = Math.round(interval / 36.5) / 10;
+
+    if (isMobile) {
+        if (interval < 30) return `${interval}d`;
+        else if (interval < 365) return `${m}m`;
+        else return `${y}y`;
+    } else {
+        if (interval < 30)
+            return interval == 1.0 ? "1.0 day" : `${interval} days`;
+        else if (interval < 365) return m == 1.0 ? "1.0 month" : `${m} months`;
+        else return y == 1.0 ? "1.0 year" : `${y} years`;
+    }
+}

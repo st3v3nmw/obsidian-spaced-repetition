@@ -285,8 +285,10 @@ export default class SRPlugin extends Plugin {
             }
         );
 
+        let noteCountText = this.dueNotesCount == 1 ? "note" : "notes";
+        let cardCountText = this.dueFlashcardsCount == 1 ? "card" : "cards";
         this.statusBar.setText(
-            `Review: ${this.dueNotesCount} note(s), ${this.dueFlashcardsCount} card(s) due`
+            `Review: ${this.dueNotesCount} ${noteCountText}, ${this.dueFlashcardsCount} ${cardCountText} due`
         );
         this.reviewQueueView.redraw();
     }
@@ -470,8 +472,10 @@ export default class SRPlugin extends Plugin {
                 return obj;
             }, {});
 
+        let noteCountText = this.dueNotesCount == 1 ? "note" : "notes";
+        let cardCountText = this.dueFlashcardsCount == 1 ? "card" : "cards";
         this.statusBar.setText(
-            `Review: ${this.dueNotesCount} note(s), ${this.dueFlashcardsCount} card(s) due`
+            `Review: ${this.dueNotesCount} ${noteCountText}, ${this.dueFlashcardsCount} ${cardCountText} due`
         );
     }
 
