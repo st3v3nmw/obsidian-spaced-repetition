@@ -5,7 +5,7 @@ export const YAML_FRONT_MATTER_REGEX = /^---\n((?:.*\n)*?)---/;
 export const SINGLELINE_CARD_REGEX =
     /^(.+)::(.+?)\n?(?:<!--SR:(.+),(\d+),(\d+)-->|$)/gm;
 export const MULTILINE_CARD_REGEX =
-    /^((?:.+\n)+)\?\n((?:.+\n)+?)(?:<!--SR:(.+),(\d+),(\d+)-->|$)/gm;
+    /^((?:.+\n)+)\?\n((?:.+?\n?)+?)(?:<!--SR:(.+),(\d+),(\d+)-->|$)/gm;
 export const CLOZE_CARD_DETECTOR = /(?:.+\n)*^.*?==.*?==.*\n(?:.+\n?)*/gm; // card must have at least one cloze
 export const CLOZE_DELETIONS_EXTRACTOR = /==(.*?)==/gm;
 export const CLOZE_SCHEDULING_EXTRACTOR = /!([\d-]+),(\d+),(\d+)/gm;
