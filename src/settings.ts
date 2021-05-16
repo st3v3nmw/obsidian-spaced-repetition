@@ -1,12 +1,17 @@
 import { Notice, PluginSettingTab, Setting, App } from "obsidian";
 import type SRPlugin from "./main";
 import { SRSettings } from "./types";
+import { escapeRegexString } from "./utils";
 
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
     flashcardTags: ["#flashcards"],
     cardCommentOnSameLine: false,
     buryRelatedCards: false,
+    singlelineCardSeparator: "::",
+    singlelineReversedCardSeparator: ":::",
+    multilineCardSeparator: "?",
+    multilineReversedCardSeparator: "??",
     // notes
     tagsToReview: ["#review"],
     openRandomNote: false,
@@ -117,6 +122,84 @@ export class SRSettingTab extends PluginSettingTab {
                         await this.plugin.savePluginData();
                     })
             );
+
+        new Setting(containerEl)
+            .setName("Separator for inline flashcards")
+            .setDesc(
+                "Note that after changing this you have to manually edit any flashcards you already have."
+            )
+            .addText((text) =>
+                text
+                    .setValue(
+                        `${getSetting(
+                            "singlelineCardSeparator",
+                            this.plugin.data.settings
+                        )}`
+                    )
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.singlelineCardSeparator =
+                                value;
+                            await this.plugin.savePluginData();
+                            this.plugin.singlelineCardRegex = new RegExp(
+                                `^(.+)${escapeRegexString(
+                                    value
+                                )}(.+?)\\n?(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
+                                "gm"
+                            );
+                        });
+                    })
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.singlelineCardSeparator =
+                            DEFAULT_SETTINGS.singlelineCardSeparator;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
+
+        new Setting(containerEl)
+            .setName("Separator for multiline flashcards")
+            .setDesc(
+                "Note that after changing this you have to manually edit any flashcards you already have."
+            )
+            .addText((text) =>
+                text
+                    .setValue(
+                        `${getSetting(
+                            "multilineCardSeparator",
+                            this.plugin.data.settings
+                        )}`
+                    )
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.multilineCardSeparator =
+                                value;
+                            await this.plugin.savePluginData();
+                            this.plugin.multilineCardRegex = new RegExp(
+                                `^((?:.+\\n)+)${escapeRegexString(
+                                    value
+                                )}\\n((?:.+?\\n?)+?)(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
+                                "gm"
+                            );
+                        });
+                    })
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.multilineCardSeparator =
+                            DEFAULT_SETTINGS.multilineCardSeparator;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
         containerEl.createDiv().innerHTML = "<h3>Notes</h3>";
 
