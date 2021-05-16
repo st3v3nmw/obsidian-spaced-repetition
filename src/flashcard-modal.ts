@@ -4,6 +4,7 @@ import { Card, CardType, FlashcardModalMode, ReviewResponse } from "./types";
 import { schedule, textInterval } from "./sched";
 import { CLOZE_SCHEDULING_EXTRACTOR } from "./constants";
 import { getSetting } from "./settings";
+import { escapeRegexString } from "./utils";
 
 export class FlashcardModal extends Modal {
     private plugin: SRPlugin;
@@ -327,7 +328,7 @@ export class FlashcardModal extends Modal {
 
         let fileText = await this.app.vault.read(this.currentCard.note);
         let replacementRegex = new RegExp(
-            this.currentCard.cardText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), // escape string
+            escapeRegexString(this.currentCard.cardText),
             "gm"
         );
 

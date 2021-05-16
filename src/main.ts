@@ -7,7 +7,7 @@ import {
     getAllTags,
 } from "obsidian";
 import * as graph from "pagerank.js";
-import { SRSettingTab, DEFAULT_SETTINGS } from "./settings";
+import { SRSettingTab, DEFAULT_SETTINGS, getSetting } from "./settings";
 import { FlashcardModal } from "./flashcard-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "./sidebar";
 import { schedule } from "./sched";
@@ -23,14 +23,13 @@ import {
     CROSS_HAIRS_ICON,
     SCHEDULING_INFO_REGEX,
     YAML_FRONT_MATTER_REGEX,
-    SINGLELINE_CARD_REGEX,
-    MULTILINE_CARD_REGEX,
     CLOZE_CARD_DETECTOR,
     CLOZE_DELETIONS_EXTRACTOR,
     CLOZE_SCHEDULING_EXTRACTOR,
     WIKILINK_MEDIA_REGEX,
     MARKDOWN_LINK_MEDIA_REGEX,
 } from "./constants";
+import { escapeRegexString } from "./utils";
 
 interface PluginData {
     settings: SRSettings;
@@ -57,6 +56,9 @@ export default class SRPlugin extends Plugin {
     public dueFlashcards: Record<string, Card[]> = {}; // <deck name, Card[]>
     public dueFlashcardsCount: number = 0;
 
+    public singlelineCardRegex: RegExp;
+    public multilineCardRegex: RegExp;
+
     async onload() {
         await this.loadPluginData();
 
@@ -70,6 +72,23 @@ export default class SRPlugin extends Plugin {
             this.sync();
             this.reviewNextNote();
         });
+
+        this.singlelineCardRegex = new RegExp(
+            `^(.+)${escapeRegexString(
+                getSetting("singlelineCardSeparator", this.data.settings)
+            )}(.+?)\\n?(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
+            "gm"
+        );
+
+        this.multilineCardRegex = new RegExp(
+            `^((?:.+\\n)+)${escapeRegexString(
+                getSetting("multilineCardSeparator", this.data.settings)
+            )}\\n((?:.+?\\n?)+?)(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
+            "gm"
+        );
+
+        console.log(this.singlelineCardRegex);
+        console.log(this.multilineCardRegex);
 
         this.addRibbonIcon("crosshairs", "Review flashcards", async () => {
             await this.flashcards_sync();
@@ -494,9 +513,9 @@ export default class SRPlugin extends Plugin {
 
         let now = Date.now();
         // basic cards
-        for (let regex of [SINGLELINE_CARD_REGEX, MULTILINE_CARD_REGEX]) {
+        for (let regex of [this.singlelineCardRegex, this.multilineCardRegex]) {
             let cardType: CardType =
-                regex == SINGLELINE_CARD_REGEX
+                regex == this.singlelineCardRegex
                     ? CardType.SingleLineBasic
                     : CardType.MultiLineBasic;
             for (let match of fileText.matchAll(regex)) {
@@ -569,7 +588,7 @@ export default class SRPlugin extends Plugin {
                 newCardText += "-->\n";
 
                 let replacementRegex = new RegExp(
-                    cardText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), // escape string
+                    escapeRegexString(cardText),
                     "gm"
                 );
                 fileText = fileText.replace(replacementRegex, newCardText);

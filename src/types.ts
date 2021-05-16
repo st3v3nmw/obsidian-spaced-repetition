@@ -5,6 +5,10 @@ export interface SRSettings {
     flashcardTags: string[];
     cardCommentOnSameLine: boolean;
     buryRelatedCards: boolean;
+    singlelineCardSeparator: string;
+    singlelineReversedCardSeparator: string;
+    multilineCardSeparator: string;
+    multilineReversedCardSeparator: string;
     // notes
     tagsToReview: string[];
     openRandomNote: boolean;
