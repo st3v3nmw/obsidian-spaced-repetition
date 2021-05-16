@@ -87,9 +87,6 @@ export default class SRPlugin extends Plugin {
             "gm"
         );
 
-        console.log(this.singlelineCardRegex);
-        console.log(this.multilineCardRegex);
-
         this.addRibbonIcon("crosshairs", "Review flashcards", async () => {
             await this.flashcards_sync();
             new FlashcardModal(this.app, this).open();

@@ -375,12 +375,22 @@ export class FlashcardModal extends Modal {
             if (this.currentCard.cardType == CardType.SingleLineBasic) {
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${this.currentCard.front}::${this.currentCard.back}${sep}<!--SR:${dueString},${interval},${ease}-->`
+                    `${this.currentCard.front}${getSetting(
+                        "singlelineCardSeparator",
+                        this.plugin.data.settings
+                    )}${
+                        this.currentCard.back
+                    }${sep}<!--SR:${dueString},${interval},${ease}-->`
                 );
             } else {
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${this.currentCard.front}\n?\n${this.currentCard.back}${sep}<!--SR:${dueString},${interval},${ease}-->`
+                    `${this.currentCard.front}\n${getSetting(
+                        "multilineCardSeparator",
+                        this.plugin.data.settings
+                    )}\n${
+                        this.currentCard.back
+                    }${sep}<!--SR:${dueString},${interval},${ease}-->`
                 );
             }
         }
