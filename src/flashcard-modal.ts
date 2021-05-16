@@ -331,11 +331,15 @@ export class FlashcardModal extends Modal {
             "gm"
         );
 
+        let sep = getSetting("cardCommentOnSameLine", this.plugin.data.settings)
+            ? " "
+            : "\n";
+
         if (this.currentCard.cardType == CardType.Cloze) {
             let schedIdx = this.currentCard.cardText.lastIndexOf("<!--SR:");
             if (schedIdx == -1) {
                 // first time adding scheduling information to flashcard
-                this.currentCard.cardText = `${this.currentCard.cardText}\n<!--SR:!${dueString},${interval},${ease}-->`;
+                this.currentCard.cardText = `${this.currentCard.cardText}${sep}<!--SR:!${dueString},${interval},${ease}-->`;
             } else {
                 let scheduling = [
                     ...this.currentCard.cardText.matchAll(
@@ -368,10 +372,6 @@ export class FlashcardModal extends Modal {
                 this.buryRelatedCards(this.currentCard.relatedCards);
         } else {
             if (this.currentCard.cardType == CardType.SingleLineBasic) {
-                let sep = this.plugin.data.settings.singleLineCommentOnSameLine
-                    ? " "
-                    : "\n";
-
                 fileText = fileText.replace(
                     replacementRegex,
                     `${this.currentCard.front}::${this.currentCard.back}${sep}<!--SR:${dueString},${interval},${ease}-->`
@@ -379,7 +379,7 @@ export class FlashcardModal extends Modal {
             } else {
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${this.currentCard.front}\n?\n${this.currentCard.back}\n<!--SR:${dueString},${interval},${ease}-->`
+                    `${this.currentCard.front}\n?\n${this.currentCard.back}${sep}<!--SR:${dueString},${interval},${ease}-->`
                 );
             }
         }

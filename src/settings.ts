@@ -5,7 +5,7 @@ import { SRSettings } from "./types";
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
     flashcardTags: ["#flashcards"],
-    singleLineCommentOnSameLine: false,
+    cardCommentOnSameLine: false,
     buryRelatedCards: false,
     // notes
     tagsToReview: ["#review"],
@@ -82,7 +82,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName(
-                "Save scheduling comment for single-line flashcards on the same line?"
+                "Save scheduling comment on the same line as the flashcard's last line?"
             )
             .setDesc(
                 "Turning this on will make the HTML comments not break list formatting."
@@ -91,13 +91,12 @@ export class SRSettingTab extends PluginSettingTab {
                 toggle
                     .setValue(
                         getSetting(
-                            "singleLineCommentOnSameLine",
+                            "cardCommentOnSameLine",
                             this.plugin.data.settings
                         )
                     )
                     .onChange(async (value) => {
-                        this.plugin.data.settings.singleLineCommentOnSameLine =
-                            value;
+                        this.plugin.data.settings.cardCommentOnSameLine = value;
                         await this.plugin.savePluginData();
                     })
             );

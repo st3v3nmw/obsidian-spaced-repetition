@@ -3,7 +3,7 @@ import { TFile } from "obsidian";
 export interface SRSettings {
     // flashcards
     flashcardTags: string[];
-    singleLineCommentOnSameLine: boolean;
+    cardCommentOnSameLine: boolean;
     buryRelatedCards: boolean;
     // notes
     tagsToReview: string[];
