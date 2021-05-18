@@ -659,7 +659,8 @@ export default class SRPlugin extends Plugin {
                 }
 
                 relatedCards.push(cardObj);
-                addContextToCard(cardObj, match.index, headings);
+                if (getSetting("showContextInCards", this.plugin.data.settings))
+                    addContextToCard(cardObj, match.index, headings);
             }
         }
 
