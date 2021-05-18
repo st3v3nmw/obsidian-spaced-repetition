@@ -180,10 +180,10 @@ export default class SRPlugin extends Plugin {
         });
 
         this.addCommand({
-            id: "srs-note-review-flashcards",
+            id: "srs-review-flashcards",
             name: "Review flashcards",
-            callback: () => {
-                this.flashcards_sync();
+            callback: async () => {
+                await this.flashcards_sync();
                 new FlashcardModal(this.app, this).open();
             },
         });
