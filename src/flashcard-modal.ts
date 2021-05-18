@@ -130,9 +130,11 @@ export class FlashcardModal extends Modal {
         this.resetLinkView.style.float = "right";
         this.contentEl.appendChild(this.resetLinkView);
 
-        this.contextView = document.createElement("div");
-        this.contextView.setAttribute("id", "sr-context");
-        this.contentEl.appendChild(this.contextView);
+        if (getSetting("showContextInCards", this.plugin.data.settings)) {
+            this.contextView = document.createElement("div");
+            this.contextView.setAttribute("id", "sr-context");
+            this.contentEl.appendChild(this.contextView);
+        }
 
         this.flashcardView = document.createElement("div");
         this.flashcardView.setAttribute("id", "sr-flashcard-view");
@@ -259,7 +261,8 @@ export class FlashcardModal extends Modal {
             }
         }
 
-        this.contextView.setText(this.currentCard.context);
+        if (getSetting("showContextInCards", this.plugin.data.settings))
+            this.contextView.setText(this.currentCard.context);
     }
 
     showAnswer() {

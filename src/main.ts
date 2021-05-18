@@ -564,7 +564,8 @@ export default class SRPlugin extends Plugin {
                     this.newFlashcardsCount++;
                 }
 
-                addContextToCard(cardObj, match.index, headings);
+                if (getSetting("showContextInCards", this.data.settings))
+                    addContextToCard(cardObj, match.index, headings);
             }
         }
 

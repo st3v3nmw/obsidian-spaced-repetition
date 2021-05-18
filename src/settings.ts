@@ -8,6 +8,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardTags: ["#flashcards"],
     cardCommentOnSameLine: false,
     buryRelatedCards: false,
+    showContextInCards: true,
     singlelineCardSeparator: "::",
     singlelineReversedCardSeparator: ":::",
     multilineCardSeparator: "?",
@@ -119,6 +120,23 @@ export class SRSettingTab extends PluginSettingTab {
                     )
                     .onChange(async (value) => {
                         this.plugin.data.settings.buryRelatedCards = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Show context in cards?")
+            .setDesc("i.e. Title > Heading 1 > Subheading > ... > Subheading")
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(
+                        getSetting(
+                            "showContextInCards",
+                            this.plugin.data.settings
+                        )
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.showContextInCards = value;
                         await this.plugin.savePluginData();
                     })
             );

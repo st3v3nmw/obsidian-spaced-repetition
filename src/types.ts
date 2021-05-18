@@ -5,6 +5,7 @@ export interface SRSettings {
     flashcardTags: string[];
     cardCommentOnSameLine: boolean;
     buryRelatedCards: boolean;
+    showContextInCards: boolean;
     singlelineCardSeparator: string;
     singlelineReversedCardSeparator: string;
     multilineCardSeparator: string;
