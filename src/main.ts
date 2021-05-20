@@ -527,7 +527,6 @@ export default class SRPlugin extends Plugin {
                     match[2].trim(),
                     note.path
                 );
-                console.log("front", front);
                 let cardObj: Card;
                 // flashcard already scheduled
                 if (match[3]) {
@@ -567,7 +566,6 @@ export default class SRPlugin extends Plugin {
                         originalBackText,
                         cardType,
                     };
-                    console.log("cardObj", cardObj);
                     this.newFlashcards[deck].push(cardObj);
                     this.newFlashcardsCount++;
                 }
