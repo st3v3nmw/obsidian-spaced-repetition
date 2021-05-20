@@ -516,15 +516,18 @@ export default class SRPlugin extends Plugin {
                     ? CardType.SingleLineBasic
                     : CardType.MultiLineBasic;
             for (let match of fileText.matchAll(regex)) {
-                match[0] = match[0].trim();
-                match[1] = await this.fixCardMediaLinks(
+                let cardText = match[0].trim();
+                let originalFrontText = match[1].trim();
+                let front = await this.fixCardMediaLinks(
                     match[1].trim(),
                     note.path
                 );
-                match[2] = await this.fixCardMediaLinks(
+                let originalBackText = match[2].trim();
+                let back = await this.fixCardMediaLinks(
                     match[2].trim(),
                     note.path
                 );
+                console.log("front", front);
                 let cardObj: Card;
                 // flashcard already scheduled
                 if (match[3]) {
@@ -541,10 +544,12 @@ export default class SRPlugin extends Plugin {
                             interval: parseInt(match[4]),
                             ease: parseInt(match[5]),
                             note,
-                            front: match[1],
-                            back: match[2],
-                            cardText: match[0],
+                            front,
+                            back,
+                            cardText,
                             context: "",
+                            originalFrontText,
+                            originalBackText,
                             cardType,
                         };
                         this.dueFlashcards[deck].push(cardObj);
@@ -554,12 +559,15 @@ export default class SRPlugin extends Plugin {
                     cardObj = {
                         isDue: false,
                         note,
-                        front: match[1],
-                        back: match[2],
-                        cardText: match[0],
+                        front,
+                        back,
+                        cardText,
                         context: "",
+                        originalFrontText,
+                        originalBackText,
                         cardType,
                     };
+                    console.log("cardObj", cardObj);
                     this.newFlashcards[deck].push(cardObj);
                     this.newFlashcardsCount++;
                 }
@@ -632,6 +640,8 @@ export default class SRPlugin extends Plugin {
                             back,
                             cardText: match[0],
                             context: "",
+                            originalFrontText: "",
+                            originalBackText: "",
                             cardType: CardType.Cloze,
                             subCardIdx: i,
                             relatedCards,
@@ -649,6 +659,8 @@ export default class SRPlugin extends Plugin {
                         back,
                         cardText: match[0],
                         context: "",
+                        originalFrontText: "",
+                        originalBackText: "",
                         cardType: CardType.Cloze,
                         subCardIdx: i,
                         relatedCards,
@@ -659,7 +671,7 @@ export default class SRPlugin extends Plugin {
                 }
 
                 relatedCards.push(cardObj);
-                if (getSetting("showContextInCards", this.plugin.data.settings))
+                if (getSetting("showContextInCards", this.data.settings))
                     addContextToCard(cardObj, match.index, headings);
             }
         }
