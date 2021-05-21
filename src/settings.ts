@@ -9,9 +9,14 @@ export const DEFAULT_SETTINGS: SRSettings = {
     cardCommentOnSameLine: false,
     buryRelatedCards: false,
     showContextInCards: true,
+    disableClozeCards: false,
+    disableSinglelineCards: false,
     singlelineCardSeparator: "::",
+    disableSinglelineReversedCards: false,
     singlelineReversedCardSeparator: ":::",
+    disableMultilineCards: false,
     multilineCardSeparator: "?",
+    disableMultilineReversedCards: false,
     multilineReversedCardSeparator: "??",
     // notes
     tagsToReview: ["#review"],
@@ -137,6 +142,25 @@ export class SRSettingTab extends PluginSettingTab {
                     )
                     .onChange(async (value) => {
                         this.plugin.data.settings.showContextInCards = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Disable cloze cards?")
+            .setDesc(
+                "If you're not currently using 'em & would like the plugin to run a tad faster."
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(
+                        getSetting(
+                            "disableClozeCards",
+                            this.plugin.data.settings
+                        )
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.disableClozeCards = value;
                         await this.plugin.savePluginData();
                     })
             );

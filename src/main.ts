@@ -576,63 +576,89 @@ export default class SRPlugin extends Plugin {
         }
 
         // cloze deletion cards
-        for (let match of fileText.matchAll(CLOZE_CARD_DETECTOR)) {
-            match[0] = match[0].trim();
+        if (!getSetting("disableClozeCards", this.data.settings)) {
+            for (let match of fileText.matchAll(CLOZE_CARD_DETECTOR)) {
+                match[0] = match[0].trim();
 
-            let cardText = match[0];
-            let deletions = [...cardText.matchAll(CLOZE_DELETIONS_EXTRACTOR)];
-            let scheduling = [...cardText.matchAll(CLOZE_SCHEDULING_EXTRACTOR)];
+                let cardText = match[0];
+                let deletions = [
+                    ...cardText.matchAll(CLOZE_DELETIONS_EXTRACTOR),
+                ];
+                let scheduling = [
+                    ...cardText.matchAll(CLOZE_SCHEDULING_EXTRACTOR),
+                ];
 
-            // we have some extra scheduling dates to delete
-            if (scheduling.length > deletions.length) {
-                let idxSched = cardText.lastIndexOf("<!--SR:") + 7;
-                let newCardText = cardText.substring(0, idxSched);
-                for (let i = 0; i < deletions.length; i++)
-                    newCardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
-                newCardText += "-->\n";
+                // we have some extra scheduling dates to delete
+                if (scheduling.length > deletions.length) {
+                    let idxSched = cardText.lastIndexOf("<!--SR:") + 7;
+                    let newCardText = cardText.substring(0, idxSched);
+                    for (let i = 0; i < deletions.length; i++)
+                        newCardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
+                    newCardText += "-->\n";
 
-                let replacementRegex = new RegExp(
-                    escapeRegexString(cardText),
-                    "gm"
-                );
-                fileText = fileText.replace(replacementRegex, newCardText);
-                fileChanged = true;
-            }
+                    let replacementRegex = new RegExp(
+                        escapeRegexString(cardText),
+                        "gm"
+                    );
+                    fileText = fileText.replace(replacementRegex, newCardText);
+                    fileChanged = true;
+                }
 
-            let relatedCards: Card[] = [];
-            for (let i = 0; i < deletions.length; i++) {
-                let cardObj: Card;
+                let relatedCards: Card[] = [];
+                for (let i = 0; i < deletions.length; i++) {
+                    let cardObj: Card;
 
-                let deletionStart = deletions[i].index;
-                let deletionEnd = deletionStart + deletions[i][0].length;
-                let front =
-                    cardText.substring(0, deletionStart) +
-                    "<span style='color:#2196f3'>[...]</span>" +
-                    cardText.substring(deletionEnd);
-                front = (
-                    await this.fixCardMediaLinks(front, note.path)
-                ).replace(/==/gm, "");
-                let back =
-                    cardText.substring(0, deletionStart) +
-                    "<span style='color:#2196f3'>" +
-                    cardText.substring(deletionStart, deletionEnd) +
-                    "</span>" +
-                    cardText.substring(deletionEnd);
-                back = (await this.fixCardMediaLinks(back, note.path)).replace(
-                    /==/gm,
-                    ""
-                );
+                    let deletionStart = deletions[i].index;
+                    let deletionEnd = deletionStart + deletions[i][0].length;
+                    let front =
+                        cardText.substring(0, deletionStart) +
+                        "<span style='color:#2196f3'>[...]</span>" +
+                        cardText.substring(deletionEnd);
+                    front = (
+                        await this.fixCardMediaLinks(front, note.path)
+                    ).replace(/==/gm, "");
+                    let back =
+                        cardText.substring(0, deletionStart) +
+                        "<span style='color:#2196f3'>" +
+                        cardText.substring(deletionStart, deletionEnd) +
+                        "</span>" +
+                        cardText.substring(deletionEnd);
+                    back = (
+                        await this.fixCardMediaLinks(back, note.path)
+                    ).replace(/==/gm, "");
 
-                // card deletion scheduled
-                if (i < scheduling.length) {
-                    let dueUnix: number = window
-                        .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY"])
-                        .valueOf();
-                    if (dueUnix <= now) {
+                    // card deletion scheduled
+                    if (i < scheduling.length) {
+                        let dueUnix: number = window
+                            .moment(scheduling[i][1], [
+                                "YYYY-MM-DD",
+                                "DD-MM-YYYY",
+                            ])
+                            .valueOf();
+                        if (dueUnix <= now) {
+                            cardObj = {
+                                isDue: true,
+                                interval: parseInt(scheduling[i][2]),
+                                ease: parseInt(scheduling[i][3]),
+                                note,
+                                front,
+                                back,
+                                cardText: match[0],
+                                context: "",
+                                originalFrontText: "",
+                                originalBackText: "",
+                                cardType: CardType.Cloze,
+                                subCardIdx: i,
+                                relatedCards,
+                            };
+
+                            this.dueFlashcards[deck].push(cardObj);
+                            this.dueFlashcardsCount++;
+                        } else continue;
+                    } else {
+                        // new card
                         cardObj = {
-                            isDue: true,
-                            interval: parseInt(scheduling[i][2]),
-                            ease: parseInt(scheduling[i][3]),
+                            isDue: false,
                             note,
                             front,
                             back,
@@ -645,32 +671,14 @@ export default class SRPlugin extends Plugin {
                             relatedCards,
                         };
 
-                        this.dueFlashcards[deck].push(cardObj);
-                        this.dueFlashcardsCount++;
-                    } else continue;
-                } else {
-                    // new card
-                    cardObj = {
-                        isDue: false,
-                        note,
-                        front,
-                        back,
-                        cardText: match[0],
-                        context: "",
-                        originalFrontText: "",
-                        originalBackText: "",
-                        cardType: CardType.Cloze,
-                        subCardIdx: i,
-                        relatedCards,
-                    };
+                        this.newFlashcards[deck].push(cardObj);
+                        this.newFlashcardsCount++;
+                    }
 
-                    this.newFlashcards[deck].push(cardObj);
-                    this.newFlashcardsCount++;
+                    relatedCards.push(cardObj);
+                    if (getSetting("showContextInCards", this.data.settings))
+                        addContextToCard(cardObj, match.index, headings);
                 }
-
-                relatedCards.push(cardObj);
-                if (getSetting("showContextInCards", this.data.settings))
-                    addContextToCard(cardObj, match.index, headings);
             }
         }
 

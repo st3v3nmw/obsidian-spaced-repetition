@@ -6,9 +6,14 @@ export interface SRSettings {
     cardCommentOnSameLine: boolean;
     buryRelatedCards: boolean;
     showContextInCards: boolean;
+    disableClozeCards: boolean;
+    disableSinglelineCards: boolean;
     singlelineCardSeparator: string;
+    disableSinglelineReversedCards: boolean;
     singlelineReversedCardSeparator: string;
+    disableMultilineCards: boolean;
     multilineCardSeparator: string;
+    disableMultilineReversedCards: boolean;
     multilineReversedCardSeparator: string;
     // notes
     tagsToReview: string[];
