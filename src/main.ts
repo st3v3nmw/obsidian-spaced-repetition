@@ -28,6 +28,8 @@ import {
     CLOZE_SCHEDULING_EXTRACTOR,
     WIKILINK_MEDIA_REGEX,
     MARKDOWN_LINK_MEDIA_REGEX,
+    CODEBLOCK_REGEX,
+    INLINE_CODE_REGEX,
 } from "./constants";
 import { escapeRegexString } from "./utils";
 
@@ -508,6 +510,13 @@ export default class SRPlugin extends Plugin {
             this.newFlashcards[deck] = [];
         }
 
+        // find all codeblocks
+        let codeblocks: [number, number][] = [];
+        for (let regex of [CODEBLOCK_REGEX, INLINE_CODE_REGEX]) {
+            for (let match of fileText.matchAll(regex))
+                codeblocks.push([match.index, match.index + match[0].length]);
+        }
+
         let now = Date.now();
         // basic cards
         for (let regex of [this.singlelineCardRegex, this.multilineCardRegex]) {
@@ -516,15 +525,20 @@ export default class SRPlugin extends Plugin {
                     ? CardType.SingleLineBasic
                     : CardType.MultiLineBasic;
             for (let match of fileText.matchAll(regex)) {
+                if (
+                    inCodeblock(match.index, match[0].trim().length, codeblocks)
+                )
+                    continue;
+
                 let cardText = match[0].trim();
                 let originalFrontText = match[1].trim();
                 let front = await this.fixCardMediaLinks(
-                    match[1].trim(),
+                    originalFrontText,
                     note.path
                 );
                 let originalBackText = match[2].trim();
                 let back = await this.fixCardMediaLinks(
-                    match[2].trim(),
+                    originalBackText,
                     note.path
                 );
                 let cardObj: Card;
@@ -581,10 +595,20 @@ export default class SRPlugin extends Plugin {
                 match[0] = match[0].trim();
 
                 let cardText = match[0];
-                let deletions = [
-                    ...cardText.matchAll(CLOZE_DELETIONS_EXTRACTOR),
-                ];
-                let scheduling = [
+
+                let deletions: RegExpMatchArray[] = [];
+                for (let m of cardText.matchAll(CLOZE_DELETIONS_EXTRACTOR)) {
+                    if (
+                        inCodeblock(
+                            match.index + m.index,
+                            m[0].trim().length,
+                            codeblocks
+                        )
+                    )
+                        continue;
+                    deletions.push(m);
+                }
+                let scheduling: RegExpMatchArray[] = [
                     ...cardText.matchAll(CLOZE_SCHEDULING_EXTRACTOR),
                 ];
 
@@ -746,4 +770,19 @@ function addContextToCard(
 
     for (let headingObj of stack) cardObj.context += headingObj.heading + " > ";
     cardObj.context = cardObj.context.slice(0, -3);
+}
+
+function inCodeblock(
+    matchStart: number,
+    matchLength: number,
+    codeblocks: [number, number][]
+) {
+    for (let codeblock of codeblocks) {
+        if (
+            matchStart >= codeblock[0] &&
+            matchStart + matchLength <= codeblock[1]
+        )
+            return true;
+    }
+    return false;
 }
