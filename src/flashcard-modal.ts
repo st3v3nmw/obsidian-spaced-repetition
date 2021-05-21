@@ -378,21 +378,21 @@ export class FlashcardModal extends Modal {
             if (this.currentCard.cardType == CardType.SingleLineBasic) {
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${this.currentCard.front}${getSetting(
+                    `${this.currentCard.originalFrontText}${getSetting(
                         "singlelineCardSeparator",
                         this.plugin.data.settings
                     )}${
-                        this.currentCard.back
+                        this.currentCard.originalBackText
                     }${sep}<!--SR:${dueString},${interval},${ease}-->`
                 );
             } else {
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${this.currentCard.front}\n${getSetting(
+                    `${this.currentCard.originalFrontText}\n${getSetting(
                         "multilineCardSeparator",
                         this.plugin.data.settings
                     )}\n${
-                        this.currentCard.back
+                        this.currentCard.originalBackText
                     }${sep}<!--SR:${dueString},${interval},${ease}-->`
                 );
             }

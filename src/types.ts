@@ -57,6 +57,8 @@ export interface Card {
     back: string;
     cardText: string;
     context: string;
+    originalFrontText: string;
+    originalBackText: string;
     // types
     cardType: CardType;
     // stuff for cards with sub-cards
