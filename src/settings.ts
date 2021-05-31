@@ -72,7 +72,7 @@ export class SRSettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .setName("Flashcard tags")
             .setDesc(
-                "Enter tags separated by spaces i.e. #flashcards #deck2 #deck3."
+                "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3."
             )
             .addTextArea((text) =>
                 text
@@ -85,7 +85,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange((value) => {
                         applySettingsUpdate(async () => {
                             this.plugin.data.settings.flashcardTags =
-                                value.split(" ");
+                                value.split(/\s+/);
                             await this.plugin.savePluginData();
                         });
                     })
@@ -247,7 +247,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName("Tags to review")
-            .setDesc("Enter tags separated by spaces i.e. #review #tag2 #tag3.")
+            .setDesc("Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.")
             .addTextArea((text) =>
                 text
                     .setValue(
@@ -259,7 +259,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange((value) => {
                         applySettingsUpdate(async () => {
                             this.plugin.data.settings.tagsToReview =
-                                value.split(" ");
+                                value.split(/\s+/);
                             await this.plugin.savePluginData();
                         });
                     })
