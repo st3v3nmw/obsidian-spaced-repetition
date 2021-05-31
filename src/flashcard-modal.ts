@@ -4,7 +4,7 @@ import { Card, CardType, FlashcardModalMode, ReviewResponse } from "./types";
 import { schedule, textInterval } from "./sched";
 import { CLOZE_SCHEDULING_EXTRACTOR } from "./constants";
 import { getSetting } from "./settings";
-import { escapeRegexString } from "./utils";
+import { escapeRegexString, fixDollarSigns } from "./utils";
 
 export class FlashcardModal extends Modal {
     private plugin: SRPlugin;
@@ -68,7 +68,11 @@ export class FlashcardModal extends Modal {
                 else if (this.mode == FlashcardModalMode.Back) {
                     if (e.code == "Numpad1" || e.code == "Digit1")
                         this.processReview(ReviewResponse.Hard);
-                    else if (e.code == "Numpad2" || e.code == "Digit2")
+                    else if (
+                        e.code == "Numpad2" ||
+                        e.code == "Digit2" ||
+                        e.code == "Space"
+                    )
                         this.processReview(ReviewResponse.Good);
                     else if (e.code == "Numpad3" || e.code == "Digit3")
                         this.processReview(ReviewResponse.Easy);
@@ -379,7 +383,7 @@ export class FlashcardModal extends Modal {
 
             fileText = fileText.replace(
                 replacementRegex,
-                this.currentCard.cardText
+                fixDollarSigns(this.currentCard.cardText)
             );
             for (let relatedCard of this.currentCard.relatedCards)
                 relatedCard.cardText = this.currentCard.cardText;
@@ -389,22 +393,26 @@ export class FlashcardModal extends Modal {
             if (this.currentCard.cardType == CardType.SingleLineBasic) {
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${this.currentCard.originalFrontText}${getSetting(
+                    `${fixDollarSigns(
+                        this.currentCard.originalFrontText
+                    )}${getSetting(
                         "singlelineCardSeparator",
                         this.plugin.data.settings
-                    )}${
+                    )}${fixDollarSigns(
                         this.currentCard.originalBackText
-                    }${sep}<!--SR:${dueString},${interval},${ease}-->`
+                    )}${sep}<!--SR:${dueString},${interval},${ease}-->`
                 );
             } else {
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${this.currentCard.originalFrontText}\n${getSetting(
+                    `${fixDollarSigns(
+                        this.currentCard.originalFrontText
+                    )}\n${getSetting(
                         "multilineCardSeparator",
                         this.plugin.data.settings
-                    )}\n${
+                    )}\n${fixDollarSigns(
                         this.currentCard.originalBackText
-                    }${sep}<!--SR:${dueString},${interval},${ease}-->`
+                    )}${sep}<!--SR:${dueString},${interval},${ease}-->`
                 );
             }
         }
