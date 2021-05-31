@@ -319,12 +319,23 @@ export class FlashcardModal extends Modal {
 
             due = window.moment(Date.now() + interval * 24 * 3600 * 1000);
         } else {
-            interval = 1.0;
-            ease = this.plugin.data.settings.baseEase;
-            this.plugin.dueFlashcards[this.currentDeck].splice(0, 1);
-            this.plugin.dueFlashcards[this.currentDeck].push(this.currentCard);
+            this.currentCard.interval = 1.0;
+            this.currentCard.ease = this.plugin.data.settings.baseEase;
+            if (this.currentCard.isDue) {
+                this.plugin.dueFlashcards[this.currentDeck].splice(0, 1);
+                this.plugin.dueFlashcards[this.currentDeck].push(
+                    this.currentCard
+                );
+            } else {
+                this.plugin.newFlashcards[this.currentDeck].splice(0, 1);
+                this.plugin.newFlashcards[this.currentDeck].push(
+                    this.currentCard
+                );
+            }
             due = window.moment(Date.now());
             new Notice("Card's progress has been reset");
+            this.nextCard();
+            return;
         }
 
         let dueString = due.format("YYYY-MM-DD");
