@@ -85,7 +85,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange((value) => {
                         applySettingsUpdate(async () => {
                             this.plugin.data.settings.flashcardTags =
-                                value.split(/[\s\n]+/);
+                                value.split(/\s+/);
                             await this.plugin.savePluginData();
                         });
                     })
@@ -259,7 +259,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange((value) => {
                         applySettingsUpdate(async () => {
                             this.plugin.data.settings.tagsToReview =
-                                value.split(/[\s\n]+/);
+                                value.split(/\s+/);
                             await this.plugin.savePluginData();
                         });
                     })
