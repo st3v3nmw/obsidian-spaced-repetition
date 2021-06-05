@@ -468,6 +468,13 @@ export default class SRPlugin extends Plugin {
         this.dueFlashcardsCount = 0;
 
         for (let note of notes) {
+            if (getSetting("convertFoldersToDecks", this.data.settings)) {
+                let path: string[] = note.path.split("/");
+                path.pop(); // remove filename
+                await this.findFlashcards(note, "#" + path.join("/"));
+                continue;
+            }
+
             let fileCachedData =
                 this.app.metadataCache.getFileCache(note) || {};
             let frontmatter =
@@ -505,6 +512,7 @@ export default class SRPlugin extends Plugin {
         let fileChanged = false;
 
         let deckPath: string[] = deckPathStr.substring(1).split("/");
+        if (deckPath.length == 1 && deckPath[0] == "") deckPath = ["/"];
         this.deckTree.createDeck([...deckPath]);
 
         // find all codeblocks

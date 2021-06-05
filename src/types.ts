@@ -4,6 +4,7 @@ import { FlashcardModal } from "./flashcard-modal";
 export interface SRSettings {
     // flashcards
     flashcardTags: string[];
+    convertFoldersToDecks: boolean;
     cardCommentOnSameLine: boolean;
     buryRelatedCards: boolean;
     showContextInCards: boolean;

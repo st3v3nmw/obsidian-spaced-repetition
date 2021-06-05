@@ -95,6 +95,7 @@ export class FlashcardModal extends Modal {
         this.mode = FlashcardModalMode.DecksList;
         this.titleEl.setText("Decks");
         this.contentEl.innerHTML = "";
+        this.contentEl.setAttribute("id", "sr-flashcard-view");
 
         for (let deck of this.plugin.deckTree.subdecks)
             deck.render(this.contentEl, this);
@@ -245,7 +246,8 @@ export class FlashcardModal extends Modal {
             : "\n";
 
         if (this.currentCard.cardType == CardType.Cloze) {
-            let schedIdx: number = this.currentCard.cardText.lastIndexOf("<!--SR:");
+            let schedIdx: number =
+                this.currentCard.cardText.lastIndexOf("<!--SR:");
             if (schedIdx == -1) {
                 // first time adding scheduling information to flashcard
                 this.currentCard.cardText = `${this.currentCard.cardText}${sep}<!--SR:!${dueString},${interval},${ease}-->`;
@@ -256,7 +258,12 @@ export class FlashcardModal extends Modal {
                     ),
                 ];
 
-                let deletionSched: string[] = ["0", dueString, `${interval}`, `${ease}`];
+                let deletionSched: string[] = [
+                    "0",
+                    dueString,
+                    `${interval}`,
+                    `${ease}`,
+                ];
                 if (this.currentCard.isDue)
                     scheduling[this.currentCard.subCardIdx] = deletionSched;
                 else scheduling.push(deletionSched);
@@ -347,9 +354,12 @@ Deck.prototype.render = function (
         modal.setupCardsView();
         this.nextCard(modal);
     });
-    let deckViewInnerText: HTMLElement = deckViewInner.createDiv("tag-pane-tag-text");
+    let deckViewInnerText: HTMLElement =
+        deckViewInner.createDiv("tag-pane-tag-text");
     deckViewInnerText.innerHTML += `<span class="tag-pane-tag-self">${this.deckName}</span>`;
-    let deckViewOuter: HTMLElement = deckViewSelf.createDiv("tree-item-flair-outer");
+    let deckViewOuter: HTMLElement = deckViewSelf.createDiv(
+        "tree-item-flair-outer"
+    );
     deckViewOuter.innerHTML +=
         '<span style="background-color:#4caf50;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
         this.dueFlashcardsCount +

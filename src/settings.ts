@@ -6,6 +6,7 @@ import { escapeRegexString } from "./utils";
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
     flashcardTags: ["#flashcards"],
+    convertFoldersToDecks: false,
     cardCommentOnSameLine: false,
     buryRelatedCards: false,
     showContextInCards: true,
@@ -89,6 +90,25 @@ export class SRSettingTab extends PluginSettingTab {
                                 value.split(/\s+/);
                             await this.plugin.savePluginData();
                         });
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Convert folders to decks and subdecks?")
+            .setDesc(
+                "This is an alternative to the Flashcard tags option above."
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(
+                        getSetting(
+                            "convertFoldersToDecks",
+                            this.plugin.data.settings
+                        )
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.convertFoldersToDecks = value;
+                        await this.plugin.savePluginData();
                     })
             );
 
