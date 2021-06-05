@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Q&A
+    url: https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/categories/q-a
+    about: Please ask and answer questions here.
+  - name: General discussion
+    url: https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/categories/general
+    about: For general discussion, use the general category of the discussions section.
