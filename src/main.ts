@@ -18,6 +18,7 @@ import {
     CardType,
     ReviewResponse,
     SRSettings,
+    Deck,
 } from "./types";
 import {
     CROSS_HAIRS_ICON,
@@ -53,9 +54,7 @@ export default class SRPlugin extends Plugin {
     private pageranks: Record<string, number> = {};
     private dueNotesCount: number = 0;
 
-    public newFlashcards: Record<string, Card[]> = {}; // <deck name, Card[]>
-    public newFlashcardsCount: number = 0;
-    public dueFlashcards: Record<string, Card[]> = {}; // <deck name, Card[]>
+    public deckTree: Deck = new Deck("root", null);
     public dueFlashcardsCount: number = 0;
 
     public singlelineCardRegex: RegExp;
@@ -216,7 +215,7 @@ export default class SRPlugin extends Plugin {
         this.pageranks = {};
         this.dueNotesCount = 0;
 
-        let now = Date.now();
+        let now: number = Date.now();
         for (let note of notes) {
             if (this.incomingLinks[note.path] == undefined)
                 this.incomingLinks[note.path] = [];
@@ -244,11 +243,16 @@ export default class SRPlugin extends Plugin {
                 fileCachedData.frontmatter || <Record<string, any>>{};
             let tags = getAllTags(fileCachedData) || [];
 
-            let shouldIgnore = true;
+            let shouldIgnore: boolean = true;
             for (let tag of tags) {
-                if (this.data.settings.tagsToReview.includes(tag)) {
-                    shouldIgnore = false;
-                    break;
+                for (let tagToReview of this.data.settings.tagsToReview) {
+                    if (
+                        tag == tagToReview ||
+                        tag.startsWith(tagToReview + "/")
+                    ) {
+                        shouldIgnore = false;
+                        break;
+                    }
                 }
             }
 
@@ -318,11 +322,13 @@ export default class SRPlugin extends Plugin {
         let frontmatter = fileCachedData.frontmatter || <Record<string, any>>{};
 
         let tags = getAllTags(fileCachedData) || [];
-        let shouldIgnore = true;
+        let shouldIgnore: boolean = true;
         for (let tag of tags) {
-            if (this.data.settings.tagsToReview.includes(tag)) {
-                shouldIgnore = false;
-                break;
+            for (let tagToReview of this.data.settings.tagsToReview) {
+                if (tag == tagToReview || tag.startsWith(tagToReview + "/")) {
+                    shouldIgnore = false;
+                    break;
+                }
             }
         }
 
@@ -458,12 +464,17 @@ export default class SRPlugin extends Plugin {
     async flashcards_sync() {
         let notes = this.app.vault.getMarkdownFiles();
 
-        this.newFlashcards = {};
-        this.newFlashcardsCount = 0;
-        this.dueFlashcards = {};
+        this.deckTree = new Deck("root", null);
         this.dueFlashcardsCount = 0;
 
         for (let note of notes) {
+            if (getSetting("convertFoldersToDecks", this.data.settings)) {
+                let path: string[] = note.path.split("/");
+                path.pop(); // remove filename
+                await this.findFlashcards(note, "#" + path.join("/"));
+                continue;
+            }
+
             let fileCachedData =
                 this.app.metadataCache.getFileCache(note) || {};
             let frontmatter =
@@ -471,44 +482,38 @@ export default class SRPlugin extends Plugin {
             let tags = getAllTags(fileCachedData) || [];
 
             for (let tag of tags) {
-                if (this.data.settings.flashcardTags.includes(tag)) {
-                    await this.findFlashcards(note, tag);
-                    break;
+                for (let tagToReview of this.data.settings.flashcardTags) {
+                    if (
+                        tag == tagToReview ||
+                        tag.startsWith(tagToReview + "/")
+                    ) {
+                        await this.findFlashcards(note, tag);
+                        break;
+                    }
                 }
             }
         }
 
         // sort the deck names
-        this.dueFlashcards = Object.keys(this.dueFlashcards)
-            .sort()
-            .reduce((obj: Record<string, Card[]>, key: string) => {
-                obj[key] = this.dueFlashcards[key];
-                return obj;
-            }, {});
-        this.newFlashcards = Object.keys(this.newFlashcards)
-            .sort()
-            .reduce((obj: Record<string, Card[]>, key: string) => {
-                obj[key] = this.newFlashcards[key];
-                return obj;
-            }, {});
+        this.deckTree.sortSubdecksList();
 
-        let noteCountText = this.dueNotesCount == 1 ? "note" : "notes";
-        let cardCountText = this.dueFlashcardsCount == 1 ? "card" : "cards";
+        let noteCountText: string = this.dueNotesCount == 1 ? "note" : "notes";
+        let cardCountText: string =
+            this.dueFlashcardsCount == 1 ? "card" : "cards";
         this.statusBar.setText(
             `Review: ${this.dueNotesCount} ${noteCountText}, ${this.dueFlashcardsCount} ${cardCountText} due`
         );
     }
 
-    async findFlashcards(note: TFile, deck: string) {
+    async findFlashcards(note: TFile, deckPathStr: string) {
         let fileText = await this.app.vault.read(note);
         let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         let headings = fileCachedData.headings || [];
         let fileChanged = false;
 
-        if (!this.dueFlashcards.hasOwnProperty(deck)) {
-            this.dueFlashcards[deck] = [];
-            this.newFlashcards[deck] = [];
-        }
+        let deckPath: string[] = deckPathStr.substring(1).split("/");
+        if (deckPath.length == 1 && deckPath[0] == "") deckPath = ["/"];
+        this.deckTree.createDeck([...deckPath]);
 
         // find all codeblocks
         let codeblocks: [number, number][] = [];
@@ -565,7 +570,8 @@ export default class SRPlugin extends Plugin {
                             originalBackText,
                             cardType,
                         };
-                        this.dueFlashcards[deck].push(cardObj);
+
+                        this.deckTree.insertFlashcard([...deckPath], cardObj);
                         this.dueFlashcardsCount++;
                     } else continue;
                 } else {
@@ -580,8 +586,8 @@ export default class SRPlugin extends Plugin {
                         originalBackText,
                         cardType,
                     };
-                    this.newFlashcards[deck].push(cardObj);
-                    this.newFlashcardsCount++;
+
+                    this.deckTree.insertFlashcard([...deckPath], cardObj);
                 }
 
                 if (getSetting("showContextInCards", this.data.settings))
@@ -676,7 +682,10 @@ export default class SRPlugin extends Plugin {
                                 relatedCards,
                             };
 
-                            this.dueFlashcards[deck].push(cardObj);
+                            this.deckTree.insertFlashcard(
+                                [...deckPath],
+                                cardObj
+                            );
                             this.dueFlashcardsCount++;
                         } else continue;
                     } else {
@@ -695,8 +704,7 @@ export default class SRPlugin extends Plugin {
                             relatedCards,
                         };
 
-                        this.newFlashcards[deck].push(cardObj);
-                        this.newFlashcardsCount++;
+                        this.deckTree.insertFlashcard([...deckPath], cardObj);
                     }
 
                     relatedCards.push(cardObj);

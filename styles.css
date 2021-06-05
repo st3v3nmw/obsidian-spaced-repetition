@@ -20,14 +20,9 @@
     align-items: center;
 }
 
-.sr-deck {
-    height: 48px;
-    line-height: 48px;
-    width: 100%;
-    cursor: pointer;
-    display: inline-grid;
-    grid-template-columns: auto 64px 64px;
-    border-bottom: 1px solid grey;
+.sr-deck-counts {
+    color: #ffffff;
+    margin-left: 4px; 
 }
 
 #sr-show-answer {

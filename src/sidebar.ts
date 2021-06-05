@@ -49,11 +49,11 @@ export class ReviewQueueListView extends ItemView {
     public redraw() {
         const openFile = this.app.workspace.getActiveFile();
 
-        const rootEl = createDiv("nav-folder mod-root");
-        const childrenEl = rootEl.createDiv("nav-folder-children");
+        const rootEl: HTMLElement = createDiv("nav-folder mod-root");
+        const childrenEl: HTMLElement = rootEl.createDiv("nav-folder-children");
 
         if (this.plugin.newNotes.length > 0) {
-            let newNotesFolderEl = this.createRightPaneFolder(
+            let newNotesFolderEl: HTMLElement = this.createRightPaneFolder(
                 childrenEl,
                 "New",
                 !this.activeFolders.has("New")
@@ -71,16 +71,16 @@ export class ReviewQueueListView extends ItemView {
 
         if (this.plugin.scheduledNotes.length > 0) {
             let now: number = Date.now();
-            let currUnix = -1;
+            let currUnix: number = -1;
             let folderEl, folderTitle;
-            let maxDaysToRender = getSetting(
+            let maxDaysToRender: number = getSetting(
                 "maxNDaysNotesReviewQueue",
                 this.plugin.data.settings
             );
 
             for (let sNote of this.plugin.scheduledNotes) {
                 if (sNote.dueUnix != currUnix) {
-                    let nDays = Math.ceil(
+                    let nDays: number = Math.ceil(
                         (sNote.dueUnix - now) / (24 * 3600 * 1000)
                     );
 
@@ -121,7 +121,7 @@ export class ReviewQueueListView extends ItemView {
         parentEl: any,
         folderTitle: string,
         collapsed: boolean
-    ): any {
+    ): HTMLElement {
         const folderEl = parentEl.createDiv("nav-folder");
         const folderTitleEl = folderEl.createDiv("nav-folder-title");
         const childrenEl = folderEl.createDiv("nav-folder-children");
@@ -164,10 +164,10 @@ export class ReviewQueueListView extends ItemView {
         fileElActive: boolean,
         hidden: boolean
     ) {
-        const navFileEl = folderEl.createDiv("nav-file");
+        const navFileEl: HTMLElement = folderEl.createDiv("nav-file");
         if (hidden) navFileEl.style.display = "none";
 
-        const navFileTitle = navFileEl.createDiv("nav-file-title");
+        const navFileTitle: HTMLElement = navFileEl.createDiv("nav-file-title");
         if (fileElActive) navFileTitle.addClass("is-active");
 
         navFileTitle.createDiv("nav-file-title-content").setText(file.basename);

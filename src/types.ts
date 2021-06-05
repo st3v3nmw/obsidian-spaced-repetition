@@ -1,8 +1,10 @@
 import { TFile } from "obsidian";
+import { FlashcardModal } from "./flashcard-modal";
 
 export interface SRSettings {
     // flashcards
     flashcardTags: string[];
+    convertFoldersToDecks: boolean;
     cardCommentOnSameLine: boolean;
     buryRelatedCards: boolean;
     showContextInCards: boolean;
@@ -49,7 +51,96 @@ export interface LinkStat {
     linkCount: number;
 }
 
+// Decks
+
+export class Deck {
+    public deckName: string;
+    public newFlashcards: Card[];
+    public newFlashcardsCount: number = 0; // counts those in subdecks too
+    public dueFlashcards: Card[];
+    public dueFlashcardsCount: number = 0; // counts those in subdecks too
+    public subdecks: Deck[];
+    public parent: Deck;
+
+    constructor(deckName: string, parent: Deck) {
+        this.deckName = deckName;
+        this.newFlashcards = [];
+        this.newFlashcardsCount = 0;
+        this.dueFlashcards = [];
+        this.dueFlashcardsCount = 0;
+        this.subdecks = [];
+        this.parent = parent;
+    }
+
+    createDeck(deckPath: string[]) {
+        if (deckPath.length == 0) return;
+
+        let deckName: string = deckPath.shift();
+        for (let deck of this.subdecks) {
+            if (deckName == deck.deckName) {
+                deck.createDeck(deckPath);
+                return;
+            }
+        }
+
+        let deck: Deck = new Deck(deckName, this);
+        this.subdecks.push(deck);
+        deck.createDeck(deckPath);
+    }
+
+    insertFlashcard(deckPath: string[], cardObj: Card): void {
+        if (deckPath.length == 0) {
+            if (cardObj.isDue) this.dueFlashcards.push(cardObj);
+            else this.newFlashcards.push(cardObj);
+            return;
+        }
+
+        let deckName: string = deckPath.shift();
+        for (let deck of this.subdecks) {
+            if (deckName == deck.deckName) {
+                if (cardObj.isDue) deck.dueFlashcardsCount++;
+                else deck.newFlashcardsCount++;
+
+                deck.insertFlashcard(deckPath, cardObj);
+                return;
+            }
+        }
+    }
+
+    deleteFlashcardAtIndex(index: number, cardIsDue: boolean): void {
+        if (cardIsDue) this.dueFlashcards.splice(index, 1);
+        else this.newFlashcards.splice(index, 1);
+
+        let deck: Deck = this;
+        while (deck != null) {
+            if (cardIsDue) deck.dueFlashcardsCount--;
+            else deck.newFlashcardsCount--;
+            deck = deck.parent;
+        }
+    }
+
+    sortSubdecksList(): void {
+        this.subdecks.sort((a, b) => {
+            if (a.deckName < b.deckName) return -1;
+            else if (a.deckName > b.deckName) return 1;
+            return 0;
+        });
+
+        for (let deck of this.subdecks) deck.sortSubdecksList();
+    }
+
+    // implemented in flashcard-model.ts
+    render(containerEl: HTMLElement, modal: FlashcardModal): void {}
+    nextCard(modal: FlashcardModal): void {}
+}
+
 // Flashcards
+
+export enum CardType {
+    SingleLineBasic,
+    MultiLineBasic,
+    Cloze,
+}
 
 export interface Card {
     // scheduling
@@ -70,12 +161,6 @@ export interface Card {
     // stuff for cards with sub-cards
     subCardIdx?: number;
     relatedCards?: Card[];
-}
-
-export enum CardType {
-    SingleLineBasic,
-    MultiLineBasic,
-    Cloze,
 }
 
 export enum FlashcardModalMode {
