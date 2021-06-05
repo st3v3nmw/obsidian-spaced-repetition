@@ -117,7 +117,9 @@ export class FlashcardModal extends Modal {
         this.contentEl.innerHTML = "";
 
         this.fileLinkView = createDiv("sr-link");
-        this.fileLinkView.setAttribute("aria-label", "Open file");
+        this.fileLinkView.setText("Open file");
+        if (getSetting("showFileNameInFileLink", this.plugin.data.settings))
+            this.fileLinkView.setAttribute("aria-label", "Open file");
         this.fileLinkView.addEventListener("click", (_) => {
             this.close();
             this.plugin.app.workspace.activeLeaf.openFile(
@@ -267,7 +269,8 @@ export class FlashcardModal extends Modal {
 
         if (getSetting("showContextInCards", this.plugin.data.settings))
             this.contextView.setText(this.currentCard.context);
-        this.fileLinkView.setText(this.currentCard.note.basename);
+        if (getSetting("showFileNameInFileLink", this.plugin.data.settings))
+            this.fileLinkView.setText(this.currentCard.note.basename);
     }
 
     showAnswer() {
