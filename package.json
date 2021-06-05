@@ -13,7 +13,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^15.1.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
-    "@rollup/plugin-typescript": "^6.0.0",
+    "@rollup/plugin-typescript": "^8.2.1",
     "@types/node": "^15.12.1",
     "moment": "^2.29.1",
     "obsidian": "https://github.com/obsidianmd/obsidian-api/tarball/master",
