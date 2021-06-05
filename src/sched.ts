@@ -31,7 +31,7 @@ export function schedule(
     if (fuzz) {
         // fuzz
         if (interval >= 8) {
-            let fuzz = [-0.05 * interval, 0, 0.05 * interval];
+            let fuzz: number[] = [-0.05 * interval, 0, 0.05 * interval];
             interval += fuzz[Math.floor(Math.random() * fuzz.length)];
         }
     }
@@ -42,8 +42,8 @@ export function schedule(
 }
 
 export function textInterval(interval: number, isMobile: boolean): string {
-    let m = Math.round(interval / 3) / 10;
-    let y = Math.round(interval / 36.5) / 10;
+    let m: number = Math.round(interval / 3) / 10;
+    let y: number = Math.round(interval / 36.5) / 10;
 
     if (isMobile) {
         if (interval < 30) return `${interval}d`;

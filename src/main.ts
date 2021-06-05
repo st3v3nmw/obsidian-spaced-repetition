@@ -215,7 +215,7 @@ export default class SRPlugin extends Plugin {
         this.pageranks = {};
         this.dueNotesCount = 0;
 
-        let now = Date.now();
+        let now: number = Date.now();
         for (let note of notes) {
             if (this.incomingLinks[note.path] == undefined)
                 this.incomingLinks[note.path] = [];

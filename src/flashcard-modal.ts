@@ -174,7 +174,7 @@ export class FlashcardModal extends Modal {
             this.resetLinkView.style.display = "inline-block";
 
         if (this.currentCard.cardType != CardType.Cloze) {
-            let hr = document.createElement("hr");
+            let hr: HTMLElement = document.createElement("hr");
             hr.setAttribute("id", "sr-hr-card-divide");
             this.flashcardView.appendChild(hr);
         } else this.flashcardView.innerHTML = "";
@@ -229,31 +229,34 @@ export class FlashcardModal extends Modal {
             return;
         }
 
-        let dueString = due.format("YYYY-MM-DD");
+        let dueString: string = due.format("YYYY-MM-DD");
 
-        let fileText = await this.app.vault.read(this.currentCard.note);
+        let fileText: string = await this.app.vault.read(this.currentCard.note);
         let replacementRegex = new RegExp(
             escapeRegexString(this.currentCard.cardText),
             "gm"
         );
 
-        let sep = getSetting("cardCommentOnSameLine", this.plugin.data.settings)
+        let sep: string = getSetting(
+            "cardCommentOnSameLine",
+            this.plugin.data.settings
+        )
             ? " "
             : "\n";
 
         if (this.currentCard.cardType == CardType.Cloze) {
-            let schedIdx = this.currentCard.cardText.lastIndexOf("<!--SR:");
+            let schedIdx: number = this.currentCard.cardText.lastIndexOf("<!--SR:");
             if (schedIdx == -1) {
                 // first time adding scheduling information to flashcard
                 this.currentCard.cardText = `${this.currentCard.cardText}${sep}<!--SR:!${dueString},${interval},${ease}-->`;
             } else {
-                let scheduling = [
+                let scheduling: RegExpMatchArray[] = [
                     ...this.currentCard.cardText.matchAll(
                         CLOZE_SCHEDULING_EXTRACTOR
                     ),
                 ];
 
-                let deletionSched = ["0", dueString, `${interval}`, `${ease}`];
+                let deletionSched: string[] = ["0", dueString, `${interval}`, `${ease}`];
                 if (this.currentCard.isDue)
                     scheduling[this.currentCard.subCardIdx] = deletionSched;
                 else scheduling.push(deletionSched);
@@ -325,9 +328,9 @@ Deck.prototype.render = function (
     containerEl: HTMLElement,
     modal: FlashcardModal
 ): void {
-    let deckView = containerEl.createDiv("tree-item");
+    let deckView: HTMLElement = containerEl.createDiv("tree-item");
 
-    let deckViewSelf = deckView.createDiv(
+    let deckViewSelf: HTMLElement = deckView.createDiv(
         "tree-item-self tag-pane-tag is-clickable"
     );
     let collapsed: boolean = true;
@@ -335,17 +338,18 @@ Deck.prototype.render = function (
         "tree-item-icon collapse-icon"
     );
     collapseIconEl.innerHTML = COLLAPSE_ICON;
-    collapseIconEl.childNodes[0].style.transform = "rotate(-90deg)";
+    (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
+        "rotate(-90deg)";
 
-    let deckViewInner = deckViewSelf.createDiv("tree-item-inner");
+    let deckViewInner: HTMLElement = deckViewSelf.createDiv("tree-item-inner");
     deckViewInner.addEventListener("click", (_) => {
         modal.currentDeck = this;
         modal.setupCardsView();
         this.nextCard(modal);
     });
-    let deckViewInnerText = deckViewInner.createDiv("tag-pane-tag-text");
+    let deckViewInnerText: HTMLElement = deckViewInner.createDiv("tag-pane-tag-text");
     deckViewInnerText.innerHTML += `<span class="tag-pane-tag-self">${this.deckName}</span>`;
-    let deckViewOuter = deckViewSelf.createDiv("tree-item-flair-outer");
+    let deckViewOuter: HTMLElement = deckViewSelf.createDiv("tree-item-flair-outer");
     deckViewOuter.innerHTML +=
         '<span style="background-color:#4caf50;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
         this.dueFlashcardsCount +
@@ -355,14 +359,16 @@ Deck.prototype.render = function (
         this.newFlashcardsCount +
         "</span>";
 
-    let deckViewChildren = deckView.createDiv("tree-item-children");
+    let deckViewChildren: HTMLElement =
+        deckView.createDiv("tree-item-children");
     deckViewChildren.style.display = "none";
     collapseIconEl.addEventListener("click", (_) => {
         if (collapsed) {
-            collapseIconEl.childNodes[0].style.transform = "";
+            (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "";
             deckViewChildren.style.display = "block";
         } else {
-            collapseIconEl.childNodes[0].style.transform = "rotate(-90deg)";
+            (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
+                "rotate(-90deg)";
             deckViewChildren.style.display = "none";
         }
         collapsed = !collapsed;
@@ -406,21 +412,21 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
             null
         );
 
-        let hardInterval = schedule(
+        let hardInterval: number = schedule(
             ReviewResponse.Hard,
             modal.currentCard.interval,
             modal.currentCard.ease,
             false,
             modal.plugin.data.settings
         ).interval;
-        let goodInterval = schedule(
+        let goodInterval: number = schedule(
             ReviewResponse.Good,
             modal.currentCard.interval,
             modal.currentCard.ease,
             false,
             modal.plugin.data.settings
         ).interval;
-        let easyInterval = schedule(
+        let easyInterval: number = schedule(
             ReviewResponse.Easy,
             modal.currentCard.interval,
             modal.currentCard.ease,

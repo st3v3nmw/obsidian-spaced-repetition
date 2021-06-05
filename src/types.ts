@@ -74,7 +74,7 @@ export class Deck {
     createDeck(deckPath: string[]) {
         if (deckPath.length == 0) return;
 
-        let deckName = deckPath.shift();
+        let deckName: string = deckPath.shift();
         for (let deck of this.subdecks) {
             if (deckName == deck.deckName) {
                 deck.createDeck(deckPath);
@@ -82,7 +82,7 @@ export class Deck {
             }
         }
 
-        let deck = new Deck(deckName, this);
+        let deck: Deck = new Deck(deckName, this);
         this.subdecks.push(deck);
         deck.createDeck(deckPath);
     }
@@ -94,7 +94,7 @@ export class Deck {
             return;
         }
 
-        let deckName = deckPath.shift();
+        let deckName: string = deckPath.shift();
         for (let deck of this.subdecks) {
             if (deckName == deck.deckName) {
                 if (cardObj.isDue) deck.dueFlashcardsCount++;
