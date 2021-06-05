@@ -6,6 +6,7 @@ export interface SRSettings {
     cardCommentOnSameLine: boolean;
     buryRelatedCards: boolean;
     showContextInCards: boolean;
+    showFileNameInFileLink: boolean;
     disableClozeCards: boolean;
     disableSinglelineCards: boolean;
     singlelineCardSeparator: string;

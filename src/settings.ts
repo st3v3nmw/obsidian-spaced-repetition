@@ -9,6 +9,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     cardCommentOnSameLine: false,
     buryRelatedCards: false,
     showContextInCards: true,
+    showFileNameInFileLink: true,
     disableClozeCards: false,
     disableSinglelineCards: false,
     singlelineCardSeparator: "::",
@@ -147,6 +148,25 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
+            .setName(
+                "Show file name instead of 'open link' in flashcard review?"
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(
+                        getSetting(
+                            "showFileNameInFileLink",
+                            this.plugin.data.settings
+                        )
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.showFileNameInFileLink =
+                            value;
+                        await this.plugin.savePluginData();
+                    })
+            );
+
+        new Setting(containerEl)
             .setName("Disable cloze cards?")
             .setDesc(
                 "If you're not currently using 'em & would like the plugin to run a tad faster."
@@ -247,7 +267,9 @@ export class SRSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName("Tags to review")
-            .setDesc("Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.")
+            .setDesc(
+                "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3."
+            )
             .addTextArea((text) =>
                 text
                     .setValue(
