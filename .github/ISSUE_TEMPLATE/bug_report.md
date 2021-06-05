@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a bug report to help us improve the plugin
+about: Create a bug report to help us improve the plugin.
 title: "[BUG]"
 labels: bug
 assignees: ''
