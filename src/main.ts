@@ -339,8 +339,9 @@ export default class SRPlugin extends Plugin {
             return;
         }
 
-        let fileText = await this.app.vault.read(note);
-        let ease, interval;
+        let fileText: string = await this.app.vault.read(note);
+        let ease, interval, delayBeforeReview;
+        let now: number = Date.now();
         // new note
         if (
             !(
@@ -392,22 +393,33 @@ export default class SRPlugin extends Plugin {
                         : linkContribution * this.data.settings.baseEase)
             );
             interval = 1;
+            delayBeforeReview = 0;
         } else {
             interval = frontmatter["sr-interval"];
             ease = frontmatter["sr-ease"];
+            delayBeforeReview =
+                now -
+                window
+                    .moment(frontmatter["sr-due"], [
+                        "YYYY-MM-DD",
+                        "DD-MM-YYYY",
+                        "ddd MMM DD YYYY",
+                    ])
+                    .valueOf();
         }
 
         let schedObj = schedule(
             response,
             interval,
             ease,
+            delayBeforeReview,
             true,
             this.data.settings
         );
         interval = Math.round(schedObj.interval);
         ease = schedObj.ease;
 
-        let due = window.moment(Date.now() + interval * 24 * 3600 * 1000);
+        let due = window.moment(now + interval * 24 * 3600 * 1000);
         let dueString = due.format("YYYY-MM-DD");
 
         // check if scheduling info exists
@@ -561,6 +573,7 @@ export default class SRPlugin extends Plugin {
                             isDue: true,
                             interval: parseInt(match[4]),
                             ease: parseInt(match[5]),
+                            delayBeforeReview: now - dueUnix,
                             note,
                             front,
                             back,
@@ -670,6 +683,7 @@ export default class SRPlugin extends Plugin {
                                 isDue: true,
                                 interval: parseInt(scheduling[i][2]),
                                 ease: parseInt(scheduling[i][3]),
+                                delayBeforeReview: now - dueUnix,
                                 note,
                                 front,
                                 back,

@@ -199,6 +199,7 @@ export class FlashcardModal extends Modal {
                     response,
                     this.currentCard.interval,
                     this.currentCard.ease,
+                    this.currentCard.delayBeforeReview,
                     true,
                     this.plugin.data.settings
                 );
@@ -210,6 +211,7 @@ export class FlashcardModal extends Modal {
                     response,
                     1,
                     getSetting("baseEase", this.plugin.data.settings),
+                    0,
                     true,
                     this.plugin.data.settings
                 );
@@ -397,7 +399,9 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
                 }
             }
         }
-        modal.decksList();
+
+        if (this.parent == null) modal.decksList();
+        else this.parent.nextCard(modal);
         return;
     }
 
@@ -426,6 +430,7 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
             ReviewResponse.Hard,
             modal.currentCard.interval,
             modal.currentCard.ease,
+            modal.currentCard.delayBeforeReview,
             false,
             modal.plugin.data.settings
         ).interval;
@@ -433,6 +438,7 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
             ReviewResponse.Good,
             modal.currentCard.interval,
             modal.currentCard.ease,
+            modal.currentCard.delayBeforeReview,
             false,
             modal.plugin.data.settings
         ).interval;
@@ -440,6 +446,7 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
             ReviewResponse.Easy,
             modal.currentCard.interval,
             modal.currentCard.ease,
+            modal.currentCard.delayBeforeReview,
             false,
             modal.plugin.data.settings
         ).interval;
