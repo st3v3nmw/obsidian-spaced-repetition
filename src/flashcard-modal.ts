@@ -397,7 +397,9 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
                 }
             }
         }
-        modal.decksList();
+
+        if (this.parent == null) modal.decksList();
+        else this.parent.nextCard(modal);
         return;
     }
 
