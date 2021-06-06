@@ -56,6 +56,8 @@ export default class SRPlugin extends Plugin {
 
     public deckTree: Deck = new Deck("root", null);
     public dueFlashcardsCount: number = 0;
+    public dueDatesFlashcards: Record<number, number> = {}; // Record<# of days in future, due count>
+    public dueDatesNotes: Record<number, number> = {}; // Record<# of days in future, due count>
 
     public singlelineCardRegex: RegExp;
     public multilineCardRegex: RegExp;
@@ -214,6 +216,7 @@ export default class SRPlugin extends Plugin {
         this.incomingLinks = {};
         this.pageranks = {};
         this.dueNotesCount = 0;
+        this.dueDatesNotes = {};
 
         let now: number = Date.now();
         for (let note of notes) {
@@ -285,6 +288,10 @@ export default class SRPlugin extends Plugin {
             this.easeByPath[note.path] = frontmatter["sr-ease"];
 
             if (dueUnix <= now) this.dueNotesCount++;
+            let nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
+            if (!this.dueDatesNotes.hasOwnProperty(nDays))
+                this.dueDatesNotes[nDays] = 0;
+            this.dueDatesNotes[nDays]++;
         }
 
         graph.rank(0.85, 0.000001, (node: string, rank: number) => {
@@ -354,7 +361,7 @@ export default class SRPlugin extends Plugin {
                 linkPGTotal = 0,
                 totalLinkCount = 0;
 
-            for (let statObj of this.incomingLinks[note.path]) {
+            for (let statObj of this.incomingLinks[note.path] || []) {
                 let ease = this.easeByPath[statObj.sourcePath];
                 if (ease) {
                     linkTotal +=
@@ -413,10 +420,10 @@ export default class SRPlugin extends Plugin {
             interval,
             ease,
             delayBeforeReview,
-            true,
-            this.data.settings
+            this.data.settings,
+            this.dueDatesNotes
         );
-        interval = Math.round(schedObj.interval);
+        interval = schedObj.interval;
         ease = schedObj.ease;
 
         let due = window.moment(now + interval * 24 * 3600 * 1000);
@@ -478,6 +485,7 @@ export default class SRPlugin extends Plugin {
 
         this.deckTree = new Deck("root", null);
         this.dueFlashcardsCount = 0;
+        this.dueDatesFlashcards = {};
 
         for (let note of notes) {
             if (getSetting("convertFoldersToDecks", this.data.settings)) {
@@ -568,6 +576,13 @@ export default class SRPlugin extends Plugin {
                             "ddd MMM DD YYYY",
                         ])
                         .valueOf();
+                    let nDays: number = Math.ceil(
+                        (dueUnix - now) / (24 * 3600 * 1000)
+                    );
+                    if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
+                        this.dueDatesFlashcards[nDays] = 0;
+                    this.dueDatesFlashcards[nDays]++;
+
                     if (dueUnix <= now) {
                         cardObj = {
                             isDue: true,
@@ -678,6 +693,13 @@ export default class SRPlugin extends Plugin {
                                 "DD-MM-YYYY",
                             ])
                             .valueOf();
+                        let nDays: number = Math.ceil(
+                            (dueUnix - now) / (24 * 3600 * 1000)
+                        );
+                        if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
+                            this.dueDatesFlashcards[nDays] = 0;
+                        this.dueDatesFlashcards[nDays]++;
+
                         if (dueUnix <= now) {
                             cardObj = {
                                 isDue: true,

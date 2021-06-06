@@ -6,8 +6,8 @@ export function schedule(
     interval: number,
     ease: number,
     delayBeforeReview: number,
-    fuzz: boolean,
-    settingsObj: SRSettings
+    settingsObj: SRSettings,
+    dueDates?: Record<number, number>
 ) {
     let lapsesIntervalChange: number = getSetting(
         "lapsesIntervalChange",
@@ -35,12 +35,29 @@ export function schedule(
         );
     }
 
-    if (fuzz) {
-        // fuzz
-        if (interval >= 8) {
-            let fuzz: number[] = [-0.05 * interval, 0, 0.05 * interval];
-            interval += fuzz[Math.floor(Math.random() * fuzz.length)];
+    // replaces random fuzz with load balancing over the fuzz interval
+    if (dueDates != null) {
+        interval = Math.round(interval);
+        if (!dueDates.hasOwnProperty(interval)) dueDates[interval] = 0;
+
+        let fuzzRange: [number, number];
+        if (interval < 2) fuzzRange = [1, 1];
+        else if (interval == 2) fuzzRange = [2, 3];
+        else {
+            let fuzz: number;
+            if (interval < 7) fuzz = 1;
+            else if (interval < 30)
+                fuzz = Math.max(2, Math.floor(interval * 0.15));
+            else fuzz = Math.max(4, Math.floor(interval * 0.05));
+            fuzzRange = [interval - fuzz, interval + fuzz];
         }
+
+        for (let ivl = fuzzRange[0]; ivl <= fuzzRange[1]; ivl++) {
+            if (!dueDates.hasOwnProperty(ivl)) dueDates[ivl] = 0;
+            if (dueDates[ivl] < dueDates[interval]) interval = ivl;
+        }
+
+        dueDates[interval]++;
     }
 
     interval = Math.min(interval, maximumInterval);

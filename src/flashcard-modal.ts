@@ -200,10 +200,10 @@ export class FlashcardModal extends Modal {
                     this.currentCard.interval,
                     this.currentCard.ease,
                     this.currentCard.delayBeforeReview,
-                    true,
-                    this.plugin.data.settings
+                    this.plugin.data.settings,
+                    this.plugin.dueDatesFlashcards
                 );
-                interval = Math.round(schedObj.interval);
+                interval = schedObj.interval;
                 ease = schedObj.ease;
                 this.plugin.dueFlashcardsCount--;
             } else {
@@ -212,10 +212,10 @@ export class FlashcardModal extends Modal {
                     1,
                     getSetting("baseEase", this.plugin.data.settings),
                     0,
-                    true,
-                    this.plugin.data.settings
+                    this.plugin.data.settings,
+                    this.plugin.dueDatesFlashcards
                 );
-                interval = Math.round(schedObj.interval);
+                interval = schedObj.interval;
                 ease = schedObj.ease;
             }
 
@@ -431,7 +431,6 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
             modal.currentCard.interval,
             modal.currentCard.ease,
             modal.currentCard.delayBeforeReview,
-            false,
             modal.plugin.data.settings
         ).interval;
         let goodInterval: number = schedule(
@@ -439,7 +438,6 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
             modal.currentCard.interval,
             modal.currentCard.ease,
             modal.currentCard.delayBeforeReview,
-            false,
             modal.plugin.data.settings
         ).interval;
         let easyInterval: number = schedule(
@@ -447,7 +445,6 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
             modal.currentCard.interval,
             modal.currentCard.ease,
             modal.currentCard.delayBeforeReview,
-            false,
             modal.plugin.data.settings
         ).interval;
 
