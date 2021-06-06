@@ -326,9 +326,15 @@ export class FlashcardModal extends Modal {
             let newIdx = this.currentDeck.newFlashcards.indexOf(relatedCard);
 
             if (dueIdx != -1)
-                this.currentDeck.deleteFlashcardAtIndex(dueIdx, true);
+                this.currentDeck.deleteFlashcardAtIndex(
+                    dueIdx,
+                    this.currentDeck.dueFlashcards[dueIdx].isDue
+                );
             else if (newIdx != -1)
-                this.currentDeck.deleteFlashcardAtIndex(newIdx, true);
+                this.currentDeck.deleteFlashcardAtIndex(
+                    newIdx,
+                    this.currentDeck.newFlashcards[newIdx].isDue
+                );
         }
     }
 }
