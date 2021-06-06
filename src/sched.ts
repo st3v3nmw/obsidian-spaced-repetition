@@ -5,6 +5,7 @@ export function schedule(
     response: ReviewResponse,
     interval: number,
     ease: number,
+    delayBeforeReview: number,
     fuzz: boolean,
     settingsObj: SRSettings
 ) {
@@ -15,18 +16,24 @@ export function schedule(
     let easyBonus: number = getSetting("easyBonus", settingsObj);
     let maximumInterval: number = getSetting("maximumInterval", settingsObj);
 
-    if (response != ReviewResponse.Good) {
-        ease =
-            response == ReviewResponse.Easy
-                ? ease + 20
-                : Math.max(130, ease - 20);
+    delayBeforeReview = Math.max(
+        0,
+        Math.floor(delayBeforeReview / (24 * 3600 * 1000))
+    );
+
+    if (response == ReviewResponse.Easy) {
+        ease += 20;
+        interval = ((interval + delayBeforeReview) * ease) / 100;
+        interval *= easyBonus;
+    } else if (response == ReviewResponse.Good) {
+        interval = ((interval + delayBeforeReview / 2) * ease) / 100;
+    } else if (response == ReviewResponse.Hard) {
+        ease = Math.max(130, ease - 20);
+        interval = Math.max(
+            1,
+            (interval + delayBeforeReview / 4) * lapsesIntervalChange
+        );
     }
-
-    if (response == ReviewResponse.Hard)
-        interval = Math.max(1, interval * lapsesIntervalChange);
-    else interval = (interval * ease) / 100;
-
-    if (response == ReviewResponse.Easy) interval *= easyBonus;
 
     if (fuzz) {
         // fuzz

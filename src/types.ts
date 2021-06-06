@@ -147,6 +147,7 @@ export interface Card {
     isDue: boolean;
     interval?: number;
     ease?: number;
+    delayBeforeReview?: number;
     // note
     note: TFile;
     // visuals
