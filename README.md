@@ -11,6 +11,7 @@ Visit the [Discussions](https://github.com/st3v3nmw/obsidian-spaced-repetition/d
 ## Features
 
 - Flashcards
+    - [Decks](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Decks)
     - [Remnote single-line style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#single-line-remnote-style) (`Question::Answer`)
     - [Multi-line style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#multi-line) (Separated by `?`)
     - [Cloze cards](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#cloze-cards) (`==highlight==` your cloze deletions!)
