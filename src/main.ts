@@ -529,11 +529,11 @@ export default class SRPlugin extends Plugin {
         let fileText = await this.app.vault.read(note);
         let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         let headings = fileCachedData.headings || [];
-        let fileChanged = false;
+        let fileChanged: boolean = false;
 
+        let deckAdded: boolean = false;
         let deckPath: string[] = deckPathStr.substring(1).split("/");
         if (deckPath.length == 1 && deckPath[0] == "") deckPath = ["/"];
-        this.deckTree.createDeck([...deckPath]);
 
         // find all codeblocks
         let codeblocks: [number, number][] = [];
@@ -554,6 +554,11 @@ export default class SRPlugin extends Plugin {
                     inCodeblock(match.index, match[0].trim().length, codeblocks)
                 )
                     continue;
+
+                if (!deckAdded) {
+                    this.deckTree.createDeck([...deckPath]);
+                    deckAdded = true;
+                }
 
                 let cardText = match[0].trim();
                 let originalFrontText = match[1].trim();
@@ -627,6 +632,11 @@ export default class SRPlugin extends Plugin {
         if (!getSetting("disableClozeCards", this.data.settings)) {
             for (let match of fileText.matchAll(CLOZE_CARD_DETECTOR)) {
                 match[0] = match[0].trim();
+
+                if (!deckAdded) {
+                    this.deckTree.createDeck([...deckPath]);
+                    deckAdded = true;
+                }
 
                 let cardText = match[0];
 
