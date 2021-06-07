@@ -32,14 +32,21 @@ import {
     CODEBLOCK_REGEX,
     INLINE_CODE_REGEX,
 } from "./constants";
-import { escapeRegexString } from "./utils";
+import { escapeRegexString, cyrb53 } from "./utils";
 
 interface PluginData {
     settings: SRSettings;
+    buryDate: string;
+    // hashes of card texts
+    // should work as long as user doesn't modify card's text
+    // covers most of the cases
+    buryList: string[];
 }
 
 const DEFAULT_DATA: PluginData = {
     settings: DEFAULT_SETTINGS,
+    buryDate: "",
+    buryList: [],
 };
 
 export default class SRPlugin extends Plugin {
@@ -487,6 +494,13 @@ export default class SRPlugin extends Plugin {
         this.dueFlashcardsCount = 0;
         this.dueDatesFlashcards = {};
 
+        let todayDate = window.moment(Date.now()).format("YYYY-MM-DD");
+        // clear list if we've changed dates
+        if (todayDate != this.data.buryDate) {
+            this.data.buryDate = todayDate;
+            this.data.buryList = [];
+        }
+
         for (let note of notes) {
             if (getSetting("convertFoldersToDecks", this.data.settings)) {
                 let path: string[] = note.path.split("/");
@@ -561,6 +575,8 @@ export default class SRPlugin extends Plugin {
                 }
 
                 let cardText = match[0].trim();
+                if (this.data.buryList.includes(cyrb53(cardText))) continue;
+
                 let originalFrontText = match[1].trim();
                 let front = await this.fixCardMediaLinks(
                     originalFrontText,
@@ -639,6 +655,7 @@ export default class SRPlugin extends Plugin {
                 }
 
                 let cardText = match[0];
+                if (this.data.buryList.includes(cyrb53(cardText))) continue;
 
                 let deletions: RegExpMatchArray[] = [];
                 for (let m of cardText.matchAll(CLOZE_DELETIONS_EXTRACTOR)) {
