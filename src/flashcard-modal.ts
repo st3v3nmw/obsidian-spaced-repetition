@@ -25,6 +25,7 @@ export class FlashcardModal extends Modal {
     public contextView: HTMLElement;
     public currentCard: Card;
     public currentDeck: Deck;
+    public checkDeck: Deck;
     public mode: FlashcardModalMode;
 
     constructor(app: App, plugin: SRPlugin) {
@@ -362,6 +363,7 @@ Deck.prototype.render = function (
     let deckViewInner: HTMLElement = deckViewSelf.createDiv("tree-item-inner");
     deckViewInner.addEventListener("click", (_) => {
         modal.currentDeck = this;
+        modal.checkDeck = this.parent;
         modal.setupCardsView();
         this.nextCard(modal);
     });
@@ -409,7 +411,7 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
             }
         }
 
-        if (this.parent == null) modal.decksList();
+        if (this.parent == modal.checkDeck) modal.decksList();
         else this.parent.nextCard(modal);
         return;
     }
