@@ -321,9 +321,11 @@ export class FlashcardModal extends Modal {
         this.currentDeck.nextCard(this);
     }
 
-    buryRelatedCards(tillNextDay: boolean) {
-        if (tillNextDay)
+    async buryRelatedCards(tillNextDay: boolean) {
+        if (tillNextDay) {
             this.plugin.data.buryList.push(cyrb53(this.currentCard.cardText));
+            await this.plugin.savePluginData();
+        }
 
         for (let relatedCard of this.currentCard.relatedCards) {
             let dueIdx = this.currentDeck.dueFlashcards.indexOf(relatedCard);
