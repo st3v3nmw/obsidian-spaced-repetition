@@ -10,7 +10,7 @@ import {
 import { schedule, textInterval } from "./sched";
 import { CLOZE_SCHEDULING_EXTRACTOR, COLLAPSE_ICON } from "./constants";
 import { getSetting } from "./settings";
-import { escapeRegexString, fixDollarSigns } from "./utils";
+import { escapeRegexString, fixDollarSigns, cyrb53 } from "./utils";
 
 export class FlashcardModal extends Modal {
     public plugin: SRPlugin;
@@ -58,7 +58,7 @@ export class FlashcardModal extends Modal {
                         this.currentCard.isDue
                     );
                     if (this.currentCard.cardType == CardType.Cloze)
-                        this.buryRelatedCards(this.currentCard.relatedCards);
+                        this.buryRelatedCards(false);
                     this.currentDeck.nextCard(this);
                 } else if (
                     this.mode == FlashcardModalMode.Front &&
@@ -287,7 +287,7 @@ export class FlashcardModal extends Modal {
             for (let relatedCard of this.currentCard.relatedCards)
                 relatedCard.cardText = this.currentCard.cardText;
             if (this.plugin.data.settings.buryRelatedCards)
-                this.buryRelatedCards(this.currentCard.relatedCards);
+                this.buryRelatedCards(true);
         } else {
             if (this.currentCard.cardType == CardType.SingleLineBasic) {
                 fileText = fileText.replace(
@@ -320,8 +320,11 @@ export class FlashcardModal extends Modal {
         this.currentDeck.nextCard(this);
     }
 
-    buryRelatedCards(arr: Card[]) {
-        for (let relatedCard of arr) {
+    buryRelatedCards(tillNextDay: boolean) {
+        if (tillNextDay)
+            this.plugin.data.buryList.push(cyrb53(this.currentCard.cardText));
+
+        for (let relatedCard of this.currentCard.relatedCards) {
             let dueIdx = this.currentDeck.dueFlashcards.indexOf(relatedCard);
             let newIdx = this.currentDeck.newFlashcards.indexOf(relatedCard);
 
