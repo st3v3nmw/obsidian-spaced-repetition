@@ -33,7 +33,9 @@
     position: absolute;
     bottom: 0;
     cursor: pointer;
-    backdrop-filter: invert(4%);
+    background-color: #2196f3;
+    color: #ffffff;
+    border-radius: 4px;
 }
 
 #sr-hr-card-divide {
@@ -47,6 +49,7 @@
 #sr-easy-btn {
     height: 48px;
     margin: auto;
+    color: #ffffff;
 }
 
 #sr-hard-btn {
@@ -68,7 +71,7 @@
 }
 
 #sr-flashcard-view {
-    overflow-y: scroll;
+    overflow-y: auto;
     height: 80%;
 }
 
