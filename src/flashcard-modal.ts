@@ -321,7 +321,7 @@ export class FlashcardModal extends Modal {
         this.currentDeck.nextCard(this);
     }
 
-    buryRelatedCards(tillNextDay: boolean) {
+    async buryRelatedCards(tillNextDay: boolean) {
         if (tillNextDay) {
             this.plugin.data.buryList.push(cyrb53(this.currentCard.cardText));
             await this.plugin.savePluginData();
