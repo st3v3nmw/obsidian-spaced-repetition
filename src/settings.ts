@@ -134,7 +134,7 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Bury related cards until the next review session?")
+            .setName("Bury related cards until the next day?")
             .setDesc("This applies to other cloze deletions in cloze cards.")
             .addToggle((toggle) =>
                 toggle
