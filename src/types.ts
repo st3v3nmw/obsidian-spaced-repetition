@@ -89,6 +89,9 @@ export class Deck {
     }
 
     insertFlashcard(deckPath: string[], cardObj: Card): void {
+        if (cardObj.isDue) this.dueFlashcardsCount++;
+        else this.newFlashcardsCount++;
+
         if (deckPath.length == 0) {
             if (cardObj.isDue) this.dueFlashcards.push(cardObj);
             else this.newFlashcards.push(cardObj);
@@ -98,9 +101,6 @@ export class Deck {
         let deckName: string = deckPath.shift();
         for (let deck of this.subdecks) {
             if (deckName == deck.deckName) {
-                if (cardObj.isDue) deck.dueFlashcardsCount++;
-                else deck.newFlashcardsCount++;
-
                 deck.insertFlashcard(deckPath, cardObj);
                 return;
             }
