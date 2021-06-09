@@ -95,6 +95,14 @@ export class FlashcardModal extends Modal {
     decksList() {
         this.mode = FlashcardModalMode.DecksList;
         this.titleEl.setText("Decks");
+        this.titleEl.innerHTML +=
+            '<span style="background-color:#4caf50;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
+            this.plugin.deckTree.dueFlashcardsCount +
+            "</span>";
+        this.titleEl.innerHTML +=
+            '<span style="background-color:#2196f3;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
+            this.plugin.deckTree.newFlashcardsCount +
+            "</span>";
         this.contentEl.innerHTML = "";
         this.contentEl.setAttribute("id", "sr-flashcard-view");
 
@@ -206,7 +214,6 @@ export class FlashcardModal extends Modal {
                 );
                 interval = schedObj.interval;
                 ease = schedObj.ease;
-                this.plugin.dueFlashcardsCount--;
             } else {
                 let schedObj = schedule(
                     response,

@@ -62,7 +62,6 @@ export default class SRPlugin extends Plugin {
     private dueNotesCount: number = 0;
 
     public deckTree: Deck = new Deck("root", null);
-    public dueFlashcardsCount: number = 0;
     public dueDatesFlashcards: Record<number, number> = {}; // Record<# of days in future, due count>
     public dueDatesNotes: Record<number, number> = {}; // Record<# of days in future, due count>
 
@@ -324,9 +323,9 @@ export default class SRPlugin extends Plugin {
         );
 
         let noteCountText = this.dueNotesCount == 1 ? "note" : "notes";
-        let cardCountText = this.dueFlashcardsCount == 1 ? "card" : "cards";
+        let cardCountText = this.deckTree.dueFlashcardsCount == 1 ? "card" : "cards";
         this.statusBar.setText(
-            `Review: ${this.dueNotesCount} ${noteCountText}, ${this.dueFlashcardsCount} ${cardCountText} due`
+            `Review: ${this.dueNotesCount} ${noteCountText}, ${this.deckTree.dueFlashcardsCount} ${cardCountText} due`
         );
         this.reviewQueueView.redraw();
     }
@@ -491,7 +490,6 @@ export default class SRPlugin extends Plugin {
         let notes = this.app.vault.getMarkdownFiles();
 
         this.deckTree = new Deck("root", null);
-        this.dueFlashcardsCount = 0;
         this.dueDatesFlashcards = {};
 
         let todayDate = window.moment(Date.now()).format("YYYY-MM-DD");
@@ -533,9 +531,9 @@ export default class SRPlugin extends Plugin {
 
         let noteCountText: string = this.dueNotesCount == 1 ? "note" : "notes";
         let cardCountText: string =
-            this.dueFlashcardsCount == 1 ? "card" : "cards";
+            this.deckTree.dueFlashcardsCount == 1 ? "card" : "cards";
         this.statusBar.setText(
-            `Review: ${this.dueNotesCount} ${noteCountText}, ${this.dueFlashcardsCount} ${cardCountText} due`
+            `Review: ${this.dueNotesCount} ${noteCountText}, ${this.deckTree.dueFlashcardsCount} ${cardCountText} due`
         );
     }
 
@@ -621,7 +619,6 @@ export default class SRPlugin extends Plugin {
                         };
 
                         this.deckTree.insertFlashcard([...deckPath], cardObj);
-                        this.dueFlashcardsCount++;
                     } else continue;
                 } else {
                     cardObj = {
@@ -749,7 +746,6 @@ export default class SRPlugin extends Plugin {
                                 [...deckPath],
                                 cardObj
                             );
-                            this.dueFlashcardsCount++;
                         } else continue;
                     } else {
                         // new card
