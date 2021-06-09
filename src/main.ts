@@ -68,6 +68,10 @@ export default class SRPlugin extends Plugin {
     public singlelineCardRegex: RegExp;
     public multilineCardRegex: RegExp;
 
+    // prevent calling these functions if another instance is already running
+    private notesSyncLock: boolean = false;
+    private flashcardsSyncLock: boolean = false;
+
     async onload() {
         await this.loadPluginData();
 
@@ -78,8 +82,10 @@ export default class SRPlugin extends Plugin {
         this.statusBar.setAttribute("aria-label", "Open a note for review");
         this.statusBar.setAttribute("aria-label-position", "top");
         this.statusBar.addEventListener("click", (_: any) => {
-            this.sync();
-            this.reviewNextNote();
+            if (!this.notesSyncLock) {
+                this.sync();
+                this.reviewNextNote();
+            }
         });
 
         this.singlelineCardRegex = new RegExp(
@@ -97,8 +103,10 @@ export default class SRPlugin extends Plugin {
         );
 
         this.addRibbonIcon("crosshairs", "Review flashcards", async () => {
-            await this.flashcards_sync();
-            new FlashcardModal(this.app, this).open();
+            if (!this.flashcardsSyncLock) {
+                await this.flashcards_sync();
+                new FlashcardModal(this.app, this).open();
+            }
         });
 
         this.registerView(
@@ -153,8 +161,10 @@ export default class SRPlugin extends Plugin {
             id: "srs-note-review-open-note",
             name: "Open a note for review",
             callback: () => {
-                this.sync();
-                this.reviewNextNote();
+                if (!this.notesSyncLock) {
+                    this.sync();
+                    this.reviewNextNote();
+                }
             },
         });
 
@@ -192,8 +202,10 @@ export default class SRPlugin extends Plugin {
             id: "srs-review-flashcards",
             name: "Review flashcards",
             callback: async () => {
-                await this.flashcards_sync();
-                new FlashcardModal(this.app, this).open();
+                if (!this.flashcardsSyncLock) {
+                    await this.flashcards_sync();
+                    new FlashcardModal(this.app, this).open();
+                }
             },
         });
 
@@ -213,6 +225,9 @@ export default class SRPlugin extends Plugin {
     }
 
     async sync() {
+        if (this.notesSyncLock) return;
+        this.notesSyncLock = true;
+
         let notes = this.app.vault.getMarkdownFiles();
 
         graph.reset();
@@ -323,11 +338,14 @@ export default class SRPlugin extends Plugin {
         );
 
         let noteCountText = this.dueNotesCount == 1 ? "note" : "notes";
-        let cardCountText = this.deckTree.dueFlashcardsCount == 1 ? "card" : "cards";
+        let cardCountText =
+            this.deckTree.dueFlashcardsCount == 1 ? "card" : "cards";
         this.statusBar.setText(
             `Review: ${this.dueNotesCount} ${noteCountText}, ${this.deckTree.dueFlashcardsCount} ${cardCountText} due`
         );
         this.reviewQueueView.redraw();
+
+        this.notesSyncLock = false;
     }
 
     async saveReviewResponse(note: TFile, response: ReviewResponse) {
@@ -459,8 +477,10 @@ export default class SRPlugin extends Plugin {
         new Notice("Response received.");
 
         setTimeout(() => {
-            this.sync();
-            if (this.data.settings.autoNextNote) this.reviewNextNote();
+            if (!this.notesSyncLock) {
+                this.sync();
+                if (this.data.settings.autoNextNote) this.reviewNextNote();
+            }
         }, 500);
     }
 
@@ -487,6 +507,9 @@ export default class SRPlugin extends Plugin {
     }
 
     async flashcards_sync() {
+        if (this.flashcardsSyncLock) return;
+        this.flashcardsSyncLock = true;
+
         let notes = this.app.vault.getMarkdownFiles();
 
         this.deckTree = new Deck("root", null);
@@ -535,6 +558,8 @@ export default class SRPlugin extends Plugin {
         this.statusBar.setText(
             `Review: ${this.dueNotesCount} ${noteCountText}, ${this.deckTree.dueFlashcardsCount} ${cardCountText} due`
         );
+
+        this.flashcardsSyncLock = false;
     }
 
     async findFlashcards(note: TFile, deckPathStr: string) {
