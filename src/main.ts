@@ -60,10 +60,11 @@ export default class SRPlugin extends Plugin {
     private incomingLinks: Record<string, LinkStat[]> = {};
     private pageranks: Record<string, number> = {};
     private dueNotesCount: number = 0;
+    public dueDatesNotes: Record<number, number> = {}; // Record<# of days in future, due count>
 
     public deckTree: Deck = new Deck("root", null);
     public dueDatesFlashcards: Record<number, number> = {}; // Record<# of days in future, due count>
-    public dueDatesNotes: Record<number, number> = {}; // Record<# of days in future, due count>
+    public totalFlashcards: number = 0;
 
     public singlelineCardRegex: RegExp;
     public multilineCardRegex: RegExp;
@@ -514,6 +515,7 @@ export default class SRPlugin extends Plugin {
 
         this.deckTree = new Deck("root", null);
         this.dueDatesFlashcards = {};
+        this.totalFlashcards = 0;
 
         let todayDate = window.moment(Date.now()).format("YYYY-MM-DD");
         // clear list if we've changed dates
@@ -598,6 +600,7 @@ export default class SRPlugin extends Plugin {
                 }
 
                 let cardText = match[0].trim();
+                this.totalFlashcards++;
                 if (this.data.buryList.includes(cyrb53(cardText))) continue;
 
                 let originalFrontText = match[1].trim();
@@ -677,7 +680,6 @@ export default class SRPlugin extends Plugin {
                 }
 
                 let cardText = match[0];
-                if (this.data.buryList.includes(cyrb53(cardText))) continue;
 
                 let deletions: RegExpMatchArray[] = [];
                 for (let m of cardText.matchAll(CLOZE_DELETIONS_EXTRACTOR)) {
@@ -710,6 +712,9 @@ export default class SRPlugin extends Plugin {
                     fileText = fileText.replace(replacementRegex, newCardText);
                     fileChanged = true;
                 }
+
+                this.totalFlashcards += deletions.length;
+                if (this.data.buryList.includes(cyrb53(cardText))) continue;
 
                 let relatedCards: Card[] = [];
                 for (let i = 0; i < deletions.length; i++) {

@@ -96,13 +96,17 @@ export class FlashcardModal extends Modal {
         this.mode = FlashcardModalMode.DecksList;
         this.titleEl.setText("Decks");
         this.titleEl.innerHTML +=
-            '<span style="background-color:#4caf50;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
+            '<p style="margin:0px;line-height:12px;">' +
+            '<span style="background-color:#4caf50;color:#ffffff;" aria-label="Due cards" class="tag-pane-tag-count tree-item-flair">' +
             this.plugin.deckTree.dueFlashcardsCount +
-            "</span>";
-        this.titleEl.innerHTML +=
-            '<span style="background-color:#2196f3;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
+            "</span>" +
+            '<span style="background-color:#2196f3;" aria-label="New cards" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
             this.plugin.deckTree.newFlashcardsCount +
-            "</span>";
+            "</span>" +
+            '<span style="background-color:#ff9800;" aria-label="Total cards" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
+            this.plugin.totalFlashcards +
+            "</span>" +
+            "</p>";
         this.contentEl.innerHTML = "";
         this.contentEl.setAttribute("id", "sr-flashcard-view");
 
