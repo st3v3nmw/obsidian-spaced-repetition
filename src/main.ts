@@ -601,7 +601,6 @@ export default class SRPlugin extends Plugin {
 
                 let cardText = match[0].trim();
                 this.totalFlashcards++;
-                if (this.data.buryList.includes(cyrb53(cardText))) continue;
 
                 let originalFrontText = match[1].trim();
                 let front = await this.fixCardMediaLinks(
@@ -629,6 +628,7 @@ export default class SRPlugin extends Plugin {
                     if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
                         this.dueDatesFlashcards[nDays] = 0;
                     this.dueDatesFlashcards[nDays]++;
+                    if (this.data.buryList.includes(cyrb53(cardText))) continue;
 
                     if (dueUnix <= now) {
                         cardObj = {
@@ -714,7 +714,6 @@ export default class SRPlugin extends Plugin {
                 }
 
                 this.totalFlashcards += deletions.length;
-                if (this.data.buryList.includes(cyrb53(cardText))) continue;
 
                 let relatedCards: Card[] = [];
                 for (let i = 0; i < deletions.length; i++) {
@@ -753,6 +752,7 @@ export default class SRPlugin extends Plugin {
                         if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
                             this.dueDatesFlashcards[nDays] = 0;
                         this.dueDatesFlashcards[nDays]++;
+                        if (this.data.buryList.includes(cyrb53(cardText))) continue;
 
                         if (dueUnix <= now) {
                             cardObj = {
