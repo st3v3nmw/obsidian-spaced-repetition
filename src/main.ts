@@ -9,6 +9,7 @@ import {
 import * as graph from "pagerank.js";
 import { SRSettingTab, DEFAULT_SETTINGS, getSetting } from "./settings";
 import { FlashcardModal } from "./flashcard-modal";
+import { StatsModal } from "./stats-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "./sidebar";
 import { schedule } from "./sched";
 import {
@@ -207,6 +208,14 @@ export default class SRPlugin extends Plugin {
                     await this.flashcards_sync();
                     new FlashcardModal(this.app, this).open();
                 }
+            },
+        });
+
+        this.addCommand({
+            id: "srs-view-stats",
+            name: "View statistics",
+            callback: () => {
+                new StatsModal(this.app, this.dueDatesFlashcards).open();
             },
         });
 
@@ -752,7 +761,8 @@ export default class SRPlugin extends Plugin {
                         if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
                             this.dueDatesFlashcards[nDays] = 0;
                         this.dueDatesFlashcards[nDays]++;
-                        if (this.data.buryList.includes(cyrb53(cardText))) continue;
+                        if (this.data.buryList.includes(cyrb53(cardText)))
+                            continue;
 
                         if (dueUnix <= now) {
                             cardObj = {
