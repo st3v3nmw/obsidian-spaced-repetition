@@ -155,7 +155,7 @@ export class ReviewQueueListView extends ItemView {
             }
         });
 
-        return childrenEl;
+        return folderEl;
     }
 
     private createRightPaneFile(
@@ -164,7 +164,9 @@ export class ReviewQueueListView extends ItemView {
         fileElActive: boolean,
         hidden: boolean
     ) {
-        const navFileEl: HTMLElement = folderEl.createDiv("nav-file");
+        const navFileEl: HTMLElement = folderEl
+            .getElementsByClassName("nav-folder-children")[0]
+            .createDiv("nav-file");
         if (hidden) navFileEl.style.display = "none";
 
         const navFileTitle: HTMLElement = navFileEl.createDiv("nav-file-title");
