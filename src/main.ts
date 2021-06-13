@@ -788,6 +788,9 @@ export default class SRPlugin extends Plugin {
                             );
                         } else continue;
                     } else {
+                        if (this.data.buryList.includes(cyrb53(cardText)))
+                            continue;
+                            
                         // new card
                         cardObj = {
                             isDue: false,
