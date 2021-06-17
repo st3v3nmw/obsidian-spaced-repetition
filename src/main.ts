@@ -825,15 +825,24 @@ export default class SRPlugin extends Plugin {
     ): Promise<string> {
         for (let regex of [WIKILINK_MEDIA_REGEX, MARKDOWN_LINK_MEDIA_REGEX]) {
             cardText = cardText.replace(regex, (match, imagePath) => {
-                let fullImagePath = this.app.metadataCache.getFirstLinkpathDest(
+                let fullImageLink = this.app.metadataCache.getFirstLinkpathDest(
                     decodeURIComponent(imagePath),
                     filePath
-                ).path;
-                return (
-                    '<img src="' +
-                    this.app.vault.adapter.getResourcePath(fullImagePath) +
-                    '" />'
                 );
+
+                if (fullImageLink) {
+                    // image exists
+                    return (
+                        '<img src="' +
+                        this.app.vault.adapter.getResourcePath(
+                            fullImageLink.path
+                        ) +
+                        '" />'
+                    );
+                } else {
+                    // image does not exist
+                    return imagePath;
+                }
             });
         }
 
