@@ -278,14 +278,14 @@ export default class SRPlugin extends Plugin {
             let tags = getAllTags(fileCachedData) || [];
 
             let shouldIgnore: boolean = true;
-            for (let tag of tags) {
+            outer: for (let tag of tags) {
                 for (let tagToReview of this.data.settings.tagsToReview) {
                     if (
                         tag == tagToReview ||
                         tag.startsWith(tagToReview + "/")
                     ) {
                         shouldIgnore = false;
-                        break;
+                        break outer;
                     }
                 }
             }
@@ -364,11 +364,11 @@ export default class SRPlugin extends Plugin {
 
         let tags = getAllTags(fileCachedData) || [];
         let shouldIgnore: boolean = true;
-        for (let tag of tags) {
+        outer: for (let tag of tags) {
             for (let tagToReview of this.data.settings.tagsToReview) {
                 if (tag == tagToReview || tag.startsWith(tagToReview + "/")) {
                     shouldIgnore = false;
-                    break;
+                    break outer;
                 }
             }
         }
@@ -547,14 +547,14 @@ export default class SRPlugin extends Plugin {
                 fileCachedData.frontmatter || <Record<string, any>>{};
             let tags = getAllTags(fileCachedData) || [];
 
-            for (let tag of tags) {
+            outer: for (let tag of tags) {
                 for (let tagToReview of this.data.settings.flashcardTags) {
                     if (
                         tag == tagToReview ||
                         tag.startsWith(tagToReview + "/")
                     ) {
                         await this.findFlashcards(note, tag);
-                        break;
+                        break outer;
                     }
                 }
             }
@@ -790,7 +790,7 @@ export default class SRPlugin extends Plugin {
                     } else {
                         if (this.data.buryList.includes(cyrb53(cardText)))
                             continue;
-                            
+
                         // new card
                         cardObj = {
                             isDue: false,
