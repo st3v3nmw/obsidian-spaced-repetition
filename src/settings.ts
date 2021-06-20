@@ -11,7 +11,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     buryRelatedCards: false,
     showContextInCards: true,
     largeScreenMode: false,
-    showFileNameInFileLink: true,
+    showFileNameInFileLink: false,
+    randomizeCardOrder: true,
     disableClozeCards: false,
     disableSinglelineCards: false,
     singlelineCardSeparator: "::",
@@ -184,7 +185,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName(
-                "Show file name instead of 'open link' in flashcard review?"
+                "Show file name instead of 'Open file' in flashcard review?"
             )
             .addToggle((toggle) =>
                 toggle
@@ -197,6 +198,22 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         this.plugin.data.settings.showFileNameInFileLink =
                             value;
+                        await this.plugin.savePluginData();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Randomize card order during review?")
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(
+                        getSetting(
+                            "randomizeCardOrder",
+                            this.plugin.data.settings
+                        )
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.randomizeCardOrder = value;
                         await this.plugin.savePluginData();
                     })
             );

@@ -31,6 +31,7 @@ export class FlashcardModal extends Modal {
     public resetLinkView: HTMLElement;
     public contextView: HTMLElement;
     public currentCard: Card;
+    public currentCardIdx: number;
     public currentDeck: Deck;
     public checkDeck: Deck;
     public mode: FlashcardModalMode;
@@ -67,7 +68,7 @@ export class FlashcardModal extends Modal {
                     e.code == "KeyS"
                 ) {
                     this.currentDeck.deleteFlashcardAtIndex(
-                        0,
+                        this.currentCardIdx,
                         this.currentCard.isDue
                     );
                     if (this.currentCard.cardType == CardType.Cloze)
@@ -211,7 +212,7 @@ export class FlashcardModal extends Modal {
     async processReview(response: ReviewResponse) {
         let interval, ease, due;
 
-        this.currentDeck.deleteFlashcardAtIndex(0, this.currentCard.isDue);
+        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
         if (response != ReviewResponse.Reset) {
             // scheduled card
             if (this.currentCard.isDue) {
@@ -390,8 +391,7 @@ export class FlashcardModal extends Modal {
                     (img) => {
                         if (el.hasAttribute("width"))
                             img.setAttribute("width", el.getAttribute("width"));
-                        else
-                            img.setAttribute("width", "100%");
+                        else img.setAttribute("width", "100%");
                         if (el.hasAttribute("alt"))
                             img.setAttribute("alt", el.getAttribute("alt"));
                     }
@@ -494,7 +494,12 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
     modal.mode = FlashcardModalMode.Front;
 
     if (this.dueFlashcards.length > 0) {
-        modal.currentCard = this.dueFlashcards[0];
+        if (getSetting("randomizeCardOrder", modal.plugin.data.settings))
+            modal.currentCardIdx = Math.floor(
+                Math.random() * this.dueFlashcards.length
+            );
+        else modal.currentCardIdx = 0;
+        modal.currentCard = this.dueFlashcards[modal.currentCardIdx];
         modal.renderMarkdownWrapper(
             modal.currentCard.front,
             modal.flashcardView
@@ -538,7 +543,12 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
             );
         }
     } else if (this.newFlashcards.length > 0) {
-        modal.currentCard = this.newFlashcards[0];
+        if (getSetting("randomizeCardOrder", modal.plugin.data.settings))
+            modal.currentCardIdx = Math.floor(
+                Math.random() * this.newFlashcards.length
+            );
+        else modal.currentCardIdx = 0;
+        modal.currentCard = this.newFlashcards[modal.currentCardIdx];
         modal.renderMarkdownWrapper(
             modal.currentCard.front,
             modal.flashcardView
