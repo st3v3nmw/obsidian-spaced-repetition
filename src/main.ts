@@ -65,7 +65,6 @@ export default class SRPlugin extends Plugin {
 
     public deckTree: Deck = new Deck("root", null);
     public dueDatesFlashcards: Record<number, number> = {}; // Record<# of days in future, due count>
-    public totalFlashcards: number = 0;
 
     public singlelineCardRegex: RegExp;
     public multilineCardRegex: RegExp;
@@ -524,7 +523,6 @@ export default class SRPlugin extends Plugin {
 
         this.deckTree = new Deck("root", null);
         this.dueDatesFlashcards = {};
-        this.totalFlashcards = 0;
 
         let todayDate = window.moment(Date.now()).format("YYYY-MM-DD");
         // clear list if we've changed dates
@@ -609,7 +607,6 @@ export default class SRPlugin extends Plugin {
                 }
 
                 let cardText = match[0].trim();
-                this.totalFlashcards++;
 
                 let originalFrontText = match[1].trim();
                 let front = await this.fixCardMediaLinks(
@@ -637,7 +634,10 @@ export default class SRPlugin extends Plugin {
                     if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
                         this.dueDatesFlashcards[nDays] = 0;
                     this.dueDatesFlashcards[nDays]++;
-                    if (this.data.buryList.includes(cyrb53(cardText))) continue;
+                    if (this.data.buryList.includes(cyrb53(cardText))) {
+                        this.deckTree.countFlashcard([...deckPath]);
+                        continue;
+                    }
 
                     if (dueUnix <= now) {
                         cardObj = {
@@ -656,7 +656,10 @@ export default class SRPlugin extends Plugin {
                         };
 
                         this.deckTree.insertFlashcard([...deckPath], cardObj);
-                    } else continue;
+                    } else {
+                        this.deckTree.countFlashcard([...deckPath]);
+                        continue;
+                    }
                 } else {
                     cardObj = {
                         isDue: false,
@@ -722,8 +725,6 @@ export default class SRPlugin extends Plugin {
                     fileChanged = true;
                 }
 
-                this.totalFlashcards += deletions.length;
-
                 let relatedCards: Card[] = [];
                 for (let i = 0; i < deletions.length; i++) {
                     let cardObj: Card;
@@ -761,8 +762,10 @@ export default class SRPlugin extends Plugin {
                         if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
                             this.dueDatesFlashcards[nDays] = 0;
                         this.dueDatesFlashcards[nDays]++;
-                        if (this.data.buryList.includes(cyrb53(cardText)))
+                        if (this.data.buryList.includes(cyrb53(cardText))) {
+                            this.deckTree.countFlashcard([...deckPath]);
                             continue;
+                        }
 
                         if (dueUnix <= now) {
                             cardObj = {
@@ -786,10 +789,15 @@ export default class SRPlugin extends Plugin {
                                 [...deckPath],
                                 cardObj
                             );
-                        } else continue;
-                    } else {
-                        if (this.data.buryList.includes(cyrb53(cardText)))
+                        } else {
+                            this.deckTree.countFlashcard([...deckPath]);
                             continue;
+                        }
+                    } else {
+                        if (this.data.buryList.includes(cyrb53(cardText))) {
+                            this.deckTree.countFlashcard([...deckPath]);
+                            continue;
+                        }
 
                         // new card
                         cardObj = {

@@ -59,6 +59,7 @@ export class Deck {
     public newFlashcardsCount: number = 0; // counts those in subdecks too
     public dueFlashcards: Card[];
     public dueFlashcardsCount: number = 0; // counts those in subdecks too
+    public totalFlashcards: number = 0; // counts those in subdecks too
     public subdecks: Deck[];
     public parent: Deck;
 
@@ -68,6 +69,7 @@ export class Deck {
         this.newFlashcardsCount = 0;
         this.dueFlashcards = [];
         this.dueFlashcardsCount = 0;
+        this.totalFlashcards = 0;
         this.subdecks = [];
         this.parent = parent;
     }
@@ -91,6 +93,7 @@ export class Deck {
     insertFlashcard(deckPath: string[], cardObj: Card): void {
         if (cardObj.isDue) this.dueFlashcardsCount++;
         else this.newFlashcardsCount++;
+        this.totalFlashcards++;
 
         if (deckPath.length == 0) {
             if (cardObj.isDue) this.dueFlashcards.push(cardObj);
@@ -102,6 +105,20 @@ export class Deck {
         for (let deck of this.subdecks) {
             if (deckName == deck.deckName) {
                 deck.insertFlashcard(deckPath, cardObj);
+                return;
+            }
+        }
+    }
+
+    // count flashcards that have either been buried
+    // or aren't due yet
+    countFlashcard(deckPath: string[]): void {
+        this.totalFlashcards++;
+
+        let deckName: string = deckPath.shift();
+        for (let deck of this.subdecks) {
+            if (deckName == deck.deckName) {
+                deck.countFlashcard(deckPath);
                 return;
             }
         }
