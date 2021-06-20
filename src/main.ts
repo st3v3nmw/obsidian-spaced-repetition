@@ -28,8 +28,6 @@ import {
     CLOZE_CARD_DETECTOR,
     CLOZE_DELETIONS_EXTRACTOR,
     CLOZE_SCHEDULING_EXTRACTOR,
-    WIKILINK_MEDIA_REGEX,
-    MARKDOWN_LINK_MEDIA_REGEX,
     CODEBLOCK_REGEX,
     INLINE_CODE_REGEX,
 } from "./constants";
@@ -608,16 +606,8 @@ export default class SRPlugin extends Plugin {
 
                 let cardText = match[0].trim();
 
-                let originalFrontText = match[1].trim();
-                let front = await this.fixCardMediaLinks(
-                    originalFrontText,
-                    note.path
-                );
-                let originalBackText = match[2].trim();
-                let back = await this.fixCardMediaLinks(
-                    originalBackText,
-                    note.path
-                );
+                let front = match[1].trim();
+                let back = match[2].trim();
                 let cardObj: Card;
                 // flashcard already scheduled
                 if (match[3]) {
@@ -650,8 +640,6 @@ export default class SRPlugin extends Plugin {
                             back,
                             cardText,
                             context: "",
-                            originalFrontText,
-                            originalBackText,
                             cardType,
                         };
 
@@ -668,8 +656,6 @@ export default class SRPlugin extends Plugin {
                         back,
                         cardText,
                         context: "",
-                        originalFrontText,
-                        originalBackText,
                         cardType,
                     };
 
@@ -735,18 +721,14 @@ export default class SRPlugin extends Plugin {
                         cardText.substring(0, deletionStart) +
                         "<span style='color:#2196f3'>[...]</span>" +
                         cardText.substring(deletionEnd);
-                    front = (
-                        await this.fixCardMediaLinks(front, note.path)
-                    ).replace(/==/gm, "");
+                    front = front.replace(/==/gm, "");
                     let back =
                         cardText.substring(0, deletionStart) +
                         "<span style='color:#2196f3'>" +
                         cardText.substring(deletionStart, deletionEnd) +
                         "</span>" +
                         cardText.substring(deletionEnd);
-                    back = (
-                        await this.fixCardMediaLinks(back, note.path)
-                    ).replace(/==/gm, "");
+                    back = back.replace(/==/gm, "");
 
                     // card deletion scheduled
                     if (i < scheduling.length) {
@@ -778,8 +760,6 @@ export default class SRPlugin extends Plugin {
                                 back,
                                 cardText: match[0],
                                 context: "",
-                                originalFrontText: "",
-                                originalBackText: "",
                                 cardType: CardType.Cloze,
                                 subCardIdx: i,
                                 relatedCards,
@@ -807,8 +787,6 @@ export default class SRPlugin extends Plugin {
                             back,
                             cardText: match[0],
                             context: "",
-                            originalFrontText: "",
-                            originalBackText: "",
                             cardType: CardType.Cloze,
                             subCardIdx: i,
                             relatedCards,
@@ -825,36 +803,6 @@ export default class SRPlugin extends Plugin {
         }
 
         if (fileChanged) await this.app.vault.modify(note, fileText);
-    }
-
-    async fixCardMediaLinks(
-        cardText: string,
-        filePath: string
-    ): Promise<string> {
-        for (let regex of [WIKILINK_MEDIA_REGEX, MARKDOWN_LINK_MEDIA_REGEX]) {
-            cardText = cardText.replace(regex, (match, imagePath) => {
-                let fullImageLink = this.app.metadataCache.getFirstLinkpathDest(
-                    decodeURIComponent(imagePath),
-                    filePath
-                );
-
-                if (fullImageLink) {
-                    // image exists
-                    return (
-                        '<img src="' +
-                        this.app.vault.adapter.getResourcePath(
-                            fullImageLink.path
-                        ) +
-                        '" />'
-                    );
-                } else {
-                    // image does not exist
-                    return imagePath;
-                }
-            });
-        }
-
-        return cardText;
     }
 
     async loadPluginData() {

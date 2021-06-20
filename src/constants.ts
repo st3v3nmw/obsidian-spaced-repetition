@@ -7,11 +7,6 @@ export const CLOZE_CARD_DETECTOR: RegExp =
 export const CLOZE_DELETIONS_EXTRACTOR: RegExp = /==(.*?)==/gm;
 export const CLOZE_SCHEDULING_EXTRACTOR: RegExp = /!([\d-]+),(\d+),(\d+)/gm;
 
-export const WIKILINK_MEDIA_REGEX: RegExp =
-    /!\[\[(.*?.(?:png|jpe?g|gif|bmp|svg)).*?\]\]/gm; // ![[...]] format
-export const MARKDOWN_LINK_MEDIA_REGEX: RegExp =
-    /!\[.*\]\(((?!https?:\/\/).*.(?:png|jpe?g|gif|bmp|svg))\)/gm; // ![...](...) format
-
 export const CODEBLOCK_REGEX: RegExp = /```(?:.*\n)*?```/gm;
 export const INLINE_CODE_REGEX: RegExp = /`(?!`).+`/gm;
 
