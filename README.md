@@ -24,6 +24,7 @@ Visit the [Discussions](https://github.com/st3v3nmw/obsidian-spaced-repetition/d
 - Notes
   - [Reviewing entire notes](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Notes)
   - Possible use case: [Incremental writing](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Incremental-writing)
+- [Statistics](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Statistics)
 
 ## Quick Demo
 
