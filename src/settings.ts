@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     cardCommentOnSameLine: false,
     buryRelatedCards: false,
     showContextInCards: true,
+    largeScreenMode: false,
     showFileNameInFileLink: true,
     disableClozeCards: false,
     disableSinglelineCards: false,
@@ -163,6 +164,20 @@ export class SRSettingTab extends PluginSettingTab {
                     )
                     .onChange(async (value) => {
                         this.plugin.data.settings.showContextInCards = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Review cards in large screen mode?")
+            .setDesc("[Desktop] Should be useful if you have very large images")
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(
+                        getSetting("largeScreenMode", this.plugin.data.settings)
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.largeScreenMode = value;
                         await this.plugin.savePluginData();
                     })
             );

@@ -1,4 +1,11 @@
-import { Modal, App, MarkdownRenderer, Notice, Platform } from "obsidian";
+import {
+    Modal,
+    App,
+    MarkdownRenderer,
+    Notice,
+    Platform,
+    TFile,
+} from "obsidian";
 import type SRPlugin from "./main";
 import {
     Card,
@@ -40,8 +47,13 @@ export class FlashcardModal extends Modal {
             this.modalEl.style.width = "100%";
             this.contentEl.style.display = "block";
         } else {
-            this.modalEl.style.height = "80%";
-            this.modalEl.style.width = "40%";
+            if (getSetting("largeScreenMode", this.plugin.data.settings)) {
+                this.modalEl.style.height = "100%";
+                this.modalEl.style.width = "100%";
+            } else {
+                this.modalEl.style.height = "80%";
+                this.modalEl.style.width = "40%";
+            }
         }
 
         this.contentEl.style.position = "relative";
@@ -193,12 +205,7 @@ export class FlashcardModal extends Modal {
             this.flashcardView.appendChild(hr);
         } else this.flashcardView.innerHTML = "";
 
-        MarkdownRenderer.renderMarkdown(
-            this.currentCard.back,
-            this.flashcardView,
-            this.currentCard.note.path,
-            null
-        );
+        this.renderMarkdownWrapper(this.currentCard.back, this.flashcardView);
     }
 
     async processReview(response: ReviewResponse) {
@@ -304,25 +311,21 @@ export class FlashcardModal extends Modal {
             if (this.currentCard.cardType == CardType.SingleLineBasic) {
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${fixDollarSigns(
-                        this.currentCard.originalFrontText
-                    )}${getSetting(
+                    `${fixDollarSigns(this.currentCard.front)}${getSetting(
                         "singlelineCardSeparator",
                         this.plugin.data.settings
                     )}${fixDollarSigns(
-                        this.currentCard.originalBackText
+                        this.currentCard.back
                     )}${sep}<!--SR:${dueString},${interval},${ease}-->`
                 );
             } else {
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${fixDollarSigns(
-                        this.currentCard.originalFrontText
-                    )}\n${getSetting(
+                    `${fixDollarSigns(this.currentCard.front)}\n${getSetting(
                         "multilineCardSeparator",
                         this.plugin.data.settings
                     )}\n${fixDollarSigns(
-                        this.currentCard.originalBackText
+                        this.currentCard.back
                     )}${sep}<!--SR:${dueString},${interval},${ease}-->`
                 );
             }
@@ -353,6 +356,53 @@ export class FlashcardModal extends Modal {
                     this.currentDeck.newFlashcards[newIdx].isDue
                 );
         }
+    }
+
+    // slightly modified version of the renderMarkdown function in
+    // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/KanbanView.tsx
+    async renderMarkdownWrapper(
+        markdownString: string,
+        containerEl: HTMLElement
+    ) {
+        MarkdownRenderer.renderMarkdown(
+            markdownString,
+            containerEl,
+            this.currentCard.note.path,
+            null
+        );
+        containerEl.findAll(".internal-embed").forEach((el) => {
+            const src = el.getAttribute("src");
+            const target =
+                typeof src === "string" &&
+                this.plugin.app.metadataCache.getFirstLinkpathDest(
+                    src,
+                    this.currentCard.note.path
+                );
+            if (target instanceof TFile && target.extension !== "md") {
+                el.innerText = "";
+                el.createEl(
+                    "img",
+                    {
+                        attr: {
+                            src: this.plugin.app.vault.getResourcePath(target),
+                        },
+                    },
+                    (img) => {
+                        if (el.hasAttribute("width"))
+                            img.setAttribute("width", el.getAttribute("width"));
+                        else
+                            img.setAttribute("width", "100%");
+                        if (el.hasAttribute("alt"))
+                            img.setAttribute("alt", el.getAttribute("alt"));
+                    }
+                );
+                el.addClasses(["image-embed", "is-loaded"]);
+            }
+
+            // file does not exist
+            // display dead link
+            if (target == null) el.innerText = src;
+        });
     }
 }
 
@@ -445,11 +495,9 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
 
     if (this.dueFlashcards.length > 0) {
         modal.currentCard = this.dueFlashcards[0];
-        MarkdownRenderer.renderMarkdown(
+        modal.renderMarkdownWrapper(
             modal.currentCard.front,
-            modal.flashcardView,
-            modal.currentCard.note.path,
-            null
+            modal.flashcardView
         );
 
         let hardInterval: number = schedule(
@@ -491,11 +539,9 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
         }
     } else if (this.newFlashcards.length > 0) {
         modal.currentCard = this.newFlashcards[0];
-        MarkdownRenderer.renderMarkdown(
+        modal.renderMarkdownWrapper(
             modal.currentCard.front,
-            modal.flashcardView,
-            modal.currentCard.note.path,
-            null
+            modal.flashcardView
         );
 
         if (Platform.isMobile) {
