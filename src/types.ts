@@ -10,6 +10,7 @@ export interface SRSettings {
     showContextInCards: boolean;
     largeScreenMode: boolean;
     showFileNameInFileLink: boolean;
+    randomizeCardOrder: boolean;
     disableClozeCards: boolean;
     disableSinglelineCards: boolean;
     singlelineCardSeparator: string;
