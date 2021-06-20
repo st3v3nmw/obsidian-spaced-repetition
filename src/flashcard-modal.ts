@@ -103,8 +103,8 @@ export class FlashcardModal extends Modal {
             '<span style="background-color:#2196f3;" aria-label="New cards" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
             this.plugin.deckTree.newFlashcardsCount +
             "</span>" +
-            '<span style="background-color:#ff9800;" aria-label="Total cards" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
-            this.plugin.totalFlashcards +
+            '<span style="background-color:#ff7043;" aria-label="Total cards" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
+            this.plugin.deckTree.totalFlashcards +
             "</span>" +
             "</p>";
         this.contentEl.innerHTML = "";
@@ -389,10 +389,12 @@ Deck.prototype.render = function (
     deckViewOuter.innerHTML +=
         '<span style="background-color:#4caf50;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
         this.dueFlashcardsCount +
-        "</span>";
-    deckViewOuter.innerHTML +=
+        "</span>" +
         '<span style="background-color:#2196f3;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
         this.newFlashcardsCount +
+        "</span>" +
+        '<span style="background-color:#ff7043;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
+        this.totalFlashcards +
         "</span>";
 
     let deckViewChildren: HTMLElement =
