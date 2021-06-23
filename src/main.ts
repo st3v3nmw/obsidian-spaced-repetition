@@ -527,6 +527,7 @@ export default class SRPlugin extends Plugin {
         if (todayDate != this.data.buryDate) {
             this.data.buryDate = todayDate;
             this.data.buryList = [];
+            await this.savePluginData();
         }
 
         for (let note of notes) {
