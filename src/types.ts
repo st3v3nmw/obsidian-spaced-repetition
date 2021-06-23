@@ -6,7 +6,7 @@ export interface SRSettings {
     flashcardTags: string[];
     convertFoldersToDecks: boolean;
     cardCommentOnSameLine: boolean;
-    buryRelatedCards: boolean;
+    burySiblingCards: boolean;
     showContextInCards: boolean;
     largeScreenMode: boolean;
     showFileNameInFileLink: boolean;
@@ -176,9 +176,9 @@ export interface Card {
     context: string;
     // types
     cardType: CardType;
-    // stuff for cards with sub-cards
-    subCardIdx?: number;
-    relatedCards?: Card[];
+    // information for sibling cards
+    siblingIdx?: number;
+    siblings?: Card[];
 }
 
 export enum FlashcardModalMode {

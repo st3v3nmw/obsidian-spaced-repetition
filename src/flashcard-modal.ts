@@ -15,7 +15,7 @@ import {
     Deck,
 } from "./types";
 import { schedule, textInterval } from "./sched";
-import { CLOZE_SCHEDULING_EXTRACTOR, COLLAPSE_ICON } from "./constants";
+import { MULTI_SCHEDULING_EXTRACTOR, COLLAPSE_ICON } from "./constants";
 import { getSetting } from "./settings";
 import { escapeRegexString, fixDollarSigns, cyrb53 } from "./utils";
 
@@ -72,7 +72,7 @@ export class FlashcardModal extends Modal {
                         this.currentCard.isDue
                     );
                     if (this.currentCard.cardType == CardType.Cloze)
-                        this.buryRelatedCards(false);
+                        this.burySiblingCards(false);
                     this.currentDeck.nextCard(this);
                 } else if (
                     this.mode == FlashcardModalMode.Front &&
@@ -276,7 +276,7 @@ export class FlashcardModal extends Modal {
             } else {
                 let scheduling: RegExpMatchArray[] = [
                     ...this.currentCard.cardText.matchAll(
-                        CLOZE_SCHEDULING_EXTRACTOR
+                        MULTI_SCHEDULING_EXTRACTOR
                     ),
                 ];
 
@@ -287,7 +287,7 @@ export class FlashcardModal extends Modal {
                     `${ease}`,
                 ];
                 if (this.currentCard.isDue)
-                    scheduling[this.currentCard.subCardIdx] = deletionSched;
+                    scheduling[this.currentCard.siblingIdx] = deletionSched;
                 else scheduling.push(deletionSched);
 
                 this.currentCard.cardText = this.currentCard.cardText.replace(
@@ -304,10 +304,10 @@ export class FlashcardModal extends Modal {
                 replacementRegex,
                 fixDollarSigns(this.currentCard.cardText)
             );
-            for (let relatedCard of this.currentCard.relatedCards)
-                relatedCard.cardText = this.currentCard.cardText;
-            if (this.plugin.data.settings.buryRelatedCards)
-                this.buryRelatedCards(true);
+            for (let sibling of this.currentCard.siblings)
+                sibling.cardText = this.currentCard.cardText;
+            if (this.plugin.data.settings.burySiblingCards)
+                this.burySiblingCards(true);
         } else {
             if (this.currentCard.cardType == CardType.SingleLineBasic) {
                 fileText = fileText.replace(
@@ -336,15 +336,15 @@ export class FlashcardModal extends Modal {
         this.currentDeck.nextCard(this);
     }
 
-    async buryRelatedCards(tillNextDay: boolean) {
+    async burySiblingCards(tillNextDay: boolean) {
         if (tillNextDay) {
             this.plugin.data.buryList.push(cyrb53(this.currentCard.cardText));
             await this.plugin.savePluginData();
         }
 
-        for (let relatedCard of this.currentCard.relatedCards) {
-            let dueIdx = this.currentDeck.dueFlashcards.indexOf(relatedCard);
-            let newIdx = this.currentDeck.newFlashcards.indexOf(relatedCard);
+        for (let sibling of this.currentCard.siblings) {
+            let dueIdx = this.currentDeck.dueFlashcards.indexOf(sibling);
+            let newIdx = this.currentDeck.newFlashcards.indexOf(sibling);
 
             if (dueIdx != -1)
                 this.currentDeck.deleteFlashcardAtIndex(

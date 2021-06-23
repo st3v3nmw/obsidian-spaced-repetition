@@ -8,7 +8,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardTags: ["#flashcards"],
     convertFoldersToDecks: false,
     cardCommentOnSameLine: false,
-    buryRelatedCards: false,
+    burySiblingCards: false,
     showContextInCards: true,
     largeScreenMode: false,
     showFileNameInFileLink: false,
@@ -136,18 +136,20 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Bury related cards until the next day?")
-            .setDesc("This applies to other cloze deletions in cloze cards.")
+            .setName("Bury sibling cards until the next day?")
+            .setDesc(
+                "Siblings are cards generated from the same card text i.e. cloze deletions"
+            )
             .addToggle((toggle) =>
                 toggle
                     .setValue(
                         getSetting(
-                            "buryRelatedCards",
+                            "burySiblingCards",
                             this.plugin.data.settings
                         )
                     )
                     .onChange(async (value) => {
-                        this.plugin.data.settings.buryRelatedCards = value;
+                        this.plugin.data.settings.burySiblingCards = value;
                         await this.plugin.savePluginData();
                     })
             );

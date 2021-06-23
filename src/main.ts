@@ -27,7 +27,7 @@ import {
     YAML_FRONT_MATTER_REGEX,
     CLOZE_CARD_DETECTOR,
     CLOZE_DELETIONS_EXTRACTOR,
-    CLOZE_SCHEDULING_EXTRACTOR,
+    MULTI_SCHEDULING_EXTRACTOR,
     CODEBLOCK_REGEX,
     INLINE_CODE_REGEX,
 } from "./constants";
@@ -693,7 +693,7 @@ export default class SRPlugin extends Plugin {
                     deletions.push(m);
                 }
                 let scheduling: RegExpMatchArray[] = [
-                    ...cardText.matchAll(CLOZE_SCHEDULING_EXTRACTOR),
+                    ...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
                 ];
 
                 // we have some extra scheduling dates to delete
@@ -712,7 +712,7 @@ export default class SRPlugin extends Plugin {
                     fileChanged = true;
                 }
 
-                let relatedCards: Card[] = [];
+                let siblings: Card[] = [];
                 for (let i = 0; i < deletions.length; i++) {
                     let cardObj: Card;
 
@@ -762,8 +762,8 @@ export default class SRPlugin extends Plugin {
                                 cardText: match[0],
                                 context: "",
                                 cardType: CardType.Cloze,
-                                subCardIdx: i,
-                                relatedCards,
+                                siblingIdx: i,
+                                siblings,
                             };
 
                             this.deckTree.insertFlashcard(
@@ -789,14 +789,14 @@ export default class SRPlugin extends Plugin {
                             cardText: match[0],
                             context: "",
                             cardType: CardType.Cloze,
-                            subCardIdx: i,
-                            relatedCards,
+                            siblingIdx: i,
+                            siblings,
                         };
 
                         this.deckTree.insertFlashcard([...deckPath], cardObj);
                     }
 
-                    relatedCards.push(cardObj);
+                    siblings.push(cardObj);
                     if (getSetting("showContextInCards", this.data.settings))
                         addContextToCard(cardObj, match.index, headings);
                 }
