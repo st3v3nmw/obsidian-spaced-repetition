@@ -5,6 +5,8 @@ import {
     TFile,
     HeadingCache,
     getAllTags,
+    FuzzySuggestModal,
+    SuggestModal,
 } from "obsidian";
 import * as graph from "pagerank.js";
 import { SRSettingTab, DEFAULT_SETTINGS, getSetting } from "./settings";
@@ -20,6 +22,8 @@ import {
     ReviewResponse,
     SRSettings,
     Deck,
+    ReviewDeck,
+    ReviewDeckSelectionModal,
 } from "./types";
 import {
     CROSS_HAIRS_ICON,
@@ -53,6 +57,9 @@ export default class SRPlugin extends Plugin {
     private reviewQueueView: ReviewQueueListView;
     public data: PluginData;
 
+    public reviewDecks: { [deckKey: string]: ReviewDeck } = {};
+    public lastSelectedReviewDeck: string;
+
     public newNotes: TFile[] = [];
     public scheduledNotes: SchedNote[] = [];
     private easeByPath: Record<string, number> = {};
@@ -83,7 +90,7 @@ export default class SRPlugin extends Plugin {
         this.statusBar.addEventListener("click", (_: any) => {
             if (!this.notesSyncLock) {
                 this.sync();
-                this.reviewNextNote();
+                this.reviewNextNoteModal();
             }
         });
 
@@ -162,7 +169,7 @@ export default class SRPlugin extends Plugin {
             callback: () => {
                 if (!this.notesSyncLock) {
                     this.sync();
-                    this.reviewNextNote();
+                    this.reviewNextNoteModal();
                 }
             },
         });
@@ -245,6 +252,7 @@ export default class SRPlugin extends Plugin {
         this.pageranks = {};
         this.dueNotesCount = 0;
         this.dueDatesNotes = {};
+        this.reviewDecks = {};
 
         let now: number = Date.now();
         for (let note of notes) {
@@ -281,6 +289,9 @@ export default class SRPlugin extends Plugin {
                         tag == tagToReview ||
                         tag.startsWith(tagToReview + "/")
                     ) {
+                        if (!this.reviewDecks.hasOwnProperty(tag)) {
+                            this.reviewDecks[tag] = new ReviewDeck(tag);
+                        }
                         shouldIgnore = false;
                         break outer;
                     }
@@ -297,6 +308,11 @@ export default class SRPlugin extends Plugin {
                     frontmatter.hasOwnProperty("sr-ease")
                 )
             ) {
+                for (let tag of tags) {
+                    if (this.reviewDecks.hasOwnProperty(tag)) {
+                        this.reviewDecks[tag].newNotes.push(note);
+                    }
+                }
                 this.newNotes.push(note);
                 continue;
             }
@@ -312,14 +328,37 @@ export default class SRPlugin extends Plugin {
                 note,
                 dueUnix,
             });
+            for (let tag of tags) {
+                if (this.reviewDecks.hasOwnProperty(tag)) {
+                    this.reviewDecks[tag].scheduledNotes.push({note, dueUnix});
+                }
+            }
 
             this.easeByPath[note.path] = frontmatter["sr-ease"];
 
-            if (dueUnix <= now) this.dueNotesCount++;
+            if (dueUnix <= now) {
+                this.dueNotesCount++;
+
+                for (let tag of tags) {
+                    if (this.reviewDecks.hasOwnProperty(tag)) {
+                        this.reviewDecks[tag].dueNotesCount++;
+                    }
+                }
+            }
+
             let nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
             if (!this.dueDatesNotes.hasOwnProperty(nDays))
                 this.dueDatesNotes[nDays] = 0;
             this.dueDatesNotes[nDays]++;
+
+            for (let tag of tags) {
+                if (this.reviewDecks.hasOwnProperty(tag)) {
+                    let deck = this.reviewDecks[tag];
+                    if (!deck.dueDatesNotes.hasOwnProperty(nDays))
+                        deck.dueDatesNotes[nDays] = 0;
+                    deck.dueDatesNotes[nDays]++;
+                }
+            }
         }
 
         graph.rank(0.85, 0.000001, (node: string, rank: number) => {
@@ -343,6 +382,12 @@ export default class SRPlugin extends Plugin {
                 );
             }
         );
+
+        for (let deckKey in this.reviewDecks) {
+            if (this.reviewDecks.hasOwnProperty(deckKey)) {
+                this.reviewDecks[deckKey].sortNotes(this.pageranks);
+            }
+        }
 
         let noteCountText = this.dueNotesCount == 1 ? "note" : "notes";
         let cardCountText =
@@ -486,27 +531,41 @@ export default class SRPlugin extends Plugin {
         setTimeout(() => {
             if (!this.notesSyncLock) {
                 this.sync();
-                if (this.data.settings.autoNextNote) this.reviewNextNote();
+                if (this.data.settings.autoNextNote) this.reviewNextNote(this.lastSelectedReviewDeck);
             }
         }, 500);
     }
 
-    async reviewNextNote() {
-        if (this.dueNotesCount > 0) {
+    async reviewNextNoteModal() {
+        let deckSelectionModal = new ReviewDeckSelectionModal(this.app, Object.keys(this.reviewDecks));
+        deckSelectionModal.submitCallback = (deckKey: string) => this.reviewNextNote(deckKey);
+        deckSelectionModal.open();
+    }
+
+    async reviewNextNote(deckKey: string) {
+        if (!this.reviewDecks.hasOwnProperty(deckKey)) {
+            new Notice("No deck exists for " + deckKey);
+            return;
+        }
+
+        this.lastSelectedReviewDeck = deckKey;
+        let deck = this.reviewDecks[deckKey];
+
+        if (deck.dueNotesCount > 0) {
             let index = this.data.settings.openRandomNote
-                ? Math.floor(Math.random() * this.dueNotesCount)
+                ? Math.floor(Math.random() * deck.dueNotesCount)
                 : 0;
             this.app.workspace.activeLeaf.openFile(
-                this.scheduledNotes[index].note
+                deck.scheduledNotes[index].note
             );
             return;
         }
 
-        if (this.newNotes.length > 0) {
+        if (deck.newNotes.length > 0) {
             let index = this.data.settings.openRandomNote
-                ? Math.floor(Math.random() * this.newNotes.length)
+                ? Math.floor(Math.random() * deck.newNotes.length)
                 : 0;
-            this.app.workspace.activeLeaf.openFile(this.newNotes[index]);
+            this.app.workspace.activeLeaf.openFile(deck.newNotes[index]);
             return;
         }
 

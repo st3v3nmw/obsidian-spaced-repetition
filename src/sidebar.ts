@@ -52,63 +52,78 @@ export class ReviewQueueListView extends ItemView {
         const rootEl: HTMLElement = createDiv("nav-folder mod-root");
         const childrenEl: HTMLElement = rootEl.createDiv("nav-folder-children");
 
-        if (this.plugin.newNotes.length > 0) {
-            let newNotesFolderEl: HTMLElement = this.createRightPaneFolder(
-                childrenEl,
-                "New",
-                !this.activeFolders.has("New")
-            );
+        if (Object.keys(this.plugin.reviewDecks).length > 0) {
+            for (let deckKey in this.plugin.reviewDecks) {
+                if (this.plugin.reviewDecks.hasOwnProperty(deckKey)) {
+                    let deck = this.plugin.reviewDecks[deckKey];
 
-            for (let newFile of this.plugin.newNotes) {
-                this.createRightPaneFile(
-                    newNotesFolderEl,
-                    newFile,
-                    openFile && newFile.path === openFile.path,
-                    !this.activeFolders.has("New")
-                );
-            }
-        }
-
-        if (this.plugin.scheduledNotes.length > 0) {
-            let now: number = Date.now();
-            let currUnix: number = -1;
-            let folderEl, folderTitle;
-            let maxDaysToRender: number = getSetting(
-                "maxNDaysNotesReviewQueue",
-                this.plugin.data.settings
-            );
-
-            for (let sNote of this.plugin.scheduledNotes) {
-                if (sNote.dueUnix != currUnix) {
-                    let nDays: number = Math.ceil(
-                        (sNote.dueUnix - now) / (24 * 3600 * 1000)
-                    );
-
-                    if (nDays > maxDaysToRender) break;
-
-                    folderTitle =
-                        nDays == -1
-                            ? "Yesterday"
-                            : nDays == 0
-                            ? "Today"
-                            : nDays == 1
-                            ? "Tomorrow"
-                            : new Date(sNote.dueUnix).toDateString();
-
-                    folderEl = this.createRightPaneFolder(
+                    let deckFolderEl: HTMLElement = this.createRightPaneFolder(
                         childrenEl,
-                        folderTitle,
-                        !this.activeFolders.has(folderTitle)
+                        deckKey,
+                        !this.activeFolders.has(deckKey),
+                        true
                     );
-                    currUnix = sNote.dueUnix;
-                }
 
-                this.createRightPaneFile(
-                    folderEl,
-                    sNote.note,
-                    openFile && sNote.note.path === openFile.path,
-                    !this.activeFolders.has(folderTitle)
-                );
+                    if (deck.newNotes.length > 0) {
+                        let newNotesFolderEl: HTMLElement = this.createRightPaneFolder(
+                            deckFolderEl,
+                            "New",
+                            !this.activeFolders.has("New")
+                        );
+
+                        for (let newFile of deck.newNotes) {
+                            this.createRightPaneFile(
+                                newNotesFolderEl,
+                                newFile,
+                                openFile && newFile.path === openFile.path,
+                                !this.activeFolders.has("New")
+                            );
+                        }
+                    }
+
+                    if (deck.scheduledNotes.length > 0) {
+                        let now: number = Date.now();
+                        let currUnix: number = -1;
+                        let schedFolderEl, folderTitle;
+                        let maxDaysToRender: number = getSetting(
+                            "maxNDaysNotesReviewQueue",
+                            this.plugin.data.settings
+                        );
+
+                        for (let sNote of deck.scheduledNotes) {
+                            if (sNote.dueUnix != currUnix) {
+                                let nDays: number = Math.ceil(
+                                    (sNote.dueUnix - now) / (24 * 3600 * 1000)
+                                );
+
+                                if (nDays > maxDaysToRender) break;
+
+                                folderTitle =
+                                    nDays == -1
+                                        ? "Yesterday"
+                                        : nDays == 0
+                                        ? "Today"
+                                        : nDays == 1
+                                        ? "Tomorrow"
+                                        : new Date(sNote.dueUnix).toDateString();
+
+                                schedFolderEl = this.createRightPaneFolder(
+                                    deckFolderEl,
+                                    folderTitle,
+                                    !this.activeFolders.has(folderTitle)
+                                );
+                                currUnix = sNote.dueUnix;
+                            }
+
+                            this.createRightPaneFile(
+                                schedFolderEl,
+                                sNote.note,
+                                openFile && sNote.note.path === openFile.path,
+                                !this.activeFolders.has(folderTitle)
+                            );
+                        }
+                    }
+                }
             }
         }
 
@@ -120,8 +135,15 @@ export class ReviewQueueListView extends ItemView {
     private createRightPaneFolder(
         parentEl: any,
         folderTitle: string,
-        collapsed: boolean
+        collapsed: boolean,
+        isRoot: boolean = false,
     ): HTMLElement {
+        if (!isRoot) {
+            parentEl = parentEl
+                .getElementsByClassName("nav-folder-children")[0]
+                .createDiv('nav-folder');
+        }
+        
         const folderEl = parentEl.createDiv("nav-folder");
         const folderTitleEl = folderEl.createDiv("nav-folder-title");
         const childrenEl = folderEl.createDiv("nav-folder-children");
