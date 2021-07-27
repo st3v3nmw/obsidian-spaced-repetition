@@ -44,18 +44,10 @@ export class FlashcardModal extends Modal {
         this.titleEl.setText("Decks");
 
         if (Platform.isMobile) {
-            this.modalEl.style.height = "100%";
-            this.modalEl.style.width = "100%";
             this.contentEl.style.display = "block";
-        } else {
-            if (getSetting("largeScreenMode", this.plugin.data.settings)) {
-                this.modalEl.style.height = "100%";
-                this.modalEl.style.width = "100%";
-            } else {
-                this.modalEl.style.height = "80%";
-                this.modalEl.style.width = "40%";
-            }
         }
+        this.modalEl.style.height = getSetting("flashcardHeightPercentage", this.plugin.data.settings) + "%";
+        this.modalEl.style.width = getSetting("flashcardWidthPercentage", this.plugin.data.settings) + "%";
 
         this.contentEl.style.position = "relative";
         this.contentEl.style.height = "92%";
