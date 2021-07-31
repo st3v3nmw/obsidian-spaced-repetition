@@ -7,20 +7,13 @@ import {
     getAllTags,
 } from "obsidian";
 import * as graph from "pagerank.js";
-import { SRSettingTab, DEFAULT_SETTINGS, getSetting } from "./settings";
+import { customAlphabet } from "nanoid";
+import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "./settings";
 import { FlashcardModal } from "./flashcard-modal";
 import { StatsModal } from "./stats-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "./sidebar";
-import { schedule } from "./sched";
-import {
-    SchedNote,
-    LinkStat,
-    Card,
-    CardType,
-    ReviewResponse,
-    SRSettings,
-    Deck,
-} from "./types";
+import { SRFile, ReviewResponse, schedule } from "./scheduling";
+import { SchedNote, LinkStat, Card, CardType, Deck } from "./types";
 import {
     CROSS_HAIRS_ICON,
     SCHEDULING_INFO_REGEX,
@@ -30,31 +23,24 @@ import {
     MULTI_SCHEDULING_EXTRACTOR,
     CODEBLOCK_REGEX,
     INLINE_CODE_REGEX,
-    NANOID_ALPHABET
+    NANOID_ALPHABET,
 } from "./constants";
 import { escapeRegexString, cyrb53 } from "./utils";
-import { customAlphabet } from 'nanoid';
 
 const nanoid = customAlphabet(NANOID_ALPHABET, 16);
 
-interface PluginData {
-    settings: SRSettings;
-    buryDate: string;
-    // hashes of card texts
-    // should work as long as user doesn't modify card's text
-    // covers most of the cases
-    buryList: string[];
+export interface PluginData {
+    files: Record<string, SRFile>; // Record<file's uuid, SRFile obj.>
 }
 
-const DEFAULT_DATA: PluginData = {
-    settings: DEFAULT_SETTINGS,
-    buryDate: "",
-    buryList: [],
+const DEFAULT_PLUGIN_DATA: PluginData = {
+    files: {},
 };
 
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     private reviewQueueView: ReviewQueueListView;
+    public settings: SRSettings;
     public data: PluginData;
 
     public newNotes: TFile[] = [];
@@ -76,9 +62,8 @@ export default class SRPlugin extends Plugin {
     private flashcardsSyncLock: boolean = false;
 
     async onload() {
+        await this.loadSettings();
         await this.loadPluginData();
-
-        console.log(nanoid());
 
         addIcon("crosshairs", CROSS_HAIRS_ICON);
 
@@ -95,14 +80,14 @@ export default class SRPlugin extends Plugin {
 
         this.singlelineCardRegex = new RegExp(
             `^(.+)${escapeRegexString(
-                getSetting("singlelineCardSeparator", this.data.settings)
+                this.settings.singlelineCardSeparator
             )}(.+?)\\n?(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
             "gm"
         );
 
         this.multilineCardRegex = new RegExp(
             `^((?:.+\\n)+)${escapeRegexString(
-                getSetting("multilineCardSeparator", this.data.settings)
+                this.settings.multilineCardSeparator
             )}\\n((?:.+?\\n?)+?)(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
             "gm"
         );
@@ -120,7 +105,7 @@ export default class SRPlugin extends Plugin {
                 (this.reviewQueueView = new ReviewQueueListView(leaf, this))
         );
 
-        if (!this.data.settings.disableFileMenuReviewOptions) {
+        if (!this.settings.disableFileMenuReviewOptions) {
             this.registerEvent(
                 this.app.workspace.on("file-menu", (menu, file: TFile) => {
                     menu.addItem((item) => {
@@ -282,7 +267,7 @@ export default class SRPlugin extends Plugin {
 
             let shouldIgnore: boolean = true;
             outer: for (let tag of tags) {
-                for (let tagToReview of this.data.settings.tagsToReview) {
+                for (let tagToReview of this.settings.tagsToReview) {
                     if (
                         tag == tagToReview ||
                         tag.startsWith(tagToReview + "/")
@@ -368,7 +353,7 @@ export default class SRPlugin extends Plugin {
         let tags = getAllTags(fileCachedData) || [];
         let shouldIgnore: boolean = true;
         outer: for (let tag of tags) {
-            for (let tagToReview of this.data.settings.tagsToReview) {
+            for (let tagToReview of this.settings.tagsToReview) {
                 if (tag == tagToReview || tag.startsWith(tagToReview + "/")) {
                     shouldIgnore = false;
                     break outer;
@@ -428,13 +413,13 @@ export default class SRPlugin extends Plugin {
             }
 
             let linkContribution =
-                this.data.settings.maxLinkFactor *
+                this.settings.maxLinkFactor *
                 Math.min(1.0, Math.log(totalLinkCount + 0.5) / Math.log(64));
             ease = Math.round(
-                (1.0 - linkContribution) * this.data.settings.baseEase +
+                (1.0 - linkContribution) * this.settings.baseEase +
                     (totalLinkCount > 0
                         ? (linkContribution * linkTotal) / linkPGTotal
-                        : linkContribution * this.data.settings.baseEase)
+                        : linkContribution * this.settings.baseEase)
             );
             interval = 1;
             delayBeforeReview = 0;
@@ -457,7 +442,7 @@ export default class SRPlugin extends Plugin {
             interval,
             ease,
             delayBeforeReview,
-            this.data.settings,
+            this.settings,
             this.dueDatesNotes
         );
         interval = schedObj.interval;
@@ -492,14 +477,14 @@ export default class SRPlugin extends Plugin {
         setTimeout(() => {
             if (!this.notesSyncLock) {
                 this.sync();
-                if (this.data.settings.autoNextNote) this.reviewNextNote();
+                if (this.settings.autoNextNote) this.reviewNextNote();
             }
         }, 500);
     }
 
     async reviewNextNote() {
         if (this.dueNotesCount > 0) {
-            let index = this.data.settings.openRandomNote
+            let index = this.settings.openRandomNote
                 ? Math.floor(Math.random() * this.dueNotesCount)
                 : 0;
             this.app.workspace.activeLeaf.openFile(
@@ -509,7 +494,7 @@ export default class SRPlugin extends Plugin {
         }
 
         if (this.newNotes.length > 0) {
-            let index = this.data.settings.openRandomNote
+            let index = this.settings.openRandomNote
                 ? Math.floor(Math.random() * this.newNotes.length)
                 : 0;
             this.app.workspace.activeLeaf.openFile(this.newNotes[index]);
@@ -528,16 +513,8 @@ export default class SRPlugin extends Plugin {
         this.deckTree = new Deck("root", null);
         this.dueDatesFlashcards = {};
 
-        let todayDate = window.moment(Date.now()).format("YYYY-MM-DD");
-        // clear list if we've changed dates
-        if (todayDate != this.data.buryDate) {
-            this.data.buryDate = todayDate;
-            this.data.buryList = [];
-            await this.savePluginData();
-        }
-
         for (let note of notes) {
-            if (getSetting("convertFoldersToDecks", this.data.settings)) {
+            if (this.settings.convertFoldersToDecks) {
                 let path: string[] = note.path.split("/");
                 path.pop(); // remove filename
                 await this.findFlashcards(note, "#" + path.join("/"));
@@ -551,7 +528,7 @@ export default class SRPlugin extends Plugin {
             let tags = getAllTags(fileCachedData) || [];
 
             outer: for (let tag of tags) {
-                for (let tagToReview of this.data.settings.flashcardTags) {
+                for (let tagToReview of this.settings.flashcardTags) {
                     if (
                         tag == tagToReview ||
                         tag.startsWith(tagToReview + "/")
@@ -617,10 +594,7 @@ export default class SRPlugin extends Plugin {
                 let cardObj: Card;
                 let front = match[1].trim();
                 let back = match[2].trim();
-                let context: string = getSetting(
-                    "showContextInCards",
-                    this.data.settings
-                )
+                let context: string = this.settings.showContextInCards
                     ? getCardContext(match.index, headings)
                     : "";
                 // flashcard already scheduled
@@ -638,7 +612,7 @@ export default class SRPlugin extends Plugin {
                     if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
                         this.dueDatesFlashcards[nDays] = 0;
                     this.dueDatesFlashcards[nDays]++;
-                    if (this.data.buryList.includes(cyrb53(cardText))) {
+                    if (this.data.buried.has(cyrb53(cardText))) {
                         this.deckTree.countFlashcard([...deckPath]);
                         continue;
                     }
@@ -684,10 +658,7 @@ export default class SRPlugin extends Plugin {
             let regex: RegExp = regexBundled[0];
             let cardType: CardType = regexBundled[1];
 
-            if (
-                cardType == CardType.Cloze &&
-                getSetting("disableClozeCards", this.data.settings)
-            )
+            if (cardType == CardType.Cloze && this.settings.disableClozeCards)
                 continue;
 
             for (let match of fileText.matchAll(regex)) {
@@ -732,10 +703,7 @@ export default class SRPlugin extends Plugin {
                     fileChanged = true;
                 }
 
-                let context: string = getSetting(
-                    "showContextInCards",
-                    this.data.settings
-                )
+                let context: string = this.settings.showContextInCards
                     ? getCardContext(match.index, headings)
                     : "";
                 let siblings: Card[] = [];
@@ -772,7 +740,7 @@ export default class SRPlugin extends Plugin {
                         if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
                             this.dueDatesFlashcards[nDays] = 0;
                         this.dueDatesFlashcards[nDays]++;
-                        if (this.data.buryList.includes(cyrb53(cardText))) {
+                        if (this.data.buried.has(cyrb53(cardText))) {
                             this.deckTree.countFlashcard([...deckPath]);
                             continue;
                         }
@@ -802,7 +770,7 @@ export default class SRPlugin extends Plugin {
                             continue;
                         }
                     } else {
-                        if (this.data.buryList.includes(cyrb53(cardText))) {
+                        if (this.data.buried.has(cyrb53(cardText))) {
                             this.deckTree.countFlashcard([...deckPath]);
                             continue;
                         }
@@ -831,12 +799,49 @@ export default class SRPlugin extends Plugin {
         if (fileChanged) await this.app.vault.modify(note, fileText);
     }
 
+    async loadSettings() {
+        this.settings = Object.assign(
+            {},
+            DEFAULT_SETTINGS,
+            await this.loadData()
+        );
+    }
+
+    async saveSettings() {
+        await this.saveData(this.settings);
+    }
+
     async loadPluginData() {
-        this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
+        let adapter = this.app.vault.adapter;
+        let dbPath: string = `${this.settings.dbFolderPath}/${this.settings.dbID}.json`;
+        if (await adapter.exists(dbPath)) {
+            let data = await adapter.read(dbPath);
+            if (data)
+                this.data = Object.assign(
+                    {},
+                    DEFAULT_PLUGIN_DATA,
+                    JSON.parse(data)
+                );
+            else this.data = DEFAULT_PLUGIN_DATA;
+        } else {
+            // create folder
+            let currFolder: string = "";
+            for (let folder of this.settings.dbFolderPath.split("/")) {
+                currFolder += folder + "/";
+                if (!(await adapter.exists(currFolder)))
+                    adapter.mkdir(currFolder);
+            }
+            this.data = DEFAULT_PLUGIN_DATA;
+            await adapter.write(dbPath, JSON.stringify(this.data, null, 2));
+        }
     }
 
     async savePluginData() {
-        await this.saveData(this.data);
+        let dbPath: string = `${this.settings.dbFolderPath}/${this.settings.dbID}.json`;
+        await this.app.vault.adapter.write(
+            dbPath,
+            JSON.stringify(this.data, null, 2)
+        );
     }
 
     initView() {

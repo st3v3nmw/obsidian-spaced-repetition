@@ -1,5 +1,30 @@
-import { ReviewResponse, SRSettings } from "./types";
-import { getSetting } from "./settings";
+import { SRSettings } from "./settings";
+
+interface SRItem {
+    dueUnix?: number;
+    interval?: number;
+    ease?: number;
+    uniqueID: string;
+}
+
+interface SRCard extends SRItem {
+    siblingIdx: number;
+    buryDate: string;
+    lastUpdated: number;
+}
+
+export interface SRFile extends SRItem {
+    filename: string;
+    lastModified: number;
+    cards: Record<string, SRCard>; // Record<uuid, scheduling obj.>
+}
+
+export enum ReviewResponse {
+    Easy,
+    Good,
+    Hard,
+    Reset,
+}
 
 export function schedule(
     response: ReviewResponse,
@@ -9,12 +34,9 @@ export function schedule(
     settingsObj: SRSettings,
     dueDates?: Record<number, number>
 ) {
-    let lapsesIntervalChange: number = getSetting(
-        "lapsesIntervalChange",
-        settingsObj
-    );
-    let easyBonus: number = getSetting("easyBonus", settingsObj);
-    let maximumInterval: number = getSetting("maximumInterval", settingsObj);
+    let lapsesIntervalChange: number = settingsObj.lapsesIntervalChange;
+    let easyBonus: number = settingsObj.easyBonus;
+    let maximumInterval: number = settingsObj.maximumInterval;
 
     delayBeforeReview = Math.max(
         0,

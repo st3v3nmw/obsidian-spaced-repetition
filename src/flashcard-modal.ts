@@ -7,17 +7,17 @@ import {
     TFile,
 } from "obsidian";
 import type SRPlugin from "./main";
-import {
-    Card,
-    CardType,
-    FlashcardModalMode,
-    ReviewResponse,
-    Deck,
-} from "./types";
-import { schedule, textInterval } from "./sched";
+import { Card, CardType, Deck } from "./types";
+import { ReviewResponse, schedule, textInterval } from "./scheduling";
 import { MULTI_SCHEDULING_EXTRACTOR, COLLAPSE_ICON } from "./constants";
-import { getSetting } from "./settings";
 import { escapeRegexString, fixDollarSigns, cyrb53 } from "./utils";
+
+export enum FlashcardModalMode {
+    DecksList,
+    Front,
+    Back,
+    Closed,
+}
 
 export class FlashcardModal extends Modal {
     public plugin: SRPlugin;
@@ -46,8 +46,10 @@ export class FlashcardModal extends Modal {
         if (Platform.isMobile) {
             this.contentEl.style.display = "block";
         }
-        this.modalEl.style.height = getSetting("flashcardHeightPercentage", this.plugin.data.settings) + "%";
-        this.modalEl.style.width = getSetting("flashcardWidthPercentage", this.plugin.data.settings) + "%";
+        this.modalEl.style.height =
+            this.plugin.settings.flashcardHeightPercentage + "%";
+        this.modalEl.style.width =
+            this.plugin.settings.flashcardWidthPercentage + "%";
 
         this.contentEl.style.position = "relative";
         this.contentEl.style.height = "92%";
@@ -124,7 +126,7 @@ export class FlashcardModal extends Modal {
 
         this.fileLinkView = this.contentEl.createDiv("sr-link");
         this.fileLinkView.setText("Open file");
-        if (getSetting("showFileNameInFileLink", this.plugin.data.settings))
+        if (this.plugin.settings.showFileNameInFileLink)
             this.fileLinkView.setAttribute("aria-label", "Open file");
         this.fileLinkView.addEventListener("click", (_) => {
             this.close();
@@ -140,7 +142,7 @@ export class FlashcardModal extends Modal {
         });
         this.resetLinkView.style.float = "right";
 
-        if (getSetting("showContextInCards", this.plugin.data.settings)) {
+        if (this.plugin.settings.showContextInCards) {
             this.contextView = this.contentEl.createDiv();
             this.contextView.setAttribute("id", "sr-context");
         }
@@ -204,7 +206,10 @@ export class FlashcardModal extends Modal {
     async processReview(response: ReviewResponse) {
         let interval, ease, due;
 
-        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+        this.currentDeck.deleteFlashcardAtIndex(
+            this.currentCardIdx,
+            this.currentCard.isDue
+        );
         if (response != ReviewResponse.Reset) {
             // scheduled card
             if (this.currentCard.isDue) {
@@ -213,7 +218,7 @@ export class FlashcardModal extends Modal {
                     this.currentCard.interval,
                     this.currentCard.ease,
                     this.currentCard.delayBeforeReview,
-                    this.plugin.data.settings,
+                    this.plugin.settings,
                     this.plugin.dueDatesFlashcards
                 );
                 interval = schedObj.interval;
@@ -222,9 +227,9 @@ export class FlashcardModal extends Modal {
                 let schedObj = schedule(
                     response,
                     1,
-                    getSetting("baseEase", this.plugin.data.settings),
+                    this.plugin.settings.baseEase,
                     0,
-                    this.plugin.data.settings,
+                    this.plugin.settings,
                     this.plugin.dueDatesFlashcards
                 );
                 interval = schedObj.interval;
@@ -234,7 +239,7 @@ export class FlashcardModal extends Modal {
             due = window.moment(Date.now() + interval * 24 * 3600 * 1000);
         } else {
             this.currentCard.interval = 1.0;
-            this.currentCard.ease = this.plugin.data.settings.baseEase;
+            this.currentCard.ease = this.plugin.settings.baseEase;
             if (this.currentCard.isDue)
                 this.currentDeck.dueFlashcards.push(this.currentCard);
             else this.currentDeck.newFlashcards.push(this.currentCard);
@@ -252,10 +257,7 @@ export class FlashcardModal extends Modal {
             "gm"
         );
 
-        let sep: string = getSetting(
-            "cardCommentOnSameLine",
-            this.plugin.data.settings
-        )
+        let sep: string = this.plugin.settings.cardCommentOnSameLine
             ? " "
             : "\n";
 
@@ -298,26 +300,24 @@ export class FlashcardModal extends Modal {
             );
             for (let sibling of this.currentCard.siblings)
                 sibling.cardText = this.currentCard.cardText;
-            if (this.plugin.data.settings.burySiblingCards)
+            if (this.plugin.settings.burySiblingCards)
                 this.burySiblingCards(true);
         } else {
             if (this.currentCard.cardType == CardType.SingleLineBasic) {
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${fixDollarSigns(this.currentCard.front)}${getSetting(
-                        "singlelineCardSeparator",
-                        this.plugin.data.settings
-                    )}${fixDollarSigns(
+                    `${fixDollarSigns(this.currentCard.front)}${
+                        this.plugin.settings.singlelineCardSeparator
+                    }${fixDollarSigns(
                         this.currentCard.back
                     )}${sep}<!--SR:${dueString},${interval},${ease}-->`
                 );
             } else {
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${fixDollarSigns(this.currentCard.front)}\n${getSetting(
-                        "multilineCardSeparator",
-                        this.plugin.data.settings
-                    )}\n${fixDollarSigns(
+                    `${fixDollarSigns(this.currentCard.front)}\n${
+                        this.plugin.settings.multilineCardSeparator
+                    }\n${fixDollarSigns(
                         this.currentCard.back
                     )}${sep}<!--SR:${dueString},${interval},${ease}-->`
                 );
@@ -330,7 +330,7 @@ export class FlashcardModal extends Modal {
 
     async burySiblingCards(tillNextDay: boolean) {
         if (tillNextDay) {
-            this.plugin.data.buryList.push(cyrb53(this.currentCard.cardText));
+            this.plugin.data.buried.add(cyrb53(this.currentCard.cardText));
             await this.plugin.savePluginData();
         }
 
@@ -486,7 +486,7 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
     modal.mode = FlashcardModalMode.Front;
 
     if (this.dueFlashcards.length > 0) {
-        if (getSetting("randomizeCardOrder", modal.plugin.data.settings))
+        if (modal.plugin.settings.randomizeCardOrder)
             modal.currentCardIdx = Math.floor(
                 Math.random() * this.dueFlashcards.length
             );
@@ -502,21 +502,21 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
             modal.currentCard.interval,
             modal.currentCard.ease,
             modal.currentCard.delayBeforeReview,
-            modal.plugin.data.settings
+            modal.plugin.settings
         ).interval;
         let goodInterval: number = schedule(
             ReviewResponse.Good,
             modal.currentCard.interval,
             modal.currentCard.ease,
             modal.currentCard.delayBeforeReview,
-            modal.plugin.data.settings
+            modal.plugin.settings
         ).interval;
         let easyInterval: number = schedule(
             ReviewResponse.Easy,
             modal.currentCard.interval,
             modal.currentCard.ease,
             modal.currentCard.delayBeforeReview,
-            modal.plugin.data.settings
+            modal.plugin.settings
         ).interval;
 
         if (Platform.isMobile) {
@@ -535,7 +535,7 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
             );
         }
     } else if (this.newFlashcards.length > 0) {
-        if (getSetting("randomizeCardOrder", modal.plugin.data.settings))
+        if (modal.plugin.settings.randomizeCardOrder)
             modal.currentCardIdx = Math.floor(
                 Math.random() * this.newFlashcards.length
             );
@@ -557,8 +557,8 @@ Deck.prototype.nextCard = function (modal: FlashcardModal): void {
         }
     }
 
-    if (getSetting("showContextInCards", modal.plugin.data.settings))
+    if (modal.plugin.settings.showContextInCards)
         modal.contextView.setText(modal.currentCard.context);
-    if (getSetting("showFileNameInFileLink", modal.plugin.data.settings))
+    if (modal.plugin.settings.showFileNameInFileLink)
         modal.fileLinkView.setText(modal.currentCard.note.basename);
 };

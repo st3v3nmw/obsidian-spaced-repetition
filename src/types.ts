@@ -1,47 +1,6 @@
 import { TFile } from "obsidian";
 import { FlashcardModal } from "./flashcard-modal";
 
-export interface SRSettings {
-    // flashcards
-    flashcardTags: string[];
-    convertFoldersToDecks: boolean;
-    cardCommentOnSameLine: boolean;
-    burySiblingCards: boolean;
-    showContextInCards: boolean;
-    flashcardHeightPercentage: number;
-    flashcardWidthPercentage: number;
-    showFileNameInFileLink: boolean;
-    randomizeCardOrder: boolean;
-    disableClozeCards: boolean;
-    disableSinglelineCards: boolean;
-    singlelineCardSeparator: string;
-    disableSinglelineReversedCards: boolean;
-    singlelineReversedCardSeparator: string;
-    disableMultilineCards: boolean;
-    multilineCardSeparator: string;
-    disableMultilineReversedCards: boolean;
-    multilineReversedCardSeparator: string;
-    // notes
-    tagsToReview: string[];
-    openRandomNote: boolean;
-    autoNextNote: boolean;
-    disableFileMenuReviewOptions: boolean;
-    maxNDaysNotesReviewQueue: number;
-    // algorithm
-    baseEase: number;
-    lapsesIntervalChange: number;
-    easyBonus: number;
-    maximumInterval: number;
-    maxLinkFactor: number;
-}
-
-export enum ReviewResponse {
-    Easy,
-    Good,
-    Hard,
-    Reset,
-}
-
 // Notes
 
 export interface SchedNote {
@@ -180,11 +139,4 @@ export interface Card {
     // information for sibling cards
     siblingIdx?: number;
     siblings?: Card[];
-}
-
-export enum FlashcardModalMode {
-    DecksList,
-    Front,
-    Back,
-    Closed,
 }
