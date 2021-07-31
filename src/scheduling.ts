@@ -1,22 +1,20 @@
 import { SRSettings } from "./settings";
 
 interface SRItem {
-    dueUnix?: number;
+    due?: number;
     interval?: number;
     ease?: number;
-    uniqueID: string;
 }
 
 interface SRCard extends SRItem {
     siblingIdx: number;
-    buryDate: string;
     lastUpdated: number;
 }
 
 export interface SRFile extends SRItem {
-    filename: string;
+    lastKnownPath: string;
     lastModified: number;
-    cards: Record<string, SRCard>; // Record<uuid, scheduling obj.>
+    cards: Record<string, SRCard>; // Record<card's uuid, scheduling obj.>
 }
 
 export enum ReviewResponse {

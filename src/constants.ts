@@ -1,5 +1,5 @@
-export const SCHEDULING_INFO_REGEX: RegExp =
-    /^---\n((?:.*\n)*)sr-due: (.+)\nsr-interval: (\d+)\nsr-ease: (\d+)\n((?:.*\n)*)---/;
+export const UUID_REGEX: RegExp =
+    /^---\n((?:.*\n)*)sr-id: (.+)\n((?:.*\n)*)---/;
 export const YAML_FRONT_MATTER_REGEX: RegExp = /^---\n((?:.*\n)*?)---/;
 
 export const CLOZE_CARD_DETECTOR: RegExp =

@@ -122,6 +122,8 @@ export enum CardType {
 }
 
 export interface Card {
+    uniqueID?: string;
+    fileUniqueID: string;
     // scheduling
     isDue: boolean;
     interval?: number;

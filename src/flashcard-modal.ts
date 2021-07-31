@@ -6,11 +6,18 @@ import {
     Platform,
     TFile,
 } from "obsidian";
+import { customAlphabet } from "nanoid";
 import type SRPlugin from "./main";
 import { Card, CardType, Deck } from "./types";
 import { ReviewResponse, schedule, textInterval } from "./scheduling";
-import { MULTI_SCHEDULING_EXTRACTOR, COLLAPSE_ICON } from "./constants";
-import { escapeRegexString, fixDollarSigns, cyrb53 } from "./utils";
+import {
+    MULTI_SCHEDULING_EXTRACTOR,
+    COLLAPSE_ICON,
+    NANOID_ALPHABET,
+} from "./constants";
+import { escapeRegexString, fixDollarSigns } from "./utils";
+
+const nanoid = customAlphabet(NANOID_ALPHABET, 16);
 
 export enum FlashcardModalMode {
     DecksList,
@@ -204,7 +211,7 @@ export class FlashcardModal extends Modal {
     }
 
     async processReview(response: ReviewResponse) {
-        let interval, ease, due;
+        let due, interval, ease, siblingIdx;
 
         this.currentDeck.deleteFlashcardAtIndex(
             this.currentCardIdx,
@@ -236,102 +243,67 @@ export class FlashcardModal extends Modal {
                 ease = schedObj.ease;
             }
 
-            due = window.moment(Date.now() + interval * 24 * 3600 * 1000);
+            due = Date.now() + interval * 24 * 3600 * 1000;
         } else {
             this.currentCard.interval = 1.0;
             this.currentCard.ease = this.plugin.settings.baseEase;
             if (this.currentCard.isDue)
                 this.currentDeck.dueFlashcards.push(this.currentCard);
             else this.currentDeck.newFlashcards.push(this.currentCard);
-            due = window.moment(Date.now());
+            due = Date.now();
             new Notice("Card's progress has been reset");
             this.currentDeck.nextCard(this);
             return;
         }
 
-        let dueString: string = due.format("YYYY-MM-DD");
-
-        let fileText: string = await this.app.vault.read(this.currentCard.note);
+        let uniqueID: string = this.currentCard.uniqueID ?? nanoid();
         let replacementRegex = new RegExp(
             escapeRegexString(this.currentCard.cardText),
             "gm"
         );
-
         let sep: string = this.plugin.settings.cardCommentOnSameLine
             ? " "
             : "\n";
 
-        if (this.currentCard.cardType == CardType.Cloze) {
-            let schedIdx: number =
-                this.currentCard.cardText.lastIndexOf("<!--SR:");
-            if (schedIdx == -1) {
-                // first time adding scheduling information to flashcard
-                this.currentCard.cardText = `${this.currentCard.cardText}${sep}<!--SR:!${dueString},${interval},${ease}-->`;
-            } else {
-                let scheduling: RegExpMatchArray[] = [
-                    ...this.currentCard.cardText.matchAll(
-                        MULTI_SCHEDULING_EXTRACTOR
-                    ),
-                ];
-
-                let deletionSched: string[] = [
-                    "0",
-                    dueString,
-                    `${interval}`,
-                    `${ease}`,
-                ];
-                if (this.currentCard.isDue)
-                    scheduling[this.currentCard.siblingIdx] = deletionSched;
-                else scheduling.push(deletionSched);
-
-                this.currentCard.cardText = this.currentCard.cardText.replace(
-                    /<!--SR:.+-->/gm,
-                    ""
-                );
-                this.currentCard.cardText += "<!--SR:";
-                for (let i = 0; i < scheduling.length; i++)
-                    this.currentCard.cardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
-                this.currentCard.cardText += "-->";
-            }
-
+        if (!this.currentCard.isDue) {
+            let fileText: string = await this.app.vault.read(
+                this.currentCard.note
+            );
             fileText = fileText.replace(
                 replacementRegex,
-                fixDollarSigns(this.currentCard.cardText)
+                fixDollarSigns(this.currentCard.cardText) +
+                    `${sep}<!--SR: ${uniqueID}-->`
             );
+            await this.app.vault.modify(this.currentCard.note, fileText);
+        }
+
+        if (this.currentCard.cardType == CardType.Cloze) {
             for (let sibling of this.currentCard.siblings)
                 sibling.cardText = this.currentCard.cardText;
             if (this.plugin.settings.burySiblingCards)
                 this.burySiblingCards(true);
-        } else {
-            if (this.currentCard.cardType == CardType.SingleLineBasic) {
-                fileText = fileText.replace(
-                    replacementRegex,
-                    `${fixDollarSigns(this.currentCard.front)}${
-                        this.plugin.settings.singlelineCardSeparator
-                    }${fixDollarSigns(
-                        this.currentCard.back
-                    )}${sep}<!--SR:${dueString},${interval},${ease}-->`
-                );
-            } else {
-                fileText = fileText.replace(
-                    replacementRegex,
-                    `${fixDollarSigns(this.currentCard.front)}\n${
-                        this.plugin.settings.multilineCardSeparator
-                    }\n${fixDollarSigns(
-                        this.currentCard.back
-                    )}${sep}<!--SR:${dueString},${interval},${ease}-->`
-                );
-            }
+            // write to file
         }
 
-        await this.app.vault.modify(this.currentCard.note, fileText);
+        this.plugin.data.files[this.currentCard.fileUniqueID].cards[uniqueID] =
+            {
+                due,
+                interval,
+                ease,
+                siblingIdx: this.currentCard.siblingIdx,
+                lastUpdated: Date.now(),
+            };
+        this.plugin.data.files[this.currentCard.fileUniqueID].lastModified =
+            this.currentCard.note.stat.mtime;
+
+        await this.plugin.savePluginData();
         this.currentDeck.nextCard(this);
     }
 
     async burySiblingCards(tillNextDay: boolean) {
         if (tillNextDay) {
-            this.plugin.data.buried.add(cyrb53(this.currentCard.cardText));
-            await this.plugin.savePluginData();
+            this.plugin.data.buried.add(this.currentCard.uniqueID);
+            await await this.plugin.savePluginData();
         }
 
         for (let sibling of this.currentCard.siblings) {

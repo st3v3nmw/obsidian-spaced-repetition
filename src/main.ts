@@ -7,6 +7,7 @@ import {
     getAllTags,
 } from "obsidian";
 import * as graph from "pagerank.js";
+import stringify from "json-stringify-pretty-compact";
 import { customAlphabet } from "nanoid";
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "./settings";
 import { FlashcardModal } from "./flashcard-modal";
@@ -16,7 +17,7 @@ import { SRFile, ReviewResponse, schedule } from "./scheduling";
 import { SchedNote, LinkStat, Card, CardType, Deck } from "./types";
 import {
     CROSS_HAIRS_ICON,
-    SCHEDULING_INFO_REGEX,
+    UUID_REGEX,
     YAML_FRONT_MATTER_REGEX,
     CLOZE_CARD_DETECTOR,
     CLOZE_DELETIONS_EXTRACTOR,
@@ -25,15 +26,22 @@ import {
     INLINE_CODE_REGEX,
     NANOID_ALPHABET,
 } from "./constants";
-import { escapeRegexString, cyrb53 } from "./utils";
+import { escapeRegexString } from "./utils";
 
 const nanoid = customAlphabet(NANOID_ALPHABET, 16);
 
 export interface PluginData {
-    files: Record<string, SRFile>; // Record<file's uuid, SRFile obj.>
+    buryDate: string;
+    // hashes of card texts
+    // should work as long as user doesn't modify card's text
+    // covers most of the cases
+    buried: Set<string>;
+    files: Record<string, SRFile>; // Record<file's uniqueID, SRFile obj.>
 }
 
 const DEFAULT_PLUGIN_DATA: PluginData = {
+    buryDate: "",
+    buried: new Set(),
     files: {},
 };
 
@@ -282,29 +290,21 @@ export default class SRPlugin extends Plugin {
 
             // file has no scheduling information
             if (
-                !(
-                    frontmatter.hasOwnProperty("sr-due") &&
-                    frontmatter.hasOwnProperty("sr-interval") &&
-                    frontmatter.hasOwnProperty("sr-ease")
-                )
+                !frontmatter.hasOwnProperty("sr-id") ||
+                !this.data.files[frontmatter["sr-id"]].due
             ) {
                 this.newNotes.push(note);
                 continue;
             }
 
-            let dueUnix: number = window
-                .moment(frontmatter["sr-due"], [
-                    "YYYY-MM-DD",
-                    "DD-MM-YYYY",
-                    "ddd MMM DD YYYY",
-                ])
-                .valueOf();
+            let srFile: SRFile = this.data.files[frontmatter["sr-id"]];
+            let dueUnix: number = srFile.due;
             this.scheduledNotes.push({
                 note,
                 dueUnix,
             });
 
-            this.easeByPath[note.path] = frontmatter["sr-ease"];
+            this.easeByPath[note.path] = srFile.ease;
 
             if (dueUnix <= now) this.dueNotesCount++;
             let nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
@@ -368,17 +368,17 @@ export default class SRPlugin extends Plugin {
             return;
         }
 
-        let fileText: string = await this.app.vault.read(note);
-        let ease, interval, delayBeforeReview;
+        let ease,
+            interval,
+            delayBeforeReview,
+            uniqueID,
+            cards = {};
         let now: number = Date.now();
         // new note
-        if (
-            !(
-                frontmatter.hasOwnProperty("sr-due") &&
-                frontmatter.hasOwnProperty("sr-interval") &&
-                frontmatter.hasOwnProperty("sr-ease")
-            )
-        ) {
+        if (!frontmatter.hasOwnProperty("sr-id")) {
+            uniqueID = nanoid();
+            await this.saveUUIDToFile(note, uniqueID);
+
             let linkTotal = 0,
                 linkPGTotal = 0,
                 totalLinkCount = 0;
@@ -424,17 +424,12 @@ export default class SRPlugin extends Plugin {
             interval = 1;
             delayBeforeReview = 0;
         } else {
-            interval = frontmatter["sr-interval"];
-            ease = frontmatter["sr-ease"];
-            delayBeforeReview =
-                now -
-                window
-                    .moment(frontmatter["sr-due"], [
-                        "YYYY-MM-DD",
-                        "DD-MM-YYYY",
-                        "ddd MMM DD YYYY",
-                    ])
-                    .valueOf();
+            uniqueID = frontmatter["uniqueID"];
+            let srFile: SRFile = this.data.files[uniqueID];
+            interval = srFile.interval;
+            ease = srFile.ease;
+            cards = srFile.cards;
+            delayBeforeReview = now - srFile.due;
         }
 
         let schedObj = schedule(
@@ -448,30 +443,20 @@ export default class SRPlugin extends Plugin {
         interval = schedObj.interval;
         ease = schedObj.ease;
 
-        let due = window.moment(now + interval * 24 * 3600 * 1000);
-        let dueString = due.format("YYYY-MM-DD");
+        let due: number = window
+            .moment(now + interval * 24 * 3600 * 1000)
+            .valueOf();
 
-        // check if scheduling info exists
-        if (SCHEDULING_INFO_REGEX.test(fileText)) {
-            let schedulingInfo = SCHEDULING_INFO_REGEX.exec(fileText);
-            fileText = fileText.replace(
-                SCHEDULING_INFO_REGEX,
-                `---\n${schedulingInfo[1]}sr-due: ${dueString}\nsr-interval: ${interval}\nsr-ease: ${ease}\n${schedulingInfo[5]}---`
-            );
+        this.data.files[uniqueID] = {
+            due,
+            interval,
+            ease,
+            lastKnownPath: note.path,
+            lastModified: note.stat.mtime,
+            cards,
+        };
 
-            // new note with existing YAML front matter
-        } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
-            let existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
-            fileText = fileText.replace(
-                YAML_FRONT_MATTER_REGEX,
-                `---\n${existingYaml[1]}sr-due: ${dueString}\nsr-interval: ${interval}\nsr-ease: ${ease}\n---`
-            );
-        } else {
-            fileText = `---\nsr-due: ${dueString}\nsr-interval: ${interval}\nsr-ease: ${ease}\n---\n\n${fileText}`;
-        }
-
-        this.app.vault.modify(note, fileText);
-
+        await this.savePluginData();
         new Notice("Response received.");
 
         setTimeout(() => {
@@ -512,6 +497,13 @@ export default class SRPlugin extends Plugin {
 
         this.deckTree = new Deck("root", null);
         this.dueDatesFlashcards = {};
+
+        let todayDate = window.moment(Date.now()).format("YYYY-MM-DD");
+        // clear list if we've changed dates
+        if (todayDate != this.data.buryDate) {
+            this.data.buryDate = todayDate;
+            this.data.buried = new Set();
+        }
 
         for (let note of notes) {
             if (this.settings.convertFoldersToDecks) {
@@ -554,14 +546,19 @@ export default class SRPlugin extends Plugin {
     }
 
     async findFlashcards(note: TFile, deckPathStr: string) {
-        let fileText = await this.app.vault.read(note);
+        let fileText: string = await this.app.vault.read(note);
         let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         let headings = fileCachedData.headings || [];
-        let fileChanged: boolean = false;
+        let frontmatter = fileCachedData.frontmatter || <Record<string, any>>{};
+
+        let fileUniqueID: string = frontmatter["sr-id"] ?? nanoid();
+        let hasFlashcards: boolean = false;
 
         let deckAdded: boolean = false;
         let deckPath: string[] = deckPathStr.substring(1).split("/");
         if (deckPath.length == 1 && deckPath[0] == "") deckPath = ["/"];
+
+        let uniqueID: string = "hey!";
 
         // find all codeblocks
         let codeblocks: [number, number][] = [];
@@ -583,6 +580,7 @@ export default class SRPlugin extends Plugin {
                     inCodeblock(match.index, match[0].trim().length, codeblocks)
                 )
                     continue;
+                hasFlashcards = true;
 
                 if (!deckAdded) {
                     this.deckTree.createDeck([...deckPath]);
@@ -612,13 +610,14 @@ export default class SRPlugin extends Plugin {
                     if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
                         this.dueDatesFlashcards[nDays] = 0;
                     this.dueDatesFlashcards[nDays]++;
-                    if (this.data.buried.has(cyrb53(cardText))) {
+                    if (this.data.buried.has(uniqueID)) {
                         this.deckTree.countFlashcard([...deckPath]);
                         continue;
                     }
 
                     if (dueUnix <= now) {
                         cardObj = {
+                            fileUniqueID,
                             isDue: true,
                             interval: parseInt(match[4]),
                             ease: parseInt(match[5]),
@@ -638,6 +637,7 @@ export default class SRPlugin extends Plugin {
                     }
                 } else {
                     cardObj = {
+                        fileUniqueID,
                         isDue: false,
                         note,
                         front,
@@ -669,6 +669,8 @@ export default class SRPlugin extends Plugin {
                     deckAdded = true;
                 }
 
+                hasFlashcards = true;
+
                 let cardText = match[0];
 
                 let siblingMatches: RegExpMatchArray[] = [];
@@ -688,20 +690,6 @@ export default class SRPlugin extends Plugin {
                 ];
 
                 // we have some extra scheduling dates to delete
-                if (scheduling.length > siblingMatches.length) {
-                    let idxSched = cardText.lastIndexOf("<!--SR:") + 7;
-                    let newCardText = cardText.substring(0, idxSched);
-                    for (let i = 0; i < siblingMatches.length; i++)
-                        newCardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
-                    newCardText += "-->\n";
-
-                    let replacementRegex = new RegExp(
-                        escapeRegexString(cardText),
-                        "gm"
-                    );
-                    fileText = fileText.replace(replacementRegex, newCardText);
-                    fileChanged = true;
-                }
 
                 let context: string = this.settings.showContextInCards
                     ? getCardContext(match.index, headings)
@@ -740,13 +728,14 @@ export default class SRPlugin extends Plugin {
                         if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
                             this.dueDatesFlashcards[nDays] = 0;
                         this.dueDatesFlashcards[nDays]++;
-                        if (this.data.buried.has(cyrb53(cardText))) {
+                        if (this.data.buried.has(uniqueID)) {
                             this.deckTree.countFlashcard([...deckPath]);
                             continue;
                         }
 
                         if (dueUnix <= now) {
                             cardObj = {
+                                fileUniqueID,
                                 isDue: true,
                                 interval: parseInt(scheduling[i][2]),
                                 ease: parseInt(scheduling[i][3]),
@@ -770,13 +759,14 @@ export default class SRPlugin extends Plugin {
                             continue;
                         }
                     } else {
-                        if (this.data.buried.has(cyrb53(cardText))) {
+                        if (this.data.buried.has(uniqueID)) {
                             this.deckTree.countFlashcard([...deckPath]);
                             continue;
                         }
 
                         // new card
                         cardObj = {
+                            fileUniqueID,
                             isDue: false,
                             note,
                             front,
@@ -796,7 +786,29 @@ export default class SRPlugin extends Plugin {
             }
         }
 
-        if (fileChanged) await this.app.vault.modify(note, fileText);
+        if (hasFlashcards && !frontmatter.hasOwnProperty("sr-id")) {
+            await this.saveUUIDToFile(note, fileUniqueID);
+            this.data.files[fileUniqueID] = {
+                lastKnownPath: note.path,
+                lastModified: note.stat.mtime,
+                cards: {},
+            };
+            await this.savePluginData();
+        }
+    }
+
+    async saveUUIDToFile(note: TFile, uniqueID: string) {
+        let fileText: string = await this.app.vault.read(note);
+        // has existing YAML front matter?
+        if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
+            let existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
+            fileText = fileText.replace(
+                YAML_FRONT_MATTER_REGEX,
+                `---\n${existingYaml[1]}sr-id: ${uniqueID}\n---`
+            );
+        } else fileText = `---\nsr-id: ${uniqueID}\n---\n\n${fileText}`;
+
+        this.app.vault.modify(note, fileText);
     }
 
     async loadSettings() {
@@ -832,7 +844,10 @@ export default class SRPlugin extends Plugin {
                     adapter.mkdir(currFolder);
             }
             this.data = DEFAULT_PLUGIN_DATA;
-            await adapter.write(dbPath, JSON.stringify(this.data, null, 2));
+            await adapter.write(
+                dbPath,
+                stringify(this.data, { maxLength: 200 })
+            );
         }
     }
 
@@ -840,7 +855,7 @@ export default class SRPlugin extends Plugin {
         let dbPath: string = `${this.settings.dbFolderPath}/${this.settings.dbID}.json`;
         await this.app.vault.adapter.write(
             dbPath,
-            JSON.stringify(this.data, null, 2)
+            stringify(this.data, { maxLength: 200 })
         );
     }
 

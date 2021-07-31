@@ -4,7 +4,7 @@ import type SRPlugin from "./main";
 import { escapeRegexString } from "./utils";
 import { NANOID_ALPHABET } from "./constants";
 
-const nanoid = customAlphabet(NANOID_ALPHABET, 8);
+const nanoid = customAlphabet(NANOID_ALPHABET, 16);
 const DEBOUNCE_TIMER_MS: number = 512;
 
 export interface SRSettings {
