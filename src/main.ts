@@ -30,8 +30,12 @@ import {
     MULTI_SCHEDULING_EXTRACTOR,
     CODEBLOCK_REGEX,
     INLINE_CODE_REGEX,
+    NANOID_ALPHABET
 } from "./constants";
 import { escapeRegexString, cyrb53 } from "./utils";
+import { customAlphabet } from 'nanoid';
+
+const nanoid = customAlphabet(NANOID_ALPHABET, 16);
 
 interface PluginData {
     settings: SRSettings;
@@ -73,6 +77,8 @@ export default class SRPlugin extends Plugin {
 
     async onload() {
         await this.loadPluginData();
+
+        console.log(nanoid());
 
         addIcon("crosshairs", CROSS_HAIRS_ICON);
 
