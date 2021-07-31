@@ -8,7 +8,8 @@ export interface SRSettings {
     cardCommentOnSameLine: boolean;
     burySiblingCards: boolean;
     showContextInCards: boolean;
-    largeScreenMode: boolean;
+    flashcardHeightPercentage: number;
+    flashcardWidthPercentage: number;
     showFileNameInFileLink: boolean;
     randomizeCardOrder: boolean;
     disableClozeCards: boolean;
