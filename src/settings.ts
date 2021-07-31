@@ -179,6 +179,7 @@ export class SRSettingTab extends PluginSettingTab {
                 slider
                   .setLimits(10, 100, 5)
                   .setValue(getSetting("flashcardHeightPercentage", this.plugin.data.settings))
+                  .setDynamicTooltip()
                   .onChange(async (value) => {
                      this.plugin.data.settings.flashcardHeightPercentage = value;
                      await this.plugin.savePluginData();
@@ -192,6 +193,7 @@ export class SRSettingTab extends PluginSettingTab {
                 slider
                   .setLimits(10, 100, 5)
                   .setValue(getSetting("flashcardWidthPercentage", this.plugin.data.settings))
+                  .setDynamicTooltip()
                   .onChange(async (value) => {
                      this.plugin.data.settings.flashcardWidthPercentage = value;
                      await this.plugin.savePluginData();
