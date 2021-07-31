@@ -10,7 +10,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     cardCommentOnSameLine: false,
     buryRelatedCards: false,
     showContextInCards: true,
-    largeScreenMode: false,
+    flashcardHeightPercentage: 80,
+    flashcardWidthPercentage: 40,
     showFileNameInFileLink: false,
     randomizeCardOrder: true,
     disableClozeCards: false,
@@ -170,17 +171,29 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Review cards in large screen mode?")
-            .setDesc("[Desktop] Should be useful if you have very large images")
-            .addToggle((toggle) =>
-                toggle
-                    .setValue(
-                        getSetting("largeScreenMode", this.plugin.data.settings)
-                    )
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.largeScreenMode = value;
-                        await this.plugin.savePluginData();
-                    })
+            .setName("Flashcard Height Percentage")
+            .setDesc("[Desktop] Should be set to 100% if you have very large images")
+            .addSlider((slider) =>
+                slider
+                  .setLimits(10, 100, 5)
+                  .setValue(getSetting("flashcardHeightPercentage", this.plugin.data.settings))
+                  .onChange(async (value) => {
+                     this.plugin.data.settings.flashcardHeightPercentage = value;
+                     await this.plugin.savePluginData();
+                  })
+            );
+
+        new Setting(containerEl)
+            .setName("Flashcard Width Percentage")
+            .setDesc("[Desktop] Should be set to 100% if you have very large images")
+            .addSlider((slider) =>
+                slider
+                  .setLimits(10, 100, 5)
+                  .setValue(getSetting("flashcardWidthPercentage", this.plugin.data.settings))
+                  .onChange(async (value) => {
+                     this.plugin.data.settings.flashcardWidthPercentage = value;
+                     await this.plugin.savePluginData();
+                  })
             );
 
         new Setting(containerEl)
