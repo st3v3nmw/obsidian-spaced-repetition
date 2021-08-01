@@ -7,20 +7,11 @@ import {
     getAllTags,
 } from "obsidian";
 import * as graph from "pagerank.js";
-import { SRSettingTab, DEFAULT_SETTINGS, getSetting } from "./settings";
-import { FlashcardModal } from "./flashcard-modal";
+import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "./settings";
+import { FlashcardModal, Deck } from "./flashcard-modal";
 import { StatsModal } from "./stats-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "./sidebar";
-import { schedule } from "./sched";
-import {
-    SchedNote,
-    LinkStat,
-    Card,
-    CardType,
-    ReviewResponse,
-    SRSettings,
-    Deck,
-} from "./types";
+import { CardType, Card, ReviewResponse, schedule } from "./scheduling";
 import {
     CROSS_HAIRS_ICON,
     SCHEDULING_INFO_REGEX,
@@ -47,6 +38,18 @@ const DEFAULT_DATA: PluginData = {
     buryDate: "",
     buryList: [],
 };
+
+// Notes
+
+export interface SchedNote {
+    note: TFile;
+    dueUnix: number;
+}
+
+export interface LinkStat {
+    sourcePath: string;
+    linkCount: number;
+}
 
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
@@ -89,14 +92,14 @@ export default class SRPlugin extends Plugin {
 
         this.singlelineCardRegex = new RegExp(
             `^(.+)${escapeRegexString(
-                getSetting("singlelineCardSeparator", this.data.settings)
+                this.data.settings.singlelineCardSeparator
             )}(.+?)\\n?(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
             "gm"
         );
 
         this.multilineCardRegex = new RegExp(
             `^((?:.+\\n)+)${escapeRegexString(
-                getSetting("multilineCardSeparator", this.data.settings)
+                this.data.settings.multilineCardSeparator
             )}\\n((?:.+?\\n?)+?)(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
             "gm"
         );
@@ -531,7 +534,7 @@ export default class SRPlugin extends Plugin {
         }
 
         for (let note of notes) {
-            if (getSetting("convertFoldersToDecks", this.data.settings)) {
+            if (this.data.settings.convertFoldersToDecks) {
                 let path: string[] = note.path.split("/");
                 path.pop(); // remove filename
                 await this.findFlashcards(note, "#" + path.join("/"));
@@ -611,10 +614,7 @@ export default class SRPlugin extends Plugin {
                 let cardObj: Card;
                 let front = match[1].trim();
                 let back = match[2].trim();
-                let context: string = getSetting(
-                    "showContextInCards",
-                    this.data.settings
-                )
+                let context: string = this.data.settings.showContextInCards
                     ? getCardContext(match.index, headings)
                     : "";
                 // flashcard already scheduled
@@ -680,7 +680,7 @@ export default class SRPlugin extends Plugin {
 
             if (
                 cardType == CardType.Cloze &&
-                getSetting("disableClozeCards", this.data.settings)
+                this.data.settings.disableClozeCards
             )
                 continue;
 
@@ -726,10 +726,7 @@ export default class SRPlugin extends Plugin {
                     fileChanged = true;
                 }
 
-                let context: string = getSetting(
-                    "showContextInCards",
-                    this.data.settings
-                )
+                let context: string = this.data.settings.showContextInCards
                     ? getCardContext(match.index, headings)
                     : "";
                 let siblings: Card[] = [];
@@ -827,6 +824,11 @@ export default class SRPlugin extends Plugin {
 
     async loadPluginData() {
         this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
+        this.data.settings = Object.assign(
+            {},
+            DEFAULT_SETTINGS,
+            this.data.settings
+        );
     }
 
     async savePluginData() {
