@@ -617,6 +617,9 @@ export default class SRPlugin extends Plugin {
                 let context: string = this.data.settings.showContextInCards
                     ? getCardContext(match.index, headings)
                     : "";
+                let lineNo: number = fileText
+                    .substring(0, match.index)
+                    .split("\n").length;
                 // flashcard already scheduled
                 if (match[3]) {
                     let dueUnix: number = window
@@ -644,6 +647,7 @@ export default class SRPlugin extends Plugin {
                             ease: parseInt(match[5]),
                             delayBeforeReview: now - dueUnix,
                             note,
+                            lineNo,
                             front,
                             back,
                             cardText,
@@ -660,6 +664,7 @@ export default class SRPlugin extends Plugin {
                     cardObj = {
                         isDue: false,
                         note,
+                        lineNo,
                         front,
                         back,
                         cardText,
@@ -729,6 +734,9 @@ export default class SRPlugin extends Plugin {
                 let context: string = this.data.settings.showContextInCards
                     ? getCardContext(match.index, headings)
                     : "";
+                let lineNo: number = fileText
+                    .substring(0, match.index)
+                    .split("\n").length;
                 let siblings: Card[] = [];
                 for (let i = 0; i < siblingMatches.length; i++) {
                     let cardObj: Card;
@@ -775,6 +783,7 @@ export default class SRPlugin extends Plugin {
                                 ease: parseInt(scheduling[i][3]),
                                 delayBeforeReview: now - dueUnix,
                                 note,
+                                lineNo,
                                 front,
                                 back,
                                 cardText: match[0],
@@ -802,6 +811,7 @@ export default class SRPlugin extends Plugin {
                         cardObj = {
                             isDue: false,
                             note,
+                            lineNo,
                             front,
                             back,
                             cardText: match[0],

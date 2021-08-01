@@ -24,6 +24,7 @@ export interface Card {
     delayBeforeReview?: number;
     // note
     note: TFile;
+    lineNo: number;
     // visuals
     front: string;
     back: string;
