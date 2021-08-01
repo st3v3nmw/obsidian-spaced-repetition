@@ -5,6 +5,7 @@ import {
     Notice,
     Platform,
     TFile,
+    MarkdownView,
 } from "obsidian";
 import type SRPlugin from "./main";
 import {
@@ -131,11 +132,17 @@ export class FlashcardModal extends Modal {
         this.fileLinkView.setText("Open file");
         if (this.plugin.data.settings.showFileNameInFileLink)
             this.fileLinkView.setAttribute("aria-label", "Open file");
-        this.fileLinkView.addEventListener("click", (_) => {
+        this.fileLinkView.addEventListener("click", async (_) => {
             this.close();
-            this.plugin.app.workspace.activeLeaf.openFile(
+            await this.plugin.app.workspace.activeLeaf.openFile(
                 this.currentCard.note
             );
+            let activeView =
+                this.app.workspace.getActiveViewOfType(MarkdownView);
+            activeView.editor.setCursor({
+                line: this.currentCard.lineNo,
+                ch: 0,
+            });
         });
 
         this.resetLinkView = this.contentEl.createDiv("sr-link");
