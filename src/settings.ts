@@ -1,14 +1,49 @@
-import { Notice, PluginSettingTab, Setting, App } from "obsidian";
+import { Notice, PluginSettingTab, Setting, App, debounce } from "obsidian";
 import type SRPlugin from "./main";
-import { SRSettings } from "./types";
 import { escapeRegexString } from "./utils";
+
+const DEBOUNCE_TIMER_MS: number = 512;
+
+export interface SRSettings {
+    // flashcards
+    flashcardTags: string[];
+    convertFoldersToDecks: boolean;
+    cardCommentOnSameLine: boolean;
+    burySiblingCards: boolean;
+    showContextInCards: boolean;
+    flashcardHeightPercentage: number;
+    flashcardWidthPercentage: number;
+    showFileNameInFileLink: boolean;
+    randomizeCardOrder: boolean;
+    disableClozeCards: boolean;
+    disableSinglelineCards: boolean;
+    singlelineCardSeparator: string;
+    disableSinglelineReversedCards: boolean;
+    singlelineReversedCardSeparator: string;
+    disableMultilineCards: boolean;
+    multilineCardSeparator: string;
+    disableMultilineReversedCards: boolean;
+    multilineReversedCardSeparator: string;
+    // notes
+    tagsToReview: string[];
+    openRandomNote: boolean;
+    autoNextNote: boolean;
+    disableFileMenuReviewOptions: boolean;
+    maxNDaysNotesReviewQueue: number;
+    // algorithm
+    baseEase: number;
+    lapsesIntervalChange: number;
+    easyBonus: number;
+    maximumInterval: number;
+    maxLinkFactor: number;
+}
 
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
     flashcardTags: ["#flashcards"],
     convertFoldersToDecks: false,
     cardCommentOnSameLine: false,
-    buryRelatedCards: false,
+    burySiblingCards: false,
     showContextInCards: true,
     flashcardHeightPercentage: 80,
     flashcardWidthPercentage: 40,
@@ -36,22 +71,6 @@ export const DEFAULT_SETTINGS: SRSettings = {
     maximumInterval: 36525,
     maxLinkFactor: 1.0,
 };
-
-export function getSetting(
-    settingName: keyof SRSettings,
-    settingsObj: SRSettings
-): any {
-    let value: any = settingsObj[settingName];
-    value ??= DEFAULT_SETTINGS[settingName];
-    return value;
-}
-
-// https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
-let applyDebounceTimer: number = 0;
-function applySettingsUpdate(callback: Function): void {
-    clearTimeout(applyDebounceTimer);
-    applyDebounceTimer = window.setTimeout(callback, 512);
-}
 
 export class SRSettingTab extends PluginSettingTab {
     private plugin: SRPlugin;
@@ -81,18 +100,17 @@ export class SRSettingTab extends PluginSettingTab {
             )
             .addTextArea((text) =>
                 text
-                    .setValue(
-                        `${getSetting(
-                            "flashcardTags",
-                            this.plugin.data.settings
-                        ).join(" ")}`
-                    )
+                    .setValue(this.plugin.data.settings.flashcardTags.join(" "))
                     .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            this.plugin.data.settings.flashcardTags =
-                                value.split(/\s+/);
-                            await this.plugin.savePluginData();
-                        });
+                        debounce(
+                            async () => {
+                                this.plugin.data.settings.flashcardTags =
+                                    value.split(/\s+/);
+                                await this.plugin.savePluginData();
+                            },
+                            DEBOUNCE_TIMER_MS,
+                            true
+                        );
                     })
             );
 
@@ -103,12 +121,7 @@ export class SRSettingTab extends PluginSettingTab {
             )
             .addToggle((toggle) =>
                 toggle
-                    .setValue(
-                        getSetting(
-                            "convertFoldersToDecks",
-                            this.plugin.data.settings
-                        )
-                    )
+                    .setValue(this.plugin.data.settings.convertFoldersToDecks)
                     .onChange(async (value) => {
                         this.plugin.data.settings.convertFoldersToDecks = value;
                         await this.plugin.savePluginData();
@@ -124,12 +137,7 @@ export class SRSettingTab extends PluginSettingTab {
             )
             .addToggle((toggle) =>
                 toggle
-                    .setValue(
-                        getSetting(
-                            "cardCommentOnSameLine",
-                            this.plugin.data.settings
-                        )
-                    )
+                    .setValue(this.plugin.data.settings.cardCommentOnSameLine)
                     .onChange(async (value) => {
                         this.plugin.data.settings.cardCommentOnSameLine = value;
                         await this.plugin.savePluginData();
@@ -137,18 +145,15 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Bury related cards until the next day?")
-            .setDesc("This applies to other cloze deletions in cloze cards.")
+            .setName("Bury sibling cards until the next day?")
+            .setDesc(
+                "Siblings are cards generated from the same card text i.e. cloze deletions"
+            )
             .addToggle((toggle) =>
                 toggle
-                    .setValue(
-                        getSetting(
-                            "buryRelatedCards",
-                            this.plugin.data.settings
-                        )
-                    )
+                    .setValue(this.plugin.data.settings.burySiblingCards)
                     .onChange(async (value) => {
-                        this.plugin.data.settings.buryRelatedCards = value;
+                        this.plugin.data.settings.burySiblingCards = value;
                         await this.plugin.savePluginData();
                     })
             );
@@ -158,12 +163,7 @@ export class SRSettingTab extends PluginSettingTab {
             .setDesc("i.e. Title > Heading 1 > Subheading > ... > Subheading")
             .addToggle((toggle) =>
                 toggle
-                    .setValue(
-                        getSetting(
-                            "showContextInCards",
-                            this.plugin.data.settings
-                        )
-                    )
+                    .setValue(this.plugin.data.settings.showContextInCards)
                     .onChange(async (value) => {
                         this.plugin.data.settings.showContextInCards = value;
                         await this.plugin.savePluginData();
@@ -172,28 +172,40 @@ export class SRSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName("Flashcard Height Percentage")
-            .setDesc("[Desktop] Should be set to 100% if you have very large images")
+            .setDesc(
+                "[Desktop] Should be set to 100% if you have very large images"
+            )
             .addSlider((slider) =>
                 slider
-                  .setLimits(10, 100, 5)
-                  .setValue(getSetting("flashcardHeightPercentage", this.plugin.data.settings))
-                  .onChange(async (value) => {
-                     this.plugin.data.settings.flashcardHeightPercentage = value;
-                     await this.plugin.savePluginData();
-                  })
+                    .setLimits(10, 100, 5)
+                    .setValue(
+                        this.plugin.data.settings.flashcardHeightPercentage
+                    )
+                    .setDynamicTooltip()
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.flashcardHeightPercentage =
+                            value;
+                        await this.plugin.savePluginData();
+                    })
             );
 
         new Setting(containerEl)
             .setName("Flashcard Width Percentage")
-            .setDesc("[Desktop] Should be set to 100% if you have very large images")
+            .setDesc(
+                "[Desktop] Should be set to 100% if you have very large images"
+            )
             .addSlider((slider) =>
                 slider
-                  .setLimits(10, 100, 5)
-                  .setValue(getSetting("flashcardWidthPercentage", this.plugin.data.settings))
-                  .onChange(async (value) => {
-                     this.plugin.data.settings.flashcardWidthPercentage = value;
-                     await this.plugin.savePluginData();
-                  })
+                    .setLimits(10, 100, 5)
+                    .setValue(
+                        this.plugin.data.settings.flashcardWidthPercentage
+                    )
+                    .setDynamicTooltip()
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.flashcardWidthPercentage =
+                            value;
+                        await this.plugin.savePluginData();
+                    })
             );
 
         new Setting(containerEl)
@@ -202,12 +214,7 @@ export class SRSettingTab extends PluginSettingTab {
             )
             .addToggle((toggle) =>
                 toggle
-                    .setValue(
-                        getSetting(
-                            "showFileNameInFileLink",
-                            this.plugin.data.settings
-                        )
-                    )
+                    .setValue(this.plugin.data.settings.showFileNameInFileLink)
                     .onChange(async (value) => {
                         this.plugin.data.settings.showFileNameInFileLink =
                             value;
@@ -219,12 +226,7 @@ export class SRSettingTab extends PluginSettingTab {
             .setName("Randomize card order during review?")
             .addToggle((toggle) =>
                 toggle
-                    .setValue(
-                        getSetting(
-                            "randomizeCardOrder",
-                            this.plugin.data.settings
-                        )
-                    )
+                    .setValue(this.plugin.data.settings.randomizeCardOrder)
                     .onChange(async (value) => {
                         this.plugin.data.settings.randomizeCardOrder = value;
                         await this.plugin.savePluginData();
@@ -238,12 +240,7 @@ export class SRSettingTab extends PluginSettingTab {
             )
             .addToggle((toggle) =>
                 toggle
-                    .setValue(
-                        getSetting(
-                            "disableClozeCards",
-                            this.plugin.data.settings
-                        )
-                    )
+                    .setValue(this.plugin.data.settings.disableClozeCards)
                     .onChange(async (value) => {
                         this.plugin.data.settings.disableClozeCards = value;
                         await this.plugin.savePluginData();
@@ -257,24 +254,23 @@ export class SRSettingTab extends PluginSettingTab {
             )
             .addText((text) =>
                 text
-                    .setValue(
-                        `${getSetting(
-                            "singlelineCardSeparator",
-                            this.plugin.data.settings
-                        )}`
-                    )
+                    .setValue(this.plugin.data.settings.singlelineCardSeparator)
                     .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            this.plugin.data.settings.singlelineCardSeparator =
-                                value;
-                            await this.plugin.savePluginData();
-                            this.plugin.singlelineCardRegex = new RegExp(
-                                `^(.+)${escapeRegexString(
-                                    value
-                                )}(.+?)\\n?(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
-                                "gm"
-                            );
-                        });
+                        debounce(
+                            async () => {
+                                this.plugin.data.settings.singlelineCardSeparator =
+                                    value;
+                                await this.plugin.savePluginData();
+                                this.plugin.singlelineCardRegex = new RegExp(
+                                    `^(.+)${escapeRegexString(
+                                        value
+                                    )}(.+?)\\n?(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
+                                    "gm"
+                                );
+                            },
+                            DEBOUNCE_TIMER_MS,
+                            true
+                        );
                     })
             )
             .addExtraButton((button) => {
@@ -296,24 +292,23 @@ export class SRSettingTab extends PluginSettingTab {
             )
             .addText((text) =>
                 text
-                    .setValue(
-                        `${getSetting(
-                            "multilineCardSeparator",
-                            this.plugin.data.settings
-                        )}`
-                    )
+                    .setValue(this.plugin.data.settings.multilineCardSeparator)
                     .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            this.plugin.data.settings.multilineCardSeparator =
-                                value;
-                            await this.plugin.savePluginData();
-                            this.plugin.multilineCardRegex = new RegExp(
-                                `^((?:.+\\n)+)${escapeRegexString(
-                                    value
-                                )}\\n((?:.+?\\n?)+?)(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
-                                "gm"
-                            );
-                        });
+                        debounce(
+                            async () => {
+                                this.plugin.data.settings.multilineCardSeparator =
+                                    value;
+                                await this.plugin.savePluginData();
+                                this.plugin.multilineCardRegex = new RegExp(
+                                    `^((?:.+\\n)+)${escapeRegexString(
+                                        value
+                                    )}\\n((?:.+?\\n?)+?)(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
+                                    "gm"
+                                );
+                            },
+                            DEBOUNCE_TIMER_MS,
+                            true
+                        );
                     })
             )
             .addExtraButton((button) => {
@@ -337,18 +332,17 @@ export class SRSettingTab extends PluginSettingTab {
             )
             .addTextArea((text) =>
                 text
-                    .setValue(
-                        `${getSetting(
-                            "tagsToReview",
-                            this.plugin.data.settings
-                        ).join(" ")}`
-                    )
+                    .setValue(this.plugin.data.settings.tagsToReview.join(" "))
                     .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            this.plugin.data.settings.tagsToReview =
-                                value.split(/\s+/);
-                            await this.plugin.savePluginData();
-                        });
+                        debounce(
+                            async () => {
+                                this.plugin.data.settings.tagsToReview =
+                                    value.split(/\s+/);
+                                await this.plugin.savePluginData();
+                            },
+                            DEBOUNCE_TIMER_MS,
+                            true
+                        );
                     })
             );
 
@@ -359,9 +353,7 @@ export class SRSettingTab extends PluginSettingTab {
             )
             .addToggle((toggle) =>
                 toggle
-                    .setValue(
-                        getSetting("openRandomNote", this.plugin.data.settings)
-                    )
+                    .setValue(this.plugin.data.settings.openRandomNote)
                     .onChange(async (value) => {
                         this.plugin.data.settings.openRandomNote = value;
                         await this.plugin.savePluginData();
@@ -373,9 +365,7 @@ export class SRSettingTab extends PluginSettingTab {
             .setDesc("For faster reviews.")
             .addToggle((toggle) =>
                 toggle
-                    .setValue(
-                        getSetting("autoNextNote", this.plugin.data.settings)
-                    )
+                    .setValue(this.plugin.data.settings.autoNextNote)
                     .onChange(async (value) => {
                         this.plugin.data.settings.autoNextNote = value;
                         await this.plugin.savePluginData();
@@ -392,10 +382,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addToggle((toggle) =>
                 toggle
                     .setValue(
-                        getSetting(
-                            "disableFileMenuReviewOptions",
-                            this.plugin.data.settings
-                        )
+                        this.plugin.data.settings.disableFileMenuReviewOptions
                     )
                     .onChange(async (value) => {
                         this.plugin.data.settings.disableFileMenuReviewOptions =
@@ -410,32 +397,35 @@ export class SRSettingTab extends PluginSettingTab {
             .addText((text) =>
                 text
                     .setValue(
-                        `${getSetting(
-                            "maxNDaysNotesReviewQueue",
-                            this.plugin.data.settings
-                        )}`
+                        this.plugin.data.settings.maxNDaysNotesReviewQueue.toString()
                     )
                     .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            let numValue: number = Number.parseInt(value);
-                            if (!isNaN(numValue)) {
-                                if (numValue < 1) {
-                                    new Notice(
-                                        "The number of days must be at least 1."
-                                    );
-                                    text.setValue(
-                                        `${this.plugin.data.settings.maxNDaysNotesReviewQueue}`
-                                    );
-                                    return;
-                                }
+                        debounce(
+                            async () => {
+                                let numValue: number = Number.parseInt(value);
+                                if (!isNaN(numValue)) {
+                                    if (numValue < 1) {
+                                        new Notice(
+                                            "The number of days must be at least 1."
+                                        );
+                                        text.setValue(
+                                            this.plugin.data.settings.maxNDaysNotesReviewQueue.toString()
+                                        );
+                                        return;
+                                    }
 
-                                this.plugin.data.settings.maxNDaysNotesReviewQueue =
-                                    numValue;
-                                await this.plugin.savePluginData();
-                            } else {
-                                new Notice("Please provide a valid number.");
-                            }
-                        });
+                                    this.plugin.data.settings.maxNDaysNotesReviewQueue =
+                                        numValue;
+                                    await this.plugin.savePluginData();
+                                } else {
+                                    new Notice(
+                                        "Please provide a valid number."
+                                    );
+                                }
+                            },
+                            DEBOUNCE_TIMER_MS,
+                            true
+                        );
                     })
             )
             .addExtraButton((button) => {
@@ -460,29 +450,34 @@ export class SRSettingTab extends PluginSettingTab {
             .setDesc("minimum = 130, preferrably approximately 250.")
             .addText((text) =>
                 text
-                    .setValue(
-                        `${getSetting("baseEase", this.plugin.data.settings)}`
-                    )
+                    .setValue(this.plugin.data.settings.baseEase.toString())
                     .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            let numValue: number = Number.parseInt(value);
-                            if (!isNaN(numValue)) {
-                                if (numValue < 130) {
-                                    new Notice(
-                                        "The base ease must be at least 130."
-                                    );
-                                    text.setValue(
-                                        `${this.plugin.data.settings.baseEase}`
-                                    );
-                                    return;
-                                }
+                        debounce(
+                            async () => {
+                                let numValue: number = Number.parseInt(value);
+                                if (!isNaN(numValue)) {
+                                    if (numValue < 130) {
+                                        new Notice(
+                                            "The base ease must be at least 130."
+                                        );
+                                        text.setValue(
+                                            `${this.plugin.data.settings.baseEase}`
+                                        );
+                                        return;
+                                    }
 
-                                this.plugin.data.settings.baseEase = numValue;
-                                await this.plugin.savePluginData();
-                            } else {
-                                new Notice("Please provide a valid number.");
-                            }
-                        });
+                                    this.plugin.data.settings.baseEase =
+                                        numValue;
+                                    await this.plugin.savePluginData();
+                                } else {
+                                    new Notice(
+                                        "Please provide a valid number."
+                                    );
+                                }
+                            },
+                            DEBOUNCE_TIMER_MS,
+                            true
+                        );
                     })
             )
             .addExtraButton((button) => {
@@ -504,10 +499,7 @@ export class SRSettingTab extends PluginSettingTab {
                 slider
                     .setLimits(1, 99, 1)
                     .setValue(
-                        getSetting(
-                            "lapsesIntervalChange",
-                            this.plugin.data.settings
-                        ) * 100
+                        this.plugin.data.settings.lapsesIntervalChange * 100
                     )
                     .setDynamicTooltip()
                     .onChange(async (value: number) => {
@@ -535,34 +527,39 @@ export class SRSettingTab extends PluginSettingTab {
             .addText((text) =>
                 text
                     .setValue(
-                        `${
-                            getSetting("easyBonus", this.plugin.data.settings) *
-                            100
-                        }`
+                        (this.plugin.data.settings.easyBonus * 100).toString()
                     )
                     .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            let numValue: number = Number.parseInt(value) / 100;
-                            if (!isNaN(numValue)) {
-                                if (numValue < 1.0) {
-                                    new Notice(
-                                        "The easy bonus must be at least 100."
-                                    );
-                                    text.setValue(
-                                        `${
-                                            this.plugin.data.settings
-                                                .easyBonus * 100
-                                        }`
-                                    );
-                                    return;
-                                }
+                        debounce(
+                            async () => {
+                                let numValue: number =
+                                    Number.parseInt(value) / 100;
+                                if (!isNaN(numValue)) {
+                                    if (numValue < 1.0) {
+                                        new Notice(
+                                            "The easy bonus must be at least 100."
+                                        );
+                                        text.setValue(
+                                            `${
+                                                this.plugin.data.settings
+                                                    .easyBonus * 100
+                                            }`
+                                        );
+                                        return;
+                                    }
 
-                                this.plugin.data.settings.easyBonus = numValue;
-                                await this.plugin.savePluginData();
-                            } else {
-                                new Notice("Please provide a valid number.");
-                            }
-                        });
+                                    this.plugin.data.settings.easyBonus =
+                                        numValue;
+                                    await this.plugin.savePluginData();
+                                } else {
+                                    new Notice(
+                                        "Please provide a valid number."
+                                    );
+                                }
+                            },
+                            DEBOUNCE_TIMER_MS,
+                            true
+                        );
                     })
             )
             .addExtraButton((button) => {
@@ -585,32 +582,35 @@ export class SRSettingTab extends PluginSettingTab {
             .addText((text) =>
                 text
                     .setValue(
-                        `${getSetting(
-                            "maximumInterval",
-                            this.plugin.data.settings
-                        )}`
+                        this.plugin.data.settings.maximumInterval.toString()
                     )
                     .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            let numValue: number = Number.parseInt(value);
-                            if (!isNaN(numValue)) {
-                                if (numValue < 1) {
-                                    new Notice(
-                                        "The maximum interval must be at least 1 day."
-                                    );
-                                    text.setValue(
-                                        `${this.plugin.data.settings.maximumInterval}`
-                                    );
-                                    return;
-                                }
+                        debounce(
+                            async () => {
+                                let numValue: number = Number.parseInt(value);
+                                if (!isNaN(numValue)) {
+                                    if (numValue < 1) {
+                                        new Notice(
+                                            "The maximum interval must be at least 1 day."
+                                        );
+                                        text.setValue(
+                                            this.plugin.data.settings.maximumInterval.toString()
+                                        );
+                                        return;
+                                    }
 
-                                this.plugin.data.settings.maximumInterval =
-                                    numValue;
-                                await this.plugin.savePluginData();
-                            } else {
-                                new Notice("Please provide a valid number.");
-                            }
-                        });
+                                    this.plugin.data.settings.maximumInterval =
+                                        numValue;
+                                    await this.plugin.savePluginData();
+                                } else {
+                                    new Notice(
+                                        "Please provide a valid number."
+                                    );
+                                }
+                            },
+                            DEBOUNCE_TIMER_MS,
+                            true
+                        );
                     })
             )
             .addExtraButton((button) => {
@@ -633,10 +633,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addSlider((slider) =>
                 slider
                     .setLimits(0, 100, 1)
-                    .setValue(
-                        getSetting("maxLinkFactor", this.plugin.data.settings) *
-                            100
-                    )
+                    .setValue(this.plugin.data.settings.maxLinkFactor * 100)
                     .setDynamicTooltip()
                     .onChange(async (value: number) => {
                         this.plugin.data.settings.maxLinkFactor = value;

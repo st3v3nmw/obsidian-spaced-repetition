@@ -7,27 +7,18 @@ import {
     getAllTags,
 } from "obsidian";
 import * as graph from "pagerank.js";
-import { SRSettingTab, DEFAULT_SETTINGS, getSetting } from "./settings";
-import { FlashcardModal } from "./flashcard-modal";
+import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "./settings";
+import { FlashcardModal, Deck } from "./flashcard-modal";
 import { StatsModal } from "./stats-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "./sidebar";
-import { schedule } from "./sched";
-import {
-    SchedNote,
-    LinkStat,
-    Card,
-    CardType,
-    ReviewResponse,
-    SRSettings,
-    Deck,
-} from "./types";
+import { CardType, Card, ReviewResponse, schedule } from "./scheduling";
 import {
     CROSS_HAIRS_ICON,
     SCHEDULING_INFO_REGEX,
     YAML_FRONT_MATTER_REGEX,
     CLOZE_CARD_DETECTOR,
     CLOZE_DELETIONS_EXTRACTOR,
-    CLOZE_SCHEDULING_EXTRACTOR,
+    MULTI_SCHEDULING_EXTRACTOR,
     CODEBLOCK_REGEX,
     INLINE_CODE_REGEX,
 } from "./constants";
@@ -47,6 +38,18 @@ const DEFAULT_DATA: PluginData = {
     buryDate: "",
     buryList: [],
 };
+
+// Notes
+
+export interface SchedNote {
+    note: TFile;
+    dueUnix: number;
+}
+
+export interface LinkStat {
+    sourcePath: string;
+    linkCount: number;
+}
 
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
@@ -89,14 +92,14 @@ export default class SRPlugin extends Plugin {
 
         this.singlelineCardRegex = new RegExp(
             `^(.+)${escapeRegexString(
-                getSetting("singlelineCardSeparator", this.data.settings)
+                this.data.settings.singlelineCardSeparator
             )}(.+?)\\n?(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
             "gm"
         );
 
         this.multilineCardRegex = new RegExp(
             `^((?:.+\\n)+)${escapeRegexString(
-                getSetting("multilineCardSeparator", this.data.settings)
+                this.data.settings.multilineCardSeparator
             )}\\n((?:.+?\\n?)+?)(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
             "gm"
         );
@@ -527,10 +530,11 @@ export default class SRPlugin extends Plugin {
         if (todayDate != this.data.buryDate) {
             this.data.buryDate = todayDate;
             this.data.buryList = [];
+            await this.savePluginData();
         }
 
         for (let note of notes) {
-            if (getSetting("convertFoldersToDecks", this.data.settings)) {
+            if (this.data.settings.convertFoldersToDecks) {
                 let path: string[] = note.path.split("/");
                 path.pop(); // remove filename
                 await this.findFlashcards(note, "#" + path.join("/"));
@@ -588,11 +592,12 @@ export default class SRPlugin extends Plugin {
 
         let now = Date.now();
         // basic cards
-        for (let regex of [this.singlelineCardRegex, this.multilineCardRegex]) {
-            let cardType: CardType =
-                regex == this.singlelineCardRegex
-                    ? CardType.SingleLineBasic
-                    : CardType.MultiLineBasic;
+        for (let regexBundled of <Array<[RegExp, CardType]>>[
+            [this.singlelineCardRegex, CardType.SingleLineBasic],
+            [this.multilineCardRegex, CardType.MultiLineBasic],
+        ]) {
+            let regex = regexBundled[0];
+            let cardType: CardType = regexBundled[1];
             for (let match of fileText.matchAll(regex)) {
                 if (
                     inCodeblock(match.index, match[0].trim().length, codeblocks)
@@ -606,9 +611,12 @@ export default class SRPlugin extends Plugin {
 
                 let cardText = match[0].trim();
 
+                let cardObj: Card;
                 let front = match[1].trim();
                 let back = match[2].trim();
-                let cardObj: Card;
+                let context: string = this.data.settings.showContextInCards
+                    ? getCardContext(match.index, headings)
+                    : "";
                 // flashcard already scheduled
                 if (match[3]) {
                     let dueUnix: number = window
@@ -639,7 +647,7 @@ export default class SRPlugin extends Plugin {
                             front,
                             back,
                             cardText,
-                            context: "",
+                            context,
                             cardType,
                         };
 
@@ -655,21 +663,28 @@ export default class SRPlugin extends Plugin {
                         front,
                         back,
                         cardText,
-                        context: "",
+                        context,
                         cardType,
                     };
 
                     this.deckTree.insertFlashcard([...deckPath], cardObj);
                 }
-
-                if (getSetting("showContextInCards", this.data.settings))
-                    addContextToCard(cardObj, match.index, headings);
             }
         }
 
-        // cloze deletion cards
-        if (!getSetting("disableClozeCards", this.data.settings)) {
-            for (let match of fileText.matchAll(CLOZE_CARD_DETECTOR)) {
+        for (let regexBundled of <Array<[RegExp, CardType]>>[
+            [CLOZE_CARD_DETECTOR, CardType.Cloze],
+        ]) {
+            let regex: RegExp = regexBundled[0];
+            let cardType: CardType = regexBundled[1];
+
+            if (
+                cardType == CardType.Cloze &&
+                this.data.settings.disableClozeCards
+            )
+                continue;
+
+            for (let match of fileText.matchAll(regex)) {
                 match[0] = match[0].trim();
 
                 if (!deckAdded) {
@@ -679,7 +694,7 @@ export default class SRPlugin extends Plugin {
 
                 let cardText = match[0];
 
-                let deletions: RegExpMatchArray[] = [];
+                let siblingMatches: RegExpMatchArray[] = [];
                 for (let m of cardText.matchAll(CLOZE_DELETIONS_EXTRACTOR)) {
                     if (
                         inCodeblock(
@@ -689,17 +704,17 @@ export default class SRPlugin extends Plugin {
                         )
                     )
                         continue;
-                    deletions.push(m);
+                    siblingMatches.push(m);
                 }
                 let scheduling: RegExpMatchArray[] = [
-                    ...cardText.matchAll(CLOZE_SCHEDULING_EXTRACTOR),
+                    ...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
                 ];
 
                 // we have some extra scheduling dates to delete
-                if (scheduling.length > deletions.length) {
+                if (scheduling.length > siblingMatches.length) {
                     let idxSched = cardText.lastIndexOf("<!--SR:") + 7;
                     let newCardText = cardText.substring(0, idxSched);
-                    for (let i = 0; i < deletions.length; i++)
+                    for (let i = 0; i < siblingMatches.length; i++)
                         newCardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
                     newCardText += "-->\n";
 
@@ -711,12 +726,16 @@ export default class SRPlugin extends Plugin {
                     fileChanged = true;
                 }
 
-                let relatedCards: Card[] = [];
-                for (let i = 0; i < deletions.length; i++) {
+                let context: string = this.data.settings.showContextInCards
+                    ? getCardContext(match.index, headings)
+                    : "";
+                let siblings: Card[] = [];
+                for (let i = 0; i < siblingMatches.length; i++) {
                     let cardObj: Card;
 
-                    let deletionStart = deletions[i].index;
-                    let deletionEnd = deletionStart + deletions[i][0].length;
+                    let deletionStart = siblingMatches[i].index;
+                    let deletionEnd =
+                        deletionStart + siblingMatches[i][0].length;
                     let front =
                         cardText.substring(0, deletionStart) +
                         "<span style='color:#2196f3'>[...]</span>" +
@@ -759,10 +778,10 @@ export default class SRPlugin extends Plugin {
                                 front,
                                 back,
                                 cardText: match[0],
-                                context: "",
+                                context,
                                 cardType: CardType.Cloze,
-                                subCardIdx: i,
-                                relatedCards,
+                                siblingIdx: i,
+                                siblings,
                             };
 
                             this.deckTree.insertFlashcard(
@@ -786,18 +805,16 @@ export default class SRPlugin extends Plugin {
                             front,
                             back,
                             cardText: match[0],
-                            context: "",
+                            context,
                             cardType: CardType.Cloze,
-                            subCardIdx: i,
-                            relatedCards,
+                            siblingIdx: i,
+                            siblings,
                         };
 
                         this.deckTree.insertFlashcard([...deckPath], cardObj);
                     }
 
-                    relatedCards.push(cardObj);
-                    if (getSetting("showContextInCards", this.data.settings))
-                        addContextToCard(cardObj, match.index, headings);
+                    siblings.push(cardObj);
                 }
             }
         }
@@ -807,6 +824,11 @@ export default class SRPlugin extends Plugin {
 
     async loadPluginData() {
         this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
+        this.data.settings = Object.assign(
+            {},
+            DEFAULT_SETTINGS,
+            this.data.settings
+        );
     }
 
     async savePluginData() {
@@ -825,11 +847,7 @@ export default class SRPlugin extends Plugin {
     }
 }
 
-function addContextToCard(
-    cardObj: Card,
-    cardOffset: number,
-    headings: HeadingCache[]
-): void {
+function getCardContext(cardOffset: number, headings: HeadingCache[]): string {
     let stack: HeadingCache[] = [];
     for (let heading of headings) {
         if (heading.position.start.offset > cardOffset) break;
@@ -843,8 +861,9 @@ function addContextToCard(
         stack.push(heading);
     }
 
-    for (let headingObj of stack) cardObj.context += headingObj.heading + " > ";
-    cardObj.context = cardObj.context.slice(0, -3);
+    let context: string = "";
+    for (let headingObj of stack) context += headingObj.heading + " > ";
+    return context.slice(0, -3);
 }
 
 function inCodeblock(
