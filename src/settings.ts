@@ -1,4 +1,11 @@
-import { Notice, PluginSettingTab, Setting, App, debounce } from "obsidian";
+import {
+    Notice,
+    PluginSettingTab,
+    Setting,
+    App,
+    debounce,
+    Platform,
+} from "obsidian";
 import type SRPlugin from "./main";
 import { escapeRegexString } from "./utils";
 
@@ -45,8 +52,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     cardCommentOnSameLine: false,
     burySiblingCards: false,
     showContextInCards: true,
-    flashcardHeightPercentage: 80,
-    flashcardWidthPercentage: 40,
+    flashcardHeightPercentage: Platform.isDesktop ? 80 : 100,
+    flashcardWidthPercentage: Platform.isDesktop ? 40 : 100,
     showFileNameInFileLink: false,
     randomizeCardOrder: true,
     disableClozeCards: false,
@@ -187,7 +194,18 @@ export class SRSettingTab extends PluginSettingTab {
                             value;
                         await this.plugin.savePluginData();
                     })
-            );
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.flashcardHeightPercentage =
+                            DEFAULT_SETTINGS.flashcardHeightPercentage;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
         new Setting(containerEl)
             .setName("Flashcard Width Percentage")
@@ -206,7 +224,18 @@ export class SRSettingTab extends PluginSettingTab {
                             value;
                         await this.plugin.savePluginData();
                     })
-            );
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip("Reset to default")
+                    .onClick(async () => {
+                        this.plugin.data.settings.flashcardWidthPercentage =
+                            DEFAULT_SETTINGS.flashcardWidthPercentage;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
         new Setting(containerEl)
             .setName(

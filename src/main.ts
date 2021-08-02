@@ -470,9 +470,8 @@ export default class SRPlugin extends Plugin {
                 SCHEDULING_INFO_REGEX,
                 `---\n${schedulingInfo[1]}sr-due: ${dueString}\nsr-interval: ${interval}\nsr-ease: ${ease}\n${schedulingInfo[5]}---`
             );
-
-            // new note with existing YAML front matter
         } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
+            // new note with existing YAML front matter
             let existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
             fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
@@ -482,7 +481,11 @@ export default class SRPlugin extends Plugin {
             fileText = `---\nsr-due: ${dueString}\nsr-interval: ${interval}\nsr-ease: ${ease}\n---\n\n${fileText}`;
         }
 
-        this.app.vault.modify(note, fileText);
+        if (this.data.settings.burySiblingCards) {
+            await this.findFlashcards(note, "", true); // bury all cards in current note
+            await this.savePluginData();
+        }
+        await this.app.vault.modify(note, fileText);
 
         new Notice("Response received.");
 
@@ -573,7 +576,11 @@ export default class SRPlugin extends Plugin {
         this.flashcardsSyncLock = false;
     }
 
-    async findFlashcards(note: TFile, deckPathStr: string) {
+    async findFlashcards(
+        note: TFile,
+        deckPathStr: string,
+        buryOnly: boolean = false
+    ) {
         let fileText = await this.app.vault.read(note);
         let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         let headings = fileCachedData.headings || [];
@@ -604,12 +611,18 @@ export default class SRPlugin extends Plugin {
                 )
                     continue;
 
+                let cardText: string = match[0].trim();
+                let cardTextHash: string = cyrb53(cardText);
+
+                if (buryOnly) {
+                    this.data.buryList.push(cardTextHash);
+                    continue;
+                }
+
                 if (!deckAdded) {
                     this.deckTree.createDeck([...deckPath]);
                     deckAdded = true;
                 }
-
-                let cardText = match[0].trim();
 
                 let cardObj: Card;
                 let front = match[1].trim();
@@ -635,7 +648,7 @@ export default class SRPlugin extends Plugin {
                     if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
                         this.dueDatesFlashcards[nDays] = 0;
                     this.dueDatesFlashcards[nDays]++;
-                    if (this.data.buryList.includes(cyrb53(cardText))) {
+                    if (this.data.buryList.includes(cardTextHash)) {
                         this.deckTree.countFlashcard([...deckPath]);
                         continue;
                     }
@@ -692,12 +705,18 @@ export default class SRPlugin extends Plugin {
             for (let match of fileText.matchAll(regex)) {
                 match[0] = match[0].trim();
 
+                let cardText: string = match[0];
+                let cardTextHash: string = cyrb53(cardText);
+
+                if (buryOnly) {
+                    this.data.buryList.push(cardTextHash);
+                    continue;
+                }
+
                 if (!deckAdded) {
                     this.deckTree.createDeck([...deckPath]);
                     deckAdded = true;
                 }
-
-                let cardText = match[0];
 
                 let siblingMatches: RegExpMatchArray[] = [];
                 for (let m of cardText.matchAll(CLOZE_DELETIONS_EXTRACTOR)) {
@@ -771,7 +790,7 @@ export default class SRPlugin extends Plugin {
                         if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
                             this.dueDatesFlashcards[nDays] = 0;
                         this.dueDatesFlashcards[nDays]++;
-                        if (this.data.buryList.includes(cyrb53(cardText))) {
+                        if (this.data.buryList.includes(cardTextHash)) {
                             this.deckTree.countFlashcard([...deckPath]);
                             continue;
                         }

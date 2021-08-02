@@ -508,12 +508,15 @@ export class Deck {
             "tree-item-self tag-pane-tag is-clickable"
         );
         let collapsed: boolean = true;
-        let collapseIconEl: HTMLElement = deckViewSelf.createDiv(
-            "tree-item-icon collapse-icon"
-        );
-        collapseIconEl.innerHTML = COLLAPSE_ICON;
-        (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
-            "rotate(-90deg)";
+        let collapseIconEl: HTMLElement;
+        if (this.subdecks.length > 0) {
+            collapseIconEl = deckViewSelf.createDiv(
+                "tree-item-icon collapse-icon"
+            );
+            collapseIconEl.innerHTML = COLLAPSE_ICON;
+            (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
+                "rotate(-90deg)";
+        }
 
         let deckViewInner: HTMLElement =
             deckViewSelf.createDiv("tree-item-inner");
@@ -543,18 +546,22 @@ export class Deck {
         let deckViewChildren: HTMLElement =
             deckView.createDiv("tree-item-children");
         deckViewChildren.style.display = "none";
-        collapseIconEl.addEventListener("click", (_) => {
-            if (collapsed) {
-                (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
-                    "";
-                deckViewChildren.style.display = "block";
-            } else {
-                (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
-                    "rotate(-90deg)";
-                deckViewChildren.style.display = "none";
-            }
-            collapsed = !collapsed;
-        });
+        if (this.subdecks.length > 0) {
+            collapseIconEl.addEventListener("click", (_) => {
+                if (collapsed) {
+                    (
+                        collapseIconEl.childNodes[0] as HTMLElement
+                    ).style.transform = "";
+                    deckViewChildren.style.display = "block";
+                } else {
+                    (
+                        collapseIconEl.childNodes[0] as HTMLElement
+                    ).style.transform = "rotate(-90deg)";
+                    deckViewChildren.style.display = "none";
+                }
+                collapsed = !collapsed;
+            });
+        }
         for (let deck of this.subdecks) deck.render(deckViewChildren, modal);
     }
 
