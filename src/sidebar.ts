@@ -1,8 +1,8 @@
 import { ItemView, WorkspaceLeaf, Menu, TFile } from "obsidian";
-import type SRPlugin from "./main";
-import { COLLAPSE_ICON } from "./constants";
+import type SRPlugin from "src/main";
+import { COLLAPSE_ICON } from "src/constants";
 
-export const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
+export const REVIEW_QUEUE_VIEW_TYPE: string = "review-queue-list-view";
 
 export class ReviewQueueListView extends ItemView {
     private plugin: SRPlugin;
@@ -33,7 +33,7 @@ export class ReviewQueueListView extends ItemView {
         return "crosshairs";
     }
 
-    public onHeaderMenu(menu: Menu) {
+    public onHeaderMenu(menu: Menu): void {
         menu.addItem((item) => {
             item.setTitle("Close")
                 .setIcon("cross")
@@ -45,11 +45,11 @@ export class ReviewQueueListView extends ItemView {
         });
     }
 
-    public redraw() {
-        const openFile = this.app.workspace.getActiveFile();
+    public redraw(): void {
+        let openFile: TFile | null = this.app.workspace.getActiveFile();
 
-        const rootEl: HTMLElement = createDiv("nav-folder mod-root");
-        const childrenEl: HTMLElement = rootEl.createDiv("nav-folder-children");
+        let rootEl: HTMLElement = createDiv("nav-folder mod-root"),
+            childrenEl: HTMLElement = rootEl.createDiv("nav-folder-children");
 
         if (this.plugin.newNotes.length > 0) {
             let newNotesFolderEl: HTMLElement = this.createRightPaneFolder(
@@ -62,21 +62,22 @@ export class ReviewQueueListView extends ItemView {
                 this.createRightPaneFile(
                     newNotesFolderEl,
                     newFile,
-                    openFile && newFile.path === openFile.path,
+                    openFile !== null && newFile.path === openFile.path,
                     !this.activeFolders.has("New")
                 );
             }
         }
 
         if (this.plugin.scheduledNotes.length > 0) {
-            let now: number = Date.now();
-            let currUnix: number = -1;
-            let folderEl, folderTitle;
+            let now: number = Date.now(),
+                currUnix: number = -1;
+            let folderEl: HTMLElement | null = null,
+                folderTitle: string = "";
             let maxDaysToRender: number =
                 this.plugin.data.settings.maxNDaysNotesReviewQueue;
 
             for (let sNote of this.plugin.scheduledNotes) {
-                if (sNote.dueUnix != currUnix) {
+                if (sNote.dueUnix !== currUnix) {
                     let nDays: number = Math.ceil(
                         (sNote.dueUnix - now) / (24 * 3600 * 1000)
                     );
@@ -84,11 +85,11 @@ export class ReviewQueueListView extends ItemView {
                     if (nDays > maxDaysToRender) break;
 
                     folderTitle =
-                        nDays == -1
+                        nDays === -1
                             ? "Yesterday"
-                            : nDays == 0
+                            : nDays === 0
                             ? "Today"
-                            : nDays == 1
+                            : nDays === 1
                             ? "Tomorrow"
                             : new Date(sNote.dueUnix).toDateString();
 
@@ -101,52 +102,59 @@ export class ReviewQueueListView extends ItemView {
                 }
 
                 this.createRightPaneFile(
-                    folderEl,
+                    folderEl!,
                     sNote.note,
-                    openFile && sNote.note.path === openFile.path,
+                    openFile !== null && sNote.note.path === openFile.path,
                     !this.activeFolders.has(folderTitle)
                 );
             }
         }
 
-        const contentEl = this.containerEl.children[1];
+        let contentEl: Element = this.containerEl.children[1];
         contentEl.empty();
         contentEl.appendChild(rootEl);
     }
 
     private createRightPaneFolder(
-        parentEl: any,
+        parentEl: HTMLElement,
         folderTitle: string,
         collapsed: boolean
     ): HTMLElement {
-        const folderEl = parentEl.createDiv("nav-folder");
-        const folderTitleEl = folderEl.createDiv("nav-folder-title");
-        const childrenEl = folderEl.createDiv("nav-folder-children");
-        const collapseIconEl = folderTitleEl.createDiv(
-            "nav-folder-collapse-indicator collapse-icon"
-        );
-        collapseIconEl.innerHTML = COLLAPSE_ICON;
+        let folderEl: HTMLDivElement = parentEl.createDiv("nav-folder"),
+            folderTitleEl: HTMLDivElement =
+                folderEl.createDiv("nav-folder-title"),
+            childrenEl: HTMLDivElement = folderEl.createDiv(
+                "nav-folder-children"
+            ),
+            collapseIconEl: HTMLDivElement = folderTitleEl.createDiv(
+                "nav-folder-collapse-indicator collapse-icon"
+            );
 
+        collapseIconEl.innerHTML = COLLAPSE_ICON;
         if (collapsed)
-            collapseIconEl.childNodes[0].style.transform = "rotate(-90deg)";
+            (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
+                "rotate(-90deg)";
 
         folderTitleEl
             .createDiv("nav-folder-title-content")
             .setText(folderTitle);
 
-        folderTitleEl.onClickEvent((_: any) => {
-            for (let child of childrenEl.childNodes) {
+        folderTitleEl.onClickEvent((_) => {
+            for (let child of childrenEl.childNodes as NodeListOf<HTMLElement>) {
                 if (
-                    child.style.display == "block" ||
-                    child.style.display == ""
+                    child.style.display === "block" ||
+                    child.style.display === ""
                 ) {
                     child.style.display = "none";
-                    collapseIconEl.childNodes[0].style.transform =
-                        "rotate(-90deg)";
+                    (
+                        collapseIconEl.childNodes[0] as HTMLElement
+                    ).style.transform = "rotate(-90deg)";
                     this.activeFolders.delete(folderTitle);
                 } else {
                     child.style.display = "block";
-                    collapseIconEl.childNodes[0].style.transform = "";
+                    (
+                        collapseIconEl.childNodes[0] as HTMLElement
+                    ).style.transform = "";
                     this.activeFolders.add(folderTitle);
                 }
             }
@@ -156,17 +164,17 @@ export class ReviewQueueListView extends ItemView {
     }
 
     private createRightPaneFile(
-        folderEl: any,
+        folderEl: HTMLElement,
         file: TFile,
         fileElActive: boolean,
         hidden: boolean
-    ) {
-        const navFileEl: HTMLElement = folderEl
+    ): void {
+        let navFileEl: HTMLElement = folderEl
             .getElementsByClassName("nav-folder-children")[0]
             .createDiv("nav-file");
         if (hidden) navFileEl.style.display = "none";
 
-        const navFileTitle: HTMLElement = navFileEl.createDiv("nav-file-title");
+        let navFileTitle: HTMLElement = navFileEl.createDiv("nav-file-title");
         if (fileElActive) navFileTitle.addClass("is-active");
 
         navFileTitle.createDiv("nav-file-title-content").setText(file.basename);
@@ -184,7 +192,7 @@ export class ReviewQueueListView extends ItemView {
             "contextmenu",
             (event: MouseEvent) => {
                 event.preventDefault();
-                const fileMenu = new Menu(this.app);
+                let fileMenu: Menu = new Menu(this.app);
                 this.app.workspace.trigger(
                     "file-menu",
                     fileMenu,

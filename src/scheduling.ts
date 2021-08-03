@@ -1,5 +1,5 @@
 import { TFile } from "obsidian";
-import { SRSettings } from "./settings";
+import { SRSettings } from "src/settings";
 
 export enum ReviewResponse {
     Easy,
@@ -33,8 +33,8 @@ export interface Card {
     // types
     cardType: CardType;
     // information for sibling cards
-    siblingIdx?: number;
-    siblings?: Card[];
+    siblingIdx: number;
+    siblings: Card[];
 }
 
 export function schedule(
@@ -44,19 +44,19 @@ export function schedule(
     delayBeforeReview: number,
     settingsObj: SRSettings,
     dueDates?: Record<number, number>
-) {
+): Record<string, number> {
     delayBeforeReview = Math.max(
         0,
         Math.floor(delayBeforeReview / (24 * 3600 * 1000))
     );
 
-    if (response == ReviewResponse.Easy) {
+    if (response === ReviewResponse.Easy) {
         ease += 20;
         interval = ((interval + delayBeforeReview) * ease) / 100;
         interval *= settingsObj.easyBonus;
-    } else if (response == ReviewResponse.Good) {
+    } else if (response === ReviewResponse.Good) {
         interval = ((interval + delayBeforeReview / 2) * ease) / 100;
-    } else if (response == ReviewResponse.Hard) {
+    } else if (response === ReviewResponse.Hard) {
         ease = Math.max(130, ease - 20);
         interval = Math.max(
             1,
@@ -66,7 +66,7 @@ export function schedule(
     }
 
     // replaces random fuzz with load balancing over the fuzz interval
-    if (dueDates != null) {
+    if (dueDates !== undefined) {
         interval = Math.round(interval);
         if (!dueDates.hasOwnProperty(interval)) dueDates[interval] = 0;
 
@@ -96,8 +96,8 @@ export function schedule(
 }
 
 export function textInterval(interval: number, isMobile: boolean): string {
-    let m: number = Math.round(interval / 3) / 10;
-    let y: number = Math.round(interval / 36.5) / 10;
+    let m: number = Math.round(interval / 3) / 10,
+        y: number = Math.round(interval / 36.5) / 10;
 
     if (isMobile) {
         if (interval < 30) return `${interval}d`;
@@ -105,8 +105,8 @@ export function textInterval(interval: number, isMobile: boolean): string {
         else return `${y}y`;
     } else {
         if (interval < 30)
-            return interval == 1.0 ? "1.0 day" : `${interval} days`;
-        else if (interval < 365) return m == 1.0 ? "1.0 month" : `${m} months`;
-        else return y == 1.0 ? "1.0 year" : `${y} years`;
+            return interval === 1.0 ? "1.0 day" : `${interval} days`;
+        else if (interval < 365) return m === 1.0 ? "1.0 month" : `${m} months`;
+        else return y === 1.0 ? "1.0 year" : `${y} years`;
     }
 }

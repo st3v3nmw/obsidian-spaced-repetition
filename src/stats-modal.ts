@@ -1,12 +1,19 @@
-import { Modal, App, MarkdownRenderer, Notice, Platform } from "obsidian";
-import { getKeysPreserveType } from "./utils";
+import { Modal, App, MarkdownRenderer, Platform } from "obsidian";
+import type SRPlugin from "src/main";
+import { getKeysPreserveType } from "src/utils";
 
 export class StatsModal extends Modal {
+    private plugin: SRPlugin;
     private dueDatesFlashcards: Record<number, number>;
 
-    constructor(app: App, dueDatesFlashcards: Record<number, number>) {
+    constructor(
+        app: App,
+        dueDatesFlashcards: Record<number, number>,
+        plugin: SRPlugin
+    ) {
         super(app);
 
+        this.plugin = plugin;
         this.dueDatesFlashcards = dueDatesFlashcards;
 
         this.titleEl.setText("Statistics");
@@ -21,7 +28,7 @@ export class StatsModal extends Modal {
         }
     }
 
-    onOpen() {
+    onOpen(): void {
         let { contentEl } = this;
 
         contentEl.innerHTML +=
@@ -47,7 +54,7 @@ export class StatsModal extends Modal {
             else dueDatesFlashcardsCopy[dueOffset] = dueCount;
         }
 
-        let text =
+        let text: string =
             "```chart\n" +
             "\ttype: bar\n" +
             `\tlabels: [${Object.keys(dueDatesFlashcardsCopy)}]\n` +
@@ -60,10 +67,10 @@ export class StatsModal extends Modal {
             "\tstacked: true\n" +
             "````";
 
-        MarkdownRenderer.renderMarkdown(text, contentEl, null, null);
+        MarkdownRenderer.renderMarkdown(text, contentEl, "", this.plugin);
     }
 
-    onClose() {
+    onClose(): void {
         let { contentEl } = this;
         contentEl.empty();
     }
