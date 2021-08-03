@@ -1,17 +1,14 @@
+type Hex = number;
+
 // https://stackoverflow.com/a/6969486
 export function escapeRegexString(text: string): string {
     return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-// https://stackoverflow.com/questions/38866071/javascript-replace-method-dollar-signs
-export function fixDollarSigns(text: string): string {
-    return text.split("$$").join("$$$");
-}
-
 // https://stackoverflow.com/a/52171480
 export function cyrb53(str: string, seed: number = 0): string {
-    let h1 = 0xdeadbeef ^ seed,
-        h2 = 0x41c6ce57 ^ seed;
+    let h1: Hex = 0xdeadbeef ^ seed,
+        h2: Hex = 0x41c6ce57 ^ seed;
     for (let i = 0, ch; i < str.length; i++) {
         ch = str.charCodeAt(i);
         h1 = Math.imul(h1 ^ ch, 2654435761);

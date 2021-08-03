@@ -6,8 +6,8 @@ import {
     debounce,
     Platform,
 } from "obsidian";
-import type SRPlugin from "./main";
-import { escapeRegexString } from "./utils";
+import type SRPlugin from "src/main";
+import { escapeRegexString } from "src/utils";
 
 const DEBOUNCE_TIMER_MS: number = 512;
 
@@ -87,7 +87,7 @@ export class SRSettingTab extends PluginSettingTab {
         this.plugin = plugin;
     }
 
-    display() {
+    display(): void {
         let { containerEl } = this;
 
         containerEl.empty();
@@ -490,7 +490,7 @@ export class SRSettingTab extends PluginSettingTab {
                                             "The base ease must be at least 130."
                                         );
                                         text.setValue(
-                                            `${this.plugin.data.settings.baseEase}`
+                                            this.plugin.data.settings.baseEase.toString()
                                         );
                                         return;
                                     }
@@ -569,10 +569,10 @@ export class SRSettingTab extends PluginSettingTab {
                                             "The easy bonus must be at least 100."
                                         );
                                         text.setValue(
-                                            `${
+                                            (
                                                 this.plugin.data.settings
                                                     .easyBonus * 100
-                                            }`
+                                            ).toString()
                                         );
                                         return;
                                     }
