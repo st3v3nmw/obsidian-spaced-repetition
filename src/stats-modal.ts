@@ -1,6 +1,7 @@
 import { Modal, App, MarkdownRenderer, Platform } from "obsidian";
 import type SRPlugin from "src/main";
 import { getKeysPreserveType } from "src/utils";
+import { t } from "src/lang/helpers";
 
 export class StatsModal extends Modal {
     private plugin: SRPlugin;
@@ -16,7 +17,7 @@ export class StatsModal extends Modal {
         this.plugin = plugin;
         this.dueDatesFlashcards = dueDatesFlashcards;
 
-        this.titleEl.setText("Statistics");
+        this.titleEl.setText(t("Statistics"));
 
         if (Platform.isMobile) {
             this.modalEl.style.height = "100%";
@@ -33,9 +34,15 @@ export class StatsModal extends Modal {
 
         contentEl.innerHTML +=
             "<div style='text-align:center'>" +
-            "<span>Note that this requires the Obsidian Charts plugin to work</span>" +
-            "<h2 style='text-align:center'>Forecast</h2>" +
-            "<h4 style='text-align:center'>The number of cards due in the future</h4>" +
+            "<span>" +
+            t("Note that this requires the Obsidian Charts plugin to work") +
+            "</span>" +
+            "<h2 style='text-align:center'>" +
+            t("Forecast") +
+            "</h2>" +
+            "<h4 style='text-align:center'>" +
+            t("The number of cards due in the future") +
+            "</h4>" +
             "</div>";
 
         let maxN: number = Math.max(
@@ -59,11 +66,14 @@ export class StatsModal extends Modal {
             "\ttype: bar\n" +
             `\tlabels: [${Object.keys(dueDatesFlashcardsCopy)}]\n` +
             "\tseries:\n" +
-            "\t\t- title: Scheduled\n" +
-            `\t\t  data: [${Object.values(dueDatesFlashcardsCopy)}]\n` +
-            '\txTitle: "Days"\n' +
-            '\tyTitle: "Number of cards"\n' +
-            "\tlegend: false\n" +
+            "\t\t- title: " +
+            t("Scheduled") +
+            `\n\t\t  data: [${Object.values(dueDatesFlashcardsCopy)}]\n` +
+            "\txTitle: " +
+            t("Days") +
+            "\n\tyTitle: " +
+            t("Number of cards") +
+            "\n\tlegend: false\n" +
             "\tstacked: true\n" +
             "````";
 

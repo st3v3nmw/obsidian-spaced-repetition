@@ -1,5 +1,6 @@
 import { TFile } from "obsidian";
 import { SRSettings } from "src/settings";
+import { t } from "src/lang/helpers";
 
 export enum ReviewResponse {
     Easy,
@@ -105,8 +106,16 @@ export function textInterval(interval: number, isMobile: boolean): string {
         else return `${y}y`;
     } else {
         if (interval < 30)
-            return interval === 1.0 ? "1.0 day" : `${interval} days`;
-        else if (interval < 365) return m === 1.0 ? "1.0 month" : `${m} months`;
-        else return y === 1.0 ? "1.0 year" : `${y} years`;
+            return interval === 1.0
+                ? "1.0 " + t("day")
+                : interval.toString() + " " + t("days");
+        else if (interval < 365)
+            return m === 1.0
+                ? "1.0 " + t("month")
+                : m.toString() + " " + t("months");
+        else
+            return y === 1.0
+                ? "1.0 " + t("year")
+                : y.toString() + " " + t("years");
     }
 }

@@ -1,6 +1,7 @@
 import { ItemView, WorkspaceLeaf, Menu, TFile } from "obsidian";
 import type SRPlugin from "src/main";
 import { COLLAPSE_ICON } from "src/constants";
+import { t } from "src/lang/helpers";
 
 export const REVIEW_QUEUE_VIEW_TYPE: string = "review-queue-list-view";
 
@@ -12,7 +13,7 @@ export class ReviewQueueListView extends ItemView {
         super(leaf);
 
         this.plugin = plugin;
-        this.activeFolders = new Set(["Today"]);
+        this.activeFolders = new Set([t("Today")]);
         this.registerEvent(
             this.app.workspace.on("file-open", (_: any) => this.redraw())
         );
@@ -26,7 +27,7 @@ export class ReviewQueueListView extends ItemView {
     }
 
     public getDisplayText(): string {
-        return "Notes Review Queue";
+        return t("Notes Review Queue");
     }
 
     public getIcon(): string {
@@ -35,7 +36,7 @@ export class ReviewQueueListView extends ItemView {
 
     public onHeaderMenu(menu: Menu): void {
         menu.addItem((item) => {
-            item.setTitle("Close")
+            item.setTitle(t("Close"))
                 .setIcon("cross")
                 .onClick(() => {
                     this.app.workspace.detachLeavesOfType(
@@ -54,8 +55,8 @@ export class ReviewQueueListView extends ItemView {
         if (this.plugin.newNotes.length > 0) {
             let newNotesFolderEl: HTMLElement = this.createRightPaneFolder(
                 childrenEl,
-                "New",
-                !this.activeFolders.has("New")
+                t("New"),
+                !this.activeFolders.has(t("New"))
             );
 
             for (let newFile of this.plugin.newNotes) {
@@ -63,7 +64,7 @@ export class ReviewQueueListView extends ItemView {
                     newNotesFolderEl,
                     newFile,
                     openFile !== null && newFile.path === openFile.path,
-                    !this.activeFolders.has("New")
+                    !this.activeFolders.has(t("New"))
                 );
             }
         }
@@ -86,11 +87,11 @@ export class ReviewQueueListView extends ItemView {
 
                     folderTitle =
                         nDays === -1
-                            ? "Yesterday"
+                            ? t("Yesterday")
                             : nDays === 0
-                            ? "Today"
+                            ? t("Today")
                             : nDays === 1
-                            ? "Tomorrow"
+                            ? t("Tomorrow")
                             : new Date(sNote.dueUnix).toDateString();
 
                     folderEl = this.createRightPaneFolder(
