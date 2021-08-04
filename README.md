@@ -8,6 +8,8 @@ Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/proje
 Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues) if you have a feature request or a bug-report. \
 Visit the [Discussions](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions) section for Q&A help, feedback, and general discussion.
 
+To help translate the plugin to another language, copy the entries from `src/lang/locale/en.ts` to the proper file in `locales` (i.e. `fr.ts` for French, or `sw.ts` for Swahili), translate, and then open a pull request. Thanks!
+
 ## Features
 
 - Flashcards
