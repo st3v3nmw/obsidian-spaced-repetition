@@ -6,6 +6,7 @@ import {
     TFile,
     HeadingCache,
     getAllTags,
+    moment,
 } from "obsidian";
 import * as graph from "pagerank.js";
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
@@ -24,6 +25,7 @@ import {
     INLINE_CODE_REGEX,
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
+import { t } from "src/lang/helpers";
 
 interface PluginData {
     settings: SRSettings;
@@ -80,7 +82,7 @@ export default class SRPlugin extends Plugin {
 
         this.statusBar = this.addStatusBarItem();
         this.statusBar.classList.add("mod-clickable");
-        this.statusBar.setAttribute("aria-label", "Open a note for review");
+        this.statusBar.setAttribute("aria-label", t("Open a note for review"));
         this.statusBar.setAttribute("aria-label-position", "top");
         this.statusBar.addEventListener("click", (_: any) => {
             if (!this.notesSyncLock) {
@@ -103,7 +105,7 @@ export default class SRPlugin extends Plugin {
             "gm"
         );
 
-        this.addRibbonIcon("crosshairs", "Review flashcards", async () => {
+        this.addRibbonIcon("crosshairs", t("Review flashcards"), async () => {
             if (!this.flashcardsSyncLock) {
                 await this.flashcards_sync();
                 new FlashcardModal(this.app, this).open();
@@ -126,7 +128,7 @@ export default class SRPlugin extends Plugin {
                             fileish.extension === "md"
                         ) {
                             menu.addItem((item) => {
-                                item.setTitle("Review: Easy")
+                                item.setTitle(t("Review: Easy"))
                                     .setIcon("crosshairs")
                                     .onClick((_) => {
                                         this.saveReviewResponse(
@@ -137,7 +139,7 @@ export default class SRPlugin extends Plugin {
                             });
 
                             menu.addItem((item) => {
-                                item.setTitle("Review: Good")
+                                item.setTitle(t("Review: Good"))
                                     .setIcon("crosshairs")
                                     .onClick((_) => {
                                         this.saveReviewResponse(
@@ -148,7 +150,7 @@ export default class SRPlugin extends Plugin {
                             });
 
                             menu.addItem((item) => {
-                                item.setTitle("Review: Hard")
+                                item.setTitle(t("Review: Hard"))
                                     .setIcon("crosshairs")
                                     .onClick((_) => {
                                         this.saveReviewResponse(
@@ -165,7 +167,7 @@ export default class SRPlugin extends Plugin {
 
         this.addCommand({
             id: "srs-note-review-open-note",
-            name: "Open a note for review",
+            name: t("Open a note for review"),
             callback: () => {
                 if (!this.notesSyncLock) {
                     this.sync();
@@ -176,7 +178,7 @@ export default class SRPlugin extends Plugin {
 
         this.addCommand({
             id: "srs-note-review-easy",
-            name: "Review note as easy",
+            name: t("Review note as easy"),
             callback: () => {
                 let openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md")
@@ -186,7 +188,7 @@ export default class SRPlugin extends Plugin {
 
         this.addCommand({
             id: "srs-note-review-good",
-            name: "Review note as good",
+            name: t("Review note as good"),
             callback: () => {
                 let openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md")
@@ -196,7 +198,7 @@ export default class SRPlugin extends Plugin {
 
         this.addCommand({
             id: "srs-note-review-hard",
-            name: "Review note as hard",
+            name: t("Review note as hard"),
             callback: () => {
                 let openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md")
@@ -206,7 +208,7 @@ export default class SRPlugin extends Plugin {
 
         this.addCommand({
             id: "srs-review-flashcards",
-            name: "Review flashcards",
+            name: t("Review flashcards"),
             callback: async () => {
                 if (!this.flashcardsSyncLock) {
                     await this.flashcards_sync();
@@ -217,7 +219,7 @@ export default class SRPlugin extends Plugin {
 
         this.addCommand({
             id: "srs-view-stats",
-            name: "View statistics",
+            name: t("View statistics"),
             callback: () => {
                 new StatsModal(this.app, this.dueDatesFlashcards, this).open();
             },
@@ -308,13 +310,11 @@ export default class SRPlugin extends Plugin {
                 continue;
             }
 
-            let dueUnix: number = window
-                .moment(frontmatter["sr-due"], [
-                    "YYYY-MM-DD",
-                    "DD-MM-YYYY",
-                    "ddd MMM DD YYYY",
-                ])
-                .valueOf();
+            let dueUnix: number = moment(frontmatter["sr-due"], [
+                "YYYY-MM-DD",
+                "DD-MM-YYYY",
+                "ddd MMM DD YYYY",
+            ]).valueOf();
             this.scheduledNotes.push({
                 note,
                 dueUnix,
@@ -351,12 +351,15 @@ export default class SRPlugin extends Plugin {
             }
         );
 
-        let noteCountText: string = this.dueNotesCount === 1 ? "note" : "notes";
+        let noteCountText: string =
+            this.dueNotesCount === 1 ? t("note") : t("notes");
         let cardCountText: string =
-            this.deckTree.dueFlashcardsCount === 1 ? "card" : "cards";
+            this.deckTree.dueFlashcardsCount === 1 ? t("card") : t("cards");
         this.statusBar.setText(
-            `Review: ${this.dueNotesCount} ${noteCountText}, ` +
-                `${this.deckTree.dueFlashcardsCount} ${cardCountText} due`
+            t("Review") +
+                `: ${this.dueNotesCount} ${noteCountText}, ` +
+                `${this.deckTree.dueFlashcardsCount} ${cardCountText} ` +
+                t("due")
         );
         this.reviewQueueView.redraw();
 
@@ -383,7 +386,9 @@ export default class SRPlugin extends Plugin {
 
         if (shouldIgnore) {
             new Notice(
-                "Please tag the note appropriately for reviewing (in settings)."
+                t(
+                    "Please tag the note appropriately for reviewing (in settings)."
+                )
             );
             return;
         }
@@ -450,13 +455,11 @@ export default class SRPlugin extends Plugin {
             ease = frontmatter["sr-ease"];
             delayBeforeReview =
                 now -
-                window
-                    .moment(frontmatter["sr-due"], [
-                        "YYYY-MM-DD",
-                        "DD-MM-YYYY",
-                        "ddd MMM DD YYYY",
-                    ])
-                    .valueOf();
+                moment(frontmatter["sr-due"], [
+                    "YYYY-MM-DD",
+                    "DD-MM-YYYY",
+                    "ddd MMM DD YYYY",
+                ]).valueOf();
         }
 
         let schedObj: Record<string, number> = schedule(
@@ -470,7 +473,7 @@ export default class SRPlugin extends Plugin {
         interval = schedObj.interval;
         ease = schedObj.ease;
 
-        let due = window.moment(now + interval * 24 * 3600 * 1000);
+        let due: moment.Moment = moment(now + interval * 24 * 3600 * 1000);
         let dueString: string = due.format("YYYY-MM-DD");
 
         // check if scheduling info exists
@@ -502,7 +505,7 @@ export default class SRPlugin extends Plugin {
         }
         await this.app.vault.modify(note, fileText);
 
-        new Notice("Response received.");
+        new Notice(t("Response received."));
 
         setTimeout(() => {
             if (!this.notesSyncLock) {
@@ -531,7 +534,7 @@ export default class SRPlugin extends Plugin {
             return;
         }
 
-        new Notice("You're done for the day :D.");
+        new Notice(t("You're all caught up now :D."));
     }
 
     async flashcards_sync(): Promise<void> {
@@ -543,7 +546,7 @@ export default class SRPlugin extends Plugin {
         this.deckTree = new Deck("root", null);
         this.dueDatesFlashcards = {};
 
-        let todayDate = window.moment(Date.now()).format("YYYY-MM-DD");
+        let todayDate: string = moment(Date.now()).format("YYYY-MM-DD");
         // clear list if we've changed dates
         if (todayDate !== this.data.buryDate) {
             this.data.buryDate = todayDate;
@@ -579,12 +582,15 @@ export default class SRPlugin extends Plugin {
         // sort the deck names
         this.deckTree.sortSubdecksList();
 
-        let noteCountText: string = this.dueNotesCount === 1 ? "note" : "notes";
+        let noteCountText: string =
+            this.dueNotesCount === 1 ? t("note") : t("notes");
         let cardCountText: string =
-            this.deckTree.dueFlashcardsCount === 1 ? "card" : "cards";
+            this.deckTree.dueFlashcardsCount === 1 ? t("card") : t("cards");
         this.statusBar.setText(
-            `Review: ${this.dueNotesCount} ${noteCountText}, ` +
-                `${this.deckTree.dueFlashcardsCount} ${cardCountText} due`
+            t("Review") +
+                `: ${this.dueNotesCount} ${noteCountText}, ` +
+                `${this.deckTree.dueFlashcardsCount} ${cardCountText} ` +
+                t("due")
         );
 
         this.flashcardsSyncLock = false;
@@ -660,13 +666,11 @@ export default class SRPlugin extends Plugin {
                     .split("\n").length;
                 // flashcard already scheduled
                 if (match[3]) {
-                    let dueUnix: number = window
-                        .moment(match[3], [
-                            "YYYY-MM-DD",
-                            "DD-MM-YYYY",
-                            "ddd MMM DD YYYY",
-                        ])
-                        .valueOf();
+                    let dueUnix: number = moment(match[3], [
+                        "YYYY-MM-DD",
+                        "DD-MM-YYYY",
+                        "ddd MMM DD YYYY",
+                    ]).valueOf();
                     let nDays: number = Math.ceil(
                         (dueUnix - now) / (24 * 3600 * 1000)
                     );
@@ -810,12 +814,10 @@ export default class SRPlugin extends Plugin {
 
                     // card deletion scheduled
                     if (i < scheduling.length) {
-                        let dueUnix: number = window
-                            .moment(scheduling[i][1], [
-                                "YYYY-MM-DD",
-                                "DD-MM-YYYY",
-                            ])
-                            .valueOf();
+                        let dueUnix: number = moment(scheduling[i][1], [
+                            "YYYY-MM-DD",
+                            "DD-MM-YYYY",
+                        ]).valueOf();
                         let nDays: number = Math.ceil(
                             (dueUnix - now) / (24 * 3600 * 1000)
                         );

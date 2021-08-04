@@ -8,6 +8,7 @@ import {
 } from "obsidian";
 import type SRPlugin from "src/main";
 import { escapeRegexString } from "src/utils";
+import { t } from "src/lang/helpers";
 
 const DEBOUNCE_TIMER_MS: number = 512;
 
@@ -93,17 +94,22 @@ export class SRSettingTab extends PluginSettingTab {
         containerEl.empty();
 
         containerEl.createDiv().innerHTML =
-            "<h2>Spaced Repetition Plugin - Settings</h2>";
+            "<h2>" + t("Spaced Repetition Plugin - Settings") + "</h2>";
 
         containerEl.createDiv().innerHTML =
-            'For more information, check the <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki">wiki</a>.';
+            t("For more information, check the") +
+            '<a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki">' +
+            t("wiki") +
+            "</a>.";
 
-        containerEl.createDiv().innerHTML = "<h3>Flashcards</h3>";
+        containerEl.createDiv().innerHTML = "<h3>" + t("Flashcards") + "</h3>";
 
         new Setting(containerEl)
-            .setName("Flashcard tags")
+            .setName(t("Flashcard tags"))
             .setDesc(
-                "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3."
+                t(
+                    "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3."
+                )
             )
             .addTextArea((text) =>
                 text
@@ -122,9 +128,9 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Convert folders to decks and subdecks?")
+            .setName(t("Convert folders to decks and subdecks?"))
             .setDesc(
-                "This is an alternative to the Flashcard tags option above."
+                t("This is an alternative to the Flashcard tags option above.")
             )
             .addToggle((toggle) =>
                 toggle
@@ -137,10 +143,14 @@ export class SRSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName(
-                "Save scheduling comment on the same line as the flashcard's last line?"
+                t(
+                    "Save scheduling comment on the same line as the flashcard's last line?"
+                )
             )
             .setDesc(
-                "Turning this on will make the HTML comments not break list formatting."
+                t(
+                    "Turning this on will make the HTML comments not break list formatting."
+                )
             )
             .addToggle((toggle) =>
                 toggle
@@ -152,9 +162,11 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Bury sibling cards until the next day?")
+            .setName(t("Bury sibling cards until the next day?"))
             .setDesc(
-                "Siblings are cards generated from the same card text i.e. cloze deletions"
+                t(
+                    "Siblings are cards generated from the same card text i.e. cloze deletions"
+                )
             )
             .addToggle((toggle) =>
                 toggle
@@ -166,8 +178,10 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Show context in cards?")
-            .setDesc("i.e. Title > Heading 1 > Subheading > ... > Subheading")
+            .setName(t("Show context in cards?"))
+            .setDesc(
+                t("i.e. Title > Heading 1 > Subheading > ... > Subheading")
+            )
             .addToggle((toggle) =>
                 toggle
                     .setValue(this.plugin.data.settings.showContextInCards)
@@ -178,9 +192,11 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Flashcard Height Percentage")
+            .setName(t("Flashcard Height Percentage"))
             .setDesc(
-                "[Desktop] Should be set to 100% if you have very large images"
+                t(
+                    "[Desktop] Should be set to 100% if you have very large images"
+                )
             )
             .addSlider((slider) =>
                 slider
@@ -198,7 +214,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip("Reset to default")
+                    .setTooltip(t("Reset to default"))
                     .onClick(async () => {
                         this.plugin.data.settings.flashcardHeightPercentage =
                             DEFAULT_SETTINGS.flashcardHeightPercentage;
@@ -208,9 +224,11 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName("Flashcard Width Percentage")
+            .setName(t("Flashcard Width Percentage"))
             .setDesc(
-                "[Desktop] Should be set to 100% if you have very large images"
+                t(
+                    "[Desktop] Should be set to 100% if you have very large images"
+                )
             )
             .addSlider((slider) =>
                 slider
@@ -228,7 +246,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip("Reset to default")
+                    .setTooltip(t("Reset to default"))
                     .onClick(async () => {
                         this.plugin.data.settings.flashcardWidthPercentage =
                             DEFAULT_SETTINGS.flashcardWidthPercentage;
@@ -239,7 +257,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName(
-                "Show file name instead of 'Open file' in flashcard review?"
+                t("Show file name instead of 'Open file' in flashcard review?")
             )
             .addToggle((toggle) =>
                 toggle
@@ -252,7 +270,7 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Randomize card order during review?")
+            .setName(t("Randomize card order during review?"))
             .addToggle((toggle) =>
                 toggle
                     .setValue(this.plugin.data.settings.randomizeCardOrder)
@@ -263,9 +281,11 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Disable cloze cards?")
+            .setName(t("Disable cloze cards?"))
             .setDesc(
-                "If you're not currently using 'em & would like the plugin to run a tad faster."
+                t(
+                    "If you're not currently using 'em & would like the plugin to run a tad faster."
+                )
             )
             .addToggle((toggle) =>
                 toggle
@@ -277,9 +297,11 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Separator for inline flashcards")
+            .setName(t("Separator for inline flashcards"))
             .setDesc(
-                "Note that after changing this you have to manually edit any flashcards you already have."
+                t(
+                    "Note that after changing this you have to manually edit any flashcards you already have."
+                )
             )
             .addText((text) =>
                 text
@@ -305,7 +327,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip("Reset to default")
+                    .setTooltip(t("Reset to default"))
                     .onClick(async () => {
                         this.plugin.data.settings.singlelineCardSeparator =
                             DEFAULT_SETTINGS.singlelineCardSeparator;
@@ -315,9 +337,11 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName("Separator for multiline flashcards")
+            .setName(t("Separator for multiline flashcards"))
             .setDesc(
-                "Note that after changing this you have to manually edit any flashcards you already have."
+                t(
+                    "Note that after changing this you have to manually edit any flashcards you already have."
+                )
             )
             .addText((text) =>
                 text
@@ -343,7 +367,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip("Reset to default")
+                    .setTooltip(t("Reset to default"))
                     .onClick(async () => {
                         this.plugin.data.settings.multilineCardSeparator =
                             DEFAULT_SETTINGS.multilineCardSeparator;
@@ -352,12 +376,14 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
-        containerEl.createDiv().innerHTML = "<h3>Notes</h3>";
+        containerEl.createDiv().innerHTML = "<h3>" + t("Notes") + "</h3>";
 
         new Setting(containerEl)
-            .setName("Tags to review")
+            .setName(t("Tags to review"))
             .setDesc(
-                "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3."
+                t(
+                    "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3."
+                )
             )
             .addTextArea((text) =>
                 text
@@ -376,9 +402,11 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Open a random note for review")
+            .setName(t("Open a random note for review"))
             .setDesc(
-                "When you turn this off, notes are ordered by importance (PageRank)."
+                t(
+                    "When you turn this off, notes are ordered by importance (PageRank)."
+                )
             )
             .addToggle((toggle) =>
                 toggle
@@ -390,8 +418,8 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Open next note automatically after a review")
-            .setDesc("For faster reviews.")
+            .setName(t("Open next note automatically after a review"))
+            .setDesc(t("For faster reviews."))
             .addToggle((toggle) =>
                 toggle
                     .setValue(this.plugin.data.settings.autoNextNote)
@@ -403,10 +431,14 @@ export class SRSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName(
-                "Disable review options in the file menu i.e. Review: Easy Good Hard"
+                t(
+                    "Disable review options in the file menu i.e. Review: Easy Good Hard"
+                )
             )
             .setDesc(
-                "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this."
+                t(
+                    "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this."
+                )
             )
             .addToggle((toggle) =>
                 toggle
@@ -421,8 +453,8 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName("Maximum number of days to display on right panel")
-            .setDesc("Reduce this for a cleaner interface.")
+            .setName(t("Maximum number of days to display on right panel"))
+            .setDesc(t("Reduce this for a cleaner interface."))
             .addText((text) =>
                 text
                     .setValue(
@@ -435,7 +467,9 @@ export class SRSettingTab extends PluginSettingTab {
                                 if (!isNaN(numValue)) {
                                     if (numValue < 1) {
                                         new Notice(
-                                            "The number of days must be at least 1."
+                                            t(
+                                                "The number of days must be at least 1."
+                                            )
                                         );
                                         text.setValue(
                                             this.plugin.data.settings.maxNDaysNotesReviewQueue.toString()
@@ -448,7 +482,7 @@ export class SRSettingTab extends PluginSettingTab {
                                     await this.plugin.savePluginData();
                                 } else {
                                     new Notice(
-                                        "Please provide a valid number."
+                                        t("Please provide a valid number.")
                                     );
                                 }
                             },
@@ -460,7 +494,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip("Reset to default")
+                    .setTooltip(t("Reset to default"))
                     .onClick(async () => {
                         this.plugin.data.settings.maxNDaysNotesReviewQueue =
                             DEFAULT_SETTINGS.maxNDaysNotesReviewQueue;
@@ -469,14 +503,17 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
-        containerEl.createDiv().innerHTML = "<h3>Algorithm</h3>";
+        containerEl.createDiv().innerHTML = "<h3>" + t("Algorithm") + "</h3>";
 
         containerEl.createDiv().innerHTML =
-            'For more information, check the <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Spaced-Repetition-Algorithm">algorithm implementation</a>.';
+            t("For more information, check the") +
+            '<a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Spaced-Repetition-Algorithm">' +
+            t("algorithm implementation") +
+            "</a>.";
 
         new Setting(containerEl)
-            .setName("Base ease")
-            .setDesc("minimum = 130, preferrably approximately 250.")
+            .setName(t("Base ease"))
+            .setDesc(t("minimum = 130, preferrably approximately 250."))
             .addText((text) =>
                 text
                     .setValue(this.plugin.data.settings.baseEase.toString())
@@ -487,7 +524,9 @@ export class SRSettingTab extends PluginSettingTab {
                                 if (!isNaN(numValue)) {
                                     if (numValue < 130) {
                                         new Notice(
-                                            "The base ease must be at least 130."
+                                            t(
+                                                "The base ease must be at least 130."
+                                            )
                                         );
                                         text.setValue(
                                             this.plugin.data.settings.baseEase.toString()
@@ -500,7 +539,7 @@ export class SRSettingTab extends PluginSettingTab {
                                     await this.plugin.savePluginData();
                                 } else {
                                     new Notice(
-                                        "Please provide a valid number."
+                                        t("Please provide a valid number.")
                                     );
                                 }
                             },
@@ -512,7 +551,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip("Reset to default")
+                    .setTooltip(t("Reset to default"))
                     .onClick(async () => {
                         this.plugin.data.settings.baseEase =
                             DEFAULT_SETTINGS.baseEase;
@@ -522,8 +561,10 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName("Interval change when you review a flashcard/note as hard")
-            .setDesc("newInterval = oldInterval * intervalChange / 100.")
+            .setName(
+                t("Interval change when you review a flashcard/note as hard")
+            )
+            .setDesc(t("newInterval = oldInterval * intervalChange / 100."))
             .addSlider((slider) =>
                 slider
                     .setLimits(1, 99, 1)
@@ -539,7 +580,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip("Reset to default")
+                    .setTooltip(t("Reset to default"))
                     .onClick(async () => {
                         this.plugin.data.settings.lapsesIntervalChange =
                             DEFAULT_SETTINGS.lapsesIntervalChange;
@@ -549,9 +590,11 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName("Easy bonus")
+            .setName(t("Easy bonus"))
             .setDesc(
-                "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%)."
+                t(
+                    "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%)."
+                )
             )
             .addText((text) =>
                 text
@@ -566,7 +609,9 @@ export class SRSettingTab extends PluginSettingTab {
                                 if (!isNaN(numValue)) {
                                     if (numValue < 1.0) {
                                         new Notice(
-                                            "The easy bonus must be at least 100."
+                                            t(
+                                                "The easy bonus must be at least 100."
+                                            )
                                         );
                                         text.setValue(
                                             (
@@ -582,7 +627,7 @@ export class SRSettingTab extends PluginSettingTab {
                                     await this.plugin.savePluginData();
                                 } else {
                                     new Notice(
-                                        "Please provide a valid number."
+                                        t("Please provide a valid number.")
                                     );
                                 }
                             },
@@ -594,7 +639,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip("Reset to default")
+                    .setTooltip(t("Reset to default"))
                     .onClick(async () => {
                         this.plugin.data.settings.easyBonus =
                             DEFAULT_SETTINGS.easyBonus;
@@ -604,9 +649,11 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName("Maximum Interval")
+            .setName(t("Maximum Interval"))
             .setDesc(
-                "Allows you to place an upper limit on the interval (default = 100 years)."
+                t(
+                    "Allows you to place an upper limit on the interval (default = 100 years)."
+                )
             )
             .addText((text) =>
                 text
@@ -620,7 +667,9 @@ export class SRSettingTab extends PluginSettingTab {
                                 if (!isNaN(numValue)) {
                                     if (numValue < 1) {
                                         new Notice(
-                                            "The maximum interval must be at least 1 day."
+                                            t(
+                                                "The maximum interval must be at least 1 day."
+                                            )
                                         );
                                         text.setValue(
                                             this.plugin.data.settings.maximumInterval.toString()
@@ -633,7 +682,7 @@ export class SRSettingTab extends PluginSettingTab {
                                     await this.plugin.savePluginData();
                                 } else {
                                     new Notice(
-                                        "Please provide a valid number."
+                                        t("Please provide a valid number.")
                                     );
                                 }
                             },
@@ -645,7 +694,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip("Reset to default")
+                    .setTooltip(t("Reset to default"))
                     .onClick(async () => {
                         this.plugin.data.settings.maximumInterval =
                             DEFAULT_SETTINGS.maximumInterval;
@@ -655,9 +704,11 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName("Maximum link contribution")
+            .setName(t("Maximum link contribution"))
             .setDesc(
-                "Maximum contribution of the weighted ease of linked notes to the initial ease."
+                t(
+                    "Maximum contribution of the weighted ease of linked notes to the initial ease."
+                )
             )
             .addSlider((slider) =>
                 slider
@@ -672,7 +723,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip("Reset to default")
+                    .setTooltip(t("Reset to default"))
                     .onClick(async () => {
                         this.plugin.data.settings.maxLinkFactor =
                             DEFAULT_SETTINGS.maxLinkFactor;

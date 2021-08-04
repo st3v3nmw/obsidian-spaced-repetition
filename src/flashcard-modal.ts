@@ -6,6 +6,7 @@ import {
     Platform,
     TFile,
     MarkdownView,
+    moment,
 } from "obsidian";
 import type SRPlugin from "src/main";
 import {
@@ -17,6 +18,7 @@ import {
 } from "src/scheduling";
 import { MULTI_SCHEDULING_EXTRACTOR, COLLAPSE_ICON } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
+import { t } from "src/lang/helpers";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -47,7 +49,7 @@ export class FlashcardModal extends Modal {
 
         this.plugin = plugin;
 
-        this.titleEl.setText("Decks");
+        this.titleEl.setText(t("Decks"));
 
         if (Platform.isMobile) this.contentEl.style.display = "block";
         this.modalEl.style.height =
@@ -105,16 +107,22 @@ export class FlashcardModal extends Modal {
 
     decksList(): void {
         this.mode = FlashcardModalMode.DecksList;
-        this.titleEl.setText("Decks");
+        this.titleEl.setText(t("Decks"));
         this.titleEl.innerHTML +=
             '<p style="margin:0px;line-height:12px;">' +
-            '<span style="background-color:#4caf50;color:#ffffff;" aria-label="Due cards" class="tag-pane-tag-count tree-item-flair">' +
+            '<span style="background-color:#4caf50;color:#ffffff;" aria-label="' +
+            t("Due cards") +
+            '" class="tag-pane-tag-count tree-item-flair">' +
             this.plugin.deckTree.dueFlashcardsCount +
             "</span>" +
-            '<span style="background-color:#2196f3;" aria-label="New cards" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
+            '<span style="background-color:#2196f3;" aria-label="' +
+            t("New cards") +
+            '" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
             this.plugin.deckTree.newFlashcardsCount +
             "</span>" +
-            '<span style="background-color:#ff7043;" aria-label="Total cards" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
+            '<span style="background-color:#ff7043;" aria-label="' +
+            t("Total cards") +
+            '" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
             this.plugin.deckTree.totalFlashcards +
             "</span>" +
             "</p>";
@@ -129,9 +137,9 @@ export class FlashcardModal extends Modal {
         this.contentEl.innerHTML = "";
 
         this.fileLinkView = this.contentEl.createDiv("sr-link");
-        this.fileLinkView.setText("Open file");
+        this.fileLinkView.setText(t("Open file"));
         if (this.plugin.data.settings.showFileNameInFileLink)
-            this.fileLinkView.setAttribute("aria-label", "Open file");
+            this.fileLinkView.setAttribute("aria-label", t("Open file"));
         this.fileLinkView.addEventListener("click", async (_) => {
             this.close();
             await this.plugin.app.workspace.activeLeaf.openFile(
@@ -146,7 +154,7 @@ export class FlashcardModal extends Modal {
         });
 
         this.resetLinkView = this.contentEl.createDiv("sr-link");
-        this.resetLinkView.setText("Reset card's progress");
+        this.resetLinkView.setText(t("Reset card's progress"));
         this.resetLinkView.addEventListener("click", (_) => {
             this.processReview(ReviewResponse.Reset);
         });
@@ -164,7 +172,7 @@ export class FlashcardModal extends Modal {
 
         this.hardBtn = document.createElement("button");
         this.hardBtn.setAttribute("id", "sr-hard-btn");
-        this.hardBtn.setText("Hard");
+        this.hardBtn.setText(t("Hard"));
         this.hardBtn.addEventListener("click", (_) => {
             this.processReview(ReviewResponse.Hard);
         });
@@ -172,7 +180,7 @@ export class FlashcardModal extends Modal {
 
         this.goodBtn = document.createElement("button");
         this.goodBtn.setAttribute("id", "sr-good-btn");
-        this.goodBtn.setText("Good");
+        this.goodBtn.setText(t("Good"));
         this.goodBtn.addEventListener("click", (_) => {
             this.processReview(ReviewResponse.Good);
         });
@@ -180,7 +188,7 @@ export class FlashcardModal extends Modal {
 
         this.easyBtn = document.createElement("button");
         this.easyBtn.setAttribute("id", "sr-easy-btn");
-        this.easyBtn.setText("Easy");
+        this.easyBtn.setText(t("Easy"));
         this.easyBtn.addEventListener("click", (_) => {
             this.processReview(ReviewResponse.Easy);
         });
@@ -189,7 +197,7 @@ export class FlashcardModal extends Modal {
 
         this.answerBtn = this.contentEl.createDiv();
         this.answerBtn.setAttribute("id", "sr-show-answer");
-        this.answerBtn.setText("Show Answer");
+        this.answerBtn.setText(t("Show Answer"));
         this.answerBtn.addEventListener("click", (_) => {
             this.showAnswer();
         });
@@ -214,7 +222,7 @@ export class FlashcardModal extends Modal {
     }
 
     async processReview(response: ReviewResponse): Promise<void> {
-        let interval: number, ease: number, due;
+        let interval: number, ease: number, due: moment.Moment;
 
         this.currentDeck.deleteFlashcardAtIndex(
             this.currentCardIdx,
@@ -246,15 +254,15 @@ export class FlashcardModal extends Modal {
                 ease = schedObj.ease;
             }
 
-            due = window.moment(Date.now() + interval * 24 * 3600 * 1000);
+            due = moment(Date.now() + interval * 24 * 3600 * 1000);
         } else {
             this.currentCard.interval = 1.0;
             this.currentCard.ease = this.plugin.data.settings.baseEase;
             if (this.currentCard.isDue)
                 this.currentDeck.dueFlashcards.push(this.currentCard);
             else this.currentDeck.newFlashcards.push(this.currentCard);
-            due = window.moment(Date.now());
-            new Notice("Card's progress has been reset");
+            due = moment(Date.now());
+            new Notice(t("Card's progress has been reset."));
             this.currentDeck.nextCard(this);
             return;
         }
@@ -290,8 +298,8 @@ export class FlashcardModal extends Modal {
                 let deletionSched: string[] = [
                     "0",
                     dueString,
-                    `${interval}`,
-                    `${ease}`,
+                    interval.toString(),
+                    ease.toString(),
                 ];
                 if (this.currentCard.isDue)
                     scheduling[this.currentCard.siblingIdx] = deletionSched;
@@ -644,13 +652,13 @@ export class Deck {
                 modal.easyBtn.setText(textInterval(easyInterval, true));
             } else {
                 modal.hardBtn.setText(
-                    `Hard - ${textInterval(hardInterval, false)}`
+                    t("Hard") + " - " + textInterval(hardInterval, false)
                 );
                 modal.goodBtn.setText(
-                    `Good - ${textInterval(goodInterval, false)}`
+                    t("Good") + " - " + textInterval(goodInterval, false)
                 );
                 modal.easyBtn.setText(
-                    `Easy - ${textInterval(easyInterval, false)}`
+                    t("Easy") + " - " + textInterval(easyInterval, false)
                 );
             }
         } else if (this.newFlashcards.length > 0) {
@@ -670,9 +678,9 @@ export class Deck {
                 modal.goodBtn.setText("2.5d");
                 modal.easyBtn.setText("3.5d");
             } else {
-                modal.hardBtn.setText("Hard - 1.0 day");
-                modal.goodBtn.setText("Good - 2.5 days");
-                modal.easyBtn.setText("Easy - 3.5 days");
+                modal.hardBtn.setText(t("Hard") + " - 1.0 " + t("day"));
+                modal.goodBtn.setText(t("Good") + " - 2.5 " + t("days"));
+                modal.easyBtn.setText(t("Easy") + " - 3.5 " + t("days"));
             }
         }
 
