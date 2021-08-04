@@ -600,6 +600,13 @@ export default class SRPlugin extends Plugin {
         let headings: HeadingCache[] = fileCachedData.headings || [];
         let fileChanged: boolean = false;
 
+        // Add newline to file with text
+        // Cloze cards require a newline
+        if (fileText.slice(-1) !== "\n" && fileText.length > 0) {
+            fileText += "\n";
+            fileChanged = true;
+        }
+
         let deckAdded: boolean = false;
         let deckPath: string[] = deckPathStr.substring(1).split("/");
         if (deckPath.length === 1 && deckPath[0] === "") deckPath = ["/"];
