@@ -502,11 +502,10 @@ export default class SRPlugin extends Plugin {
                 `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
                     `sr-interval: ${interval}\nsr-ease: ${ease}\n---`
             );
-        } else {
+        } else
             fileText =
                 `---\nsr-due: ${dueString}\nsr-interval: ${interval}\n` +
                 `sr-ease: ${ease}\n---\n\n${fileText}`;
-        }
 
         if (this.data.settings.burySiblingCards) {
             await this.findFlashcards(note, [], true); // bury all cards in current note

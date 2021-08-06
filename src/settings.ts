@@ -1,16 +1,7 @@
-import {
-    Notice,
-    PluginSettingTab,
-    Setting,
-    App,
-    debounce,
-    Platform,
-} from "obsidian";
+import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
 import type SRPlugin from "src/main";
 import { escapeRegexString } from "src/utils";
 import { t } from "src/lang/helpers";
-
-const DEBOUNCE_TIMER_MS: number = 512;
 
 export interface SRSettings {
     // flashcards
@@ -80,6 +71,13 @@ export const DEFAULT_SETTINGS: SRSettings = {
     maxLinkFactor: 1.0,
 };
 
+// https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
+let applyDebounceTimer: number = 0;
+function applySettingsUpdate(callback: Function): void {
+    clearTimeout(applyDebounceTimer);
+    applyDebounceTimer = window.setTimeout(callback, 512);
+}
+
 export class SRSettingTab extends PluginSettingTab {
     private plugin: SRPlugin;
 
@@ -98,7 +96,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         containerEl.createDiv().innerHTML =
             t("For more information, check the") +
-            '<a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki">' +
+            ' <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki">' +
             t("wiki") +
             "</a>.";
 
@@ -115,15 +113,11 @@ export class SRSettingTab extends PluginSettingTab {
                 text
                     .setValue(this.plugin.data.settings.flashcardTags.join(" "))
                     .onChange((value) => {
-                        debounce(
-                            async () => {
-                                this.plugin.data.settings.flashcardTags =
-                                    value.split(/\s+/);
-                                await this.plugin.savePluginData();
-                            },
-                            DEBOUNCE_TIMER_MS,
-                            true
-                        );
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.flashcardTags =
+                                value.split(/\s+/);
+                            await this.plugin.savePluginData();
+                        });
                     })
             );
 
@@ -307,21 +301,17 @@ export class SRSettingTab extends PluginSettingTab {
                 text
                     .setValue(this.plugin.data.settings.singlelineCardSeparator)
                     .onChange((value) => {
-                        debounce(
-                            async () => {
-                                this.plugin.data.settings.singlelineCardSeparator =
-                                    value;
-                                await this.plugin.savePluginData();
-                                this.plugin.singlelineCardRegex = new RegExp(
-                                    `^(.+)${escapeRegexString(
-                                        value
-                                    )}(.+?)\\n?(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
-                                    "gm"
-                                );
-                            },
-                            DEBOUNCE_TIMER_MS,
-                            true
-                        );
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.singlelineCardSeparator =
+                                value;
+                            await this.plugin.savePluginData();
+                            this.plugin.singlelineCardRegex = new RegExp(
+                                `^(.+)${escapeRegexString(
+                                    value
+                                )}(.+?)\\n?(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
+                                "gm"
+                            );
+                        });
                     })
             )
             .addExtraButton((button) => {
@@ -347,21 +337,17 @@ export class SRSettingTab extends PluginSettingTab {
                 text
                     .setValue(this.plugin.data.settings.multilineCardSeparator)
                     .onChange((value) => {
-                        debounce(
-                            async () => {
-                                this.plugin.data.settings.multilineCardSeparator =
-                                    value;
-                                await this.plugin.savePluginData();
-                                this.plugin.multilineCardRegex = new RegExp(
-                                    `^((?:.+\\n)+)${escapeRegexString(
-                                        value
-                                    )}\\n((?:.+?\\n?)+?)(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
-                                    "gm"
-                                );
-                            },
-                            DEBOUNCE_TIMER_MS,
-                            true
-                        );
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.multilineCardSeparator =
+                                value;
+                            await this.plugin.savePluginData();
+                            this.plugin.multilineCardRegex = new RegExp(
+                                `^((?:.+\\n)+)${escapeRegexString(
+                                    value
+                                )}\\n((?:.+?\\n?)+?)(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
+                                "gm"
+                            );
+                        });
                     })
             )
             .addExtraButton((button) => {
@@ -389,15 +375,11 @@ export class SRSettingTab extends PluginSettingTab {
                 text
                     .setValue(this.plugin.data.settings.tagsToReview.join(" "))
                     .onChange((value) => {
-                        debounce(
-                            async () => {
-                                this.plugin.data.settings.tagsToReview =
-                                    value.split(/\s+/);
-                                await this.plugin.savePluginData();
-                            },
-                            DEBOUNCE_TIMER_MS,
-                            true
-                        );
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.tagsToReview =
+                                value.split(/\s+/);
+                            await this.plugin.savePluginData();
+                        });
                     })
             );
 
@@ -461,34 +443,28 @@ export class SRSettingTab extends PluginSettingTab {
                         this.plugin.data.settings.maxNDaysNotesReviewQueue.toString()
                     )
                     .onChange((value) => {
-                        debounce(
-                            async () => {
-                                let numValue: number = Number.parseInt(value);
-                                if (!isNaN(numValue)) {
-                                    if (numValue < 1) {
-                                        new Notice(
-                                            t(
-                                                "The number of days must be at least 1."
-                                            )
-                                        );
-                                        text.setValue(
-                                            this.plugin.data.settings.maxNDaysNotesReviewQueue.toString()
-                                        );
-                                        return;
-                                    }
-
-                                    this.plugin.data.settings.maxNDaysNotesReviewQueue =
-                                        numValue;
-                                    await this.plugin.savePluginData();
-                                } else {
+                        applySettingsUpdate(async () => {
+                            let numValue: number = Number.parseInt(value);
+                            if (!isNaN(numValue)) {
+                                if (numValue < 1) {
                                     new Notice(
-                                        t("Please provide a valid number.")
+                                        t(
+                                            "The number of days must be at least 1."
+                                        )
                                     );
+                                    text.setValue(
+                                        this.plugin.data.settings.maxNDaysNotesReviewQueue.toString()
+                                    );
+                                    return;
                                 }
-                            },
-                            DEBOUNCE_TIMER_MS,
-                            true
-                        );
+
+                                this.plugin.data.settings.maxNDaysNotesReviewQueue =
+                                    numValue;
+                                await this.plugin.savePluginData();
+                            } else {
+                                new Notice(t("Please provide a valid number."));
+                            }
+                        });
                     })
             )
             .addExtraButton((button) => {
@@ -507,7 +483,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         containerEl.createDiv().innerHTML =
             t("For more information, check the") +
-            '<a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Spaced-Repetition-Algorithm">' +
+            ' <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Spaced-Repetition-Algorithm">' +
             t("algorithm implementation") +
             "</a>.";
 
@@ -518,34 +494,25 @@ export class SRSettingTab extends PluginSettingTab {
                 text
                     .setValue(this.plugin.data.settings.baseEase.toString())
                     .onChange((value) => {
-                        debounce(
-                            async () => {
-                                let numValue: number = Number.parseInt(value);
-                                if (!isNaN(numValue)) {
-                                    if (numValue < 130) {
-                                        new Notice(
-                                            t(
-                                                "The base ease must be at least 130."
-                                            )
-                                        );
-                                        text.setValue(
-                                            this.plugin.data.settings.baseEase.toString()
-                                        );
-                                        return;
-                                    }
-
-                                    this.plugin.data.settings.baseEase =
-                                        numValue;
-                                    await this.plugin.savePluginData();
-                                } else {
+                        applySettingsUpdate(async () => {
+                            let numValue: number = Number.parseInt(value);
+                            if (!isNaN(numValue)) {
+                                if (numValue < 130) {
                                     new Notice(
-                                        t("Please provide a valid number.")
+                                        t("The base ease must be at least 130.")
                                     );
+                                    text.setValue(
+                                        this.plugin.data.settings.baseEase.toString()
+                                    );
+                                    return;
                                 }
-                            },
-                            DEBOUNCE_TIMER_MS,
-                            true
-                        );
+
+                                this.plugin.data.settings.baseEase = numValue;
+                                await this.plugin.savePluginData();
+                            } else {
+                                new Notice(t("Please provide a valid number."));
+                            }
+                        });
                     })
             )
             .addExtraButton((button) => {
@@ -602,38 +569,30 @@ export class SRSettingTab extends PluginSettingTab {
                         (this.plugin.data.settings.easyBonus * 100).toString()
                     )
                     .onChange((value) => {
-                        debounce(
-                            async () => {
-                                let numValue: number =
-                                    Number.parseInt(value) / 100;
-                                if (!isNaN(numValue)) {
-                                    if (numValue < 1.0) {
-                                        new Notice(
-                                            t(
-                                                "The easy bonus must be at least 100."
-                                            )
-                                        );
-                                        text.setValue(
-                                            (
-                                                this.plugin.data.settings
-                                                    .easyBonus * 100
-                                            ).toString()
-                                        );
-                                        return;
-                                    }
-
-                                    this.plugin.data.settings.easyBonus =
-                                        numValue;
-                                    await this.plugin.savePluginData();
-                                } else {
+                        applySettingsUpdate(async () => {
+                            let numValue: number = Number.parseInt(value) / 100;
+                            if (!isNaN(numValue)) {
+                                if (numValue < 1.0) {
                                     new Notice(
-                                        t("Please provide a valid number.")
+                                        t(
+                                            "The easy bonus must be at least 100."
+                                        )
                                     );
+                                    text.setValue(
+                                        (
+                                            this.plugin.data.settings
+                                                .easyBonus * 100
+                                        ).toString()
+                                    );
+                                    return;
                                 }
-                            },
-                            DEBOUNCE_TIMER_MS,
-                            true
-                        );
+
+                                this.plugin.data.settings.easyBonus = numValue;
+                                await this.plugin.savePluginData();
+                            } else {
+                                new Notice(t("Please provide a valid number."));
+                            }
+                        });
                     })
             )
             .addExtraButton((button) => {
@@ -661,34 +620,28 @@ export class SRSettingTab extends PluginSettingTab {
                         this.plugin.data.settings.maximumInterval.toString()
                     )
                     .onChange((value) => {
-                        debounce(
-                            async () => {
-                                let numValue: number = Number.parseInt(value);
-                                if (!isNaN(numValue)) {
-                                    if (numValue < 1) {
-                                        new Notice(
-                                            t(
-                                                "The maximum interval must be at least 1 day."
-                                            )
-                                        );
-                                        text.setValue(
-                                            this.plugin.data.settings.maximumInterval.toString()
-                                        );
-                                        return;
-                                    }
-
-                                    this.plugin.data.settings.maximumInterval =
-                                        numValue;
-                                    await this.plugin.savePluginData();
-                                } else {
+                        applySettingsUpdate(async () => {
+                            let numValue: number = Number.parseInt(value);
+                            if (!isNaN(numValue)) {
+                                if (numValue < 1) {
                                     new Notice(
-                                        t("Please provide a valid number.")
+                                        t(
+                                            "The maximum interval must be at least 1 day."
+                                        )
                                     );
+                                    text.setValue(
+                                        this.plugin.data.settings.maximumInterval.toString()
+                                    );
+                                    return;
                                 }
-                            },
-                            DEBOUNCE_TIMER_MS,
-                            true
-                        );
+
+                                this.plugin.data.settings.maximumInterval =
+                                    numValue;
+                                await this.plugin.savePluginData();
+                            } else {
+                                new Notice(t("Please provide a valid number."));
+                            }
+                        });
                     })
             )
             .addExtraButton((button) => {
