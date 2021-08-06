@@ -485,13 +485,13 @@ export class Deck {
 
     // count flashcards that have either been buried
     // or aren't due yet
-    countFlashcard(deckPath: string[]): void {
-        this.totalFlashcards++;
+    countFlashcard(deckPath: string[], n: number = 1): void {
+        this.totalFlashcards += n;
 
         let deckName: string = deckPath.shift()!;
         for (let deck of this.subdecks) {
             if (deckName === deck.deckName) {
-                deck.countFlashcard(deckPath);
+                deck.countFlashcard(deckPath, n);
                 return;
             }
         }

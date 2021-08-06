@@ -34,13 +34,22 @@ interface PluginData {
     // should work as long as user doesn't modify card's text
     // which covers most of the cases
     buryList: string[];
+    cache: Record<string, SRFileCache>; // Record<last known path, SRFileCache>
 }
 
 const DEFAULT_DATA: PluginData = {
     settings: DEFAULT_SETTINGS,
     buryDate: "",
     buryList: [],
+    cache: {},
 };
+
+interface SRFileCache {
+    totalCards: number;
+    hasNewCards: boolean;
+    nextDueDate: string;
+    lastUpdated: number;
+}
 
 export interface SchedNote {
     note: TFile;
@@ -500,7 +509,7 @@ export default class SRPlugin extends Plugin {
         }
 
         if (this.data.settings.burySiblingCards) {
-            await this.findFlashcards(note, "", true); // bury all cards in current note
+            await this.findFlashcards(note, [], true); // bury all cards in current note
             await this.savePluginData();
         }
         await this.app.vault.modify(note, fileText);
@@ -546,38 +555,65 @@ export default class SRPlugin extends Plugin {
         this.deckTree = new Deck("root", null);
         this.dueDatesFlashcards = {};
 
-        let todayDate: string = moment(Date.now()).format("YYYY-MM-DD");
+        let now: moment.Moment = moment(Date.now());
+        let todayDate: string = now.format("YYYY-MM-DD");
         // clear list if we've changed dates
         if (todayDate !== this.data.buryDate) {
             this.data.buryDate = todayDate;
             this.data.buryList = [];
-            await this.savePluginData();
         }
 
         for (let note of notes) {
+            // find deck path
+            let deckPath: string[] = [];
             if (this.data.settings.convertFoldersToDecks) {
-                let path: string[] = note.path.split("/");
-                path.pop(); // remove filename
-                await this.findFlashcards(note, "#" + path.join("/"));
-                continue;
-            }
+                deckPath = note.path.split("/");
+                deckPath.pop(); // remove filename
+            } else {
+                let fileCachedData =
+                    this.app.metadataCache.getFileCache(note) || {};
+                let tags = getAllTags(fileCachedData) || [];
 
-            let fileCachedData =
-                this.app.metadataCache.getFileCache(note) || {};
-            let tags = getAllTags(fileCachedData) || [];
-
-            outer: for (let tag of tags) {
-                for (let tagToReview of this.data.settings.flashcardTags) {
-                    if (
-                        tag === tagToReview ||
-                        tag.startsWith(tagToReview + "/")
-                    ) {
-                        await this.findFlashcards(note, tag);
-                        break outer;
+                outer: for (let tag of tags) {
+                    for (let tagToReview of this.data.settings.flashcardTags) {
+                        if (
+                            tag === tagToReview ||
+                            tag.startsWith(tagToReview + "/")
+                        ) {
+                            deckPath = tag.substring(1).split("/");
+                            break outer;
+                        }
                     }
                 }
             }
+
+            if (deckPath.length === 0) continue;
+            if (deckPath.length === 1 && deckPath[0] === "") deckPath = ["/"];
+
+            if (this.data.cache.hasOwnProperty(note.path)) {
+                let fileCache: SRFileCache = this.data.cache[note.path];
+                // Has file changed?
+                if (fileCache.lastUpdated === note.stat.mtime) {
+                    if (fileCache.totalCards == 0) continue;
+                    else if (
+                        !fileCache.hasNewCards &&
+                        now.valueOf() <
+                            moment(
+                                fileCache.nextDueDate,
+                                "YYYY-MM-DD"
+                            ).valueOf()
+                    ) {
+                        this.deckTree.createDeck([...deckPath]);
+                        this.deckTree.countFlashcard(
+                            deckPath,
+                            fileCache.totalCards
+                        );
+                    } else await this.findFlashcards(note, deckPath);
+                } else await this.findFlashcards(note, deckPath);
+            } else await this.findFlashcards(note, deckPath);
         }
+
+        await this.savePluginData();
 
         // sort the deck names
         this.deckTree.sortSubdecksList();
@@ -598,13 +634,19 @@ export default class SRPlugin extends Plugin {
 
     async findFlashcards(
         note: TFile,
-        deckPathStr: string,
+        deckPath: string[],
         buryOnly: boolean = false
     ): Promise<void> {
         let fileText: string = await this.app.vault.read(note);
         let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         let headings: HeadingCache[] = fileCachedData.headings || [];
-        let fileChanged: boolean = false;
+        let fileChanged: boolean = false,
+            deckAdded = false;
+
+        // info. for caching
+        let hasNewCards: boolean = false,
+            totalCards: number = 0,
+            nextDueDate: number = Infinity; // 03:14:07 UTC, January 19 2038 haha
 
         // Add newline to file with text
         // Cloze cards require a newline
@@ -612,10 +654,6 @@ export default class SRPlugin extends Plugin {
             fileText += "\n";
             fileChanged = true;
         }
-
-        let deckAdded: boolean = false;
-        let deckPath: string[] = deckPathStr.substring(1).split("/");
-        if (deckPath.length === 1 && deckPath[0] === "") deckPath = ["/"];
 
         // find all codeblocks
         let codeblocks: [number, number][] = [];
@@ -664,6 +702,7 @@ export default class SRPlugin extends Plugin {
                 let lineNo: number = fileText
                     .substring(0, match.index!)
                     .split("\n").length;
+                totalCards++;
                 // flashcard already scheduled
                 if (match[3]) {
                     let dueUnix: number = moment(match[3], [
@@ -671,6 +710,7 @@ export default class SRPlugin extends Plugin {
                         "DD-MM-YYYY",
                         "ddd MMM DD YYYY",
                     ]).valueOf();
+                    if (dueUnix < nextDueDate) nextDueDate = dueUnix;
                     let nDays: number = Math.ceil(
                         (dueUnix - now) / (24 * 3600 * 1000)
                     );
@@ -705,6 +745,7 @@ export default class SRPlugin extends Plugin {
                         continue;
                     }
                 } else {
+                    if (!hasNewCards) hasNewCards = true;
                     cardObj = {
                         isDue: false,
                         note,
@@ -811,6 +852,7 @@ export default class SRPlugin extends Plugin {
                         "</span>" +
                         cardText.substring(deletionEnd);
                     back = back.replace(/==/gm, "");
+                    totalCards++;
 
                     // card deletion scheduled
                     if (i < scheduling.length) {
@@ -818,6 +860,7 @@ export default class SRPlugin extends Plugin {
                             "YYYY-MM-DD",
                             "DD-MM-YYYY",
                         ]).valueOf();
+                        if (dueUnix < nextDueDate) nextDueDate = dueUnix;
                         let nDays: number = Math.ceil(
                             (dueUnix - now) / (24 * 3600 * 1000)
                         );
@@ -855,6 +898,7 @@ export default class SRPlugin extends Plugin {
                             continue;
                         }
                     } else {
+                        if (!hasNewCards) hasNewCards = true;
                         if (this.data.buryList.includes(cyrb53(cardText))) {
                             this.deckTree.countFlashcard([...deckPath]);
                             continue;
@@ -881,6 +925,17 @@ export default class SRPlugin extends Plugin {
                 }
             }
         }
+
+        if (!buryOnly)
+            this.data.cache[note.path] = {
+                totalCards,
+                hasNewCards,
+                nextDueDate:
+                    nextDueDate !== Infinity
+                        ? moment(nextDueDate).format("YYYY-MM-DD")
+                        : "",
+                lastUpdated: note.stat.mtime,
+            };
 
         if (fileChanged) await this.app.vault.modify(note, fileText);
     }
