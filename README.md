@@ -32,7 +32,7 @@ To help translate the plugin to another language, fork this repository, copy the
 
 https://user-images.githubusercontent.com/43380836/115256965-5d455f00-a138-11eb-988f-27ba29f328a0.mp4
 
-(if the screencast video doesn't play, check it out on the project's [README](https://github.com/st3v3nmw/obsidian-spaced-repetition/edit/master/README.md) on GitHub)
+(if the screencast video doesn't play, check it out on the project's [README](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/README.md) on GitHub)
 
 ### Sample Cloze Deletion
 

@@ -55,9 +55,9 @@ export function schedule(
         ease += 20;
         interval = ((interval + delayBeforeReview) * ease) / 100;
         interval *= settingsObj.easyBonus;
-    } else if (response === ReviewResponse.Good) {
+    } else if (response === ReviewResponse.Good)
         interval = ((interval + delayBeforeReview / 2) * ease) / 100;
-    } else if (response === ReviewResponse.Hard) {
+    else if (response === ReviewResponse.Hard) {
         ease = Math.max(130, ease - 20);
         interval = Math.max(
             1,
