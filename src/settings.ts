@@ -1,6 +1,6 @@
 import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
+
 import type SRPlugin from "src/main";
-import { escapeRegexString } from "src/utils";
 import { t } from "src/lang/helpers";
 import { LogLevel } from "src/logger";
 
@@ -16,13 +16,9 @@ export interface SRSettings {
     showFileNameInFileLink: boolean;
     randomizeCardOrder: boolean;
     disableClozeCards: boolean;
-    disableSinglelineCards: boolean;
     singlelineCardSeparator: string;
-    disableSinglelineReversedCards: boolean;
     singlelineReversedCardSeparator: string;
-    disableMultilineCards: boolean;
     multilineCardSeparator: string;
-    disableMultilineReversedCards: boolean;
     multilineReversedCardSeparator: string;
     // notes
     tagsToReview: string[];
@@ -52,13 +48,9 @@ export const DEFAULT_SETTINGS: SRSettings = {
     showFileNameInFileLink: false,
     randomizeCardOrder: true,
     disableClozeCards: false,
-    disableSinglelineCards: false,
     singlelineCardSeparator: "::",
-    disableSinglelineReversedCards: false,
     singlelineReversedCardSeparator: ":::",
-    disableMultilineCards: false,
     multilineCardSeparator: "?",
-    disableMultilineReversedCards: false,
     multilineReversedCardSeparator: "??",
     // notes
     tagsToReview: ["#review"],
@@ -310,12 +302,6 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings.singlelineCardSeparator =
                                 value;
                             await this.plugin.savePluginData();
-                            this.plugin.singlelineCardRegex = new RegExp(
-                                `^(.+)${escapeRegexString(
-                                    value
-                                )}(.+?)\\n?(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
-                                "gm"
-                            );
                         });
                     })
             )
@@ -326,6 +312,39 @@ export class SRSettingTab extends PluginSettingTab {
                     .onClick(async () => {
                         this.plugin.data.settings.singlelineCardSeparator =
                             DEFAULT_SETTINGS.singlelineCardSeparator;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
+
+        new Setting(containerEl)
+            .setName(t("Separator for inline reversed flashcards"))
+            .setDesc(
+                t(
+                    "Note that after changing this you have to manually edit any flashcards you already have."
+                )
+            )
+            .addText((text) =>
+                text
+                    .setValue(
+                        this.plugin.data.settings
+                            .singlelineReversedCardSeparator
+                    )
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.singlelineReversedCardSeparator =
+                                value;
+                            await this.plugin.savePluginData();
+                        });
+                    })
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("Reset to default"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.singlelineReversedCardSeparator =
+                            DEFAULT_SETTINGS.singlelineReversedCardSeparator;
                         await this.plugin.savePluginData();
                         this.display();
                     });
@@ -346,12 +365,6 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings.multilineCardSeparator =
                                 value;
                             await this.plugin.savePluginData();
-                            this.plugin.multilineCardRegex = new RegExp(
-                                `^((?:.+\\n)+)${escapeRegexString(
-                                    value
-                                )}\\n((?:.+?\\n?)+?)(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
-                                "gm"
-                            );
                         });
                     })
             )
@@ -362,6 +375,38 @@ export class SRSettingTab extends PluginSettingTab {
                     .onClick(async () => {
                         this.plugin.data.settings.multilineCardSeparator =
                             DEFAULT_SETTINGS.multilineCardSeparator;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
+
+        new Setting(containerEl)
+            .setName(t("Separator for multiline reversed flashcards"))
+            .setDesc(
+                t(
+                    "Note that after changing this you have to manually edit any flashcards you already have."
+                )
+            )
+            .addText((text) =>
+                text
+                    .setValue(
+                        this.plugin.data.settings.multilineReversedCardSeparator
+                    )
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.multilineReversedCardSeparator =
+                                value;
+                            await this.plugin.savePluginData();
+                        });
+                    })
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("Reset to default"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.multilineReversedCardSeparator =
+                            DEFAULT_SETTINGS.multilineReversedCardSeparator;
                         await this.plugin.savePluginData();
                         this.display();
                     });

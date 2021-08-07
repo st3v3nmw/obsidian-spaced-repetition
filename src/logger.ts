@@ -4,7 +4,13 @@ export enum LogLevel {
     Error,
 }
 
-export const Logger = (console: Console, logLevel: LogLevel) => {
+export interface Logger {
+    info: Function;
+    warn: Function;
+    error: Function;
+}
+
+export const createLogger = (console: Console, logLevel: LogLevel): Logger => {
     let info: Function, warn: Function;
 
     if (logLevel === LogLevel.Info)

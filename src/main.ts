@@ -9,6 +9,7 @@ import {
     moment,
 } from "obsidian";
 import * as graph from "pagerank.js";
+
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
 import { FlashcardModal, Deck } from "src/flashcard-modal";
 import { StatsModal } from "src/stats-modal";
@@ -19,15 +20,12 @@ import {
     YAML_FRONT_MATTER_REGEX,
     SCHEDULING_INFO_REGEX,
     LEGACY_SCHEDULING_EXTRACTOR,
-    CLOZE_CARD_DETECTOR,
-    CLOZE_DELETIONS_EXTRACTOR,
     MULTI_SCHEDULING_EXTRACTOR,
-    CODEBLOCK_REGEX,
-    INLINE_CODE_REGEX,
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
-import { Logger } from "src/logger";
+import { parse } from "src/parser";
+import { Logger, createLogger } from "src/logger";
 
 interface PluginData {
     settings: SRSettings;
@@ -51,6 +49,7 @@ interface SRFileCache {
     hasNewCards: boolean;
     nextDueDate: string;
     lastUpdated: number;
+    dueDatesFlashcards: Record<number, number>;
 }
 
 export interface SchedNote {
@@ -67,7 +66,7 @@ export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     private reviewQueueView: ReviewQueueListView;
     public data: PluginData;
-    public logger;
+    public logger: Logger;
 
     public newNotes: TFile[] = [];
     public scheduledNotes: SchedNote[] = [];
@@ -80,16 +79,13 @@ export default class SRPlugin extends Plugin {
     public deckTree: Deck = new Deck("root", null);
     public dueDatesFlashcards: Record<number, number> = {}; // Record<# of days in future, due count>
 
-    public singlelineCardRegex: RegExp;
-    public multilineCardRegex: RegExp;
-
     // prevent calling these functions if another instance is already running
     private notesSyncLock: boolean = false;
     private flashcardsSyncLock: boolean = false;
 
     async onload(): Promise<void> {
         await this.loadPluginData();
-        this.logger = Logger(console, this.data.settings.logLevel);
+        this.logger = createLogger(console, this.data.settings.logLevel);
 
         addIcon("crosshairs", CROSS_HAIRS_ICON);
 
@@ -103,20 +99,6 @@ export default class SRPlugin extends Plugin {
                 this.reviewNextNote();
             }
         });
-
-        this.singlelineCardRegex = new RegExp(
-            `^(.+)${escapeRegexString(
-                this.data.settings.singlelineCardSeparator
-            )}(.+?)\\n?(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
-            "gm"
-        );
-
-        this.multilineCardRegex = new RegExp(
-            `^((?:.+\\n)+)${escapeRegexString(
-                this.data.settings.multilineCardSeparator
-            )}\\n((?:.+?\\n?)+?)(?:<!--SR:(.+),(\\d+),(\\d+)-->|$)`,
-            "gm"
-        );
 
         this.addRibbonIcon("crosshairs", t("Review flashcards"), async () => {
             if (!this.flashcardsSyncLock) {
@@ -566,7 +548,10 @@ export default class SRPlugin extends Plugin {
             this.data.buryList = [];
         }
 
+        let notePathsSet: Set<string> = new Set();
         for (let note of notes) {
+            notePathsSet.add(note.path);
+
             // find deck path
             let deckPath: string[] = [];
             if (this.data.settings.convertFoldersToDecks) {
@@ -597,7 +582,7 @@ export default class SRPlugin extends Plugin {
                 let fileCache: SRFileCache = this.data.cache[note.path];
                 // Has file changed?
                 if (fileCache.lastUpdated === note.stat.mtime) {
-                    if (fileCache.totalCards == 0) continue;
+                    if (fileCache.totalCards === 0) continue;
                     else if (
                         !fileCache.hasNewCards &&
                         now.valueOf() <
@@ -614,6 +599,20 @@ export default class SRPlugin extends Plugin {
                     } else await this.findFlashcards(note, deckPath);
                 } else await this.findFlashcards(note, deckPath);
             } else await this.findFlashcards(note, deckPath);
+
+            for (let [nDay, count] of Object.entries(
+                this.data.cache[note.path].dueDatesFlashcards
+            )) {
+                if (!this.dueDatesFlashcards.hasOwnProperty(nDay))
+                    this.dueDatesFlashcards[nDay] = 0;
+                this.dueDatesFlashcards[nDay] += count;
+            }
+        }
+
+        // remove unused cache entries
+        for (let cachedPath in this.data.cache) {
+            if (!notePathsSet.has(cachedPath))
+                delete this.data.cache[cachedPath];
         }
         this.logger.info(`Flashcard sync took ${Date.now() - now.valueOf()}ms`);
         await this.savePluginData();
@@ -646,33 +645,22 @@ export default class SRPlugin extends Plugin {
         let fileChanged: boolean = false,
             deckAdded = false;
 
-        // info. for caching
+        // caching information
         let hasNewCards: boolean = false,
             totalCards: number = 0,
-            nextDueDate: number = Infinity; // 03:14:07 UTC, January 19 2038 haha
-
-        // Add newline to file with text
-        // Cloze cards require a newline
-        if (fileText.slice(-1) !== "\n" && fileText.length > 0) {
-            fileText += "\n";
-            fileChanged = true;
-        }
-
-        // find all codeblocks
-        let codeblocks: [number, number][] = [];
-        for (let regex of [CODEBLOCK_REGEX, INLINE_CODE_REGEX]) {
-            for (let match of fileText.matchAll(regex))
-                codeblocks.push([match.index!, match.index! + match[0].length]);
-        }
+            nextDueDate: number = Infinity, // 03:14:07 UTC, January 19 2038 haha
+            dueDatesFlashcards: Record<number, number> = {};
 
         let now: number = Date.now();
-        for (let regexBundled of <Array<[RegExp, CardType]>>[
-            [this.singlelineCardRegex, CardType.SingleLineBasic],
-            [this.multilineCardRegex, CardType.MultiLineBasic],
-            [CLOZE_CARD_DETECTOR, CardType.Cloze],
-        ]) {
-            let regex: RegExp = regexBundled[0];
-            let cardType: CardType = regexBundled[1];
+        let parsedCards: [CardType, string, number][] = parse(
+            fileText,
+            this.data.settings
+        );
+        this.logger.info(parsedCards);
+        for (let parsedCard of parsedCards) {
+            let cardType: CardType = parsedCard[0],
+                cardText: string = parsedCard[1],
+                lineNo: number = parsedCard[2];
 
             if (
                 cardType === CardType.Cloze &&
@@ -680,169 +668,181 @@ export default class SRPlugin extends Plugin {
             )
                 continue;
 
-            for (let match of fileText.matchAll(regex)) {
-                match[0] = match[0].trim();
+            let cardTextHash: string = cyrb53(cardText);
 
-                let cardText: string = match[0];
-                let cardTextHash: string = cyrb53(cardText);
+            if (buryOnly) {
+                this.data.buryList.push(cardTextHash);
+                continue;
+            }
 
-                if (buryOnly) {
-                    this.data.buryList.push(cardTextHash);
-                    continue;
+            if (!deckAdded) {
+                this.deckTree.createDeck([...deckPath]);
+                deckAdded = true;
+            }
+
+            let siblingMatches: [string, string][] = [];
+            if (cardType === CardType.Cloze) {
+                let front: string, back: string;
+                for (let m of cardText.matchAll(/==(.*?)==/gm)) {
+                    let deletionStart: number = m.index!,
+                        deletionEnd: number = deletionStart + m[0].length;
+                    front =
+                        cardText.substring(0, deletionStart) +
+                        "<span style='color:#2196f3'>[...]</span>" +
+                        cardText.substring(deletionEnd);
+                    front = front.replace(/==/gm, "");
+                    back =
+                        cardText.substring(0, deletionStart) +
+                        "<span style='color:#2196f3'>" +
+                        cardText.substring(deletionStart, deletionEnd) +
+                        "</span>" +
+                        cardText.substring(deletionEnd);
+                    back = back.replace(/==/gm, "");
+                    siblingMatches.push([front, back]);
                 }
-
-                if (!deckAdded) {
-                    this.deckTree.createDeck([...deckPath]);
-                    deckAdded = true;
-                }
-
-                let siblingMatches: RegExpMatchArray[] = [];
-                if (cardType == CardType.Cloze) {
-                    for (let m of cardText.matchAll(
-                        CLOZE_DELETIONS_EXTRACTOR
-                    )) {
-                        if (
-                            inCodeblock(
-                                match.index! + m.index!,
-                                m[0].trim().length,
-                                codeblocks
-                            )
-                        )
-                            continue;
-                        siblingMatches.push(m);
-                    }
-                } else siblingMatches.push(match);
-
-                let scheduling: RegExpMatchArray[] = [
-                    ...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
-                ];
-                if (scheduling.length == 0)
-                    scheduling = [
-                        ...cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR),
-                    ];
-
-                // we have some extra scheduling dates to delete
-                if (scheduling.length > siblingMatches.length) {
-                    let idxSched: number = cardText.lastIndexOf("<!--SR:") + 7;
-                    let newCardText: string = cardText.substring(0, idxSched);
-                    for (let i = 0; i < siblingMatches.length; i++)
-                        newCardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
-                    newCardText += "-->\n";
-
-                    let replacementRegex = new RegExp(
-                        escapeRegexString(cardText),
-                        "gm"
+            } else {
+                let idx: number;
+                if (cardType === CardType.SingleLineBasic) {
+                    idx = cardText.indexOf(
+                        this.data.settings.singlelineCardSeparator
                     );
-                    fileText = fileText.replace(
-                        replacementRegex,
-                        (_) => newCardText
+                    siblingMatches.push([
+                        cardText.substring(0, idx),
+                        cardText.substring(
+                            idx +
+                                this.data.settings.singlelineCardSeparator
+                                    .length
+                        ),
+                    ]);
+                } else if (cardType === CardType.SingleLineReversed) {
+                    idx = cardText.indexOf(
+                        this.data.settings.singlelineReversedCardSeparator
                     );
-                    fileChanged = true;
-                }
-
-                let context: string = this.data.settings.showContextInCards
-                    ? getCardContext(match.index!, headings)
-                    : "";
-                let lineNo: number = fileText
-                    .substring(0, match.index!)
-                    .split("\n").length;
-                let siblings: Card[] = [];
-                for (let i = 0; i < siblingMatches.length; i++) {
-                    let cardObj: Card;
-
-                    let front: string, back: string;
-                    if (cardType == CardType.Cloze) {
-                        let deletionStart: number = siblingMatches[i].index!,
-                            deletionEnd: number =
-                                deletionStart + siblingMatches[i][0].length;
-                        front =
-                            cardText.substring(0, deletionStart) +
-                            "<span style='color:#2196f3'>[...]</span>" +
-                            cardText.substring(deletionEnd);
-                        front = front.replace(/==/gm, "");
-                        back =
-                            cardText.substring(0, deletionStart) +
-                            "<span style='color:#2196f3'>" +
-                            cardText.substring(deletionStart, deletionEnd) +
-                            "</span>" +
-                            cardText.substring(deletionEnd);
-                        back = back.replace(/==/gm, "");
-                    } else {
-                        front = siblingMatches[i][1].trim();
-                        back = siblingMatches[i][2].trim();
-                    }
-
-                    totalCards++;
-
-                    // card scheduled
-                    if (i < scheduling.length) {
-                        let dueUnix: number = moment(scheduling[i][1], [
-                            "YYYY-MM-DD",
-                            "DD-MM-YYYY",
-                        ]).valueOf();
-                        if (dueUnix < nextDueDate) nextDueDate = dueUnix;
-                        let nDays: number = Math.ceil(
-                            (dueUnix - now) / (24 * 3600 * 1000)
+                    let side1: string = cardText.substring(0, idx),
+                        side2: string = cardText.substring(
+                            idx +
+                                this.data.settings
+                                    .singlelineReversedCardSeparator.length
                         );
-                        if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
-                            this.dueDatesFlashcards[nDays] = 0;
-                        this.dueDatesFlashcards[nDays]++;
-                        if (this.data.buryList.includes(cardTextHash)) {
-                            this.deckTree.countFlashcard([...deckPath]);
-                            continue;
-                        }
+                    siblingMatches.push([side1, side2]);
+                    siblingMatches.push([side2, side1]);
+                } else if (cardType === CardType.MultiLineBasic) {
+                    idx = cardText.indexOf(
+                        "\n" + this.data.settings.multilineCardSeparator + "\n"
+                    );
+                    siblingMatches.push([
+                        cardText.substring(0, idx),
+                        cardText.substring(
+                            idx +
+                                2 +
+                                this.data.settings.multilineCardSeparator.length
+                        ),
+                    ]);
+                } else if (cardType === CardType.MultiLineReversed) {
+                    idx = cardText.indexOf(
+                        "\n" +
+                            this.data.settings.multilineReversedCardSeparator +
+                            "\n"
+                    );
+                    let side1: string = cardText.substring(0, idx),
+                        side2: string = cardText.substring(
+                            idx +
+                                2 +
+                                this.data.settings
+                                    .multilineReversedCardSeparator.length
+                        );
+                    siblingMatches.push([side1, side2]);
+                    siblingMatches.push([side2, side1]);
+                }
+            }
 
-                        if (dueUnix <= now) {
-                            cardObj = {
-                                isDue: true,
-                                interval: parseInt(scheduling[i][2]),
-                                ease: parseInt(scheduling[i][3]),
-                                delayBeforeReview: now - dueUnix,
-                                note,
-                                lineNo,
-                                front,
-                                back,
-                                cardText,
-                                context,
-                                cardType,
-                                siblingIdx: i,
-                                siblings,
-                            };
+            let scheduling: RegExpMatchArray[] = [
+                ...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
+            ];
+            if (scheduling.length === 0)
+                scheduling = [
+                    ...cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR),
+                ];
 
-                            this.deckTree.insertFlashcard(
-                                [...deckPath],
-                                cardObj
-                            );
-                        } else {
-                            this.deckTree.countFlashcard([...deckPath]);
-                            continue;
-                        }
-                    } else {
-                        if (!hasNewCards) hasNewCards = true;
-                        if (this.data.buryList.includes(cyrb53(cardText))) {
-                            this.deckTree.countFlashcard([...deckPath]);
-                            continue;
-                        }
+            // we have some extra scheduling dates to delete
+            if (scheduling.length > siblingMatches.length) {
+                let idxSched: number = cardText.lastIndexOf("<!--SR:") + 7;
+                let newCardText: string = cardText.substring(0, idxSched);
+                for (let i = 0; i < siblingMatches.length; i++)
+                    newCardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
+                newCardText += "-->";
 
-                        // new card
-                        cardObj = {
-                            isDue: false,
-                            note,
-                            lineNo,
-                            front,
-                            back,
-                            cardText,
-                            context,
-                            cardType,
-                            siblingIdx: i,
-                            siblings,
-                        };
+                let replacementRegex = new RegExp(
+                    escapeRegexString(cardText),
+                    "gm"
+                );
+                fileText = fileText.replace(
+                    replacementRegex,
+                    (_) => newCardText
+                );
+                fileChanged = true;
+            }
 
-                        this.deckTree.insertFlashcard([...deckPath], cardObj);
+            let context: string = this.data.settings.showContextInCards
+                ? getCardContext(lineNo, headings)
+                : "";
+            let siblings: Card[] = [];
+            for (let i = 0; i < siblingMatches.length; i++) {
+                let front: string = siblingMatches[i][0].trim(),
+                    back: string = siblingMatches[i][1].trim();
+
+                let cardObj: Card = {
+                    isDue: i < scheduling.length,
+                    note,
+                    lineNo,
+                    front,
+                    back,
+                    cardText,
+                    context,
+                    cardType,
+                    siblingIdx: i,
+                    siblings,
+                };
+
+                totalCards++;
+
+                // card scheduled
+                if (i < scheduling.length) {
+                    let dueUnix: number = moment(scheduling[i][1], [
+                        "YYYY-MM-DD",
+                        "DD-MM-YYYY",
+                    ]).valueOf();
+                    if (dueUnix < nextDueDate) nextDueDate = dueUnix;
+                    let nDays: number = Math.ceil(
+                        (dueUnix - now) / (24 * 3600 * 1000)
+                    );
+                    if (!dueDatesFlashcards.hasOwnProperty(nDays))
+                        dueDatesFlashcards[nDays] = 0;
+                    dueDatesFlashcards[nDays]++;
+                    if (this.data.buryList.includes(cardTextHash)) {
+                        this.deckTree.countFlashcard([...deckPath]);
+                        continue;
                     }
 
-                    siblings.push(cardObj);
+                    if (dueUnix <= now) {
+                        cardObj.interval = parseInt(scheduling[i][2]);
+                        cardObj.ease = parseInt(scheduling[i][3]);
+                        cardObj.delayBeforeReview = now - dueUnix;
+                        this.deckTree.insertFlashcard([...deckPath], cardObj);
+                    } else {
+                        this.deckTree.countFlashcard([...deckPath]);
+                        continue;
+                    }
+                } else {
+                    if (!hasNewCards) hasNewCards = true;
+                    if (this.data.buryList.includes(cyrb53(cardText))) {
+                        this.deckTree.countFlashcard([...deckPath]);
+                        continue;
+                    }
+                    this.deckTree.insertFlashcard([...deckPath], cardObj);
                 }
+
+                siblings.push(cardObj);
             }
         }
 
@@ -855,6 +855,7 @@ export default class SRPlugin extends Plugin {
                         ? moment(nextDueDate).format("YYYY-MM-DD")
                         : "",
                 lastUpdated: note.stat.mtime,
+                dueDatesFlashcards,
             };
 
         if (fileChanged) await this.app.vault.modify(note, fileText);
@@ -885,10 +886,10 @@ export default class SRPlugin extends Plugin {
     }
 }
 
-function getCardContext(cardOffset: number, headings: HeadingCache[]): string {
+function getCardContext(cardLine: number, headings: HeadingCache[]): string {
     let stack: HeadingCache[] = [];
     for (let heading of headings) {
-        if (heading.position.start.offset > cardOffset) break;
+        if (heading.position.start.line > cardLine) break;
 
         while (
             stack.length > 0 &&
@@ -902,19 +903,4 @@ function getCardContext(cardOffset: number, headings: HeadingCache[]): string {
     let context: string = "";
     for (let headingObj of stack) context += headingObj.heading + " > ";
     return context.slice(0, -3);
-}
-
-function inCodeblock(
-    matchStart: number,
-    matchLength: number,
-    codeblocks: [number, number][]
-): boolean {
-    for (let codeblock of codeblocks) {
-        if (
-            matchStart >= codeblock[0] &&
-            matchStart + matchLength <= codeblock[1]
-        )
-            return true;
-    }
-    return false;
 }

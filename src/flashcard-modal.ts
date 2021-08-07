@@ -8,6 +8,7 @@ import {
     MarkdownView,
     moment,
 } from "obsidian";
+
 import type SRPlugin from "src/main";
 import {
     Card,
@@ -16,7 +17,11 @@ import {
     textInterval,
     ReviewResponse,
 } from "src/scheduling";
-import { MULTI_SCHEDULING_EXTRACTOR, COLLAPSE_ICON } from "src/constants";
+import {
+    COLLAPSE_ICON,
+    MULTI_SCHEDULING_EXTRACTOR,
+    LEGACY_SCHEDULING_EXTRACTOR,
+} from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
 
@@ -292,6 +297,12 @@ export class FlashcardModal extends Modal {
                     MULTI_SCHEDULING_EXTRACTOR
                 ),
             ];
+            if (scheduling.length === 0)
+                scheduling = [
+                    ...this.currentCard.cardText.matchAll(
+                        LEGACY_SCHEDULING_EXTRACTOR
+                    ),
+                ];
 
             let currCardSched: string[] = [
                 "0",
