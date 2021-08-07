@@ -80,6 +80,8 @@ export default {
     "If you're not currently using 'em & would like the plugin to run a tad faster.":
         "If you're not currently using 'em & would like the plugin to run a tad faster.",
     "Separator for inline flashcards": "Separator for inline flashcards",
+    "Separator for inline reversed flashcards": "Separator for inline reversed flashcards",
+    "Separator for multiline reversed flashcards": "Separator for multiline reversed flashcards",
     "Note that after changing this you have to manually edit any flashcards you already have.":
         "Note that after changing this you have to manually edit any flashcards you already have.",
     "Separator for multiline flashcards": "Separator for multiline flashcards",
