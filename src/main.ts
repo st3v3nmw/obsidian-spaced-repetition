@@ -16,8 +16,9 @@ import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/sidebar";
 import { CardType, Card, ReviewResponse, schedule } from "src/scheduling";
 import {
     CROSS_HAIRS_ICON,
-    SCHEDULING_INFO_REGEX,
     YAML_FRONT_MATTER_REGEX,
+    SCHEDULING_INFO_REGEX,
+    LEGACY_SCHEDULING_EXTRACTOR,
     CLOZE_CARD_DETECTOR,
     CLOZE_DELETIONS_EXTRACTOR,
     MULTI_SCHEDULING_EXTRACTOR,
@@ -66,7 +67,7 @@ export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     private reviewQueueView: ReviewQueueListView;
     public data: PluginData;
-    public logger: Logger;
+    public logger;
 
     public newNotes: TFile[] = [];
     public scheduledNotes: SchedNote[] = [];
@@ -88,7 +89,7 @@ export default class SRPlugin extends Plugin {
 
     async onload(): Promise<void> {
         await this.loadPluginData();
-        this.logger = new Logger(this.data.settings.logLevel);
+        this.logger = Logger(console, this.data.settings.logLevel);
 
         addIcon("crosshairs", CROSS_HAIRS_ICON);
 
@@ -715,6 +716,10 @@ export default class SRPlugin extends Plugin {
                 let scheduling: RegExpMatchArray[] = [
                     ...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
                 ];
+                if (scheduling.length == 0)
+                    scheduling = [
+                        ...cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR),
+                    ];
 
                 // we have some extra scheduling dates to delete
                 if (scheduling.length > siblingMatches.length) {

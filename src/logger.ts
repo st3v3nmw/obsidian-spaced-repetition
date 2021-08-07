@@ -4,22 +4,22 @@ export enum LogLevel {
     Error,
 }
 
-export const LOG_PREFIX: string = "SR: ";
-export class Logger {
-    private logLevel: LogLevel;
-    constructor(logLevel: LogLevel) {
-        this.logLevel = logLevel;
-    }
+export const Logger = (console: Console, logLevel: LogLevel) => {
+    let info: Function, warn: Function;
 
-    info(text: string) {
-        if (this.logLevel == LogLevel.Info) console.info(LOG_PREFIX + text);
-    }
+    if (logLevel === LogLevel.Info)
+        info = Function.prototype.bind.call(console.info, console, "SR:");
+    else info = (..._: any[]) => {};
 
-    warn(text: string) {
-        if (this.logLevel <= LogLevel.Warn) console.warn(LOG_PREFIX + text);
-    }
+    if (logLevel <= LogLevel.Warn)
+        warn = Function.prototype.bind.call(console.warn, console, "SR:");
+    else warn = (..._: any[]) => {};
 
-    error(text: string) {
-        console.error(LOG_PREFIX + text);
-    }
-}
+    let error: Function = Function.prototype.bind.call(
+        console.error,
+        console,
+        "SR:"
+    );
+
+    return { info, warn, error };
+};
