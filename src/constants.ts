@@ -2,10 +2,10 @@ export const SCHEDULING_INFO_REGEX: RegExp =
     /^---\n((?:.*\n)*)sr-due: (.+)\nsr-interval: (\d+)\nsr-ease: (\d+)\n((?:.*\n)*)---/;
 export const YAML_FRONT_MATTER_REGEX: RegExp = /^---\n((?:.*\n)*?)---/;
 
+export const MULTI_SCHEDULING_EXTRACTOR: RegExp = /!([\d-]+),(\d+),(\d+)/gm;
 export const CLOZE_CARD_DETECTOR: RegExp =
     /(?:.+\n)*^.*?==.*?==.*\n(?:.+\n?)*/gm; // card must have at least one cloze
 export const CLOZE_DELETIONS_EXTRACTOR: RegExp = /==(.*?)==/gm;
-export const MULTI_SCHEDULING_EXTRACTOR: RegExp = /!([\d-]+),(\d+),(\d+)/gm;
 
 export const CODEBLOCK_REGEX: RegExp = /```(?:.*\n)*?```/gm;
 export const INLINE_CODE_REGEX: RegExp = /`(?!`).+`/gm;

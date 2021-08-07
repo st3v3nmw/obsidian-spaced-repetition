@@ -26,6 +26,7 @@ import {
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
+import { Logger } from "src/logger";
 
 interface PluginData {
     settings: SRSettings;
@@ -65,6 +66,7 @@ export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     private reviewQueueView: ReviewQueueListView;
     public data: PluginData;
+    public logger: Logger;
 
     public newNotes: TFile[] = [];
     public scheduledNotes: SchedNote[] = [];
@@ -86,6 +88,7 @@ export default class SRPlugin extends Plugin {
 
     async onload(): Promise<void> {
         await this.loadPluginData();
+        this.logger = new Logger(this.data.settings.logLevel);
 
         addIcon("crosshairs", CROSS_HAIRS_ICON);
 
@@ -568,6 +571,7 @@ export default class SRPlugin extends Plugin {
             if (this.data.settings.convertFoldersToDecks) {
                 deckPath = note.path.split("/");
                 deckPath.pop(); // remove filename
+                if (deckPath.length === 0) deckPath = ["/"];
             } else {
                 let fileCachedData =
                     this.app.metadataCache.getFileCache(note) || {};
@@ -587,7 +591,6 @@ export default class SRPlugin extends Plugin {
             }
 
             if (deckPath.length === 0) continue;
-            if (deckPath.length === 1 && deckPath[0] === "") deckPath = ["/"];
 
             if (this.data.cache.hasOwnProperty(note.path)) {
                 let fileCache: SRFileCache = this.data.cache[note.path];
@@ -611,7 +614,7 @@ export default class SRPlugin extends Plugin {
                 } else await this.findFlashcards(note, deckPath);
             } else await this.findFlashcards(note, deckPath);
         }
-
+        this.logger.info(`Flashcard sync took ${Date.now() - now.valueOf()}ms`);
         await this.savePluginData();
 
         // sort the deck names
@@ -662,108 +665,9 @@ export default class SRPlugin extends Plugin {
         }
 
         let now: number = Date.now();
-        // basic cards
         for (let regexBundled of <Array<[RegExp, CardType]>>[
             [this.singlelineCardRegex, CardType.SingleLineBasic],
             [this.multilineCardRegex, CardType.MultiLineBasic],
-        ]) {
-            let regex = regexBundled[0];
-            let cardType: CardType = regexBundled[1];
-            for (let match of fileText.matchAll(regex)) {
-                if (
-                    inCodeblock(
-                        match.index!,
-                        match[0].trim().length,
-                        codeblocks
-                    )
-                )
-                    continue;
-
-                let cardText: string = match[0].trim();
-                let cardTextHash: string = cyrb53(cardText);
-
-                if (buryOnly) {
-                    this.data.buryList.push(cardTextHash);
-                    continue;
-                }
-
-                if (!deckAdded) {
-                    this.deckTree.createDeck([...deckPath]);
-                    deckAdded = true;
-                }
-
-                let cardObj: Card;
-                let front: string = match[1].trim(),
-                    back: string = match[2].trim();
-                let context: string = this.data.settings.showContextInCards
-                    ? getCardContext(match.index!, headings)
-                    : "";
-                let lineNo: number = fileText
-                    .substring(0, match.index!)
-                    .split("\n").length;
-                totalCards++;
-                // flashcard already scheduled
-                if (match[3]) {
-                    let dueUnix: number = moment(match[3], [
-                        "YYYY-MM-DD",
-                        "DD-MM-YYYY",
-                        "ddd MMM DD YYYY",
-                    ]).valueOf();
-                    if (dueUnix < nextDueDate) nextDueDate = dueUnix;
-                    let nDays: number = Math.ceil(
-                        (dueUnix - now) / (24 * 3600 * 1000)
-                    );
-                    if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
-                        this.dueDatesFlashcards[nDays] = 0;
-                    this.dueDatesFlashcards[nDays]++;
-                    if (this.data.buryList.includes(cardTextHash)) {
-                        this.deckTree.countFlashcard([...deckPath]);
-                        continue;
-                    }
-
-                    if (dueUnix <= now) {
-                        cardObj = {
-                            isDue: true,
-                            interval: parseInt(match[4]),
-                            ease: parseInt(match[5]),
-                            delayBeforeReview: now - dueUnix,
-                            note,
-                            lineNo,
-                            front,
-                            back,
-                            cardText,
-                            context,
-                            cardType,
-                            siblingIdx: 0,
-                            siblings: [],
-                        };
-
-                        this.deckTree.insertFlashcard([...deckPath], cardObj);
-                    } else {
-                        this.deckTree.countFlashcard([...deckPath]);
-                        continue;
-                    }
-                } else {
-                    if (!hasNewCards) hasNewCards = true;
-                    cardObj = {
-                        isDue: false,
-                        note,
-                        lineNo,
-                        front,
-                        back,
-                        cardText,
-                        context,
-                        cardType,
-                        siblingIdx: 0,
-                        siblings: [],
-                    };
-
-                    this.deckTree.insertFlashcard([...deckPath], cardObj);
-                }
-            }
-        }
-
-        for (let regexBundled of <Array<[RegExp, CardType]>>[
             [CLOZE_CARD_DETECTOR, CardType.Cloze],
         ]) {
             let regex: RegExp = regexBundled[0];
@@ -792,17 +696,22 @@ export default class SRPlugin extends Plugin {
                 }
 
                 let siblingMatches: RegExpMatchArray[] = [];
-                for (let m of cardText.matchAll(CLOZE_DELETIONS_EXTRACTOR)) {
-                    if (
-                        inCodeblock(
-                            match.index! + m.index!,
-                            m[0].trim().length,
-                            codeblocks
+                if (cardType == CardType.Cloze) {
+                    for (let m of cardText.matchAll(
+                        CLOZE_DELETIONS_EXTRACTOR
+                    )) {
+                        if (
+                            inCodeblock(
+                                match.index! + m.index!,
+                                m[0].trim().length,
+                                codeblocks
+                            )
                         )
-                    )
-                        continue;
-                    siblingMatches.push(m);
-                }
+                            continue;
+                        siblingMatches.push(m);
+                    }
+                } else siblingMatches.push(match);
+
                 let scheduling: RegExpMatchArray[] = [
                     ...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
                 ];
@@ -836,24 +745,31 @@ export default class SRPlugin extends Plugin {
                 for (let i = 0; i < siblingMatches.length; i++) {
                     let cardObj: Card;
 
-                    let deletionStart: number = siblingMatches[i].index!,
-                        deletionEnd: number =
-                            deletionStart + siblingMatches[i][0].length;
-                    let front: string =
-                        cardText.substring(0, deletionStart) +
-                        "<span style='color:#2196f3'>[...]</span>" +
-                        cardText.substring(deletionEnd);
-                    front = front.replace(/==/gm, "");
-                    let back: string =
-                        cardText.substring(0, deletionStart) +
-                        "<span style='color:#2196f3'>" +
-                        cardText.substring(deletionStart, deletionEnd) +
-                        "</span>" +
-                        cardText.substring(deletionEnd);
-                    back = back.replace(/==/gm, "");
+                    let front: string, back: string;
+                    if (cardType == CardType.Cloze) {
+                        let deletionStart: number = siblingMatches[i].index!,
+                            deletionEnd: number =
+                                deletionStart + siblingMatches[i][0].length;
+                        front =
+                            cardText.substring(0, deletionStart) +
+                            "<span style='color:#2196f3'>[...]</span>" +
+                            cardText.substring(deletionEnd);
+                        front = front.replace(/==/gm, "");
+                        back =
+                            cardText.substring(0, deletionStart) +
+                            "<span style='color:#2196f3'>" +
+                            cardText.substring(deletionStart, deletionEnd) +
+                            "</span>" +
+                            cardText.substring(deletionEnd);
+                        back = back.replace(/==/gm, "");
+                    } else {
+                        front = siblingMatches[i][1].trim();
+                        back = siblingMatches[i][2].trim();
+                    }
+
                     totalCards++;
 
-                    // card deletion scheduled
+                    // card scheduled
                     if (i < scheduling.length) {
                         let dueUnix: number = moment(scheduling[i][1], [
                             "YYYY-MM-DD",
@@ -881,9 +797,9 @@ export default class SRPlugin extends Plugin {
                                 lineNo,
                                 front,
                                 back,
-                                cardText: match[0],
+                                cardText,
                                 context,
-                                cardType: CardType.Cloze,
+                                cardType,
                                 siblingIdx: i,
                                 siblings,
                             };
@@ -910,9 +826,9 @@ export default class SRPlugin extends Plugin {
                             lineNo,
                             front,
                             back,
-                            cardText: match[0],
+                            cardText,
                             context,
-                            cardType: CardType.Cloze,
+                            cardType,
                             siblingIdx: i,
                             siblings,
                         };

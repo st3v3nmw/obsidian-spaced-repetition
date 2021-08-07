@@ -1,9 +1,13 @@
 type Hex = number;
 
+// https://stackoverflow.com/a/59459000
+export const getKeysPreserveType = Object.keys as <T extends object>(
+    obj: T
+) => Array<keyof T>;
+
 // https://stackoverflow.com/a/6969486
-export function escapeRegexString(text: string): string {
-    return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+export const escapeRegexString = (text: string) =>
+    text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // https://stackoverflow.com/a/52171480
 export function cyrb53(str: string, seed: number = 0): string {
@@ -22,8 +26,3 @@ export function cyrb53(str: string, seed: number = 0): string {
         Math.imul(h1 ^ (h1 >>> 13), 3266489909);
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
 }
-
-// https://stackoverflow.com/a/59459000
-export const getKeysPreserveType = Object.keys as <T extends object>(
-    obj: T
-) => Array<keyof T>;
