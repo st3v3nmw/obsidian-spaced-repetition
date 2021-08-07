@@ -1,6 +1,7 @@
 import { TFile } from "obsidian";
 
 import { SRSettings } from "src/settings";
+import { CardType } from "src/types";
 import { t } from "src/lang/helpers";
 
 export enum ReviewResponse {
@@ -11,14 +12,6 @@ export enum ReviewResponse {
 }
 
 // Flashcards
-
-export enum CardType {
-    SingleLineBasic,
-    SingleLineReversed,
-    MultiLineBasic,
-    MultiLineReversed,
-    Cloze,
-}
 
 export interface Card {
     // scheduling

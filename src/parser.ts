@@ -1,20 +1,22 @@
-import { CardType } from "src/scheduling";
-import { SRSettings } from "src/settings";
+import { CardType } from "src/types";
 
 export function parse(
     fileText: string,
-    settingsObj: SRSettings
+    singlelineCardSeparator: string,
+    singlelineReversedCardSeparator: string,
+    multilineCardSeparator: string,
+    multilineReversedCardSeparator: string
 ): [CardType, string, number][] {
     let cardText: string = "";
     let cards: [CardType, string, number][] = [];
     let cardType: CardType | null = null;
-    let startLineNo: number = 0;
+    let lineNo: number = 0;
 
     let lines: string[] = fileText.split("\n");
     for (let i = 0; i < lines.length; i++) {
         if (lines[i].length === 0) {
             if (cardType) {
-                cards.push([cardType, cardText, startLineNo]);
+                cards.push([cardType, cardText, lineNo]);
                 cardType = null;
             }
 
@@ -33,30 +35,30 @@ export function parse(
         cardText += lines[i];
 
         if (
-            lines[i].includes(settingsObj.singlelineReversedCardSeparator) ||
-            lines[i].includes(settingsObj.singlelineCardSeparator)
+            lines[i].includes(singlelineReversedCardSeparator) ||
+            lines[i].includes(singlelineCardSeparator)
         ) {
-            cardType = lines[i].includes(
-                settingsObj.singlelineReversedCardSeparator
-            )
+            cardType = lines[i].includes(singlelineReversedCardSeparator)
                 ? CardType.SingleLineReversed
                 : CardType.SingleLineBasic;
+            cardText = lines[i];
+            lineNo = i;
             if (i + 1 < lines.length && lines[i + 1].startsWith("<!--SR:")) {
                 cardText += "\n" + lines[i + 1];
                 i++;
             }
-            cards.push([cardType, cardText, i]);
+            cards.push([cardType, cardText, lineNo]);
             cardType = null;
             cardText = "";
         } else if (cardType === null && /==.*?==/gm.test(lines[i])) {
             cardType = CardType.Cloze;
-            startLineNo = i;
-        } else if (lines[i] === settingsObj.multilineCardSeparator) {
+            lineNo = i;
+        } else if (lines[i] === multilineCardSeparator) {
             cardType = CardType.MultiLineBasic;
-            startLineNo = i;
-        } else if (lines[i] === settingsObj.multilineReversedCardSeparator) {
+            lineNo = i;
+        } else if (lines[i] === multilineReversedCardSeparator) {
             cardType = CardType.MultiLineReversed;
-            startLineNo = i;
+            lineNo = i;
         } else if (lines[i].startsWith("```")) {
             while (i + 1 < lines.length && !lines[i + 1].startsWith("```")) {
                 i++;
@@ -67,7 +69,7 @@ export function parse(
         }
     }
 
-    if (cardType && cardText) cards.push([cardType, cardText, startLineNo]);
+    if (cardType && cardText) cards.push([cardType, cardText, lineNo]);
 
     return cards;
 }

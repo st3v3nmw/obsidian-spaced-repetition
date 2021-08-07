@@ -1,6 +1,9 @@
 {
     "compilerOptions": {
         "baseUrl": "./",
+        "paths": {
+            "src/*": ["src/*"]
+        },
         "inlineSourceMap": true,
         "inlineSources": true,
         "module": "ESNext",
@@ -17,6 +20,7 @@
         "noFallthroughCasesInSwitch": true,
         "allowUnusedLabels": false,
         "moduleResolution": "node",
+        "esModuleInterop": true,
         "importHelpers": true,
         "lib": ["dom", "dom.Iterable", "es5", "scripthost", "esnext"]
     },

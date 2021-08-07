@@ -6,17 +6,11 @@ import {
     Platform,
     TFile,
     MarkdownView,
-    moment,
 } from "obsidian";
 
 import type SRPlugin from "src/main";
-import {
-    Card,
-    CardType,
-    schedule,
-    textInterval,
-    ReviewResponse,
-} from "src/scheduling";
+import { Card, schedule, textInterval, ReviewResponse } from "src/scheduling";
+import { CardType } from "src/types";
 import {
     COLLAPSE_ICON,
     MULTI_SCHEDULING_EXTRACTOR,
@@ -227,7 +221,7 @@ export class FlashcardModal extends Modal {
     }
 
     async processReview(response: ReviewResponse): Promise<void> {
-        let interval: number, ease: number, due: moment.Moment;
+        let interval: number, ease: number, due;
 
         this.currentDeck.deleteFlashcardAtIndex(
             this.currentCardIdx,
@@ -259,14 +253,14 @@ export class FlashcardModal extends Modal {
                 ease = schedObj.ease;
             }
 
-            due = moment(Date.now() + interval * 24 * 3600 * 1000);
+            due = window.moment(Date.now() + interval * 24 * 3600 * 1000);
         } else {
             this.currentCard.interval = 1.0;
             this.currentCard.ease = this.plugin.data.settings.baseEase;
             if (this.currentCard.isDue)
                 this.currentDeck.dueFlashcards.push(this.currentCard);
             else this.currentDeck.newFlashcards.push(this.currentCard);
-            due = moment(Date.now());
+            due = window.moment(Date.now());
             new Notice(t("Card's progress has been reset."));
             this.currentDeck.nextCard(this);
             return;

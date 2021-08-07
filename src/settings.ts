@@ -1,8 +1,8 @@
 import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
 
 import type SRPlugin from "src/main";
-import { t } from "src/lang/helpers";
 import { LogLevel } from "src/logger";
+import { t } from "src/lang/helpers";
 
 export interface SRSettings {
     // flashcards

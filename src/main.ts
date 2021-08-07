@@ -6,7 +6,6 @@ import {
     TFile,
     HeadingCache,
     getAllTags,
-    moment,
 } from "obsidian";
 import * as graph from "pagerank.js";
 
@@ -14,7 +13,8 @@ import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
 import { FlashcardModal, Deck } from "src/flashcard-modal";
 import { StatsModal } from "src/stats-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/sidebar";
-import { CardType, Card, ReviewResponse, schedule } from "src/scheduling";
+import { Card, ReviewResponse, schedule } from "src/scheduling";
+import { CardType } from "src/types";
 import {
     CROSS_HAIRS_ICON,
     YAML_FRONT_MATTER_REGEX,
@@ -305,11 +305,13 @@ export default class SRPlugin extends Plugin {
                 continue;
             }
 
-            let dueUnix: number = moment(frontmatter["sr-due"], [
-                "YYYY-MM-DD",
-                "DD-MM-YYYY",
-                "ddd MMM DD YYYY",
-            ]).valueOf();
+            let dueUnix: number = window
+                .moment(frontmatter["sr-due"], [
+                    "YYYY-MM-DD",
+                    "DD-MM-YYYY",
+                    "ddd MMM DD YYYY",
+                ])
+                .valueOf();
             this.scheduledNotes.push({
                 note,
                 dueUnix,
@@ -450,11 +452,13 @@ export default class SRPlugin extends Plugin {
             ease = frontmatter["sr-ease"];
             delayBeforeReview =
                 now -
-                moment(frontmatter["sr-due"], [
-                    "YYYY-MM-DD",
-                    "DD-MM-YYYY",
-                    "ddd MMM DD YYYY",
-                ]).valueOf();
+                window
+                    .moment(frontmatter["sr-due"], [
+                        "YYYY-MM-DD",
+                        "DD-MM-YYYY",
+                        "ddd MMM DD YYYY",
+                    ])
+                    .valueOf();
         }
 
         let schedObj: Record<string, number> = schedule(
@@ -468,7 +472,7 @@ export default class SRPlugin extends Plugin {
         interval = schedObj.interval;
         ease = schedObj.ease;
 
-        let due: moment.Moment = moment(now + interval * 24 * 3600 * 1000);
+        let due = window.moment(now + interval * 24 * 3600 * 1000);
         let dueString: string = due.format("YYYY-MM-DD");
 
         // check if scheduling info exists
@@ -540,7 +544,7 @@ export default class SRPlugin extends Plugin {
         this.deckTree = new Deck("root", null);
         this.dueDatesFlashcards = {};
 
-        let now: moment.Moment = moment(Date.now());
+        let now = window.moment(Date.now());
         let todayDate: string = now.format("YYYY-MM-DD");
         // clear list if we've changed dates
         if (todayDate !== this.data.buryDate) {
@@ -586,10 +590,9 @@ export default class SRPlugin extends Plugin {
                     else if (
                         !fileCache.hasNewCards &&
                         now.valueOf() <
-                            moment(
-                                fileCache.nextDueDate,
-                                "YYYY-MM-DD"
-                            ).valueOf()
+                            window
+                                .moment(fileCache.nextDueDate, "YYYY-MM-DD")
+                                .valueOf()
                     ) {
                         this.deckTree.createDeck([...deckPath]);
                         this.deckTree.countFlashcard(
@@ -654,7 +657,10 @@ export default class SRPlugin extends Plugin {
         let now: number = Date.now();
         let parsedCards: [CardType, string, number][] = parse(
             fileText,
-            this.data.settings
+            this.data.settings.singlelineCardSeparator,
+            this.data.settings.singlelineReversedCardSeparator,
+            this.data.settings.multilineCardSeparator,
+            this.data.settings.multilineReversedCardSeparator
         );
         this.logger.info(parsedCards);
         for (let parsedCard of parsedCards) {
@@ -808,10 +814,9 @@ export default class SRPlugin extends Plugin {
 
                 // card scheduled
                 if (i < scheduling.length) {
-                    let dueUnix: number = moment(scheduling[i][1], [
-                        "YYYY-MM-DD",
-                        "DD-MM-YYYY",
-                    ]).valueOf();
+                    let dueUnix: number = window
+                        .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY"])
+                        .valueOf();
                     if (dueUnix < nextDueDate) nextDueDate = dueUnix;
                     let nDays: number = Math.ceil(
                         (dueUnix - now) / (24 * 3600 * 1000)
@@ -852,7 +857,7 @@ export default class SRPlugin extends Plugin {
                 hasNewCards,
                 nextDueDate:
                     nextDueDate !== Infinity
-                        ? moment(nextDueDate).format("YYYY-MM-DD")
+                        ? window.moment(nextDueDate).format("YYYY-MM-DD")
                         : "",
                 lastUpdated: note.stat.mtime,
                 dueDatesFlashcards,
