@@ -13,7 +13,9 @@ export enum ReviewResponse {
 
 export enum CardType {
     SingleLineBasic,
+    SingleLineReversed,
     MultiLineBasic,
+    MultiLineReversed,
     Cloze,
 }
 

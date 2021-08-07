@@ -2,6 +2,7 @@ import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
 import type SRPlugin from "src/main";
 import { escapeRegexString } from "src/utils";
 import { t } from "src/lang/helpers";
+import { LogLevel } from "src/logger";
 
 export interface SRSettings {
     // flashcards
@@ -35,6 +36,8 @@ export interface SRSettings {
     easyBonus: number;
     maximumInterval: number;
     maxLinkFactor: number;
+    // logging
+    logLevel: LogLevel;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
@@ -69,6 +72,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     easyBonus: 1.3,
     maximumInterval: 36525,
     maxLinkFactor: 1.0,
+    // logging
+    logLevel: LogLevel.Warn,
 };
 
 // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts

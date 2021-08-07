@@ -279,75 +279,48 @@ export class FlashcardModal extends Modal {
             ? " "
             : "\n";
 
-        if (this.currentCard.cardType === CardType.Cloze) {
-            let schedIdx: number =
-                this.currentCard.cardText.lastIndexOf("<!--SR:");
-            if (schedIdx === -1) {
-                // first time adding scheduling information to flashcard
-                this.currentCard.cardText =
-                    this.currentCard.cardText +
-                    sep +
-                    `<!--SR:!${dueString},${interval},${ease}-->`;
-            } else {
-                let scheduling: RegExpMatchArray[] = [
-                    ...this.currentCard.cardText.matchAll(
-                        MULTI_SCHEDULING_EXTRACTOR
-                    ),
-                ];
-
-                let deletionSched: string[] = [
-                    "0",
-                    dueString,
-                    interval.toString(),
-                    ease.toString(),
-                ];
-                if (this.currentCard.isDue)
-                    scheduling[this.currentCard.siblingIdx] = deletionSched;
-                else scheduling.push(deletionSched);
-
-                this.currentCard.cardText = this.currentCard.cardText.replace(
-                    /<!--SR:.+-->/gm,
-                    ""
-                );
-                this.currentCard.cardText += "<!--SR:";
-                for (let i = 0; i < scheduling.length; i++)
-                    this.currentCard.cardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
-                this.currentCard.cardText += "-->";
-            }
-
-            fileText = fileText.replace(
-                replacementRegex,
-                (_) => this.currentCard.cardText
-            );
-            for (let sibling of this.currentCard.siblings)
-                sibling.cardText = this.currentCard.cardText;
-            if (this.plugin.data.settings.burySiblingCards)
-                this.burySiblingCards(true);
+        // check if we're adding scheduling information to the flashcard
+        // for the first time
+        if (this.currentCard.cardText.lastIndexOf("<!--SR:") === -1) {
+            this.currentCard.cardText =
+                this.currentCard.cardText +
+                sep +
+                `<!--SR:!${dueString},${interval},${ease}-->`;
         } else {
-            if (this.currentCard.cardType === CardType.SingleLineBasic) {
-                fileText = fileText.replace(
-                    replacementRegex,
-                    (_) =>
-                        this.currentCard.front +
-                        this.plugin.data.settings.singlelineCardSeparator +
-                        this.currentCard.back +
-                        sep +
-                        `<!--SR:${dueString},${interval},${ease}-->`
-                );
-            } else {
-                fileText = fileText.replace(
-                    replacementRegex,
-                    (_) =>
-                        this.currentCard.front +
-                        "\n" +
-                        this.plugin.data.settings.multilineCardSeparator +
-                        "\n" +
-                        this.currentCard.back +
-                        sep +
-                        `<!--SR:${dueString},${interval},${ease}-->`
-                );
-            }
+            let scheduling: RegExpMatchArray[] = [
+                ...this.currentCard.cardText.matchAll(
+                    MULTI_SCHEDULING_EXTRACTOR
+                ),
+            ];
+
+            let currCardSched: string[] = [
+                "0",
+                dueString,
+                interval.toString(),
+                ease.toString(),
+            ];
+            if (this.currentCard.isDue)
+                scheduling[this.currentCard.siblingIdx] = currCardSched;
+            else scheduling.push(currCardSched);
+
+            this.currentCard.cardText = this.currentCard.cardText.replace(
+                /<!--SR:.+-->/gm,
+                ""
+            );
+            this.currentCard.cardText += "<!--SR:";
+            for (let i = 0; i < scheduling.length; i++)
+                this.currentCard.cardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
+            this.currentCard.cardText += "-->";
         }
+
+        fileText = fileText.replace(
+            replacementRegex,
+            (_) => this.currentCard.cardText
+        );
+        for (let sibling of this.currentCard.siblings)
+            sibling.cardText = this.currentCard.cardText;
+        if (this.plugin.data.settings.burySiblingCards)
+            this.burySiblingCards(true);
 
         await this.app.vault.modify(this.currentCard.note, fileText);
         this.currentDeck.nextCard(this);
