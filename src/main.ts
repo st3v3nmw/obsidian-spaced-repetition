@@ -27,7 +27,7 @@ import {
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
-import { Logger } from "src/logger";
+import { Logger, createLogger } from "src/logger";
 
 interface PluginData {
     settings: SRSettings;
@@ -67,7 +67,7 @@ export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     private reviewQueueView: ReviewQueueListView;
     public data: PluginData;
-    public logger;
+    public logger: Logger;
 
     public newNotes: TFile[] = [];
     public scheduledNotes: SchedNote[] = [];
@@ -89,7 +89,7 @@ export default class SRPlugin extends Plugin {
 
     async onload(): Promise<void> {
         await this.loadPluginData();
-        this.logger = Logger(console, this.data.settings.logLevel);
+        this.logger = createLogger(console, this.data.settings.logLevel);
 
         addIcon("crosshairs", CROSS_HAIRS_ICON);
 
