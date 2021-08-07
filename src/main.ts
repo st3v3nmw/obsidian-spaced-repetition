@@ -9,6 +9,7 @@ import {
     moment,
 } from "obsidian";
 import * as graph from "pagerank.js";
+
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
 import { FlashcardModal, Deck } from "src/flashcard-modal";
 import { StatsModal } from "src/stats-modal";
@@ -20,8 +21,6 @@ import {
     SCHEDULING_INFO_REGEX,
     LEGACY_SCHEDULING_EXTRACTOR,
     MULTI_SCHEDULING_EXTRACTOR,
-    CODEBLOCK_REGEX,
-    INLINE_CODE_REGEX,
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
@@ -50,6 +49,7 @@ interface SRFileCache {
     hasNewCards: boolean;
     nextDueDate: string;
     lastUpdated: number;
+    dueDatesFlashcards: Record<number, number>;
 }
 
 export interface SchedNote {
@@ -548,7 +548,10 @@ export default class SRPlugin extends Plugin {
             this.data.buryList = [];
         }
 
+        let notePathsSet: Set<string> = new Set();
         for (let note of notes) {
+            notePathsSet.add(note.path);
+
             // find deck path
             let deckPath: string[] = [];
             if (this.data.settings.convertFoldersToDecks) {
@@ -596,6 +599,20 @@ export default class SRPlugin extends Plugin {
                     } else await this.findFlashcards(note, deckPath);
                 } else await this.findFlashcards(note, deckPath);
             } else await this.findFlashcards(note, deckPath);
+
+            for (let [nDay, count] of Object.entries(
+                this.data.cache[note.path].dueDatesFlashcards
+            )) {
+                if (!this.dueDatesFlashcards.hasOwnProperty(nDay))
+                    this.dueDatesFlashcards[nDay] = 0;
+                this.dueDatesFlashcards[nDay] += count;
+            }
+        }
+
+        // remove unused cache entries
+        for (let cachedPath in this.data.cache) {
+            if (!notePathsSet.has(cachedPath))
+                delete this.data.cache[cachedPath];
         }
         this.logger.info(`Flashcard sync took ${Date.now() - now.valueOf()}ms`);
         await this.savePluginData();
@@ -628,17 +645,11 @@ export default class SRPlugin extends Plugin {
         let fileChanged: boolean = false,
             deckAdded = false;
 
-        // info. for caching
+        // caching information
         let hasNewCards: boolean = false,
             totalCards: number = 0,
-            nextDueDate: number = Infinity; // 03:14:07 UTC, January 19 2038 haha
-
-        // find all codeblocks
-        let codeblocks: [number, number][] = [];
-        for (let regex of [CODEBLOCK_REGEX, INLINE_CODE_REGEX]) {
-            for (let match of fileText.matchAll(regex))
-                codeblocks.push([match.index!, match.index! + match[0].length]);
-        }
+            nextDueDate: number = Infinity, // 03:14:07 UTC, January 19 2038 haha
+            dueDatesFlashcards: Record<number, number> = {};
 
         let now: number = Date.now();
         let parsedCards: [CardType, string, number][] = parse(
@@ -805,9 +816,9 @@ export default class SRPlugin extends Plugin {
                     let nDays: number = Math.ceil(
                         (dueUnix - now) / (24 * 3600 * 1000)
                     );
-                    if (!this.dueDatesFlashcards.hasOwnProperty(nDays))
-                        this.dueDatesFlashcards[nDays] = 0;
-                    this.dueDatesFlashcards[nDays]++;
+                    if (!dueDatesFlashcards.hasOwnProperty(nDays))
+                        dueDatesFlashcards[nDays] = 0;
+                    dueDatesFlashcards[nDays]++;
                     if (this.data.buryList.includes(cardTextHash)) {
                         this.deckTree.countFlashcard([...deckPath]);
                         continue;
@@ -844,6 +855,7 @@ export default class SRPlugin extends Plugin {
                         ? moment(nextDueDate).format("YYYY-MM-DD")
                         : "",
                 lastUpdated: note.stat.mtime,
+                dueDatesFlashcards,
             };
 
         if (fileChanged) await this.app.vault.modify(note, fileText);
