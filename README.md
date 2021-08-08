@@ -14,8 +14,8 @@ To help translate this plugin to another language, fork this repository, copy th
 
 - Flashcards
     - [Decks](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Decks) (Using Obsidian's hierarchical tags or folder structure)
-    - [Single-line style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#single-line-basic-remnote-styl) (`Question::Answer`)
-    - [Single-line reversed style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#single-line-reversed) (`Question:::Answer`))
+    - [Single-line style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#single-line-basic-remnote-style) (`Question::Answer`)
+    - [Single-line reversed style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#single-line-reversed) (`Question:::Answer`)
     - [Multi-line style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#multi-line-basic) (Separated by `?`)
     - [Multi-line reversed style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#multi-line-reversed) (Separated by `??`)
     - [Cloze cards](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#cloze-cards) (`==highlight==` your cloze deletions!)
