@@ -1,7 +1,6 @@
 import { ItemView, WorkspaceLeaf, Menu, TFile } from "obsidian";
 import type SRPlugin from "./main";
 import { COLLAPSE_ICON } from "./constants";
-import { getSetting } from "./settings";
 
 export const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
 
@@ -85,10 +84,7 @@ export class ReviewQueueListView extends ItemView {
                         let now: number = Date.now();
                         let currUnix: number = -1;
                         let schedFolderEl, folderTitle;
-                        let maxDaysToRender: number = getSetting(
-                            "maxNDaysNotesReviewQueue",
-                            this.plugin.data.settings
-                        );
+                        let maxDaysToRender: number = this.plugin.data.settings.maxNDaysNotesReviewQueue;
 
                         for (let sNote of deck.scheduledNotes) {
                             if (sNote.dueUnix != currUnix) {

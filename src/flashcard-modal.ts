@@ -5,19 +5,25 @@ import {
     Notice,
     Platform,
     TFile,
+    MarkdownView,
 } from "obsidian";
 import type SRPlugin from "./main";
 import {
     Card,
     CardType,
-    FlashcardModalMode,
+    schedule,
+    textInterval,
     ReviewResponse,
-    Deck,
-} from "./types";
-import { schedule, textInterval } from "./sched";
-import { CLOZE_SCHEDULING_EXTRACTOR, COLLAPSE_ICON } from "./constants";
-import { getSetting } from "./settings";
+} from "./scheduling";
+import { MULTI_SCHEDULING_EXTRACTOR, COLLAPSE_ICON } from "./constants";
 import { escapeRegexString, fixDollarSigns, cyrb53 } from "./utils";
+
+export enum FlashcardModalMode {
+    DecksList,
+    Front,
+    Back,
+    Closed,
+}
 
 export class FlashcardModal extends Modal {
     public plugin: SRPlugin;
@@ -43,19 +49,11 @@ export class FlashcardModal extends Modal {
 
         this.titleEl.setText("Decks");
 
-        if (Platform.isMobile) {
-            this.modalEl.style.height = "100%";
-            this.modalEl.style.width = "100%";
-            this.contentEl.style.display = "block";
-        } else {
-            if (getSetting("largeScreenMode", this.plugin.data.settings)) {
-                this.modalEl.style.height = "100%";
-                this.modalEl.style.width = "100%";
-            } else {
-                this.modalEl.style.height = "80%";
-                this.modalEl.style.width = "40%";
-            }
-        }
+        if (Platform.isMobile) this.contentEl.style.display = "block";
+        this.modalEl.style.height =
+            this.plugin.data.settings.flashcardHeightPercentage + "%";
+        this.modalEl.style.width =
+            this.plugin.data.settings.flashcardWidthPercentage + "%";
 
         this.contentEl.style.position = "relative";
         this.contentEl.style.height = "92%";
@@ -72,7 +70,7 @@ export class FlashcardModal extends Modal {
                         this.currentCard.isDue
                     );
                     if (this.currentCard.cardType == CardType.Cloze)
-                        this.buryRelatedCards(false);
+                        this.burySiblingCards(false);
                     this.currentDeck.nextCard(this);
                 } else if (
                     this.mode == FlashcardModalMode.Front &&
@@ -132,13 +130,19 @@ export class FlashcardModal extends Modal {
 
         this.fileLinkView = this.contentEl.createDiv("sr-link");
         this.fileLinkView.setText("Open file");
-        if (getSetting("showFileNameInFileLink", this.plugin.data.settings))
+        if (this.plugin.data.settings.showFileNameInFileLink)
             this.fileLinkView.setAttribute("aria-label", "Open file");
-        this.fileLinkView.addEventListener("click", (_) => {
+        this.fileLinkView.addEventListener("click", async (_) => {
             this.close();
-            this.plugin.app.workspace.activeLeaf.openFile(
+            await this.plugin.app.workspace.activeLeaf.openFile(
                 this.currentCard.note
             );
+            let activeView =
+                this.app.workspace.getActiveViewOfType(MarkdownView);
+            activeView.editor.setCursor({
+                line: this.currentCard.lineNo,
+                ch: 0,
+            });
         });
 
         this.resetLinkView = this.contentEl.createDiv("sr-link");
@@ -148,7 +152,7 @@ export class FlashcardModal extends Modal {
         });
         this.resetLinkView.style.float = "right";
 
-        if (getSetting("showContextInCards", this.plugin.data.settings)) {
+        if (this.plugin.data.settings.showContextInCards) {
             this.contextView = this.contentEl.createDiv();
             this.contextView.setAttribute("id", "sr-context");
         }
@@ -212,7 +216,10 @@ export class FlashcardModal extends Modal {
     async processReview(response: ReviewResponse) {
         let interval, ease, due;
 
-        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+        this.currentDeck.deleteFlashcardAtIndex(
+            this.currentCardIdx,
+            this.currentCard.isDue
+        );
         if (response != ReviewResponse.Reset) {
             // scheduled card
             if (this.currentCard.isDue) {
@@ -230,7 +237,7 @@ export class FlashcardModal extends Modal {
                 let schedObj = schedule(
                     response,
                     1,
-                    getSetting("baseEase", this.plugin.data.settings),
+                    this.plugin.data.settings.baseEase,
                     0,
                     this.plugin.data.settings,
                     this.plugin.dueDatesFlashcards
@@ -260,10 +267,7 @@ export class FlashcardModal extends Modal {
             "gm"
         );
 
-        let sep: string = getSetting(
-            "cardCommentOnSameLine",
-            this.plugin.data.settings
-        )
+        let sep: string = this.plugin.data.settings.cardCommentOnSameLine
             ? " "
             : "\n";
 
@@ -276,7 +280,7 @@ export class FlashcardModal extends Modal {
             } else {
                 let scheduling: RegExpMatchArray[] = [
                     ...this.currentCard.cardText.matchAll(
-                        CLOZE_SCHEDULING_EXTRACTOR
+                        MULTI_SCHEDULING_EXTRACTOR
                     ),
                 ];
 
@@ -287,7 +291,7 @@ export class FlashcardModal extends Modal {
                     `${ease}`,
                 ];
                 if (this.currentCard.isDue)
-                    scheduling[this.currentCard.subCardIdx] = deletionSched;
+                    scheduling[this.currentCard.siblingIdx] = deletionSched;
                 else scheduling.push(deletionSched);
 
                 this.currentCard.cardText = this.currentCard.cardText.replace(
@@ -304,28 +308,26 @@ export class FlashcardModal extends Modal {
                 replacementRegex,
                 fixDollarSigns(this.currentCard.cardText)
             );
-            for (let relatedCard of this.currentCard.relatedCards)
-                relatedCard.cardText = this.currentCard.cardText;
-            if (this.plugin.data.settings.buryRelatedCards)
-                this.buryRelatedCards(true);
+            for (let sibling of this.currentCard.siblings)
+                sibling.cardText = this.currentCard.cardText;
+            if (this.plugin.data.settings.burySiblingCards)
+                this.burySiblingCards(true);
         } else {
             if (this.currentCard.cardType == CardType.SingleLineBasic) {
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${fixDollarSigns(this.currentCard.front)}${getSetting(
-                        "singlelineCardSeparator",
-                        this.plugin.data.settings
-                    )}${fixDollarSigns(
+                    `${fixDollarSigns(this.currentCard.front)}${
+                        this.plugin.data.settings.singlelineCardSeparator
+                    }${fixDollarSigns(
                         this.currentCard.back
                     )}${sep}<!--SR:${dueString},${interval},${ease}-->`
                 );
             } else {
                 fileText = fileText.replace(
                     replacementRegex,
-                    `${fixDollarSigns(this.currentCard.front)}\n${getSetting(
-                        "multilineCardSeparator",
-                        this.plugin.data.settings
-                    )}\n${fixDollarSigns(
+                    `${fixDollarSigns(this.currentCard.front)}\n${
+                        this.plugin.data.settings.multilineCardSeparator
+                    }\n${fixDollarSigns(
                         this.currentCard.back
                     )}${sep}<!--SR:${dueString},${interval},${ease}-->`
                 );
@@ -336,15 +338,15 @@ export class FlashcardModal extends Modal {
         this.currentDeck.nextCard(this);
     }
 
-    async buryRelatedCards(tillNextDay: boolean) {
+    async burySiblingCards(tillNextDay: boolean) {
         if (tillNextDay) {
             this.plugin.data.buryList.push(cyrb53(this.currentCard.cardText));
             await this.plugin.savePluginData();
         }
 
-        for (let relatedCard of this.currentCard.relatedCards) {
-            let dueIdx = this.currentDeck.dueFlashcards.indexOf(relatedCard);
-            let newIdx = this.currentDeck.newFlashcards.indexOf(relatedCard);
+        for (let sibling of this.currentCard.siblings) {
+            let dueIdx = this.currentDeck.dueFlashcards.indexOf(sibling);
+            let newIdx = this.currentDeck.newFlashcards.indexOf(sibling);
 
             if (dueIdx != -1)
                 this.currentDeck.deleteFlashcardAtIndex(
@@ -406,167 +408,267 @@ export class FlashcardModal extends Modal {
     }
 }
 
-Deck.prototype.render = function (
-    containerEl: HTMLElement,
-    modal: FlashcardModal
-): void {
-    let deckView: HTMLElement = containerEl.createDiv("tree-item");
+export class Deck {
+    public deckName: string;
+    public newFlashcards: Card[];
+    public newFlashcardsCount: number = 0; // counts those in subdecks too
+    public dueFlashcards: Card[];
+    public dueFlashcardsCount: number = 0; // counts those in subdecks too
+    public totalFlashcards: number = 0; // counts those in subdecks too
+    public subdecks: Deck[];
+    public parent: Deck;
 
-    let deckViewSelf: HTMLElement = deckView.createDiv(
-        "tree-item-self tag-pane-tag is-clickable"
-    );
-    let collapsed: boolean = true;
-    let collapseIconEl: HTMLElement = deckViewSelf.createDiv(
-        "tree-item-icon collapse-icon"
-    );
-    collapseIconEl.innerHTML = COLLAPSE_ICON;
-    (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
-        "rotate(-90deg)";
+    constructor(deckName: string, parent: Deck) {
+        this.deckName = deckName;
+        this.newFlashcards = [];
+        this.newFlashcardsCount = 0;
+        this.dueFlashcards = [];
+        this.dueFlashcardsCount = 0;
+        this.totalFlashcards = 0;
+        this.subdecks = [];
+        this.parent = parent;
+    }
 
-    let deckViewInner: HTMLElement = deckViewSelf.createDiv("tree-item-inner");
-    deckViewInner.addEventListener("click", (_) => {
-        modal.currentDeck = this;
-        modal.checkDeck = this.parent;
-        modal.setupCardsView();
-        this.nextCard(modal);
-    });
-    let deckViewInnerText: HTMLElement =
-        deckViewInner.createDiv("tag-pane-tag-text");
-    deckViewInnerText.innerHTML += `<span class="tag-pane-tag-self">${this.deckName}</span>`;
-    let deckViewOuter: HTMLElement = deckViewSelf.createDiv(
-        "tree-item-flair-outer"
-    );
-    deckViewOuter.innerHTML +=
-        '<span style="background-color:#4caf50;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
-        this.dueFlashcardsCount +
-        "</span>" +
-        '<span style="background-color:#2196f3;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
-        this.newFlashcardsCount +
-        "</span>" +
-        '<span style="background-color:#ff7043;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
-        this.totalFlashcards +
-        "</span>";
+    createDeck(deckPath: string[]) {
+        if (deckPath.length == 0) return;
 
-    let deckViewChildren: HTMLElement =
-        deckView.createDiv("tree-item-children");
-    deckViewChildren.style.display = "none";
-    collapseIconEl.addEventListener("click", (_) => {
-        if (collapsed) {
-            (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "";
-            deckViewChildren.style.display = "block";
-        } else {
-            (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
-                "rotate(-90deg)";
-            deckViewChildren.style.display = "none";
-        }
-        collapsed = !collapsed;
-    });
-    for (let deck of this.subdecks) deck.render(deckViewChildren, modal);
-};
-
-Deck.prototype.nextCard = function (modal: FlashcardModal): void {
-    if (this.newFlashcards.length + this.dueFlashcards.length == 0) {
-        if (this.dueFlashcardsCount + this.newFlashcardsCount > 0) {
-            for (let deck of this.subdecks) {
-                if (deck.dueFlashcardsCount + deck.newFlashcardsCount > 0) {
-                    modal.currentDeck = deck;
-                    deck.nextCard(modal);
-                    return;
-                }
+        let deckName: string = deckPath.shift();
+        for (let deck of this.subdecks) {
+            if (deckName == deck.deckName) {
+                deck.createDeck(deckPath);
+                return;
             }
         }
 
-        if (this.parent == modal.checkDeck) modal.decksList();
-        else this.parent.nextCard(modal);
-        return;
+        let deck: Deck = new Deck(deckName, this);
+        this.subdecks.push(deck);
+        deck.createDeck(deckPath);
     }
 
-    modal.responseDiv.style.display = "none";
-    modal.resetLinkView.style.display = "none";
-    modal.titleEl.setText(
-        `${this.deckName} - ${
-            this.dueFlashcardsCount + this.newFlashcardsCount
-        }`
-    );
+    insertFlashcard(deckPath: string[], cardObj: Card): void {
+        if (cardObj.isDue) this.dueFlashcardsCount++;
+        else this.newFlashcardsCount++;
+        this.totalFlashcards++;
 
-    modal.answerBtn.style.display = "initial";
-    modal.flashcardView.innerHTML = "";
-    modal.mode = FlashcardModalMode.Front;
-
-    if (this.dueFlashcards.length > 0) {
-        if (getSetting("randomizeCardOrder", modal.plugin.data.settings))
-            modal.currentCardIdx = Math.floor(
-                Math.random() * this.dueFlashcards.length
-            );
-        else modal.currentCardIdx = 0;
-        modal.currentCard = this.dueFlashcards[modal.currentCardIdx];
-        modal.renderMarkdownWrapper(
-            modal.currentCard.front,
-            modal.flashcardView
-        );
-
-        let hardInterval: number = schedule(
-            ReviewResponse.Hard,
-            modal.currentCard.interval,
-            modal.currentCard.ease,
-            modal.currentCard.delayBeforeReview,
-            modal.plugin.data.settings
-        ).interval;
-        let goodInterval: number = schedule(
-            ReviewResponse.Good,
-            modal.currentCard.interval,
-            modal.currentCard.ease,
-            modal.currentCard.delayBeforeReview,
-            modal.plugin.data.settings
-        ).interval;
-        let easyInterval: number = schedule(
-            ReviewResponse.Easy,
-            modal.currentCard.interval,
-            modal.currentCard.ease,
-            modal.currentCard.delayBeforeReview,
-            modal.plugin.data.settings
-        ).interval;
-
-        if (Platform.isMobile) {
-            modal.hardBtn.setText(textInterval(hardInterval, true));
-            modal.goodBtn.setText(textInterval(goodInterval, true));
-            modal.easyBtn.setText(textInterval(easyInterval, true));
-        } else {
-            modal.hardBtn.setText(
-                `Hard - ${textInterval(hardInterval, false)}`
-            );
-            modal.goodBtn.setText(
-                `Good - ${textInterval(goodInterval, false)}`
-            );
-            modal.easyBtn.setText(
-                `Easy - ${textInterval(easyInterval, false)}`
-            );
+        if (deckPath.length == 0) {
+            if (cardObj.isDue) this.dueFlashcards.push(cardObj);
+            else this.newFlashcards.push(cardObj);
+            return;
         }
-    } else if (this.newFlashcards.length > 0) {
-        if (getSetting("randomizeCardOrder", modal.plugin.data.settings))
-            modal.currentCardIdx = Math.floor(
-                Math.random() * this.newFlashcards.length
-            );
-        else modal.currentCardIdx = 0;
-        modal.currentCard = this.newFlashcards[modal.currentCardIdx];
-        modal.renderMarkdownWrapper(
-            modal.currentCard.front,
-            modal.flashcardView
-        );
 
-        if (Platform.isMobile) {
-            modal.hardBtn.setText("1.0d");
-            modal.goodBtn.setText("2.5d");
-            modal.easyBtn.setText("3.5d");
-        } else {
-            modal.hardBtn.setText("Hard - 1.0 day");
-            modal.goodBtn.setText("Good - 2.5 days");
-            modal.easyBtn.setText("Easy - 3.5 days");
+        let deckName: string = deckPath.shift();
+        for (let deck of this.subdecks) {
+            if (deckName == deck.deckName) {
+                deck.insertFlashcard(deckPath, cardObj);
+                return;
+            }
         }
     }
 
-    if (getSetting("showContextInCards", modal.plugin.data.settings))
-        modal.contextView.setText(modal.currentCard.context);
-    if (getSetting("showFileNameInFileLink", modal.plugin.data.settings))
-        modal.fileLinkView.setText(modal.currentCard.note.basename);
-};
+    // count flashcards that have either been buried
+    // or aren't due yet
+    countFlashcard(deckPath: string[]): void {
+        this.totalFlashcards++;
+
+        let deckName: string = deckPath.shift();
+        for (let deck of this.subdecks) {
+            if (deckName == deck.deckName) {
+                deck.countFlashcard(deckPath);
+                return;
+            }
+        }
+    }
+
+    deleteFlashcardAtIndex(index: number, cardIsDue: boolean): void {
+        if (cardIsDue) this.dueFlashcards.splice(index, 1);
+        else this.newFlashcards.splice(index, 1);
+
+        let deck: Deck = this;
+        while (deck != null) {
+            if (cardIsDue) deck.dueFlashcardsCount--;
+            else deck.newFlashcardsCount--;
+            deck = deck.parent;
+        }
+    }
+
+    sortSubdecksList(): void {
+        this.subdecks.sort((a, b) => {
+            if (a.deckName < b.deckName) return -1;
+            else if (a.deckName > b.deckName) return 1;
+            return 0;
+        });
+
+        for (let deck of this.subdecks) deck.sortSubdecksList();
+    }
+
+    render(containerEl: HTMLElement, modal: FlashcardModal): void {
+        let deckView: HTMLElement = containerEl.createDiv("tree-item");
+
+        let deckViewSelf: HTMLElement = deckView.createDiv(
+            "tree-item-self tag-pane-tag is-clickable"
+        );
+        let collapsed: boolean = true;
+        let collapseIconEl: HTMLElement;
+        if (this.subdecks.length > 0) {
+            collapseIconEl = deckViewSelf.createDiv(
+                "tree-item-icon collapse-icon"
+            );
+            collapseIconEl.innerHTML = COLLAPSE_ICON;
+            (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
+                "rotate(-90deg)";
+        }
+
+        let deckViewInner: HTMLElement =
+            deckViewSelf.createDiv("tree-item-inner");
+        deckViewInner.addEventListener("click", (_) => {
+            modal.currentDeck = this;
+            modal.checkDeck = this.parent;
+            modal.setupCardsView();
+            this.nextCard(modal);
+        });
+        let deckViewInnerText: HTMLElement =
+            deckViewInner.createDiv("tag-pane-tag-text");
+        deckViewInnerText.innerHTML += `<span class="tag-pane-tag-self">${this.deckName}</span>`;
+        let deckViewOuter: HTMLElement = deckViewSelf.createDiv(
+            "tree-item-flair-outer"
+        );
+        deckViewOuter.innerHTML +=
+            '<span style="background-color:#4caf50;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
+            this.dueFlashcardsCount +
+            "</span>" +
+            '<span style="background-color:#2196f3;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
+            this.newFlashcardsCount +
+            "</span>" +
+            '<span style="background-color:#ff7043;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
+            this.totalFlashcards +
+            "</span>";
+
+        let deckViewChildren: HTMLElement =
+            deckView.createDiv("tree-item-children");
+        deckViewChildren.style.display = "none";
+        if (this.subdecks.length > 0) {
+            collapseIconEl.addEventListener("click", (_) => {
+                if (collapsed) {
+                    (
+                        collapseIconEl.childNodes[0] as HTMLElement
+                    ).style.transform = "";
+                    deckViewChildren.style.display = "block";
+                } else {
+                    (
+                        collapseIconEl.childNodes[0] as HTMLElement
+                    ).style.transform = "rotate(-90deg)";
+                    deckViewChildren.style.display = "none";
+                }
+                collapsed = !collapsed;
+            });
+        }
+        for (let deck of this.subdecks) deck.render(deckViewChildren, modal);
+    }
+
+    nextCard(modal: FlashcardModal): void {
+        if (this.newFlashcards.length + this.dueFlashcards.length == 0) {
+            if (this.dueFlashcardsCount + this.newFlashcardsCount > 0) {
+                for (let deck of this.subdecks) {
+                    if (deck.dueFlashcardsCount + deck.newFlashcardsCount > 0) {
+                        modal.currentDeck = deck;
+                        deck.nextCard(modal);
+                        return;
+                    }
+                }
+            }
+
+            if (this.parent == modal.checkDeck) modal.decksList();
+            else this.parent.nextCard(modal);
+            return;
+        }
+
+        modal.responseDiv.style.display = "none";
+        modal.resetLinkView.style.display = "none";
+        modal.titleEl.setText(
+            `${this.deckName} - ${
+                this.dueFlashcardsCount + this.newFlashcardsCount
+            }`
+        );
+
+        modal.answerBtn.style.display = "initial";
+        modal.flashcardView.innerHTML = "";
+        modal.mode = FlashcardModalMode.Front;
+
+        if (this.dueFlashcards.length > 0) {
+            if (modal.plugin.data.settings.randomizeCardOrder)
+                modal.currentCardIdx = Math.floor(
+                    Math.random() * this.dueFlashcards.length
+                );
+            else modal.currentCardIdx = 0;
+            modal.currentCard = this.dueFlashcards[modal.currentCardIdx];
+            modal.renderMarkdownWrapper(
+                modal.currentCard.front,
+                modal.flashcardView
+            );
+
+            let hardInterval: number = schedule(
+                ReviewResponse.Hard,
+                modal.currentCard.interval,
+                modal.currentCard.ease,
+                modal.currentCard.delayBeforeReview,
+                modal.plugin.data.settings
+            ).interval;
+            let goodInterval: number = schedule(
+                ReviewResponse.Good,
+                modal.currentCard.interval,
+                modal.currentCard.ease,
+                modal.currentCard.delayBeforeReview,
+                modal.plugin.data.settings
+            ).interval;
+            let easyInterval: number = schedule(
+                ReviewResponse.Easy,
+                modal.currentCard.interval,
+                modal.currentCard.ease,
+                modal.currentCard.delayBeforeReview,
+                modal.plugin.data.settings
+            ).interval;
+
+            if (Platform.isMobile) {
+                modal.hardBtn.setText(textInterval(hardInterval, true));
+                modal.goodBtn.setText(textInterval(goodInterval, true));
+                modal.easyBtn.setText(textInterval(easyInterval, true));
+            } else {
+                modal.hardBtn.setText(
+                    `Hard - ${textInterval(hardInterval, false)}`
+                );
+                modal.goodBtn.setText(
+                    `Good - ${textInterval(goodInterval, false)}`
+                );
+                modal.easyBtn.setText(
+                    `Easy - ${textInterval(easyInterval, false)}`
+                );
+            }
+        } else if (this.newFlashcards.length > 0) {
+            if (modal.plugin.data.settings.randomizeCardOrder)
+                modal.currentCardIdx = Math.floor(
+                    Math.random() * this.newFlashcards.length
+                );
+            else modal.currentCardIdx = 0;
+            modal.currentCard = this.newFlashcards[modal.currentCardIdx];
+            modal.renderMarkdownWrapper(
+                modal.currentCard.front,
+                modal.flashcardView
+            );
+
+            if (Platform.isMobile) {
+                modal.hardBtn.setText("1.0d");
+                modal.goodBtn.setText("2.5d");
+                modal.easyBtn.setText("3.5d");
+            } else {
+                modal.hardBtn.setText("Hard - 1.0 day");
+                modal.goodBtn.setText("Good - 2.5 days");
+                modal.easyBtn.setText("Easy - 3.5 days");
+            }
+        }
+
+        if (modal.plugin.data.settings.showContextInCards)
+            modal.contextView.setText(modal.currentCard.context);
+        if (modal.plugin.data.settings.showFileNameInFileLink)
+            modal.fileLinkView.setText(modal.currentCard.note.basename);
+    }
+}

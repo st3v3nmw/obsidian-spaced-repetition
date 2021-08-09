@@ -1,5 +1,41 @@
-import { ReviewResponse, SRSettings } from "./types";
-import { getSetting } from "./settings";
+import { TFile } from "obsidian";
+import { SRSettings } from "./settings";
+
+export enum ReviewResponse {
+    Easy,
+    Good,
+    Hard,
+    Reset,
+}
+
+// Flashcards
+
+export enum CardType {
+    SingleLineBasic,
+    MultiLineBasic,
+    Cloze,
+}
+
+export interface Card {
+    // scheduling
+    isDue: boolean;
+    interval?: number;
+    ease?: number;
+    delayBeforeReview?: number;
+    // note
+    note: TFile;
+    lineNo: number;
+    // visuals
+    front: string;
+    back: string;
+    cardText: string;
+    context: string;
+    // types
+    cardType: CardType;
+    // information for sibling cards
+    siblingIdx?: number;
+    siblings?: Card[];
+}
 
 export function schedule(
     response: ReviewResponse,
@@ -9,13 +45,6 @@ export function schedule(
     settingsObj: SRSettings,
     dueDates?: Record<number, number>
 ) {
-    let lapsesIntervalChange: number = getSetting(
-        "lapsesIntervalChange",
-        settingsObj
-    );
-    let easyBonus: number = getSetting("easyBonus", settingsObj);
-    let maximumInterval: number = getSetting("maximumInterval", settingsObj);
-
     delayBeforeReview = Math.max(
         0,
         Math.floor(delayBeforeReview / (24 * 3600 * 1000))
@@ -24,14 +53,15 @@ export function schedule(
     if (response == ReviewResponse.Easy) {
         ease += 20;
         interval = ((interval + delayBeforeReview) * ease) / 100;
-        interval *= easyBonus;
+        interval *= settingsObj.easyBonus;
     } else if (response == ReviewResponse.Good) {
         interval = ((interval + delayBeforeReview / 2) * ease) / 100;
     } else if (response == ReviewResponse.Hard) {
         ease = Math.max(130, ease - 20);
         interval = Math.max(
             1,
-            (interval + delayBeforeReview / 4) * lapsesIntervalChange
+            (interval + delayBeforeReview / 4) *
+                settingsObj.lapsesIntervalChange
         );
     }
 
@@ -41,8 +71,8 @@ export function schedule(
         if (!dueDates.hasOwnProperty(interval)) dueDates[interval] = 0;
 
         let fuzzRange: [number, number];
-        if (interval < 2) fuzzRange = [1, 1];
-        else if (interval == 2) fuzzRange = [2, 3];
+        // disable fuzzing for small intervals
+        if (interval <= 4) fuzzRange = [interval, interval];
         else {
             let fuzz: number;
             if (interval < 7) fuzz = 1;
@@ -60,7 +90,7 @@ export function schedule(
         dueDates[interval]++;
     }
 
-    interval = Math.min(interval, maximumInterval);
+    interval = Math.min(interval, settingsObj.maximumInterval);
 
     return { interval: Math.round(interval * 10) / 10, ease };
 }

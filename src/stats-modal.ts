@@ -1,4 +1,5 @@
 import { Modal, App, MarkdownRenderer, Notice, Platform } from "obsidian";
+import { getKeysPreserveType } from "./utils";
 
 export class StatsModal extends Modal {
     private dueDatesFlashcards: Record<number, number>;
@@ -30,13 +31,29 @@ export class StatsModal extends Modal {
             "<h4 style='text-align:center'>The number of cards due in the future</h4>" +
             "</div>";
 
+        let maxN: number = Math.max(
+            ...getKeysPreserveType(this.dueDatesFlashcards)
+        );
+        for (let dueOffset = 0; dueOffset <= maxN; dueOffset++) {
+            if (!this.dueDatesFlashcards.hasOwnProperty(dueOffset))
+                this.dueDatesFlashcards[dueOffset] = 0;
+        }
+
+        let dueDatesFlashcardsCopy: Record<number, number> = { 0: 0 };
+        for (let [dueOffset, dueCount] of Object.entries(
+            this.dueDatesFlashcards
+        )) {
+            if (dueOffset <= 0) dueDatesFlashcardsCopy[0] += dueCount;
+            else dueDatesFlashcardsCopy[dueOffset] = dueCount;
+        }
+
         let text =
             "```chart\n" +
             "\ttype: bar\n" +
-            `\tlabels: [${Object.keys(this.dueDatesFlashcards)}]\n` +
+            `\tlabels: [${Object.keys(dueDatesFlashcardsCopy)}]\n` +
             "\tseries:\n" +
             "\t\t- title: Scheduled\n" +
-            `\t\t  data: [${Object.values(this.dueDatesFlashcards)}]\n` +
+            `\t\t  data: [${Object.values(dueDatesFlashcardsCopy)}]\n` +
             '\txTitle: "Days"\n' +
             '\tyTitle: "Number of cards"\n' +
             "\tlegend: false\n" +
