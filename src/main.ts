@@ -271,6 +271,7 @@ export default class SRPlugin extends Plugin {
                     graph.link(note.path, targetPath, links[targetPath]);
                 }
             }
+            if (this.data.settings.noteFoldersToIgnore.some(folder => note.path.startsWith(folder))) continue;
 
             let fileCachedData =
                 this.app.metadataCache.getFileCache(note) || {};
@@ -372,6 +373,15 @@ export default class SRPlugin extends Plugin {
         let frontmatter = fileCachedData.frontmatter || <Record<string, any>>{};
 
         let tags = getAllTags(fileCachedData) || [];
+        if (this.data.settings.noteFoldersToIgnore.some(folder => note.path.startsWith(folder))) {
+            new Notice(
+                t(
+                    "Note is saved under ignored folder (check settings)."
+                )
+            );
+            return;
+        }
+
         let shouldIgnore: boolean = true;
         for (let tag of tags) {
             if (
