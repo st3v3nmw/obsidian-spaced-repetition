@@ -266,4 +266,10 @@ test("Test not parsing cards in HTML comments", () => {
             ...defaultSeparators
         )
     ).toEqual([]);
+    expect(
+        parse(
+            "<!--\nQuestion\n?\nAnswer <!--SR:!2021-08-11,4,270-->\n\n<!--cloze ==deletion== test-->-->",
+            ...defaultSeparators
+        )
+    ).toEqual([]);
 });

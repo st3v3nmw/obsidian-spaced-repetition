@@ -175,7 +175,8 @@ export default class SRPlugin extends Plugin {
             id: "srs-note-review-easy",
             name: t("Review note as easy"),
             callback: () => {
-                let openFile: TFile | null = this.app.workspace.getActiveFile();
+                const openFile: TFile | null =
+                    this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md")
                     this.saveReviewResponse(openFile, ReviewResponse.Easy);
             },
@@ -185,7 +186,7 @@ export default class SRPlugin extends Plugin {
             id: "srs-note-review-good",
             name: t("Review note as good"),
             callback: () => {
-                let openFile: TFile | null = this.app.workspace.getActiveFile();
+                const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md")
                     this.saveReviewResponse(openFile, ReviewResponse.Good);
             },
@@ -195,7 +196,7 @@ export default class SRPlugin extends Plugin {
             id: "srs-note-review-hard",
             name: t("Review note as hard"),
             callback: () => {
-                let openFile: TFile | null = this.app.workspace.getActiveFile();
+                const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md")
                     this.saveReviewResponse(openFile, ReviewResponse.Hard);
             },
@@ -279,18 +280,18 @@ export default class SRPlugin extends Plugin {
             let tags = getAllTags(fileCachedData) || [];
 
             let shouldIgnore: boolean = true;
-            outer: for (let tag of tags) {
-                for (let tagToReview of this.data.settings.tagsToReview) {
-                    if (
-                        tag === tagToReview ||
-                        tag.startsWith(tagToReview + "/")
-                    ) {
-                        shouldIgnore = false;
-                        break outer;
-                    }
+            for (let tag of tags) {
+                if (
+                    this.data.settings.tagsToReview.some(
+                        (tagToReview) =>
+                            tag === tagToReview ||
+                            tag.startsWith(tagToReview + "/")
+                    )
+                ) {
+                    shouldIgnore = false;
+                    break;
                 }
             }
-
             if (shouldIgnore) continue;
 
             // file has no scheduling information
@@ -372,12 +373,15 @@ export default class SRPlugin extends Plugin {
 
         let tags = getAllTags(fileCachedData) || [];
         let shouldIgnore: boolean = true;
-        outer: for (let tag of tags) {
-            for (let tagToReview of this.data.settings.tagsToReview) {
-                if (tag === tagToReview || tag.startsWith(tagToReview + "/")) {
-                    shouldIgnore = false;
-                    break outer;
-                }
+        for (let tag of tags) {
+            if (
+                this.data.settings.tagsToReview.some(
+                    (tagToReview) =>
+                        tag === tagToReview || tag.startsWith(tagToReview + "/")
+                )
+            ) {
+                shouldIgnore = false;
+                break;
             }
         }
 
@@ -567,15 +571,16 @@ export default class SRPlugin extends Plugin {
                     this.app.metadataCache.getFileCache(note) || {};
                 let tags = getAllTags(fileCachedData) || [];
 
-                outer: for (let tag of tags) {
-                    for (let tagToReview of this.data.settings.flashcardTags) {
-                        if (
-                            tag === tagToReview ||
-                            tag.startsWith(tagToReview + "/")
-                        ) {
-                            deckPath = tag.substring(1).split("/");
-                            break outer;
-                        }
+                for (let tag of tags) {
+                    if (
+                        this.data.settings.tagsToReview.some(
+                            (tagToReview) =>
+                                tag === tagToReview ||
+                                tag.startsWith(tagToReview + "/")
+                        )
+                    ) {
+                        deckPath = tag.substring(1).split("/");
+                        break;
                     }
                 }
             }

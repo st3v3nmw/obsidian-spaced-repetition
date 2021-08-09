@@ -19,14 +19,10 @@ export class StatsModal extends Modal {
 
         this.titleEl.setText(t("Statistics"));
 
-        if (Platform.isMobile) {
-            this.modalEl.style.height = "100%";
-            this.modalEl.style.width = "100%";
-            this.contentEl.style.display = "block";
-        } else {
-            this.modalEl.style.height = "100%";
-            this.modalEl.style.width = "100%";
-        }
+        this.modalEl.style.height = "100%";
+        this.modalEl.style.width = "100%";
+
+        if (Platform.isMobile) this.contentEl.style.display = "block";
     }
 
     onOpen(): void {

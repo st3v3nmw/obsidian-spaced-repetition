@@ -1,7 +1,18 @@
 import { CardType } from "src/types";
 
+/**
+ * Returns flashcards found in `text`
+ *
+ * @param text - The text to extract flashcards from
+ * @param singlelineCardSeparator - Separator for inline basic cards
+ * @param singlelineReversedCardSeparator - Separator for inline reversed cards
+ * @param multilineCardSeparator - Separator for multiline basic cards
+ * @param multilineReversedCardSeparator - Separator for multiline basic card
+ * @returns An array of [CardType, card text, line number] tuples
+ */
+
 export function parse(
-    fileText: string,
+    text: string,
     singlelineCardSeparator: string,
     singlelineReversedCardSeparator: string,
     multilineCardSeparator: string,
@@ -12,7 +23,7 @@ export function parse(
     let cardType: CardType | null = null;
     let lineNo: number = 0;
 
-    let lines: string[] = fileText.split("\n");
+    let lines: string[] = text.split("\n");
     for (let i = 0; i < lines.length; i++) {
         if (lines[i].length === 0) {
             if (cardType) {

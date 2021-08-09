@@ -1,15 +1,37 @@
 type Hex = number;
 
-// https://stackoverflow.com/a/59459000
+/**
+ * Returns an array of the keys of an object with type `(keyof T)[]`
+ * instead of `string[]`
+ * Please see https://stackoverflow.com/a/59459000 for more details
+ *
+ * @param obj - An object
+ * @returns An array of the keys of `obj` with type `(keyof T)[]`
+ */
 export const getKeysPreserveType = Object.keys as <T extends object>(
     obj: T
 ) => Array<keyof T>;
 
-// https://stackoverflow.com/a/6969486
+/**
+ * Escapes the input string so that it can be converted to a regex
+ * while making sure that symbols like `?` and `*` aren't interpreted
+ * as regex specials.
+ * Please see https://stackoverflow.com/a/6969486 for more details
+ *
+ * @param str - The string to be escaped
+ * @returns The escaped string
+ */
 export const escapeRegexString = (text: string) =>
     text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-// https://stackoverflow.com/a/52171480
+/**
+ * Returns the cyrb53 hash (hex string) of the input string
+ * Please see https://stackoverflow.com/a/52171480 for more details
+ *
+ * @param str - The string to be hashed
+ * @param seed - The seed for the cyrb53 function
+ * @returns The cyrb53 hash (hex string) of `str` seeded using `seed`
+ */
 export function cyrb53(str: string, seed: number = 0): string {
     let h1: Hex = 0xdeadbeef ^ seed,
         h2: Hex = 0x41c6ce57 ^ seed;
