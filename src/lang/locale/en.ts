@@ -149,4 +149,9 @@ export default {
     Review: "Review",
     due: "due",
     Days: "Days",
+    "Folders to ignore": "Folders to ignore",
+    "Enter folder paths separated by newlines i.e. Templates Meta/Scripts": 
+        "Enter folder paths separated by newlines i.e. Templates Meta/Scripts",
+    "Note is saved under ignored folder (check settings).": 
+        "Note is saved under ignored folder (check settings).",
 };

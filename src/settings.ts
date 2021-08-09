@@ -22,6 +22,7 @@ export interface SRSettings {
     multilineReversedCardSeparator: string;
     // notes
     tagsToReview: string[];
+    noteFoldersToIgnore: string[];
     openRandomNote: boolean;
     autoNextNote: boolean;
     disableFileMenuReviewOptions: boolean;
@@ -54,6 +55,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     multilineReversedCardSeparator: "??",
     // notes
     tagsToReview: ["#review"],
+    noteFoldersToIgnore: [],
     openRandomNote: false,
     autoNextNote: false,
     disableFileMenuReviewOptions: false,
@@ -428,6 +430,25 @@ export class SRSettingTab extends PluginSettingTab {
                         applySettingsUpdate(async () => {
                             this.plugin.data.settings.tagsToReview =
                                 value.split(/\s+/);
+                            await this.plugin.savePluginData();
+                        });
+                    })
+            );
+        
+        new Setting(containerEl)
+            .setName(t("Folders to ignore"))
+            .setDesc(
+                t(
+                    "Enter folder paths separated by newlines i.e. Templates Meta/Scripts"
+                )
+            )
+            .addTextArea((text) =>
+                text
+                    .setValue(this.plugin.data.settings.noteFoldersToIgnore.join("\n"))
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.noteFoldersToIgnore =
+                                value.split(/\n+/).map(v => v.trim()).filter(v => v);
                             await this.plugin.savePluginData();
                         });
                     })
