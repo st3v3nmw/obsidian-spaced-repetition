@@ -7,11 +7,7 @@ export class StatsModal extends Modal {
     private plugin: SRPlugin;
     private dueDatesFlashcards: Record<number, number>;
 
-    constructor(
-        app: App,
-        dueDatesFlashcards: Record<number, number>,
-        plugin: SRPlugin
-    ) {
+    constructor(app: App, dueDatesFlashcards: Record<number, number>, plugin: SRPlugin) {
         super(app);
 
         this.plugin = plugin;
@@ -41,18 +37,14 @@ export class StatsModal extends Modal {
             "</h4>" +
             "</div>";
 
-        let maxN: number = Math.max(
-            ...getKeysPreserveType(this.dueDatesFlashcards)
-        );
+        let maxN: number = Math.max(...getKeysPreserveType(this.dueDatesFlashcards));
         for (let dueOffset = 0; dueOffset <= maxN; dueOffset++) {
             if (!this.dueDatesFlashcards.hasOwnProperty(dueOffset))
                 this.dueDatesFlashcards[dueOffset] = 0;
         }
 
         let dueDatesFlashcardsCopy: Record<number, number> = { 0: 0 };
-        for (let [dueOffset, dueCount] of Object.entries(
-            this.dueDatesFlashcards
-        )) {
+        for (let [dueOffset, dueCount] of Object.entries(this.dueDatesFlashcards)) {
             if (dueOffset <= 0) dueDatesFlashcardsCopy[0] += dueCount;
             else dueDatesFlashcardsCopy[dueOffset] = dueCount;
         }

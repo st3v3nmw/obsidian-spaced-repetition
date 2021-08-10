@@ -42,10 +42,7 @@ export function schedule(
     settingsObj: SRSettings,
     dueDates?: Record<number, number>
 ): Record<string, number> {
-    delayBeforeReview = Math.max(
-        0,
-        Math.floor(delayBeforeReview / (24 * 3600 * 1000))
-    );
+    delayBeforeReview = Math.max(0, Math.floor(delayBeforeReview / (24 * 3600 * 1000)));
 
     if (response === ReviewResponse.Easy) {
         ease += 20;
@@ -57,8 +54,7 @@ export function schedule(
         ease = Math.max(130, ease - 20);
         interval = Math.max(
             1,
-            (interval + delayBeforeReview / 4) *
-                settingsObj.lapsesIntervalChange
+            (interval + delayBeforeReview / 4) * settingsObj.lapsesIntervalChange
         );
     }
 
@@ -73,8 +69,7 @@ export function schedule(
         else {
             let fuzz: number;
             if (interval < 7) fuzz = 1;
-            else if (interval < 30)
-                fuzz = Math.max(2, Math.floor(interval * 0.15));
+            else if (interval < 30) fuzz = Math.max(2, Math.floor(interval * 0.15));
             else fuzz = Math.max(4, Math.floor(interval * 0.05));
             fuzzRange = [interval - fuzz, interval + fuzz];
         }
@@ -102,16 +97,9 @@ export function textInterval(interval: number, isMobile: boolean): string {
         else return `${y}y`;
     } else {
         if (interval < 30)
-            return interval === 1.0
-                ? "1.0 " + t("day")
-                : interval.toString() + " " + t("days");
+            return interval === 1.0 ? "1.0 " + t("day") : interval.toString() + " " + t("days");
         else if (interval < 365)
-            return m === 1.0
-                ? "1.0 " + t("month")
-                : m.toString() + " " + t("months");
-        else
-            return y === 1.0
-                ? "1.0 " + t("year")
-                : y.toString() + " " + t("years");
+            return m === 1.0 ? "1.0 " + t("month") : m.toString() + " " + t("months");
+        else return y === 1.0 ? "1.0 " + t("year") : y.toString() + " " + t("years");
     }
 }

@@ -21,11 +21,7 @@ export const createLogger = (console: Console, logLevel: LogLevel): Logger => {
         warn = Function.prototype.bind.call(console.warn, console, "SR:");
     else warn = (..._: any[]) => {};
 
-    let error: Function = Function.prototype.bind.call(
-        console.error,
-        console,
-        "SR:"
-    );
+    let error: Function = Function.prototype.bind.call(console.error, console, "SR:");
 
     return { info, warn, error };
 };

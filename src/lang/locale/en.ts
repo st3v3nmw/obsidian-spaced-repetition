@@ -68,8 +68,8 @@ export default {
     "i.e. Title > Heading 1 > Subheading > ... > Subheading":
         "i.e. Title > Heading 1 > Subheading > ... > Subheading",
     "Flashcard Height Percentage": "Flashcard Height Percentage",
-    "[Desktop] Should be set to 100% if you have very large images":
-        "[Desktop] Should be set to 100% if you have very large images",
+    "Should be set to 100% on mobile or if you have very large images":
+        "Should be set to 100% on mobile or if you have very large images",
     "Reset to default": "Reset to default",
     "Flashcard Width Percentage": "Flashcard Width Percentage",
     "Show file name instead of 'Open file' in flashcard review?":

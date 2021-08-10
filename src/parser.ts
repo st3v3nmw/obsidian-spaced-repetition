@@ -10,7 +10,6 @@ import { CardType } from "src/types";
  * @param multilineReversedCardSeparator - Separator for multiline basic card
  * @returns An array of [CardType, card text, line number] tuples
  */
-
 export function parse(
     text: string,
     singlelineCardSeparator: string,
@@ -33,10 +32,7 @@ export function parse(
 
             cardText = "";
             continue;
-        } else if (
-            lines[i].startsWith("<!--") &&
-            !lines[i].startsWith("<!--SR:")
-        ) {
+        } else if (lines[i].startsWith("<!--") && !lines[i].startsWith("<!--SR:")) {
             while (i + 1 < lines.length && !lines[i + 1].includes("-->")) i++;
             i++;
             continue;

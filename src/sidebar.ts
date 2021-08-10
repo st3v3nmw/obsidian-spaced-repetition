@@ -15,12 +15,8 @@ export class ReviewQueueListView extends ItemView {
 
         this.plugin = plugin;
         this.activeFolders = new Set([t("Today")]);
-        this.registerEvent(
-            this.app.workspace.on("file-open", (_: any) => this.redraw())
-        );
-        this.registerEvent(
-            this.app.vault.on("rename", (_: any) => this.redraw())
-        );
+        this.registerEvent(this.app.workspace.on("file-open", (_: any) => this.redraw()));
+        this.registerEvent(this.app.vault.on("rename", (_: any) => this.redraw()));
     }
 
     public getViewType(): string {
@@ -40,9 +36,7 @@ export class ReviewQueueListView extends ItemView {
             item.setTitle(t("Close"))
                 .setIcon("cross")
                 .onClick(() => {
-                    this.app.workspace.detachLeavesOfType(
-                        REVIEW_QUEUE_VIEW_TYPE
-                    );
+                    this.app.workspace.detachLeavesOfType(REVIEW_QUEUE_VIEW_TYPE);
                 });
         });
     }
@@ -75,14 +69,11 @@ export class ReviewQueueListView extends ItemView {
                 currUnix: number = -1;
             let folderEl: HTMLElement | null = null,
                 folderTitle: string = "";
-            let maxDaysToRender: number =
-                this.plugin.data.settings.maxNDaysNotesReviewQueue;
+            let maxDaysToRender: number = this.plugin.data.settings.maxNDaysNotesReviewQueue;
 
             for (let sNote of this.plugin.scheduledNotes) {
                 if (sNote.dueUnix !== currUnix) {
-                    let nDays: number = Math.ceil(
-                        (sNote.dueUnix - now) / (24 * 3600 * 1000)
-                    );
+                    let nDays: number = Math.ceil((sNote.dueUnix - now) / (24 * 3600 * 1000));
 
                     if (nDays > maxDaysToRender) break;
 
@@ -123,40 +114,28 @@ export class ReviewQueueListView extends ItemView {
         collapsed: boolean
     ): HTMLElement {
         let folderEl: HTMLDivElement = parentEl.createDiv("nav-folder"),
-            folderTitleEl: HTMLDivElement =
-                folderEl.createDiv("nav-folder-title"),
-            childrenEl: HTMLDivElement = folderEl.createDiv(
-                "nav-folder-children"
-            ),
+            folderTitleEl: HTMLDivElement = folderEl.createDiv("nav-folder-title"),
+            childrenEl: HTMLDivElement = folderEl.createDiv("nav-folder-children"),
             collapseIconEl: HTMLDivElement = folderTitleEl.createDiv(
                 "nav-folder-collapse-indicator collapse-icon"
             );
 
         collapseIconEl.innerHTML = COLLAPSE_ICON;
         if (collapsed)
-            (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
-                "rotate(-90deg)";
+            (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "rotate(-90deg)";
 
-        folderTitleEl
-            .createDiv("nav-folder-title-content")
-            .setText(folderTitle);
+        folderTitleEl.createDiv("nav-folder-title-content").setText(folderTitle);
 
         folderTitleEl.onClickEvent((_) => {
             for (let child of childrenEl.childNodes as NodeListOf<HTMLElement>) {
-                if (
-                    child.style.display === "block" ||
-                    child.style.display === ""
-                ) {
+                if (child.style.display === "block" || child.style.display === "") {
                     child.style.display = "none";
-                    (
-                        collapseIconEl.childNodes[0] as HTMLElement
-                    ).style.transform = "rotate(-90deg)";
+                    (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
+                        "rotate(-90deg)";
                     this.activeFolders.delete(folderTitle);
                 } else {
                     child.style.display = "block";
-                    (
-                        collapseIconEl.childNodes[0] as HTMLElement
-                    ).style.transform = "";
+                    (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "";
                     this.activeFolders.add(folderTitle);
                 }
             }
@@ -195,13 +174,7 @@ export class ReviewQueueListView extends ItemView {
             (event: MouseEvent) => {
                 event.preventDefault();
                 let fileMenu: Menu = new Menu(this.app);
-                this.app.workspace.trigger(
-                    "file-menu",
-                    fileMenu,
-                    file,
-                    "my-context-menu",
-                    null
-                );
+                this.app.workspace.trigger("file-menu", fileMenu, file, "my-context-menu", null);
                 fileMenu.showAtPosition({
                     x: event.pageX,
                     y: event.pageY,

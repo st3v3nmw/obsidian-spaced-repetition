@@ -1,12 +1,4 @@
-import {
-    Notice,
-    Plugin,
-    addIcon,
-    TAbstractFile,
-    TFile,
-    HeadingCache,
-    getAllTags,
-} from "obsidian";
+import { Notice, Plugin, addIcon, TAbstractFile, TFile, HeadingCache, getAllTags } from "obsidian";
 import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
@@ -109,54 +101,38 @@ export default class SRPlugin extends Plugin {
 
         this.registerView(
             REVIEW_QUEUE_VIEW_TYPE,
-            (leaf) =>
-                (this.reviewQueueView = new ReviewQueueListView(leaf, this))
+            (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this))
         );
 
         if (!this.data.settings.disableFileMenuReviewOptions) {
             this.registerEvent(
-                this.app.workspace.on(
-                    "file-menu",
-                    (menu, fileish: TAbstractFile) => {
-                        if (
-                            fileish instanceof TFile &&
-                            fileish.extension === "md"
-                        ) {
-                            menu.addItem((item) => {
-                                item.setTitle(t("Review: Easy"))
-                                    .setIcon("crosshairs")
-                                    .onClick((_) => {
-                                        this.saveReviewResponse(
-                                            fileish,
-                                            ReviewResponse.Easy
-                                        );
-                                    });
-                            });
+                this.app.workspace.on("file-menu", (menu, fileish: TAbstractFile) => {
+                    if (fileish instanceof TFile && fileish.extension === "md") {
+                        menu.addItem((item) => {
+                            item.setTitle(t("Review: Easy"))
+                                .setIcon("crosshairs")
+                                .onClick((_) => {
+                                    this.saveReviewResponse(fileish, ReviewResponse.Easy);
+                                });
+                        });
 
-                            menu.addItem((item) => {
-                                item.setTitle(t("Review: Good"))
-                                    .setIcon("crosshairs")
-                                    .onClick((_) => {
-                                        this.saveReviewResponse(
-                                            fileish,
-                                            ReviewResponse.Good
-                                        );
-                                    });
-                            });
+                        menu.addItem((item) => {
+                            item.setTitle(t("Review: Good"))
+                                .setIcon("crosshairs")
+                                .onClick((_) => {
+                                    this.saveReviewResponse(fileish, ReviewResponse.Good);
+                                });
+                        });
 
-                            menu.addItem((item) => {
-                                item.setTitle(t("Review: Hard"))
-                                    .setIcon("crosshairs")
-                                    .onClick((_) => {
-                                        this.saveReviewResponse(
-                                            fileish,
-                                            ReviewResponse.Hard
-                                        );
-                                    });
-                            });
-                        }
+                        menu.addItem((item) => {
+                            item.setTitle(t("Review: Hard"))
+                                .setIcon("crosshairs")
+                                .onClick((_) => {
+                                    this.saveReviewResponse(fileish, ReviewResponse.Hard);
+                                });
+                        });
                     }
-                )
+                })
             );
         }
 
@@ -175,8 +151,7 @@ export default class SRPlugin extends Plugin {
             id: "srs-note-review-easy",
             name: t("Review note as easy"),
             callback: () => {
-                const openFile: TFile | null =
-                    this.app.workspace.getActiveFile();
+                const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md")
                     this.saveReviewResponse(openFile, ReviewResponse.Easy);
             },
@@ -231,9 +206,7 @@ export default class SRPlugin extends Plugin {
     }
 
     onunload(): void {
-        this.app.workspace
-            .getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE)
-            .forEach((leaf) => leaf.detach());
+        this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).forEach((leaf) => leaf.detach());
     }
 
     async sync(): Promise<void> {
@@ -253,8 +226,7 @@ export default class SRPlugin extends Plugin {
 
         let now: number = Date.now();
         for (let note of notes) {
-            if (this.incomingLinks[note.path] === undefined)
-                this.incomingLinks[note.path] = [];
+            if (this.incomingLinks[note.path] === undefined) this.incomingLinks[note.path] = [];
 
             let links = this.app.metadataCache.resolvedLinks[note.path] || {};
             for (let targetPath in links) {
@@ -271,22 +243,23 @@ export default class SRPlugin extends Plugin {
                     graph.link(note.path, targetPath, links[targetPath]);
                 }
             }
-            if (this.data.settings.noteFoldersToIgnore.some(folder => note.path.startsWith(folder))) continue;
+            if (
+                this.data.settings.noteFoldersToIgnore.some((folder) =>
+                    note.path.startsWith(folder)
+                )
+            )
+                continue;
 
-            let fileCachedData =
-                this.app.metadataCache.getFileCache(note) || {};
+            let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
 
-            let frontmatter =
-                fileCachedData.frontmatter || <Record<string, any>>{};
+            let frontmatter = fileCachedData.frontmatter || <Record<string, any>>{};
             let tags = getAllTags(fileCachedData) || [];
 
             let shouldIgnore: boolean = true;
             for (let tag of tags) {
                 if (
                     this.data.settings.tagsToReview.some(
-                        (tagToReview) =>
-                            tag === tagToReview ||
-                            tag.startsWith(tagToReview + "/")
+                        (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/")
                     )
                 ) {
                     shouldIgnore = false;
@@ -308,11 +281,7 @@ export default class SRPlugin extends Plugin {
             }
 
             let dueUnix: number = window
-                .moment(frontmatter["sr-due"], [
-                    "YYYY-MM-DD",
-                    "DD-MM-YYYY",
-                    "ddd MMM DD YYYY",
-                ])
+                .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
                 .valueOf();
             this.scheduledNotes.push({
                 note,
@@ -323,8 +292,7 @@ export default class SRPlugin extends Plugin {
 
             if (dueUnix <= now) this.dueNotesCount++;
             let nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
-            if (!this.dueDatesNotes.hasOwnProperty(nDays))
-                this.dueDatesNotes[nDays] = 0;
+            if (!this.dueDatesNotes.hasOwnProperty(nDays)) this.dueDatesNotes[nDays] = 0;
             this.dueDatesNotes[nDays]++;
         }
 
@@ -334,26 +302,18 @@ export default class SRPlugin extends Plugin {
 
         // sort new notes by importance
         this.newNotes = this.newNotes.sort(
-            (a: TFile, b: TFile) =>
-                (this.pageranks[b.path] || 0) - (this.pageranks[a.path] || 0)
+            (a: TFile, b: TFile) => (this.pageranks[b.path] || 0) - (this.pageranks[a.path] || 0)
         );
 
         // sort scheduled notes by date & within those days, sort them by importance
-        this.scheduledNotes = this.scheduledNotes.sort(
-            (a: SchedNote, b: SchedNote) => {
-                let result: number = a.dueUnix - b.dueUnix;
-                if (result !== 0) return result;
-                return (
-                    (this.pageranks[b.note.path] || 0) -
-                    (this.pageranks[a.note.path] || 0)
-                );
-            }
-        );
+        this.scheduledNotes = this.scheduledNotes.sort((a: SchedNote, b: SchedNote) => {
+            let result: number = a.dueUnix - b.dueUnix;
+            if (result !== 0) return result;
+            return (this.pageranks[b.note.path] || 0) - (this.pageranks[a.note.path] || 0);
+        });
 
-        let noteCountText: string =
-            this.dueNotesCount === 1 ? t("note") : t("notes");
-        let cardCountText: string =
-            this.deckTree.dueFlashcardsCount === 1 ? t("card") : t("cards");
+        let noteCountText: string = this.dueNotesCount === 1 ? t("note") : t("notes");
+        let cardCountText: string = this.deckTree.dueFlashcardsCount === 1 ? t("card") : t("cards");
         this.statusBar.setText(
             t("Review") +
                 `: ${this.dueNotesCount} ${noteCountText}, ` +
@@ -365,20 +325,13 @@ export default class SRPlugin extends Plugin {
         this.notesSyncLock = false;
     }
 
-    async saveReviewResponse(
-        note: TFile,
-        response: ReviewResponse
-    ): Promise<void> {
+    async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
         let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         let frontmatter = fileCachedData.frontmatter || <Record<string, any>>{};
 
         let tags = getAllTags(fileCachedData) || [];
-        if (this.data.settings.noteFoldersToIgnore.some(folder => note.path.startsWith(folder))) {
-            new Notice(
-                t(
-                    "Note is saved under ignored folder (check settings)."
-                )
-            );
+        if (this.data.settings.noteFoldersToIgnore.some((folder) => note.path.startsWith(folder))) {
+            new Notice(t("Note is saved under ignored folder (check settings)."));
             return;
         }
 
@@ -386,8 +339,7 @@ export default class SRPlugin extends Plugin {
         for (let tag of tags) {
             if (
                 this.data.settings.tagsToReview.some(
-                    (tagToReview) =>
-                        tag === tagToReview || tag.startsWith(tagToReview + "/")
+                    (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/")
                 )
             ) {
                 shouldIgnore = false;
@@ -396,11 +348,7 @@ export default class SRPlugin extends Plugin {
         }
 
         if (shouldIgnore) {
-            new Notice(
-                t(
-                    "Please tag the note appropriately for reviewing (in settings)."
-                )
-            );
+            new Notice(t("Please tag the note appropriately for reviewing (in settings)."));
             return;
         }
 
@@ -424,28 +372,19 @@ export default class SRPlugin extends Plugin {
             for (let statObj of this.incomingLinks[note.path] || []) {
                 let ease: number = this.easeByPath[statObj.sourcePath];
                 if (ease) {
-                    linkTotal +=
-                        statObj.linkCount *
-                        this.pageranks[statObj.sourcePath] *
-                        ease;
-                    linkPGTotal +=
-                        this.pageranks[statObj.sourcePath] * statObj.linkCount;
+                    linkTotal += statObj.linkCount * this.pageranks[statObj.sourcePath] * ease;
+                    linkPGTotal += this.pageranks[statObj.sourcePath] * statObj.linkCount;
                     totalLinkCount += statObj.linkCount;
                 }
             }
 
-            let outgoingLinks =
-                this.app.metadataCache.resolvedLinks[note.path] || {};
+            let outgoingLinks = this.app.metadataCache.resolvedLinks[note.path] || {};
             for (let linkedFilePath in outgoingLinks) {
                 let ease: number = this.easeByPath[linkedFilePath];
                 if (ease) {
                     linkTotal +=
-                        outgoingLinks[linkedFilePath] *
-                        this.pageranks[linkedFilePath] *
-                        ease;
-                    linkPGTotal +=
-                        this.pageranks[linkedFilePath] *
-                        outgoingLinks[linkedFilePath];
+                        outgoingLinks[linkedFilePath] * this.pageranks[linkedFilePath] * ease;
+                    linkPGTotal += this.pageranks[linkedFilePath] * outgoingLinks[linkedFilePath];
                     totalLinkCount += outgoingLinks[linkedFilePath];
                 }
             }
@@ -467,11 +406,7 @@ export default class SRPlugin extends Plugin {
             delayBeforeReview =
                 now -
                 window
-                    .moment(frontmatter["sr-due"], [
-                        "YYYY-MM-DD",
-                        "DD-MM-YYYY",
-                        "ddd MMM DD YYYY",
-                    ])
+                    .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
                     .valueOf();
         }
 
@@ -532,9 +467,7 @@ export default class SRPlugin extends Plugin {
             let index: number = this.data.settings.openRandomNote
                 ? Math.floor(Math.random() * this.dueNotesCount)
                 : 0;
-            this.app.workspace.activeLeaf.openFile(
-                this.scheduledNotes[index].note
-            );
+            this.app.workspace.activeLeaf.openFile(this.scheduledNotes[index].note);
             return;
         }
 
@@ -568,6 +501,13 @@ export default class SRPlugin extends Plugin {
 
         let notePathsSet: Set<string> = new Set();
         for (let note of notes) {
+            if (
+                this.data.settings.noteFoldersToIgnore.some((folder) =>
+                    note.path.startsWith(folder)
+                )
+            )
+                continue;
+
             notePathsSet.add(note.path);
 
             // find deck path
@@ -577,16 +517,14 @@ export default class SRPlugin extends Plugin {
                 deckPath.pop(); // remove filename
                 if (deckPath.length === 0) deckPath = ["/"];
             } else {
-                let fileCachedData =
-                    this.app.metadataCache.getFileCache(note) || {};
+                let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
                 let tags = getAllTags(fileCachedData) || [];
 
                 for (let tag of tags) {
                     if (
                         this.data.settings.tagsToReview.some(
                             (tagToReview) =>
-                                tag === tagToReview ||
-                                tag.startsWith(tagToReview + "/")
+                                tag === tagToReview || tag.startsWith(tagToReview + "/")
                         )
                     ) {
                         deckPath = tag.substring(1).split("/");
@@ -604,16 +542,10 @@ export default class SRPlugin extends Plugin {
                     if (fileCache.totalCards === 0) continue;
                     else if (
                         !fileCache.hasNewCards &&
-                        now.valueOf() <
-                            window
-                                .moment(fileCache.nextDueDate, "YYYY-MM-DD")
-                                .valueOf()
+                        now.valueOf() < window.moment(fileCache.nextDueDate, "YYYY-MM-DD").valueOf()
                     ) {
                         this.deckTree.createDeck([...deckPath]);
-                        this.deckTree.countFlashcard(
-                            deckPath,
-                            fileCache.totalCards
-                        );
+                        this.deckTree.countFlashcard(deckPath, fileCache.totalCards);
                     } else await this.findFlashcards(note, deckPath);
                 } else await this.findFlashcards(note, deckPath);
             } else await this.findFlashcards(note, deckPath);
@@ -629,8 +561,7 @@ export default class SRPlugin extends Plugin {
 
         // remove unused cache entries
         for (let cachedPath in this.data.cache) {
-            if (!notePathsSet.has(cachedPath))
-                delete this.data.cache[cachedPath];
+            if (!notePathsSet.has(cachedPath)) delete this.data.cache[cachedPath];
         }
         this.logger.info(`Flashcard sync took ${Date.now() - now.valueOf()}ms`);
         await this.savePluginData();
@@ -638,10 +569,8 @@ export default class SRPlugin extends Plugin {
         // sort the deck names
         this.deckTree.sortSubdecksList();
 
-        let noteCountText: string =
-            this.dueNotesCount === 1 ? t("note") : t("notes");
-        let cardCountText: string =
-            this.deckTree.dueFlashcardsCount === 1 ? t("card") : t("cards");
+        let noteCountText: string = this.dueNotesCount === 1 ? t("note") : t("notes");
+        let cardCountText: string = this.deckTree.dueFlashcardsCount === 1 ? t("card") : t("cards");
         this.statusBar.setText(
             t("Review") +
                 `: ${this.dueNotesCount} ${noteCountText}, ` +
@@ -683,11 +612,7 @@ export default class SRPlugin extends Plugin {
                 cardText: string = parsedCard[1],
                 lineNo: number = parsedCard[2];
 
-            if (
-                cardType === CardType.Cloze &&
-                this.data.settings.disableClozeCards
-            )
-                continue;
+            if (cardType === CardType.Cloze && this.data.settings.disableClozeCards) continue;
 
             let cardTextHash: string = cyrb53(cardText);
 
@@ -724,66 +649,43 @@ export default class SRPlugin extends Plugin {
             } else {
                 let idx: number;
                 if (cardType === CardType.SingleLineBasic) {
-                    idx = cardText.indexOf(
-                        this.data.settings.singlelineCardSeparator
-                    );
+                    idx = cardText.indexOf(this.data.settings.singlelineCardSeparator);
                     siblingMatches.push([
                         cardText.substring(0, idx),
-                        cardText.substring(
-                            idx +
-                                this.data.settings.singlelineCardSeparator
-                                    .length
-                        ),
+                        cardText.substring(idx + this.data.settings.singlelineCardSeparator.length),
                     ]);
                 } else if (cardType === CardType.SingleLineReversed) {
-                    idx = cardText.indexOf(
-                        this.data.settings.singlelineReversedCardSeparator
-                    );
+                    idx = cardText.indexOf(this.data.settings.singlelineReversedCardSeparator);
                     let side1: string = cardText.substring(0, idx),
                         side2: string = cardText.substring(
-                            idx +
-                                this.data.settings
-                                    .singlelineReversedCardSeparator.length
+                            idx + this.data.settings.singlelineReversedCardSeparator.length
                         );
                     siblingMatches.push([side1, side2]);
                     siblingMatches.push([side2, side1]);
                 } else if (cardType === CardType.MultiLineBasic) {
-                    idx = cardText.indexOf(
-                        "\n" + this.data.settings.multilineCardSeparator + "\n"
-                    );
+                    idx = cardText.indexOf("\n" + this.data.settings.multilineCardSeparator + "\n");
                     siblingMatches.push([
                         cardText.substring(0, idx),
                         cardText.substring(
-                            idx +
-                                2 +
-                                this.data.settings.multilineCardSeparator.length
+                            idx + 2 + this.data.settings.multilineCardSeparator.length
                         ),
                     ]);
                 } else if (cardType === CardType.MultiLineReversed) {
                     idx = cardText.indexOf(
-                        "\n" +
-                            this.data.settings.multilineReversedCardSeparator +
-                            "\n"
+                        "\n" + this.data.settings.multilineReversedCardSeparator + "\n"
                     );
                     let side1: string = cardText.substring(0, idx),
                         side2: string = cardText.substring(
-                            idx +
-                                2 +
-                                this.data.settings
-                                    .multilineReversedCardSeparator.length
+                            idx + 2 + this.data.settings.multilineReversedCardSeparator.length
                         );
                     siblingMatches.push([side1, side2]);
                     siblingMatches.push([side2, side1]);
                 }
             }
 
-            let scheduling: RegExpMatchArray[] = [
-                ...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
-            ];
+            let scheduling: RegExpMatchArray[] = [...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR)];
             if (scheduling.length === 0)
-                scheduling = [
-                    ...cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR),
-                ];
+                scheduling = [...cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
 
             // we have some extra scheduling dates to delete
             if (scheduling.length > siblingMatches.length) {
@@ -793,14 +695,8 @@ export default class SRPlugin extends Plugin {
                     newCardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
                 newCardText += "-->";
 
-                let replacementRegex = new RegExp(
-                    escapeRegexString(cardText),
-                    "gm"
-                );
-                fileText = fileText.replace(
-                    replacementRegex,
-                    (_) => newCardText
-                );
+                let replacementRegex = new RegExp(escapeRegexString(cardText), "gm");
+                fileText = fileText.replace(replacementRegex, (_) => newCardText);
                 fileChanged = true;
             }
 
@@ -833,11 +729,8 @@ export default class SRPlugin extends Plugin {
                         .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY"])
                         .valueOf();
                     if (dueUnix < nextDueDate) nextDueDate = dueUnix;
-                    let nDays: number = Math.ceil(
-                        (dueUnix - now) / (24 * 3600 * 1000)
-                    );
-                    if (!dueDatesFlashcards.hasOwnProperty(nDays))
-                        dueDatesFlashcards[nDays] = 0;
+                    let nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
+                    if (!dueDatesFlashcards.hasOwnProperty(nDays)) dueDatesFlashcards[nDays] = 0;
                     dueDatesFlashcards[nDays]++;
                     if (this.data.buryList.includes(cardTextHash)) {
                         this.deckTree.countFlashcard([...deckPath]);
@@ -871,9 +764,7 @@ export default class SRPlugin extends Plugin {
                 totalCards,
                 hasNewCards,
                 nextDueDate:
-                    nextDueDate !== Infinity
-                        ? window.moment(nextDueDate).format("YYYY-MM-DD")
-                        : "",
+                    nextDueDate !== Infinity ? window.moment(nextDueDate).format("YYYY-MM-DD") : "",
                 lastUpdated: note.stat.mtime,
                 dueDatesFlashcards,
             };
@@ -883,11 +774,7 @@ export default class SRPlugin extends Plugin {
 
     async loadPluginData(): Promise<void> {
         this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
-        this.data.settings = Object.assign(
-            {},
-            DEFAULT_SETTINGS,
-            this.data.settings
-        );
+        this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
     }
 
     async savePluginData(): Promise<void> {
@@ -911,11 +798,7 @@ function getCardContext(cardLine: number, headings: HeadingCache[]): string {
     for (let heading of headings) {
         if (heading.position.start.line > cardLine) break;
 
-        while (
-            stack.length > 0 &&
-            stack[stack.length - 1].level >= heading.level
-        )
-            stack.pop();
+        while (stack.length > 0 && stack[stack.length - 1].level >= heading.level) stack.pop();
 
         stack.push(heading);
     }
