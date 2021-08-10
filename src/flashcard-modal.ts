@@ -1,12 +1,4 @@
-import {
-    Modal,
-    App,
-    MarkdownRenderer,
-    Notice,
-    Platform,
-    TFile,
-    MarkdownView,
-} from "obsidian";
+import { Modal, App, MarkdownRenderer, Notice, Platform, TFile, MarkdownView } from "obsidian";
 
 import type SRPlugin from "src/main";
 import { Card, schedule, textInterval, ReviewResponse } from "src/scheduling";
@@ -51,10 +43,8 @@ export class FlashcardModal extends Modal {
         this.titleEl.setText(t("Decks"));
 
         if (Platform.isMobile) this.contentEl.style.display = "block";
-        this.modalEl.style.height =
-            this.plugin.data.settings.flashcardHeightPercentage + "%";
-        this.modalEl.style.width =
-            this.plugin.data.settings.flashcardWidthPercentage + "%";
+        this.modalEl.style.height = this.plugin.data.settings.flashcardHeightPercentage + "%";
+        this.modalEl.style.width = this.plugin.data.settings.flashcardWidthPercentage + "%";
 
         this.contentEl.style.position = "relative";
         this.contentEl.style.height = "92%";
@@ -62,16 +52,12 @@ export class FlashcardModal extends Modal {
 
         document.body.onkeypress = (e) => {
             if (this.mode !== FlashcardModalMode.DecksList) {
-                if (
-                    this.mode !== FlashcardModalMode.Closed &&
-                    e.code === "KeyS"
-                ) {
+                if (this.mode !== FlashcardModalMode.Closed && e.code === "KeyS") {
                     this.currentDeck.deleteFlashcardAtIndex(
                         this.currentCardIdx,
                         this.currentCard.isDue
                     );
-                    if (this.currentCard.cardType === CardType.Cloze)
-                        this.burySiblingCards(false);
+                    if (this.currentCard.cardType === CardType.Cloze) this.burySiblingCards(false);
                     this.currentDeck.nextCard(this);
                 } else if (
                     this.mode === FlashcardModalMode.Front &&
@@ -81,11 +67,7 @@ export class FlashcardModal extends Modal {
                 else if (this.mode === FlashcardModalMode.Back) {
                     if (e.code === "Numpad1" || e.code === "Digit1")
                         this.processReview(ReviewResponse.Hard);
-                    else if (
-                        e.code === "Numpad2" ||
-                        e.code === "Digit2" ||
-                        e.code === "Space"
-                    )
+                    else if (e.code === "Numpad2" || e.code === "Digit2" || e.code === "Space")
                         this.processReview(ReviewResponse.Good);
                     else if (e.code === "Numpad3" || e.code === "Digit3")
                         this.processReview(ReviewResponse.Easy);
@@ -128,8 +110,7 @@ export class FlashcardModal extends Modal {
         this.contentEl.innerHTML = "";
         this.contentEl.setAttribute("id", "sr-flashcard-view");
 
-        for (let deck of this.plugin.deckTree.subdecks)
-            deck.render(this.contentEl, this);
+        for (let deck of this.plugin.deckTree.subdecks) deck.render(this.contentEl, this);
     }
 
     setupCardsView() {
@@ -141,11 +122,8 @@ export class FlashcardModal extends Modal {
             this.fileLinkView.setAttribute("aria-label", t("Open file"));
         this.fileLinkView.addEventListener("click", async (_) => {
             this.close();
-            await this.plugin.app.workspace.activeLeaf.openFile(
-                this.currentCard.note
-            );
-            let activeView: MarkdownView =
-                this.app.workspace.getActiveViewOfType(MarkdownView)!;
+            await this.plugin.app.workspace.activeLeaf.openFile(this.currentCard.note);
+            let activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView)!;
             activeView.editor.setCursor({
                 line: this.currentCard.lineNo,
                 ch: 0,
@@ -208,8 +186,7 @@ export class FlashcardModal extends Modal {
         this.answerBtn.style.display = "none";
         this.responseDiv.style.display = "grid";
 
-        if (this.currentCard.isDue)
-            this.resetLinkView.style.display = "inline-block";
+        if (this.currentCard.isDue) this.resetLinkView.style.display = "inline-block";
 
         if (this.currentCard.cardType !== CardType.Cloze) {
             let hr: HTMLElement = document.createElement("hr");
@@ -223,10 +200,7 @@ export class FlashcardModal extends Modal {
     async processReview(response: ReviewResponse): Promise<void> {
         let interval: number, ease: number, due;
 
-        this.currentDeck.deleteFlashcardAtIndex(
-            this.currentCardIdx,
-            this.currentCard.isDue
-        );
+        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
         if (response !== ReviewResponse.Reset) {
             // scheduled card
             if (this.currentCard.isDue) {
@@ -257,8 +231,7 @@ export class FlashcardModal extends Modal {
         } else {
             this.currentCard.interval = 1.0;
             this.currentCard.ease = this.plugin.data.settings.baseEase;
-            if (this.currentCard.isDue)
-                this.currentDeck.dueFlashcards.push(this.currentCard);
+            if (this.currentCard.isDue) this.currentDeck.dueFlashcards.push(this.currentCard);
             else this.currentDeck.newFlashcards.push(this.currentCard);
             due = window.moment(Date.now());
             new Notice(t("Card's progress has been reset."));
@@ -269,63 +242,36 @@ export class FlashcardModal extends Modal {
         let dueString: string = due.format("YYYY-MM-DD");
 
         let fileText: string = await this.app.vault.read(this.currentCard.note);
-        let replacementRegex = new RegExp(
-            escapeRegexString(this.currentCard.cardText),
-            "gm"
-        );
+        let replacementRegex = new RegExp(escapeRegexString(this.currentCard.cardText), "gm");
 
-        let sep: string = this.plugin.data.settings.cardCommentOnSameLine
-            ? " "
-            : "\n";
+        let sep: string = this.plugin.data.settings.cardCommentOnSameLine ? " " : "\n";
 
         // check if we're adding scheduling information to the flashcard
         // for the first time
         if (this.currentCard.cardText.lastIndexOf("<!--SR:") === -1) {
             this.currentCard.cardText =
-                this.currentCard.cardText +
-                sep +
-                `<!--SR:!${dueString},${interval},${ease}-->`;
+                this.currentCard.cardText + sep + `<!--SR:!${dueString},${interval},${ease}-->`;
         } else {
             let scheduling: RegExpMatchArray[] = [
-                ...this.currentCard.cardText.matchAll(
-                    MULTI_SCHEDULING_EXTRACTOR
-                ),
+                ...this.currentCard.cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
             ];
             if (scheduling.length === 0)
-                scheduling = [
-                    ...this.currentCard.cardText.matchAll(
-                        LEGACY_SCHEDULING_EXTRACTOR
-                    ),
-                ];
+                scheduling = [...this.currentCard.cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
 
-            let currCardSched: string[] = [
-                "0",
-                dueString,
-                interval.toString(),
-                ease.toString(),
-            ];
-            if (this.currentCard.isDue)
-                scheduling[this.currentCard.siblingIdx] = currCardSched;
+            let currCardSched: string[] = ["0", dueString, interval.toString(), ease.toString()];
+            if (this.currentCard.isDue) scheduling[this.currentCard.siblingIdx] = currCardSched;
             else scheduling.push(currCardSched);
 
-            this.currentCard.cardText = this.currentCard.cardText.replace(
-                /<!--SR:.+-->/gm,
-                ""
-            );
+            this.currentCard.cardText = this.currentCard.cardText.replace(/<!--SR:.+-->/gm, "");
             this.currentCard.cardText += "<!--SR:";
             for (let i = 0; i < scheduling.length; i++)
                 this.currentCard.cardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
             this.currentCard.cardText += "-->";
         }
 
-        fileText = fileText.replace(
-            replacementRegex,
-            (_) => this.currentCard.cardText
-        );
-        for (let sibling of this.currentCard.siblings)
-            sibling.cardText = this.currentCard.cardText;
-        if (this.plugin.data.settings.burySiblingCards)
-            this.burySiblingCards(true);
+        fileText = fileText.replace(replacementRegex, (_) => this.currentCard.cardText);
+        for (let sibling of this.currentCard.siblings) sibling.cardText = this.currentCard.cardText;
+        if (this.plugin.data.settings.burySiblingCards) this.burySiblingCards(true);
 
         await this.app.vault.modify(this.currentCard.note, fileText);
         this.currentDeck.nextCard(this);
@@ -356,10 +302,7 @@ export class FlashcardModal extends Modal {
 
     // slightly modified version of the renderMarkdown function in
     // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/KanbanView.tsx
-    async renderMarkdownWrapper(
-        markdownString: string,
-        containerEl: HTMLElement
-    ): Promise<void> {
+    async renderMarkdownWrapper(markdownString: string, containerEl: HTMLElement): Promise<void> {
         MarkdownRenderer.renderMarkdown(
             markdownString,
             containerEl,
@@ -370,10 +313,7 @@ export class FlashcardModal extends Modal {
             let src: string = el.getAttribute("src")!;
             let target: TFile | null | false =
                 typeof src === "string" &&
-                this.plugin.app.metadataCache.getFirstLinkpathDest(
-                    src,
-                    this.currentCard.note.path
-                );
+                this.plugin.app.metadataCache.getFirstLinkpathDest(src, this.currentCard.note.path);
             if (target instanceof TFile && target.extension !== "md") {
                 el.innerText = "";
                 el.createEl(
@@ -385,10 +325,7 @@ export class FlashcardModal extends Modal {
                     },
                     (img) => {
                         if (el.hasAttribute("width"))
-                            img.setAttribute(
-                                "width",
-                                el.getAttribute("width")!
-                            );
+                            img.setAttribute("width", el.getAttribute("width")!);
                         else img.setAttribute("width", "100%");
                         if (el.hasAttribute("alt"))
                             img.setAttribute("alt", el.getAttribute("alt")!);
@@ -506,28 +443,21 @@ export class Deck {
         let collapsed: boolean = true;
         let collapseIconEl: HTMLElement | null = null;
         if (this.subdecks.length > 0) {
-            collapseIconEl = deckViewSelf.createDiv(
-                "tree-item-icon collapse-icon"
-            );
+            collapseIconEl = deckViewSelf.createDiv("tree-item-icon collapse-icon");
             collapseIconEl.innerHTML = COLLAPSE_ICON;
-            (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
-                "rotate(-90deg)";
+            (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "rotate(-90deg)";
         }
 
-        let deckViewInner: HTMLElement =
-            deckViewSelf.createDiv("tree-item-inner");
+        let deckViewInner: HTMLElement = deckViewSelf.createDiv("tree-item-inner");
         deckViewInner.addEventListener("click", (_) => {
             modal.currentDeck = this;
             modal.checkDeck = this.parent!;
             modal.setupCardsView();
             this.nextCard(modal);
         });
-        let deckViewInnerText: HTMLElement =
-            deckViewInner.createDiv("tag-pane-tag-text");
+        let deckViewInnerText: HTMLElement = deckViewInner.createDiv("tag-pane-tag-text");
         deckViewInnerText.innerHTML += `<span class="tag-pane-tag-self">${this.deckName}</span>`;
-        let deckViewOuter: HTMLElement = deckViewSelf.createDiv(
-            "tree-item-flair-outer"
-        );
+        let deckViewOuter: HTMLElement = deckViewSelf.createDiv("tree-item-flair-outer");
         deckViewOuter.innerHTML +=
             '<span style="background-color:#4caf50;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
             this.dueFlashcardsCount +
@@ -539,20 +469,16 @@ export class Deck {
             this.totalFlashcards +
             "</span>";
 
-        let deckViewChildren: HTMLElement =
-            deckView.createDiv("tree-item-children");
+        let deckViewChildren: HTMLElement = deckView.createDiv("tree-item-children");
         deckViewChildren.style.display = "none";
         if (this.subdecks.length > 0) {
             collapseIconEl!.addEventListener("click", (_) => {
                 if (collapsed) {
-                    (
-                        collapseIconEl!.childNodes[0] as HTMLElement
-                    ).style.transform = "";
+                    (collapseIconEl!.childNodes[0] as HTMLElement).style.transform = "";
                     deckViewChildren.style.display = "block";
                 } else {
-                    (
-                        collapseIconEl!.childNodes[0] as HTMLElement
-                    ).style.transform = "rotate(-90deg)";
+                    (collapseIconEl!.childNodes[0] as HTMLElement).style.transform =
+                        "rotate(-90deg)";
                     deckViewChildren.style.display = "none";
                 }
                 collapsed = !collapsed;
@@ -581,9 +507,7 @@ export class Deck {
         modal.responseDiv.style.display = "none";
         modal.resetLinkView.style.display = "none";
         modal.titleEl.setText(
-            `${this.deckName} - ${
-                this.dueFlashcardsCount + this.newFlashcardsCount
-            }`
+            `${this.deckName} - ${this.dueFlashcardsCount + this.newFlashcardsCount}`
         );
 
         modal.answerBtn.style.display = "initial";
@@ -592,15 +516,10 @@ export class Deck {
 
         if (this.dueFlashcards.length > 0) {
             if (modal.plugin.data.settings.randomizeCardOrder)
-                modal.currentCardIdx = Math.floor(
-                    Math.random() * this.dueFlashcards.length
-                );
+                modal.currentCardIdx = Math.floor(Math.random() * this.dueFlashcards.length);
             else modal.currentCardIdx = 0;
             modal.currentCard = this.dueFlashcards[modal.currentCardIdx];
-            modal.renderMarkdownWrapper(
-                modal.currentCard.front,
-                modal.flashcardView
-            );
+            modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
 
             let hardInterval: number = schedule(
                 ReviewResponse.Hard,
@@ -629,27 +548,16 @@ export class Deck {
                 modal.goodBtn.setText(textInterval(goodInterval, true));
                 modal.easyBtn.setText(textInterval(easyInterval, true));
             } else {
-                modal.hardBtn.setText(
-                    t("Hard") + " - " + textInterval(hardInterval, false)
-                );
-                modal.goodBtn.setText(
-                    t("Good") + " - " + textInterval(goodInterval, false)
-                );
-                modal.easyBtn.setText(
-                    t("Easy") + " - " + textInterval(easyInterval, false)
-                );
+                modal.hardBtn.setText(t("Hard") + " - " + textInterval(hardInterval, false));
+                modal.goodBtn.setText(t("Good") + " - " + textInterval(goodInterval, false));
+                modal.easyBtn.setText(t("Easy") + " - " + textInterval(easyInterval, false));
             }
         } else if (this.newFlashcards.length > 0) {
             if (modal.plugin.data.settings.randomizeCardOrder)
-                modal.currentCardIdx = Math.floor(
-                    Math.random() * this.newFlashcards.length
-                );
+                modal.currentCardIdx = Math.floor(Math.random() * this.newFlashcards.length);
             else modal.currentCardIdx = 0;
             modal.currentCard = this.newFlashcards[modal.currentCardIdx];
-            modal.renderMarkdownWrapper(
-                modal.currentCard.front,
-                modal.flashcardView
-            );
+            modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
 
             if (Platform.isMobile) {
                 modal.hardBtn.setText("1.0d");
