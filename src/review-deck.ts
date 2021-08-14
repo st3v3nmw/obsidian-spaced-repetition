@@ -14,21 +14,15 @@ export class ReviewDeck {
 
     public sortNotes(pageranks: Record<string, number>) {
         this.newNotes = this.newNotes.sort(
-            (a: TFile, b: TFile) =>
-                (pageranks[b.path] || 0) - (pageranks[a.path] || 0)
+            (a: TFile, b: TFile) => (pageranks[b.path] || 0) - (pageranks[a.path] || 0)
         );
 
         // sort scheduled notes by date & within those days, sort them by importance
-        this.scheduledNotes = this.scheduledNotes.sort(
-            (a: SchedNote, b: SchedNote) => {
-                let result = a.dueUnix - b.dueUnix;
-                if (result != 0) return result;
-                return (
-                    (pageranks[b.note.path] || 0) -
-                    (pageranks[a.note.path] || 0)
-                );
-            }
-        );
+        this.scheduledNotes = this.scheduledNotes.sort((a: SchedNote, b: SchedNote) => {
+            let result = a.dueUnix - b.dueUnix;
+            if (result != 0) return result;
+            return (pageranks[b.note.path] || 0) - (pageranks[a.note.path] || 0);
+        });
     }
 }
 
@@ -49,7 +43,7 @@ export class ReviewDeckSelectionModal extends FuzzySuggestModal<string> {
         return item;
     }
 
-    onChooseItem(deckKey: string, evt: MouseEvent | KeyboardEvent): void {
+    onChooseItem(deckKey: string, _: MouseEvent | KeyboardEvent): void {
         this.close();
         this.submitCallback(deckKey);
     }
