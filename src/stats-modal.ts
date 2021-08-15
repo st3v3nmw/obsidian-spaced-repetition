@@ -18,7 +18,9 @@ export class StatsModal extends Modal {
         this.modalEl.style.height = "100%";
         this.modalEl.style.width = "100%";
 
-        if (Platform.isMobile) this.contentEl.style.display = "block";
+        if (Platform.isMobile) {
+            this.contentEl.style.display = "block";
+        }
     }
 
     onOpen(): void {
@@ -39,14 +41,18 @@ export class StatsModal extends Modal {
 
         let maxN: number = Math.max(...getKeysPreserveType(this.dueDatesFlashcards));
         for (let dueOffset = 0; dueOffset <= maxN; dueOffset++) {
-            if (!this.dueDatesFlashcards.hasOwnProperty(dueOffset))
+            if (!this.dueDatesFlashcards.hasOwnProperty(dueOffset)) {
                 this.dueDatesFlashcards[dueOffset] = 0;
+            }
         }
 
         let dueDatesFlashcardsCopy: Record<number, number> = { 0: 0 };
         for (let [dueOffset, dueCount] of Object.entries(this.dueDatesFlashcards)) {
-            if (dueOffset <= 0) dueDatesFlashcardsCopy[0] += dueCount;
-            else dueDatesFlashcardsCopy[dueOffset] = dueCount;
+            if (dueOffset <= 0) {
+                dueDatesFlashcardsCopy[0] += dueCount;
+            } else {
+                dueDatesFlashcardsCopy[dueOffset] = dueCount;
+            }
         }
 
         let text: string =

@@ -38,7 +38,9 @@ export function parse(
             continue;
         }
 
-        if (cardText.length > 0) cardText += "\n";
+        if (cardText.length > 0) {
+            cardText += "\n";
+        }
         cardText += lines[i];
 
         if (
@@ -76,7 +78,9 @@ export function parse(
         }
     }
 
-    if (cardType && cardText) cards.push([cardType, cardText, lineNo]);
+    if (cardType && cardText) {
+        cards.push([cardType, cardText, lineNo]);
+    }
 
     return cards;
 }

@@ -70,7 +70,7 @@ export class ReviewQueueListView extends ItemView {
                             this.createRightPaneFile(
                                 newNotesFolderEl,
                                 newFile,
-                                openFile && newFile.path === openFile.path,
+                                openFile! && newFile.path === openFile.path,
                                 !this.activeFolders.has("New")
                             );
                         }
@@ -90,7 +90,9 @@ export class ReviewQueueListView extends ItemView {
                                     (sNote.dueUnix - now) / (24 * 3600 * 1000)
                                 );
 
-                                if (nDays > maxDaysToRender) break;
+                                if (nDays > maxDaysToRender) {
+                                    break;
+                                }
 
                                 folderTitle =
                                     nDays == -1
@@ -112,7 +114,7 @@ export class ReviewQueueListView extends ItemView {
                             this.createRightPaneFile(
                                 schedFolderEl!,
                                 sNote.note,
-                                openFile && sNote.note.path === openFile.path,
+                                openFile! && sNote.note.path === openFile.path,
                                 !this.activeFolders.has(folderTitle)
                             );
                         }
@@ -146,8 +148,9 @@ export class ReviewQueueListView extends ItemView {
             );
 
         collapseIconEl.innerHTML = COLLAPSE_ICON;
-        if (collapsed)
+        if (collapsed) {
             (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "rotate(-90deg)";
+        }
 
         folderTitleEl.createDiv("nav-folder-title-content").setText(folderTitle);
 
@@ -178,10 +181,14 @@ export class ReviewQueueListView extends ItemView {
         let navFileEl: HTMLElement = folderEl
             .getElementsByClassName("nav-folder-children")[0]
             .createDiv("nav-file");
-        if (hidden) navFileEl.style.display = "none";
+        if (hidden) {
+            navFileEl.style.display = "none";
+        }
 
         let navFileTitle: HTMLElement = navFileEl.createDiv("nav-file-title");
-        if (fileElActive) navFileTitle.addClass("is-active");
+        if (fileElActive) {
+            navFileTitle.addClass("is-active");
+        }
 
         navFileTitle.createDiv("nav-file-title-content").setText(file.basename);
         navFileTitle.addEventListener(

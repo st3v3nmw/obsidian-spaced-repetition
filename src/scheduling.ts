@@ -48,9 +48,9 @@ export function schedule(
         ease += 20;
         interval = ((interval + delayBeforeReview) * ease) / 100;
         interval *= settingsObj.easyBonus;
-    } else if (response === ReviewResponse.Good)
+    } else if (response === ReviewResponse.Good) {
         interval = ((interval + delayBeforeReview / 2) * ease) / 100;
-    else if (response === ReviewResponse.Hard) {
+    } else if (response === ReviewResponse.Hard) {
         ease = Math.max(130, ease - 20);
         interval = Math.max(
             1,
@@ -61,12 +61,15 @@ export function schedule(
     // replaces random fuzz with load balancing over the fuzz interval
     if (dueDates !== undefined) {
         interval = Math.round(interval);
-        if (!dueDates.hasOwnProperty(interval)) dueDates[interval] = 0;
+        if (!dueDates.hasOwnProperty(interval)) {
+            dueDates[interval] = 0;
+        }
 
         let fuzzRange: [number, number];
         // disable fuzzing for small intervals
-        if (interval <= 4) fuzzRange = [interval, interval];
-        else {
+        if (interval <= 4) {
+            fuzzRange = [interval, interval];
+        } else {
             let fuzz: number;
             if (interval < 7) fuzz = 1;
             else if (interval < 30) fuzz = Math.max(2, Math.floor(interval * 0.15));
@@ -75,8 +78,12 @@ export function schedule(
         }
 
         for (let ivl = fuzzRange[0]; ivl <= fuzzRange[1]; ivl++) {
-            if (!dueDates.hasOwnProperty(ivl)) dueDates[ivl] = 0;
-            if (dueDates[ivl] < dueDates[interval]) interval = ivl;
+            if (!dueDates.hasOwnProperty(ivl)) {
+                dueDates[ivl] = 0;
+            }
+            if (dueDates[ivl] < dueDates[interval]) {
+                interval = ivl;
+            }
         }
 
         dueDates[interval]++;
@@ -96,10 +103,12 @@ export function textInterval(interval: number, isMobile: boolean): string {
         else if (interval < 365) return `${m}m`;
         else return `${y}y`;
     } else {
-        if (interval < 30)
+        if (interval < 30) {
             return interval === 1.0 ? "1.0 " + t("day") : interval.toString() + " " + t("days");
-        else if (interval < 365)
+        } else if (interval < 365) {
             return m === 1.0 ? "1.0 " + t("month") : m.toString() + " " + t("months");
-        else return y === 1.0 ? "1.0 " + t("year") : y.toString() + " " + t("years");
+        } else {
+            return y === 1.0 ? "1.0 " + t("year") : y.toString() + " " + t("years");
+        }
     }
 }
