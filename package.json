@@ -9,7 +9,7 @@
         "test": "jest"
     },
     "keywords": [],
-    "author": "",
+    "author": "Stephen Mwangi",
     "license": "MIT",
     "devDependencies": {
         "@rollup/plugin-commonjs": "^20.0.0",
