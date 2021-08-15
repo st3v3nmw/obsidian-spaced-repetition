@@ -42,7 +42,9 @@ export class FlashcardModal extends Modal {
 
         this.titleEl.setText(t("Decks"));
 
-        if (Platform.isMobile) this.contentEl.style.display = "block";
+        if (Platform.isMobile) {
+            this.contentEl.style.display = "block";
+        }
         this.modalEl.style.height = this.plugin.data.settings.flashcardHeightPercentage + "%";
         this.modalEl.style.width = this.plugin.data.settings.flashcardWidthPercentage + "%";
 
@@ -57,22 +59,25 @@ export class FlashcardModal extends Modal {
                         this.currentCardIdx,
                         this.currentCard.isDue
                     );
-                    if (this.currentCard.cardType === CardType.Cloze) this.burySiblingCards(false);
+                    if (this.currentCard.cardType === CardType.Cloze) {
+                        this.burySiblingCards(false);
+                    }
                     this.currentDeck.nextCard(this);
                 } else if (
                     this.mode === FlashcardModalMode.Front &&
                     (e.code === "Space" || e.code === "Enter")
-                )
+                ) {
                     this.showAnswer();
-                else if (this.mode === FlashcardModalMode.Back) {
-                    if (e.code === "Numpad1" || e.code === "Digit1")
+                } else if (this.mode === FlashcardModalMode.Back) {
+                    if (e.code === "Numpad1" || e.code === "Digit1") {
                         this.processReview(ReviewResponse.Hard);
-                    else if (e.code === "Numpad2" || e.code === "Digit2" || e.code === "Space")
+                    } else if (e.code === "Numpad2" || e.code === "Digit2" || e.code === "Space") {
                         this.processReview(ReviewResponse.Good);
-                    else if (e.code === "Numpad3" || e.code === "Digit3")
+                    } else if (e.code === "Numpad3" || e.code === "Digit3") {
                         this.processReview(ReviewResponse.Easy);
-                    else if (e.code === "Numpad0" || e.code === "Digit0")
+                    } else if (e.code === "Numpad0" || e.code === "Digit0") {
                         this.processReview(ReviewResponse.Reset);
+                    }
                 }
             }
         };
@@ -110,7 +115,9 @@ export class FlashcardModal extends Modal {
         this.contentEl.innerHTML = "";
         this.contentEl.setAttribute("id", "sr-flashcard-view");
 
-        for (let deck of this.plugin.deckTree.subdecks) deck.render(this.contentEl, this);
+        for (let deck of this.plugin.deckTree.subdecks) {
+            deck.render(this.contentEl, this);
+        }
     }
 
     setupCardsView() {
@@ -118,8 +125,9 @@ export class FlashcardModal extends Modal {
 
         this.fileLinkView = this.contentEl.createDiv("sr-link");
         this.fileLinkView.setText(t("Open file"));
-        if (this.plugin.data.settings.showFileNameInFileLink)
+        if (this.plugin.data.settings.showFileNameInFileLink) {
             this.fileLinkView.setAttribute("aria-label", t("Open file"));
+        }
         this.fileLinkView.addEventListener("click", async (_) => {
             this.close();
             await this.plugin.app.workspace.activeLeaf.openFile(this.currentCard.note);
@@ -186,13 +194,17 @@ export class FlashcardModal extends Modal {
         this.answerBtn.style.display = "none";
         this.responseDiv.style.display = "grid";
 
-        if (this.currentCard.isDue) this.resetLinkView.style.display = "inline-block";
+        if (this.currentCard.isDue) {
+            this.resetLinkView.style.display = "inline-block";
+        }
 
         if (this.currentCard.cardType !== CardType.Cloze) {
             let hr: HTMLElement = document.createElement("hr");
             hr.setAttribute("id", "sr-hr-card-divide");
             this.flashcardView.appendChild(hr);
-        } else this.flashcardView.innerHTML = "";
+        } else {
+            this.flashcardView.innerHTML = "";
+        }
 
         this.renderMarkdownWrapper(this.currentCard.back, this.flashcardView);
     }
@@ -231,8 +243,11 @@ export class FlashcardModal extends Modal {
         } else {
             this.currentCard.interval = 1.0;
             this.currentCard.ease = this.plugin.data.settings.baseEase;
-            if (this.currentCard.isDue) this.currentDeck.dueFlashcards.push(this.currentCard);
-            else this.currentDeck.newFlashcards.push(this.currentCard);
+            if (this.currentCard.isDue) {
+                this.currentDeck.dueFlashcards.push(this.currentCard);
+            } else {
+                this.currentDeck.newFlashcards.push(this.currentCard);
+            }
             due = window.moment(Date.now());
             new Notice(t("Card's progress has been reset."));
             this.currentDeck.nextCard(this);
@@ -246,7 +261,9 @@ export class FlashcardModal extends Modal {
 
         let sep: string = this.plugin.data.settings.cardCommentOnSameLine ? " " : "\n";
         // Override separator if last block is a codeblock
-        if (this.currentCard.cardText.endsWith("```") && sep !== "\n") sep = "\n";
+        if (this.currentCard.cardText.endsWith("```") && sep !== "\n") {
+            sep = "\n";
+        }
 
         // check if we're adding scheduling information to the flashcard
         // for the first time
@@ -257,23 +274,32 @@ export class FlashcardModal extends Modal {
             let scheduling: RegExpMatchArray[] = [
                 ...this.currentCard.cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
             ];
-            if (scheduling.length === 0)
+            if (scheduling.length === 0) {
                 scheduling = [...this.currentCard.cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
+            }
 
             let currCardSched: string[] = ["0", dueString, interval.toString(), ease.toString()];
-            if (this.currentCard.isDue) scheduling[this.currentCard.siblingIdx] = currCardSched;
-            else scheduling.push(currCardSched);
+            if (this.currentCard.isDue) {
+                scheduling[this.currentCard.siblingIdx] = currCardSched;
+            } else {
+                scheduling.push(currCardSched);
+            }
 
             this.currentCard.cardText = this.currentCard.cardText.replace(/<!--SR:.+-->/gm, "");
             this.currentCard.cardText += "<!--SR:";
-            for (let i = 0; i < scheduling.length; i++)
+            for (let i = 0; i < scheduling.length; i++) {
                 this.currentCard.cardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
+            }
             this.currentCard.cardText += "-->";
         }
 
         fileText = fileText.replace(replacementRegex, (_) => this.currentCard.cardText);
-        for (let sibling of this.currentCard.siblings) sibling.cardText = this.currentCard.cardText;
-        if (this.plugin.data.settings.burySiblingCards) this.burySiblingCards(true);
+        for (let sibling of this.currentCard.siblings) {
+            sibling.cardText = this.currentCard.cardText;
+        }
+        if (this.plugin.data.settings.burySiblingCards) {
+            this.burySiblingCards(true);
+        }
 
         await this.app.vault.modify(this.currentCard.note, fileText);
         this.currentDeck.nextCard(this);
@@ -338,7 +364,9 @@ export class FlashcardModal extends Modal {
 
             // file does not exist
             // display dead link
-            if (target === null) el.innerText = src;
+            if (target === null) {
+                el.innerText = src;
+            }
         });
     }
 }
@@ -365,7 +393,9 @@ export class Deck {
     }
 
     createDeck(deckPath: string[]): void {
-        if (deckPath.length === 0) return;
+        if (deckPath.length === 0) {
+            return;
+        }
 
         let deckName: string = deckPath.shift()!;
         for (let deck of this.subdecks) {
@@ -381,13 +411,19 @@ export class Deck {
     }
 
     insertFlashcard(deckPath: string[], cardObj: Card): void {
-        if (cardObj.isDue) this.dueFlashcardsCount++;
-        else this.newFlashcardsCount++;
+        if (cardObj.isDue) {
+            this.dueFlashcardsCount++;
+        } else {
+            this.newFlashcardsCount++;
+        }
         this.totalFlashcards++;
 
         if (deckPath.length === 0) {
-            if (cardObj.isDue) this.dueFlashcards.push(cardObj);
-            else this.newFlashcards.push(cardObj);
+            if (cardObj.isDue) {
+                this.dueFlashcards.push(cardObj);
+            } else {
+                this.newFlashcards.push(cardObj);
+            }
             return;
         }
 
@@ -415,25 +451,36 @@ export class Deck {
     }
 
     deleteFlashcardAtIndex(index: number, cardIsDue: boolean): void {
-        if (cardIsDue) this.dueFlashcards.splice(index, 1);
-        else this.newFlashcards.splice(index, 1);
+        if (cardIsDue) {
+            this.dueFlashcards.splice(index, 1);
+        } else {
+            this.newFlashcards.splice(index, 1);
+        }
 
         let deck: Deck | null = this;
         while (deck !== null) {
-            if (cardIsDue) deck.dueFlashcardsCount--;
-            else deck.newFlashcardsCount--;
+            if (cardIsDue) {
+                deck.dueFlashcardsCount--;
+            } else {
+                deck.newFlashcardsCount--;
+            }
             deck = deck.parent;
         }
     }
 
     sortSubdecksList(): void {
         this.subdecks.sort((a, b) => {
-            if (a.deckName < b.deckName) return -1;
-            else if (a.deckName > b.deckName) return 1;
+            if (a.deckName < b.deckName) {
+                return -1;
+            } else if (a.deckName > b.deckName) {
+                return 1;
+            }
             return 0;
         });
 
-        for (let deck of this.subdecks) deck.sortSubdecksList();
+        for (let deck of this.subdecks) {
+            deck.sortSubdecksList();
+        }
     }
 
     render(containerEl: HTMLElement, modal: FlashcardModal): void {
@@ -486,7 +533,9 @@ export class Deck {
                 collapsed = !collapsed;
             });
         }
-        for (let deck of this.subdecks) deck.render(deckViewChildren, modal);
+        for (let deck of this.subdecks) {
+            deck.render(deckViewChildren, modal);
+        }
     }
 
     nextCard(modal: FlashcardModal): void {
@@ -501,8 +550,11 @@ export class Deck {
                 }
             }
 
-            if (this.parent == modal.checkDeck) modal.decksList();
-            else this.parent!.nextCard(modal);
+            if (this.parent == modal.checkDeck) {
+                modal.decksList();
+            } else {
+                this.parent!.nextCard(modal);
+            }
             return;
         }
 
@@ -517,9 +569,11 @@ export class Deck {
         modal.mode = FlashcardModalMode.Front;
 
         if (this.dueFlashcards.length > 0) {
-            if (modal.plugin.data.settings.randomizeCardOrder)
+            if (modal.plugin.data.settings.randomizeCardOrder) {
                 modal.currentCardIdx = Math.floor(Math.random() * this.dueFlashcards.length);
-            else modal.currentCardIdx = 0;
+            } else {
+                modal.currentCardIdx = 0;
+            }
             modal.currentCard = this.dueFlashcards[modal.currentCardIdx];
             modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
 
@@ -555,9 +609,11 @@ export class Deck {
                 modal.easyBtn.setText(t("Easy") + " - " + textInterval(easyInterval, false));
             }
         } else if (this.newFlashcards.length > 0) {
-            if (modal.plugin.data.settings.randomizeCardOrder)
+            if (modal.plugin.data.settings.randomizeCardOrder) {
                 modal.currentCardIdx = Math.floor(Math.random() * this.newFlashcards.length);
-            else modal.currentCardIdx = 0;
+            } else {
+                modal.currentCardIdx = 0;
+            }
             modal.currentCard = this.newFlashcards[modal.currentCardIdx];
             modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
 
