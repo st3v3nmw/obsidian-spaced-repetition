@@ -44,8 +44,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     cardCommentOnSameLine: false,
     burySiblingCards: false,
     showContextInCards: true,
-    flashcardHeightPercentage: Platform.isDesktop ? 80 : 100,
-    flashcardWidthPercentage: Platform.isDesktop ? 40 : 100,
+    flashcardHeightPercentage: Platform.isMobile ? 100 : 80,
+    flashcardWidthPercentage: Platform.isMobile ? 100 : 40,
     showFileNameInFileLink: false,
     randomizeCardOrder: true,
     disableClozeCards: false,
@@ -98,6 +98,23 @@ export class SRSettingTab extends PluginSettingTab {
             ' <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki">' +
             t("wiki") +
             "</a>.";
+
+        new Setting(containerEl)
+            .setName(t("Folders to ignore"))
+            .setDesc(t("Enter folder paths separated by newlines i.e. Templates Meta/Scripts"))
+            .addTextArea((text) =>
+                text
+                    .setValue(this.plugin.data.settings.noteFoldersToIgnore.join("\n"))
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.noteFoldersToIgnore = value
+                                .split(/\n+/)
+                                .map((v) => v.trim())
+                                .filter((v) => v);
+                            await this.plugin.savePluginData();
+                        });
+                    })
+            );
 
         containerEl.createDiv().innerHTML = "<h3>" + t("Flashcards") + "</h3>";
 
@@ -367,6 +384,17 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
+        new Setting(containerEl)
+            .setName(t("Clear cache?"))
+            .setDesc(t("If you're having issues seeing some cards, try this."))
+            .addButton((button) => {
+                button.setButtonText(t("Clear cache")).onClick(async () => {
+                    this.plugin.data.cache = {};
+                    await this.plugin.savePluginData();
+                    new Notice(t("Cache cleared"));
+                });
+            });
+
         containerEl.createDiv().innerHTML = "<h3>" + t("Notes") + "</h3>";
 
         new Setting(containerEl)
@@ -378,23 +406,6 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange((value) => {
                         applySettingsUpdate(async () => {
                             this.plugin.data.settings.tagsToReview = value.split(/\s+/);
-                            await this.plugin.savePluginData();
-                        });
-                    })
-            );
-
-        new Setting(containerEl)
-            .setName(t("Folders to ignore"))
-            .setDesc(t("Enter folder paths separated by newlines i.e. Templates Meta/Scripts"))
-            .addTextArea((text) =>
-                text
-                    .setValue(this.plugin.data.settings.noteFoldersToIgnore.join("\n"))
-                    .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            this.plugin.data.settings.noteFoldersToIgnore = value
-                                .split(/\n+/)
-                                .map((v) => v.trim())
-                                .filter((v) => v);
                             await this.plugin.savePluginData();
                         });
                     })

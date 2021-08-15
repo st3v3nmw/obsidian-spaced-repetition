@@ -522,7 +522,7 @@ export default class SRPlugin extends Plugin {
 
                 for (let tag of tags) {
                     if (
-                        this.data.settings.tagsToReview.some(
+                        this.data.settings.flashcardTags.some(
                             (tagToReview) =>
                                 tag === tagToReview || tag.startsWith(tagToReview + "/")
                         )
