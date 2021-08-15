@@ -361,9 +361,7 @@ export default class SRPlugin extends Plugin {
         });
 
         for (let deckKey in this.reviewDecks) {
-            if (this.reviewDecks.hasOwnProperty(deckKey)) {
-                this.reviewDecks[deckKey].sortNotes(this.pageranks);
-            }
+            this.reviewDecks[deckKey].sortNotes(this.pageranks);
         }
 
         let noteCountText: string = this.dueNotesCount === 1 ? t("note") : t("notes");
@@ -520,7 +518,7 @@ export default class SRPlugin extends Plugin {
     }
 
     async reviewNextNoteModal(): Promise<void> {
-        let reviewDeckNames = Object.keys(this.reviewDecks);
+        let reviewDeckNames: string[] = Object.keys(this.reviewDecks);
         if (reviewDeckNames.length === 1) {
             this.reviewNextNote(reviewDeckNames[0]);
         } else {
@@ -601,15 +599,12 @@ export default class SRPlugin extends Plugin {
                 let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
                 let tags = getAllTags(fileCachedData) || [];
 
-                for (let tag of tags) {
-                    if (
-                        this.data.settings.flashcardTags.some(
-                            (tagToReview) =>
-                                tag === tagToReview || tag.startsWith(tagToReview + "/")
-                        )
-                    ) {
-                        deckPath = tag.substring(1).split("/");
-                        break;
+                outer: for (let tagToReview of this.data.settings.flashcardTags) {
+                    for (let tag of tags) {
+                        if (tag === tagToReview || tag.startsWith(tagToReview + "/")) {
+                            deckPath = tag.substring(1).split("/");
+                            break outer;
+                        }
                     }
                 }
             }

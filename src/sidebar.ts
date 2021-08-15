@@ -2,19 +2,18 @@ import { ItemView, WorkspaceLeaf, Menu, TFile } from "obsidian";
 
 import type SRPlugin from "src/main";
 import { COLLAPSE_ICON } from "src/constants";
+import { ReviewDeck } from "src/review-deck";
 import { t } from "src/lang/helpers";
 
 export const REVIEW_QUEUE_VIEW_TYPE: string = "review-queue-list-view";
 
 export class ReviewQueueListView extends ItemView {
     private plugin: SRPlugin;
-    private activeFolders: Set<string>;
 
     constructor(leaf: WorkspaceLeaf, plugin: SRPlugin) {
         super(leaf);
 
         this.plugin = plugin;
-        this.activeFolders = new Set([t("Today")]);
         this.registerEvent(this.app.workspace.on("file-open", (_: any) => this.redraw()));
         this.registerEvent(this.app.vault.on("rename", (_: any) => this.redraw()));
     }
@@ -47,78 +46,73 @@ export class ReviewQueueListView extends ItemView {
         let rootEl: HTMLElement = createDiv("nav-folder mod-root"),
             childrenEl: HTMLElement = rootEl.createDiv("nav-folder-children");
 
-        if (Object.keys(this.plugin.reviewDecks).length > 0) {
-            for (let deckKey in this.plugin.reviewDecks) {
-                if (this.plugin.reviewDecks.hasOwnProperty(deckKey)) {
-                    let deck = this.plugin.reviewDecks[deckKey];
+        for (let deckKey in this.plugin.reviewDecks) {
+            let deck: ReviewDeck = this.plugin.reviewDecks[deckKey];
 
-                    let deckFolderEl: HTMLElement = this.createRightPaneFolder(
-                        childrenEl,
-                        deckKey,
-                        !this.activeFolders.has(deckKey),
-                        true
+            let deckFolderEl: HTMLElement = this.createRightPaneFolder(
+                childrenEl,
+                deckKey,
+                false,
+                deck
+            ).getElementsByClassName("nav-folder-children")[0] as HTMLElement;
+
+            if (deck.newNotes.length > 0) {
+                let newNotesFolderEl: HTMLElement = this.createRightPaneFolder(
+                    deckFolderEl,
+                    t("New"),
+                    !deck.activeFolders.has(t("New")),
+                    deck
+                );
+
+                for (let newFile of deck.newNotes) {
+                    this.createRightPaneFile(
+                        newNotesFolderEl,
+                        newFile,
+                        openFile! && newFile.path === openFile.path,
+                        !deck.activeFolders.has(t("New"))
                     );
+                }
+            }
 
-                    if (deck.newNotes.length > 0) {
-                        let newNotesFolderEl: HTMLElement = this.createRightPaneFolder(
+            if (deck.scheduledNotes.length > 0) {
+                let now: number = Date.now();
+                let currUnix: number = -1;
+                let schedFolderEl: HTMLElement | null = null,
+                    folderTitle: string = "";
+                let maxDaysToRender: number = this.plugin.data.settings.maxNDaysNotesReviewQueue;
+
+                for (let sNote of deck.scheduledNotes) {
+                    if (sNote.dueUnix != currUnix) {
+                        let nDays: number = Math.ceil((sNote.dueUnix - now) / (24 * 3600 * 1000));
+
+                        if (nDays > maxDaysToRender) {
+                            break;
+                        }
+
+                        folderTitle =
+                            nDays == -1
+                                ? t("Yesterday")
+                                : nDays == 0
+                                ? t("Today")
+                                : nDays == 1
+                                ? t("Tomorrow")
+                                : new Date(sNote.dueUnix).toDateString();
+
+                        schedFolderEl = this.createRightPaneFolder(
                             deckFolderEl,
-                            "New",
-                            !this.activeFolders.has("New")
+                            folderTitle,
+                            !deck.activeFolders.has(folderTitle),
+                            deck
                         );
-
-                        for (let newFile of deck.newNotes) {
-                            this.createRightPaneFile(
-                                newNotesFolderEl,
-                                newFile,
-                                openFile! && newFile.path === openFile.path,
-                                !this.activeFolders.has("New")
-                            );
-                        }
+                        currUnix = sNote.dueUnix;
                     }
 
-                    if (deck.scheduledNotes.length > 0) {
-                        let now: number = Date.now();
-                        let currUnix: number = -1;
-                        let schedFolderEl: HTMLElement | null = null,
-                            folderTitle: string = "";
-                        let maxDaysToRender: number =
-                            this.plugin.data.settings.maxNDaysNotesReviewQueue;
-
-                        for (let sNote of deck.scheduledNotes) {
-                            if (sNote.dueUnix != currUnix) {
-                                let nDays: number = Math.ceil(
-                                    (sNote.dueUnix - now) / (24 * 3600 * 1000)
-                                );
-
-                                if (nDays > maxDaysToRender) {
-                                    break;
-                                }
-
-                                folderTitle =
-                                    nDays == -1
-                                        ? "Yesterday"
-                                        : nDays == 0
-                                        ? "Today"
-                                        : nDays == 1
-                                        ? "Tomorrow"
-                                        : new Date(sNote.dueUnix).toDateString();
-
-                                schedFolderEl = this.createRightPaneFolder(
-                                    deckFolderEl,
-                                    folderTitle,
-                                    !this.activeFolders.has(folderTitle)
-                                );
-                                currUnix = sNote.dueUnix;
-                            }
-
-                            this.createRightPaneFile(
-                                schedFolderEl!,
-                                sNote.note,
-                                openFile! && sNote.note.path === openFile.path,
-                                !this.activeFolders.has(folderTitle)
-                            );
-                        }
-                    }
+                    this.createRightPaneFile(
+                        schedFolderEl!,
+                        sNote.note,
+                        openFile! && sNote.note.path === openFile.path,
+                        !deck.activeFolders.has(folderTitle)
+                    );
                 }
             }
         }
@@ -132,14 +126,8 @@ export class ReviewQueueListView extends ItemView {
         parentEl: HTMLElement,
         folderTitle: string,
         collapsed: boolean,
-        isRoot: boolean = false
+        deck: ReviewDeck
     ): HTMLElement {
-        if (!isRoot) {
-            parentEl = parentEl
-                .getElementsByClassName("nav-folder-children")[0]
-                .createDiv("nav-folder");
-        }
-
         let folderEl: HTMLDivElement = parentEl.createDiv("nav-folder"),
             folderTitleEl: HTMLDivElement = folderEl.createDiv("nav-folder-title"),
             childrenEl: HTMLDivElement = folderEl.createDiv("nav-folder-children"),
@@ -160,11 +148,11 @@ export class ReviewQueueListView extends ItemView {
                     child.style.display = "none";
                     (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
                         "rotate(-90deg)";
-                    this.activeFolders.delete(folderTitle);
+                    deck.activeFolders.delete(folderTitle);
                 } else {
                     child.style.display = "block";
                     (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "";
-                    this.activeFolders.add(folderTitle);
+                    deck.activeFolders.add(folderTitle);
                 }
             }
         });
