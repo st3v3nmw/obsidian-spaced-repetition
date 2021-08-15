@@ -44,24 +44,21 @@ export default {
     // settings.ts
     Notes: "Notes",
     Flashcards: "Flashcards",
-    "Spaced Repetition Plugin - Settings":
-        "Spaced Repetition Plugin - Settings",
+    "Spaced Repetition Plugin - Settings": "Spaced Repetition Plugin - Settings",
     "For more information, check the": "For more information, check the",
     wiki: "wiki",
     "algorithm implementation": "algorithm implementation",
     "Flashcard tags": "Flashcard tags",
     "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.":
         "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.",
-    "Convert folders to decks and subdecks?":
-        "Convert folders to decks and subdecks?",
+    "Convert folders to decks and subdecks?": "Convert folders to decks and subdecks?",
     "This is an alternative to the Flashcard tags option above.":
         "This is an alternative to the Flashcard tags option above.",
     "Save scheduling comment on the same line as the flashcard's last line?":
         "Save scheduling comment on the same line as the flashcard's last line?",
     "Turning this on will make the HTML comments not break list formatting.":
         "Turning this on will make the HTML comments not break list formatting.",
-    "Bury sibling cards until the next day?":
-        "Bury sibling cards until the next day?",
+    "Bury sibling cards until the next day?": "Bury sibling cards until the next day?",
     "Siblings are cards generated from the same card text i.e. cloze deletions":
         "Siblings are cards generated from the same card text i.e. cloze deletions",
     "Show context in cards?": "Show context in cards?",
@@ -74,8 +71,7 @@ export default {
     "Flashcard Width Percentage": "Flashcard Width Percentage",
     "Show file name instead of 'Open file' in flashcard review?":
         "Show file name instead of 'Open file' in flashcard review?",
-    "Randomize card order during review?":
-        "Randomize card order during review?",
+    "Randomize card order during review?": "Randomize card order during review?",
     "Disable cloze cards?": "Disable cloze cards?",
     "If you're not currently using 'em & would like the plugin to run a tad faster.":
         "If you're not currently using 'em & would like the plugin to run a tad faster.",
@@ -85,14 +81,18 @@ export default {
     "Note that after changing this you have to manually edit any flashcards you already have.":
         "Note that after changing this you have to manually edit any flashcards you already have.",
     "Separator for multiline flashcards": "Separator for multiline flashcards",
+    "Clear cache?": "Clear cache?",
+    "Clear cache": "Clear cache",
+    "Cache cleared": "Cache cleared",
+    "If you're having issues seeing some cards, try this.":
+        "If you're having issues seeing some cards, try this.",
     "Tags to review": "Tags to review",
     "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.":
         "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.",
     "Open a random note for review": "Open a random note for review",
     "When you turn this off, notes are ordered by importance (PageRank).":
         "When you turn this off, notes are ordered by importance (PageRank).",
-    "Open next note automatically after a review":
-        "Open next note automatically after a review",
+    "Open next note automatically after a review": "Open next note automatically after a review",
     "For faster reviews.": "For faster reviews.",
     "Disable review options in the file menu i.e. Review: Easy Good Hard":
         "Disable review options in the file menu i.e. Review: Easy Good Hard",
@@ -100,17 +100,14 @@ export default {
         "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this.",
     "Maximum number of days to display on right panel":
         "Maximum number of days to display on right panel",
-    "Reduce this for a cleaner interface.":
-        "Reduce this for a cleaner interface.",
-    "The number of days must be at least 1.":
-        "The number of days must be at least 1.",
+    "Reduce this for a cleaner interface.": "Reduce this for a cleaner interface.",
+    "The number of days must be at least 1.": "The number of days must be at least 1.",
     "Please provide a valid number.": "Please provide a valid number.",
     Algorithm: "Algorithm",
     "Base ease": "Base ease",
     "minimum = 130, preferrably approximately 250.":
         "minimum = 130, preferrably approximately 250.",
-    "The base ease must be at least 130.":
-        "The base ease must be at least 130.",
+    "The base ease must be at least 130.": "The base ease must be at least 130.",
     "Interval change when you review a flashcard/note as hard":
         "Interval change when you review a flashcard/note as hard",
     "newInterval = oldInterval * intervalChange / 100.":
@@ -118,13 +115,11 @@ export default {
     "Easy bonus": "Easy bonus",
     "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%).":
         "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%).",
-    "The easy bonus must be at least 100.":
-        "The easy bonus must be at least 100.",
+    "The easy bonus must be at least 100.": "The easy bonus must be at least 100.",
     "Maximum Interval": "Maximum Interval",
     "Allows you to place an upper limit on the interval (default = 100 years).":
         "Allows you to place an upper limit on the interval (default = 100 years).",
-    "The maximum interval must be at least 1 day.":
-        "The maximum interval must be at least 1 day.",
+    "The maximum interval must be at least 1 day.": "The maximum interval must be at least 1 day.",
     "Maximum link contribution": "Maximum link contribution",
     "Maximum contribution of the weighted ease of linked notes to the initial ease.":
         "Maximum contribution of the weighted ease of linked notes to the initial ease.",
@@ -142,16 +137,15 @@ export default {
     "Note that this requires the Obsidian Charts plugin to work":
         "Note that this requires the Obsidian Charts plugin to work",
     Forecast: "Forecast",
-    "The number of cards due in the future":
-        "The number of cards due in the future",
+    "The number of cards due in the future": "The number of cards due in the future",
     "Number of cards": "Number of cards",
     Scheduled: "Scheduled",
     Review: "Review",
     due: "due",
     Days: "Days",
     "Folders to ignore": "Folders to ignore",
-    "Enter folder paths separated by newlines i.e. Templates Meta/Scripts": 
+    "Enter folder paths separated by newlines i.e. Templates Meta/Scripts":
         "Enter folder paths separated by newlines i.e. Templates Meta/Scripts",
-    "Note is saved under ignored folder (check settings).": 
+    "Note is saved under ignored folder (check settings).":
         "Note is saved under ignored folder (check settings).",
 };
