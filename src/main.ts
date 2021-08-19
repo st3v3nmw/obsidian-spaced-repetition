@@ -195,8 +195,11 @@ export default class SRPlugin extends Plugin {
         this.addCommand({
             id: "srs-view-stats",
             name: t("View statistics"),
-            callback: () => {
-                new StatsModal(this.app, this.dueDatesFlashcards, this).open();
+            callback: async () => {
+                if (!this.flashcardsSyncLock) {
+                    await this.flashcards_sync();
+                    new StatsModal(this.app, this.dueDatesFlashcards, this).open();
+                }
             },
         });
 
@@ -317,12 +320,6 @@ export default class SRPlugin extends Plugin {
 
             if (dueUnix <= now) {
                 this.dueNotesCount++;
-
-                for (let tag of tags) {
-                    if (this.reviewDecks.hasOwnProperty(tag)) {
-                        this.reviewDecks[tag].dueNotesCount++;
-                    }
-                }
             }
 
             let nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
@@ -330,16 +327,6 @@ export default class SRPlugin extends Plugin {
                 this.dueDatesNotes[nDays] = 0;
             }
             this.dueDatesNotes[nDays]++;
-
-            for (let tag of tags) {
-                if (this.reviewDecks.hasOwnProperty(tag)) {
-                    let deck = this.reviewDecks[tag];
-                    if (!deck.dueDatesNotes.hasOwnProperty(nDays)) {
-                        deck.dueDatesNotes[nDays] = 0;
-                    }
-                    deck.dueDatesNotes[nDays]++;
-                }
-            }
         }
 
         graph.rank(0.85, 0.000001, (node: string, rank: number) => {
@@ -537,9 +524,9 @@ export default class SRPlugin extends Plugin {
         this.lastSelectedReviewDeck = deckKey;
         let deck = this.reviewDecks[deckKey];
 
-        if (deck.dueNotesCount > 0) {
+        if (deck.scheduledNotes.length > 0) {
             let index = this.data.settings.openRandomNote
-                ? Math.floor(Math.random() * deck.dueNotesCount)
+                ? Math.floor(Math.random() * deck.scheduledNotes.length)
                 : 0;
             this.app.workspace.activeLeaf.openFile(deck.scheduledNotes[index].note);
             return;

@@ -7,8 +7,6 @@ export class ReviewDeck {
     public deckName: string;
     public newNotes: TFile[] = [];
     public scheduledNotes: SchedNote[] = [];
-    public dueNotesCount: number;
-    public dueDatesNotes: Record<number, number> = {}; // Record<# of days in future, due count>
     public activeFolders: Set<string>;
 
     constructor(name: string) {
