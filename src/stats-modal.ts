@@ -1,4 +1,5 @@
 import { Modal, App, MarkdownRenderer, Platform } from "obsidian";
+
 import type SRPlugin from "src/main";
 import { getKeysPreserveType } from "src/utils";
 import { t } from "src/lang/helpers";

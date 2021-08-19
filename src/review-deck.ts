@@ -1,15 +1,17 @@
 import { App, FuzzySuggestModal, TFile } from "obsidian";
-import { SchedNote } from "./main";
+
+import { SchedNote } from "src/main";
+import { t } from "src/lang/helpers";
 
 export class ReviewDeck {
     public deckName: string;
     public newNotes: TFile[] = [];
     public scheduledNotes: SchedNote[] = [];
-    public dueNotesCount: number;
-    public dueDatesNotes: Record<number, number> = {}; // Record<# of days in future, due count>
+    public activeFolders: Set<string>;
 
     constructor(name: string) {
         this.deckName = name;
+        this.activeFolders = new Set([t("Today")]);
     }
 
     public sortNotes(pageranks: Record<string, number>) {
