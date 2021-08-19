@@ -1,4 +1,4 @@
-name: Build obsidian plugin
+name: Build Obsidian plugin
 
 on:
   push:
@@ -39,7 +39,7 @@ jobs:
       with:
         tag_name: ${{ github.ref }}
         release_name: ${{ github.ref }}
-        draft: false
+        draft: true
         prerelease: false
     - name: Upload zip file
       id: upload-zip
