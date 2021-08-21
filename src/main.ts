@@ -314,6 +314,10 @@ export default class SRPlugin extends Plugin {
             }
 
             this.easeByPath[note.path] = frontmatter["sr-ease"];
+            
+            if (dueUnix <= now) {
+                this.dueNotesCount++;
+            }
 
             let nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
             if (!this.dueDatesNotes.hasOwnProperty(nDays)) {
