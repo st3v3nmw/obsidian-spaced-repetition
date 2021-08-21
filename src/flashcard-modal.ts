@@ -59,9 +59,7 @@ export class FlashcardModal extends Modal {
                         this.currentCardIdx,
                         this.currentCard.isDue
                     );
-                    if (this.currentCard.cardType === CardType.Cloze) {
-                        this.burySiblingCards(false);
-                    }
+                    this.burySiblingCards(false);
                     this.currentDeck.nextCard(this);
                 } else if (
                     this.mode === FlashcardModalMode.Front &&
@@ -611,6 +609,15 @@ export class Deck {
         } else if (this.newFlashcards.length > 0) {
             if (modal.plugin.data.settings.randomizeCardOrder) {
                 modal.currentCardIdx = Math.floor(Math.random() * this.newFlashcards.length);
+
+                // look for first unscheduled sibling
+                let card: Card = this.newFlashcards[modal.currentCardIdx];
+                for (let siblingCard of card.siblings) {
+                    if (!siblingCard.isDue) {
+                        modal.currentCardIdx += siblingCard.siblingIdx - card.siblingIdx;
+                        break;
+                    }
+                }
             } else {
                 modal.currentCardIdx = 0;
             }

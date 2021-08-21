@@ -225,9 +225,7 @@ export default class SRPlugin extends Plugin {
         let notes: TFile[] = this.app.vault.getMarkdownFiles();
 
         graph.reset();
-        this.scheduledNotes = [];
         this.easeByPath = {};
-        this.newNotes = [];
         this.incomingLinks = {};
         this.pageranks = {};
         this.dueNotesCount = 0;
@@ -299,28 +297,23 @@ export default class SRPlugin extends Plugin {
                         this.reviewDecks[tag].newNotes.push(note);
                     }
                 }
-                this.newNotes.push(note);
                 continue;
             }
 
             let dueUnix: number = window
                 .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
                 .valueOf();
-            this.scheduledNotes.push({
-                note,
-                dueUnix,
-            });
             for (let tag of tags) {
                 if (this.reviewDecks.hasOwnProperty(tag)) {
                     this.reviewDecks[tag].scheduledNotes.push({ note, dueUnix });
+
+                    if (dueUnix <= now) {
+                        this.reviewDecks[tag].dueNotesCount++;
+                    }
                 }
             }
 
             this.easeByPath[note.path] = frontmatter["sr-ease"];
-
-            if (dueUnix <= now) {
-                this.dueNotesCount++;
-            }
 
             let nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
             if (!this.dueDatesNotes.hasOwnProperty(nDays)) {
@@ -331,20 +324,6 @@ export default class SRPlugin extends Plugin {
 
         graph.rank(0.85, 0.000001, (node: string, rank: number) => {
             this.pageranks[node] = rank * 10000;
-        });
-
-        // sort new notes by importance
-        this.newNotes = this.newNotes.sort(
-            (a: TFile, b: TFile) => (this.pageranks[b.path] || 0) - (this.pageranks[a.path] || 0)
-        );
-
-        // sort scheduled notes by date & within those days, sort them by importance
-        this.scheduledNotes = this.scheduledNotes.sort((a: SchedNote, b: SchedNote) => {
-            let result: number = a.dueUnix - b.dueUnix;
-            if (result !== 0) {
-                return result;
-            }
-            return (this.pageranks[b.note.path] || 0) - (this.pageranks[a.note.path] || 0);
         });
 
         for (let deckKey in this.reviewDecks) {
@@ -524,9 +503,9 @@ export default class SRPlugin extends Plugin {
         this.lastSelectedReviewDeck = deckKey;
         let deck = this.reviewDecks[deckKey];
 
-        if (deck.scheduledNotes.length > 0) {
+        if (deck.dueNotesCount > 0) {
             let index = this.data.settings.openRandomNote
-                ? Math.floor(Math.random() * deck.scheduledNotes.length)
+                ? Math.floor(Math.random() * deck.dueNotesCount)
                 : 0;
             this.app.workspace.activeLeaf.openFile(deck.scheduledNotes[index].note);
             return;
@@ -892,6 +871,7 @@ function getCardContext(cardLine: number, headings: HeadingCache[]): string {
 
     let context: string = "";
     for (let headingObj of stack) {
+        headingObj.heading = headingObj.heading.replace(/\[\^\d+\]/gm, "").trim();
         context += headingObj.heading + " > ";
     }
     return context.slice(0, -3);
