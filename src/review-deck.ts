@@ -8,6 +8,7 @@ export class ReviewDeck {
     public newNotes: TFile[] = [];
     public scheduledNotes: SchedNote[] = [];
     public activeFolders: Set<string>;
+    public dueNotesCount: number = 0;
 
     constructor(name: string) {
         this.deckName = name;
@@ -15,6 +16,7 @@ export class ReviewDeck {
     }
 
     public sortNotes(pageranks: Record<string, number>) {
+        // sort new notes by importance
         this.newNotes = this.newNotes.sort(
             (a: TFile, b: TFile) => (pageranks[b.path] || 0) - (pageranks[a.path] || 0)
         );
