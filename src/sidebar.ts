@@ -183,7 +183,7 @@ export class ReviewQueueListView extends ItemView {
             "click",
             (event: MouseEvent) => {
                 event.preventDefault();
-                this.app.workspace.activeLeaf.openFile(file);
+                this.app.workspace.activeLeaf!.openFile(file);
                 return false;
             },
             false

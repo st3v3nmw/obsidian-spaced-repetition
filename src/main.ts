@@ -3,7 +3,7 @@ import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
 import { FlashcardModal, Deck } from "src/flashcard-modal";
-import { StatsModal } from "src/stats-modal";
+import { StatsModal, Stats } from "src/stats-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/sidebar";
 import { Card, ReviewResponse, schedule } from "src/scheduling";
 import { CardType } from "src/types";
@@ -64,6 +64,7 @@ export default class SRPlugin extends Plugin {
 
     public deckTree: Deck = new Deck("root", null);
     public dueDatesFlashcards: Record<number, number> = {}; // Record<# of days in future, due count>
+    public cardStats: Stats;
 
     // prevent calling these functions if another instance is already running
     private notesSyncLock: boolean = false;
@@ -188,7 +189,7 @@ export default class SRPlugin extends Plugin {
             callback: async () => {
                 if (!this.flashcardsSyncLock) {
                     await this.flashcards_sync();
-                    new StatsModal(this.app, this.dueDatesFlashcards, this).open();
+                    new StatsModal(this.app, this).open();
                 }
             },
         });
@@ -501,7 +502,7 @@ export default class SRPlugin extends Plugin {
             let index = this.data.settings.openRandomNote
                 ? Math.floor(Math.random() * deck.dueNotesCount)
                 : 0;
-            this.app.workspace.activeLeaf.openFile(deck.scheduledNotes[index].note);
+            this.app.workspace.activeLeaf!.openFile(deck.scheduledNotes[index].note);
             return;
         }
 
@@ -509,7 +510,7 @@ export default class SRPlugin extends Plugin {
             let index = this.data.settings.openRandomNote
                 ? Math.floor(Math.random() * deck.newNotes.length)
                 : 0;
-            this.app.workspace.activeLeaf.openFile(deck.newNotes[index]);
+            this.app.workspace.activeLeaf!.openFile(deck.newNotes[index]);
             return;
         }
 
@@ -526,6 +527,13 @@ export default class SRPlugin extends Plugin {
 
         this.deckTree = new Deck("root", null);
         this.dueDatesFlashcards = {};
+        this.cardStats = {
+            eases: {},
+            intervals: {},
+            newCount: 0,
+            youngCount: 0,
+            matureCount: 0,
+        };
 
         let now = window.moment(Date.now());
         let todayDate: string = now.format("YYYY-MM-DD");
@@ -610,7 +618,6 @@ export default class SRPlugin extends Plugin {
             this.data.settings.multilineCardSeparator,
             this.data.settings.multilineReversedCardSeparator
         );
-        this.logger.info(parsedCards);
         for (let parsedCard of parsedCards) {
             let cardType: CardType = parsedCard[0],
                 cardText: string = parsedCard[1],
@@ -737,14 +744,32 @@ export default class SRPlugin extends Plugin {
                         this.dueDatesFlashcards[nDays] = 0;
                     }
                     this.dueDatesFlashcards[nDays]++;
+
+                    let interval: number = parseInt(scheduling[i][2]),
+                        ease: number = parseInt(scheduling[i][3]);
+                    if (!this.cardStats.intervals.hasOwnProperty(interval)) {
+                        this.cardStats.intervals[interval] = 0;
+                    }
+                    this.cardStats.intervals[interval]++;
+                    if (!this.cardStats.eases.hasOwnProperty(ease)) {
+                        this.cardStats.eases[ease] = 0;
+                    }
+                    this.cardStats.eases[ease]++;
+
+                    if (interval >= 21) {
+                        this.cardStats.matureCount++;
+                    } else {
+                        this.cardStats.youngCount++;
+                    }
+
                     if (this.data.buryList.includes(cardTextHash)) {
                         this.deckTree.countFlashcard([...deckPath]);
                         continue;
                     }
 
                     if (dueUnix <= now) {
-                        cardObj.interval = parseInt(scheduling[i][2]);
-                        cardObj.ease = parseInt(scheduling[i][3]);
+                        cardObj.interval = interval;
+                        cardObj.ease = ease;
                         cardObj.delayBeforeReview = now - dueUnix;
                         this.deckTree.insertFlashcard([...deckPath], cardObj);
                     } else {
@@ -752,6 +777,7 @@ export default class SRPlugin extends Plugin {
                         continue;
                     }
                 } else {
+                    this.cardStats.newCount++;
                     if (this.data.buryList.includes(cyrb53(cardText))) {
                         this.deckTree.countFlashcard([...deckPath]);
                         continue;
