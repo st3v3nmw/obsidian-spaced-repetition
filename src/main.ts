@@ -14,7 +14,7 @@ import {
     LEGACY_SCHEDULING_EXTRACTOR,
     MULTI_SCHEDULING_EXTRACTOR,
 } from "src/constants";
-import { escapeRegexString, cyrb53 } from "src/utils";
+import { escapeRegexString, cyrb53, removeLegacyKeys } from "src/utils";
 import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
 import { t } from "src/lang/helpers";
 import { parse } from "src/parser";
@@ -27,23 +27,13 @@ interface PluginData {
     // should work as long as user doesn't modify card's text
     // which covers most of the cases
     buryList: string[];
-    cache: Record<string, SRFileCache>; // Record<last known path, SRFileCache>
 }
 
 const DEFAULT_DATA: PluginData = {
     settings: DEFAULT_SETTINGS,
     buryDate: "",
     buryList: [],
-    cache: {},
 };
-
-interface SRFileCache {
-    totalCards: number;
-    hasNewCards: boolean;
-    nextDueDate: string;
-    lastUpdated: number;
-    dueDatesFlashcards: Record<number, number>;
-}
 
 export interface SchedNote {
     note: TFile;
@@ -314,7 +304,7 @@ export default class SRPlugin extends Plugin {
             }
 
             this.easeByPath[note.path] = frontmatter["sr-ease"];
-            
+
             if (dueUnix <= now) {
                 this.dueNotesCount++;
             }
@@ -581,46 +571,10 @@ export default class SRPlugin extends Plugin {
 
             if (deckPath.length === 0) continue;
 
-            if (this.data.cache.hasOwnProperty(note.path)) {
-                let fileCache: SRFileCache = this.data.cache[note.path];
-                // Has file changed?
-                if (fileCache.lastUpdated === note.stat.mtime) {
-                    if (fileCache.totalCards === 0) {
-                        continue;
-                    } else if (
-                        !fileCache.hasNewCards &&
-                        now.valueOf() < window.moment(fileCache.nextDueDate, "YYYY-MM-DD").valueOf()
-                    ) {
-                        this.deckTree.createDeck([...deckPath]);
-                        this.deckTree.countFlashcard(deckPath, fileCache.totalCards);
-                    } else {
-                        await this.findFlashcards(note, deckPath);
-                    }
-                } else {
-                    await this.findFlashcards(note, deckPath);
-                }
-            } else {
-                await this.findFlashcards(note, deckPath);
-            }
-
-            for (let [nDay, count] of Object.entries(
-                this.data.cache[note.path].dueDatesFlashcards
-            )) {
-                if (!this.dueDatesFlashcards.hasOwnProperty(nDay)) {
-                    this.dueDatesFlashcards[nDay] = 0;
-                }
-                this.dueDatesFlashcards[nDay] += count;
-            }
+            await this.findFlashcards(note, deckPath);
         }
 
-        // remove unused cache entries
-        for (let cachedPath in this.data.cache) {
-            if (!notePathsSet.has(cachedPath)) {
-                delete this.data.cache[cachedPath];
-            }
-        }
         this.logger.info(`Flashcard sync took ${Date.now() - now.valueOf()}ms`);
-        await this.savePluginData();
 
         // sort the deck names
         this.deckTree.sortSubdecksList();
@@ -647,12 +601,6 @@ export default class SRPlugin extends Plugin {
         let headings: HeadingCache[] = fileCachedData.headings || [];
         let fileChanged: boolean = false,
             deckAdded = false;
-
-        // caching information
-        let hasNewCards: boolean = false,
-            totalCards: number = 0,
-            nextDueDate: number = Infinity, // 03:14:07 UTC, January 19 2038 haha
-            dueDatesFlashcards: Record<number, number> = {};
 
         let now: number = Date.now();
         let parsedCards: [CardType, string, number][] = parse(
@@ -779,21 +727,16 @@ export default class SRPlugin extends Plugin {
                     siblings,
                 };
 
-                totalCards++;
-
                 // card scheduled
                 if (i < scheduling.length) {
                     let dueUnix: number = window
                         .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY"])
                         .valueOf();
-                    if (dueUnix < nextDueDate) {
-                        nextDueDate = dueUnix;
-                    }
                     let nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
-                    if (!dueDatesFlashcards.hasOwnProperty(nDays)) {
-                        dueDatesFlashcards[nDays] = 0;
+                    if (!this.dueDatesFlashcards.hasOwnProperty(nDays)) {
+                        this.dueDatesFlashcards[nDays] = 0;
                     }
-                    dueDatesFlashcards[nDays]++;
+                    this.dueDatesFlashcards[nDays]++;
                     if (this.data.buryList.includes(cardTextHash)) {
                         this.deckTree.countFlashcard([...deckPath]);
                         continue;
@@ -809,9 +752,6 @@ export default class SRPlugin extends Plugin {
                         continue;
                     }
                 } else {
-                    if (!hasNewCards) {
-                        hasNewCards = true;
-                    }
                     if (this.data.buryList.includes(cyrb53(cardText))) {
                         this.deckTree.countFlashcard([...deckPath]);
                         continue;
@@ -823,16 +763,6 @@ export default class SRPlugin extends Plugin {
             }
         }
 
-        if (!buryOnly)
-            this.data.cache[note.path] = {
-                totalCards,
-                hasNewCards,
-                nextDueDate:
-                    nextDueDate !== Infinity ? window.moment(nextDueDate).format("YYYY-MM-DD") : "",
-                lastUpdated: note.stat.mtime,
-                dueDatesFlashcards,
-            };
-
         if (fileChanged) {
             await this.app.vault.modify(note, fileText);
         }
@@ -840,7 +770,9 @@ export default class SRPlugin extends Plugin {
 
     async loadPluginData(): Promise<void> {
         this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
+        this.data = removeLegacyKeys(this.data, DEFAULT_DATA) as PluginData;
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
+        this.data.settings = removeLegacyKeys(this.data.settings, DEFAULT_SETTINGS) as SRSettings;
     }
 
     async savePluginData(): Promise<void> {

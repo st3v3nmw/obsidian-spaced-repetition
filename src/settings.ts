@@ -384,17 +384,6 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
-        new Setting(containerEl)
-            .setName(t("Clear cache?"))
-            .setDesc(t("If you're having issues seeing some cards, try this."))
-            .addButton((button) => {
-                button.setButtonText(t("Clear cache")).onClick(async () => {
-                    this.plugin.data.cache = {};
-                    await this.plugin.savePluginData();
-                    new Notice(t("Cache cleared"));
-                });
-            });
-
         containerEl.createDiv().innerHTML = "<h3>" + t("Notes") + "</h3>";
 
         new Setting(containerEl)
