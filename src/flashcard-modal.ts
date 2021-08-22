@@ -128,7 +128,7 @@ export class FlashcardModal extends Modal {
         }
         this.fileLinkView.addEventListener("click", async (_) => {
             this.close();
-            await this.plugin.app.workspace.activeLeaf.openFile(this.currentCard.note);
+            await this.plugin.app.workspace.activeLeaf!.openFile(this.currentCard.note);
             let activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView)!;
             activeView.editor.setCursor({
                 line: this.currentCard.lineNo,

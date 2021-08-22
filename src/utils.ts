@@ -41,3 +41,22 @@ export function cyrb53(str: string, seed: number = 0): string {
     h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
 }
+
+/**
+ * Removes legacy <key, value> pairs that no longer need to be saved
+ *
+ * @param currentData - Data to clean up
+ * @param defaultData - Template to lookup currently used keys from
+ * @returns the cleaned up record
+ */
+export function removeLegacyKeys(
+    currentData: Record<string, any>,
+    defaultData: Record<string, any>
+): Record<string, any> {
+    for (let key of Object.keys(currentData)) {
+        if (!defaultData.hasOwnProperty(key)) {
+            delete currentData[key];
+        }
+    }
+    return currentData;
+}

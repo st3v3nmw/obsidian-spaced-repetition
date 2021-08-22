@@ -143,6 +143,12 @@ export default {
     Review: "Review",
     due: "due",
     Days: "Days",
+    "Card Types": "Card Types",
+    Intervals: "Intervals",
+    "Delays until reviews are shown again": "Delays until reviews are shown again",
+    "Count": "Count",
+    "Eases": "Eases",
+
     "Folders to ignore": "Folders to ignore",
     "Enter folder paths separated by newlines i.e. Templates Meta/Scripts":
         "Enter folder paths separated by newlines i.e. Templates Meta/Scripts",
