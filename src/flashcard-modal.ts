@@ -212,9 +212,10 @@ export class FlashcardModal extends Modal {
 
         this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
         if (response !== ReviewResponse.Reset) {
+            let schedObj: Record<string, number>;
             // scheduled card
             if (this.currentCard.isDue) {
-                let schedObj: Record<string, number> = schedule(
+                schedObj = schedule(
                     response,
                     this.currentCard.interval!,
                     this.currentCard.ease!,
@@ -222,13 +223,16 @@ export class FlashcardModal extends Modal {
                     this.plugin.data.settings,
                     this.plugin.dueDatesFlashcards
                 );
-                interval = schedObj.interval;
-                ease = schedObj.ease;
             } else {
-                let schedObj: Record<string, number> = schedule(
+                let initial_ease: number = this.plugin.data.settings.baseEase;
+                if (this.plugin.easeByPath.hasOwnProperty(this.currentCard.note.path)) {
+                    initial_ease = this.plugin.easeByPath[this.currentCard.note.path];
+                }
+
+                schedObj = schedule(
                     response,
-                    1,
-                    this.plugin.data.settings.baseEase,
+                    1.0,
+                    initial_ease,
                     0,
                     this.plugin.data.settings,
                     this.plugin.dueDatesFlashcards
@@ -237,6 +241,8 @@ export class FlashcardModal extends Modal {
                 ease = schedObj.ease;
             }
 
+            interval = schedObj.interval;
+            ease = schedObj.ease;
             due = window.moment(Date.now() + interval * 24 * 3600 * 1000);
         } else {
             this.currentCard.interval = 1.0;
@@ -566,6 +572,9 @@ export class Deck {
         modal.flashcardView.innerHTML = "";
         modal.mode = FlashcardModalMode.Front;
 
+        let interval: number = 1.0,
+            ease: number = modal.plugin.data.settings.baseEase,
+            delayBeforeReview: number = 0;
         if (this.dueFlashcards.length > 0) {
             if (modal.plugin.data.settings.randomizeCardOrder) {
                 modal.currentCardIdx = Math.floor(Math.random() * this.dueFlashcards.length);
@@ -575,37 +584,9 @@ export class Deck {
             modal.currentCard = this.dueFlashcards[modal.currentCardIdx];
             modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
 
-            let hardInterval: number = schedule(
-                ReviewResponse.Hard,
-                modal.currentCard.interval!,
-                modal.currentCard.ease!,
-                modal.currentCard.delayBeforeReview!,
-                modal.plugin.data.settings
-            ).interval;
-            let goodInterval: number = schedule(
-                ReviewResponse.Good,
-                modal.currentCard.interval!,
-                modal.currentCard.ease!,
-                modal.currentCard.delayBeforeReview!,
-                modal.plugin.data.settings
-            ).interval;
-            let easyInterval: number = schedule(
-                ReviewResponse.Easy,
-                modal.currentCard.interval!,
-                modal.currentCard.ease!,
-                modal.currentCard.delayBeforeReview!,
-                modal.plugin.data.settings
-            ).interval;
-
-            if (Platform.isMobile) {
-                modal.hardBtn.setText(textInterval(hardInterval, true));
-                modal.goodBtn.setText(textInterval(goodInterval, true));
-                modal.easyBtn.setText(textInterval(easyInterval, true));
-            } else {
-                modal.hardBtn.setText(t("Hard") + " - " + textInterval(hardInterval, false));
-                modal.goodBtn.setText(t("Good") + " - " + textInterval(goodInterval, false));
-                modal.easyBtn.setText(t("Easy") + " - " + textInterval(easyInterval, false));
-            }
+            interval = modal.currentCard.interval!;
+            ease = modal.currentCard.ease!;
+            delayBeforeReview = modal.currentCard.delayBeforeReview!;
         } else if (this.newFlashcards.length > 0) {
             if (modal.plugin.data.settings.randomizeCardOrder) {
                 modal.currentCardIdx = Math.floor(Math.random() * this.newFlashcards.length);
@@ -624,15 +605,41 @@ export class Deck {
             modal.currentCard = this.newFlashcards[modal.currentCardIdx];
             modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
 
-            if (Platform.isMobile) {
-                modal.hardBtn.setText("1.0d");
-                modal.goodBtn.setText("2.5d");
-                modal.easyBtn.setText("3.5d");
-            } else {
-                modal.hardBtn.setText(t("Hard") + " - 1.0 " + t("day"));
-                modal.goodBtn.setText(t("Good") + " - 2.5 " + t("days"));
-                modal.easyBtn.setText(t("Easy") + " - 3.5 " + t("days"));
+            if (modal.plugin.easeByPath.hasOwnProperty(modal.currentCard.note.path)) {
+                ease = modal.plugin.easeByPath[modal.currentCard.note.path];
             }
+        }
+
+        let hardInterval: number = schedule(
+            ReviewResponse.Hard,
+            interval,
+            ease,
+            delayBeforeReview,
+            modal.plugin.data.settings
+        ).interval;
+        let goodInterval: number = schedule(
+            ReviewResponse.Good,
+            interval,
+            ease,
+            delayBeforeReview,
+            modal.plugin.data.settings
+        ).interval;
+        let easyInterval: number = schedule(
+            ReviewResponse.Easy,
+            interval,
+            ease,
+            delayBeforeReview,
+            modal.plugin.data.settings
+        ).interval;
+
+        if (Platform.isMobile) {
+            modal.hardBtn.setText(textInterval(hardInterval, true));
+            modal.goodBtn.setText(textInterval(goodInterval, true));
+            modal.easyBtn.setText(textInterval(easyInterval, true));
+        } else {
+            modal.hardBtn.setText(t("Hard") + " - " + textInterval(hardInterval, false));
+            modal.goodBtn.setText(t("Good") + " - " + textInterval(goodInterval, false));
+            modal.easyBtn.setText(t("Easy") + " - " + textInterval(easyInterval, false));
         }
 
         if (modal.plugin.data.settings.showContextInCards)

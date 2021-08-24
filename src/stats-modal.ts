@@ -75,9 +75,9 @@ export class StatsModal extends Modal {
             "<h2 style='text-align:center'>" +
             t("Forecast") +
             "</h2>" +
-            "<h4 style='text-align:center'>" +
+            "<p style='text-align:center'>" +
             t("The number of cards due in the future") +
-            "</h4>" +
+            "</p>" +
             "</div>\n\n" +
             "```chart\n" +
             "\ttype: bar\n" +
@@ -124,9 +124,9 @@ export class StatsModal extends Modal {
             "<h2 style='text-align:center'>" +
             t("Intervals") +
             "</h2>" +
-            "<h4 style='text-align:center'>" +
+            "<p style='text-align:center'>" +
             t("Delays until reviews are shown again") +
-            "</h4>" +
+            "</p>" +
             "</div>\n\n" +
             "```chart\n" +
             "\ttype: bar\n" +
@@ -184,6 +184,9 @@ export class StatsModal extends Modal {
             "<h2 style='text-align:center'>" +
             t("Card Types") +
             "</h2>" +
+            "<p style='text-align:center'>" +
+            t("This includes buried cards as well, if any") +
+            "</p>" +
             "</div>\n\n" +
             "```chart\n" +
             "\ttype: pie\n" +

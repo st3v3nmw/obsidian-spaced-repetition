@@ -148,6 +148,7 @@ export default {
     "Delays until reviews are shown again": "Delays until reviews are shown again",
     "Count": "Count",
     "Eases": "Eases",
+    "This includes buried cards as well, if any": "This includes buried cards as well, if any",
 
     "Folders to ignore": "Folders to ignore",
     "Enter folder paths separated by newlines i.e. Templates Meta/Scripts":

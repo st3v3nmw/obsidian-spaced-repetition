@@ -67,8 +67,7 @@ export default class SRPlugin extends Plugin {
     public cardStats: Stats;
 
     // prevent calling these functions if another instance is already running
-    private notesSyncLock: boolean = false;
-    private flashcardsSyncLock: boolean = false;
+    private syncLock: boolean = false;
 
     async onload(): Promise<void> {
         await this.loadPluginData();
@@ -81,15 +80,15 @@ export default class SRPlugin extends Plugin {
         this.statusBar.setAttribute("aria-label", t("Open a note for review"));
         this.statusBar.setAttribute("aria-label-position", "top");
         this.statusBar.addEventListener("click", (_: any) => {
-            if (!this.notesSyncLock) {
+            if (!this.syncLock) {
                 this.sync();
                 this.reviewNextNoteModal();
             }
         });
 
         this.addRibbonIcon("crosshairs", t("Review flashcards"), async () => {
-            if (!this.flashcardsSyncLock) {
-                await this.flashcards_sync();
+            if (!this.syncLock) {
+                await this.sync();
                 new FlashcardModal(this.app, this).open();
             }
         });
@@ -135,7 +134,7 @@ export default class SRPlugin extends Plugin {
             id: "srs-note-review-open-note",
             name: t("Open a note for review"),
             callback: () => {
-                if (!this.notesSyncLock) {
+                if (!this.syncLock) {
                     this.sync();
                     this.reviewNextNoteModal();
                 }
@@ -176,8 +175,8 @@ export default class SRPlugin extends Plugin {
             id: "srs-review-flashcards",
             name: t("Review flashcards"),
             callback: async () => {
-                if (!this.flashcardsSyncLock) {
-                    await this.flashcards_sync();
+                if (!this.syncLock) {
+                    await this.sync();
                     new FlashcardModal(this.app, this).open();
                 }
             },
@@ -187,8 +186,8 @@ export default class SRPlugin extends Plugin {
             id: "srs-view-stats",
             name: t("View statistics"),
             callback: async () => {
-                if (!this.flashcardsSyncLock) {
-                    await this.flashcards_sync();
+                if (!this.syncLock) {
+                    await this.sync();
                     new StatsModal(this.app, this).open();
                 }
             },
@@ -199,7 +198,6 @@ export default class SRPlugin extends Plugin {
         this.app.workspace.onLayoutReady(() => {
             this.initView();
             setTimeout(() => this.sync(), 2000);
-            setTimeout(() => this.flashcards_sync(), 2000);
         });
     }
 
@@ -208,13 +206,14 @@ export default class SRPlugin extends Plugin {
     }
 
     async sync(): Promise<void> {
-        if (this.notesSyncLock) {
+        if (this.syncLock) {
             return;
         }
-        this.notesSyncLock = true;
+        this.syncLock = true;
 
         let notes: TFile[] = this.app.vault.getMarkdownFiles();
 
+        // reset notes stuff
         graph.reset();
         this.easeByPath = {};
         this.incomingLinks = {};
@@ -223,8 +222,34 @@ export default class SRPlugin extends Plugin {
         this.dueDatesNotes = {};
         this.reviewDecks = {};
 
-        let now: number = Date.now();
+        // reset flashcards stuff
+        this.deckTree = new Deck("root", null);
+        this.dueDatesFlashcards = {};
+        this.cardStats = {
+            eases: {},
+            intervals: {},
+            newCount: 0,
+            youngCount: 0,
+            matureCount: 0,
+        };
+
+        let now = window.moment(Date.now());
+        let todayDate: string = now.format("YYYY-MM-DD");
+        // clear bury list if we've changed dates
+        if (todayDate !== this.data.buryDate) {
+            this.data.buryDate = todayDate;
+            this.data.buryList = [];
+        }
+
         for (let note of notes) {
+            if (
+                this.data.settings.noteFoldersToIgnore.some((folder) =>
+                    note.path.startsWith(folder)
+                )
+            ) {
+                continue;
+            }
+
             if (this.incomingLinks[note.path] === undefined) {
                 this.incomingLinks[note.path] = [];
             }
@@ -244,12 +269,35 @@ export default class SRPlugin extends Plugin {
                     graph.link(note.path, targetPath, links[targetPath]);
                 }
             }
-            if (
-                this.data.settings.noteFoldersToIgnore.some((folder) =>
-                    note.path.startsWith(folder)
-                )
-            ) {
-                continue;
+
+            // find deck path
+            let deckPath: string[] = [];
+            if (this.data.settings.convertFoldersToDecks) {
+                deckPath = note.path.split("/");
+                deckPath.pop(); // remove filename
+                if (deckPath.length === 0) {
+                    deckPath = ["/"];
+                }
+            } else {
+                let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
+                let tags = getAllTags(fileCachedData) || [];
+
+                outer: for (let tagToReview of this.data.settings.flashcardTags) {
+                    for (let tag of tags) {
+                        if (tag === tagToReview || tag.startsWith(tagToReview + "/")) {
+                            deckPath = tag.substring(1).split("/");
+                            break outer;
+                        }
+                    }
+                }
+            }
+
+            if (deckPath.length !== 0) {
+                let flashcardsInNoteAvgEase = await this.findFlashcardsInNote(note, deckPath);
+
+                if (flashcardsInNoteAvgEase > 0) {
+                    this.easeByPath[note.path] = flashcardsInNoteAvgEase;
+                }
             }
 
             let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
@@ -298,19 +346,24 @@ export default class SRPlugin extends Plugin {
                 if (this.reviewDecks.hasOwnProperty(tag)) {
                     this.reviewDecks[tag].scheduledNotes.push({ note, dueUnix });
 
-                    if (dueUnix <= now) {
+                    if (dueUnix <= now.valueOf()) {
                         this.reviewDecks[tag].dueNotesCount++;
                     }
                 }
             }
 
-            this.easeByPath[note.path] = frontmatter["sr-ease"];
+            if (this.easeByPath.hasOwnProperty(note.path)) {
+                this.easeByPath[note.path] =
+                    (this.easeByPath[note.path] + frontmatter["sr-ease"]) / 2;
+            } else {
+                this.easeByPath[note.path] = frontmatter["sr-ease"];
+            }
 
-            if (dueUnix <= now) {
+            if (dueUnix <= now.valueOf()) {
                 this.dueNotesCount++;
             }
 
-            let nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
+            let nDays: number = Math.ceil((dueUnix - now.valueOf()) / (24 * 3600 * 1000));
             if (!this.dueDatesNotes.hasOwnProperty(nDays)) {
                 this.dueDatesNotes[nDays] = 0;
             }
@@ -321,9 +374,14 @@ export default class SRPlugin extends Plugin {
             this.pageranks[node] = rank * 10000;
         });
 
+        // sort the deck names
+        this.deckTree.sortSubdecksList();
+
         for (let deckKey in this.reviewDecks) {
             this.reviewDecks[deckKey].sortNotes(this.pageranks);
         }
+
+        this.logger.info(`Sync took ${Date.now() - now.valueOf()}ms`);
 
         let noteCountText: string = this.dueNotesCount === 1 ? t("note") : t("notes");
         let cardCountText: string = this.deckTree.dueFlashcardsCount === 1 ? t("card") : t("cards");
@@ -335,7 +393,7 @@ export default class SRPlugin extends Plugin {
         );
         this.reviewQueueView.redraw();
 
-        this.notesSyncLock = false;
+        this.syncLock = false;
     }
 
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
@@ -405,13 +463,17 @@ export default class SRPlugin extends Plugin {
             let linkContribution: number =
                 this.data.settings.maxLinkFactor *
                 Math.min(1.0, Math.log(totalLinkCount + 0.5) / Math.log(64));
-            ease = Math.round(
+            ease =
                 (1.0 - linkContribution) * this.data.settings.baseEase +
-                    (totalLinkCount > 0
-                        ? (linkContribution * linkTotal) / linkPGTotal
-                        : linkContribution * this.data.settings.baseEase)
-            );
-            interval = 1;
+                (totalLinkCount > 0
+                    ? (linkContribution * linkTotal) / linkPGTotal
+                    : linkContribution * this.data.settings.baseEase);
+            // add note's average flashcard ease if available
+            if (this.easeByPath.hasOwnProperty(note.path)) {
+                ease = (ease + this.easeByPath[note.path]) / 2;
+            }
+            ease = Math.round(ease);
+            interval = 1.0;
             delayBeforeReview = 0;
         } else {
             interval = frontmatter["sr-interval"];
@@ -461,7 +523,7 @@ export default class SRPlugin extends Plugin {
         }
 
         if (this.data.settings.burySiblingCards) {
-            await this.findFlashcards(note, [], true); // bury all cards in current note
+            await this.findFlashcardsInNote(note, [], true); // bury all cards in current note
             await this.savePluginData();
         }
         await this.app.vault.modify(note, fileText);
@@ -469,7 +531,7 @@ export default class SRPlugin extends Plugin {
         new Notice(t("Response received."));
 
         setTimeout(() => {
-            if (!this.notesSyncLock) {
+            if (!this.syncLock) {
                 this.sync();
                 if (this.data.settings.autoNextNote) {
                     this.reviewNextNote(this.lastSelectedReviewDeck);
@@ -517,98 +579,18 @@ export default class SRPlugin extends Plugin {
         new Notice(t("You're all caught up now :D."));
     }
 
-    async flashcards_sync(): Promise<void> {
-        if (this.flashcardsSyncLock) {
-            return;
-        }
-        this.flashcardsSyncLock = true;
-
-        let notes: TFile[] = this.app.vault.getMarkdownFiles();
-
-        this.deckTree = new Deck("root", null);
-        this.dueDatesFlashcards = {};
-        this.cardStats = {
-            eases: {},
-            intervals: {},
-            newCount: 0,
-            youngCount: 0,
-            matureCount: 0,
-        };
-
-        let now = window.moment(Date.now());
-        let todayDate: string = now.format("YYYY-MM-DD");
-        // clear list if we've changed dates
-        if (todayDate !== this.data.buryDate) {
-            this.data.buryDate = todayDate;
-            this.data.buryList = [];
-        }
-
-        let notePathsSet: Set<string> = new Set();
-        for (let note of notes) {
-            if (
-                this.data.settings.noteFoldersToIgnore.some((folder) =>
-                    note.path.startsWith(folder)
-                )
-            ) {
-                continue;
-            }
-
-            notePathsSet.add(note.path);
-
-            // find deck path
-            let deckPath: string[] = [];
-            if (this.data.settings.convertFoldersToDecks) {
-                deckPath = note.path.split("/");
-                deckPath.pop(); // remove filename
-                if (deckPath.length === 0) {
-                    deckPath = ["/"];
-                }
-            } else {
-                let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
-                let tags = getAllTags(fileCachedData) || [];
-
-                outer: for (let tagToReview of this.data.settings.flashcardTags) {
-                    for (let tag of tags) {
-                        if (tag === tagToReview || tag.startsWith(tagToReview + "/")) {
-                            deckPath = tag.substring(1).split("/");
-                            break outer;
-                        }
-                    }
-                }
-            }
-
-            if (deckPath.length === 0) continue;
-
-            await this.findFlashcards(note, deckPath);
-        }
-
-        this.logger.info(`Flashcard sync took ${Date.now() - now.valueOf()}ms`);
-
-        // sort the deck names
-        this.deckTree.sortSubdecksList();
-
-        let noteCountText: string = this.dueNotesCount === 1 ? t("note") : t("notes");
-        let cardCountText: string = this.deckTree.dueFlashcardsCount === 1 ? t("card") : t("cards");
-        this.statusBar.setText(
-            t("Review") +
-                `: ${this.dueNotesCount} ${noteCountText}, ` +
-                `${this.deckTree.dueFlashcardsCount} ${cardCountText} ` +
-                t("due")
-        );
-
-        this.flashcardsSyncLock = false;
-    }
-
-    async findFlashcards(
+    async findFlashcardsInNote(
         note: TFile,
         deckPath: string[],
         buryOnly: boolean = false
-    ): Promise<void> {
+    ): Promise<number> {
         let fileText: string = await this.app.vault.read(note);
         let fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         let headings: HeadingCache[] = fileCachedData.headings || [];
         let fileChanged: boolean = false,
-            deckAdded = false;
+            deckAdded: boolean = false,
+            totalNoteEase: number = 0,
+            scheduledCount: number = 0;
 
         let now: number = Date.now();
         let parsedCards: [CardType, string, number][] = parse(
@@ -755,8 +737,10 @@ export default class SRPlugin extends Plugin {
                         this.cardStats.eases[ease] = 0;
                     }
                     this.cardStats.eases[ease]++;
+                    totalNoteEase += ease;
+                    scheduledCount++;
 
-                    if (interval >= 21) {
+                    if (interval >= 32) {
                         this.cardStats.matureCount++;
                     } else {
                         this.cardStats.youngCount++;
@@ -792,6 +776,8 @@ export default class SRPlugin extends Plugin {
         if (fileChanged) {
             await this.app.vault.modify(note, fileText);
         }
+
+        return scheduledCount > 0 ? totalNoteEase / scheduledCount : 0;
     }
 
     async loadPluginData(): Promise<void> {
