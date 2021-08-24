@@ -1,0 +1,3 @@
+[submodule "docs"]
+	path = docs
+	url = https://github.com/st3v3nmw/obsidian-spaced-repetition.wiki.git
