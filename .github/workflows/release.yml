@@ -26,7 +26,7 @@ jobs:
         npm install
         npm run build --if-present
         mkdir ${{ env.PLUGIN_NAME }}
-        cp main.js manifest.json styles.css ${{ env.PLUGIN_NAME }}
+        cp build/main.js manifest.json styles.css ${{ env.PLUGIN_NAME }}
         zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
         ls
         echo "::set-output name=tag_name::$(git tag --sort version:refname | tail -n 1)"
@@ -58,7 +58,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} 
-        asset_path: ./main.js
+        asset_path: ./build/main.js
         asset_name: main.js
         asset_content_type: text/javascript
     - name: Upload manifest.json
