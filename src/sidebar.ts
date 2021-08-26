@@ -27,7 +27,7 @@ export class ReviewQueueListView extends ItemView {
     }
 
     public getIcon(): string {
-        return "crosshairs";
+        return "SpacedRepIcon";
     }
 
     public onHeaderMenu(menu: Menu): void {
