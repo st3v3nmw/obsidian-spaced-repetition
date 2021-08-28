@@ -46,7 +46,8 @@ export function cyrb53(str: string, seed = 0): string {
 }
 
 /**
- * Removes legacy <key, value> pairs that no longer need to be saved
+ * Removes legacy <key, value> pairs that are no longer in use
+ * For instance, from the settings & plugin data objects
  *
  * @param currentData - Data to clean up
  * @param defaultData - Template to lookup currently used keys from

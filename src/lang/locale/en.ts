@@ -28,6 +28,7 @@ export default {
     REVIEW_ALL_CARDS: "Review flashcards from all notes",
     VIEW_STATS: "View statistics",
     STATUS_BAR: "Review: ${dueNotesCount} notes(s), ${dueFlashcardsCount} card(s) due",
+    SYNC_TIME_TAKEN: "Sync took ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "Note is saved under ignored folder (check settings).",
     PLEASE_TAG_NOTE: "Please tag the note appropriately for reviewing (in settings).",
     RESPONSE_RECEIVED: "Response received.",
@@ -106,6 +107,8 @@ export default {
     MAX_LINK_CONTRIB: "Maximum link contribution",
     MAX_LINK_CONTRIB_DESC:
         "Maximum contribution of the weighted ease of linked notes to the initial ease.",
+    LOGGING: "Logging",
+    DISPLAY_DEBUG_INFO: "Display debugging information on the developer console?",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Notes Review Queue",

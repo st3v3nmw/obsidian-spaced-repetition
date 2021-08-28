@@ -172,7 +172,7 @@ export class StatsModal extends Modal {
             t("COUNT") +
             `\n\t\t  data: [${Object.values(cardStats.eases)}]\n` +
             "\txTitle: " +
-            t("Days") +
+            t("DAYS") +
             "\n\tyTitle: " +
             t("NUMBER_OF_CARDS") +
             "\n\tlegend: false\n" +
