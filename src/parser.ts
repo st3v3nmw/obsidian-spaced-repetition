@@ -15,7 +15,9 @@ export function parse(
     singlelineCardSeparator: string,
     singlelineReversedCardSeparator: string,
     multilineCardSeparator: string,
-    multilineReversedCardSeparator: string
+    multilineReversedCardSeparator: string,
+    convertHighlightsToClozes: boolean,
+    convertBoldTextToClozes: boolean
 ): [CardType, string, number][] {
     let cardText = "";
     const cards: [CardType, string, number][] = [];
@@ -59,7 +61,11 @@ export function parse(
             cards.push([cardType, cardText, lineNo]);
             cardType = null;
             cardText = "";
-        } else if (cardType === null && /==.*?==/gm.test(lines[i])) {
+        } else if (
+            cardType === null &&
+            ((convertHighlightsToClozes && /==.*?==/gm.test(lines[i])) ||
+                (convertBoldTextToClozes && /\*\*.*?\*\*/gm.test(lines[i])))
+        ) {
             cardType = CardType.Cloze;
             lineNo = i;
         } else if (lines[i] === multilineCardSeparator) {

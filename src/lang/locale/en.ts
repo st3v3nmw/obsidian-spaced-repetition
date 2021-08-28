@@ -42,7 +42,7 @@ export default {
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition Plugin - Settings",
-    CHECK_WIKI: 'For more information, check the <a href="${wiki_url}">wiki</a>',
+    CHECK_WIKI: 'For more information, check the <a href="${wiki_url}">wiki</a>.',
     FOLDERS_TO_IGNORE: "Folders to ignore",
     FOLDERS_TO_IGNORE_DESC: "Enter folder paths separated by newlines i.e. Templates Meta/Scripts",
     FLASHCARDS: "Flashcards",
@@ -91,7 +91,7 @@ export default {
     VALID_NUMBER_WARNING: "Please provide a valid number.",
     ALGORITHM: "Algorithm",
     CHECK_ALGORITHM_WIKI:
-        'For more information, check the <a href="${algo_url}">algorithm implementation</a>',
+        'For more information, check the <a href="${algo_url}">algorithm implementation</a>.',
     BASE_EASE: "Base ease",
     BASE_EASE_DESC: "minimum = 130, preferrably approximately 250.",
     BASE_EASE_MIN_WARNING: "The base ease must be at least 130.",
