@@ -598,23 +598,22 @@ export default class SRPlugin extends Plugin {
             deckAdded = false,
             totalNoteEase = 0,
             scheduledCount = 0;
+        const settings: SRSettings = this.data.settings;
 
         const now: number = Date.now();
         const parsedCards: [CardType, string, number][] = parse(
             fileText,
-            this.data.settings.singlelineCardSeparator,
-            this.data.settings.singlelineReversedCardSeparator,
-            this.data.settings.multilineCardSeparator,
-            this.data.settings.multilineReversedCardSeparator
+            settings.singlelineCardSeparator,
+            settings.singlelineReversedCardSeparator,
+            settings.multilineCardSeparator,
+            settings.multilineReversedCardSeparator,
+            settings.convertHighlightsToClozes,
+            settings.convertBoldTextToClozes
         );
         for (const parsedCard of parsedCards) {
             const cardType: CardType = parsedCard[0],
                 cardText: string = parsedCard[1],
                 lineNo: number = parsedCard[2];
-
-            if (cardType === CardType.Cloze && this.data.settings.disableClozeCards) {
-                continue;
-            }
 
             const cardTextHash: string = cyrb53(cardText);
 
@@ -630,55 +629,68 @@ export default class SRPlugin extends Plugin {
 
             const siblingMatches: [string, string][] = [];
             if (cardType === CardType.Cloze) {
+                const siblings: RegExpMatchArray[] = [];
+                if (settings.convertHighlightsToClozes) {
+                    siblings.push(...cardText.matchAll(/==(.*?)==/gm));
+                }
+                if (settings.convertBoldTextToClozes) {
+                    siblings.push(...cardText.matchAll(/\*\*(.*?)\*\*/gm));
+                }
+                siblings.sort((a, b) => {
+                    if (a.index < b.index) {
+                        return -1;
+                    }
+                    if (a.index > b.index) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
                 let front: string, back: string;
-                for (const m of cardText.matchAll(/==(.*?)==/gm)) {
+                for (const m of siblings) {
                     const deletionStart: number = m.index,
                         deletionEnd: number = deletionStart + m[0].length;
                     front =
                         cardText.substring(0, deletionStart) +
                         "<span style='color:#2196f3'>[...]</span>" +
                         cardText.substring(deletionEnd);
-                    front = front.replace(/==/gm, "");
+                    front = front.replace(/==/gm, "").replace(/\*\*/gm, "");
                     back =
                         cardText.substring(0, deletionStart) +
                         "<span style='color:#2196f3'>" +
                         cardText.substring(deletionStart, deletionEnd) +
                         "</span>" +
                         cardText.substring(deletionEnd);
-                    back = back.replace(/==/gm, "");
+                    back = back.replace(/==/gm, "").replace(/\*\*/gm, "");
                     siblingMatches.push([front, back]);
                 }
             } else {
                 let idx: number;
                 if (cardType === CardType.SingleLineBasic) {
-                    idx = cardText.indexOf(this.data.settings.singlelineCardSeparator);
+                    idx = cardText.indexOf(settings.singlelineCardSeparator);
                     siblingMatches.push([
                         cardText.substring(0, idx),
-                        cardText.substring(idx + this.data.settings.singlelineCardSeparator.length),
+                        cardText.substring(idx + settings.singlelineCardSeparator.length),
                     ]);
                 } else if (cardType === CardType.SingleLineReversed) {
-                    idx = cardText.indexOf(this.data.settings.singlelineReversedCardSeparator);
+                    idx = cardText.indexOf(settings.singlelineReversedCardSeparator);
                     const side1: string = cardText.substring(0, idx),
                         side2: string = cardText.substring(
-                            idx + this.data.settings.singlelineReversedCardSeparator.length
+                            idx + settings.singlelineReversedCardSeparator.length
                         );
                     siblingMatches.push([side1, side2]);
                     siblingMatches.push([side2, side1]);
                 } else if (cardType === CardType.MultiLineBasic) {
-                    idx = cardText.indexOf("\n" + this.data.settings.multilineCardSeparator + "\n");
+                    idx = cardText.indexOf("\n" + settings.multilineCardSeparator + "\n");
                     siblingMatches.push([
                         cardText.substring(0, idx),
-                        cardText.substring(
-                            idx + 2 + this.data.settings.multilineCardSeparator.length
-                        ),
+                        cardText.substring(idx + 2 + settings.multilineCardSeparator.length),
                     ]);
                 } else if (cardType === CardType.MultiLineReversed) {
-                    idx = cardText.indexOf(
-                        "\n" + this.data.settings.multilineReversedCardSeparator + "\n"
-                    );
+                    idx = cardText.indexOf("\n" + settings.multilineReversedCardSeparator + "\n");
                     const side1: string = cardText.substring(0, idx),
                         side2: string = cardText.substring(
-                            idx + 2 + this.data.settings.multilineReversedCardSeparator.length
+                            idx + 2 + settings.multilineReversedCardSeparator.length
                         );
                     siblingMatches.push([side1, side2]);
                     siblingMatches.push([side2, side1]);
@@ -702,7 +714,7 @@ export default class SRPlugin extends Plugin {
                 fileChanged = true;
             }
 
-            const context: string = this.data.settings.showContextInCards
+            const context: string = settings.showContextInCards
                 ? getCardContext(lineNo, headings)
                 : "";
             const siblings: Card[] = [];
@@ -792,7 +804,7 @@ export default class SRPlugin extends Plugin {
             );
             return (
                 flashcardsInNoteAvgEase * flashcardContribution +
-                this.data.settings.baseEase * (1.0 - flashcardContribution)
+                settings.baseEase * (1.0 - flashcardContribution)
             );
         }
 
