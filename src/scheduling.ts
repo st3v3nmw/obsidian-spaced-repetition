@@ -61,7 +61,7 @@ export function schedule(
     // replaces random fuzz with load balancing over the fuzz interval
     if (dueDates !== undefined) {
         interval = Math.round(interval);
-        if (!dueDates.hasOwnProperty(interval)) {
+        if (!Object.prototype.hasOwnProperty.call(dueDates, interval)) {
             dueDates[interval] = 0;
         }
 
@@ -78,7 +78,7 @@ export function schedule(
         }
 
         for (let ivl = fuzzRange[0]; ivl <= fuzzRange[1]; ivl++) {
-            if (!dueDates.hasOwnProperty(ivl)) {
+            if (!Object.prototype.hasOwnProperty.call(dueDates, ivl)) {
                 dueDates[ivl] = 0;
             }
             if (dueDates[ivl] < dueDates[interval]) {
@@ -95,7 +95,7 @@ export function schedule(
 }
 
 export function textInterval(interval: number, isMobile: boolean): string {
-    let m: number = Math.round(interval / 3) / 10,
+    const m: number = Math.round(interval / 3) / 10,
         y: number = Math.round(interval / 36.5) / 10;
 
     if (isMobile) {
@@ -104,11 +104,11 @@ export function textInterval(interval: number, isMobile: boolean): string {
         else return `${y}y`;
     } else {
         if (interval < 30) {
-            return interval === 1.0 ? "1.0 " + t("day") : interval.toString() + " " + t("days");
+            return t("DAYS_STR_IVL").interpolate({ interval });
         } else if (interval < 365) {
-            return m === 1.0 ? "1.0 " + t("month") : m.toString() + " " + t("months");
+            return t("MONTHS_STR_IVL").interpolate({ interval: m });
         } else {
-            return y === 1.0 ? "1.0 " + t("year") : y.toString() + " " + t("years");
+            return t("YEARS_STR_IVL").interpolate({ interval: y });
         }
     }
 }
