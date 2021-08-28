@@ -324,16 +324,17 @@ export class FlashcardModal extends Modal {
             const dueIdx = this.currentDeck.dueFlashcards.indexOf(sibling);
             const newIdx = this.currentDeck.newFlashcards.indexOf(sibling);
 
-            if (dueIdx !== -1)
+            if (dueIdx !== -1) {
                 this.currentDeck.deleteFlashcardAtIndex(
                     dueIdx,
                     this.currentDeck.dueFlashcards[dueIdx].isDue
                 );
-            else if (newIdx !== -1)
+            } else if (newIdx !== -1) {
                 this.currentDeck.deleteFlashcardAtIndex(
                     newIdx,
                     this.currentDeck.newFlashcards[newIdx].isDue
                 );
+            }
         }
     }
 
@@ -461,10 +462,10 @@ export class Deck {
     deleteFlashcardAtIndex(index: number, cardIsDue: boolean): void {
         if (cardIsDue) {
             this.dueFlashcards.splice(index, 1);
-            deck.dueFlashcardsCount--;
+            this.dueFlashcardsCount--;
         } else {
             this.newFlashcards.splice(index, 1);
-            deck.newFlashcardsCount--;
+            this.newFlashcardsCount--;
         }
 
         let deck: Deck = this.parent;

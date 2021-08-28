@@ -17,7 +17,7 @@ import { escapeRegexString, cyrb53, removeLegacyKeys } from "src/utils";
 import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
 import { t } from "src/lang/helpers";
 import { parse } from "src/parser";
-import { appIcon } from './icons/appicon';
+import { appIcon } from "src/icons/appicon";
 
 interface PluginData {
     settings: SRSettings;
@@ -75,7 +75,7 @@ export default class SRPlugin extends Plugin {
         await this.loadPluginData();
 
         appIcon();
- 
+
         this.statusBar = this.addStatusBarItem();
         this.statusBar.classList.add("mod-clickable");
         this.statusBar.setAttribute("aria-label", t("OPEN_NOTE_REVIEW"));
@@ -360,13 +360,22 @@ export default class SRPlugin extends Plugin {
 
         // sort the deck names
         this.deckTree.sortSubdecksList();
-        console.log(this.easeByPath);
+        if (this.data.settings.showDebugMessages) {
+            console.log(`SR: ${t("EASES")}`, this.easeByPath);
+        }
 
         for (const deckKey in this.reviewDecks) {
             this.reviewDecks[deckKey].sortNotes(this.pageranks);
         }
 
-        console.log(`Sync took ${Date.now() - now.valueOf()}ms`);
+        if (this.data.settings.showDebugMessages) {
+            console.log(
+                "SR: " +
+                    t("SYNC_TIME_TAKEN").interpolate({
+                        t: Date.now() - now.valueOf(),
+                    })
+            );
+        }
 
         this.statusBar.setText(
             t("STATUS_BAR").interpolate({

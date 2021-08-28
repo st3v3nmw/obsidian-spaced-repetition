@@ -610,5 +610,13 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
+
+        containerEl.createDiv().innerHTML = "<h3>" + t("LOGGING") + "</h3>";
+        new Setting(containerEl).setName(t("DISPLAY_DEBUG_INFO")).addToggle((toggle) =>
+            toggle.setValue(this.plugin.data.settings.showDebugMessages).onChange(async (value) => {
+                this.plugin.data.settings.showDebugMessages = value;
+                await this.plugin.savePluginData();
+            })
+        );
     }
 }
