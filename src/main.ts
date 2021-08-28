@@ -1,4 +1,4 @@
-import { Notice, Plugin, addIcon, TAbstractFile, TFile, HeadingCache, getAllTags } from "obsidian";
+import { Notice, Plugin, TAbstractFile, TFile, HeadingCache, getAllTags } from "obsidian";
 import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
@@ -8,7 +8,6 @@ import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/sidebar";
 import { Card, ReviewResponse, schedule } from "src/scheduling";
 import { CardType } from "src/types";
 import {
-    CROSS_HAIRS_ICON,
     YAML_FRONT_MATTER_REGEX,
     SCHEDULING_INFO_REGEX,
     LEGACY_SCHEDULING_EXTRACTOR,
@@ -18,6 +17,7 @@ import { escapeRegexString, cyrb53, removeLegacyKeys } from "src/utils";
 import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
 import { t } from "src/lang/helpers";
 import { parse } from "src/parser";
+import { appIcon } from './icons/appicon';
 
 interface PluginData {
     settings: SRSettings;
@@ -74,8 +74,8 @@ export default class SRPlugin extends Plugin {
     async onload(): Promise<void> {
         await this.loadPluginData();
 
-        addIcon("crosshairs", CROSS_HAIRS_ICON);
-
+        appIcon();
+ 
         this.statusBar = this.addStatusBarItem();
         this.statusBar.classList.add("mod-clickable");
         this.statusBar.setAttribute("aria-label", t("OPEN_NOTE_REVIEW"));
@@ -85,7 +85,7 @@ export default class SRPlugin extends Plugin {
             this.reviewNextNoteModal();
         });
 
-        this.addRibbonIcon("crosshairs", t("REVIEW_CARDS"), async () => {
+        this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
             await this.sync();
             new FlashcardModal(this.app, this).open();
         });
@@ -101,7 +101,7 @@ export default class SRPlugin extends Plugin {
                     if (fileish instanceof TFile && fileish.extension === "md") {
                         menu.addItem((item) => {
                             item.setTitle(t("REVIEW_EASY_FILE_MENU"))
-                                .setIcon("crosshairs")
+                                .setIcon("SpacedRepIcon")
                                 .onClick(() => {
                                     this.saveReviewResponse(fileish, ReviewResponse.Easy);
                                 });
@@ -109,7 +109,7 @@ export default class SRPlugin extends Plugin {
 
                         menu.addItem((item) => {
                             item.setTitle(t("REVIEW_GOOD_FILE_MENU"))
-                                .setIcon("crosshairs")
+                                .setIcon("SpacedRepIcon")
                                 .onClick(() => {
                                     this.saveReviewResponse(fileish, ReviewResponse.Good);
                                 });
@@ -117,7 +117,7 @@ export default class SRPlugin extends Plugin {
 
                         menu.addItem((item) => {
                             item.setTitle(t("REVIEW_HARD_FILE_MENU"))
-                                .setIcon("crosshairs")
+                                .setIcon("SpacedRepIcon")
                                 .onClick(() => {
                                     this.saveReviewResponse(fileish, ReviewResponse.Hard);
                                 });
