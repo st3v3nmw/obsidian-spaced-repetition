@@ -2,156 +2,135 @@
 
 export default {
     // flashcard-modal.ts
-    Decks: "Decks",
-    "Open file": "Open file",
-    "Due cards": "Due cards",
-    "New cards": "New cards",
-    "Total cards": "Total cards",
-    "Reset card's progress": "Reset card's progress",
-    Hard: "Hard",
-    Good: "Good",
-    Easy: "Easy",
-    "Show Answer": "Show Answer",
-    "Card's progress has been reset.": "Card's progress has been reset.",
+    DECKS: "Decks",
+    DUE_CARDS: "Due Cards",
+    NEW_CARDS: "New Cards",
+    TOTAL_CARDS: "Total Cards",
+    OPEN_FILE: "Open File",
+    RESET_CARD_PROGRESS: "Reset card's progress",
+    HARD: "Hard",
+    GOOD: "Good",
+    EASY: "Easy",
+    SHOW_ANSWER: "Show Answer",
+    CARD_PROGRESS_RESET: "Card's progress has been reset.",
 
     // main.ts
-    "Open a note for review": "Open a note for review",
-    "Review flashcards": "Review flashcards",
-    "Review: Easy": "Review: Easy",
-    "Review: Good": "Review: Good",
-    "Review: Hard": "Review: Hard",
-    "Review note as easy": "Review note as easy",
-    "Review note as good": "Review note as good",
-    "Review note as hard": "Review note as hard",
-    "View statistics": "View statistics",
-    note: "note",
-    notes: "notes",
-    card: "card",
-    cards: "cards",
-    "Please tag the note appropriately for reviewing (in settings).":
-        "Please tag the note appropriately for reviewing (in settings).",
-    "You're all caught up now :D.": "You're all caught up now :D.",
-    "Response received.": "Response received.",
+    OPEN_NOTE_REVIEW: "Open a note for review",
+    REVIEW_CARDS: "Review flashcards",
+    REVIEW_EASY_FILE_MENU: "Review: Easy",
+    REVIEW_GOOD_FILE_MENU: "Review: Good",
+    REVIEW_HARD_FILE_MENU: "Review: Hard",
+    OPEN_NOTE_FOR_REVIEW_CMD: "Open a note for review",
+    REVIEW_NOTE_EASY_CMD: "Review note as easy",
+    REVIEW_NOTE_GOOD_CMD: "Review note as good",
+    REVIEW_NOTE_HARD_CMD: "Review note as hard",
+    REVIEW_CARDS_IN_NOTE: "Review flashcards in this note",
+    REVIEW_ALL_CARDS: "Review flashcards from all notes",
+    VIEW_STATS: "View statistics",
+    STATUS_BAR: "Review: ${dueNotesCount} notes(s), ${dueFlashcardsCount} card(s) due",
+    NOTE_IN_IGNORED_FOLDER: "Note is saved under ignored folder (check settings).",
+    PLEASE_TAG_NOTE: "Please tag the note appropriately for reviewing (in settings).",
+    RESPONSE_RECEIVED: "Response received.",
+    NO_DECK_EXISTS: "No deck exists for ${deckName}",
+    ALL_CAUGHT_UP: "You're all caught up now :D.",
 
     // scheduling.ts
-    day: "day",
-    days: "days",
-    month: "month",
-    months: "months",
-    year: "year",
-    years: "years",
+    DAYS_STR_IVL: "${interval} days",
+    MONTHS_STR_IVL: "${interval} months",
+    YEARS_STR_IVL: "${interval} years",
 
     // settings.ts
-    Notes: "Notes",
-    Flashcards: "Flashcards",
-    "Spaced Repetition Plugin - Settings": "Spaced Repetition Plugin - Settings",
-    "For more information, check the": "For more information, check the",
-    wiki: "wiki",
-    "algorithm implementation": "algorithm implementation",
-    "Flashcard tags": "Flashcard tags",
-    "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.":
+    SETTINGS_HEADER: "Spaced Repetition Plugin - Settings",
+    CHECK_WIKI: 'For more information, check the <a href="${wiki_url}">wiki</a>',
+    FOLDERS_TO_IGNORE: "Folders to ignore",
+    FOLDERS_TO_IGNORE_DESC: "Enter folder paths separated by newlines i.e. Templates Meta/Scripts",
+    FLASHCARDS: "Flashcards",
+    FLASHCARD_TAGS: "Flashcard tags",
+    FLASHCARD_TAGS_DESC:
         "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.",
-    "Convert folders to decks and subdecks?": "Convert folders to decks and subdecks?",
-    "This is an alternative to the Flashcard tags option above.":
-        "This is an alternative to the Flashcard tags option above.",
-    "Save scheduling comment on the same line as the flashcard's last line?":
+    CONVERT_FOLDERS_TO_DECKS: "Convert folders to decks and subdecks?",
+    CONVERT_FOLDERS_TO_DECKS_DESC: "This is an alternative to the Flashcard tags option above.",
+    INLINE_SCHEDULING_COMMENTS:
         "Save scheduling comment on the same line as the flashcard's last line?",
-    "Turning this on will make the HTML comments not break list formatting.":
+    INLINE_SCHEDULING_COMMENTS_DESC:
         "Turning this on will make the HTML comments not break list formatting.",
-    "Bury sibling cards until the next day?": "Bury sibling cards until the next day?",
-    "Siblings are cards generated from the same card text i.e. cloze deletions":
+    BURY_SIBLINGS_TILL_NEXT_DAY: "Bury sibling cards until the next day?",
+    BURY_SIBLINGS_TILL_NEXT_DAY_DESC:
         "Siblings are cards generated from the same card text i.e. cloze deletions",
-    "Show context in cards?": "Show context in cards?",
-    "i.e. Title > Heading 1 > Subheading > ... > Subheading":
-        "i.e. Title > Heading 1 > Subheading > ... > Subheading",
-    "Flashcard Height Percentage": "Flashcard Height Percentage",
-    "Should be set to 100% on mobile or if you have very large images":
+    SHOW_CARD_CONTEXT: "Show context in cards?",
+    SHOW_CARD_CONTEXT_DESC: "i.e. Title > Heading 1 > Subheading > ... > Subheading",
+    CARD_MODAL_HEIGHT_PERCENT: "Flashcard Height Percentage",
+    CARD_MODAL_SIZE_PERCENT_DESC:
         "Should be set to 100% on mobile or if you have very large images",
-    "Reset to default": "Reset to default",
-    "Flashcard Width Percentage": "Flashcard Width Percentage",
-    "Show file name instead of 'Open file' in flashcard review?":
-        "Show file name instead of 'Open file' in flashcard review?",
-    "Randomize card order during review?": "Randomize card order during review?",
-    "Disable cloze cards?": "Disable cloze cards?",
-    "If you're not currently using 'em & would like the plugin to run a tad faster.":
-        "If you're not currently using 'em & would like the plugin to run a tad faster.",
-    "Separator for inline flashcards": "Separator for inline flashcards",
-    "Separator for inline reversed flashcards": "Separator for inline reversed flashcards",
-    "Separator for multiline reversed flashcards": "Separator for multiline reversed flashcards",
-    "Note that after changing this you have to manually edit any flashcards you already have.":
+    RESET_DEFAULT: "Reset to default",
+    CARD_MODAL_WIDTH_PERCENT: "Flashcard Width Percentage",
+    FILENAME_OR_OPEN_FILE: "Show file name instead of 'Open file' in flashcard review?",
+    RANDOMIZE_CARD_ORDER: "Randomize card order during review?",
+    DISABLE_CLOZE_CARDS: "Disable cloze cards?",
+    CONVERT_HIGHLIGHTS_TO_CLOZES: "Convert ==hightlights== to clozes?",
+    CONVERT_BOLD_TEXT_TO_CLOZES: "Convert **bolded text** to clozes?",
+    INLINE_CARDS_SEPARATOR: "Separator for inline flashcards",
+    FIX_SEPARATORS_MANUALLY_WARNING:
         "Note that after changing this you have to manually edit any flashcards you already have.",
-    "Separator for multiline flashcards": "Separator for multiline flashcards",
-    "Clear cache?": "Clear cache?",
-    "Clear cache": "Clear cache",
-    "Cache cleared": "Cache cleared",
-    "If you're having issues seeing some cards, try this.":
-        "If you're having issues seeing some cards, try this.",
-    "Tags to review": "Tags to review",
-    "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.":
-        "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.",
-    "Open a random note for review": "Open a random note for review",
-    "When you turn this off, notes are ordered by importance (PageRank).":
-        "When you turn this off, notes are ordered by importance (PageRank).",
-    "Open next note automatically after a review": "Open next note automatically after a review",
-    "For faster reviews.": "For faster reviews.",
-    "Disable review options in the file menu i.e. Review: Easy Good Hard":
+    INLINE_REVERSED_CARDS_SEPARATOR: "Separator for inline reversed flashcards",
+    MULTILINE_CARDS_SEPARATOR: "Separator for multiline flashcards",
+    MULTILINE_REVERSED_CARDS_SEPARATOR: "Separator for multiline reversed flashcards",
+    NOTES: "Notes",
+    TAGS_TO_REVIEW: "Tags to review",
+    TAGS_TO_REVIEW_DESC: "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.",
+    OPEN_RANDOM_NOTE: "Open a random note for review",
+    OPEN_RANDOM_NOTE_DESC: "When you turn this off, notes are ordered by importance (PageRank).",
+    AUTO_NEXT_NOTE: "Open next note automatically after a review",
+    DISABLE_FILE_MENU_REVIEW_OPTIONS:
         "Disable review options in the file menu i.e. Review: Easy Good Hard",
-    "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this.":
+    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
         "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this.",
-    "Maximum number of days to display on right panel":
-        "Maximum number of days to display on right panel",
-    "Reduce this for a cleaner interface.": "Reduce this for a cleaner interface.",
-    "The number of days must be at least 1.": "The number of days must be at least 1.",
-    "Please provide a valid number.": "Please provide a valid number.",
-    Algorithm: "Algorithm",
-    "Base ease": "Base ease",
-    "minimum = 130, preferrably approximately 250.":
-        "minimum = 130, preferrably approximately 250.",
-    "The base ease must be at least 130.": "The base ease must be at least 130.",
-    "Interval change when you review a flashcard/note as hard":
-        "Interval change when you review a flashcard/note as hard",
-    "newInterval = oldInterval * intervalChange / 100.":
-        "newInterval = oldInterval * intervalChange / 100.",
-    "Easy bonus": "Easy bonus",
-    "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%).":
+    MAX_N_DAYS_REVIEW_QUEUE: "Maximum number of days to display on right panel",
+    MIN_ONE_DAY: "The number of days must be at least 1.",
+    VALID_NUMBER_WARNING: "Please provide a valid number.",
+    ALGORITHM: "Algorithm",
+    CHECK_ALGORITHM_WIKI:
+        'For more information, check the <a href="${algo_url}">algorithm implementation</a>',
+    BASE_EASE: "Base ease",
+    BASE_EASE_DESC: "minimum = 130, preferrably approximately 250.",
+    BASE_EASE_MIN_WARNING: "The base ease must be at least 130.",
+    LAPSE_INTERVAL_CHANGE: "Interval change when you review a flashcard/note as hard",
+    LAPSE_INTERVAL_CHANGE_DESC: "newInterval = oldInterval * intervalChange / 100.",
+    EASY_BONUS: "Easy Bonus",
+    EASY_BONUS_DESC:
         "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%).",
-    "The easy bonus must be at least 100.": "The easy bonus must be at least 100.",
-    "Maximum Interval": "Maximum Interval",
-    "Allows you to place an upper limit on the interval (default = 100 years).":
-        "Allows you to place an upper limit on the interval (default = 100 years).",
-    "The maximum interval must be at least 1 day.": "The maximum interval must be at least 1 day.",
-    "Maximum link contribution": "Maximum link contribution",
-    "Maximum contribution of the weighted ease of linked notes to the initial ease.":
+    EASY_BONUS_MIN_WARNING: "The easy bonus must be at least 100.",
+    MAX_INTERVAL: "Maximum Interval",
+    MAX_INTERVAL_DESC: "Allows you to place an upper limit on the interval (default = 100 years).",
+    MAX_INTERVAL_MIN_WARNING: "The maximum interval must be at least 1 day.",
+    MAX_LINK_CONTRIB: "Maximum link contribution",
+    MAX_LINK_CONTRIB_DESC:
         "Maximum contribution of the weighted ease of linked notes to the initial ease.",
 
     // sidebar.ts
-    New: "New",
-    Yesterday: "Yesterday",
-    Today: "Today",
-    Tomorrow: "Tomorrow",
-    "Notes Review Queue": "Notes Review Queue",
-    Close: "Close",
+    NOTES_REVIEW_QUEUE: "Notes Review Queue",
+    CLOSE: "Close",
+    NEW: "New",
+    YESTERDAY: "Yesterday",
+    TODAY: "Today",
+    TOMORROW: "Tomorrow",
 
     // stats-modal.ts
-    Statistics: "Statistics",
-    "Note that this requires the Obsidian Charts plugin to work":
-        "Note that this requires the Obsidian Charts plugin to work",
-    Forecast: "Forecast",
-    "The number of cards due in the future": "The number of cards due in the future",
-    "Number of cards": "Number of cards",
-    Scheduled: "Scheduled",
-    Review: "Review",
-    due: "due",
-    Days: "Days",
-    "Card Types": "Card Types",
-    Intervals: "Intervals",
-    "Delays until reviews are shown again": "Delays until reviews are shown again",
-    "Count": "Count",
-    "Eases": "Eases",
-
-    "Folders to ignore": "Folders to ignore",
-    "Enter folder paths separated by newlines i.e. Templates Meta/Scripts":
-        "Enter folder paths separated by newlines i.e. Templates Meta/Scripts",
-    "Note is saved under ignored folder (check settings).":
-        "Note is saved under ignored folder (check settings).",
+    STATS_TITLE: "Statistics",
+    OBSIDIAN_CHARTS_REQUIRED: "Note that this requires the Obsidian Charts plugin to work",
+    FORECAST: "Forecast",
+    FORECAST_DESC: "The number of cards due in the future",
+    SCHEDULED: "Scheduled",
+    DAYS: "Days",
+    NUMBER_OF_CARDS: "Number of cards",
+    REVIEWS_PER_DAY: "Average: ${avg} reviews/day",
+    INTERVALS: "Intervals",
+    INTERVALS_DESC: "Delays until reviews are shown again",
+    COUNT: "Count",
+    INTERVALS_SUMMARY: "Average interval: ${avg}, Longest interval: ${longest}",
+    EASES: "Eases",
+    EASES_SUMMARY: "Average ease: ${avgEase}",
+    CARD_TYPES: "Card Types",
+    CARD_TYPES_DESC: "This includes buried cards as well, if any",
+    CARD_TYPES_SUMMARY: "Total cards: ${totalCardsCount}",
 };

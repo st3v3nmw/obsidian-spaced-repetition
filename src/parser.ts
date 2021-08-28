@@ -17,12 +17,12 @@ export function parse(
     multilineCardSeparator: string,
     multilineReversedCardSeparator: string
 ): [CardType, string, number][] {
-    let cardText: string = "";
-    let cards: [CardType, string, number][] = [];
+    let cardText = "";
+    const cards: [CardType, string, number][] = [];
     let cardType: CardType | null = null;
-    let lineNo: number = 0;
+    let lineNo = 0;
 
-    let lines: string[] = text.split("\n");
+    const lines: string[] = text.split("\n");
     for (let i = 0; i < lines.length; i++) {
         if (lines[i].length === 0) {
             if (cardType) {

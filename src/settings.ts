@@ -1,7 +1,6 @@
 import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
 
 import type SRPlugin from "src/main";
-import { LogLevel } from "src/logger";
 import { t } from "src/lang/helpers";
 
 export interface SRSettings {
@@ -15,7 +14,8 @@ export interface SRSettings {
     flashcardWidthPercentage: number;
     showFileNameInFileLink: boolean;
     randomizeCardOrder: boolean;
-    disableClozeCards: boolean;
+    convertHighlightsToClozes: boolean;
+    convertBoldTextToClozes: boolean;
     singlelineCardSeparator: string;
     singlelineReversedCardSeparator: string;
     multilineCardSeparator: string;
@@ -34,7 +34,7 @@ export interface SRSettings {
     maximumInterval: number;
     maxLinkFactor: number;
     // logging
-    logLevel: LogLevel;
+    showDebugMessages: boolean;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
@@ -48,7 +48,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardWidthPercentage: Platform.isMobile ? 100 : 40,
     showFileNameInFileLink: false,
     randomizeCardOrder: true,
-    disableClozeCards: false,
+    convertHighlightsToClozes: false,
+    convertBoldTextToClozes: true,
     singlelineCardSeparator: "::",
     singlelineReversedCardSeparator: ":::",
     multilineCardSeparator: "?",
@@ -67,12 +68,12 @@ export const DEFAULT_SETTINGS: SRSettings = {
     maximumInterval: 36525,
     maxLinkFactor: 1.0,
     // logging
-    logLevel: LogLevel.Warn,
+    showDebugMessages: false,
 };
 
 // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
-let applyDebounceTimer: number = 0;
-function applySettingsUpdate(callback: Function): void {
+let applyDebounceTimer = 0;
+function applySettingsUpdate(callback): void {
     clearTimeout(applyDebounceTimer);
     applyDebounceTimer = window.setTimeout(callback, 512);
 }
@@ -86,22 +87,19 @@ export class SRSettingTab extends PluginSettingTab {
     }
 
     display(): void {
-        let { containerEl } = this;
+        const { containerEl } = this;
 
         containerEl.empty();
 
-        containerEl.createDiv().innerHTML =
-            "<h2>" + t("Spaced Repetition Plugin - Settings") + "</h2>";
+        containerEl.createDiv().innerHTML = "<h2>" + t("SETTINGS_HEADER") + "</h2>";
 
-        containerEl.createDiv().innerHTML =
-            t("For more information, check the") +
-            ' <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki">' +
-            t("wiki") +
-            "</a>.";
+        containerEl.createDiv().innerHTML = t("CHECK_WIKI").interpolate({
+            wiki_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki",
+        });
 
         new Setting(containerEl)
-            .setName(t("Folders to ignore"))
-            .setDesc(t("Enter folder paths separated by newlines i.e. Templates Meta/Scripts"))
+            .setName(t("FOLDERS_TO_IGNORE"))
+            .setDesc(t("FOLDERS_TO_IGNORE_DESC"))
             .addTextArea((text) =>
                 text
                     .setValue(this.plugin.data.settings.noteFoldersToIgnore.join("\n"))
@@ -116,13 +114,11 @@ export class SRSettingTab extends PluginSettingTab {
                     })
             );
 
-        containerEl.createDiv().innerHTML = "<h3>" + t("Flashcards") + "</h3>";
+        containerEl.createDiv().innerHTML = "<h3>" + t("FLASHCARDS") + "</h3>";
 
         new Setting(containerEl)
-            .setName(t("Flashcard tags"))
-            .setDesc(
-                t("Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.")
-            )
+            .setName(t("FLASHCARD_TAGS"))
+            .setDesc(t("FLASHCARD_TAGS_DESC"))
             .addTextArea((text) =>
                 text
                     .setValue(this.plugin.data.settings.flashcardTags.join(" "))
@@ -135,8 +131,8 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName(t("Convert folders to decks and subdecks?"))
-            .setDesc(t("This is an alternative to the Flashcard tags option above."))
+            .setName(t("CONVERT_FOLDERS_TO_DECKS"))
+            .setDesc(t("CONVERT_FOLDERS_TO_DECKS_DESC"))
             .addToggle((toggle) =>
                 toggle
                     .setValue(this.plugin.data.settings.convertFoldersToDecks)
@@ -147,8 +143,8 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName(t("Save scheduling comment on the same line as the flashcard's last line?"))
-            .setDesc(t("Turning this on will make the HTML comments not break list formatting."))
+            .setName(t("INLINE_SCHEDULING_COMMENTS"))
+            .setDesc(t("INLINE_SCHEDULING_COMMENTS_DESC"))
             .addToggle((toggle) =>
                 toggle
                     .setValue(this.plugin.data.settings.cardCommentOnSameLine)
@@ -159,8 +155,8 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName(t("Bury sibling cards until the next day?"))
-            .setDesc(t("Siblings are cards generated from the same card text i.e. cloze deletions"))
+            .setName(t("BURY_SIBLINGS_TILL_NEXT_DAY"))
+            .setDesc(t("BURY_SIBLINGS_TILL_NEXT_DAY_DESC"))
             .addToggle((toggle) =>
                 toggle
                     .setValue(this.plugin.data.settings.burySiblingCards)
@@ -171,8 +167,8 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName(t("Show context in cards?"))
-            .setDesc(t("i.e. Title > Heading 1 > Subheading > ... > Subheading"))
+            .setName(t("SHOW_CARD_CONTEXT"))
+            .setDesc(t("SHOW_CARD_CONTEXT_DESC"))
             .addToggle((toggle) =>
                 toggle
                     .setValue(this.plugin.data.settings.showContextInCards)
@@ -183,8 +179,8 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName(t("Flashcard Height Percentage"))
-            .setDesc(t("Should be set to 100% on mobile or if you have very large images"))
+            .setName(t("CARD_MODAL_HEIGHT_PERCENT"))
+            .setDesc(t("CARD_MODAL_SIZE_PERCENT_DESC"))
             .addSlider((slider) =>
                 slider
                     .setLimits(10, 100, 5)
@@ -198,7 +194,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip(t("Reset to default"))
+                    .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         this.plugin.data.settings.flashcardHeightPercentage =
                             DEFAULT_SETTINGS.flashcardHeightPercentage;
@@ -208,8 +204,8 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName(t("Flashcard Width Percentage"))
-            .setDesc(t("Should be set to 100% on mobile or if you have very large images"))
+            .setName(t("CARD_MODAL_WIDTH_PERCENT"))
+            .setDesc(t("CARD_MODAL_SIZE_PERCENT_DESC"))
             .addSlider((slider) =>
                 slider
                     .setLimits(10, 100, 5)
@@ -223,7 +219,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip(t("Reset to default"))
+                    .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         this.plugin.data.settings.flashcardWidthPercentage =
                             DEFAULT_SETTINGS.flashcardWidthPercentage;
@@ -232,49 +228,45 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
-        new Setting(containerEl)
-            .setName(t("Show file name instead of 'Open file' in flashcard review?"))
-            .addToggle((toggle) =>
-                toggle
-                    .setValue(this.plugin.data.settings.showFileNameInFileLink)
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.showFileNameInFileLink = value;
-                        await this.plugin.savePluginData();
-                    })
-            );
+        new Setting(containerEl).setName(t("FILENAME_OR_OPEN_FILE")).addToggle((toggle) =>
+            toggle
+                .setValue(this.plugin.data.settings.showFileNameInFileLink)
+                .onChange(async (value) => {
+                    this.plugin.data.settings.showFileNameInFileLink = value;
+                    await this.plugin.savePluginData();
+                })
+        );
+
+        new Setting(containerEl).setName(t("RANDOMIZE_CARD_ORDER")).addToggle((toggle) =>
+            toggle
+                .setValue(this.plugin.data.settings.randomizeCardOrder)
+                .onChange(async (value) => {
+                    this.plugin.data.settings.randomizeCardOrder = value;
+                    await this.plugin.savePluginData();
+                })
+        );
+
+        new Setting(containerEl).setName(t("CONVERT_HIGHLIGHTS_TO_CLOZES")).addToggle((toggle) =>
+            toggle
+                .setValue(this.plugin.data.settings.convertHighlightsToClozes)
+                .onChange(async (value) => {
+                    this.plugin.data.settings.convertHighlightsToClozes = value;
+                    await this.plugin.savePluginData();
+                })
+        );
+
+        new Setting(containerEl).setName(t("CONVERT_BOLD_TEXT_TO_CLOZES")).addToggle((toggle) =>
+            toggle
+                .setValue(this.plugin.data.settings.convertBoldTextToClozes)
+                .onChange(async (value) => {
+                    this.plugin.data.settings.convertBoldTextToClozes = value;
+                    await this.plugin.savePluginData();
+                })
+        );
 
         new Setting(containerEl)
-            .setName(t("Randomize card order during review?"))
-            .addToggle((toggle) =>
-                toggle
-                    .setValue(this.plugin.data.settings.randomizeCardOrder)
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.randomizeCardOrder = value;
-                        await this.plugin.savePluginData();
-                    })
-            );
-
-        new Setting(containerEl)
-            .setName(t("Disable cloze cards?"))
-            .setDesc(
-                t("If you're not currently using 'em & would like the plugin to run a tad faster.")
-            )
-            .addToggle((toggle) =>
-                toggle
-                    .setValue(this.plugin.data.settings.disableClozeCards)
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.disableClozeCards = value;
-                        await this.plugin.savePluginData();
-                    })
-            );
-
-        new Setting(containerEl)
-            .setName(t("Separator for inline flashcards"))
-            .setDesc(
-                t(
-                    "Note that after changing this you have to manually edit any flashcards you already have."
-                )
-            )
+            .setName(t("INLINE_CARDS_SEPARATOR"))
+            .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
             .addText((text) =>
                 text
                     .setValue(this.plugin.data.settings.singlelineCardSeparator)
@@ -288,7 +280,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip(t("Reset to default"))
+                    .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         this.plugin.data.settings.singlelineCardSeparator =
                             DEFAULT_SETTINGS.singlelineCardSeparator;
@@ -298,12 +290,8 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName(t("Separator for inline reversed flashcards"))
-            .setDesc(
-                t(
-                    "Note that after changing this you have to manually edit any flashcards you already have."
-                )
-            )
+            .setName(t("INLINE_REVERSED_CARDS_SEPARATOR"))
+            .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
             .addText((text) =>
                 text
                     .setValue(this.plugin.data.settings.singlelineReversedCardSeparator)
@@ -317,7 +305,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip(t("Reset to default"))
+                    .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         this.plugin.data.settings.singlelineReversedCardSeparator =
                             DEFAULT_SETTINGS.singlelineReversedCardSeparator;
@@ -327,12 +315,8 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName(t("Separator for multiline flashcards"))
-            .setDesc(
-                t(
-                    "Note that after changing this you have to manually edit any flashcards you already have."
-                )
-            )
+            .setName(t("MULTILINE_CARDS_SEPARATOR"))
+            .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
             .addText((text) =>
                 text
                     .setValue(this.plugin.data.settings.multilineCardSeparator)
@@ -346,7 +330,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip(t("Reset to default"))
+                    .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         this.plugin.data.settings.multilineCardSeparator =
                             DEFAULT_SETTINGS.multilineCardSeparator;
@@ -356,12 +340,8 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName(t("Separator for multiline reversed flashcards"))
-            .setDesc(
-                t(
-                    "Note that after changing this you have to manually edit any flashcards you already have."
-                )
-            )
+            .setName(t("MULTILINE_REVERSED_CARDS_SEPARATOR"))
+            .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
             .addText((text) =>
                 text
                     .setValue(this.plugin.data.settings.multilineReversedCardSeparator)
@@ -375,7 +355,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip(t("Reset to default"))
+                    .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         this.plugin.data.settings.multilineReversedCardSeparator =
                             DEFAULT_SETTINGS.multilineReversedCardSeparator;
@@ -384,11 +364,11 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
-        containerEl.createDiv().innerHTML = "<h3>" + t("Notes") + "</h3>";
+        containerEl.createDiv().innerHTML = "<h3>" + t("NOTES") + "</h3>";
 
         new Setting(containerEl)
-            .setName(t("Tags to review"))
-            .setDesc(t("Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3."))
+            .setName(t("TAGS_TO_REVIEW"))
+            .setDesc(t("TAGS_TO_REVIEW_DESC"))
             .addTextArea((text) =>
                 text
                     .setValue(this.plugin.data.settings.tagsToReview.join(" "))
@@ -401,8 +381,8 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName(t("Open a random note for review"))
-            .setDesc(t("When you turn this off, notes are ordered by importance (PageRank)."))
+            .setName(t("OPEN_RANDOM_NOTE"))
+            .setDesc(t("OPEN_RANDOM_NOTE_DESC"))
             .addToggle((toggle) =>
                 toggle
                     .setValue(this.plugin.data.settings.openRandomNote)
@@ -412,23 +392,16 @@ export class SRSettingTab extends PluginSettingTab {
                     })
             );
 
-        new Setting(containerEl)
-            .setName(t("Open next note automatically after a review"))
-            .setDesc(t("For faster reviews."))
-            .addToggle((toggle) =>
-                toggle.setValue(this.plugin.data.settings.autoNextNote).onChange(async (value) => {
-                    this.plugin.data.settings.autoNextNote = value;
-                    await this.plugin.savePluginData();
-                })
-            );
+        new Setting(containerEl).setName(t("AUTO_NEXT_NOTE")).addToggle((toggle) =>
+            toggle.setValue(this.plugin.data.settings.autoNextNote).onChange(async (value) => {
+                this.plugin.data.settings.autoNextNote = value;
+                await this.plugin.savePluginData();
+            })
+        );
 
         new Setting(containerEl)
-            .setName(t("Disable review options in the file menu i.e. Review: Easy Good Hard"))
-            .setDesc(
-                t(
-                    "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this."
-                )
-            )
+            .setName(t("DISABLE_FILE_MENU_REVIEW_OPTIONS"))
+            .setDesc(t("DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
             .addToggle((toggle) =>
                 toggle
                     .setValue(this.plugin.data.settings.disableFileMenuReviewOptions)
@@ -439,17 +412,16 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName(t("Maximum number of days to display on right panel"))
-            .setDesc(t("Reduce this for a cleaner interface."))
+            .setName(t("MAX_N_DAYS_REVIEW_QUEUE"))
             .addText((text) =>
                 text
                     .setValue(this.plugin.data.settings.maxNDaysNotesReviewQueue.toString())
                     .onChange((value) => {
                         applySettingsUpdate(async () => {
-                            let numValue: number = Number.parseInt(value);
+                            const numValue: number = Number.parseInt(value);
                             if (!isNaN(numValue)) {
                                 if (numValue < 1) {
-                                    new Notice(t("The number of days must be at least 1."));
+                                    new Notice(t("MIN_ONE_DAY"));
                                     text.setValue(
                                         this.plugin.data.settings.maxNDaysNotesReviewQueue.toString()
                                     );
@@ -459,7 +431,7 @@ export class SRSettingTab extends PluginSettingTab {
                                 this.plugin.data.settings.maxNDaysNotesReviewQueue = numValue;
                                 await this.plugin.savePluginData();
                             } else {
-                                new Notice(t("Please provide a valid number."));
+                                new Notice(t("VALID_NUMBER_WARNING"));
                             }
                         });
                     })
@@ -467,7 +439,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip(t("Reset to default"))
+                    .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         this.plugin.data.settings.maxNDaysNotesReviewQueue =
                             DEFAULT_SETTINGS.maxNDaysNotesReviewQueue;
@@ -476,24 +448,22 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
-        containerEl.createDiv().innerHTML = "<h3>" + t("Algorithm") + "</h3>";
-
-        containerEl.createDiv().innerHTML =
-            t("For more information, check the") +
-            ' <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Spaced-Repetition-Algorithm">' +
-            t("algorithm implementation") +
-            "</a>.";
+        containerEl.createDiv().innerHTML = "<h3>" + t("ALGORITHM") + "</h3>";
+        containerEl.createDiv().innerHTML = t("CHECK_ALGORITHM_WIKI").interpolate({
+            algo_url:
+                "https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Spaced-Repetition-Algorithm",
+        });
 
         new Setting(containerEl)
-            .setName(t("Base ease"))
-            .setDesc(t("minimum = 130, preferrably approximately 250."))
+            .setName(t("BASE_EASE"))
+            .setDesc(t("BASE_EASE_DESC"))
             .addText((text) =>
                 text.setValue(this.plugin.data.settings.baseEase.toString()).onChange((value) => {
                     applySettingsUpdate(async () => {
-                        let numValue: number = Number.parseInt(value);
+                        const numValue: number = Number.parseInt(value);
                         if (!isNaN(numValue)) {
                             if (numValue < 130) {
-                                new Notice(t("The base ease must be at least 130."));
+                                new Notice(t("BASE_EASE_MIN_WARNING"));
                                 text.setValue(this.plugin.data.settings.baseEase.toString());
                                 return;
                             }
@@ -501,7 +471,7 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings.baseEase = numValue;
                             await this.plugin.savePluginData();
                         } else {
-                            new Notice(t("Please provide a valid number."));
+                            new Notice(t("VALID_NUMBER_WARNING"));
                         }
                     });
                 })
@@ -509,7 +479,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip(t("Reset to default"))
+                    .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         this.plugin.data.settings.baseEase = DEFAULT_SETTINGS.baseEase;
                         await this.plugin.savePluginData();
@@ -518,8 +488,8 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName(t("Interval change when you review a flashcard/note as hard"))
-            .setDesc(t("newInterval = oldInterval * intervalChange / 100."))
+            .setName(t("LAPSE_INTERVAL_CHANGE"))
+            .setDesc(t("LAPSE_INTERVAL_CHANGE_DESC"))
             .addSlider((slider) =>
                 slider
                     .setLimits(1, 99, 1)
@@ -533,7 +503,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip(t("Reset to default"))
+                    .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         this.plugin.data.settings.lapsesIntervalChange =
                             DEFAULT_SETTINGS.lapsesIntervalChange;
@@ -543,21 +513,17 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName(t("Easy bonus"))
-            .setDesc(
-                t(
-                    "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%)."
-                )
-            )
+            .setName(t("EASY_BONUS"))
+            .setDesc(t("EASY_BONUS_DESC"))
             .addText((text) =>
                 text
                     .setValue((this.plugin.data.settings.easyBonus * 100).toString())
                     .onChange((value) => {
                         applySettingsUpdate(async () => {
-                            let numValue: number = Number.parseInt(value) / 100;
+                            const numValue: number = Number.parseInt(value) / 100;
                             if (!isNaN(numValue)) {
                                 if (numValue < 1.0) {
-                                    new Notice(t("The easy bonus must be at least 100."));
+                                    new Notice(t("EASY_BONUS_MIN_WARNING"));
                                     text.setValue(
                                         (this.plugin.data.settings.easyBonus * 100).toString()
                                     );
@@ -567,7 +533,7 @@ export class SRSettingTab extends PluginSettingTab {
                                 this.plugin.data.settings.easyBonus = numValue;
                                 await this.plugin.savePluginData();
                             } else {
-                                new Notice(t("Please provide a valid number."));
+                                new Notice(t("VALID_NUMBER_WARNING"));
                             }
                         });
                     })
@@ -575,7 +541,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip(t("Reset to default"))
+                    .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         this.plugin.data.settings.easyBonus = DEFAULT_SETTINGS.easyBonus;
                         await this.plugin.savePluginData();
@@ -584,17 +550,17 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName(t("Maximum Interval"))
-            .setDesc(t("Allows you to place an upper limit on the interval (default = 100 years)."))
+            .setName(t("MAX_INTERVAL"))
+            .setDesc(t("MAX_INTERVAL_DESC"))
             .addText((text) =>
                 text
                     .setValue(this.plugin.data.settings.maximumInterval.toString())
                     .onChange((value) => {
                         applySettingsUpdate(async () => {
-                            let numValue: number = Number.parseInt(value);
+                            const numValue: number = Number.parseInt(value);
                             if (!isNaN(numValue)) {
                                 if (numValue < 1) {
-                                    new Notice(t("The maximum interval must be at least 1 day."));
+                                    new Notice(t("MAX_INTERVAL_MIN_WARNING"));
                                     text.setValue(
                                         this.plugin.data.settings.maximumInterval.toString()
                                     );
@@ -604,7 +570,7 @@ export class SRSettingTab extends PluginSettingTab {
                                 this.plugin.data.settings.maximumInterval = numValue;
                                 await this.plugin.savePluginData();
                             } else {
-                                new Notice(t("Please provide a valid number."));
+                                new Notice(t("VALID_NUMBER_WARNING"));
                             }
                         });
                     })
@@ -612,7 +578,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip(t("Reset to default"))
+                    .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         this.plugin.data.settings.maximumInterval =
                             DEFAULT_SETTINGS.maximumInterval;
@@ -622,10 +588,8 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName(t("Maximum link contribution"))
-            .setDesc(
-                t("Maximum contribution of the weighted ease of linked notes to the initial ease.")
-            )
+            .setName(t("MAX_LINK_CONTRIB"))
+            .setDesc(t("MAX_LINK_CONTRIB_DESC"))
             .addSlider((slider) =>
                 slider
                     .setLimits(0, 100, 1)
@@ -639,7 +603,7 @@ export class SRSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button
                     .setIcon("reset")
-                    .setTooltip(t("Reset to default"))
+                    .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         this.plugin.data.settings.maxLinkFactor = DEFAULT_SETTINGS.maxLinkFactor;
                         await this.plugin.savePluginData();

@@ -22,7 +22,7 @@ export class StatsModal extends Modal {
 
         this.plugin = plugin;
 
-        this.titleEl.setText(t("Statistics"));
+        this.titleEl.setText(t("STATS_TITLE"));
 
         this.modalEl.style.height = "100%";
         this.modalEl.style.width = "100%";
@@ -33,31 +33,28 @@ export class StatsModal extends Modal {
     }
 
     onOpen(): void {
-        let { contentEl } = this;
+        const { contentEl } = this;
 
-        // @ts-ignore: Property 'plugins' does not exist on type 'App'
         if (!this.app.plugins.enabledPlugins.has(OBSIDIAN_CHARTS_ID)) {
             contentEl.innerHTML +=
-                "<div style='text-align:center'>" +
-                "<span>" +
-                t("Note that this requires the Obsidian Charts plugin to work") +
-                "</span>" +
-                "</div>";
+                "<div style='text-align:center'><span>" +
+                t("OBSIDIAN_CHARTS_REQUIRED") +
+                "</span></div>";
             return;
         }
 
-        let text: string = "";
+        let text = "";
 
         // Add forecast
         let maxN: number = Math.max(...getKeysPreserveType(this.plugin.dueDatesFlashcards));
         for (let dueOffset = 0; dueOffset <= maxN; dueOffset++) {
-            if (!this.plugin.dueDatesFlashcards.hasOwnProperty(dueOffset)) {
+            if (!Object.prototype.hasOwnProperty.call(this.plugin.dueDatesFlashcards, dueOffset)) {
                 this.plugin.dueDatesFlashcards[dueOffset] = 0;
             }
         }
 
-        let dueDatesFlashcardsCopy: Record<number, number> = { 0: 0 };
-        for (let [dueOffset, dueCount] of Object.entries(this.plugin.dueDatesFlashcards)) {
+        const dueDatesFlashcardsCopy: Record<number, number> = { 0: 0 };
+        for (const [dueOffset, dueCount] of Object.entries(this.plugin.dueDatesFlashcards)) {
             if (dueOffset <= 0) {
                 dueDatesFlashcardsCopy[0] += dueCount;
             } else {
@@ -65,47 +62,47 @@ export class StatsModal extends Modal {
             }
         }
 
-        let cardStats: Stats = this.plugin.cardStats;
-        let scheduledCount: number = cardStats.youngCount + cardStats.matureCount;
+        const cardStats: Stats = this.plugin.cardStats;
+        const scheduledCount: number = cardStats.youngCount + cardStats.matureCount;
         maxN = Math.max(maxN, 1);
 
         // let the horrors begin LOL
         text +=
             "\n<div style='text-align:center'>" +
             "<h2 style='text-align:center'>" +
-            t("Forecast") +
+            t("FORECAST") +
             "</h2>" +
-            "<h4 style='text-align:center'>" +
-            t("The number of cards due in the future") +
-            "</h4>" +
+            "<p style='text-align:center'>" +
+            t("FORECAST_DESC") +
+            "</p>" +
             "</div>\n\n" +
             "```chart\n" +
             "\ttype: bar\n" +
             `\tlabels: [${Object.keys(dueDatesFlashcardsCopy)}]\n` +
             "\tseries:\n" +
             "\t\t- title: " +
-            t("Scheduled") +
+            t("SCHEDULED") +
             `\n\t\t  data: [${Object.values(dueDatesFlashcardsCopy)}]\n` +
             "\txTitle: " +
-            t("Days") +
+            t("DAYS") +
             "\n\tyTitle: " +
-            t("Number of cards") +
+            t("NUMBER_OF_CARDS") +
             "\n\tlegend: false\n" +
             "\tstacked: true\n" +
             "````\n" +
             "\n<div style='text-align:center'>" +
-            `Average: ${(scheduledCount / maxN).toFixed(1)} reviews/day` +
+            t("REVIEWS_PER_DAY").interpolate({ avg: (scheduledCount / maxN).toFixed(1) }) +
             "</div>";
 
         maxN = Math.max(...getKeysPreserveType(cardStats.intervals));
         for (let interval = 0; interval <= maxN; interval++) {
-            if (!cardStats.intervals.hasOwnProperty(interval)) {
+            if (!Object.prototype.hasOwnProperty.call(cardStats.intervals, interval)) {
                 cardStats.intervals[interval] = 0;
             }
         }
 
         // Add intervals
-        let average_interval: string = textInterval(
+        const average_interval: string = textInterval(
                 Math.round(
                     (Object.entries(cardStats.intervals)
                         .map(([interval, count]) => interval * count)
@@ -122,33 +119,41 @@ export class StatsModal extends Modal {
         text +=
             "\n<div style='text-align:center'>" +
             "<h2 style='text-align:center'>" +
-            t("Intervals") +
+            t("INTERVALS") +
             "</h2>" +
-            "<h4 style='text-align:center'>" +
-            t("Delays until reviews are shown again") +
-            "</h4>" +
+            "<p style='text-align:center'>" +
+            t("INTERVALS_DESC") +
+            "</p>" +
             "</div>\n\n" +
             "```chart\n" +
             "\ttype: bar\n" +
             `\tlabels: [${Object.keys(cardStats.intervals)}]\n` +
             "\tseries:\n" +
             "\t\t- title: " +
-            t("Count") +
+            t("COUNT") +
             `\n\t\t  data: [${Object.values(cardStats.intervals)}]\n` +
             "\txTitle: " +
-            t("Days") +
+            t("DAYS") +
             "\n\tyTitle: " +
-            t("Number of cards") +
+            t("NUMBER_OF_CARDS") +
             "\n\tlegend: false\n" +
             "\tstacked: true\n" +
             "````\n" +
             "\n<div style='text-align:center'>" +
-            `Average interval: ${average_interval}, ` +
-            `Longest interval: ${longest_interval}` +
+            t("INTERVALS_SUMMARY").interpolate({
+                avg: average_interval,
+                longest: longest_interval,
+            }) +
             "</div>";
 
         // Add eases
-        let average_ease: number = Math.round(
+        const eases: number[] = getKeysPreserveType(cardStats.eases);
+        for (let ease = Math.min(...eases); ease <= Math.max(...eases); ease++) {
+            if (!Object.prototype.hasOwnProperty.call(cardStats.eases, ease)) {
+                cardStats.eases[ease] = 0;
+            }
+        }
+        const average_ease: number = Math.round(
             Object.entries(cardStats.eases)
                 .map(([ease, count]) => ease * count)
                 .reduce((a, b) => a + b) / scheduledCount
@@ -156,7 +161,7 @@ export class StatsModal extends Modal {
         text +=
             "\n<div style='text-align:center'>" +
             "<h2 style='text-align:center'>" +
-            t("Eases") +
+            t("EASES") +
             "</h2>" +
             "</div>\n\n" +
             "```chart\n" +
@@ -164,48 +169,51 @@ export class StatsModal extends Modal {
             `\tlabels: [${Object.keys(cardStats.eases)}]\n` +
             "\tseries:\n" +
             "\t\t- title: " +
-            t("Count") +
+            t("COUNT") +
             `\n\t\t  data: [${Object.values(cardStats.eases)}]\n` +
             "\txTitle: " +
             t("Days") +
             "\n\tyTitle: " +
-            t("Number of cards") +
+            t("NUMBER_OF_CARDS") +
             "\n\tlegend: false\n" +
             "\tstacked: true\n" +
             "````\n" +
             "\n<div style='text-align:center'>" +
-            `Average ease: ${average_ease}` +
+            t("EASES_SUMMARY").interpolate({ avgEase: average_ease }) +
             "</div>";
 
         // Add card types
-        let totalCards: number = this.plugin.deckTree.totalFlashcards;
+        const totalCardsCount: number = this.plugin.deckTree.totalFlashcards;
         text +=
             "\n<div style='text-align:center'>" +
             "<h2 style='text-align:center'>" +
-            t("Card Types") +
+            t("CARD_TYPES") +
             "</h2>" +
+            "<p style='text-align:center'>" +
+            t("CARD_TYPES_DESC") +
+            "</p>" +
             "</div>\n\n" +
             "```chart\n" +
             "\ttype: pie\n" +
             `\tlabels: ['New - ${Math.round(
-                (cardStats.newCount / totalCards) * 100
+                (cardStats.newCount / totalCardsCount) * 100
             )}%', 'Young - ${Math.round(
-                (cardStats.youngCount / totalCards) * 100
-            )}%', 'Mature - ${Math.round((cardStats.matureCount / totalCards) * 100)}%']\n` +
-            `\tseries:\n` +
+                (cardStats.youngCount / totalCardsCount) * 100
+            )}%', 'Mature - ${Math.round((cardStats.matureCount / totalCardsCount) * 100)}%']\n` +
+            "\tseries:\n" +
             `\t\t- data: [${cardStats.newCount}, ${cardStats.youngCount}, ${cardStats.matureCount}]\n` +
             "\twidth: 40%\n" +
             "\tlabelColors: true\n" +
             "```\n" +
             "\n<div style='text-align:center'>" +
-            `Total cards: ${totalCards}` +
+            t("CARD_TYPES_SUMMARY").interpolate({ totalCardsCount }) +
             "</div>";
 
         MarkdownRenderer.renderMarkdown(text, contentEl, "", this.plugin);
     }
 
     onClose(): void {
-        let { contentEl } = this;
+        const { contentEl } = this;
         contentEl.empty();
     }
 }

@@ -5,7 +5,7 @@ import { COLLAPSE_ICON } from "src/constants";
 import { ReviewDeck } from "src/review-deck";
 import { t } from "src/lang/helpers";
 
-export const REVIEW_QUEUE_VIEW_TYPE: string = "review-queue-list-view";
+export const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
 
 export class ReviewQueueListView extends ItemView {
     private plugin: SRPlugin;
@@ -14,8 +14,8 @@ export class ReviewQueueListView extends ItemView {
         super(leaf);
 
         this.plugin = plugin;
-        this.registerEvent(this.app.workspace.on("file-open", (_: any) => this.redraw()));
-        this.registerEvent(this.app.vault.on("rename", (_: any) => this.redraw()));
+        this.registerEvent(this.app.workspace.on("file-open", () => this.redraw()));
+        this.registerEvent(this.app.vault.on("rename", () => this.redraw()));
     }
 
     public getViewType(): string {
@@ -23,7 +23,7 @@ export class ReviewQueueListView extends ItemView {
     }
 
     public getDisplayText(): string {
-        return t("Notes Review Queue");
+        return t("NOTES_REVIEW_QUEUE");
     }
 
     public getIcon(): string {
@@ -32,7 +32,7 @@ export class ReviewQueueListView extends ItemView {
 
     public onHeaderMenu(menu: Menu): void {
         menu.addItem((item) => {
-            item.setTitle(t("Close"))
+            item.setTitle(t("CLOSE"))
                 .setIcon("cross")
                 .onClick(() => {
                     this.app.workspace.detachLeavesOfType(REVIEW_QUEUE_VIEW_TYPE);
@@ -41,15 +41,15 @@ export class ReviewQueueListView extends ItemView {
     }
 
     public redraw(): void {
-        let openFile: TFile | null = this.app.workspace.getActiveFile();
+        const openFile: TFile | null = this.app.workspace.getActiveFile();
 
-        let rootEl: HTMLElement = createDiv("nav-folder mod-root"),
+        const rootEl: HTMLElement = createDiv("nav-folder mod-root"),
             childrenEl: HTMLElement = rootEl.createDiv("nav-folder-children");
 
-        for (let deckKey in this.plugin.reviewDecks) {
-            let deck: ReviewDeck = this.plugin.reviewDecks[deckKey];
+        for (const deckKey in this.plugin.reviewDecks) {
+            const deck: ReviewDeck = this.plugin.reviewDecks[deckKey];
 
-            let deckFolderEl: HTMLElement = this.createRightPaneFolder(
+            const deckFolderEl: HTMLElement = this.createRightPaneFolder(
                 childrenEl,
                 deckKey,
                 false,
@@ -57,46 +57,47 @@ export class ReviewQueueListView extends ItemView {
             ).getElementsByClassName("nav-folder-children")[0] as HTMLElement;
 
             if (deck.newNotes.length > 0) {
-                let newNotesFolderEl: HTMLElement = this.createRightPaneFolder(
+                const newNotesFolderEl: HTMLElement = this.createRightPaneFolder(
                     deckFolderEl,
-                    t("New"),
-                    !deck.activeFolders.has(t("New")),
+                    t("NEW"),
+                    !deck.activeFolders.has(t("NEW")),
                     deck
                 );
 
-                for (let newFile of deck.newNotes) {
+                for (const newFile of deck.newNotes) {
                     this.createRightPaneFile(
                         newNotesFolderEl,
                         newFile,
-                        openFile! && newFile.path === openFile.path,
-                        !deck.activeFolders.has(t("New"))
+                        openFile && newFile.path === openFile.path,
+                        !deck.activeFolders.has(t("NEW"))
                     );
                 }
             }
 
             if (deck.scheduledNotes.length > 0) {
-                let now: number = Date.now();
-                let currUnix: number = -1;
+                const now: number = Date.now();
+                let currUnix = -1;
                 let schedFolderEl: HTMLElement | null = null,
-                    folderTitle: string = "";
-                let maxDaysToRender: number = this.plugin.data.settings.maxNDaysNotesReviewQueue;
+                    folderTitle = "";
+                const maxDaysToRender: number = this.plugin.data.settings.maxNDaysNotesReviewQueue;
 
-                for (let sNote of deck.scheduledNotes) {
+                for (const sNote of deck.scheduledNotes) {
                     if (sNote.dueUnix != currUnix) {
-                        let nDays: number = Math.ceil((sNote.dueUnix - now) / (24 * 3600 * 1000));
+                        const nDays: number = Math.ceil((sNote.dueUnix - now) / (24 * 3600 * 1000));
 
                         if (nDays > maxDaysToRender) {
                             break;
                         }
 
-                        folderTitle =
-                            nDays == -1
-                                ? t("Yesterday")
-                                : nDays == 0
-                                ? t("Today")
-                                : nDays == 1
-                                ? t("Tomorrow")
-                                : new Date(sNote.dueUnix).toDateString();
+                        if (nDays === -1) {
+                            folderTitle = t("YESTERDAY");
+                        } else if (nDays === 0) {
+                            folderTitle = t("TODAY");
+                        } else if (nDays === 1) {
+                            folderTitle = t("TOMORROW");
+                        } else {
+                            folderTitle = new Date(sNote.dueUnix).toDateString();
+                        }
 
                         schedFolderEl = this.createRightPaneFolder(
                             deckFolderEl,
@@ -108,16 +109,16 @@ export class ReviewQueueListView extends ItemView {
                     }
 
                     this.createRightPaneFile(
-                        schedFolderEl!,
+                        schedFolderEl,
                         sNote.note,
-                        openFile! && sNote.note.path === openFile.path,
+                        openFile && sNote.note.path === openFile.path,
                         !deck.activeFolders.has(folderTitle)
                     );
                 }
             }
         }
 
-        let contentEl: Element = this.containerEl.children[1];
+        const contentEl: Element = this.containerEl.children[1];
         contentEl.empty();
         contentEl.appendChild(rootEl);
     }
@@ -128,7 +129,7 @@ export class ReviewQueueListView extends ItemView {
         collapsed: boolean,
         deck: ReviewDeck
     ): HTMLElement {
-        let folderEl: HTMLDivElement = parentEl.createDiv("nav-folder"),
+        const folderEl: HTMLDivElement = parentEl.createDiv("nav-folder"),
             folderTitleEl: HTMLDivElement = folderEl.createDiv("nav-folder-title"),
             childrenEl: HTMLDivElement = folderEl.createDiv("nav-folder-children"),
             collapseIconEl: HTMLDivElement = folderTitleEl.createDiv(
@@ -142,8 +143,8 @@ export class ReviewQueueListView extends ItemView {
 
         folderTitleEl.createDiv("nav-folder-title-content").setText(folderTitle);
 
-        folderTitleEl.onClickEvent((_) => {
-            for (let child of childrenEl.childNodes as NodeListOf<HTMLElement>) {
+        folderTitleEl.onClickEvent(() => {
+            for (const child of childrenEl.childNodes as NodeListOf<HTMLElement>) {
                 if (child.style.display === "block" || child.style.display === "") {
                     child.style.display = "none";
                     (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
@@ -166,14 +167,14 @@ export class ReviewQueueListView extends ItemView {
         fileElActive: boolean,
         hidden: boolean
     ): void {
-        let navFileEl: HTMLElement = folderEl
+        const navFileEl: HTMLElement = folderEl
             .getElementsByClassName("nav-folder-children")[0]
             .createDiv("nav-file");
         if (hidden) {
             navFileEl.style.display = "none";
         }
 
-        let navFileTitle: HTMLElement = navFileEl.createDiv("nav-file-title");
+        const navFileTitle: HTMLElement = navFileEl.createDiv("nav-file-title");
         if (fileElActive) {
             navFileTitle.addClass("is-active");
         }
@@ -183,7 +184,7 @@ export class ReviewQueueListView extends ItemView {
             "click",
             (event: MouseEvent) => {
                 event.preventDefault();
-                this.app.workspace.activeLeaf!.openFile(file);
+                this.app.workspace.activeLeaf.openFile(file);
                 return false;
             },
             false
@@ -193,7 +194,7 @@ export class ReviewQueueListView extends ItemView {
             "contextmenu",
             (event: MouseEvent) => {
                 event.preventDefault();
-                let fileMenu: Menu = new Menu(this.app);
+                const fileMenu: Menu = new Menu(this.app);
                 this.app.workspace.trigger("file-menu", fileMenu, file, "my-context-menu", null);
                 fileMenu.showAtPosition({
                     x: event.pageX,

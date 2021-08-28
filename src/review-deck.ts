@@ -8,14 +8,14 @@ export class ReviewDeck {
     public newNotes: TFile[] = [];
     public scheduledNotes: SchedNote[] = [];
     public activeFolders: Set<string>;
-    public dueNotesCount: number = 0;
+    public dueNotesCount = 0;
 
     constructor(name: string) {
         this.deckName = name;
         this.activeFolders = new Set([t("Today")]);
     }
 
-    public sortNotes(pageranks: Record<string, number>) {
+    public sortNotes(pageranks: Record<string, number>): void {
         // sort new notes by importance
         this.newNotes = this.newNotes.sort(
             (a: TFile, b: TFile) => (pageranks[b.path] || 0) - (pageranks[a.path] || 0)
@@ -23,7 +23,7 @@ export class ReviewDeck {
 
         // sort scheduled notes by date & within those days, sort them by importance
         this.scheduledNotes = this.scheduledNotes.sort((a: SchedNote, b: SchedNote) => {
-            let result = a.dueUnix - b.dueUnix;
+            const result = a.dueUnix - b.dueUnix;
             if (result != 0) {
                 return result;
             }

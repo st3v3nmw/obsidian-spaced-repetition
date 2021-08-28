@@ -8,7 +8,9 @@ type Hex = number;
  * @param obj - An object
  * @returns An array of the keys of `obj` with type `(keyof T)[]`
  */
-export const getKeysPreserveType = Object.keys as <T extends object>(obj: T) => Array<keyof T>;
+export const getKeysPreserveType = Object.keys as <T extends Record<string, unknown>>(
+    obj: T
+) => Array<keyof T>;
 
 /**
  * Escapes the input string so that it can be converted to a regex
@@ -19,7 +21,8 @@ export const getKeysPreserveType = Object.keys as <T extends object>(obj: T) => 
  * @param str - The string to be escaped
  * @returns The escaped string
  */
-export const escapeRegexString = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+export const escapeRegexString = (text: string): string =>
+    text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /**
  * Returns the cyrb53 hash (hex string) of the input string
@@ -29,7 +32,7 @@ export const escapeRegexString = (text: string) => text.replace(/[.*+?^${}()|[\]
  * @param seed - The seed for the cyrb53 function
  * @returns The cyrb53 hash (hex string) of `str` seeded using `seed`
  */
-export function cyrb53(str: string, seed: number = 0): string {
+export function cyrb53(str: string, seed = 0): string {
     let h1: Hex = 0xdeadbeef ^ seed,
         h2: Hex = 0x41c6ce57 ^ seed;
     for (let i = 0, ch; i < str.length; i++) {
@@ -50,11 +53,11 @@ export function cyrb53(str: string, seed: number = 0): string {
  * @returns the cleaned up record
  */
 export function removeLegacyKeys(
-    currentData: Record<string, any>,
-    defaultData: Record<string, any>
-): Record<string, any> {
-    for (let key of Object.keys(currentData)) {
-        if (!defaultData.hasOwnProperty(key)) {
+    currentData: Record<string, unknown>,
+    defaultData: Record<string, unknown>
+): Record<string, unknown> {
+    for (const key of Object.keys(currentData)) {
+        if (!Object.prototype.hasOwnProperty.call(defaultData, key)) {
             delete currentData[key];
         }
     }

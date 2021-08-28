@@ -40,7 +40,7 @@ export class FlashcardModal extends Modal {
 
         this.plugin = plugin;
 
-        this.titleEl.setText(t("Decks"));
+        this.titleEl.setText(t("DECKS"));
 
         if (Platform.isMobile) {
             this.contentEl.style.display = "block";
@@ -91,21 +91,21 @@ export class FlashcardModal extends Modal {
 
     decksList(): void {
         this.mode = FlashcardModalMode.DecksList;
-        this.titleEl.setText(t("Decks"));
+        this.titleEl.setText(t("DECKS"));
         this.titleEl.innerHTML +=
             '<p style="margin:0px;line-height:12px;">' +
             '<span style="background-color:#4caf50;color:#ffffff;" aria-label="' +
-            t("Due cards") +
+            t("DUE_CARDS") +
             '" class="tag-pane-tag-count tree-item-flair">' +
             this.plugin.deckTree.dueFlashcardsCount +
             "</span>" +
             '<span style="background-color:#2196f3;" aria-label="' +
-            t("New cards") +
+            t("NEW_CARDS") +
             '" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
             this.plugin.deckTree.newFlashcardsCount +
             "</span>" +
             '<span style="background-color:#ff7043;" aria-label="' +
-            t("Total cards") +
+            t("TOTAL_CARDS") +
             '" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
             this.plugin.deckTree.totalFlashcards +
             "</span>" +
@@ -113,23 +113,23 @@ export class FlashcardModal extends Modal {
         this.contentEl.innerHTML = "";
         this.contentEl.setAttribute("id", "sr-flashcard-view");
 
-        for (let deck of this.plugin.deckTree.subdecks) {
+        for (const deck of this.plugin.deckTree.subdecks) {
             deck.render(this.contentEl, this);
         }
     }
 
-    setupCardsView() {
+    setupCardsView(): void {
         this.contentEl.innerHTML = "";
 
         this.fileLinkView = this.contentEl.createDiv("sr-link");
-        this.fileLinkView.setText(t("Open file"));
+        this.fileLinkView.setText(t("OPEN_FILE"));
         if (this.plugin.data.settings.showFileNameInFileLink) {
-            this.fileLinkView.setAttribute("aria-label", t("Open file"));
+            this.fileLinkView.setAttribute("aria-label", t("OPEN_FILE"));
         }
-        this.fileLinkView.addEventListener("click", async (_) => {
+        this.fileLinkView.addEventListener("click", async () => {
             this.close();
-            await this.plugin.app.workspace.activeLeaf!.openFile(this.currentCard.note);
-            let activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView)!;
+            await this.plugin.app.workspace.activeLeaf.openFile(this.currentCard.note);
+            const activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
             activeView.editor.setCursor({
                 line: this.currentCard.lineNo,
                 ch: 0,
@@ -137,8 +137,8 @@ export class FlashcardModal extends Modal {
         });
 
         this.resetLinkView = this.contentEl.createDiv("sr-link");
-        this.resetLinkView.setText(t("Reset card's progress"));
-        this.resetLinkView.addEventListener("click", (_) => {
+        this.resetLinkView.setText(t("RESET_CARD_PROGRESS"));
+        this.resetLinkView.addEventListener("click", () => {
             this.processReview(ReviewResponse.Reset);
         });
         this.resetLinkView.style.float = "right";
@@ -155,24 +155,24 @@ export class FlashcardModal extends Modal {
 
         this.hardBtn = document.createElement("button");
         this.hardBtn.setAttribute("id", "sr-hard-btn");
-        this.hardBtn.setText(t("Hard"));
-        this.hardBtn.addEventListener("click", (_) => {
+        this.hardBtn.setText(t("HARD"));
+        this.hardBtn.addEventListener("click", () => {
             this.processReview(ReviewResponse.Hard);
         });
         this.responseDiv.appendChild(this.hardBtn);
 
         this.goodBtn = document.createElement("button");
         this.goodBtn.setAttribute("id", "sr-good-btn");
-        this.goodBtn.setText(t("Good"));
-        this.goodBtn.addEventListener("click", (_) => {
+        this.goodBtn.setText(t("GOOD"));
+        this.goodBtn.addEventListener("click", () => {
             this.processReview(ReviewResponse.Good);
         });
         this.responseDiv.appendChild(this.goodBtn);
 
         this.easyBtn = document.createElement("button");
         this.easyBtn.setAttribute("id", "sr-easy-btn");
-        this.easyBtn.setText(t("Easy"));
-        this.easyBtn.addEventListener("click", (_) => {
+        this.easyBtn.setText(t("EASY"));
+        this.easyBtn.addEventListener("click", () => {
             this.processReview(ReviewResponse.Easy);
         });
         this.responseDiv.appendChild(this.easyBtn);
@@ -180,8 +180,8 @@ export class FlashcardModal extends Modal {
 
         this.answerBtn = this.contentEl.createDiv();
         this.answerBtn.setAttribute("id", "sr-show-answer");
-        this.answerBtn.setText(t("Show Answer"));
-        this.answerBtn.addEventListener("click", (_) => {
+        this.answerBtn.setText(t("SHOW_ANSWER"));
+        this.answerBtn.addEventListener("click", () => {
             this.showAnswer();
         });
     }
@@ -197,7 +197,7 @@ export class FlashcardModal extends Modal {
         }
 
         if (this.currentCard.cardType !== CardType.Cloze) {
-            let hr: HTMLElement = document.createElement("hr");
+            const hr: HTMLElement = document.createElement("hr");
             hr.setAttribute("id", "sr-hr-card-divide");
             this.flashcardView.appendChild(hr);
         } else {
@@ -212,23 +212,32 @@ export class FlashcardModal extends Modal {
 
         this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
         if (response !== ReviewResponse.Reset) {
+            let schedObj: Record<string, number>;
             // scheduled card
             if (this.currentCard.isDue) {
-                let schedObj: Record<string, number> = schedule(
+                schedObj = schedule(
                     response,
-                    this.currentCard.interval!,
-                    this.currentCard.ease!,
-                    this.currentCard.delayBeforeReview!,
+                    this.currentCard.interval,
+                    this.currentCard.ease,
+                    this.currentCard.delayBeforeReview,
                     this.plugin.data.settings,
                     this.plugin.dueDatesFlashcards
                 );
-                interval = schedObj.interval;
-                ease = schedObj.ease;
             } else {
-                let schedObj: Record<string, number> = schedule(
+                let initial_ease: number = this.plugin.data.settings.baseEase;
+                if (
+                    Object.prototype.hasOwnProperty.call(
+                        this.plugin.easeByPath,
+                        this.currentCard.note.path
+                    )
+                ) {
+                    initial_ease = Math.round(this.plugin.easeByPath[this.currentCard.note.path]);
+                }
+
+                schedObj = schedule(
                     response,
-                    1,
-                    this.plugin.data.settings.baseEase,
+                    1.0,
+                    initial_ease,
                     0,
                     this.plugin.data.settings,
                     this.plugin.dueDatesFlashcards
@@ -237,6 +246,8 @@ export class FlashcardModal extends Modal {
                 ease = schedObj.ease;
             }
 
+            interval = schedObj.interval;
+            ease = schedObj.ease;
             due = window.moment(Date.now() + interval * 24 * 3600 * 1000);
         } else {
             this.currentCard.interval = 1.0;
@@ -247,15 +258,15 @@ export class FlashcardModal extends Modal {
                 this.currentDeck.newFlashcards.push(this.currentCard);
             }
             due = window.moment(Date.now());
-            new Notice(t("Card's progress has been reset."));
+            new Notice(t("CARD_PROGRESS_RESET"));
             this.currentDeck.nextCard(this);
             return;
         }
 
-        let dueString: string = due.format("YYYY-MM-DD");
+        const dueString: string = due.format("YYYY-MM-DD");
 
         let fileText: string = await this.app.vault.read(this.currentCard.note);
-        let replacementRegex = new RegExp(escapeRegexString(this.currentCard.cardText), "gm");
+        const replacementRegex = new RegExp(escapeRegexString(this.currentCard.cardText), "gm");
 
         let sep: string = this.plugin.data.settings.cardCommentOnSameLine ? " " : "\n";
         // Override separator if last block is a codeblock
@@ -276,7 +287,7 @@ export class FlashcardModal extends Modal {
                 scheduling = [...this.currentCard.cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
             }
 
-            let currCardSched: string[] = ["0", dueString, interval.toString(), ease.toString()];
+            const currCardSched: string[] = ["0", dueString, interval.toString(), ease.toString()];
             if (this.currentCard.isDue) {
                 scheduling[this.currentCard.siblingIdx] = currCardSched;
             } else {
@@ -291,8 +302,8 @@ export class FlashcardModal extends Modal {
             this.currentCard.cardText += "-->";
         }
 
-        fileText = fileText.replace(replacementRegex, (_) => this.currentCard.cardText);
-        for (let sibling of this.currentCard.siblings) {
+        fileText = fileText.replace(replacementRegex, () => this.currentCard.cardText);
+        for (const sibling of this.currentCard.siblings) {
             sibling.cardText = this.currentCard.cardText;
         }
         if (this.plugin.data.settings.burySiblingCards) {
@@ -309,9 +320,9 @@ export class FlashcardModal extends Modal {
             await this.plugin.savePluginData();
         }
 
-        for (let sibling of this.currentCard.siblings) {
-            let dueIdx = this.currentDeck.dueFlashcards.indexOf(sibling);
-            let newIdx = this.currentDeck.newFlashcards.indexOf(sibling);
+        for (const sibling of this.currentCard.siblings) {
+            const dueIdx = this.currentDeck.dueFlashcards.indexOf(sibling);
+            const newIdx = this.currentDeck.newFlashcards.indexOf(sibling);
 
             if (dueIdx !== -1)
                 this.currentDeck.deleteFlashcardAtIndex(
@@ -336,8 +347,8 @@ export class FlashcardModal extends Modal {
             this.plugin
         );
         containerEl.findAll(".internal-embed").forEach((el) => {
-            let src: string = el.getAttribute("src")!;
-            let target: TFile | null | false =
+            const src: string = el.getAttribute("src");
+            const target: TFile | null | false =
                 typeof src === "string" &&
                 this.plugin.app.metadataCache.getFirstLinkpathDest(src, this.currentCard.note.path);
             if (target instanceof TFile && target.extension !== "md") {
@@ -351,10 +362,9 @@ export class FlashcardModal extends Modal {
                     },
                     (img) => {
                         if (el.hasAttribute("width"))
-                            img.setAttribute("width", el.getAttribute("width")!);
+                            img.setAttribute("width", el.getAttribute("width"));
                         else img.setAttribute("width", "100%");
-                        if (el.hasAttribute("alt"))
-                            img.setAttribute("alt", el.getAttribute("alt")!);
+                        if (el.hasAttribute("alt")) img.setAttribute("alt", el.getAttribute("alt"));
                     }
                 );
                 el.addClasses(["image-embed", "is-loaded"]);
@@ -372,10 +382,10 @@ export class FlashcardModal extends Modal {
 export class Deck {
     public deckName: string;
     public newFlashcards: Card[];
-    public newFlashcardsCount: number = 0; // counts those in subdecks too
+    public newFlashcardsCount = 0; // counts those in subdecks too
     public dueFlashcards: Card[];
-    public dueFlashcardsCount: number = 0; // counts those in subdecks too
-    public totalFlashcards: number = 0; // counts those in subdecks too
+    public dueFlashcardsCount = 0; // counts those in subdecks too
+    public totalFlashcards = 0; // counts those in subdecks too
     public subdecks: Deck[];
     public parent: Deck | null;
 
@@ -395,15 +405,15 @@ export class Deck {
             return;
         }
 
-        let deckName: string = deckPath.shift()!;
-        for (let deck of this.subdecks) {
+        const deckName: string = deckPath.shift();
+        for (const deck of this.subdecks) {
             if (deckName === deck.deckName) {
                 deck.createDeck(deckPath);
                 return;
             }
         }
 
-        let deck: Deck = new Deck(deckName, this);
+        const deck: Deck = new Deck(deckName, this);
         this.subdecks.push(deck);
         deck.createDeck(deckPath);
     }
@@ -425,8 +435,8 @@ export class Deck {
             return;
         }
 
-        let deckName: string = deckPath.shift()!;
-        for (let deck of this.subdecks) {
+        const deckName: string = deckPath.shift();
+        for (const deck of this.subdecks) {
             if (deckName === deck.deckName) {
                 deck.insertFlashcard(deckPath, cardObj);
                 return;
@@ -436,11 +446,11 @@ export class Deck {
 
     // count flashcards that have either been buried
     // or aren't due yet
-    countFlashcard(deckPath: string[], n: number = 1): void {
+    countFlashcard(deckPath: string[], n = 1): void {
         this.totalFlashcards += n;
 
-        let deckName: string = deckPath.shift()!;
-        for (let deck of this.subdecks) {
+        const deckName: string = deckPath.shift();
+        for (const deck of this.subdecks) {
             if (deckName === deck.deckName) {
                 deck.countFlashcard(deckPath, n);
                 return;
@@ -451,11 +461,13 @@ export class Deck {
     deleteFlashcardAtIndex(index: number, cardIsDue: boolean): void {
         if (cardIsDue) {
             this.dueFlashcards.splice(index, 1);
+            deck.dueFlashcardsCount--;
         } else {
             this.newFlashcards.splice(index, 1);
+            deck.newFlashcardsCount--;
         }
 
-        let deck: Deck | null = this;
+        let deck: Deck = this.parent;
         while (deck !== null) {
             if (cardIsDue) {
                 deck.dueFlashcardsCount--;
@@ -476,18 +488,18 @@ export class Deck {
             return 0;
         });
 
-        for (let deck of this.subdecks) {
+        for (const deck of this.subdecks) {
             deck.sortSubdecksList();
         }
     }
 
     render(containerEl: HTMLElement, modal: FlashcardModal): void {
-        let deckView: HTMLElement = containerEl.createDiv("tree-item");
+        const deckView: HTMLElement = containerEl.createDiv("tree-item");
 
-        let deckViewSelf: HTMLElement = deckView.createDiv(
+        const deckViewSelf: HTMLElement = deckView.createDiv(
             "tree-item-self tag-pane-tag is-clickable"
         );
-        let collapsed: boolean = true;
+        let collapsed = true;
         let collapseIconEl: HTMLElement | null = null;
         if (this.subdecks.length > 0) {
             collapseIconEl = deckViewSelf.createDiv("tree-item-icon collapse-icon");
@@ -495,16 +507,16 @@ export class Deck {
             (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "rotate(-90deg)";
         }
 
-        let deckViewInner: HTMLElement = deckViewSelf.createDiv("tree-item-inner");
-        deckViewInner.addEventListener("click", (_) => {
+        const deckViewInner: HTMLElement = deckViewSelf.createDiv("tree-item-inner");
+        deckViewInner.addEventListener("click", () => {
             modal.currentDeck = this;
-            modal.checkDeck = this.parent!;
+            modal.checkDeck = this.parent;
             modal.setupCardsView();
             this.nextCard(modal);
         });
-        let deckViewInnerText: HTMLElement = deckViewInner.createDiv("tag-pane-tag-text");
+        const deckViewInnerText: HTMLElement = deckViewInner.createDiv("tag-pane-tag-text");
         deckViewInnerText.innerHTML += `<span class="tag-pane-tag-self">${this.deckName}</span>`;
-        let deckViewOuter: HTMLElement = deckViewSelf.createDiv("tree-item-flair-outer");
+        const deckViewOuter: HTMLElement = deckViewSelf.createDiv("tree-item-flair-outer");
         deckViewOuter.innerHTML +=
             '<span style="background-color:#4caf50;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
             this.dueFlashcardsCount +
@@ -516,22 +528,22 @@ export class Deck {
             this.totalFlashcards +
             "</span>";
 
-        let deckViewChildren: HTMLElement = deckView.createDiv("tree-item-children");
+        const deckViewChildren: HTMLElement = deckView.createDiv("tree-item-children");
         deckViewChildren.style.display = "none";
         if (this.subdecks.length > 0) {
-            collapseIconEl!.addEventListener("click", (_) => {
+            collapseIconEl.addEventListener("click", () => {
                 if (collapsed) {
-                    (collapseIconEl!.childNodes[0] as HTMLElement).style.transform = "";
+                    (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "";
                     deckViewChildren.style.display = "block";
                 } else {
-                    (collapseIconEl!.childNodes[0] as HTMLElement).style.transform =
+                    (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
                         "rotate(-90deg)";
                     deckViewChildren.style.display = "none";
                 }
                 collapsed = !collapsed;
             });
         }
-        for (let deck of this.subdecks) {
+        for (const deck of this.subdecks) {
             deck.render(deckViewChildren, modal);
         }
     }
@@ -539,7 +551,7 @@ export class Deck {
     nextCard(modal: FlashcardModal): void {
         if (this.newFlashcards.length + this.dueFlashcards.length === 0) {
             if (this.dueFlashcardsCount + this.newFlashcardsCount > 0) {
-                for (let deck of this.subdecks) {
+                for (const deck of this.subdecks) {
                     if (deck.dueFlashcardsCount + deck.newFlashcardsCount > 0) {
                         modal.currentDeck = deck;
                         deck.nextCard(modal);
@@ -551,7 +563,7 @@ export class Deck {
             if (this.parent == modal.checkDeck) {
                 modal.decksList();
             } else {
-                this.parent!.nextCard(modal);
+                this.parent.nextCard(modal);
             }
             return;
         }
@@ -566,6 +578,9 @@ export class Deck {
         modal.flashcardView.innerHTML = "";
         modal.mode = FlashcardModalMode.Front;
 
+        let interval = 1.0,
+            ease: number = modal.plugin.data.settings.baseEase,
+            delayBeforeReview = 0;
         if (this.dueFlashcards.length > 0) {
             if (modal.plugin.data.settings.randomizeCardOrder) {
                 modal.currentCardIdx = Math.floor(Math.random() * this.dueFlashcards.length);
@@ -575,44 +590,16 @@ export class Deck {
             modal.currentCard = this.dueFlashcards[modal.currentCardIdx];
             modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
 
-            let hardInterval: number = schedule(
-                ReviewResponse.Hard,
-                modal.currentCard.interval!,
-                modal.currentCard.ease!,
-                modal.currentCard.delayBeforeReview!,
-                modal.plugin.data.settings
-            ).interval;
-            let goodInterval: number = schedule(
-                ReviewResponse.Good,
-                modal.currentCard.interval!,
-                modal.currentCard.ease!,
-                modal.currentCard.delayBeforeReview!,
-                modal.plugin.data.settings
-            ).interval;
-            let easyInterval: number = schedule(
-                ReviewResponse.Easy,
-                modal.currentCard.interval!,
-                modal.currentCard.ease!,
-                modal.currentCard.delayBeforeReview!,
-                modal.plugin.data.settings
-            ).interval;
-
-            if (Platform.isMobile) {
-                modal.hardBtn.setText(textInterval(hardInterval, true));
-                modal.goodBtn.setText(textInterval(goodInterval, true));
-                modal.easyBtn.setText(textInterval(easyInterval, true));
-            } else {
-                modal.hardBtn.setText(t("Hard") + " - " + textInterval(hardInterval, false));
-                modal.goodBtn.setText(t("Good") + " - " + textInterval(goodInterval, false));
-                modal.easyBtn.setText(t("Easy") + " - " + textInterval(easyInterval, false));
-            }
+            interval = modal.currentCard.interval;
+            ease = modal.currentCard.ease;
+            delayBeforeReview = modal.currentCard.delayBeforeReview;
         } else if (this.newFlashcards.length > 0) {
             if (modal.plugin.data.settings.randomizeCardOrder) {
                 modal.currentCardIdx = Math.floor(Math.random() * this.newFlashcards.length);
 
                 // look for first unscheduled sibling
-                let card: Card = this.newFlashcards[modal.currentCardIdx];
-                for (let siblingCard of card.siblings) {
+                const card: Card = this.newFlashcards[modal.currentCardIdx];
+                for (const siblingCard of card.siblings) {
                     if (!siblingCard.isDue) {
                         modal.currentCardIdx += siblingCard.siblingIdx - card.siblingIdx;
                         break;
@@ -624,15 +611,46 @@ export class Deck {
             modal.currentCard = this.newFlashcards[modal.currentCardIdx];
             modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
 
-            if (Platform.isMobile) {
-                modal.hardBtn.setText("1.0d");
-                modal.goodBtn.setText("2.5d");
-                modal.easyBtn.setText("3.5d");
-            } else {
-                modal.hardBtn.setText(t("Hard") + " - 1.0 " + t("day"));
-                modal.goodBtn.setText(t("Good") + " - 2.5 " + t("days"));
-                modal.easyBtn.setText(t("Easy") + " - 3.5 " + t("days"));
+            if (
+                Object.prototype.hasOwnProperty.call(
+                    modal.plugin.easeByPath,
+                    modal.currentCard.note.path
+                )
+            ) {
+                ease = modal.plugin.easeByPath[modal.currentCard.note.path];
             }
+        }
+
+        const hardInterval: number = schedule(
+            ReviewResponse.Hard,
+            interval,
+            ease,
+            delayBeforeReview,
+            modal.plugin.data.settings
+        ).interval;
+        const goodInterval: number = schedule(
+            ReviewResponse.Good,
+            interval,
+            ease,
+            delayBeforeReview,
+            modal.plugin.data.settings
+        ).interval;
+        const easyInterval: number = schedule(
+            ReviewResponse.Easy,
+            interval,
+            ease,
+            delayBeforeReview,
+            modal.plugin.data.settings
+        ).interval;
+
+        if (Platform.isMobile) {
+            modal.hardBtn.setText(textInterval(hardInterval, true));
+            modal.goodBtn.setText(textInterval(goodInterval, true));
+            modal.easyBtn.setText(textInterval(easyInterval, true));
+        } else {
+            modal.hardBtn.setText(`${t("HARD")} - ${textInterval(hardInterval, false)}`);
+            modal.goodBtn.setText(`${t("GOOD")} - ${textInterval(goodInterval, false)}`);
+            modal.easyBtn.setText(`${t("EASY")} - ${textInterval(easyInterval, false)}`);
         }
 
         if (modal.plugin.data.settings.showContextInCards)
