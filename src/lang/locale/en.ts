@@ -6,7 +6,7 @@ export default {
     DUE_CARDS: "Due Cards",
     NEW_CARDS: "New Cards",
     TOTAL_CARDS: "Total Cards",
-    OPEN_FILE: "Edit Later",
+    EDIT_LATER: "Edit Later",
     RESET_CARD_PROGRESS: "Reset card's progress",
     HARD: "Hard",
     GOOD: "Good",
@@ -15,12 +15,11 @@ export default {
     CARD_PROGRESS_RESET: "Card's progress has been reset.",
 
     // main.ts
-    OPEN_NOTE_REVIEW: "Open a note for review",
+    OPEN_NOTE_FOR_REVIEW: "Open a note for review",
     REVIEW_CARDS: "Review flashcards",
     REVIEW_EASY_FILE_MENU: "Review: Easy",
     REVIEW_GOOD_FILE_MENU: "Review: Good",
     REVIEW_HARD_FILE_MENU: "Review: Hard",
-    OPEN_NOTE_FOR_REVIEW_CMD: "Open a note for review",
     REVIEW_NOTE_EASY_CMD: "Review note as easy",
     REVIEW_NOTE_GOOD_CMD: "Review note as good",
     REVIEW_NOTE_HARD_CMD: "Review note as hard",

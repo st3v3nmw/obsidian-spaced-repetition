@@ -78,7 +78,7 @@ export default class SRPlugin extends Plugin {
 
         this.statusBar = this.addStatusBarItem();
         this.statusBar.classList.add("mod-clickable");
-        this.statusBar.setAttribute("aria-label", t("OPEN_NOTE_REVIEW"));
+        this.statusBar.setAttribute("aria-label", t("OPEN_NOTE_FOR_REVIEW"));
         this.statusBar.setAttribute("aria-label-position", "top");
         this.statusBar.addEventListener("click", async () => {
             await this.sync();
@@ -129,7 +129,7 @@ export default class SRPlugin extends Plugin {
 
         this.addCommand({
             id: "srs-note-review-open-note",
-            name: t("OPEN_NOTE_FOR_REVIEW_CMD"),
+            name: t("OPEN_NOTE_FOR_REVIEW"),
             callback: async () => {
                 await this.sync();
                 this.reviewNextNoteModal();

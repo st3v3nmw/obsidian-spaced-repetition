@@ -122,9 +122,9 @@ export class FlashcardModal extends Modal {
         this.contentEl.innerHTML = "";
 
         this.fileLinkView = this.contentEl.createDiv("sr-link");
-        this.fileLinkView.setText(t("OPEN_FILE"));
+        this.fileLinkView.setText(t("EDIT_LATER"));
         if (this.plugin.data.settings.showFileNameInFileLink) {
-            this.fileLinkView.setAttribute("aria-label", t("OPEN_FILE"));
+            this.fileLinkView.setAttribute("aria-label", t("EDIT_LATER"));
         }
         this.fileLinkView.addEventListener("click", async () => {
             // @ts-ignore
