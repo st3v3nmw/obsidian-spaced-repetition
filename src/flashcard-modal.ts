@@ -130,11 +130,17 @@ export class FlashcardModal extends Modal {
             // @ts-ignore
             const activeLeaf: WorkspaceLeaf = this.plugin.app.workspace.activeLeaf;
             if (this.plugin.app.workspace.getActiveFile() === null)
-                activeLeaf.openFile(this.currentCard.note);
+                await activeLeaf.openFile(this.currentCard.note);
             else {
                 const newLeaf = this.plugin.app.workspace.createLeafBySplit(activeLeaf, "vertical", false);
-                newLeaf.openFile(this.currentCard.note);
+                await newLeaf.openFile(this.currentCard.note, {active: true});
             }
+            // @ts-ignore
+            const activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+            activeView.editor.setCursor({
+                line: this.currentCard.lineNo,
+                ch: 0,
+            });            
             this.currentDeck.deleteFlashcardAtIndex(
                 this.currentCardIdx,
                 this.currentCard.isDue
