@@ -496,7 +496,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .setValue(this.plugin.data.settings.lapsesIntervalChange * 100)
                     .setDynamicTooltip()
                     .onChange(async (value: number) => {
-                        this.plugin.data.settings.lapsesIntervalChange = value;
+                        this.plugin.data.settings.lapsesIntervalChange = value / 100;
                         await this.plugin.savePluginData();
                     })
             )
@@ -596,7 +596,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .setValue(this.plugin.data.settings.maxLinkFactor * 100)
                     .setDynamicTooltip()
                     .onChange(async (value: number) => {
-                        this.plugin.data.settings.maxLinkFactor = value;
+                        this.plugin.data.settings.maxLinkFactor = value / 100;
                         await this.plugin.savePluginData();
                     })
             )
