@@ -6,7 +6,7 @@ export default {
     DUE_CARDS: "Due Cards",
     NEW_CARDS: "New Cards",
     TOTAL_CARDS: "Total Cards",
-    OPEN_FILE: "Open File",
+    OPEN_FILE: "Edit Later",
     RESET_CARD_PROGRESS: "Reset card's progress",
     HARD: "Hard",
     GOOD: "Good",

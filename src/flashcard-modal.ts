@@ -127,13 +127,20 @@ export class FlashcardModal extends Modal {
             this.fileLinkView.setAttribute("aria-label", t("OPEN_FILE"));
         }
         this.fileLinkView.addEventListener("click", async () => {
-            this.close();
-            await this.plugin.app.workspace.activeLeaf.openFile(this.currentCard.note);
-            const activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-            activeView.editor.setCursor({
-                line: this.currentCard.lineNo,
-                ch: 0,
-            });
+            // @ts-ignore
+            const activeLeaf: WorkspaceLeaf = this.plugin.app.workspace.activeLeaf;
+            if (this.plugin.app.workspace.getActiveFile() === null)
+                activeLeaf.openFile(this.currentCard.note);
+            else {
+                const newLeaf = this.plugin.app.workspace.createLeafBySplit(activeLeaf, "vertical", false);
+                newLeaf.openFile(this.currentCard.note);
+            }
+            this.currentDeck.deleteFlashcardAtIndex(
+                this.currentCardIdx,
+                this.currentCard.isDue
+            );
+            this.burySiblingCards(false);
+            this.currentDeck.nextCard(this);
         });
 
         this.resetLinkView = this.contentEl.createDiv("sr-link");
