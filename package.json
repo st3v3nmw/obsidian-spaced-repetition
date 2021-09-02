@@ -4,8 +4,8 @@
     "description": "Fight the forgetting curve by reviewing flashcards & entire notes.",
     "main": "main.js",
     "scripts": {
-        "dev": "esbuild src/main.ts --bundle --external:obsidian --format=cjs --outfile=build/main.js --watch",
-        "build": "esbuild src/main.ts --bundle --external:obsidian --format=cjs --outfile=build/main.js",
+        "dev": "esbuild src/main.ts --bundle --external:obsidian --format=cjs --sourcemap=inline --outfile=build/main.js --watch",
+        "build": "esbuild src/main.ts --bundle --external:obsidian --format=cjs --sourcemap=inline --sources-content=false --outfile=build/main.js",
         "test": "jest"
     },
     "keywords": [],

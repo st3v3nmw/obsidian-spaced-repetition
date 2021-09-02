@@ -4,7 +4,7 @@
 
 Fight the forgetting curve & note aging by reviewing flashcards & notes using [spaced repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Spaced-Repetition-Algorithm) on Obsidian.md
 
-Spaced repetition? [Basics](https://ncase.me/remember/), [Detailed](https://www.gwern.net/Spaced-repetition).
+Spaced repetition, eh? [Basics](https://ncase.me/remember/), [Detailed](https://www.gwern.net/Spaced-repetition).
 
 Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/1) for upcoming features & fixes. \
 Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues) if you have a feature request or a bug-report. \
