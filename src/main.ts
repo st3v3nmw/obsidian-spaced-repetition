@@ -55,6 +55,7 @@ export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     private reviewQueueView: ReviewQueueListView;
     public data: PluginData;
+    public syncLock = false;
 
     public reviewDecks: { [deckKey: string]: ReviewDeck } = {};
     public lastSelectedReviewDeck: string;
@@ -81,13 +82,17 @@ export default class SRPlugin extends Plugin {
         this.statusBar.setAttribute("aria-label", t("OPEN_NOTE_FOR_REVIEW"));
         this.statusBar.setAttribute("aria-label-position", "top");
         this.statusBar.addEventListener("click", async () => {
-            await this.sync();
-            this.reviewNextNoteModal();
+            if (!this.syncLock) {
+                await this.sync();
+                this.reviewNextNoteModal();
+            }
         });
 
         this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
-            await this.sync();
-            new FlashcardModal(this.app, this).open();
+            if (!this.syncLock) {
+                await this.sync();
+                new FlashcardModal(this.app, this).open();
+            }
         });
 
         this.registerView(
@@ -131,8 +136,10 @@ export default class SRPlugin extends Plugin {
             id: "srs-note-review-open-note",
             name: t("OPEN_NOTE_FOR_REVIEW"),
             callback: async () => {
-                await this.sync();
-                this.reviewNextNoteModal();
+                if (!this.syncLock) {
+                    await this.sync();
+                    this.reviewNextNoteModal();
+                }
             },
         });
 
@@ -173,8 +180,10 @@ export default class SRPlugin extends Plugin {
             id: "srs-review-flashcards",
             name: t("REVIEW_ALL_CARDS"),
             callback: async () => {
-                await this.sync();
-                new FlashcardModal(this.app, this).open();
+                if (!this.syncLock) {
+                    await this.sync();
+                    new FlashcardModal(this.app, this).open();
+                }
             },
         });
 
@@ -196,8 +205,10 @@ export default class SRPlugin extends Plugin {
             id: "srs-view-stats",
             name: t("VIEW_STATS"),
             callback: async () => {
-                await this.sync();
-                new StatsModal(this.app, this).open();
+                if (!this.syncLock) {
+                    await this.sync();
+                    new StatsModal(this.app, this).open();
+                }
             },
         });
 
@@ -205,7 +216,11 @@ export default class SRPlugin extends Plugin {
 
         this.app.workspace.onLayoutReady(() => {
             this.initView();
-            setTimeout(async () => await this.sync(), 2000);
+            setTimeout(async () => {
+                if (!this.syncLock) {
+                    await this.sync();
+                }
+            }, 2000);
         });
     }
 
@@ -214,6 +229,11 @@ export default class SRPlugin extends Plugin {
     }
 
     async sync(): Promise<void> {
+        if (this.syncLock) {
+            return;
+        }
+        this.syncLock = true;
+
         // reset notes stuff
         graph.reset();
         this.easeByPath = {};
@@ -384,6 +404,8 @@ export default class SRPlugin extends Plugin {
             })
         );
         this.reviewQueueView.redraw();
+
+        this.syncLock = false;
     }
 
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
@@ -518,12 +540,10 @@ export default class SRPlugin extends Plugin {
 
         new Notice(t("RESPONSE_RECEIVED"));
 
-        setTimeout(async () => {
-            await this.sync();
-            if (this.data.settings.autoNextNote) {
-                this.reviewNextNote(this.lastSelectedReviewDeck);
-            }
-        }, 500);
+        await this.sync();
+        if (this.data.settings.autoNextNote) {
+            this.reviewNextNote(this.lastSelectedReviewDeck);
+        }
     }
 
     async reviewNextNoteModal(): Promise<void> {
