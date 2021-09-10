@@ -169,14 +169,6 @@ export class FlashcardModal extends Modal {
 
         this.responseDiv = this.contentEl.createDiv("sr-response");
 
-        this.nextBtn = document.createElement("div");
-        this.nextBtn.setAttribute("id", "sr-next-btn");
-        this.nextBtn.setText(t("NEXT"));
-        this.nextBtn.addEventListener("click", () => {
-            this.processReview(ReviewResponse.Reset); // Can be any response, doesn't actually matter.
-        });
-        this.responseDiv.appendChild(this.nextBtn);
-
         this.hardBtn = document.createElement("button");
         this.hardBtn.setAttribute("id", "sr-hard-btn");
         this.hardBtn.setText(t("HARD"));
@@ -209,15 +201,12 @@ export class FlashcardModal extends Modal {
             this.showAnswer();
         });
 
-        if (this.ignoreStats)
-        {
-            this.hardBtn.style.display = 'none';
+        if (this.ignoreStats) {
             this.goodBtn.style.display = 'none';
-            this.easyBtn.style.display = 'none';
-        }
-        else
-        {
-            this.nextBtn.style.display = 'none';
+
+            this.responseDiv.addClass('sr-ignorestats-response');
+            this.easyBtn.addClass('sr-ignorestats-btn');
+            this.hardBtn.addClass('sr-ignorestats-btn');
         }
     }
 
@@ -245,7 +234,9 @@ export class FlashcardModal extends Modal {
     async processReview(response: ReviewResponse): Promise<void> {
 
         if (this.ignoreStats) {
-            this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+            if (response == ReviewResponse.Easy) {
+                this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+            }
             this.currentDeck.nextCard(this);
             return;
         }
@@ -686,7 +677,12 @@ export class Deck {
             modal.plugin.data.settings
         ).interval;
 
-        if (Platform.isMobile) {
+        if (modal.ignoreStats)
+        {
+            // Same for mobile/desktop
+            modal.hardBtn.setText(`${t("HARD")}`);
+            modal.easyBtn.setText(`${t("EASY")}`);
+        } else if (Platform.isMobile) {
             modal.hardBtn.setText(textInterval(hardInterval, true));
             modal.goodBtn.setText(textInterval(goodInterval, true));
             modal.easyBtn.setText(textInterval(easyInterval, true));

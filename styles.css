@@ -13,6 +13,9 @@
     position: absolute;
     bottom: 0;
 }
+.sr-ignorestats-response{
+    grid-template-columns: auto auto!important;
+}
 
 .sr-centered {
     display: flex;
@@ -25,7 +28,6 @@
     margin-left: 4px; 
 }
 
-#sr-next-btn,
 #sr-show-answer {
     height: 48px;
     line-height: 48px;
@@ -57,7 +59,6 @@
     background-color: #f44336;
 }
 
-#sr-next-btn,
 #sr-good-btn {
     background-color: #2196f3;
 }
@@ -77,6 +78,12 @@
     height: 80%;
 }
 
+.sr-ignorestats-btn{
+    /* Bit of a hack, but it works. */
+    margin: 0px!important;
+    margin-right: 12px!important;
+}
+
 @media only screen and (max-width: 600px) {
     .sr-modal-content::-webkit-scrollbar,
     #sr-flashcard-view::-webkit-scrollbar {
@@ -88,7 +95,6 @@
         width: 95% !important;
     }
 
-    #sr-next-btn,
     #sr-hard-btn,
     #sr-good-btn,
     #sr-easy-btn {
