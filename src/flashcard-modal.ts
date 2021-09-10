@@ -25,6 +25,7 @@ export class FlashcardModal extends Modal {
     public hardBtn: HTMLElement;
     public goodBtn: HTMLElement;
     public easyBtn: HTMLElement;
+    public nextBtn: HTMLElement;
     public responseDiv: HTMLElement;
     public fileLinkView: HTMLElement;
     public resetLinkView: HTMLElement;
@@ -34,11 +35,13 @@ export class FlashcardModal extends Modal {
     public currentDeck: Deck;
     public checkDeck: Deck;
     public mode: FlashcardModalMode;
+    public ignoreStats: Boolean;
 
-    constructor(app: App, plugin: SRPlugin) {
+    constructor(app: App, plugin: SRPlugin, ignoreStats: Boolean = false) {
         super(app);
 
         this.plugin = plugin;
+        this.ignoreStats = ignoreStats;
 
         this.titleEl.setText(t("DECKS"));
 
@@ -166,6 +169,14 @@ export class FlashcardModal extends Modal {
 
         this.responseDiv = this.contentEl.createDiv("sr-response");
 
+        this.nextBtn = document.createElement("div");
+        this.nextBtn.setAttribute("id", "sr-next-btn");
+        this.nextBtn.setText(t("NEXT"));
+        this.nextBtn.addEventListener("click", () => {
+            this.processReview(ReviewResponse.Reset); // Can be any response, doesn't actually matter.
+        });
+        this.responseDiv.appendChild(this.nextBtn);
+
         this.hardBtn = document.createElement("button");
         this.hardBtn.setAttribute("id", "sr-hard-btn");
         this.hardBtn.setText(t("HARD"));
@@ -197,6 +208,17 @@ export class FlashcardModal extends Modal {
         this.answerBtn.addEventListener("click", () => {
             this.showAnswer();
         });
+
+        if (this.ignoreStats)
+        {
+            this.hardBtn.style.display = 'none';
+            this.goodBtn.style.display = 'none';
+            this.easyBtn.style.display = 'none';
+        }
+        else
+        {
+            this.nextBtn.style.display = 'none';
+        }
     }
 
     showAnswer(): void {
@@ -220,7 +242,16 @@ export class FlashcardModal extends Modal {
         this.renderMarkdownWrapper(this.currentCard.back, this.flashcardView);
     }
 
+    //async processWithoutReview
+
     async processReview(response: ReviewResponse): Promise<void> {
+
+        if (this.ignoreStats) {
+            this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+            this.currentDeck.nextCard(this);
+            return;
+        }
+
         let interval: number, ease: number, due;
 
         this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);

@@ -25,6 +25,7 @@
     margin-left: 4px; 
 }
 
+#sr-next-btn,
 #sr-show-answer {
     height: 48px;
     line-height: 48px;
@@ -56,6 +57,7 @@
     background-color: #f44336;
 }
 
+#sr-next-btn,
 #sr-good-btn {
     background-color: #2196f3;
 }
@@ -86,6 +88,7 @@
         width: 95% !important;
     }
 
+    #sr-next-btn,
     #sr-hard-btn,
     #sr-good-btn,
     #sr-easy-btn {

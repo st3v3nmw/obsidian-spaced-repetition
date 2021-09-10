@@ -193,6 +193,20 @@ export default class SRPlugin extends Plugin {
         });
 
         this.addCommand({
+            id: "srs-cram-flashcards-in-note",
+            name: t("CRAM_CARDS_IN_NOTE"),
+            callback: async () => {
+                const openFile: TFile | null = this.app.workspace.getActiveFile();
+                if (openFile && openFile.extension === "md") {
+                    this.deckTree = new Deck("root", null);
+                    const deckPath: string[] = this.findDeckPath(openFile);
+                    await this.findFlashcardsInNote(openFile, deckPath, false, true);
+                    new FlashcardModal(this.app, this, true).open();
+                }
+            },
+        });
+
+        this.addCommand({
             id: "srs-view-stats",
             name: t("VIEW_STATS"),
             callback: async () => {
@@ -590,7 +604,7 @@ export default class SRPlugin extends Plugin {
         return deckPath;
     }
 
-    async findFlashcardsInNote(note: TFile, deckPath: string[], buryOnly = false): Promise<number> {
+    async findFlashcardsInNote(note: TFile, deckPath: string[], buryOnly = false, ignoreStats = false): Promise<number> {
         let fileText: string = await this.app.vault.read(note);
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         const headings: HeadingCache[] = fileCachedData.headings || [];
@@ -736,7 +750,12 @@ export default class SRPlugin extends Plugin {
                 };
 
                 // card scheduled
-                if (i < scheduling.length) {
+                if (ignoreStats)
+                {
+                    this.cardStats.newCount++;
+                    cardObj.isDue = true;
+                    this.deckTree.insertFlashcard([...deckPath], cardObj);
+                } else if (i < scheduling.length) {
                     const dueUnix: number = window
                         .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY"])
                         .valueOf();
