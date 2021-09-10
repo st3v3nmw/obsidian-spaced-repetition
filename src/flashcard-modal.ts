@@ -242,8 +242,6 @@ export class FlashcardModal extends Modal {
         this.renderMarkdownWrapper(this.currentCard.back, this.flashcardView);
     }
 
-    //async processWithoutReview
-
     async processReview(response: ReviewResponse): Promise<void> {
 
         if (this.ignoreStats) {
