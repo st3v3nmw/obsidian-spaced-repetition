@@ -290,15 +290,14 @@ export default class SRPlugin extends Plugin {
             const tags = getAllTags(fileCachedData) || [];
 
             let shouldIgnore = true;
-            for (const tag of tags) {
-                if (
-                    this.data.settings.tagsToReview.some(
-                        (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/")
-                    )
-                ) {
-                    if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, tag)) {
-                        this.reviewDecks[tag] = new ReviewDeck(tag);
+            const matchedNoteTags = [];
+
+            for (const tagToReview of this.data.settings.tagsToReview) {
+                if (tags.some((tag) => tag === tagToReview || tag.startsWith(tagToReview + "/"))) {
+                    if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, tagToReview)) {
+                        this.reviewDecks[tagToReview] = new ReviewDeck(tagToReview);
                     }
+                    matchedNoteTags.push(tagToReview);
                     shouldIgnore = false;
                     break;
                 }
@@ -315,10 +314,8 @@ export default class SRPlugin extends Plugin {
                     Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
                 )
             ) {
-                for (const tag of tags) {
-                    if (Object.prototype.hasOwnProperty.call(this.reviewDecks, tag)) {
-                        this.reviewDecks[tag].newNotes.push(note);
-                    }
+                for (const matchedNoteTag of matchedNoteTags) {
+                    this.reviewDecks[matchedNoteTag].newNotes.push(note);
                 }
                 continue;
             }
@@ -326,13 +323,11 @@ export default class SRPlugin extends Plugin {
             const dueUnix: number = window
                 .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
                 .valueOf();
-            for (const tag of tags) {
-                if (Object.prototype.hasOwnProperty.call(this.reviewDecks, tag)) {
-                    this.reviewDecks[tag].scheduledNotes.push({ note, dueUnix });
 
-                    if (dueUnix <= now.valueOf()) {
-                        this.reviewDecks[tag].dueNotesCount++;
-                    }
+            for (const matchedNoteTag of matchedNoteTags) {
+                this.reviewDecks[matchedNoteTag].scheduledNotes.push({ note, dueUnix });
+                if (dueUnix <= now.valueOf()) {
+                    this.reviewDecks[matchedNoteTag].dueNotesCount++;
                 }
             }
 
