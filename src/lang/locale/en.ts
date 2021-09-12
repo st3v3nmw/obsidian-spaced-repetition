@@ -24,6 +24,7 @@ export default {
     REVIEW_NOTE_GOOD_CMD: "Review note as good",
     REVIEW_NOTE_HARD_CMD: "Review note as hard",
     REVIEW_CARDS_IN_NOTE: "Review flashcards in this note",
+    CRAM_CARDS_IN_NOTE: "Cram flashcards in this note.",
     REVIEW_ALL_CARDS: "Review flashcards from all notes",
     VIEW_STATS: "View statistics",
     STATUS_BAR: "Review: ${dueNotesCount} notes(s), ${dueFlashcardsCount} card(s) due",
