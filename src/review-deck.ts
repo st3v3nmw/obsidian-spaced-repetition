@@ -12,7 +12,7 @@ export class ReviewDeck {
 
     constructor(name: string) {
         this.deckName = name;
-        this.activeFolders = new Set([t("Today")]);
+        this.activeFolders = new Set([this.deckName, t("TODAY")]);
     }
 
     public sortNotes(pageranks: Record<string, number>): void {
