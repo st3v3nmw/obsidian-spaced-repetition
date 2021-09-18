@@ -1,18 +1,28 @@
 // Deutsch
 
+/*
+Deck = Stapel
+due = anstehend / fällig ?
+Card = Karte
+review = Wiederholung
+interval = Intervall
+Flashcard = Lernkarte / (Karte / Lernkartei)
+ease = Einfacheit(-sfaktor)
+*/
+
 export default {
     // flashcard-modal.ts
-    DECKS: "Decks", // todo
-    DUE_CARDS: "Due Cards", // todo
-    NEW_CARDS: "New Cards", // todo
-    TOTAL_CARDS: "Total Cards", // todo
-    EDIT_LATER: "Edit Later", // todo
-    RESET_CARD_PROGRESS: "Reset card's progress", // todo
-    HARD: "Hard", // todo
-    GOOD: "Good", // todo
-    EASY: "Easy", // todo
-    SHOW_ANSWER: "Show Answer", // todo
-    CARD_PROGRESS_RESET: "Card's progress has been reset.", // todo
+    DECKS: "Stapeln",
+    DUE_CARDS: "Anstehende Karten",
+    NEW_CARDS: "Neue Karten",
+    TOTAL_CARDS: "Alle Karten",
+    EDIT_LATER: "Später bearbeiten",
+    RESET_CARD_PROGRESS: "Kartenfortschritt zurücksetzten",
+    HARD: "Schwer",
+    GOOD: "Gut",
+    EASY: "Einfach",
+    SHOW_ANSWER: "Zeige Antwort",
+    CARD_PROGRESS_RESET: "Kartenfortschritt wurde zurückgesetzt.",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Open a note for review", // todo
@@ -32,25 +42,25 @@ export default {
     NOTE_IN_IGNORED_FOLDER: "Note is saved under ignored folder (check settings).", // todo
     PLEASE_TAG_NOTE: "Please tag the note appropriately for reviewing (in settings).", // todo
     RESPONSE_RECEIVED: "Response received.", // todo
-    NO_DECK_EXISTS: "No deck exists for ${deckName}", // todo
+    NO_DECK_EXISTS: "Kein Stapel für ${deckName} gefunden.",
     ALL_CAUGHT_UP: "You're all caught up now :D.", // todo
 
     // scheduling.ts
-    DAYS_STR_IVL: "${interval} day(s)", // todo
-    MONTHS_STR_IVL: "${interval} month(s)", // todo
-    YEARS_STR_IVL: "${interval} year(s)", // todo
+    DAYS_STR_IVL: "${interval} Tag(e)", // todo
+    MONTHS_STR_IVL: "${interval} Monat(e)", // todo
+    YEARS_STR_IVL: "${interval} Jahr(e)", // todo
 
     // settings.ts
-    SETTINGS_HEADER: "Spaced Repetition Plugin - Settings", // todo
-    CHECK_WIKI: 'For more information, check the <a href="${wiki_url}">wiki</a>.',
+    SETTINGS_HEADER: "Spaced Repetition Plugin - Einstellungen",
+    CHECK_WIKI: 'Weitere Informationen gibt es im <a href="${wiki_url}">Wiki</a>.',
     FOLDERS_TO_IGNORE: "Folders to ignore", // todo
     FOLDERS_TO_IGNORE_DESC: "Enter folder paths separated by newlines i.e. Templates Meta/Scripts", // todo
-    FLASHCARDS: "Flashcards", // todo
-    FLASHCARD_TAGS: "Flashcard tags", // todo
+    FLASHCARDS: "Lernkarten",
+    FLASHCARD_TAGS: "Lernkarten Tags",
     FLASHCARD_TAGS_DESC:
-            "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.", // todo
-    CONVERT_FOLDERS_TO_DECKS: "Convert folders to decks and subdecks?", // todo
-    CONVERT_FOLDERS_TO_DECKS_DESC: "This is an alternative to the Flashcard tags option above.", // todo
+            "Enter tags separated by spaces or newlines i.e. #flashcards #stapel2 #stapel3.", // todo
+    CONVERT_FOLDERS_TO_DECKS: "Ordner in Stapeln und Substapeln umwandeln?",
+    CONVERT_FOLDERS_TO_DECKS_DESC: "Eine Alternative zur oberen \"Lernkarten Tags\" Option.",
     INLINE_SCHEDULING_COMMENTS:
             "Save scheduling comment on the same line as the flashcard's last line?", // todo
     INLINE_SCHEDULING_COMMENTS_DESC:
@@ -101,36 +111,36 @@ export default {
     EASY_BONUS_DESC:
             "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%).", // todo
     EASY_BONUS_MIN_WARNING: "The easy bonus must be at least 100.", // todo
-    MAX_INTERVAL: "Maximum Interval", // todo
-    MAX_INTERVAL_DESC: "Allows you to place an upper limit on the interval (default = 100 years).", // todo
-    MAX_INTERVAL_MIN_WARNING: "The maximum interval must be at least 1 day.", // todo
+    MAX_INTERVAL: "Maximales Intervall",
+    MAX_INTERVAL_DESC: "Das maximale Intervall (in Tagen) für Wiederholungen. Standard sind 100 Jahre.",
+    MAX_INTERVAL_MIN_WARNING: "Das maximale Interall muss mindestens ein Tag sein.",
     MAX_LINK_CONTRIB: "Maximum link contribution", // todo
     MAX_LINK_CONTRIB_DESC:
             "Maximum contribution of the weighted ease of linked notes to the initial ease.", // todo
     LOGGING: "Logging", // todo
-    DISPLAY_DEBUG_INFO: "Display debugging information on the developer console?", // todo
+    DISPLAY_DEBUG_INFO: "Informationen zum Debugging in der Entwicklerkonsole anzeigen?",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Notes Review Queue", // todo
-    CLOSE: "Close", // todo
-    NEW: "New", // todo
-    YESTERDAY: "Yesterday", // todo
-    TODAY: "Today", // todo
-    TOMORROW: "Tomorrow", // todo
+    CLOSE: "Schliessen",
+    NEW: "Neu",
+    YESTERDAY: "Gestern",
+    TODAY: "Heute",
+    TOMORROW: "Morgen",
 
     // stats-modal.ts
-    STATS_TITLE: "Statistics", // todo
-    OBSIDIAN_CHARTS_REQUIRED: "Note that this requires the Obsidian Charts plugin to work", // todo
-    FORECAST: "Forecast", // todo
-    FORECAST_DESC: "The number of cards due in the future", // todo
-    SCHEDULED: "Scheduled", // todo
-    DAYS: "Days", // todo
-    NUMBER_OF_CARDS: "Number of cards", // todo
-    REVIEWS_PER_DAY: "Average: ${avg} reviews/day", // todo
-    INTERVALS: "Intervals", // todo
-    INTERVALS_DESC: "Delays until reviews are shown again", // todo
-    COUNT: "Count", // todo
-    INTERVALS_SUMMARY: "Average interval: ${avg}, Longest interval: ${longest}", // todo
+    STATS_TITLE: "Statistiken",
+    OBSIDIAN_CHARTS_REQUIRED: "Hinweis: Das Obsidian Charts plugin wird benötigt um die Statistiken anzuzeigen.",
+    FORECAST: "Prognose",
+    FORECAST_DESC: "Anzahl der künftig anstehenden Karten",
+    SCHEDULED: "Anstehend",
+    DAYS: "Tage",
+    NUMBER_OF_CARDS: "Anzahl der Karten",
+    REVIEWS_PER_DAY: "Durchschnitt: ${avg} Wiederholungen/Tag",
+    INTERVALS: "Intervalle",
+    INTERVALS_DESC: "Intervalle bis Wiederholungen anstehen",
+    COUNT: "Anzahl",
+    INTERVALS_SUMMARY: "Durchschnittliches Intervall: ${avg}, Längstes Intervall: ${longest}",
     EASES: "Eases", // todo
     EASES_SUMMARY: "Average ease: ${avgEase}", // todo
     CARD_TYPES: "Card Types", // todo
