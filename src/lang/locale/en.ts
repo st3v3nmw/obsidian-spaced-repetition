@@ -135,5 +135,8 @@ export default {
     EASES_SUMMARY: "Average ease: ${avgEase}",
     CARD_TYPES: "Card Types",
     CARD_TYPES_DESC: "This includes buried cards as well, if any",
+    CARD_TYPE_NEW: "New",
+    CARD_TYPE_YOUNG: "Young",
+    CARD_TYPE_MATURE: "Mature",
     CARD_TYPES_SUMMARY: "Total cards: ${totalCardsCount}",
 };

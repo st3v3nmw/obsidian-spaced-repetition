@@ -7,8 +7,12 @@ Card = Karte
 review = Wiederholung
 interval = Intervall
 Flashcard = Lernkarte / (Karte / Lernkartei)
-ease = Einfacheit(-sfaktor)
+ease = Einfachheit(-sfaktor)
+reversed flashcards = beidseitige Lernkarten
 */
+
+// Obsidian specific names (folder, note, tag, etc.) are consistent with the german Obsidian.md translation:
+// https://github.com/obsidianmd/obsidian-translations/blob/master/de.json
 
 export default {
     // flashcard-modal.ts
@@ -52,19 +56,19 @@ export default {
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition Plugin - Einstellungen",
-    CHECK_WIKI: 'Weitere Informationen gibt es im <a href="${wiki_url}">Wiki</a>.',
-    FOLDERS_TO_IGNORE: "Folders to ignore", // todo
-    FOLDERS_TO_IGNORE_DESC: "Enter folder paths separated by newlines i.e. Templates Meta/Scripts", // todo
+    CHECK_WIKI: 'Weitere Informationen gibt es im <a href="${wiki_url}">Wiki (English)</a>.',
+    FOLDERS_TO_IGNORE: "Ausgeschlossene Ordner", // todo
+    FOLDERS_TO_IGNORE_DESC: "Mehrere Ordner mit Zeilenumbrüchen getrennt angeben. Bsp. OrdnerA OrdnerB/Unterordner",
     FLASHCARDS: "Lernkarten",
     FLASHCARD_TAGS: "Lernkarten Tags",
     FLASHCARD_TAGS_DESC:
-            "Enter tags separated by spaces or newlines i.e. #flashcards #stapel2 #stapel3.", // todo
+            "Mehrere Tags mit Leerzeichen oder Zeilenumbrüchen getrennt angeben. Bsp. #lernkarte #stapel2 #stapel3.",
     CONVERT_FOLDERS_TO_DECKS: "Ordner in Stapeln und Substapeln umwandeln?",
     CONVERT_FOLDERS_TO_DECKS_DESC: "Eine Alternative zur oberen \"Lernkarten Tags\" Option.",
     INLINE_SCHEDULING_COMMENTS:
-            "Save scheduling comment on the same line as the flashcard's last line?", // todo
+            "Soll der Fortschritt in der gleichen Zeile gespeichert werden wie die letzte Zeile einer Lernkartei?",
     INLINE_SCHEDULING_COMMENTS_DESC:
-            "Turning this on will make the HTML comments not break list formatting.", // todo
+            "Wenn aktiviert werden der HTML Kommentar die umgebende Liste nicht aufbrechen.",
     BURY_SIBLINGS_TILL_NEXT_DAY: "Bury sibling cards until the next day?", // todo
     BURY_SIBLINGS_TILL_NEXT_DAY_DESC:
             "Siblings are cards generated from the same card text i.e. cloze deletions", // todo
@@ -73,51 +77,51 @@ export default {
     CARD_MODAL_HEIGHT_PERCENT: "Flashcard Height Percentage", // todo
     CARD_MODAL_SIZE_PERCENT_DESC:
             "Should be set to 100% on mobile or if you have very large images", // todo
-    RESET_DEFAULT: "Reset to default", // todo
+    RESET_DEFAULT: "Standardeinstellung wiederherstellen", // todo
     CARD_MODAL_WIDTH_PERCENT: "Flashcard Width Percentage", // todo
     FILENAME_OR_OPEN_FILE: "Show file name instead of 'Open file' in flashcard review?", // todo
     RANDOMIZE_CARD_ORDER: "Randomize card order during review?", // todo
-    DISABLE_CLOZE_CARDS: "Disable cloze cards?", // todo
-    CONVERT_HIGHLIGHTS_TO_CLOZES: "Convert ==hightlights== to clozes?", // todo
-    CONVERT_BOLD_TEXT_TO_CLOZES: "Convert **bolded text** to clozes?", // todo
-    INLINE_CARDS_SEPARATOR: "Separator for inline flashcards", // todo
+    DISABLE_CLOZE_CARDS: "Cloze Karten deaktivieren?",
+    CONVERT_HIGHLIGHTS_TO_CLOZES: "==Hervorgehobenen== Text in cloze Karten umwandeln?",
+    CONVERT_BOLD_TEXT_TO_CLOZES: "**Fettgedruckten** Text in cloze Karten umwandeln?",
+    INLINE_CARDS_SEPARATOR: "Trennzeichen für einzeilige Lernkarten",
     FIX_SEPARATORS_MANUALLY_WARNING:
-            "Note that after changing this you have to manually edit any flashcards you already have.", // todo
-    INLINE_REVERSED_CARDS_SEPARATOR: "Separator for inline reversed flashcards", // todo
-    MULTILINE_CARDS_SEPARATOR: "Separator for multiline flashcards", // todo
-    MULTILINE_REVERSED_CARDS_SEPARATOR: "Separator for multiline reversed flashcards", // todo
-    NOTES: "Notes", // todo
-    TAGS_TO_REVIEW: "Tags to review", // todo
-    TAGS_TO_REVIEW_DESC: "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.", // todo
-    OPEN_RANDOM_NOTE: "Open a random note for review", // todo
-    OPEN_RANDOM_NOTE_DESC: "When you turn this off, notes are ordered by importance (PageRank).", // todo
-    AUTO_NEXT_NOTE: "Open next note automatically after a review", // todo
+            "Wenn diese Einstellung geändert wird, dann müssen die entsprechenden Lernkarten manuell angepasst werden angepasst werden.",
+    INLINE_REVERSED_CARDS_SEPARATOR: "Trennzeichen für einzeilige beidseitige Lernkarten",
+    MULTILINE_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige Lernkarten",
+    MULTILINE_REVERSED_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige beidseitige Lernkarten",
+    NOTES: "Notizen", // todo
+    TAGS_TO_REVIEW: "Zu wiederholende Tags",
+    TAGS_TO_REVIEW_DESC: "Mehrere Tags können mit Leerzeichen oder Zeilenumbrüchen getrennt angegeben werden. Bsp. #prüfen #tag1 #tag2.",
+    OPEN_RANDOM_NOTE: "Zufällige Karten wiederholen",
+    OPEN_RANDOM_NOTE_DESC: "Wenn dies deaktiviert wird, dann werden die Notizen nach Wichtigkeit wiederholt (PageRank).",
+    AUTO_NEXT_NOTE: "Nach einer Wiederholung automatisch die nächste Karte öffnen",
     DISABLE_FILE_MENU_REVIEW_OPTIONS:
             "Disable review options in the file menu i.e. Review: Easy Good Hard", // todo
     DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
             "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this.", // todo
     MAX_N_DAYS_REVIEW_QUEUE: "Maximum number of days to display on right panel", // todo
     MIN_ONE_DAY: "The number of days must be at least 1.", // todo
-    VALID_NUMBER_WARNING: "Please provide a valid number.", // todo
-    ALGORITHM: "Algorithm", // todo
+    VALID_NUMBER_WARNING: "Bitte eine gültige Zahl eingeben.", // todo
+    ALGORITHM: "Algorithmus",
     CHECK_ALGORITHM_WIKI:
-            'For more information, check the <a href="${algo_url}">algorithm implementation</a>.',
+            'Weiterführende Informationen: <a href="${algo_url}">Implementierung des Algorithmus (English)</a>.',
     BASE_EASE: "Base ease", // todo
     BASE_EASE_DESC: "minimum = 130, preferrably approximately 250.", // todo
     BASE_EASE_MIN_WARNING: "The base ease must be at least 130.", // todo
-    LAPSE_INTERVAL_CHANGE: "Interval change when you review a flashcard/note as hard", // todo
-    LAPSE_INTERVAL_CHANGE_DESC: "newInterval = oldInterval * intervalChange / 100.", // todo
-    EASY_BONUS: "Easy Bonus", // todo
+    LAPSE_INTERVAL_CHANGE: "Anpassungsfaktor des Intervalls wenn eine Notiz / Karte 'Schwer' abgeschlossen wird", // todo
+    LAPSE_INTERVAL_CHANGE_DESC: "neuesIntervall = altesIntervall * anpassungsfaktor / 100.", // todo
+    EASY_BONUS: "Einfachheit-Bonus",
     EASY_BONUS_DESC:
-            "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%).", // todo
-    EASY_BONUS_MIN_WARNING: "The easy bonus must be at least 100.", // todo
+            "Der Einfachheit-Bonus gibt an um welchen Faktor (in Prozent) das Intervall länger sein soll, wenn eine Notiz / Karte 'Einfach' statt 'Gut' abgeschlossen wird. Minimum ist 100%.",
+    EASY_BONUS_MIN_WARNING: "Der Einfachheit-Bonus muss mindestens 100 sein.",
     MAX_INTERVAL: "Maximales Intervall",
     MAX_INTERVAL_DESC: "Das maximale Intervall (in Tagen) für Wiederholungen. Standard sind 100 Jahre.",
     MAX_INTERVAL_MIN_WARNING: "Das maximale Interall muss mindestens ein Tag sein.",
     MAX_LINK_CONTRIB: "Maximum link contribution", // todo
     MAX_LINK_CONTRIB_DESC:
             "Maximum contribution of the weighted ease of linked notes to the initial ease.", // todo
-    LOGGING: "Logging", // todo
+    LOGGING: "Logging",
     DISPLAY_DEBUG_INFO: "Informationen zum Debugging in der Entwicklerkonsole anzeigen?",
 
     // sidebar.ts
@@ -141,9 +145,12 @@ export default {
     INTERVALS_DESC: "Intervalle bis Wiederholungen anstehen",
     COUNT: "Anzahl",
     INTERVALS_SUMMARY: "Durchschnittliches Intervall: ${avg}, Längstes Intervall: ${longest}",
-    EASES: "Eases", // todo
-    EASES_SUMMARY: "Average ease: ${avgEase}", // todo
+    EASES: "Einfachheiten",
+    EASES_SUMMARY: "Durchschnittliche Einfachheit: ${avgEase}",
     CARD_TYPES: "Card Types", // todo
     CARD_TYPES_DESC: "This includes buried cards as well, if any", // todo
+    CARD_TYPE_NEW: "New", // todo
+    CARD_TYPE_YOUNG: "Young", // todo
+    CARD_TYPE_MATURE: "Mature", // todo
     CARD_TYPES_SUMMARY: "Total cards: ${totalCardsCount}", // todo
 };
