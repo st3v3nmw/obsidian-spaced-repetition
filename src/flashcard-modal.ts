@@ -386,24 +386,50 @@ export class FlashcardModal extends Modal {
                 typeof src === "string" &&
                 this.plugin.app.metadataCache.getFirstLinkpathDest(src, this.currentCard.note.path);
             if (target instanceof TFile && target.extension !== "md") {
-                el.innerText = "";
-                el.createEl(
-                    "img",
-                    {
+                if (target.extension == "mp3" ) {
+                //<span alt="terra.mp3" src="terra.mp3" class="internal-embed media-embed is-loaded"><audio controls="" src="app://local/%2FUsers%2Fcareilly%2FLibrary%2FMobile%20Documents%2FiCloud~md~obsidian%2FDocuments%2FNotes%2FLanguages%2FItalian%2FFFItalianWordList%2F625%20Collection%2Fterra.mp3?1424097892000"></audio></span>
+                    el.innerText = "";
+                    el.createEl("audio", {
                         attr: {
-                            src: this.plugin.app.vault.getResourcePath(target),
-                        },
-                    },
-                    (img) => {
+                            controls: "",
+                            src: this.plugin.app.vault.getResourcePath(target)
+                        }
+                    }, (img) => {
+                        if (el.hasAttribute("alt"))
+                            img.setAttribute("alt", el.getAttribute("alt"));
+                    });
+                    el.addClasses(["media-embed", "is-loaded"]);
+                } else if (target.extension == "webm") {
+                    // <span alt="sample_960x400_ocean_with_audio.webm" src="sample_960x400_ocean_with_audio.webm" class="internal-embed media-embed is-loaded"><video controls="" src="app://local/%2FUsers%2Fcareilly%2FLibrary%2FMobile%20Documents%2FiCloud~md~obsidian%2FDocuments%2FNotes%2Fsample_960x400_ocean_with_audio.webm?1631986890167"></video></span>
+                    el.innerText = "";
+                    el.createEl("audio", {
+                        attr: {
+                            controls: "",
+                            src: this.plugin.app.vault.getResourcePath(target)
+                        }
+                    }, (img) => {
+                        if (el.hasAttribute("alt"))
+                            img.setAttribute("alt", el.getAttribute("alt"));
+                    });
+                    el.addClasses(["media-embed", "is-loaded"]);
+                } else {
+                    el.innerText = "";
+                    el.createEl("img", {
+                        attr: {
+                            src: this.plugin.app.vault.getResourcePath(target)
+                        }
+                    }, (img) => {
                         if (el.hasAttribute("width"))
                             img.setAttribute("width", el.getAttribute("width"));
-                        else img.setAttribute("width", "100%");
-                        if (el.hasAttribute("alt")) img.setAttribute("alt", el.getAttribute("alt"));
-                    }
-                );
-                el.addClasses(["image-embed", "is-loaded"]);
-            }
+                        else
+                            img.setAttribute("width", "100%");
+                        if (el.hasAttribute("alt"))
+                            img.setAttribute("alt", el.getAttribute("alt"));
+                    });
+                    el.addClasses(["image-embed", "is-loaded"]);
+                }
 
+            }
             // file does not exist
             // display dead link
             if (target === null) {
