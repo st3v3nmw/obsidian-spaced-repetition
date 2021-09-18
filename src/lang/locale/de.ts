@@ -1,17 +1,6 @@
 // Deutsch
 
-/*
-Deck = Stapel
-due = anstehend / fällig ?
-Card = Karte
-review = Wiederholung
-interval = Intervall
-Flashcard = Lernkarte / (Karte / Lernkartei)
-ease = Einfachheit(-sfaktor)
-reversed flashcards = beidseitige Lernkarten
-*/
-
-// Obsidian specific names (folder, note, tag, etc.) are consistent with the german Obsidian.md translation:
+// Obsidian specific names (folder, note, tag, etc.) are consistent with the german translation:
 // https://github.com/obsidianmd/obsidian-translations/blob/master/de.json
 
 export default {
@@ -29,35 +18,35 @@ export default {
     CARD_PROGRESS_RESET: "Kartenfortschritt wurde zurückgesetzt.",
 
     // main.ts
-    OPEN_NOTE_FOR_REVIEW: "Open a note for review", // todo
-    REVIEW_CARDS: "Review flashcards", // todo
-    REVIEW_EASY_FILE_MENU: "Review: Easy", // todo
-    REVIEW_GOOD_FILE_MENU: "Review: Good", // todo
-    REVIEW_HARD_FILE_MENU: "Review: Hard", // todo
-    REVIEW_NOTE_EASY_CMD: "Review note as easy", // todo
-    REVIEW_NOTE_GOOD_CMD: "Review note as good", // todo
-    REVIEW_NOTE_HARD_CMD: "Review note as hard", // todo
-    REVIEW_CARDS_IN_NOTE: "Review flashcards in this note", // todo
-    CRAM_CARDS_IN_NOTE: "Cram flashcards in this note.", // todo
-    REVIEW_ALL_CARDS: "Review flashcards from all notes", // todo
-    VIEW_STATS: "View statistics", // todo
-    STATUS_BAR: "Review: ${dueNotesCount} notes(s), ${dueFlashcardsCount} card(s) due", // todo
-    SYNC_TIME_TAKEN: "Sync took ${t}ms", // todo
-    NOTE_IN_IGNORED_FOLDER: "Note is saved under ignored folder (check settings).", // todo
-    PLEASE_TAG_NOTE: "Please tag the note appropriately for reviewing (in settings).", // todo
-    RESPONSE_RECEIVED: "Response received.", // todo
+    OPEN_NOTE_FOR_REVIEW: "Notiz zur Wiederholung öffnen",
+    REVIEW_CARDS: "Lernkarten wiederholen",
+    REVIEW_EASY_FILE_MENU: "Notiz abschliessen als: Einfach",
+    REVIEW_GOOD_FILE_MENU: "Notiz abschliessen als: Gut",
+    REVIEW_HARD_FILE_MENU: "Notiz abschliessen als: Schwer",
+    REVIEW_NOTE_EASY_CMD: "Notiz abschliessen als: Einfach",
+    REVIEW_NOTE_GOOD_CMD: "Notiz abschliessen als: Gut",
+    REVIEW_NOTE_HARD_CMD: "Notiz abschliessen als: Schwer",
+    REVIEW_CARDS_IN_NOTE: "Lernkarten in dieser Notiz wiederholen",
+    CRAM_CARDS_IN_NOTE: "Lernkarten in dieser Notiz pauken.",
+    REVIEW_ALL_CARDS: "Alle Lernkarten wiederholen",
+    VIEW_STATS: "Statistiken anzeigen",
+    STATUS_BAR: "Wiederholung: ${dueNotesCount} Notiz(en), ${dueFlashcardsCount} Karte(n) anstehend",
+    SYNC_TIME_TAKEN: "Sync dauerte ${t}ms",
+    NOTE_IN_IGNORED_FOLDER: "Notiz befindet sich in einem ausgeschlossenen Ordner (siehe Einstellungen).",
+    PLEASE_TAG_NOTE: "Bitte die Notiz für Wiederholungen entsprechend taggen (siehe Einstellungen).",
+    RESPONSE_RECEIVED: "Antwort erhalten.",
     NO_DECK_EXISTS: "Kein Stapel für ${deckName} gefunden.",
-    ALL_CAUGHT_UP: "You're all caught up now :D.", // todo
+    ALL_CAUGHT_UP: "Yuhu! Alles geschafft! :D.",
 
     // scheduling.ts
-    DAYS_STR_IVL: "${interval} Tag(e)", // todo
-    MONTHS_STR_IVL: "${interval} Monat(e)", // todo
-    YEARS_STR_IVL: "${interval} Jahr(e)", // todo
+    DAYS_STR_IVL: "${interval} Tag(e)",
+    MONTHS_STR_IVL: "${interval} Monat(e)",
+    YEARS_STR_IVL: "${interval} Jahr(e)",
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition Plugin - Einstellungen",
     CHECK_WIKI: 'Weitere Informationen gibt es im <a href="${wiki_url}">Wiki (English)</a>.',
-    FOLDERS_TO_IGNORE: "Ausgeschlossene Ordner", // todo
+    FOLDERS_TO_IGNORE: "Ausgeschlossene Ordner",
     FOLDERS_TO_IGNORE_DESC: "Mehrere Ordner mit Zeilenumbrüchen getrennt angeben. Bsp. OrdnerA OrdnerB/Unterordner",
     FLASHCARDS: "Lernkarten",
     FLASHCARD_TAGS: "Lernkarten Tags",
@@ -66,21 +55,21 @@ export default {
     CONVERT_FOLDERS_TO_DECKS: "Ordner in Stapeln und Substapeln umwandeln?",
     CONVERT_FOLDERS_TO_DECKS_DESC: "Eine Alternative zur oberen \"Lernkarten Tags\" Option.",
     INLINE_SCHEDULING_COMMENTS:
-            "Soll der Fortschritt in der gleichen Zeile gespeichert werden wie die letzte Zeile einer Lernkartei?",
+            "Den Fortschritt in der gleichen Zeile wie die letzte Zeile einer Lernkartei speichern?",
     INLINE_SCHEDULING_COMMENTS_DESC:
             "Wenn aktiviert werden der HTML Kommentar die umgebende Liste nicht aufbrechen.",
-    BURY_SIBLINGS_TILL_NEXT_DAY: "Bury sibling cards until the next day?", // todo
+    BURY_SIBLINGS_TILL_NEXT_DAY: "Verwandte Karten auf den nächsten Tag verlegen?",
     BURY_SIBLINGS_TILL_NEXT_DAY_DESC:
-            "Siblings are cards generated from the same card text i.e. cloze deletions", // todo
-    SHOW_CARD_CONTEXT: "Show context in cards?", // todo
-    SHOW_CARD_CONTEXT_DESC: "i.e. Title > Heading 1 > Subheading > ... > Subheading", // todo
-    CARD_MODAL_HEIGHT_PERCENT: "Flashcard Height Percentage", // todo
+            "Verwandte Karten sind aus der gleichen Karte generiert worden (z.B. cloze Karten).",
+    SHOW_CARD_CONTEXT: "Kontext in den Karten anzeigen?",
+    SHOW_CARD_CONTEXT_DESC: "Bsp. Titel > Überschrift 1 > Sektion > ... > Untersektion",
+    CARD_MODAL_HEIGHT_PERCENT: "Höhe der Lernkartei in Prozent",
     CARD_MODAL_SIZE_PERCENT_DESC:
-            "Should be set to 100% on mobile or if you have very large images", // todo
-    RESET_DEFAULT: "Standardeinstellung wiederherstellen", // todo
-    CARD_MODAL_WIDTH_PERCENT: "Flashcard Width Percentage", // todo
-    FILENAME_OR_OPEN_FILE: "Show file name instead of 'Open file' in flashcard review?", // todo
-    RANDOMIZE_CARD_ORDER: "Randomize card order during review?", // todo
+            "Auf kleinen Bildschirmen (z.B. Smartphones) oder bei sehr grossen Bildern sollte dieser Wert auf 100% gesetzt werden.",
+    RESET_DEFAULT: "Standardeinstellung wiederherstellen",
+    CARD_MODAL_WIDTH_PERCENT: "Breite einer Lernkarte in Prozent",
+    FILENAME_OR_OPEN_FILE: "Während der Wiederholung den Notiznamen statt 'Später bearbeiten' anzeigen?",
+    RANDOMIZE_CARD_ORDER: "Während der Wiederhoung die Reihenfolge zufällig mischen?",
     DISABLE_CLOZE_CARDS: "Cloze Karten deaktivieren?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==Hervorgehobenen== Text in cloze Karten umwandeln?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "**Fettgedruckten** Text in cloze Karten umwandeln?",
@@ -90,27 +79,27 @@ export default {
     INLINE_REVERSED_CARDS_SEPARATOR: "Trennzeichen für einzeilige beidseitige Lernkarten",
     MULTILINE_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige Lernkarten",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige beidseitige Lernkarten",
-    NOTES: "Notizen", // todo
+    NOTES: "Notizen",
     TAGS_TO_REVIEW: "Zu wiederholende Tags",
     TAGS_TO_REVIEW_DESC: "Mehrere Tags können mit Leerzeichen oder Zeilenumbrüchen getrennt angegeben werden. Bsp. #prüfen #tag1 #tag2.",
     OPEN_RANDOM_NOTE: "Zufällige Karten wiederholen",
     OPEN_RANDOM_NOTE_DESC: "Wenn dies deaktiviert wird, dann werden die Notizen nach Wichtigkeit wiederholt (PageRank).",
     AUTO_NEXT_NOTE: "Nach einer Wiederholung automatisch die nächste Karte öffnen",
     DISABLE_FILE_MENU_REVIEW_OPTIONS:
-            "Disable review options in the file menu i.e. Review: Easy Good Hard", // todo
+            "Optionen zur Wiederholung im Menü einer Datei deaktivieren. Bsp. Wiederholen: Einfach Gut Schwer",
     DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-            "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this.", // todo
-    MAX_N_DAYS_REVIEW_QUEUE: "Maximum number of days to display on right panel", // todo
-    MIN_ONE_DAY: "The number of days must be at least 1.", // todo
-    VALID_NUMBER_WARNING: "Bitte eine gültige Zahl eingeben.", // todo
+            "Nach dem Deaktivieren können die Tastenkürzel zur Wiederholung verwendet werden. Obsidian muss nach einer Änderung neu geladen weren.",
+    MAX_N_DAYS_REVIEW_QUEUE: "Maximale Anzahl der anstehender Notizen, die im rechten Fensterbereich angezeigt werden",
+    MIN_ONE_DAY: "Anzahl der Tage muss mindestens 1 sein.",
+    VALID_NUMBER_WARNING: "Bitte eine gültige Zahl eingeben.",
     ALGORITHM: "Algorithmus",
     CHECK_ALGORITHM_WIKI:
             'Weiterführende Informationen: <a href="${algo_url}">Implementierung des Algorithmus (English)</a>.',
-    BASE_EASE: "Base ease", // todo
-    BASE_EASE_DESC: "minimum = 130, preferrably approximately 250.", // todo
-    BASE_EASE_MIN_WARNING: "The base ease must be at least 130.", // todo
-    LAPSE_INTERVAL_CHANGE: "Anpassungsfaktor des Intervalls wenn eine Notiz / Karte 'Schwer' abgeschlossen wird", // todo
-    LAPSE_INTERVAL_CHANGE_DESC: "neuesIntervall = altesIntervall * anpassungsfaktor / 100.", // todo
+    BASE_EASE: "Basis der Einfachheit",
+    BASE_EASE_DESC: "Minimum ist 130. Empfohlen wird ca. 250.",
+    BASE_EASE_MIN_WARNING: "Basis der Einfachheit muss mindestens 130 sein.",
+    LAPSE_INTERVAL_CHANGE: "Anpassungsfaktor des Intervalls wenn eine Notiz / Karte 'Schwer' abgeschlossen wird",
+    LAPSE_INTERVAL_CHANGE_DESC: "neuesIntervall = altesIntervall * anpassungsfaktor / 100.",
     EASY_BONUS: "Einfachheit-Bonus",
     EASY_BONUS_DESC:
             "Der Einfachheit-Bonus gibt an um welchen Faktor (in Prozent) das Intervall länger sein soll, wenn eine Notiz / Karte 'Einfach' statt 'Gut' abgeschlossen wird. Minimum ist 100%.",
@@ -118,14 +107,14 @@ export default {
     MAX_INTERVAL: "Maximales Intervall",
     MAX_INTERVAL_DESC: "Das maximale Intervall (in Tagen) für Wiederholungen. Standard sind 100 Jahre.",
     MAX_INTERVAL_MIN_WARNING: "Das maximale Interall muss mindestens ein Tag sein.",
-    MAX_LINK_CONTRIB: "Maximum link contribution", // todo
+    MAX_LINK_CONTRIB: "Maximaler Einfluss von Links",
     MAX_LINK_CONTRIB_DESC:
-            "Maximum contribution of the weighted ease of linked notes to the initial ease.", // todo
+            "Maximaler Einfluss der Einfachheiten verlinkter Notizen zur gewichteten initialen Einfachheit.",
     LOGGING: "Logging",
     DISPLAY_DEBUG_INFO: "Informationen zum Debugging in der Entwicklerkonsole anzeigen?",
 
     // sidebar.ts
-    NOTES_REVIEW_QUEUE: "Notes Review Queue", // todo
+    NOTES_REVIEW_QUEUE: "Anstehende Notizen zur Wiederholung",
     CLOSE: "Schliessen",
     NEW: "Neu",
     YESTERDAY: "Gestern",
@@ -147,10 +136,10 @@ export default {
     INTERVALS_SUMMARY: "Durchschnittliches Intervall: ${avg}, Längstes Intervall: ${longest}",
     EASES: "Einfachheiten",
     EASES_SUMMARY: "Durchschnittliche Einfachheit: ${avgEase}",
-    CARD_TYPES: "Card Types", // todo
-    CARD_TYPES_DESC: "This includes buried cards as well, if any", // todo
-    CARD_TYPE_NEW: "New", // todo
-    CARD_TYPE_YOUNG: "Young", // todo
-    CARD_TYPE_MATURE: "Mature", // todo
-    CARD_TYPES_SUMMARY: "Total cards: ${totalCardsCount}", // todo
+    CARD_TYPES: "Kategorien von Karten",
+    CARD_TYPES_DESC: "Verlegte Karten eingeschlossen",
+    CARD_TYPE_NEW: "Neu",
+    CARD_TYPE_YOUNG: "Jung",
+    CARD_TYPE_MATURE: "Ausgereift",
+    CARD_TYPES_SUMMARY: "Insgesamt ${totalCardsCount} Karten",
 };
