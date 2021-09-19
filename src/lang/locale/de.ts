@@ -5,7 +5,7 @@
 
 export default {
     // flashcard-modal.ts
-    DECKS: "Stapeln",
+    DECKS: "Stapel",
     DUE_CARDS: "Anstehende Karten",
     NEW_CARDS: "Neue Karten",
     TOTAL_CARDS: "Alle Karten",
@@ -45,22 +45,22 @@ export default {
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition Plugin - Einstellungen",
-    CHECK_WIKI: 'Weitere Informationen gibt es im <a href="${wiki_url}">Wiki (English)</a>.',
+    CHECK_WIKI: 'Weitere Informationen gibt es im <a href="${wiki_url}">Wiki</a> (english).',
     FOLDERS_TO_IGNORE: "Ausgeschlossene Ordner",
-    FOLDERS_TO_IGNORE_DESC: "Mehrere Ordner mit Zeilenumbrüchen getrennt angeben. Bsp. OrdnerA OrdnerB/Unterordner",
+    FOLDERS_TO_IGNORE_DESC: "Mehrere Ordner mit Zeilenumbrüchen getrennt angeben. Bsp. OrdnerA[Zeilenumbruch]OrdnerB/Unterordner",
     FLASHCARDS: "Lernkarten",
     FLASHCARD_TAGS: "Lernkarten Tags",
     FLASHCARD_TAGS_DESC:
-            "Mehrere Tags mit Leerzeichen oder Zeilenumbrüchen getrennt angeben. Bsp. #lernkarte #stapel2 #stapel3.",
-    CONVERT_FOLDERS_TO_DECKS: "Ordner in Stapeln und Substapeln umwandeln?",
+            "Mehrere Tags mit Leerzeichen oder Zeilenumbrüchen getrennt angeben. Bsp. #karte #stapel2 #stapel3.",
+    CONVERT_FOLDERS_TO_DECKS: "Ordner in Stapel und Substapel umwandeln?",
     CONVERT_FOLDERS_TO_DECKS_DESC: "Eine Alternative zur oberen \"Lernkarten Tags\" Option.",
     INLINE_SCHEDULING_COMMENTS:
             "Den Fortschritt in der gleichen Zeile wie die letzte Zeile einer Lernkartei speichern?",
     INLINE_SCHEDULING_COMMENTS_DESC:
-            "Wenn aktiviert werden der HTML Kommentar die umgebende Liste nicht aufbrechen.",
+            "Wenn aktiviert, wird der HTML Kommentar die umgebende Liste nicht aufbrechen.",
     BURY_SIBLINGS_TILL_NEXT_DAY: "Verwandte Karten auf den nächsten Tag verlegen?",
     BURY_SIBLINGS_TILL_NEXT_DAY_DESC:
-            "Verwandte Karten sind aus der gleichen Karte generiert worden (z.B. cloze Karten).",
+            "Verwandte Karten sind aus der gleichen Karte generiert worden (z.B. Lückentextkarten oder beidseitige Karten).",
     SHOW_CARD_CONTEXT: "Kontext in den Karten anzeigen?",
     SHOW_CARD_CONTEXT_DESC: "Bsp. Titel > Überschrift 1 > Sektion > ... > Untersektion",
     CARD_MODAL_HEIGHT_PERCENT: "Höhe der Lernkartei in Prozent",
@@ -70,18 +70,18 @@ export default {
     CARD_MODAL_WIDTH_PERCENT: "Breite einer Lernkarte in Prozent",
     FILENAME_OR_OPEN_FILE: "Während der Wiederholung den Notiznamen statt 'Später bearbeiten' anzeigen?",
     RANDOMIZE_CARD_ORDER: "Während der Wiederhoung die Reihenfolge zufällig mischen?",
-    DISABLE_CLOZE_CARDS: "Cloze Karten deaktivieren?",
-    CONVERT_HIGHLIGHTS_TO_CLOZES: "==Hervorgehobenen== Text in cloze Karten umwandeln?",
-    CONVERT_BOLD_TEXT_TO_CLOZES: "**Fettgedruckten** Text in cloze Karten umwandeln?",
+    DISABLE_CLOZE_CARDS: "Lückentextkarten (cloze deletions) deaktivieren?",
+    CONVERT_HIGHLIGHTS_TO_CLOZES: "==Hervorgehobenen== Text in Lückentextkarten umwandeln?",
+    CONVERT_BOLD_TEXT_TO_CLOZES: "**Fettgedruckten** Text in Lückentextkarten umwandeln?",
     INLINE_CARDS_SEPARATOR: "Trennzeichen für einzeilige Lernkarten",
     FIX_SEPARATORS_MANUALLY_WARNING:
-            "Wenn diese Einstellung geändert wird, dann müssen die entsprechenden Lernkarten manuell angepasst werden angepasst werden.",
+            "Wenn diese Einstellung geändert wird, dann müssen die entsprechenden Lernkarten manuell angepasst werden.",
     INLINE_REVERSED_CARDS_SEPARATOR: "Trennzeichen für einzeilige beidseitige Lernkarten",
     MULTILINE_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige Lernkarten",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige beidseitige Lernkarten",
     NOTES: "Notizen",
     TAGS_TO_REVIEW: "Zu wiederholende Tags",
-    TAGS_TO_REVIEW_DESC: "Mehrere Tags können mit Leerzeichen oder Zeilenumbrüchen getrennt angegeben werden. Bsp. #prüfen #tag1 #tag2.",
+    TAGS_TO_REVIEW_DESC: "Mehrere Tags können mit Leerzeichen oder Zeilenumbrüchen getrennt angegeben werden. Bsp. #karte #tag1 #tag2.",
     OPEN_RANDOM_NOTE: "Zufällige Karten wiederholen",
     OPEN_RANDOM_NOTE_DESC: "Wenn dies deaktiviert wird, dann werden die Notizen nach Wichtigkeit wiederholt (PageRank).",
     AUTO_NEXT_NOTE: "Nach einer Wiederholung automatisch die nächste Karte öffnen",
@@ -89,12 +89,12 @@ export default {
             "Optionen zur Wiederholung im Menü einer Datei deaktivieren. Bsp. Wiederholen: Einfach Gut Schwer",
     DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
             "Nach dem Deaktivieren können die Tastenkürzel zur Wiederholung verwendet werden. Obsidian muss nach einer Änderung neu geladen weren.",
-    MAX_N_DAYS_REVIEW_QUEUE: "Maximale Anzahl der anstehender Notizen, die im rechten Fensterbereich angezeigt werden",
+    MAX_N_DAYS_REVIEW_QUEUE: "Maximale Anzahl anstehender Notizen, die im rechten Fensterbereich angezeigt werden",
     MIN_ONE_DAY: "Anzahl der Tage muss mindestens 1 sein.",
     VALID_NUMBER_WARNING: "Bitte eine gültige Zahl eingeben.",
     ALGORITHM: "Algorithmus",
     CHECK_ALGORITHM_WIKI:
-            'Weiterführende Informationen: <a href="${algo_url}">Implementierung des Algorithmus (English)</a>.',
+            'Weiterführende Informationen: <a href="${algo_url}">Implementierung des Algorithmus</a> (english).',
     BASE_EASE: "Basis der Einfachheit",
     BASE_EASE_DESC: "Minimum ist 130. Empfohlen wird ca. 250.",
     BASE_EASE_MIN_WARNING: "Basis der Einfachheit muss mindestens 130 sein.",
@@ -109,7 +109,7 @@ export default {
     MAX_INTERVAL_MIN_WARNING: "Das maximale Interall muss mindestens ein Tag sein.",
     MAX_LINK_CONTRIB: "Maximaler Einfluss von Links",
     MAX_LINK_CONTRIB_DESC:
-            "Maximaler Einfluss der Einfachheiten verlinkter Notizen zur gewichteten initialen Einfachheit.",
+            "Maximaler Einfluss der Einfachheiten verlinkter Notizen zur gewichteten initialen Einfachheit einer neuen Lernkarte.",
     LOGGING: "Logging",
     DISPLAY_DEBUG_INFO: "Informationen zum Debugging in der Entwicklerkonsole anzeigen?",
 
@@ -123,7 +123,7 @@ export default {
 
     // stats-modal.ts
     STATS_TITLE: "Statistiken",
-    OBSIDIAN_CHARTS_REQUIRED: "Hinweis: Das Obsidian Charts plugin wird benötigt um die Statistiken anzuzeigen.",
+    OBSIDIAN_CHARTS_REQUIRED: "Hinweis: Das Obsidian Charts Plugin wird benötigt um die Statistiken anzuzeigen.",
     FORECAST: "Prognose",
     FORECAST_DESC: "Anzahl der künftig anstehenden Karten",
     SCHEDULED: "Anstehend",
@@ -134,9 +134,9 @@ export default {
     INTERVALS_DESC: "Intervalle bis Wiederholungen anstehen",
     COUNT: "Anzahl",
     INTERVALS_SUMMARY: "Durchschnittliches Intervall: ${avg}, Längstes Intervall: ${longest}",
-    EASES: "Einfachheiten",
+    EASES: "Einfachheit",
     EASES_SUMMARY: "Durchschnittliche Einfachheit: ${avgEase}",
-    CARD_TYPES: "Kategorien von Karten",
+    CARD_TYPES: "Kategorisierung",
     CARD_TYPES_DESC: "Verlegte Karten eingeschlossen",
     CARD_TYPE_NEW: "Neu",
     CARD_TYPE_YOUNG: "Jung",
