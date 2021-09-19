@@ -195,11 +195,11 @@ export class StatsModal extends Modal {
             "</div>\n\n" +
             "```chart\n" +
             "\ttype: pie\n" +
-            `\tlabels: ['New - ${Math.round(
+            `\tlabels: ['${t("CARD_TYPE_NEW")} - ${Math.round(
                 (cardStats.newCount / totalCardsCount) * 100
-            )}%', 'Young - ${Math.round(
+            )}%', '${t("CARD_TYPE_YOUNG")} - ${Math.round(
                 (cardStats.youngCount / totalCardsCount) * 100
-            )}%', 'Mature - ${Math.round((cardStats.matureCount / totalCardsCount) * 100)}%']\n` +
+            )}%', '${t("CARD_TYPE_MATURE")} - ${Math.round((cardStats.matureCount / totalCardsCount) * 100)}%']\n` +
             "\tseries:\n" +
             `\t\t- data: [${cardStats.newCount}, ${cardStats.youngCount}, ${cardStats.matureCount}]\n` +
             "\twidth: 40%\n" +
