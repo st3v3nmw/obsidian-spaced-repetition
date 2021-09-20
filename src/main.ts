@@ -626,7 +626,7 @@ export default class SRPlugin extends Plugin {
             let cardText: string = parsedCard[1];
 
 
-            const tagInCardRegEx = /#[^\s]+/ig;
+            const tagInCardRegEx = /#[^\s#]+/ig;
             const cardDeckPath = cardText.match(tagInCardRegEx)?.slice(-1)[0].replace("#", "").split("/");
             if(cardDeckPath) {
                 deckPath = cardDeckPath;
