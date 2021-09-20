@@ -604,10 +604,10 @@ export default class SRPlugin extends Plugin {
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         const headings: HeadingCache[] = fileCachedData.headings || [];
         let fileChanged = false,
-            deckAdded = false,
             totalNoteEase = 0,
             scheduledCount = 0;
         const settings: SRSettings = this.data.settings;
+        const noteDeckPath = deckPath;
 
         const now: number = Date.now();
         const parsedCards: [CardType, string, number][] = parse(
@@ -620,20 +620,26 @@ export default class SRPlugin extends Plugin {
             settings.convertBoldTextToClozes
         );
         for (const parsedCard of parsedCards) {
+            deckPath = noteDeckPath;
             const cardType: CardType = parsedCard[0],
-                cardText: string = parsedCard[1],
                 lineNo: number = parsedCard[2];
+            let cardText: string = parsedCard[1];
+
+
+            const tagInCardRegEx = /#[^\s]+/ig;
+            const cardDeckPath = cardText.match(tagInCardRegEx)?.slice(-1)[0].replace("#", "").split("/");
+            if(cardDeckPath) {
+                deckPath = cardDeckPath;
+                cardText = cardText.replaceAll(tagInCardRegEx, "");
+            }
+
+            this.deckTree.createDeck([...deckPath]);
 
             const cardTextHash: string = cyrb53(cardText);
 
             if (buryOnly) {
                 this.data.buryList.push(cardTextHash);
                 continue;
-            }
-
-            if (!deckAdded) {
-                this.deckTree.createDeck([...deckPath]);
-                deckAdded = true;
             }
 
             const siblingMatches: [string, string][] = [];
