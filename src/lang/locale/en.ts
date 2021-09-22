@@ -65,7 +65,7 @@ export default {
         "Should be set to 100% on mobile or if you have very large images",
     RESET_DEFAULT: "Reset to default",
     CARD_MODAL_WIDTH_PERCENT: "Flashcard Width Percentage",
-    FILENAME_OR_OPEN_FILE: "Show file name instead of 'Open file' in flashcard review?",
+    FILENAME_OR_OPEN_FILE: "Show file name instead of 'Edit Later' in flashcard review?",
     RANDOMIZE_CARD_ORDER: "Randomize card order during review?",
     DISABLE_CLOZE_CARDS: "Disable cloze cards?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Convert ==hightlights== to clozes?",
