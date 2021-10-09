@@ -49,10 +49,4 @@ Create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your 
 
 Check the [wiki](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki) for more details.
 
-## Support
-
-<sub><sup>Oh, would you look at that, a button, that just loves to be clicked. No pressure or anything though. I'll, uhh, just give you two a moment, ... okay.</sup></sub>
-
 <a href='https://ko-fi.com/M4M44DEN6' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi3.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
-
-<sub><sup>P.S. Saw that buttons thing [here](https://youtu.be/rPh7EQPSaO4?list=LL&t=238). I ain't that creative lol, but hey.</sup></sub>
