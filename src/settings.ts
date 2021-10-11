@@ -12,6 +12,7 @@ export interface SRSettings {
     showContextInCards: boolean;
     flashcardHeightPercentage: number;
     flashcardWidthPercentage: number;
+    flashcardFullScreen: boolean;
     showFileNameInFileLink: boolean;
     randomizeCardOrder: boolean;
     convertHighlightsToClozes: boolean;
@@ -227,6 +228,18 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
+
+        new Setting(containerEl)
+            .setName(t("CARD_MODAL_FULL_SCREEN"))
+            .setDesc(t("CARD_MODAL_FULL_SCREEN_DESC"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.flashcardFullScreen)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.flashcardFullScreen = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
 
         new Setting(containerEl).setName(t("FILENAME_OR_OPEN_FILE")).addToggle((toggle) =>
             toggle

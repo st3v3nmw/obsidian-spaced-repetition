@@ -50,6 +50,10 @@ export class FlashcardModal extends Modal {
         }
         this.modalEl.style.height = this.plugin.data.settings.flashcardHeightPercentage + "%";
         this.modalEl.style.width = this.plugin.data.settings.flashcardWidthPercentage + "%";
+        if (this.plugin.data.settings.flashcardFullScreen) {
+            this.modalEl.style.minHeight = "100%";
+            this.modalEl.style.minWidth = "100%";
+        }
 
         this.contentEl.style.position = "relative";
         this.contentEl.style.height = "92%";
@@ -143,7 +147,7 @@ export class FlashcardModal extends Modal {
             activeView.editor.setCursor({
                 line: this.currentCard.lineNo,
                 ch: 0,
-            });            
+            });
             this.currentDeck.deleteFlashcardAtIndex(
                 this.currentCardIdx,
                 this.currentCard.isDue

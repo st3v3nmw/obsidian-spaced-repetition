@@ -68,6 +68,8 @@ export default {
             "Auf kleinen Bildschirmen (z.B. Smartphones) oder bei sehr grossen Bildern sollte dieser Wert auf 100% gesetzt werden.",
     RESET_DEFAULT: "Standardeinstellung wiederherstellen",
     CARD_MODAL_WIDTH_PERCENT: "Breite einer Lernkarte in Prozent",
+    CARD_MODAL_FULL_SCREEN: "Vollbildschirmmodus",
+    CARD_MODAL_FULL_SCREEN_DESC: "Die Lernkarte wird immer auf der vollen Bildschirmbreite- und höhe angezeigt",
     FILENAME_OR_OPEN_FILE: "Während der Wiederholung den Notiznamen statt 'Später bearbeiten' anzeigen?",
     RANDOMIZE_CARD_ORDER: "Während der Wiederhoung die Reihenfolge zufällig mischen?",
     DISABLE_CLOZE_CARDS: "Lückentextkarten (cloze deletions) deaktivieren?",
