@@ -47,6 +47,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     showContextInCards: true,
     flashcardHeightPercentage: Platform.isMobile ? 100 : 80,
     flashcardWidthPercentage: Platform.isMobile ? 100 : 40,
+    flashcardFullScreen: false,
     showFileNameInFileLink: false,
     randomizeCardOrder: true,
     convertHighlightsToClozes: true,
