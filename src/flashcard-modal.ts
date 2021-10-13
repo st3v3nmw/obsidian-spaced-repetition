@@ -425,7 +425,7 @@ export class FlashcardModal extends Modal {
                     }, (img) => {
                         if (el.hasAttribute("width"))
                             img.setAttribute("width", el.getAttribute("width"));
-                        else
+                        else if (!this.plugin.data.settings.flashcardFullScreen)
                             img.setAttribute("width", "100%");
                         if (el.hasAttribute("alt"))
                             img.setAttribute("alt", el.getAttribute("alt"));
