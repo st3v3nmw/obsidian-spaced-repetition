@@ -25,7 +25,7 @@
 
 .sr-deck-counts {
     color: #ffffff;
-    margin-left: 4px; 
+    margin-left: 4px;
 }
 
 #sr-show-answer {
@@ -76,6 +76,10 @@
 #sr-flashcard-view {
     overflow-y: auto;
     height: 80%;
+}
+
+#sr-flashcard-view img {
+    object-fit: none;
 }
 
 .sr-ignorestats-btn{
