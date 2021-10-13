@@ -97,6 +97,10 @@
         display: none;
     }
 
+    #sr-flashcard-view img {
+        min-width: 100%;
+    }
+
     .sr-response,
     #sr-show-answer {
         width: 95% !important;
