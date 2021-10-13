@@ -1,4 +1,4 @@
-import { Notice, Plugin, TAbstractFile, TFile, HeadingCache, getAllTags } from "obsidian";
+import { Notice, Plugin, TAbstractFile, TFile, HeadingCache, getAllTags, Platform } from "obsidian";
 import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
@@ -88,7 +88,7 @@ export default class SRPlugin extends Plugin {
         this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
             await this.sync();
 
-            if (this.data.settings.flashcardFullScreen)
+            if (!Platform.isMobile && this.data.settings.flashcardFullScreen)
                 window.document.documentElement.requestFullscreen();
             new FlashcardModal(this.app, this).open();
         });
