@@ -87,6 +87,9 @@ export default class SRPlugin extends Plugin {
 
         this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
             await this.sync();
+
+            if (this.data.settings.flashcardFullScreen)
+                window.document.documentElement.requestFullscreen();
             new FlashcardModal(this.app, this).open();
         });
 
