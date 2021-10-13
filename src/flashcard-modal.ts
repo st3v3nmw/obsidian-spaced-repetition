@@ -93,6 +93,8 @@ export class FlashcardModal extends Modal {
     }
 
     onClose(): void {
+        if (!Platform.isMobile && this.plugin.data.settings.flashcardFullScreen)
+            window.document.exitFullscreen();
         this.mode = FlashcardModalMode.Closed;
     }
 
