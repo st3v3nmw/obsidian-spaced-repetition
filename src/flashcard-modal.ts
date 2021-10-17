@@ -425,9 +425,9 @@ export class FlashcardModal extends Modal {
                             img.setAttribute("width", "100%");
                         if (el.hasAttribute("alt"))
                             img.setAttribute("alt", el.getAttribute("alt"));
-                        el.addEventListener("click", (ev) => {
-                            ev.target.style.minWidth = ev.target.style.minWidth === "100%" ? "null" : "100%";
-                        });
+                        el.addEventListener("click", (ev) =>
+                            ev.target.style.minWidth = ev.target.style.minWidth === "100%" ? null : "100%"
+                        );
                     });
                     el.addClasses(["image-embed", "is-loaded"]);
                 }
