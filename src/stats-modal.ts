@@ -91,7 +91,7 @@ export class StatsModal extends Modal {
             "\tstacked: true\n" +
             "````\n" +
             "\n<div style='text-align:center'>" +
-            t("REVIEWS_PER_DAY").interpolate({ avg: (scheduledCount / maxN).toFixed(1) }) +
+            t("REVIEWS_PER_DAY", { avg: (scheduledCount / maxN).toFixed(1) }) +
             "</div>";
 
         maxN = Math.max(...getKeysPreserveType(cardStats.intervals));
@@ -140,7 +140,7 @@ export class StatsModal extends Modal {
             "\tstacked: true\n" +
             "````\n" +
             "\n<div style='text-align:center'>" +
-            t("INTERVALS_SUMMARY").interpolate({
+            t("INTERVALS_SUMMARY", {
                 avg: average_interval,
                 longest: longest_interval,
             }) +
@@ -179,7 +179,7 @@ export class StatsModal extends Modal {
             "\tstacked: true\n" +
             "````\n" +
             "\n<div style='text-align:center'>" +
-            t("EASES_SUMMARY").interpolate({ avgEase: average_ease }) +
+            t("EASES_SUMMARY", { avgEase: average_ease }) +
             "</div>";
 
         // Add card types
@@ -206,7 +206,7 @@ export class StatsModal extends Modal {
             "\tlabelColors: true\n" +
             "```\n" +
             "\n<div style='text-align:center'>" +
-            t("CARD_TYPES_SUMMARY").interpolate({ totalCardsCount }) +
+            t("CARD_TYPES_SUMMARY", { totalCardsCount }) +
             "</div>";
 
         MarkdownRenderer.renderMarkdown(text, contentEl, "", this.plugin);

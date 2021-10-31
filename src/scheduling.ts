@@ -104,11 +104,11 @@ export function textInterval(interval: number, isMobile: boolean): string {
         else return `${y}y`;
     } else {
         if (interval < 30) {
-            return t("DAYS_STR_IVL").interpolate({ interval });
+            return t("DAYS_STR_IVL", { interval });
         } else if (interval < 365) {
-            return t("MONTHS_STR_IVL").interpolate({ interval: m });
+            return t("MONTHS_STR_IVL", { interval: m });
         } else {
-            return t("YEARS_STR_IVL").interpolate({ interval: y });
+            return t("YEARS_STR_IVL", { interval: y });
         }
     }
 }

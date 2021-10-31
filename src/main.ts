@@ -44,13 +44,6 @@ export interface LinkStat {
     linkCount: number;
 }
 
-// https://stackoverflow.com/a/41015840/
-String.prototype.interpolate = function (params: Record<string, unknown>) {
-    const names: string[] = Object.keys(params);
-    const vals: unknown[] = Object.values(params);
-    return new Function(...names, `return \`${this}\`;`)(...vals);
-};
-
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     private reviewQueueView: ReviewQueueListView;
@@ -380,14 +373,14 @@ export default class SRPlugin extends Plugin {
         if (this.data.settings.showDebugMessages) {
             console.log(
                 "SR: " +
-                    t("SYNC_TIME_TAKEN").interpolate({
+                    t("SYNC_TIME_TAKEN", {
                         t: Date.now() - now.valueOf(),
                     })
             );
         }
 
         this.statusBar.setText(
-            t("STATUS_BAR").interpolate({
+            t("STATUS_BAR", {
                 dueNotesCount: this.dueNotesCount,
                 dueFlashcardsCount: this.deckTree.dueFlashcardsCount,
             })
@@ -548,7 +541,7 @@ export default class SRPlugin extends Plugin {
 
     async reviewNextNote(deckKey: string): Promise<void> {
         if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, deckKey)) {
-            new Notice(t("NO_DECK_EXISTS").interpolate({ deckName: deckKey }));
+            new Notice(t("NO_DECK_EXISTS", { deckName: deckKey }));
             return;
         }
 
