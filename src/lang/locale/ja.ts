@@ -3,8 +3,8 @@
 export default {
     // flashcard-modal.ts
     DECKS: "デッキ",
-    DUE_CARDS: "期限のカード",
-    NEW_CARDS: "新規カード",
+    DUE_CARDS: "期日のカード",
+    NEW_CARDS: "新規のカード",
     TOTAL_CARDS: "カード合計",
     EDIT_LATER: "後で編集",
     RESET_CARD_PROGRESS: "カードの進捗をリセット",
