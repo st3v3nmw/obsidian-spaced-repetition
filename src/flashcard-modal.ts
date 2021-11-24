@@ -354,41 +354,104 @@ export class FlashcardModal extends Modal {
     // slightly modified version of the renderMarkdown function in
     // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/KanbanView.tsx
     async renderMarkdownWrapper(markdownString: string, containerEl: HTMLElement): Promise<void> {
-        MarkdownRenderer.renderMarkdown(
-            markdownString,
-            containerEl,
-            this.currentCard.note.path,
-            this.plugin
-        );
-        containerEl.findAll(".internal-embed").forEach((el) => {
-            const src: string = el.getAttribute("src");
-            const target: TFile | null | false =
-                typeof src === "string" &&
-                this.plugin.app.metadataCache.getFirstLinkpathDest(src, this.currentCard.note.path);
-            if (target instanceof TFile && target.extension !== "md") {
-                el.innerText = "";
-                el.createEl(
-                    "img",
-                    {
-                        attr: {
-                            src: this.plugin.app.vault.getResourcePath(target),
-                        },
-                    },
-                    (img) => {
-                        if (el.hasAttribute("width"))
-                            img.setAttribute("width", el.getAttribute("width"));
-                        else img.setAttribute("width", "100%");
-                        if (el.hasAttribute("alt")) img.setAttribute("alt", el.getAttribute("alt"));
-                    }
-                );
-                el.addClasses(["image-embed", "is-loaded"]);
-            }
+        MarkdownRenderer.renderMarkdown(markdownString, containerEl, this.currentCard.note.path, this.plugin);
 
-            // file does not exist
-            // display dead link
-            if (target === null) {
-                el.innerText = src;
+        containerEl.findAll(".internal-embed").forEach((el) => {
+            const link = this.parseLink(el.getAttribute("src"));
+
+            // file does not exist, display dead link
+            if (!link.target) {
+                el.innerText = link.text;
+            } else if (link.target instanceof TFile) {
+                if (link.target.extension !== "md") {
+                    this.embedMediaFile(el, link.target);
+                } else {
+                    el.innerText = "";
+                    this.renderTransclude(el, link);
+                }
             }
+        });
+    }
+
+    parseLink(src) {
+        const linkComponentsRegex = /^(?<file>[^#\^]+)?(?:#(?!\^)(?<heading>.+)|#\^(?<blockId>.+)|#)?$/
+        const matched = typeof src === "string" && src.match(linkComponentsRegex);
+        const file = matched.groups.file || this.currentCard.note.path;
+        const target = this.plugin.app.metadataCache.getFirstLinkpathDest(file, this.currentCard.note.path);
+        // move lookup upstream? ^^^
+        return {text: matched[0], file: matched.groups.file, heading: matched.groups.heading, blockId: matched.groups.blockId, target: target}
+    }
+
+    embedMediaFile(el, target) {
+        if (target.extension == "mp3" ) {
+            el.innerText = "";
+            el.createEl("audio", {
+                attr: {
+                    controls: "",
+                    src: this.plugin.app.vault.getResourcePath(target)
+                }
+            }, (img) => {
+                if (el.hasAttribute("alt"))
+                    img.setAttribute("alt", el.getAttribute("alt"));
+            });
+            el.addClasses(["media-embed", "is-loaded"]);
+        } else if (target.extension == "webm") {
+            el.innerText = "";
+            el.createEl("audio", {
+                attr: {
+                    controls: "",
+                    src: this.plugin.app.vault.getResourcePath(target)
+                }
+            }, (img) => {
+                if (el.hasAttribute("alt"))
+                    img.setAttribute("alt", el.getAttribute("alt"));
+            });
+            el.addClasses(["media-embed", "is-loaded"]);
+        } else {
+            el.innerText = "";
+            el.createEl("img", {
+                attr: {
+                    src: this.plugin.app.vault.getResourcePath(target)
+                }
+            }, (img) => {
+                if (el.hasAttribute("width"))
+                    img.setAttribute("width", el.getAttribute("width"));
+                else
+                    img.setAttribute("width", "100%");
+                if (el.hasAttribute("alt"))
+                    img.setAttribute("alt", el.getAttribute("alt"));
+            });
+
+            el.addClasses(["image-embed", "is-loaded"]);
+        }
+    }
+
+    async renderTransclude(el, link) {
+        const cache = app.metadataCache.getCache(link.target.path);
+        const text = await app.vault.cachedRead(link.target);
+        let blockText;
+        if (link.heading) {
+            const clean = (s) => s.replace(/[\W\s]/g, '');
+            const headingIndex = cache.headings?.findIndex( (h) => clean(h.heading) === clean(link.heading) );
+            const heading = cache.headings[headingIndex];
+
+            const startAt = heading.position.start.offset;
+            const endAt = cache.headings.slice(headingIndex + 1).find( (h) => h.level <= heading.level )?.position?.start?.offset || text.length;
+
+            blockText = text.substring(startAt, endAt);
+        } else if (link.blockId) {
+            const block = cache.blocks[link.blockId];
+            const startAt = block.position.start.offset;
+            const endAt = block.position.end.offset;
+            blockText = text.substring(startAt, endAt);
+        } else {
+            blockText = text;
+        }
+
+        MarkdownRenderer.renderMarkdown(blockText, el, link.target.path, this.plugin);
+
+        el.findAll(".internal-embed").forEach((el) => {
+            this.embedMediaFile(el, this.parseLink(el.getAttribute("src")).target);
         });
     }
 }
