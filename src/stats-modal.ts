@@ -91,7 +91,7 @@ export class StatsModal extends Modal {
             "\tstacked: true\n" +
             "````\n" +
             "\n<div style='text-align:center'>" +
-            t("REVIEWS_PER_DAY").interpolate({ avg: (scheduledCount / maxN).toFixed(1) }) +
+            t("REVIEWS_PER_DAY", { avg: (scheduledCount / maxN).toFixed(1) }) +
             "</div>";
 
         maxN = Math.max(...getKeysPreserveType(cardStats.intervals));
@@ -140,7 +140,7 @@ export class StatsModal extends Modal {
             "\tstacked: true\n" +
             "````\n" +
             "\n<div style='text-align:center'>" +
-            t("INTERVALS_SUMMARY").interpolate({
+            t("INTERVALS_SUMMARY", {
                 avg: average_interval,
                 longest: longest_interval,
             }) +
@@ -179,7 +179,7 @@ export class StatsModal extends Modal {
             "\tstacked: true\n" +
             "````\n" +
             "\n<div style='text-align:center'>" +
-            t("EASES_SUMMARY").interpolate({ avgEase: average_ease }) +
+            t("EASES_SUMMARY", { avgEase: average_ease }) +
             "</div>";
 
         // Add card types
@@ -195,18 +195,18 @@ export class StatsModal extends Modal {
             "</div>\n\n" +
             "```chart\n" +
             "\ttype: pie\n" +
-            `\tlabels: ['New - ${Math.round(
+            `\tlabels: ['${t("CARD_TYPE_NEW")} - ${Math.round(
                 (cardStats.newCount / totalCardsCount) * 100
-            )}%', 'Young - ${Math.round(
+            )}%', '${t("CARD_TYPE_YOUNG")} - ${Math.round(
                 (cardStats.youngCount / totalCardsCount) * 100
-            )}%', 'Mature - ${Math.round((cardStats.matureCount / totalCardsCount) * 100)}%']\n` +
+            )}%', '${t("CARD_TYPE_MATURE")} - ${Math.round((cardStats.matureCount / totalCardsCount) * 100)}%']\n` +
             "\tseries:\n" +
             `\t\t- data: [${cardStats.newCount}, ${cardStats.youngCount}, ${cardStats.matureCount}]\n` +
             "\twidth: 40%\n" +
             "\tlabelColors: true\n" +
             "```\n" +
             "\n<div style='text-align:center'>" +
-            t("CARD_TYPES_SUMMARY").interpolate({ totalCardsCount }) +
+            t("CARD_TYPES_SUMMARY", { totalCardsCount }) +
             "</div>";
 
         MarkdownRenderer.renderMarkdown(text, contentEl, "", this.plugin);

@@ -41,17 +41,20 @@ export class ReviewQueueListView extends ItemView {
     }
 
     public redraw(): void {
-        const openFile: TFile | null = this.app.workspace.getActiveFile();
+        const activeFile: TFile | null = this.app.workspace.getActiveFile();
 
-        const rootEl: HTMLElement = createDiv("nav-folder mod-root"),
-            childrenEl: HTMLElement = rootEl.createDiv("nav-folder-children");
+        const rootEl: HTMLElement = createDiv("nav-folder mod-root");
+        const childrenEl: HTMLElement = rootEl.createDiv("nav-folder-children");
 
         for (const deckKey in this.plugin.reviewDecks) {
             const deck: ReviewDeck = this.plugin.reviewDecks[deckKey];
 
+            const deckCollapsed = !deck.activeFolders.has(deck.deckName);
+
             const deckFolderEl: HTMLElement = this.createRightPaneFolder(
                 childrenEl,
                 deckKey,
+                deckCollapsed,
                 false,
                 deck
             ).getElementsByClassName("nav-folder-children")[0] as HTMLElement;
@@ -61,15 +64,25 @@ export class ReviewQueueListView extends ItemView {
                     deckFolderEl,
                     t("NEW"),
                     !deck.activeFolders.has(t("NEW")),
+                    deckCollapsed,
                     deck
                 );
 
                 for (const newFile of deck.newNotes) {
+                    const fileIsOpen = activeFile && newFile.path === activeFile.path;
+                    if (fileIsOpen) {
+                        deck.activeFolders.add(deck.deckName);
+                        deck.activeFolders.add(t("NEW"));
+                        this.changeFolderIconToExpanded(newNotesFolderEl);
+                        this.changeFolderIconToExpanded(deckFolderEl);
+                    }
                     this.createRightPaneFile(
                         newNotesFolderEl,
                         newFile,
-                        openFile && newFile.path === openFile.path,
-                        !deck.activeFolders.has(t("NEW"))
+                        fileIsOpen,
+                        !deck.activeFolders.has(t("NEW")),
+                        deck,
+                        this.plugin,
                     );
                 }
             }
@@ -103,16 +116,27 @@ export class ReviewQueueListView extends ItemView {
                             deckFolderEl,
                             folderTitle,
                             !deck.activeFolders.has(folderTitle),
+                            deckCollapsed,
                             deck
                         );
                         currUnix = sNote.dueUnix;
                     }
 
+                    const fileIsOpen = activeFile && sNote.note.path === activeFile.path;
+                    if (fileIsOpen) {
+                        deck.activeFolders.add(deck.deckName);
+                        deck.activeFolders.add(folderTitle);
+                        this.changeFolderIconToExpanded(schedFolderEl);
+                        this.changeFolderIconToExpanded(deckFolderEl);
+                    }
+
                     this.createRightPaneFile(
                         schedFolderEl,
                         sNote.note,
-                        openFile && sNote.note.path === openFile.path,
-                        !deck.activeFolders.has(folderTitle)
+                        fileIsOpen,
+                        !deck.activeFolders.has(folderTitle),
+                        deck,
+                        this.plugin,
                     );
                 }
             }
@@ -127,14 +151,15 @@ export class ReviewQueueListView extends ItemView {
         parentEl: HTMLElement,
         folderTitle: string,
         collapsed: boolean,
+        hidden: boolean,
         deck: ReviewDeck
     ): HTMLElement {
-        const folderEl: HTMLDivElement = parentEl.createDiv("nav-folder"),
-            folderTitleEl: HTMLDivElement = folderEl.createDiv("nav-folder-title"),
-            childrenEl: HTMLDivElement = folderEl.createDiv("nav-folder-children"),
-            collapseIconEl: HTMLDivElement = folderTitleEl.createDiv(
-                "nav-folder-collapse-indicator collapse-icon"
-            );
+        const folderEl: HTMLDivElement = parentEl.createDiv("nav-folder");
+        const folderTitleEl: HTMLDivElement = folderEl.createDiv("nav-folder-title");
+        const childrenEl: HTMLDivElement = folderEl.createDiv("nav-folder-children");
+        const collapseIconEl: HTMLDivElement = folderTitleEl.createDiv(
+            "nav-folder-collapse-indicator collapse-icon"
+        );
 
         collapseIconEl.innerHTML = COLLAPSE_ICON;
         if (collapsed) {
@@ -142,6 +167,10 @@ export class ReviewQueueListView extends ItemView {
         }
 
         folderTitleEl.createDiv("nav-folder-title-content").setText(folderTitle);
+
+        if (hidden) {
+            folderEl.style.display = "none";
+        }
 
         folderTitleEl.onClickEvent(() => {
             for (const child of childrenEl.childNodes as NodeListOf<HTMLElement>) {
@@ -165,7 +194,9 @@ export class ReviewQueueListView extends ItemView {
         folderEl: HTMLElement,
         file: TFile,
         fileElActive: boolean,
-        hidden: boolean
+        hidden: boolean,
+        deck: ReviewDeck,
+        plugin: SRPlugin,
     ): void {
         const navFileEl: HTMLElement = folderEl
             .getElementsByClassName("nav-folder-children")[0]
@@ -184,6 +215,7 @@ export class ReviewQueueListView extends ItemView {
             "click",
             (event: MouseEvent) => {
                 event.preventDefault();
+                plugin.lastSelectedReviewDeck = deck.deckName;
                 this.app.workspace.activeLeaf.openFile(file);
                 return false;
             },
@@ -204,5 +236,10 @@ export class ReviewQueueListView extends ItemView {
             },
             false
         );
+    }
+
+    private changeFolderIconToExpanded(folderEl: HTMLElement): void {
+        const collapseIconEl = folderEl.find("div.nav-folder-collapse-indicator");
+        (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "";
     }
 }

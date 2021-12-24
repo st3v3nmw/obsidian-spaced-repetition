@@ -25,6 +25,7 @@ export class FlashcardModal extends Modal {
     public hardBtn: HTMLElement;
     public goodBtn: HTMLElement;
     public easyBtn: HTMLElement;
+    public nextBtn: HTMLElement;
     public responseDiv: HTMLElement;
     public fileLinkView: HTMLElement;
     public resetLinkView: HTMLElement;
@@ -34,11 +35,13 @@ export class FlashcardModal extends Modal {
     public currentDeck: Deck;
     public checkDeck: Deck;
     public mode: FlashcardModalMode;
+    public ignoreStats: Boolean;
 
-    constructor(app: App, plugin: SRPlugin) {
+    constructor(app: App, plugin: SRPlugin, ignoreStats: Boolean = false) {
         super(app);
 
         this.plugin = plugin;
+        this.ignoreStats = ignoreStats;
 
         this.titleEl.setText(t("DECKS"));
 
@@ -197,6 +200,14 @@ export class FlashcardModal extends Modal {
         this.answerBtn.addEventListener("click", () => {
             this.showAnswer();
         });
+
+        if (this.ignoreStats) {
+            this.goodBtn.style.display = 'none';
+
+            this.responseDiv.addClass('sr-ignorestats-response');
+            this.easyBtn.addClass('sr-ignorestats-btn');
+            this.hardBtn.addClass('sr-ignorestats-btn');
+        }
     }
 
     showAnswer(): void {
@@ -221,6 +232,15 @@ export class FlashcardModal extends Modal {
     }
 
     async processReview(response: ReviewResponse): Promise<void> {
+
+        if (this.ignoreStats) {
+            if (response == ReviewResponse.Easy) {
+                this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+            }
+            this.currentDeck.nextCard(this);
+            return;
+        }
+
         let interval: number, ease: number, due;
 
         this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
@@ -366,24 +386,50 @@ export class FlashcardModal extends Modal {
                 typeof src === "string" &&
                 this.plugin.app.metadataCache.getFirstLinkpathDest(src, this.currentCard.note.path);
             if (target instanceof TFile && target.extension !== "md") {
-                el.innerText = "";
-                el.createEl(
-                    "img",
-                    {
+                if (target.extension == "mp3" ) {
+                //<span alt="terra.mp3" src="terra.mp3" class="internal-embed media-embed is-loaded"><audio controls="" src="app://local/%2FUsers%2Fcareilly%2FLibrary%2FMobile%20Documents%2FiCloud~md~obsidian%2FDocuments%2FNotes%2FLanguages%2FItalian%2FFFItalianWordList%2F625%20Collection%2Fterra.mp3?1424097892000"></audio></span>
+                    el.innerText = "";
+                    el.createEl("audio", {
                         attr: {
-                            src: this.plugin.app.vault.getResourcePath(target),
-                        },
-                    },
-                    (img) => {
+                            controls: "",
+                            src: this.plugin.app.vault.getResourcePath(target)
+                        }
+                    }, (img) => {
+                        if (el.hasAttribute("alt"))
+                            img.setAttribute("alt", el.getAttribute("alt"));
+                    });
+                    el.addClasses(["media-embed", "is-loaded"]);
+                } else if (target.extension == "webm") {
+                    // <span alt="sample_960x400_ocean_with_audio.webm" src="sample_960x400_ocean_with_audio.webm" class="internal-embed media-embed is-loaded"><video controls="" src="app://local/%2FUsers%2Fcareilly%2FLibrary%2FMobile%20Documents%2FiCloud~md~obsidian%2FDocuments%2FNotes%2Fsample_960x400_ocean_with_audio.webm?1631986890167"></video></span>
+                    el.innerText = "";
+                    el.createEl("audio", {
+                        attr: {
+                            controls: "",
+                            src: this.plugin.app.vault.getResourcePath(target)
+                        }
+                    }, (img) => {
+                        if (el.hasAttribute("alt"))
+                            img.setAttribute("alt", el.getAttribute("alt"));
+                    });
+                    el.addClasses(["media-embed", "is-loaded"]);
+                } else {
+                    el.innerText = "";
+                    el.createEl("img", {
+                        attr: {
+                            src: this.plugin.app.vault.getResourcePath(target)
+                        }
+                    }, (img) => {
                         if (el.hasAttribute("width"))
                             img.setAttribute("width", el.getAttribute("width"));
-                        else img.setAttribute("width", "100%");
-                        if (el.hasAttribute("alt")) img.setAttribute("alt", el.getAttribute("alt"));
-                    }
-                );
-                el.addClasses(["image-embed", "is-loaded"]);
-            }
+                        else
+                            img.setAttribute("width", "100%");
+                        if (el.hasAttribute("alt"))
+                            img.setAttribute("alt", el.getAttribute("alt"));
+                    });
+                    el.addClasses(["image-embed", "is-loaded"]);
+                }
 
+            }
             // file does not exist
             // display dead link
             if (target === null) {
@@ -657,7 +703,12 @@ export class Deck {
             modal.plugin.data.settings
         ).interval;
 
-        if (Platform.isMobile) {
+        if (modal.ignoreStats)
+        {
+            // Same for mobile/desktop
+            modal.hardBtn.setText(`${t("HARD")}`);
+            modal.easyBtn.setText(`${t("EASY")}`);
+        } else if (Platform.isMobile) {
             modal.hardBtn.setText(textInterval(hardInterval, true));
             modal.goodBtn.setText(textInterval(goodInterval, true));
             modal.easyBtn.setText(textInterval(easyInterval, true));

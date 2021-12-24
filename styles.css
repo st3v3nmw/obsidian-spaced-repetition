@@ -13,6 +13,9 @@
     position: absolute;
     bottom: 0;
 }
+.sr-ignorestats-response{
+    grid-template-columns: auto auto!important;
+}
 
 .sr-centered {
     display: flex;
@@ -73,6 +76,12 @@
 #sr-flashcard-view {
     overflow-y: auto;
     height: 80%;
+}
+
+.sr-ignorestats-btn{
+    /* Bit of a hack, but it works. */
+    margin: 0px!important;
+    margin-right: 12px!important;
 }
 
 @media only screen and (max-width: 600px) {

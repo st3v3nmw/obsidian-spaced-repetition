@@ -73,7 +73,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
 
 // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
 let applyDebounceTimer = 0;
-function applySettingsUpdate(callback): void {
+function applySettingsUpdate(callback: () => void): void {
     clearTimeout(applyDebounceTimer);
     applyDebounceTimer = window.setTimeout(callback, 512);
 }
@@ -93,7 +93,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         containerEl.createDiv().innerHTML = "<h2>" + t("SETTINGS_HEADER") + "</h2>";
 
-        containerEl.createDiv().innerHTML = t("CHECK_WIKI").interpolate({
+        containerEl.createDiv().innerHTML = t("CHECK_WIKI", {
             wiki_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki",
         });
 
@@ -449,7 +449,7 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         containerEl.createDiv().innerHTML = "<h3>" + t("ALGORITHM") + "</h3>";
-        containerEl.createDiv().innerHTML = t("CHECK_ALGORITHM_WIKI").interpolate({
+        containerEl.createDiv().innerHTML = t("CHECK_ALGORITHM_WIKI", {
             algo_url:
                 "https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Spaced-Repetition-Algorithm",
         });

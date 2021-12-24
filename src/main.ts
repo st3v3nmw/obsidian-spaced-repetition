@@ -44,13 +44,6 @@ export interface LinkStat {
     linkCount: number;
 }
 
-// https://stackoverflow.com/a/41015840/
-String.prototype.interpolate = function (params: Record<string, unknown>) {
-    const names: string[] = Object.keys(params);
-    const vals: unknown[] = Object.values(params);
-    return new Function(...names, `return \`${this}\`;`)(...vals);
-};
-
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     private reviewQueueView: ReviewQueueListView;
@@ -202,6 +195,20 @@ export default class SRPlugin extends Plugin {
         });
 
         this.addCommand({
+            id: "srs-cram-flashcards-in-note",
+            name: t("CRAM_CARDS_IN_NOTE"),
+            callback: async () => {
+                const openFile: TFile | null = this.app.workspace.getActiveFile();
+                if (openFile && openFile.extension === "md") {
+                    this.deckTree = new Deck("root", null);
+                    const deckPath: string[] = this.findDeckPath(openFile);
+                    await this.findFlashcardsInNote(openFile, deckPath, false, true);
+                    new FlashcardModal(this.app, this, true).open();
+                }
+            },
+        });
+
+        this.addCommand({
             id: "srs-view-stats",
             name: t("VIEW_STATS"),
             callback: async () => {
@@ -310,15 +317,14 @@ export default class SRPlugin extends Plugin {
             const tags = getAllTags(fileCachedData) || [];
 
             let shouldIgnore = true;
-            for (const tag of tags) {
-                if (
-                    this.data.settings.tagsToReview.some(
-                        (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/")
-                    )
-                ) {
-                    if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, tag)) {
-                        this.reviewDecks[tag] = new ReviewDeck(tag);
+            const matchedNoteTags = [];
+
+            for (const tagToReview of this.data.settings.tagsToReview) {
+                if (tags.some((tag) => tag === tagToReview || tag.startsWith(tagToReview + "/"))) {
+                    if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, tagToReview)) {
+                        this.reviewDecks[tagToReview] = new ReviewDeck(tagToReview);
                     }
+                    matchedNoteTags.push(tagToReview);
                     shouldIgnore = false;
                     break;
                 }
@@ -335,10 +341,8 @@ export default class SRPlugin extends Plugin {
                     Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
                 )
             ) {
-                for (const tag of tags) {
-                    if (Object.prototype.hasOwnProperty.call(this.reviewDecks, tag)) {
-                        this.reviewDecks[tag].newNotes.push(note);
-                    }
+                for (const matchedNoteTag of matchedNoteTags) {
+                    this.reviewDecks[matchedNoteTag].newNotes.push(note);
                 }
                 continue;
             }
@@ -346,13 +350,11 @@ export default class SRPlugin extends Plugin {
             const dueUnix: number = window
                 .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
                 .valueOf();
-            for (const tag of tags) {
-                if (Object.prototype.hasOwnProperty.call(this.reviewDecks, tag)) {
-                    this.reviewDecks[tag].scheduledNotes.push({ note, dueUnix });
 
-                    if (dueUnix <= now.valueOf()) {
-                        this.reviewDecks[tag].dueNotesCount++;
-                    }
+            for (const matchedNoteTag of matchedNoteTags) {
+                this.reviewDecks[matchedNoteTag].scheduledNotes.push({ note, dueUnix });
+                if (dueUnix <= now.valueOf()) {
+                    this.reviewDecks[matchedNoteTag].dueNotesCount++;
                 }
             }
 
@@ -391,14 +393,14 @@ export default class SRPlugin extends Plugin {
         if (this.data.settings.showDebugMessages) {
             console.log(
                 "SR: " +
-                    t("SYNC_TIME_TAKEN").interpolate({
+                    t("SYNC_TIME_TAKEN", {
                         t: Date.now() - now.valueOf(),
                     })
             );
         }
 
         this.statusBar.setText(
-            t("STATUS_BAR").interpolate({
+            t("STATUS_BAR", {
                 dueNotesCount: this.dueNotesCount,
                 dueFlashcardsCount: this.deckTree.dueFlashcardsCount,
             })
@@ -559,7 +561,7 @@ export default class SRPlugin extends Plugin {
 
     async reviewNextNote(deckKey: string): Promise<void> {
         if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, deckKey)) {
-            new Notice(t("NO_DECK_EXISTS").interpolate({ deckName: deckKey }));
+            new Notice(t("NO_DECK_EXISTS", { deckName: deckKey }));
             return;
         }
 
@@ -610,15 +612,15 @@ export default class SRPlugin extends Plugin {
         return deckPath;
     }
 
-    async findFlashcardsInNote(note: TFile, deckPath: string[], buryOnly = false): Promise<number> {
+    async findFlashcardsInNote(note: TFile, deckPath: string[], buryOnly = false, ignoreStats = false): Promise<number> {
         let fileText: string = await this.app.vault.read(note);
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         const headings: HeadingCache[] = fileCachedData.headings || [];
         let fileChanged = false,
-            deckAdded = false,
             totalNoteEase = 0,
             scheduledCount = 0;
         const settings: SRSettings = this.data.settings;
+        const noteDeckPath = deckPath;
 
         const now: number = Date.now();
         const parsedCards: [CardType, string, number][] = parse(
@@ -631,20 +633,26 @@ export default class SRPlugin extends Plugin {
             settings.convertBoldTextToClozes
         );
         for (const parsedCard of parsedCards) {
+            deckPath = noteDeckPath;
             const cardType: CardType = parsedCard[0],
-                cardText: string = parsedCard[1],
                 lineNo: number = parsedCard[2];
+            let cardText: string = parsedCard[1];
+
+
+            const tagInCardRegEx = /#[^\s#]+/ig;
+            const cardDeckPath = cardText.match(tagInCardRegEx)?.slice(-1)[0].replace("#", "").split("/");
+            if(cardDeckPath) {
+                deckPath = cardDeckPath;
+                cardText = cardText.replaceAll(tagInCardRegEx, "");
+            }
+
+            this.deckTree.createDeck([...deckPath]);
 
             const cardTextHash: string = cyrb53(cardText);
 
             if (buryOnly) {
                 this.data.buryList.push(cardTextHash);
                 continue;
-            }
-
-            if (!deckAdded) {
-                this.deckTree.createDeck([...deckPath]);
-                deckAdded = true;
             }
 
             const siblingMatches: [string, string][] = [];
@@ -756,7 +764,12 @@ export default class SRPlugin extends Plugin {
                 };
 
                 // card scheduled
-                if (i < scheduling.length) {
+                if (ignoreStats)
+                {
+                    this.cardStats.newCount++;
+                    cardObj.isDue = true;
+                    this.deckTree.insertFlashcard([...deckPath], cardObj);
+                } else if (i < scheduling.length) {
                     const dueUnix: number = window
                         .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY"])
                         .valueOf();

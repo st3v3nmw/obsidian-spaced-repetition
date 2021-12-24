@@ -53,10 +53,23 @@ const localeMap: { [k: string]: Partial<typeof en> } = {
 
 const locale = localeMap[moment.locale()];
 
-export function t(str: keyof typeof en): string {
+// https://stackoverflow.com/a/41015840/
+function interpolate(str: string, params: Record<string, unknown>): string {
+    const names: string[] = Object.keys(params);
+    const vals: unknown[] = Object.values(params);
+    return new Function(...names, `return \`${str}\`;`)(...vals);
+}
+
+export function t(str: keyof typeof en, params?: Record<string, unknown>): string {
     if (!locale) {
         console.error("Error: SRS locale not found", moment.locale());
     }
 
-    return (locale && locale[str]) || en[str];
+    const result = (locale && locale[str]) || en[str];
+
+    if(params) {
+        return interpolate(result, params);
+    }
+
+    return result;
 }
