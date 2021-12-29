@@ -3,7 +3,7 @@ test("Test translation without interpolation in English", () => {
         const { moment } = require("obsidian");
         const mockLocale = moment.locale as jest.MockedFunction<() => string>;
         mockLocale.mockImplementation(() => 'en');
-        const {t} = require("src/lang/helpers");
+        const { t } = require("src/lang/helpers");
         expect(t("HARD")).toEqual("Hard");
     });
 });
@@ -13,7 +13,7 @@ test("Test translation without interpolation in German", () => {
         const { moment } = require("obsidian");
         const mockLocale = moment.locale as jest.MockedFunction<() => string>;
         mockLocale.mockImplementation(() => 'de');
-        const {t} = require("src/lang/helpers");
+        const { t } = require("src/lang/helpers");
         expect(t("HARD")).toEqual("Schwer");
     });
 });
@@ -23,10 +23,10 @@ test("Test translation with interpolation in English", () => {
         const { moment } = require("obsidian");
         const mockLocale = moment.locale as jest.MockedFunction<() => string>;
         mockLocale.mockImplementation(() => 'en');
-        const {t} = require("src/lang/helpers");
+        const { t } = require("src/lang/helpers");
         expect(
-            t("STATUS_BAR", {dueNotesCount: 1, dueFlashcardsCount: 2})
-        ).toEqual("Review: 1 notes(s), 2 card(s) due");
+            t("STATUS_BAR", { dueNotesCount: 1, dueFlashcardsCount: 2 })
+        ).toEqual("Review: 1 note(s), 2 card(s) due");
     });
 });
 
@@ -35,9 +35,9 @@ test("Test translation with interpolation in German", () => {
         const { moment } = require("obsidian");
         const mockLocale = moment.locale as jest.MockedFunction<() => string>;
         mockLocale.mockImplementation(() => 'de');
-        const {t} = require("src/lang/helpers");
+        const { t } = require("src/lang/helpers");
         expect(
-            t("STATUS_BAR", {dueNotesCount: 1, dueFlashcardsCount: 2})
+            t("STATUS_BAR", { dueNotesCount: 1, dueFlashcardsCount: 2 })
         ).toEqual("Wiederholung: 1 Notiz(en), 2 Karte(n) anstehend");
     });
 });

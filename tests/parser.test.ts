@@ -99,7 +99,7 @@ test("Test parsing of cloze cards", () => {
     expect(
         parse(
             "some text before\n\na deletion on\nsuch ==wow==\n\n" +
-                "many text\nsuch surprise ==wow== more ==text==\nsome text after\n\nHmm",
+            "many text\nsuch surprise ==wow== more ==text==\nsome text after\n\nHmm",
             ...defaultArgs
         )
     ).toEqual([
@@ -128,7 +128,7 @@ test("Test parsing of cloze cards", () => {
     expect(
         parse(
             "some text before\n\na deletion on\nsuch **wow**\n\n" +
-                "many text\nsuch surprise **wow** more **text**\nsome text after\n\nHmm",
+            "many text\nsuch surprise **wow** more **text**\nsome text after\n\nHmm",
             ...defaultArgs
         )
     ).toEqual([
@@ -151,17 +151,17 @@ test("Test parsing of a mix of card types", () => {
     expect(
         parse(
             "# Lorem Ipsum\n\nLorem ipsum dolor ==sit amet==, consectetur ==adipiscing== elit.\n" +
-                "Duis magna arcu, eleifend rhoncus ==euismod non,==\nlaoreet vitae enim.\n\n" +
-                "Fusce placerat::velit in pharetra gravida\n\n" +
-                "Donec dapibus ullamcorper aliquam.\n??\nDonec dapibus ullamcorper aliquam.\n<!--SR:2021-08-11,4,270-->",
+            "Duis magna arcu, eleifend rhoncus ==euismod non,==\nlaoreet vitae enim.\n\n" +
+            "Fusce placerat::velit in pharetra gravida\n\n" +
+            "Donec dapibus ullamcorper aliquam.\n??\nDonec dapibus ullamcorper aliquam.\n<!--SR:2021-08-11,4,270-->",
             ...defaultArgs
         )
     ).toEqual([
         [
             CardType.Cloze,
             "Lorem ipsum dolor ==sit amet==, consectetur ==adipiscing== elit.\n" +
-                "Duis magna arcu, eleifend rhoncus ==euismod non,==\n" +
-                "laoreet vitae enim.",
+            "Duis magna arcu, eleifend rhoncus ==euismod non,==\n" +
+            "laoreet vitae enim.",
             2,
         ],
         [CardType.SingleLineBasic, "Fusce placerat::velit in pharetra gravida", 6],
@@ -178,14 +178,14 @@ test("Test codeblocks", () => {
     expect(
         parse(
             "How do you ... Python?\n?\n" +
-                "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
+            "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
             ...defaultArgs
         )
     ).toEqual([
         [
             CardType.MultiLineBasic,
             "How do you ... Python?\n?\n" +
-                "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
+            "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
             1,
         ],
     ]);
@@ -194,14 +194,14 @@ test("Test codeblocks", () => {
     expect(
         parse(
             "How do you ... Python?\n?\n" +
-                "```\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
+            "```\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
             ...defaultArgs
         )
     ).toEqual([
         [
             CardType.MultiLineBasic,
             "How do you ... Python?\n?\n" +
-                "```\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
+            "```\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
             1,
         ],
     ]);

@@ -1,4 +1,4 @@
-import { Notice, Plugin, TAbstractFile, TFile, HeadingCache, getAllTags } from "obsidian";
+import { Notice, Plugin, TAbstractFile, TFile, HeadingCache, getAllTags, FrontMatterCache } from "obsidian";
 import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
@@ -13,7 +13,7 @@ import {
     LEGACY_SCHEDULING_EXTRACTOR,
     MULTI_SCHEDULING_EXTRACTOR,
 } from "src/constants";
-import { escapeRegexString, cyrb53, removeLegacyKeys } from "src/utils";
+import { escapeRegexString, cyrb53 } from "src/utils";
 import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
 import { t } from "src/lang/helpers";
 import { parse } from "src/parser";
@@ -313,7 +313,7 @@ export default class SRPlugin extends Plugin {
 
             const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
 
-            const frontmatter = fileCachedData.frontmatter || <Record<string, unknown>>{};
+            const frontmatter: FrontMatterCache | Record<string, unknown> = fileCachedData.frontmatter || {};
             const tags = getAllTags(fileCachedData) || [];
 
             let shouldIgnore = true;
@@ -393,9 +393,9 @@ export default class SRPlugin extends Plugin {
         if (this.data.settings.showDebugMessages) {
             console.log(
                 "SR: " +
-                    t("SYNC_TIME_TAKEN", {
-                        t: Date.now() - now.valueOf(),
-                    })
+                t("SYNC_TIME_TAKEN", {
+                    t: Date.now() - now.valueOf(),
+                })
             );
         }
 
@@ -412,7 +412,7 @@ export default class SRPlugin extends Plugin {
 
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
-        const frontmatter = fileCachedData.frontmatter || <Record<string, unknown>>{};
+        const frontmatter: FrontMatterCache | Record<string, unknown> = fileCachedData.frontmatter || {};
 
         const tags = getAllTags(fileCachedData) || [];
         if (this.data.settings.noteFoldersToIgnore.some((folder) => note.path.startsWith(folder))) {
@@ -517,8 +517,8 @@ export default class SRPlugin extends Plugin {
             fileText = fileText.replace(
                 SCHEDULING_INFO_REGEX,
                 `---\n${schedulingInfo[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
-                    `${schedulingInfo[5]}---`
+                `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
+                `${schedulingInfo[5]}---`
             );
         } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
             // new note with existing YAML front matter
@@ -526,7 +526,7 @@ export default class SRPlugin extends Plugin {
             fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
                 `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n---`
+                `sr-interval: ${interval}\nsr-ease: ${ease}\n---`
             );
         } else {
             fileText =
@@ -641,7 +641,7 @@ export default class SRPlugin extends Plugin {
 
             const tagInCardRegEx = /#[^\s#]+/ig;
             const cardDeckPath = cardText.match(tagInCardRegEx)?.slice(-1)[0].replace("#", "").split("/");
-            if(cardDeckPath) {
+            if (cardDeckPath) {
                 deckPath = cardDeckPath;
                 cardText = cardText.replaceAll(tagInCardRegEx, "");
             }
@@ -764,8 +764,7 @@ export default class SRPlugin extends Plugin {
                 };
 
                 // card scheduled
-                if (ignoreStats)
-                {
+                if (ignoreStats) {
                     this.cardStats.newCount++;
                     cardObj.isDue = true;
                     this.deckTree.insertFlashcard([...deckPath], cardObj);
@@ -846,9 +845,7 @@ export default class SRPlugin extends Plugin {
 
     async loadPluginData(): Promise<void> {
         this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
-        this.data = removeLegacyKeys(this.data, DEFAULT_DATA) as PluginData;
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
-        this.data.settings = removeLegacyKeys(this.data.settings, DEFAULT_SETTINGS) as SRSettings;
     }
 
     async savePluginData(): Promise<void> {

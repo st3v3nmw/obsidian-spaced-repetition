@@ -1,4 +1,4 @@
-import { Modal, App, MarkdownRenderer, Notice, Platform, TFile, MarkdownView } from "obsidian";
+import { Modal, App, MarkdownRenderer, Notice, Platform, TFile, MarkdownView, WorkspaceLeaf } from "obsidian";
 
 import type SRPlugin from "src/main";
 import { Card, schedule, textInterval, ReviewResponse } from "src/scheduling";
@@ -35,9 +35,9 @@ export class FlashcardModal extends Modal {
     public currentDeck: Deck;
     public checkDeck: Deck;
     public mode: FlashcardModalMode;
-    public ignoreStats: Boolean;
+    public ignoreStats: boolean;
 
-    constructor(app: App, plugin: SRPlugin, ignoreStats: Boolean = false) {
+    constructor(app: App, plugin: SRPlugin, ignoreStats = false) {
         super(app);
 
         this.plugin = plugin;
@@ -55,7 +55,7 @@ export class FlashcardModal extends Modal {
         this.contentEl.style.height = "92%";
         this.contentEl.addClass("sr-modal-content");
 
-        document.body.onkeypress = (e) => {
+        document.body.onkeydown = (e) => {
             if (this.mode !== FlashcardModalMode.DecksList) {
                 if (this.mode !== FlashcardModalMode.Closed && e.code === "KeyS") {
                     this.currentDeck.deleteFlashcardAtIndex(
@@ -130,20 +130,18 @@ export class FlashcardModal extends Modal {
             this.fileLinkView.setAttribute("aria-label", t("EDIT_LATER"));
         }
         this.fileLinkView.addEventListener("click", async () => {
-            // @ts-ignore
             const activeLeaf: WorkspaceLeaf = this.plugin.app.workspace.activeLeaf;
             if (this.plugin.app.workspace.getActiveFile() === null)
                 await activeLeaf.openFile(this.currentCard.note);
             else {
                 const newLeaf = this.plugin.app.workspace.createLeafBySplit(activeLeaf, "vertical", false);
-                await newLeaf.openFile(this.currentCard.note, {active: true});
+                await newLeaf.openFile(this.currentCard.note, { active: true });
             }
-            // @ts-ignore
             const activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
             activeView.editor.setCursor({
                 line: this.currentCard.lineNo,
                 ch: 0,
-            });            
+            });
             this.currentDeck.deleteFlashcardAtIndex(
                 this.currentCardIdx,
                 this.currentCard.isDue
@@ -202,11 +200,11 @@ export class FlashcardModal extends Modal {
         });
 
         if (this.ignoreStats) {
-            this.goodBtn.style.display = 'none';
+            this.goodBtn.style.display = "none";
 
-            this.responseDiv.addClass('sr-ignorestats-response');
-            this.easyBtn.addClass('sr-ignorestats-btn');
-            this.hardBtn.addClass('sr-ignorestats-btn');
+            this.responseDiv.addClass("sr-ignorestats-response");
+            this.easyBtn.addClass("sr-ignorestats-btn");
+            this.hardBtn.addClass("sr-ignorestats-btn");
         }
     }
 
@@ -386,21 +384,7 @@ export class FlashcardModal extends Modal {
                 typeof src === "string" &&
                 this.plugin.app.metadataCache.getFirstLinkpathDest(src, this.currentCard.note.path);
             if (target instanceof TFile && target.extension !== "md") {
-                if (target.extension == "mp3" ) {
-                //<span alt="terra.mp3" src="terra.mp3" class="internal-embed media-embed is-loaded"><audio controls="" src="app://local/%2FUsers%2Fcareilly%2FLibrary%2FMobile%20Documents%2FiCloud~md~obsidian%2FDocuments%2FNotes%2FLanguages%2FItalian%2FFFItalianWordList%2F625%20Collection%2Fterra.mp3?1424097892000"></audio></span>
-                    el.innerText = "";
-                    el.createEl("audio", {
-                        attr: {
-                            controls: "",
-                            src: this.plugin.app.vault.getResourcePath(target)
-                        }
-                    }, (img) => {
-                        if (el.hasAttribute("alt"))
-                            img.setAttribute("alt", el.getAttribute("alt"));
-                    });
-                    el.addClasses(["media-embed", "is-loaded"]);
-                } else if (target.extension == "webm") {
-                    // <span alt="sample_960x400_ocean_with_audio.webm" src="sample_960x400_ocean_with_audio.webm" class="internal-embed media-embed is-loaded"><video controls="" src="app://local/%2FUsers%2Fcareilly%2FLibrary%2FMobile%20Documents%2FiCloud~md~obsidian%2FDocuments%2FNotes%2Fsample_960x400_ocean_with_audio.webm?1631986890167"></video></span>
+                if (target.extension === "mp3" || target.extension == "webm") {
                     el.innerText = "";
                     el.createEl("audio", {
                         attr: {
@@ -429,10 +413,8 @@ export class FlashcardModal extends Modal {
                     el.addClasses(["image-embed", "is-loaded"]);
                 }
 
-            }
-            // file does not exist
-            // display dead link
-            if (target === null) {
+            } else if (target === null) {
+                // file does not exist, display dead link
                 el.innerText = src;
             }
         });
@@ -703,8 +685,7 @@ export class Deck {
             modal.plugin.data.settings
         ).interval;
 
-        if (modal.ignoreStats)
-        {
+        if (modal.ignoreStats) {
             // Same for mobile/desktop
             modal.hardBtn.setText(`${t("HARD")}`);
             modal.easyBtn.setText(`${t("EASY")}`);

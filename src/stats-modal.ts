@@ -35,6 +35,8 @@ export class StatsModal extends Modal {
     onOpen(): void {
         const { contentEl } = this;
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         if (!this.app.plugins.enabledPlugins.has(OBSIDIAN_CHARTS_ID)) {
             contentEl.innerHTML +=
                 "<div style='text-align:center'><span>" +
@@ -103,15 +105,15 @@ export class StatsModal extends Modal {
 
         // Add intervals
         const average_interval: string = textInterval(
-                Math.round(
-                    (Object.entries(cardStats.intervals)
-                        .map(([interval, count]) => interval * count)
-                        .reduce((a, b) => a + b) /
-                        scheduledCount) *
-                        10
-                ) / 10,
-                false
-            ),
+            Math.round(
+                (Object.entries(cardStats.intervals)
+                    .map(([interval, count]) => interval * count)
+                    .reduce((a, b) => a + b, 0) /
+                    scheduledCount) *
+                10
+            ) / 10,
+            false
+        ),
             longest_interval: string = textInterval(
                 Math.max(...getKeysPreserveType(cardStats.intervals)),
                 false
@@ -156,7 +158,7 @@ export class StatsModal extends Modal {
         const average_ease: number = Math.round(
             Object.entries(cardStats.eases)
                 .map(([ease, count]) => ease * count)
-                .reduce((a, b) => a + b) / scheduledCount
+                .reduce((a, b) => a + b, 0) / scheduledCount
         );
         text +=
             "\n<div style='text-align:center'>" +
