@@ -35,7 +35,7 @@ export function parse(
             cardText = "";
             continue;
         } else if (lines[i].startsWith("<!--") && !lines[i].startsWith("<!--SR:")) {
-            while (i + 1 < lines.length && !lines[i + 1].includes("-->")) i++;
+            while (i + 1 < lines.length && !lines[i].includes("-->")) i++;
             i++;
             continue;
         }
