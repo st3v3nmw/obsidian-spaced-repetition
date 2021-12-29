@@ -1,4 +1,12 @@
-import { Notice, Plugin, TAbstractFile, TFile, HeadingCache, getAllTags, FrontMatterCache } from "obsidian";
+import {
+    Notice,
+    Plugin,
+    TAbstractFile,
+    TFile,
+    HeadingCache,
+    getAllTags,
+    FrontMatterCache,
+} from "obsidian";
 import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
@@ -313,7 +321,8 @@ export default class SRPlugin extends Plugin {
 
             const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
 
-            const frontmatter: FrontMatterCache | Record<string, unknown> = fileCachedData.frontmatter || {};
+            const frontmatter: FrontMatterCache | Record<string, unknown> =
+                fileCachedData.frontmatter || {};
             const tags = getAllTags(fileCachedData) || [];
 
             let shouldIgnore = true;
@@ -393,9 +402,9 @@ export default class SRPlugin extends Plugin {
         if (this.data.settings.showDebugMessages) {
             console.log(
                 "SR: " +
-                t("SYNC_TIME_TAKEN", {
-                    t: Date.now() - now.valueOf(),
-                })
+                    t("SYNC_TIME_TAKEN", {
+                        t: Date.now() - now.valueOf(),
+                    })
             );
         }
 
@@ -412,7 +421,8 @@ export default class SRPlugin extends Plugin {
 
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
-        const frontmatter: FrontMatterCache | Record<string, unknown> = fileCachedData.frontmatter || {};
+        const frontmatter: FrontMatterCache | Record<string, unknown> =
+            fileCachedData.frontmatter || {};
 
         const tags = getAllTags(fileCachedData) || [];
         if (this.data.settings.noteFoldersToIgnore.some((folder) => note.path.startsWith(folder))) {
@@ -517,8 +527,8 @@ export default class SRPlugin extends Plugin {
             fileText = fileText.replace(
                 SCHEDULING_INFO_REGEX,
                 `---\n${schedulingInfo[1]}sr-due: ${dueString}\n` +
-                `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
-                `${schedulingInfo[5]}---`
+                    `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
+                    `${schedulingInfo[5]}---`
             );
         } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
             // new note with existing YAML front matter
@@ -526,7 +536,7 @@ export default class SRPlugin extends Plugin {
             fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
                 `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
-                `sr-interval: ${interval}\nsr-ease: ${ease}\n---`
+                    `sr-interval: ${interval}\nsr-ease: ${ease}\n---`
             );
         } else {
             fileText =
@@ -612,7 +622,12 @@ export default class SRPlugin extends Plugin {
         return deckPath;
     }
 
-    async findFlashcardsInNote(note: TFile, deckPath: string[], buryOnly = false, ignoreStats = false): Promise<number> {
+    async findFlashcardsInNote(
+        note: TFile,
+        deckPath: string[],
+        buryOnly = false,
+        ignoreStats = false
+    ): Promise<number> {
         let fileText: string = await this.app.vault.read(note);
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         const headings: HeadingCache[] = fileCachedData.headings || [];
@@ -638,9 +653,12 @@ export default class SRPlugin extends Plugin {
                 lineNo: number = parsedCard[2];
             let cardText: string = parsedCard[1];
 
-
-            const tagInCardRegEx = /#[^\s#]+/ig;
-            const cardDeckPath = cardText.match(tagInCardRegEx)?.slice(-1)[0].replace("#", "").split("/");
+            const tagInCardRegEx = /#[^\s#]+/gi;
+            const cardDeckPath = cardText
+                .match(tagInCardRegEx)
+                ?.slice(-1)[0]
+                .replace("#", "")
+                .split("/");
             if (cardDeckPath) {
                 deckPath = cardDeckPath;
                 cardText = cardText.replaceAll(tagInCardRegEx, "");

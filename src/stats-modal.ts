@@ -1,10 +1,11 @@
-import { Modal, App, MarkdownRenderer, Platform } from "obsidian";
+import { Modal, App, Platform } from "obsidian";
 
 import type SRPlugin from "src/main";
 import { getKeysPreserveType } from "src/utils";
 import { textInterval } from "src/scheduling";
-import { OBSIDIAN_CHARTS_ID } from "src/constants";
 import { t } from "src/lang/helpers";
+import Chart from "chart.js/auto";
+import { ChartTypeRegistry } from "chart.js";
 
 export interface Stats {
     eases: Record<number, number>;
@@ -34,18 +35,7 @@ export class StatsModal extends Modal {
 
     onOpen(): void {
         const { contentEl } = this;
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        if (!this.app.plugins.enabledPlugins.has(OBSIDIAN_CHARTS_ID)) {
-            contentEl.innerHTML +=
-                "<div style='text-align:center'><span>" +
-                t("OBSIDIAN_CHARTS_REQUIRED") +
-                "</span></div>";
-            return;
-        }
-
-        let text = "";
+        contentEl.style.textAlign = "center";
 
         // Add forecast
         let maxN: number = Math.max(...getKeysPreserveType(this.plugin.dueDatesFlashcards));
@@ -68,33 +58,24 @@ export class StatsModal extends Modal {
         const scheduledCount: number = cardStats.youngCount + cardStats.matureCount;
         maxN = Math.max(maxN, 1);
 
-        // let the horrors begin LOL
-        text +=
-            "\n<div style='text-align:center'>" +
-            "<h2 style='text-align:center'>" +
-            t("FORECAST") +
-            "</h2>" +
-            "<p style='text-align:center'>" +
-            t("FORECAST_DESC") +
-            "</p>" +
-            "</div>\n\n" +
-            "```chart\n" +
-            "\ttype: bar\n" +
-            `\tlabels: [${Object.keys(dueDatesFlashcardsCopy)}]\n` +
-            "\tseries:\n" +
-            "\t\t- title: " +
-            t("SCHEDULED") +
-            `\n\t\t  data: [${Object.values(dueDatesFlashcardsCopy)}]\n` +
-            "\txTitle: " +
-            t("DAYS") +
-            "\n\tyTitle: " +
-            t("NUMBER_OF_CARDS") +
-            "\n\tlegend: false\n" +
-            "\tstacked: true\n" +
-            "````\n" +
-            "\n<div style='text-align:center'>" +
-            t("REVIEWS_PER_DAY", { avg: (scheduledCount / maxN).toFixed(1) }) +
-            "</div>";
+        contentEl.innerHTML +=
+            "<canvas id='forecastChart'></canvas><span id='forecastChartSummary'></span>" +
+            "<canvas id='intervalsChart'></canvas><span id='intervalsChartSummary'></span>" +
+            "<canvas id='easesChart'></canvas><span id='easesChartSummary'></span>" +
+            "<div style='width: 50%;'><canvas id='cardTypesChart'></canvas></div><span id='cardTypesChart'></span>";
+
+        createStatsChart(
+            "bar",
+            "forecastChart",
+            t("FORECAST"),
+            t("FORECAST_DESC"),
+            Object.keys(dueDatesFlashcardsCopy),
+            Object.values(dueDatesFlashcardsCopy),
+            t("REVIEWS_PER_DAY", { avg: (scheduledCount / maxN).toFixed(1) }),
+            t("SCHEDULED"),
+            t("DAYS"),
+            t("NUMBER_OF_CARDS")
+        );
 
         maxN = Math.max(...getKeysPreserveType(cardStats.intervals));
         for (let interval = 0; interval <= maxN; interval++) {
@@ -105,48 +86,32 @@ export class StatsModal extends Modal {
 
         // Add intervals
         const average_interval: string = textInterval(
-            Math.round(
-                (Object.entries(cardStats.intervals)
-                    .map(([interval, count]) => interval * count)
-                    .reduce((a, b) => a + b, 0) /
-                    scheduledCount) *
-                10
-            ) / 10,
-            false
-        ),
+                Math.round(
+                    (Object.entries(cardStats.intervals)
+                        .map(([interval, count]) => interval * count)
+                        .reduce((a, b) => a + b, 0) /
+                        scheduledCount) *
+                        10
+                ) / 10,
+                false
+            ),
             longest_interval: string = textInterval(
                 Math.max(...getKeysPreserveType(cardStats.intervals)),
                 false
             );
-        text +=
-            "\n<div style='text-align:center'>" +
-            "<h2 style='text-align:center'>" +
-            t("INTERVALS") +
-            "</h2>" +
-            "<p style='text-align:center'>" +
-            t("INTERVALS_DESC") +
-            "</p>" +
-            "</div>\n\n" +
-            "```chart\n" +
-            "\ttype: bar\n" +
-            `\tlabels: [${Object.keys(cardStats.intervals)}]\n` +
-            "\tseries:\n" +
-            "\t\t- title: " +
-            t("COUNT") +
-            `\n\t\t  data: [${Object.values(cardStats.intervals)}]\n` +
-            "\txTitle: " +
-            t("DAYS") +
-            "\n\tyTitle: " +
-            t("NUMBER_OF_CARDS") +
-            "\n\tlegend: false\n" +
-            "\tstacked: true\n" +
-            "````\n" +
-            "\n<div style='text-align:center'>" +
-            t("INTERVALS_SUMMARY", {
-                avg: average_interval,
-                longest: longest_interval,
-            }) +
-            "</div>";
+
+        createStatsChart(
+            "bar",
+            "intervalsChart",
+            t("INTERVALS"),
+            t("INTERVALS_DESC"),
+            Object.keys(cardStats.intervals),
+            Object.values(cardStats.intervals),
+            t("INTERVALS_SUMMARY", { avg: average_interval, longest: longest_interval }),
+            t("COUNT"),
+            t("DAYS"),
+            t("NUMBER_OF_CARDS")
+        );
 
         // Add eases
         const eases: number[] = getKeysPreserveType(cardStats.eases);
@@ -160,62 +125,111 @@ export class StatsModal extends Modal {
                 .map(([ease, count]) => ease * count)
                 .reduce((a, b) => a + b, 0) / scheduledCount
         );
-        text +=
-            "\n<div style='text-align:center'>" +
-            "<h2 style='text-align:center'>" +
-            t("EASES") +
-            "</h2>" +
-            "</div>\n\n" +
-            "```chart\n" +
-            "\ttype: bar\n" +
-            `\tlabels: [${Object.keys(cardStats.eases)}]\n` +
-            "\tseries:\n" +
-            "\t\t- title: " +
-            t("COUNT") +
-            `\n\t\t  data: [${Object.values(cardStats.eases)}]\n` +
-            "\txTitle: " +
-            t("EASES") +
-            "\n\tyTitle: " +
-            t("NUMBER_OF_CARDS") +
-            "\n\tlegend: false\n" +
-            "\tstacked: true\n" +
-            "````\n" +
-            "\n<div style='text-align:center'>" +
-            t("EASES_SUMMARY", { avgEase: average_ease }) +
-            "</div>";
+
+        createStatsChart(
+            "bar",
+            "easesChart",
+            t("EASES"),
+            "",
+            Object.keys(cardStats.eases),
+            Object.values(cardStats.eases),
+            t("EASES_SUMMARY", { avgEase: average_ease }),
+            t("COUNT"),
+            t("EASES"),
+            t("NUMBER_OF_CARDS")
+        );
 
         // Add card types
         const totalCardsCount: number = this.plugin.deckTree.totalFlashcards;
-        text +=
-            "\n<div style='text-align:center'>" +
-            "<h2 style='text-align:center'>" +
-            t("CARD_TYPES") +
-            "</h2>" +
-            "<p style='text-align:center'>" +
-            t("CARD_TYPES_DESC") +
-            "</p>" +
-            "</div>\n\n" +
-            "```chart\n" +
-            "\ttype: pie\n" +
-            `\tlabels: ['${t("CARD_TYPE_NEW")} - ${Math.round(
-                (cardStats.newCount / totalCardsCount) * 100
-            )}%', '${t("CARD_TYPE_YOUNG")} - ${Math.round(
-                (cardStats.youngCount / totalCardsCount) * 100
-            )}%', '${t("CARD_TYPE_MATURE")} - ${Math.round((cardStats.matureCount / totalCardsCount) * 100)}%']\n` +
-            "\tseries:\n" +
-            `\t\t- data: [${cardStats.newCount}, ${cardStats.youngCount}, ${cardStats.matureCount}]\n` +
-            "\twidth: 40%\n" +
-            "\tlabelColors: true\n" +
-            "```\n" +
-            "\n<div style='text-align:center'>" +
-            t("CARD_TYPES_SUMMARY", { totalCardsCount }) +
-            "</div>";
-
-        MarkdownRenderer.renderMarkdown(text, contentEl, "", this.plugin);
+        createStatsChart(
+            "pie",
+            "cardTypesChart",
+            t("CARD_TYPES"),
+            t("CARD_TYPES_DESC"),
+            [
+                `${t("CARD_TYPE_NEW")} - ${Math.round(
+                    (cardStats.newCount / totalCardsCount) * 100
+                )}%`,
+                `${t("CARD_TYPE_YOUNG")} - ${Math.round(
+                    (cardStats.youngCount / totalCardsCount) * 100
+                )}%`,
+                `${t("CARD_TYPE_MATURE")} - ${Math.round(
+                    (cardStats.matureCount / totalCardsCount) * 100
+                )}%`,
+            ],
+            [cardStats.newCount, cardStats.youngCount, cardStats.matureCount],
+            t("CARD_TYPES_SUMMARY", { totalCardsCount })
+        );
     }
 
     onClose(): void {
         const { contentEl } = this;
         contentEl.empty();
     }
+}
+
+function createStatsChart(
+    type: keyof ChartTypeRegistry,
+    canvasId: string,
+    title: string,
+    subtitle: string,
+    labels: string[],
+    data: number[],
+    summary: string,
+    seriesTitle = "",
+    xAxisTitle = "",
+    yAxisTitle = ""
+) {
+    let scales = {},
+        backgroundColor = ["#2196f3"];
+    if (type !== "pie") {
+        scales = {
+            x: {
+                title: {
+                    display: true,
+                    text: xAxisTitle,
+                },
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: yAxisTitle,
+                },
+            },
+        };
+    } else {
+        backgroundColor = ["#2196f3", "#4caf50", "green"];
+    }
+
+    new Chart(document.getElementById(canvasId) as HTMLCanvasElement, {
+        type,
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: seriesTitle,
+                    backgroundColor,
+                    data,
+                },
+            ],
+        },
+        options: {
+            scales,
+            plugins: {
+                title: {
+                    display: true,
+                    text: title,
+                },
+                subtitle: {
+                    display: true,
+                    text: subtitle,
+                },
+                legend: {
+                    display: false,
+                },
+            },
+        },
+    });
+
+    document.getElementById(`${canvasId}Summary`).innerText = summary;
 }

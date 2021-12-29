@@ -1,4 +1,13 @@
-import { Modal, App, MarkdownRenderer, Notice, Platform, TFile, MarkdownView, WorkspaceLeaf } from "obsidian";
+import {
+    Modal,
+    App,
+    MarkdownRenderer,
+    Notice,
+    Platform,
+    TFile,
+    MarkdownView,
+    WorkspaceLeaf,
+} from "obsidian";
 
 import type SRPlugin from "src/main";
 import { Card, schedule, textInterval, ReviewResponse } from "src/scheduling";
@@ -134,7 +143,11 @@ export class FlashcardModal extends Modal {
             if (this.plugin.app.workspace.getActiveFile() === null)
                 await activeLeaf.openFile(this.currentCard.note);
             else {
-                const newLeaf = this.plugin.app.workspace.createLeafBySplit(activeLeaf, "vertical", false);
+                const newLeaf = this.plugin.app.workspace.createLeafBySplit(
+                    activeLeaf,
+                    "vertical",
+                    false
+                );
                 await newLeaf.openFile(this.currentCard.note, { active: true });
             }
             const activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
@@ -142,10 +155,7 @@ export class FlashcardModal extends Modal {
                 line: this.currentCard.lineNo,
                 ch: 0,
             });
-            this.currentDeck.deleteFlashcardAtIndex(
-                this.currentCardIdx,
-                this.currentCard.isDue
-            );
+            this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
             this.burySiblingCards(false);
             this.currentDeck.nextCard(this);
         });
@@ -230,10 +240,12 @@ export class FlashcardModal extends Modal {
     }
 
     async processReview(response: ReviewResponse): Promise<void> {
-
         if (this.ignoreStats) {
             if (response == ReviewResponse.Easy) {
-                this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+                this.currentDeck.deleteFlashcardAtIndex(
+                    this.currentCardIdx,
+                    this.currentCard.isDue
+                );
             }
             this.currentDeck.nextCard(this);
             return;
@@ -386,33 +398,39 @@ export class FlashcardModal extends Modal {
             if (target instanceof TFile && target.extension !== "md") {
                 if (target.extension === "mp3" || target.extension == "webm") {
                     el.innerText = "";
-                    el.createEl("audio", {
-                        attr: {
-                            controls: "",
-                            src: this.plugin.app.vault.getResourcePath(target)
+                    el.createEl(
+                        "audio",
+                        {
+                            attr: {
+                                controls: "",
+                                src: this.plugin.app.vault.getResourcePath(target),
+                            },
+                        },
+                        (img) => {
+                            if (el.hasAttribute("alt"))
+                                img.setAttribute("alt", el.getAttribute("alt"));
                         }
-                    }, (img) => {
-                        if (el.hasAttribute("alt"))
-                            img.setAttribute("alt", el.getAttribute("alt"));
-                    });
+                    );
                     el.addClasses(["media-embed", "is-loaded"]);
                 } else {
                     el.innerText = "";
-                    el.createEl("img", {
-                        attr: {
-                            src: this.plugin.app.vault.getResourcePath(target)
+                    el.createEl(
+                        "img",
+                        {
+                            attr: {
+                                src: this.plugin.app.vault.getResourcePath(target),
+                            },
+                        },
+                        (img) => {
+                            if (el.hasAttribute("width"))
+                                img.setAttribute("width", el.getAttribute("width"));
+                            else img.setAttribute("width", "100%");
+                            if (el.hasAttribute("alt"))
+                                img.setAttribute("alt", el.getAttribute("alt"));
                         }
-                    }, (img) => {
-                        if (el.hasAttribute("width"))
-                            img.setAttribute("width", el.getAttribute("width"));
-                        else
-                            img.setAttribute("width", "100%");
-                        if (el.hasAttribute("alt"))
-                            img.setAttribute("alt", el.getAttribute("alt"));
-                    });
+                    );
                     el.addClasses(["image-embed", "is-loaded"]);
                 }
-
             } else if (target === null) {
                 // file does not exist, display dead link
                 el.innerText = src;
