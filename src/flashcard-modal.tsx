@@ -748,19 +748,22 @@ export class Deck {
             delayBeforeReview = modal.currentCard.delayBeforeReview;
         } else if (this.newFlashcards.length > 0) {
             if (modal.plugin.data.settings.randomizeCardOrder) {
-                modal.currentCardIdx = Math.floor(Math.random() * this.newFlashcards.length);
+                const pickedCardIdx = Math.floor(Math.random() * this.newFlashcards.length);
+                modal.currentCardIdx = pickedCardIdx;
 
                 // look for first unscheduled sibling
-                const card: Card = this.newFlashcards[modal.currentCardIdx];
-                for (const siblingCard of card.siblings) {
-                    if (!siblingCard.isDue) {
-                        modal.currentCardIdx += siblingCard.siblingIdx - card.siblingIdx;
-                        break;
+                const pickedCard: Card = this.newFlashcards[pickedCardIdx];
+                let idx = pickedCardIdx;
+                while (idx >= 0 && pickedCard.siblings.includes(this.newFlashcards[idx])) {
+                    if (!this.newFlashcards[idx].isDue) {
+                        modal.currentCardIdx = idx;
                     }
+                    idx--;
                 }
             } else {
                 modal.currentCardIdx = 0;
             }
+
             modal.currentCard = this.newFlashcards[modal.currentCardIdx];
             modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
 
