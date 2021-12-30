@@ -586,26 +586,26 @@ export class Deck {
         deckViewInnerText.innerHTML += <span class="tag-pane-tag-self">{this.deckName}</span>;
         const deckViewOuter: HTMLElement = deckViewSelf.createDiv("tree-item-flair-outer");
         deckViewOuter.innerHTML += (
-            <>
+            <span>
                 <span
                     style="background-color:#4caf50;"
                     class="tag-pane-tag-count tree-item-flair sr-deck-counts"
                 >
-                    {this.dueFlashcardsCount}
+                    {this.dueFlashcardsCount.toString()}
                 </span>
                 <span
                     style="background-color:#2196f3;"
                     class="tag-pane-tag-count tree-item-flair sr-deck-counts"
                 >
-                    {this.newFlashcardsCount}
+                    {this.newFlashcardsCount.toString()}
                 </span>
                 <span
                     style="background-color:#ff7043;"
                     class="tag-pane-tag-count tree-item-flair sr-deck-counts"
                 >
-                    {this.totalFlashcards}
+                    {this.totalFlashcards.toString()}
                 </span>
-            </>
+            </span>
         );
 
         const deckViewChildren: HTMLElement = deckView.createDiv("tree-item-children");

@@ -1,12 +1,37 @@
 import { Modal, App, Platform } from "obsidian";
 import h from "vhtml";
-import Chart from "chart.js/auto";
-import { ChartTypeRegistry } from "chart.js";
+import {
+    Chart,
+    BarElement,
+    BarController,
+    Legend,
+    Title,
+    Tooltip,
+    SubTitle,
+    ChartTypeRegistry,
+    CategoryScale,
+    LinearScale,
+    PieController,
+    ArcElement,
+} from "chart.js";
 
 import type SRPlugin from "src/main";
 import { getKeysPreserveType } from "src/utils";
 import { textInterval } from "src/scheduling";
 import { t } from "src/lang/helpers";
+
+Chart.register(
+    BarElement,
+    BarController,
+    Legend,
+    Title,
+    Tooltip,
+    SubTitle,
+    CategoryScale,
+    LinearScale,
+    PieController,
+    ArcElement
+);
 
 export interface Stats {
     eases: Record<number, number>;
@@ -60,7 +85,7 @@ export class StatsModal extends Modal {
         maxN = Math.max(maxN, 1);
 
         contentEl.innerHTML += (
-            <>
+            <div>
                 <canvas id="forecastChart"></canvas>
                 <span id="forecastChartSummary"></span>
                 <canvas id="intervalsChart"></canvas>
@@ -71,7 +96,7 @@ export class StatsModal extends Modal {
                     <canvas id="cardTypesChart"></canvas>
                 </div>
                 <span id="cardTypesChartSummary"></span>
-            </>
+            </div>
         );
 
         createStatsChart(
@@ -96,14 +121,15 @@ export class StatsModal extends Modal {
 
         // Add intervals
         const average_interval: string = textInterval(
-            Math.round(
-                (Object.entries(cardStats.intervals)
-                    .map(([interval, count]) => interval * count)
-                    .reduce((a, b) => a + b, 0) /
-                    scheduledCount) *
-                    10
-            ) / 10,
-            false),
+                Math.round(
+                    (Object.entries(cardStats.intervals)
+                        .map(([interval, count]) => interval * count)
+                        .reduce((a, b) => a + b, 0) /
+                        scheduledCount) *
+                        10
+                ) / 10,
+                false
+            ),
             longest_interval: string = textInterval(
                 Math.max(...getKeysPreserveType(cardStats.intervals)),
                 false
