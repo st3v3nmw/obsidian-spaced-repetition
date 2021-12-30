@@ -1,4 +1,5 @@
 import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
 import type SRPlugin from "src/main";

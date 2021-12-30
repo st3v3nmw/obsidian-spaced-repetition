@@ -8,11 +8,11 @@ import {
     MarkdownView,
     WorkspaceLeaf,
 } from "obsidian";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
 import type SRPlugin from "src/main";
-import { Card, schedule, textInterval, ReviewResponse } from "src/scheduling";
-import { CardType } from "src/types";
+import { Card, CardType, schedule, textInterval, ReviewResponse } from "src/scheduling";
 import {
     COLLAPSE_ICON,
     MULTI_SCHEDULING_EXTRACTOR,

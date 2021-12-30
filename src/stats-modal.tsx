@@ -1,4 +1,5 @@
 import { Modal, App, Platform } from "obsidian";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 import {
     Chart,
