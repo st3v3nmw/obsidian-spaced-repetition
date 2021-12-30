@@ -1,4 +1,5 @@
 import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
+import h from "vhtml";
 
 import type SRPlugin from "src/main";
 import { t } from "src/lang/helpers";
@@ -91,7 +92,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
-        containerEl.createDiv().innerHTML = "<h2>" + t("SETTINGS_HEADER") + "</h2>";
+        containerEl.createDiv().innerHTML = <h2>{t("SETTINGS_HEADER")}</h2>;
 
         containerEl.createDiv().innerHTML = t("CHECK_WIKI", {
             wiki_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki",
@@ -114,7 +115,7 @@ export class SRSettingTab extends PluginSettingTab {
                     })
             );
 
-        containerEl.createDiv().innerHTML = "<h3>" + t("FLASHCARDS") + "</h3>";
+        containerEl.createDiv().innerHTML = <h3>{t("FLASHCARDS")}</h3>;
 
         new Setting(containerEl)
             .setName(t("FLASHCARD_TAGS"))
@@ -364,7 +365,7 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
-        containerEl.createDiv().innerHTML = "<h3>" + t("NOTES") + "</h3>";
+        containerEl.createDiv().innerHTML = <h3>{t("NOTES")}</h3>;
 
         new Setting(containerEl)
             .setName(t("TAGS_TO_REVIEW"))
@@ -448,7 +449,7 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
-        containerEl.createDiv().innerHTML = "<h3>" + t("ALGORITHM") + "</h3>";
+        containerEl.createDiv().innerHTML = <h3>{t("ALGORITHM")}</h3>;
         containerEl.createDiv().innerHTML = t("CHECK_ALGORITHM_WIKI", {
             algo_url:
                 "https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Spaced-Repetition-Algorithm",
@@ -611,7 +612,7 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
-        containerEl.createDiv().innerHTML = "<h3>" + t("LOGGING") + "</h3>";
+        containerEl.createDiv().innerHTML = <h3>{t("LOGGING")}</h3>;
         new Setting(containerEl).setName(t("DISPLAY_DEBUG_INFO")).addToggle((toggle) =>
             toggle.setValue(this.plugin.data.settings.showDebugMessages).onChange(async (value) => {
                 this.plugin.data.settings.showDebugMessages = value;
