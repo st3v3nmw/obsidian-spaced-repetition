@@ -2,9 +2,7 @@
     "compilerOptions": {
         "baseUrl": "./",
         "paths": {
-            "src/*": [
-                "src/*"
-            ]
+            "src/*": ["src/*"]
         },
         "inlineSourceMap": true,
         "inlineSources": true,
@@ -15,17 +13,8 @@
         "moduleResolution": "node",
         "esModuleInterop": true,
         "importHelpers": true,
-        "lib": [
-            "dom",
-            "dom.Iterable",
-            "scripthost",
-            "ES5",
-            "ES6",
-            "ES7",
-            "ES2021",
-        ]
+        "lib": ["dom", "dom.Iterable", "scripthost", "ES5", "ES6", "ES7", "ES2021"],
+        "jsxFactory": "h",
     },
-    "include": [
-        "**/*.ts"
-    ]
+    "include": ["**/*.ts", "**/*.tsx"]
 }

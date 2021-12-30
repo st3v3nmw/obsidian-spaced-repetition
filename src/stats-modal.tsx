@@ -1,11 +1,12 @@
 import { Modal, App, Platform } from "obsidian";
+import h from "vhtml";
+import Chart from "chart.js/auto";
+import { ChartTypeRegistry } from "chart.js";
 
 import type SRPlugin from "src/main";
 import { getKeysPreserveType } from "src/utils";
 import { textInterval } from "src/scheduling";
 import { t } from "src/lang/helpers";
-import Chart from "chart.js/auto";
-import { ChartTypeRegistry } from "chart.js";
 
 export interface Stats {
     eases: Record<number, number>;
@@ -58,11 +59,20 @@ export class StatsModal extends Modal {
         const scheduledCount: number = cardStats.youngCount + cardStats.matureCount;
         maxN = Math.max(maxN, 1);
 
-        contentEl.innerHTML +=
-            "<canvas id='forecastChart'></canvas><span id='forecastChartSummary'></span>" +
-            "<canvas id='intervalsChart'></canvas><span id='intervalsChartSummary'></span>" +
-            "<canvas id='easesChart'></canvas><span id='easesChartSummary'></span>" +
-            "<div style='width: 50%;'><canvas id='cardTypesChart'></canvas></div><span id='cardTypesChart'></span>";
+        contentEl.innerHTML += (
+            <>
+                <canvas id="forecastChart"></canvas>
+                <span id="forecastChartSummary"></span>
+                <canvas id="intervalsChart"></canvas>
+                <span id="intervalsChartSummary"></span>
+                <canvas id="easesChart"></canvas>
+                <span id="easesChartSummary"></span>
+                <div style="width: 50%;">
+                    <canvas id="cardTypesChart"></canvas>
+                </div>
+                <span id="cardTypesChartSummary"></span>
+            </>
+        );
 
         createStatsChart(
             "bar",
@@ -86,15 +96,14 @@ export class StatsModal extends Modal {
 
         // Add intervals
         const average_interval: string = textInterval(
-                Math.round(
-                    (Object.entries(cardStats.intervals)
-                        .map(([interval, count]) => interval * count)
-                        .reduce((a, b) => a + b, 0) /
-                        scheduledCount) *
-                        10
-                ) / 10,
-                false
-            ),
+            Math.round(
+                (Object.entries(cardStats.intervals)
+                    .map(([interval, count]) => interval * count)
+                    .reduce((a, b) => a + b, 0) /
+                    scheduledCount) *
+                    10
+            ) / 10,
+            false),
             longest_interval: string = textInterval(
                 Math.max(...getKeysPreserveType(cardStats.intervals)),
                 false

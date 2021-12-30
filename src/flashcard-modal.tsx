@@ -8,6 +8,7 @@ import {
     MarkdownView,
     WorkspaceLeaf,
 } from "obsidian";
+import h from "vhtml";
 
 import type SRPlugin from "src/main";
 import { Card, schedule, textInterval, ReviewResponse } from "src/scheduling";
@@ -104,24 +105,31 @@ export class FlashcardModal extends Modal {
     decksList(): void {
         this.mode = FlashcardModalMode.DecksList;
         this.titleEl.setText(t("DECKS"));
-        this.titleEl.innerHTML +=
-            '<p style="margin:0px;line-height:12px;">' +
-            '<span style="background-color:#4caf50;color:#ffffff;" aria-label="' +
-            t("DUE_CARDS") +
-            '" class="tag-pane-tag-count tree-item-flair">' +
-            this.plugin.deckTree.dueFlashcardsCount +
-            "</span>" +
-            '<span style="background-color:#2196f3;" aria-label="' +
-            t("NEW_CARDS") +
-            '" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
-            this.plugin.deckTree.newFlashcardsCount +
-            "</span>" +
-            '<span style="background-color:#ff7043;" aria-label="' +
-            t("TOTAL_CARDS") +
-            '" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
-            this.plugin.deckTree.totalFlashcards +
-            "</span>" +
-            "</p>";
+        this.titleEl.innerHTML += (
+            <p style="margin:0px;line-height:12px;">
+                <span
+                    style="background-color:#4caf50;color:#ffffff;"
+                    aria-label={t("DUE_CARDS")}
+                    class="tag-pane-tag-count tree-item-flair"
+                >
+                    {this.plugin.deckTree.dueFlashcardsCount}
+                </span>
+                <span
+                    style="background-color:#2196f3;"
+                    aria-label={t("NEW_CARDS")}
+                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                >
+                    {this.plugin.deckTree.newFlashcardsCount}
+                </span>
+                <span
+                    style="background-color:#ff7043;"
+                    aria-label={t("TOTAL_CARDS")}
+                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                >
+                    {this.plugin.deckTree.totalFlashcards}
+                </span>
+            </p>
+        );
         this.contentEl.innerHTML = "";
         this.contentEl.setAttribute("id", "sr-flashcard-view");
 
@@ -575,18 +583,30 @@ export class Deck {
             this.nextCard(modal);
         });
         const deckViewInnerText: HTMLElement = deckViewInner.createDiv("tag-pane-tag-text");
-        deckViewInnerText.innerHTML += `<span class="tag-pane-tag-self">${this.deckName}</span>`;
+        deckViewInnerText.innerHTML += <span class="tag-pane-tag-self">{this.deckName}</span>;
         const deckViewOuter: HTMLElement = deckViewSelf.createDiv("tree-item-flair-outer");
-        deckViewOuter.innerHTML +=
-            '<span style="background-color:#4caf50;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
-            this.dueFlashcardsCount +
-            "</span>" +
-            '<span style="background-color:#2196f3;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
-            this.newFlashcardsCount +
-            "</span>" +
-            '<span style="background-color:#ff7043;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
-            this.totalFlashcards +
-            "</span>";
+        deckViewOuter.innerHTML += (
+            <>
+                <span
+                    style="background-color:#4caf50;"
+                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                >
+                    {this.dueFlashcardsCount}
+                </span>
+                <span
+                    style="background-color:#2196f3;"
+                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                >
+                    {this.newFlashcardsCount}
+                </span>
+                <span
+                    style="background-color:#ff7043;"
+                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                >
+                    {this.totalFlashcards}
+                </span>
+            </>
+        );
 
         const deckViewChildren: HTMLElement = deckView.createDiv("tree-item-children");
         deckViewChildren.style.display = "none";
