@@ -1,4 +1,12 @@
-import { Notice, Plugin, TAbstractFile, TFile, HeadingCache, getAllTags } from "obsidian";
+import {
+    Notice,
+    Plugin,
+    TAbstractFile,
+    TFile,
+    HeadingCache,
+    getAllTags,
+    FrontMatterCache,
+} from "obsidian";
 import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
@@ -13,7 +21,7 @@ import {
     LEGACY_SCHEDULING_EXTRACTOR,
     MULTI_SCHEDULING_EXTRACTOR,
 } from "src/constants";
-import { escapeRegexString, cyrb53, removeLegacyKeys } from "src/utils";
+import { escapeRegexString, cyrb53 } from "src/utils";
 import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
 import { t } from "src/lang/helpers";
 import { parse } from "src/parser";
@@ -48,6 +56,7 @@ export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     private reviewQueueView: ReviewQueueListView;
     public data: PluginData;
+    public syncLock = false;
 
     public reviewDecks: { [deckKey: string]: ReviewDeck } = {};
     public lastSelectedReviewDeck: string;
@@ -74,13 +83,17 @@ export default class SRPlugin extends Plugin {
         this.statusBar.setAttribute("aria-label", t("OPEN_NOTE_FOR_REVIEW"));
         this.statusBar.setAttribute("aria-label-position", "top");
         this.statusBar.addEventListener("click", async () => {
-            await this.sync();
-            this.reviewNextNoteModal();
+            if (!this.syncLock) {
+                await this.sync();
+                this.reviewNextNoteModal();
+            }
         });
 
         this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
-            await this.sync();
-            new FlashcardModal(this.app, this).open();
+            if (!this.syncLock) {
+                await this.sync();
+                new FlashcardModal(this.app, this).open();
+            }
         });
 
         this.registerView(
@@ -124,8 +137,10 @@ export default class SRPlugin extends Plugin {
             id: "srs-note-review-open-note",
             name: t("OPEN_NOTE_FOR_REVIEW"),
             callback: async () => {
-                await this.sync();
-                this.reviewNextNoteModal();
+                if (!this.syncLock) {
+                    await this.sync();
+                    this.reviewNextNoteModal();
+                }
             },
         });
 
@@ -166,8 +181,10 @@ export default class SRPlugin extends Plugin {
             id: "srs-review-flashcards",
             name: t("REVIEW_ALL_CARDS"),
             callback: async () => {
-                await this.sync();
-                new FlashcardModal(this.app, this).open();
+                if (!this.syncLock) {
+                    await this.sync();
+                    new FlashcardModal(this.app, this).open();
+                }
             },
         });
 
@@ -203,8 +220,10 @@ export default class SRPlugin extends Plugin {
             id: "srs-view-stats",
             name: t("VIEW_STATS"),
             callback: async () => {
-                await this.sync();
-                new StatsModal(this.app, this).open();
+                if (!this.syncLock) {
+                    await this.sync();
+                    new StatsModal(this.app, this).open();
+                }
             },
         });
 
@@ -212,7 +231,11 @@ export default class SRPlugin extends Plugin {
 
         this.app.workspace.onLayoutReady(() => {
             this.initView();
-            setTimeout(async () => await this.sync(), 2000);
+            setTimeout(async () => {
+                if (!this.syncLock) {
+                    await this.sync();
+                }
+            }, 2000);
         });
     }
 
@@ -221,6 +244,11 @@ export default class SRPlugin extends Plugin {
     }
 
     async sync(): Promise<void> {
+        if (this.syncLock) {
+            return;
+        }
+        this.syncLock = true;
+
         // reset notes stuff
         graph.reset();
         this.easeByPath = {};
@@ -293,7 +321,8 @@ export default class SRPlugin extends Plugin {
 
             const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
 
-            const frontmatter = fileCachedData.frontmatter || <Record<string, unknown>>{};
+            const frontmatter: FrontMatterCache | Record<string, unknown> =
+                fileCachedData.frontmatter || {};
             const tags = getAllTags(fileCachedData) || [];
 
             let shouldIgnore = true;
@@ -386,11 +415,14 @@ export default class SRPlugin extends Plugin {
             })
         );
         this.reviewQueueView.redraw();
+
+        this.syncLock = false;
     }
 
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
-        const frontmatter = fileCachedData.frontmatter || <Record<string, unknown>>{};
+        const frontmatter: FrontMatterCache | Record<string, unknown> =
+            fileCachedData.frontmatter || {};
 
         const tags = getAllTags(fileCachedData) || [];
         if (this.data.settings.noteFoldersToIgnore.some((folder) => note.path.startsWith(folder))) {
@@ -520,12 +552,10 @@ export default class SRPlugin extends Plugin {
 
         new Notice(t("RESPONSE_RECEIVED"));
 
-        setTimeout(async () => {
-            await this.sync();
-            if (this.data.settings.autoNextNote) {
-                this.reviewNextNote(this.lastSelectedReviewDeck);
-            }
-        }, 500);
+        await this.sync();
+        if (this.data.settings.autoNextNote) {
+            this.reviewNextNote(this.lastSelectedReviewDeck);
+        }
     }
 
     async reviewNextNoteModal(): Promise<void> {
@@ -592,7 +622,12 @@ export default class SRPlugin extends Plugin {
         return deckPath;
     }
 
-    async findFlashcardsInNote(note: TFile, deckPath: string[], buryOnly = false, ignoreStats = false): Promise<number> {
+    async findFlashcardsInNote(
+        note: TFile,
+        deckPath: string[],
+        buryOnly = false,
+        ignoreStats = false
+    ): Promise<number> {
         let fileText: string = await this.app.vault.read(note);
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         const headings: HeadingCache[] = fileCachedData.headings || [];
@@ -618,10 +653,13 @@ export default class SRPlugin extends Plugin {
                 lineNo: number = parsedCard[2];
             let cardText: string = parsedCard[1];
 
-
-            const tagInCardRegEx = /#[^\s#]+/ig;
-            const cardDeckPath = cardText.match(tagInCardRegEx)?.slice(-1)[0].replace("#", "").split("/");
-            if(cardDeckPath) {
+            const tagInCardRegEx = /#[^\s#]+/gi;
+            const cardDeckPath = cardText
+                .match(tagInCardRegEx)
+                ?.slice(-1)[0]
+                .replace("#", "")
+                .split("/");
+            if (cardDeckPath) {
                 deckPath = cardDeckPath;
                 cardText = cardText.replaceAll(tagInCardRegEx, "");
             }
@@ -744,8 +782,7 @@ export default class SRPlugin extends Plugin {
                 };
 
                 // card scheduled
-                if (ignoreStats)
-                {
+                if (ignoreStats) {
                     this.cardStats.newCount++;
                     cardObj.isDue = true;
                     this.deckTree.insertFlashcard([...deckPath], cardObj);
@@ -826,9 +863,7 @@ export default class SRPlugin extends Plugin {
 
     async loadPluginData(): Promise<void> {
         this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
-        this.data = removeLegacyKeys(this.data, DEFAULT_DATA) as PluginData;
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
-        this.data.settings = removeLegacyKeys(this.data.settings, DEFAULT_SETTINGS) as SRSettings;
     }
 
     async savePluginData(): Promise<void> {

@@ -4,28 +4,32 @@
     "description": "Fight the forgetting curve by reviewing flashcards & entire notes.",
     "main": "main.js",
     "scripts": {
-        "dev": "esbuild src/main.ts --bundle --external:obsidian --format=cjs --sourcemap=inline --outfile=build/main.js --watch",
-        "build": "esbuild src/main.ts --bundle --external:obsidian --format=cjs --sourcemap=inline --sources-content=false --outfile=build/main.js",
+        "dev": "node esbuild.config.mjs",
+        "build": "node esbuild.config.mjs production",
         "test": "jest"
     },
     "keywords": [],
     "author": "Stephen Mwangi",
     "license": "MIT",
     "devDependencies": {
-        "@types/jest": "^27.0.1",
-        "@types/node": "^17.0.1",
-        "@typescript-eslint/eslint-plugin": "^5.7.0",
-        "@typescript-eslint/parser": "^5.8.0",
+        "@types/jest": "^27.0.3",
+        "@types/node": "^16.11.6",
+        "@types/vhtml": "^2.2.4",
+        "@typescript-eslint/eslint-plugin": "^5.2.0",
+        "@typescript-eslint/parser": "^5.2.0",
+        "builtin-modules": "^3.2.0",
+        "esbuild": "~0.13.0",
         "eslint": "^8.3.0",
-        "jest": "^27.0.6",
+        "jest": "^27.4.5",
         "moment": "^2.29.1",
-        "obsidian": "https://github.com/obsidianmd/obsidian-api/tarball/master",
+        "obsidian": "^0.12.17",
         "ts-jest": "^27.0.4",
-        "tslib": "^2.0.3",
-        "typescript": "^4.3.5"
+        "tslib": "2.3.1",
+        "typescript": "4.4.4",
+        "vhtml": "^2.2.0"
     },
     "dependencies": {
-        "esbuild": "^0.14.5",
+        "chart.js": "^3.7.0",
         "pagerank.js": "^1.0.2"
     }
 }

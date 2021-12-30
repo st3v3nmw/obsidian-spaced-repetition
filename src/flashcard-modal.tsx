@@ -1,4 +1,14 @@
-import { Modal, App, MarkdownRenderer, Notice, Platform, TFile, MarkdownView } from "obsidian";
+import {
+    Modal,
+    App,
+    MarkdownRenderer,
+    Notice,
+    Platform,
+    TFile,
+    MarkdownView,
+    WorkspaceLeaf,
+} from "obsidian";
+import h from "vhtml";
 
 import type SRPlugin from "src/main";
 import { Card, schedule, textInterval, ReviewResponse } from "src/scheduling";
@@ -35,9 +45,9 @@ export class FlashcardModal extends Modal {
     public currentDeck: Deck;
     public checkDeck: Deck;
     public mode: FlashcardModalMode;
-    public ignoreStats: Boolean;
+    public ignoreStats: boolean;
 
-    constructor(app: App, plugin: SRPlugin, ignoreStats: Boolean = false) {
+    constructor(app: App, plugin: SRPlugin, ignoreStats = false) {
         super(app);
 
         this.plugin = plugin;
@@ -55,7 +65,7 @@ export class FlashcardModal extends Modal {
         this.contentEl.style.height = "92%";
         this.contentEl.addClass("sr-modal-content");
 
-        document.body.onkeypress = (e) => {
+        document.body.onkeydown = (e) => {
             if (this.mode !== FlashcardModalMode.DecksList) {
                 if (this.mode !== FlashcardModalMode.Closed && e.code === "KeyS") {
                     this.currentDeck.deleteFlashcardAtIndex(
@@ -95,24 +105,31 @@ export class FlashcardModal extends Modal {
     decksList(): void {
         this.mode = FlashcardModalMode.DecksList;
         this.titleEl.setText(t("DECKS"));
-        this.titleEl.innerHTML +=
-            '<p style="margin:0px;line-height:12px;">' +
-            '<span style="background-color:#4caf50;color:#ffffff;" aria-label="' +
-            t("DUE_CARDS") +
-            '" class="tag-pane-tag-count tree-item-flair">' +
-            this.plugin.deckTree.dueFlashcardsCount +
-            "</span>" +
-            '<span style="background-color:#2196f3;" aria-label="' +
-            t("NEW_CARDS") +
-            '" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
-            this.plugin.deckTree.newFlashcardsCount +
-            "</span>" +
-            '<span style="background-color:#ff7043;" aria-label="' +
-            t("TOTAL_CARDS") +
-            '" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
-            this.plugin.deckTree.totalFlashcards +
-            "</span>" +
-            "</p>";
+        this.titleEl.innerHTML += (
+            <p style="margin:0px;line-height:12px;">
+                <span
+                    style="background-color:#4caf50;color:#ffffff;"
+                    aria-label={t("DUE_CARDS")}
+                    class="tag-pane-tag-count tree-item-flair"
+                >
+                    {this.plugin.deckTree.dueFlashcardsCount}
+                </span>
+                <span
+                    style="background-color:#2196f3;"
+                    aria-label={t("NEW_CARDS")}
+                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                >
+                    {this.plugin.deckTree.newFlashcardsCount}
+                </span>
+                <span
+                    style="background-color:#ff7043;"
+                    aria-label={t("TOTAL_CARDS")}
+                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                >
+                    {this.plugin.deckTree.totalFlashcards}
+                </span>
+            </p>
+        );
         this.contentEl.innerHTML = "";
         this.contentEl.setAttribute("id", "sr-flashcard-view");
 
@@ -130,24 +147,23 @@ export class FlashcardModal extends Modal {
             this.fileLinkView.setAttribute("aria-label", t("EDIT_LATER"));
         }
         this.fileLinkView.addEventListener("click", async () => {
-            // @ts-ignore
             const activeLeaf: WorkspaceLeaf = this.plugin.app.workspace.activeLeaf;
             if (this.plugin.app.workspace.getActiveFile() === null)
                 await activeLeaf.openFile(this.currentCard.note);
             else {
-                const newLeaf = this.plugin.app.workspace.createLeafBySplit(activeLeaf, "vertical", false);
-                await newLeaf.openFile(this.currentCard.note, {active: true});
+                const newLeaf = this.plugin.app.workspace.createLeafBySplit(
+                    activeLeaf,
+                    "vertical",
+                    false
+                );
+                await newLeaf.openFile(this.currentCard.note, { active: true });
             }
-            // @ts-ignore
             const activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
             activeView.editor.setCursor({
                 line: this.currentCard.lineNo,
                 ch: 0,
-            });            
-            this.currentDeck.deleteFlashcardAtIndex(
-                this.currentCardIdx,
-                this.currentCard.isDue
-            );
+            });
+            this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
             this.burySiblingCards(false);
             this.currentDeck.nextCard(this);
         });
@@ -202,11 +218,11 @@ export class FlashcardModal extends Modal {
         });
 
         if (this.ignoreStats) {
-            this.goodBtn.style.display = 'none';
+            this.goodBtn.style.display = "none";
 
-            this.responseDiv.addClass('sr-ignorestats-response');
-            this.easyBtn.addClass('sr-ignorestats-btn');
-            this.hardBtn.addClass('sr-ignorestats-btn');
+            this.responseDiv.addClass("sr-ignorestats-response");
+            this.easyBtn.addClass("sr-ignorestats-btn");
+            this.hardBtn.addClass("sr-ignorestats-btn");
         }
     }
 
@@ -232,10 +248,12 @@ export class FlashcardModal extends Modal {
     }
 
     async processReview(response: ReviewResponse): Promise<void> {
-
         if (this.ignoreStats) {
             if (response == ReviewResponse.Easy) {
-                this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+                this.currentDeck.deleteFlashcardAtIndex(
+                    this.currentCardIdx,
+                    this.currentCard.isDue
+                );
             }
             this.currentDeck.nextCard(this);
             return;
@@ -386,53 +404,43 @@ export class FlashcardModal extends Modal {
                 typeof src === "string" &&
                 this.plugin.app.metadataCache.getFirstLinkpathDest(src, this.currentCard.note.path);
             if (target instanceof TFile && target.extension !== "md") {
-                if (target.extension == "mp3" ) {
-                //<span alt="terra.mp3" src="terra.mp3" class="internal-embed media-embed is-loaded"><audio controls="" src="app://local/%2FUsers%2Fcareilly%2FLibrary%2FMobile%20Documents%2FiCloud~md~obsidian%2FDocuments%2FNotes%2FLanguages%2FItalian%2FFFItalianWordList%2F625%20Collection%2Fterra.mp3?1424097892000"></audio></span>
+                if (target.extension === "mp3" || target.extension == "webm") {
                     el.innerText = "";
-                    el.createEl("audio", {
-                        attr: {
-                            controls: "",
-                            src: this.plugin.app.vault.getResourcePath(target)
+                    el.createEl(
+                        "audio",
+                        {
+                            attr: {
+                                controls: "",
+                                src: this.plugin.app.vault.getResourcePath(target),
+                            },
+                        },
+                        (img) => {
+                            if (el.hasAttribute("alt"))
+                                img.setAttribute("alt", el.getAttribute("alt"));
                         }
-                    }, (img) => {
-                        if (el.hasAttribute("alt"))
-                            img.setAttribute("alt", el.getAttribute("alt"));
-                    });
-                    el.addClasses(["media-embed", "is-loaded"]);
-                } else if (target.extension == "webm") {
-                    // <span alt="sample_960x400_ocean_with_audio.webm" src="sample_960x400_ocean_with_audio.webm" class="internal-embed media-embed is-loaded"><video controls="" src="app://local/%2FUsers%2Fcareilly%2FLibrary%2FMobile%20Documents%2FiCloud~md~obsidian%2FDocuments%2FNotes%2Fsample_960x400_ocean_with_audio.webm?1631986890167"></video></span>
-                    el.innerText = "";
-                    el.createEl("audio", {
-                        attr: {
-                            controls: "",
-                            src: this.plugin.app.vault.getResourcePath(target)
-                        }
-                    }, (img) => {
-                        if (el.hasAttribute("alt"))
-                            img.setAttribute("alt", el.getAttribute("alt"));
-                    });
+                    );
                     el.addClasses(["media-embed", "is-loaded"]);
                 } else {
                     el.innerText = "";
-                    el.createEl("img", {
-                        attr: {
-                            src: this.plugin.app.vault.getResourcePath(target)
+                    el.createEl(
+                        "img",
+                        {
+                            attr: {
+                                src: this.plugin.app.vault.getResourcePath(target),
+                            },
+                        },
+                        (img) => {
+                            if (el.hasAttribute("width"))
+                                img.setAttribute("width", el.getAttribute("width"));
+                            else img.setAttribute("width", "100%");
+                            if (el.hasAttribute("alt"))
+                                img.setAttribute("alt", el.getAttribute("alt"));
                         }
-                    }, (img) => {
-                        if (el.hasAttribute("width"))
-                            img.setAttribute("width", el.getAttribute("width"));
-                        else
-                            img.setAttribute("width", "100%");
-                        if (el.hasAttribute("alt"))
-                            img.setAttribute("alt", el.getAttribute("alt"));
-                    });
+                    );
                     el.addClasses(["image-embed", "is-loaded"]);
                 }
-
-            }
-            // file does not exist
-            // display dead link
-            if (target === null) {
+            } else if (target === null) {
+                // file does not exist, display dead link
                 el.innerText = src;
             }
         });
@@ -575,18 +583,30 @@ export class Deck {
             this.nextCard(modal);
         });
         const deckViewInnerText: HTMLElement = deckViewInner.createDiv("tag-pane-tag-text");
-        deckViewInnerText.innerHTML += `<span class="tag-pane-tag-self">${this.deckName}</span>`;
+        deckViewInnerText.innerHTML += <span class="tag-pane-tag-self">{this.deckName}</span>;
         const deckViewOuter: HTMLElement = deckViewSelf.createDiv("tree-item-flair-outer");
-        deckViewOuter.innerHTML +=
-            '<span style="background-color:#4caf50;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
-            this.dueFlashcardsCount +
-            "</span>" +
-            '<span style="background-color:#2196f3;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
-            this.newFlashcardsCount +
-            "</span>" +
-            '<span style="background-color:#ff7043;" class="tag-pane-tag-count tree-item-flair sr-deck-counts">' +
-            this.totalFlashcards +
-            "</span>";
+        deckViewOuter.innerHTML += (
+            <span>
+                <span
+                    style="background-color:#4caf50;"
+                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                >
+                    {this.dueFlashcardsCount.toString()}
+                </span>
+                <span
+                    style="background-color:#2196f3;"
+                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                >
+                    {this.newFlashcardsCount.toString()}
+                </span>
+                <span
+                    style="background-color:#ff7043;"
+                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                >
+                    {this.totalFlashcards.toString()}
+                </span>
+            </span>
+        );
 
         const deckViewChildren: HTMLElement = deckView.createDiv("tree-item-children");
         deckViewChildren.style.display = "none";
@@ -703,8 +723,7 @@ export class Deck {
             modal.plugin.data.settings
         ).interval;
 
-        if (modal.ignoreStats)
-        {
+        if (modal.ignoreStats) {
             // Same for mobile/desktop
             modal.hardBtn.setText(`${t("HARD")}`);
             modal.easyBtn.setText(`${t("EASY")}`);
