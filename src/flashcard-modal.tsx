@@ -398,57 +398,124 @@ export class FlashcardModal extends Modal {
             this.currentCard.note.path,
             this.plugin
         );
+
         containerEl.findAll(".internal-embed").forEach((el) => {
-            const src: string = el.getAttribute("src");
-            const target: TFile | null | false =
-                typeof src === "string" &&
-                this.plugin.app.metadataCache.getFirstLinkpathDest(src, this.currentCard.note.path);
-            if (target instanceof TFile && target.extension !== "md") {
-                if (target.extension === "mp3" || target.extension == "webm") {
-                    el.innerText = "";
-                    el.createEl(
-                        "audio",
-                        {
-                            attr: {
-                                controls: "",
-                                src: this.plugin.app.vault.getResourcePath(target),
-                            },
-                        },
-                        (img) => {
-                            if (el.hasAttribute("alt"))
-                                img.setAttribute("alt", el.getAttribute("alt"));
-                        }
-                    );
-                    el.addClasses(["media-embed", "is-loaded"]);
+            const link = this.parseLink(el.getAttribute("src"));
+
+            // file does not exist, display dead link
+            if (!link.target) {
+                el.innerText = link.text;
+            } else if (link.target instanceof TFile) {
+                if (link.target.extension !== "md") {
+                    this.embedMediaFile(el, link.target);
                 } else {
                     el.innerText = "";
-                    el.createEl(
-                        "img",
-                        {
-                            attr: {
-                                src: this.plugin.app.vault.getResourcePath(target),
-                            },
-                        },
-                        (img) => {
-                            if (el.hasAttribute("width"))
-                                img.setAttribute("width", el.getAttribute("width"));
-                            else img.setAttribute("width", "100%");
-                            if (el.hasAttribute("alt"))
-                                img.setAttribute("alt", el.getAttribute("alt"));
-                            el.addEventListener(
-                                "click",
-                                (ev) =>
-                                    (ev.target.style.minWidth =
-                                        ev.target.style.minWidth === "100%" ? null : "100%")
-                            );
-                        }
-                    );
-                    el.addClasses(["image-embed", "is-loaded"]);
+                    this.renderTransclude(el, link);
                 }
-            } else if (target === null) {
-                // file does not exist, display dead link
-                el.innerText = src;
             }
+        });
+    }
+
+    parseLink(src: string) {
+        const linkComponentsRegex =
+            /^(?<file>[^#^]+)?(?:#(?!\^)(?<heading>.+)|#\^(?<blockId>.+)|#)?$/;
+        const matched = typeof src === "string" && src.match(linkComponentsRegex);
+        const file = matched.groups.file || this.currentCard.note.path;
+        const target = this.plugin.app.metadataCache.getFirstLinkpathDest(
+            file,
+            this.currentCard.note.path
+        );
+        // move lookup upstream? ^^^
+        return {
+            text: matched[0],
+            file: matched.groups.file,
+            heading: matched.groups.heading,
+            blockId: matched.groups.blockId,
+            target: target,
+        };
+    }
+
+    embedMediaFile(el: HTMLElement, target: TFile) {
+        if (target.extension === "mp3" || target.extension == "webm") {
+            el.innerText = "";
+            el.createEl(
+                "audio",
+                {
+                    attr: {
+                        controls: "",
+                        src: this.plugin.app.vault.getResourcePath(target),
+                    },
+                },
+                (audio) => {
+                    if (el.hasAttribute("alt")) audio.setAttribute("alt", el.getAttribute("alt"));
+                }
+            );
+            el.addClasses(["media-embed", "is-loaded"]);
+        } else {
+            el.innerText = "";
+            el.createEl(
+                "img",
+                {
+                    attr: {
+                        src: this.plugin.app.vault.getResourcePath(target),
+                    },
+                },
+                (img) => {
+                    if (el.hasAttribute("width"))
+                        img.setAttribute("width", el.getAttribute("width"));
+                    else img.setAttribute("width", "100%");
+                    if (el.hasAttribute("alt")) img.setAttribute("alt", el.getAttribute("alt"));
+                    el.addEventListener(
+                        "click",
+                        (ev) =>
+                            (ev.target.style.minWidth =
+                                ev.target.style.minWidth === "100%" ? null : "100%")
+                    );
+                }
+            );
+            el.addClasses(["image-embed", "is-loaded"]);
+        }
+    }
+
+    async renderTransclude(
+        el: HTMLElement,
+        link: {
+            text: string;
+            file: string;
+            heading: string;
+            blockId: string;
+            target: TFile;
+        }
+    ) {
+        const cache = this.app.metadataCache.getCache(link.target.path);
+        const text = await this.app.vault.cachedRead(link.target);
+        let blockText;
+        if (link.heading) {
+            const clean = (s: string) => s.replace(/[\W\s]/g, "");
+            const headingIndex = cache.headings?.findIndex(
+                (h) => clean(h.heading) === clean(link.heading)
+            );
+            const heading = cache.headings[headingIndex];
+
+            const startAt = heading.position.start.offset;
+            const endAt =
+                cache.headings.slice(headingIndex + 1).find((h) => h.level <= heading.level)
+                    ?.position?.start?.offset || text.length;
+
+            blockText = text.substring(startAt, endAt);
+        } else if (link.blockId) {
+            const block = cache.blocks[link.blockId];
+            const startAt = block.position.start.offset;
+            const endAt = block.position.end.offset;
+            blockText = text.substring(startAt, endAt);
+        } else {
+            blockText = text;
+        }
+
+        MarkdownRenderer.renderMarkdown(blockText, el, link.target.path, this.plugin);
+
+        el.findAll(".internal-embed").forEach((el) => {
+            this.embedMediaFile(el, this.parseLink(el.getAttribute("src")).target);
         });
     }
 }
