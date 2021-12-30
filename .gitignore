@@ -11,3 +11,6 @@ package-lock.json
 
 # build
 build
+
+# coverage
+coverage

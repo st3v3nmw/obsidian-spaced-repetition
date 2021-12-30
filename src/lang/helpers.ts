@@ -62,12 +62,12 @@ function interpolate(str: string, params: Record<string, unknown>): string {
 
 export function t(str: keyof typeof en, params?: Record<string, unknown>): string {
     if (!locale) {
-        console.error("Error: SRS locale not found", moment.locale());
+        console.error(`SRS error: Locale ${moment.locale()} not found.`);
     }
 
     const result = (locale && locale[str]) || en[str];
 
-    if(params) {
+    if (params) {
         return interpolate(result, params);
     }
 

@@ -63,26 +63,25 @@ export function schedule(
         interval = Math.round(interval);
         if (!Object.prototype.hasOwnProperty.call(dueDates, interval)) {
             dueDates[interval] = 0;
-        }
-
-        let fuzzRange: [number, number];
-        // disable fuzzing for small intervals
-        if (interval <= 4) {
-            fuzzRange = [interval, interval];
         } else {
-            let fuzz: number;
-            if (interval < 7) fuzz = 1;
-            else if (interval < 30) fuzz = Math.max(2, Math.floor(interval * 0.15));
-            else fuzz = Math.max(4, Math.floor(interval * 0.05));
-            fuzzRange = [interval - fuzz, interval + fuzz];
-        }
+            // disable fuzzing for small intervals
+            if (interval > 4) {
+                let fuzz = 0;
+                if (interval < 7) fuzz = 1;
+                else if (interval < 30) fuzz = Math.max(2, Math.floor(interval * 0.15));
+                else fuzz = Math.max(4, Math.floor(interval * 0.05));
 
-        for (let ivl = fuzzRange[0]; ivl <= fuzzRange[1]; ivl++) {
-            if (!Object.prototype.hasOwnProperty.call(dueDates, ivl)) {
-                dueDates[ivl] = 0;
-            }
-            if (dueDates[ivl] < dueDates[interval]) {
-                interval = ivl;
+                const originalInterval = interval;
+                outer: for (let i = 1; i <= fuzz; i++) {
+                    for (const ivl of [originalInterval - i, originalInterval + i]) {
+                        if (!Object.prototype.hasOwnProperty.call(dueDates, ivl)) {
+                            dueDates[ivl] = 0;
+                            interval = ivl;
+                            break outer;
+                        }
+                        if (dueDates[ivl] < dueDates[interval]) interval = ivl;
+                    }
+                }
             }
         }
 
@@ -96,12 +95,12 @@ export function schedule(
 
 export function textInterval(interval: number, isMobile: boolean): string {
     const m: number = Math.round(interval / 3) / 10,
-        y: number = Math.round(interval / 36.5) / 10;
+        y: number = Math.round(interval / 36.525) / 10;
 
     if (isMobile) {
-        if (interval < 30) return `${interval}d`;
-        else if (interval < 365) return `${m}m`;
-        else return `${y}y`;
+        if (interval < 30) return t("DAYS_STR_IVL_MOBILE", { interval });
+        else if (interval < 365) return t("MONTHS_STR_IVL_MOBILE", { interval: m });
+        else return t("YEARS_STR_IVL_MOBILE", { interval: y });
     } else {
         if (interval < 30) {
             return t("DAYS_STR_IVL", { interval });
