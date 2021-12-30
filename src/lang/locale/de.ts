@@ -42,6 +42,9 @@ export default {
     DAYS_STR_IVL: "${interval} Tag(e)",
     MONTHS_STR_IVL: "${interval} Monat(e)",
     YEARS_STR_IVL: "${interval} Jahr(e)",
+    DAYS_STR_IVL_MOBILE: "${interval}d",
+    MONTHS_STR_IVL_MOBILE: "${interval}m",
+    YEARS_STR_IVL_MOBILE: "${interval}y",
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition Plugin - Einstellungen",
@@ -123,7 +126,6 @@ export default {
 
     // stats-modal.ts
     STATS_TITLE: "Statistiken",
-    OBSIDIAN_CHARTS_REQUIRED: "Hinweis: Das Obsidian Charts Plugin wird benötigt um die Statistiken anzuzeigen.",
     FORECAST: "Prognose",
     FORECAST_DESC: "Anzahl der künftig anstehenden Karten",
     SCHEDULED: "Anstehend",

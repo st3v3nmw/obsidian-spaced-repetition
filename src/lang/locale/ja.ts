@@ -39,6 +39,9 @@ export default {
     DAYS_STR_IVL: "${interval}日後",
     MONTHS_STR_IVL: "${interval}月後",
     YEARS_STR_IVL: "${interval}年後",
+    DAYS_STR_IVL_MOBILE: "${interval}d",
+    MONTHS_STR_IVL_MOBILE: "${interval}m",
+    YEARS_STR_IVL_MOBILE: "${interval}y",
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition Plugin - 設定",
@@ -120,7 +123,6 @@ export default {
 
     // stats-modal.ts
     STATS_TITLE: "統計",
-    OBSIDIAN_CHARTS_REQUIRED: "この機能を動作させるにはObsidian Chartsプラグインが必要です",
     FORECAST: "予測",
     FORECAST_DESC: "復習期日が来るカードの枚数",
     SCHEDULED: "スケジューリング済み",

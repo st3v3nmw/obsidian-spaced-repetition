@@ -6,9 +6,9 @@
     "scripts": {
         "dev": "node esbuild.config.mjs",
         "build": "node esbuild.config.mjs production",
-        "test": "jest"
+        "test": "jest --coverage"
     },
-    "keywords": [],
+    "keywords": ["obsidian", "spaced-repetition"],
     "author": "Stephen Mwangi",
     "license": "MIT",
     "devDependencies": {

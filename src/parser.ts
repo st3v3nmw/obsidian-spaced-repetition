@@ -1,4 +1,4 @@
-import { CardType } from "src/types";
+import { CardType } from "src/scheduling";
 
 /**
  * Returns flashcards found in `text`

@@ -39,6 +39,9 @@ export default {
     DAYS_STR_IVL: "${interval} day(s)",
     MONTHS_STR_IVL: "${interval} month(s)",
     YEARS_STR_IVL: "${interval} year(s)",
+    DAYS_STR_IVL_MOBILE: "${interval}d",
+    MONTHS_STR_IVL_MOBILE: "${interval}m",
+    YEARS_STR_IVL_MOBILE: "${interval}y",
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition Plugin - Settings",
@@ -120,7 +123,6 @@ export default {
 
     // stats-modal.ts
     STATS_TITLE: "Statistics",
-    OBSIDIAN_CHARTS_REQUIRED: "Note that this requires the Obsidian Charts plugin to work",
     FORECAST: "Forecast",
     FORECAST_DESC: "The number of cards due in the future",
     SCHEDULED: "Scheduled",
