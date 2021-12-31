@@ -22,7 +22,7 @@
         "eslint": "^8.3.0",
         "jest": "^27.4.5",
         "moment": "^2.29.1",
-        "obsidian": "^0.12.17",
+        "obsidian": "^0.13.11",
         "ts-jest": "^27.0.4",
         "tslib": "2.3.1",
         "typescript": "4.4.4",
