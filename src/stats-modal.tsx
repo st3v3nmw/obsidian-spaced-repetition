@@ -128,11 +128,11 @@ export class StatsModal extends Modal {
                         .reduce((a, b) => a + b, 0) /
                         scheduledCount) *
                         10
-                ) / 10,
+                ) / 10 || 0,
                 false
             ),
             longest_interval: string = textInterval(
-                Math.max(...getKeysPreserveType(cardStats.intervals)),
+                Math.max(...getKeysPreserveType(cardStats.intervals)) || 0,
                 false
             );
 
@@ -156,11 +156,12 @@ export class StatsModal extends Modal {
                 cardStats.eases[ease] = 0;
             }
         }
-        const average_ease: number = Math.round(
-            Object.entries(cardStats.eases)
-                .map(([ease, count]) => ease * count)
-                .reduce((a, b) => a + b, 0) / scheduledCount
-        );
+        const average_ease: number =
+            Math.round(
+                Object.entries(cardStats.eases)
+                    .map(([ease, count]) => ease * count)
+                    .reduce((a, b) => a + b, 0) / scheduledCount
+            ) || 0;
 
         createStatsChart(
             "bar",

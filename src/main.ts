@@ -392,6 +392,7 @@ export default class SRPlugin extends Plugin {
         this.deckTree.sortSubdecksList();
         if (this.data.settings.showDebugMessages) {
             console.log(`SR: ${t("EASES")}`, this.easeByPath);
+            console.log(`SR: ${t("DECKS")}`, this.deckTree);
         }
 
         for (const deckKey in this.reviewDecks) {
@@ -652,15 +653,17 @@ export default class SRPlugin extends Plugin {
                 lineNo: number = parsedCard[2];
             let cardText: string = parsedCard[1];
 
-            const tagInCardRegEx = /#[^\s#]+/gi;
-            const cardDeckPath = cardText
-                .match(tagInCardRegEx)
-                ?.slice(-1)[0]
-                .replace("#", "")
-                .split("/");
-            if (cardDeckPath) {
-                deckPath = cardDeckPath;
-                cardText = cardText.replaceAll(tagInCardRegEx, "");
+            if (!settings.convertFoldersToDecks) {
+                const tagInCardRegEx = /^#[^\s#]+/gim;
+                const cardDeckPath = cardText
+                    .match(tagInCardRegEx)
+                    ?.slice(-1)[0]
+                    .replace("#", "")
+                    .split("/");
+                if (cardDeckPath) {
+                    deckPath = cardDeckPath;
+                    cardText = cardText.replaceAll(tagInCardRegEx, "");
+                }
             }
 
             this.deckTree.createDeck([...deckPath]);

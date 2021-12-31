@@ -112,21 +112,21 @@ export class FlashcardModal extends Modal {
                     aria-label={t("DUE_CARDS")}
                     class="tag-pane-tag-count tree-item-flair"
                 >
-                    {this.plugin.deckTree.dueFlashcardsCount}
+                    {this.plugin.deckTree.dueFlashcardsCount.toString()}
                 </span>
                 <span
                     style="background-color:#2196f3;"
                     aria-label={t("NEW_CARDS")}
                     class="tag-pane-tag-count tree-item-flair sr-deck-counts"
                 >
-                    {this.plugin.deckTree.newFlashcardsCount}
+                    {this.plugin.deckTree.newFlashcardsCount.toString()}
                 </span>
                 <span
                     style="background-color:#ff7043;"
                     aria-label={t("TOTAL_CARDS")}
                     class="tag-pane-tag-count tree-item-flair sr-deck-counts"
                 >
-                    {this.plugin.deckTree.totalFlashcards}
+                    {this.plugin.deckTree.totalFlashcards.toString()}
                 </span>
             </p>
         );
@@ -724,7 +724,7 @@ export class Deck {
         modal.responseDiv.style.display = "none";
         modal.resetLinkView.style.display = "none";
         modal.titleEl.setText(
-            `${this.deckName} - ${this.dueFlashcardsCount + this.newFlashcardsCount}`
+            `${this.deckName}: ${this.dueFlashcardsCount + this.newFlashcardsCount}`
         );
 
         modal.answerBtn.style.display = "initial";
