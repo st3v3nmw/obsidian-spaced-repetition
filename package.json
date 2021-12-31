@@ -18,7 +18,7 @@
         "@typescript-eslint/eslint-plugin": "^5.2.0",
         "@typescript-eslint/parser": "^5.2.0",
         "builtin-modules": "^3.2.0",
-        "esbuild": "~0.13.0",
+        "esbuild": "~0.14.9",
         "eslint": "^8.3.0",
         "jest": "^27.4.5",
         "moment": "^2.29.1",
