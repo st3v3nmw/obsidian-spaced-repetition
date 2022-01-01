@@ -50,7 +50,15 @@ export class StatsModal extends Modal {
 
         this.plugin = plugin;
 
-        this.titleEl.setText(t("STATS_TITLE"));
+        this.titleEl.setText(`${t("STATS_TITLE")} `);
+        this.titleEl.innerHTML += (
+            <select id="chartPeriod">
+                <option value="month" selected>{t("MONTH")}</option>
+                <option value="quarter">{t("QUARTER")}</option>
+                <option value="year">{t("YEAR")}</option>
+                <option value="lifetime">{t("LIFETIME")}</option>
+            </select>
+        );
 
         this.modalEl.style.height = "100%";
         this.modalEl.style.width = "100%";
@@ -89,11 +97,14 @@ export class StatsModal extends Modal {
             <div>
                 <canvas id="forecastChart"></canvas>
                 <span id="forecastChartSummary"></span>
+                <p></p>
                 <canvas id="intervalsChart"></canvas>
                 <span id="intervalsChartSummary"></span>
+                <p></p>
                 <canvas id="easesChart"></canvas>
                 <span id="easesChartSummary"></span>
-                <div style="width: 50%;">
+                <p></p>
+                <div style="width: 50%; margin: auto;">
                     <canvas id="cardTypesChart"></canvas>
                 </div>
                 <span id="cardTypesChartSummary"></span>
@@ -238,15 +249,17 @@ function createStatsChart(
         backgroundColor = ["#2196f3", "#4caf50", "green"];
     }
 
-    new Chart(document.getElementById(canvasId) as HTMLCanvasElement, {
+    const shouldFilter = canvasId === "forecastChart" || canvasId === "intervalsChart";
+
+    const statsChart = new Chart(document.getElementById(canvasId) as HTMLCanvasElement, {
         type,
         data: {
-            labels,
+            labels: shouldFilter ? labels.slice(0, 31) : labels,
             datasets: [
                 {
                     label: seriesTitle,
                     backgroundColor,
-                    data,
+                    data: shouldFilter ? data.slice(0, 31) : data,
                 },
             ],
         },
@@ -256,10 +269,16 @@ function createStatsChart(
                 title: {
                     display: true,
                     text: title,
+                    font: {
+                        size: 22,
+                    },
                 },
                 subtitle: {
                     display: true,
                     text: subtitle,
+                    font: {
+                        size: 16,
+                    },
                 },
                 legend: {
                     display: false,
@@ -267,6 +286,35 @@ function createStatsChart(
             },
         },
     });
+
+    if (shouldFilter) {
+        const chartPeriodEl = document.getElementById("chartPeriod");
+        chartPeriodEl.addEventListener("click", () => {
+            let filteredLabels, filteredData;
+            const chartPeriod = chartPeriodEl.value;
+            if (chartPeriod === "month") {
+                filteredLabels = labels.slice(0, 31);
+                filteredData = data.slice(0, 31);
+            } else if (chartPeriod === "quarter") {
+                filteredLabels = labels.slice(0, 91);
+                filteredData = data.slice(0, 91);
+            } else if (chartPeriod === "year") {
+                filteredLabels = labels.slice(0, 366);
+                filteredData = data.slice(0, 366);
+            } else {
+                filteredLabels = labels;
+                filteredData = data;
+            }
+
+            statsChart.data.labels = filteredLabels;
+            statsChart.data.datasets[0] = {
+                label: seriesTitle,
+                backgroundColor,
+                data: filteredData,
+            };
+            statsChart.update();
+        });
+    }
 
     document.getElementById(`${canvasId}Summary`).innerText = summary;
 }

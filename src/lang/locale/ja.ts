@@ -1,7 +1,7 @@
 // 日本語
 
 export default {
-    // flashcard-modal.ts
+    // flashcard-modal.tsx
     DECKS: "デッキ",
     DUE_CARDS: "期日のカード",
     NEW_CARDS: "新規のカード",
@@ -121,8 +121,12 @@ export default {
     TODAY: "今日",
     TOMORROW: "明日",
 
-    // stats-modal.ts
+    // stats-modal.tsx
     STATS_TITLE: "統計",
+    MONTH: "Month",
+    QUARTER: "Quarter",
+    YEAR: "Year",
+    LIFETIME: "Lifetime",
     FORECAST: "予測",
     FORECAST_DESC: "復習期日が来るカードの枚数",
     SCHEDULED: "スケジューリング済み",

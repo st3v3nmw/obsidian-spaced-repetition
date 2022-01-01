@@ -1,7 +1,7 @@
 // English
 
 export default {
-    // flashcard-modal.ts
+    // flashcard-modal.tsx
     DECKS: "Decks",
     DUE_CARDS: "Due Cards",
     NEW_CARDS: "New Cards",
@@ -121,8 +121,12 @@ export default {
     TODAY: "Today",
     TOMORROW: "Tomorrow",
 
-    // stats-modal.ts
+    // stats-modal.tsx
     STATS_TITLE: "Statistics",
+    MONTH: "Month",
+    QUARTER: "Quarter",
+    YEAR: "Year",
+    LIFETIME: "Lifetime",
     FORECAST: "Forecast",
     FORECAST_DESC: "The number of cards due in the future",
     SCHEDULED: "Scheduled",
