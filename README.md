@@ -22,7 +22,7 @@ To help translate this plugin to another language, check the [translation guide 
     - [Cloze cards](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#cloze-cards) (`==highlight==` your cloze deletions!, or `**bolded text**`)
     - [Card context - automatic titles based on headings](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Reviewing-Flashcards#context) (i.e. `Note title > Heading 1 > Subheading`)
     - Rich text support in flashcards (inherited from Obsidian)
-      - Images
+      - Images, Audio, & Video
       - LaTeX
       - Code syntax highlighting
       - Footnotes

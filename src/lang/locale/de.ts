@@ -4,7 +4,7 @@
 // https://github.com/obsidianmd/obsidian-translations/blob/master/de.json
 
 export default {
-    // flashcard-modal.ts
+    // flashcard-modal.tsx
     DECKS: "Stapel",
     DUE_CARDS: "Anstehende Karten",
     NEW_CARDS: "Neue Karten",
@@ -124,8 +124,12 @@ export default {
     TODAY: "Heute",
     TOMORROW: "Morgen",
 
-    // stats-modal.ts
+    // stats-modal.tsx
     STATS_TITLE: "Statistiken",
+    MONTH: "Month",
+    QUARTER: "Quarter",
+    YEAR: "Year",
+    LIFETIME: "Lifetime",
     FORECAST: "Prognose",
     FORECAST_DESC: "Anzahl der künftig anstehenden Karten",
     SCHEDULED: "Anstehend",

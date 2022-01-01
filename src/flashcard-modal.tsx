@@ -17,6 +17,9 @@ import {
     COLLAPSE_ICON,
     MULTI_SCHEDULING_EXTRACTOR,
     LEGACY_SCHEDULING_EXTRACTOR,
+    IMAGE_FORMATS,
+    AUDIO_FORMATS,
+    VIDEO_FORMATS,
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
@@ -391,7 +394,13 @@ export class FlashcardModal extends Modal {
 
     // slightly modified version of the renderMarkdown function in
     // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/KanbanView.tsx
-    async renderMarkdownWrapper(markdownString: string, containerEl: HTMLElement): Promise<void> {
+    async renderMarkdownWrapper(
+        markdownString: string,
+        containerEl: HTMLElement,
+        recursiveDepth = 0
+    ): Promise<void> {
+        if (recursiveDepth > 4) return;
+
         MarkdownRenderer.renderMarkdown(
             markdownString,
             containerEl,
@@ -410,7 +419,7 @@ export class FlashcardModal extends Modal {
                     this.embedMediaFile(el, link.target);
                 } else {
                     el.innerText = "";
-                    this.renderTransclude(el, link);
+                    this.renderTransclude(el, link, recursiveDepth);
                 }
             }
         });
@@ -436,23 +445,8 @@ export class FlashcardModal extends Modal {
     }
 
     embedMediaFile(el: HTMLElement, target: TFile) {
-        if (target.extension === "mp3" || target.extension == "webm") {
-            el.innerText = "";
-            el.createEl(
-                "audio",
-                {
-                    attr: {
-                        controls: "",
-                        src: this.plugin.app.vault.getResourcePath(target),
-                    },
-                },
-                (audio) => {
-                    if (el.hasAttribute("alt")) audio.setAttribute("alt", el.getAttribute("alt"));
-                }
-            );
-            el.addClasses(["media-embed", "is-loaded"]);
-        } else {
-            el.innerText = "";
+        el.innerText = "";
+        if (IMAGE_FORMATS.includes(target.extension)) {
             el.createEl(
                 "img",
                 {
@@ -474,6 +468,25 @@ export class FlashcardModal extends Modal {
                 }
             );
             el.addClasses(["image-embed", "is-loaded"]);
+        } else if (
+            AUDIO_FORMATS.includes(target.extension) ||
+            VIDEO_FORMATS.includes(target.extension)
+        ) {
+            el.createEl(
+                AUDIO_FORMATS.includes(target.extension) ? "audio" : "video",
+                {
+                    attr: {
+                        controls: "",
+                        src: this.plugin.app.vault.getResourcePath(target),
+                    },
+                },
+                (audio) => {
+                    if (el.hasAttribute("alt")) audio.setAttribute("alt", el.getAttribute("alt"));
+                }
+            );
+            el.addClasses(["media-embed", "is-loaded"]);
+        } else {
+            el.innerText = target.path;
         }
     }
 
@@ -485,7 +498,8 @@ export class FlashcardModal extends Modal {
             heading: string;
             blockId: string;
             target: TFile;
-        }
+        },
+        recursiveDepth: number
     ) {
         const cache = this.app.metadataCache.getCache(link.target.path);
         const text = await this.app.vault.cachedRead(link.target);
@@ -512,11 +526,7 @@ export class FlashcardModal extends Modal {
             blockText = text;
         }
 
-        MarkdownRenderer.renderMarkdown(blockText, el, link.target.path, this.plugin);
-
-        el.findAll(".internal-embed").forEach((el) => {
-            this.embedMediaFile(el, this.parseLink(el.getAttribute("src")).target);
-        });
+        this.renderMarkdownWrapper(blockText, el, recursiveDepth + 1);
     }
 }
 
