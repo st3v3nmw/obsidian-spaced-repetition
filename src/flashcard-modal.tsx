@@ -141,6 +141,30 @@ export class FlashcardModal extends Modal {
         }
     }
 
+    // async createNewEditModal(): Promise<void> {
+        // const activeLeaf = this.plugin.app.workspace.activeLeaf;
+        // if (this.plugin.app.workspace.getActiveFile() === null) {
+        //     await activeLeaf.openFile(this.currentCard.note);
+        // }
+        // else {
+        //     const newLeaf = this.plugin.app.workspace.createLeafBySplit(
+        //         activeLeaf,
+        //         "vertical",
+        //         false
+        //     );
+        //     await newLeaf.openFile(this.currentCard.note, { active: true });
+        // }
+        // const activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+        // activeView.editor.setCursor({
+        //     line: this.currentCard.lineNo,
+        //     ch: 0,
+        // });
+        // this.modifyCards.push(this.currentCard);
+        // this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+        // this.burySiblingCards(false);
+        // this.currentDeck.nextCard(this);
+    // }
+
     setupCardsView(): void {
         this.contentEl.innerHTML = "";
 
@@ -150,22 +174,11 @@ export class FlashcardModal extends Modal {
             this.fileLinkView.setAttribute("aria-label", t("EDIT_LATER"));
         }
         this.fileLinkView.addEventListener("click", async () => {
-            const activeLeaf: WorkspaceLeaf = this.plugin.app.workspace.activeLeaf;
-            if (this.plugin.app.workspace.getActiveFile() === null)
-                await activeLeaf.openFile(this.currentCard.note);
-            else {
-                const newLeaf = this.plugin.app.workspace.createLeafBySplit(
-                    activeLeaf,
-                    "vertical",
-                    false
-                );
-                await newLeaf.openFile(this.currentCard.note, { active: true });
-            }
-            const activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-            activeView.editor.setCursor({
-                line: this.currentCard.lineNo,
-                ch: 0,
-            });
+            this.currentCard.editLater = true;
+            let fileText: string = await this.app.vault.read(this.currentCard.note);
+            const replacementRegex = new RegExp(escapeRegexString(this.currentCard.cardText), "gm");
+            fileText = fileText.replace(replacementRegex, () => this.currentCard.cardText+"\n#edit-later");
+            await this.app.vault.modify(this.currentCard.note, fileText);
             this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
             this.burySiblingCards(false);
             this.currentDeck.nextCard(this);
