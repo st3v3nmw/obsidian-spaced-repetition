@@ -13,6 +13,7 @@ export enum ReviewResponse {
 // Flashcards
 
 export interface Card {
+    editLater: boolean;
     // scheduling
     isDue: boolean;
     interval?: number;
