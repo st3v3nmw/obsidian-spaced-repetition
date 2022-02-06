@@ -22,6 +22,7 @@ export interface SRSettings {
     singlelineReversedCardSeparator: string;
     multilineCardSeparator: string;
     multilineReversedCardSeparator: string;
+    editLaterTag: string;
     // notes
     tagsToReview: string[];
     noteFoldersToIgnore: string[];
@@ -56,6 +57,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     singlelineReversedCardSeparator: ":::",
     multilineCardSeparator: "?",
     multilineReversedCardSeparator: "??",
+    editLaterTag: "#edit-later",
     // notes
     tagsToReview: ["#review"],
     noteFoldersToIgnore: [],
@@ -361,6 +363,31 @@ export class SRSettingTab extends PluginSettingTab {
                     .onClick(async () => {
                         this.plugin.data.settings.multilineReversedCardSeparator =
                             DEFAULT_SETTINGS.multilineReversedCardSeparator;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
+
+        new Setting(containerEl)
+            .setName(t("EDIT_LATER_TAG"))
+            .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
+            .addText((text) =>
+                text
+                    .setValue(this.plugin.data.settings.editLaterTag)
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.editLaterTag = value;
+                            await this.plugin.savePluginData();
+                        });
+                    })
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.multilineCardSeparator =
+                            DEFAULT_SETTINGS.multilineCardSeparator;
                         await this.plugin.savePluginData();
                         this.display();
                     });
