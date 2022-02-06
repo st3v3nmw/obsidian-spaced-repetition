@@ -79,6 +79,7 @@ export default {
     INLINE_REVERSED_CARDS_SEPARATOR: "Separator for inline reversed flashcards",
     MULTILINE_CARDS_SEPARATOR: "Separator for multiline flashcards",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Separator for multiline reversed flashcards",
+    EDIT_LATER_TAG: "Tag to insert when flashcard marked for editing later",
     NOTES: "Notes",
     TAGS_TO_REVIEW: "Tags to review",
     TAGS_TO_REVIEW_DESC: "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.",
