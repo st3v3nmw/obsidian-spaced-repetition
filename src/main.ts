@@ -781,6 +781,7 @@ export default class SRPlugin extends Plugin {
                     cardType,
                     siblingIdx: i,
                     siblings,
+                    editLater: false
                 };
 
                 // card scheduled
