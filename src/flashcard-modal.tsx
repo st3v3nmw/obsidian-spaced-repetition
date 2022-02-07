@@ -177,7 +177,7 @@ export class FlashcardModal extends Modal {
             this.currentCard.editLater = true;
             let fileText: string = await this.app.vault.read(this.currentCard.note);
             const replacementRegex = new RegExp(escapeRegexString(this.currentCard.cardText), "gm");
-            fileText = fileText.replace(replacementRegex, () => this.currentCard.cardText+"\n#edit-later");
+            fileText = fileText.replace(replacementRegex, () => this.currentCard.cardText+`\n${this.plugin.data.settings.editLaterTag}`);
             await this.app.vault.modify(this.currentCard.note, fileText);
             this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
             this.burySiblingCards(false);
