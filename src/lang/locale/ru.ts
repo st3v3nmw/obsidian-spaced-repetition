@@ -1,10 +1,11 @@
 // русский
 
 // @ytatichno Сафронов Максим
+// https://github.com/ytatichno
 
 export default {
     // flashcard-modal.tsx
-    DECKS: "Доски",
+    DECKS: "Уровни",
     DUE_CARDS: "Предстоящие карточки",
     NEW_CARDS: "Новые карточки",
     TOTAL_CARDS: "Всего карточек",
@@ -34,7 +35,7 @@ export default {
     NOTE_IN_IGNORED_FOLDER: "Заметка сохранена в игнорируемую папку (см настройки).",
     PLEASE_TAG_NOTE: "Пожалуйста пометьте заметку как надо для повторения (см настройки).",
     RESPONSE_RECEIVED: "Ответ получен.",
-    NO_DECK_EXISTS: "Не существует доски ${deckName}",
+    NO_DECK_EXISTS: "Не существует уровня ${deckName}",
     ALL_CAUGHT_UP: "Есть! Ты справился! :D.",
 
     // scheduling.ts
@@ -54,22 +55,22 @@ export default {
     FLASHCARD_TAGS: "Тэги карточек",
     FLASHCARD_TAGS_DESC:
         "Ведите тэги разделенные enter'ом или пробелом пример: #flashcards #deck2 #deck3.",
-    CONVERT_FOLDERS_TO_DECKS: "Конвертировать папки в доски и субдоски?",
+    CONVERT_FOLDERS_TO_DECKS: "Конвертировать папки в уровни и подуровни?",
     CONVERT_FOLDERS_TO_DECKS_DESC: "Это альтернатива тэгам карточек, настройка сверху.",
     INLINE_SCHEDULING_COMMENTS:
         "Сохранять комментарий планирования на строке после карточек?",
     INLINE_SCHEDULING_COMMENTS_DESC:
         "Включение этого сделает так, что HTML комментарии не будут ломать форматирование списка.",
-    BURY_SIBLINGS_TILL_NEXT_DAY: "Bury sibling cards until the next day?",
+    BURY_SIBLINGS_TILL_NEXT_DAY: "Прятать родственные карточки до след. дня?",
     BURY_SIBLINGS_TILL_NEXT_DAY_DESC:
-        "Siblings are cards generated from the same card text i.e. cloze deletions",
-    SHOW_CARD_CONTEXT: "Show context in cards?",
-    SHOW_CARD_CONTEXT_DESC: "i.e. Title > Heading 1 > Subheading > ... > Subheading",
-    CARD_MODAL_HEIGHT_PERCENT: "Flashcard Height Percentage",
+        "Родственные карточки - те, которые образованы из одного текста, пример: карточки с пропусками([...])",
+    SHOW_CARD_CONTEXT: "Показывать контекст в карточках(во время повторения)?",
+    SHOW_CARD_CONTEXT_DESC: "пример: Title > Heading 1 > Subheading > ... > Subheading",
+    CARD_MODAL_HEIGHT_PERCENT: "Высота карточки впроцентах",
     CARD_MODAL_SIZE_PERCENT_DESC:
-        "Should be set to 100% on mobile or if you have very large images",
+        "Если пользуетесь мобильным телефоном, выставьте 100% или у вас будут огромные изображения",
     RESET_DEFAULT: "Настройки по умолчанию",
-    CARD_MODAL_WIDTH_PERCENT: "Процентаж ширины карточки",
+    CARD_MODAL_WIDTH_PERCENT: "Ширина карточки в процентах",
     FILENAME_OR_OPEN_FILE: "Показывать имя файла вместо 'Редактировать после' во время повторения?",
     RANDOMIZE_CARD_ORDER: "Случайный порядок карточек во время повторения?",
     DISABLE_CLOZE_CARDS: "Выключить карты с пропусками(пример: [...])?",
@@ -90,33 +91,34 @@ export default {
     DISABLE_FILE_MENU_REVIEW_OPTIONS:
         "Выключить выбор сложности повторения в меню файла, пример: Повторение: Легко Нормально Сложно",
     DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "После выключения вы сможете повторять при помощи хоткеев. Перезагрузите Obsidian после изменения этого.",
         "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this.",
-    MAX_N_DAYS_REVIEW_QUEUE: "Maximum number of days to display on right panel",
-    MIN_ONE_DAY: "The number of days must be at least 1.",
-    VALID_NUMBER_WARNING: "Please provide a valid number.",
+    MAX_N_DAYS_REVIEW_QUEUE: "Наибольшее количество дней для отображение на панели справа",
+    MIN_ONE_DAY: "Количество дней не меньше 1.",
+    VALID_NUMBER_WARNING: "Пожалуйста введите подходящее число.",
     ALGORITHM: "Алгоритм",
     CHECK_ALGORITHM_WIKI:
         'За дополнительной информацией обращайтесь к <a href="${algo_url}">реализация алгоритма</a>(скоро будет перевод).',
     BASE_EASE: "Базовая Простота",
     BASE_EASE_DESC: "минимум = 130, предпочтительно около 250.",
     BASE_EASE_MIN_WARNING: "Простота должна быть минимум 130.",
-    LAPSE_INTERVAL_CHANGE: "Interval change when you review a flashcard/note as hard",
-    LAPSE_INTERVAL_CHANGE_DESC: "newInterval = oldInterval * intervalChange / 100.",
+    LAPSE_INTERVAL_CHANGE: "Изменение промежутка когда вы отвечаете Сложно во время повторения карточки/заметки",
+    LAPSE_INTERVAL_CHANGE_DESC: "новыйПромежуток = старыйПромежуток * изменениеПромежутка / 100.",
     EASY_BONUS: "Легко: бонус",
     EASY_BONUS_DESC:
-        "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%).",
-    EASY_BONUS_MIN_WARNING: "The easy bonus must be at least 100.",
-    MAX_INTERVAL: "Maximum Interval",
-    MAX_INTERVAL_DESC: "Allows you to place an upper limit on the interval (default = 100 years).",
-    MAX_INTERVAL_MIN_WARNING: "The maximum interval must be at least 1 day.",
-    MAX_LINK_CONTRIB: "Maximum link contribution",
+        "Бонус за Легко позволяет вам установить разницу в промежутках между ответами Хорошо и Легко на карточке/заметке (мин. = 100%).",
+    EASY_BONUS_MIN_WARNING: "Бонус за Легко должен быть не меньше 100.",
+    MAX_INTERVAL: "Максимальный промежуток(откладывания карточки)",
+    MAX_INTERVAL_DESC: "Позволяет вам устанавливать верхнюю границу на промежуток (по умолчанию = 100 years).",
+    MAX_INTERVAL_MIN_WARNING: "Максимальный промежуток должен быть не меньше 1.",
+    MAX_LINK_CONTRIB: "Максимальный вклад связи(ссылки)",
     MAX_LINK_CONTRIB_DESC:
-        "Maximum contribution of the weighted ease of linked notes to the initial ease.",
-    LOGGING: "Logging",
-    DISPLAY_DEBUG_INFO: "Display debugging information on the developer console?",
+        "Максимальный вклад взвешенной Простоты связанных заметок в начальную Простоту.",
+    LOGGING: "Ведение лога",
+    DISPLAY_DEBUG_INFO: "Отображать информацию отладки на консоль разработчика(developer console)?",
 
     // sidebar.ts
-    NOTES_REVIEW_QUEUE: "Очередь повторения заметок",
+    NOTES_REVIEW_QUEUE: "Очередь заметок на повторение",
     CLOSE: "Закрыть",
     NEW: "Новые",
     YESTERDAY: "Вчерашние",
