@@ -1,6 +1,6 @@
 // русский
 
-// English
+// @ytatichno Сафронов Максим
 
 export default {
     // flashcard-modal.tsx
@@ -47,16 +47,17 @@ export default {
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition Плагин - Настройки",
-    CHECK_WIKI: 'Для дополнительной инфы, смотри <a href="${wiki_url}">wiki</a>. Скоро будет перевод :3',
-    FOLDERS_TO_IGNORE: "Игнорируемы папки",
-    FOLDERS_TO_IGNORE_DESC: "Enter folder paths separated by newlines i.e. Templates Meta/Scripts",
-    FLASHCARDS: "Флэшкарточки",
-    FLASHCARD_TAGS: "Тэги флэшкарточек",
+    CHECK_WIKI: 'Для доп инфы, смотри <a href="${wiki_url}">wiki</a>. Скоро будет перевод :3',
+    FOLDERS_TO_IGNORE: "Игнорируемые папки",
+    FOLDERS_TO_IGNORE_DESC: "Ведите пути папок разделенные enter'ом пример: Templates Meta/Scripts",
+    FLASHCARDS: "Карточки",
+    FLASHCARD_TAGS: "Тэги карточек",
     FLASHCARD_TAGS_DESC:
-        "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.",
-    CONVERT_FOLDERS_TO_DECKS: "Convert folders to decks and subdecks?",
-    CONVERT_FOLDERS_TO_DECKS_DESC: "This is an alternative to the Flashcard tags option above.",
+        "Ведите тэги разделенные enter'ом или пробелом пример: #flashcards #deck2 #deck3.",
+    CONVERT_FOLDERS_TO_DECKS: "Конвертировать папки в доски и субдоски?",
+    CONVERT_FOLDERS_TO_DECKS_DESC: "Это альтернатива тэгам карточек, настройка сверху.",
     INLINE_SCHEDULING_COMMENTS:
+        "Сохранять комментарий планирования на строке после карточек?",
         "Save scheduling comment on the same line as the flashcard's last line?",
     INLINE_SCHEDULING_COMMENTS_DESC:
         "Turning this on will make the HTML comments not break list formatting.",
@@ -116,35 +117,35 @@ export default {
     DISPLAY_DEBUG_INFO: "Display debugging information on the developer console?",
 
     // sidebar.ts
-    NOTES_REVIEW_QUEUE: "Notes Review Queue",
-    CLOSE: "Close",
-    NEW: "New",
-    YESTERDAY: "Yesterday",
-    TODAY: "Today",
-    TOMORROW: "Tomorrow",
+    NOTES_REVIEW_QUEUE: "Очередь повторения заметок",
+    CLOSE: "Закрыть",
+    NEW: "Новые",
+    YESTERDAY: "Вчерашние",
+    TODAY: "Завтрашние",
+    TOMORROW: "Послезавтрашние",
 
     // stats-modal.tsx
     STATS_TITLE: "Статистика",
     MONTH: "Месяц",
     QUARTER: "Четверть",
-    YEAR: "год",
-    LIFETIME: "Lifetime",
+    YEAR: "Год",
+    LIFETIME: "Всё время",
     FORECAST: "Прогноз",
-    FORECAST_DESC: "The number of cards due in the future",
-    SCHEDULED: "Scheduled",
-    DAYS: "Days",
-    NUMBER_OF_CARDS: "Number of cards",
-    REVIEWS_PER_DAY: "Среднее количство: ${avg} reviews/день",  //!!!
+    FORECAST_DESC: "Количество карточек предстоящих в будущем",
+    SCHEDULED: "Запланировано",
+    DAYS: "Дней",
+    NUMBER_OF_CARDS: "Количество карточек",
+    REVIEWS_PER_DAY: "Среднее количство: ${avg} повторений/день",  //!!!
     INTERVALS: "Интервалы",
-    INTERVALS_DESC: "Delays until reviews are shown again",
-    COUNT: "Count",
-    INTERVALS_SUMMARY: "Average interval: ${avg}, Longest interval: ${longest}",
-    EASES: "Eases",
-    EASES_SUMMARY: "Average ease: ${avgEase}",
+    INTERVALS_DESC: "Промежутки времени до следующего показа карточек во время повторения",
+    COUNT: "Количество",
+    INTERVALS_SUMMARY: "Средний промежуток: ${avg}, Самый длинный промежуток: ${longest}",
+    EASES: "Облегчений?",
+    EASES_SUMMARY: "Среднее количество облегчений: ${avgEase}",
     CARD_TYPES: "Типы карточек",
-    CARD_TYPES_DESC: "This includes buried cards as well, if any",
-    CARD_TYPE_NEW: "Новая",
-    CARD_TYPE_YOUNG: "Молодая",
-    CARD_TYPE_MATURE: "Бывалая",
+    CARD_TYPES_DESC: "Это включая спрятанные карточки, если что:",
+    CARD_TYPE_NEW: "Новых",
+    CARD_TYPE_YOUNG: "Молодых",
+    CARD_TYPE_MATURE: "Взрослых",
     CARD_TYPES_SUMMARY: "Всего карточек: ${totalCardsCount}",
 };
