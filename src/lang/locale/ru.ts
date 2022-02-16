@@ -15,7 +15,7 @@ export default {
     GOOD: "Нормально",
     EASY: "Легко",
     SHOW_ANSWER: "Показать ответ",
-    CARD_PROGRESS_RESET: "Прогресс изучение карточки был сброшен",
+    CARD_PROGRESS_RESET: "Сбросить прогресс изучение карточки",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Открыть заметку для повторения",
@@ -64,7 +64,7 @@ export default {
     BURY_SIBLINGS_TILL_NEXT_DAY: "Прятать родственные карточки до след. дня?",
     BURY_SIBLINGS_TILL_NEXT_DAY_DESC:
         "Родственные карточки - те, которые образованы из одного текста, пример: карточки с пропусками([...])",
-    SHOW_CARD_CONTEXT: "Показывать контекст в карточках(во время повторения)?",
+    SHOW_CARD_CONTEXT: "Показывать контекст(уровень) в карточках(во время повторения)?",
     SHOW_CARD_CONTEXT_DESC: "пример: Title > Heading 1 > Subheading > ... > Subheading",
     CARD_MODAL_HEIGHT_PERCENT: "Высота карточки впроцентах",
     CARD_MODAL_SIZE_PERCENT_DESC:
@@ -92,7 +92,6 @@ export default {
         "Выключить выбор сложности повторения в меню файла, пример: Повторение: Легко Нормально Сложно",
     DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
         "После выключения вы сможете повторять при помощи хоткеев. Перезагрузите Obsidian после изменения этого.",
-        "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this.",
     MAX_N_DAYS_REVIEW_QUEUE: "Наибольшее количество дней для отображение на панели справа",
     MIN_ONE_DAY: "Количество дней не меньше 1.",
     VALID_NUMBER_WARNING: "Пожалуйста введите подходящее число.",
@@ -141,7 +140,7 @@ export default {
     INTERVALS_DESC: "Промежутки времени до следующего показа карточек во время повторения",
     COUNT: "Количество",
     INTERVALS_SUMMARY: "Средний промежуток: ${avg}, Самый длинный промежуток: ${longest}",
-    EASES: "Простота(параметр в алгоритме, который влияет на приоритет и время показа карточек) \n (от англ. ease, см комментарии планирования)",
+    EASES: "Простота(параметр в алгоритме, который влияет на приоритет и время показа карточек) \n (от англ. ease, см настройки алгоритма)",
     EASES_SUMMARY: "Среднее количество Простоты: ${avgEase}",
     CARD_TYPES: "Типы карточек",
     CARD_TYPES_DESC: "Это включая спрятанные карточки, если что:",
