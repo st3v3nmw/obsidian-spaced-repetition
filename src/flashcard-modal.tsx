@@ -215,7 +215,7 @@ export class FlashcardModal extends Modal {
 
         this.answerBtn = this.contentEl.createDiv();
         this.answerBtn.setAttribute("id", "sr-show-answer");
-        this.answerBtn.setText(t("SHOW_ANSWER"));
+        this.answerBtn.setText(`${Platform.isMobile ? '' : 'Space: '}${t("SHOW_ANSWER")}`);
         this.answerBtn.addEventListener("click", () => {
             this.showAnswer();
         });
@@ -811,16 +811,16 @@ export class Deck {
 
         if (modal.ignoreStats) {
             // Same for mobile/desktop
-            modal.hardBtn.setText(`${t("HARD")}`);
-            modal.easyBtn.setText(`${t("EASY")}`);
+            modal.hardBtn.setText(`${Platform.isMobile ? '' : '1: '}${t("HARD")}`);
+            modal.easyBtn.setText(`${Platform.isMobile ? '' : '3: '}${t("EASY")}`);
         } else if (Platform.isMobile) {
             modal.hardBtn.setText(textInterval(hardInterval, true));
             modal.goodBtn.setText(textInterval(goodInterval, true));
             modal.easyBtn.setText(textInterval(easyInterval, true));
         } else {
-            modal.hardBtn.setText(`${t("HARD")} - ${textInterval(hardInterval, false)}`);
-            modal.goodBtn.setText(`${t("GOOD")} - ${textInterval(goodInterval, false)}`);
-            modal.easyBtn.setText(`${t("EASY")} - ${textInterval(easyInterval, false)}`);
+            modal.hardBtn.setText(`1: ${t("HARD")} - ${textInterval(hardInterval, false)}`);
+            modal.goodBtn.setText(`2: ${t("GOOD")} - ${textInterval(goodInterval, false)}`);
+            modal.easyBtn.setText(`3: ${t("EASY")} - ${textInterval(easyInterval, false)}`);
         }
 
         if (modal.plugin.data.settings.showContextInCards)
