@@ -5,8 +5,11 @@ module.exports = {
     moduleNameMapper: {
         "src/(.*)": "<rootDir>/src/$1",
     },
+    collectCoverageFrom: [
+        "src/**/*.ts*"
+    ],
     moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node", "d.ts"],
     roots: ["<rootDir>/src/", "<rootDir>/tests/"],
-    coveragePathIgnorePatterns: ["/node_modules/", "src/lang/locale/"],
-    coverageDirectory: "coverage",
+coveragePathIgnorePatterns: ["/node_modules/", "src/lang/locale/", "src/constants", "src/icons"],
+coverageDirectory: "coverage",
 };
