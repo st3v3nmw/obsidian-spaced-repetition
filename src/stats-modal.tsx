@@ -290,7 +290,7 @@ function createStatsChart(
     });
 
     if (shouldFilter) {
-        const chartPeriodEl = document.getElementById("chartPeriod");
+        const chartPeriodEl = document.getElementById("chartPeriod") as HTMLSelectElement;
         chartPeriodEl.addEventListener("click", () => {
             let filteredLabels, filteredData;
             const chartPeriod = chartPeriodEl.value;
