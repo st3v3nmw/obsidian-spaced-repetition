@@ -4,8 +4,9 @@
     "description": "Fight the forgetting curve by reviewing flashcards & entire notes.",
     "main": "main.js",
     "scripts": {
-        "dev": "node esbuild.config.mjs",
         "build": "node esbuild.config.mjs production",
+        "dev": "node esbuild.config.mjs",
+        "format": "yarn prettier --write .",
         "test": "jest --coverage"
     },
     "author": "Stephen Mwangi",
