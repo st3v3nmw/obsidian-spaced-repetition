@@ -18,5 +18,8 @@ jobs:
             
       - uses: actions/checkout@v2
 
+      - name: Install Dependencies
+        run: yarn install --no-progress --silent
+            
       - name: Lint
         run: yarn lint
