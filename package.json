@@ -7,6 +7,7 @@
         "build": "node esbuild.config.mjs production",
         "dev": "node esbuild.config.mjs",
         "format": "yarn prettier --write .",
+        "lint": "yarn prettier --check .",
         "test": "jest --coverage"
     },
     "author": "Stephen Mwangi",
