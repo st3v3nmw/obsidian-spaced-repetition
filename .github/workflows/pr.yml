@@ -1,25 +1,25 @@
 name: Lint and Test
 
 on:
-  push:
-    branches: [ '*' ]
-  pull_request:
-    branches: [ '*' ]
+    push:
+        branches: ["*"]
+    pull_request:
+        branches: ["*"]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    build:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Setup Node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16
-            
-      - uses: actions/checkout@v2
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 16
 
-      - name: Install Dependencies
-        run: yarn install --no-progress --silent
-            
-      - name: Lint
-        run: yarn lint
+            - uses: actions/checkout@v2
+
+            - name: Install Dependencies
+              run: yarn install --no-progress --silent
+
+            - name: Lint
+              run: yarn lint
