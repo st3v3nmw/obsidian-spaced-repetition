@@ -13,8 +13,8 @@
     position: absolute;
     bottom: 0;
 }
-.sr-ignorestats-response{
-    grid-template-columns: auto auto!important;
+.sr-ignorestats-response {
+    grid-template-columns: auto auto !important;
 }
 
 .sr-centered {
@@ -25,7 +25,7 @@
 
 .sr-deck-counts {
     color: #ffffff;
-    margin-left: 4px; 
+    margin-left: 4px;
 }
 
 #sr-show-answer {

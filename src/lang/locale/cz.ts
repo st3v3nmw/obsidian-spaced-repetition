@@ -47,7 +47,8 @@ export default {
     SETTINGS_HEADER: "Spaced Repetition Plugin - Nastavení",
     CHECK_WIKI: 'Pro více informací jděte na <a href="${wiki_url}">wiki</a>.',
     FOLDERS_TO_IGNORE: "Ignorované složky",
-    FOLDERS_TO_IGNORE_DESC: "Zadejte cesty ke složkám oddělené odřádkováním napříkad. Šablony Meta/Scripts",
+    FOLDERS_TO_IGNORE_DESC:
+        "Zadejte cesty ke složkám oddělené odřádkováním napříkad. Šablony Meta/Scripts",
     FLASHCARDS: "Kartičky",
     FLASHCARD_TAGS: "Tag pro kartičky",
     FLASHCARD_TAGS_DESC:
@@ -81,7 +82,8 @@ export default {
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Oddělovač pro víceřádkove otočené kartičky",
     NOTES: "Poznámky",
     TAGS_TO_REVIEW: "Tag pro revizi",
-    TAGS_TO_REVIEW_DESC: "Zadejte tagy oddělené mezerami nebo odřádkováním například #review #tag2 #tag3.",
+    TAGS_TO_REVIEW_DESC:
+        "Zadejte tagy oddělené mezerami nebo odřádkováním například #review #tag2 #tag3.",
     OPEN_RANDOM_NOTE: "Otevřít náhodnou poznámku pro revizi",
     OPEN_RANDOM_NOTE_DESC: "Pokud toto vypnete, poznámky budou řazeny dle důležitosti (PageRank).",
     AUTO_NEXT_NOTE: "Otevřít automaticky další poznámku po dokončení revize",
@@ -93,8 +95,7 @@ export default {
     MIN_ONE_DAY: "Počet dní musí být minimálně 1.",
     VALID_NUMBER_WARNING: "Prosím zadejte validní číslo.",
     ALGORITHM: "Algoritmus",
-    CHECK_ALGORITHM_WIKI:
-        'Pro více informací jděte na <a href="${algo_url}">popis algoritmu</a>.',
+    CHECK_ALGORITHM_WIKI: 'Pro více informací jděte na <a href="${algo_url}">popis algoritmu</a>.',
     BASE_EASE: "Základní složitost",
     BASE_EASE_DESC: "minimum = 130, nejlépe přibližně 250.",
     BASE_EASE_MIN_WARNING: "Základní složitost musí být minimálně 130.",

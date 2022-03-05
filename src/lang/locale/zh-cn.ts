@@ -50,22 +50,17 @@ export default {
     FOLDERS_TO_IGNORE_DESC: "输入文件夹路径，用新建行分隔，例如： Templates Meta/Scripts",
     FLASHCARDS: "卡片",
     FLASHCARD_TAGS: "卡片标签",
-    FLASHCARD_TAGS_DESC:
-        "输入标签，用空格或新建行分隔，例如： #flashcards #deck2 #deck3.",
+    FLASHCARD_TAGS_DESC: "输入标签，用空格或新建行分隔，例如： #flashcards #deck2 #deck3.",
     CONVERT_FOLDERS_TO_DECKS: "是否将文件夹内容转换为卡片组和子卡片组？",
     CONVERT_FOLDERS_TO_DECKS_DESC: "此选项为卡片标签选项的替代选项。",
-    INLINE_SCHEDULING_COMMENTS:
-        "是否将计划重复时间保存在卡片最后一行的同一行？",
-    INLINE_SCHEDULING_COMMENTS_DESC:
-        "HTML注释不再破坏列表格式",
+    INLINE_SCHEDULING_COMMENTS: "是否将计划重复时间保存在卡片最后一行的同一行？",
+    INLINE_SCHEDULING_COMMENTS_DESC: "HTML注释不再破坏列表格式",
     BURY_SIBLINGS_TILL_NEXT_DAY: "将关联卡片隐藏至下一天？",
-    BURY_SIBLINGS_TILL_NEXT_DAY_DESC:
-        "关联卡片是来自同一卡片的不同形式， 例如： 完形填空卡片",
+    BURY_SIBLINGS_TILL_NEXT_DAY_DESC: "关联卡片是来自同一卡片的不同形式， 例如： 完形填空卡片",
     SHOW_CARD_CONTEXT: "在卡片中显示上下文？",
     SHOW_CARD_CONTEXT_DESC: "例如： 标题 > 副标题 > 小标题 > ... > 小标题",
     CARD_MODAL_HEIGHT_PERCENT: "卡片高度百分比",
-    CARD_MODAL_SIZE_PERCENT_DESC:
-        "请在移动端使用并需要浏览较大图片时设为100%",
+    CARD_MODAL_SIZE_PERCENT_DESC: "请在移动端使用并需要浏览较大图片时设为100%",
     RESET_DEFAULT: "重置为默认",
     CARD_MODAL_WIDTH_PERCENT: "卡片宽度百分比",
     FILENAME_OR_OPEN_FILE: "在复习卡片时显示文件名称而不是“稍后编辑”？",
@@ -74,8 +69,7 @@ export default {
     CONVERT_HIGHLIGHTS_TO_CLOZES: "将 ==高亮== 转换为完形填空？",
     CONVERT_BOLD_TEXT_TO_CLOZES: "将 **粗体** 转换为完形填空？",
     INLINE_CARDS_SEPARATOR: "单行卡片的分隔符",
-    FIX_SEPARATORS_MANUALLY_WARNING:
-        "注意： 更改此选项后你将需要自行更改已存在卡片的分隔符。",
+    FIX_SEPARATORS_MANUALLY_WARNING: "注意： 更改此选项后你将需要自行更改已存在卡片的分隔符。",
     INLINE_REVERSED_CARDS_SEPARATOR: "单行翻转卡片的分隔符",
     MULTILINE_CARDS_SEPARATOR: "多行卡片的分隔符",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "多行翻转卡片的分隔符",
@@ -85,31 +79,27 @@ export default {
     OPEN_RANDOM_NOTE: "复习随机笔记",
     OPEN_RANDOM_NOTE_DESC: "关闭此选项，笔记将以重要度(PageRank)排序。",
     AUTO_NEXT_NOTE: "复习后自动打开下一个笔记",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "关闭文件选单中的复习选项 例如： 复习： 简单 记得 较难",
+    DISABLE_FILE_MENU_REVIEW_OPTIONS: "关闭文件选单中的复习选项 例如： 复习： 简单 记得 较难",
     DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
         "关闭此选项后你可以使用快捷键开始复习。重新启动Obsidian使本选项生效。",
     MAX_N_DAYS_REVIEW_QUEUE: "右边栏中显示的最大天数",
     MIN_ONE_DAY: "天数最小值为1",
     VALID_NUMBER_WARNING: "请输入有效的数字。",
     ALGORITHM: "算法",
-    CHECK_ALGORITHM_WIKI:
-        '了解更多, 请点击 <a href="${algo_url}">algorithm implementation</a>.',
+    CHECK_ALGORITHM_WIKI: '了解更多, 请点击 <a href="${algo_url}">algorithm implementation</a>.',
     BASE_EASE: "基础掌握程度",
     BASE_EASE_DESC: "最小值130，推荐值约250.",
     BASE_EASE_MIN_WARNING: "基础掌握程度的最小值为130。",
     LAPSE_INTERVAL_CHANGE: "将复习时标注为“较难”的卡片或笔记复习间隔缩短",
     LAPSE_INTERVAL_CHANGE_DESC: "新复习间隔 = 原复习间隔 * 间隔改变系数 / 100.",
     EASY_BONUS: "简单奖励",
-    EASY_BONUS_DESC:
-        "简单奖励设定“记得”和“简单”卡片或笔记的复习间隔差距（最小值100%）。",
+    EASY_BONUS_DESC: "简单奖励设定“记得”和“简单”卡片或笔记的复习间隔差距（最小值100%）。",
     EASY_BONUS_MIN_WARNING: "简单奖励至少为100。",
     MAX_INTERVAL: "最大间隔",
     MAX_INTERVAL_DESC: "设定复习的最大间隔时间（默认值100年）。",
     MAX_INTERVAL_MIN_WARNING: "最大间隔至少为1天",
     MAX_LINK_CONTRIB: "最大链接收益",
-    MAX_LINK_CONTRIB_DESC:
-        "由原掌握程度链接的笔记给与的最大加权掌握度收益。",
+    MAX_LINK_CONTRIB_DESC: "由原掌握程度链接的笔记给与的最大加权掌握度收益。",
     LOGGING: "记录中",
     DISPLAY_DEBUG_INFO: "在开发者控制台中显示调试信息？",
 
