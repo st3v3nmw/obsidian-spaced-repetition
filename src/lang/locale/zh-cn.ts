@@ -17,9 +17,9 @@ export default {
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "打开一个笔记开始复习",
     REVIEW_CARDS: "复习卡片",
-    REVIEW_EASY_FILE_MENU: "复习： 简单",
-    REVIEW_GOOD_FILE_MENU: "复习： 记得",
-    REVIEW_HARD_FILE_MENU: "复习： 较难",
+    REVIEW_EASY_FILE_MENU: "复习：简单",
+    REVIEW_GOOD_FILE_MENU: "复习：记得",
+    REVIEW_HARD_FILE_MENU: "复习：较难",
     REVIEW_NOTE_EASY_CMD: "标记为“简单”",
     REVIEW_NOTE_GOOD_CMD: "标记为“记得”",
     REVIEW_NOTE_HARD_CMD: "标记为“较难”",
@@ -31,7 +31,7 @@ export default {
     SYNC_TIME_TAKEN: "同步时间 ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "笔记保存在已被忽略的路径中（检查设置选项）。",
     PLEASE_TAG_NOTE: "请将需要复习的笔记中加入正确的标签（检查设置选项）。",
-    RESPONSE_RECEIVED: "回应已收到",
+    RESPONSE_RECEIVED: "反馈已收到",
     NO_DECK_EXISTS: "没有 ${deckName} 卡组",
     ALL_CAUGHT_UP: "都复习完啦，你真棒！",
 
@@ -47,11 +47,11 @@ export default {
     SETTINGS_HEADER: "间隔重复插件 - 设置",
     CHECK_WIKI: '了解更多, 请点击 <a href="${wiki_url}">wiki</a>.',
     FOLDERS_TO_IGNORE: "忽略此文件夹",
-    FOLDERS_TO_IGNORE_DESC: "输入文件夹路径，用新建行分隔，例如： Templates Meta/Scripts",
+    FOLDERS_TO_IGNORE_DESC: "输入文件夹路径，用新建行分隔，例如：Templates Meta/Scripts",
     FLASHCARDS: "卡片",
     FLASHCARD_TAGS: "卡片标签",
     FLASHCARD_TAGS_DESC:
-        "输入标签，用空格或新建行分隔，例如： #flashcards #deck2 #deck3.",
+        "输入标签，用空格或新建行分隔，例如：#flashcards #deck2 #deck3.",
     CONVERT_FOLDERS_TO_DECKS: "是否将文件夹内容转换为卡片组和子卡片组？",
     CONVERT_FOLDERS_TO_DECKS_DESC: "此选项为卡片标签选项的替代选项。",
     INLINE_SCHEDULING_COMMENTS:
@@ -60,9 +60,9 @@ export default {
         "HTML注释不再破坏列表格式",
     BURY_SIBLINGS_TILL_NEXT_DAY: "将关联卡片隐藏至下一天？",
     BURY_SIBLINGS_TILL_NEXT_DAY_DESC:
-        "关联卡片是来自同一卡片的不同形式， 例如： 完形填空卡片",
+        "关联卡片是来自同一卡片的不同形式， 例如：完形填空卡片",
     SHOW_CARD_CONTEXT: "在卡片中显示上下文？",
-    SHOW_CARD_CONTEXT_DESC: "例如： 标题 > 副标题 > 小标题 > ... > 小标题",
+    SHOW_CARD_CONTEXT_DESC: "例如：标题 > 副标题 > 小标题 > ... > 小标题",
     CARD_MODAL_HEIGHT_PERCENT: "卡片高度百分比",
     CARD_MODAL_SIZE_PERCENT_DESC:
         "请在移动端使用并需要浏览较大图片时设为100%",
@@ -75,18 +75,18 @@ export default {
     CONVERT_BOLD_TEXT_TO_CLOZES: "将 **粗体** 转换为完形填空？",
     INLINE_CARDS_SEPARATOR: "单行卡片的分隔符",
     FIX_SEPARATORS_MANUALLY_WARNING:
-        "注意： 更改此选项后你将需要自行更改已存在卡片的分隔符。",
+        "注意：更改此选项后你将需要自行更改已存在卡片的分隔符。",
     INLINE_REVERSED_CARDS_SEPARATOR: "单行翻转卡片的分隔符",
     MULTILINE_CARDS_SEPARATOR: "多行卡片的分隔符",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "多行翻转卡片的分隔符",
     NOTES: "笔记",
     TAGS_TO_REVIEW: "复习标签",
-    TAGS_TO_REVIEW_DESC: "输入标签，用空格或新建行分隔，例如： #review #tag2 #tag3.",
+    TAGS_TO_REVIEW_DESC: "输入标签，用空格或新建行分隔，例如：#review #tag2 #tag3.",
     OPEN_RANDOM_NOTE: "复习随机笔记",
     OPEN_RANDOM_NOTE_DESC: "关闭此选项，笔记将以重要度(PageRank)排序。",
     AUTO_NEXT_NOTE: "复习后自动打开下一个笔记",
     DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "关闭文件选单中的复习选项 例如： 复习： 简单 记得 较难",
+        "关闭文件选单中的复习选项 例如：复习：简单 记得 较难",
     DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
         "关闭此选项后你可以使用快捷键开始复习。重新启动Obsidian使本选项生效。",
     MAX_N_DAYS_REVIEW_QUEUE: "右边栏中显示的最大天数",
