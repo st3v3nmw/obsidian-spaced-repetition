@@ -462,8 +462,10 @@ export class FlashcardModal extends Modal {
                     el.addEventListener(
                         "click",
                         (ev) =>
-                            (ev.target.style.minWidth =
-                                ev.target.style.minWidth === "100%" ? null : "100%")
+                            ((ev.target as HTMLElement).style.minWidth =
+                                (ev.target as HTMLElement).style.minWidth === "100%"
+                                    ? null
+                                    : "100%")
                     );
                 }
             );
