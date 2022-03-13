@@ -50,15 +50,13 @@ export default {
     FOLDERS_TO_IGNORE_DESC: "输入文件夹路径，用新建行分隔，例如：Templates Meta/Scripts",
     FLASHCARDS: "卡片",
     FLASHCARD_TAGS: "卡片标签",
-    FLASHCARD_TAGS_DESC:
-        "输入标签，用空格或新建行分隔，例如：#flashcards #deck2 #deck3.",
+    FLASHCARD_TAGS_DESC: "输入标签，用空格或新建行分隔，例如：#flashcards #deck2 #deck3.",
     CONVERT_FOLDERS_TO_DECKS: "是否将文件夹内容转换为卡片组和子卡片组？",
     CONVERT_FOLDERS_TO_DECKS_DESC: "此选项为卡片标签选项的替代选项。",
     INLINE_SCHEDULING_COMMENTS: "是否将计划重复时间保存在卡片最后一行的同一行？",
     INLINE_SCHEDULING_COMMENTS_DESC: "HTML注释不再破坏列表格式",
     BURY_SIBLINGS_TILL_NEXT_DAY: "将关联卡片隐藏至下一天？",
-    BURY_SIBLINGS_TILL_NEXT_DAY_DESC:
-        "关联卡片是来自同一卡片的不同形式， 例如：完形填空卡片",
+    BURY_SIBLINGS_TILL_NEXT_DAY_DESC: "关联卡片是来自同一卡片的不同形式， 例如：完形填空卡片",
     SHOW_CARD_CONTEXT: "在卡片中显示上下文？",
     SHOW_CARD_CONTEXT_DESC: "例如：标题 > 副标题 > 小标题 > ... > 小标题",
     CARD_MODAL_HEIGHT_PERCENT: "卡片高度百分比",
@@ -71,8 +69,7 @@ export default {
     CONVERT_HIGHLIGHTS_TO_CLOZES: "将 ==高亮== 转换为完形填空？",
     CONVERT_BOLD_TEXT_TO_CLOZES: "将 **粗体** 转换为完形填空？",
     INLINE_CARDS_SEPARATOR: "单行卡片的分隔符",
-    FIX_SEPARATORS_MANUALLY_WARNING:
-        "注意：更改此选项后你将需要自行更改已存在卡片的分隔符。",
+    FIX_SEPARATORS_MANUALLY_WARNING: "注意：更改此选项后你将需要自行更改已存在卡片的分隔符。",
     INLINE_REVERSED_CARDS_SEPARATOR: "单行翻转卡片的分隔符",
     MULTILINE_CARDS_SEPARATOR: "多行卡片的分隔符",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "多行翻转卡片的分隔符",
@@ -82,8 +79,7 @@ export default {
     OPEN_RANDOM_NOTE: "复习随机笔记",
     OPEN_RANDOM_NOTE_DESC: "关闭此选项，笔记将以重要度(PageRank)排序。",
     AUTO_NEXT_NOTE: "复习后自动打开下一个笔记",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "关闭文件选单中的复习选项 例如：复习：简单 记得 较难",
+    DISABLE_FILE_MENU_REVIEW_OPTIONS: "关闭文件选单中的复习选项 例如：复习：简单 记得 较难",
     DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
         "关闭此选项后你可以使用快捷键开始复习。重新启动Obsidian使本选项生效。",
     MAX_N_DAYS_REVIEW_QUEUE: "右边栏中显示的最大天数",

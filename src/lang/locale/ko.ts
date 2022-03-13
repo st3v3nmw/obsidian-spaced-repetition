@@ -47,7 +47,8 @@ export default {
     SETTINGS_HEADER: "Spaced Repetition Plugin - 설정",
     CHECK_WIKI: '더 많은 정보를 원하시면, <a href="${wiki_url}">wiki</a>를 확인해주세요.',
     FOLDERS_TO_IGNORE: "무시할 폴더들",
-    FOLDERS_TO_IGNORE_DESC: "폴더 경로를 빈 줄로 구분해서 입력해주세요. 'Templates Meta/Scripts' 와 같이 입력하는 것은 유효하지 않습니다.",
+    FOLDERS_TO_IGNORE_DESC:
+        "폴더 경로를 빈 줄로 구분해서 입력해주세요. 'Templates Meta/Scripts' 와 같이 입력하는 것은 유효하지 않습니다.",
     FLASHCARDS: "플래시카드",
     FLASHCARD_TAGS: "플래시카드 태그",
     FLASHCARD_TAGS_DESC:
@@ -62,7 +63,8 @@ export default {
     BURY_SIBLINGS_TILL_NEXT_DAY_DESC:
         "Sibling 카드는 동일한 카드 텍스트에서 생성된 카드입니다. i.e. cloze deletions",
     SHOW_CARD_CONTEXT: "카드의 문맥(context)을 표시하시겠습니까?",
-    SHOW_CARD_CONTEXT_DESC: "카드에서 'Title > Heading 1 > Subheading > ... > Subheading' 의 표시를 할지 설정합니다.",
+    SHOW_CARD_CONTEXT_DESC:
+        "카드에서 'Title > Heading 1 > Subheading > ... > Subheading' 의 표시를 할지 설정합니다.",
     CARD_MODAL_HEIGHT_PERCENT: "플래시카드 높이 비율",
     CARD_MODAL_SIZE_PERCENT_DESC:
         "모바일 버전 혹은 매우 큰 이미지가 있는 경우 100%로 설정해야 합니다.",
@@ -81,7 +83,8 @@ export default {
     MULTILINE_REVERSED_CARDS_SEPARATOR: "여러 줄 반전 플래시카드 구분자",
     NOTES: "노트",
     TAGS_TO_REVIEW: "리뷰에 사용할 태그",
-    TAGS_TO_REVIEW_DESC: "태그를 공백 또는 빈 줄로 구분해서 입력해주세요. 예) '#review #tag2 #tag3'",
+    TAGS_TO_REVIEW_DESC:
+        "태그를 공백 또는 빈 줄로 구분해서 입력해주세요. 예) '#review #tag2 #tag3'",
     OPEN_RANDOM_NOTE: "리뷰를 위해 랜덤 노트를 엽니다.",
     OPEN_RANDOM_NOTE_DESC: "이 옵션이 꺼져있으면, 노트는 중요도(페이지 랭크)에 따라 정렬됩니다.",
     AUTO_NEXT_NOTE: "리뷰 후에 다음 노트를 자동으로 엽니다.",
