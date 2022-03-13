@@ -1,11 +1,11 @@
 module.exports = {
     moment: {
-        locale: jest.fn(() => "en")
+        locale: jest.fn(() => "en"),
     },
     PluginSettingTab: jest.fn().mockImplementation(),
     Platform: {
         get isMobile() {
-            jest.fn(() => false)
-        }
-    }
+            jest.fn(() => false);
+        },
+    },
 };

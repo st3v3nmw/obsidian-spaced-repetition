@@ -13,23 +13,23 @@ To help translate this plugin to another language, check the [translation guide 
 
 ## Features
 
-- Flashcards
-    - [Decks](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Decks) (Using Obsidian's hierarchical tags or folder structure)
-    - [Single-line style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#single-line-basic-remnote-style) (`Question::Answer`)
-    - [Single-line reversed style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#single-line-reversed) (`Question:::Answer`)
-    - [Multi-line style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#multi-line-basic) (Separated by `?`)
-    - [Multi-line reversed style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#multi-line-reversed) (Separated by `??`)
-    - [Cloze cards](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#cloze-cards) (`==highlight==` your cloze deletions!, or `**bolded text**`)
-    - [Card context - automatic titles based on headings](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Reviewing-Flashcards#context) (i.e. `Note title > Heading 1 > Subheading`)
-    - Rich text support in flashcards (inherited from Obsidian)
-      - Images, Audio, & Video
-      - LaTeX
-      - Code syntax highlighting
-      - Footnotes
-- Notes
-  - [Reviewing entire notes](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Notes)
-  - Possible use case: [Incremental writing](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Incremental-Writing)
-- [Statistics](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Statistics)
+-   Flashcards
+    -   [Decks](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Decks) (Using Obsidian's hierarchical tags or folder structure)
+    -   [Single-line style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#single-line-basic-remnote-style) (`Question::Answer`)
+    -   [Single-line reversed style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#single-line-reversed) (`Question:::Answer`)
+    -   [Multi-line style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#multi-line-basic) (Separated by `?`)
+    -   [Multi-line reversed style](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#multi-line-reversed) (Separated by `??`)
+    -   [Cloze cards](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Flashcard-Types#cloze-cards) (`==highlight==` your cloze deletions!, or `**bolded text**`)
+    -   [Card context - automatic titles based on headings](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Reviewing-Flashcards#context) (i.e. `Note title > Heading 1 > Subheading`)
+    -   Rich text support in flashcards (inherited from Obsidian)
+        -   Images, Audio, & Video
+        -   LaTeX
+        -   Code syntax highlighting
+        -   Footnotes
+-   Notes
+    -   [Reviewing entire notes](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Notes)
+    -   Possible use case: [Incremental writing](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Incremental-Writing)
+-   [Statistics](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Statistics)
 
 ## Quick Demo
 

@@ -1,4 +1,4 @@
-import { addIcon } from 'obsidian';
+import { addIcon } from "obsidian";
 
 export function appIcon() {
     addIcon(
