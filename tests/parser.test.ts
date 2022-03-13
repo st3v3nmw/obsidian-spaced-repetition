@@ -205,6 +205,38 @@ test("Test codeblocks", () => {
             1,
         ],
     ]);
+
+    // general Markdown syntax
+    expect(
+        parse(
+            "Nested Markdown?\n?\n" +
+                "````ad-note\n\n" +
+                "```git\n" +
+                "+ print('hello')\n" +
+                "- print('world')\n" +
+                "```\n\n" +
+                "~~~python\n" +
+                "print('hello world')\n" +
+                "~~~\n" +
+                "````",
+            ...defaultArgs
+        )
+    ).toEqual([
+        [
+            CardType.MultiLineBasic,
+            "Nested Markdown?\n?\n" +
+                "````ad-note\n\n" +
+                "```git\n" +
+                "+ print('hello')\n" +
+                "- print('world')\n" +
+                "```\n\n" +
+                "~~~python\n" +
+                "print('hello world')\n" +
+                "~~~\n" +
+                "````",
+            1,
+        ],
+    ]);
 });
 
 test("Test not parsing cards in HTML comments", () => {

@@ -74,8 +74,8 @@ export function parse(
         } else if (lines[i] === multilineReversedCardSeparator) {
             cardType = CardType.MultiLineReversed;
             lineNo = i;
-        } else if (lines[i].startsWith("```") | lines[i].startsWith("~~~")) {
-            let codeBlockClose = lines[i].match(/`+|~+/);
+        } else if (lines[i].startsWith("```") || lines[i].startsWith("~~~")) {
+            const codeBlockClose = lines[i].match(/`+|~+/)[0];
             while (i + 1 < lines.length && !lines[i + 1].startsWith(codeBlockClose)) {
                 i++;
                 cardText += "\n" + lines[i];
