@@ -652,6 +652,10 @@ export default class SRPlugin extends Plugin {
             const cardType: CardType = parsedCard[0],
                 lineNo: number = parsedCard[2];
             let cardText: string = parsedCard[1];
+            
+            if (cardText.includes(settings.editLaterTag)) {
+                continue;
+            }
 
             if (!settings.convertFoldersToDecks) {
                 const tagInCardRegEx = /^#[^\s#]+/gi;
