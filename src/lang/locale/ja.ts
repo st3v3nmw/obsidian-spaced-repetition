@@ -84,6 +84,7 @@ export default {
     DISABLE_CLOZE_CARDS: "穴埋めカードを無効化しますか？",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==ハイライト==を穴埋めとして使用しますか？",
     CONVERT_BOLD_TEXT_TO_CLOZES: "**ボールド体**を穴埋めとして使用しますか？",
+    CONVERT_CURLY_BRACKETS_TO_CLOZES: "{{中括弧}}を穴埋めとして使用しますか？",
     INLINE_CARDS_SEPARATOR: "インラインフラッシュカードに使用するセパレーター",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "このオプションを変更する場合には、作成済みのフラッシュカードを手動で編集し直す必要があることに注意してください。",
