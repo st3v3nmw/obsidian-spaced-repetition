@@ -18,6 +18,7 @@ export interface SRSettings {
     randomizeCardOrder: boolean;
     convertHighlightsToClozes: boolean;
     convertBoldTextToClozes: boolean;
+    convertCurlyBracketsToClozes: boolean;
     singlelineCardSeparator: string;
     singlelineReversedCardSeparator: string;
     multilineCardSeparator: string;
@@ -52,6 +53,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     randomizeCardOrder: true,
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
+    convertCurlyBracketsToClozes: false,
     singlelineCardSeparator: "::",
     singlelineReversedCardSeparator: ":::",
     multilineCardSeparator: "?",
@@ -265,6 +267,17 @@ export class SRSettingTab extends PluginSettingTab {
                     await this.plugin.savePluginData();
                 })
         );
+
+        new Setting(containerEl)
+            .setName(t("CONVERT_CURLY_BRACKETS_TO_CLOZES"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.convertCurlyBracketsToClozes)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.convertCurlyBracketsToClozes = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
 
         new Setting(containerEl)
             .setName(t("INLINE_CARDS_SEPARATOR"))

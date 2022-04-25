@@ -645,7 +645,8 @@ export default class SRPlugin extends Plugin {
             settings.multilineCardSeparator,
             settings.multilineReversedCardSeparator,
             settings.convertHighlightsToClozes,
-            settings.convertBoldTextToClozes
+            settings.convertBoldTextToClozes,
+            settings.convertCurlyBracketsToClozes
         );
         for (const parsedCard of parsedCards) {
             deckPath = noteDeckPath;
@@ -684,6 +685,9 @@ export default class SRPlugin extends Plugin {
                 if (settings.convertBoldTextToClozes) {
                     siblings.push(...cardText.matchAll(/\*\*(.*?)\*\*/gm));
                 }
+                if (settings.convertCurlyBracketsToClozes) {
+                    siblings.push(...cardText.matchAll(/{{(.*?)}}/gm));
+                }
                 siblings.sort((a, b) => {
                     if (a.index < b.index) {
                         return -1;
@@ -702,14 +706,22 @@ export default class SRPlugin extends Plugin {
                         cardText.substring(0, deletionStart) +
                         "<span style='color:#2196f3'>[...]</span>" +
                         cardText.substring(deletionEnd);
-                    front = front.replace(/==/gm, "").replace(/\*\*/gm, "");
+                    front = front
+                        .replace(/==/gm, "")
+                        .replace(/\*\*/gm, "")
+                        .replace(/{{/gm, "")
+                        .replace(/}}/gm, "");
                     back =
                         cardText.substring(0, deletionStart) +
                         "<span style='color:#2196f3'>" +
                         cardText.substring(deletionStart, deletionEnd) +
                         "</span>" +
                         cardText.substring(deletionEnd);
-                    back = back.replace(/==/gm, "").replace(/\*\*/gm, "");
+                    back = back
+                        .replace(/==/gm, "")
+                        .replace(/\*\*/gm, "")
+                        .replace(/{{/gm, "")
+                        .replace(/}}/gm, "");
                     siblingMatches.push([front, back]);
                 }
             } else {
