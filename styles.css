@@ -3,7 +3,22 @@
     text-decoration: underline;
     cursor: pointer;
     margin-bottom: 16px;
-    display: inline-block;
+    /* display: inline-block; */
+    float: left;
+    width: 33%;
+    text-align: center;
+}
+
+.sr-input-modal {
+    height: 80%;
+}
+
+.sr-input-area {
+    height: 80%;
+}
+
+.sr-input-area > textarea {
+    height: 100%;
 }
 
 .sr-response {
@@ -71,11 +86,14 @@
     font-style: italic;
     font-weight: bold;
     margin-top: 16px;
+    display: inline-block;
+    width: 100%;
 }
 
 #sr-flashcard-view {
-    overflow-y: auto;
+    /* overflow-y: off; */
     height: 80%;
+    padding-top: 1em;
 }
 
 .sr-ignorestats-btn {
