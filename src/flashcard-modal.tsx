@@ -68,29 +68,34 @@ export class FlashcardModal extends Modal {
         this.contentEl.style.height = "92%";
         this.contentEl.addClass("sr-modal-content");
 
+        // TODO: refactor into event handler?
         document.body.onkeydown = (e) => {
-            if (this.mode !== FlashcardModalMode.DecksList) {
-                if (this.mode !== FlashcardModalMode.Closed && e.code === "KeyS") {
-                    this.currentDeck.deleteFlashcardAtIndex(
-                        this.currentCardIdx,
-                        this.currentCard.isDue
-                    );
-                    this.burySiblingCards(false);
-                    this.currentDeck.nextCard(this);
-                } else if (
-                    this.mode === FlashcardModalMode.Front &&
-                    (e.code === "Space" || e.code === "Enter")
-                ) {
-                    this.showAnswer();
-                } else if (this.mode === FlashcardModalMode.Back) {
-                    if (e.code === "Numpad1" || e.code === "Digit1") {
-                        this.processReview(ReviewResponse.Hard);
-                    } else if (e.code === "Numpad2" || e.code === "Digit2" || e.code === "Space") {
-                        this.processReview(ReviewResponse.Good);
-                    } else if (e.code === "Numpad3" || e.code === "Digit3") {
-                        this.processReview(ReviewResponse.Easy);
-                    } else if (e.code === "Numpad0" || e.code === "Digit0") {
-                        this.processReview(ReviewResponse.Reset);
+            // TODO: Please fix this. Is ugly.
+            // Checks if the input textbox is in focus before processing keyboard shortcuts.
+            if (document.activeElement.nodeName != 'TEXTAREA') {
+                if (this.mode !== FlashcardModalMode.DecksList) {
+                    if (this.mode !== FlashcardModalMode.Closed && e.code === "KeyS") {
+                        this.currentDeck.deleteFlashcardAtIndex(
+                            this.currentCardIdx,
+                            this.currentCard.isDue
+                        );
+                        this.burySiblingCards(false);
+                        this.currentDeck.nextCard(this);
+                    } else if (
+                        this.mode === FlashcardModalMode.Front &&
+                        (e.code === "Space" || e.code === "Enter")
+                    ) {
+                        this.showAnswer();
+                    } else if (this.mode === FlashcardModalMode.Back) {
+                        if (e.code === "Numpad1" || e.code === "Digit1") {
+                            this.processReview(ReviewResponse.Hard);
+                        } else if (e.code === "Numpad2" || e.code === "Digit2" || e.code === "Space") {
+                            this.processReview(ReviewResponse.Good);
+                        } else if (e.code === "Numpad3" || e.code === "Digit3") {
+                            this.processReview(ReviewResponse.Easy);
+                        } else if (e.code === "Numpad0" || e.code === "Digit0") {
+                            this.processReview(ReviewResponse.Reset);
+                        }
                     }
                 }
             }
@@ -140,30 +145,6 @@ export class FlashcardModal extends Modal {
             deck.render(this.contentEl, this);
         }
     }
-
-    // async createNewEditModal(): Promise<void> {
-        // const activeLeaf = this.plugin.app.workspace.activeLeaf;
-        // if (this.plugin.app.workspace.getActiveFile() === null) {
-        //     await activeLeaf.openFile(this.currentCard.note);
-        // }
-        // else {
-        //     const newLeaf = this.plugin.app.workspace.createLeafBySplit(
-        //         activeLeaf,
-        //         "vertical",
-        //         false
-        //     );
-        //     await newLeaf.openFile(this.currentCard.note, { active: true });
-        // }
-        // const activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-        // activeView.editor.setCursor({
-        //     line: this.currentCard.lineNo,
-        //     ch: 0,
-        // });
-        // this.modifyCards.push(this.currentCard);
-        // this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
-        // this.burySiblingCards(false);
-        // this.currentDeck.nextCard(this);
-    // }
 
     setupCardsView(): void {
         this.contentEl.innerHTML = "";
