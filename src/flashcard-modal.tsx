@@ -160,6 +160,7 @@ export class FlashcardModal extends Modal {
     public responseDiv: HTMLElement;
     public fileLinkView: HTMLElement;
     public resetLinkView: HTMLElement;
+    public editLinkView: HTMLElement;
     public contextView: HTMLElement;
     public currentCard: Card;
     public currentCardIdx: number;
@@ -274,13 +275,32 @@ export class FlashcardModal extends Modal {
         }
         this.fileLinkView.addEventListener("click", async () => {
             this.currentCard.editLater = true;
-            let fileText: string = await this.app.vault.read(this.currentCard.note);
-            const replacementRegex = new RegExp(escapeRegexString(this.currentCard.cardText), "gm");
-            fileText = fileText.replace(replacementRegex, () => this.currentCard.cardText+`\n${this.plugin.data.settings.editLaterTag}`);
-            await this.app.vault.modify(this.currentCard.note, fileText);
-            this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
-            this.burySiblingCards(false);
-            this.currentDeck.nextCard(this);
+            await this.modifyCardText(
+                this.currentCard.cardText,
+                `${this.currentCard.cardText}\n${this.plugin.data.settings.editLaterTag}`
+            );
+        });
+        
+        this.editLinkView = this.contentEl.createDiv("sr-link");
+        this.editLinkView.setText(t("EDIT_NOW"));
+        this.editLinkView.addEventListener("click", async () => {
+            // remove SR info from input modal prompt
+            let textPromptArr = this.currentCard.cardText.split("\n");
+            let textPrompt = "";
+            if (textPromptArr[textPromptArr.length-1].startsWith("<!--SR:")) {
+                textPrompt = textPromptArr.slice(0,-1).join("\n");
+            } else {
+                textPrompt = this.currentCard.cardText;
+            }
+
+            let editModal = FlashcardEditModal.Prompt(this.app, this.plugin, textPrompt);
+            editModal.then( 
+                async (modifiedCardText) => {
+                    this.modifyCardText(textPrompt, modifiedCardText);
+                })
+                .catch(
+                    (reason) => console.log(reason)
+                );
         });
 
         this.resetLinkView = this.contentEl.createDiv("sr-link");
@@ -288,7 +308,6 @@ export class FlashcardModal extends Modal {
         this.resetLinkView.addEventListener("click", () => {
             this.processReview(ReviewResponse.Reset);
         });
-        this.resetLinkView.style.float = "right";
 
         if (this.plugin.data.settings.showContextInCards) {
             this.contextView = this.contentEl.createDiv();
@@ -339,6 +358,21 @@ export class FlashcardModal extends Modal {
             this.easyBtn.addClass("sr-ignorestats-btn");
             this.hardBtn.addClass("sr-ignorestats-btn");
         }
+    }
+
+    private async modifyCardText(originalText:string, replacementText: string) {
+        if (!replacementText) return;
+        if (replacementText == originalText) return;
+        let fileText: string = await this.app.vault.read(this.currentCard.note);
+        const originalTextRegex = new RegExp(escapeRegexString(originalText), "gm");
+        fileText = fileText.replace(
+            originalTextRegex,
+            replacementText
+        );
+        await this.app.vault.modify(this.currentCard.note, fileText);
+        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+        this.burySiblingCards(false);
+        this.currentDeck.nextCard(this);
     }
 
     showAnswer(): void {
