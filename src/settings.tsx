@@ -372,14 +372,12 @@ export class SRSettingTab extends PluginSettingTab {
             .setName(t("EDIT_LATER_TAG"))
             .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
             .addText((text) =>
-                text
-                    .setValue(this.plugin.data.settings.editLaterTag)
-                    .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            this.plugin.data.settings.editLaterTag = value;
-                            await this.plugin.savePluginData();
-                        });
-                    })
+                text.setValue(this.plugin.data.settings.editLaterTag).onChange((value) => {
+                    applySettingsUpdate(async () => {
+                        this.plugin.data.settings.editLaterTag = value;
+                        await this.plugin.savePluginData();
+                    });
+                })
             )
             .addExtraButton((button) => {
                 button

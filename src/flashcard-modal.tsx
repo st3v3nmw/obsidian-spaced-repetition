@@ -6,7 +6,7 @@ import {
     Notice,
     Platform,
     TFile,
-    TextAreaComponent
+    TextAreaComponent,
 } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
@@ -42,7 +42,7 @@ export class FlashcardEditModal extends Modal {
     private didSubmit: boolean = false;
     private inputComponent: TextAreaComponent;
     private readonly modalText: string;
-    
+
     public static Prompt(app: App, plugin: SRPlugin, placeholder: string): Promise<string> {
         const newPromptModal = new FlashcardEditModal(app, plugin, placeholder);
         return newPromptModal.waitForClose;
@@ -52,14 +52,11 @@ export class FlashcardEditModal extends Modal {
         this.plugin = plugin;
         this.titleEl.setText("Edit Card");
         this.modalText = existingText;
-        
 
-        this.waitForClose = new Promise<string>(
-            (resolve, reject) => {
-                this.resolvePromise = resolve;
-                this.rejectPromise = reject;
-            }
-        );
+        this.waitForClose = new Promise<string>((resolve, reject) => {
+            this.resolvePromise = resolve;
+            this.rejectPromise = reject;
+        });
         this.display();
         this.open();
     }
@@ -67,32 +64,34 @@ export class FlashcardEditModal extends Modal {
     private display() {
         this.contentEl.empty();
         this.titleEl.textContent = "Edit Flashcard";
-        this.modalEl.addClass('sr-input-modal');
+        this.modalEl.addClass("sr-input-modal");
 
         const mainContentContainer: HTMLDivElement = this.contentEl.createDiv();
-        mainContentContainer.addClass('sr-input-area');
+        mainContentContainer.addClass("sr-input-area");
         this.inputComponent = this.createInputField(mainContentContainer, this.modalText);
         this.createButtonBar(mainContentContainer);
     }
 
     private createButton(container: HTMLElement, text: string, callback: (evt: MouseEvent) => any) {
         const btn = new ButtonComponent(container);
-        btn.setButtonText(text)
-            .onClick(callback);
+        btn.setButtonText(text).onClick(callback);
 
         return btn;
     }
 
     private createButtonBar(mainContentContainer: HTMLDivElement) {
         const buttonBarContainer: HTMLDivElement = mainContentContainer.createDiv();
-        this.createButton(buttonBarContainer, "Ok", this.submitClickCallback)
-            .setCta().buttonEl.style.marginRight = '0';
+        this.createButton(
+            buttonBarContainer,
+            "Ok",
+            this.submitClickCallback
+        ).setCta().buttonEl.style.marginRight = "0";
         this.createButton(buttonBarContainer, "Cancel", this.cancelClickCallback);
 
-        buttonBarContainer.style.display = 'flex';
-        buttonBarContainer.style.flexDirection = 'row-reverse';
-        buttonBarContainer.style.justifyContent = 'flex-start';
-        buttonBarContainer.style.marginTop = '1rem';
+        buttonBarContainer.style.display = "flex";
+        buttonBarContainer.style.flexDirection = "row-reverse";
+        buttonBarContainer.style.justifyContent = "flex-start";
+        buttonBarContainer.style.marginTop = "1rem";
     }
 
     protected createInputField(container: HTMLElement, value: string) {
@@ -101,8 +100,8 @@ export class FlashcardEditModal extends Modal {
         textComponent.inputEl.style.width = "100%";
         textComponent
             .setValue(value ?? "")
-            .onChange(value => this.input = value)
-            .inputEl.addEventListener('keydown', this.submitEnterCallback);
+            .onChange((value) => (this.input = value))
+            .inputEl.addEventListener("keydown", this.submitEnterCallback);
 
         return textComponent;
     }
@@ -111,11 +110,11 @@ export class FlashcardEditModal extends Modal {
     private cancelClickCallback = (evt: MouseEvent) => this.cancel();
 
     private submitEnterCallback = (evt: KeyboardEvent) => {
-        if ((evt.ctrlKey || evt.metaKey ) && evt.key === "Enter") {
+        if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter") {
             evt.preventDefault();
             this.submit();
         }
-    }
+    };
 
     private submit() {
         this.didSubmit = true;
@@ -140,12 +139,12 @@ export class FlashcardEditModal extends Modal {
     }
 
     private resolveInput() {
-        if(!this.didSubmit) this.rejectPromise("No input given.");
+        if (!this.didSubmit) this.rejectPromise("No input given.");
         else this.resolvePromise(this.input);
     }
 
     private removeInputListener() {
-        this.inputComponent.inputEl.removeEventListener('keydown', this.submitEnterCallback)
+        this.inputComponent.inputEl.removeEventListener("keydown", this.submitEnterCallback);
     }
 }
 
@@ -191,7 +190,7 @@ export class FlashcardModal extends Modal {
         document.body.onkeydown = (e) => {
             // TODO: Please fix this. Is ugly.
             // Checks if the input textbox is in focus before processing keyboard shortcuts.
-            if (document.activeElement.nodeName != 'TEXTAREA') {
+            if (document.activeElement.nodeName != "TEXTAREA") {
                 if (this.mode !== FlashcardModalMode.DecksList) {
                     if (this.mode !== FlashcardModalMode.Closed && e.code === "KeyS") {
                         this.currentDeck.deleteFlashcardAtIndex(
@@ -208,7 +207,11 @@ export class FlashcardModal extends Modal {
                     } else if (this.mode === FlashcardModalMode.Back) {
                         if (e.code === "Numpad1" || e.code === "Digit1") {
                             this.processReview(ReviewResponse.Hard);
-                        } else if (e.code === "Numpad2" || e.code === "Digit2" || e.code === "Space") {
+                        } else if (
+                            e.code === "Numpad2" ||
+                            e.code === "Digit2" ||
+                            e.code === "Space"
+                        ) {
                             this.processReview(ReviewResponse.Good);
                         } else if (e.code === "Numpad3" || e.code === "Digit3") {
                             this.processReview(ReviewResponse.Easy);
@@ -280,27 +283,25 @@ export class FlashcardModal extends Modal {
                 `${this.currentCard.cardText}\n${this.plugin.data.settings.editLaterTag}`
             );
         });
-        
+
         this.editLinkView = this.contentEl.createDiv("sr-link");
         this.editLinkView.setText(t("EDIT_NOW"));
         this.editLinkView.addEventListener("click", async () => {
             // remove SR info from input modal prompt
             let textPromptArr = this.currentCard.cardText.split("\n");
             let textPrompt = "";
-            if (textPromptArr[textPromptArr.length-1].startsWith("<!--SR:")) {
-                textPrompt = textPromptArr.slice(0,-1).join("\n");
+            if (textPromptArr[textPromptArr.length - 1].startsWith("<!--SR:")) {
+                textPrompt = textPromptArr.slice(0, -1).join("\n");
             } else {
                 textPrompt = this.currentCard.cardText;
             }
 
             let editModal = FlashcardEditModal.Prompt(this.app, this.plugin, textPrompt);
-            editModal.then( 
-                async (modifiedCardText) => {
+            editModal
+                .then(async (modifiedCardText) => {
                     this.modifyCardText(textPrompt, modifiedCardText);
                 })
-                .catch(
-                    (reason) => console.log(reason)
-                );
+                .catch((reason) => console.log(reason));
         });
 
         this.resetLinkView = this.contentEl.createDiv("sr-link");
@@ -360,15 +361,12 @@ export class FlashcardModal extends Modal {
         }
     }
 
-    private async modifyCardText(originalText:string, replacementText: string) {
+    private async modifyCardText(originalText: string, replacementText: string) {
         if (!replacementText) return;
         if (replacementText == originalText) return;
         let fileText: string = await this.app.vault.read(this.currentCard.note);
         const originalTextRegex = new RegExp(escapeRegexString(originalText), "gm");
-        fileText = fileText.replace(
-            originalTextRegex,
-            replacementText
-        );
+        fileText = fileText.replace(originalTextRegex, replacementText);
         await this.app.vault.modify(this.currentCard.note, fileText);
         this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
         this.burySiblingCards(false);
