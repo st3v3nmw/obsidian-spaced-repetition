@@ -150,7 +150,7 @@ export class FlashcardModal extends Modal {
             this.fileLinkView.setAttribute("aria-label", t("EDIT_LATER"));
         }
         this.fileLinkView.addEventListener("click", async () => {
-            const activeLeaf: WorkspaceLeaf = this.plugin.app.workspace.activeLeaf;
+            const activeLeaf: WorkspaceLeaf = this.plugin.app.workspace.getLeaf();
             if (this.plugin.app.workspace.getActiveFile() === null)
                 await activeLeaf.openFile(this.currentCard.note);
             else {
