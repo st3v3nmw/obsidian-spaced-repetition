@@ -220,7 +220,7 @@ export class ReviewQueueListView extends ItemView {
                 this.app.workspace.iterateAllLeaves((t) => openFiles.push(t.view?.file));
                 if (openFiles.includes(file)) {
                     new Notice("File already open!");
-                } else if (this.app.workspace.getActiveFile() === undefined) {
+                } else if (this.app.workspace.getActiveFile() === null) {
                     await this.app.workspace.getLeaf().openFile(file);
                 } else {
                     await this.app.workspace.getLeaf(true).openFile(file);
