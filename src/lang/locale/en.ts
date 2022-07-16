@@ -8,9 +8,6 @@ export default {
     TOTAL_CARDS: "Total Cards",
     EDIT_LATER: "Edit Later",
     RESET_CARD_PROGRESS: "Reset card's progress",
-    HARD: "Hard",
-    GOOD: "Good",
-    EASY: "Easy",
     SHOW_ANSWER: "Show Answer",
     CARD_PROGRESS_RESET: "Card's progress has been reset.",
 
@@ -49,6 +46,12 @@ export default {
     FOLDERS_TO_IGNORE: "Folders to ignore",
     FOLDERS_TO_IGNORE_DESC: "Enter folder paths separated by newlines i.e. Templates Meta/Scripts",
     FLASHCARDS: "Flashcards",
+    FLASHCARD_EASY_LABEL: "Easy Button Text",
+    FLASHCARD_GOOD_LABEL: "Good Button Text",
+    FLASHCARD_HARD_LABEL: "Hard Button Text",
+    FLASHCARD_EASY_DESC: "Customize the label for the \"Easy\" Button",
+    FLASHCARD_GOOD_DESC: "Customize the label for the \"Good\" Button",
+    FLASHCARD_HARD_DESC: "Customize the label for the \"Hard\" Button",
     FLASHCARD_TAGS: "Flashcard tags",
     FLASHCARD_TAGS_DESC:
         "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.",

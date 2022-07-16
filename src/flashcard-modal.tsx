@@ -190,7 +190,7 @@ export class FlashcardModal extends Modal {
 
         this.hardBtn = document.createElement("button");
         this.hardBtn.setAttribute("id", "sr-hard-btn");
-        this.hardBtn.setText(t("HARD"));
+        this.hardBtn.setText(this.plugin.data.settings.flashcardHardText);
         this.hardBtn.addEventListener("click", () => {
             this.processReview(ReviewResponse.Hard);
         });
@@ -198,7 +198,7 @@ export class FlashcardModal extends Modal {
 
         this.goodBtn = document.createElement("button");
         this.goodBtn.setAttribute("id", "sr-good-btn");
-        this.goodBtn.setText(t("GOOD"));
+        this.goodBtn.setText(this.plugin.data.settings.flashcardGoodText);
         this.goodBtn.addEventListener("click", () => {
             this.processReview(ReviewResponse.Good);
         });
@@ -206,7 +206,7 @@ export class FlashcardModal extends Modal {
 
         this.easyBtn = document.createElement("button");
         this.easyBtn.setAttribute("id", "sr-easy-btn");
-        this.easyBtn.setText(t("EASY"));
+        this.easyBtn.setText(this.plugin.data.settings.flashcardEasyText);
         this.easyBtn.addEventListener("click", () => {
             this.processReview(ReviewResponse.Easy);
         });
@@ -813,16 +813,16 @@ export class Deck {
 
         if (modal.ignoreStats) {
             // Same for mobile/desktop
-            modal.hardBtn.setText(`${t("HARD")}`);
-            modal.easyBtn.setText(`${t("EASY")}`);
+            modal.hardBtn.setText(`${modal.plugin.data.settings.flashcardHardText}`);
+            modal.easyBtn.setText(`${modal.plugin.data.settings.flashcardEasyText}`);
         } else if (Platform.isMobile) {
             modal.hardBtn.setText(textInterval(hardInterval, true));
             modal.goodBtn.setText(textInterval(goodInterval, true));
             modal.easyBtn.setText(textInterval(easyInterval, true));
         } else {
-            modal.hardBtn.setText(`${t("HARD")} - ${textInterval(hardInterval, false)}`);
-            modal.goodBtn.setText(`${t("GOOD")} - ${textInterval(goodInterval, false)}`);
-            modal.easyBtn.setText(`${t("EASY")} - ${textInterval(easyInterval, false)}`);
+            modal.hardBtn.setText(`${modal.plugin.data.settings.flashcardHardText} - ${textInterval(hardInterval, false)}`);
+            modal.goodBtn.setText(`${modal.plugin.data.settings.flashcardGoodText} - ${textInterval(goodInterval, false)}`);
+            modal.easyBtn.setText(`${modal.plugin.data.settings.flashcardEasyText} - ${textInterval(easyInterval, false)}`);
         }
 
         if (modal.plugin.data.settings.showContextInCards)

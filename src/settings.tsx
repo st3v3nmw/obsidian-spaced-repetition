@@ -7,6 +7,9 @@ import { t } from "src/lang/helpers";
 
 export interface SRSettings {
     // flashcards
+    flashcardEasyText: string;
+    flashcardGoodText: string;
+    flashcardHardText: string;
     flashcardTags: string[];
     convertFoldersToDecks: boolean;
     cardCommentOnSameLine: boolean;
@@ -41,6 +44,9 @@ export interface SRSettings {
 
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
+    flashcardEasyText: "Easy",
+    flashcardGoodText: "Good",
+    flashcardHardText: "Hard",
     flashcardTags: ["#flashcards"],
     convertFoldersToDecks: false,
     cardCommentOnSameLine: false,
@@ -117,6 +123,81 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         containerEl.createDiv().innerHTML = <h3>{t("FLASHCARDS")}</h3>;
+
+        new Setting(containerEl)
+            .setName(t("FLASHCARD_EASY_LABEL"))
+            .setDesc(t("FLASHCARD_EASY_DESC"))
+            .addText((text) =>
+                text
+                    .setValue(this.plugin.data.settings.flashcardEasyText)
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.flashcardEasyText = value;
+                            await this.plugin.savePluginData();
+                        });
+                    })
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.flashcardEasyText =
+                            DEFAULT_SETTINGS.flashcardEasyText;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
+
+        new Setting(containerEl)
+            .setName(t("FLASHCARD_GOOD_LABEL"))
+            .setDesc(t("FLASHCARD_GOOD_DESC"))
+            .addText((text) =>
+                text
+                    .setValue(this.plugin.data.settings.flashcardGoodText)
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.flashcardGoodText = value;
+                            await this.plugin.savePluginData();
+                        });
+                    })
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.flashcardEasyText =
+                            DEFAULT_SETTINGS.flashcardEasyText;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
+
+        new Setting(containerEl)
+            .setName(t("FLASHCARD_HARD_LABEL"))
+            .setDesc(t("FLASHCARD_HARD_DESC"))
+            .addText((text) =>
+                text
+                    .setValue(this.plugin.data.settings.flashcardHardText)
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.flashcardHardText = value;
+                            await this.plugin.savePluginData();
+                        });
+                    })
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.flashcardEasyText =
+                            DEFAULT_SETTINGS.flashcardEasyText;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
         new Setting(containerEl)
             .setName(t("FLASHCARD_TAGS"))
