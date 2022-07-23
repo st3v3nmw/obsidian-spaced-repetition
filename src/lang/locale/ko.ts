@@ -8,9 +8,6 @@ export default {
     TOTAL_CARDS: "전체 카드들",
     EDIT_LATER: "나중에 편집하기",
     RESET_CARD_PROGRESS: "카드의 진행상황을 초기화합니다.",
-    HARD: "어려움(Hard)",
-    GOOD: "좋음(Good)",
-    EASY: "쉬움(Easy)",
     SHOW_ANSWER: "정답 확인하기",
     CARD_PROGRESS_RESET: "카드의 진행상황이 초기화되었습니다.",
 
@@ -50,6 +47,12 @@ export default {
     FOLDERS_TO_IGNORE_DESC:
         "폴더 경로를 빈 줄로 구분해서 입력해주세요. 'Templates Meta/Scripts' 와 같이 입력하는 것은 유효하지 않습니다.",
     FLASHCARDS: "플래시카드",
+    FLASHCARD_EASY_LABEL: "Easy Button Text",
+    FLASHCARD_GOOD_LABEL: "Good Button Text",
+    FLASHCARD_HARD_LABEL: "Hard Button Text",
+    FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
+    FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
+    FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
     FLASHCARD_TAGS: "플래시카드 태그",
     FLASHCARD_TAGS_DESC:
         "태그를 공백 또는 빈 줄로 구분해서 입력해주세요. 예) '#flashcards #deck2 #deck3'",

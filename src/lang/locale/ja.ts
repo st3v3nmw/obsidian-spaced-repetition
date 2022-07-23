@@ -8,9 +8,6 @@ export default {
     TOTAL_CARDS: "カード合計",
     EDIT_LATER: "後で編集",
     RESET_CARD_PROGRESS: "カードの進捗をリセット",
-    HARD: "Hard",
-    GOOD: "Good",
-    EASY: "Easy",
     SHOW_ANSWER: "解答を表示",
     CARD_PROGRESS_RESET: "カードの進捗がリセットされました。",
 
@@ -51,6 +48,12 @@ export default {
     FOLDERS_TO_IGNORE_DESC:
         'フォルダパスを改行で区切って入力してください。"Templates Meta/Scripts" のようなスペースによる区切りでの書き方は無効です。',
     FLASHCARDS: "フラッシュカード",
+    FLASHCARD_EASY_LABEL: "Easy Button Text",
+    FLASHCARD_GOOD_LABEL: "Good Button Text",
+    FLASHCARD_HARD_LABEL: "Hard Button Text",
+    FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
+    FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
+    FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
     FLASHCARD_TAGS: "フラッシュカードに使用するタグ",
     FLASHCARD_TAGS_DESC:
         'タグをスペースまたは改行で区切って入力してください。例: "#flashcards #deck2 #deck3"',

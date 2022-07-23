@@ -216,15 +216,7 @@ export class ReviewQueueListView extends ItemView {
             async (event: MouseEvent) => {
                 event.preventDefault();
                 plugin.lastSelectedReviewDeck = deck.deckName;
-                let openFiles: TFile[] = [];
-                this.app.workspace.iterateAllLeaves((t) => openFiles.push(t.view?.file));
-                if (openFiles.includes(file)) {
-                    new Notice("File already open!");
-                } else if (this.app.workspace.getActiveFile() === null) {
-                    await this.app.workspace.getLeaf().openFile(file);
-                } else {
-                    await this.app.workspace.getLeaf(true).openFile(file);
-                }
+                await this.app.workspace.getLeaf().openFile(file);
                 return false;
             },
             false

@@ -11,9 +11,6 @@ export default {
     TOTAL_CARDS: "Alle Karten",
     EDIT_LATER: "Später bearbeiten",
     RESET_CARD_PROGRESS: "Kartenfortschritt zurücksetzten",
-    HARD: "Schwer",
-    GOOD: "Gut",
-    EASY: "Einfach",
     SHOW_ANSWER: "Zeige Antwort",
     CARD_PROGRESS_RESET: "Kartenfortschritt wurde zurückgesetzt.",
 
@@ -56,6 +53,12 @@ export default {
     FOLDERS_TO_IGNORE_DESC:
         "Mehrere Ordner mit Zeilenumbrüchen getrennt angeben. Bsp. OrdnerA[Zeilenumbruch]OrdnerB/Unterordner",
     FLASHCARDS: "Lernkarten",
+    FLASHCARD_EASY_LABEL: "Easy Button Text",
+    FLASHCARD_GOOD_LABEL: "Good Button Text",
+    FLASHCARD_HARD_LABEL: "Hard Button Text",
+    FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
+    FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
+    FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
     FLASHCARD_TAGS: "Lernkarten Tags",
     FLASHCARD_TAGS_DESC:
         "Mehrere Tags mit Leerzeichen oder Zeilenumbrüchen getrennt angeben. Bsp. #karte #stapel2 #stapel3.",

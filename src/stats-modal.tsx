@@ -17,7 +17,7 @@ import {
 } from "chart.js";
 
 import type SRPlugin from "src/main";
-import { getKeysPreserveType } from "src/utils";
+import { getKeysPreserveType, getTypedObjectEntries } from "src/utils";
 import { textInterval } from "src/scheduling";
 import { t } from "src/lang/helpers";
 
@@ -83,7 +83,7 @@ export class StatsModal extends Modal {
         }
 
         const dueDatesFlashcardsCopy: Record<number, number> = { 0: 0 };
-        for (const [dueOffset, dueCount] of Object.entries(this.plugin.dueDatesFlashcards)) {
+        for (const [dueOffset, dueCount] of getTypedObjectEntries(this.plugin.dueDatesFlashcards)) {
             if (dueOffset <= 0) {
                 dueDatesFlashcardsCopy[0] += dueCount;
             } else {
@@ -136,7 +136,7 @@ export class StatsModal extends Modal {
         // Add intervals
         const average_interval: string = textInterval(
                 Math.round(
-                    (Object.entries(cardStats.intervals)
+                    (getTypedObjectEntries(cardStats.intervals)
                         .map(([interval, count]) => interval * count)
                         .reduce((a, b) => a + b, 0) /
                         scheduledCount) *
@@ -171,7 +171,7 @@ export class StatsModal extends Modal {
         }
         const average_ease: number =
             Math.round(
-                Object.entries(cardStats.eases)
+                getTypedObjectEntries(cardStats.eases)
                     .map(([ease, count]) => ease * count)
                     .reduce((a, b) => a + b, 0) / scheduledCount
             ) || 0;
