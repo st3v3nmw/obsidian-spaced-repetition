@@ -8,9 +8,6 @@ export default {
     TOTAL_CARDS: "Kartiček celkem",
     EDIT_LATER: "Upravit později",
     RESET_CARD_PROGRESS: "Vynulovat pokrok kartičky",
-    HARD: "Težké",
-    GOOD: "Dobré",
-    EASY: "Jednoduché",
     SHOW_ANSWER: "Ukázat odpověď",
     CARD_PROGRESS_RESET: "Pokrok kartičky byl vynulován.",
 
@@ -50,6 +47,12 @@ export default {
     FOLDERS_TO_IGNORE_DESC:
         "Zadejte cesty ke složkám oddělené odřádkováním napříkad. Šablony Meta/Scripts",
     FLASHCARDS: "Kartičky",
+    FLASHCARD_EASY_LABEL: "Easy Button Text",
+    FLASHCARD_GOOD_LABEL: "Good Button Text",
+    FLASHCARD_HARD_LABEL: "Hard Button Text",
+    FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
+    FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
+    FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
     FLASHCARD_TAGS: "Tag pro kartičky",
     FLASHCARD_TAGS_DESC:
         "Zadete tagy oodělené mezerou nebo odřádkováním například. #kartičky #balíčke2 #balíček3.",

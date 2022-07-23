@@ -11,9 +11,6 @@ export default {
     TOTAL_CARDS: "Всего карточек",
     EDIT_LATER: "Редактировать после",
     RESET_CARD_PROGRESS: "Сбросить прогресс карточки",
-    HARD: "Сложно",
-    GOOD: "Нормально",
-    EASY: "Легко",
     SHOW_ANSWER: "Показать ответ",
     CARD_PROGRESS_RESET: "Сбросить прогресс изучение карточки",
 
@@ -53,6 +50,12 @@ export default {
     FOLDERS_TO_IGNORE: "Игнорируемые папки",
     FOLDERS_TO_IGNORE_DESC: "Ведите пути папок разделенные enter'ом пример: Templates Meta/Scripts",
     FLASHCARDS: "Карточки",
+    FLASHCARD_EASY_LABEL: "Easy Button Text",
+    FLASHCARD_GOOD_LABEL: "Good Button Text",
+    FLASHCARD_HARD_LABEL: "Hard Button Text",
+    FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
+    FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
+    FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
     FLASHCARD_TAGS: "Тэги карточек",
     FLASHCARD_TAGS_DESC:
         "Ведите тэги разделенные enter'ом или пробелом пример: #flashcards #deck2 #deck3.",
