@@ -582,7 +582,7 @@ export default class SRPlugin extends Plugin {
             const index = this.data.settings.openRandomNote
                 ? Math.floor(Math.random() * deck.dueNotesCount)
                 : 0;
-            this.app.workspace.activeLeaf.openFile(deck.scheduledNotes[index].note);
+            this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
             return;
         }
 
@@ -590,7 +590,7 @@ export default class SRPlugin extends Plugin {
             const index = this.data.settings.openRandomNote
                 ? Math.floor(Math.random() * deck.newNotes.length)
                 : 0;
-            this.app.workspace.activeLeaf.openFile(deck.newNotes[index]);
+            this.app.workspace.getLeaf().openFile(deck.newNotes[index]);
             return;
         }
 
