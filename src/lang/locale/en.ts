@@ -49,9 +49,9 @@ export default {
     FLASHCARD_EASY_LABEL: "Easy Button Text",
     FLASHCARD_GOOD_LABEL: "Good Button Text",
     FLASHCARD_HARD_LABEL: "Hard Button Text",
-    FLASHCARD_EASY_DESC: "Customize the label for the \"Easy\" Button",
-    FLASHCARD_GOOD_DESC: "Customize the label for the \"Good\" Button",
-    FLASHCARD_HARD_DESC: "Customize the label for the \"Hard\" Button",
+    FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
+    FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
+    FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
     FLASHCARD_TAGS: "Flashcard tags",
     FLASHCARD_TAGS_DESC:
         "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.",

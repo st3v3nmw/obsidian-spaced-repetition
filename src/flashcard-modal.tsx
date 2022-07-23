@@ -820,9 +820,24 @@ export class Deck {
             modal.goodBtn.setText(textInterval(goodInterval, true));
             modal.easyBtn.setText(textInterval(easyInterval, true));
         } else {
-            modal.hardBtn.setText(`${modal.plugin.data.settings.flashcardHardText} - ${textInterval(hardInterval, false)}`);
-            modal.goodBtn.setText(`${modal.plugin.data.settings.flashcardGoodText} - ${textInterval(goodInterval, false)}`);
-            modal.easyBtn.setText(`${modal.plugin.data.settings.flashcardEasyText} - ${textInterval(easyInterval, false)}`);
+            modal.hardBtn.setText(
+                `${modal.plugin.data.settings.flashcardHardText} - ${textInterval(
+                    hardInterval,
+                    false
+                )}`
+            );
+            modal.goodBtn.setText(
+                `${modal.plugin.data.settings.flashcardGoodText} - ${textInterval(
+                    goodInterval,
+                    false
+                )}`
+            );
+            modal.easyBtn.setText(
+                `${modal.plugin.data.settings.flashcardEasyText} - ${textInterval(
+                    easyInterval,
+                    false
+                )}`
+            );
         }
 
         if (modal.plugin.data.settings.showContextInCards)
