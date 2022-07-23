@@ -128,14 +128,12 @@ export class SRSettingTab extends PluginSettingTab {
             .setName(t("FLASHCARD_EASY_LABEL"))
             .setDesc(t("FLASHCARD_EASY_DESC"))
             .addText((text) =>
-                text
-                    .setValue(this.plugin.data.settings.flashcardEasyText)
-                    .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            this.plugin.data.settings.flashcardEasyText = value;
-                            await this.plugin.savePluginData();
-                        });
-                    })
+                text.setValue(this.plugin.data.settings.flashcardEasyText).onChange((value) => {
+                    applySettingsUpdate(async () => {
+                        this.plugin.data.settings.flashcardEasyText = value;
+                        await this.plugin.savePluginData();
+                    });
+                })
             )
             .addExtraButton((button) => {
                 button
@@ -153,14 +151,12 @@ export class SRSettingTab extends PluginSettingTab {
             .setName(t("FLASHCARD_GOOD_LABEL"))
             .setDesc(t("FLASHCARD_GOOD_DESC"))
             .addText((text) =>
-                text
-                    .setValue(this.plugin.data.settings.flashcardGoodText)
-                    .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            this.plugin.data.settings.flashcardGoodText = value;
-                            await this.plugin.savePluginData();
-                        });
-                    })
+                text.setValue(this.plugin.data.settings.flashcardGoodText).onChange((value) => {
+                    applySettingsUpdate(async () => {
+                        this.plugin.data.settings.flashcardGoodText = value;
+                        await this.plugin.savePluginData();
+                    });
+                })
             )
             .addExtraButton((button) => {
                 button
@@ -178,14 +174,12 @@ export class SRSettingTab extends PluginSettingTab {
             .setName(t("FLASHCARD_HARD_LABEL"))
             .setDesc(t("FLASHCARD_HARD_DESC"))
             .addText((text) =>
-                text
-                    .setValue(this.plugin.data.settings.flashcardHardText)
-                    .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            this.plugin.data.settings.flashcardHardText = value;
-                            await this.plugin.savePluginData();
-                        });
-                    })
+                text.setValue(this.plugin.data.settings.flashcardHardText).onChange((value) => {
+                    applySettingsUpdate(async () => {
+                        this.plugin.data.settings.flashcardHardText = value;
+                        await this.plugin.savePluginData();
+                    });
+                })
             )
             .addExtraButton((button) => {
                 button
