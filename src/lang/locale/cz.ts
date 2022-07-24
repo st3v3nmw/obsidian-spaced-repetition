@@ -8,6 +8,9 @@ export default {
     TOTAL_CARDS: "Kartiček celkem",
     EDIT_LATER: "Upravit později",
     RESET_CARD_PROGRESS: "Vynulovat pokrok kartičky",
+    HARD: "Težké",
+    GOOD: "Dobré",
+    EASY: "Jednoduché",
     SHOW_ANSWER: "Ukázat odpověď",
     CARD_PROGRESS_RESET: "Pokrok kartičky byl vynulován.",
 

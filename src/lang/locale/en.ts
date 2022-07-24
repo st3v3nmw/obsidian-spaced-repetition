@@ -8,6 +8,9 @@ export default {
     TOTAL_CARDS: "Total Cards",
     EDIT_LATER: "Edit Later",
     RESET_CARD_PROGRESS: "Reset card's progress",
+    HARD: "Hard",
+    GOOD: "Good",
+    EASY: "Easy",
     SHOW_ANSWER: "Show Answer",
     CARD_PROGRESS_RESET: "Card's progress has been reset.",
 

@@ -8,6 +8,9 @@ export default {
     TOTAL_CARDS: "全部卡片",
     EDIT_LATER: "稍后编辑",
     RESET_CARD_PROGRESS: "重置卡片",
+    HARD: "较难",
+    GOOD: "记得",
+    EASY: "简单",
     SHOW_ANSWER: "显示答案",
     CARD_PROGRESS_RESET: "卡片已被重置。",
 
