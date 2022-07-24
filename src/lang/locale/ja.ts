@@ -8,6 +8,9 @@ export default {
     TOTAL_CARDS: "カード合計",
     EDIT_LATER: "後で編集",
     RESET_CARD_PROGRESS: "カードの進捗をリセット",
+    HARD: "Hard",
+    GOOD: "Good",
+    EASY: "Easy",
     SHOW_ANSWER: "解答を表示",
     CARD_PROGRESS_RESET: "カードの進捗がリセットされました。",
 

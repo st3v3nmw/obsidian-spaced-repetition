@@ -11,6 +11,9 @@ export default {
     TOTAL_CARDS: "Alle Karten",
     EDIT_LATER: "Später bearbeiten",
     RESET_CARD_PROGRESS: "Kartenfortschritt zurücksetzten",
+    HARD: "Schwer",
+    GOOD: "Gut",
+    EASY: "Einfach",
     SHOW_ANSWER: "Zeige Antwort",
     CARD_PROGRESS_RESET: "Kartenfortschritt wurde zurückgesetzt.",
 

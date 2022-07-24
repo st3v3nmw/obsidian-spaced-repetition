@@ -11,6 +11,9 @@ export default {
     TOTAL_CARDS: "Всего карточек",
     EDIT_LATER: "Редактировать после",
     RESET_CARD_PROGRESS: "Сбросить прогресс карточки",
+    HARD: "Сложно",
+    GOOD: "Нормально",
+    EASY: "Легко",
     SHOW_ANSWER: "Показать ответ",
     CARD_PROGRESS_RESET: "Сбросить прогресс изучение карточки",
 

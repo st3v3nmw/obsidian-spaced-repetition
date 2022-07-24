@@ -8,6 +8,9 @@ export default {
     TOTAL_CARDS: "전체 카드들",
     EDIT_LATER: "나중에 편집하기",
     RESET_CARD_PROGRESS: "카드의 진행상황을 초기화합니다.",
+    HARD: "어려움(Hard)",
+    GOOD: "좋음(Good)",
+    EASY: "쉬움(Easy)",
     SHOW_ANSWER: "정답 확인하기",
     CARD_PROGRESS_RESET: "카드의 진행상황이 초기화되었습니다.",
 
