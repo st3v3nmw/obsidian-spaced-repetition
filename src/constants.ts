@@ -1,5 +1,5 @@
 export const SCHEDULING_INFO_REGEX =
-    /^---\n((?:.*\n)*)signynt-sr-due: (.+)\nsignynt-sr-interval: (\d+)\nsignynt-sr-ease: (\d+)\n((?:.*\n)*)---/;
+    /^---\n((?:.*\n)*)sara-sr-due: (.+)\nsara-sr-interval: (\d+)\nsara-sr-ease: (\d+)\n((?:.*\n)*)---/;
 export const YAML_FRONT_MATTER_REGEX = /^---\n((?:.*\n)*?)---/;
 
 export const MULTI_SCHEDULING_EXTRACTOR = /!([\d-]+),(\d+),(\d+)/gm;
