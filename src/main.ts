@@ -346,9 +346,9 @@ export default class SRPlugin extends Plugin {
             // file has no scheduling information
             if (
                 !(
-                    Object.prototype.hasOwnProperty.call(frontmatter, "sr-due") &&
-                    Object.prototype.hasOwnProperty.call(frontmatter, "sr-interval") &&
-                    Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
+                    Object.prototype.hasOwnProperty.call(frontmatter, "signynt-sr-due") &&
+                    Object.prototype.hasOwnProperty.call(frontmatter, "signynt-sr-interval") &&
+                    Object.prototype.hasOwnProperty.call(frontmatter, "signynt-sr-ease")
                 )
             ) {
                 for (const matchedNoteTag of matchedNoteTags) {
@@ -358,7 +358,7 @@ export default class SRPlugin extends Plugin {
             }
 
             const dueUnix: number = window
-                .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
+                .moment(frontmatter["signynt-sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
                 .valueOf();
 
             for (const matchedNoteTag of matchedNoteTags) {
@@ -370,9 +370,9 @@ export default class SRPlugin extends Plugin {
 
             if (Object.prototype.hasOwnProperty.call(this.easeByPath, note.path)) {
                 this.easeByPath[note.path] =
-                    (this.easeByPath[note.path] + frontmatter["sr-ease"]) / 2;
+                    (this.easeByPath[note.path] + frontmatter["signynt-sr-ease"]) / 2;
             } else {
-                this.easeByPath[note.path] = frontmatter["sr-ease"];
+                this.easeByPath[note.path] = frontmatter["signynt-sr-ease"];
             }
 
             if (dueUnix <= now.valueOf()) {
@@ -455,9 +455,9 @@ export default class SRPlugin extends Plugin {
         // new note
         if (
             !(
-                Object.prototype.hasOwnProperty.call(frontmatter, "sr-due") &&
-                Object.prototype.hasOwnProperty.call(frontmatter, "sr-interval") &&
-                Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
+                Object.prototype.hasOwnProperty.call(frontmatter, "signynt-sr-due") &&
+                Object.prototype.hasOwnProperty.call(frontmatter, "signynt-sr-interval") &&
+                Object.prototype.hasOwnProperty.call(frontmatter, "signynt-sr-ease")
             )
         ) {
             let linkTotal = 0,
@@ -500,12 +500,12 @@ export default class SRPlugin extends Plugin {
             interval = 1.0;
             delayBeforeReview = 0;
         } else {
-            interval = frontmatter["sr-interval"];
-            ease = frontmatter["sr-ease"];
+            interval = frontmatter["signynt-sr-interval"];
+            ease = frontmatter["signynt-sr-ease"];
             delayBeforeReview =
                 now -
                 window
-                    .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
+                    .moment(frontmatter["signynt-sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
                     .valueOf();
         }
 
@@ -528,8 +528,8 @@ export default class SRPlugin extends Plugin {
             const schedulingInfo = SCHEDULING_INFO_REGEX.exec(fileText);
             fileText = fileText.replace(
                 SCHEDULING_INFO_REGEX,
-                `---\n${schedulingInfo[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
+                `---\n${schedulingInfo[1]}signynt-sr-due: ${dueString}\n` +
+                    `signynt-sr-interval: ${interval}\nsignynt-sr-ease: ${ease}\n` +
                     `${schedulingInfo[5]}---`
             );
         } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
@@ -537,13 +537,13 @@ export default class SRPlugin extends Plugin {
             const existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
             fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
-                `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n---`
+                `---\n${existingYaml[1]}signynt-sr-due: ${dueString}\n` +
+                    `signynt-sr-interval: ${interval}\nsignynt-sr-ease: ${ease}\n---`
             );
         } else {
             fileText =
-                `---\nsr-due: ${dueString}\nsr-interval: ${interval}\n` +
-                `sr-ease: ${ease}\n---\n\n${fileText}`;
+                `---\nsignynt-sr-due: ${dueString}\nsignynt-sr-interval: ${interval}\n` +
+                `signynt-sr-ease: ${ease}\n---\n\n${fileText}`;
         }
 
         if (this.data.settings.burySiblingCards) {

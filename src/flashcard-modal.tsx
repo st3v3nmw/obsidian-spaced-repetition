@@ -66,7 +66,7 @@ export class FlashcardModal extends Modal {
 
         this.contentEl.style.position = "relative";
         this.contentEl.style.height = "92%";
-        this.contentEl.addClass("sr-modal-content");
+        this.contentEl.addClass("signynt-sr-modal-content");
 
         document.body.onkeydown = (e) => {
             if (this.mode !== FlashcardModalMode.DecksList) {
@@ -132,21 +132,21 @@ export class FlashcardModal extends Modal {
                 <span
                     style="background-color:#2196f3;"
                     aria-label={t("NEW_CARDS")}
-                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                    class="tag-pane-tag-count tree-item-flair signynt-sr-deck-counts"
                 >
                     {this.plugin.deckTree.newFlashcardsCount.toString()}
                 </span>
                 <span
                     style="background-color:#ff7043;"
                     aria-label={t("TOTAL_CARDS")}
-                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                    class="tag-pane-tag-count tree-item-flair signynt-sr-deck-counts"
                 >
                     {this.plugin.deckTree.totalFlashcards.toString()}
                 </span>
             </p>
         );
         this.contentEl.innerHTML = "";
-        this.contentEl.setAttribute("id", "sr-flashcard-view");
+        this.contentEl.setAttribute("id", "signynt-sr-flashcard-view");
 
         for (const deck of this.plugin.deckTree.subdecks) {
             deck.render(this.contentEl, this);
@@ -165,7 +165,7 @@ export class FlashcardModal extends Modal {
             }
         });
 
-        this.fileLinkView = this.contentEl.createDiv("sr-link");
+        this.fileLinkView = this.contentEl.createDiv("signynt-sr-link");
         this.fileLinkView.setText(t("EDIT_LATER"));
         if (this.plugin.data.settings.showFileNameInFileLink) {
             this.fileLinkView.setAttribute("aria-label", t("EDIT_LATER"));
@@ -192,7 +192,7 @@ export class FlashcardModal extends Modal {
             this.currentDeck.nextCard(this);
         });
 
-        this.resetLinkView = this.contentEl.createDiv("sr-link");
+        this.resetLinkView = this.contentEl.createDiv("signynt-sr-link");
         this.resetLinkView.setText(t("RESET_CARD_PROGRESS"));
         this.resetLinkView.addEventListener("click", () => {
             this.processReview(ReviewResponse.Reset);
@@ -201,16 +201,16 @@ export class FlashcardModal extends Modal {
 
         if (this.plugin.data.settings.showContextInCards) {
             this.contextView = this.contentEl.createDiv();
-            this.contextView.setAttribute("id", "sr-context");
+            this.contextView.setAttribute("id", "signynt-sr-context");
         }
 
         this.flashcardView = this.contentEl.createDiv("div");
-        this.flashcardView.setAttribute("id", "sr-flashcard-view");
+        this.flashcardView.setAttribute("id", "signynt-sr-flashcard-view");
 
-        this.responseDiv = this.contentEl.createDiv("sr-response");
+        this.responseDiv = this.contentEl.createDiv("signynt-sr-response");
 
         this.hardBtn = document.createElement("button");
-        this.hardBtn.setAttribute("id", "sr-hard-btn");
+        this.hardBtn.setAttribute("id", "signynt-sr-hard-btn");
         this.hardBtn.setText(this.plugin.data.settings.flashcardHardText);
         this.hardBtn.addEventListener("click", () => {
             this.processReview(ReviewResponse.Hard);
@@ -218,7 +218,7 @@ export class FlashcardModal extends Modal {
         this.responseDiv.appendChild(this.hardBtn);
 
         this.goodBtn = document.createElement("button");
-        this.goodBtn.setAttribute("id", "sr-good-btn");
+        this.goodBtn.setAttribute("id", "signynt-sr-good-btn");
         this.goodBtn.setText(this.plugin.data.settings.flashcardGoodText);
         this.goodBtn.addEventListener("click", () => {
             this.processReview(ReviewResponse.Good);
@@ -226,7 +226,7 @@ export class FlashcardModal extends Modal {
         this.responseDiv.appendChild(this.goodBtn);
 
         this.easyBtn = document.createElement("button");
-        this.easyBtn.setAttribute("id", "sr-easy-btn");
+        this.easyBtn.setAttribute("id", "signynt-sr-easy-btn");
         this.easyBtn.setText(this.plugin.data.settings.flashcardEasyText);
         this.easyBtn.addEventListener("click", () => {
             this.processReview(ReviewResponse.Easy);
@@ -235,7 +235,7 @@ export class FlashcardModal extends Modal {
         this.responseDiv.style.display = "none";
 
         this.answerBtn = this.contentEl.createDiv();
-        this.answerBtn.setAttribute("id", "sr-show-answer");
+        this.answerBtn.setAttribute("id", "signynt-sr-show-answer");
         this.answerBtn.setText(t("SHOW_ANSWER"));
         this.answerBtn.addEventListener("click", () => {
             this.showAnswer();
@@ -244,9 +244,9 @@ export class FlashcardModal extends Modal {
         if (this.ignoreStats) {
             this.goodBtn.style.display = "none";
 
-            this.responseDiv.addClass("sr-ignorestats-response");
-            this.easyBtn.addClass("sr-ignorestats-btn");
-            this.hardBtn.addClass("sr-ignorestats-btn");
+            this.responseDiv.addClass("signynt-sr-ignorestats-response");
+            this.easyBtn.addClass("signynt-sr-ignorestats-btn");
+            this.hardBtn.addClass("signynt-sr-ignorestats-btn");
         }
     }
 
@@ -262,7 +262,7 @@ export class FlashcardModal extends Modal {
 
         if (this.currentCard.cardType !== CardType.Cloze) {
             const hr: HTMLElement = document.createElement("hr");
-            hr.setAttribute("id", "sr-hr-card-divide");
+            hr.setAttribute("id", "signynt-sr-hr-card-divide");
             this.flashcardView.appendChild(hr);
         } else {
             this.flashcardView.innerHTML = "";
@@ -696,19 +696,19 @@ export class Deck {
             <span>
                 <span
                     style="background-color:#4caf50;"
-                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                    class="tag-pane-tag-count tree-item-flair signynt-sr-deck-counts"
                 >
                     {this.dueFlashcardsCount.toString()}
                 </span>
                 <span
                     style="background-color:#2196f3;"
-                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                    class="tag-pane-tag-count tree-item-flair signynt-sr-deck-counts"
                 >
                     {this.newFlashcardsCount.toString()}
                 </span>
                 <span
                     style="background-color:#ff7043;"
-                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                    class="tag-pane-tag-count tree-item-flair signynt-sr-deck-counts"
                 >
                     {this.totalFlashcards.toString()}
                 </span>
