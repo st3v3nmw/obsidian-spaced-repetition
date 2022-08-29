@@ -32,7 +32,8 @@
         "ts-jest": "^27.0.4",
         "tslib": "2.3.1",
         "typescript": "4.5.4",
-        "vhtml": "^2.2.0"
+        "vhtml": "^2.2.0",
+        "yarn": "^1.22.19"
     },
     "dependencies": {
         "chart.js": "^3.7.0",
