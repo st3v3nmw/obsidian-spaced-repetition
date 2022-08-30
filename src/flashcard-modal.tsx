@@ -6,7 +6,7 @@ import {
     Platform,
     TFile,
     MarkdownView,
-    WorkspaceLeaf,
+    WorkspaceLeaf, Editor,
 } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
@@ -198,10 +198,21 @@ export class FlashcardModal extends Modal {
                 await newLeaf.openFile(this.currentCard.note, { active: true });
             }
             const activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-            activeView.editor.setCursor({
-                line: this.currentCard.lineNo,
-                ch: 0,
-            });
+            if (activeView.getMode() == "preview") {
+                activeView.previewMode.applyScroll(this.currentCard.lineNo);
+            }
+            else {
+                activeView.editor.scrollIntoView({
+                        from: {
+                            line: this.currentCard.lineNo,
+                            ch: 0,
+                        },
+                        to: {
+                            line: this.currentCard.lineNo,
+                            ch: 0,
+                        }
+                    }, true);
+            }
             this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
             this.burySiblingCards(false);
             this.currentDeck.nextCard(this);
