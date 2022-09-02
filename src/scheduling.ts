@@ -38,6 +38,7 @@ export enum CardType {
     SingleLineReversed,
     MultiLineBasic,
     MultiLineReversed,
+    CallOutQuestion,
     Cloze,
 }
 

@@ -1,4 +1,5 @@
 import { CardType } from "src/scheduling";
+import { niceNum } from "chart.js/types/helpers";
 
 /**
  * Returns flashcards found in `text`
@@ -39,6 +40,11 @@ export function parse(
             while (i + 1 < lines.length && !lines[i].includes("-->")) i++;
             i++;
             continue;
+        } else if (cardType == CardType.CallOutQuestion && /^( *>? *)+$/gm.test(lines[i])) {
+            cards.push([cardType, cardText, lineNo]);
+            cardType = null;
+            cardText = "";
+            continue;
         }
 
         if (cardText.length > 0) {
@@ -70,6 +76,10 @@ export function parse(
         ) {
             cardType = CardType.Cloze;
             lineNo = i;
+            cardText = lines[i];
+            cards.push([cardType, cardText, lineNo]);
+            cardType = null;
+            cardText = "";
         } else if (lines[i] === multilineCardSeparator) {
             cardType = CardType.MultiLineBasic;
             lineNo = i;
@@ -84,6 +94,14 @@ export function parse(
             }
             cardText += "\n" + codeBlockClose;
             i++;
+        } else if (/^(( *> *)+\[!question\]-* *)/gm.test(lines[i])) {
+            cardType = CardType.CallOutQuestion;
+            lineNo = i;
+            const matches = lines[i].match(/^(( *> *)+\[!question\]-* *)/gm);
+            cardText = lines[i].substring(matches[0].length);
+            if (cardText.length === 0) {
+                cardText = matches[0].charAt(matches[0].length - 1);
+            }
         }
     }
 

@@ -6,7 +6,8 @@ import {
     Platform,
     TFile,
     MarkdownView,
-    WorkspaceLeaf, Editor,
+    WorkspaceLeaf,
+    Editor,
 } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
@@ -200,9 +201,9 @@ export class FlashcardModal extends Modal {
             const activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
             if (activeView.getMode() == "preview") {
                 activeView.previewMode.applyScroll(this.currentCard.lineNo);
-            }
-            else {
-                activeView.editor.scrollIntoView({
+            } else {
+                activeView.editor.scrollIntoView(
+                    {
                         from: {
                             line: this.currentCard.lineNo,
                             ch: 0,
@@ -210,8 +211,10 @@ export class FlashcardModal extends Modal {
                         to: {
                             line: this.currentCard.lineNo,
                             ch: 0,
-                        }
-                    }, true);
+                        },
+                    },
+                    true
+                );
             }
             this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
             this.burySiblingCards(false);
@@ -375,6 +378,10 @@ export class FlashcardModal extends Modal {
             sep = "\n";
         }
 
+        const matches = this.currentCard.back.match(/^( *> *)+/g);
+        if (matches != null) {
+            sep += matches[0];
+        }
         // check if we're adding scheduling information to the flashcard
         // for the first time
         if (this.currentCard.cardText.lastIndexOf("<!--SR:") === -1) {
@@ -395,8 +402,10 @@ export class FlashcardModal extends Modal {
                 scheduling.push(currCardSched);
             }
 
-            this.currentCard.cardText = this.currentCard.cardText.replace(/<!--SR:.+-->/gm, "");
-            this.currentCard.cardText += "<!--SR:";
+            this.currentCard.cardText = this.currentCard.cardText.replace(
+                /(?<=<!--SR:.*)-->/gm,
+                ""
+            );
             for (let i = 0; i < scheduling.length; i++) {
                 this.currentCard.cardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
             }

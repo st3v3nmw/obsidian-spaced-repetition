@@ -25,6 +25,7 @@ import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
 import { t } from "src/lang/helpers";
 import { parse } from "src/parser";
 import { appIcon } from "src/icons/appicon";
+import id from "src/lang/locale/id";
 
 interface PluginData {
     settings: SRSettings;
@@ -756,6 +757,12 @@ export default class SRPlugin extends Plugin {
                         );
                     siblingMatches.push([side1, side2]);
                     siblingMatches.push([side2, side1]);
+                } else if (cardType === CardType.CallOutQuestion) {
+                    idx = cardText.indexOf("\n");
+                    if (idx === -1) {
+                        console.error("callout question card should not -1");
+                    }
+                    siblingMatches.push([cardText.substring(0, idx), cardText.substring(idx + 1)]);
                 }
             }
 
