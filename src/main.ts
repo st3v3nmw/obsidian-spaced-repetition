@@ -343,14 +343,7 @@ export default class SRPlugin extends Plugin {
                 continue;
             }
 
-            // file has no scheduling information
-            if (
-                !(
-                    Object.prototype.hasOwnProperty.call(frontmatter, "sr-due") &&
-                    Object.prototype.hasOwnProperty.call(frontmatter, "sr-interval") &&
-                    Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
-                )
-            ) {
+            if (!fileHasSchedulingInformation(frontmatter)) {
                 for (const matchedNoteTag of matchedNoteTags) {
                     this.reviewDecks[matchedNoteTag].newNotes.push(note);
                 }
@@ -453,13 +446,7 @@ export default class SRPlugin extends Plugin {
         let ease: number, interval: number, delayBeforeReview: number;
         const now: number = Date.now();
         // new note
-        if (
-            !(
-                Object.prototype.hasOwnProperty.call(frontmatter, "sr-due") &&
-                Object.prototype.hasOwnProperty.call(frontmatter, "sr-interval") &&
-                Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
-            )
-        ) {
+        if (!fileHasSchedulingInformation(frontmatter)) {
             let linkTotal = 0,
                 linkPGTotal = 0,
                 totalLinkCount = 0;
@@ -918,4 +905,14 @@ function getCardContext(cardLine: number, headings: HeadingCache[]): string {
         context += headingObj.heading + " > ";
     }
     return context.slice(0, -3);
+}
+
+function fileHasSchedulingInformation(
+    frontmatter: FrontMatterCache | Record<string, unknown>
+): boolean {
+    return (
+        Object.prototype.hasOwnProperty.call(frontmatter, "sr-due") &&
+        Object.prototype.hasOwnProperty.call(frontmatter, "sr-interval") &&
+        Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
+    );
 }
