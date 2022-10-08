@@ -590,8 +590,8 @@ export default class SRPlugin extends Plugin {
         let deckPaths: string[][] = [];
         if (this.data.settings.convertFoldersToDecks) {
             deckPaths[0] = note.path.split("/");
-            deckPaths.pop(); // remove filename
-            if (deckPaths.length === 0) {
+            deckPaths[0].pop(); // remove filename
+            if (deckPaths[0].length === 0) {
                 deckPaths[0] = ["/"];
             }
         } else {
