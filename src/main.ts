@@ -196,8 +196,8 @@ export default class SRPlugin extends Plugin {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
                     this.deckTree = new Deck("root", null);
-                    const deckPath: string[] = this.findDeckPath(openFile);
-                    await this.findFlashcardsInNote(openFile, deckPath);
+                    const deckPaths: string[][] = this.findAllDeckPaths(openFile);
+                    await this.findFlashcardsInNote(openFile, deckPaths);
                     new FlashcardModal(this.app, this).open();
                 }
             },
@@ -210,8 +210,8 @@ export default class SRPlugin extends Plugin {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
                     this.deckTree = new Deck("root", null);
-                    const deckPath: string[] = this.findDeckPath(openFile);
-                    await this.findFlashcardsInNote(openFile, deckPath, false, true);
+                    const deckPaths: string[][] = this.findAllDeckPaths(openFile);
+                    await this.findFlashcardsInNote(openFile, deckPaths, false, true);
                     new FlashcardModal(this.app, this, true).open();
                 }
             },
@@ -308,11 +308,11 @@ export default class SRPlugin extends Plugin {
                 }
             }
 
-            const deckPath: string[] = this.findDeckPath(note);
-            if (deckPath.length !== 0) {
+            const deckPaths: string[][] = this.findAllDeckPaths(note);
+            if (deckPaths.length !== 0) {
                 const flashcardsInNoteAvgEase: number = await this.findFlashcardsInNote(
                     note,
-                    deckPath
+                    deckPaths
                 );
 
                 if (flashcardsInNoteAvgEase > 0) {
@@ -586,34 +586,33 @@ export default class SRPlugin extends Plugin {
         new Notice(t("ALL_CAUGHT_UP"));
     }
 
-    findDeckPath(note: TFile): string[] {
-        let deckPath: string[] = [];
+    findAllDeckPaths(note: TFile): string[][] {
+        let deckPaths: string[][] = [];
         if (this.data.settings.convertFoldersToDecks) {
-            deckPath = note.path.split("/");
-            deckPath.pop(); // remove filename
-            if (deckPath.length === 0) {
-                deckPath = ["/"];
+            deckPaths[0] = note.path.split("/");
+            deckPaths.pop(); // remove filename
+            if (deckPaths.length === 0) {
+                deckPaths[0] = ["/"];
             }
         } else {
             const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
-            const tags = getAllTags(fileCachedData) || [];
+            const tagsInThisNote = getAllTags(fileCachedData) || [];
 
-            outer: for (const tagToReview of this.data.settings.flashcardTags) {
-                for (const tag of tags) {
+            for (const tagToReview of this.data.settings.flashcardTags) {
+                for (const tag of tagsInThisNote) {
                     if (tag === tagToReview || tag.startsWith(tagToReview + "/")) {
-                        deckPath = tag.substring(1).split("/");
-                        break outer;
+                        deckPaths.push(tag.substring(1).split("/"));
                     }
                 }
             }
         }
 
-        return deckPath;
+        return deckPaths;
     }
 
     async findFlashcardsInNote(
         note: TFile,
-        deckPath: string[],
+        deckPaths: string[][],
         buryOnly = false,
         ignoreStats = false
     ): Promise<number> {
@@ -624,7 +623,6 @@ export default class SRPlugin extends Plugin {
             totalNoteEase = 0,
             scheduledCount = 0;
         const settings: SRSettings = this.data.settings;
-        const noteDeckPath = deckPath;
 
         const now: number = Date.now();
         const parsedCards: [CardType, string, number][] = parse(
@@ -637,211 +635,224 @@ export default class SRPlugin extends Plugin {
             settings.convertBoldTextToClozes,
             settings.convertCurlyBracketsToClozes
         );
-        for (const parsedCard of parsedCards) {
-            deckPath = noteDeckPath;
-            const cardType: CardType = parsedCard[0],
-                lineNo: number = parsedCard[2];
-            let cardText: string = parsedCard[1];
 
-            if (!settings.convertFoldersToDecks) {
-                const tagInCardRegEx = /^#[^\s#]+/gi;
-                const cardDeckPath = cardText
-                    .match(tagInCardRegEx)
-                    ?.slice(-1)[0]
-                    .replace("#", "")
-                    .split("/");
-                if (cardDeckPath) {
-                    deckPath = cardDeckPath;
-                    cardText = cardText.replaceAll(tagInCardRegEx, "");
+        for (let deckPath of deckPaths) {
+            const noteDeckPath = deckPath;
+            for (const parsedCard of parsedCards) {
+                deckPath = noteDeckPath;
+                const cardType: CardType = parsedCard[0],
+                    lineNo: number = parsedCard[2];
+                let cardText: string = parsedCard[1];
+
+                if (!settings.convertFoldersToDecks) {
+                    const tagInCardRegEx = /^#[^\s#]+/gi;
+                    const cardDeckPath = cardText
+                        .match(tagInCardRegEx)
+                        ?.slice(-1)[0]
+                        .replace("#", "")
+                        .split("/");
+                    if (cardDeckPath) {
+                        deckPath = cardDeckPath;
+                        cardText = cardText.replaceAll(tagInCardRegEx, "");
+                    }
                 }
-            }
 
-            this.deckTree.createDeck([...deckPath]);
+                this.deckTree.createDeck([...deckPath]);
 
-            const cardTextHash: string = cyrb53(cardText);
+                const cardTextHash: string = cyrb53(cardText);
 
-            if (buryOnly) {
-                this.data.buryList.push(cardTextHash);
-                continue;
-            }
-
-            const siblingMatches: [string, string][] = [];
-            if (cardType === CardType.Cloze) {
-                const siblings: RegExpMatchArray[] = [];
-                if (settings.convertHighlightsToClozes) {
-                    siblings.push(...cardText.matchAll(/==(.*?)==/gm));
+                if (buryOnly) {
+                    this.data.buryList.push(cardTextHash);
+                    continue;
                 }
-                if (settings.convertBoldTextToClozes) {
-                    siblings.push(...cardText.matchAll(/\*\*(.*?)\*\*/gm));
-                }
-                if (settings.convertCurlyBracketsToClozes) {
-                    siblings.push(...cardText.matchAll(/{{(.*?)}}/gm));
-                }
-                siblings.sort((a, b) => {
-                    if (a.index < b.index) {
-                        return -1;
+
+                const siblingMatches: [string, string][] = [];
+                if (cardType === CardType.Cloze) {
+                    const siblings: RegExpMatchArray[] = [];
+                    if (settings.convertHighlightsToClozes) {
+                        siblings.push(...cardText.matchAll(/==(.*?)==/gm));
                     }
-                    if (a.index > b.index) {
-                        return 1;
+                    if (settings.convertBoldTextToClozes) {
+                        siblings.push(...cardText.matchAll(/\*\*(.*?)\*\*/gm));
                     }
-                    return 0;
-                });
-
-                let front: string, back: string;
-                for (const m of siblings) {
-                    const deletionStart: number = m.index,
-                        deletionEnd: number = deletionStart + m[0].length;
-                    front =
-                        cardText.substring(0, deletionStart) +
-                        "<span style='color:#2196f3'>[...]</span>" +
-                        cardText.substring(deletionEnd);
-                    front = front
-                        .replace(/==/gm, "")
-                        .replace(/\*\*/gm, "")
-                        .replace(/{{/gm, "")
-                        .replace(/}}/gm, "");
-                    back =
-                        cardText.substring(0, deletionStart) +
-                        "<span style='color:#2196f3'>" +
-                        cardText.substring(deletionStart, deletionEnd) +
-                        "</span>" +
-                        cardText.substring(deletionEnd);
-                    back = back
-                        .replace(/==/gm, "")
-                        .replace(/\*\*/gm, "")
-                        .replace(/{{/gm, "")
-                        .replace(/}}/gm, "");
-                    siblingMatches.push([front, back]);
-                }
-            } else {
-                let idx: number;
-                if (cardType === CardType.SingleLineBasic) {
-                    idx = cardText.indexOf(settings.singlelineCardSeparator);
-                    siblingMatches.push([
-                        cardText.substring(0, idx),
-                        cardText.substring(idx + settings.singlelineCardSeparator.length),
-                    ]);
-                } else if (cardType === CardType.SingleLineReversed) {
-                    idx = cardText.indexOf(settings.singlelineReversedCardSeparator);
-                    const side1: string = cardText.substring(0, idx),
-                        side2: string = cardText.substring(
-                            idx + settings.singlelineReversedCardSeparator.length
-                        );
-                    siblingMatches.push([side1, side2]);
-                    siblingMatches.push([side2, side1]);
-                } else if (cardType === CardType.MultiLineBasic) {
-                    idx = cardText.indexOf("\n" + settings.multilineCardSeparator + "\n");
-                    siblingMatches.push([
-                        cardText.substring(0, idx),
-                        cardText.substring(idx + 2 + settings.multilineCardSeparator.length),
-                    ]);
-                } else if (cardType === CardType.MultiLineReversed) {
-                    idx = cardText.indexOf("\n" + settings.multilineReversedCardSeparator + "\n");
-                    const side1: string = cardText.substring(0, idx),
-                        side2: string = cardText.substring(
-                            idx + 2 + settings.multilineReversedCardSeparator.length
-                        );
-                    siblingMatches.push([side1, side2]);
-                    siblingMatches.push([side2, side1]);
-                }
-            }
-
-            let scheduling: RegExpMatchArray[] = [...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR)];
-            if (scheduling.length === 0)
-                scheduling = [...cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
-
-            // we have some extra scheduling dates to delete
-            if (scheduling.length > siblingMatches.length) {
-                const idxSched: number = cardText.lastIndexOf("<!--SR:") + 7;
-                let newCardText: string = cardText.substring(0, idxSched);
-                for (let i = 0; i < siblingMatches.length; i++)
-                    newCardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
-                newCardText += "-->";
-
-                const replacementRegex = new RegExp(escapeRegexString(cardText), "gm");
-                fileText = fileText.replace(replacementRegex, () => newCardText);
-                fileChanged = true;
-            }
-
-            const context: string = settings.showContextInCards
-                ? getCardContext(lineNo, headings)
-                : "";
-            const siblings: Card[] = [];
-            for (let i = 0; i < siblingMatches.length; i++) {
-                const front: string = siblingMatches[i][0].trim(),
-                    back: string = siblingMatches[i][1].trim();
-
-                const cardObj: Card = {
-                    isDue: i < scheduling.length,
-                    note,
-                    lineNo,
-                    front,
-                    back,
-                    cardText,
-                    context,
-                    cardType,
-                    siblingIdx: i,
-                    siblings,
-                };
-
-                // card scheduled
-                if (ignoreStats) {
-                    this.cardStats.newCount++;
-                    cardObj.isDue = true;
-                    this.deckTree.insertFlashcard([...deckPath], cardObj);
-                } else if (i < scheduling.length) {
-                    const dueUnix: number = window
-                        .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY"])
-                        .valueOf();
-                    const nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
-                    if (!Object.prototype.hasOwnProperty.call(this.dueDatesFlashcards, nDays)) {
-                        this.dueDatesFlashcards[nDays] = 0;
+                    if (settings.convertCurlyBracketsToClozes) {
+                        siblings.push(...cardText.matchAll(/{{(.*?)}}/gm));
                     }
-                    this.dueDatesFlashcards[nDays]++;
+                    siblings.sort((a, b) => {
+                        if (a.index < b.index) {
+                            return -1;
+                        }
+                        if (a.index > b.index) {
+                            return 1;
+                        }
+                        return 0;
+                    });
 
-                    const interval: number = parseInt(scheduling[i][2]),
-                        ease: number = parseInt(scheduling[i][3]);
-                    if (!Object.prototype.hasOwnProperty.call(this.cardStats.intervals, interval)) {
-                        this.cardStats.intervals[interval] = 0;
-                    }
-                    this.cardStats.intervals[interval]++;
-                    if (!Object.prototype.hasOwnProperty.call(this.cardStats.eases, ease)) {
-                        this.cardStats.eases[ease] = 0;
-                    }
-                    this.cardStats.eases[ease]++;
-                    totalNoteEase += ease;
-                    scheduledCount++;
-
-                    if (interval >= 32) {
-                        this.cardStats.matureCount++;
-                    } else {
-                        this.cardStats.youngCount++;
-                    }
-
-                    if (this.data.buryList.includes(cardTextHash)) {
-                        this.deckTree.countFlashcard([...deckPath]);
-                        continue;
-                    }
-
-                    if (dueUnix <= now) {
-                        cardObj.interval = interval;
-                        cardObj.ease = ease;
-                        cardObj.delayBeforeReview = now - dueUnix;
-                        this.deckTree.insertFlashcard([...deckPath], cardObj);
-                    } else {
-                        this.deckTree.countFlashcard([...deckPath]);
-                        continue;
+                    let front: string, back: string;
+                    for (const m of siblings) {
+                        const deletionStart: number = m.index,
+                            deletionEnd: number = deletionStart + m[0].length;
+                        front =
+                            cardText.substring(0, deletionStart) +
+                            "<span style='color:#2196f3'>[...]</span>" +
+                            cardText.substring(deletionEnd);
+                        front = front
+                            .replace(/==/gm, "")
+                            .replace(/\*\*/gm, "")
+                            .replace(/{{/gm, "")
+                            .replace(/}}/gm, "");
+                        back =
+                            cardText.substring(0, deletionStart) +
+                            "<span style='color:#2196f3'>" +
+                            cardText.substring(deletionStart, deletionEnd) +
+                            "</span>" +
+                            cardText.substring(deletionEnd);
+                        back = back
+                            .replace(/==/gm, "")
+                            .replace(/\*\*/gm, "")
+                            .replace(/{{/gm, "")
+                            .replace(/}}/gm, "");
+                        siblingMatches.push([front, back]);
                     }
                 } else {
-                    this.cardStats.newCount++;
-                    if (this.data.buryList.includes(cyrb53(cardText))) {
-                        this.deckTree.countFlashcard([...deckPath]);
-                        continue;
+                    let idx: number;
+                    if (cardType === CardType.SingleLineBasic) {
+                        idx = cardText.indexOf(settings.singlelineCardSeparator);
+                        siblingMatches.push([
+                            cardText.substring(0, idx),
+                            cardText.substring(idx + settings.singlelineCardSeparator.length),
+                        ]);
+                    } else if (cardType === CardType.SingleLineReversed) {
+                        idx = cardText.indexOf(settings.singlelineReversedCardSeparator);
+                        const side1: string = cardText.substring(0, idx),
+                            side2: string = cardText.substring(
+                                idx + settings.singlelineReversedCardSeparator.length
+                            );
+                        siblingMatches.push([side1, side2]);
+                        siblingMatches.push([side2, side1]);
+                    } else if (cardType === CardType.MultiLineBasic) {
+                        idx = cardText.indexOf("\n" + settings.multilineCardSeparator + "\n");
+                        siblingMatches.push([
+                            cardText.substring(0, idx),
+                            cardText.substring(idx + 2 + settings.multilineCardSeparator.length),
+                        ]);
+                    } else if (cardType === CardType.MultiLineReversed) {
+                        idx = cardText.indexOf(
+                            "\n" + settings.multilineReversedCardSeparator + "\n"
+                        );
+                        const side1: string = cardText.substring(0, idx),
+                            side2: string = cardText.substring(
+                                idx + 2 + settings.multilineReversedCardSeparator.length
+                            );
+                        siblingMatches.push([side1, side2]);
+                        siblingMatches.push([side2, side1]);
                     }
-                    this.deckTree.insertFlashcard([...deckPath], cardObj);
                 }
 
-                siblings.push(cardObj);
+                let scheduling: RegExpMatchArray[] = [
+                    ...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
+                ];
+                if (scheduling.length === 0)
+                    scheduling = [...cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
+
+                // we have some extra scheduling dates to delete
+                if (scheduling.length > siblingMatches.length) {
+                    const idxSched: number = cardText.lastIndexOf("<!--SR:") + 7;
+                    let newCardText: string = cardText.substring(0, idxSched);
+                    for (let i = 0; i < siblingMatches.length; i++)
+                        newCardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
+                    newCardText += "-->";
+
+                    const replacementRegex = new RegExp(escapeRegexString(cardText), "gm");
+                    fileText = fileText.replace(replacementRegex, () => newCardText);
+                    fileChanged = true;
+                }
+
+                const context: string = settings.showContextInCards
+                    ? getCardContext(lineNo, headings)
+                    : "";
+                const siblings: Card[] = [];
+                for (let i = 0; i < siblingMatches.length; i++) {
+                    const front: string = siblingMatches[i][0].trim(),
+                        back: string = siblingMatches[i][1].trim();
+
+                    const cardObj: Card = {
+                        isDue: i < scheduling.length,
+                        note,
+                        lineNo,
+                        front,
+                        back,
+                        cardText,
+                        context,
+                        cardType,
+                        siblingIdx: i,
+                        siblings,
+                    };
+
+                    // card scheduled
+                    if (ignoreStats) {
+                        this.cardStats.newCount++;
+                        cardObj.isDue = true;
+                        this.deckTree.insertFlashcard([...deckPath], cardObj);
+                    } else if (i < scheduling.length) {
+                        const dueUnix: number = window
+                            .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY"])
+                            .valueOf();
+                        const nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
+                        if (!Object.prototype.hasOwnProperty.call(this.dueDatesFlashcards, nDays)) {
+                            this.dueDatesFlashcards[nDays] = 0;
+                        }
+                        this.dueDatesFlashcards[nDays]++;
+
+                        const interval: number = parseInt(scheduling[i][2]),
+                            ease: number = parseInt(scheduling[i][3]);
+                        if (
+                            !Object.prototype.hasOwnProperty.call(
+                                this.cardStats.intervals,
+                                interval
+                            )
+                        ) {
+                            this.cardStats.intervals[interval] = 0;
+                        }
+                        this.cardStats.intervals[interval]++;
+                        if (!Object.prototype.hasOwnProperty.call(this.cardStats.eases, ease)) {
+                            this.cardStats.eases[ease] = 0;
+                        }
+                        this.cardStats.eases[ease]++;
+                        totalNoteEase += ease;
+                        scheduledCount++;
+
+                        if (interval >= 32) {
+                            this.cardStats.matureCount++;
+                        } else {
+                            this.cardStats.youngCount++;
+                        }
+
+                        if (this.data.buryList.includes(cardTextHash)) {
+                            this.deckTree.countFlashcard([...deckPath]);
+                            continue;
+                        }
+
+                        if (dueUnix <= now) {
+                            cardObj.interval = interval;
+                            cardObj.ease = ease;
+                            cardObj.delayBeforeReview = now - dueUnix;
+                            this.deckTree.insertFlashcard([...deckPath], cardObj);
+                        } else {
+                            this.deckTree.countFlashcard([...deckPath]);
+                            continue;
+                        }
+                    } else {
+                        this.cardStats.newCount++;
+                        if (this.data.buryList.includes(cyrb53(cardText))) {
+                            this.deckTree.countFlashcard([...deckPath]);
+                            continue;
+                        }
+                        this.deckTree.insertFlashcard([...deckPath], cardObj);
+                    }
+
+                    siblings.push(cardObj);
+                }
             }
         }
 
