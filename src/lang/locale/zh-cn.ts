@@ -92,6 +92,10 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "右边栏中显示的最大天数",
     MIN_ONE_DAY: "天数最小值为1",
     VALID_NUMBER_WARNING: "请输入有效的数字。",
+    UI_PREFERENCES: "用户界面首选项",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE: "甲板树最初应显示为展开",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
+        "关闭此选项可折叠同一张卡片中的嵌套牌组。如果您的卡片属于同一文件中的许多套牌，则很有用。",
     ALGORITHM: "算法",
     CHECK_ALGORITHM_WIKI: '了解更多, 请点击 <a href="${algo_url}">algorithm implementation</a>.',
     BASE_EASE: "基础掌握程度",

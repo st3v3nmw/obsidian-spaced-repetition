@@ -106,6 +106,10 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "右パネルに表示する最大の日数",
     MIN_ONE_DAY: "日数には1以上の数字を指定してください。",
     VALID_NUMBER_WARNING: "有効な数字を入力してください。",
+    UI_PREFERENCES: "ユーザー インターフェイスの設定",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE: "デッキ ツリーは最初は展開して表示する必要があります",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
+        "これをオフにすると、同じカード内のネストされたデッキが折りたたまれます。同じファイルに多くのデッキに属するカードがある場合に便利です。",
     ALGORITHM: "アルゴリズム",
     CHECK_ALGORITHM_WIKI:
         '詳細については<a href="${algo_url}">アルゴリズムの実装</a>を確認してください。',
