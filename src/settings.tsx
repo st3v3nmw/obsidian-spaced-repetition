@@ -33,6 +33,8 @@ export interface SRSettings {
     autoNextNote: boolean;
     disableFileMenuReviewOptions: boolean;
     maxNDaysNotesReviewQueue: number;
+    // UI preferences
+    initiallyExpandAllSubdecksInTree: boolean;
     // algorithm
     baseEase: number;
     lapsesIntervalChange: number;
@@ -71,6 +73,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     autoNextNote: false,
     disableFileMenuReviewOptions: false,
     maxNDaysNotesReviewQueue: 365,
+    // UI settings
+    initiallyExpandAllSubdecksInTree: true,
     // algorithm
     baseEase: 250,
     lapsesIntervalChange: 0.5,
@@ -537,6 +541,20 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
+
+        containerEl.createDiv().innerHTML = <h3>{t("UI_PREFERENCES")}</h3>;
+
+        new Setting(containerEl)
+            .setName(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE"))
+            .setDesc(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.initiallyExpandAllSubdecksInTree)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.initiallyExpandAllSubdecksInTree = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
 
         containerEl.createDiv().innerHTML = <h3>{t("ALGORITHM")}</h3>;
         containerEl.createDiv().innerHTML = t("CHECK_ALGORITHM_WIKI", {

@@ -99,6 +99,10 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "Maximum number of days to display on right panel",
     MIN_ONE_DAY: "The number of days must be at least 1.",
     VALID_NUMBER_WARNING: "Please provide a valid number.",
+    UI_PREFERENCES: "UI Preferences",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Deck trees should be initially displayed as expanded",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
+        "Turn this off to collapse nested decks in the same card. Useful if you have cards which belong to many decks in the same file.",
     ALGORITHM: "Algorithm",
     CHECK_ALGORITHM_WIKI:
         'For more information, check the <a href="${algo_url}">algorithm implementation</a>.',
