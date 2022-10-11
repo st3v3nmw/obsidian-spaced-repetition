@@ -673,12 +673,15 @@ export class Deck {
         const deckViewSelf: HTMLElement = deckView.createDiv(
             "tree-item-self tag-pane-tag is-clickable"
         );
-        let collapsed = modal.plugin.data.settings.initiallyExpandAllSubdecksInTree;
+        const shouldBeInitiallyExpanded: boolean =
+            modal.plugin.data.settings.initiallyExpandAllSubdecksInTree;
+        let collapsed = shouldBeInitiallyExpanded;
         let collapseIconEl: HTMLElement | null = null;
         if (this.subdecks.length > 0) {
             collapseIconEl = deckViewSelf.createDiv("tree-item-icon collapse-icon");
             collapseIconEl.innerHTML = COLLAPSE_ICON;
-            (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "rotate(-90deg)";
+            (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
+                shouldBeInitiallyExpanded ? "" : "rotate(-90deg)";
         }
 
         const deckViewInner: HTMLElement = deckViewSelf.createDiv("tree-item-inner");
@@ -716,9 +719,7 @@ export class Deck {
         );
 
         const deckViewChildren: HTMLElement = deckView.createDiv("tree-item-children");
-        deckViewChildren.style.display = modal.plugin.data.settings.initiallyExpandAllSubdecksInTree
-            ? "block"
-            : "none";
+        deckViewChildren.style.display = shouldBeInitiallyExpanded ? "block" : "none";
         if (this.subdecks.length > 0) {
             collapseIconEl.addEventListener("click", () => {
                 if (collapsed) {
