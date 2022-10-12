@@ -101,6 +101,11 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "Maximální počet dní zobrazených v pravém panelu",
     MIN_ONE_DAY: "Počet dní musí být minimálně 1.",
     VALID_NUMBER_WARNING: "Prosím zadejte validní číslo.",
+    UI_PREFERENCES: "Předvolby uživatelského rozhraní",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE:
+        "Stromy balíčky by měly být zpočátku zobrazeny jako rozbalené",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
+        "Vypněte toto, chcete-li sbalit vnořené balíčky na stejné kartě. To je užitečné, pokud máte kartičky, které patří k mnoha balíčkům ve stejném souboru.",
     ALGORITHM: "Algoritmus",
     CHECK_ALGORITHM_WIKI: 'Pro více informací jděte na <a href="${algo_url}">popis algoritmu</a>.',
     BASE_EASE: "Základní složitost",

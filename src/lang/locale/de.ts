@@ -111,6 +111,10 @@ export default {
         "Maximale Anzahl anstehender Notizen, die im rechten Fensterbereich angezeigt werden",
     MIN_ONE_DAY: "Anzahl der Tage muss mindestens 1 sein.",
     VALID_NUMBER_WARNING: "Bitte eine gültige Zahl eingeben.",
+    UI_PREFERENCES: "Einstellungen der Benutzeroberfläche",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Deckbäume sollten anfänglich erweitert angezeigt werden",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
+        "Deaktivieren Sie dies, um verschachtelte Decks in derselben Karte zu reduzieren. Nützlich, wenn Sie Karten haben, die zu vielen Decks in derselben Datei gehören.",
     ALGORITHM: "Algorithmus",
     CHECK_ALGORITHM_WIKI:
         'Weiterführende Informationen: <a href="${algo_url}">Implementierung des Algorithmus</a> (english).',

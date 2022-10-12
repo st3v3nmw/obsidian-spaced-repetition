@@ -1,11 +1,12 @@
 import { parse } from "src/parser";
 import { CardType } from "src/scheduling";
 
-const defaultArgs: [string, string, string, string, boolean, boolean] = [
+const defaultArgs: [string, string, string, string, boolean, boolean, boolean] = [
     "::",
     ":::",
     "?",
     "??",
+    true,
     true,
     true,
 ];
@@ -110,7 +111,9 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum ==p\ndolor won==", ...defaultArgs)).toEqual([]);
     expect(parse("lorem ipsum ==dolor won=", ...defaultArgs)).toEqual([]);
     // ==highlights== turned off
-    expect(parse("cloze ==deletion== test", "::", ":::", "?", "??", false, true)).toEqual([]);
+    expect(parse("cloze ==deletion== test", "::", ":::", "?", "??", false, true, false)).toEqual(
+        []
+    );
 
     // **bolded**
     expect(parse("cloze **deletion** test", ...defaultArgs)).toEqual([
@@ -139,7 +142,9 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum **p\ndolor won**", ...defaultArgs)).toEqual([]);
     expect(parse("lorem ipsum **dolor won*", ...defaultArgs)).toEqual([]);
     // **bolded** turned off
-    expect(parse("cloze **deletion** test", "::", ":::", "?", "??", true, false)).toEqual([]);
+    expect(parse("cloze **deletion** test", "::", ":::", "?", "??", true, false, false)).toEqual(
+        []
+    );
 
     // both
     expect(parse("cloze **deletion** test ==another deletion==!", ...defaultArgs)).toEqual([
