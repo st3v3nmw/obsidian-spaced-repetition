@@ -74,6 +74,7 @@
 }
 
 #sr-flashcard-view {
+    font-size: var(--font-text-size);
     overflow-y: auto;
     height: 80%;
 }
