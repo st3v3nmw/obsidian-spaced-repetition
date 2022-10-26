@@ -1,6 +1,6 @@
 {
     "name": "obsidian-spaced-repetition",
-    "version": "1.7.3",
+    "version": "1.8.0",
     "description": "Fight the forgetting curve by reviewing flashcards & entire notes.",
     "main": "main.js",
     "scripts": {
@@ -19,6 +19,7 @@
     "license": "MIT",
     "devDependencies": {
         "@types/jest": "^27.0.3",
+        "@types/jest-expect-message": "^1.0.4",
         "@types/node": "^17.0.5",
         "@types/vhtml": "^2.2.4",
         "@typescript-eslint/eslint-plugin": "^5.2.0",
@@ -28,8 +29,9 @@
         "eslint": "^8.3.0",
         "husky": "^7.0.4",
         "jest": "^27.4.5",
-        "moment": "^2.29.1",
-        "obsidian": "^0.13.11",
+        "jest-27-expect-message": "^1.1.0",
+        "moment": "^2.29.4",
+        "obsidian": "^0.15.4",
         "prettier": "^2.5.1",
         "ts-jest": "^27.0.4",
         "tslib": "2.3.1",

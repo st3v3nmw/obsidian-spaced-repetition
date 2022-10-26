@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, Menu, TFile } from "obsidian";
+import { ItemView, WorkspaceLeaf, Menu, TFile, Notice } from "obsidian";
 
 import type SRPlugin from "src/main";
 import { COLLAPSE_ICON } from "src/constants";
@@ -213,10 +213,10 @@ export class ReviewQueueListView extends ItemView {
         navFileTitle.createDiv("nav-file-title-content").setText(file.basename);
         navFileTitle.addEventListener(
             "click",
-            (event: MouseEvent) => {
+            async (event: MouseEvent) => {
                 event.preventDefault();
                 plugin.lastSelectedReviewDeck = deck.deckName;
-                this.app.workspace.activeLeaf.openFile(file);
+                await this.app.workspace.getLeaf().openFile(file);
                 return false;
             },
             false
@@ -226,7 +226,7 @@ export class ReviewQueueListView extends ItemView {
             "contextmenu",
             (event: MouseEvent) => {
                 event.preventDefault();
-                const fileMenu: Menu = new Menu(this.app);
+                const fileMenu: Menu = new Menu();
                 this.app.workspace.trigger("file-menu", fileMenu, file, "my-context-menu", null);
                 fileMenu.showAtPosition({
                     x: event.pageX,

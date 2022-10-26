@@ -53,6 +53,12 @@ export default {
     FOLDERS_TO_IGNORE: "Игнорируемые папки",
     FOLDERS_TO_IGNORE_DESC: "Ведите пути папок разделенные enter'ом пример: Templates Meta/Scripts",
     FLASHCARDS: "Карточки",
+    FLASHCARD_EASY_LABEL: "Easy Button Text",
+    FLASHCARD_GOOD_LABEL: "Good Button Text",
+    FLASHCARD_HARD_LABEL: "Hard Button Text",
+    FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
+    FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
+    FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
     FLASHCARD_TAGS: "Тэги карточек",
     FLASHCARD_TAGS_DESC:
         "Ведите тэги разделенные enter'ом или пробелом пример: #flashcards #deck2 #deck3.",
@@ -76,6 +82,8 @@ export default {
     DISABLE_CLOZE_CARDS: "Выключить карты с пропусками(пример: [...])?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Конвертировать ==выделенный текст== в пропуски(пример: [...])?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "Конвертировать **жирный текст** в пропуски(пример: [...])?",
+    CONVERT_CURLY_BRACKETS_TO_CLOZES:
+        "Конвертировать {{фигурные скобки}} в пропуски(пример: [...])?",
     INLINE_CARDS_SEPARATOR: "Разделитель для внутристрочных карточек",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Внимание! после изменения этого вам придётся вручную редактировать уже существующие карточки",
@@ -96,12 +104,17 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "Наибольшее количество дней для отображение на панели справа",
     MIN_ONE_DAY: "Количество дней не меньше 1.",
     VALID_NUMBER_WARNING: "Пожалуйста введите подходящее число.",
+    UI_PREFERENCES: "Пользовательский интерфейс Настройки",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE:
+        "Деревья колод должны изначально отображаться как развернутые",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
+        "Отключите этот параметр, чтобы свернуть вложенные колоды на одной карточке. Полезно, если у вас есть карты, которые принадлежат многим колодам в одном файле.",
     ALGORITHM: "Алгоритм",
     CHECK_ALGORITHM_WIKI:
         'За дополнительной информацией обращайтесь к <a href="${algo_url}">реализация алгоритма</a>(скоро будет перевод).',
-    BASE_EASE: "Базовая Простота",
+    BASE_EASE: "Базовая Лёгкость",
     BASE_EASE_DESC: "минимум = 130, предпочтительно около 250.",
-    BASE_EASE_MIN_WARNING: "Простота должна быть минимум 130.",
+    BASE_EASE_MIN_WARNING: "Лёгкость должна быть минимум 130.",
     LAPSE_INTERVAL_CHANGE:
         "Изменение промежутка когда вы отвечаете Сложно во время повторения карточки/заметки",
     LAPSE_INTERVAL_CHANGE_DESC: "новыйПромежуток = старыйПромежуток * изменениеПромежутка / 100.",
@@ -115,7 +128,7 @@ export default {
     MAX_INTERVAL_MIN_WARNING: "Максимальный промежуток должен быть не меньше 1.",
     MAX_LINK_CONTRIB: "Максимальный вклад связи(ссылки)",
     MAX_LINK_CONTRIB_DESC:
-        "Максимальный вклад взвешенной Простоты связанных заметок в начальную Простоту.",
+        "Максимальный вклад взвешенной Лёгкости связанных заметок в начальную Лёгкость.",
     LOGGING: "Ведение лога",
     DISPLAY_DEBUG_INFO: "Отображать информацию отладки на консоль разработчика(developer console)?",
 
@@ -124,8 +137,8 @@ export default {
     CLOSE: "Закрыть",
     NEW: "Новые",
     YESTERDAY: "Вчерашние",
-    TODAY: "Завтрашние",
-    TOMORROW: "Послезавтрашние",
+    TODAY: "Сегодняшние",
+    TOMORROW: "Завтрашние",
 
     // stats-modal.tsx
     STATS_TITLE: "Статистика",
@@ -143,8 +156,8 @@ export default {
     INTERVALS_DESC: "Промежутки времени до следующего показа карточек во время повторения",
     COUNT: "Количество",
     INTERVALS_SUMMARY: "Средний промежуток: ${avg}, Самый длинный промежуток: ${longest}",
-    EASES: "Простота(параметр в алгоритме, который влияет на приоритет и время показа карточек) \n (от англ. ease, см настройки алгоритма)",
-    EASES_SUMMARY: "Среднее количество Простоты: ${avgEase}",
+    EASES: "Лёгкость(параметр в алгоритме, который влияет на приоритет и время показа карточек) \n (от англ. ease, см настройки алгоритма)",
+    EASES_SUMMARY: "Среднее количество Лёгкости: ${avgEase}",
     CARD_TYPES: "Типы карточек",
     CARD_TYPES_DESC: "Это включая спрятанные карточки, если что:",
     CARD_TYPE_NEW: "Новых",

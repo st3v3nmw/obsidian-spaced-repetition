@@ -7,6 +7,9 @@ import { t } from "src/lang/helpers";
 
 export interface SRSettings {
     // flashcards
+    flashcardEasyText: string;
+    flashcardGoodText: string;
+    flashcardHardText: string;
     flashcardTags: string[];
     convertFoldersToDecks: boolean;
     cardCommentOnSameLine: boolean;
@@ -18,6 +21,7 @@ export interface SRSettings {
     randomizeCardOrder: boolean;
     convertHighlightsToClozes: boolean;
     convertBoldTextToClozes: boolean;
+    convertCurlyBracketsToClozes: boolean;
     singlelineCardSeparator: string;
     singlelineReversedCardSeparator: string;
     multilineCardSeparator: string;
@@ -30,6 +34,8 @@ export interface SRSettings {
     autoNextNote: boolean;
     disableFileMenuReviewOptions: boolean;
     maxNDaysNotesReviewQueue: number;
+    // UI preferences
+    initiallyExpandAllSubdecksInTree: boolean;
     // algorithm
     baseEase: number;
     lapsesIntervalChange: number;
@@ -42,6 +48,9 @@ export interface SRSettings {
 
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
+    flashcardEasyText: t("EASY"),
+    flashcardGoodText: t("GOOD"),
+    flashcardHardText: t("HARD"),
     flashcardTags: ["#flashcards"],
     convertFoldersToDecks: false,
     cardCommentOnSameLine: false,
@@ -53,6 +62,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     randomizeCardOrder: true,
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
+    convertCurlyBracketsToClozes: false,
     singlelineCardSeparator: "::",
     singlelineReversedCardSeparator: ":::",
     multilineCardSeparator: "?",
@@ -65,6 +75,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     autoNextNote: false,
     disableFileMenuReviewOptions: false,
     maxNDaysNotesReviewQueue: 365,
+    // UI settings
+    initiallyExpandAllSubdecksInTree: true,
     // algorithm
     baseEase: 250,
     lapsesIntervalChange: 0.5,
@@ -269,6 +281,17 @@ export class SRSettingTab extends PluginSettingTab {
         );
 
         new Setting(containerEl)
+            .setName(t("CONVERT_CURLY_BRACKETS_TO_CLOZES"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.convertCurlyBracketsToClozes)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.convertCurlyBracketsToClozes = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
+
+        new Setting(containerEl)
             .setName(t("INLINE_CARDS_SEPARATOR"))
             .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
             .addText((text) =>
@@ -369,12 +392,12 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
-            .setName(t("EDIT_LATER_TAG"))
-            .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
+            .setName(t("FLASHCARD_EASY_LABEL"))
+            .setDesc(t("FLASHCARD_EASY_DESC"))
             .addText((text) =>
-                text.setValue(this.plugin.data.settings.editLaterTag).onChange((value) => {
+                text.setValue(this.plugin.data.settings.flashcardEasyText).onChange((value) => {
                     applySettingsUpdate(async () => {
-                        this.plugin.data.settings.editLaterTag = value;
+                        this.plugin.data.settings.flashcardEasyText = value;
                         await this.plugin.savePluginData();
                     });
                 })
@@ -384,8 +407,54 @@ export class SRSettingTab extends PluginSettingTab {
                     .setIcon("reset")
                     .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
-                        this.plugin.data.settings.multilineCardSeparator =
-                            DEFAULT_SETTINGS.multilineCardSeparator;
+                        this.plugin.data.settings.flashcardEasyText =
+                            DEFAULT_SETTINGS.flashcardEasyText;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
+
+        new Setting(containerEl)
+            .setName(t("FLASHCARD_GOOD_LABEL"))
+            .setDesc(t("FLASHCARD_GOOD_DESC"))
+            .addText((text) =>
+                text.setValue(this.plugin.data.settings.flashcardGoodText).onChange((value) => {
+                    applySettingsUpdate(async () => {
+                        this.plugin.data.settings.flashcardGoodText = value;
+                        await this.plugin.savePluginData();
+                    });
+                })
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.flashcardGoodText =
+                            DEFAULT_SETTINGS.flashcardGoodText;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
+
+        new Setting(containerEl)
+            .setName(t("FLASHCARD_HARD_LABEL"))
+            .setDesc(t("FLASHCARD_HARD_DESC"))
+            .addText((text) =>
+                text.setValue(this.plugin.data.settings.flashcardHardText).onChange((value) => {
+                    applySettingsUpdate(async () => {
+                        this.plugin.data.settings.flashcardHardText = value;
+                        await this.plugin.savePluginData();
+                    });
+                })
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.flashcardHardText =
+                            DEFAULT_SETTINGS.flashcardHardText;
                         await this.plugin.savePluginData();
                         this.display();
                     });
@@ -474,6 +543,20 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
+
+        containerEl.createDiv().innerHTML = <h3>{t("UI_PREFERENCES")}</h3>;
+
+        new Setting(containerEl)
+            .setName(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE"))
+            .setDesc(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.initiallyExpandAllSubdecksInTree)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.initiallyExpandAllSubdecksInTree = value;
+                        await this.plugin.savePluginData();
+                    })
+            );
 
         containerEl.createDiv().innerHTML = <h3>{t("ALGORITHM")}</h3>;
         containerEl.createDiv().innerHTML = t("CHECK_ALGORITHM_WIKI", {

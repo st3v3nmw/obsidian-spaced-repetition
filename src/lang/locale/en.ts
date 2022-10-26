@@ -50,6 +50,12 @@ export default {
     FOLDERS_TO_IGNORE: "Folders to ignore",
     FOLDERS_TO_IGNORE_DESC: "Enter folder paths separated by newlines i.e. Templates Meta/Scripts",
     FLASHCARDS: "Flashcards",
+    FLASHCARD_EASY_LABEL: "Easy Button Text",
+    FLASHCARD_GOOD_LABEL: "Good Button Text",
+    FLASHCARD_HARD_LABEL: "Hard Button Text",
+    FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
+    FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
+    FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
     FLASHCARD_TAGS: "Flashcard tags",
     FLASHCARD_TAGS_DESC:
         "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.",
@@ -74,6 +80,7 @@ export default {
     DISABLE_CLOZE_CARDS: "Disable cloze cards?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Convert ==hightlights== to clozes?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "Convert **bolded text** to clozes?",
+    CONVERT_CURLY_BRACKETS_TO_CLOZES: "Convert {{curly brackets}} to clozes?",
     INLINE_CARDS_SEPARATOR: "Separator for inline flashcards",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Note that after changing this you have to manually edit any flashcards you already have.",
@@ -94,6 +101,10 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "Maximum number of days to display on right panel",
     MIN_ONE_DAY: "The number of days must be at least 1.",
     VALID_NUMBER_WARNING: "Please provide a valid number.",
+    UI_PREFERENCES: "UI Preferences",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Deck trees should be initially displayed as expanded",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
+        "Turn this off to collapse nested decks in the same card. Useful if you have cards which belong to many decks in the same file.",
     ALGORITHM: "Algorithm",
     CHECK_ALGORITHM_WIKI:
         'For more information, check the <a href="${algo_url}">algorithm implementation</a>.',

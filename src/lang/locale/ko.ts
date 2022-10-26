@@ -50,6 +50,12 @@ export default {
     FOLDERS_TO_IGNORE_DESC:
         "폴더 경로를 빈 줄로 구분해서 입력해주세요. 'Templates Meta/Scripts' 와 같이 입력하는 것은 유효하지 않습니다.",
     FLASHCARDS: "플래시카드",
+    FLASHCARD_EASY_LABEL: "Easy Button Text",
+    FLASHCARD_GOOD_LABEL: "Good Button Text",
+    FLASHCARD_HARD_LABEL: "Hard Button Text",
+    FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
+    FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
+    FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
     FLASHCARD_TAGS: "플래시카드 태그",
     FLASHCARD_TAGS_DESC:
         "태그를 공백 또는 빈 줄로 구분해서 입력해주세요. 예) '#flashcards #deck2 #deck3'",
@@ -75,6 +81,7 @@ export default {
     DISABLE_CLOZE_CARDS: "빈 칸 채우기 카드를 비활성화하시겠습니까?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==hightlights== 를 빈 칸 채우기로 전환하시겠습니까?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "**bolded text** 를 빈 칸 채우기로 전환하시겠습니까?",
+    CONVERT_CURLY_BRACKETS_TO_CLOZES: "{{curly brackets}} 를 빈 칸 채우기로 전환하시겠습니까?",
     INLINE_CARDS_SEPARATOR: "인라인 플래시카드 구분자",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "주의: 이 옵션을 수정한 후에는 이미 작성된 플래시카드를 수동으로 수정해야 함을 주의하십시오.",
@@ -95,6 +102,10 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "오른쪽 패널에 표시할 최대 일수",
     MIN_ONE_DAY: "적어도 1이상이어야 합니다.",
     VALID_NUMBER_WARNING: "유효한 숫자를 입력해주세요.",
+    UI_PREFERENCES: "사용자 인터페이스 기본 설정",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE: "덱 트리는 처음에 확장된 것으로 표시되어야 합니다.",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
+        "같은 카드에 중첩된 덱을 접으려면 이 옵션을 끄십시오. 같은 파일에 여러 덱에 속한 카드가 있는 경우 유용합니다.",
     ALGORITHM: "알고리즘",
     CHECK_ALGORITHM_WIKI:
         '더 많은 정보를 원하시면, <a href="${algo_url}">algorithm implementation</a>을 확인해주세요.',
