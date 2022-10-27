@@ -64,7 +64,7 @@ export default {
     INLINE_SCHEDULING_COMMENTS:
         "Salvar comentários de agendamento na mesma linha que a última linha do flashcard?",
     INLINE_SCHEDULING_COMMENTS_DESC:
-        "Ligar isso vai fazer os comentários em HTML não quebrarem a formatação de listas.",
+        "Ligar isso vai fazer com que os comentários em HTML não quebrem a formatação de listas.",
     BURY_SIBLINGS_TILL_NEXT_DAY: "Enterrar cartas irmãs até o próximo dia?",
     BURY_SIBLINGS_TILL_NEXT_DAY_DESC:
         "Cartas irmãs são geradas pelo texto da mesma carta ex: omissão de palavras",
@@ -72,12 +72,12 @@ export default {
     SHOW_CARD_CONTEXT_DESC: "ex: Título > Cabeçalho 1 > Subcabeçalho > ... > Subcabeçalho",
     CARD_MODAL_HEIGHT_PERCENT: "Porcentagem da Altura do Flashcard",
     CARD_MODAL_SIZE_PERCENT_DESC:
-        "Deveria estar colocado em 100% em dispositivos móveis ou se você tem imagens muito grandes",
+        "Deveria estar configurado em 100% em dispositivos móveis ou se você tem imagens muito grandes",
     RESET_DEFAULT: "Reiniciar para a pré-definição",
     CARD_MODAL_WIDTH_PERCENT: "Porcentagem de Largura do Flashcard",
     FILENAME_OR_OPEN_FILE: "Mostrar o nome do arquivo ao invés de 'Editar Depois' na revisão dos flashcards?",
     RANDOMIZE_CARD_ORDER: "Aleatorizar a ordem das cartas durante a revisão?",
-    DISABLE_CLOZE_CARDS: "Disabilitar notas que usam omissão de palavras?",
+    DISABLE_CLOZE_CARDS: "Desabilitar notas que usam omissão de palavras?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Converter ==marca-texto== em omissões?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "Converter **texto em negrito** em omissões?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Converter {{chaves}} em omissões?",
@@ -85,13 +85,13 @@ export default {
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Note que depois de mudar isso você vai ter que manualmente mudar quaisquer flashcards que você tenha.",
     INLINE_REVERSED_CARDS_SEPARATOR: "Separador para flashcards inline reversos",
-    MULTILINE_CARDS_SEPARATOR: "Separador para flashcards de múltiplas linhast",
+    MULTILINE_CARDS_SEPARATOR: "Separador para flashcards de múltiplas linhas",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Separador para flashcards de múltiplas linhas reversos",
     NOTES: "Notas",
     TAGS_TO_REVIEW: "Etiquetas para revisar",
     TAGS_TO_REVIEW_DESC: "Ensira etiquetas separadas por espaços ou quebra de linhas ex: #revisar #etiqueta2 #etiqueta3.",
     OPEN_RANDOM_NOTE: "Abrir uma nota aleatória para revisar",
-    OPEN_RANDOM_NOTE_DESC: "Quando você disabilitar isso, as notas vão ser ordenadas por importância (PageRank).",
+    OPEN_RANDOM_NOTE_DESC: "Quando você desabilitar isso, as notas vão ser ordenadas por importância (PageRank).",
     AUTO_NEXT_NOTE: "Abrir a próxima nota automaticamente depois de uma revisão",
     DISABLE_FILE_MENU_REVIEW_OPTIONS:
         "Desabilitar opções de revisão no menu de arquivos ex: Revisão: Fácil OK Difícil",
@@ -114,10 +114,10 @@ export default {
     LAPSE_INTERVAL_CHANGE_DESC: "novoIntervalo = velhoIntervalo * mudancaIntervalo / 100.",
     EASY_BONUS: "Bônus de Fácil",
     EASY_BONUS_DESC:
-        "O bônus de fácil te deixa mudar a diferência entre intervalos de responder OK e Fácil em um(a) flashcard/nota (mínimo = 100%).",
+        "O bônus de fácil te permite mudar a diferência entre intervalos de responder OK e Fácil em um(a) flashcard/nota (mínimo = 100%).",
     EASY_BONUS_MIN_WARNING: "O bônus de fácil deve ser pelo menos 100.",
     MAX_INTERVAL: "Intervalo Máximo",
-    MAX_INTERVAL_DESC: "Te deixa colocar um limite máximo no intervalo (pré-definição = 100 years).",
+    MAX_INTERVAL_DESC: "Te permite colocar um limite máximo no intervalo (pré-definição = 100 anos).",
     MAX_INTERVAL_MIN_WARNING: "O intervalo máximo deve ser pelo menos 1 dia.",
     MAX_LINK_CONTRIB: "Contribuição Máxima de Links",
     MAX_LINK_CONTRIB_DESC:
