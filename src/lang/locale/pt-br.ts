@@ -77,7 +77,7 @@ export default {
     CARD_MODAL_WIDTH_PERCENT: "Porcentagem de Largura do Flashcard",
     FILENAME_OR_OPEN_FILE: "Mostrar o nome do arquivo ao invés de 'Editar Depois' na revisão dos flashcards?",
     RANDOMIZE_CARD_ORDER: "Aleatorizar a ordem das cartas durante a revisão?",
-    DISABLE_CLOZE_CARDS: "Desabilitar notas que usam omissão de palavras?",
+    DISABLE_CLOZE_CARDS: "Desabilitar cartas que usam omissão de palavras?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Converter ==marca-texto== em omissões?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "Converter **texto em negrito** em omissões?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Converter {{chaves}} em omissões?",
