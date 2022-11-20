@@ -19,8 +19,8 @@ export interface SRSettings {
     convertHighlightsToClozes: boolean;
     convertBoldTextToClozes: boolean;
     convertCurlyBracketsToClozes: boolean;
-    singlelineCardSeparator: string;
-    singlelineReversedCardSeparator: string;
+    singleLineCardSeparator: string;
+    singleLineReversedCardSeparator: string;
     multilineCardSeparator: string;
     multilineReversedCardSeparator: string;
     // notes
@@ -60,8 +60,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
     convertCurlyBracketsToClozes: false,
-    singlelineCardSeparator: "::",
-    singlelineReversedCardSeparator: ":::",
+    singleLineCardSeparator: "::",
+    singleLineReversedCardSeparator: ":::",
     multilineCardSeparator: "?",
     multilineReversedCardSeparator: "??",
     // notes
@@ -293,10 +293,10 @@ export class SRSettingTab extends PluginSettingTab {
             .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
             .addText((text) =>
                 text
-                    .setValue(this.plugin.data.settings.singlelineCardSeparator)
+                    .setValue(this.plugin.data.settings.singleLineCardSeparator)
                     .onChange((value) => {
                         applySettingsUpdate(async () => {
-                            this.plugin.data.settings.singlelineCardSeparator = value;
+                            this.plugin.data.settings.singleLineCardSeparator = value;
                             await this.plugin.savePluginData();
                         });
                     })
@@ -306,8 +306,8 @@ export class SRSettingTab extends PluginSettingTab {
                     .setIcon("reset")
                     .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
-                        this.plugin.data.settings.singlelineCardSeparator =
-                            DEFAULT_SETTINGS.singlelineCardSeparator;
+                        this.plugin.data.settings.singleLineCardSeparator =
+                            DEFAULT_SETTINGS.singleLineCardSeparator;
                         await this.plugin.savePluginData();
                         this.display();
                     });
@@ -318,10 +318,10 @@ export class SRSettingTab extends PluginSettingTab {
             .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
             .addText((text) =>
                 text
-                    .setValue(this.plugin.data.settings.singlelineReversedCardSeparator)
+                    .setValue(this.plugin.data.settings.singleLineReversedCardSeparator)
                     .onChange((value) => {
                         applySettingsUpdate(async () => {
-                            this.plugin.data.settings.singlelineReversedCardSeparator = value;
+                            this.plugin.data.settings.singleLineReversedCardSeparator = value;
                             await this.plugin.savePluginData();
                         });
                     })
@@ -331,8 +331,8 @@ export class SRSettingTab extends PluginSettingTab {
                     .setIcon("reset")
                     .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
-                        this.plugin.data.settings.singlelineReversedCardSeparator =
-                            DEFAULT_SETTINGS.singlelineReversedCardSeparator;
+                        this.plugin.data.settings.singleLineReversedCardSeparator =
+                            DEFAULT_SETTINGS.singleLineReversedCardSeparator;
                         await this.plugin.savePluginData();
                         this.display();
                     });

@@ -644,8 +644,8 @@ export default class SRPlugin extends Plugin {
         const now: number = Date.now();
         const parsedCards: [CardType, string, number][] = parse(
             fileText,
-            settings.singlelineCardSeparator,
-            settings.singlelineReversedCardSeparator,
+            settings.singleLineCardSeparator,
+            settings.singleLineReversedCardSeparator,
             settings.multilineCardSeparator,
             settings.multilineReversedCardSeparator,
             settings.convertHighlightsToClozes,
@@ -731,16 +731,16 @@ export default class SRPlugin extends Plugin {
             } else {
                 let idx: number;
                 if (cardType === CardType.SingleLineBasic) {
-                    idx = cardText.indexOf(settings.singlelineCardSeparator);
+                    idx = cardText.indexOf(settings.singleLineCardSeparator);
                     siblingMatches.push([
                         cardText.substring(0, idx),
-                        cardText.substring(idx + settings.singlelineCardSeparator.length),
+                        cardText.substring(idx + settings.singleLineCardSeparator.length),
                     ]);
                 } else if (cardType === CardType.SingleLineReversed) {
-                    idx = cardText.indexOf(settings.singlelineReversedCardSeparator);
+                    idx = cardText.indexOf(settings.singleLineReversedCardSeparator);
                     const side1: string = cardText.substring(0, idx),
                         side2: string = cardText.substring(
-                            idx + settings.singlelineReversedCardSeparator.length
+                            idx + settings.singleLineReversedCardSeparator.length
                         );
                     siblingMatches.push([side1, side2]);
                     siblingMatches.push([side2, side1]);
