@@ -9,7 +9,11 @@
         "format": "yarn prettier --write .",
         "lint": "yarn prettier --check .",
         "test": "jest --coverage",
-        "prepare": "husky install"
+        "prepare": "husky install",
+        "release": "standard-version"
+    },
+    "standard-version": {
+        "t": ""
     },
     "author": "Stephen Mwangi",
     "license": "MIT",
@@ -29,6 +33,7 @@
         "moment": "^2.29.4",
         "obsidian": "^0.15.4",
         "prettier": "^2.5.1",
+        "standard-version": "^9.5.0",
         "ts-jest": "^27.0.4",
         "tslib": "2.3.1",
         "typescript": "4.5.4",
