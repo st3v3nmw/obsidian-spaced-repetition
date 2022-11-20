@@ -418,6 +418,7 @@ export default class SRPlugin extends Plugin {
         );
         this.reviewQueueView.redraw();
 
+        if (this.reviewQueueView) this.reviewQueueView.redraw();
         this.syncLock = false;
     }
 
@@ -584,7 +585,7 @@ export default class SRPlugin extends Plugin {
             const index = this.data.settings.openRandomNote
                 ? Math.floor(Math.random() * deck.dueNotesCount)
                 : 0;
-            this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
+            await this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
             return;
         }
 
