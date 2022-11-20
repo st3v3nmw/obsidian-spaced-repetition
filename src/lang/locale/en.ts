@@ -87,6 +87,7 @@ export default {
     MULTILINE_CARDS_SEPARATOR: "Separator for multiline flashcards",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Separator for multiline reversed flashcards",
     NOTES: "Notes",
+    REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "Tags to review",
     TAGS_TO_REVIEW_DESC: "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.",
     OPEN_RANDOM_NOTE: "Open a random note for review",
