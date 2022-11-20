@@ -97,10 +97,12 @@ export default class SRPlugin extends Plugin {
             }
         });
 
-        this.registerView(
-            REVIEW_QUEUE_VIEW_TYPE,
-            (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this))
-        );
+        if (this.data.settings.enableNoteReviewPaneOnStartup) {
+            this.registerView(
+                REVIEW_QUEUE_VIEW_TYPE,
+                (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this))
+            );
+        }
 
         if (!this.data.settings.disableFileMenuReviewOptions) {
             this.registerEvent(
@@ -416,9 +418,8 @@ export default class SRPlugin extends Plugin {
                 dueFlashcardsCount: this.deckTree.dueFlashcardsCount,
             })
         );
-        this.reviewQueueView.redraw();
 
-        if (this.reviewQueueView) this.reviewQueueView.redraw();
+        if (this.data.settings.enableNoteReviewPaneOnStartup) this.reviewQueueView.redraw();
         this.syncLock = false;
     }
 
@@ -888,14 +889,11 @@ export default class SRPlugin extends Plugin {
     }
 
     initView(): void {
-        if (this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).length) {
-            return;
-        }
-
-        this.app.workspace.getRightLeaf(false).setViewState({
-            type: REVIEW_QUEUE_VIEW_TYPE,
-            active: true,
-        });
+        if (this.data.settings.enableNoteReviewPaneOnStartup)
+            this.app.workspace.getRightLeaf(false).setViewState({
+                type: REVIEW_QUEUE_VIEW_TYPE,
+                active: true,
+            });
     }
 }
 
