@@ -1,7 +1,4 @@
 import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import h from "vhtml";
-
 import type SRPlugin from "src/main";
 import { t } from "src/lang/helpers";
 
@@ -107,7 +104,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
-        containerEl.createDiv().innerHTML = <h2>{t("SETTINGS_HEADER")}</h2>;
+        containerEl.createEl("h2", { text: `${t("SETTINGS_HEADER")}` });
 
         containerEl.createDiv().innerHTML = t("CHECK_WIKI", {
             wiki_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki",
@@ -130,7 +127,7 @@ export class SRSettingTab extends PluginSettingTab {
                     })
             );
 
-        containerEl.createDiv().innerHTML = <h3>{t("FLASHCARDS")}</h3>;
+        containerEl.createEl("h3", { text: `${t("FLASHCARDS")}` });
 
         new Setting(containerEl)
             .setName(t("FLASHCARD_TAGS"))
@@ -553,7 +550,7 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
-        containerEl.createDiv().innerHTML = <h3>{t("UI_PREFERENCES")}</h3>;
+        containerEl.createEl("h3", { text: `${t("UI_PREFERENCES")}` });
 
         new Setting(containerEl)
             .setName(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE"))
@@ -567,7 +564,7 @@ export class SRSettingTab extends PluginSettingTab {
                     })
             );
 
-        containerEl.createDiv().innerHTML = <h3>{t("ALGORITHM")}</h3>;
+        containerEl.createEl("h3", { text: `${t("ALGORITHM")}` });
         containerEl.createDiv().innerHTML = t("CHECK_ALGORITHM_WIKI", {
             algo_url:
                 "https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Spaced-Repetition-Algorithm",
@@ -730,7 +727,7 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
-        containerEl.createDiv().innerHTML = <h3>{t("LOGGING")}</h3>;
+        containerEl.createEl("h3", { text: `${t("LOGGING")}` });
         new Setting(containerEl).setName(t("DISPLAY_DEBUG_INFO")).addToggle((toggle) =>
             toggle.setValue(this.plugin.data.settings.showDebugMessages).onChange(async (value) => {
                 this.plugin.data.settings.showDebugMessages = value;
