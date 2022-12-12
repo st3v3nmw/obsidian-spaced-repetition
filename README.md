@@ -31,14 +31,14 @@ To help translate this plugin to another language, check the [translation guide 
     -   Possible use case: [Incremental writing](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Incremental-Writing)
 -   [Statistics](https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Statistics)
 -   Translated into:
-    - Chinese (Simplified) / 简体中文
-    - Chinese (Traditional) / 繁體中文
-    - Czech / čeština
-    - German / Deutsch
-    - Korean / 한국어
-    - Japanese / 日本語
-    - Portuguese (Brazil) / Português do Brasil
-    - Russian / русский
+    -   Chinese (Simplified) / 简体中文
+    -   Chinese (Traditional) / 繁體中文
+    -   Czech / čeština
+    -   German / Deutsch
+    -   Korean / 한국어
+    -   Japanese / 日本語
+    -   Portuguese (Brazil) / Português do Brasil
+    -   Russian / русский
 
 ## Quick Demo
 
