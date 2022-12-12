@@ -6,6 +6,7 @@ export default {
     DUE_CARDS: "期日のカード",
     NEW_CARDS: "新規のカード",
     TOTAL_CARDS: "カード合計",
+    BACK: "Back",
     EDIT_LATER: "後で編集",
     RESET_CARD_PROGRESS: "カードの進捗をリセット",
     HARD: "Hard",

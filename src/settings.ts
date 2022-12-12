@@ -73,7 +73,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     disableFileMenuReviewOptions: false,
     maxNDaysNotesReviewQueue: 365,
     // UI settings
-    initiallyExpandAllSubdecksInTree: true,
+    initiallyExpandAllSubdecksInTree: false,
     // algorithm
     baseEase: 250,
     lapsesIntervalChange: 0.5,

@@ -6,6 +6,7 @@ export default {
     DUE_CARDS: "다시 볼 카드들",
     NEW_CARDS: "새로운 카드들",
     TOTAL_CARDS: "전체 카드들",
+    BACK: "Back",
     EDIT_LATER: "나중에 편집하기",
     RESET_CARD_PROGRESS: "카드의 진행상황을 초기화합니다.",
     HARD: "어려움(Hard)",

@@ -9,10 +9,17 @@
 .sr-response {
     display: inline-grid;
     width: 100%;
-    grid-template-columns: auto auto auto;
+    grid-template-columns: auto auto auto auto;
     position: absolute;
     bottom: 0;
 }
+
+.sr-ignorestats-btn {
+    /* Bit of a hack, but it works. */
+    margin: 0px !important;
+    margin-right: 12px !important;
+}
+
 .sr-ignorestats-response {
     grid-template-columns: auto auto !important;
 }
@@ -21,11 +28,20 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 }
 
 .sr-deck-counts {
     color: #ffffff;
     margin-left: 4px;
+    padding: 4px;
+}
+
+.sr-back-btn {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin-right: 4px;
 }
 
 #sr-show-answer {
@@ -77,12 +93,6 @@
     font-size: var(--font-text-size);
     overflow-y: auto;
     height: 80%;
-}
-
-.sr-ignorestats-btn {
-    /* Bit of a hack, but it works. */
-    margin: 0px !important;
-    margin-right: 12px !important;
 }
 
 @media only screen and (max-width: 600px) {

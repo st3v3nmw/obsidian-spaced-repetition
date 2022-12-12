@@ -57,6 +57,7 @@ export class FlashcardModal extends Modal {
         this.ignoreStats = ignoreStats;
 
         this.titleEl.setText(t("DECKS"));
+        this.titleEl.addClass("sr-centered");
 
         if (Platform.isMobile) {
             this.contentEl.style.display = "block";
@@ -125,7 +126,7 @@ export class FlashcardModal extends Modal {
                 <span
                     style="background-color:#4caf50;color:#ffffff;"
                     aria-label={t("DUE_CARDS")}
-                    class="tag-pane-tag-count tree-item-flair"
+                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
                 >
                     {this.plugin.deckTree.dueFlashcardsCount.toString()}
                 </span>
@@ -155,9 +156,27 @@ export class FlashcardModal extends Modal {
 
     setupCardsView(): void {
         this.contentEl.innerHTML = "";
-        const historyLinkView = this.contentEl.createEl("button");
 
-        historyLinkView.setText("〈");
+        const historyLinkView = this.contentEl.createEl("button");
+        historyLinkView.addClass("sr-back-btn");
+        historyLinkView.setAttribute("aria-label", t("BACK"));
+        historyLinkView.innerHTML += (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewbox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="svg-icon lucide-arrow-left"
+            >
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        );
         historyLinkView.addEventListener("click", (e: PointerEvent) => {
             if (e.pointerType.length > 0) {
                 this.plugin.data.historyDeck = "";
