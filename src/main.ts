@@ -887,7 +887,10 @@ export default class SRPlugin extends Plugin {
             (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this))
         );
 
-        if (this.data.settings.enableNoteReviewPaneOnStartup && app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).length == 0) {
+        if (
+            this.data.settings.enableNoteReviewPaneOnStartup &&
+            app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).length == 0
+        ) {
             this.app.workspace.getRightLeaf(false).setViewState({
                 type: REVIEW_QUEUE_VIEW_TYPE,
                 active: true,
