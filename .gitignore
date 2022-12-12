@@ -11,6 +11,13 @@ package-lock.json
 
 # yarn
 yarn-error.log
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
 # build
 build

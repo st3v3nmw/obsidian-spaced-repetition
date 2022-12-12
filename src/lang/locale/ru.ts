@@ -91,6 +91,7 @@ export default {
     MULTILINE_CARDS_SEPARATOR: "Разделитель для многострочных карточек",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Разделитель для обратных многострочных карточек",
     NOTES: "Заметки",
+    REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "Тэги для повторения",
     TAGS_TO_REVIEW_DESC:
         "Введите тэги, разделенные пробелами или enter`ами, пример: #review #tag2 #tag3.",
