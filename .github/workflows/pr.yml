@@ -12,12 +12,12 @@ jobs:
             - name: Setup Node
               uses: actions/setup-node@v1
               with:
-                  node-version: 16
+                  node-version: 18
 
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
 
             - name: Install Dependencies
-              run: yarn install --no-progress --silent
+              run: yarn install
 
             - name: Lint
               run: yarn lint

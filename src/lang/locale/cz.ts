@@ -88,6 +88,7 @@ export default {
     MULTILINE_CARDS_SEPARATOR: "Oddělovač pro víceřádkové kartičky",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Oddělovač pro víceřádkove otočené kartičky",
     NOTES: "Poznámky",
+    REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "Tag pro revizi",
     TAGS_TO_REVIEW_DESC:
         "Zadejte tagy oddělené mezerami nebo odřádkováním například #review #tag2 #tag3.",

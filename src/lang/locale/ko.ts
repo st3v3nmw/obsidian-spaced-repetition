@@ -89,6 +89,7 @@ export default {
     MULTILINE_CARDS_SEPARATOR: "여러 줄 플래시카드 구분자",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "여러 줄 반전 플래시카드 구분자",
     NOTES: "노트",
+    REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "리뷰에 사용할 태그",
     TAGS_TO_REVIEW_DESC:
         "태그를 공백 또는 빈 줄로 구분해서 입력해주세요. 예) '#review #tag2 #tag3'",
