@@ -17,5 +17,6 @@
         "jsx": "react",
         "jsxFactory": "h"
     },
-    "include": ["**/*.ts", "**/*.tsx"]
+    "include": ["**/*.ts", "**/*.tsx"],
+    "files": ["node_modules/jest-expect-message/types/index.d.ts"]
 }

@@ -1,6 +1,0 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-echo "yarn format >/dev/null\n"
-yarn format >/dev/null
-git add -u
