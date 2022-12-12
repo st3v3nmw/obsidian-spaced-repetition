@@ -7,6 +7,7 @@ export default {
     DUE_CARDS: "Cartas para Colocar em Dia",
     NEW_CARDS: "Novas Cartas",
     TOTAL_CARDS: "Total de Cartas",
+    BACK: "Back",
     EDIT_LATER: "Editar Depois",
     RESET_CARD_PROGRESS: "Reiniciar o Progresso da Carta",
     HARD: "Difícil",

@@ -6,6 +6,7 @@ export default {
     DUE_CARDS: "Kartičky po termínu",
     NEW_CARDS: "Nové kartičky",
     TOTAL_CARDS: "Kartiček celkem",
+    BACK: "Back",
     EDIT_LATER: "Upravit později",
     RESET_CARD_PROGRESS: "Vynulovat pokrok kartičky",
     HARD: "Težké",

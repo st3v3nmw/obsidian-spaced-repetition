@@ -6,6 +6,7 @@ export default {
     DUE_CARDS: "到期卡片",
     NEW_CARDS: "新卡片",
     TOTAL_CARDS: "全部卡片",
+    BACK: "Back",
     EDIT_LATER: "稍后编辑",
     RESET_CARD_PROGRESS: "重置卡片",
     HARD: "较难",

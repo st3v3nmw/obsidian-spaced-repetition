@@ -7,8 +7,8 @@
         "build": "node esbuild.config.mjs production",
         "dev": "node esbuild.config.mjs",
         "format": "npx prettier --write .",
-        "lint": "npx prettier --check .",
-        "test": "jest --coverage"
+        "lint": "npx prettier --check . && npx eslint src/",
+        "test": "jest --verbose --runInBand"
     },
     "author": "Stephen Mwangi",
     "license": "MIT",

@@ -9,6 +9,7 @@ export default {
     DUE_CARDS: "Anstehende Karten",
     NEW_CARDS: "Neue Karten",
     TOTAL_CARDS: "Alle Karten",
+    BACK: "Back",
     EDIT_LATER: "Später bearbeiten",
     RESET_CARD_PROGRESS: "Kartenfortschritt zurücksetzten",
     HARD: "Schwer",

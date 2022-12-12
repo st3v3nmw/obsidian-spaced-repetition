@@ -15,6 +15,8 @@ module.exports = {
         "src/constants",
         "src/icons",
         "src/declarations.d.ts",
+        "build",
     ],
     coverageDirectory: "coverage",
+    collectCoverage: true,
 };
