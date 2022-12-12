@@ -56,17 +56,22 @@ export default {
     FLASHCARD_GOOD_DESC: '自訂「記得」按鈕的標籤',
     FLASHCARD_HARD_DESC: '自訂「較難」按鈕的標籤',
     FLASHCARD_TAGS: "卡片標籤",
-    FLASHCARD_TAGS_DESC: "輸入標籤（用空白或換行字元分隔），例如：#flashcards #deck2 #deck3.",
+    FLASHCARD_TAGS_DESC: 
+        "輸入標籤（用空白或換行字元分隔），例如：#flashcards #deck2 #deck3.",
     CONVERT_FOLDERS_TO_DECKS: "是否將資料夾內容轉換為牌組和子牌組？",
     CONVERT_FOLDERS_TO_DECKS_DESC: "此選項為卡片標籤選項的替代選項。",
-    INLINE_SCHEDULING_COMMENTS: "是否將計劃重複時間儲存在卡片最後一行的同一行？",
-    INLINE_SCHEDULING_COMMENTS_DESC: "勾選後HTML註解不會破壞列表格式問題。",
+    INLINE_SCHEDULING_COMMENTS: 
+        "是否將計劃重複時間儲存在卡片最後一行的同一行？",
+    INLINE_SCHEDULING_COMMENTS_DESC: 
+        "勾選後HTML註解不會破壞列表格式問題。",
     BURY_SIBLINGS_TILL_NEXT_DAY: "將反轉卡片隱藏至下一天？",
-    BURY_SIBLINGS_TILL_NEXT_DAY_DESC: "反轉卡片由同一卡片文字產生，例如：填空克漏字",
+    BURY_SIBLINGS_TILL_NEXT_DAY_DESC: 
+        "反轉卡片由同一卡片文字產生，例如：填空克漏字",
     SHOW_CARD_CONTEXT: "在卡片中顯示上下文？",
     SHOW_CARD_CONTEXT_DESC: "例如：標題 > 副標題 > 小標題 > ... > 小標題",
     CARD_MODAL_HEIGHT_PERCENT: "卡片高度百分比",
-    CARD_MODAL_SIZE_PERCENT_DESC: "在移動端或需要較大圖片時應設定為100%",
+    CARD_MODAL_SIZE_PERCENT_DESC: 
+        "在移動端或需要較大圖片時應設定為100%",
     RESET_DEFAULT: "重置為預設值",
     CARD_MODAL_WIDTH_PERCENT: "卡片寬度百分比",
     FILENAME_OR_OPEN_FILE: "在復習卡片時顯示檔名而不是「稍後編輯」？",
@@ -76,17 +81,20 @@ export default {
     CONVERT_BOLD_TEXT_TO_CLOZES: "將 **粗體** 轉換為填空克漏字？",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "將 {{大括號}} 轉換為填空克漏字？",
     INLINE_CARDS_SEPARATOR: "單行卡片的分隔字元",
-    FIX_SEPARATORS_MANUALLY_WARNING: "注意：更改此選項後你將需要自行更改已存在卡片的分隔字元。",
+    FIX_SEPARATORS_MANUALLY_WARNING: 
+        "注意：更改此選項後你將需要自行更改已存在卡片的分隔字元。",
     INLINE_REVERSED_CARDS_SEPARATOR: "單行反轉卡片的分隔字元",
     MULTILINE_CARDS_SEPARATOR: "多行卡片的分隔字元",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "多行翻轉卡片的分隔字元",
     NOTES: "筆記",
+    REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "復習標籤",
     TAGS_TO_REVIEW_DESC: "輸入標籤，用空格或換行字元分隔，例如：#review #tag2 #tag3.",
     OPEN_RANDOM_NOTE: "復習隨機筆記",
     OPEN_RANDOM_NOTE_DESC: "關閉此選項，筆記將以重要度(PageRank)排序。",
     AUTO_NEXT_NOTE: "復習後自動打開下一個筆記",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS: "關閉檔案選單中的復習選項 例如：復習：簡單 記得 較難",
+    DISABLE_FILE_MENU_REVIEW_OPTIONS: 
+        "關閉檔案選單中的復習選項 例如：復習：簡單 記得 較難",
     DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
         "關閉檔案選單的復習選項，例如：復習: 簡單 記得 較難。",
     MAX_N_DAYS_REVIEW_QUEUE: "右邊面板顯示的最大天數",
@@ -97,20 +105,23 @@ export default {
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "關閉此選項可摺疊同一張卡片中的巢狀牌組。如果您的卡片屬於同一檔案中的許多套牌，則很有用。",
     ALGORITHM: "演算法",
-    CHECK_ALGORITHM_WIKI: '瞭解更多, 請點選 <a href="${algo_url}">algorithm implementation</a>.',
+    CHECK_ALGORITHM_WIKI: 
+        '瞭解更多, 請點選 <a href="${algo_url}">algorithm implementation</a>.',
     BASE_EASE: "基礎掌握程度",
     BASE_EASE_DESC: "最小值130，推薦值約250.",
     BASE_EASE_MIN_WARNING: "基礎掌握程度的最小值為130。",
     LAPSE_INTERVAL_CHANGE: "將復習時標註為「較難」的卡片或筆記復習間隔縮短",
     LAPSE_INTERVAL_CHANGE_DESC: "新復習間隔 = 原復習間隔 * 間隔改變係數 / 100.",
     EASY_BONUS: "簡單獎勵",
-    EASY_BONUS_DESC: "簡單獎勵設定「記得」和「簡單」卡片或筆記的復習間隔差距（最小值100%）。",
+    EASY_BONUS_DESC: 
+        "簡單獎勵設定「記得」和「簡單」卡片或筆記的復習間隔差距（最小值100%）。",
     EASY_BONUS_MIN_WARNING: "簡單獎勵至少為100。",
     MAX_INTERVAL: "最大間隔",
     MAX_INTERVAL_DESC: "設定復習的最大間隔時間（預設值100年）。",
     MAX_INTERVAL_MIN_WARNING: "最大間隔至少為1天",
     MAX_LINK_CONTRIB: "最大鏈接貢獻",
-    MAX_LINK_CONTRIB_DESC: "Maximum contribution of the weighted ease of linked notes to the initial ease.",
+    MAX_LINK_CONTRIB_DESC: 
+        "Maximum contribution of the weighted ease of linked notes to the initial ease.",
     LOGGING: "記錄中",
     DISPLAY_DEBUG_INFO: "在開發者控制台中顯示除錯資訊？",
 
