@@ -17,8 +17,8 @@ import { Card, CardType, ReviewResponse, schedule } from "src/scheduling";
 import {
     YAML_FRONT_MATTER_REGEX,
     SCHEDULING_INFO_REGEX,
-    LEGACY_SCHEDULING_EXTRACTOR,
-    MULTI_SCHEDULING_EXTRACTOR,
+    LEGACY_LEGACY_SCHEDULING_EXTRACTOR,
+    LEGACY_MULTI_SCHEDULING_EXTRACTOR,
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
@@ -754,9 +754,9 @@ export default class SRPlugin extends Plugin {
                 }
             }
 
-            let scheduling: RegExpMatchArray[] = [...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR)];
+            let scheduling: RegExpMatchArray[] = [...cardText.matchAll(LEGACY_MULTI_SCHEDULING_EXTRACTOR)];
             if (scheduling.length === 0)
-                scheduling = [...cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
+                scheduling = [...cardText.matchAll(LEGACY_LEGACY_SCHEDULING_EXTRACTOR)];
 
             // we have some extra scheduling dates to delete
             if (scheduling.length > siblingMatches.length) {

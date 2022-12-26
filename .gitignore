@@ -24,3 +24,6 @@ build
 
 # coverage
 coverage
+
+# Temp for hot reloads
+main.js

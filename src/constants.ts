@@ -2,8 +2,8 @@ export const SCHEDULING_INFO_REGEX =
     /^---\n((?:.*\n)*)sr-due: (.+)\nsr-interval: (\d+)\nsr-ease: (\d+)\n((?:.*\n)?)---/;
 export const YAML_FRONT_MATTER_REGEX = /^---\n((?:.*\n)*?)---/;
 
-export const MULTI_SCHEDULING_EXTRACTOR = /!([\d-]+),(\d+),(\d+)/gm;
-export const LEGACY_SCHEDULING_EXTRACTOR = /<!--SR:([\d-]+),(\d+),(\d+)-->/gm;
+export const LEGACY_MULTI_SCHEDULING_EXTRACTOR = /!([\d-]+),(\d+),(\d+)/gm;
+export const LEGACY_LEGACY_SCHEDULING_EXTRACTOR = /<!--SR:([\d-]+),(\d+),(\d+)-->/gm;
 
 export const IMAGE_FORMATS = ["jpg", "jpeg", "gif", "png", "svg"];
 export const AUDIO_FORMATS = ["mp3", "webm", "m4a", "wav", "ogg"];

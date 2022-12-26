@@ -15,8 +15,8 @@ import type SRPlugin from "src/main";
 import { Card, CardType, schedule, textInterval, ReviewResponse } from "src/scheduling";
 import {
     COLLAPSE_ICON,
-    MULTI_SCHEDULING_EXTRACTOR,
-    LEGACY_SCHEDULING_EXTRACTOR,
+    LEGACY_MULTI_SCHEDULING_EXTRACTOR,
+    LEGACY_LEGACY_SCHEDULING_EXTRACTOR,
     IMAGE_FORMATS,
     AUDIO_FORMATS,
     VIDEO_FORMATS,
@@ -318,6 +318,9 @@ export class FlashcardModal extends Modal {
                     this.plugin.dueDatesFlashcards
                 );
             } else {
+
+                // First time this card was reviewed, so need to 
+                // add data to it.
                 let initial_ease: number = this.plugin.data.settings.baseEase;
                 if (
                     Object.prototype.hasOwnProperty.call(
@@ -375,10 +378,10 @@ export class FlashcardModal extends Modal {
                 this.currentCard.cardText + sep + `<!--SR:!${dueString},${interval},${ease}-->`;
         } else {
             let scheduling: RegExpMatchArray[] = [
-                ...this.currentCard.cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
+                ...this.currentCard.cardText.matchAll(LEGACY_MULTI_SCHEDULING_EXTRACTOR),
             ];
             if (scheduling.length === 0) {
-                scheduling = [...this.currentCard.cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
+                scheduling = [...this.currentCard.cardText.matchAll(LEGACY_LEGACY_SCHEDULING_EXTRACTOR)];
             }
 
             const currCardSched: string[] = ["0", dueString, interval.toString(), ease.toString()];
