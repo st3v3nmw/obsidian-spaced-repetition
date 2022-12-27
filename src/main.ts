@@ -754,6 +754,7 @@ export default class SRPlugin extends Plugin {
                 }
             }
 
+            // TODO: Update scheduling information to minutes
             let scheduling: RegExpMatchArray[] = [...cardText.matchAll(LEGACY_MULTI_SCHEDULING_EXTRACTOR)];
             if (scheduling.length === 0)
                 scheduling = [...cardText.matchAll(LEGACY_LEGACY_SCHEDULING_EXTRACTOR)];

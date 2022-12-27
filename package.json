@@ -13,6 +13,7 @@
     "author": "Stephen Mwangi",
     "license": "MIT",
     "devDependencies": {
+        "@types/heap": "^0.2.31",
         "@types/jest": "^29.2.4",
         "@types/node": "^18.11.13",
         "@types/vhtml": "^2.2.4",
@@ -34,6 +35,7 @@
     },
     "dependencies": {
         "chart.js": "^4.0.1",
+        "heap": "^0.2.7",
         "i": "^0.3.7",
         "pagerank.js": "^1.0.2"
     },

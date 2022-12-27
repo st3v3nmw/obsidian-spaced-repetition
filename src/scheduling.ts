@@ -15,6 +15,7 @@ export enum ReviewResponse {
 export interface Card {
     // scheduling
     isDue: boolean;
+    isReDue: boolean;
     interval?: number;
     ease?: number;
     delayBeforeReview?: number;

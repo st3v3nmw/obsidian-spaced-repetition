@@ -23,6 +23,7 @@ import {
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
+import Heap from "heap";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -350,7 +351,7 @@ export class FlashcardModal extends Modal {
             this.currentCard.interval = 1.0;
             this.currentCard.ease = this.plugin.data.settings.baseEase;
             if (this.currentCard.isDue) {
-                this.currentDeck.dueFlashcards.push(this.currentCard);
+                Heap.push(this.currentDeck.dueFlashcards, this.currentCard, Deck.comparator);
             } else {
                 this.currentDeck.newFlashcards.push(this.currentCard);
             }
@@ -624,9 +625,9 @@ export class Deck {
 
         if (deckPath.length === 0) {
             if (cardObj.isDue) {
-                this.dueFlashcards.push(cardObj);
+                Heap.push(this.dueFlashcards, cardObj, Deck.comparator);
             } else {
-                this.newFlashcards.push(cardObj);
+                Heap.push(this.newFlashcards, cardObj, Deck.comparator);
             }
             return;
         }
@@ -654,13 +655,16 @@ export class Deck {
         }
     }
 
+    // TODO: May need to delete this?
     deleteFlashcardAtIndex(index: number, cardIsDue: boolean): void {
         if (cardIsDue) {
             this.dueFlashcards.splice(index, 1);
             this.dueFlashcardsCount--;
+            Heap.heapify(this.dueFlashcards, Deck.comparator);
         } else {
             this.newFlashcards.splice(index, 1);
             this.newFlashcardsCount--;
+            Heap.heapify(this.newFlashcards, Deck.comparator);
         }
 
         let deck: Deck = this.parent;
@@ -794,6 +798,8 @@ export class Deck {
         let interval = 1.0,
             ease: number = modal.plugin.data.settings.baseEase,
             delayBeforeReview = 0;
+
+        // TODO: Need to update below for Heap
         if (this.dueFlashcards.length > 0) {
             if (modal.plugin.data.settings.randomizeCardOrder) {
                 modal.currentCardIdx = Math.floor(Math.random() * this.dueFlashcards.length);
@@ -892,5 +898,14 @@ export class Deck {
             modal.contextView.setText(modal.currentCard.context);
         if (modal.plugin.data.settings.showFileNameInFileLink)
             modal.fileLinkView.setText(modal.currentCard.note.basename);
+    }
+
+    // TODO: Access whether to randomize or not
+    static comparator(a: Card, b: Card): number {
+        if (a.isDue && !b.isDue)
+            return 1;
+        if (!a.isDue && b.isDue)
+            return -1;
+        return 0;
     }
 }
