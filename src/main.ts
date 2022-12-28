@@ -17,8 +17,8 @@ import { Card, CardType, ReviewResponse, schedule } from "src/scheduling";
 import {
     YAML_FRONT_MATTER_REGEX,
     SCHEDULING_INFO_REGEX,
-    LEGACY_LEGACY_SCHEDULING_EXTRACTOR,
-    LEGACY_MULTI_SCHEDULING_EXTRACTOR,
+    LEGACY_SCHEDULING_EXTRACTOR,
+    MULTI_SCHEDULING_EXTRACTOR,
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
@@ -645,6 +645,7 @@ export default class SRPlugin extends Plugin {
             settings.convertBoldTextToClozes,
             settings.convertCurlyBracketsToClozes
         );
+
         for (const parsedCard of parsedCards) {
             deckPath = noteDeckPath;
             const cardType: CardType = parsedCard[0],
@@ -755,10 +756,10 @@ export default class SRPlugin extends Plugin {
             }
 
             // TODO: Update scheduling information to minutes
-            let scheduling: RegExpMatchArray[] = [...cardText.matchAll(LEGACY_MULTI_SCHEDULING_EXTRACTOR)];
+            let scheduling: RegExpMatchArray[] = [...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR)];
             if (scheduling.length === 0)
-                scheduling = [...cardText.matchAll(LEGACY_LEGACY_SCHEDULING_EXTRACTOR)];
-
+                scheduling = [...cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
+            
             // we have some extra scheduling dates to delete
             if (scheduling.length > siblingMatches.length) {
                 const idxSched: number = cardText.lastIndexOf("<!--SR:") + 7;
@@ -782,6 +783,7 @@ export default class SRPlugin extends Plugin {
 
                 const cardObj: Card = {
                     isDue: i < scheduling.length,
+                    isReDue: false,
                     note,
                     lineNo,
                     front,
@@ -800,7 +802,7 @@ export default class SRPlugin extends Plugin {
                     this.deckTree.insertFlashcard([...deckPath], cardObj);
                 } else if (i < scheduling.length) {
                     const dueUnix: number = window
-                        .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY"])
+                        .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY", t("DATE_SCHED_FMT")])
                         .valueOf();
                     const nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
                     if (!Object.prototype.hasOwnProperty.call(this.dueDatesFlashcards, nDays)) {

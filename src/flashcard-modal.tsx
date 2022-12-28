@@ -15,8 +15,8 @@ import type SRPlugin from "src/main";
 import { Card, CardType, schedule, textInterval, ReviewResponse } from "src/scheduling";
 import {
     COLLAPSE_ICON,
-    LEGACY_MULTI_SCHEDULING_EXTRACTOR,
-    LEGACY_LEGACY_SCHEDULING_EXTRACTOR,
+    MULTI_SCHEDULING_EXTRACTOR,
+    LEGACY_SCHEDULING_EXTRACTOR,
     IMAGE_FORMATS,
     AUDIO_FORMATS,
     VIDEO_FORMATS,
@@ -361,7 +361,8 @@ export class FlashcardModal extends Modal {
             return;
         }
 
-        const dueString: string = due.format("YYYY-MM-DD");
+        // TODO: Change to only include time if re-reviewing on same day
+        const dueString: string = due.format(t("DATE_SCHED_FMT"));
 
         let fileText: string = await this.app.vault.read(this.currentCard.note);
         const replacementRegex = new RegExp(escapeRegexString(this.currentCard.cardText), "gm");
@@ -379,10 +380,10 @@ export class FlashcardModal extends Modal {
                 this.currentCard.cardText + sep + `<!--SR:!${dueString},${interval},${ease}-->`;
         } else {
             let scheduling: RegExpMatchArray[] = [
-                ...this.currentCard.cardText.matchAll(LEGACY_MULTI_SCHEDULING_EXTRACTOR),
+                ...this.currentCard.cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
             ];
             if (scheduling.length === 0) {
-                scheduling = [...this.currentCard.cardText.matchAll(LEGACY_LEGACY_SCHEDULING_EXTRACTOR)];
+                scheduling = [...this.currentCard.cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
             }
 
             const currCardSched: string[] = ["0", dueString, interval.toString(), ease.toString()];
@@ -801,11 +802,8 @@ export class Deck {
 
         // TODO: Need to update below for Heap
         if (this.dueFlashcards.length > 0) {
-            if (modal.plugin.data.settings.randomizeCardOrder) {
-                modal.currentCardIdx = Math.floor(Math.random() * this.dueFlashcards.length);
-            } else {
-                modal.currentCardIdx = 0;
-            }
+            modal.currentCardIdx = 0;  // Heap incorporates randomness based on settings
+
             modal.currentCard = this.dueFlashcards[modal.currentCardIdx];
             modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
 
@@ -813,22 +811,8 @@ export class Deck {
             ease = modal.currentCard.ease;
             delayBeforeReview = modal.currentCard.delayBeforeReview;
         } else if (this.newFlashcards.length > 0) {
-            if (modal.plugin.data.settings.randomizeCardOrder) {
-                const pickedCardIdx = Math.floor(Math.random() * this.newFlashcards.length);
-                modal.currentCardIdx = pickedCardIdx;
-
-                // look for first unscheduled sibling
-                const pickedCard: Card = this.newFlashcards[pickedCardIdx];
-                let idx = pickedCardIdx;
-                while (idx >= 0 && pickedCard.siblings.includes(this.newFlashcards[idx])) {
-                    if (!this.newFlashcards[idx].isDue) {
-                        modal.currentCardIdx = idx;
-                    }
-                    idx--;
-                }
-            } else {
-                modal.currentCardIdx = 0;
-            }
+            // TODO: Explain why we needed to "look for first unscheduled sibling"
+            modal.currentCardIdx = 0;  // Heap incorporates randomness based on settings
 
             modal.currentCard = this.newFlashcards[modal.currentCardIdx];
             modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
