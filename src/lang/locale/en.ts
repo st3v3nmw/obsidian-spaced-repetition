@@ -37,13 +37,15 @@ export default {
     ALL_CAUGHT_UP: "You're all caught up now :D.",
 
     // scheduling.ts
+    // TODO: Translate MINUTES_X to other langs
+    MINUTES_STR_IVL: "${interval} minutes(s)",
     DAYS_STR_IVL: "${interval} day(s)",
     MONTHS_STR_IVL: "${interval} month(s)",
     YEARS_STR_IVL: "${interval} year(s)",
+    MINUTES_STR_IVL_MOBILE: "${interval}m",
     DAYS_STR_IVL_MOBILE: "${interval}d",
-    MONTHS_STR_IVL_MOBILE: "${interval}m",
+    MONTHS_STR_IVL_MOBILE: "${interval}mo",
     YEARS_STR_IVL_MOBILE: "${interval}y",
-    DATE_SCHED_FMT: "YYYY-MM-DD hh:mm:ss",
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition Plugin - Settings",

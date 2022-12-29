@@ -802,7 +802,7 @@ export default class SRPlugin extends Plugin {
                     this.deckTree.insertFlashcard([...deckPath], cardObj);
                 } else if (i < scheduling.length) {
                     const dueUnix: number = window
-                        .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY", t("DATE_SCHED_FMT")])
+                        .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY"])
                         .valueOf();
                     const nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
                     if (!Object.prototype.hasOwnProperty.call(this.dueDatesFlashcards, nDays)) {

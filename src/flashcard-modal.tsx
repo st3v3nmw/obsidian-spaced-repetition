@@ -229,6 +229,8 @@ export class FlashcardModal extends Modal {
 
         this.responseDiv = this.contentEl.createDiv("sr-response");
 
+        // TODO: Add 'impossible' button. Requires adding for all languages.
+
         this.hardBtn = document.createElement("button");
         this.hardBtn.setAttribute("id", "sr-hard-btn");
         this.hardBtn.setText(this.plugin.data.settings.flashcardHardText);
@@ -346,7 +348,7 @@ export class FlashcardModal extends Modal {
 
             interval = schedObj.interval;
             ease = schedObj.ease;
-            due = window.moment(Date.now() + interval * 24 * 3600 * 1000);
+            due = window.moment(Date.now() + interval * 60 * 1000);
         } else {
             this.currentCard.interval = 1.0;
             this.currentCard.ease = this.plugin.data.settings.baseEase;
@@ -362,7 +364,7 @@ export class FlashcardModal extends Modal {
         }
 
         // TODO: Change to only include time if re-reviewing on same day
-        const dueString: string = due.format(t("DATE_SCHED_FMT"));
+        const dueString: string = due.format("YYYY-MM-DD");
 
         let fileText: string = await this.app.vault.read(this.currentCard.note);
         const replacementRegex = new RegExp(escapeRegexString(this.currentCard.cardText), "gm");
