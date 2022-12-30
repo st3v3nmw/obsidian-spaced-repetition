@@ -24,3 +24,6 @@ build
 
 # coverage
 coverage
+
+# mkdocs
+site/

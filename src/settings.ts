@@ -107,7 +107,7 @@ export class SRSettingTab extends PluginSettingTab {
         containerEl.createEl("h2", { text: `${t("SETTINGS_HEADER")}` });
 
         containerEl.createDiv().innerHTML = t("CHECK_WIKI", {
-            wiki_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki",
+            wiki_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/",
         });
 
         new Setting(containerEl)
@@ -566,8 +566,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         containerEl.createEl("h3", { text: `${t("ALGORITHM")}` });
         containerEl.createDiv().innerHTML = t("CHECK_ALGORITHM_WIKI", {
-            algo_url:
-                "https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Spaced-Repetition-Algorithm",
+            algo_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
         });
 
         new Setting(containerEl)

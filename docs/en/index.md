@@ -2,6 +2,8 @@
 
 <img src="https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/total" /> <img src="https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/latest/total?style=flat-square" /> <img src="https://img.shields.io/github/manifest-json/v/st3v3nmw/obsidian-spaced-repetition?style=flat-square" />
 
+⚠️ These docs are a bit outdated. Updates will follow soon.
+
 Fight the forgetting curve & note aging by reviewing flashcards & notes using spaced repetition on Obsidian.md
 
 -   Check the documentation [here](https://www.stephenmwangi.com/obsidian-spaced-repetition/).
@@ -9,7 +11,7 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
 -   Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug-report.
 -   Visit the [discussions](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/) section for Q&A help, feedback, and general discussion.
 -   The plugin has been translated into _Chinese (Simplified) / 简体中文, Chinese (Traditional) / 繁體中文, Czech / čeština, German / Deutsch, Korean / 한국어, Japanese / 日本語, Portuguese (Brazil) / Português do Brasil and Russian / русский_ by the Obsidian community 😄.
-    -   To help translate this plugin to your language, check the [translation guide here](/contributing/#translating).
+    -   To help translate this plugin to your language, check the [translation guide here](/obsidian-spaced-repetition/contributing/#translating).
 
 ## Resources
 
