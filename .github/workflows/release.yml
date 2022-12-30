@@ -32,7 +32,7 @@ jobs:
                   echo "::set-output name=tag_name::$(git tag --sort version:refname | tail -n 1)"
 
             - name: Create Release
-              id: create-release
+              id: create_release
               uses: actions/create-release@v1
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
