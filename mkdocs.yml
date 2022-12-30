@@ -1,0 +1,15 @@
+site_name: Obsidian Spaced Repetition Plugin
+site_url: https://www.stephenmwangi.com/obsidian-spaced-repetition/
+repo_url: https://github.com/st3v3nmw/obsidian-spaced-repetition/
+edit_uri_template: "blob/master/docs/{path}"
+theme:
+    name: null
+    custom_dir: "docs/cinder"
+    highlightjs: true
+    hljs_style: github
+nav:
+    - Home: index.md
+    - Flashcards: flashcards.md
+    - Notes: notes.md
+    - Contributing: contributing.md
+    - Algorithms: algorithms.md
