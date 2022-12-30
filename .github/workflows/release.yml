@@ -45,7 +45,7 @@ jobs:
 
             - name: Upload zip file
               id: upload-zip
-              uses: actions/upload-release-asset@v3
+              uses: actions/upload-release-asset@v1
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
@@ -56,7 +56,7 @@ jobs:
 
             - name: Upload main.js
               id: upload-main
-              uses: actions/upload-release-asset@v3
+              uses: actions/upload-release-asset@v1
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
@@ -67,7 +67,7 @@ jobs:
 
             - name: Upload manifest.json
               id: upload-manifest
-              uses: actions/upload-release-asset@v3
+              uses: actions/upload-release-asset@v1
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
@@ -78,7 +78,7 @@ jobs:
 
             - name: Upload styles.css
               id: upload-css
-              uses: actions/upload-release-asset@v3
+              uses: actions/upload-release-asset@v1
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
@@ -89,9 +89,9 @@ jobs:
 
             - name: Use Python
               uses: actions/setup-python@v3
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                   python-version: "3.11"
-            - run: pip install mkdocs
+            - run: pip install mkdocs mkdocs-static-i18n mkdocs-git-authors-plugin mkdocs-git-revision-date-localized-plugin
             - run: mkdocs gh-deploy --force --clean --verbose
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

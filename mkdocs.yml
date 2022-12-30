@@ -1,9 +1,14 @@
 site_name: Obsidian Spaced Repetition Plugin
 site_url: https://www.stephenmwangi.com/obsidian-spaced-repetition/
+site_author: Stephen Mwangi
+repo_name: GitHub
 repo_url: https://github.com/st3v3nmw/obsidian-spaced-repetition/
 edit_uri_template: "blob/master/docs/{path}"
+remote_branch: gh-pages
+remote_name: origin
 theme:
     name: null
+    locale: en
     custom_dir: "docs/cinder"
     highlightjs: true
     hljs_style: github
@@ -13,3 +18,15 @@ nav:
     - Notes: notes.md
     - Contributing: contributing.md
     - Algorithms: algorithms.md
+plugins:
+    - search:
+    - i18n:
+          default_language: en
+          docs_structure: folder
+          languages:
+              en: english
+    - git-revision-date-localized:
+          enable_creation_date: true
+          type: timeago
+          fallback_to_build_date: true
+    - git-authors:
