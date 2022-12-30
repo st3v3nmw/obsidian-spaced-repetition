@@ -368,11 +368,7 @@ export class FlashcardModal extends Modal {
         } else {
             this.currentCard.interval = 1.0;
             this.currentCard.ease = this.plugin.data.settings.baseEase;
-            if (this.currentCard.isDue) {
-                Heap.push(this.currentDeck.dueFlashcards, this.currentCard, Deck.comparator);
-            } else {
-                this.currentDeck.newFlashcards.push(this.currentCard);
-            }
+            this.currentDeck.insertFlashcard([], this.currentCard);
             due = window.moment(Date.now());
             new Notice(t("CARD_PROGRESS_RESET"));
             this.currentDeck.nextCard(this);
@@ -437,18 +433,12 @@ export class FlashcardModal extends Modal {
         }
 
         for (const sibling of this.currentCard.siblings) {
-            const dueIdx = this.currentDeck.dueFlashcards.indexOf(sibling);
-            const newIdx = this.currentDeck.newFlashcards.indexOf(sibling);
+            const idx = this.currentDeck.flashcards.indexOf(sibling);
 
-            if (dueIdx !== -1) {
+            if (idx !== -1) {
                 this.currentDeck.deleteFlashcardAtIndex(
-                    dueIdx,
-                    this.currentDeck.dueFlashcards[dueIdx].isDue
-                );
-            } else if (newIdx !== -1) {
-                this.currentDeck.deleteFlashcardAtIndex(
-                    newIdx,
-                    this.currentDeck.newFlashcards[newIdx].isDue
+                    idx,
+                    this.currentDeck.flashcards[idx].isDue
                 );
             }
         }
@@ -597,9 +587,8 @@ export class FlashcardModal extends Modal {
 // TODO: Update Deck to only contain one stack of flashcards
 export class Deck {
     public deckName: string;
-    public newFlashcards: Card[];
+    public flashcards: Card[];
     public newFlashcardsCount = 0; // counts those in subdecks too
-    public dueFlashcards: Card[];
     public dueFlashcardsCount = 0; // counts those in subdecks too
     public totalFlashcards = 0; // counts those in subdecks too
     public subdecks: Deck[];
@@ -607,9 +596,8 @@ export class Deck {
 
     constructor(deckName: string, parent: Deck | null) {
         this.deckName = deckName;
-        this.newFlashcards = [];
         this.newFlashcardsCount = 0;
-        this.dueFlashcards = [];
+        this.flashcards = [];
         this.dueFlashcardsCount = 0;
         this.totalFlashcards = 0;
         this.subdecks = [];
@@ -645,11 +633,7 @@ export class Deck {
             this.totalFlashcards++;
 
         if (deckPath.length === 0) {
-            if (cardObj.isDue) {
-                Heap.push(this.dueFlashcards, cardObj, Deck.comparator);
-            } else {
-                Heap.push(this.newFlashcards, cardObj, Deck.comparator);
-            }
+            Heap.push(this.flashcards, cardObj, Deck.comparator);
             return;
         }
 
@@ -678,14 +662,12 @@ export class Deck {
 
     // TODO: May need to delete this?
     deleteFlashcardAtIndex(index: number, cardIsDue: boolean): void {
+        this.flashcards.splice(index, 1);
+        Heap.heapify(this.flashcards, Deck.comparator);
         if (cardIsDue) {
-            this.dueFlashcards.splice(index, 1);
             this.dueFlashcardsCount--;
-            Heap.heapify(this.dueFlashcards, Deck.comparator);
         } else {
-            this.newFlashcards.splice(index, 1);
             this.newFlashcardsCount--;
-            Heap.heapify(this.newFlashcards, Deck.comparator);
         }
 
         let deck: Deck = this.parent;
@@ -786,7 +768,8 @@ export class Deck {
     }
 
     nextCard(modal: FlashcardModal): void {
-        if (this.newFlashcards.length + this.dueFlashcards.length === 0) {
+        Heap.heapify(this.flashcards, Deck.comparator);
+        if (this.flashcards.length === 0) {
             if (this.dueFlashcardsCount + this.newFlashcardsCount > 0) {
                 for (const deck of this.subdecks) {
                     if (deck.dueFlashcardsCount + deck.newFlashcardsCount > 0) {
@@ -821,23 +804,18 @@ export class Deck {
             delayBeforeReview = 0;
 
         // TODO: Need to update below for Heap
-        if (this.dueFlashcards.length > 0) {
-            modal.currentCardIdx = 0;  // Heap incorporates randomness based on settings
-
-            modal.currentCard = this.dueFlashcards[modal.currentCardIdx];
-            modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
-
-            interval = modal.currentCard.interval;
-            ease = modal.currentCard.ease;
-            delayBeforeReview = modal.currentCard.delayBeforeReview;
-        } else if (this.newFlashcards.length > 0) {
+        if (this.flashcards.length > 0) {
             // TODO: Explain why we needed to "look for first unscheduled sibling"
             modal.currentCardIdx = 0;  // Heap incorporates randomness based on settings
 
-            modal.currentCard = this.newFlashcards[modal.currentCardIdx];
+            modal.currentCard = this.flashcards[modal.currentCardIdx];
             modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
 
-            if (
+            if (modal.currentCard.isDue) {
+                interval = modal.currentCard.interval;
+                ease = modal.currentCard.ease;
+                delayBeforeReview = modal.currentCard.delayBeforeReview;
+            } else if (
                 Object.prototype.hasOwnProperty.call(
                     modal.plugin.easeByPath,
                     modal.currentCard.note.path
