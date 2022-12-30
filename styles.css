@@ -55,6 +55,7 @@
     background-color: #2196f3;
     color: #ffffff;
     border-radius: 4px;
+    user-select: text;
 }
 
 #sr-hr-card-divide {
@@ -93,6 +94,7 @@
     font-size: var(--font-text-size);
     overflow-y: auto;
     height: 80%;
+    user-select: text;
 }
 
 @media only screen and (max-width: 600px) {
