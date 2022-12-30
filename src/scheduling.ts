@@ -74,6 +74,7 @@ export function schedule(
             ease = Math.max(settingsObj.baseEase, ease - 20);
         }
     } else {
+        // TODO: Change old algorithm to deal with minutes? How?
         if (response === ReviewResponse.Easy) {
             ease += 20;
             interval = ((interval + minutesBeforeReview) * ease) / 100;
@@ -124,6 +125,7 @@ export function schedule(
         dueDates[Math.round(interval / MINUTES_PER_DAY)]++;
     }
 
+    // Round down to 1m and 10m for consistency
     interval = Math.min(interval, settingsObj.maximumInterval * MINUTES_PER_DAY);
     if (interval < 10) {
         interval = 1;

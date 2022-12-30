@@ -20,6 +20,7 @@ import {
     IMAGE_FORMATS,
     AUDIO_FORMATS,
     VIDEO_FORMATS,
+    MINUTES_PER_DAY,
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
@@ -348,7 +349,22 @@ export class FlashcardModal extends Modal {
 
             interval = schedObj.interval;
             ease = schedObj.ease;
-            due = window.moment(Date.now() + interval * 60 * 1000);
+
+            // Re-add card to deck if we need to review the card
+            // on the same day.
+            if (interval < MINUTES_PER_DAY) {
+                this.currentCard.isDue = true;
+                this.currentCard.isReDue = true;
+                this.currentCard.interval = interval;
+                this.currentCard.ease = ease;
+                this.currentCard.delayBeforeReview = interval;
+                this.currentDeck.insertFlashcard([], this.currentCard);
+                due = window.moment(Date.now() + interval * 60 * 1000);
+            } else {
+                // Round down to start of day
+                due = window.moment(Date.now() + interval * 60 * 1000).startOf("day");
+            }
+
         } else {
             this.currentCard.interval = 1.0;
             this.currentCard.ease = this.plugin.data.settings.baseEase;
@@ -363,8 +379,7 @@ export class FlashcardModal extends Modal {
             return;
         }
 
-        // TODO: Change to only include time if re-reviewing on same day
-        const dueString: string = due.format("YYYY-MM-DD");
+        const dueString: string = due.format(t("DATE_SCHED_FMT"));
 
         let fileText: string = await this.app.vault.read(this.currentCard.note);
         const replacementRegex = new RegExp(escapeRegexString(this.currentCard.cardText), "gm");
@@ -579,6 +594,7 @@ export class FlashcardModal extends Modal {
     }
 }
 
+// TODO: Update Deck to only contain one stack of flashcards
 export class Deck {
     public deckName: string;
     public newFlashcards: Card[];
@@ -624,7 +640,9 @@ export class Deck {
         } else {
             this.newFlashcardsCount++;
         }
-        this.totalFlashcards++;
+
+        if (!cardObj.isReDue)
+            this.totalFlashcards++;
 
         if (deckPath.length === 0) {
             if (cardObj.isDue) {

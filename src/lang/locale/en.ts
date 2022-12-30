@@ -46,6 +46,7 @@ export default {
     DAYS_STR_IVL_MOBILE: "${interval}d",
     MONTHS_STR_IVL_MOBILE: "${interval}mo",
     YEARS_STR_IVL_MOBILE: "${interval}y",
+    DATE_SCHED_FMT: "YYYY-MM-DD HH:mm:ss",
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition Plugin - Settings",

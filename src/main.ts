@@ -417,6 +417,7 @@ export default class SRPlugin extends Plugin {
     }
 
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
+        console.log("HAHAHA");
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         const frontmatter: FrontMatterCache | Record<string, unknown> =
             fileCachedData.frontmatter || {};
@@ -802,7 +803,7 @@ export default class SRPlugin extends Plugin {
                     this.deckTree.insertFlashcard([...deckPath], cardObj);
                 } else if (i < scheduling.length) {
                     const dueUnix: number = window
-                        .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY"])
+                        .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY", t("DATE_SCHED_FMT")])
                         .valueOf();
                     const nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
                     if (!Object.prototype.hasOwnProperty.call(this.dueDatesFlashcards, nDays)) {
