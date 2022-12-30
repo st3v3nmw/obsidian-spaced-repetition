@@ -306,73 +306,62 @@ export class FlashcardModal extends Modal {
             return;
         }
 
-        let interval: number, ease: number, due;
+        let due: moment.Moment;
 
-        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
-        if (response !== ReviewResponse.Reset) {
-            let schedObj: Record<string, number>;
-            // scheduled card
-            if (this.currentCard.isDue) {
-                schedObj = schedule(
-                    response,
-                    this.currentCard.interval,
-                    this.currentCard.ease,
-                    this.currentCard.delayBeforeReview,
-                    this.plugin.data.settings,
-                    this.plugin.dueDatesFlashcards
-                );
-            } else {
-
-                // First time this card was reviewed, so need to 
-                // add data to it.
-                let initial_ease: number = this.plugin.data.settings.baseEase;
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        this.plugin.easeByPath,
-                        this.currentCard.note.path
-                    )
-                ) {
-                    initial_ease = Math.round(this.plugin.easeByPath[this.currentCard.note.path]);
-                }
-
-                schedObj = schedule(
-                    response,
-                    1.0,
-                    initial_ease,
-                    0,
-                    this.plugin.data.settings,
-                    this.plugin.dueDatesFlashcards
-                );
-                interval = schedObj.interval;
-                ease = schedObj.ease;
-            }
-
-            interval = schedObj.interval;
-            ease = schedObj.ease;
-
-            // Re-add card to deck if we need to review the card
-            // on the same day.
-            if (interval < MINUTES_PER_DAY) {
-                this.currentCard.isDue = true;
-                this.currentCard.isReDue = true;
-                this.currentCard.interval = interval;
-                this.currentCard.ease = ease;
-                this.currentCard.delayBeforeReview = interval;
-                this.currentDeck.insertFlashcard([], this.currentCard);
-                due = window.moment(Date.now() + interval * 60 * 1000);
-            } else {
-                // Round down to start of day
-                due = window.moment(Date.now() + interval * 60 * 1000).startOf("day");
-            }
-
-        } else {
-            this.currentCard.interval = 1.0;
-            this.currentCard.ease = this.plugin.data.settings.baseEase;
-            this.currentDeck.insertFlashcard([], this.currentCard);
+        // Exit early if doing a reset
+        if (response === ReviewResponse.Reset) {
+            const newCard: Card = {...this.currentCard};
+            newCard.interval = 1.0;
+            newCard.ease = this.plugin.data.settings.baseEase;
+            this.currentDeck.notifyCardChanged(this.currentCardIdx, newCard);
             due = window.moment(Date.now());
             new Notice(t("CARD_PROGRESS_RESET"));
             this.currentDeck.nextCard(this);
             return;
+        }
+        
+        let schedObj: Record<string, number>;
+        // scheduled card
+        if (this.currentCard.isDue) {
+            schedObj = schedule(
+                response,
+                this.currentCard.interval,
+                this.currentCard.ease,
+                this.currentCard.delayBeforeReview,
+                this.plugin.data.settings,
+                this.plugin.dueDatesFlashcards
+            );
+        } else {
+
+            // First time this card was reviewed, so need to 
+            // add data to it.
+            let initial_ease: number = this.plugin.data.settings.baseEase;
+            if (
+                Object.prototype.hasOwnProperty.call(
+                    this.plugin.easeByPath,
+                    this.currentCard.note.path
+                )
+            ) {
+                initial_ease = Math.round(this.plugin.easeByPath[this.currentCard.note.path]);
+            }
+
+            schedObj = schedule(
+                response,
+                1.0,
+                initial_ease,
+                0,
+                this.plugin.data.settings,
+                this.plugin.dueDatesFlashcards
+            );
+        }
+
+        const interval: number = schedObj.interval;
+        const ease: number = schedObj.ease;
+
+        // Calculate the next due date for this card.
+        due = window.moment(Date.now() + interval * 60 * 1000);
+        if (interval >= MINUTES_PER_DAY) {
+            due = due.startOf("day");
         }
 
         const dueString: string = due.format(t("DATE_SCHED_FMT"));
@@ -421,8 +410,24 @@ export class FlashcardModal extends Modal {
         if (this.plugin.data.settings.burySiblingCards) {
             this.burySiblingCards(true);
         }
-
+        
         await this.app.vault.modify(this.currentCard.note, fileText);
+
+        // Update the card within the deck if we need to re-review it.
+        // Otherwise, delete the card from the deck.
+        if (interval < MINUTES_PER_DAY) {
+            const newCard = {...this.currentCard};  // Need to copy so that old card's data persists
+            newCard.isDue = true;
+            newCard.isReDue = true;
+            newCard.interval = interval;
+            newCard.ease = ease;
+            newCard.delayBeforeReview = interval;
+
+            this.currentDeck.notifyCardChanged(this.currentCardIdx, newCard);
+        } else {
+            this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+        }
+
         this.currentDeck.nextCard(this);
     }
 
@@ -432,10 +437,9 @@ export class FlashcardModal extends Modal {
             await this.plugin.savePluginData();
         }
 
+        let idx;
         for (const sibling of this.currentCard.siblings) {
-            const idx = this.currentDeck.flashcards.indexOf(sibling);
-
-            if (idx !== -1) {
+            while ((idx = this.currentDeck.flashcards.indexOf(sibling)) != -1)  {
                 this.currentDeck.deleteFlashcardAtIndex(
                     idx,
                     this.currentDeck.flashcards[idx].isDue
@@ -629,6 +633,7 @@ export class Deck {
             this.newFlashcardsCount++;
         }
 
+        // Card was just deleted, don't increment total count;
         if (!cardObj.isReDue)
             this.totalFlashcards++;
 
@@ -661,24 +666,37 @@ export class Deck {
     }
 
     // TODO: May need to delete this?
-    deleteFlashcardAtIndex(index: number, cardIsDue: boolean): void {
-        this.flashcards.splice(index, 1);
-        Heap.heapify(this.flashcards, Deck.comparator);
+    deleteFlashcardAtIndex(index: number, cardIsDue: boolean, base = true): void {
+        if (base) {
+            this.flashcards.splice(index, 1);
+            Heap.heapify(this.flashcards, Deck.comparator);    
+        }
+
         if (cardIsDue) {
             this.dueFlashcardsCount--;
         } else {
             this.newFlashcardsCount--;
         }
 
-        let deck: Deck = this.parent;
+        if (this.parent !== null)
+            this.parent.deleteFlashcardAtIndex(index, cardIsDue, false);
+    }
+
+    notifyCardChanged(oldCardIdx: number, newCard: Card): void {
+        this.deleteFlashcardAtIndex(oldCardIdx, this.flashcards[oldCardIdx].isDue);
+        const deckName: string[] = [this.deckName];
+        let deck = this.parent;
+        let root = this.parent;
         while (deck !== null) {
-            if (cardIsDue) {
-                deck.dueFlashcardsCount--;
-            } else {
-                deck.newFlashcardsCount--;
-            }
+            deckName.push(deck.deckName);
+            root = deck;
             deck = deck.parent;
         }
+
+        console.log(deckName);
+
+        root.insertFlashcard(deckName.reverse().slice(1, deckName.length), newCard);
+        console.log(root.dueFlashcardsCount);
     }
 
     sortSubdecksList(): void {
