@@ -1,4 +1,4 @@
-name: Build Obsidian plugin
+name: Release Obsidian plugin
 
 on:
     push:
@@ -9,14 +9,14 @@ env:
     PLUGIN_NAME: obsidian-spaced-repetition
 
 jobs:
-    build:
+    release:
         runs-on: ubuntu-latest
 
         steps:
             - uses: actions/checkout@v3
 
             - name: Use Node.js
-              uses: actions/setup-node@v1
+              uses: actions/setup-node@v3
               with:
                   node-version: "18.x"
 
@@ -32,8 +32,8 @@ jobs:
                   echo "::set-output name=tag_name::$(git tag --sort version:refname | tail -n 1)"
 
             - name: Create Release
-              id: create_release
-              uses: actions/create-release@v1
+              id: create-release
+              uses: actions/create-release@v3
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   VERSION: ${{ github.ref }}
@@ -45,7 +45,7 @@ jobs:
 
             - name: Upload zip file
               id: upload-zip
-              uses: actions/upload-release-asset@v1
+              uses: actions/upload-release-asset@v3
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
@@ -56,7 +56,7 @@ jobs:
 
             - name: Upload main.js
               id: upload-main
-              uses: actions/upload-release-asset@v1
+              uses: actions/upload-release-asset@v3
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
@@ -67,7 +67,7 @@ jobs:
 
             - name: Upload manifest.json
               id: upload-manifest
-              uses: actions/upload-release-asset@v1
+              uses: actions/upload-release-asset@v3
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
@@ -78,7 +78,7 @@ jobs:
 
             - name: Upload styles.css
               id: upload-css
-              uses: actions/upload-release-asset@v1
+              uses: actions/upload-release-asset@v3
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
@@ -86,3 +86,12 @@ jobs:
                   asset_path: ./styles.css
                   asset_name: styles.css
                   asset_content_type: text/css
+
+            - name: Use Python
+              uses: actions/setup-python@v3
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  python-version: "3.11"
+            - run: pip install mkdocs
+            - run: mkdocs gh-deploy --force --clean --verbose
