@@ -45,7 +45,7 @@ export enum CardType {
 }
 
 /**
- * 
+ *
  * @param response Whether or not the card was labelled 'easy', 'good', or 'hard'
  * @param interval The interval in minutes between the previous review and when the card becomes available for review.
  * @param ease The internal ease of the card

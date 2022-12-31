@@ -760,7 +760,7 @@ export default class SRPlugin extends Plugin {
             let scheduling: RegExpMatchArray[] = [...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR)];
             if (scheduling.length === 0)
                 scheduling = [...cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
-            
+
             // we have some extra scheduling dates to delete
             if (scheduling.length > siblingMatches.length) {
                 const idxSched: number = cardText.lastIndexOf("<!--SR:") + 7;

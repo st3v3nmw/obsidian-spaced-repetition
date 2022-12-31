@@ -310,7 +310,7 @@ export class FlashcardModal extends Modal {
 
         // Exit early if doing a reset
         if (response === ReviewResponse.Reset) {
-            const newCard: Card = {...this.currentCard};
+            const newCard: Card = { ...this.currentCard };
             newCard.interval = 1.0;
             newCard.ease = this.plugin.data.settings.baseEase;
             this.currentDeck.notifyCardChanged(this.currentCardIdx, newCard);
@@ -319,7 +319,7 @@ export class FlashcardModal extends Modal {
             this.currentDeck.nextCard(this);
             return;
         }
-        
+
         let schedObj: Record<string, number>;
         // scheduled card
         if (this.currentCard.isDue) {
@@ -332,8 +332,7 @@ export class FlashcardModal extends Modal {
                 this.plugin.dueDatesFlashcards
             );
         } else {
-
-            // First time this card was reviewed, so need to 
+            // First time this card was reviewed, so need to
             // add data to it.
             let initial_ease: number = this.plugin.data.settings.baseEase;
             if (
@@ -410,13 +409,13 @@ export class FlashcardModal extends Modal {
         if (this.plugin.data.settings.burySiblingCards) {
             this.burySiblingCards(true);
         }
-        
+
         await this.app.vault.modify(this.currentCard.note, fileText);
 
         // Update the card within the deck if we need to re-review it.
         // Otherwise, delete the card from the deck.
         if (interval < MINUTES_PER_DAY) {
-            const newCard = {...this.currentCard};  // Need to copy so that old card's data persists
+            const newCard = { ...this.currentCard }; // Need to copy so that old card's data persists
             newCard.isDue = true;
             newCard.isReDue = true;
             newCard.interval = interval;
@@ -440,7 +439,7 @@ export class FlashcardModal extends Modal {
 
         let idx;
         for (const sibling of this.currentCard.siblings) {
-            while ((idx = this.currentDeck.flashcards.indexOf(sibling)) != -1)  {
+            while ((idx = this.currentDeck.flashcards.indexOf(sibling)) != -1) {
                 this.currentDeck.deleteFlashcardAtIndex(
                     idx,
                     this.currentDeck.flashcards[idx].isDue
@@ -635,8 +634,7 @@ export class Deck {
         }
 
         // Card was just deleted, don't increment total count;
-        if (!cardObj.isReDue)
-            this.totalFlashcards++;
+        if (!cardObj.isReDue) this.totalFlashcards++;
 
         if (deckPath.length === 0) {
             Heap.push(this.flashcards, cardObj, Deck.comparator);
@@ -670,7 +668,7 @@ export class Deck {
     deleteFlashcardAtIndex(index: number, cardIsDue: boolean, base = true): void {
         if (base) {
             this.flashcards.splice(index, 1);
-            Heap.heapify(this.flashcards, Deck.comparator);    
+            Heap.heapify(this.flashcards, Deck.comparator);
         }
 
         if (cardIsDue) {
@@ -679,8 +677,7 @@ export class Deck {
             this.newFlashcardsCount--;
         }
 
-        if (this.parent !== null)
-            this.parent.deleteFlashcardAtIndex(index, cardIsDue, false);
+        if (this.parent !== null) this.parent.deleteFlashcardAtIndex(index, cardIsDue, false);
     }
 
     notifyCardChanged(oldCardIdx: number, newCard: Card): void {
@@ -693,7 +690,6 @@ export class Deck {
             root = deck;
             deck = deck.parent;
         }
-
 
         root.insertFlashcard(deckName.reverse().slice(1, deckName.length), newCard);
     }
@@ -804,7 +800,7 @@ export class Deck {
             }
             return;
         }
-        
+
         // Actually get next card.
         Heap.heapify(this.flashcards, Deck.comparator);
 
@@ -824,7 +820,7 @@ export class Deck {
 
         if (this.flashcards.length > 0) {
             // TODO: Explain why we needed to "look for first unscheduled sibling"
-            modal.currentCardIdx = 0;  // Heap incorporates randomness based on settings
+            modal.currentCardIdx = 0; // Heap incorporates randomness based on settings
 
             modal.currentCard = this.flashcards[modal.currentCardIdx];
             modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
@@ -901,40 +897,36 @@ export class Deck {
     }
 
     /**
-     * 
+     *
      * @param a One card to compare with another
      * @param b The other card to compare
      * @returns +1 => b should be reviewed first, -1 => a should be reviewed first, 0 => no preference
-    */
-   static comparator(a: Card, b: Card): number {
-       
-       // New cards are reviewed after due cards.
-       if (!a.isDue && !b.isDue)
-       return 0;
-       if (a.isDue && !b.isDue)
-       return -1;
-       if (!a.isDue && b.isDue)
-        return 1;
-        
+     */
+    static comparator(a: Card, b: Card): number {
+        // New cards are reviewed after due cards.
+        if (!a.isDue && !b.isDue) return 0;
+        if (a.isDue && !b.isDue) return -1;
+        if (!a.isDue && b.isDue) return 1;
+
         const now = window.moment(Date.now()).valueOf();
-        
+
         // Both redue
         if (a.isReDue && b.isReDue) {
             const aReviewDelay = a.previousReview + a.interval * 60 * 1000 - now;
             const bReviewDelay = b.previousReview + b.interval * 60 * 1000 - now;
-            
-            return (aReviewDelay < bReviewDelay) ? -1 : 1;
+
+            return aReviewDelay < bReviewDelay ? -1 : 1;
         }
-        
+
         // One redue, other is due
         if (a.isReDue) {
             const aDiff = now - a.previousReview + a.interval * 60 * 1000;
-            return (aDiff > 0) ? 1 : -1;
+            return aDiff > 0 ? 1 : -1;
         } else if (b.isReDue) {
             const bDiff = now - b.previousReview + b.interval * 60 * 1000;
-            return (bDiff > 0) ? -1 : 1;
+            return bDiff > 0 ? -1 : 1;
         }
-        
+
         // Both due, don't care which is reviewed first
         // Currently assume randomness
         // TODO: Access whether to randomize or not
