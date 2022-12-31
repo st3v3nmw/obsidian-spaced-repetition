@@ -422,6 +422,7 @@ export class FlashcardModal extends Modal {
             newCard.interval = interval;
             newCard.ease = ease;
             newCard.delayBeforeReview = interval;
+            newCard.previousReview = window.moment(Date.now()).valueOf();
 
             this.currentDeck.notifyCardChanged(this.currentCardIdx, newCard);
         } else {
@@ -693,10 +694,8 @@ export class Deck {
             deck = deck.parent;
         }
 
-        console.log(deckName);
 
         root.insertFlashcard(deckName.reverse().slice(1, deckName.length), newCard);
-        console.log(root.dueFlashcardsCount);
     }
 
     sortSubdecksList(): void {
@@ -786,7 +785,6 @@ export class Deck {
     }
 
     nextCard(modal: FlashcardModal): void {
-        Heap.heapify(this.flashcards, Deck.comparator);
         if (this.flashcards.length === 0) {
             if (this.dueFlashcardsCount + this.newFlashcardsCount > 0) {
                 for (const deck of this.subdecks) {
@@ -806,6 +804,9 @@ export class Deck {
             }
             return;
         }
+        
+        // Actually get next card.
+        Heap.heapify(this.flashcards, Deck.comparator);
 
         modal.responseDiv.style.display = "none";
         modal.resetLinkView.style.display = "none";
@@ -821,7 +822,6 @@ export class Deck {
             ease: number = modal.plugin.data.settings.baseEase,
             delayBeforeReview = 0;
 
-        // TODO: Need to update below for Heap
         if (this.flashcards.length > 0) {
             // TODO: Explain why we needed to "look for first unscheduled sibling"
             modal.currentCardIdx = 0;  // Heap incorporates randomness based on settings
@@ -900,12 +900,44 @@ export class Deck {
             modal.fileLinkView.setText(modal.currentCard.note.basename);
     }
 
-    // TODO: Access whether to randomize or not
-    static comparator(a: Card, b: Card): number {
-        if (a.isDue && !b.isDue)
-            return 1;
-        if (!a.isDue && b.isDue)
-            return -1;
+    /**
+     * 
+     * @param a One card to compare with another
+     * @param b The other card to compare
+     * @returns +1 => b should be reviewed first, -1 => a should be reviewed first, 0 => no preference
+    */
+   static comparator(a: Card, b: Card): number {
+       
+       // New cards are reviewed after due cards.
+       if (!a.isDue && !b.isDue)
+       return 0;
+       if (a.isDue && !b.isDue)
+       return -1;
+       if (!a.isDue && b.isDue)
+        return 1;
+        
+        const now = window.moment(Date.now()).valueOf();
+        
+        // Both redue
+        if (a.isReDue && b.isReDue) {
+            const aReviewDelay = a.previousReview + a.interval * 60 * 1000 - now;
+            const bReviewDelay = b.previousReview + b.interval * 60 * 1000 - now;
+            
+            return (aReviewDelay < bReviewDelay) ? -1 : 1;
+        }
+        
+        // One redue, other is due
+        if (a.isReDue) {
+            const aDiff = now - a.previousReview + a.interval * 60 * 1000;
+            return (aDiff > 0) ? 1 : -1;
+        } else if (b.isReDue) {
+            const bDiff = now - b.previousReview + b.interval * 60 * 1000;
+            return (bDiff > 0) ? -1 : 1;
+        }
+        
+        // Both due, don't care which is reviewed first
+        // Currently assume randomness
+        // TODO: Access whether to randomize or not
         return 0;
     }
 }

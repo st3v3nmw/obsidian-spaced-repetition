@@ -20,6 +20,7 @@ export interface Card {
     interval?: number;
     ease?: number;
     delayBeforeReview?: number;
+    previousReview?: number;
     // note
     note: TFile;
     lineNo: number;
