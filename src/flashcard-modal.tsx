@@ -230,7 +230,8 @@ export class FlashcardModal extends Modal {
 
         this.responseDiv = this.contentEl.createDiv("sr-response");
 
-        // TODO: Add 'impossible' button. Requires adding for all languages.
+        // TODO: Add 'impossible' button, forcing card to be reviewed no matter length of other buttons.
+        // Requires adding for all languages.
 
         this.hardBtn = document.createElement("button");
         this.hardBtn.setAttribute("id", "sr-hard-btn");
@@ -588,7 +589,6 @@ export class FlashcardModal extends Modal {
     }
 }
 
-// TODO: Update Deck to only contain one stack of flashcards
 export class Deck {
     public deckName: string;
     public flashcards: Card[];
@@ -664,7 +664,6 @@ export class Deck {
         }
     }
 
-    // TODO: May need to delete this?
     deleteFlashcardAtIndex(index: number, cardIsDue: boolean, base = true): void {
         if (base) {
             this.flashcards.splice(index, 1);

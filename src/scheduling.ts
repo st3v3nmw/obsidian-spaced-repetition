@@ -75,7 +75,6 @@ export function schedule(
             ease = Math.max(settingsObj.baseEase, ease - 20);
         }
     } else {
-        // TODO: Change old algorithm to deal with minutes? How?
         if (response === ReviewResponse.Easy) {
             ease += 20;
             interval = ((interval + minutesBeforeReview) * ease) / 100;

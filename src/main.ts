@@ -417,7 +417,6 @@ export default class SRPlugin extends Plugin {
     }
 
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
-        console.log("HAHAHA");
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         const frontmatter: FrontMatterCache | Record<string, unknown> =
             fileCachedData.frontmatter || {};
@@ -756,7 +755,6 @@ export default class SRPlugin extends Plugin {
                 }
             }
 
-            // TODO: Update scheduling information to minutes
             let scheduling: RegExpMatchArray[] = [...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR)];
             if (scheduling.length === 0)
                 scheduling = [...cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];

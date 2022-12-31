@@ -36,7 +36,6 @@
     "dependencies": {
         "chart.js": "^4.0.1",
         "heap": "^0.2.7",
-        "i": "^0.3.7",
         "pagerank.js": "^1.0.2"
     },
     "packageManager": "npm@8.18.0"
