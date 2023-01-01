@@ -7,7 +7,7 @@ and this project (sorta) adheres to [Semantic Versioning](https://semver.org/spe
 
 ## [Unreleased]
 
-## [1.9.2] - 2023-01-01
+## [1.9.2] - 2023-01-02
 
 ### Changed
 
