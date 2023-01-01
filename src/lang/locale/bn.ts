@@ -1,0 +1,3 @@
+// Bengali
+
+export default {};

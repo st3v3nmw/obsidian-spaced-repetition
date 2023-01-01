@@ -1,4 +1,4 @@
-name: Release Obsidian plugin
+name: Release Obsidian Spaced Repetition Plugin
 
 on:
     push:
@@ -31,8 +31,14 @@ jobs:
                   ls
                   echo "::set-output name=tag_name::$(git tag --sort version:refname | tail -n 1)"
 
+            - name: Extract release notes
+              id: extract-release-notes
+              uses: ffurrer2/extract-release-notes@v1
+              with:
+                  changelog_file: docs/CHANGELOG.md
+
             - name: Create Release
-              id: create_release
+              id: create-release
               uses: actions/create-release@v1
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -40,8 +46,9 @@ jobs:
               with:
                   tag_name: ${{ github.ref }}
                   release_name: ${{ github.ref }}
-                  draft: true
+                  draft: false
                   prerelease: false
+                  body: ${{ steps.extract-release-notes.outputs.release_notes }}
 
             - name: Upload zip file
               id: upload-zip
@@ -49,7 +56,7 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  upload_url: ${{ steps.create-release.outputs.upload_url }}
                   asset_path: ./${{ env.PLUGIN_NAME }}.zip
                   asset_name: ${{ env.PLUGIN_NAME }}-${{ steps.build.outputs.tag_name }}.zip
                   asset_content_type: application/zip
@@ -60,7 +67,7 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  upload_url: ${{ steps.create-release.outputs.upload_url }}
                   asset_path: ./build/main.js
                   asset_name: main.js
                   asset_content_type: text/javascript
@@ -71,7 +78,7 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  upload_url: ${{ steps.create-release.outputs.upload_url }}
                   asset_path: ./manifest.json
                   asset_name: manifest.json
                   asset_content_type: application/json
@@ -82,7 +89,7 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  upload_url: ${{ steps.create-release.outputs.upload_url }}
                   asset_path: ./styles.css
                   asset_name: styles.css
                   asset_content_type: text/css
@@ -91,7 +98,7 @@ jobs:
               uses: actions/setup-python@v3
               with:
                   python-version: "3.11"
-            - run: pip install mkdocs mkdocs-static-i18n mkdocs-git-authors-plugin mkdocs-git-revision-date-localized-plugin
-            - run: mkdocs gh-deploy --force --clean --verbose
+            - run: pip install -r requirements.txt
+            - run: mkdocs gh-deploy --clean --verbose
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

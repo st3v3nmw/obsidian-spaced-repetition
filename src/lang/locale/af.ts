@@ -1,0 +1,3 @@
+// Afrikaans
+
+export default {};

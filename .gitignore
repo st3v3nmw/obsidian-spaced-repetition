@@ -27,3 +27,5 @@ coverage
 
 # mkdocs
 site/
+venv/
+.venv/

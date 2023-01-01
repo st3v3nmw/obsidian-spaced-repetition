@@ -1,8 +1,17 @@
+---
+comments: true
+---
+
 # Algorithms
 
 ## SM-2
 
-⚠️ Note that this hasn't been updated in a while, please see the [code](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/src/scheduling.ts).
+[:octicons-tag-24: v1.7.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.7.0)
+
+!!! warning
+
+    Note that this hasn't been updated in a while,
+    please see the [code](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/src/scheduling.ts).
 
 (It's the same as that used for flashcards - apart from the PageRanks)
 
