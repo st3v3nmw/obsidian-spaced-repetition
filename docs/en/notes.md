@@ -1,3 +1,7 @@
+---
+comments: true
+---
+
 # Notes
 
 -   Notes should be atomic i.e. focus on a single concept.
@@ -11,11 +15,15 @@ Tag any notes that you'd like to review as `#review`. This default tag can be ch
 
 ## New Notes
 
+[:octicons-tag-24: v1.6.2](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.6.2)
+
 All "new" notes are listed under `New` on the right pane (Review Queue). Like so:
 
 <img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/new_notes.png" />
 
 ## Reviewing
+
+[:octicons-tag-24: v1.6.1](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.6.1)
 
 Open the file & review it. Once done, choose either the `Review: Easy`, `Review: Good`, or the `Review: Hard` option on the file menu (the three dots). The `Easy`, `Good`, or `Hard` depend on how well you comprehend the material being reviewed.
 
@@ -31,9 +39,13 @@ The note will then be scheduled appropriately:
 
 ### Faster Review
 
+[:octicons-tag-24: v1.2.2](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.2.2)
+
 Commands to open a note for review, and making review responses are provided. You can create custom hotkeys for them in `Settings -> HotKeys`. This allows for much faster review.
 
 ### Review Settings
+
+[:octicons-tag-24: v1.7.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.7.0)
 
 Available settings are:
 
@@ -42,15 +54,21 @@ Available settings are:
 
 ## Scheduled notes
 
+[:octicons-tag-24: v1.4.3](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.4.3)
+
 `Review: N due` on the status bar at the bottom of the screen shows how many notes one has to review today (Today's notes + overdue notes). Clicking on that opens one of the notes for review.
 
 Alternatively, one can use the `Open a note for review` command.
 
 ## Review Queue
 
+[:octicons-tag-24: v1.9.1](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.9.1)
+
 -   Daily review entries are sorted by importance (PageRank)
 
 ## Incremental Writing
+
+[:octicons-tag-24: v1.2.3](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.2.3)
 
 This was introduced [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/15) by `@aviskase`.
 

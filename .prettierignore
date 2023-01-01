@@ -4,4 +4,3 @@ node_modules
 .yarn
 .pnp.cjs
 .pnp.loader.mjs
-docs/cinder

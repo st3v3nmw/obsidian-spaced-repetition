@@ -1,4 +1,10 @@
+---
+comments: true
+---
+
 # Contributing
+
+First off, thanks for wanting to contribute to the Spaced Repetition plugin! Your time and effort is highly appreciated.
 
 ## Bug Reports & Feature Requests
 
@@ -8,17 +14,19 @@
 
 ## Translating
 
+[:octicons-tag-24: v1.8.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.8.0)
+
 ### Steps
 
-To help translate the plugin to another language:
+To help translate the plugin to your language:
 
-1. Fork this repository,
-2. Copy the entries from `src/lang/locale/en.ts` to the proper file in `locales` (i.e. `fr.ts` for French, or `sw.ts` for Swahili),
-3. Translate
-4. Then open a pull request.
+1. Fork the [repository](https://github.com/st3v3nmw/obsidian-spaced-repetition).
+2. Copy the entries from `src/lang/locale/en.ts` to the proper file in `src/lang/locale/` (i.e. `fr.ts` for French, or `sw.ts` for Swahili). The locale codes are [IETF language tags](https://en.wikipedia.org/wiki/IETF_language_tag).
+3. Translate,
+4. Then open a pull request,
 5. & a thank you for your time, much appreciated!
 
-### Translating
+### Example
 
 Sample `en.ts` file:
 
@@ -56,3 +64,80 @@ Please note that:
 2. Text inside `${}` isn't translated. This is used to replace variables in code. For instance, if interval = 4, it becomes `4 days` in English & `Siku 4` in Swahili. Quite nifty if you ask me.
 
 ## Code
+
+1. Make your changes.
+2. Run `npm run dev` to test the changes inside Obsidian.
+3. You could create symbolic links between the build files and the Obsidian vault, example:
+
+    ```bash
+    # remove existing files in the Obsidian vault
+    rm ~/notes/.obsidian/plugins/obsidian-spaced-repetition/main.js ~/notes/.obsidian/plugins/obsidian-spaced-repetition/manifest.json ~/notes/.obsidian/plugins/obsidian-spaced-repetition/styles.css
+    # use absolute paths
+    ln -s /home/stephen/obsidian-spaced-repetition/build/main.js /home/stephen/notes/.obsidian/plugins/obsidian-spaced-repetition
+    ln -s /home/stephen/obsidian-spaced-repetition/manifest.json /home/stephen/notes/.obsidian/plugins/obsidian-spaced-repetition
+    ln -s /home/stephen/obsidian-spaced-repetition/styles.css /home/stephen/notes/.obsidian/plugins/obsidian-spaced-repetition
+    ```
+
+    - Alternatively, you could try the [Hot Reload plugin](https://github.com/pjeby/hot-reload)
+
+4. Document the "user-facing" changes e.g. new feature, UI change, etc.
+5. If your "business logic" is properly decoupled from Obsidian APIs, write some unit tests.
+    - This project uses [jest](https://jestjs.io/), tests are stored in `tests/`.
+    - `npm run test`
+6. Before pushing your changes, run the linter: `npm run lint`.
+    - Format the code in case any warnings are raised: `npm run format`
+7. Open the pull request.
+
+## Documentation
+
+[:octicons-tag-24: v1.9.2](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.9.2)
+
+The documentation consists of Markdown files which [MkDocs](https://www.mkdocs.org/) converts to static web pages.
+These files reside in `docs/` in the respective language's folder. For instance, English docs are located in `docs/en/`.
+
+The docs are served on [https://www.stephenmwangi.com/obsidian-spaced-repetition/](https://www.stephenmwangi.com/obsidian-spaced-repetition/).
+
+For small changes, you can simply open an pull request for merging (against `master`).
+The changes will be live once [a new release is made](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/.github/workflows/release.yml).
+For larger diffs, it's important that you check how your docs look like as explained below.
+
+### Previewing
+
+1. Create a virtual environment: `python3 -m venv venv`
+2. Activate it: `. venv/bin/activate`
+3. Install the required dependencies: `pip install -r requirements.txt`
+4. Serve the docs: `mkdocs serve`
+5. View your documentation locally on [http://127.0.0.1:8000/obsidian-spaced-repetition/](http://127.0.0.1:8000/obsidian-spaced-repetition/), any changes you make will reflect on the browser instantly.
+
+### Translating Documentation
+
+1. Create a folder for your language in `docs/` if it doesn't exist. Use the language codes provided [here](https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/#site-language).
+2. Add the code from (1) to the MkDocs configuration (`mkdocs.yml` - `plugins.i18n.languages`).
+3. Copy the files from the English (`en`) folder into the new folder.
+4. Translate then open a pull request.
+5. & a thank you for your time, much appreciated!
+
+## Making Releases
+
+[:octicons-tag-24: v1.9.2](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.9.2)
+
+This section is for maintainers only.
+
+Example using `v1.9.2`:
+
+1. Create a new branch: `git switch -c release-v1.9.2`
+2. Bump the plugin version in `manifest.json` and `package.json` (following [Semantic Versioning](https://semver.org/spec/v2.0.0.html)).
+    - If the new version uses new Obsidian APIs, update `minAppVersion` and `versions.json` to reflect this.
+3. Update the changelog (`docs/changelog.md`) - use the new version to replace the `[Unreleased]` section.
+4. Commit and push the changes:
+
+    ```bash
+    git add .
+    git commit -m "Bump version to v1.9.2"
+    git push --set-upstream origin release-v1.9.2
+    ```
+
+5. Open and merge the PR into `master`.
+6. Locally, switch back to `master` and pull the changes: `git switch master && git pull`
+7. Create a git tag with the version: `git tag 1.9.2`
+8. Push the tag: `git push --tags`. You're all set! The [GitHub action](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/.github/workflows/release.yml) should pick this up, create a release, publish it, and update the live documentation.
