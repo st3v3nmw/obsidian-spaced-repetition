@@ -181,6 +181,8 @@ You can wrap flashcards in HTML comments e.g. `<!--Card text <!--SR:2021-08-20,1
 
 [:octicons-tag-24: v1.7.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.7.0)
 
+Currently, the only supported method is "cramming" all cards in a note using the Cram flashcards in this note command. Will work on a per-deck across-all-notes method.
+
 ## Statistics
 
 [:octicons-tag-24: v1.7.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.7.0)
