@@ -3,7 +3,7 @@
     text-decoration: underline;
     cursor: pointer;
     margin-bottom: 16px;
-    display: inline-block;
+    width: max-content;
 }
 
 .sr-response {
@@ -41,7 +41,6 @@
     background-color: transparent !important;
     box-shadow: none !important;
     padding: 0 !important;
-    margin-right: 4px;
 }
 
 #sr-show-answer {
@@ -97,7 +96,20 @@
     user-select: text;
 }
 
+#chartPeriod {
+    appearance: menulist;
+    border-right: 8px solid transparent;
+}
+
 @media only screen and (max-width: 600px) {
+    .sr-back-btn {
+        width: initial !important;
+    }
+
+    .sr-modal-content {
+        width: 98% !important;
+    }
+
     .sr-modal-content::-webkit-scrollbar,
     #sr-flashcard-view::-webkit-scrollbar {
         display: none;
@@ -105,7 +117,8 @@
 
     .sr-response,
     #sr-show-answer {
-        width: 95% !important;
+        width: 93.5% !important;
+        line-height: 60px;
     }
 
     #sr-hard-btn,

@@ -6,8 +6,6 @@ comments: true
 
 ## SM-2
 
-[:octicons-tag-24: v1.7.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.7.0)
-
 !!! warning
 
     Note that this hasn't been updated in a while,

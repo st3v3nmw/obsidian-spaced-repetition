@@ -2,13 +2,9 @@
 comments: true
 ---
 
-# Obsidian Spaced Repetition Plugin
+# Obsidian Spaced Repetition
 
 <img src="https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/total" /> <img src="https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/latest/total?style=flat-square" /> <img src="https://img.shields.io/github/manifest-json/v/st3v3nmw/obsidian-spaced-repetition?style=flat-square" />
-
-!!! warning
-
-    These docs are a bit outdated. Updates will follow soon.
 
 Fight the forgetting curve & note aging by reviewing flashcards & notes using spaced repetition on Obsidian.md
 
@@ -16,17 +12,22 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
 -   Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/2/) for upcoming features & fixes.
 -   Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug-report.
 -   Visit the [discussions](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/) section for Q&A help, feedback, and general discussion.
--   The plugin has been translated into
-    _Chinese (Simplified) / 简体中文 - [:octicons-tag-24: v1.9.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.9.0),_
-    _Chinese (Traditional) / 繁體中文 - [:octicons-tag-24: v1.9.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.9.0),_
-    _Czech / čeština - [:octicons-tag-24: v1.7.2](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.7.2),_
-    _German / Deutsch - [:octicons-tag-24: v1.7.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.7.0),_
-    _Korean / 한국어 - [:octicons-tag-24: v1.8.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.8.0),_
-    _Japanese / 日本語 - [:octicons-tag-24: v1.7.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.7.0),_
-    _Portuguese (Brazil) / Português do Brasil - [:octicons-tag-24: v1.9.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.9.0)_
-    and _Russian / русский - [:octicons-tag-24: v1.8.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.8.0)_
-    by the Obsidian community 😄.
-    -   To help translate this plugin to your language, check the [translation guide here](/obsidian-spaced-repetition/contributing/#translating).
+-   The plugin has been translated into _Chinese (Simplified) / 简体中文, Chinese (Traditional) / 繁體中文, Czech / čeština, German / Deutsch, Korean / 한국어, Japanese / 日本語, Portuguese (Brazil) / Português do Brasil and Russian / русский_ by the Obsidian community 😄.
+    -   To help translate this plugin to your language, check the [translation guide here](https://www.stephenmwangi.com/obsidian-spaced-repetition/contributing/#translating_1).
+
+## Quick Demo
+
+<video controls>
+  <source src="https://user-images.githubusercontent.com/43380836/115256965-5d455f00-a138-11eb-988f-27ba29f328a0.mp4" type="video/mp4">
+</video>
+
+## Installation
+
+You can easily install the plugin from Obsidian's community plugin section in the Obsidian app (Search for `Spaced Repetition`).
+
+### Manual Installation
+
+Create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your vault. Add the `main.js`, `manifest.json`, and the `styles.css` files from the [latest release](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases) to the folder.
 
 ## Resources
 

@@ -10,8 +10,6 @@ comments: true
 
 ### Single-line Basic (Remnote style)
 
-[:octicons-tag-24: v1.4.6](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.4.6)
-
 The prompt and the answer are separated by `::` (this can be configured in settings).
 
 ```markdown
@@ -19,8 +17,6 @@ the question goes on this side::answer goes here!
 ```
 
 ### Single-line Reversed
-
-[:octicons-tag-24: v1.6.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.6.0)
 
 Creates two cards `side1:::side2` & the reversed version `side2:::side1`.
 
@@ -31,8 +27,6 @@ the question goes on this side:::answer goes here!
 ```
 
 ### Multi-line Basic
-
-[:octicons-tag-24: v1.7.1](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.7.1)
 
 The front and the back of the card are separated by `?` (this can be configured in settings).
 
@@ -54,8 +48,6 @@ the answer
 ```
 
 ### Multi-line Reversed
-
-[:octicons-tag-24: v1.7.1](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.7.1)
 
 Creates two cards `side1??side2` & the reversed version `side2??side1`.
 
@@ -80,8 +72,6 @@ the answer
 
 ### Cloze cards
 
-[:octicons-tag-24: v1.9.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.9.0)
-
 You can easily add cloze deletion cards using `==highlights==`, `**bolded text**`, or `{{text in curly braces}}`.
 
 These can be turned on or off in settings.
@@ -90,15 +80,11 @@ Anki style `{{c1:This text}} would {{c2:generate}} {{c1:2 cards}}` cloze deletio
 
 ## Decks
 
-[:octicons-tag-24: v1.9.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.9.0)
-
 ![Screenshot from 2021-06-05 19-28-24](https://user-images.githubusercontent.com/43380836/120922211-78603400-c6d0-11eb-9d09-bdd5df1c9112.png)
 
 The green and blue counts on the right of each deck name represent due and new cards respectively.
 
 ### Using Obsidian Tags
-
-[:octicons-tag-24: v1.7.2](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.7.2)
 
 1. Specify flashcard tags in settings (`#flashcards` is the default).
 2. Tag any notes that you'd like to put flashcards using said tags.
@@ -109,15 +95,11 @@ Note that `#flashcards` will match nested tags like `#flashcards/subdeck/subdeck
 
 ### Using Folder Structure
 
-[:octicons-tag-24: v1.5.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.5.0)
-
 The plugin will automatically search for folders that contain flashcards & use their paths to create decks & sub-decks i.e. `Folder/sub-folder/sub-sub-folder` ⇔ `Deck/sub-deck/sub-sub-deck`.
 
 This is an alternative to the tagging option and can be enabled in settings.
 
 ## Reviewing
-
-[:octicons-tag-24: v1.9.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.9.0)
 
 Once done creating cards, click on the flashcards button on the left ribbon to start reviewing the flashcards. After a card is reviewed, a HTML comment is added containing the next review day, the interval, and the card's ease.
 
@@ -131,8 +113,6 @@ Note that you can skip a card by simply pressing `S` (case doesn't matter).
 
 ### Faster Review
 
-[:octicons-tag-24: v1.4.5](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.4.5)
-
 To review faster, use the following keyboard shortcuts:
 
 -   `Space/Enter` => Show answer
@@ -142,8 +122,6 @@ To review faster, use the following keyboard shortcuts:
 -   `3` => Review as `Easy`
 
 ### Context
-
-[:octicons-tag-24: v1.4.7](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.4.7)
 
 If the parent note has heading(s), the flashcard will have a title containing the context.
 
@@ -173,19 +151,13 @@ To delete a card, simply delete the scheduling information & the card text.
 
 ### Ignoring cards
 
-[:octicons-tag-24: v1.7.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.7.0)
-
 You can wrap flashcards in HTML comments e.g. `<!--Card text <!--SR:2021-08-20,13,290--> -->` to prevent it from showing up in your review queues. You can always remove the wrapping comment later.
 
 ## Cramming
 
-[:octicons-tag-24: v1.7.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.7.0)
-
 Currently, the only supported method is "cramming" all cards in a note using the Cram flashcards in this note command. Will work on a per-deck across-all-notes method.
 
 ## Statistics
-
-[:octicons-tag-24: v1.7.0](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases/tag/1.7.0)
 
 The statistics section can be accessed using the `View Statistics` command.
 
