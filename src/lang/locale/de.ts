@@ -9,13 +9,20 @@ export default {
     DUE_CARDS: "Anstehende Karten",
     NEW_CARDS: "Neue Karten",
     TOTAL_CARDS: "Alle Karten",
-    EDIT_LATER: "Später bearbeiten",
+    BACK: "Back",
+    EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "Kartenfortschritt zurücksetzten",
     HARD: "Schwer",
     GOOD: "Gut",
     EASY: "Einfach",
     SHOW_ANSWER: "Zeige Antwort",
     CARD_PROGRESS_RESET: "Kartenfortschritt wurde zurückgesetzt.",
+    SAVE: "Save",
+    CANCEL: "Cancel",
+    NO_INPUT: "No input provided.",
+    CURRENT_EASE_HELP_TEXT: "Current Ease: ",
+    CURRENT_INTERVAL_HELP_TEXT: "Current Interval: ",
+    CARD_GENERATED_FROM: "Generated from: ${notePath}",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Notiz zur Wiederholung öffnen",
@@ -81,8 +88,6 @@ export default {
         "Auf kleinen Bildschirmen (z.B. Smartphones) oder bei sehr grossen Bildern sollte dieser Wert auf 100% gesetzt werden.",
     RESET_DEFAULT: "Standardeinstellung wiederherstellen",
     CARD_MODAL_WIDTH_PERCENT: "Breite einer Lernkarte in Prozent",
-    FILENAME_OR_OPEN_FILE:
-        "Während der Wiederholung den Notiznamen statt 'Später bearbeiten' anzeigen?",
     RANDOMIZE_CARD_ORDER: "Während der Wiederhoung die Reihenfolge zufällig mischen?",
     DISABLE_CLOZE_CARDS: "Lückentextkarten (cloze deletions) deaktivieren?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==Hervorgehobenen== Text in Lückentextkarten umwandeln?",
@@ -96,6 +101,7 @@ export default {
     MULTILINE_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige Lernkarten",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige beidseitige Lernkarten",
     NOTES: "Notizen",
+    REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "Zu wiederholende Tags",
     TAGS_TO_REVIEW_DESC:
         "Mehrere Tags können mit Leerzeichen oder Zeilenumbrüchen getrennt angegeben werden. Bsp. #karte #tag1 #tag2.",

@@ -7,13 +7,20 @@ export default {
     DUE_CARDS: "Cartas para Colocar em Dia",
     NEW_CARDS: "Novas Cartas",
     TOTAL_CARDS: "Total de Cartas",
-    EDIT_LATER: "Editar Depois",
+    BACK: "Back",
+    EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "Reiniciar o Progresso da Carta",
     HARD: "Difícil",
     GOOD: "OK",
     EASY: "Fácil",
     SHOW_ANSWER: "Mostrar Resposta",
     CARD_PROGRESS_RESET: "O Progresso da Carta foi reiniciado",
+    SAVE: "Save",
+    CANCEL: "Cancel",
+    NO_INPUT: "No input provided.",
+    CURRENT_EASE_HELP_TEXT: "Current Ease: ",
+    CURRENT_INTERVAL_HELP_TEXT: "Current Interval: ",
+    CARD_GENERATED_FROM: "Generated from: ${notePath}",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Abrir uma nota para revisar",
@@ -78,8 +85,6 @@ export default {
         "Deveria estar configurado em 100% em dispositivos móveis ou se você tem imagens muito grandes",
     RESET_DEFAULT: "Reiniciar para a pré-definição",
     CARD_MODAL_WIDTH_PERCENT: "Porcentagem de Largura do Flashcard",
-    FILENAME_OR_OPEN_FILE:
-        "Mostrar o nome do arquivo ao invés de 'Editar Depois' na revisão dos flashcards?",
     RANDOMIZE_CARD_ORDER: "Aleatorizar a ordem das cartas durante a revisão?",
     DISABLE_CLOZE_CARDS: "Desabilitar cartas que usam omissão de palavras?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Converter ==marca-texto== em omissões?",
@@ -92,6 +97,7 @@ export default {
     MULTILINE_CARDS_SEPARATOR: "Separador para flashcards de múltiplas linhas",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Separador para flashcards de múltiplas linhas reversos",
     NOTES: "Notas",
+    REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "Etiquetas para revisar",
     TAGS_TO_REVIEW_DESC:
         "Ensira etiquetas separadas por espaços ou quebra de linhas ex: #revisar #etiqueta2 #etiqueta3.",

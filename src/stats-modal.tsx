@@ -51,8 +51,9 @@ export class StatsModal extends Modal {
         this.plugin = plugin;
 
         this.titleEl.setText(`${t("STATS_TITLE")} `);
+        this.titleEl.addClass("sr-centered");
         this.titleEl.innerHTML += (
-            <select id="chartPeriod">
+            <select id="sr-chart-period">
                 <option value="month" selected>
                     {t("MONTH")}
                 </option>
@@ -99,16 +100,18 @@ export class StatsModal extends Modal {
             <div>
                 <canvas id="forecastChart"></canvas>
                 <span id="forecastChartSummary"></span>
-                <p></p>
+                <br />
+                <br />
                 <canvas id="intervalsChart"></canvas>
                 <span id="intervalsChartSummary"></span>
-                <p></p>
+                <br />
+                <br />
                 <canvas id="easesChart"></canvas>
                 <span id="easesChartSummary"></span>
-                <p></p>
-                <div style="width: 50%; margin: auto;">
-                    <canvas id="cardTypesChart"></canvas>
-                </div>
+                <br />
+                <br />
+                <canvas id="cardTypesChart"></canvas>
+                <br />
                 <span id="cardTypesChartSummary"></span>
             </div>
         );
@@ -230,6 +233,9 @@ function createStatsChart(
     xAxisTitle = "",
     yAxisTitle = ""
 ) {
+    const style = getComputedStyle(document.body);
+    const textColor = style.getPropertyValue("--text-normal");
+
     let scales = {},
         backgroundColor = ["#2196f3"];
     if (type !== "pie") {
@@ -238,12 +244,14 @@ function createStatsChart(
                 title: {
                     display: true,
                     text: xAxisTitle,
+                    color: textColor,
                 },
             },
             y: {
                 title: {
                     display: true,
                     text: yAxisTitle,
+                    color: textColor,
                 },
             },
         };
@@ -274,23 +282,27 @@ function createStatsChart(
                     font: {
                         size: 22,
                     },
+                    color: textColor,
                 },
                 subtitle: {
                     display: true,
                     text: subtitle,
                     font: {
                         size: 16,
+                        style: "italic",
                     },
+                    color: textColor,
                 },
                 legend: {
                     display: false,
                 },
             },
+            aspectRatio: 2,
         },
     });
 
     if (shouldFilter) {
-        const chartPeriodEl = document.getElementById("chartPeriod") as HTMLSelectElement;
+        const chartPeriodEl = document.getElementById("sr-chart-period") as HTMLSelectElement;
         chartPeriodEl.addEventListener("click", () => {
             let filteredLabels, filteredData;
             const chartPeriod = chartPeriodEl.value;

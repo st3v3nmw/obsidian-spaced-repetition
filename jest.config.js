@@ -2,7 +2,7 @@
 module.exports = {
     preset: "ts-jest",
     testEnvironment: "jsdom",
-    setupFilesAfterEnv: ["jest-27-expect-message"],
+    setupFilesAfterEnv: ["jest-expect-message"],
     moduleNameMapper: {
         "src/(.*)": "<rootDir>/src/$1",
     },
@@ -15,6 +15,8 @@ module.exports = {
         "src/constants",
         "src/icons",
         "src/declarations.d.ts",
+        "build",
     ],
     coverageDirectory: "coverage",
+    collectCoverage: true,
 };

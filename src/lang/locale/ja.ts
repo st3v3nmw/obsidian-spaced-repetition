@@ -6,13 +6,20 @@ export default {
     DUE_CARDS: "期日のカード",
     NEW_CARDS: "新規のカード",
     TOTAL_CARDS: "カード合計",
-    EDIT_LATER: "後で編集",
+    BACK: "Back",
+    EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "カードの進捗をリセット",
     HARD: "Hard",
     GOOD: "Good",
     EASY: "Easy",
     SHOW_ANSWER: "解答を表示",
     CARD_PROGRESS_RESET: "カードの進捗がリセットされました。",
+    SAVE: "Save",
+    CANCEL: "Cancel",
+    NO_INPUT: "No input provided.",
+    CURRENT_EASE_HELP_TEXT: "Current Ease: ",
+    CURRENT_INTERVAL_HELP_TEXT: "Current Interval: ",
+    CARD_GENERATED_FROM: "Generated from: ${notePath}",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "レビューするノートを開く",
@@ -78,8 +85,6 @@ export default {
         "モバイル版、または非常に大きなサイズの画像がある場合には100%にする必要があります。",
     RESET_DEFAULT: "デフォルト値にリセットする",
     CARD_MODAL_WIDTH_PERCENT: "フラッシュカードの横サイズのパーセンテージ",
-    FILENAME_OR_OPEN_FILE:
-        "フラッシュカードレビューで｢後で編集｣の代わりにファイル名を表示しますか？",
     RANDOMIZE_CARD_ORDER: "レビュー中のカードの順番をランダムにしますか？",
     DISABLE_CLOZE_CARDS: "穴埋めカードを無効化しますか？",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==ハイライト==を穴埋めとして使用しますか？",
@@ -92,6 +97,7 @@ export default {
     MULTILINE_CARDS_SEPARATOR: "複数行のフラッシュカードに使用するセパレーター",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "複数行の表裏反転フラッシュカードに使用するセパレーター",
     NOTES: "ノート",
+    REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "レビューに使用するタグ",
     TAGS_TO_REVIEW_DESC:
         'タグをスペースまたは改行で区切って入力してください。例: "#review #tag2 #tag3"',

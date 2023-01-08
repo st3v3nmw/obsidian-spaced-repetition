@@ -14,7 +14,6 @@ export interface SRSettings {
     showContextInCards: boolean;
     flashcardHeightPercentage: number;
     flashcardWidthPercentage: number;
-    showFileNameInFileLink: boolean;
     randomizeCardOrder: boolean;
     convertHighlightsToClozes: boolean;
     convertBoldTextToClozes: boolean;
@@ -23,6 +22,7 @@ export interface SRSettings {
     singleLineReversedCardSeparator: string;
     multilineCardSeparator: string;
     multilineReversedCardSeparator: string;
+    editLaterTag: string;
     // notes
     enableNoteReviewPaneOnStartup: boolean;
     tagsToReview: string[];
@@ -55,7 +55,6 @@ export const DEFAULT_SETTINGS: SRSettings = {
     showContextInCards: true,
     flashcardHeightPercentage: Platform.isMobile ? 100 : 80,
     flashcardWidthPercentage: Platform.isMobile ? 100 : 40,
-    showFileNameInFileLink: false,
     randomizeCardOrder: true,
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
@@ -64,6 +63,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     singleLineReversedCardSeparator: ":::",
     multilineCardSeparator: "?",
     multilineReversedCardSeparator: "??",
+    editLaterTag: "#edit-later",
     // notes
     enableNoteReviewPaneOnStartup: true,
     tagsToReview: ["#review"],
@@ -73,7 +73,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     disableFileMenuReviewOptions: false,
     maxNDaysNotesReviewQueue: 365,
     // UI settings
-    initiallyExpandAllSubdecksInTree: true,
+    initiallyExpandAllSubdecksInTree: false,
     // algorithm
     baseEase: 250,
     lapsesIntervalChange: 0.5,
@@ -104,10 +104,11 @@ export class SRSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
-        containerEl.createEl("h2", { text: `${t("SETTINGS_HEADER")}` });
+        const header = containerEl.createEl("h1", { text: `${t("SETTINGS_HEADER")}` });
+        header.addClass("sr-centered");
 
         containerEl.createDiv().innerHTML = t("CHECK_WIKI", {
-            wiki_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki",
+            wiki_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/",
         });
 
         new Setting(containerEl)
@@ -240,15 +241,6 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
-
-        new Setting(containerEl).setName(t("FILENAME_OR_OPEN_FILE")).addToggle((toggle) =>
-            toggle
-                .setValue(this.plugin.data.settings.showFileNameInFileLink)
-                .onChange(async (value) => {
-                    this.plugin.data.settings.showFileNameInFileLink = value;
-                    await this.plugin.savePluginData();
-                })
-        );
 
         new Setting(containerEl).setName(t("RANDOMIZE_CARD_ORDER")).addToggle((toggle) =>
             toggle
@@ -566,8 +558,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         containerEl.createEl("h3", { text: `${t("ALGORITHM")}` });
         containerEl.createDiv().innerHTML = t("CHECK_ALGORITHM_WIKI", {
-            algo_url:
-                "https://github.com/st3v3nmw/obsidian-spaced-repetition/wiki/Spaced-Repetition-Algorithm",
+            algo_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
         });
 
         new Setting(containerEl)

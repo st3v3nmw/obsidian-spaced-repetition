@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, Menu, TFile, Notice } from "obsidian";
+import { ItemView, WorkspaceLeaf, Menu, TFile } from "obsidian";
 
 import type SRPlugin from "src/main";
 import { COLLAPSE_ICON } from "src/constants";

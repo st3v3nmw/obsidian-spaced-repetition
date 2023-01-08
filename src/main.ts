@@ -97,13 +97,6 @@ export default class SRPlugin extends Plugin {
             }
         });
 
-        if (this.data.settings.enableNoteReviewPaneOnStartup) {
-            this.registerView(
-                REVIEW_QUEUE_VIEW_TYPE,
-                (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this))
-            );
-        }
-
         if (!this.data.settings.disableFileMenuReviewOptions) {
             this.registerEvent(
                 this.app.workspace.on("file-menu", (menu, fileish: TAbstractFile) => {
@@ -669,6 +662,10 @@ export default class SRPlugin extends Plugin {
                 lineNo: number = parsedCard[2];
             let cardText: string = parsedCard[1];
 
+            if (cardText.includes(settings.editLaterTag)) {
+                continue;
+            }
+
             if (!settings.convertFoldersToDecks) {
                 const tagInCardRegEx = /^#[^\s#]+/gi;
                 const cardDeckPath = cardText
@@ -808,6 +805,7 @@ export default class SRPlugin extends Plugin {
                     cardType,
                     siblingIdx: i,
                     siblings,
+                    editLater: false,
                 };
 
                 // card scheduled
@@ -900,11 +898,20 @@ export default class SRPlugin extends Plugin {
     }
 
     initView(): void {
-        if (this.data.settings.enableNoteReviewPaneOnStartup)
+        this.registerView(
+            REVIEW_QUEUE_VIEW_TYPE,
+            (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this))
+        );
+
+        if (
+            this.data.settings.enableNoteReviewPaneOnStartup &&
+            app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).length == 0
+        ) {
             this.app.workspace.getRightLeaf(false).setViewState({
                 type: REVIEW_QUEUE_VIEW_TYPE,
                 active: true,
             });
+        }
     }
 }
 

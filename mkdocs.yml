@@ -1,0 +1,65 @@
+site_name: Obsidian Spaced Repetition
+site_url: https://www.stephenmwangi.com/obsidian-spaced-repetition/
+site_author: Stephen Mwangi
+site_description: >-
+    Documentation for the Obsidian Spaced Repetition plugin
+
+repo_name: st3v3nmw/obsidian-spaced-repetition
+repo_url: https://github.com/st3v3nmw/obsidian-spaced-repetition/
+edit_uri: ""
+
+theme:
+    name: material
+    custom_dir: docs/overrides
+    logo: assets/favicon.ico
+    favicon: assets/favicon.ico
+    icon:
+        repo: fontawesome/brands/github
+    palette:
+        - scheme: default
+          toggle:
+              icon: material/brightness-7
+              name: Switch to dark mode
+        - scheme: slate
+          toggle:
+              icon: material/brightness-4
+              name: Switch to light mode
+    features:
+        - navigation.top
+        - toc.follow
+
+nav:
+    - Index: index.md
+    - Flashcards: flashcards.md
+    - Notes: notes.md
+    - Contributing: contributing.md
+    - Algorithms: algorithms.md
+    - Changelog: changelog.md
+    - License: license.md
+
+plugins:
+    - search
+    - i18n:
+          docs_structure: folder
+          languages:
+              en: English
+          default_language: en
+
+markdown_extensions:
+    - toc:
+          permalink: true
+    - pymdownx.highlight:
+          anchor_linenums: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - admonition
+    - pymdownx.details
+    - pymdownx.superfences
+    - attr_list
+    - footnotes
+    - pymdownx.emoji:
+          emoji_index: !!python/name:materialx.emoji.twemoji
+          emoji_generator: !!python/name:materialx.emoji.to_svg
+
+remote_branch: gh-pages
+remote_name: origin
