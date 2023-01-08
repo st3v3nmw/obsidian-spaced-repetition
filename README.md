@@ -19,7 +19,7 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
     -   [Single-line reversed style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#single-line-reversed) (`Question:::Answer`)
     -   [Multi-line style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#multi-line-basic) (Separated by `?`)
     -   [Multi-line reversed style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#multi-line-reversed) (Separated by `??`)
-    -   [Cloze cards](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#cloze-cards) (`==highlight==` your cloze deletions!, or `**bolded text**`)
+    -   [Cloze cards](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#cloze-cards) (`==highlight==` your cloze deletions!, `**bolded text**`, or `{{text in curly braces}}`)
     -   [Card context - automatic titles based on headings](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#context) (i.e. `Note title > Heading 1 > Subheading`)
     -   Rich text support in flashcards (inherited from Obsidian)
         -   Images, Audio, & Video
@@ -36,14 +36,6 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
 https://user-images.githubusercontent.com/43380836/115256965-5d455f00-a138-11eb-988f-27ba29f328a0.mp4
 
 (if the screencast video doesn't play, check it out on the project's [README](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/README.md) on GitHub)
-
-## Installation
-
-You can easily install the plugin from Obsidian's community plugin section in the Obsidian app (Search for `Spaced Repetition`).
-
-### Manual Installation
-
-Create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your vault. Add the `main.js`, `manifest.json`, and the `styles.css` files from the [latest release](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases) to the folder.
 
 ## Usage
 

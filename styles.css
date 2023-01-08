@@ -4,6 +4,7 @@
     cursor: pointer;
     margin-bottom: 16px;
     width: max-content;
+    display: inline-block;
 }
 
 .sr-response {
@@ -41,6 +42,8 @@
     background-color: transparent !important;
     box-shadow: none !important;
     padding: 0 !important;
+    cursor: pointer;
+    display: block;
 }
 
 #sr-show-answer {
@@ -69,6 +72,7 @@
     height: 48px;
     margin: auto;
     color: #ffffff;
+    cursor: pointer;
 }
 
 #sr-hard-btn {
