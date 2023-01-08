@@ -10,6 +10,10 @@
         "lint": "npx prettier --check . && npx eslint src/",
         "test": "jest --verbose --runInBand"
     },
+    "keywords": [
+        "obsidian",
+        "spaced-repetition"
+    ],
     "author": "Stephen Mwangi",
     "license": "MIT",
     "devDependencies": {

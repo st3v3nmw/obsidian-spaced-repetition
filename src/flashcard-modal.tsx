@@ -1,12 +1,12 @@
 import {
+    ButtonComponent,
     Modal,
     App,
     MarkdownRenderer,
     Notice,
     Platform,
     TFile,
-    MarkdownView,
-    WorkspaceLeaf,
+    TextAreaComponent,
 } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
@@ -31,6 +31,128 @@ export enum FlashcardModalMode {
     Closed,
 }
 
+// from https://github.com/chhoumann/quickadd/blob/bce0b4cdac44b867854d6233796e3406dfd163c6/src/gui/GenericInputPrompt/GenericInputPrompt.ts#L5
+export class FlashcardEditModal extends Modal {
+    public plugin: SRPlugin;
+    public input: string;
+    public waitForClose: Promise<string>;
+
+    private resolvePromise: (input: string) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private rejectPromise: (reason?: any) => void;
+    private didSubmit = false;
+    private inputComponent: TextAreaComponent;
+    private readonly modalText: string;
+
+    public static Prompt(app: App, plugin: SRPlugin, placeholder: string): Promise<string> {
+        const newPromptModal = new FlashcardEditModal(app, plugin, placeholder);
+        return newPromptModal.waitForClose;
+    }
+    constructor(app: App, plugin: SRPlugin, existingText: string) {
+        super(app);
+        this.plugin = plugin;
+        this.titleEl.setText("Edit Card");
+        this.modalText = existingText;
+
+        this.waitForClose = new Promise<string>((resolve, reject) => {
+            this.resolvePromise = resolve;
+            this.rejectPromise = reject;
+        });
+        this.display();
+        this.open();
+    }
+
+    private display() {
+        this.contentEl.empty();
+        this.titleEl.textContent = "Edit Flashcard";
+        this.modalEl.addClass("sr-input-modal");
+
+        const mainContentContainer: HTMLDivElement = this.contentEl.createDiv();
+        mainContentContainer.addClass("sr-input-area");
+        this.inputComponent = this.createInputField(mainContentContainer, this.modalText);
+        this.createButtonBar(mainContentContainer);
+    }
+
+    private createButton(
+        container: HTMLElement,
+        text: string,
+        callback: (evt: MouseEvent) => void
+    ) {
+        const btn = new ButtonComponent(container);
+        btn.setButtonText(text).onClick(callback);
+
+        return btn;
+    }
+
+    private createButtonBar(mainContentContainer: HTMLDivElement) {
+        const buttonBarContainer: HTMLDivElement = mainContentContainer.createDiv();
+        this.createButton(
+            buttonBarContainer,
+            "Ok",
+            this.submitClickCallback
+        ).setCta().buttonEl.style.marginRight = "0";
+        this.createButton(buttonBarContainer, "Cancel", this.cancelClickCallback);
+
+        buttonBarContainer.style.display = "flex";
+        buttonBarContainer.style.flexDirection = "row-reverse";
+        buttonBarContainer.style.justifyContent = "flex-start";
+        buttonBarContainer.style.marginTop = "1rem";
+    }
+
+    protected createInputField(container: HTMLElement, value: string) {
+        const textComponent = new TextAreaComponent(container);
+
+        textComponent.inputEl.style.width = "100%";
+        textComponent
+            .setValue(value ?? "")
+            .onChange((value) => (this.input = value))
+            .inputEl.addEventListener("keydown", this.submitEnterCallback);
+
+        return textComponent;
+    }
+
+    private submitClickCallback = (_: MouseEvent) => this.submit();
+    private cancelClickCallback = (_: MouseEvent) => this.cancel();
+
+    private submitEnterCallback = (evt: KeyboardEvent) => {
+        if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter") {
+            evt.preventDefault();
+            this.submit();
+        }
+    };
+
+    private submit() {
+        this.didSubmit = true;
+
+        this.close();
+    }
+
+    private cancel() {
+        this.close();
+    }
+
+    onOpen() {
+        super.onOpen();
+
+        this.inputComponent.inputEl.focus();
+    }
+
+    onClose() {
+        super.onClose();
+        this.resolveInput();
+        this.removeInputListener();
+    }
+
+    private resolveInput() {
+        if (!this.didSubmit) this.rejectPromise("No input given.");
+        else this.resolvePromise(this.input);
+    }
+
+    private removeInputListener() {
+        this.inputComponent.inputEl.removeEventListener("keydown", this.submitEnterCallback);
+    }
+}
+
 export class FlashcardModal extends Modal {
     public plugin: SRPlugin;
     public answerBtn: HTMLElement;
@@ -42,6 +164,7 @@ export class FlashcardModal extends Modal {
     public responseDiv: HTMLElement;
     public fileLinkView: HTMLElement;
     public resetLinkView: HTMLElement;
+    public editLinkView: HTMLElement;
     public contextView: HTMLElement;
     public currentCard: Card;
     public currentCardIdx: number;
@@ -69,29 +192,38 @@ export class FlashcardModal extends Modal {
         this.contentEl.style.height = "92%";
         this.contentEl.addClass("sr-modal-content");
 
+        // TODO: refactor into event handler?
         document.body.onkeydown = (e) => {
-            if (this.mode !== FlashcardModalMode.DecksList) {
-                if (this.mode !== FlashcardModalMode.Closed && e.code === "KeyS") {
-                    this.currentDeck.deleteFlashcardAtIndex(
-                        this.currentCardIdx,
-                        this.currentCard.isDue
-                    );
-                    this.burySiblingCards(false);
-                    this.currentDeck.nextCard(this);
-                } else if (
-                    this.mode === FlashcardModalMode.Front &&
-                    (e.code === "Space" || e.code === "Enter")
-                ) {
-                    this.showAnswer();
-                } else if (this.mode === FlashcardModalMode.Back) {
-                    if (e.code === "Numpad1" || e.code === "Digit1") {
-                        this.processReview(ReviewResponse.Hard);
-                    } else if (e.code === "Numpad2" || e.code === "Digit2" || e.code === "Space") {
-                        this.processReview(ReviewResponse.Good);
-                    } else if (e.code === "Numpad3" || e.code === "Digit3") {
-                        this.processReview(ReviewResponse.Easy);
-                    } else if (e.code === "Numpad0" || e.code === "Digit0") {
-                        this.processReview(ReviewResponse.Reset);
+            // TODO: Please fix this. Is ugly.
+            // Checks if the input textbox is in focus before processing keyboard shortcuts.
+            if (document.activeElement.nodeName != "TEXTAREA") {
+                if (this.mode !== FlashcardModalMode.DecksList) {
+                    if (this.mode !== FlashcardModalMode.Closed && e.code === "KeyS") {
+                        this.currentDeck.deleteFlashcardAtIndex(
+                            this.currentCardIdx,
+                            this.currentCard.isDue
+                        );
+                        this.burySiblingCards(false);
+                        this.currentDeck.nextCard(this);
+                    } else if (
+                        this.mode === FlashcardModalMode.Front &&
+                        (e.code === "Space" || e.code === "Enter")
+                    ) {
+                        this.showAnswer();
+                    } else if (this.mode === FlashcardModalMode.Back) {
+                        if (e.code === "Numpad1" || e.code === "Digit1") {
+                            this.processReview(ReviewResponse.Hard);
+                        } else if (
+                            e.code === "Numpad2" ||
+                            e.code === "Digit2" ||
+                            e.code === "Space"
+                        ) {
+                            this.processReview(ReviewResponse.Good);
+                        } else if (e.code === "Numpad3" || e.code === "Digit3") {
+                            this.processReview(ReviewResponse.Easy);
+                        } else if (e.code === "Numpad0" || e.code === "Digit0") {
+                            this.processReview(ReviewResponse.Reset);
+                        }
                     }
                 }
             }
@@ -190,25 +322,31 @@ export class FlashcardModal extends Modal {
             this.fileLinkView.setAttribute("aria-label", t("EDIT_LATER"));
         }
         this.fileLinkView.addEventListener("click", async () => {
-            const activeLeaf: WorkspaceLeaf = this.plugin.app.workspace.getLeaf();
-            if (this.plugin.app.workspace.getActiveFile() === null)
-                await activeLeaf.openFile(this.currentCard.note);
-            else {
-                const newLeaf = this.plugin.app.workspace.createLeafBySplit(
-                    activeLeaf,
-                    "vertical",
-                    false
-                );
-                await newLeaf.openFile(this.currentCard.note, { active: true });
+            this.currentCard.editLater = true;
+            await this.modifyCardText(
+                this.currentCard.cardText,
+                `${this.currentCard.cardText}\n${this.plugin.data.settings.editLaterTag}`
+            );
+        });
+
+        this.editLinkView = this.contentEl.createDiv("sr-link");
+        this.editLinkView.setText(t("EDIT_NOW"));
+        this.editLinkView.addEventListener("click", async () => {
+            // remove SR info from input modal prompt
+            const textPromptArr = this.currentCard.cardText.split("\n");
+            let textPrompt = "";
+            if (textPromptArr[textPromptArr.length - 1].startsWith("<!--SR:")) {
+                textPrompt = textPromptArr.slice(0, -1).join("\n");
+            } else {
+                textPrompt = this.currentCard.cardText;
             }
-            const activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-            activeView.editor.setCursor({
-                line: this.currentCard.lineNo,
-                ch: 0,
-            });
-            this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
-            this.burySiblingCards(false);
-            this.currentDeck.nextCard(this);
+
+            const editModal = FlashcardEditModal.Prompt(this.app, this.plugin, textPrompt);
+            editModal
+                .then(async (modifiedCardText) => {
+                    this.modifyCardText(textPrompt, modifiedCardText);
+                })
+                .catch((reason) => console.log(reason));
         });
 
         this.resetLinkView = this.contentEl.createDiv("sr-link");
@@ -216,7 +354,6 @@ export class FlashcardModal extends Modal {
         this.resetLinkView.addEventListener("click", () => {
             this.processReview(ReviewResponse.Reset);
         });
-        this.resetLinkView.style.float = "right";
 
         if (this.plugin.data.settings.showContextInCards) {
             this.contextView = this.contentEl.createDiv();
@@ -267,6 +404,18 @@ export class FlashcardModal extends Modal {
             this.easyBtn.addClass("sr-ignorestats-btn");
             this.hardBtn.addClass("sr-ignorestats-btn");
         }
+    }
+
+    private async modifyCardText(originalText: string, replacementText: string) {
+        if (!replacementText) return;
+        if (replacementText == originalText) return;
+        let fileText: string = await this.app.vault.read(this.currentCard.note);
+        const originalTextRegex = new RegExp(escapeRegexString(originalText), "gm");
+        fileText = fileText.replace(originalTextRegex, replacementText);
+        await this.app.vault.modify(this.currentCard.note, fileText);
+        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+        this.burySiblingCards(false);
+        this.currentDeck.nextCard(this);
     }
 
     showAnswer(): void {

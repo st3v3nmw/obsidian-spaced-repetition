@@ -3,8 +3,23 @@
     text-decoration: underline;
     cursor: pointer;
     margin-bottom: 16px;
-    width: max-content;
-    display: inline-block;
+    /* width: max-content; */
+    /* display: inline-block; */
+    float: left;
+    width: 33%;
+    text-align: center;
+}
+
+.sr-input-modal {
+    height: 80%;
+}
+
+.sr-input-area {
+    height: 80%;
+}
+
+.sr-input-area > textarea {
+    height: 100%;
 }
 
 .sr-response {
@@ -91,6 +106,8 @@
     font-style: italic;
     font-weight: bold;
     margin-top: 16px;
+    display: inline-block;
+    width: 100%;
 }
 
 #sr-flashcard-view {
@@ -98,6 +115,7 @@
     overflow-y: auto;
     height: 80%;
     user-select: text;
+    padding-top: 1em;
 }
 
 #chartPeriod {
