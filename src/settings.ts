@@ -14,7 +14,6 @@ export interface SRSettings {
     showContextInCards: boolean;
     flashcardHeightPercentage: number;
     flashcardWidthPercentage: number;
-    showFileNameInFileLink: boolean;
     randomizeCardOrder: boolean;
     convertHighlightsToClozes: boolean;
     convertBoldTextToClozes: boolean;
@@ -56,7 +55,6 @@ export const DEFAULT_SETTINGS: SRSettings = {
     showContextInCards: true,
     flashcardHeightPercentage: Platform.isMobile ? 100 : 80,
     flashcardWidthPercentage: Platform.isMobile ? 100 : 40,
-    showFileNameInFileLink: false,
     randomizeCardOrder: true,
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
@@ -243,15 +241,6 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
-
-        new Setting(containerEl).setName(t("FILENAME_OR_OPEN_FILE")).addToggle((toggle) =>
-            toggle
-                .setValue(this.plugin.data.settings.showFileNameInFileLink)
-                .onChange(async (value) => {
-                    this.plugin.data.settings.showFileNameInFileLink = value;
-                    await this.plugin.savePluginData();
-                })
-        );
 
         new Setting(containerEl).setName(t("RANDOMIZE_CARD_ORDER")).addToggle((toggle) =>
             toggle
