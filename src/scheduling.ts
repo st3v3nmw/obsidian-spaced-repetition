@@ -102,6 +102,10 @@ export function schedule(
 }
 
 export function textInterval(interval: number, isMobile: boolean): string {
+    if (interval === null) {
+        return t("NEW");
+    }
+
     const m: number = Math.round(interval / 3.04375) / 10,
         y: number = Math.round(interval / 36.525) / 10;
 
