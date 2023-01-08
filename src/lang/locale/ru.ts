@@ -33,9 +33,10 @@ export default {
     REVIEW_NOTE_EASY_CMD: "Повторять заметку как Лёгкую",
     REVIEW_NOTE_GOOD_CMD: "Повторять заметку как Нормальную",
     REVIEW_NOTE_HARD_CMD: "Повторять заметку как Сложную",
+    REVIEW_ALL_CARDS: "Повторить все карточки во всех заметках",
+    CRAM_ALL_CARDS: "Select a deck to cram",
     REVIEW_CARDS_IN_NOTE: "Повторить карточки в этой заметке",
     CRAM_CARDS_IN_NOTE: "Зубрить карточки в этой заметке",
-    REVIEW_ALL_CARDS: "Повторить все карточки во всех заметках",
     VIEW_STATS: "Посмотреть статистику",
     STATUS_BAR:
         "Повторить: ${dueNotesCount} заметок(-ки), ${dueFlashcardsCount} карточек(-ки) предстоит",

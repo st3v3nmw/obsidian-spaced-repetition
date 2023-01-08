@@ -111,6 +111,12 @@ Wrapping in a HTML comment makes the scheduling information not visible in the n
 
 Note that you can skip a card by simply pressing `S` (case doesn't matter).
 
+!!! tip
+
+    If you're experiencing issues with the size of the modal on mobile devices,
+    go to settings and set the _Flashcard Height Percentage_ and _Flashcard Width Percentage_
+    to 100% to maximize it.
+
 ### Faster Review
 
 To review faster, use the following keyboard shortcuts:
