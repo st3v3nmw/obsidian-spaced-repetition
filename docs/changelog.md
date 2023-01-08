@@ -7,6 +7,12 @@ and this project (sorta) adheres to [Semantic Versioning](https://semver.org/spe
 
 ## [Unreleased]
 
+### Added
+
+-   Modal to edit flashcards ([@AB1908](https://github.com/AB1908))
+-   Add per-deck cramming command ([@LennyPhoenix](https://github.com/LennyPhoenix))
+-   Add flashcards menu
+
 ## [1.9.4] - 2023-01-08
 
 ### Fixes

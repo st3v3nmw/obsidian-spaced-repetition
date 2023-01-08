@@ -33,9 +33,10 @@ export default {
     REVIEW_NOTE_EASY_CMD: "Notiz abschliessen als: Einfach",
     REVIEW_NOTE_GOOD_CMD: "Notiz abschliessen als: Gut",
     REVIEW_NOTE_HARD_CMD: "Notiz abschliessen als: Schwer",
+    REVIEW_ALL_CARDS: "Alle Lernkarten wiederholen",
+    CRAM_ALL_CARDS: "Select a deck to cram",
     REVIEW_CARDS_IN_NOTE: "Lernkarten in dieser Notiz wiederholen",
     CRAM_CARDS_IN_NOTE: "Lernkarten in dieser Notiz pauken.",
-    REVIEW_ALL_CARDS: "Alle Lernkarten wiederholen",
     VIEW_STATS: "Statistiken anzeigen",
     STATUS_BAR:
         "Wiederholung: ${dueNotesCount} Notiz(en), ${dueFlashcardsCount} Karte(n) anstehend",

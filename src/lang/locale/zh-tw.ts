@@ -33,6 +33,7 @@ export default {
     REVIEW_CARDS_IN_NOTE: "復習此筆記中的卡片",
     CRAM_CARDS_IN_NOTE: "集中復習此筆記中的卡片",
     REVIEW_ALL_CARDS: "復習所有筆記中的卡片",
+    CRAM_ALL_CARDS: "Select a deck to cram",
     VIEW_STATS: "檢視數據",
     STATUS_BAR: "復習: ${dueNotesCount} 筆記, ${dueFlashcardsCount} 卡片已到期",
     SYNC_TIME_TAKEN: "同步時間 ${t}ms",

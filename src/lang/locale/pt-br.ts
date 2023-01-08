@@ -31,9 +31,10 @@ export default {
     REVIEW_NOTE_EASY_CMD: "Revisar nota como fácil",
     REVIEW_NOTE_GOOD_CMD: "Revisar nota como OK",
     REVIEW_NOTE_HARD_CMD: "Revisar nota como difícil",
+    REVIEW_ALL_CARDS: "Revisar flashcards de todas as notas",
+    CRAM_ALL_CARDS: "Select a deck to cram",
     REVIEW_CARDS_IN_NOTE: "Revisar flashcards nessa nota",
     CRAM_CARDS_IN_NOTE: "Revisar todas as flashcards nessa nota",
-    REVIEW_ALL_CARDS: "Revisar flashcards de todas as notas",
     VIEW_STATS: "Ver estatísticas",
     STATUS_BAR:
         "Revisão: ${dueNotesCount} nota(s), ${dueFlashcardsCount} Carta(s) para colocar em dia",
