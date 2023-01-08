@@ -651,6 +651,10 @@ export default class SRPlugin extends Plugin {
                 lineNo: number = parsedCard[2];
             let cardText: string = parsedCard[1];
 
+            if (cardText.includes(settings.editLaterTag)) {
+                continue;
+            }
+
             if (!settings.convertFoldersToDecks) {
                 const tagInCardRegEx = /^#[^\s#]+/gi;
                 const cardDeckPath = cardText
@@ -790,6 +794,7 @@ export default class SRPlugin extends Plugin {
                     cardType,
                     siblingIdx: i,
                     siblings,
+                    editLater: false,
                 };
 
                 // card scheduled
