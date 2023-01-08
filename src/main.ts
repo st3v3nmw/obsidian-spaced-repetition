@@ -787,7 +787,7 @@ export default class SRPlugin extends Plugin {
             }
 
             const context: string = settings.showContextInCards
-                ? getCardContext(lineNo, headings)
+                ? getCardContext(lineNo, headings, note.basename)
                 : "";
             const siblings: Card[] = [];
             for (let i = 0; i < siblingMatches.length; i++) {
@@ -915,7 +915,7 @@ export default class SRPlugin extends Plugin {
     }
 }
 
-function getCardContext(cardLine: number, headings: HeadingCache[]): string {
+function getCardContext(cardLine: number, headings: HeadingCache[], note_title: string): string {
     const stack: HeadingCache[] = [];
     for (const heading of headings) {
         if (heading.position.start.line > cardLine) {
@@ -929,10 +929,10 @@ function getCardContext(cardLine: number, headings: HeadingCache[]): string {
         stack.push(heading);
     }
 
-    let context = "";
+    let context = `${note_title} > `;
     for (const headingObj of stack) {
         headingObj.heading = headingObj.heading.replace(/\[\^\d+\]/gm, "").trim();
-        context += headingObj.heading + " > ";
+        context += `${headingObj.heading} > `;
     }
     return context.slice(0, -3);
 }
