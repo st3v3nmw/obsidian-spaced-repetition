@@ -38,8 +38,9 @@ export class FlashcardEditModal extends Modal {
     public waitForClose: Promise<string>;
 
     private resolvePromise: (input: string) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private rejectPromise: (reason?: any) => void;
-    private didSubmit: boolean = false;
+    private didSubmit = false;
     private inputComponent: TextAreaComponent;
     private readonly modalText: string;
 
@@ -72,7 +73,11 @@ export class FlashcardEditModal extends Modal {
         this.createButtonBar(mainContentContainer);
     }
 
-    private createButton(container: HTMLElement, text: string, callback: (evt: MouseEvent) => any) {
+    private createButton(
+        container: HTMLElement,
+        text: string,
+        callback: (evt: MouseEvent) => void
+    ) {
         const btn = new ButtonComponent(container);
         btn.setButtonText(text).onClick(callback);
 
@@ -106,8 +111,8 @@ export class FlashcardEditModal extends Modal {
         return textComponent;
     }
 
-    private submitClickCallback = (evt: MouseEvent) => this.submit();
-    private cancelClickCallback = (evt: MouseEvent) => this.cancel();
+    private submitClickCallback = (_: MouseEvent) => this.submit();
+    private cancelClickCallback = (_: MouseEvent) => this.cancel();
 
     private submitEnterCallback = (evt: KeyboardEvent) => {
         if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter") {
@@ -328,7 +333,7 @@ export class FlashcardModal extends Modal {
         this.editLinkView.setText(t("EDIT_NOW"));
         this.editLinkView.addEventListener("click", async () => {
             // remove SR info from input modal prompt
-            let textPromptArr = this.currentCard.cardText.split("\n");
+            const textPromptArr = this.currentCard.cardText.split("\n");
             let textPrompt = "";
             if (textPromptArr[textPromptArr.length - 1].startsWith("<!--SR:")) {
                 textPrompt = textPromptArr.slice(0, -1).join("\n");
@@ -336,7 +341,7 @@ export class FlashcardModal extends Modal {
                 textPrompt = this.currentCard.cardText;
             }
 
-            let editModal = FlashcardEditModal.Prompt(this.app, this.plugin, textPrompt);
+            const editModal = FlashcardEditModal.Prompt(this.app, this.plugin, textPrompt);
             editModal
                 .then(async (modifiedCardText) => {
                     this.modifyCardText(textPrompt, modifiedCardText);
