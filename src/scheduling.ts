@@ -102,7 +102,7 @@ export function schedule(
 }
 
 export function textInterval(interval: number, isMobile: boolean): string {
-    if (interval === null) {
+    if (interval === undefined) {
         return t("NEW");
     }
 
