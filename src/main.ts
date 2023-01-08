@@ -185,6 +185,15 @@ export default class SRPlugin extends Plugin {
         });
 
         this.addCommand({
+            id: "srs-cram-flashcards",
+            name: t("CRAM_ALL_CARDS"),
+            callback: async () => {
+                await this.sync(true);
+                new FlashcardModal(this.app, this, true).open();
+            },
+        });
+
+        this.addCommand({
             id: "srs-review-flashcards-in-note",
             name: t("REVIEW_CARDS_IN_NOTE"),
             callback: async () => {
@@ -239,7 +248,7 @@ export default class SRPlugin extends Plugin {
         this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).forEach((leaf) => leaf.detach());
     }
 
-    async sync(): Promise<void> {
+    async sync(ignoreStats = false): Promise<void> {
         if (this.syncLock) {
             return;
         }
@@ -307,7 +316,9 @@ export default class SRPlugin extends Plugin {
             if (deckPath.length !== 0) {
                 const flashcardsInNoteAvgEase: number = await this.findFlashcardsInNote(
                     note,
-                    deckPath
+                    deckPath,
+                    false,
+                    ignoreStats
                 );
 
                 if (flashcardsInNoteAvgEase > 0) {
