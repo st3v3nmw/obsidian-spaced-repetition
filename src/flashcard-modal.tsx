@@ -329,7 +329,8 @@ export class FlashcardModal extends Modal {
         setIcon(cardInfo, "info");
         cardInfo.setAttribute("aria-label", "View Card Info");
         cardInfo.addEventListener("click", async () => {
-            const currentEaseStr = t("CURRENT_EASE_HELP_TEXT") + this.currentCard.ease ?? t("NEW");
+            const currentEaseStr =
+                t("CURRENT_EASE_HELP_TEXT") + (this.currentCard.ease ?? t("NEW"));
             const currentIntervalStr =
                 t("CURRENT_INTERVAL_HELP_TEXT") + textInterval(this.currentCard.interval, false);
             const generatedFromStr = t("CARD_GENERATED_FROM", {
