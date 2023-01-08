@@ -13,6 +13,10 @@ and this project (sorta) adheres to [Semantic Versioning](https://semver.org/spe
 -   Add per-deck cramming command ([@LennyPhoenix](https://github.com/LennyPhoenix))
 -   Add flashcards menu
 
+### Changed
+
+-   Add note title to card context
+
 ## [1.9.4] - 2023-01-08
 
 ### Fixes
