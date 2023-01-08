@@ -7,6 +7,10 @@ and this project (sorta) adheres to [Semantic Versioning](https://semver.org/spe
 
 ## [Unreleased]
 
+### Fixes
+
+-   Minor UI fix on flashcards
+
 ## [1.9.3] - 2023-01-02
 
 ### Changed

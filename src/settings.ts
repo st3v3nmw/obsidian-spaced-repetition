@@ -104,7 +104,8 @@ export class SRSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
-        containerEl.createEl("h2", { text: `${t("SETTINGS_HEADER")}` });
+        const header = containerEl.createEl("h1", { text: `${t("SETTINGS_HEADER")}` });
+        header.addClass("sr-centered");
 
         containerEl.createDiv().innerHTML = t("CHECK_WIKI", {
             wiki_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/",
