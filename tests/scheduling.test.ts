@@ -1,25 +1,27 @@
+import { MINUTES_PER_DAY } from "src/constants";
 import { schedule, ReviewResponse, textInterval } from "src/scheduling";
 import { DEFAULT_SETTINGS } from "src/settings";
 
+// TODO: Test with more than 1 day in interval
 test("Test reviewing with default settings", () => {
     expect(
         schedule(ReviewResponse.Easy, 1, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, {})
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase + 20,
-        interval: 4,
+        interval: 1440,
     });
 
     expect(
         schedule(ReviewResponse.Good, 1, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, {})
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
-        interval: 3,
+        interval: 10,
     });
 
     expect(
         schedule(ReviewResponse.Hard, 1, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, {})
     ).toEqual({
-        ease: DEFAULT_SETTINGS.baseEase - 20,
+        ease: DEFAULT_SETTINGS.baseEase,
         interval: 1,
     });
 });
@@ -30,21 +32,21 @@ test("Test reviewing with default settings & delay", () => {
         schedule(ReviewResponse.Easy, 10, DEFAULT_SETTINGS.baseEase, delay, DEFAULT_SETTINGS, {})
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase + 20,
-        interval: 42,
+        interval: 1440,
     });
 
     expect(
         schedule(ReviewResponse.Good, 10, DEFAULT_SETTINGS.baseEase, delay, DEFAULT_SETTINGS, {})
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
-        interval: 28,
+        interval: 10,
     });
 
     expect(
         schedule(ReviewResponse.Hard, 10, DEFAULT_SETTINGS.baseEase, delay, DEFAULT_SETTINGS, {})
     ).toEqual({
-        ease: DEFAULT_SETTINGS.baseEase - 20,
-        interval: 5,
+        ease: DEFAULT_SETTINGS.baseEase,
+        interval: 1,
     });
 });
 
@@ -59,13 +61,13 @@ test("Test load balancing, small interval (load balancing disabled)", () => {
         schedule(ReviewResponse.Good, 1, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates)
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
-        interval: 3,
+        interval: 10,
     });
     expect(dueDates).toEqual({
-        0: 1,
+        0: 2,
         1: 1,
         2: 1,
-        3: 5,
+        3: 4,
     });
 });
 
@@ -75,13 +77,13 @@ test("Test load balancing", () => {
         5: 2,
     };
     expect(
-        schedule(ReviewResponse.Good, 2, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates)
+        schedule(ReviewResponse.Good, 1, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates)
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
-        interval: 4,
+        interval: 10,
     });
     expect(dueDates).toEqual({
-        4: 1,
+        0: 1,
         5: 2,
     });
 
@@ -93,10 +95,10 @@ test("Test load balancing", () => {
         schedule(ReviewResponse.Good, 10, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates)
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
-        interval: 24,
+        interval: 10,
     });
     expect(dueDates).toEqual({
-        24: 1,
+        0: 1,
         25: 2,
     });
 
@@ -117,9 +119,10 @@ test("Test load balancing", () => {
         schedule(ReviewResponse.Good, 25, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates)
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
-        interval: 66,
+        interval: 10,
     });
     expect(dueDates).toEqual({
+        0: 1,
         2: 5,
         59: 8,
         60: 9,
@@ -128,21 +131,23 @@ test("Test load balancing", () => {
         63: 4,
         64: 4,
         65: 8,
-        66: 3,
+        66: 2,
         67: 10,
     });
 });
 
 test("Test textInterval - desktop", () => {
-    expect(textInterval(1, false)).toEqual("1 day(s)");
-    expect(textInterval(41, false)).toEqual("1.3 month(s)");
-    expect(textInterval(366, false)).toEqual("1 year(s)");
-    expect(textInterval(1000, false)).toEqual("2.7 year(s)");
+    expect(textInterval(1, false)).toEqual("1 minute(s)");
+    expect(textInterval(1 * MINUTES_PER_DAY, false)).toEqual("1 day(s)");
+    expect(textInterval(41 * MINUTES_PER_DAY, false)).toEqual("1.3 month(s)");
+    expect(textInterval(366 * MINUTES_PER_DAY, false)).toEqual("1 year(s)");
+    expect(textInterval(1000 * MINUTES_PER_DAY, false)).toEqual("2.7 year(s)");
 });
 
 test("Test textInterval - mobile", () => {
-    expect(textInterval(1, true)).toEqual("1d");
-    expect(textInterval(41, true)).toEqual("1.3m");
-    expect(textInterval(366, true)).toEqual("1y");
-    expect(textInterval(1000, true)).toEqual("2.7y");
+    expect(textInterval(1, true)).toEqual("1m");
+    expect(textInterval(1 * MINUTES_PER_DAY, true)).toEqual("1d");
+    expect(textInterval(41 * MINUTES_PER_DAY, true)).toEqual("1.3mo");
+    expect(textInterval(366 * MINUTES_PER_DAY, true)).toEqual("1y");
+    expect(textInterval(1000 * MINUTES_PER_DAY, true)).toEqual("2.7y");
 });

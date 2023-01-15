@@ -93,30 +93,34 @@ export function schedule(
     // replaces random fuzz with load balancing over the fuzz interval
     if (dueDates !== undefined) {
         interval = Math.round(interval);
-        if (!Object.prototype.hasOwnProperty.call(dueDates, interval)) {
-            dueDates[interval] = 0;
+        const dayInterval = Math.round(interval / MINUTES_PER_DAY);
+        if (!Object.prototype.hasOwnProperty.call(dueDates, dayInterval)) {
+            dueDates[dayInterval] = 0;
         } else {
             // disable fuzzing for small intervals
             if (interval > 4 * MINUTES_PER_DAY) {
                 let fuzz = 0;
 
                 if (interval < 7 * MINUTES_PER_DAY) {
-                    fuzz = MINUTES_PER_DAY;
+                    fuzz = 1;
                 } else if (interval < 30 * MINUTES_PER_DAY) {
                     fuzz = Math.max(2, Math.floor(interval * 0.15));
                 } else {
                     fuzz = Math.max(4, Math.floor(interval * 0.05));
                 }
 
+                fuzz *= MINUTES_PER_DAY;
+
                 const originalInterval = interval;
-                outer: for (let i = 1; i <= fuzz; i++) {
+                outer: for (let i = MINUTES_PER_DAY; i <= fuzz; i += MINUTES_PER_DAY) {
                     for (const ivl of [originalInterval - i, originalInterval + i]) {
-                        if (!Object.prototype.hasOwnProperty.call(dueDates, ivl)) {
-                            dueDates[Math.round(ivl / MINUTES_PER_DAY)] = 0;
+                        const dayIvl = Math.round(ivl / MINUTES_PER_DAY);
+                        if (!Object.prototype.hasOwnProperty.call(dueDates, dayIvl)) {
+                            dueDates[dayIvl] = 0;
                             interval = ivl;
                             break outer;
                         }
-                        if (dueDates[ivl] < dueDates[interval]) interval = ivl;
+                        if (dueDates[dayIvl] < dueDates[dayInterval]) interval = ivl;
                     }
                 }
             }

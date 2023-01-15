@@ -38,7 +38,7 @@ export default {
 
     // scheduling.ts
     // TODO: Translate MINUTES_X to other langs
-    MINUTES_STR_IVL: "${interval} minutes(s)",
+    MINUTES_STR_IVL: "${interval} minute(s)",
     DAYS_STR_IVL: "${interval} day(s)",
     MONTHS_STR_IVL: "${interval} month(s)",
     YEARS_STR_IVL: "${interval} year(s)",

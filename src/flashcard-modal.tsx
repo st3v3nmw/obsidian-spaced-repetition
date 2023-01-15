@@ -25,6 +25,7 @@ import {
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
 import Heap from "heap";
+import { DEFAULT_SETTINGS } from "./settings";
 
 export enum FlashcardModalMode {
     DecksList,
