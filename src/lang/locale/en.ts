@@ -97,6 +97,8 @@ export default {
     REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "Tags to review",
     TAGS_TO_REVIEW_DESC: "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.",
+    FRONTMATTER_NAME: "Frontmatter addition",
+    FRONTMATTER_NAME_DESC: "Enter an additional name to include in frontmatter, useful if multiple people want to review the same notes. If you use `-simon` the tags in frontmatter will become `sr-due-simon`.",
     OPEN_RANDOM_NOTE: "Open a random note for review",
     OPEN_RANDOM_NOTE_DESC: "When you turn this off, notes are ordered by importance (PageRank).",
     AUTO_NEXT_NOTE: "Open next note automatically after a review",

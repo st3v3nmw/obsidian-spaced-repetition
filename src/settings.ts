@@ -26,6 +26,7 @@ export interface SRSettings {
     // notes
     enableNoteReviewPaneOnStartup: boolean;
     tagsToReview: string[];
+    reviewFrontmatter: string[];
     noteFoldersToIgnore: string[];
     openRandomNote: boolean;
     autoNextNote: boolean;
@@ -67,6 +68,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // notes
     enableNoteReviewPaneOnStartup: true,
     tagsToReview: ["#review"],
+    reviewFrontmatter: [""],
     noteFoldersToIgnore: [],
     openRandomNote: false,
     autoNextNote: false,
@@ -469,6 +471,20 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange((value) => {
                         applySettingsUpdate(async () => {
                             this.plugin.data.settings.tagsToReview = value.split(/\s+/);
+                            await this.plugin.savePluginData();
+                        });
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName(t("FRONTMATTER_NAME"))
+            .setDesc(t("FRONTMATTER_NAME_DESC"))
+            .addTextArea((text) =>
+                text
+                    .setValue(this.plugin.data.settings.reviewFrontmatter.join(" "))
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.reviewFrontmatter = value.split(/\s+/);
                             await this.plugin.savePluginData();
                         });
                     })
