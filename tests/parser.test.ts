@@ -1,7 +1,7 @@
 import { parse } from "src/parser";
 import { CardType } from "src/scheduling";
 
-const defaultArgs: [string, string, string, string, boolean, boolean, boolean] = [
+const defaultArgs: [string, string, string, string, boolean, boolean, boolean, string, string] = [
     "::",
     ":::",
     "?",
@@ -9,6 +9,8 @@ const defaultArgs: [string, string, string, string, boolean, boolean, boolean] =
     true,
     true,
     true,
+    "{=",
+    "=}"
 ];
 
 test("Test parsing of single line basic cards", () => {
@@ -111,7 +113,7 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum ==p\ndolor won==", ...defaultArgs)).toEqual([]);
     expect(parse("lorem ipsum ==dolor won=", ...defaultArgs)).toEqual([]);
     // ==highlights== turned off
-    expect(parse("cloze ==deletion== test", "::", ":::", "?", "??", false, true, false)).toEqual(
+    expect(parse("cloze ==deletion== test", "::", ":::", "?", "??", false, true, false, "", "")).toEqual(
         []
     );
 
@@ -142,13 +144,51 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum **p\ndolor won**", ...defaultArgs)).toEqual([]);
     expect(parse("lorem ipsum **dolor won*", ...defaultArgs)).toEqual([]);
     // **bolded** turned off
-    expect(parse("cloze **deletion** test", "::", ":::", "?", "??", true, false, false)).toEqual(
+    expect(parse("cloze **deletion** test", "::", ":::", "?", "??", true, false, false, "", "")).toEqual(
         []
     );
 
-    // both
-    expect(parse("cloze **deletion** test ==another deletion==!", ...defaultArgs)).toEqual([
-        [CardType.Cloze, "cloze **deletion** test ==another deletion==!", 0],
+    // {=custom=}
+    expect(parse("cloze {=deletion=} test", ...defaultArgs)).toEqual([
+        [CardType.Cloze, "cloze {=deletion=} test", 0],
+    ]);
+    expect(parse("cloze {=deletion=} test\n<!--SR:2021-08-11,4,270-->", ...defaultArgs)).toEqual([
+        [CardType.Cloze, "cloze {=deletion=} test\n<!--SR:2021-08-11,4,270-->", 0],
+    ]);
+    expect(parse("cloze {=deletion=} test <!--SR:2021-08-11,4,270-->", ...defaultArgs)).toEqual([
+        [CardType.Cloze, "cloze {=deletion=} test <!--SR:2021-08-11,4,270-->", 0],
+    ]);
+    expect(parse("{=this=} is a {=deletion=}\n", ...defaultArgs)).toEqual([
+        [CardType.Cloze, "{=this=} is a {=deletion=}", 0],
+    ]);
+    expect(
+        parse(
+            "some text before\n\na deletion on\nsuch {=wow=}\n\n" +
+            "many text\nsuch surprise {=wow=} more {=text=}\nsome text after\n\nHmm",
+            ...defaultArgs
+        )
+    ).toEqual([
+        [CardType.Cloze, "a deletion on\nsuch {=wow=}", 3],
+        [CardType.Cloze, "many text\nsuch surprise {=wow=} more {=text=}\nsome text after", 6],
+    ]);
+    expect(parse("srdf {=", ...defaultArgs)).toEqual([]);
+    expect(parse("=} srdf", ...defaultArgs)).toEqual([]);
+    expect(parse("lorem ipsum {=p\ndolor won=}", ...defaultArgs)).toEqual([]);
+    expect(parse("lorem ipsum {=dolor won=", ...defaultArgs)).toEqual([]);
+    // {=custom=} turned off
+    expect(parse("cloze {=deletion=} test", "::", ":::", "?", "??", true, true, true, "", "")).toEqual(
+        []
+    );
+    expect(parse("cloze {=deletion=} test", "::", ":::", "?", "??", true, true, true, "{=", "")).toEqual(
+        []
+    );
+    expect(parse("cloze {=deletion=} test", "::", ":::", "?", "??", true, true, true, "", "=}")).toEqual(
+        []
+    );
+
+    // all
+    expect(parse("cloze **deletion** test ==another deletion== {=custom deletion=}!", ...defaultArgs)).toEqual([
+        [CardType.Cloze, "cloze **deletion** test ==another deletion== {=custom deletion=}!", 0],
     ]);
 });
 
@@ -256,4 +296,5 @@ test("Test not parsing cards in HTML comments", () => {
     ).toEqual([]);
     expect(parse("<!--cloze ==deletion== test-->", ...defaultArgs)).toEqual([]);
     expect(parse("<!--cloze **deletion** test-->", ...defaultArgs)).toEqual([]);
+    expect(parse("<!--cloze {=deletion=} test-->", ...defaultArgs)).toEqual([]);
 });

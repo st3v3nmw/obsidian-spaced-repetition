@@ -18,6 +18,8 @@ export interface SRSettings {
     convertHighlightsToClozes: boolean;
     convertBoldTextToClozes: boolean;
     convertCurlyBracketsToClozes: boolean;
+    clozeOpeningToken: string;
+    clozeClosingToken: string;
     singleLineCardSeparator: string;
     singleLineReversedCardSeparator: string;
     multilineCardSeparator: string;
@@ -59,6 +61,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
     convertCurlyBracketsToClozes: false,
+    clozeOpeningToken: "",
+    clozeClosingToken: "",
     singleLineCardSeparator: "::",
     singleLineReversedCardSeparator: ":::",
     multilineCardSeparator: "?",
@@ -279,6 +283,58 @@ export class SRSettingTab extends PluginSettingTab {
                         await this.plugin.savePluginData();
                     })
             );
+
+        new Setting(containerEl)
+            .setName(t("CLOZE_OPENING_TOKEN"))
+            .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
+            .addText((text) =>
+                text
+                    .setPlaceholder(t("CLOZE_TOKEN_DISABLED"))
+                    .setValue(this.plugin.data.settings.clozeOpeningToken)
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.clozeOpeningToken = value;
+                            await this.plugin.savePluginData();
+                        });
+                    })
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.clozeOpeningToken =
+                            DEFAULT_SETTINGS.clozeOpeningToken;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
+
+        new Setting(containerEl)
+            .setName(t("CLOZE_CLOSING_TOKEN"))
+            .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
+            .addText((text) =>
+                text
+                    .setPlaceholder(t("CLOZE_TOKEN_DISABLED"))
+                    .setValue(this.plugin.data.settings.clozeClosingToken)
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.clozeClosingToken = value;
+                            await this.plugin.savePluginData();
+                        });
+                    })
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.clozeClosingToken =
+                            DEFAULT_SETTINGS.clozeClosingToken;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
         new Setting(containerEl)
             .setName(t("INLINE_CARDS_SEPARATOR"))

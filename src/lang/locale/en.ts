@@ -87,6 +87,9 @@ export default {
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Convert ==hightlights== to clozes?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "Convert **bolded text** to clozes?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Convert {{curly brackets}} to clozes?",
+    CLOZE_OPENING_TOKEN: "Opening token for clozes",
+    CLOZE_CLOSING_TOKEN: "Closing token for clozes",
+    CLOZE_TOKEN_DISABLED: "(Disabled)",
     INLINE_CARDS_SEPARATOR: "Separator for inline flashcards",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Note that after changing this you have to manually edit any flashcards you already have.",

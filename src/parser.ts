@@ -1,4 +1,5 @@
 import { CardType } from "src/scheduling";
+import { escapeRegexString } from "./utils";
 
 /**
  * Returns flashcards found in `text`
@@ -18,7 +19,9 @@ export function parse(
     multilineReversedCardSeparator: string,
     convertHighlightsToClozes: boolean,
     convertBoldTextToClozes: boolean,
-    convertCurlyBracketsToClozes: boolean
+    convertCurlyBracketsToClozes: boolean,
+    clozeOpeningToken: string,
+    clozeClosingToken: string
 ): [CardType, string, number][] {
     let cardText = "";
     const cards: [CardType, string, number][] = [];
@@ -66,7 +69,10 @@ export function parse(
             cardType === null &&
             ((convertHighlightsToClozes && /==.*?==/gm.test(lines[i])) ||
                 (convertBoldTextToClozes && /\*\*.*?\*\*/gm.test(lines[i])) ||
-                (convertCurlyBracketsToClozes && /{{.*?}}/gm.test(lines[i])))
+                (convertCurlyBracketsToClozes && /{{.*?}}/gm.test(lines[i])) ||
+                (clozeOpeningToken !== "" &&
+                    clozeClosingToken !== "" &&
+                    new RegExp(`${escapeRegexString(clozeOpeningToken)}.*?${escapeRegexString(clozeClosingToken)}`, "gm").test(lines[i])))
         ) {
             cardType = CardType.Cloze;
             lineNo = i;

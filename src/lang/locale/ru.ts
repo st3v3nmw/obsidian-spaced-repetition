@@ -91,6 +91,9 @@ export default {
     CONVERT_BOLD_TEXT_TO_CLOZES: "Конвертировать **жирный текст** в пропуски(пример: [...])?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES:
         "Конвертировать {{фигурные скобки}} в пропуски(пример: [...])?",
+    CLOZE_OPENING_TOKEN: "Opening token for clozes",
+    CLOZE_CLOSING_TOKEN: "Closing token for clozes",
+    CLOZE_TOKEN_DISABLED: "(Disabled)",
     INLINE_CARDS_SEPARATOR: "Разделитель для внутристрочных карточек",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Внимание! после изменения этого вам придётся вручную редактировать уже существующие карточки",

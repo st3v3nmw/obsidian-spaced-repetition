@@ -654,7 +654,9 @@ export default class SRPlugin extends Plugin {
             settings.multilineReversedCardSeparator,
             settings.convertHighlightsToClozes,
             settings.convertBoldTextToClozes,
-            settings.convertCurlyBracketsToClozes
+            settings.convertCurlyBracketsToClozes,
+            settings.clozeOpeningToken,
+            settings.clozeClosingToken
         );
         for (const parsedCard of parsedCards) {
             deckPath = noteDeckPath;
@@ -700,6 +702,11 @@ export default class SRPlugin extends Plugin {
                 if (settings.convertCurlyBracketsToClozes) {
                     siblings.push(...cardText.matchAll(/{{(.*?)}}/gm));
                 }
+                if (settings.clozeOpeningToken !== "" && settings.clozeClosingToken !== "") {
+                    siblings.push(...cardText.matchAll(new RegExp(
+                        `${escapeRegexString(settings.clozeOpeningToken)}.*?${escapeRegexString(settings.clozeClosingToken)}`,
+                        "gm")));
+                }
                 siblings.sort((a, b) => {
                     if (a.index < b.index) {
                         return -1;
@@ -722,7 +729,9 @@ export default class SRPlugin extends Plugin {
                         .replace(/==/gm, "")
                         .replace(/\*\*/gm, "")
                         .replace(/{{/gm, "")
-                        .replace(/}}/gm, "");
+                        .replace(/}}/gm, "")
+                        .replaceAll(settings.clozeOpeningToken, "")
+                        .replaceAll(settings.clozeClosingToken, "");
                     back =
                         cardText.substring(0, deletionStart) +
                         "<span style='color:#2196f3'>" +
@@ -733,7 +742,9 @@ export default class SRPlugin extends Plugin {
                         .replace(/==/gm, "")
                         .replace(/\*\*/gm, "")
                         .replace(/{{/gm, "")
-                        .replace(/}}/gm, "");
+                        .replace(/}}/gm, "")
+                        .replaceAll(settings.clozeOpeningToken, "")
+                        .replaceAll(settings.clozeClosingToken, "");
                     siblingMatches.push([front, back]);
                 }
             } else {

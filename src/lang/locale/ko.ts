@@ -89,6 +89,9 @@ export default {
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==hightlights== 를 빈 칸 채우기로 전환하시겠습니까?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "**bolded text** 를 빈 칸 채우기로 전환하시겠습니까?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "{{curly brackets}} 를 빈 칸 채우기로 전환하시겠습니까?",
+    CLOZE_OPENING_TOKEN: "Opening token for clozes",
+    CLOZE_CLOSING_TOKEN: "Closing token for clozes",
+    CLOZE_TOKEN_DISABLED: "(Disabled)",
     INLINE_CARDS_SEPARATOR: "인라인 플래시카드 구분자",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "주의: 이 옵션을 수정한 후에는 이미 작성된 플래시카드를 수동으로 수정해야 함을 주의하십시오.",

@@ -95,6 +95,9 @@ export default {
     CONVERT_BOLD_TEXT_TO_CLOZES: "**Fettgedruckten** Text in Lückentextkarten umwandeln?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES:
         "{{Geschweifte Klammern}} Text in Lückentextkarten umwandeln?",
+    CLOZE_OPENING_TOKEN: "Opening token for clozes",
+    CLOZE_CLOSING_TOKEN: "Closing token for clozes",
+    CLOZE_TOKEN_DISABLED: "(Disabled)",
     INLINE_CARDS_SEPARATOR: "Trennzeichen für einzeilige Lernkarten",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Wenn diese Einstellung geändert wird, dann müssen die entsprechenden Lernkarten manuell angepasst werden.",

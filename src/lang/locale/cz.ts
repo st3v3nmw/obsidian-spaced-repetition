@@ -88,6 +88,9 @@ export default {
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Převést ==zvýraznění== na clozes?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "Převést **tučný text** na clozes?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Převést {{složené závorky}} na clozes?",
+    CLOZE_OPENING_TOKEN: "Opening token for clozes",
+    CLOZE_CLOSING_TOKEN: "Closing token for clozes",
+    CLOZE_TOKEN_DISABLED: "(Disabled)",
     INLINE_CARDS_SEPARATOR: "Oddělovač pro inline kartičky",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Pozor. Jakmile toto změníte, budete muset ručně upravit všechny existující kartičky.",
