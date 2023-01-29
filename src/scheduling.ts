@@ -67,8 +67,10 @@ export function schedule(
     }
 
     // replaces random fuzz with load balancing over the fuzz interval
-    
     if (dueDates !== undefined) {
+        // conserve the decimal part
+        const interval_decimal = interval - Math.round(interval);
+    
         interval = Math.round(interval);
         if (!Object.prototype.hasOwnProperty.call(dueDates, interval)) {
             dueDates[interval] = 0;
@@ -95,8 +97,11 @@ export function schedule(
         }
 
         dueDates[interval]++;
-    }
 
+        // add the decimal part
+        interval = interval + interval_decimal;
+    }
+    
     interval = Math.min(interval, settingsObj.maximumInterval);
 
     return { interval: Math.round(interval * 10) / 10, ease };

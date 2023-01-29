@@ -123,6 +123,10 @@ export default {
     EASY_BONUS_DESC:
         "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%).",
     EASY_BONUS_MIN_WARNING: "The easy bonus must be at least 100.",
+    REVIEW_BEFORE_DUE: "Review Flashnotes Before Due",
+    REVIEW_BEFORE_DUE_DESC:
+        "The review before due allows you to review flashnote before due.",
+    REVIEW_BEFORE_DUE_MIN_WARNING: "The review before due must be at least 0.",
     MAX_INTERVAL: "Maximum Interval",
     MAX_INTERVAL_DESC: "Allows you to place an upper limit on the interval (default = 100 years).",
     MAX_INTERVAL_MIN_WARNING: "The maximum interval must be at least 1 day.",

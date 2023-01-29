@@ -39,6 +39,7 @@ export interface SRSettings {
     easyBonus: number;
     maximumInterval: number;
     maxLinkFactor: number;
+    reviewBeforeDue: number;
     // logging
     showDebugMessages: boolean;
 }
@@ -80,6 +81,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     easyBonus: 1.3,
     maximumInterval: 36525,
     maxLinkFactor: 1.0,
+    reviewBeforeDue: 0.0,
     // logging
     showDebugMessages: false,
 };
@@ -651,6 +653,44 @@ export class SRSettingTab extends PluginSettingTab {
                     .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         this.plugin.data.settings.easyBonus = DEFAULT_SETTINGS.easyBonus;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
+
+        
+        new Setting(containerEl)
+            .setName(t("REVIEW_BEFORE_DUE"))
+            .setDesc(t("REVIEW_BEFORE_DUE_DESC"))
+            .addText((text) =>
+                text
+                    .setValue((this.plugin.data.settings.reviewBeforeDue).toString())
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            const numValue: number = Number.parseFloat(value);
+                            if (!isNaN(numValue)) {
+                                if (numValue < 0.0) {
+                                    new Notice(t("REVIEW_BEFORE_DUE_MIN_WARNING"));
+                                    text.setValue(
+                                        (this.plugin.data.settings.reviewBeforeDue * 100).toString()
+                                    );
+                                    return;
+                                }
+
+                                this.plugin.data.settings.reviewBeforeDue = Math.floor(numValue * 100) / 100;
+                                await this.plugin.savePluginData();
+                            } else {
+                                new Notice(t("VALID_NUMBER_WARNING"));
+                            }
+                        });
+                    })
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.reviewBeforeDue = DEFAULT_SETTINGS.reviewBeforeDue;
                         await this.plugin.savePluginData();
                         this.display();
                     });

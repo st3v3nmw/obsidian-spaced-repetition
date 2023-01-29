@@ -847,7 +847,7 @@ export default class SRPlugin extends Plugin {
                         continue;
                     }
 
-                    if (dueUnix <= now) {
+                    if (dueUnix <= now + this.data.settings.reviewBeforeDue * 24 * 3600 * 1000) {
                         cardObj.interval = interval;
                         cardObj.ease = ease;
                         cardObj.delayBeforeReview = now - dueUnix;
