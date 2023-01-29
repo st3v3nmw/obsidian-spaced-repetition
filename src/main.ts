@@ -275,7 +275,7 @@ export default class SRPlugin extends Plugin {
         };
 
         const now = window.moment(Date.now());
-        const todayDate: string = now.format("YYYY-MM-DD");
+        const todayDate: string = now.format("YYYY-MM-DD-HH-mm");
         // clear bury list if we've changed dates
         if (todayDate !== this.data.buryDate) {
             this.data.buryDate = todayDate;
@@ -364,7 +364,7 @@ export default class SRPlugin extends Plugin {
             }
 
             const dueUnix: number = window
-                .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
+                .moment(frontmatter["sr-due"], ["YYYY-MM-DD-HH-mm", "YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
                 .valueOf();
 
             for (const matchedNoteTag of matchedNoteTags) {
@@ -511,7 +511,7 @@ export default class SRPlugin extends Plugin {
             delayBeforeReview =
                 now -
                 window
-                    .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
+                    .moment(frontmatter["sr-due"], ["YYYY-MM-DD-HH-mm", "YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
                     .valueOf();
         }
 
@@ -527,7 +527,7 @@ export default class SRPlugin extends Plugin {
         ease = schedObj.ease;
 
         const due = window.moment(now + interval * 24 * 3600 * 1000);
-        const dueString: string = due.format("YYYY-MM-DD");
+        const dueString: string = due.format("YYYY-MM-DD-HH-mm");
 
         // check if scheduling info exists
         if (SCHEDULING_INFO_REGEX.test(fileText)) {
@@ -815,7 +815,7 @@ export default class SRPlugin extends Plugin {
                     this.deckTree.insertFlashcard([...deckPath], cardObj);
                 } else if (i < scheduling.length) {
                     const dueUnix: number = window
-                        .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY"])
+                        .moment(scheduling[i][1], ["YYYY-MM-DD-HH-mm", "YYYY-MM-DD", "DD-MM-YYYY"])
                         .valueOf();
                     const nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
                     if (!Object.prototype.hasOwnProperty.call(this.dueDatesFlashcards, nDays)) {

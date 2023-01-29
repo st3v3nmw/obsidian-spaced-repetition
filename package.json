@@ -1,5 +1,5 @@
 {
-    "name": "obsidian-spaced-repetition",
+    "name": "min-obsidian-spaced-repetition",
     "version": "1.9.4",
     "description": "Fight the forgetting curve by reviewing flashcards & entire notes.",
     "main": "main.js",
