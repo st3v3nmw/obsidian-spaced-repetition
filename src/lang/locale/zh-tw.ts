@@ -7,6 +7,7 @@ export default {
     NEW_CARDS: "新卡片",
     TOTAL_CARDS: "全部卡片",
     BACK: "Back",
+    SKIP: "Skip",
     EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "重置卡片",
     HARD: "較難",

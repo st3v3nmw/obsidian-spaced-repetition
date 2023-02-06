@@ -9,6 +9,7 @@ and this project (sorta) adheres to [Semantic Versioning](https://semver.org/spe
 
 ### Added
 
+-   Add a skip button to the flashcards menu
 -   Add Arabic translation ([@Issam-seghir](https://github.com/Issam-seghir))
 -   Add note title to card context
 -   Modal to edit flashcards ([@AB1908](https://github.com/AB1908))

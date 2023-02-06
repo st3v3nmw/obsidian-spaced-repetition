@@ -196,12 +196,7 @@ export class FlashcardModal extends Modal {
                 this.mode !== FlashcardModalMode.DecksList
             ) {
                 if (this.mode !== FlashcardModalMode.Closed && e.code === "KeyS") {
-                    this.currentDeck.deleteFlashcardAtIndex(
-                        this.currentCardIdx,
-                        this.currentCard.isDue
-                    );
-                    this.burySiblingCards(false);
-                    this.currentDeck.nextCard(this);
+                    this.skipCurrentCard();
                 } else if (
                     this.mode === FlashcardModalMode.Front &&
                     (e.code === "Space" || e.code === "Enter")
@@ -287,11 +282,9 @@ export class FlashcardModal extends Modal {
         backButton.addClass("sr-flashcard-menu-item");
         setIcon(backButton, "arrow-left");
         backButton.setAttribute("aria-label", t("BACK"));
-        backButton.addEventListener("click", (e: PointerEvent) => {
-            if (e.pointerType.length > 0) {
-                this.plugin.data.historyDeck = "";
-                this.decksList();
-            }
+        backButton.addEventListener("click", () => {
+            this.plugin.data.historyDeck = "";
+            this.decksList();
         });
 
         this.editButton = flashCardMenu.createEl("button");
@@ -337,6 +330,14 @@ export class FlashcardModal extends Modal {
                 notePath: this.currentCard.note.path,
             });
             new Notice(currentEaseStr + "\n" + currentIntervalStr + "\n" + generatedFromStr);
+        });
+
+        const skipButton = flashCardMenu.createEl("button");
+        skipButton.addClass("sr-flashcard-menu-item");
+        setIcon(skipButton, "chevrons-right");
+        skipButton.setAttribute("aria-label", t("SKIP"));
+        skipButton.addEventListener("click", () => {
+            this.skipCurrentCard();
         });
 
         if (this.plugin.data.settings.showContextInCards) {
@@ -563,6 +564,12 @@ export class FlashcardModal extends Modal {
                 );
             }
         }
+    }
+
+    private skipCurrentCard(): void {
+        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+        this.burySiblingCards(false);
+        this.currentDeck.nextCard(this);
     }
 
     // slightly modified version of the renderMarkdown function in

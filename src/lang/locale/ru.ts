@@ -10,6 +10,7 @@ export default {
     NEW_CARDS: "Новые карточки",
     TOTAL_CARDS: "Всего карточек",
     BACK: "Back",
+    SKIP: "Skip",
     EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "Сбросить прогресс карточки",
     HARD: "Сложно",
