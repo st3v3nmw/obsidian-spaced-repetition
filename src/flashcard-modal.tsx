@@ -317,6 +317,14 @@ export class FlashcardModal extends Modal {
             this.processReview(ReviewResponse.Reset);
         });
 
+        const skipButton = flashCardMenu.createEl("button");
+        skipButton.addClass("sr-flashcard-menu-item");
+        setIcon(skipButton, "chevrons-right");
+        skipButton.setAttribute("aria-label", t("SKIP"));
+        skipButton.addEventListener("click", () => {
+            this.skipCurrentCard();
+        });
+
         const cardInfo = flashCardMenu.createEl("button");
         cardInfo.addClass("sr-flashcard-menu-item");
         setIcon(cardInfo, "info");
@@ -330,14 +338,6 @@ export class FlashcardModal extends Modal {
                 notePath: this.currentCard.note.path,
             });
             new Notice(currentEaseStr + "\n" + currentIntervalStr + "\n" + generatedFromStr);
-        });
-
-        const skipButton = flashCardMenu.createEl("button");
-        skipButton.addClass("sr-flashcard-menu-item");
-        setIcon(skipButton, "chevrons-right");
-        skipButton.setAttribute("aria-label", t("SKIP"));
-        skipButton.addEventListener("click", () => {
-            this.skipCurrentCard();
         });
 
         if (this.plugin.data.settings.showContextInCards) {
