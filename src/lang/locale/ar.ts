@@ -7,6 +7,7 @@ export default {
     NEW_CARDS: "بطاقات جديدة",
     TOTAL_CARDS: "إجمالي البطاقات",
     BACK: "رجوع",
+    SKIP: "Skip",
     EDIT_CARD: "تعديل البطاقة",
     RESET_CARD_PROGRESS: "إعادة تعيين تقدُّمْ البطاقة",
     HARD: "صعب",

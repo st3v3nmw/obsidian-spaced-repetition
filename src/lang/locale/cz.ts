@@ -7,6 +7,7 @@ export default {
     NEW_CARDS: "Nové kartičky",
     TOTAL_CARDS: "Kartiček celkem",
     BACK: "Back",
+    SKIP: "Skip",
     EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "Vynulovat pokrok kartičky",
     HARD: "Težké",

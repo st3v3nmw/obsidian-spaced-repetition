@@ -7,6 +7,7 @@ export default {
     NEW_CARDS: "New Cards",
     TOTAL_CARDS: "Total Cards",
     BACK: "Back",
+    SKIP: "Skip",
     EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "Reset card's progress",
     HARD: "Hard",
