@@ -10,7 +10,6 @@ edit_uri: ""
 
 theme:
     name: material
-    custom_dir: docs/overrides
     logo: assets/favicon.ico
     favicon: assets/favicon.ico
     icon:
