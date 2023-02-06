@@ -1,7 +1,3 @@
----
-comments: true
----
-
 # Notes
 
 -   Notes should be atomic i.e. focus on a single concept.
