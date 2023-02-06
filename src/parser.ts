@@ -72,7 +72,12 @@ export function parse(
                 (convertCurlyBracketsToClozes && /{{.*?}}/gm.test(lines[i])) ||
                 (clozeOpeningToken !== "" &&
                     clozeClosingToken !== "" &&
-                    new RegExp(`${escapeRegexString(clozeOpeningToken)}.*?${escapeRegexString(clozeClosingToken)}`, "gm").test(lines[i])))
+                    new RegExp(
+                        `${escapeRegexString(clozeOpeningToken)}.*?${escapeRegexString(
+                            clozeClosingToken
+                        )}`,
+                        "gm"
+                    ).test(lines[i])))
         ) {
             cardType = CardType.Cloze;
             lineNo = i;

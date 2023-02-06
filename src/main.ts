@@ -703,9 +703,16 @@ export default class SRPlugin extends Plugin {
                     siblings.push(...cardText.matchAll(/{{(.*?)}}/gm));
                 }
                 if (settings.clozeOpeningToken !== "" && settings.clozeClosingToken !== "") {
-                    siblings.push(...cardText.matchAll(new RegExp(
-                        `${escapeRegexString(settings.clozeOpeningToken)}.*?${escapeRegexString(settings.clozeClosingToken)}`,
-                        "gm")));
+                    siblings.push(
+                        ...cardText.matchAll(
+                            new RegExp(
+                                `${escapeRegexString(
+                                    settings.clozeOpeningToken
+                                )}.*?${escapeRegexString(settings.clozeClosingToken)}`,
+                                "gm"
+                            )
+                        )
+                    );
                 }
                 siblings.sort((a, b) => {
                     if (a.index < b.index) {
