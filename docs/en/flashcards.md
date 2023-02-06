@@ -1,7 +1,3 @@
----
-comments: true
----
-
 # Flashcards
 
 ## Creating

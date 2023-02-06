@@ -9,6 +9,8 @@ and this project (sorta) adheres to [Semantic Versioning](https://semver.org/spe
 
 ### Added
 
+-   Add Arabic translation ([@Issam-seghir](https://github.com/Issam-seghir))
+-   Add note title to card context
 -   Modal to edit flashcards ([@AB1908](https://github.com/AB1908))
 -   Add per-deck cramming command ([@LennyPhoenix](https://github.com/LennyPhoenix))
 -   Add flashcards menu
@@ -16,6 +18,14 @@ and this project (sorta) adheres to [Semantic Versioning](https://semver.org/spe
 ### Changed
 
 -   Add note title to card context
+
+### Removed
+
+-   Remove Giscus comments from docs website
+
+### Fixed
+
+-   Fix some terms in Chinese translations ([@emisjerry](https://github.com/emisjerry))
 
 ## [1.9.4] - 2023-01-08
 

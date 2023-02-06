@@ -1,7 +1,3 @@
----
-comments: true
----
-
 # Contributing
 
 First off, thanks for wanting to contribute to the Spaced Repetition plugin! Your time and effort is highly appreciated.
