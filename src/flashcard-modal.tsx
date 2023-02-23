@@ -195,22 +195,32 @@ export class FlashcardModal extends Modal {
                 document.activeElement.nodeName != "TEXTAREA" &&
                 this.mode !== FlashcardModalMode.DecksList
             ) {
+                const consume = () => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                };
                 if (this.mode !== FlashcardModalMode.Closed && e.code === "KeyS") {
                     this.skipCurrentCard();
+                    consume();
                 } else if (
                     this.mode === FlashcardModalMode.Front &&
                     (e.code === "Space" || e.code === "Enter")
                 ) {
                     this.showAnswer();
+                    consume();
                 } else if (this.mode === FlashcardModalMode.Back) {
                     if (e.code === "Numpad1" || e.code === "Digit1") {
                         this.processReview(ReviewResponse.Hard);
+                        consume();
                     } else if (e.code === "Numpad2" || e.code === "Digit2" || e.code === "Space") {
                         this.processReview(ReviewResponse.Good);
+                        consume();
                     } else if (e.code === "Numpad3" || e.code === "Digit3") {
                         this.processReview(ReviewResponse.Easy);
+                        consume();
                     } else if (e.code === "Numpad0" || e.code === "Digit0") {
                         this.processReview(ReviewResponse.Reset);
+                        consume();
                     }
                 }
             }
