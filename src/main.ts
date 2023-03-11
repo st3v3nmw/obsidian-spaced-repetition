@@ -710,32 +710,16 @@ export default class SRPlugin extends Plugin {
                     return 0;
                 });
 
-                let front: string, back: string;
-                for (const m of siblings) {
-                    const deletionStart: number = m.index,
-                        deletionEnd: number = deletionStart + m[0].length;
-                    front =
-                        cardText.substring(0, deletionStart) +
-                        "<span style='color:#2196f3'>[...]</span>" +
-                        cardText.substring(deletionEnd);
-                    front = front
-                        .replace(/==/gm, "")
-                        .replace(/\*\*/gm, "")
-                        .replace(/{{/gm, "")
-                        .replace(/}}/gm, "");
-                    back =
-                        cardText.substring(0, deletionStart) +
-                        "<span style='color:#2196f3'>" +
-                        cardText.substring(deletionStart, deletionEnd) +
-                        "</span>" +
-                        cardText.substring(deletionEnd);
-                    back = back
-                        .replace(/==/gm, "")
-                        .replace(/\*\*/gm, "")
-                        .replace(/{{/gm, "")
-                        .replace(/}}/gm, "");
-                    siblingMatches.push([front, back]);
-                }
+                const front = siblings.reduce((acc, sibling) => {
+                    const inputHTML = `<input type="text" class="cloze-input" size="${sibling[1].length}" />`;
+
+                    return acc
+                        ? acc.replace(sibling[0], inputHTML)
+                        : acc + sibling.input.replace(sibling[0], inputHTML);
+                }, "");
+
+                // back is being created in flashcard-modal.tsx with getClozeBackView()
+                siblingMatches.push([front, ""]);
             } else {
                 let idx: number;
                 if (cardType === CardType.SingleLineBasic) {

@@ -193,6 +193,7 @@ export class FlashcardModal extends Modal {
             // Checks if the input textbox is in focus before processing keyboard shortcuts.
             if (
                 document.activeElement.nodeName != "TEXTAREA" &&
+                document.activeElement.nodeName !== "INPUT" &&
                 this.mode !== FlashcardModalMode.DecksList
             ) {
                 const consume = () => {
@@ -413,7 +414,29 @@ export class FlashcardModal extends Modal {
         this.currentDeck.nextCard(this);
     }
 
+    private getClozeBackView(inputs: string[]): string {
+        const { convertBoldTextToClozes, convertHighlightsToClozes, convertCurlyBracketsToClozes } =
+            this.plugin.data.settings;
+
+        const clozeMatches = this.currentCard.cardText.match(/==\w+==/g);
+        const clozes = clozeMatches.map((match) => match.replaceAll("==", ""));
+
+        const output = clozes.reduce((acc, answer, index) => {
+            return acc.replace(
+                clozeMatches[index],
+                answer === inputs[index]
+                    ? `<span style="color: green">${inputs[index]}</span>`
+                    : `[<span style="color: red; text-decoration: line-through;">${inputs[index]}</span><span style="color: green">${answer}</span>]`
+            );
+        }, this.currentCard.cardText);
+
+        return output;
+    }
+
     private showAnswer(): void {
+        const clozeInputFields = Array.from(document.getElementsByClassName("cloze-input"));
+        const clozeInputs = clozeInputFields.map((clozeInput) => clozeInput.value);
+
         this.mode = FlashcardModalMode.Back;
 
         this.answerBtn.style.display = "none";
@@ -428,6 +451,7 @@ export class FlashcardModal extends Modal {
             hr.setAttribute("id", "sr-hr-card-divide");
             this.flashcardView.appendChild(hr);
         } else {
+            this.currentCard.back = this.getClozeBackView(clozeInputs);
             this.flashcardView.empty();
         }
 

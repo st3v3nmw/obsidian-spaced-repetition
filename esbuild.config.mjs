@@ -25,6 +25,6 @@ esbuild
         sourcemap: "inline",
         sourcesContent: !prod,
         treeShaking: true,
-        outfile: "build/main.js",
+        outfile: "main.js",
     })
     .catch(() => process.exit(1));
