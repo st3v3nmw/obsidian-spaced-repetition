@@ -24,6 +24,7 @@ import {
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
+import { matchClozesWithinCardText } from "./cloze-matching";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -414,23 +415,20 @@ export class FlashcardModal extends Modal {
         this.currentDeck.nextCard(this);
     }
 
-    private getClozeBackView(inputs: string[]): string {
-        const { convertBoldTextToClozes, convertHighlightsToClozes, convertCurlyBracketsToClozes } =
-            this.plugin.data.settings;
+    private getClozeBackView(clozeInputs: string[]): string {
+        const { cardText } = this.currentCard;
 
-        const clozeMatches = this.currentCard.cardText.match(/==\w+==/g);
-        const clozes = clozeMatches.map((match) => match.replaceAll("==", ""));
+        const clozeMatches = matchClozesWithinCardText(cardText, this.plugin.data.settings);
+        const correctAnswers = clozeMatches.map((match) => match[1]);
 
-        const output = clozes.reduce((acc, answer, index) => {
+        return correctAnswers.reduce((acc, answer, index) => {
             return acc.replace(
-                clozeMatches[index],
-                answer === inputs[index]
-                    ? `<span style="color: green">${inputs[index]}</span>`
-                    : `[<span style="color: red; text-decoration: line-through;">${inputs[index]}</span><span style="color: green">${answer}</span>]`
+                clozeMatches[index][0],
+                answer === clozeInputs[index]
+                    ? `<span style="color: green">${clozeInputs[index]}</span>`
+                    : `[<span style="color: red; text-decoration: line-through;">${clozeInputs[index]}</span><span style="color: green">${answer}</span>]`
             );
         }, this.currentCard.cardText);
-
-        return output;
     }
 
     private showAnswer(): void {
