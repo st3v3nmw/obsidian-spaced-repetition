@@ -490,6 +490,16 @@ export class FlashcardModal extends Modal {
                 this.currentDeck.dueFlashcards.push(this.currentCard);
             } else {
                 this.currentDeck.newFlashcards.push(this.currentCard);
+                // ensure prior sibilings have scheduling information
+                for (const sibiling of this.currentCard.siblings.filter(
+                    (sibling) => !sibling.isDue
+                )) {
+                    const idx = this.currentDeck.newFlashcards.indexOf(sibiling);
+                    if (idx !== -1) {
+                        this.currentDeck.newFlashcards.splice(idx, 1);
+                        this.currentDeck.newFlashcards.push(sibiling);
+                    }
+                }
             }
             due = window.moment(Date.now());
             new Notice(t("CARD_PROGRESS_RESET"));
