@@ -419,10 +419,6 @@ export class FlashcardModal extends Modal {
         this.answerBtn.style.display = "none";
         this.responseDiv.style.display = "grid";
 
-        if (this.currentCard.isDue) {
-            this.resetButton.disabled = false;
-        }
-
         if (this.currentCard.cardType !== CardType.Cloze) {
             const hr: HTMLElement = document.createElement("hr");
             hr.setAttribute("id", "sr-hr-card-divide");
@@ -928,7 +924,6 @@ export class Deck {
         }
 
         modal.responseDiv.style.display = "none";
-        modal.resetButton.disabled = true;
         modal.titleEl.setText(
             `${this.deckName}: ${this.dueFlashcardsCount + this.newFlashcardsCount}`
         );
