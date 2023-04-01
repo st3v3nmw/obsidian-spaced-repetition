@@ -848,8 +848,9 @@ export class Deck {
         if (this.subdecks.length > 0) {
             collapseIconEl = deckViewSelf.createDiv("tree-item-icon collapse-icon");
             collapseIconEl.innerHTML = COLLAPSE_ICON;
-            (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
-                collapsed ? "rotate(-90deg)" : "";
+            (collapseIconEl.childNodes[0] as HTMLElement).style.transform = collapsed
+                ? "rotate(-90deg)"
+                : "";
         }
 
         const deckViewInner: HTMLElement = deckViewSelf.createDiv("tree-item-inner");
