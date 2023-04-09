@@ -192,7 +192,7 @@ export class FlashcardModal extends Modal {
             // TODO: Please fix this. It's ugly.
             // Checks if the input textbox is in focus before processing keyboard shortcuts.
             if (
-                document.activeElement.nodeName != "TEXTAREA" &&
+                document.activeElement.nodeName !== "TEXTAREA" &&
                 this.mode !== FlashcardModalMode.DecksList
             ) {
                 const consume = () => {

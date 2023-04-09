@@ -130,7 +130,7 @@ export default {
     EASY_BONUS_DESC:
         "Easyボーナスによってフラッシュカード/ノートにおける間隔の差分を設定できます(最小値 = 100%)。",
     EASY_BONUS_MIN_WARNING: "Easyボーナスには100以上の数字を指定してください。",
-    MAX_INTERVAL: "間隔の最大値",
+    MAX_INTERVAL: "Maximum interval in days",
     MAX_INTERVAL_DESC: "間隔に上限値を設定することができます(デフォルト値 = 100年)。",
     MAX_INTERVAL_MIN_WARNING: "間隔の最大値には1以上の数字を指定してください。",
     MAX_LINK_CONTRIB: "リンクコントリビューションの最大値",

@@ -114,7 +114,7 @@ export default {
     EASY_BONUS: "簡單獎勵",
     EASY_BONUS_DESC: "簡單獎勵設定「記得」和「簡單」卡片或筆記的復習間隔差距（最小值100%）。",
     EASY_BONUS_MIN_WARNING: "簡單獎勵至少為100。",
-    MAX_INTERVAL: "最大間隔",
+    MAX_INTERVAL: "Maximum interval in days",
     MAX_INTERVAL_DESC: "設定復習的最大間隔時間（預設值100年）。",
     MAX_INTERVAL_MIN_WARNING: "最大間隔至少為1天",
     MAX_LINK_CONTRIB: "最大鏈接貢獻",
