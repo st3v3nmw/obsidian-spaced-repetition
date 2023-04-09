@@ -9,6 +9,7 @@ and this project (sorta) adheres to [Semantic Versioning](https://semver.org/spe
 
 ### Changed
 
+-   Close very old issues (>= 1 year)
 -   Update Russian translation ([mikkovedru](https://github.com/mikkovedru))
 
 ### Fixed
