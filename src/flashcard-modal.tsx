@@ -24,6 +24,7 @@ import {
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
+import { matchClozesWithinCardText } from "./cloze-matching";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -193,6 +194,7 @@ export class FlashcardModal extends Modal {
             // Checks if the input textbox is in focus before processing keyboard shortcuts.
             if (
                 document.activeElement.nodeName != "TEXTAREA" &&
+                document.activeElement.nodeName !== "INPUT" &&
                 this.mode !== FlashcardModalMode.DecksList
             ) {
                 const consume = () => {
@@ -413,7 +415,26 @@ export class FlashcardModal extends Modal {
         this.currentDeck.nextCard(this);
     }
 
+    private getClozeBackView(clozeInputs: string[]): string {
+        const { cardText } = this.currentCard;
+
+        const clozeMatches = matchClozesWithinCardText(cardText, this.plugin.data.settings);
+        const correctAnswers = clozeMatches.map((match) => match[1]);
+
+        return correctAnswers.reduce((acc, answer, index) => {
+            return acc.replace(
+                clozeMatches[index][0],
+                answer === clozeInputs[index]
+                    ? `<span style="color: green">${clozeInputs[index]}</span>`
+                    : `[<span style="color: red; text-decoration: line-through;">${clozeInputs[index]}</span><span style="color: green">${answer}</span>]`
+            );
+        }, this.currentCard.cardText);
+    }
+
     private showAnswer(): void {
+        const clozeInputFields = Array.from(document.getElementsByClassName("cloze-input"));
+        const clozeInputs = clozeInputFields.map((clozeInput) => clozeInput.value);
+
         this.mode = FlashcardModalMode.Back;
 
         this.answerBtn.style.display = "none";
@@ -428,6 +449,7 @@ export class FlashcardModal extends Modal {
             hr.setAttribute("id", "sr-hr-card-divide");
             this.flashcardView.appendChild(hr);
         } else {
+            this.currentCard.back = this.getClozeBackView(clozeInputs);
             this.flashcardView.empty();
         }
 

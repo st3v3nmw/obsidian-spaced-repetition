@@ -25,6 +25,7 @@ import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
 import { t } from "src/lang/helpers";
 import { parse } from "src/parser";
 import { appIcon } from "src/icons/appicon";
+import { matchClozesWithinCardText } from "./cloze-matching";
 
 interface PluginData {
     settings: SRSettings;
@@ -690,52 +691,19 @@ export default class SRPlugin extends Plugin {
 
             const siblingMatches: [string, string][] = [];
             if (cardType === CardType.Cloze) {
-                const siblings: RegExpMatchArray[] = [];
-                if (settings.convertHighlightsToClozes) {
-                    siblings.push(...cardText.matchAll(/==(.*?)==/gm));
-                }
-                if (settings.convertBoldTextToClozes) {
-                    siblings.push(...cardText.matchAll(/\*\*(.*?)\*\*/gm));
-                }
-                if (settings.convertCurlyBracketsToClozes) {
-                    siblings.push(...cardText.matchAll(/{{(.*?)}}/gm));
-                }
-                siblings.sort((a, b) => {
-                    if (a.index < b.index) {
-                        return -1;
-                    }
-                    if (a.index > b.index) {
-                        return 1;
-                    }
-                    return 0;
-                });
+                const front = matchClozesWithinCardText(cardText, this.data.settings).reduce(
+                    (acc, sibling) => {
+                        const inputHTML = `<input type="text" class="cloze-input" size="${sibling[1].length}" />`;
 
-                let front: string, back: string;
-                for (const m of siblings) {
-                    const deletionStart: number = m.index,
-                        deletionEnd: number = deletionStart + m[0].length;
-                    front =
-                        cardText.substring(0, deletionStart) +
-                        "<span style='color:#2196f3'>[...]</span>" +
-                        cardText.substring(deletionEnd);
-                    front = front
-                        .replace(/==/gm, "")
-                        .replace(/\*\*/gm, "")
-                        .replace(/{{/gm, "")
-                        .replace(/}}/gm, "");
-                    back =
-                        cardText.substring(0, deletionStart) +
-                        "<span style='color:#2196f3'>" +
-                        cardText.substring(deletionStart, deletionEnd) +
-                        "</span>" +
-                        cardText.substring(deletionEnd);
-                    back = back
-                        .replace(/==/gm, "")
-                        .replace(/\*\*/gm, "")
-                        .replace(/{{/gm, "")
-                        .replace(/}}/gm, "");
-                    siblingMatches.push([front, back]);
-                }
+                        return acc
+                            ? acc.replace(sibling[0], inputHTML)
+                            : acc + sibling.input.replace(sibling[0], inputHTML);
+                    },
+                    ""
+                );
+
+                // back is being created in flashcard-modal.tsx with getClozeBackView()
+                siblingMatches.push([front, ""]);
             } else {
                 let idx: number;
                 if (cardType === CardType.SingleLineBasic) {
