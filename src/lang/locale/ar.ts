@@ -123,7 +123,7 @@ export default {
     EASY_BONUS_DESC:
         "تتيح لك المكافأة السهلة ضبط الفرق في الفواصل الزمنية بين الرد الجيد والسهل على بطاقة/ملاحظة (الحد الأدنى = 100 ٪).",
     EASY_BONUS_MIN_WARNING: "يجب أن تكون المكافأة السهلة 100 على الأقل.",
-    MAX_INTERVAL: "الحد الأقصى للفاصل",
+    MAX_INTERVAL: "Maximum interval in days",
     MAX_INTERVAL_DESC: "يتيح لك وضع حد أعلى  للفاصل الزمني (افتراضي = 100 عام).",
     MAX_INTERVAL_MIN_WARNING: "يجب أن يكون الحد الأقصى للفاصل الزمني لمدة يوم واحد على الأقل.",
     MAX_LINK_CONTRIB: "أقصى مساهمة ارتباط",

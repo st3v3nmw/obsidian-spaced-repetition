@@ -132,7 +132,7 @@ export default {
     EASY_BONUS_DESC:
         "O bônus de fácil te permite mudar a diferência entre intervalos de responder OK e Fácil em um(a) flashcard/nota (mínimo = 100%).",
     EASY_BONUS_MIN_WARNING: "O bônus de fácil deve ser pelo menos 100.",
-    MAX_INTERVAL: "Intervalo Máximo",
+    MAX_INTERVAL: "Maximum interval in days",
     MAX_INTERVAL_DESC:
         "Te permite colocar um limite máximo no intervalo (pré-definição = 100 anos).",
     MAX_INTERVAL_MIN_WARNING: "O intervalo máximo deve ser pelo menos 1 dia.",
