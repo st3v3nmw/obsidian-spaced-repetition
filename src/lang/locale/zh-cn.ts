@@ -115,7 +115,7 @@ export default {
     EASY_BONUS: "简单奖励",
     EASY_BONUS_DESC: "简单奖励设定“记得”和“简单”卡片或笔记的复习间隔差距（最小值100%）。",
     EASY_BONUS_MIN_WARNING: "简单奖励至少为100。",
-    MAX_INTERVAL: "最大间隔",
+    MAX_INTERVAL: "Maximum interval in days",
     MAX_INTERVAL_DESC: "设定复习的最大间隔时间（默认值100年）。",
     MAX_INTERVAL_MIN_WARNING: "最大间隔至少为1天",
     MAX_LINK_CONTRIB: "最大链接收益",

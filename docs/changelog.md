@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project (sorta) adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+-   Close very old issues (>= 1 year)
+-   Update Russian translation ([mikkovedru](https://github.com/mikkovedru))
+
+### Fixed
+
+-   Show MAX_INTERVAL unit in title ([runchard](https://github.com/runchard))
+-   Fix issue requiring collapseIcon to be clicked twice to expand/collapsed deck tree ([adam-jw-casey](https://github.com/adam-jw-casey))
+-   Consume keyboard event in flashcard modal ([polyipseity](https://github.com/polyipseity))
+
 ## [1.10.0] - 2023-02-06
 
 ### Added

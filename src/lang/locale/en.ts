@@ -124,7 +124,7 @@ export default {
     EASY_BONUS_DESC:
         "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%).",
     EASY_BONUS_MIN_WARNING: "The easy bonus must be at least 100.",
-    MAX_INTERVAL: "Maximum Interval",
+    MAX_INTERVAL: "Maximum interval in days",
     MAX_INTERVAL_DESC: "Allows you to place an upper limit on the interval (default = 100 years).",
     MAX_INTERVAL_MIN_WARNING: "The maximum interval must be at least 1 day.",
     MAX_LINK_CONTRIB: "Maximum link contribution",

@@ -127,7 +127,7 @@ export default {
     EASY_BONUS_DESC:
         "쉬움(Easy) 보너스는 플래시카드/노트에서 좋음(Good)과 쉬움(Easy) 사이의 간격 차이를 설정할 수 있습니다. (최소 = 100%)",
     EASY_BONUS_MIN_WARNING: "쉬움(Easy) 보너스는 적어도 100이어야 합니다.",
-    MAX_INTERVAL: "최대 간격",
+    MAX_INTERVAL: "Maximum interval in days",
     MAX_INTERVAL_DESC: "간격의 상한선을 둘 수 있습니다. (기본값 = 100년)",
     MAX_INTERVAL_MIN_WARNING: "최대 간격은 적어도 1일이어야 합니다.",
     MAX_LINK_CONTRIB: "최대 연결 기여도",
