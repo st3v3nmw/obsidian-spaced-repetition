@@ -10,6 +10,7 @@ export default {
     NEW_CARDS: "Neue Karten",
     TOTAL_CARDS: "Alle Karten",
     BACK: "Back",
+    SKIP: "Skip",
     EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "Kartenfortschritt zurücksetzten",
     HARD: "Schwer",
@@ -138,7 +139,7 @@ export default {
     EASY_BONUS_DESC:
         "Der Einfachheit-Bonus gibt an um welchen Faktor (in Prozent) das Intervall länger sein soll, wenn eine Notiz / Karte 'Einfach' statt 'Gut' abgeschlossen wird. Minimum ist 100%.",
     EASY_BONUS_MIN_WARNING: "Der Einfachheit-Bonus muss mindestens 100 sein.",
-    MAX_INTERVAL: "Maximales Intervall",
+    MAX_INTERVAL: "Maximum interval in days",
     MAX_INTERVAL_DESC:
         "Das maximale Intervall (in Tagen) für Wiederholungen. Standard sind 100 Jahre.",
     MAX_INTERVAL_MIN_WARNING: "Das maximale Interall muss mindestens ein Tag sein.",

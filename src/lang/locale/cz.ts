@@ -7,6 +7,7 @@ export default {
     NEW_CARDS: "Nové kartičky",
     TOTAL_CARDS: "Kartiček celkem",
     BACK: "Back",
+    SKIP: "Skip",
     EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "Vynulovat pokrok kartičky",
     HARD: "Težké",
@@ -128,7 +129,7 @@ export default {
     EASY_BONUS_DESC:
         "Tento bonus umožňuje nastavit rozdíl intervalu mezi jednoduchými a dobrými kartičkami/poznámkami (minimum = 100%).",
     EASY_BONUS_MIN_WARNING: "Bonus pro jednoduchost musí být minimálně 100.",
-    MAX_INTERVAL: "Maximální interval",
+    MAX_INTERVAL: "Maximum interval in days",
     MAX_INTERVAL_DESC: "Umožňuje nastavit horní limit pro interval (defaultně = 100 let).",
     MAX_INTERVAL_MIN_WARNING: "Maximální interval musí být alespoň 1 den.",
     MAX_LINK_CONTRIB: "Maximální příspěvěk prolinkování",

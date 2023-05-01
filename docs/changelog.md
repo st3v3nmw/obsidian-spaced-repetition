@@ -7,8 +7,24 @@ and this project (sorta) adheres to [Semantic Versioning](https://semver.org/spe
 
 ## [Unreleased]
 
+### Changed
+
+-   Close very old issues (>= 1 year)
+-   Update Russian translation ([mikkovedru](https://github.com/mikkovedru))
+
+### Fixed
+
+-   Show MAX_INTERVAL unit in title ([runchard](https://github.com/runchard))
+-   Fix issue requiring collapseIcon to be clicked twice to expand/collapsed deck tree ([adam-jw-casey](https://github.com/adam-jw-casey))
+-   Consume keyboard event in flashcard modal ([polyipseity](https://github.com/polyipseity))
+
+## [1.10.0] - 2023-02-06
+
 ### Added
 
+-   Add a skip button to the flashcards menu
+-   Add Arabic translation ([@Issam-seghir](https://github.com/Issam-seghir))
+-   Add note title to card context
 -   Modal to edit flashcards ([@AB1908](https://github.com/AB1908))
 -   Add per-deck cramming command ([@LennyPhoenix](https://github.com/LennyPhoenix))
 -   Add flashcards menu
@@ -16,6 +32,14 @@ and this project (sorta) adheres to [Semantic Versioning](https://semver.org/spe
 ### Changed
 
 -   Add note title to card context
+
+### Removed
+
+-   Remove Giscus comments from docs website
+
+### Fixed
+
+-   Fix some terms in Chinese translations ([@emisjerry](https://github.com/emisjerry))
 
 ## [1.9.4] - 2023-01-08
 

@@ -1,7 +1,3 @@
----
-comments: true
----
-
 # Algorithms
 
 ## SM-2

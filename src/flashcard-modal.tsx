@@ -192,30 +192,35 @@ export class FlashcardModal extends Modal {
             // TODO: Please fix this. It's ugly.
             // Checks if the input textbox is in focus before processing keyboard shortcuts.
             if (
-                document.activeElement.nodeName != "TEXTAREA" &&
+                document.activeElement.nodeName !== "TEXTAREA" &&
                 this.mode !== FlashcardModalMode.DecksList
             ) {
+                const consume = () => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                };
                 if (this.mode !== FlashcardModalMode.Closed && e.code === "KeyS") {
-                    this.currentDeck.deleteFlashcardAtIndex(
-                        this.currentCardIdx,
-                        this.currentCard.isDue
-                    );
-                    this.burySiblingCards(false);
-                    this.currentDeck.nextCard(this);
+                    this.skipCurrentCard();
+                    consume();
                 } else if (
                     this.mode === FlashcardModalMode.Front &&
                     (e.code === "Space" || e.code === "Enter")
                 ) {
                     this.showAnswer();
+                    consume();
                 } else if (this.mode === FlashcardModalMode.Back) {
                     if (e.code === "Numpad1" || e.code === "Digit1") {
                         this.processReview(ReviewResponse.Hard);
+                        consume();
                     } else if (e.code === "Numpad2" || e.code === "Digit2" || e.code === "Space") {
                         this.processReview(ReviewResponse.Good);
+                        consume();
                     } else if (e.code === "Numpad3" || e.code === "Digit3") {
                         this.processReview(ReviewResponse.Easy);
+                        consume();
                     } else if (e.code === "Numpad0" || e.code === "Digit0") {
                         this.processReview(ReviewResponse.Reset);
+                        consume();
                     }
                 }
             }
@@ -287,11 +292,9 @@ export class FlashcardModal extends Modal {
         backButton.addClass("sr-flashcard-menu-item");
         setIcon(backButton, "arrow-left");
         backButton.setAttribute("aria-label", t("BACK"));
-        backButton.addEventListener("click", (e: PointerEvent) => {
-            if (e.pointerType.length > 0) {
-                this.plugin.data.historyDeck = "";
-                this.decksList();
-            }
+        backButton.addEventListener("click", () => {
+            this.plugin.data.historyDeck = "";
+            this.decksList();
         });
 
         this.editButton = flashCardMenu.createEl("button");
@@ -337,6 +340,14 @@ export class FlashcardModal extends Modal {
                 notePath: this.currentCard.note.path,
             });
             new Notice(currentEaseStr + "\n" + currentIntervalStr + "\n" + generatedFromStr);
+        });
+
+        const skipButton = flashCardMenu.createEl("button");
+        skipButton.addClass("sr-flashcard-menu-item");
+        setIcon(skipButton, "chevrons-right");
+        skipButton.setAttribute("aria-label", t("SKIP"));
+        skipButton.addEventListener("click", () => {
+            this.skipCurrentCard();
         });
 
         if (this.plugin.data.settings.showContextInCards) {
@@ -563,6 +574,12 @@ export class FlashcardModal extends Modal {
                 );
             }
         }
+    }
+
+    private skipCurrentCard(): void {
+        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+        this.burySiblingCards(false);
+        this.currentDeck.nextCard(this);
     }
 
     // slightly modified version of the renderMarkdown function in
@@ -826,13 +843,14 @@ export class Deck {
         );
         const shouldBeInitiallyExpanded: boolean =
             modal.plugin.data.settings.initiallyExpandAllSubdecksInTree;
-        let collapsed = shouldBeInitiallyExpanded;
+        let collapsed = !shouldBeInitiallyExpanded;
         let collapseIconEl: HTMLElement | null = null;
         if (this.subdecks.length > 0) {
             collapseIconEl = deckViewSelf.createDiv("tree-item-icon collapse-icon");
             collapseIconEl.innerHTML = COLLAPSE_ICON;
-            (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
-                shouldBeInitiallyExpanded ? "" : "rotate(-90deg)";
+            (collapseIconEl.childNodes[0] as HTMLElement).style.transform = collapsed
+                ? "rotate(-90deg)"
+                : "";
         }
 
         const deckViewInner: HTMLElement = deckViewSelf.createDiv("tree-item-inner");
@@ -870,7 +888,7 @@ export class Deck {
         );
 
         const deckViewChildren: HTMLElement = deckView.createDiv("tree-item-children");
-        deckViewChildren.style.display = shouldBeInitiallyExpanded ? "block" : "none";
+        deckViewChildren.style.display = collapsed ? "none" : "block";
         if (this.subdecks.length > 0) {
             collapseIconEl.addEventListener("click", () => {
                 if (collapsed) {
