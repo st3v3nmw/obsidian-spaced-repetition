@@ -410,7 +410,6 @@ export class FlashcardModal extends Modal {
         await this.app.vault.modify(this.currentCard.note, fileText);
         this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
         this.burySiblingCards(false);
-        this.currentDeck.nextCard(this);
     }
 
     private showAnswer(): void {
