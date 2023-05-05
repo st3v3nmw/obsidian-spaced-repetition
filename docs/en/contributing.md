@@ -1,6 +1,6 @@
 # Contributing
 
-First off, thanks for wanting to contribute to the Spaced Repetition plugin! Your time and effort is highly appreciated.
+First off, thanks for wanting to contribute to the Spaced Repetition plugin!
 
 ## Bug Reports & Feature Requests
 
@@ -139,7 +139,7 @@ Example using `v1.9.2`:
         - `MINOR` version when you add functionality in a backwards compatible manner
         - `PATCH` version when you make backwards compatible bug fixes
     - If the new version uses new Obsidian APIs, update `minAppVersion` and `versions.json` to reflect this.
-3. Update the changelog (`docs/changelog.md`); use the new version to replace the `[Unreleased]` section.
+3. Run `npm run changelog` to update the CHANGELOG.
 4. Commit and push the changes:
 
     ```bash
