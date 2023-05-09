@@ -146,3 +146,7 @@ test("Test textInterval - mobile", () => {
     expect(textInterval(366, true)).toEqual("1y");
     expect(textInterval(1000, true)).toEqual("2.7y");
 });
+
+test("Test new cards", () => {
+    expect(textInterval(undefined, false)).toEqual("NEW");
+});
