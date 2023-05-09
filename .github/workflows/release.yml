@@ -23,8 +23,9 @@ jobs:
             - name: Build
               id: build
               run: |
-                  npm install || npm install --legacy-peer-deps
-                  npm run build --if-present
+                  npm install -g pnpm
+                  pnpm install
+                  pnpm build
                   mkdir ${{ env.PLUGIN_NAME }}
                   cp build/main.js manifest.json styles.css ${{ env.PLUGIN_NAME }}
                   zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}

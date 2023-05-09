@@ -19,4 +19,10 @@ module.exports = {
     ],
     coverageDirectory: "coverage",
     collectCoverage: true,
+    coverageThreshold: {
+        global: {
+            statements: 14,
+            branches: 23,
+        },
+    },
 };

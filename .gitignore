@@ -3,11 +3,10 @@
 .idea
 
 # vscode
-.vscode 
+.vscode
 
 # npm
 node_modules
-package-lock.json
 
 # yarn
 yarn-error.log
