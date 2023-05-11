@@ -148,5 +148,5 @@ test("Test textInterval - mobile", () => {
 });
 
 test("Test new cards", () => {
-    expect(textInterval(undefined, false)).toEqual("NEW");
+    expect(textInterval(undefined, false)).toEqual("New");
 });
