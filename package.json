@@ -8,7 +8,7 @@
         "dev": "node esbuild.config.mjs",
         "format": "npx prettier --write .",
         "lint": "npx prettier --check . && npx eslint src/",
-        "test": "jest --verbose",
+        "test": "jest",
         "changelog": "auto-changelog --template=compact --package && npx prettier --write CHANGELOG.md"
     },
     "keywords": [
