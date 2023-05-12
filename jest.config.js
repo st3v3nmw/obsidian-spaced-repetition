@@ -8,7 +8,7 @@ module.exports = {
         "src/(.*)": "<rootDir>/src/$1",
     },
     moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node", "d.ts"],
-    roots: ["<rootDir>/src/", "<rootDir>/tests/"],
+    roots: ["<rootDir>/src/", "<rootDir>/tests/unit/"],
     collectCoverageFrom: ["src/**/lang/*.ts", "src/parser.ts", "src/scheduling.ts", "utils.ts"],
     coveragePathIgnorePatterns: [
         "/node_modules/",
