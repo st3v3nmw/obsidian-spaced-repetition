@@ -21,8 +21,9 @@ yarn-error.log
 # build
 build
 
-# coverage
+# testing
 coverage
+tests/e2e/vault/
 
 # mkdocs
 site/
