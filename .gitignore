@@ -29,3 +29,6 @@ tests/e2e/vault/
 site/
 venv/
 .venv/
+
+# env
+env.sh
