@@ -6,8 +6,8 @@ exports.config = {
             maxInstances: 1,
             browserName: "chrome",
             "goog:chromeOptions": {
-                binary: "/var/lib/flatpak/exports/bin/md.obsidian.Obsidian",
-                args: [],
+                binary: process.env.OBSIDIAN_BINARY_PATH,
+                args: process.env.CI ? ["headless"] : [],
             },
             acceptInsecureCerts: true,
         },

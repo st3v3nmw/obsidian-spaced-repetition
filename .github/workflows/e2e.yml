@@ -1,0 +1,32 @@
+# Note that this job currently doesn't work properly
+
+name: End to End Tests
+
+on: workflow_dispatch
+
+env:
+    OBSIDIAN_VERSION: 1.2.8
+
+jobs:
+    e2e:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "20.x"
+
+            - uses: actions/checkout@v3
+
+            - name: Install Obsidian
+              run: >
+                  sudo apt-get install libnotify4 &&
+                  curl -L https://github.com/obsidianmd/obsidian-releases/releases/download/v${{ env.OBSIDIAN_VERSION }}/obsidian_${{ env.OBSIDIAN_VERSION }}_amd64.deb -o Obsidian.deb &&
+                  sudo dpkg -i Obsidian.deb
+
+            - name: Install NPM Dependencies
+              run: npm install -g pnpm && pnpm install
+
+            - name: Test
+              run: pnpm e2e
