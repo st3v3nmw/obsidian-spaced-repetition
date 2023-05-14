@@ -31,12 +31,6 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
     -   Possible use case: [Incremental writing](https://www.stephenmwangi.com/obsidian-spaced-repetition/notes/#incremental-writing)
 -   [Statistics](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#statistics)
 
-## Quick Demo
-
-https://user-images.githubusercontent.com/43380836/115256965-5d455f00-a138-11eb-988f-27ba29f328a0.mp4
-
-(if the screencast video doesn't play, check it out on the project's [README](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/README.md) on GitHub)
-
 ## Usage
 
 Check the [docs](https://www.stephenmwangi.com/obsidian-spaced-repetition/) for more details.
