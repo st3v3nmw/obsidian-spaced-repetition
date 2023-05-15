@@ -10,13 +10,20 @@ export default {
     NEW_CARDS: "Neue Karten",
     TOTAL_CARDS: "Alle Karten",
     BACK: "Back",
-    EDIT_LATER: "Später bearbeiten",
+    SKIP: "Skip",
+    EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "Kartenfortschritt zurücksetzten",
     HARD: "Schwer",
     GOOD: "Gut",
     EASY: "Einfach",
     SHOW_ANSWER: "Zeige Antwort",
     CARD_PROGRESS_RESET: "Kartenfortschritt wurde zurückgesetzt.",
+    SAVE: "Save",
+    CANCEL: "Cancel",
+    NO_INPUT: "No input provided.",
+    CURRENT_EASE_HELP_TEXT: "Current Ease: ",
+    CURRENT_INTERVAL_HELP_TEXT: "Current Interval: ",
+    CARD_GENERATED_FROM: "Generated from: ${notePath}",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Notiz zur Wiederholung öffnen",
@@ -27,9 +34,10 @@ export default {
     REVIEW_NOTE_EASY_CMD: "Notiz abschliessen als: Einfach",
     REVIEW_NOTE_GOOD_CMD: "Notiz abschliessen als: Gut",
     REVIEW_NOTE_HARD_CMD: "Notiz abschliessen als: Schwer",
+    REVIEW_ALL_CARDS: "Alle Lernkarten wiederholen",
+    CRAM_ALL_CARDS: "Select a deck to cram",
     REVIEW_CARDS_IN_NOTE: "Lernkarten in dieser Notiz wiederholen",
     CRAM_CARDS_IN_NOTE: "Lernkarten in dieser Notiz pauken.",
-    REVIEW_ALL_CARDS: "Alle Lernkarten wiederholen",
     VIEW_STATS: "Statistiken anzeigen",
     STATUS_BAR:
         "Wiederholung: ${dueNotesCount} Notiz(en), ${dueFlashcardsCount} Karte(n) anstehend",
@@ -82,8 +90,6 @@ export default {
         "Auf kleinen Bildschirmen (z.B. Smartphones) oder bei sehr grossen Bildern sollte dieser Wert auf 100% gesetzt werden.",
     RESET_DEFAULT: "Standardeinstellung wiederherstellen",
     CARD_MODAL_WIDTH_PERCENT: "Breite einer Lernkarte in Prozent",
-    FILENAME_OR_OPEN_FILE:
-        "Während der Wiederholung den Notiznamen statt 'Später bearbeiten' anzeigen?",
     RANDOMIZE_CARD_ORDER: "Während der Wiederhoung die Reihenfolge zufällig mischen?",
     DISABLE_CLOZE_CARDS: "Lückentextkarten (cloze deletions) deaktivieren?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==Hervorgehobenen== Text in Lückentextkarten umwandeln?",
@@ -130,7 +136,7 @@ export default {
     EASY_BONUS_DESC:
         "Der Einfachheit-Bonus gibt an um welchen Faktor (in Prozent) das Intervall länger sein soll, wenn eine Notiz / Karte 'Einfach' statt 'Gut' abgeschlossen wird. Minimum ist 100%.",
     EASY_BONUS_MIN_WARNING: "Der Einfachheit-Bonus muss mindestens 100 sein.",
-    MAX_INTERVAL: "Maximales Intervall",
+    MAX_INTERVAL: "Maximum interval in days",
     MAX_INTERVAL_DESC:
         "Das maximale Intervall (in Tagen) für Wiederholungen. Standard sind 100 Jahre.",
     MAX_INTERVAL_MIN_WARNING: "Das maximale Interall muss mindestens ein Tag sein.",

@@ -8,13 +8,20 @@ export default {
     NEW_CARDS: "Novas Cartas",
     TOTAL_CARDS: "Total de Cartas",
     BACK: "Back",
-    EDIT_LATER: "Editar Depois",
+    SKIP: "Skip",
+    EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "Reiniciar o Progresso da Carta",
     HARD: "Difícil",
     GOOD: "OK",
     EASY: "Fácil",
     SHOW_ANSWER: "Mostrar Resposta",
     CARD_PROGRESS_RESET: "O Progresso da Carta foi reiniciado",
+    SAVE: "Save",
+    CANCEL: "Cancel",
+    NO_INPUT: "No input provided.",
+    CURRENT_EASE_HELP_TEXT: "Current Ease: ",
+    CURRENT_INTERVAL_HELP_TEXT: "Current Interval: ",
+    CARD_GENERATED_FROM: "Generated from: ${notePath}",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Abrir uma nota para revisar",
@@ -25,9 +32,10 @@ export default {
     REVIEW_NOTE_EASY_CMD: "Revisar nota como fácil",
     REVIEW_NOTE_GOOD_CMD: "Revisar nota como OK",
     REVIEW_NOTE_HARD_CMD: "Revisar nota como difícil",
+    REVIEW_ALL_CARDS: "Revisar flashcards de todas as notas",
+    CRAM_ALL_CARDS: "Select a deck to cram",
     REVIEW_CARDS_IN_NOTE: "Revisar flashcards nessa nota",
     CRAM_CARDS_IN_NOTE: "Revisar todas as flashcards nessa nota",
-    REVIEW_ALL_CARDS: "Revisar flashcards de todas as notas",
     VIEW_STATS: "Ver estatísticas",
     STATUS_BAR:
         "Revisão: ${dueNotesCount} nota(s), ${dueFlashcardsCount} Carta(s) para colocar em dia",
@@ -79,8 +87,6 @@ export default {
         "Deveria estar configurado em 100% em dispositivos móveis ou se você tem imagens muito grandes",
     RESET_DEFAULT: "Reiniciar para a pré-definição",
     CARD_MODAL_WIDTH_PERCENT: "Porcentagem de Largura do Flashcard",
-    FILENAME_OR_OPEN_FILE:
-        "Mostrar o nome do arquivo ao invés de 'Editar Depois' na revisão dos flashcards?",
     RANDOMIZE_CARD_ORDER: "Aleatorizar a ordem das cartas durante a revisão?",
     DISABLE_CLOZE_CARDS: "Desabilitar cartas que usam omissão de palavras?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Converter ==marca-texto== em omissões?",
@@ -126,7 +132,7 @@ export default {
     EASY_BONUS_DESC:
         "O bônus de fácil te permite mudar a diferência entre intervalos de responder OK e Fácil em um(a) flashcard/nota (mínimo = 100%).",
     EASY_BONUS_MIN_WARNING: "O bônus de fácil deve ser pelo menos 100.",
-    MAX_INTERVAL: "Intervalo Máximo",
+    MAX_INTERVAL: "Maximum interval in days",
     MAX_INTERVAL_DESC:
         "Te permite colocar um limite máximo no intervalo (pré-definição = 100 anos).",
     MAX_INTERVAL_MIN_WARNING: "O intervalo máximo deve ser pelo menos 1 dia.",

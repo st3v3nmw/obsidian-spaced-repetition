@@ -3,11 +3,10 @@
 .idea
 
 # vscode
-.vscode 
+.vscode
 
 # npm
 node_modules
-package-lock.json
 
 # yarn
 yarn-error.log
@@ -22,8 +21,17 @@ yarn-error.log
 # build
 build
 
-# coverage
+# testing
 coverage
 
 # Temp for hot reloads
 main.js
+tests/e2e/vault/
+
+# mkdocs
+site/
+venv/
+.venv/
+
+# env
+env.sh

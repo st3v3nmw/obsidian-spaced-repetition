@@ -1,12 +1,13 @@
 import {
+    ButtonComponent,
     Modal,
     App,
     MarkdownRenderer,
     Notice,
     Platform,
     TFile,
-    MarkdownView,
-    WorkspaceLeaf,
+    TextAreaComponent,
+    setIcon,
 } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
@@ -34,6 +35,123 @@ export enum FlashcardModalMode {
     Closed,
 }
 
+// from https://github.com/chhoumann/quickadd/blob/bce0b4cdac44b867854d6233796e3406dfd163c6/src/gui/GenericInputPrompt/GenericInputPrompt.ts#L5
+export class FlashcardEditModal extends Modal {
+    public plugin: SRPlugin;
+    public input: string;
+    public waitForClose: Promise<string>;
+
+    private resolvePromise: (input: string) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private rejectPromise: (reason?: any) => void;
+    private didSubmit = false;
+    private inputComponent: TextAreaComponent;
+    private readonly modalText: string;
+
+    public static Prompt(app: App, plugin: SRPlugin, placeholder: string): Promise<string> {
+        const newPromptModal = new FlashcardEditModal(app, plugin, placeholder);
+        return newPromptModal.waitForClose;
+    }
+    constructor(app: App, plugin: SRPlugin, existingText: string) {
+        super(app);
+        this.plugin = plugin;
+        this.titleEl.setText(t("EDIT_CARD"));
+        this.titleEl.addClass("sr-centered");
+        this.modalText = existingText;
+
+        this.waitForClose = new Promise<string>((resolve, reject) => {
+            this.resolvePromise = resolve;
+            this.rejectPromise = reject;
+        });
+        this.display();
+        this.open();
+    }
+
+    private display() {
+        this.contentEl.empty();
+        this.modalEl.addClass("sr-flashcard-input-modal");
+
+        const mainContentContainer: HTMLDivElement = this.contentEl.createDiv();
+        mainContentContainer.addClass("sr-flashcard-input-area");
+        this.inputComponent = this.createInputField(mainContentContainer, this.modalText);
+        this.createButtonBar(mainContentContainer);
+    }
+
+    private createButton(
+        container: HTMLElement,
+        text: string,
+        callback: (evt: MouseEvent) => void
+    ) {
+        const btn = new ButtonComponent(container);
+        btn.setButtonText(text).onClick(callback);
+        return btn;
+    }
+
+    private createButtonBar(mainContentContainer: HTMLDivElement) {
+        const buttonBarContainer: HTMLDivElement = mainContentContainer.createDiv();
+        buttonBarContainer.addClass("sr-flashcard-edit-button-bar");
+        this.createButton(
+            buttonBarContainer,
+            t("SAVE"),
+            this.submitClickCallback
+        ).setCta().buttonEl.style.marginRight = "0";
+        this.createButton(buttonBarContainer, t("CANCEL"), this.cancelClickCallback);
+    }
+
+    protected createInputField(container: HTMLElement, value: string) {
+        const textComponent = new TextAreaComponent(container);
+
+        textComponent.inputEl.style.width = "100%";
+        textComponent
+            .setValue(value ?? "")
+            .onChange((value) => (this.input = value))
+            .inputEl.addEventListener("keydown", this.submitEnterCallback);
+
+        return textComponent;
+    }
+
+    private submitClickCallback = (_: MouseEvent) => this.submit();
+    private cancelClickCallback = (_: MouseEvent) => this.cancel();
+
+    private submitEnterCallback = (evt: KeyboardEvent) => {
+        if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter") {
+            evt.preventDefault();
+            this.submit();
+        }
+    };
+
+    private submit() {
+        this.didSubmit = true;
+
+        this.close();
+    }
+
+    private cancel() {
+        this.close();
+    }
+
+    onOpen() {
+        super.onOpen();
+
+        this.inputComponent.inputEl.focus();
+    }
+
+    onClose() {
+        super.onClose();
+        this.resolveInput();
+        this.removeInputListener();
+    }
+
+    private resolveInput() {
+        if (!this.didSubmit) this.rejectPromise(t("NO_INPUT"));
+        else this.resolvePromise(this.input);
+    }
+
+    private removeInputListener() {
+        this.inputComponent.inputEl.removeEventListener("keydown", this.submitEnterCallback);
+    }
+}
+
 export class FlashcardModal extends Modal {
     public plugin: SRPlugin;
     public answerBtn: HTMLElement;
@@ -43,8 +161,8 @@ export class FlashcardModal extends Modal {
     public easyBtn: HTMLElement;
     public nextBtn: HTMLElement;
     public responseDiv: HTMLElement;
-    public fileLinkView: HTMLElement;
-    public resetLinkView: HTMLElement;
+    public resetButton: HTMLElement;
+    public editButton: HTMLElement;
     public contextView: HTMLElement;
     public currentCard: Card;
     public currentCardIdx: number;
@@ -72,29 +190,40 @@ export class FlashcardModal extends Modal {
         this.contentEl.style.height = "92%";
         this.contentEl.addClass("sr-modal-content");
 
+        // TODO: refactor into event handler?
         document.body.onkeydown = (e) => {
-            if (this.mode !== FlashcardModalMode.DecksList) {
+            // TODO: Please fix this. It's ugly.
+            // Checks if the input textbox is in focus before processing keyboard shortcuts.
+            if (
+                document.activeElement.nodeName !== "TEXTAREA" &&
+                this.mode !== FlashcardModalMode.DecksList
+            ) {
+                const consume = () => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                };
                 if (this.mode !== FlashcardModalMode.Closed && e.code === "KeyS") {
-                    this.currentDeck.deleteFlashcardAtIndex(
-                        this.currentCardIdx,
-                        this.currentCard.isDue
-                    );
-                    this.burySiblingCards(false);
-                    this.currentDeck.nextCard(this);
+                    this.skipCurrentCard();
+                    consume();
                 } else if (
                     this.mode === FlashcardModalMode.Front &&
                     (e.code === "Space" || e.code === "Enter")
                 ) {
                     this.showAnswer();
+                    consume();
                 } else if (this.mode === FlashcardModalMode.Back) {
                     if (e.code === "Numpad1" || e.code === "Digit1") {
                         this.processReview(ReviewResponse.Hard);
+                        consume();
                     } else if (e.code === "Numpad2" || e.code === "Digit2" || e.code === "Space") {
                         this.processReview(ReviewResponse.Good);
+                        consume();
                     } else if (e.code === "Numpad3" || e.code === "Digit3") {
                         this.processReview(ReviewResponse.Easy);
+                        consume();
                     } else if (e.code === "Numpad0" || e.code === "Digit0") {
                         this.processReview(ReviewResponse.Reset);
+                        consume();
                     }
                 }
             }
@@ -149,7 +278,7 @@ export class FlashcardModal extends Modal {
                 </span>
             </p>
         );
-        this.contentEl.innerHTML = "";
+        this.contentEl.empty();
         this.contentEl.setAttribute("id", "sr-flashcard-view");
 
         for (const deck of this.plugin.deckTree.subdecks) {
@@ -158,68 +287,71 @@ export class FlashcardModal extends Modal {
     }
 
     setupCardsView(): void {
-        this.contentEl.innerHTML = "";
+        this.contentEl.empty();
 
-        const historyLinkView = this.contentEl.createEl("button");
-        historyLinkView.addClass("sr-back-btn");
-        historyLinkView.setAttribute("aria-label", t("BACK"));
-        historyLinkView.innerHTML += (
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewbox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="svg-icon lucide-arrow-left"
-            >
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-        );
-        historyLinkView.addEventListener("click", (e: PointerEvent) => {
-            if (e.pointerType.length > 0) {
-                this.plugin.data.historyDeck = "";
-                this.decksList();
-            }
+        const flashCardMenu = this.contentEl.createDiv("sr-flashcard-menu");
+
+        const backButton = flashCardMenu.createEl("button");
+        backButton.addClass("sr-flashcard-menu-item");
+        setIcon(backButton, "arrow-left");
+        backButton.setAttribute("aria-label", t("BACK"));
+        backButton.addEventListener("click", () => {
+            this.plugin.data.historyDeck = "";
+            this.decksList();
         });
 
-        this.fileLinkView = this.contentEl.createDiv("sr-link");
-        this.fileLinkView.setText(t("EDIT_LATER"));
-        if (this.plugin.data.settings.showFileNameInFileLink) {
-            this.fileLinkView.setAttribute("aria-label", t("EDIT_LATER"));
-        }
-        this.fileLinkView.addEventListener("click", async () => {
-            const activeLeaf: WorkspaceLeaf = this.plugin.app.workspace.getLeaf();
-            if (this.plugin.app.workspace.getActiveFile() === null)
-                await activeLeaf.openFile(this.currentCard.note);
-            else {
-                const newLeaf = this.plugin.app.workspace.createLeafBySplit(
-                    activeLeaf,
-                    "vertical",
-                    false
-                );
-                await newLeaf.openFile(this.currentCard.note, { active: true });
+        this.editButton = flashCardMenu.createEl("button");
+        this.editButton.addClass("sr-flashcard-menu-item");
+        setIcon(this.editButton, "edit");
+        this.editButton.setAttribute("aria-label", t("EDIT_CARD"));
+        this.editButton.addEventListener("click", async () => {
+            // remove SR info from input modal prompt
+            const textPromptArr = this.currentCard.cardText.split("\n");
+            let textPrompt = "";
+            if (textPromptArr[textPromptArr.length - 1].startsWith("<!--SR:")) {
+                textPrompt = textPromptArr.slice(0, -1).join("\n");
+            } else {
+                textPrompt = this.currentCard.cardText;
             }
-            const activeView: MarkdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-            activeView.editor.setCursor({
-                line: this.currentCard.lineNo,
-                ch: 0,
-            });
-            this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
-            this.burySiblingCards(false);
-            this.currentDeck.nextCard(this);
+
+            const editModal = FlashcardEditModal.Prompt(this.app, this.plugin, textPrompt);
+            editModal
+                .then(async (modifiedCardText) => {
+                    this.modifyCardText(textPrompt, modifiedCardText);
+                })
+                .catch((reason) => console.log(reason));
         });
 
-        this.resetLinkView = this.contentEl.createDiv("sr-link");
-        this.resetLinkView.setText(t("RESET_CARD_PROGRESS"));
-        this.resetLinkView.addEventListener("click", () => {
+        this.resetButton = flashCardMenu.createEl("button");
+        this.resetButton.addClass("sr-flashcard-menu-item");
+        setIcon(this.resetButton, "refresh-cw");
+        this.resetButton.setAttribute("aria-label", t("RESET_CARD_PROGRESS"));
+        this.resetButton.addEventListener("click", () => {
             this.processReview(ReviewResponse.Reset);
         });
-        this.resetLinkView.style.float = "right";
+
+        const cardInfo = flashCardMenu.createEl("button");
+        cardInfo.addClass("sr-flashcard-menu-item");
+        setIcon(cardInfo, "info");
+        cardInfo.setAttribute("aria-label", "View Card Info");
+        cardInfo.addEventListener("click", async () => {
+            const currentEaseStr =
+                t("CURRENT_EASE_HELP_TEXT") + (this.currentCard.ease ?? t("NEW"));
+            const currentIntervalStr =
+                t("CURRENT_INTERVAL_HELP_TEXT") + textInterval(this.currentCard.interval, false);
+            const generatedFromStr = t("CARD_GENERATED_FROM", {
+                notePath: this.currentCard.note.path,
+            });
+            new Notice(currentEaseStr + "\n" + currentIntervalStr + "\n" + generatedFromStr);
+        });
+
+        const skipButton = flashCardMenu.createEl("button");
+        skipButton.addClass("sr-flashcard-menu-item");
+        setIcon(skipButton, "chevrons-right");
+        skipButton.setAttribute("aria-label", t("SKIP"));
+        skipButton.addEventListener("click", () => {
+            this.skipCurrentCard();
+        });
 
         if (this.plugin.data.settings.showContextInCards) {
             this.contextView = this.contentEl.createDiv();
@@ -229,7 +361,7 @@ export class FlashcardModal extends Modal {
         this.flashcardView = this.contentEl.createDiv("div");
         this.flashcardView.setAttribute("id", "sr-flashcard-view");
 
-        this.responseDiv = this.contentEl.createDiv("sr-response");
+        this.responseDiv = this.contentEl.createDiv("sr-flashcard-response");
 
         // TODO: Add 'impossible' button, forcing card to be reviewed no matter length of other buttons.
         // Requires adding for all languages.
@@ -275,14 +407,25 @@ export class FlashcardModal extends Modal {
         }
     }
 
-    showAnswer(): void {
+    private async modifyCardText(originalText: string, replacementText: string) {
+        if (!replacementText) return;
+        if (replacementText == originalText) return;
+        let fileText: string = await this.app.vault.read(this.currentCard.note);
+        const originalTextRegex = new RegExp(escapeRegexString(originalText), "gm");
+        fileText = fileText.replace(originalTextRegex, replacementText);
+        await this.app.vault.modify(this.currentCard.note, fileText);
+        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+        this.burySiblingCards(false);
+    }
+
+    private showAnswer(): void {
         this.mode = FlashcardModalMode.Back;
 
         this.answerBtn.style.display = "none";
         this.responseDiv.style.display = "grid";
 
         if (this.currentCard.isDue) {
-            this.resetLinkView.style.display = "inline-block";
+            this.resetButton.disabled = false;
         }
 
         if (this.currentCard.cardType !== CardType.Cloze) {
@@ -290,13 +433,13 @@ export class FlashcardModal extends Modal {
             hr.setAttribute("id", "sr-hr-card-divide");
             this.flashcardView.appendChild(hr);
         } else {
-            this.flashcardView.innerHTML = "";
+            this.flashcardView.empty();
         }
 
         this.renderMarkdownWrapper(this.currentCard.back, this.flashcardView);
     }
 
-    async processReview(response: ReviewResponse): Promise<void> {
+    private async processReview(response: ReviewResponse): Promise<void> {
         if (this.ignoreStats) {
             if (response == ReviewResponse.Easy) {
                 this.currentDeck.deleteFlashcardAtIndex(
@@ -382,7 +525,7 @@ export class FlashcardModal extends Modal {
             this.currentCard.cardText =
                 this.currentCard.cardText + sep + `<!--SR:!${dueString},${interval},${ease}-->`;
         } else {
-            let scheduling: RegExpMatchArray[] = [
+            let scheduling: (RegExpMatchArray | string[])[] = [
                 ...this.currentCard.cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
             ];
             if (scheduling.length === 0) {
@@ -433,7 +576,7 @@ export class FlashcardModal extends Modal {
         this.currentDeck.nextCard(this);
     }
 
-    async burySiblingCards(tillNextDay: boolean): Promise<void> {
+    private async burySiblingCards(tillNextDay: boolean): Promise<void> {
         if (tillNextDay) {
             this.plugin.data.buryList.push(cyrb53(this.currentCard.cardText));
             await this.plugin.savePluginData();
@@ -448,6 +591,12 @@ export class FlashcardModal extends Modal {
                 );
             }
         }
+    }
+
+    private skipCurrentCard(): void {
+        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+        this.burySiblingCards(false);
+        this.currentDeck.nextCard(this);
     }
 
     // slightly modified version of the renderMarkdown function in
@@ -483,7 +632,7 @@ export class FlashcardModal extends Modal {
         });
     }
 
-    parseLink(src: string) {
+    private parseLink(src: string) {
         const linkComponentsRegex =
             /^(?<file>[^#^]+)?(?:#(?!\^)(?<heading>.+)|#\^(?<blockId>.+)|#)?$/;
         const matched = typeof src === "string" && src.match(linkComponentsRegex);
@@ -492,7 +641,6 @@ export class FlashcardModal extends Modal {
             file,
             this.currentCard.note.path
         );
-        // move lookup upstream? ^^^
         return {
             text: matched[0],
             file: matched.groups.file,
@@ -502,7 +650,7 @@ export class FlashcardModal extends Modal {
         };
     }
 
-    embedMediaFile(el: HTMLElement, target: TFile) {
+    private embedMediaFile(el: HTMLElement, target: TFile) {
         el.innerText = "";
         if (IMAGE_FORMATS.includes(target.extension)) {
             el.createEl(
@@ -550,7 +698,7 @@ export class FlashcardModal extends Modal {
         }
     }
 
-    async renderTransclude(
+    private async renderTransclude(
         el: HTMLElement,
         link: {
             text: string;
@@ -717,13 +865,14 @@ export class Deck {
         );
         const shouldBeInitiallyExpanded: boolean =
             modal.plugin.data.settings.initiallyExpandAllSubdecksInTree;
-        let collapsed = shouldBeInitiallyExpanded;
+        let collapsed = !shouldBeInitiallyExpanded;
         let collapseIconEl: HTMLElement | null = null;
         if (this.subdecks.length > 0) {
             collapseIconEl = deckViewSelf.createDiv("tree-item-icon collapse-icon");
             collapseIconEl.innerHTML = COLLAPSE_ICON;
-            (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
-                shouldBeInitiallyExpanded ? "" : "rotate(-90deg)";
+            (collapseIconEl.childNodes[0] as HTMLElement).style.transform = collapsed
+                ? "rotate(-90deg)"
+                : "";
         }
 
         const deckViewInner: HTMLElement = deckViewSelf.createDiv("tree-item-inner");
@@ -761,7 +910,7 @@ export class Deck {
         );
 
         const deckViewChildren: HTMLElement = deckView.createDiv("tree-item-children");
-        deckViewChildren.style.display = shouldBeInitiallyExpanded ? "block" : "none";
+        deckViewChildren.style.display = collapsed ? "none" : "block";
         if (this.subdecks.length > 0) {
             collapseIconEl.addEventListener("click", () => {
                 if (collapsed) {
@@ -805,13 +954,13 @@ export class Deck {
         Heap.heapify(this.flashcards, Deck.comparator);
 
         modal.responseDiv.style.display = "none";
-        modal.resetLinkView.style.display = "none";
+        modal.resetButton.disabled = true;
         modal.titleEl.setText(
             `${this.deckName}: ${this.dueFlashcardsCount + this.newFlashcardsCount}`
         );
 
         modal.answerBtn.style.display = "initial";
-        modal.flashcardView.innerHTML = "";
+        modal.flashcardView.empty();
         modal.mode = FlashcardModalMode.Front;
 
         let interval = 1.0,
@@ -892,8 +1041,6 @@ export class Deck {
 
         if (modal.plugin.data.settings.showContextInCards)
             modal.contextView.setText(modal.currentCard.context);
-        if (modal.plugin.data.settings.showFileNameInFileLink)
-            modal.fileLinkView.setText(modal.currentCard.note.basename);
     }
 
     /**

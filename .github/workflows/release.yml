@@ -1,4 +1,4 @@
-name: Build Obsidian plugin
+name: Release
 
 on:
     push:
@@ -9,30 +9,37 @@ env:
     PLUGIN_NAME: obsidian-spaced-repetition
 
 jobs:
-    build:
+    release:
         runs-on: ubuntu-latest
 
         steps:
             - uses: actions/checkout@v3
 
             - name: Use Node.js
-              uses: actions/setup-node@v1
+              uses: actions/setup-node@v3
               with:
-                  node-version: "18.x"
+                  node-version: "20.x"
 
             - name: Build
               id: build
               run: |
-                  npm install || npm install --legacy-peer-deps
-                  npm run build --if-present
+                  npm install -g pnpm
+                  pnpm install
+                  pnpm build
                   mkdir ${{ env.PLUGIN_NAME }}
                   cp build/main.js manifest.json styles.css ${{ env.PLUGIN_NAME }}
                   zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
                   ls
                   echo "::set-output name=tag_name::$(git tag --sort version:refname | tail -n 1)"
 
+            - name: Extract release notes
+              id: extract-release-notes
+              uses: ffurrer2/extract-release-notes@v1
+              with:
+                  changelog_file: docs/changelog.md
+
             - name: Create Release
-              id: create_release
+              id: create-release
               uses: actions/create-release@v1
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -40,8 +47,9 @@ jobs:
               with:
                   tag_name: ${{ github.ref }}
                   release_name: ${{ github.ref }}
-                  draft: true
+                  draft: false
                   prerelease: false
+                  body: ${{ steps.extract-release-notes.outputs.release_notes }}
 
             - name: Upload zip file
               id: upload-zip
@@ -49,7 +57,7 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  upload_url: ${{ steps.create-release.outputs.upload_url }}
                   asset_path: ./${{ env.PLUGIN_NAME }}.zip
                   asset_name: ${{ env.PLUGIN_NAME }}-${{ steps.build.outputs.tag_name }}.zip
                   asset_content_type: application/zip
@@ -60,7 +68,7 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  upload_url: ${{ steps.create-release.outputs.upload_url }}
                   asset_path: ./build/main.js
                   asset_name: main.js
                   asset_content_type: text/javascript
@@ -71,7 +79,7 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  upload_url: ${{ steps.create-release.outputs.upload_url }}
                   asset_path: ./manifest.json
                   asset_name: manifest.json
                   asset_content_type: application/json
@@ -82,7 +90,20 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  upload_url: ${{ steps.create-release.outputs.upload_url }}
                   asset_path: ./styles.css
                   asset_name: styles.css
                   asset_content_type: text/css
+
+            - name: Use Python
+              uses: actions/setup-python@v3
+              with:
+                  python-version: "3.11"
+
+            - name: Install dependencies
+              run: pip install -r requirements.txt
+
+            - name: Deploy the documentation
+              run: mkdocs gh-deploy --force --clean --verbose
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

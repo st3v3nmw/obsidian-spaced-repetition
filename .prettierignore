@@ -4,3 +4,5 @@ node_modules
 .yarn
 .pnp.cjs
 .pnp.loader.mjs
+pnpm-lock.yaml
+tests/e2e/vault/

@@ -1,12 +1,43 @@
-.sr-link {
-    color: var(--text-accent);
-    text-decoration: underline;
-    cursor: pointer;
-    margin-bottom: 16px;
-    display: inline-block;
+.sr-flashcard-menu {
+    display: block;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
 }
 
-.sr-response {
+.sr-flashcard-menu-item {
+    box-shadow: none !important;
+    margin-right: 1rem;
+    cursor: pointer;
+}
+
+.sr-flashcard-menu-item:disabled {
+    cursor: not-allowed;
+}
+
+.sr-flashcard-input-modal {
+    height: 80%;
+}
+
+.sr-flashcard-input-area {
+    height: 80%;
+}
+
+.sr-flashcard-input-area > textarea {
+    height: 100%;
+}
+
+.sr-flashcard-edit-button-bar {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.sr-flashcard-response {
     display: inline-grid;
     width: 100%;
     grid-template-columns: auto auto auto auto;
@@ -37,13 +68,6 @@
     padding: 4px;
 }
 
-.sr-back-btn {
-    background-color: transparent !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    margin-right: 4px;
-}
-
 #sr-show-answer {
     height: 48px;
     line-height: 48px;
@@ -55,6 +79,7 @@
     background-color: #2196f3;
     color: #ffffff;
     border-radius: 4px;
+    user-select: text;
 }
 
 #sr-hr-card-divide {
@@ -69,6 +94,7 @@
     height: 48px;
     margin: auto;
     color: #ffffff;
+    cursor: pointer;
 }
 
 #sr-hard-btn {
@@ -87,23 +113,40 @@
     font-style: italic;
     font-weight: bold;
     margin-top: 16px;
+    display: block;
+    width: 100%;
 }
 
 #sr-flashcard-view {
     font-size: var(--font-text-size);
     overflow-y: auto;
     height: 80%;
+    user-select: text;
+}
+
+#sr-chart-period {
+    appearance: menulist;
+    border-right: 8px solid transparent;
 }
 
 @media only screen and (max-width: 600px) {
+    .sr-back-btn {
+        width: initial !important;
+    }
+
+    .sr-modal-content {
+        width: 98% !important;
+    }
+
     .sr-modal-content::-webkit-scrollbar,
     #sr-flashcard-view::-webkit-scrollbar {
         display: none;
     }
 
-    .sr-response,
+    .sr-flashcard-response,
     #sr-show-answer {
-        width: 95% !important;
+        width: 93.5% !important;
+        line-height: 60px;
     }
 
     #sr-hard-btn,

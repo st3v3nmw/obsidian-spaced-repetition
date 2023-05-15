@@ -185,6 +185,15 @@ export default class SRPlugin extends Plugin {
         });
 
         this.addCommand({
+            id: "srs-cram-flashcards",
+            name: t("CRAM_ALL_CARDS"),
+            callback: async () => {
+                await this.sync(true);
+                new FlashcardModal(this.app, this, true).open();
+            },
+        });
+
+        this.addCommand({
             id: "srs-review-flashcards-in-note",
             name: t("REVIEW_CARDS_IN_NOTE"),
             callback: async () => {
@@ -239,7 +248,7 @@ export default class SRPlugin extends Plugin {
         this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).forEach((leaf) => leaf.detach());
     }
 
-    async sync(): Promise<void> {
+    async sync(ignoreStats = false): Promise<void> {
         if (this.syncLock) {
             return;
         }
@@ -307,7 +316,9 @@ export default class SRPlugin extends Plugin {
             if (deckPath.length !== 0) {
                 const flashcardsInNoteAvgEase: number = await this.findFlashcardsInNote(
                     note,
-                    deckPath
+                    deckPath,
+                    false,
+                    ignoreStats
                 );
 
                 if (flashcardsInNoteAvgEase > 0) {
@@ -652,6 +663,10 @@ export default class SRPlugin extends Plugin {
                 lineNo: number = parsedCard[2];
             let cardText: string = parsedCard[1];
 
+            if (cardText.includes(settings.editLaterTag)) {
+                continue;
+            }
+
             if (!settings.convertFoldersToDecks) {
                 const tagInCardRegEx = /^#[^\s#]+/gi;
                 const cardDeckPath = cardText
@@ -773,7 +788,7 @@ export default class SRPlugin extends Plugin {
             }
 
             const context: string = settings.showContextInCards
-                ? getCardContext(lineNo, headings)
+                ? getCardContext(lineNo, headings, note.basename)
                 : "";
             const siblings: Card[] = [];
             for (let i = 0; i < siblingMatches.length; i++) {
@@ -792,6 +807,7 @@ export default class SRPlugin extends Plugin {
                     cardType,
                     siblingIdx: i,
                     siblings,
+                    editLater: false,
                 };
 
                 // card scheduled
@@ -901,7 +917,7 @@ export default class SRPlugin extends Plugin {
     }
 }
 
-function getCardContext(cardLine: number, headings: HeadingCache[]): string {
+function getCardContext(cardLine: number, headings: HeadingCache[], note_title: string): string {
     const stack: HeadingCache[] = [];
     for (const heading of headings) {
         if (heading.position.start.line > cardLine) {
@@ -915,10 +931,10 @@ function getCardContext(cardLine: number, headings: HeadingCache[]): string {
         stack.push(heading);
     }
 
-    let context = "";
+    let context = `${note_title} > `;
     for (const headingObj of stack) {
         headingObj.heading = headingObj.heading.replace(/\[\^\d+\]/gm, "").trim();
-        context += headingObj.heading + " > ";
+        context += `${headingObj.heading} > `;
     }
     return context.slice(0, -3);
 }

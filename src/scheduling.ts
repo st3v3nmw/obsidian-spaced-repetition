@@ -14,6 +14,7 @@ export enum ReviewResponse {
 // Flashcards
 
 export interface Card {
+    editLater: boolean;
     // scheduling
     isDue: boolean;
     isReDue: boolean;
@@ -141,6 +142,10 @@ export function schedule(
 }
 
 export function textInterval(interval: number, isMobile: boolean): string {
+    if (interval === undefined) {
+        return t("NEW");
+    }
+    
     const days: number = Math.round(interval / (24 * 60)),
         months: number = Math.round(days / 3.04375) / 10,
         years: number = Math.round(days / 36.525) / 10;
