@@ -156,6 +156,7 @@ export class FlashcardModal extends Modal {
     public plugin: SRPlugin;
     public answerBtn: HTMLElement;
     public flashcardView: HTMLElement;
+    public impossibleBtn: HTMLElement;
     public hardBtn: HTMLElement;
     public goodBtn: HTMLElement;
     public easyBtn: HTMLElement;
@@ -366,6 +367,14 @@ export class FlashcardModal extends Modal {
         // TODO: Add 'impossible' button, forcing card to be reviewed no matter length of other buttons.
         // Requires adding for all languages.
 
+        this.impossibleBtn = document.createElement("button");
+        this.impossibleBtn.setAttribute("id", "sr-impossible-btn");
+        this.impossibleBtn.setText(this.plugin.data.settings.flashcardHardText);
+        this.impossibleBtn.addEventListener("click", () => {
+            this.processReview(ReviewResponse.Impossible);
+        });
+        this.responseDiv.appendChild(this.impossibleBtn);
+
         this.hardBtn = document.createElement("button");
         this.hardBtn.setAttribute("id", "sr-hard-btn");
         this.hardBtn.setText(this.plugin.data.settings.flashcardHardText);
@@ -404,6 +413,7 @@ export class FlashcardModal extends Modal {
             this.responseDiv.addClass("sr-ignorestats-response");
             this.easyBtn.addClass("sr-ignorestats-btn");
             this.hardBtn.addClass("sr-ignorestats-btn");
+            this.impossibleBtn.addClass("sr-ignorestats-btn");
         }
     }
 
@@ -505,6 +515,8 @@ export class FlashcardModal extends Modal {
         // Calculate the next due date for this card.
         due = window.moment(Date.now() + interval * 60 * 1000);
         if (interval >= MINUTES_PER_DAY) {
+            // If the interval is greater than a day, then we want to
+            // schedule the card for the start of the day.
             due = due.startOf("day");
         }
 
@@ -828,6 +840,11 @@ export class Deck {
         if (this.parent !== null) this.parent.deleteFlashcardAtIndex(index, cardIsDue, false);
     }
 
+    /*
+    * Notify the deck that a card has been changed.
+    * Rather than updating the card in-place, we delete the old card
+    * and insert the new card.
+    */
     notifyCardChanged(oldCardIdx: number, newCard: Card): void {
         this.deleteFlashcardAtIndex(oldCardIdx, this.flashcards[oldCardIdx].isDue);
         const deckName: string[] = [this.deckName];
@@ -988,6 +1005,13 @@ export class Deck {
             }
         }
 
+        const impossibleInterval: number = schedule(
+            ReviewResponse.Impossible,
+            interval,
+            ease,
+            delayBeforeReview,
+            modal.plugin.data.settings
+        ).interval;
         const hardInterval: number = schedule(
             ReviewResponse.Hard,
             interval,
@@ -1012,13 +1036,21 @@ export class Deck {
 
         if (modal.ignoreStats) {
             // Same for mobile/desktop
+            modal.impossibleBtn.setText(`${modal.plugin.data.settings.flashcardHardText}`);
             modal.hardBtn.setText(`${modal.plugin.data.settings.flashcardHardText}`);
             modal.easyBtn.setText(`${modal.plugin.data.settings.flashcardEasyText}`);
         } else if (Platform.isMobile) {
+            modal.impossibleBtn.setText(textInterval(impossibleInterval, true));
             modal.hardBtn.setText(textInterval(hardInterval, true));
             modal.goodBtn.setText(textInterval(goodInterval, true));
             modal.easyBtn.setText(textInterval(easyInterval, true));
         } else {
+            modal.impossibleBtn.setText(
+                `${modal.plugin.data.settings.flashcardImpossibleText} - ${textInterval(
+                    impossibleInterval,
+                    false
+                )}`
+            );
             modal.hardBtn.setText(
                 `${modal.plugin.data.settings.flashcardHardText} - ${textInterval(
                     hardInterval,
@@ -1044,7 +1076,7 @@ export class Deck {
     }
 
     /**
-     *
+     * Comparator for cards. Used to determine which card should be reviewed first.
      * @param a One card to compare with another
      * @param b The other card to compare
      * @returns +1 => b should be reviewed first, -1 => a should be reviewed first, 0 => no preference
@@ -1057,7 +1089,7 @@ export class Deck {
 
         const now = window.moment(Date.now()).valueOf();
 
-        // Both redue
+        // Both redue, sort by review delay
         if (a.isReDue && b.isReDue) {
             const aReviewDelay = a.previousReview + a.interval * 60 * 1000 - now;
             const bReviewDelay = b.previousReview + b.interval * 60 * 1000 - now;

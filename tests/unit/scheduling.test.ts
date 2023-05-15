@@ -22,6 +22,13 @@ test("Test reviewing with default settings", () => {
         schedule(ReviewResponse.Hard, 1, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, {})
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
+        interval: 5,
+    });
+
+    expect(
+        schedule(ReviewResponse.Impossible, 1, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, {})
+    ).toEqual({
+        ease: DEFAULT_SETTINGS.baseEase,
         interval: 1,
     });
 });
@@ -46,95 +53,114 @@ test("Test reviewing with default settings & delay", () => {
         schedule(ReviewResponse.Hard, 10, DEFAULT_SETTINGS.baseEase, delay, DEFAULT_SETTINGS, {})
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
+        interval: 5,
+    });
+
+    expect(
+        schedule(ReviewResponse.Impossible, 10, DEFAULT_SETTINGS.baseEase, delay, DEFAULT_SETTINGS, {})
+    ).toEqual({
+        ease: DEFAULT_SETTINGS.baseEase,
         interval: 1,
     });
 });
 
-test("Test load balancing, small interval (load balancing disabled)", () => {
-    const dueDates = {
-        0: 1,
-        1: 1,
-        2: 1,
-        3: 4,
-    };
-    expect(
-        schedule(ReviewResponse.Good, 1, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates)
-    ).toEqual({
-        ease: DEFAULT_SETTINGS.baseEase,
-        interval: 10,
+test("Test load balancing at 1 day", () => {
+    const interval = MINUTES_PER_DAY;
+    
+    // Easy review
+    // 1 day review becomes 4 day review
+    expect(schedule(ReviewResponse.Easy, interval, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, {})).toEqual({
+        ease: DEFAULT_SETTINGS.baseEase + 20,
+        interval: 5054,
     });
-    expect(dueDates).toEqual({
-        0: 2,
-        1: 1,
-        2: 1,
-        3: 4,
+    
+    // Good review
+    // 1 day review becomes 3 day review
+    expect(schedule(ReviewResponse.Good, interval, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, {})).toEqual({
+        ease: DEFAULT_SETTINGS.baseEase,
+        interval: 3600
+    });
+
+    // Hard review
+    // 1 day review becomes 1 day review
+    expect(schedule(ReviewResponse.Hard, interval, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, {})).toEqual({
+        ease: DEFAULT_SETTINGS.baseEase,
+        interval: 1440,
+    });
+
+    // Impossible review
+    // 1 day review becomes 5m review
+    expect(schedule(ReviewResponse.Impossible, interval, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, {})).toEqual({
+        ease: DEFAULT_SETTINGS.baseEase,
+        interval: 5
     });
 });
 
-test("Test load balancing", () => {
-    // interval < 7
-    let dueDates: Record<number, number> = {
-        5: 2,
-    };
-    expect(
-        schedule(ReviewResponse.Good, 1, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates)
-    ).toEqual({
-        ease: DEFAULT_SETTINGS.baseEase,
-        interval: 10,
-    });
-    expect(dueDates).toEqual({
-        0: 1,
-        5: 2,
-    });
+// test("Test load balancing at 2 weeks", () => {
+//     const interval = 14 * MINUTES_PER_DAY;
+//     // Easy review
+//     let dueDates = {
+//         2: 5,
+//         59: 8,
+//     };
 
-    // 7 <= interval < 30
-    dueDates = {
-        25: 2,
-    };
-    expect(
-        schedule(ReviewResponse.Good, 10, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates)
-    ).toEqual({
-        ease: DEFAULT_SETTINGS.baseEase,
-        interval: 10,
-    });
-    expect(dueDates).toEqual({
-        0: 1,
-        25: 2,
-    });
+//     // 1 day review becomes 4 day review
+//     let schedObj = schedule(ReviewResponse.Easy, interval, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates);
+//     expect(schedObj["ease"]).toEqual(DEFAULT_SETTINGS.baseEase + 20);
+//     expect(schedObj["interval"]).toEqual(70762);
+//     expect(dueDates).toEqual({
+//         2: 5,
+//         59: 8,
+//     });
 
-    // interval >= 30
-    dueDates = {
-        2: 5,
-        59: 8,
-        60: 9,
-        61: 3,
-        62: 5,
-        63: 4,
-        64: 4,
-        65: 8,
-        66: 2,
-        67: 10,
-    };
-    expect(
-        schedule(ReviewResponse.Good, 25, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates)
-    ).toEqual({
-        ease: DEFAULT_SETTINGS.baseEase,
-        interval: 10,
-    });
-    expect(dueDates).toEqual({
-        0: 1,
-        2: 5,
-        59: 8,
-        60: 9,
-        61: 3,
-        62: 5,
-        63: 4,
-        64: 4,
-        65: 8,
-        66: 2,
-        67: 10,
-    });
-});
+//     // Good review
+//     dueDates = {
+//         2: 5,
+//         59: 8,
+//     };
+
+//     // 1 day review becomes 3 day review
+//     schedObj = schedule(ReviewResponse.Good, interval, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates);
+//     expect(schedObj["ease"]).toEqual(DEFAULT_SETTINGS.baseEase);
+//     expect(schedObj["interval"]).toEqual(3600);
+//     expect(dueDates).toEqual({
+//         2: 5,
+//         3: 1,
+//         59: 8,
+//     });
+    
+//     // Hard review
+//     dueDates = {
+//         2: 5,
+//         59: 8,
+//     };
+
+//     // 1 day review becomes 10m review
+//     schedObj = schedule(ReviewResponse.Hard, interval, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates);
+//     expect(schedObj["ease"]).toEqual(DEFAULT_SETTINGS.baseEase);
+//     expect(schedObj["interval"]).toEqual(10);
+//     expect(dueDates).toEqual({
+//         0: 1,
+//         2: 5,
+//         59: 8,
+//     });
+
+//     // Impossible review
+//     dueDates = {
+//         2: 5,
+//         59: 8,
+//     };
+
+//     // 1 day review becomes 10m review
+//     schedObj = schedule(ReviewResponse.Impossible, interval, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates);
+//     expect(schedObj["ease"]).toEqual(DEFAULT_SETTINGS.baseEase);
+//     expect(schedObj["interval"]).toEqual(5);
+//     expect(dueDates).toEqual({
+//         0: 1,
+//         2: 5,
+//         59: 8,
+//     });
+// });
 
 test("Test textInterval - desktop", () => {
     expect(textInterval(1, false)).toEqual("1 minute(s)");

@@ -8,6 +8,7 @@ export enum ReviewResponse {
     Easy,
     Good,
     Hard,
+    Impossible,
     Reset,
 }
 
@@ -71,6 +72,9 @@ export function schedule(
             interval = MINUTES_PER_DAY;
         } else if (response === ReviewResponse.Good) {
             interval = 10;
+        } else if (response === ReviewResponse.Hard) {
+            interval = 5;
+            ease = Math.max(settingsObj.baseEase, ease - 20);
         } else {
             interval = 1;
             ease = Math.max(settingsObj.baseEase, ease - 20);
@@ -88,12 +92,15 @@ export function schedule(
                 1,
                 (interval + minutesBeforeReview / 4) * settingsObj.lapsesIntervalChange
             );
+        } else {
+            ease = Math.max(settingsObj.baseEase, ease - 20);
+            interval = 5;
         }
     }
 
     // replaces random fuzz with load balancing over the fuzz interval
+    interval = roundInterval(interval, settingsObj.maximumInterval);
     if (dueDates !== undefined) {
-        interval = Math.round(interval);
         const dayInterval = Math.round(interval / MINUTES_PER_DAY);
         if (!Object.prototype.hasOwnProperty.call(dueDates, dayInterval)) {
             dueDates[dayInterval] = 0;
@@ -114,7 +121,8 @@ export function schedule(
 
                 const originalInterval = interval;
                 outer: for (let i = MINUTES_PER_DAY; i <= fuzz; i += MINUTES_PER_DAY) {
-                    for (const ivl of [originalInterval - i, originalInterval + i]) {
+                    for (let ivl of [originalInterval - i, originalInterval + i]) {
+                        ivl = roundInterval(ivl, settingsObj.maximumInterval);;
                         const dayIvl = Math.round(ivl / MINUTES_PER_DAY);
                         if (!Object.prototype.hasOwnProperty.call(dueDates, dayIvl)) {
                             dueDates[dayIvl] = 0;
@@ -128,14 +136,6 @@ export function schedule(
         }
 
         dueDates[Math.round(interval / MINUTES_PER_DAY)]++;
-    }
-
-    // Round down to 1m and 10m for consistency
-    interval = Math.min(interval, settingsObj.maximumInterval * MINUTES_PER_DAY);
-    if (interval < 10) {
-        interval = 1;
-    } else if (interval < MINUTES_PER_DAY) {
-        interval = 10;
     }
 
     return { interval: Math.round(interval * 10) / 10, ease };
@@ -161,4 +161,21 @@ export function textInterval(interval: number, isMobile: boolean): string {
         if (years < 1.0) return t("MONTHS_STR_IVL", { interval: months });
         return t("YEARS_STR_IVL", { interval: years });
     }
+}
+
+// Round down to 1m and 10m for consistency
+function roundInterval(interval: number, maximumInterval: number): number {
+    interval = Math.round(interval);
+    interval = Math.min(interval, maximumInterval * MINUTES_PER_DAY);
+    if (interval < 5) {
+        interval = 1;
+    } else if (interval < 10) {
+        interval = 5;
+    } else if (interval < MINUTES_PER_DAY / 3) {
+        interval = 10;
+    } else if (interval < MINUTES_PER_DAY) {
+        interval = MINUTES_PER_DAY;
+    }
+
+    return interval;
 }

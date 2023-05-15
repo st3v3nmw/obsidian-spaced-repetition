@@ -88,6 +88,7 @@
     height: 2px;
 }
 
+#sr-impossible-btn,
 #sr-hard-btn,
 #sr-good-btn,
 #sr-easy-btn {
@@ -95,6 +96,10 @@
     margin: auto;
     color: #ffffff;
     cursor: pointer;
+}
+
+#sr-impossible-btn {
+    background-color: #000000;
 }
 
 #sr-hard-btn {
@@ -149,6 +154,7 @@
         line-height: 60px;
     }
 
+    #sr-impossible-btn,
     #sr-hard-btn,
     #sr-good-btn,
     #sr-easy-btn {
