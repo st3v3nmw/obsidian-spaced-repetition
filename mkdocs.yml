@@ -43,6 +43,12 @@ plugins:
           languages:
               en: English
           default_language: en
+    - meta-descriptions:
+          export_csv: false
+          quiet: false
+          enable_checks: true
+          min_length: 50
+          max_length: 160
 
 markdown_extensions:
     - toc:

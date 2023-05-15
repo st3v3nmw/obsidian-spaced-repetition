@@ -1,6 +1,7 @@
-build
-coverage
-node_modules
+build/
+coverage/
+node_modules/
+venv/
 .yarn
 .pnp.cjs
 .pnp.loader.mjs
