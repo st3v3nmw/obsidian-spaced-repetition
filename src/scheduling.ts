@@ -109,20 +109,18 @@ export function schedule(
             if (interval > 4 * MINUTES_PER_DAY) {
                 let fuzz = 0;
 
-                if (interval < 7 * MINUTES_PER_DAY) {
-                    fuzz = 1;
-                } else if (interval < 30 * MINUTES_PER_DAY) {
-                    fuzz = Math.max(2, Math.floor(interval * 0.15));
+                if (interval <= 7 * MINUTES_PER_DAY) {
+                    fuzz = MINUTES_PER_DAY;
+                } else if (interval <= 30 * MINUTES_PER_DAY) {
+                    fuzz = Math.max(2 * MINUTES_PER_DAY, Math.floor(interval * 0.15));
                 } else {
-                    fuzz = Math.max(4, Math.floor(interval * 0.05));
+                    fuzz = Math.max(4 * MINUTES_PER_DAY, Math.floor(interval * 0.05));
                 }
-
-                fuzz *= MINUTES_PER_DAY;
 
                 const originalInterval = interval;
                 outer: for (let i = MINUTES_PER_DAY; i <= fuzz; i += MINUTES_PER_DAY) {
                     for (let ivl of [originalInterval - i, originalInterval + i]) {
-                        ivl = roundInterval(ivl, settingsObj.maximumInterval);;
+                        ivl = roundInterval(ivl, settingsObj.maximumInterval);
                         const dayIvl = Math.round(ivl / MINUTES_PER_DAY);
                         if (!Object.prototype.hasOwnProperty.call(dueDates, dayIvl)) {
                             dueDates[dayIvl] = 0;
