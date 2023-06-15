@@ -21,9 +21,12 @@ import {
     IMAGE_FORMATS,
     AUDIO_FORMATS,
     VIDEO_FORMATS,
+    MINUTES_PER_DAY,
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
+import Heap from "heap";
+import { DEFAULT_SETTINGS } from "./settings";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -153,6 +156,7 @@ export class FlashcardModal extends Modal {
     public plugin: SRPlugin;
     public answerBtn: HTMLElement;
     public flashcardView: HTMLElement;
+    public impossibleBtn: HTMLElement;
     public hardBtn: HTMLElement;
     public goodBtn: HTMLElement;
     public easyBtn: HTMLElement;
@@ -360,6 +364,17 @@ export class FlashcardModal extends Modal {
 
         this.responseDiv = this.contentEl.createDiv("sr-flashcard-response");
 
+        // TODO: Add 'impossible' button, forcing card to be reviewed no matter length of other buttons.
+        // Requires adding for all languages.
+
+        this.impossibleBtn = document.createElement("button");
+        this.impossibleBtn.setAttribute("id", "sr-impossible-btn");
+        this.impossibleBtn.setText(this.plugin.data.settings.flashcardHardText);
+        this.impossibleBtn.addEventListener("click", () => {
+            this.processReview(ReviewResponse.Impossible);
+        });
+        this.responseDiv.appendChild(this.impossibleBtn);
+
         this.hardBtn = document.createElement("button");
         this.hardBtn.setAttribute("id", "sr-hard-btn");
         this.hardBtn.setText(this.plugin.data.settings.flashcardHardText);
@@ -398,6 +413,7 @@ export class FlashcardModal extends Modal {
             this.responseDiv.addClass("sr-ignorestats-response");
             this.easyBtn.addClass("sr-ignorestats-btn");
             this.hardBtn.addClass("sr-ignorestats-btn");
+            this.impossibleBtn.addClass("sr-ignorestats-btn");
         }
     }
 
@@ -445,62 +461,66 @@ export class FlashcardModal extends Modal {
             return;
         }
 
-        let interval: number, ease: number, due;
+        let due: moment.Moment;
 
-        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
-        if (response !== ReviewResponse.Reset) {
-            let schedObj: Record<string, number>;
-            // scheduled card
-            if (this.currentCard.isDue) {
-                schedObj = schedule(
-                    response,
-                    this.currentCard.interval,
-                    this.currentCard.ease,
-                    this.currentCard.delayBeforeReview,
-                    this.plugin.data.settings,
-                    this.plugin.dueDatesFlashcards
-                );
-            } else {
-                let initial_ease: number = this.plugin.data.settings.baseEase;
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        this.plugin.easeByPath,
-                        this.currentCard.note.path
-                    )
-                ) {
-                    initial_ease = Math.round(this.plugin.easeByPath[this.currentCard.note.path]);
-                }
-
-                schedObj = schedule(
-                    response,
-                    1.0,
-                    initial_ease,
-                    0,
-                    this.plugin.data.settings,
-                    this.plugin.dueDatesFlashcards
-                );
-                interval = schedObj.interval;
-                ease = schedObj.ease;
-            }
-
-            interval = schedObj.interval;
-            ease = schedObj.ease;
-            due = window.moment(Date.now() + interval * 24 * 3600 * 1000);
-        } else {
-            this.currentCard.interval = 1.0;
-            this.currentCard.ease = this.plugin.data.settings.baseEase;
-            if (this.currentCard.isDue) {
-                this.currentDeck.dueFlashcards.push(this.currentCard);
-            } else {
-                this.currentDeck.newFlashcards.push(this.currentCard);
-            }
+        // Exit early if doing a reset
+        if (response === ReviewResponse.Reset) {
+            const newCard: Card = { ...this.currentCard };
+            newCard.interval = 1.0;
+            newCard.ease = this.plugin.data.settings.baseEase;
+            this.currentDeck.notifyCardChanged(this.currentCardIdx, newCard);
             due = window.moment(Date.now());
             new Notice(t("CARD_PROGRESS_RESET"));
             this.currentDeck.nextCard(this);
             return;
         }
 
-        const dueString: string = due.format("YYYY-MM-DD");
+        let schedObj: Record<string, number>;
+        // scheduled card
+        if (this.currentCard.isDue) {
+            schedObj = schedule(
+                response,
+                this.currentCard.interval,
+                this.currentCard.ease,
+                this.currentCard.delayBeforeReview,
+                this.plugin.data.settings,
+                this.plugin.dueDatesFlashcards
+            );
+        } else {
+            // First time this card was reviewed, so need to
+            // add data to it.
+            let initial_ease: number = this.plugin.data.settings.baseEase;
+            if (
+                Object.prototype.hasOwnProperty.call(
+                    this.plugin.easeByPath,
+                    this.currentCard.note.path
+                )
+            ) {
+                initial_ease = Math.round(this.plugin.easeByPath[this.currentCard.note.path]);
+            }
+
+            schedObj = schedule(
+                response,
+                1.0,
+                initial_ease,
+                0,
+                this.plugin.data.settings,
+                this.plugin.dueDatesFlashcards
+            );
+        }
+
+        const interval: number = schedObj.interval;
+        const ease: number = schedObj.ease;
+
+        // Calculate the next due date for this card.
+        due = window.moment(Date.now() + interval * 60 * 1000);
+        if (interval >= MINUTES_PER_DAY) {
+            // If the interval is greater than a day, then we want to
+            // schedule the card for the start of the day.
+            due = due.startOf("day");
+        }
+
+        const dueString: string = due.format(t("DATE_SCHED_FMT"));
 
         let fileText: string = await this.app.vault.read(this.currentCard.note);
         const replacementRegex = new RegExp(escapeRegexString(this.currentCard.cardText), "gm");
@@ -548,6 +568,23 @@ export class FlashcardModal extends Modal {
         }
 
         await this.app.vault.modify(this.currentCard.note, fileText);
+
+        // Update the card within the deck if we need to re-review it.
+        // Otherwise, delete the card from the deck.
+        if (interval < MINUTES_PER_DAY) {
+            const newCard = { ...this.currentCard }; // Need to copy so that old card's data persists
+            newCard.isDue = true;
+            newCard.isReDue = true;
+            newCard.interval = interval;
+            newCard.ease = ease;
+            newCard.delayBeforeReview = interval;
+            newCard.previousReview = window.moment(Date.now()).valueOf();
+
+            this.currentDeck.notifyCardChanged(this.currentCardIdx, newCard);
+        } else {
+            this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
+        }
+
         this.currentDeck.nextCard(this);
     }
 
@@ -557,19 +594,12 @@ export class FlashcardModal extends Modal {
             await this.plugin.savePluginData();
         }
 
+        let idx;
         for (const sibling of this.currentCard.siblings) {
-            const dueIdx = this.currentDeck.dueFlashcards.indexOf(sibling);
-            const newIdx = this.currentDeck.newFlashcards.indexOf(sibling);
-
-            if (dueIdx !== -1) {
+            while ((idx = this.currentDeck.flashcards.indexOf(sibling)) != -1) {
                 this.currentDeck.deleteFlashcardAtIndex(
-                    dueIdx,
-                    this.currentDeck.dueFlashcards[dueIdx].isDue
-                );
-            } else if (newIdx !== -1) {
-                this.currentDeck.deleteFlashcardAtIndex(
-                    newIdx,
-                    this.currentDeck.newFlashcards[newIdx].isDue
+                    idx,
+                    this.currentDeck.flashcards[idx].isDue
                 );
             }
         }
@@ -722,9 +752,8 @@ export class FlashcardModal extends Modal {
 
 export class Deck {
     public deckName: string;
-    public newFlashcards: Card[];
+    public flashcards: Card[];
     public newFlashcardsCount = 0; // counts those in subdecks too
-    public dueFlashcards: Card[];
     public dueFlashcardsCount = 0; // counts those in subdecks too
     public totalFlashcards = 0; // counts those in subdecks too
     public subdecks: Deck[];
@@ -732,9 +761,8 @@ export class Deck {
 
     constructor(deckName: string, parent: Deck | null) {
         this.deckName = deckName;
-        this.newFlashcards = [];
         this.newFlashcardsCount = 0;
-        this.dueFlashcards = [];
+        this.flashcards = [];
         this.dueFlashcardsCount = 0;
         this.totalFlashcards = 0;
         this.subdecks = [];
@@ -765,14 +793,12 @@ export class Deck {
         } else {
             this.newFlashcardsCount++;
         }
-        this.totalFlashcards++;
+
+        // Card was just deleted, don't increment total count;
+        if (!cardObj.isReDue) this.totalFlashcards++;
 
         if (deckPath.length === 0) {
-            if (cardObj.isDue) {
-                this.dueFlashcards.push(cardObj);
-            } else {
-                this.newFlashcards.push(cardObj);
-            }
+            Heap.push(this.flashcards, cardObj, Deck.comparator);
             return;
         }
 
@@ -799,24 +825,38 @@ export class Deck {
         }
     }
 
-    deleteFlashcardAtIndex(index: number, cardIsDue: boolean): void {
+    deleteFlashcardAtIndex(index: number, cardIsDue: boolean, base = true): void {
+        if (base) {
+            this.flashcards.splice(index, 1);
+            Heap.heapify(this.flashcards, Deck.comparator);
+        }
+
         if (cardIsDue) {
-            this.dueFlashcards.splice(index, 1);
             this.dueFlashcardsCount--;
         } else {
-            this.newFlashcards.splice(index, 1);
             this.newFlashcardsCount--;
         }
 
-        let deck: Deck = this.parent;
+        if (this.parent !== null) this.parent.deleteFlashcardAtIndex(index, cardIsDue, false);
+    }
+
+    /*
+    * Notify the deck that a card has been changed.
+    * Rather than updating the card in-place, we delete the old card
+    * and insert the new card.
+    */
+    notifyCardChanged(oldCardIdx: number, newCard: Card): void {
+        this.deleteFlashcardAtIndex(oldCardIdx, this.flashcards[oldCardIdx].isDue);
+        const deckName: string[] = [this.deckName];
+        let deck = this.parent;
+        let root = this.parent;
         while (deck !== null) {
-            if (cardIsDue) {
-                deck.dueFlashcardsCount--;
-            } else {
-                deck.newFlashcardsCount--;
-            }
+            deckName.push(deck.deckName);
+            root = deck;
             deck = deck.parent;
         }
+
+        root.insertFlashcard(deckName.reverse().slice(1, deckName.length), newCard);
     }
 
     sortSubdecksList(): void {
@@ -907,7 +947,7 @@ export class Deck {
     }
 
     nextCard(modal: FlashcardModal): void {
-        if (this.newFlashcards.length + this.dueFlashcards.length === 0) {
+        if (this.flashcards.length === 0) {
             if (this.dueFlashcardsCount + this.newFlashcardsCount > 0) {
                 for (const deck of this.subdecks) {
                     if (deck.dueFlashcardsCount + deck.newFlashcardsCount > 0) {
@@ -927,6 +967,9 @@ export class Deck {
             return;
         }
 
+        // Actually get next card.
+        Heap.heapify(this.flashcards, Deck.comparator);
+
         modal.responseDiv.style.display = "none";
         modal.resetButton.disabled = true;
         modal.titleEl.setText(
@@ -940,40 +983,19 @@ export class Deck {
         let interval = 1.0,
             ease: number = modal.plugin.data.settings.baseEase,
             delayBeforeReview = 0;
-        if (this.dueFlashcards.length > 0) {
-            if (modal.plugin.data.settings.randomizeCardOrder) {
-                modal.currentCardIdx = Math.floor(Math.random() * this.dueFlashcards.length);
-            } else {
-                modal.currentCardIdx = 0;
-            }
-            modal.currentCard = this.dueFlashcards[modal.currentCardIdx];
+
+        if (this.flashcards.length > 0) {
+            // TODO: Explain why we needed to "look for first unscheduled sibling"
+            modal.currentCardIdx = 0; // Heap incorporates randomness based on settings
+
+            modal.currentCard = this.flashcards[modal.currentCardIdx];
             modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
 
-            interval = modal.currentCard.interval;
-            ease = modal.currentCard.ease;
-            delayBeforeReview = modal.currentCard.delayBeforeReview;
-        } else if (this.newFlashcards.length > 0) {
-            if (modal.plugin.data.settings.randomizeCardOrder) {
-                const pickedCardIdx = Math.floor(Math.random() * this.newFlashcards.length);
-                modal.currentCardIdx = pickedCardIdx;
-
-                // look for first unscheduled sibling
-                const pickedCard: Card = this.newFlashcards[pickedCardIdx];
-                let idx = pickedCardIdx;
-                while (idx >= 0 && pickedCard.siblings.includes(this.newFlashcards[idx])) {
-                    if (!this.newFlashcards[idx].isDue) {
-                        modal.currentCardIdx = idx;
-                    }
-                    idx--;
-                }
-            } else {
-                modal.currentCardIdx = 0;
-            }
-
-            modal.currentCard = this.newFlashcards[modal.currentCardIdx];
-            modal.renderMarkdownWrapper(modal.currentCard.front, modal.flashcardView);
-
-            if (
+            if (modal.currentCard.isDue) {
+                interval = modal.currentCard.interval;
+                ease = modal.currentCard.ease;
+                delayBeforeReview = modal.currentCard.delayBeforeReview;
+            } else if (
                 Object.prototype.hasOwnProperty.call(
                     modal.plugin.easeByPath,
                     modal.currentCard.note.path
@@ -983,6 +1005,13 @@ export class Deck {
             }
         }
 
+        const impossibleInterval: number = schedule(
+            ReviewResponse.Impossible,
+            interval,
+            ease,
+            delayBeforeReview,
+            modal.plugin.data.settings
+        ).interval;
         const hardInterval: number = schedule(
             ReviewResponse.Hard,
             interval,
@@ -1007,13 +1036,21 @@ export class Deck {
 
         if (modal.ignoreStats) {
             // Same for mobile/desktop
+            modal.impossibleBtn.setText(`${modal.plugin.data.settings.flashcardHardText}`);
             modal.hardBtn.setText(`${modal.plugin.data.settings.flashcardHardText}`);
             modal.easyBtn.setText(`${modal.plugin.data.settings.flashcardEasyText}`);
         } else if (Platform.isMobile) {
+            modal.impossibleBtn.setText(textInterval(impossibleInterval, true));
             modal.hardBtn.setText(textInterval(hardInterval, true));
             modal.goodBtn.setText(textInterval(goodInterval, true));
             modal.easyBtn.setText(textInterval(easyInterval, true));
         } else {
+            modal.impossibleBtn.setText(
+                `${modal.plugin.data.settings.flashcardImpossibleText} - ${textInterval(
+                    impossibleInterval,
+                    false
+                )}`
+            );
             modal.hardBtn.setText(
                 `${modal.plugin.data.settings.flashcardHardText} - ${textInterval(
                     hardInterval,
@@ -1036,5 +1073,42 @@ export class Deck {
 
         if (modal.plugin.data.settings.showContextInCards)
             modal.contextView.setText(modal.currentCard.context);
+    }
+
+    /**
+     * Comparator for cards. Used to determine which card should be reviewed first.
+     * @param a One card to compare with another
+     * @param b The other card to compare
+     * @returns +1 => b should be reviewed first, -1 => a should be reviewed first, 0 => no preference
+     */
+    static comparator(a: Card, b: Card): number {
+        // New cards are reviewed after due cards.
+        if (!a.isDue && !b.isDue) return 0;
+        if (a.isDue && !b.isDue) return -1;
+        if (!a.isDue && b.isDue) return 1;
+
+        const now = window.moment(Date.now()).valueOf();
+
+        // Both redue, sort by review delay
+        if (a.isReDue && b.isReDue) {
+            const aReviewDelay = a.previousReview + a.interval * 60 * 1000 - now;
+            const bReviewDelay = b.previousReview + b.interval * 60 * 1000 - now;
+
+            return aReviewDelay < bReviewDelay ? -1 : 1;
+        }
+
+        // One redue, other is due
+        if (a.isReDue) {
+            const aDiff = now - a.previousReview + a.interval * 60 * 1000;
+            return aDiff > 0 ? 1 : -1;
+        } else if (b.isReDue) {
+            const bDiff = now - b.previousReview + b.interval * 60 * 1000;
+            return bDiff > 0 ? -1 : 1;
+        }
+
+        // Both due, don't care which is reviewed first
+        // Currently assume randomness
+        // TODO: Access whether to randomize or not
+        return 0;
     }
 }

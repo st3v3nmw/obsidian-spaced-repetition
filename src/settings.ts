@@ -7,6 +7,7 @@ export interface SRSettings {
     flashcardEasyText: string;
     flashcardGoodText: string;
     flashcardHardText: string;
+    flashcardImpossibleText: string;
     flashcardTags: string[];
     convertFoldersToDecks: boolean;
     cardCommentOnSameLine: boolean;
@@ -48,6 +49,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardEasyText: t("EASY"),
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),
+    flashcardImpossibleText: t("IMPOSSIBLE"),
     flashcardTags: ["#flashcards"],
     convertFoldersToDecks: false,
     cardCommentOnSameLine: false,

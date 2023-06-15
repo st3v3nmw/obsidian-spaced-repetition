@@ -23,6 +23,9 @@ build
 
 # testing
 coverage
+
+# Temp for hot reloads
+main.js
 tests/e2e/vault/
 
 # mkdocs

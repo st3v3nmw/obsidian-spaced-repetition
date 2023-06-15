@@ -20,6 +20,7 @@
     "author": "Stephen Mwangi",
     "license": "MIT",
     "devDependencies": {
+        "@types/heap": "^0.2.31",
         "@types/jest": "^29.5.1",
         "@types/node": "^20.1.1",
         "@types/vhtml": "^2.2.4",
@@ -48,6 +49,7 @@
         "wdio-chromedriver-service": "^8.1.1"
     },
     "dependencies": {
+        "heap": "^0.2.7",
         "chart.js": "^4.3.0",
         "pagerank.js": "^1.0.2"
     },
