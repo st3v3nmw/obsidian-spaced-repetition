@@ -2,6 +2,32 @@ import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
 import type SRPlugin from "src/main";
 import { t } from "src/lang/helpers";
 
+// https://github.com/martin-jw/obsidian-recall/blob/main/src/settings.ts
+import SrsAlgorithm from "./algorithms";
+import { Sm2Algorithm } from "./algorithms/supermemo";
+import { AnkiAlgorithm } from "./algorithms/anki";
+import ConfirmModal from "./modals/confirm";
+import { FolderSuggest } from "./suggesters/FolderSuggester";
+// recall trackfile
+export enum DataLocation {
+    PluginFolder = "In Plugin Folder",
+    RootFolder = "In Vault Folder",
+    SpecifiedFolder = "In the folder specified below",
+    SaveOnNoteFile = "Save On Note File",
+}
+
+const locationMap: Record<string, DataLocation> = {
+    "In Vault Folder": DataLocation.RootFolder,
+    "In Plugin Folder": DataLocation.PluginFolder,
+    "In the folder specified below": DataLocation.SpecifiedFolder,
+    "Save On Note File": DataLocation.SaveOnNoteFile,
+};
+
+export const algorithms: Record<string, SrsAlgorithm> = {
+    Anki: new AnkiAlgorithm(),
+    SM2: new Sm2Algorithm(),
+};
+
 export interface SRSettings {
     // flashcards
     flashcardEasyText: string;
@@ -29,6 +55,8 @@ export interface SRSettings {
     noteFoldersToIgnore: string[];
     openRandomNote: boolean;
     autoNextNote: boolean;
+    reviewResponseFloatBar: boolean;
+    reviewingNoteDirectly: boolean;
     disableFileMenuReviewOptions: boolean;
     maxNDaysNotesReviewQueue: number;
     // UI preferences
@@ -41,6 +69,15 @@ export interface SRSettings {
     maxLinkFactor: number;
     // logging
     showDebugMessages: boolean;
+
+    // trackfile: https://github.com/martin-jw/obsidian-recall/blob/main/src/settings.ts
+    dataLocation: DataLocation;
+    customFolder: string;
+    maxNewPerDay: number;
+    repeatItems: boolean;
+    trackedNoteToDecks: boolean;
+    algorithm: string;
+    algorithmSettings: any;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
@@ -70,6 +107,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     noteFoldersToIgnore: [],
     openRandomNote: false,
     autoNextNote: false,
+    reviewResponseFloatBar: false,
+    reviewingNoteDirectly: false,
     disableFileMenuReviewOptions: false,
     maxNDaysNotesReviewQueue: 365,
     // UI settings
@@ -82,6 +121,15 @@ export const DEFAULT_SETTINGS: SRSettings = {
     maxLinkFactor: 1.0,
     // logging
     showDebugMessages: false,
+
+    // trackfile: https://github.com/martin-jw/obsidian-recall/blob/main/src/settings.ts
+    dataLocation: DataLocation.PluginFolder,
+    customFolder: "",
+    maxNewPerDay: 20,
+    repeatItems: true,
+    trackedNoteToDecks: false,
+    algorithm: Object.keys(algorithms)[0],
+    algorithmSettings: Object.values(algorithms)[0].settings,
 };
 
 // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
@@ -110,6 +158,19 @@ export class SRSettingTab extends PluginSettingTab {
         containerEl.createDiv().innerHTML = t("CHECK_WIKI", {
             wiki_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/",
         });
+
+        // trackfile_setting
+        // https://github.com/martin-jw/obsidian-recall/blob/main/src/settings.ts
+        this.addDataLocationSettings(containerEl);
+        if (this.plugin.data.settings.dataLocation === DataLocation.SpecifiedFolder) {
+            this.plugin.data.settings.customFolder = this.plugin.store.dataPath;
+            this.addSpecifiedFolderSetting(containerEl);
+        }
+        this.addAlgorithmSetting(containerEl);
+        this.addNewPerDaySetting(containerEl);
+        this.addRepeatItemsSetting(containerEl);
+        this.addTrackedNoteToDecksSetting(containerEl);
+        this.addReviewResponseFloatBarSetting(containerEl);
 
         new Setting(containerEl)
             .setName(t("FOLDERS_TO_IGNORE"))
@@ -493,6 +554,8 @@ export class SRSettingTab extends PluginSettingTab {
             })
         );
 
+        this.addReviewNoteDirectlySetting(containerEl);
+
         new Setting(containerEl)
             .setName(t("DISABLE_FILE_MENU_REVIEW_OPTIONS"))
             .setDesc(t("DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
@@ -718,6 +781,8 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
+        // this.addAlgorithmSpecificDisplaySetting(containerEl);
+
         containerEl.createEl("h3", { text: `${t("LOGGING")}` });
         new Setting(containerEl).setName(t("DISPLAY_DEBUG_INFO")).addToggle((toggle) =>
             toggle.setValue(this.plugin.data.settings.showDebugMessages).onChange(async (value) => {
@@ -725,5 +790,190 @@ export class SRSettingTab extends PluginSettingTab {
                 await this.plugin.savePluginData();
             })
         );
+    }
+
+    addDataLocationSettings(containerEl: HTMLElement) {
+        const plugin = this.plugin;
+
+        new Setting(containerEl)
+            .setName(t("DATA_LOC"))
+            .setDesc(t("DATA_LOC_DESC"))
+            .addDropdown((dropdown) => {
+                Object.values(DataLocation).forEach((val) => {
+                    dropdown.addOption(val, val);
+                });
+                dropdown.setValue(plugin.data.settings.dataLocation);
+
+                dropdown.onChange((val) => {
+                    const loc = locationMap[val];
+                    plugin.data.settings.dataLocation = loc;
+                    if (loc === DataLocation.SpecifiedFolder) {
+                        console.debug("plugin.store.dataPath", plugin.store.dataPath);
+                        plugin.data.settings.customFolder = plugin.store.dataPath;
+                    }
+                    plugin.store.moveStoreLocation();
+                    plugin.savePluginData();
+                    this.display();
+                });
+            });
+    }
+
+    addSpecifiedFolderSetting(containerEl: HTMLElement) {
+        const plugin = this.plugin;
+        console.debug("plugin.data.settings.customFolder", plugin.data.settings.customFolder);
+        const fder_index = plugin.data.settings.customFolder.lastIndexOf("/");
+        let cusFolder = plugin.data.settings.customFolder.substring(0, fder_index);
+        const cusFilename = plugin.data.settings.customFolder.substring(fder_index + 1);
+
+        new Setting(containerEl)
+            .setName(t("DATA_FOLDER"))
+            // .setDesc('Folder for `tracked_files.json`')
+            .addSearch((cb) => {
+                new FolderSuggest(cb.inputEl);
+                cb.setPlaceholder("Example: folder1/folder2")
+                    .setValue(cusFolder)
+                    .onChange((new_folder) => {
+                        cusFolder = new_folder;
+                        cb.setValue(cusFolder);
+                    });
+            })
+            .addButton((btn) =>
+                btn
+                    .setButtonText("save")
+                    .setCta()
+                    .onClick(() => {
+                        plugin.data.settings.customFolder = cusFolder + "/" + cusFilename;
+                        plugin.store.moveStoreLocation();
+                        plugin.savePluginData();
+                        this.display();
+                    })
+            );
+    }
+
+    addNewPerDaySetting(containerEl: HTMLElement) {
+        const plugin = this.plugin;
+
+        new Setting(containerEl)
+            .setName(t("NEW_PER_DAY"))
+            .setDesc(t("NEW_PER_DAY_DESC"))
+            .addText((text) =>
+                text
+                    .setPlaceholder("New Per Day")
+                    .setValue(plugin.data.settings.maxNewPerDay.toString())
+                    .onChange((newValue) => {
+                        const newPerDay = Number(newValue);
+
+                        if (isNaN(newPerDay)) {
+                            new Notice(t("NEW_PER_DAY_NAN"));
+                            return;
+                        }
+
+                        if (newPerDay < -1) {
+                            new Notice(t("NEW_PER_DAY_NEG"));
+                            return;
+                        }
+
+                        plugin.data.settings.maxNewPerDay = newPerDay;
+                        plugin.savePluginData();
+                    })
+            );
+    }
+
+    addRepeatItemsSetting(containerEl: HTMLElement) {
+        const plugin = this.plugin;
+        new Setting(containerEl)
+            .setName(t("REPEAT_ITEMS"))
+            .setDesc(t("REPEAT_ITEMS_DESC"))
+            .addToggle((toggle) => {
+                toggle.setValue(this.plugin.data.settings.repeatItems);
+                toggle.onChange(async (value) => {
+                    plugin.data.settings.repeatItems = value;
+                    await plugin.savePluginData();
+                });
+            });
+    }
+
+    addAlgorithmSetting(containerEl: HTMLElement) {
+        const plugin = this.plugin;
+
+        new Setting(containerEl)
+            .setName(t("ALGORITHM"))
+            .addDropdown((dropdown) => {
+                Object.keys(algorithms).forEach((val) => {
+                    dropdown.addOption(val, val);
+                });
+                dropdown.setValue(plugin.data.settings.algorithm);
+                dropdown.onChange((newValue) => {
+                    if (newValue != plugin.data.settings.algorithm) {
+                        new ConfirmModal(plugin.app, t("ALGORITHMS_CONFIRM"), (confirmed) => {
+                            if (confirmed) {
+                                plugin.data.settings.algorithm = newValue;
+                                plugin.savePluginData();
+                                this.display();
+                            } else {
+                                dropdown.setValue(plugin.data.settings.algorithm);
+                            }
+                        }).open();
+                    }
+                });
+            })
+            .settingEl.querySelector(".setting-item-description").innerHTML = t("ALGORITHMS_DESC");
+    }
+
+    addAlgorithmSpecificDisplaySetting(containerEl: HTMLElement) {
+        const plugin = this.plugin;
+        if (plugin.data.settings.algorithm === "Default") {
+            return;
+        }
+        // Add algorithm specific settings
+        containerEl.createEl("h3").innerText = "Trackfile Algorithm Settings";
+        this.plugin.algorithm.displaySettings(containerEl, (settings: any) => {
+            this.plugin.data.settings.algorithmSettings = settings;
+            this.plugin.saveData(this.plugin.data.settings);
+        });
+    }
+
+    addTrackedNoteToDecksSetting(containerEl: HTMLElement) {
+        const plugin = this.plugin;
+
+        new Setting(containerEl)
+            .setName(t("CONVERT_TRACKED_TO_DECK"))
+            .setDesc(t("CONVERT_FOLDERS_TO_DECKS_DESC"))
+            .addToggle((toggle) => {
+                toggle.setValue(plugin.data.settings.trackedNoteToDecks).onChange((newValue) => {
+                    plugin.data.settings.trackedNoteToDecks = newValue;
+                    plugin.savePluginData();
+                });
+            });
+    }
+
+    addReviewResponseFloatBarSetting(containerEl: HTMLElement) {
+        const plugin = this.plugin;
+
+        new Setting(containerEl)
+            .setName(t("REVIEW_FLOATBAR"))
+            .setDesc(t("REVIEW_FLOATBAR_DESC"))
+            .addToggle((toggle) => {
+                toggle
+                    .setValue(plugin.data.settings.reviewResponseFloatBar)
+                    .onChange((newValue) => {
+                        plugin.data.settings.reviewResponseFloatBar = newValue;
+                        plugin.savePluginData();
+                    });
+            });
+    }
+
+    addReviewNoteDirectlySetting(containerEl: HTMLElement) {
+        const plugin = this.plugin;
+
+        new Setting(containerEl)
+            .setName(t("REVIEW_NOTE_DIRECTLY"))
+            .setDesc(t("REVIEW_NOTE_DIRECTLY_DESC"))
+            .addToggle((toggle) => {
+                toggle.setValue(plugin.data.settings.reviewingNoteDirectly).onChange((newValue) => {
+                    plugin.data.settings.reviewingNoteDirectly = newValue;
+                    plugin.savePluginData();
+                });
+            });
     }
 }

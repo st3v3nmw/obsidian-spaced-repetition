@@ -142,6 +142,29 @@ export default {
     LOGGING: "Logging",
     DISPLAY_DEBUG_INFO: "Mostrar informação de debugging no console de desenvolvimento?",
 
+    DATA_LOC: "Data Location",
+    DATA_LOC_DESC: "Where to store the data file for spaced repetition items.",
+    DATA_FOLDER: "Folder for `tracked_files.json`",
+    NEW_PER_DAY: "New Per Day",
+    NEW_PER_DAY_DESC: "Maximum number of new (unreviewed) notes to add to the queue each day.",
+    NEW_PER_DAY_NAN: "Timeout must be a number",
+    NEW_PER_DAY_NEG: "New per day must be -1 or greater.",
+    REPEAT_ITEMS: "Repeat Items",
+    REPEAT_ITEMS_DESC: "Should items marked as incorrect be repeated until correct?",
+    ALGORITHMS_CONFIRM: `Switching algorithms might reset or impact review timings on existing items.
+    This change is irreversible. Changing algorithms only takes effect after a restart
+    or a plugin reload. Are you sure you want to switch algorithms?
+    `,
+    ALGORITHMS_DESC:
+        'The algorithm used for spaced repetition. For more information see <a href="https://github.com/martin-jw/obsidian-recall">algorithms</a>.',
+    CONVERT_TRACKED_TO_DECK: "Convert Tracked Notes to decks?",
+    REVIEW_FLOATBAR: "Review Response FloatBar",
+    REVIEW_FLOATBAR_DESC:
+        "only working when autoNextNote is true. show it when reviewing note via click statusbar/sidebar/command.",
+    REVIEW_NOTE_DIRECTLY: "Reviewing Note directly?",
+    REVIEW_NOTE_DIRECTLY_DESC:
+        "when reviewing note via click statusbar or command, open it directly without having to select a tag to open a note",
+
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Fila de Notas para Revisar",
     CLOSE: "Fechar",

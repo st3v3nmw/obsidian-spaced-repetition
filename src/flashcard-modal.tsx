@@ -24,6 +24,7 @@ import {
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
+import { DataLocation } from "./settings";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -158,7 +159,7 @@ export class FlashcardModal extends Modal {
     public easyBtn: HTMLElement;
     public nextBtn: HTMLElement;
     public responseDiv: HTMLElement;
-    public resetButton: HTMLElement;
+    public resetButton: HTMLButtonElement;
     public editButton: HTMLElement;
     public contextView: HTMLElement;
     public currentCard: Card;
@@ -180,11 +181,12 @@ export class FlashcardModal extends Modal {
         if (Platform.isMobile) {
             this.contentEl.style.display = "block";
         }
+        this.modalEl.style.position = "relative";
         this.modalEl.style.height = this.plugin.data.settings.flashcardHeightPercentage + "%";
         this.modalEl.style.width = this.plugin.data.settings.flashcardWidthPercentage + "%";
 
         this.contentEl.style.position = "relative";
-        this.contentEl.style.height = "92%";
+        // this.contentEl.style.height = "92%";
         this.contentEl.addClass("sr-modal-content");
 
         // TODO: refactor into event handler?
@@ -511,35 +513,60 @@ export class FlashcardModal extends Modal {
             sep = "\n";
         }
 
-        // check if we're adding scheduling information to the flashcard
-        // for the first time
-        if (this.currentCard.cardText.lastIndexOf("<!--SR:") === -1) {
-            this.currentCard.cardText =
-                this.currentCard.cardText + sep + `<!--SR:!${dueString},${interval},${ease}-->`;
-        } else {
-            let scheduling: (RegExpMatchArray | string[])[] = [
-                ...this.currentCard.cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
-            ];
-            if (scheduling.length === 0) {
-                scheduling = [...this.currentCard.cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
-            }
-
-            const currCardSched: string[] = ["0", dueString, interval.toString(), ease.toString()];
-            if (this.currentCard.isDue) {
-                scheduling[this.currentCard.siblingIdx] = currCardSched;
+        if (this.plugin.data.settings.dataLocation === DataLocation.SaveOnNoteFile) {
+            // check if we're adding scheduling information to the flashcard
+            // for the first time
+            let scheduling: (RegExpMatchArray | string[])[];
+            if (this.currentCard.cardText.lastIndexOf("<!--SR:") === -1) {
+                this.currentCard.cardText =
+                    this.currentCard.cardText + sep + `<!--SR:!${dueString},${interval},${ease}-->`;
             } else {
-                scheduling.push(currCardSched);
+                scheduling = [...this.currentCard.cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR)];
+                if (scheduling.length === 0) {
+                    scheduling = [
+                        ...this.currentCard.cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR),
+                    ];
+                }
+
+                const currCardSched: string[] = [
+                    "0",
+                    dueString,
+                    interval.toString(),
+                    ease.toString(),
+                ];
+                if (this.currentCard.isDue) {
+                    scheduling[this.currentCard.siblingIdx] = currCardSched;
+                } else {
+                    scheduling.push(currCardSched);
+                }
+
+                this.currentCard.cardText = this.currentCard.cardText.replace(/<!--SR:.+-->/gm, "");
+                this.currentCard.cardText += "<!--SR:";
+                for (let i = 0; i < scheduling.length; i++) {
+                    this.currentCard.cardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
+                }
+                this.currentCard.cardText += "-->";
             }
 
-            this.currentCard.cardText = this.currentCard.cardText.replace(/<!--SR:.+-->/gm, "");
-            this.currentCard.cardText += "<!--SR:";
-            for (let i = 0; i < scheduling.length; i++) {
-                this.currentCard.cardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
+            fileText = fileText.replace(replacementRegex, () => this.currentCard.cardText);
+
+            await this.app.vault.modify(this.currentCard.note, fileText);
+        } else {
+            const store = this.plugin.store;
+            const lineNo: number = this.currentCard.lineNo;
+            const hash: string = cyrb53(this.currentCard.cardText);
+            const cardinfo = store.getAndSyncCardInfo(this.currentCard.note, lineNo, hash);
+            let correct = true;
+            if (!(response == ReviewResponse.Easy || response == ReviewResponse.Good)) {
+                correct = false;
             }
-            this.currentCard.cardText += "-->";
+            store.setSchedbyId(
+                cardinfo.itemIds[this.currentCard.siblingIdx],
+                [0, due.valueOf(), interval, ease],
+                correct
+            );
         }
 
-        fileText = fileText.replace(replacementRegex, () => this.currentCard.cardText);
         for (const sibling of this.currentCard.siblings) {
             sibling.cardText = this.currentCard.cardText;
         }
@@ -547,7 +574,6 @@ export class FlashcardModal extends Modal {
             this.burySiblingCards(true);
         }
 
-        await this.app.vault.modify(this.currentCard.note, fileText);
         this.currentDeck.nextCard(this);
     }
 

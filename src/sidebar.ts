@@ -4,6 +4,7 @@ import type SRPlugin from "src/main";
 import { COLLAPSE_ICON } from "src/constants";
 import { ReviewDeck } from "src/review-deck";
 import { t } from "src/lang/helpers";
+import { DataLocation } from "./settings";
 
 export const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
 
@@ -69,7 +70,10 @@ export class ReviewQueueListView extends ItemView {
                 );
 
                 for (const newFile of deck.newNotes) {
-                    const fileIsOpen = activeFile && newFile.path === activeFile.path;
+                    const fileIsOpen =
+                        activeFile &&
+                        deckKey === this.plugin.lastSelectedReviewDeck &&
+                        newFile.path === activeFile.path;
                     if (fileIsOpen) {
                         deck.activeFolders.add(deck.deckName);
                         deck.activeFolders.add(t("NEW"));
@@ -88,18 +92,25 @@ export class ReviewQueueListView extends ItemView {
             }
 
             if (deck.scheduledNotes.length > 0) {
-                const now: number = Date.now();
-                let currUnix = -1;
+                let now: number;
+                if (this.plugin.data.settings.dataLocation === DataLocation.SaveOnNoteFile) {
+                    now = Date.now();
+                } else {
+                    // end of today
+                    now = Math.ceil(Date.now() / (24 * 3600 * 1000)) * 24 * 3600 * 1000;
+                }
+                let currnDays: number | null = null;
                 let schedFolderEl: HTMLElement | null = null,
                     folderTitle = "";
+                const schedFolderElDict: { [key: string]: HTMLElement } = {};
                 const maxDaysToRender: number = this.plugin.data.settings.maxNDaysNotesReviewQueue;
 
                 for (const sNote of deck.scheduledNotes) {
-                    if (sNote.dueUnix != currUnix) {
-                        const nDays: number = Math.ceil((sNote.dueUnix - now) / (24 * 3600 * 1000));
-
+                    const nDays: number = Math.ceil((sNote.dueUnix - now) / (24 * 3600 * 1000));
+                    if (nDays != currnDays) {
                         if (nDays > maxDaysToRender) {
-                            break;
+                            // break;
+                            continue; //rand review Queue
                         }
 
                         if (nDays === -1) {
@@ -112,17 +123,25 @@ export class ReviewQueueListView extends ItemView {
                             folderTitle = new Date(sNote.dueUnix).toDateString();
                         }
 
-                        schedFolderEl = this.createRightPaneFolder(
-                            deckFolderEl,
-                            folderTitle,
-                            !deck.activeFolders.has(folderTitle),
-                            deckCollapsed,
-                            deck
-                        );
-                        currUnix = sNote.dueUnix;
+                        if (!Object.prototype.hasOwnProperty.call(schedFolderElDict, folderTitle)) {
+                            schedFolderEl = this.createRightPaneFolder(
+                                deckFolderEl,
+                                folderTitle,
+                                !deck.activeFolders.has(folderTitle),
+                                deckCollapsed,
+                                deck
+                            );
+                            schedFolderElDict[folderTitle] = schedFolderEl;
+                        } else {
+                            schedFolderEl = schedFolderElDict[folderTitle];
+                        }
+                        currnDays = nDays;
                     }
 
-                    const fileIsOpen = activeFile && sNote.note.path === activeFile.path;
+                    const fileIsOpen =
+                        activeFile &&
+                        deckKey === this.plugin.lastSelectedReviewDeck &&
+                        sNote.note.path === activeFile.path;
                     if (fileIsOpen) {
                         deck.activeFolders.add(deck.deckName);
                         deck.activeFolders.add(folderTitle);
@@ -217,6 +236,7 @@ export class ReviewQueueListView extends ItemView {
                 event.preventDefault();
                 plugin.lastSelectedReviewDeck = deck.deckName;
                 await this.app.workspace.getLeaf().openFile(file);
+                plugin.reviewNoteFloatBar.display(true);
                 return false;
             },
             false

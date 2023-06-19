@@ -122,6 +122,25 @@ export default {
     LOGGING: "記錄中",
     DISPLAY_DEBUG_INFO: "在開發者控制台中顯示除錯資訊？",
 
+    DATA_LOC: "數據位置",
+    DATA_LOC_DESC: "間隔重複資料項目的檔的保存位置.",
+    DATA_FOLDER: "`tracked_files.json`的檔夾",
+    NEW_PER_DAY: "每天新增重複的數量",
+    NEW_PER_DAY_DESC: "每天要添加到佇列中的新（未重複過的）筆記的最大數量。.",
+    NEW_PER_DAY_NAN: "必須是整數",
+    NEW_PER_DAY_NEG: "整數必須大於等於-1.",
+    REPEAT_ITEMS: "重複錯誤",
+    REPEAT_ITEMS_DESC: "錯誤項是否要一直重複復習，直到回答正確?",
+    ALGORITHMS_CONFIRM: `切換演算法可能導致日期排程重置，這個修改不可撤銷，當重啟軟體或重新加載插件切換演算法才會生效。你確定要切換演算法麼?`,
+    ALGORITHMS_DESC:
+        '用於間隔重複的演算法. 更多資訊請查閱 <a href="https://github.com/martin-jw/obsidian-recall">演算法</a>.',
+    CONVERT_TRACKED_TO_DECK: "將復習筆記轉換為卡牌組?",
+    REVIEW_FLOATBAR: "復習懸浮欄",
+    REVIEW_FLOATBAR_DESC:
+        "當設置項“復習後自動打開下一個筆記”啟用時，這個設置項啟用才生效. 通過點擊狀態欄/側邊欄/命令進行復習時就會顯示出來.",
+    REVIEW_NOTE_DIRECTLY: "直接復習筆記?",
+    REVIEW_NOTE_DIRECTLY_DESC: "復習筆記時, 不必選擇標籤（多個復習標籤的情況）就直接打開筆記",
+
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "筆記復習序列",
     CLOSE: "臨近",
