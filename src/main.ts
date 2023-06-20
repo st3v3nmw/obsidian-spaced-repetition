@@ -97,8 +97,8 @@ export default class SRPlugin extends Plugin {
         this.algorithm = algorithms[this.data.settings.algorithm];
         this.algorithm.updateSettings(this.data.settings.algorithmSettings);
 
-        this.store = new DataStore(this);
-        await this.store.load();
+        // this.store = new DataStore(this);
+        // await this.store.load();
         this.store.buildQueue();
         this.commands = new Commands(this);
         this.commands.addCommands();
@@ -606,7 +606,7 @@ export default class SRPlugin extends Plugin {
                 Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
             ) ||
             (this.data.settings.dataLocation != DataLocation.SaveOnNoteFile &&
-                this.store.isNewAdd(fileId))
+                this.store.isNewAdd(fileId) >= 0)
         ) {
             // 新笔记，没有复习过的
             let linkTotal = 0,
@@ -661,7 +661,7 @@ export default class SRPlugin extends Plugin {
 
         // reviewedNote update
         if (this.data.settings.dataLocation != DataLocation.SaveOnNoteFile) {
-            if (!this.store.isNewAdd(this.store.getFileId(note.path))) {
+            if (this.store.isNewAdd(this.store.getFileId(note.path)) < 0) {
                 let due: number;
                 [, due, interval, ease] = this.store.getReviewNoteHeaderData(note.path);
                 delayBeforeReview = due === 0 ? 0 : now - due; //just in case.
@@ -724,10 +724,10 @@ export default class SRPlugin extends Plugin {
             const sched = [null, due.valueOf(), interval, ease];
             this.store.syncheadertoDataItems(note, sched, response);
             // this.store.reviewId(fileId, response.toString());
+            await this.store.save();
 
             //Sync update
             this.singNoteSyncQueue(this, note, delayBeforeReview);
-            this.savePluginData();
         }
 
         if (!this.lastSelectedReviewDeck) {
@@ -1157,6 +1157,8 @@ export default class SRPlugin extends Plugin {
     async loadPluginData(): Promise<void> {
         this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
+        this.store = new DataStore(this);
+        await this.store.load();
     }
 
     async savePluginData(): Promise<void> {

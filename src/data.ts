@@ -432,7 +432,7 @@ export class DataStore {
      * @param id Item id, can get by:
      * findex = this.store.getFileIndex(note.path);
      * id = this.data.trackedFiles[findex].items["file"]
-     * @returns true| false| -1
+     * @returns id | -1
      */
     isNewAdd(id: number) {
         if (id < 0) {
@@ -444,11 +444,12 @@ export class DataStore {
             return -2;
         }
         // console.debug("isnewadd: ",id);
-        if (this.data.items[id]["nextReview"] == 0) {
+        // ["nextReview"] has been changed when buildQueue.
+        if (this.data.items[id]["nextReview"] == 0 || this.data.items[id]["timesReviewed"] == 0) {
             // This is a new item.
-            return true;
+            return id;
         }
-        return false;
+        return -1;
     }
 
     /**
@@ -1006,6 +1007,8 @@ export class DataStore {
 
         let oldAdd = 0;
         let newAdd = 0;
+        let oldAdd_card = 0;
+        let newAdd_card = 0;
 
         let untrackedFiles = 0;
         let removedItems = 0;
@@ -1017,6 +1020,8 @@ export class DataStore {
                     return this.verify(file).then((exists) => {
                         if (!exists) {
                             if (file != null) {
+                                console.debug("untrackfile by buildqueue:", file);
+                                new Notice("untrackfile by buildqueue:" + file);
                                 removedItems += this.untrackFile(file.path, false);
                                 item = null;
                                 untrackedFiles += 1;
@@ -1028,7 +1033,7 @@ export class DataStore {
                                     // item.nextReview = now.getTime();
                                     data.newAdded += 1;
                                     data.cardQueue.push(id);
-                                    newAdd += 1;
+                                    newAdd_card += 1;
                                 }
                             } else if (item.nextReview <= now.getTime()) {
                                 if (this.isInRepeatQueue(id)) {
@@ -1036,7 +1041,7 @@ export class DataStore {
                                 }
                                 if (!this.isCardQueued(id)) {
                                     data.cardQueue.push(id);
-                                    oldAdd += 1;
+                                    oldAdd_card += 1;
                                 }
                             }
                         } else {
@@ -1069,7 +1074,14 @@ export class DataStore {
         // }
 
         console.log(
-            "Added " + (oldAdd + newAdd) + " files to review queue, with " + newAdd + " new!"
+            "Added " + (oldAdd + newAdd) + " notes to review queue, with " + newAdd + " new!"
+        );
+        console.log(
+            "Added " +
+                (oldAdd_card + newAdd_card) +
+                " cards to review queue, with " +
+                newAdd_card +
+                " new!"
         );
 
         if (untrackedFiles > 0) {
@@ -1268,9 +1280,10 @@ export class DataStore {
                 continue;
             } // already add to other tagDeck.
 
-            if (this.isNewAdd(this.data.queue[i])) {
+            if (this.isNewAdd(this.data.queue[i]) >= 0) {
                 rdeck.newNotes.push(file);
                 this.plugin.newNotesCount++;
+                console.debug("syncRCsrsDataToSRreviewDecks: newadd");
                 continue;
             } else {
                 rdeck.scheduledNotes.push({ note: file, dueUnix: item.nextReview });
@@ -1317,9 +1330,10 @@ export class DataStore {
             this.updateItemById(fileid, ind);
             console.debug("syncRCDataToSRrevDeck update item:", item);
         }
-        if (this.isNewAdd(fileid)) {
+        if (this.isNewAdd(fileid) >= 0) {
             rdeck.newNotes.push(note);
             this.plugin.newNotesCount++;
+            console.debug("syncRCDataToSRrevDeck : addNew", fileid);
         } else {
             rdeck.scheduledNotes.push({ note: note, dueUnix: item.nextReview });
             if (item.nextReview <= now_number) {
