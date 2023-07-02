@@ -1,4 +1,17 @@
-import { CardType } from "src/scheduling";
+import {CardType} from "src/scheduling";
+
+function containsOnlySpacesAndOneSeparator(text: string, separator: string): boolean {
+    // Remove any leading or trailing spaces
+    text = text.trim();
+
+    // Check if the text consists of only spaces and exactly one question mark
+    const escapedSeparator = separator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    const regexPattern = `^[ ]*${escapedSeparator}[ ]*$`;
+    console.log(regexPattern);
+    const regex = new RegExp(regexPattern);
+    return regex.test(text);
+}
 
 /**
  * Returns flashcards found in `text`
@@ -25,14 +38,21 @@ export function parse(
     let cardType: CardType | null = null;
     let lineNo = 0;
 
+    console.log("parser working...");
+
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
     for (let i = 0; i < lines.length; i++) {
+        // creates new card off newline
         if (lines[i].length === 0) {
-            if (cardType) {
-                cards.push([cardType, cardText, lineNo]);
-                cardType = null;
+            if (!cardType) {
+                // the default card type is note, if we did not assign any other card types
+                cardType = CardType.Note;
             }
 
+            cards.push([cardType, cardText, lineNo]);
+
+            // reset card before continuing parsing
+            cardType = null;
             cardText = "";
             continue;
         } else if (lines[i].startsWith("<!--") && !lines[i].startsWith("<!--SR:")) {
@@ -70,10 +90,10 @@ export function parse(
         ) {
             cardType = CardType.Cloze;
             lineNo = i;
-        } else if (lines[i] === multilineCardSeparator) {
+        } else if (containsOnlySpacesAndOneSeparator(lines[i], multilineCardSeparator)) {
             cardType = CardType.MultiLineBasic;
             lineNo = i;
-        } else if (lines[i] === multilineReversedCardSeparator) {
+        } else if (containsOnlySpacesAndOneSeparator(lines[i], multilineReversedCardSeparator)) {
             cardType = CardType.MultiLineReversed;
             lineNo = i;
         } else if (lines[i].startsWith("```") || lines[i].startsWith("~~~")) {
@@ -87,7 +107,13 @@ export function parse(
         }
     }
 
-    if (cardType && cardText) {
+    // add the last card
+    if (cardText) {
+        if (cardType === null) {
+            // we always want to create cards, so if no cardtype is found, make the cardtype note
+            cardType = CardType.Note;
+        }
+
         cards.push([cardType, cardText, lineNo]);
     }
 

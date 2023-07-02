@@ -40,6 +40,7 @@ export enum CardType {
     MultiLineBasic,
     MultiLineReversed,
     Cloze,
+    Note
 }
 
 export function schedule(

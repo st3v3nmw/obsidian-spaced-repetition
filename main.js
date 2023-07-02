@@ -1,0 +1,1 @@
+C:/Users/richard/Desktop/obsidian_dev_vault/plugin_dev/.obsidian/plugins/obsidian-spaced-repetition/build/main.js

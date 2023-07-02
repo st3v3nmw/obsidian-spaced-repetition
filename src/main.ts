@@ -249,6 +249,8 @@ export default class SRPlugin extends Plugin {
     }
 
     async sync(ignoreStats = false): Promise<void> {
+        console.log("ln252 sync...");
+
         if (this.syncLock) {
             return;
         }
@@ -790,6 +792,7 @@ export default class SRPlugin extends Plugin {
                 ? getCardContext(lineNo, headings, note.basename)
                 : "";
             const siblings: Card[] = [];
+
             for (let i = 0; i < siblingMatches.length; i++) {
                 const front: string = siblingMatches[i][0].trim(),
                     back: string = siblingMatches[i][1].trim();
