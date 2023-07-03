@@ -1,30 +1,23 @@
-import {
-    Notice,
-    Plugin,
-    TAbstractFile,
-    TFile,
-    HeadingCache,
-    getAllTags,
-    FrontMatterCache,
-} from "obsidian";
+import {FrontMatterCache, getAllTags, HeadingCache, Notice, Plugin, TAbstractFile, TFile,} from "obsidian";
 import * as graph from "pagerank.js";
 
-import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
-import { FlashcardModal, Deck } from "src/flashcard-modal";
-import { StatsModal, Stats } from "src/stats-modal";
-import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/sidebar";
-import { Card, CardType, ReviewResponse, schedule } from "src/scheduling";
+import {DEFAULT_SETTINGS, SRSettings, SRSettingTab} from "src/settings";
+import {Deck, FlashcardModal} from "src/flashcard-modal";
+import {Stats, StatsModal} from "src/stats-modal";
+import {REVIEW_QUEUE_VIEW_TYPE, ReviewQueueListView} from "src/sidebar";
+import {Card, CardType, ReviewResponse, schedule} from "src/scheduling";
 import {
-    YAML_FRONT_MATTER_REGEX,
-    SCHEDULING_INFO_REGEX,
     LEGACY_SCHEDULING_EXTRACTOR,
     MULTI_SCHEDULING_EXTRACTOR,
+    SCHEDULING_INFO_REGEX,
+    YAML_FRONT_MATTER_REGEX,
 } from "src/constants";
-import { escapeRegexString, cyrb53 } from "src/utils";
-import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
-import { t } from "src/lang/helpers";
-import { parse } from "src/parser";
-import { appIcon } from "src/icons/appicon";
+import {cyrb53, escapeRegexString} from "src/utils";
+import {ReviewDeck, ReviewDeckSelectionModal} from "src/review-deck";
+import {t} from "src/lang/helpers";
+import {parse} from "src/parser";
+import {appIcon} from "src/icons/appicon";
+import {escapeSeparator} from "src/parser";
 
 interface PluginData {
     settings: SRSettings;
@@ -285,6 +278,21 @@ export default class SRPlugin extends Plugin {
         }
 
         const notes: TFile[] = this.app.vault.getMarkdownFiles();
+        console.log('ln282');
+        console.dir(notes);
+
+        // for debugging. count number of notes that satisfy paths
+
+        let note_count = 0;
+        for (const note of notes) {
+            const deckPath: string[] = this.findDeckPath(note);
+            if (deckPath.length !== 0) {
+                note_count++;
+            }
+        }
+
+        debugger;
+
         for (const note of notes) {
             if (
                 this.data.settings.noteFoldersToIgnore.some((folder) =>
@@ -315,6 +323,8 @@ export default class SRPlugin extends Plugin {
             }
 
             const deckPath: string[] = this.findDeckPath(note);
+
+            // if deckPath.length == 0, that means we did not find the flashcardTags in the note path
             if (deckPath.length !== 0) {
                 const flashcardsInNoteAvgEase: number = await this.findFlashcardsInNote(
                     note,
@@ -607,6 +617,11 @@ export default class SRPlugin extends Plugin {
         new Notice(t("ALL_CAUGHT_UP"));
     }
 
+    /**
+     * Checks whether a single note path contains the flashcardTags (i.e. #flashcards). If not, returns empty string,
+     * and the note will not be added to the deckTree or considered for parsing.
+     * @param note
+     */
     findDeckPath(note: TFile): string[] {
         let deckPath: string[] = [];
         if (this.data.settings.convertFoldersToDecks) {
@@ -632,6 +647,10 @@ export default class SRPlugin extends Plugin {
         return deckPath;
     }
 
+    /**
+    * Parses note for flashcard(s), and also adds it to the deckTree.
+    * Keep in mind this function only operates on one note.
+     * */
     async findFlashcardsInNote(
         note: TFile,
         deckPath: string[],
@@ -739,35 +758,63 @@ export default class SRPlugin extends Plugin {
                     siblingMatches.push([front, back]);
                 }
             } else {
-                let idx: number;
+                let frontBackSplitStartIdx: number;
                 if (cardType === CardType.SingleLineBasic) {
-                    idx = cardText.indexOf(settings.singleLineCardSeparator);
+                    frontBackSplitStartIdx = cardText.indexOf(settings.singleLineCardSeparator);
                     siblingMatches.push([
-                        cardText.substring(0, idx),
-                        cardText.substring(idx + settings.singleLineCardSeparator.length),
+                        cardText.substring(0, frontBackSplitStartIdx),
+                        cardText.substring(frontBackSplitStartIdx + settings.singleLineCardSeparator.length),
                     ]);
                 } else if (cardType === CardType.SingleLineReversed) {
-                    idx = cardText.indexOf(settings.singleLineReversedCardSeparator);
-                    const side1: string = cardText.substring(0, idx),
+                    frontBackSplitStartIdx = cardText.indexOf(settings.singleLineReversedCardSeparator);
+                    const side1: string = cardText.substring(0, frontBackSplitStartIdx),
                         side2: string = cardText.substring(
-                            idx + settings.singleLineReversedCardSeparator.length
+                            frontBackSplitStartIdx + settings.singleLineReversedCardSeparator.length
                         );
                     siblingMatches.push([side1, side2]);
                     siblingMatches.push([side2, side1]);
                 } else if (cardType === CardType.MultiLineBasic) {
-                    idx = cardText.indexOf("\n" + settings.multilineCardSeparator + "\n");
+                    // console.log("multiline ln758");
+                    // front_back_split_idx = cardText.indexOf("\n" + settings.multilineCardSeparator + "\n");
+
+                    const escapedSeparator = escapeSeparator(settings.multilineCardSeparator);
+                    const regexPattern = `(\\r\n|\\r|\\n)[ ]*${escapedSeparator}[ ]*(\\n)`;
+
+                    frontBackSplitStartIdx = cardText.search(regexPattern);
+
+                    // console.log('main cardText');
+                    // console.log(cardText);
+                    // console.log("match");
+                    // console.log(cardText.match(regexPattern));
+                    const substrLength = cardText.match(regexPattern)[0].length;
+
+                    // console.log(substrLength);
+
                     siblingMatches.push([
-                        cardText.substring(0, idx),
-                        cardText.substring(idx + 2 + settings.multilineCardSeparator.length),
+                        cardText.substring(0, frontBackSplitStartIdx),
+                        cardText.substring(frontBackSplitStartIdx + substrLength),
                     ]);
                 } else if (cardType === CardType.MultiLineReversed) {
-                    idx = cardText.indexOf("\n" + settings.multilineReversedCardSeparator + "\n");
-                    const side1: string = cardText.substring(0, idx),
+                    // console.log("multiline ln764");
+
+                    const escapedSeparator = escapeSeparator(settings.multilineReversedCardSeparator);
+                    const regexPattern = `(\\r\n|\\r|\\n)[ ]*${escapedSeparator}[ ]*(\\n)`;
+
+                    frontBackSplitStartIdx = cardText.indexOf("\n" + settings.multilineReversedCardSeparator + "\n");
+                    // front_back_split_idx = cardText.indexOf("\n" + settings.multilineReversedCardSeparator + "\n");
+
+                    const side1: string = cardText.substring(0, frontBackSplitStartIdx),
                         side2: string = cardText.substring(
-                            idx + 2 + settings.multilineReversedCardSeparator.length
+                            frontBackSplitStartIdx + 2 + settings.multilineReversedCardSeparator.length
                         );
                     siblingMatches.push([side1, side2]);
                     siblingMatches.push([side2, side1]);
+                } else if (cardType == CardType.Note) {
+                    const side1: string = cardText;
+                    const side2 = "";
+                    siblingMatches.push([side1, side2]);
+                } else {
+                    console.log("Card type not found!");
                 }
             }
 
