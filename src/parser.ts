@@ -47,23 +47,6 @@ export function parse(
 
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
     for (let i = 0; i < lines.length; i++) {
-        // creates new card off newline
-        // if (lines[i].length === 0) {
-        //     if (cardType === null) {
-        //         // the default card type is note, if we did not assign any other card types
-        //         cardType = CardType.Note;
-        //     }
-        //
-        //     console.log("cardType");
-        //     console.log(cardType);
-        //     console.log("cardText");
-        //     console.log(cardText);
-        //     cards.push([cardType, cardText, separatorLineNo]);
-        //
-        //     // reset card before continuing parsing
-        //     cardType = null;
-        //     cardText = "";
-        //     continue;
         if (lines[i].startsWith("<!--") && !lines[i].startsWith("<!--SR:")) {
             while (i + 1 < lines.length && !lines[i].includes("-->")) i++;
             i++;
@@ -74,7 +57,7 @@ export function parse(
             cardText += "\n";
         }
 
-        // keep adding lines to cardText
+        // this is the key line that builds the cardText
         cardText += lines[i];
 
         if (
@@ -120,23 +103,11 @@ export function parse(
 
 
     // add the last card
-    // if (cardText) {
     if (cardType === null) {
         // we always want to create cards, so if no cardtype is found, make the cardtype note
         cardType = CardType.Note;
     }
-
-    // console.log("cardType");
-    // console.log(cardType);
-    // console.log("cardText");
-    // console.log(cardText);
-
-    if (cardText == null) {
-        cardText = "dummy";
-    }
     cards.push([cardType, cardText, separatorLineNo]);
-    // }
-
 
     return cards;
 }

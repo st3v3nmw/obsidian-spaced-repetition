@@ -242,8 +242,6 @@ export default class SRPlugin extends Plugin {
     }
 
     async sync(ignoreStats = false): Promise<void> {
-        console.log("ln252 sync...");
-
         if (this.syncLock) {
             return;
         }
@@ -278,20 +276,17 @@ export default class SRPlugin extends Plugin {
         }
 
         const notes: TFile[] = this.app.vault.getMarkdownFiles();
-        console.log('ln282');
-        console.dir(notes);
 
         // for debugging. count number of notes that satisfy paths
-
-        let note_count = 0;
-        for (const note of notes) {
-            const deckPath: string[] = this.findDeckPath(note);
-            if (deckPath.length !== 0) {
-                note_count++;
-            }
-        }
-
-        debugger;
+        // let noteCount = 0;
+        // for (const note of notes) {
+        //     const deckPath: string[] = this.findDeckPath(note);
+        //     if (deckPath.length !== 0) {
+        //         noteCount++;
+        //     }
+        // }
+        // console.log(`Expected ${noteCount} flashcards. Because OSR avoids double counting when multiple tags are present
+        // for a card, the number of cards that show up under your Obsidian tags may be different.`);
 
         for (const note of notes) {
             if (
@@ -774,42 +769,33 @@ export default class SRPlugin extends Plugin {
                     siblingMatches.push([side1, side2]);
                     siblingMatches.push([side2, side1]);
                 } else if (cardType === CardType.MultiLineBasic) {
-                    // console.log("multiline ln758");
-                    // front_back_split_idx = cardText.indexOf("\n" + settings.multilineCardSeparator + "\n");
-
                     const escapedSeparator = escapeSeparator(settings.multilineCardSeparator);
                     const regexPattern = `(\\r\n|\\r|\\n)[ ]*${escapedSeparator}[ ]*(\\n)`;
 
                     frontBackSplitStartIdx = cardText.search(regexPattern);
 
-                    // console.log('main cardText');
-                    // console.log(cardText);
-                    // console.log("match");
-                    // console.log(cardText.match(regexPattern));
                     const substrLength = cardText.match(regexPattern)[0].length;
-
-                    // console.log(substrLength);
 
                     siblingMatches.push([
                         cardText.substring(0, frontBackSplitStartIdx),
                         cardText.substring(frontBackSplitStartIdx + substrLength),
                     ]);
                 } else if (cardType === CardType.MultiLineReversed) {
-                    // console.log("multiline ln764");
-
                     const escapedSeparator = escapeSeparator(settings.multilineReversedCardSeparator);
                     const regexPattern = `(\\r\n|\\r|\\n)[ ]*${escapedSeparator}[ ]*(\\n)`;
 
-                    frontBackSplitStartIdx = cardText.indexOf("\n" + settings.multilineReversedCardSeparator + "\n");
-                    // front_back_split_idx = cardText.indexOf("\n" + settings.multilineReversedCardSeparator + "\n");
+                    frontBackSplitStartIdx = cardText.search(regexPattern);
+
+                    const substrLength = cardText.match(regexPattern)[0].length;
 
                     const side1: string = cardText.substring(0, frontBackSplitStartIdx),
                         side2: string = cardText.substring(
-                            frontBackSplitStartIdx + 2 + settings.multilineReversedCardSeparator.length
+                            frontBackSplitStartIdx + substrLength
                         );
                     siblingMatches.push([side1, side2]);
                     siblingMatches.push([side2, side1]);
                 } else if (cardType == CardType.Note) {
+                    // for note type, we have no card back - so put empty string
                     const side1: string = cardText;
                     const side2 = "";
                     siblingMatches.push([side1, side2]);
@@ -839,7 +825,6 @@ export default class SRPlugin extends Plugin {
                 ? getCardContext(lineNo, headings, note.basename)
                 : "";
             const siblings: Card[] = [];
-
             for (let i = 0; i < siblingMatches.length; i++) {
                 const front: string = siblingMatches[i][0].trim(),
                     back: string = siblingMatches[i][1].trim();
