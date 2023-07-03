@@ -32,3 +32,5 @@ venv/
 
 # env
 env.sh
+
+main.js

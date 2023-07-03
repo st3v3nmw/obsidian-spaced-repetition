@@ -767,6 +767,8 @@ export class Deck {
         }
         this.totalFlashcards++;
 
+        // deckPath.length === 0 means we have an individual card
+        // if the length is not 0, then we must recurse to get an individual card
         if (deckPath.length === 0) {
             if (cardObj.isDue) {
                 this.dueFlashcards.push(cardObj);

@@ -1,5 +1,23 @@
 import { CardType } from "src/scheduling";
 
+export function escapeSeparator(separator: string): string {
+    return separator.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function containsOnlySpacesAndOneSeparator(text: string, separator: string): boolean {
+    // Remove any leading or trailing spaces
+    text = text.trim();
+
+    // Check if the text consists of only spaces and exactly one question mark
+    const escapedSeparator = escapeSeparator(separator);
+
+    const regexPattern = `^[ ]*${escapedSeparator}[ ]*$`;
+
+    // console.log(regexPattern);
+
+    const regex = new RegExp(regexPattern);
+    return regex.test(text);
+}
+
 /**
  * Returns flashcards found in `text`
  *
@@ -23,19 +41,13 @@ export function parse(
     let cardText = "";
     const cards: [CardType, string, number][] = [];
     let cardType: CardType | null = null;
-    let lineNo = 0;
+    let separatorLineNo = 0;
+
+    // console.log("parser working...");
 
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
     for (let i = 0; i < lines.length; i++) {
-        if (lines[i].length === 0) {
-            if (cardType) {
-                cards.push([cardType, cardText, lineNo]);
-                cardType = null;
-            }
-
-            cardText = "";
-            continue;
-        } else if (lines[i].startsWith("<!--") && !lines[i].startsWith("<!--SR:")) {
+        if (lines[i].startsWith("<!--") && !lines[i].startsWith("<!--SR:")) {
             while (i + 1 < lines.length && !lines[i].includes("-->")) i++;
             i++;
             continue;
@@ -44,6 +56,8 @@ export function parse(
         if (cardText.length > 0) {
             cardText += "\n";
         }
+
+        // this is the key line that builds the cardText
         cardText += lines[i];
 
         if (
@@ -54,12 +68,12 @@ export function parse(
                 ? CardType.SingleLineReversed
                 : CardType.SingleLineBasic;
             cardText = lines[i];
-            lineNo = i;
+            separatorLineNo = i;
             if (i + 1 < lines.length && lines[i + 1].startsWith("<!--SR:")) {
                 cardText += "\n" + lines[i + 1];
                 i++;
             }
-            cards.push([cardType, cardText, lineNo]);
+            cards.push([cardType, cardText, separatorLineNo]);
             cardType = null;
             cardText = "";
         } else if (
@@ -69,13 +83,13 @@ export function parse(
                 (convertCurlyBracketsToClozes && /{{.*?}}/gm.test(lines[i])))
         ) {
             cardType = CardType.Cloze;
-            lineNo = i;
-        } else if (lines[i] === multilineCardSeparator) {
+            separatorLineNo = i;
+        } else if (containsOnlySpacesAndOneSeparator(lines[i], multilineCardSeparator)) {
             cardType = CardType.MultiLineBasic;
-            lineNo = i;
-        } else if (lines[i] === multilineReversedCardSeparator) {
+            separatorLineNo = i;
+        } else if (containsOnlySpacesAndOneSeparator(lines[i], multilineReversedCardSeparator)) {
             cardType = CardType.MultiLineReversed;
-            lineNo = i;
+            separatorLineNo = i;
         } else if (lines[i].startsWith("```") || lines[i].startsWith("~~~")) {
             const codeBlockClose = lines[i].match(/`+|~+/)[0];
             while (i + 1 < lines.length && !lines[i + 1].startsWith(codeBlockClose)) {
@@ -87,9 +101,12 @@ export function parse(
         }
     }
 
-    if (cardType && cardText) {
-        cards.push([cardType, cardText, lineNo]);
+    // add the last card
+    if (cardType === null) {
+        // we always want to create cards, so if no cardtype is found, make the cardtype note
+        cardType = CardType.Note;
     }
+    cards.push([cardType, cardText, separatorLineNo]);
 
     return cards;
 }
