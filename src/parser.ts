@@ -1,7 +1,7 @@
-import {CardType} from "src/scheduling";
+import { CardType } from "src/scheduling";
 
 export function escapeSeparator(separator: string): string {
-    return separator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return separator.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 function containsOnlySpacesAndOneSeparator(text: string, separator: string): boolean {
     // Remove any leading or trailing spaces
@@ -100,7 +100,6 @@ export function parse(
             i++;
         }
     }
-
 
     // add the last card
     if (cardType === null) {

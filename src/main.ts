@@ -1,23 +1,31 @@
-import {FrontMatterCache, getAllTags, HeadingCache, Notice, Plugin, TAbstractFile, TFile,} from "obsidian";
+import {
+    FrontMatterCache,
+    getAllTags,
+    HeadingCache,
+    Notice,
+    Plugin,
+    TAbstractFile,
+    TFile,
+} from "obsidian";
 import * as graph from "pagerank.js";
 
-import {DEFAULT_SETTINGS, SRSettings, SRSettingTab} from "src/settings";
-import {Deck, FlashcardModal} from "src/flashcard-modal";
-import {Stats, StatsModal} from "src/stats-modal";
-import {REVIEW_QUEUE_VIEW_TYPE, ReviewQueueListView} from "src/sidebar";
-import {Card, CardType, ReviewResponse, schedule} from "src/scheduling";
+import { DEFAULT_SETTINGS, SRSettings, SRSettingTab } from "src/settings";
+import { Deck, FlashcardModal } from "src/flashcard-modal";
+import { Stats, StatsModal } from "src/stats-modal";
+import { REVIEW_QUEUE_VIEW_TYPE, ReviewQueueListView } from "src/sidebar";
+import { Card, CardType, ReviewResponse, schedule } from "src/scheduling";
 import {
     LEGACY_SCHEDULING_EXTRACTOR,
     MULTI_SCHEDULING_EXTRACTOR,
     SCHEDULING_INFO_REGEX,
     YAML_FRONT_MATTER_REGEX,
 } from "src/constants";
-import {cyrb53, escapeRegexString} from "src/utils";
-import {ReviewDeck, ReviewDeckSelectionModal} from "src/review-deck";
-import {t} from "src/lang/helpers";
-import {parse} from "src/parser";
-import {appIcon} from "src/icons/appicon";
-import {escapeSeparator} from "src/parser";
+import { cyrb53, escapeRegexString } from "src/utils";
+import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
+import { t } from "src/lang/helpers";
+import { parse } from "src/parser";
+import { appIcon } from "src/icons/appicon";
+import { escapeSeparator } from "src/parser";
 
 interface PluginData {
     settings: SRSettings;
@@ -643,8 +651,8 @@ export default class SRPlugin extends Plugin {
     }
 
     /**
-    * Parses note for flashcard(s), and also adds it to the deckTree.
-    * Keep in mind this function only operates on one note.
+     * Parses note for flashcard(s), and also adds it to the deckTree.
+     * Keep in mind this function only operates on one note.
      * */
     async findFlashcardsInNote(
         note: TFile,
@@ -758,10 +766,14 @@ export default class SRPlugin extends Plugin {
                     frontBackSplitStartIdx = cardText.indexOf(settings.singleLineCardSeparator);
                     siblingMatches.push([
                         cardText.substring(0, frontBackSplitStartIdx),
-                        cardText.substring(frontBackSplitStartIdx + settings.singleLineCardSeparator.length),
+                        cardText.substring(
+                            frontBackSplitStartIdx + settings.singleLineCardSeparator.length
+                        ),
                     ]);
                 } else if (cardType === CardType.SingleLineReversed) {
-                    frontBackSplitStartIdx = cardText.indexOf(settings.singleLineReversedCardSeparator);
+                    frontBackSplitStartIdx = cardText.indexOf(
+                        settings.singleLineReversedCardSeparator
+                    );
                     const side1: string = cardText.substring(0, frontBackSplitStartIdx),
                         side2: string = cardText.substring(
                             frontBackSplitStartIdx + settings.singleLineReversedCardSeparator.length
@@ -781,7 +793,9 @@ export default class SRPlugin extends Plugin {
                         cardText.substring(frontBackSplitStartIdx + substrLength),
                     ]);
                 } else if (cardType === CardType.MultiLineReversed) {
-                    const escapedSeparator = escapeSeparator(settings.multilineReversedCardSeparator);
+                    const escapedSeparator = escapeSeparator(
+                        settings.multilineReversedCardSeparator
+                    );
                     const regexPattern = `(\\r\n|\\r|\\n)[ ]*${escapedSeparator}[ ]*(\\n)`;
 
                     frontBackSplitStartIdx = cardText.search(regexPattern);
@@ -789,9 +803,7 @@ export default class SRPlugin extends Plugin {
                     const substrLength = cardText.match(regexPattern)[0].length;
 
                     const side1: string = cardText.substring(0, frontBackSplitStartIdx),
-                        side2: string = cardText.substring(
-                            frontBackSplitStartIdx + substrLength
-                        );
+                        side2: string = cardText.substring(frontBackSplitStartIdx + substrLength);
                     siblingMatches.push([side1, side2]);
                     siblingMatches.push([side2, side1]);
                 } else if (cardType == CardType.Note) {
