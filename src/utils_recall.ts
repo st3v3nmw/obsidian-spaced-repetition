@@ -45,6 +45,18 @@ export class MiscUtils {
     }
 
     /**
+     * Creates a copy of obj, and copies values from source into
+     * the copy
+     *
+     * @param obj
+     * @param source
+     */
+    static assignObjFully(obj: any, source: any): any {
+        const newObj = Object.assign(obj, JSON.parse(JSON.stringify(source)));
+        return newObj;
+    }
+
+    /**
      * getRegExpGroups. Counts the number of capturing groups in the provided regular
      * expression.
      *

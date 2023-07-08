@@ -1,6 +1,6 @@
 {
     "name": "obsidian-spaced-repetition",
-    "version": "1.10.1",
+    "version": "1.10.1m2",
     "description": "Fight the forgetting curve by reviewing flashcards & entire notes.",
     "main": "main.js",
     "scripts": {
@@ -10,9 +10,7 @@
         "lint": "npx prettier --check . && npx eslint src/",
         "test": "jest",
         "changelog": "auto-changelog --template=compact --package && npx prettier --write CHANGELOG.md",
-        "e2e": "make setup_e2e && wdio run ./wdio.conf.js",
-        "devr": "rollup --config rollup.config.js -w",
-        "buildr": "rollup --config rollup.config.js"
+        "e2e": "make setup_e2e && wdio run ./wdio.conf.js"
     },
     "keywords": [
         "obsidian",
@@ -22,6 +20,7 @@
     "author": "Stephen Mwangi",
     "license": "MIT",
     "devDependencies": {
+        "@popperjs/core": "^2.11.6",
         "@types/jest": "^29.5.1",
         "@types/node": "^20.1.1",
         "@types/vhtml": "^2.2.4",
@@ -33,16 +32,12 @@
         "@wdio/selenium-standalone-service": "^8.10.2",
         "@wdio/spec-reporter": "^8.10.2",
         "auto-changelog": "^2.4.0",
-        "rollup": "^2.45.2",
-        "@rollup/plugin-commonjs": "^15.1.0",
-        "@rollup/plugin-node-resolve": "^9.0.0",
-        "@rollup/plugin-typescript": "^6.0.0",
-        "rollup-plugin-copy": "^3.4.0",
         "builtin-modules": "^3.3.0",
         "chai": "^4.3.7",
+        "deepcopy": "^2.1.0",
         "esbuild": "~0.17.18",
-        "esbuild-plugin-copy": "^2.0.2",
         "eslint": "^8.40.0",
+        "fsrs.js": "^0.1.3",
         "jest": "^29.5.0",
         "jest-environment-jsdom": "^29.5.0",
         "jest-expect-message": "^1.1.3",
@@ -53,8 +48,7 @@
         "tslib": "2.5.0",
         "typescript": "5.0.4",
         "vhtml": "^2.2.0",
-        "wdio-chromedriver-service": "^8.1.1",
-        "@popperjs/core": "^2.11.6"
+        "wdio-chromedriver-service": "^8.1.1"
     },
     "dependencies": {
         "chart.js": "^4.3.0",

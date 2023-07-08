@@ -2,8 +2,9 @@ import { Setting, Notice } from "obsidian";
 import { DateUtils } from "src/utils_recall";
 import SrsAlgorithm from "./../algorithms";
 import { RepetitionItem, ReviewResult } from "./../data";
+import deepcopy from "deepcopy";
 
-interface AnkiData {
+export interface AnkiData {
     ease: number;
     lastInterval: number;
     iteration: number;
@@ -37,13 +38,24 @@ export class AnkiAlgorithm extends SrsAlgorithm {
     defaultData(): AnkiData {
         return {
             ease: this.settings.startingEase,
-            lastInterval: 1,
+            lastInterval: 0,
             iteration: 1,
         };
     }
 
     srsOptions(): string[] {
         return AnkiOptions;
+    }
+
+    calcAllOptsIntervals(item: RepetitionItem): number[] {
+        const intvls: number[] = [];
+        this.srsOptions().forEach((opt, _ind) => {
+            const itemCopy = deepcopy(item);
+            const result = this.onSelection(itemCopy, opt, false);
+            const intvl = Math.round((result.nextReview / DateUtils.DAYS_TO_MILLIS) * 100) / 100;
+            intvls.push(intvl);
+        });
+        return intvls;
     }
 
     onSelection(item: RepetitionItem, optionStr: string, repeat: boolean): ReviewResult {
@@ -101,7 +113,10 @@ export class AnkiAlgorithm extends SrsAlgorithm {
         };
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     displaySettings(containerEl: HTMLElement, update: (settings: any) => void) {
+        containerEl.createDiv().innerHTML =
+            '用于间隔重复的算法. 更多信息请查阅 <a href="https://faqs.ankiweb.net/what-spaced-repetition-algorithm.html">Anki算法</a>.';
         new Setting(containerEl)
             .setName("Starting Ease")
             .setDesc("The initial ease given to an item.")

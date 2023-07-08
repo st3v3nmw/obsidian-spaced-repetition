@@ -11,7 +11,7 @@ import {
 import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, DataLocation } from "src/settings";
-import { FlashcardModal, Deck } from "src/flashcard-modal";
+import { FlashcardModal, Deck } from "src/flashcard-modal-algo";
 import { StatsModal, Stats } from "src/stats-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/sidebar";
 import { Card, CardType, ReviewResponse, schedule } from "src/scheduling";
@@ -33,6 +33,7 @@ import Commands from "./commands";
 import SrsAlgorithm from "./algorithms";
 import { algorithms } from "src/settings";
 import { reviewNoteResponseModal } from "./modals/reviewresponse-modal";
+import { DateUtils } from "./utils_recall";
 
 interface PluginData {
     settings: SRSettings;
@@ -77,6 +78,8 @@ export default class SRPlugin extends Plugin {
     private pageranks: Record<string, number> = {};
     public newNotesCount = 0;
     public dueNotesCount = 0;
+    public dueNotesCount_real = 0;
+    public shortestInterval = 0;
     public dueDatesNotes: Record<number, number> = {}; // Record<# of days in future, due count>
 
     public deckTree: Deck = new Deck("root", null);
@@ -95,10 +98,11 @@ export default class SRPlugin extends Plugin {
         appIcon();
 
         this.algorithm = algorithms[this.data.settings.algorithm];
-        this.algorithm.updateSettings(this.data.settings.algorithmSettings);
+        this.algorithm.updateSettings(
+            this,
+            this.data.settings.algorithmSettings[this.data.settings.algorithm]
+        );
 
-        // this.store = new DataStore(this);
-        // await this.store.load();
         this.store.buildQueue();
         this.commands = new Commands(this);
         this.commands.addCommands();
@@ -112,7 +116,9 @@ export default class SRPlugin extends Plugin {
 
         if (this.data.settings.dataLocation != DataLocation.SaveOnNoteFile) {
             // save tracked_files.json
-            this.registerInterval(window.setInterval(() => this.store.save(), 5 * 60 * 1000));
+            this.registerInterval(
+                window.setInterval(() => (this.sync(), this.store.save()), 5 * 60 * 1000)
+            );
         }
 
         this.statusBar = this.addStatusBarItem();
@@ -334,6 +340,7 @@ export default class SRPlugin extends Plugin {
         console.log("Unloading Obsidian Recall. Saving tracked files...");
         this.store.save();
         this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).forEach((leaf) => leaf.detach());
+        console.log("tracked files saved.");
     }
 
     async sync(ignoreStats = false): Promise<void> {
@@ -548,9 +555,10 @@ export default class SRPlugin extends Plugin {
             );
         }
 
+        this.dueNotesCount_real = Object.keys(this.store.data.toDayAllQueue).length;
         this.statusBar.setText(
             t("STATUS_BAR", {
-                dueNotesCount: this.dueNotesCount,
+                dueNotesCount: this.dueNotesCount_real,
                 dueFlashcardsCount: this.deckTree.dueFlashcardsCount,
             })
         );
@@ -665,7 +673,6 @@ export default class SRPlugin extends Plugin {
                 let due: number;
                 [, due, interval, ease] = this.store.getReviewNoteHeaderData(note.path);
                 delayBeforeReview = due === 0 ? 0 : now - due; //just in case.
-                // console.debug(ease, interval, due, delayBeforeReview);
             }
         }
 
@@ -720,14 +727,12 @@ export default class SRPlugin extends Plugin {
             await this.sync();
         } else if (fileId > -1) {
             this.deleteNoteSchedulingHeader(note, deleteheader);
-            //update data
-            const sched = [null, due.valueOf(), interval, ease];
-            this.store.syncheadertoDataItems(note, sched, response);
-            // this.store.reviewId(fileId, response.toString());
+            this.store.reviewId(fileId, response.toString());
+
             await this.store.save();
 
             //Sync update
-            this.singNoteSyncQueue(this, note, delayBeforeReview);
+            this.singleNoteSyncQueue(this, note, delayBeforeReview);
         }
 
         if (!this.lastSelectedReviewDeck) {
@@ -736,7 +741,170 @@ export default class SRPlugin extends Plugin {
 
         new Notice(t("RESPONSE_RECEIVED"));
 
-        // console.debug("syncRCDataToSRrevDeck>", this.reviewDecks, matchedNoteTag);
+        if (this.data.settings.autoNextNote) {
+            this.reviewNextNote(this.lastSelectedReviewDeck);
+        }
+    }
+
+    async saveReviewResponsebyAlgo(note: TFile, response: string): Promise<void> {
+        const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
+        const frontmatter: FrontMatterCache | Record<string, unknown> =
+            fileCachedData.frontmatter || {};
+
+        const tags = getAllTags(fileCachedData) || [];
+        if (this.data.settings.noteFoldersToIgnore.some((folder) => note.path.startsWith(folder))) {
+            new Notice(t("NOTE_IN_IGNORED_FOLDER"));
+            return;
+        }
+
+        let shouldIgnore = true;
+        let matchedNoteTag: string;
+        for (const tag of tags) {
+            if (
+                this.data.settings.tagsToReview.some(
+                    (tagToReview) =>
+                        tag === (matchedNoteTag = tagToReview) || tag.startsWith(tagToReview + "/")
+                )
+            ) {
+                shouldIgnore = false;
+                // matchedNoteTag =  tagToReview;
+                break;
+            }
+        }
+
+        if (
+            (shouldIgnore && this.data.settings.dataLocation === DataLocation.SaveOnNoteFile) ||
+            (this.data.settings.dataLocation != DataLocation.SaveOnNoteFile &&
+                !this.store.isTracked(note.path))
+        ) {
+            new Notice(t("PLEASE_TAG_NOTE"));
+            return;
+        }
+
+        const fileText: string = await this.app.vault.read(note);
+        let ease: number, interval: number, delayBeforeReview: number;
+        const now: number = Date.now();
+        // new note
+        const fileId = this.store.getFileId(note.path);
+        if (
+            !(
+                Object.prototype.hasOwnProperty.call(frontmatter, "sr-due") &&
+                Object.prototype.hasOwnProperty.call(frontmatter, "sr-interval") &&
+                Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
+            ) ||
+            (this.data.settings.dataLocation != DataLocation.SaveOnNoteFile &&
+                this.store.isNewAdd(fileId) >= 0)
+        ) {
+            // 新笔记，没有复习过的
+            let linkTotal = 0,
+                linkPGTotal = 0,
+                totalLinkCount = 0;
+
+            for (const statObj of this.incomingLinks[note.path] || []) {
+                const ease: number = this.easeByPath[statObj.sourcePath];
+                if (ease) {
+                    linkTotal += statObj.linkCount * this.pageranks[statObj.sourcePath] * ease;
+                    linkPGTotal += this.pageranks[statObj.sourcePath] * statObj.linkCount;
+                    totalLinkCount += statObj.linkCount;
+                }
+            }
+
+            const outgoingLinks = this.app.metadataCache.resolvedLinks[note.path] || {};
+            for (const linkedFilePath in outgoingLinks) {
+                const ease: number = this.easeByPath[linkedFilePath];
+                if (ease) {
+                    linkTotal +=
+                        outgoingLinks[linkedFilePath] * this.pageranks[linkedFilePath] * ease;
+                    linkPGTotal += this.pageranks[linkedFilePath] * outgoingLinks[linkedFilePath];
+                    totalLinkCount += outgoingLinks[linkedFilePath];
+                }
+            }
+
+            const linkContribution: number =
+                this.data.settings.maxLinkFactor *
+                Math.min(1.0, Math.log(totalLinkCount + 0.5) / Math.log(64));
+            ease =
+                (1.0 - linkContribution) * this.data.settings.baseEase +
+                (totalLinkCount > 0
+                    ? (linkContribution * linkTotal) / linkPGTotal
+                    : linkContribution * this.data.settings.baseEase);
+            // add note's average flashcard ease if available
+            if (Object.prototype.hasOwnProperty.call(this.easeByPath, note.path)) {
+                ease = (ease + this.easeByPath[note.path]) / 2;
+            }
+            ease = Math.round(ease);
+            interval = 1.0;
+            delayBeforeReview = 0;
+        } else {
+            // reviewedNote update
+            interval = frontmatter["sr-interval"];
+            ease = frontmatter["sr-ease"];
+            delayBeforeReview =
+                now -
+                window
+                    .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
+                    .valueOf();
+        }
+
+        // reviewedNote update
+        if (this.data.settings.dataLocation != DataLocation.SaveOnNoteFile) {
+            if (this.store.isNewAdd(this.store.getFileId(note.path)) < 0) {
+                const [, due, ,] = this.store.getReviewNoteHeaderData(note.path);
+                delayBeforeReview = due === 0 ? 0 : now - due; //just in case.
+            }
+        }
+
+        //根据当前状态参数及反馈的选项，更新数据
+        this.store.reviewId(fileId, response);
+        let deleteheader = false;
+
+        // check if scheduling info exists
+        if (SCHEDULING_INFO_REGEX.test(fileText)) {
+            deleteheader = true;
+        }
+        if (this.data.settings.burySiblingCards) {
+            await this.findFlashcardsInNote(note, [], true); // bury all cards in current note
+            await this.savePluginData();
+        }
+
+        // save changes
+        if (this.data.settings.dataLocation !== DataLocation.SaveOnNoteFile) {
+            this.deleteNoteSchedulingHeader(note, deleteheader);
+
+            const [, due, ,] = this.store.getReviewNoteHeaderData(note.path);
+
+            //Sync update
+            this.singleNoteSyncQueue(this, note, delayBeforeReview);
+        }
+
+        const nowToday: number =
+            Math.ceil(Date.now() / DateUtils.DAYS_TO_MILLIS) * DateUtils.DAYS_TO_MILLIS;
+        const item = this.store.getItembyID(fileId);
+        if (
+            Object.keys(this.store.data.toDayLatterQueue).length > 0 &&
+            item.nextReview <= nowToday
+        ) {
+            if (
+                this.shortestInterval === 0 ||
+                this.shortestInterval < now ||
+                this.shortestInterval > item.nextReview
+            ) {
+                console.debug(
+                    "interval diff:should be - (",
+                    this.shortestInterval - item.nextReview
+                );
+                this.shortestInterval = item.nextReview;
+            }
+        } else {
+            this.shortestInterval = 0;
+        }
+
+        if (!this.lastSelectedReviewDeck) {
+            this.lastSelectedReviewDeck = matchedNoteTag;
+        }
+
+        new Notice(t("RESPONSE_RECEIVED"));
+
         if (this.data.settings.autoNextNote) {
             this.reviewNextNote(this.lastSelectedReviewDeck);
         }
@@ -767,18 +935,17 @@ export default class SRPlugin extends Plugin {
         const deck = this.reviewDecks[deckKey];
         let show = false;
         let path = null;
+        let index = -1;
 
         if (deck.dueNotesCount > 0) {
-            const index = this.data.settings.openRandomNote
-                ? Math.floor(Math.random() * deck.dueNotesCount)
-                : 0;
+            index = this.getNextDueNoteIndex(deck, deck.dueNotesCount);
+        }
+        if (index >= 0) {
             await this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
             path = deck.scheduledNotes[index].note.path;
             show = true;
             // return;
-        }
-
-        if (deck.newNotes.length > 0) {
+        } else if (deck.newNotes.length > 0) {
             const index = this.data.settings.openRandomNote
                 ? Math.floor(Math.random() * deck.newNotes.length)
                 : 0;
@@ -789,48 +956,39 @@ export default class SRPlugin extends Plugin {
         }
         if (show) {
             // reviewedNote update interval
-            let responseInterval: number[] | null = null;
-            if (this.data.settings.dataLocation != DataLocation.SaveOnNoteFile) {
-                const now: number = Date.now();
-                const [, due, interval, ease] = this.store.getReviewNoteHeaderData(path);
-                const delayBeforeReview = due === 0 ? 0 : now - due; //just in case.
-                const hardInterval: number = schedule(
-                    ReviewResponse.Hard,
-                    interval,
-                    ease,
-                    delayBeforeReview,
-                    this.data.settings
-                ).interval;
-                const goodInterval: number = schedule(
-                    ReviewResponse.Good,
-                    interval,
-                    ease,
-                    delayBeforeReview,
-                    this.data.settings
-                ).interval;
-                const easyInterval: number = schedule(
-                    ReviewResponse.Easy,
-                    interval,
-                    ease,
-                    delayBeforeReview,
-                    this.data.settings
-                ).interval;
-                responseInterval = [null, hardInterval, goodInterval, easyInterval];
-                console.debug("几个反馈结果的间隔：hge", hardInterval, goodInterval, easyInterval);
-            }
-            this.reviewNoteFloatBar.display(show, responseInterval);
+            const fid = this.store.getFileId(path);
+            const item = this.store.data.items[fid];
+            // this.reviewNoteFloatBar.algoDisplay(show, this.store.calcReviewInterval(fid));
+            this.reviewNoteFloatBar.algoDisplay(show, this.algorithm.calcAllOptsIntervals(item));
+
             return;
         }
+        const queue = this.store.data.toDayAllQueue;
+        const len = Object.keys(queue).length;
+        this.dueNotesCount_real = len;
         if (
             this.data.settings.reviewingNoteDirectly &&
-            this.dueNotesCount + this.newNotesCount > 0
+            this.dueNotesCount_real + this.newNotesCount > 0
         ) {
             const rdname: string = this.getDeckNameForReviewDirectly();
             this.reviewNextNote(rdname);
             return;
         }
 
-        this.reviewNoteFloatBar.display(show);
+        if (Object.keys(this.store.data.toDayLatterQueue).length > 0 && this.shortestInterval > 0) {
+            const now = Date.now();
+            const interval = Math.round((this.shortestInterval - now) / 1000 / 60);
+            new Notice("可以在" + interval + "分钟后来复习");
+        }
+
+        this.statusBar.setText(
+            t("STATUS_BAR", {
+                dueNotesCount: this.dueNotesCount_real,
+                dueFlashcardsCount: this.deckTree.dueFlashcardsCount,
+            })
+        );
+
+        this.reviewNoteFloatBar.selfDestruct();
         this.reviewQueueView.redraw();
         new Notice(t("ALL_CAUGHT_UP"));
     }
@@ -1032,7 +1190,6 @@ export default class SRPlugin extends Plugin {
             //update scheduling by recall
             if (settings.dataLocation !== DataLocation.SaveOnNoteFile) {
                 if (scheduling.length) {
-                    // console.debug("org card scheduling info", scheduling);
                     // delete scheduling infos in note file.
                     const idxSched: number = cardText.lastIndexOf("<!--SR:");
                     const newCardText: string = cardText.substring(0, idxSched);
@@ -1048,7 +1205,6 @@ export default class SRPlugin extends Plugin {
                     siblingMatches.length,
                     scheduling
                 );
-                // console.debug("card scheduling info:", scheduling);
             }
             const context: string = settings.showContextInCards
                 ? getCardContext(lineNo, headings, note.basename)
@@ -1133,8 +1289,6 @@ export default class SRPlugin extends Plugin {
             }
         }
 
-        // console.debug("cards in trackfile of", note.basename, this.store.data, this.deckTree);
-
         if (fileChanged) {
             await this.app.vault.modify(note, fileText);
         }
@@ -1199,12 +1353,11 @@ export default class SRPlugin extends Plugin {
             } else {
                 fileText = fileText.replace(SCHEDULING_INFO_REGEX, ``);
             }
-            // console.debug("schedulingInfo:",schedulingInfo);
             await this.app.vault.modify(note, fileText);
         }
     }
 
-    singNoteSyncQueue(plugin: SRPlugin, note: TFile, delayBeforeReview: number) {
+    singleNoteSyncQueue(plugin: SRPlugin, note: TFile, delayBeforeReview: number) {
         if (!this.lastSelectedReviewDeck) {
             this.lastSelectedReviewDeck = this.store.getTrackedFile(note.path).tags[0];
         }
@@ -1220,17 +1373,18 @@ export default class SRPlugin extends Plugin {
                 return sNote.note === note;
             });
             deck.scheduledNotes.splice(index, 1);
-            deck.dueNotesCount--;
-            plugin.dueNotesCount--;
-            const nDays: number = Math.ceil(delayBeforeReview / (24 * 3600 * 1000));
-            plugin.dueDatesNotes[nDays]--;
+            if (deck.dueNotesCount > 0) {
+                deck.dueNotesCount--;
+                plugin.dueNotesCount--;
+            }
         }
         plugin.store.syncRCDataToSRrevDeck(deck, note, now);
         deck.sortNotes(plugin.pageranks);
 
+        this.dueNotesCount_real = Object.keys(this.store.data.toDayAllQueue).length;
         this.statusBar.setText(
             t("STATUS_BAR", {
-                dueNotesCount: this.dueNotesCount,
+                dueNotesCount: this.dueNotesCount_real,
                 dueFlashcardsCount: this.deckTree.dueFlashcardsCount,
             })
         );
@@ -1261,6 +1415,52 @@ export default class SRPlugin extends Plugin {
             reviewDeckNames.splice(ind, 1);
         } while (ncount === 0 && reviewDeckNames.length);
         return rdname;
+    }
+
+    getNextDueNoteIndex(deck: ReviewDeck, NotesCount: number) {
+        let index = 0;
+        let isDue = false;
+        const queue = this.store.data.toDayAllQueue;
+        const queueLatter = this.store.data.toDayLatterQueue;
+        const len = Object.keys(queue).length;
+        this.dueNotesCount_real = len;
+
+        if (len === 0) {
+            deck.dueNotesCount = 0;
+            return -1;
+        }
+        if (!this.data.settings.openRandomNote) {
+            for (let i = 0; i < NotesCount; i++) {
+                const note = deck.scheduledNotes[(index = i)].note;
+                const fileid = this.store.getFileId(note.path);
+                if (
+                    Object.prototype.hasOwnProperty.call(queue, fileid) &&
+                    !Object.prototype.hasOwnProperty.call(queueLatter, fileid)
+                ) {
+                    isDue = true;
+                    break;
+                }
+            }
+        } else {
+            const indArr = Array.from(new Array(NotesCount).keys());
+            do {
+                index = indArr[Math.round(Math.random() * (indArr.length - 1))];
+                const note = deck.scheduledNotes[index].note;
+                const fileid = this.store.getFileId(note.path);
+                if (
+                    Object.prototype.hasOwnProperty.call(queue, fileid) ||
+                    !Object.prototype.hasOwnProperty.call(queueLatter, fileid)
+                ) {
+                    isDue = true;
+                }
+                indArr.splice(indArr.indexOf(index), 1);
+            } while (!isDue && indArr.length > 0);
+        }
+        if (!isDue) {
+            deck.dueNotesCount = 0;
+        }
+
+        return isDue ? index : -1;
     }
 
     registerTrackFileEvents() {

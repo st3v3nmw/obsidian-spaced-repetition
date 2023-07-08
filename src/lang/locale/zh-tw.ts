@@ -140,6 +140,8 @@ export default {
         "當設置項“復習後自動打開下一個筆記”啟用時，這個設置項啟用才生效. 通過點擊狀態欄/側邊欄/命令進行復習時就會顯示出來.",
     REVIEW_NOTE_DIRECTLY: "直接復習筆記?",
     REVIEW_NOTE_DIRECTLY_DESC: "復習筆記時, 不必選擇標籤（多個復習標籤的情況）就直接打開筆記",
+    INTERVAL_SHOWHIDE: "顯示復習間隔",
+    INTERVAL_SHOWHIDE_DESC: "是否在按鍵上顯示復習間隔",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "筆記復習序列",

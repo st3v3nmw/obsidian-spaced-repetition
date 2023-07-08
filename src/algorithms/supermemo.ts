@@ -1,6 +1,7 @@
 import { DateUtils } from "src/utils_recall";
 import SrsAlgorithm from "./../algorithms";
 import { RepetitionItem, ReviewResult } from "./../data";
+import deepcopy from "deepcopy";
 
 interface Sm2Data {
     ease: number;
@@ -29,6 +30,17 @@ export class Sm2Algorithm extends SrsAlgorithm {
 
     srsOptions(): string[] {
         return Sm2Options;
+    }
+
+    calcAllOptsIntervals(item: RepetitionItem): number[] {
+        const intvls: number[] = [];
+        this.srsOptions().forEach((opt, ind) => {
+            const itemCopy = deepcopy(item);
+            const result = this.onSelection(itemCopy, opt, false);
+            const intvl = Math.round((result.nextReview / DateUtils.DAYS_TO_MILLIS) * 100) / 100;
+            intvls.push(intvl);
+        });
+        return intvls;
     }
 
     onSelection(item: RepetitionItem, optionStr: string, repeat: boolean): ReviewResult {
@@ -81,6 +93,8 @@ export class Sm2Algorithm extends SrsAlgorithm {
     }
 
     displaySettings(containerEl: HTMLElement, update: (settings: any) => void): void {
+        containerEl.createDiv().innerHTML =
+            '用于间隔重复的算法. 目前与Anki算法共用参数（仅算法处理方式不同），更多信息请查阅 <a href="https://www.supermemo.com/en/archives1990-2015/english/ol/sm2">sm2算法</a>.';
         return;
     }
 }

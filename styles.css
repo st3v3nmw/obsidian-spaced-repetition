@@ -52,7 +52,7 @@
 }
 
 .sr-ignorestats-response {
-    grid-template-columns: auto auto !important;
+    grid-template-columns: 50% 50% !important;
 }
 
 .sr-centered {
@@ -177,21 +177,44 @@
     #sr-easy-btn {
         width: 100px;
     }
+
+    /* sidebar */
+    .nav-file-title,
+    .nav-folder-title {
+        margin-bottom: var(--size-2-1);
+        display: flex;
+    }
+
+    .nav-folder-title {
+        padding: var(--nav-item-parent-padding);
+    }
+
+    .nav-folder.mod-root .nav-folder > .nav-folder-children {
+        padding-left: var(--nav-item-children-padding-left);
+        margin: 0 0 0 var(--nav-item-children-margin-left);
+        border-left: var(--nav-indentation-guide-width) solid var(--nav-indentation-guide-color);
+    }
+
+    .nav-file {
+        margin-left: var(--nav-item-children-margin-left);
+        border-radius: var(--radius-s);
+    }
 }
 
 /* https://img.shields.io/github/v/release/chetachiezikeuzor/cMenu-Plugin */
 /*----------------------------------------------------------------
-CMENU TOOLBAR
+ResponseFloatBar TOOLBAR
 ----------------------------------------------------------------*/
 
 #reviewNoteResponseModalBar {
-    width: 80%;
+    width: 95%;
     height: auto;
     padding: 3px;
     display: grid;
     user-select: none;
     border-radius: 6px;
     position: absolute;
+    /* flex-direction: row; */
     left: 0;
     right: 0;
     bottom: 12%;
@@ -205,13 +228,14 @@ CMENU TOOLBAR
     border: 1px solid var(--background-modifier-border);
 }
 
-#reviewNoteResponseModalBar .cMenuCommandItem {
-    margin: 2px;
+.ResponseFloatBarCommandItem {
     border: none;
     display: flex;
     cursor: pointer;
     padding: 5px 6px;
     min-width: 10px;
+    width: 98%;
+    height: 48px;
     box-shadow: none;
     margin-left: 3px;
     margin-right: 3px;
@@ -220,26 +244,47 @@ CMENU TOOLBAR
     flex-direction: row;
     border-radius: 3px;
     font-size: initial !important;
-    background-color: var(--background-primary-alt);
+    --background-secondary: var(--background-primary-alt);
 }
 
-#reviewNoteResponseModalBar button.cMenuCommandItem:hover {
+#reviewNoteResponseModalBar button.ResponseFloatBarCommandItem:hover {
+    color: #050505;
     background-color: var(--background-secondary);
 }
 
-#reviewNoteResponseModalBar button.cMenuCommandItem svg {
+#reviewNoteResponseModalBar button.ResponseFloatBarCommandItem svg {
     width: 1.3em;
     height: 1.3em;
 }
 
 /*----------------------------------------------------------------
-  CMENU SETTING ITEMS
+  ResponseFloatBar SETTING ITEMS
   ----------------------------------------------------------------*/
-.setting-item.cMenuCommandItem:first-child {
+.setting-item.ResponseFloatBarCommandItem:first-child {
     padding-top: 18px;
 }
 
-.cMenuCommandItem {
+#sr-reset-btn,
+#sr-again-btn {
+    background: #6b6b6b;
+}
+#sr-blackout-btn {
+    background: #6b6b6b;
+}
+#sr-incorrect-btn {
+    background: #be9d9d;
+}
+#sr-incorrect\ \(easy\)-btn {
+    background: #ff9088;
+}
+
+#sr-showintvl-btn,
+#sr-close-btn {
+    margin-top: 13px;
+    height: 20px;
+}
+
+.ResponseFloatBarCommandItem {
     cursor: grab;
     padding: 18px 0 18px 0;
 }
@@ -269,35 +314,30 @@ CMENU TOOLBAR
     box-shadow: 0px 3px 32px rgb(31 38 135 / 15%);
 }
 
-.cMenuSettingsTabsContainer {
-    border-top: 1px solid var(--background-modifier-border);
-    border-bottom: 1px solid var(--background-modifier-border);
-}
-
 /*----------------------------------------------------------------
-  CMENU CLASS CHANGES
+  ResponseFloatBar CLASS CHANGES
   ----------------------------------------------------------------*/
 
-.cMenuGlassAesthetic {
+.ResponseFloatBarGlassAesthetic {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
 
-.cMenuDefaultAesthetic {
+.ResponseFloatBarDefaultAesthetic {
     background-color: var(--background-primary);
 }
 
 /*----------------------------------------------------------------
-  CMENU ICONS
+  ResponseFloatBar ICONS
   ----------------------------------------------------------------*/
 
-.cMenuIconPick {
+.ResponseFloatBarIconPick {
     line-height: normal;
     vertical-align: middle;
     margin-right: 8px;
 }
 
-.cMenuIconPick svg {
+.ResponseFloatBarIconPick svg {
     width: 17px;
     height: 17px;
 }

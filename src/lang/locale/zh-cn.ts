@@ -42,7 +42,7 @@ export default {
     PLEASE_TAG_NOTE: "请将需要复习的笔记中加入正确的标签（检查设置选项）。",
     RESPONSE_RECEIVED: "反馈已收到",
     NO_DECK_EXISTS: "没有 ${deckName} 卡组",
-    ALL_CAUGHT_UP: "都复习完啦，你真棒！",
+    ALL_CAUGHT_UP: "都复习完啦，你真棒！\n去接触点新东西吧~",
 
     // scheduling.ts
     DAYS_STR_IVL: "${interval}天",
@@ -132,7 +132,8 @@ export default {
     NEW_PER_DAY_NEG: "整数必须大于等于-1.",
     REPEAT_ITEMS: "重复错误",
     REPEAT_ITEMS_DESC: "错误项是否要一直重复复习，直到回答正确?",
-    ALGORITHMS_CONFIRM: `切换算法可能导致日期排程重置，这个修改不可撤销，当重启软件或重新加载插件切换算法才会生效。你确定要切换算法么?`,
+    ALGORITHMS_CONFIRM:
+        "切换算法可能导致日期排程重置，这个修改不可撤销，当重启软件或重新加载插件切换算法才会生效。你确定要切换算法么?",
     ALGORITHMS_DESC:
         '用于间隔重复的算法. 更多信息请查阅 <a href="https://github.com/martin-jw/obsidian-recall">算法</a>.',
     CONVERT_TRACKED_TO_DECK: "将复习笔记转换为卡牌组?",
@@ -141,6 +142,8 @@ export default {
         "当设置项“复习后自动打开下一个笔记”启用时，这个设置项启用才生效. 通过点击状态栏/侧边栏/命令进行复习时就会显示出来.",
     REVIEW_NOTE_DIRECTLY: "直接复习笔记?",
     REVIEW_NOTE_DIRECTLY_DESC: "复习笔记时, 不必选择标签（多个复习标签的情况）就直接打开笔记",
+    INTERVAL_SHOWHIDE: "显示复习间隔",
+    INTERVAL_SHOWHIDE_DESC: "是否在按键上显示复习间隔",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "笔记复习序列",

@@ -83,7 +83,7 @@ export function t(str: keyof typeof en, params?: Record<string, unknown>): strin
         console.error(`SRS error: Locale ${moment.locale()} not found.`);
     }
 
-    const result = (locale && locale[str]) || en[str];
+    const result = (locale && locale[str]) || en[str] || str;
 
     if (params) {
         return interpolate(result, params);

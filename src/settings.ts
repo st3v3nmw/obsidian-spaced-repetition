@@ -4,10 +4,14 @@ import { t } from "src/lang/helpers";
 
 // https://github.com/martin-jw/obsidian-recall/blob/main/src/settings.ts
 import SrsAlgorithm from "./algorithms";
+import { DefaultAlgorithm } from "./algorithms/scheduling_default";
 import { Sm2Algorithm } from "./algorithms/supermemo";
-import { AnkiAlgorithm } from "./algorithms/anki";
+import { AnkiAlgorithm, AnkiData } from "./algorithms/anki";
+import { FsrsAlgorithm, FsrsData } from "./algorithms/fsrs";
 import ConfirmModal from "./modals/confirm";
 import { FolderSuggest } from "./suggesters/FolderSuggester";
+import { DateUtils } from "./utils_recall";
+import deepcopy from "deepcopy";
 // recall trackfile
 export enum DataLocation {
     PluginFolder = "In Plugin Folder",
@@ -23,13 +27,23 @@ const locationMap: Record<string, DataLocation> = {
     "Save On Note File": DataLocation.SaveOnNoteFile,
 };
 
-export const algorithms: Record<string, SrsAlgorithm> = {
+export const algorithms: Record<string, SrsAlgorithm | null> = {
+    Default: new DefaultAlgorithm(),
     Anki: new AnkiAlgorithm(),
+    Fsrs: new FsrsAlgorithm(),
     SM2: new Sm2Algorithm(),
 };
 
+export enum algorithmNames {
+    Default = "Default",
+    Anki = "Anki",
+    Fsrs = "Fsrs",
+    SM2 = "SM2",
+}
+
 export interface SRSettings {
     // flashcards
+    responseOptionBtnsText: Record<string, string[]>;
     flashcardEasyText: string;
     flashcardGoodText: string;
     flashcardHardText: string;
@@ -49,6 +63,7 @@ export interface SRSettings {
     multilineCardSeparator: string;
     multilineReversedCardSeparator: string;
     editLaterTag: string;
+    intervalShowHide: boolean;
     // notes
     enableNoteReviewPaneOnStartup: boolean;
     tagsToReview: string[];
@@ -82,6 +97,7 @@ export interface SRSettings {
 
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
+    responseOptionBtnsText: {},
     flashcardEasyText: t("EASY"),
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),
@@ -101,6 +117,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     multilineCardSeparator: "?",
     multilineReversedCardSeparator: "??",
     editLaterTag: "#edit-later",
+    intervalShowHide: true,
     // notes
     enableNoteReviewPaneOnStartup: true,
     tagsToReview: ["#review"],
@@ -129,7 +146,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     repeatItems: true,
     trackedNoteToDecks: false,
     algorithm: Object.keys(algorithms)[0],
-    algorithmSettings: Object.values(algorithms)[0].settings,
+    algorithmSettings: { algorithm: Object.values(algorithms)[0].settings },
 };
 
 // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
@@ -441,74 +458,7 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
-        new Setting(containerEl)
-            .setName(t("FLASHCARD_EASY_LABEL"))
-            .setDesc(t("FLASHCARD_EASY_DESC"))
-            .addText((text) =>
-                text.setValue(this.plugin.data.settings.flashcardEasyText).onChange((value) => {
-                    applySettingsUpdate(async () => {
-                        this.plugin.data.settings.flashcardEasyText = value;
-                        await this.plugin.savePluginData();
-                    });
-                })
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.plugin.data.settings.flashcardEasyText =
-                            DEFAULT_SETTINGS.flashcardEasyText;
-                        await this.plugin.savePluginData();
-                        this.display();
-                    });
-            });
-
-        new Setting(containerEl)
-            .setName(t("FLASHCARD_GOOD_LABEL"))
-            .setDesc(t("FLASHCARD_GOOD_DESC"))
-            .addText((text) =>
-                text.setValue(this.plugin.data.settings.flashcardGoodText).onChange((value) => {
-                    applySettingsUpdate(async () => {
-                        this.plugin.data.settings.flashcardGoodText = value;
-                        await this.plugin.savePluginData();
-                    });
-                })
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.plugin.data.settings.flashcardGoodText =
-                            DEFAULT_SETTINGS.flashcardGoodText;
-                        await this.plugin.savePluginData();
-                        this.display();
-                    });
-            });
-
-        new Setting(containerEl)
-            .setName(t("FLASHCARD_HARD_LABEL"))
-            .setDesc(t("FLASHCARD_HARD_DESC"))
-            .addText((text) =>
-                text.setValue(this.plugin.data.settings.flashcardHardText).onChange((value) => {
-                    applySettingsUpdate(async () => {
-                        this.plugin.data.settings.flashcardHardText = value;
-                        await this.plugin.savePluginData();
-                    });
-                })
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.plugin.data.settings.flashcardHardText =
-                            DEFAULT_SETTINGS.flashcardHardText;
-                        await this.plugin.savePluginData();
-                        this.display();
-                    });
-            });
+        this.addIntervalShowHideSetting(containerEl);
 
         containerEl.createEl("h3", { text: `${t("NOTES")}` });
 
@@ -619,169 +569,11 @@ export class SRSettingTab extends PluginSettingTab {
                     })
             );
 
+        this.addResponseButtonTextSetting(containerEl);
+
         containerEl.createEl("h3", { text: `${t("ALGORITHM")}` });
-        containerEl.createDiv().innerHTML = t("CHECK_ALGORITHM_WIKI", {
-            algo_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
-        });
 
-        new Setting(containerEl)
-            .setName(t("BASE_EASE"))
-            .setDesc(t("BASE_EASE_DESC"))
-            .addText((text) =>
-                text.setValue(this.plugin.data.settings.baseEase.toString()).onChange((value) => {
-                    applySettingsUpdate(async () => {
-                        const numValue: number = Number.parseInt(value);
-                        if (!isNaN(numValue)) {
-                            if (numValue < 130) {
-                                new Notice(t("BASE_EASE_MIN_WARNING"));
-                                text.setValue(this.plugin.data.settings.baseEase.toString());
-                                return;
-                            }
-
-                            this.plugin.data.settings.baseEase = numValue;
-                            await this.plugin.savePluginData();
-                        } else {
-                            new Notice(t("VALID_NUMBER_WARNING"));
-                        }
-                    });
-                })
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.plugin.data.settings.baseEase = DEFAULT_SETTINGS.baseEase;
-                        await this.plugin.savePluginData();
-                        this.display();
-                    });
-            });
-
-        new Setting(containerEl)
-            .setName(t("LAPSE_INTERVAL_CHANGE"))
-            .setDesc(t("LAPSE_INTERVAL_CHANGE_DESC"))
-            .addSlider((slider) =>
-                slider
-                    .setLimits(1, 99, 1)
-                    .setValue(this.plugin.data.settings.lapsesIntervalChange * 100)
-                    .setDynamicTooltip()
-                    .onChange(async (value: number) => {
-                        this.plugin.data.settings.lapsesIntervalChange = value / 100;
-                        await this.plugin.savePluginData();
-                    })
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.plugin.data.settings.lapsesIntervalChange =
-                            DEFAULT_SETTINGS.lapsesIntervalChange;
-                        await this.plugin.savePluginData();
-                        this.display();
-                    });
-            });
-
-        new Setting(containerEl)
-            .setName(t("EASY_BONUS"))
-            .setDesc(t("EASY_BONUS_DESC"))
-            .addText((text) =>
-                text
-                    .setValue((this.plugin.data.settings.easyBonus * 100).toString())
-                    .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            const numValue: number = Number.parseInt(value) / 100;
-                            if (!isNaN(numValue)) {
-                                if (numValue < 1.0) {
-                                    new Notice(t("EASY_BONUS_MIN_WARNING"));
-                                    text.setValue(
-                                        (this.plugin.data.settings.easyBonus * 100).toString()
-                                    );
-                                    return;
-                                }
-
-                                this.plugin.data.settings.easyBonus = numValue;
-                                await this.plugin.savePluginData();
-                            } else {
-                                new Notice(t("VALID_NUMBER_WARNING"));
-                            }
-                        });
-                    })
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.plugin.data.settings.easyBonus = DEFAULT_SETTINGS.easyBonus;
-                        await this.plugin.savePluginData();
-                        this.display();
-                    });
-            });
-
-        new Setting(containerEl)
-            .setName(t("MAX_INTERVAL"))
-            .setDesc(t("MAX_INTERVAL_DESC"))
-            .addText((text) =>
-                text
-                    .setValue(this.plugin.data.settings.maximumInterval.toString())
-                    .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            const numValue: number = Number.parseInt(value);
-                            if (!isNaN(numValue)) {
-                                if (numValue < 1) {
-                                    new Notice(t("MAX_INTERVAL_MIN_WARNING"));
-                                    text.setValue(
-                                        this.plugin.data.settings.maximumInterval.toString()
-                                    );
-                                    return;
-                                }
-
-                                this.plugin.data.settings.maximumInterval = numValue;
-                                await this.plugin.savePluginData();
-                            } else {
-                                new Notice(t("VALID_NUMBER_WARNING"));
-                            }
-                        });
-                    })
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.plugin.data.settings.maximumInterval =
-                            DEFAULT_SETTINGS.maximumInterval;
-                        await this.plugin.savePluginData();
-                        this.display();
-                    });
-            });
-
-        new Setting(containerEl)
-            .setName(t("MAX_LINK_CONTRIB"))
-            .setDesc(t("MAX_LINK_CONTRIB_DESC"))
-            .addSlider((slider) =>
-                slider
-                    .setLimits(0, 100, 1)
-                    .setValue(this.plugin.data.settings.maxLinkFactor * 100)
-                    .setDynamicTooltip()
-                    .onChange(async (value: number) => {
-                        this.plugin.data.settings.maxLinkFactor = value / 100;
-                        await this.plugin.savePluginData();
-                    })
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.plugin.data.settings.maxLinkFactor = DEFAULT_SETTINGS.maxLinkFactor;
-                        await this.plugin.savePluginData();
-                        this.display();
-                    });
-            });
-
-        // this.addAlgorithmSpecificDisplaySetting(containerEl);
+        this.addAlgorithmSpecificDisplaySetting(containerEl);
 
         containerEl.createEl("h3", { text: `${t("LOGGING")}` });
         new Setting(containerEl).setName(t("DISPLAY_DEBUG_INFO")).addToggle((toggle) =>
@@ -804,15 +596,14 @@ export class SRSettingTab extends PluginSettingTab {
                 });
                 dropdown.setValue(plugin.data.settings.dataLocation);
 
-                dropdown.onChange((val) => {
+                dropdown.onChange(async (val) => {
                     const loc = locationMap[val];
                     plugin.data.settings.dataLocation = loc;
                     if (loc === DataLocation.SpecifiedFolder) {
-                        console.debug("plugin.store.dataPath", plugin.store.dataPath);
                         plugin.data.settings.customFolder = plugin.store.dataPath;
                     }
                     plugin.store.moveStoreLocation();
-                    plugin.savePluginData();
+                    await plugin.savePluginData();
                     this.display();
                 });
             });
@@ -820,7 +611,6 @@ export class SRSettingTab extends PluginSettingTab {
 
     addSpecifiedFolderSetting(containerEl: HTMLElement) {
         const plugin = this.plugin;
-        console.debug("plugin.data.settings.customFolder", plugin.data.settings.customFolder);
         const fder_index = plugin.data.settings.customFolder.lastIndexOf("/");
         let cusFolder = plugin.data.settings.customFolder.substring(0, fder_index);
         const cusFilename = plugin.data.settings.customFolder.substring(fder_index + 1);
@@ -841,10 +631,10 @@ export class SRSettingTab extends PluginSettingTab {
                 btn
                     .setButtonText("save")
                     .setCta()
-                    .onClick(() => {
+                    .onClick(async () => {
                         plugin.data.settings.customFolder = cusFolder + "/" + cusFilename;
                         plugin.store.moveStoreLocation();
-                        plugin.savePluginData();
+                        await plugin.savePluginData();
                         this.display();
                     })
             );
@@ -902,13 +692,36 @@ export class SRSettingTab extends PluginSettingTab {
                 Object.keys(algorithms).forEach((val) => {
                     dropdown.addOption(val, val);
                 });
+                const oldAlgo = plugin.data.settings.algorithm as algorithmNames;
                 dropdown.setValue(plugin.data.settings.algorithm);
                 dropdown.onChange((newValue) => {
                     if (newValue != plugin.data.settings.algorithm) {
-                        new ConfirmModal(plugin.app, t("ALGORITHMS_CONFIRM"), (confirmed) => {
+                        new ConfirmModal(plugin.app, t("ALGORITHMS_CONFIRM"), async (confirmed) => {
                             if (confirmed) {
+                                const result = this.algorithmSwitchData(
+                                    oldAlgo,
+                                    newValue as algorithmNames
+                                );
+                                if (!result) {
+                                    dropdown.setValue(plugin.data.settings.algorithm);
+                                    return;
+                                }
+
                                 plugin.data.settings.algorithm = newValue;
+                                plugin.algorithm = algorithms[plugin.data.settings.algorithm];
+                                plugin.algorithm.updateSettings(
+                                    plugin,
+                                    plugin.data.settings.algorithmSettings
+                                );
                                 plugin.savePluginData();
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
+                                await this.app.plugins.disablePlugin(plugin.manifest.id);
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
+                                await this.app.plugins.enablePlugin(plugin.manifest.id);
+                                // this.app.setting.openTabById(plugin.manifest.id);
+
                                 this.display();
                             } else {
                                 dropdown.setValue(plugin.data.settings.algorithm);
@@ -922,14 +735,13 @@ export class SRSettingTab extends PluginSettingTab {
 
     addAlgorithmSpecificDisplaySetting(containerEl: HTMLElement) {
         const plugin = this.plugin;
-        if (plugin.data.settings.algorithm === "Default") {
-            return;
-        }
+
         // Add algorithm specific settings
-        containerEl.createEl("h3").innerText = "Trackfile Algorithm Settings";
-        this.plugin.algorithm.displaySettings(containerEl, (settings: any) => {
-            this.plugin.data.settings.algorithmSettings = settings;
-            this.plugin.saveData(this.plugin.data.settings);
+        // containerEl.createEl("h3").innerText = "Trackfile Algorithm Settings";
+        plugin.algorithm.displaySettings(containerEl, (settings: any) => {
+            plugin.data.settings.algorithmSettings = settings;
+            plugin.savePluginData();
+            this.display();
         });
     }
 
@@ -963,6 +775,20 @@ export class SRSettingTab extends PluginSettingTab {
             });
     }
 
+    addIntervalShowHideSetting(containerEl: HTMLElement) {
+        const plugin = this.plugin;
+
+        new Setting(containerEl)
+            .setName(t("INTERVAL_SHOWHIDE"))
+            .setDesc(t("INTERVAL_SHOWHIDE_DESC"))
+            .addToggle((toggle) => {
+                toggle.setValue(plugin.data.settings.intervalShowHide).onChange((newValue) => {
+                    plugin.data.settings.intervalShowHide = newValue;
+                    plugin.savePluginData();
+                });
+            });
+    }
+
     addReviewNoteDirectlySetting(containerEl: HTMLElement) {
         const plugin = this.plugin;
 
@@ -975,5 +801,108 @@ export class SRSettingTab extends PluginSettingTab {
                     plugin.savePluginData();
                 });
             });
+    }
+
+    addResponseButtonTextSetting(containerEl: HTMLElement) {
+        const plugin = this.plugin;
+        const options = plugin.algorithm.srsOptions();
+        const algo = plugin.data.settings.algorithm;
+        const btnText = this.plugin.data.settings.responseOptionBtnsText;
+
+        if (btnText[algo] == null) {
+            btnText[algo] = [];
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            options.forEach((opt, ind) => (btnText[algo][ind] = t(opt.toUpperCase())));
+        }
+        options.forEach((opt, ind) => {
+            const btnTextEl = new Setting(containerEl)
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                .setName(t(opt.toUpperCase()))
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                .setDesc(t(opt.toUpperCase() + "_DESC"));
+            btnTextEl.addText((text) =>
+                text.setValue(btnText[algo][ind]).onChange((value) => {
+                    applySettingsUpdate(async () => {
+                        btnText[algo][ind] = value;
+                        await this.plugin.savePluginData();
+                    });
+                })
+            );
+            btnTextEl.addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.responseOptionBtnsText[algo][ind] =
+                            DEFAULT_SETTINGS.responseOptionBtnsText[algo][ind];
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
+        });
+    }
+
+    async algorithmSwitchData(fromAlgo: algorithmNames, toAlgo: algorithmNames) {
+        const plugin = this.plugin;
+        let result = false;
+        const items = plugin.store.data.items;
+
+        const old_path = plugin.store.dataPath;
+
+        await plugin.store.save(old_path + ".bak");
+        plugin.store.pruneData();
+        try {
+            if (
+                fromAlgo === algorithmNames.Anki ||
+                fromAlgo === algorithmNames.Default ||
+                fromAlgo === algorithmNames.SM2
+            ) {
+                if (toAlgo === algorithmNames.Fsrs) {
+                    items.forEach((item) => {
+                        if (item != null && item.data != null) {
+                            const data = item.data as AnkiData;
+                            const due = new Date(item.nextReview);
+                            const lastview = new Date(
+                                item.nextReview - data.lastInterval * DateUtils.DAYS_TO_MILLIS
+                            );
+                            const reps = item.timesReviewed;
+                            const card = algorithms[algorithmNames.Fsrs].defaultData();
+                            card.due = due;
+                            card.reps = reps;
+                            card.last_review = lastview;
+                            item.data = deepcopy(card);
+                        }
+                    });
+                }
+            } else if (
+                fromAlgo === algorithmNames.Fsrs &&
+                (toAlgo === algorithmNames.Anki ||
+                    toAlgo === algorithmNames.Default ||
+                    toAlgo === algorithmNames.SM2)
+            ) {
+                items.forEach((item) => {
+                    const data = item.data as FsrsData;
+                    const lastitval =
+                        (new Date(data.due).valueOf() - new Date(data.last_review).valueOf()) /
+                        DateUtils.DAYS_TO_MILLIS;
+                    const iter = data.reps;
+                    const newdata = algorithms[algorithmNames.Default].defaultData();
+                    newdata.lastInterval =
+                        lastitval > newdata.lastInterval ? lastitval : newdata.lastInterval;
+                    newdata.iteration = iter;
+                    item.data = deepcopy(newdata);
+                });
+            }
+            new Notice("转换完成，因算法参数不同，会导致后续复习间隔调整");
+            result = true;
+        } catch (error) {
+            await plugin.store.load(old_path + ".bak");
+            new Notice(error + "\n转换失败，已恢复旧算法及数据");
+            console.log(error);
+        }
+        return result;
     }
 }

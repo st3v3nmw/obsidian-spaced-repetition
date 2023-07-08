@@ -236,7 +236,13 @@ export class ReviewQueueListView extends ItemView {
                 event.preventDefault();
                 plugin.lastSelectedReviewDeck = deck.deckName;
                 await this.app.workspace.getLeaf().openFile(file);
-                plugin.reviewNoteFloatBar.display(true);
+                const fid = this.plugin.store.getFileId(file.path);
+                const item = plugin.store.data.items[fid];
+                plugin.reviewNoteFloatBar.algoDisplay(
+                    true,
+                    plugin.algorithm.calcAllOptsIntervals(item)
+                );
+
                 return false;
             },
             false

@@ -1,5 +1,4 @@
 import { App, Modal, ButtonComponent } from "obsidian";
-import { DataStore } from "../data";
 
 type ConfirmCallback = (confirmed: boolean) => void;
 

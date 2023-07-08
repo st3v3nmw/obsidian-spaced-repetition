@@ -1,7 +1,7 @@
 {
     "id": "obsidian-spaced-repetition-recall",
     "name": "Spaced Repetition Recall",
-    "version": "1.10.1m1",
+    "version": "1.10.1m2",
     "minAppVersion": "0.15.4",
     "description": "Fight the forgetting curve by reviewing flashcards & entire notes.",
     "author": "Newdea",

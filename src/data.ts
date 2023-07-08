@@ -1,5 +1,5 @@
 import SRPlugin from "./main";
-import { DateUtils } from "./utils_recall";
+import { DateUtils, MiscUtils } from "./utils_recall";
 import { DataLocation, SRSettings } from "./settings";
 
 import { TFile, TFolder, Notice, getAllTags } from "obsidian";
@@ -8,9 +8,10 @@ import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
 import { CardType, ReviewResponse } from "./scheduling";
 import { parse } from "./parser";
 import { cyrb53 } from "./utils";
+import deepcopy from "deepcopy";
 
 const ROOT_DATA_PATH = "./tracked_files.json";
-const PLUGIN_DATA_PATH = "./.obsidian/plugins/obsidian-spaced-repetition/tracked_files.json";
+const PLUGIN_DATA_PATH = "./.obsidian/plugins/obsidian-spaced-repetition-recall/tracked_files.json";
 
 /**
  * SrsData.
@@ -32,6 +33,8 @@ interface SrsData {
      * @type {number[]}
      */
     cardRepeatQueue: number[];
+    toDayAllQueue: Record<number, string>;
+    toDayLatterQueue: Record<number, string>;
     /**
      * @type {RepetitionItem[]}
      */
@@ -50,6 +53,11 @@ interface SrsData {
     newAdded: 0;
 }
 
+export enum RPITEMTYPE {
+    NOTE = "note",
+    CARD = "card",
+}
+
 /**
  * RepetitionItem.
  */
@@ -61,7 +69,19 @@ export interface RepetitionItem {
     /**
      * @type {number}
      */
+    ID: number;
+    /**
+     * @type {number}
+     */
     fileIndex: number;
+    /**
+     * @type {RPITEMTYPE}
+     */
+    itemType: RPITEMTYPE;
+    /**
+     * @type {string}
+     */
+    deckName: string;
     /**
      * @type {number}
      */
@@ -139,6 +159,8 @@ const DEFAULT_SRS_DATA: SrsData = {
     repeatQueue: [],
     cardQueue: [],
     cardRepeatQueue: [],
+    toDayAllQueue: {},
+    toDayLatterQueue: {},
     items: [],
     trackedFiles: [],
     lastQueue: 0,
@@ -147,7 +169,10 @@ const DEFAULT_SRS_DATA: SrsData = {
 
 const NEW_ITEM: RepetitionItem = {
     nextReview: 0,
+    ID: -1,
     fileIndex: -1,
+    itemType: RPITEMTYPE.NOTE,
+    deckName: "default",
     timesReviewed: 0,
     timesCorrect: 0,
     errorStreak: 0,
@@ -252,11 +277,11 @@ export class DataStore {
     /**
      * load.
      */
-    async load() {
+    async load(path = this.dataPath) {
         const adapter = this.plugin.app.vault.adapter;
         if (this.plugin.data.settings.dataLocation != DataLocation.SaveOnNoteFile) {
-            if (await adapter.exists(this.dataPath)) {
-                const data = await adapter.read(this.dataPath);
+            if (await adapter.exists(path)) {
+                const data = await adapter.read(path);
                 if (data == null) {
                     console.log("Unable to read SRS data!");
                     this.data = Object.assign({}, DEFAULT_SRS_DATA);
@@ -278,13 +303,11 @@ export class DataStore {
     /**
      * save.
      */
-    async save() {
-        await this.plugin.app.vault.adapter
-            .write(this.dataPath, JSON.stringify(this.data))
-            .catch((e) => {
-                new Notice("Unable to save data file!");
-                console.log(e);
-            });
+    async save(path = this.dataPath) {
+        await this.plugin.app.vault.adapter.write(path, JSON.stringify(this.data)).catch((e) => {
+            new Notice("Unable to save data file!");
+            console.log(e);
+        });
     }
 
     /**
@@ -443,13 +466,17 @@ export class DataStore {
             console.log("[wrong file ID]: file %d had been  untracked. ", id);
             return -2;
         }
-        // console.debug("isnewadd: ",id);
-        // ["nextReview"] has been changed when buildQueue.
         if (this.data.items[id]["nextReview"] == 0 || this.data.items[id]["timesReviewed"] == 0) {
             // This is a new item.
             return id;
         }
         return -1;
+    }
+
+    isCardItem(id: number) {
+        const item = this.getItembyID(id);
+        const file = this.data.trackedFiles[item.fileIndex];
+        return file.items.file !== id;
     }
 
     /**
@@ -469,6 +496,14 @@ export class DataStore {
 
         const now: Date = new Date();
         return (item.nextReview - now.getTime()) / (1000 * 60 * 60);
+    }
+
+    getItembyID(id: number): RepetitionItem {
+        return this.data.items[id];
+    }
+
+    getTrackedFileByIndex(idx: number): TrackedFile {
+        return this.data.trackedFiles[idx];
     }
 
     /**
@@ -572,6 +607,33 @@ export class DataStore {
                 }
             }
         }
+    }
+
+    /**
+     * calcReviewInterval.
+     * just calc data according to response opt for showing on button, not update,
+     * @param {number} itemId
+     */
+    calcReviewInterval(itemId: number): number[] {
+        const item = this.data.items[itemId];
+        if (item == null) {
+            return null;
+        }
+        const intervals: number[] = [];
+        for (const opt of this.plugin.algorithm.srsOptions()) {
+            // const tempitem = MiscUtils.assignObjFully({}, item);
+            const tempitem = deepcopy(item);
+            let result: ReviewResult = null;
+            if (this.isInRepeatQueue(itemId)) {
+                result = this.plugin.algorithm.onSelection(tempitem, opt, true);
+            } else {
+                result = this.plugin.algorithm.onSelection(tempitem, opt, false);
+            }
+            const intvl = Math.round((result.nextReview / DateUtils.DAYS_TO_MILLIS) * 100) / 100;
+            intervals.push(intvl);
+        }
+
+        return intervals;
     }
 
     /**
@@ -683,7 +745,7 @@ export class DataStore {
             }
         }
         this.data.trackedFiles.push(trackedFile);
-        const data = this.updateItems(path, notice);
+        const data = this.updateItems(path, tag, notice);
         console.log("Tracked: " + path);
         // this.plugin.updateStatusBar();
         return data;
@@ -706,7 +768,6 @@ export class DataStore {
         count: number,
         notice?: boolean
     ): CardInfo {
-        // console.debug("trackFileCard", note.name, lineNo, count);
         if (!this.isTrackedCardfile(note.path)) {
             console.log("Attempt to add card in untracked file: " + note.path);
             this.trackFile(note.path, "card", false);
@@ -801,11 +862,17 @@ export class DataStore {
      * updateItems.
      *
      * @param {string} path
+     * @param {string} tag? "default" , deckName
      * @param {boolean} notice
      * @returns {{ added: number; removed: number } | null}
      */
-    updateItems(path: string, notice?: boolean): { added: number; removed: number } | null {
+    updateItems(
+        path: string,
+        tag?: string,
+        notice?: boolean
+    ): { added: number; removed: number } | null {
         if (notice == null) notice = true;
+        if (tag == null) tag = this.defaultDeckname;
 
         const ind = this.getFileIndex(path);
         if (ind == -1) {
@@ -831,7 +898,9 @@ export class DataStore {
             newItem.data = Object.assign(this.plugin.algorithm.defaultData());
             // newItem.data = Object.assign(this.algorithmdefaultData());
             newItem.fileIndex = ind;
-            newItems["file"] = this.data.items.push(newItem) - 1;
+            newItem.deckName = tag;
+            newItem.ID = this.data.items.push(newItem) - 1;
+            newItems["file"] = newItem.ID;
             added += 1;
         }
 
@@ -897,6 +966,7 @@ export class DataStore {
                 const newItem: RepetitionItem = Object.assign({}, NEW_ITEM);
                 newItem.data = Object.assign(this.plugin.algorithm.defaultData());
                 newItem.fileIndex = ind;
+                newItem.itemType = RPITEMTYPE.CARD;
                 const cardId = this.data.items.push(newItem) - 1;
                 newitemIds.push(cardId);
                 added += 1;
@@ -959,6 +1029,10 @@ export class DataStore {
             const newItem: RepetitionItem = Object.assign({}, NEW_ITEM);
             newItem.data = Object.assign(this.plugin.algorithm.defaultData());
             newItem.fileIndex = fileIndex;
+            newItem.itemType =
+                this.data.trackedFiles[fileIndex].items.file === id
+                    ? RPITEMTYPE.NOTE
+                    : RPITEMTYPE.CARD;
 
             this.data.items[id] = newItem;
             this.save();
@@ -1027,7 +1101,7 @@ export class DataStore {
                                 untrackedFiles += 1;
                             }
                         } else if (file.items.file !== id) {
-                            if (item.nextReview == 0) {
+                            if (item.timesReviewed == 0) {
                                 // This is a new item.
                                 if (maxNew == -1 || data.newAdded < maxNew) {
                                     // item.nextReview = now.getTime();
@@ -1045,10 +1119,10 @@ export class DataStore {
                                 }
                             }
                         } else {
-                            if (item.nextReview == 0) {
+                            if (item.timesReviewed == 0) {
                                 // This is a new item.
                                 if (maxNew == -1 || data.newAdded < maxNew) {
-                                    item.nextReview = now.getTime();
+                                    // item.nextReview = now.getTime();   // it doesn't matter.
                                     data.newAdded += 1;
                                     data.queue.push(id);
                                     newAdd += 1;
@@ -1133,7 +1207,6 @@ export class DataStore {
         const nullItemList: number[] = [];
         const nullItemList_del: number[] = [];
 
-        // console.debug("before delete nullTrackedFiles:", tracked_files);
         tracked_files.map((tf, ind) => {
             if (tf == null) {
                 nullFileList.push(ind);
@@ -1151,11 +1224,9 @@ export class DataStore {
                 for (let nli = nullFileList.length - 1; nli >= 0; nli--) {
                     if (ifind > nullFileList[nli]) {
                         item.fileIndex -= nli + 1;
-                        // console.debug("change item:%s .ind%d to .ind%d", item, ifind, item.fileIndex);
                         break;
                     } else if (ifind === nullFileList[nli]) {
                         item = null;
-                        // console.debug("set item:%s to null", item);
                         break;
                     }
                 }
@@ -1166,9 +1237,7 @@ export class DataStore {
                 removedNullItems++;
             }
         });
-        // console.debug("after delete nullTrackedFiles:", tracked_files);
 
-        // console.debug("before delete nullitems:", items);
         for (let i = 0; i < nullItemList_del.length; i++) {
             items.splice(nullItemList_del[i], 1);
         }
@@ -1195,7 +1264,6 @@ export class DataStore {
             }
             for (const carditem of trackedFile.cardItems) {
                 if (Math.max(...carditem.itemIds) >= nlMin) {
-                    console.debug("change card:%s to", carditem.itemIds);
                     for (let idi = 0; idi < carditem.itemIds.length; idi++) {
                         const oldId = carditem.itemIds[idi];
                         let newId = -1;
@@ -1204,8 +1272,6 @@ export class DataStore {
                                 if (oldId >= nullItemList[nli]) {
                                     newId = oldId > nullItemList[nli] ? oldId - (nli + 1) : newId;
                                     carditem.itemIds.splice(idi, 1, newId);
-                                    // trackedFile.cardItems[cardind].itemIds.splice(idi,1, newId);
-                                    // console.debug("null%d change card:%s id[%d]:%d to id%d", nullItemList[nli], carditem.itemIds, idi, oldId, newId);
                                     break nlfor;
                                 }
                             }
@@ -1320,29 +1386,59 @@ export class DataStore {
         const trackedFile = this.getTrackedFile(note.path);
         const ind = this.getFileIndex(note.path);
         let now_number: number = now;
-        if (now == null) {
-            //it's inside plugin.sync();
-            const nowToday: number = Math.ceil(Date.now() / (24 * 3600 * 1000)) * 24 * 3600 * 1000;
-            now_number = nowToday;
-        }
+        const nowToday: number =
+            Math.ceil(Date.now() / DateUtils.DAYS_TO_MILLIS) * DateUtils.DAYS_TO_MILLIS;
 
         if (item == null) {
             this.updateItemById(fileid, ind);
             console.debug("syncRCDataToSRrevDeck update item:", item);
         }
+        if (now == null) {
+            //it's inside plugin.sync();
+            now_number = nowToday;
+            const currNow = Date.now();
+            if (
+                nowToday - item.nextReview > 0 &&
+                (this.data.toDayLatterQueue[fileid] == undefined || currNow - item.nextReview > 0)
+            ) {
+                this.data.toDayAllQueue[fileid] = rdeck.deckName;
+                delete this.data.toDayLatterQueue[fileid];
+            } else if (nowToday - item.nextReview < 0) {
+                // just in case some unknow errors.
+                delete this.data.toDayAllQueue[fileid];
+            }
+        } else {
+            delete this.data.toDayAllQueue[fileid];
+            Object.keys(this.data.toDayLatterQueue).forEach((fileid) => {
+                const id = Number.parseInt(fileid);
+                if (now - this.data.items[id].nextReview > 0) {
+                    if (!Object.prototype.hasOwnProperty.call(this.data.toDayAllQueue, id)) {
+                        const dname = (this.data.toDayAllQueue[id] = this.data.items[id].deckName);
+                        this.plugin.reviewDecks[dname].dueNotesCount++;
+                    }
+                    delete this.data.toDayLatterQueue[id];
+                }
+            });
+            if (item.nextReview <= nowToday) {
+                this.data.toDayLatterQueue[fileid] = rdeck.deckName;
+            } else if (item.nextReview > nowToday) {
+                delete this.data.toDayLatterQueue[fileid];
+            }
+        }
+
         if (this.isNewAdd(fileid) >= 0) {
             rdeck.newNotes.push(note);
             this.plugin.newNotesCount++;
             console.debug("syncRCDataToSRrevDeck : addNew", fileid);
         } else {
             rdeck.scheduledNotes.push({ note: note, dueUnix: item.nextReview });
-            if (item.nextReview <= now_number) {
+            if (item.nextReview <= nowToday) {
                 rdeck.dueNotesCount++;
                 this.plugin.dueNotesCount++;
             }
 
             // update pulgin data
-            const [, due, interval, ease] = this.getReviewNoteHeaderData(note.path);
+            const [, due, _interval, ease] = this.getReviewNoteHeaderData(note.path);
             if (now != null) {
                 // this.plugin.easeByPath just update in plugin.sync(), shouldn't update in pulgin.singNoteSyncQueue()
                 if (Object.prototype.hasOwnProperty.call(this.plugin.easeByPath, note.path)) {
@@ -1368,8 +1464,11 @@ export class DataStore {
                 this.save();
             }
         }
+        if (!Object.prototype.hasOwnProperty.call(item, "itemType")) {
+            item.itemType = this.isCardItem(fileid) ? RPITEMTYPE.CARD : RPITEMTYPE.NOTE;
+            this.save();
+        }
 
-        // console.debug("update rdeck:", rdeck);
         return;
     }
 
@@ -1389,7 +1488,10 @@ export class DataStore {
                 correct = true;
             }
         }
-
+        if (sched[1] == null) {
+            console.debug("%s response sched wrong: null ", note.path, fileId);
+            new Notice(note.path + "%s %s response sched wrong: null " + fileId.toString());
+        }
         this.setSchedbyId(fileId, sched, correct);
     }
 
@@ -1419,7 +1521,7 @@ export class DataStore {
      */
     getSchedbyId(id: number): RegExpMatchArray {
         const item: RepetitionItem = this.data.items[id];
-        if (item == null || item.nextReview === 0) return null; // new card doesn't need schedinfo
+        if (item == null || item.nextReview === 0 || item.timesReviewed === 0) return null; // new card doesn't need schedinfo
         const ease = item.data.ease * 100;
         const interval = item.data.lastInterval;
         // const interval = item.data.iteration;
@@ -1516,7 +1618,7 @@ export class DataStore {
                 continue;
             }
         }
-        console.debug("cardHashList: ", cardHashList);
+        // console.debug("cardHashList: ", cardHashList);
 
         // sync by total parsedCards.length
         const carditems = trackedFile.cardItems;
@@ -1527,10 +1629,8 @@ export class DataStore {
                     this.getAndSyncCardInfo(note, lines[i], cardHashList[lines[i]]);
                 }
             }
-            // console.debug("after items:", carditems);
         }
 
-        // console.log("syncNoteCardsIndex-end,token time",   {t: Date.now() - now.valueOf(),});
         return;
     }
 
@@ -1620,13 +1720,14 @@ export class DataStore {
         if (scheduling == null) {
             scheduling = [];
         }
-        console.debug("syncTrackfileCardSched-note:", note.name, lineNo, count);
+
         let carditem = this.getAndSyncCardInfo(note, lineNo, cardTextHash);
         if (carditem == null) {
             carditem = this.trackFileCard(note, lineNo, cardTextHash, count);
         }
 
         if (scheduling.length) {
+            console.debug("syncTrackfileCardSched-note:", note.name, lineNo, count);
             const schedLen = Math.min(scheduling.length, carditem.itemIds.length);
 
             for (let i = 0; i < schedLen; i++) {

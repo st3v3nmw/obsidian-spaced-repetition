@@ -1,5 +1,5 @@
 // https://img.shields.io/github/v/release/chetachiezikeuzor/cMenu-Plugin
-import { ButtonComponent, MarkdownView, Platform, TFile } from "obsidian";
+import { ButtonComponent, MarkdownView, Platform, TFile, setIcon } from "obsidian";
 import { ReviewResponse, textInterval } from "src/scheduling";
 import { SRSettings } from "src/settings";
 import SRPlugin from "../main";
@@ -10,14 +10,160 @@ export class reviewNoteResponseModal {
     containerEl: HTMLElement;
 
     id = "reviewNoteResponseModalBar";
-    buttons: ButtonComponent[];
+    buttons: HTMLButtonElement[];
     responseInterval: number[];
+    showInterval = true;
 
-    constructor(plugin: SRPlugin, show = true, responseInterval?: number[]) {
+    constructor(plugin: SRPlugin) {
         this.plugin = plugin;
         this.settings = plugin.data.settings;
 
         // this.display(show, responseInterval);
+    }
+
+    public algoDisplay(show = true, responseInterval?: number[]): void {
+        const plugin = this.plugin;
+        const settings: SRSettings = this.settings;
+
+        if (!settings.reviewResponseFloatBar || !settings.autoNextNote) return;
+        const reviewNoteResponseModalBar = document.getElementById(this.id);
+        if (!show) {
+            this.selfDestruct();
+            return;
+        } else if (reviewNoteResponseModalBar) {
+            // update show text
+
+            this.plugin.algorithm.srsOptions().forEach((opt, index) => {
+                const btn = document.getElementById("sr-" + opt.toLowerCase() + "-btn");
+                let text = opt;
+                if (this.showInterval) {
+                    text =
+                        responseInterval == null
+                            ? `${opt}`
+                            : Platform.isMobile
+                            ? textInterval(
+                                  Number.parseFloat(responseInterval[index].toFixed(5)),
+                                  true
+                              )
+                            : `${opt} - ${textInterval(
+                                  Number.parseFloat(responseInterval[index].toFixed(5)),
+                                  false
+                              )}`;
+                }
+                btn.setText(text);
+            });
+            return;
+        }
+        const buttonClick = (s: string) => {
+            const openFile: TFile | null = app.workspace.getActiveFile();
+            if (openFile && openFile.extension === "md") {
+                // const fid = plugin.store.getFileId(openFile.path);
+                // plugin.store.reviewId(fid, s);
+                plugin.saveReviewResponsebyAlgo(openFile, s);
+            }
+        };
+        const options = this.plugin.algorithm.srsOptions();
+        const optBtnCounts = options.length;
+        let btnCols = 4;
+        if (!Platform.isMobile && optBtnCounts > btnCols) {
+            btnCols = optBtnCounts;
+        }
+        this.containerEl = createEl("div");
+        this.containerEl.setAttribute("id", this.id);
+        this.containerEl.addClass("ResponseFloatBarDefaultAesthetic");
+        this.containerEl.setAttribute("style", `grid-template-columns: ${"1fr ".repeat(btnCols)}`);
+        document.body
+            .querySelector(".mod-vertical.mod-root")
+            .insertAdjacentElement("afterbegin", this.containerEl);
+        this.buttons = [];
+        options.forEach((opt: string, index) => {
+            const btn = document.createElement("button");
+            btn.setAttribute("id", "sr-" + opt.toLowerCase() + "-btn");
+            btn.setAttribute("class", "ResponseFloatBarCommandItem");
+            // btn.setAttribute("aria-label", "Hotkey: " + (index + 1));
+            // btn.setAttribute("style", `width: calc(95%/${buttonCounts});`);
+            // setIcon(btn, item.icon);
+            let text = opt;
+            if (this.showInterval) {
+                text =
+                    responseInterval == null
+                        ? `${opt}`
+                        : Platform.isMobile
+                        ? textInterval(Number.parseFloat(responseInterval[index].toFixed(5)), true)
+                        : `${opt} - ${textInterval(
+                              Number.parseFloat(responseInterval[index].toFixed(5)),
+                              false
+                          )}`;
+            }
+            btn.setText(text);
+            btn.addEventListener("click", () => buttonClick(opt));
+            this.buttons.push(btn);
+            this.containerEl.appendChild(btn);
+        });
+
+        const showIntvlBtn = document.createElement("button");
+        showIntvlBtn.setAttribute("id", "sr-showintvl-btn");
+        showIntvlBtn.setAttribute("class", "ResponseFloatBarCommandItem");
+        showIntvlBtn.setAttribute(
+            "aria-label",
+            "时间间隔显隐,\n建议：复习类不显示，渐进总结/增量写作显示"
+        );
+        // showIntvlBtn.setText("Show");
+        setIcon(showIntvlBtn, "alarm-clock");
+        showIntvlBtn.addEventListener("click", () => {
+            if (this.showInterval) {
+                this.showInterval = false;
+                setIcon(showIntvlBtn, "alarm-clock-off");
+            } else {
+                this.showInterval = true;
+                setIcon(showIntvlBtn, "alarm-clock");
+            }
+            this.algoDisplay(show, responseInterval);
+        });
+        this.buttons.push(showIntvlBtn);
+        this.containerEl.appendChild(showIntvlBtn);
+
+        const closeBtn = document.createElement("button");
+        closeBtn.setAttribute("id", "sr-close-btn");
+        closeBtn.setAttribute("class", "ResponseFloatBarCommandItem");
+        closeBtn.setAttribute("aria-label", "关闭浮栏显示");
+        // closeBtn.setAttribute("style", `width: calc(95%/${buttonCounts});`);
+        // setIcon(closeBtn, "lucide-x");
+        closeBtn.setText("X");
+        closeBtn.addEventListener("click", () => {
+            this.containerEl.style.visibility = "hidden";
+            this.selfDestruct();
+        });
+        this.buttons.push(closeBtn);
+        this.containerEl.appendChild(closeBtn);
+
+        /* const bar = document.getElementById("reviewNoteResponseModalBar");
+        const Markdown = app.workspace.getActiveViewOfType(MarkdownView);
+
+        document.body.onkeydown = (e) => {
+            if (
+                bar &&
+                bar.checkVisibility &&
+                (Markdown.getMode() === "preview" ||
+                    document.activeElement.hasClass("ResponseFloatBarCommandItem"))
+            ) {
+                const consume = () => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                };
+                for (let i = 0; i < options.length; i++) {
+                    const num = "Numpad" + i;
+                    const dig = "Digit" + i;
+                    if (e.code === num || e.code === dig) {
+                        buttonClick(options[0]);
+                        break;
+                    }
+                }
+                consume();
+            }
+        };
+ */
+        this.containerEl.style.visibility = "visible"; // : "hidden"
     }
 
     public display(show = true, responseInterval?: number[]): void {
@@ -83,7 +229,7 @@ export class reviewNoteResponseModal {
             }em;  */
             }
             bar.containerEl.setAttribute("id", bar.id);
-            bar.containerEl.addClass("cMenuDefaultAesthetic");
+            bar.containerEl.addClass("ResponseFloatBarDefaultAesthetic");
             document.body
                 .querySelector(".mod-vertical.mod-root")
                 .insertAdjacentElement("afterbegin", bar.containerEl);
@@ -91,7 +237,7 @@ export class reviewNoteResponseModal {
             menuCommands.forEach((item) => {
                 const btn = document.createElement("button");
                 btn.setAttribute("id", "sr-" + item.name.toLowerCase() + "-btn");
-                // btn.setAttribute("class", "cMenuCommandItem");
+                // btn.setAttribute("class", "ResponseFloatBarCommandItem");
                 btn.setAttribute("aria-label", item.name);
                 // setIcon(btn, item.icon);
                 btn.setText(item.text);
@@ -110,7 +256,7 @@ export class reviewNoteResponseModal {
             const button = new ButtonComponent(bar.containerEl);
             button
                 .setIcon("lucide-x")
-                .setClass("cMenuCommandItem")
+                .setClass("ResponseFloatBarCommandItem")
                 // .setButtonText("x")
                 .setTooltip("关闭浮栏显示")
                 .onClick(() => {
@@ -134,7 +280,6 @@ export class reviewNoteResponseModal {
                         clearInterval(timmer);
                     }
                 }
-                // console.debug("markdownView? ", Markdown);
             }, 10000);
         }
         if (show) {

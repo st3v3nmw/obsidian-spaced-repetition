@@ -83,6 +83,7 @@ export default class Commands {
     }
 
     recallReviewNote() {
+        const plugin = this.plugin;
         this.plugin.store.buildQueue();
         const item = this.plugin.store.getNext();
         const state: any = { mode: "empty" };
@@ -93,6 +94,13 @@ export default class Commands {
                 state.item = this.plugin.store.getNextId();
                 // state.mode = "note";
                 // state.mode = "question";
+                const fid = plugin.store.getFileId(path);
+                const item = plugin.store.data.items[fid];
+                plugin.reviewNoteFloatBar.algoDisplay(
+                    true,
+                    plugin.algorithm.calcAllOptsIntervals(item)
+                );
+                // plugin.reviewNoteFloatBar.algoDisplay(true, plugin.store.calcReviewInterval(fid));
             }
         }
         const leaf = this.plugin.app.workspace.getLeaf();
@@ -100,7 +108,6 @@ export default class Commands {
             type: "markdown",
             state: state,
         });
-        // leaf.setPinned(true);
 
         this.plugin.app.workspace.setActiveLeaf(leaf);
     }

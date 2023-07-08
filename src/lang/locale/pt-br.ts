@@ -164,6 +164,8 @@ export default {
     REVIEW_NOTE_DIRECTLY: "Reviewing Note directly?",
     REVIEW_NOTE_DIRECTLY_DESC:
         "when reviewing note via click statusbar or command, open it directly without having to select a tag to open a note",
+    INTERVAL_SHOWHIDE: "Display Next Review Interval",
+    INTERVAL_SHOWHIDE_DESC: "whether to display next revivew iterval on the response buttons.",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Fila de Notas para Revisar",
