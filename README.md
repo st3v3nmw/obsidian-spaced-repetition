@@ -13,7 +13,7 @@ This is a modified version of [obsidian-spaced-repetition](https://github.com/st
             -   it still have problems about saving cards shedule info, because when we change note content, the lineNumber and texthash will changes. I add a eventListener, but note work well in some cases. Is there any good idea?
     -   setting new per day, repeat items for review notes.
     -   setting convert tracked note to decks
-    -   setting Algorithm ( not work yet)
+    -   setting Algorithm
     -   file menu to tracknote/untracknote
 -   show floatbar for reviewing response when reviewing note by click statusbar or review command or sidebar
 -   add a setting option to Reviewing a Notes directly [#635]
