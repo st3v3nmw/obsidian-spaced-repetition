@@ -376,6 +376,8 @@ export default class SRPlugin extends Plugin {
         if (todayDate !== this.data.buryDate) {
             this.data.buryDate = todayDate;
             this.data.buryList = [];
+            this.store.data.toDayAllQueue = {};
+            this.store.data.toDayLatterQueue = {};
         }
 
         const notes: TFile[] = this.app.vault.getMarkdownFiles();
