@@ -1400,7 +1400,7 @@ export default class SRPlugin extends Plugin {
         let ndeck: ReviewDeck;
         let ncount = 0;
 
-        if (this.lastSelectedReviewDeck != null) {
+        if (this.lastSelectedReviewDeck != null && Object.keys(this.reviewDecks).includes(rdname)) {
             ndeck = this.reviewDecks[rdname];
             ncount = ndeck.dueNotesCount + ndeck.newNotes.length;
             if (ncount > 0) {
@@ -1460,9 +1460,18 @@ export default class SRPlugin extends Plugin {
         }
         if (!isDue) {
             deck.dueNotesCount = 0;
+            index = -1;
+        }
+        if (!isDue && Object.values(queue).includes(deck.deckName)) {
+            Object.keys(queue).forEach((key) => {
+                const id = Number(key);
+                if (queue[id] === deck.deckName) {
+                    delete this.store.data.toDayAllQueue[id];
+                }
+            });
         }
 
-        return isDue ? index : -1;
+        return index;
     }
 
     registerTrackFileEvents() {

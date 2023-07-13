@@ -834,6 +834,7 @@ export class DataStore {
             const ind = trackedFile.items[key];
             if (this.isQueued(ind)) {
                 this.data.queue.remove(ind);
+                delete this.data.toDayAllQueue[ind];
             }
             if (this.isInRepeatQueue(ind)) {
                 this.data.repeatQueue.remove(ind);
