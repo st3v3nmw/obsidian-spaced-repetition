@@ -14,13 +14,6 @@ function applySettingsUpdate(callback: () => void): void {
     applyDebounceTimer = window.setTimeout(callback, 512);
 }
 
-const fsrs = new fsrsjs.FSRS();
-const card = new fsrsjs.Card();
-
-//Set algorithm parameters
-fsrs.p.w = [1.0, 1.0, 5.0, -0.5, -0.5, 0.2, 1.4, -0.12, 0.8, 2.0, -0.2, 0.2, 1.0];
-// conslog(fsrs.p.w);
-
 export type FsrsData = fsrsjs.Card;
 
 interface FsrsSettings {
@@ -39,6 +32,15 @@ const FsrsOptions: string[] = ["Again", "Hard", "Good", "Easy"];
  * https://github.com/open-spaced-repetition/fsrs.js
  */
 export class FsrsAlgorithm extends SrsAlgorithm {
+    fsrs = new fsrsjs.FSRS();
+    card = new fsrsjs.Card();
+
+    constructor() {
+        super();
+        //Set algorithm parameters
+        this.updateFsrsParams();
+    }
+
     defaultSettings(): FsrsSettings {
         return {
             request_retention: 0.9,
@@ -49,14 +51,14 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         };
     }
 
-    // updateFsrsParams(settings: FsrsSettings) {
-    //     Object.keys(settings).forEach((key, _ind) => {
-    //         fsrs.p[key] = settings[key];
-    //     });
-    // }
+    updateFsrsParams() {
+        if (this.settings != undefined) {
+            this.fsrs.p = deepcopy(this.settings);
+        }
+    }
 
     defaultData(): FsrsData {
-        return deepcopy(card);
+        return deepcopy(this.card);
     }
 
     srsOptions(): string[] {
@@ -69,7 +71,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         data.last_review = new Date(data.last_review);
         const card = deepcopy(data);
         const now = new Date();
-        const scheduling_cards = fsrs.repeat(card, now);
+        const scheduling_cards = this.fsrs.repeat(card, now);
         const intvls: number[] = [];
         this.srsOptions().forEach((opt, ind) => {
             const due = scheduling_cards[ind].card.due.valueOf();
@@ -87,7 +89,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         const response = FsrsOptions.indexOf(optionStr);
 
         const now = new Date();
-        const scheduling_cards = fsrs.repeat(data, now);
+        const scheduling_cards = this.fsrs.repeat(data, now);
         console.log(scheduling_cards);
 
         //Update the card after rating:
@@ -137,16 +139,21 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                     .setPlaceholder("request_retention")
                     .setValue(this.settings.request_retention.toString())
                     .onChange((newValue) => {
-                        const retention = Number(newValue);
-
-                        if (isNaN(retention) || retention < 0) {
-                            new Notice("request_retention must be a positive number.");
-                            return;
-                        }
-
-                        this.settings.request_retention = retention;
-                        fsrs.p.request_retention = retention;
-                        update(this.settings);
+                        applySettingsUpdate(async () => {
+                            const numValue: number = Number.parseFloat(newValue);
+                            if (!isNaN(numValue) && numValue > 0) {
+                                if (numValue < 1.0) {
+                                    new Notice(t("EASY_BONUS_MIN_WARNING"));
+                                    text.setValue(this.settings.request_retention.toString());
+                                    return;
+                                }
+                                this.settings.request_retention = this.fsrs.p.request_retention =
+                                    numValue;
+                                update(this.settings);
+                            } else {
+                                new Notice(t("VALID_NUMBER_WARNING"));
+                            }
+                        });
                     })
             )
             .addExtraButton((button) => {
@@ -155,7 +162,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                     .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         this.settings.request_retention = this.defaultSettings().request_retention;
-                        fsrs.p.request_retention = this.settings.request_retention;
+                        this.fsrs.p.request_retention = this.settings.request_retention;
                         update(this.settings);
                     });
             });
@@ -174,7 +181,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                                 return;
                             }
 
-                            this.settings.easy_bonus = fsrs.p.easy_bonus = numValue;
+                            this.settings.easy_bonus = this.fsrs.p.easy_bonus = numValue;
                             update(this.settings);
                         } else {
                             new Notice(t("VALID_NUMBER_WARNING"));
@@ -187,7 +194,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                     .setIcon("reset")
                     .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
-                        this.settings.easy_bonus = fsrs.p.easy_bonus =
+                        this.settings.easy_bonus = this.fsrs.p.easy_bonus =
                             this.defaultSettings().easy_bonus;
                         update(this.settings);
                     });
@@ -207,7 +214,8 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                                 return;
                             }
 
-                            this.settings.maximum_interval = fsrs.p.maximum_interval = numValue;
+                            this.settings.maximum_interval = this.fsrs.p.maximum_interval =
+                                numValue;
                             update(this.settings);
                         } else {
                             new Notice(t("VALID_NUMBER_WARNING"));
@@ -220,7 +228,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                     .setIcon("reset")
                     .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
-                        this.settings.maximum_interval = fsrs.p.maximum_interval =
+                        this.settings.maximum_interval = this.fsrs.p.maximum_interval =
                             this.defaultSettings().maximum_interval;
                         update(this.settings);
                     });
@@ -235,7 +243,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                     .setValue(this.settings.hard_factor)
                     .setDynamicTooltip()
                     .onChange(async (value: number) => {
-                        this.settings.hard_factor = fsrs.p.hard_factor = value;
+                        this.settings.hard_factor = this.fsrs.p.hard_factor = value;
                         update(this.settings);
                     })
             )
@@ -244,7 +252,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                     .setIcon("reset")
                     .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
-                        this.settings.hard_factor = fsrs.p.hard_factor =
+                        this.settings.hard_factor = this.fsrs.p.hard_factor =
                             this.defaultSettings().hard_factor;
                         update(this.settings);
                     });
@@ -258,7 +266,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                         try {
                             const numValue: number[] = Object.assign({}, JSON.parse(value));
                             if (numValue.length === this.settings.w.length) {
-                                this.settings.w = fsrs.p.w = numValue;
+                                this.settings.w = this.fsrs.p.w = numValue;
                                 update(this.settings);
                                 return;
                             }
@@ -275,7 +283,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                     .setIcon("reset")
                     .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
-                        this.settings.w = fsrs.p.w = this.defaultSettings().w;
+                        this.settings.w = this.fsrs.p.w = this.defaultSettings().w;
                         update(this.settings);
                     });
             });

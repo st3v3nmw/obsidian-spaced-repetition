@@ -739,7 +739,7 @@ export class SRSettingTab extends PluginSettingTab {
         // Add algorithm specific settings
         // containerEl.createEl("h3").innerText = "Trackfile Algorithm Settings";
         plugin.algorithm.displaySettings(containerEl, (settings: any) => {
-            plugin.data.settings.algorithmSettings = settings;
+            plugin.data.settings.algorithmSettings[plugin.data.settings.algorithm] = settings;
             plugin.savePluginData();
             this.display();
         });
