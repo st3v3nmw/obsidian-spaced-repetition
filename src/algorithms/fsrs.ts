@@ -93,7 +93,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         console.log(scheduling_cards);
 
         //Update the card after rating:
-        item.data = deepcopy(scheduling_cards[response].card);
+        item.data = deepcopy(scheduling_cards[response].card) as FsrsData;
 
         //Get the due date for card:
         // const due = card.due;
@@ -122,10 +122,35 @@ export class FsrsAlgorithm extends SrsAlgorithm {
             correct = false;
         }
 
+        this.writeRevlog(now, item.ID, response);
+
         return {
             correct,
             nextReview: nextInterval,
         };
+    }
+
+    /**
+     * 记录重复数据 日志，
+     * @param now 
+     * @param cid 对应数据项ID，如果运行了pruneData()，ID就会变化，数据可能对应不上了
+     * @param rating 
+     */
+    async writeRevlog(now: Date, cid: number, rating: number) {
+        const plugin = this.plugin;
+        const adapter = plugin.app.vault.adapter;
+        const id = now.getTime();
+
+        const filename = "revlog.csv";
+        let filepath = plugin.store.getStorePath();
+        const fder_index = filepath.lastIndexOf("/");
+        filepath = filepath.substring(0, fder_index + 1) + filename;
+        let data = id + "\t" + cid + "\t" + rating + "\n";
+        if (!(await adapter.exists(filepath))) {
+            const title = "id\tcid\tr\n";
+            data = title + data;
+        }
+        adapter.append(filepath, data);
     }
 
     displaySettings(containerEl: HTMLElement, update: (settings: any) => void) {
