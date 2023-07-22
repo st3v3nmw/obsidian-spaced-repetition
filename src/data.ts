@@ -1194,7 +1194,7 @@ export class DataStore {
     }
 
     /**
-     * pruneData: delete unused storedata
+     * pruneData: delete unused storedata, fsrs's optimizer/writeRevlog() will be affected if using this func.
      * NulltFiles/NullItems
      * @returns
      */
@@ -1253,6 +1253,7 @@ export class DataStore {
                     if (oldId >= nullItemList[nli]) {
                         newId = oldId > nullItemList[nli] ? oldId - (nli + 1) : -1;
                         trackedFile.items.file = newId;
+                        this.getItembyID(newId).ID = newId;
                         // console.debug("change file: id%d to id%d", oldId, newId, trackedFile);
                         break;
                     }
