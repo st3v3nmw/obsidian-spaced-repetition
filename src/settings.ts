@@ -189,7 +189,7 @@ export class SRSettingTab extends PluginSettingTab {
             this.addSpecifiedFolderSetting(containerEl);
         }
         this.addAlgorithmSetting(containerEl);
-        this.addNewPerDaySetting(containerEl);
+        // this.addNewPerDaySetting(containerEl);
         this.addRepeatItemsSetting(containerEl);
         this.addTrackedNoteToDecksSetting(containerEl);
         this.addReviewResponseFloatBarSetting(containerEl);
