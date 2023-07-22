@@ -10,6 +10,7 @@ export default {
     SKIP: "Skip",
     EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "카드의 진행상황을 초기화합니다.",
+    RESET: "Reset",
     HARD: "어려움(Hard)",
     GOOD: "좋음(Good)",
     EASY: "쉬움(Easy)",

@@ -10,6 +10,7 @@ export default {
     SKIP: "略過",
     EDIT_CARD: "編輯卡片",
     RESET_CARD_PROGRESS: "重置卡片",
+    RESET: "重来",
     HARD: "較難",
     GOOD: "記得",
     EASY: "簡單",

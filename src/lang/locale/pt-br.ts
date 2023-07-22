@@ -11,6 +11,7 @@ export default {
     SKIP: "Skip",
     EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "Reiniciar o Progresso da Carta",
+    RESET: "Reset",
     HARD: "Difícil",
     GOOD: "OK",
     EASY: "Fácil",

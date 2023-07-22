@@ -97,7 +97,12 @@ export interface SRSettings {
 
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
-    responseOptionBtnsText: {},
+    responseOptionBtnsText: {
+        Default: [t("RESET"), t("HARD"), t("GOOD"), t("EASY")],
+        Fsrs: [t("RESET"), t("HARD"), t("GOOD"), t("EASY")],
+        Anki: [t("RESET"), t("HARD"), t("GOOD"), t("EASY")],
+        SM2: ["Blackout", "Incorrect", "Incorrect (Easy)", t("HARD"), t("GOOD"), t("EASY")],
+    },
     flashcardEasyText: t("EASY"),
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),

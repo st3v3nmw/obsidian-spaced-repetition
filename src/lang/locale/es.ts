@@ -10,6 +10,7 @@ export default {
     SKIP: "Saltar",
     EDIT_CARD: "Editar Tarjeta",
     RESET_CARD_PROGRESS: "Reiniciar progreso de la tarjeta",
+    RESET: "Reset",
     HARD: "Difícil",
     GOOD: "Bien",
     EASY: "Fácil",

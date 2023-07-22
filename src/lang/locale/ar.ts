@@ -10,6 +10,7 @@ export default {
     SKIP: "Skip",
     EDIT_CARD: "تعديل البطاقة",
     RESET_CARD_PROGRESS: "إعادة تعيين تقدُّمْ البطاقة",
+    RESET: "Reset",
     HARD: "صعب",
     GOOD: "جيد",
     EASY: "سهل",

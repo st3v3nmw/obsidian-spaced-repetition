@@ -16,6 +16,7 @@ export default {
     SKIP: "Пропустить",
     EDIT_CARD: "Редактировать карточку",
     RESET_CARD_PROGRESS: "Сбросить прогресс карточки",
+    RESET: "Reset",
     HARD: "Сложно",
     GOOD: "Нормально",
     EASY: "Легко",
