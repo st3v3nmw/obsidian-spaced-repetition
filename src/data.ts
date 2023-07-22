@@ -1,10 +1,10 @@
 import SRPlugin from "./main";
-import { DateUtils, MiscUtils } from "./utils_recall";
+import { DateUtils } from "./utils_recall";
 import { DataLocation, SRSettings } from "./settings";
 
 import { TFile, TFolder, Notice, getAllTags } from "obsidian";
 
-import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
+import { ReviewDeck } from "src/review-deck";
 import { CardType, ReviewResponse } from "./scheduling";
 import { parse } from "./parser";
 import { cyrb53 } from "./utils";
@@ -179,11 +179,6 @@ const NEW_ITEM: RepetitionItem = {
     data: {},
 };
 
-const NEW_CARDINFO: CardInfo = {
-    lineNo: 0,
-    cardTextHash: "",
-    itemIds: [],
-};
 
 /**
  * DataStore.
@@ -1178,7 +1173,7 @@ export class DataStore {
     async verify(file: TrackedFile): Promise<boolean> {
         const adapter = this.plugin.app.vault.adapter;
         if (file != null) {
-            return adapter.exists(file.path).catch((reason) => {
+            return adapter.exists(file.path).catch((_reason) => {
                 console.error("Unable to verify file: ", file.path);
                 return false;
             });
@@ -1361,7 +1356,7 @@ export class DataStore {
                 }
             }
 
-            const [, due, interval, ease] = this.getReviewNoteHeaderData(path);
+            const [, due, _interval, ease] = this.getReviewNoteHeaderData(path);
             if (Object.prototype.hasOwnProperty.call(this.plugin.easeByPath, path)) {
                 this.plugin.easeByPath[path] = (this.plugin.easeByPath[path] + ease) / 2;
             } else {
@@ -1570,7 +1565,6 @@ export class DataStore {
             return;
         }
 
-        const now: number = Date.now();
         const trackedFile = this.getTrackedFile(note.path);
         const fileText: string = await this.plugin.app.vault.read(note);
         const settings: SRSettings = this.plugin.data.settings;
@@ -1590,8 +1584,7 @@ export class DataStore {
         );
 
         for (const parsedCard of parsedCards) {
-            const cardType: CardType = parsedCard[0],
-                lineNo: number = parsedCard[2];
+            const lineNo: number = parsedCard[2];
             let cardText: string = parsedCard[1];
 
             if (cardText.includes(settings.editLaterTag)) {

@@ -132,9 +132,9 @@ export class FsrsAlgorithm extends SrsAlgorithm {
 
     /**
      * 记录重复数据 日志，
-     * @param now 
+     * @param now
      * @param cid 对应数据项ID，如果运行了pruneData()，ID就会变化，数据可能对应不上了
-     * @param rating 
+     * @param rating
      */
     async writeRevlog(now: Date, cid: number, rating: number) {
         const plugin = this.plugin;
@@ -153,7 +153,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         adapter.append(filepath, data);
     }
 
-    displaySettings(containerEl: HTMLElement, update: (settings: any) => void) {
+    displaySettings(containerEl: HTMLElement, update: (settings: FsrsSettings) => void) {
         containerEl.createDiv().innerHTML =
             '用于间隔重复的算法. 更多信息请查阅 <a href="https://github.com/open-spaced-repetition/fsrs.js">FSRS算法</a>.';
         new Setting(containerEl)

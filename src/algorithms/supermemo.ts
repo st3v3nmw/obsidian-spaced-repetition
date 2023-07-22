@@ -34,7 +34,7 @@ export class Sm2Algorithm extends SrsAlgorithm {
 
     calcAllOptsIntervals(item: RepetitionItem): number[] {
         const intvls: number[] = [];
-        this.srsOptions().forEach((opt, ind) => {
+        this.srsOptions().forEach((opt, _ind) => {
             const itemCopy = deepcopy(item);
             const result = this.onSelection(itemCopy, opt, false);
             const intvl = Math.round((result.nextReview / DateUtils.DAYS_TO_MILLIS) * 100) / 100;

@@ -132,7 +132,8 @@ export default {
     NEW_PER_DAY_NEG: "整數必須大於等於-1.",
     REPEAT_ITEMS: "重複錯誤",
     REPEAT_ITEMS_DESC: "錯誤項是否要一直重複復習，直到回答正確?",
-    ALGORITHMS_CONFIRM: `切換演算法可能導致日期排程重置，這個修改不可撤銷，當重啟軟體或重新加載插件切換演算法才會生效。你確定要切換演算法麼?`,
+    ALGORITHMS_CONFIRM:
+        "切換演算法可能導致日期排程重置，這個修改不可撤銷，當重啟軟體或重新加載插件切換演算法才會生效。你確定要切換演算法麼?",
     ALGORITHMS_DESC:
         '用於間隔重複的演算法. 更多資訊請查閱 <a href="https://github.com/martin-jw/obsidian-recall">演算法</a>.',
     CONVERT_TRACKED_TO_DECK: "將復習筆記轉換為卡牌組?",
