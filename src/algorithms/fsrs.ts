@@ -41,18 +41,17 @@ export class FsrsAlgorithm extends SrsAlgorithm {
     fsrs = new fsrsjs.FSRS();
     card = new fsrsjs.Card();
 
+    initFlag = false;
+
     filename = "revlog.csv";
-    logfilepath = "";
-    REVLOG_TITLE = "id\tcid\tr\n";
+    logfilepath: string = null;
+    REVLOG_sep = ", ";
+    REVLOG_TITLE = "id" + this.REVLOG_sep + "cid" + this.REVLOG_sep + "r\n";
 
     constructor() {
         super();
         //Set algorithm parameters
         this.updateFsrsParams();
-
-        const filepath = this.plugin.store.getStorePath();
-        const fder_index = filepath.lastIndexOf("/");
-        this.logfilepath = filepath.substring(0, fder_index + 1) + this.filename;
     }
 
     defaultSettings(): FsrsSettings {
@@ -71,6 +70,12 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         }
     }
 
+    getLogfilepath() {
+        const filepath = this.plugin.store.getStorePath();
+        const fder_index = filepath.lastIndexOf("/");
+        this.logfilepath = filepath.substring(0, fder_index + 1) + this.filename;
+    }
+
     defaultData(): FsrsData {
         return deepcopy(this.card);
     }
@@ -80,6 +85,12 @@ export class FsrsAlgorithm extends SrsAlgorithm {
     }
 
     calcAllOptsIntervals(item: RepetitionItem) {
+        if (!this.initFlag) {
+            this.getLogfilepath();
+            this.updateFsrsParams();
+            this.initFlag = true;
+        }
+
         const data = item.data as FsrsData;
         data.due = new Date(data.due);
         data.last_review = new Date(data.last_review);
@@ -102,6 +113,11 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         data.last_review = new Date(data.last_review);
         const response = FsrsOptions.indexOf(optionStr);
 
+        if (!this.initFlag) {
+            this.getLogfilepath();
+            this.updateFsrsParams();
+            this.initFlag = true;
+        }
         const now = new Date();
         const scheduling_cards = this.fsrs.repeat(data, now);
         console.log(scheduling_cards);
@@ -155,10 +171,9 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         const adapter = plugin.app.vault.adapter;
         const id = now.getTime();
 
-        let data = id + "\t" + cid + "\t" + rating + "\n";
+        let data = id + this.REVLOG_sep + cid + this.REVLOG_sep + rating + "\n";
         if (!(await adapter.exists(this.logfilepath))) {
-            const title = "id\tcid\tr\n";
-            data = title + data;
+            data = this.REVLOG_TITLE + data;
         }
         adapter.append(this.logfilepath, data);
     }
@@ -184,13 +199,17 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         const adapter = plugin.app.vault.adapter;
         let data = "";
         if (await adapter.exists(this.logfilepath)) {
-            // const title = "id\tcid\tr\n";
             data = await adapter.read(this.logfilepath);
         }
         return data;
     }
 
     displaySettings(containerEl: HTMLElement, update: (settings: FsrsSettings) => void) {
+        if (!this.initFlag) {
+            this.getLogfilepath();
+            this.updateFsrsParams();
+            this.initFlag = true;
+        }
         containerEl.createDiv().innerHTML =
             '用于间隔重复的算法. 更多信息请查阅 <a href="https://github.com/open-spaced-repetition/fsrs.js">FSRS算法</a>.';
         new Setting(containerEl)

@@ -604,10 +604,8 @@ export class SRSettingTab extends PluginSettingTab {
                 dropdown.onChange(async (val) => {
                     const loc = locationMap[val];
                     plugin.data.settings.dataLocation = loc;
-                    if (loc === DataLocation.SpecifiedFolder) {
-                        plugin.data.settings.customFolder = plugin.store.dataPath;
-                    }
                     plugin.store.moveStoreLocation();
+                    plugin.data.settings.customFolder = plugin.store.getStorePath();
                     await plugin.savePluginData();
                     this.display();
                 });
