@@ -1202,6 +1202,11 @@ export class DataStore {
         const nullItemList: number[] = [];
         const nullItemList_del: number[] = [];
 
+        if (this.plugin.data.settings.algorithm === "Fsrs") {
+            new Notice("因涉及到revlog.csv, 暂不可精简清除无效数据");
+            return;
+            //todo: 后续通过正则替换的方式，同步修改revlog.csv中的数据
+        }
         tracked_files.map((tf, ind) => {
             if (tf == null) {
                 nullFileList.push(ind);
