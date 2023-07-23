@@ -15,9 +15,9 @@ This is a modified version of [obsidian-spaced-repetition](https://github.com/st
         -   save on seperate tracked_files.json.
             -   it still have problems about saving cards shedule info, because when we change note content, the lineNumber and texthash will changes. I add a eventListener, but note work well in some cases. Is there any good idea?
     -   setting convert tracked note to decks
-    -   switch  Algorithm(only work on saving on seperate tracked_files.json.): Default, anki, [Fsrs](https://github.com/open-spaced-repetition/fsrs.js)
+    -   switch Algorithm(only work on saving on seperate tracked_files.json.): Default, anki, [Fsrs](https://github.com/open-spaced-repetition/fsrs.js)
     -   file menu to tracknote/untracknote
--   show floatbar for reviewing response when reviewing note by click statusbar or review command or sidebar, and can set whether showing the interval or not; 
+-   show floatbar for reviewing response when reviewing note by click statusbar or review command or sidebar, and can set whether showing the interval or not;
 -   Reviewing a Notes directly [#635];
 -   when using fsrs, output `ob-revlog.csv`, to optimize the algorithm parameters using [optimizer](https://github.com/open-spaced-repetition/fsrs4remnote/blob/main/optimizer.ipynb) for better review;
 
@@ -27,8 +27,7 @@ This is a modified version of [obsidian-spaced-repetition](https://github.com/st
 2. Create a new folder in `Vault-name/.obsidian/plugins` and put the downloaded files in there
 3. Reload your plugins and enable the plugin
 
-OR USE BRAT pulgin; 
-
+OR USE BRAT pulgin;
 
 ## Usage
 
@@ -40,4 +39,4 @@ Thank you to everyone who has created a plugin that inspired me and I took code 
 
 -   first, thanks to [@st3v3nmw's obsidian-spaced-repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) and [@martin-jw recall plugin](https://github.com/martin-jw/obsidian-recall)
 -   floatbar(thanks to [@chetachi's cMenu](https://github.com/chetachiezikeuzor/cMenu-Plugin))
-- [Fsrs Algorithm](https://github.com/open-spaced-repetition/fsrs.js)
+-   [Fsrs Algorithm](https://github.com/open-spaced-repetition/fsrs.js)
