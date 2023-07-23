@@ -49,7 +49,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
 
     initFlag = false;
 
-    filename = "revlog.csv";
+    filename = "ob_revlog.csv";
     logfilepath: string = null;
     REVLOG_sep = ", ";
     REVLOG_TITLE = "id" + this.REVLOG_sep + "cid" + this.REVLOG_sep + "r\n";
