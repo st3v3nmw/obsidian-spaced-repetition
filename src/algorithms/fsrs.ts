@@ -16,6 +16,12 @@ function applySettingsUpdate(callback: () => void): void {
 
 export type FsrsData = fsrsjs.Card;
 
+interface RevLog {
+    id: number;
+    cid: number;
+    r: number;
+}
+
 interface FsrsSettings {
     request_retention: number;
     maximum_interval: number;
@@ -35,10 +41,18 @@ export class FsrsAlgorithm extends SrsAlgorithm {
     fsrs = new fsrsjs.FSRS();
     card = new fsrsjs.Card();
 
+    filename = "revlog.csv";
+    logfilepath = "";
+    REVLOG_TITLE = "id\tcid\tr\n";
+
     constructor() {
         super();
         //Set algorithm parameters
         this.updateFsrsParams();
+
+        const filepath = this.plugin.store.getStorePath();
+        const fder_index = filepath.lastIndexOf("/");
+        this.logfilepath = filepath.substring(0, fder_index + 1) + this.filename;
     }
 
     defaultSettings(): FsrsSettings {
@@ -122,7 +136,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
             correct = false;
         }
 
-        this.writeRevlog(now, item.ID, response);
+        this.appendRevlog(now, item.ID, response);
 
         return {
             correct,
@@ -133,24 +147,47 @@ export class FsrsAlgorithm extends SrsAlgorithm {
     /**
      * 记录重复数据 日志，
      * @param now
-     * @param cid 对应数据项ID，如果运行了pruneData()，ID就会变化，数据可能对应不上了
+     * @param cid 对应数据项ID
      * @param rating
      */
-    async writeRevlog(now: Date, cid: number, rating: number) {
+    async appendRevlog(now: Date, cid: number, rating: number) {
         const plugin = this.plugin;
         const adapter = plugin.app.vault.adapter;
         const id = now.getTime();
 
-        const filename = "revlog.csv";
-        let filepath = plugin.store.getStorePath();
-        const fder_index = filepath.lastIndexOf("/");
-        filepath = filepath.substring(0, fder_index + 1) + filename;
         let data = id + "\t" + cid + "\t" + rating + "\n";
-        if (!(await adapter.exists(filepath))) {
+        if (!(await adapter.exists(this.logfilepath))) {
             const title = "id\tcid\tr\n";
             data = title + data;
         }
-        adapter.append(filepath, data);
+        adapter.append(this.logfilepath, data);
+    }
+
+    /**
+     * 重写 重复数据 日志，
+     * @param now
+     * @param cid 对应数据项ID，
+     * @param rating
+     */
+    reWriteRevlog(data: string, withTitle = false) {
+        const plugin = this.plugin;
+        const adapter = plugin.app.vault.adapter;
+
+        if (withTitle) {
+            data = this.REVLOG_TITLE + data;
+        }
+        adapter.write(this.logfilepath, data);
+    }
+
+    async readRevlog() {
+        const plugin = this.plugin;
+        const adapter = plugin.app.vault.adapter;
+        let data = "";
+        if (await adapter.exists(this.logfilepath)) {
+            // const title = "id\tcid\tr\n";
+            data = await adapter.read(this.logfilepath);
+        }
+        return data;
     }
 
     displaySettings(containerEl: HTMLElement, update: (settings: FsrsSettings) => void) {
