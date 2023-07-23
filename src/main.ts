@@ -384,7 +384,8 @@ export default class SRPlugin extends Plugin {
         for (const note of notes) {
             if (
                 this.data.settings.noteFoldersToIgnore.some((folder) =>
-                    note.path.startsWith(folder)
+                    // note.path.startsWith(folder)
+                    note.path.contains(folder)
                 )
             ) {
                 continue;
