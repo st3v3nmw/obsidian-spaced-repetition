@@ -16,10 +16,16 @@ function applySettingsUpdate(callback: () => void): void {
 
 export type FsrsData = fsrsjs.Card;
 
-interface RevLog {
+export class RevLog {
     id: number;
     cid: number;
     r: number;
+    time: number;
+    type: number;
+
+    constructor() {
+        return;
+    }
 }
 
 interface FsrsSettings {
@@ -120,7 +126,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         }
         const now = new Date();
         const scheduling_cards = this.fsrs.repeat(data, now);
-        console.log(scheduling_cards);
+        // console.log(scheduling_cards);
 
         //Update the card after rating:
         item.data = deepcopy(scheduling_cards[response].card) as FsrsData;
@@ -152,7 +158,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
             correct = false;
         }
 
-        this.appendRevlog(now, item.ID, response);
+        this.appendRevlog(now, item, response);
 
         return {
             correct,
@@ -166,12 +172,28 @@ export class FsrsAlgorithm extends SrsAlgorithm {
      * @param cid 对应数据项ID
      * @param rating
      */
-    async appendRevlog(now: Date, cid: number, rating: number) {
+    async appendRevlog(now: Date, item: RepetitionItem, rating: number) {
         const plugin = this.plugin;
         const adapter = plugin.app.vault.adapter;
-        const id = now.getTime();
+        const rlog = new RevLog();
+        rlog.id = now.getTime();
+        rlog.cid = item.ID;
+        rlog.r = rating;
+        const carddata = item.data as FsrsData;
+        rlog.time = 0;
+        rlog.type = carddata.state;
 
-        let data = id + this.REVLOG_sep + cid + this.REVLOG_sep + rating + "\n";
+        let data =
+            rlog.id +
+            this.REVLOG_sep +
+            rlog.cid +
+            this.REVLOG_sep +
+            rlog.r +
+            this.REVLOG_sep +
+            rlog.time +
+            this.REVLOG_sep +
+            rlog.type +
+            "\n";
         if (!(await adapter.exists(this.logfilepath))) {
             data = this.REVLOG_TITLE + data;
         }

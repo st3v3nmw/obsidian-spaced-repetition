@@ -179,7 +179,6 @@ const NEW_ITEM: RepetitionItem = {
     data: {},
 };
 
-
 /**
  * DataStore.
  */
