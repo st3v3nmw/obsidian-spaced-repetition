@@ -1268,6 +1268,7 @@ export class DataStore {
                                 if (oldId >= nullItemList[nli]) {
                                     newId = oldId > nullItemList[nli] ? oldId - (nli + 1) : newId;
                                     carditem.itemIds.splice(idi, 1, newId);
+                                    this.getItembyID(newId).ID = newId;
                                     break nlfor;
                                 }
                             }
