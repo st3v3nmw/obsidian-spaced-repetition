@@ -31,8 +31,6 @@ export class RevLog {
 interface FsrsSettings {
     request_retention: number;
     maximum_interval: number;
-    easy_bonus: number;
-    hard_factor: number;
     w: number[];
 }
 
@@ -64,9 +62,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         return {
             request_retention: 0.9,
             maximum_interval: 36500,
-            easy_bonus: 1.3,
-            hard_factor: 1.2,
-            w: [1.0, 1.0, 5.0, -0.5, -0.5, 0.2, 1.4, -0.12, 0.8, 2.0, -0.2, 0.2, 1.0],
+            w: [0.4, 0.6, 2.4, 5.8, 4.93, 0.94, 0.86, 0.01, 1.49, 0.14, 0.94, 2.18, 0.05, 0.34, 1.26, 0.29, 2.61],
         };
     }
 
@@ -117,7 +113,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         const data = item.data as FsrsData;
         data.due = new Date(data.due);
         data.last_review = new Date(data.last_review);
-        const response = FsrsOptions.indexOf(optionStr);
+        const response = FsrsOptions.indexOf(optionStr) + 1;
 
         if (!this.initFlag) {
             this.getLogfilepath();
@@ -143,7 +139,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         let correct = true;
         const nextInterval = item.data.due.valueOf() - item.data.last_review.valueOf();
         if (repeat) {
-            if (response == 0) {
+            if (response == 1) {
                 correct = false;
             }
 
@@ -153,7 +149,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
             };
         }
 
-        if (response == 0) {
+        if (response == 1) {
             // Again
             correct = false;
         }
@@ -271,39 +267,6 @@ export class FsrsAlgorithm extends SrsAlgorithm {
             });
 
         new Setting(containerEl)
-            .setName(t("EASY_BONUS"))
-            .setDesc(t("EASY_BONUS_DESC"))
-            .addText((text) =>
-                text.setValue(this.settings.easy_bonus.toString()).onChange((value) => {
-                    applySettingsUpdate(async () => {
-                        const numValue: number = Number.parseFloat(value);
-                        if (!isNaN(numValue)) {
-                            if (numValue < 1.0) {
-                                new Notice(t("EASY_BONUS_MIN_WARNING"));
-                                text.setValue(this.settings.easy_bonus.toString());
-                                return;
-                            }
-
-                            this.settings.easy_bonus = this.fsrs.p.easy_bonus = numValue;
-                            update(this.settings);
-                        } else {
-                            new Notice(t("VALID_NUMBER_WARNING"));
-                        }
-                    });
-                })
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.settings.easy_bonus = this.fsrs.p.easy_bonus =
-                            this.defaultSettings().easy_bonus;
-                        update(this.settings);
-                    });
-            });
-
-        new Setting(containerEl)
             .setName(t("MAX_INTERVAL"))
             .setDesc(t("MAX_INTERVAL_DESC"))
             .addText((text) =>
@@ -336,30 +299,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                         update(this.settings);
                     });
             });
-
-        new Setting(containerEl)
-            .setName("hard_factor")
-            .setDesc("hard_factor")
-            .addSlider((slider) =>
-                slider
-                    .setLimits(0, 3, 0.01)
-                    .setValue(this.settings.hard_factor)
-                    .setDynamicTooltip()
-                    .onChange(async (value: number) => {
-                        this.settings.hard_factor = this.fsrs.p.hard_factor = value;
-                        update(this.settings);
-                    })
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.settings.hard_factor = this.fsrs.p.hard_factor =
-                            this.defaultSettings().hard_factor;
-                        update(this.settings);
-                    });
-            });
+            
         new Setting(containerEl)
             .setName("w")
             .setDesc("w")
