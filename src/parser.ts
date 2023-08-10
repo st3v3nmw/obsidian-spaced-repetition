@@ -1,12 +1,4 @@
-// import { CardType } from "src/scheduling";
-
-export enum CardType {
-    SingleLineBasic,
-    SingleLineReversed,
-    MultiLineBasic,
-    MultiLineReversed,
-    Cloze,
-}
+import { CardType } from "src/scheduling";
 
 /**
  * Returns flashcards found in `text`
