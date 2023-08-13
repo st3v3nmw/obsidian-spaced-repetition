@@ -17,13 +17,13 @@ module.exports = {
 
         // Open the vault
         await browser.execute(
-            "require('electron').ipcRenderer.sendSync('vault-open', 'tests/e2e/vault', false)"
+            "require('electron').ipcRenderer.sendSync('vault-open', 'tests/e2e/vault', false)",
         );
         await module.exports.sleep(2);
 
         // Disable safemode and enable the plugin
         await browser.execute(
-            "app.plugins.setEnable(true);app.plugins.enablePlugin('obsidian-spaced-repetition')"
+            "app.plugins.setEnable(true);app.plugins.enablePlugin('obsidian-spaced-repetition')",
         );
 
         // Trust the vault

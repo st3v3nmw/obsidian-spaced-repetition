@@ -31,7 +31,7 @@ Chart.register(
     CategoryScale,
     LinearScale,
     PieController,
-    ArcElement
+    ArcElement,
 );
 
 export interface Stats {
@@ -126,7 +126,7 @@ export class StatsModal extends Modal {
             t("REVIEWS_PER_DAY", { avg: (scheduledCount / maxN).toFixed(1) }),
             t("SCHEDULED"),
             t("DAYS"),
-            t("NUMBER_OF_CARDS")
+            t("NUMBER_OF_CARDS"),
         );
 
         maxN = Math.max(...getKeysPreserveType(cardStats.intervals));
@@ -143,13 +143,13 @@ export class StatsModal extends Modal {
                         .map(([interval, count]) => interval * count)
                         .reduce((a, b) => a + b, 0) /
                         scheduledCount) *
-                        10
+                        10,
                 ) / 10 || 0,
-                false
+                false,
             ),
             longest_interval: string = textInterval(
                 Math.max(...getKeysPreserveType(cardStats.intervals)) || 0,
-                false
+                false,
             );
 
         createStatsChart(
@@ -162,7 +162,7 @@ export class StatsModal extends Modal {
             t("INTERVALS_SUMMARY", { avg: average_interval, longest: longest_interval }),
             t("COUNT"),
             t("DAYS"),
-            t("NUMBER_OF_CARDS")
+            t("NUMBER_OF_CARDS"),
         );
 
         // Add eases
@@ -176,7 +176,7 @@ export class StatsModal extends Modal {
             Math.round(
                 getTypedObjectEntries(cardStats.eases)
                     .map(([ease, count]) => ease * count)
-                    .reduce((a, b) => a + b, 0) / scheduledCount
+                    .reduce((a, b) => a + b, 0) / scheduledCount,
             ) || 0;
 
         createStatsChart(
@@ -189,7 +189,7 @@ export class StatsModal extends Modal {
             t("EASES_SUMMARY", { avgEase: average_ease }),
             t("COUNT"),
             t("EASES"),
-            t("NUMBER_OF_CARDS")
+            t("NUMBER_OF_CARDS"),
         );
 
         // Add card types
@@ -201,17 +201,17 @@ export class StatsModal extends Modal {
             t("CARD_TYPES_DESC"),
             [
                 `${t("CARD_TYPE_NEW")} - ${Math.round(
-                    (cardStats.newCount / totalCardsCount) * 100
+                    (cardStats.newCount / totalCardsCount) * 100,
                 )}%`,
                 `${t("CARD_TYPE_YOUNG")} - ${Math.round(
-                    (cardStats.youngCount / totalCardsCount) * 100
+                    (cardStats.youngCount / totalCardsCount) * 100,
                 )}%`,
                 `${t("CARD_TYPE_MATURE")} - ${Math.round(
-                    (cardStats.matureCount / totalCardsCount) * 100
+                    (cardStats.matureCount / totalCardsCount) * 100,
                 )}%`,
             ],
             [cardStats.newCount, cardStats.youngCount, cardStats.matureCount],
-            t("CARD_TYPES_SUMMARY", { totalCardsCount })
+            t("CARD_TYPES_SUMMARY", { totalCardsCount }),
         );
     }
 
@@ -231,7 +231,7 @@ function createStatsChart(
     summary: string,
     seriesTitle = "",
     xAxisTitle = "",
-    yAxisTitle = ""
+    yAxisTitle = "",
 ) {
     const style = getComputedStyle(document.body);
     const textColor = style.getPropertyValue("--text-normal");

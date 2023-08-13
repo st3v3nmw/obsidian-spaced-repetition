@@ -48,7 +48,7 @@ export function schedule(
     ease: number,
     delayBeforeReview: number,
     settingsObj: SRSettings,
-    dueDates?: Record<number, number>
+    dueDates?: Record<number, number>,
 ): Record<string, number> {
     delayBeforeReview = Math.max(0, Math.floor(delayBeforeReview / (24 * 3600 * 1000)));
 
@@ -62,7 +62,7 @@ export function schedule(
         ease = Math.max(130, ease - 20);
         interval = Math.max(
             1,
-            (interval + delayBeforeReview / 4) * settingsObj.lapsesIntervalChange
+            (interval + delayBeforeReview / 4) * settingsObj.lapsesIntervalChange,
         );
     }
 
