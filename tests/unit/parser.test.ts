@@ -47,6 +47,9 @@ test("Test parsing of multi line basic cards", () => {
     expect(parse("Question\n?\nAnswer", ...defaultArgs)).toEqual([
         [CardType.MultiLineBasic, "Question\n?\nAnswer", 1],
     ]);
+    expect(parse("Question\n? \nAnswer", ...defaultArgs)).toEqual([
+        [CardType.MultiLineBasic, "Question\n?\nAnswer", 1],
+    ]);
     expect(parse("Question\n?\nAnswer <!--SR:!2021-08-11,4,270-->", ...defaultArgs)).toEqual([
         [CardType.MultiLineBasic, "Question\n?\nAnswer <!--SR:!2021-08-11,4,270-->", 1],
     ]);
