@@ -79,7 +79,7 @@ test("Test parsing of multi line reversed cards", () => {
         [
             [CardType.MultiLineReversed, "Line0\nQ1\n??\nA1\nAnswerExtra", 4],
             [CardType.MultiLineReversed, "Q2\n??\nA2", 9],
-        ]
+        ],
     );
 });
 
@@ -101,8 +101,8 @@ test("Test parsing of cloze cards", () => {
         parse(
             "some text before\n\na deletion on\nsuch ==wow==\n\n" +
                 "many text\nsuch surprise ==wow== more ==text==\nsome text after\n\nHmm",
-            ...defaultArgs
-        )
+            ...defaultArgs,
+        ),
     ).toEqual([
         [CardType.Cloze, "a deletion on\nsuch ==wow==", 3],
         [CardType.Cloze, "many text\nsuch surprise ==wow== more ==text==\nsome text after", 6],
@@ -112,7 +112,7 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum ==dolor won=", ...defaultArgs)).toEqual([]);
     // ==highlights== turned off
     expect(parse("cloze ==deletion== test", "::", ":::", "?", "??", false, true, false)).toEqual(
-        []
+        [],
     );
 
     // **bolded**
@@ -132,8 +132,8 @@ test("Test parsing of cloze cards", () => {
         parse(
             "some text before\n\na deletion on\nsuch **wow**\n\n" +
                 "many text\nsuch surprise **wow** more **text**\nsome text after\n\nHmm",
-            ...defaultArgs
-        )
+            ...defaultArgs,
+        ),
     ).toEqual([
         [CardType.Cloze, "a deletion on\nsuch **wow**", 3],
         [CardType.Cloze, "many text\nsuch surprise **wow** more **text**\nsome text after", 6],
@@ -143,7 +143,7 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum **dolor won*", ...defaultArgs)).toEqual([]);
     // **bolded** turned off
     expect(parse("cloze **deletion** test", "::", ":::", "?", "??", true, false, false)).toEqual(
-        []
+        [],
     );
 
     // both
@@ -159,8 +159,8 @@ test("Test parsing of a mix of card types", () => {
                 "Duis magna arcu, eleifend rhoncus ==euismod non,==\nlaoreet vitae enim.\n\n" +
                 "Fusce placerat::velit in pharetra gravida\n\n" +
                 "Donec dapibus ullamcorper aliquam.\n??\nDonec dapibus ullamcorper aliquam.\n<!--SR:2021-08-11,4,270-->",
-            ...defaultArgs
-        )
+            ...defaultArgs,
+        ),
     ).toEqual([
         [
             CardType.Cloze,
@@ -184,8 +184,8 @@ test("Test codeblocks", () => {
         parse(
             "How do you ... Python?\n?\n" +
                 "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
-            ...defaultArgs
-        )
+            ...defaultArgs,
+        ),
     ).toEqual([
         [
             CardType.MultiLineBasic,
@@ -200,8 +200,8 @@ test("Test codeblocks", () => {
         parse(
             "How do you ... Python?\n?\n" +
                 "```\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
-            ...defaultArgs
-        )
+            ...defaultArgs,
+        ),
     ).toEqual([
         [
             CardType.MultiLineBasic,
@@ -224,8 +224,8 @@ test("Test codeblocks", () => {
                 "print('hello world')\n" +
                 "~~~\n" +
                 "````",
-            ...defaultArgs
-        )
+            ...defaultArgs,
+        ),
     ).toEqual([
         [
             CardType.MultiLineBasic,
@@ -246,13 +246,13 @@ test("Test codeblocks", () => {
 
 test("Test not parsing cards in HTML comments", () => {
     expect(
-        parse("<!--\nQuestion\n?\nAnswer <!--SR:!2021-08-11,4,270-->\n-->", ...defaultArgs)
+        parse("<!--\nQuestion\n?\nAnswer <!--SR:!2021-08-11,4,270-->\n-->", ...defaultArgs),
     ).toEqual([]);
     expect(
         parse(
             "<!--\nQuestion\n?\nAnswer <!--SR:!2021-08-11,4,270-->\n\n<!--cloze ==deletion== test-->-->",
-            ...defaultArgs
-        )
+            ...defaultArgs,
+        ),
     ).toEqual([]);
     expect(parse("<!--cloze ==deletion== test-->", ...defaultArgs)).toEqual([]);
     expect(parse("<!--cloze **deletion** test-->", ...defaultArgs)).toEqual([]);

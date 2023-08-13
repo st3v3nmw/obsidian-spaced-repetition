@@ -18,7 +18,7 @@ export function parse(
     multilineReversedCardSeparator: string,
     convertHighlightsToClozes: boolean,
     convertBoldTextToClozes: boolean,
-    convertCurlyBracketsToClozes: boolean
+    convertCurlyBracketsToClozes: boolean,
 ): [CardType, string, number][] {
     let cardText = "";
     const cards: [CardType, string, number][] = [];

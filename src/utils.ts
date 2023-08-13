@@ -19,7 +19,7 @@ export function getTypedObjectEntries<OBJ_T extends ObjectType>(obj: OBJ_T): Obj
  * @returns An array of the keys of `obj` with type `(keyof T)[]`
  */
 export const getKeysPreserveType = Object.keys as <T extends Record<string, unknown>>(
-    obj: T
+    obj: T,
 ) => Array<keyof T>;
 
 /**

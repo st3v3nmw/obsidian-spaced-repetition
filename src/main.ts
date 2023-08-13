@@ -125,7 +125,7 @@ export default class SRPlugin extends Plugin {
                                 });
                         });
                     }
-                })
+                }),
             );
         }
 
@@ -286,7 +286,7 @@ export default class SRPlugin extends Plugin {
         for (const note of notes) {
             if (
                 this.data.settings.noteFoldersToIgnore.some((folder) =>
-                    note.path.startsWith(folder)
+                    note.path.startsWith(folder),
                 )
             ) {
                 continue;
@@ -318,7 +318,7 @@ export default class SRPlugin extends Plugin {
                     note,
                     deckPath,
                     false,
-                    ignoreStats
+                    ignoreStats,
                 );
 
                 if (flashcardsInNoteAvgEase > 0) {
@@ -412,7 +412,7 @@ export default class SRPlugin extends Plugin {
                 "SR: " +
                     t("SYNC_TIME_TAKEN", {
                         t: Date.now() - now.valueOf(),
-                    })
+                    }),
             );
         }
 
@@ -420,7 +420,7 @@ export default class SRPlugin extends Plugin {
             t("STATUS_BAR", {
                 dueNotesCount: this.dueNotesCount,
                 dueFlashcardsCount: this.deckTree.dueFlashcardsCount,
-            })
+            }),
         );
 
         if (this.data.settings.enableNoteReviewPaneOnStartup) this.reviewQueueView.redraw();
@@ -442,7 +442,7 @@ export default class SRPlugin extends Plugin {
         for (const tag of tags) {
             if (
                 this.data.settings.tagsToReview.some(
-                    (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/")
+                    (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/"),
                 )
             ) {
                 shouldIgnore = false;
@@ -521,7 +521,7 @@ export default class SRPlugin extends Plugin {
             ease,
             delayBeforeReview,
             this.data.settings,
-            this.dueDatesNotes
+            this.dueDatesNotes,
         );
         interval = schedObj.interval;
         ease = schedObj.ease;
@@ -536,7 +536,7 @@ export default class SRPlugin extends Plugin {
                 SCHEDULING_INFO_REGEX,
                 `---\n${schedulingInfo[1]}sr-due: ${dueString}\n` +
                     `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
-                    `${schedulingInfo[5]}---`
+                    `${schedulingInfo[5]}---`,
             );
         } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
             // new note with existing YAML front matter
@@ -544,7 +544,7 @@ export default class SRPlugin extends Plugin {
             fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
                 `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n---`
+                    `sr-interval: ${interval}\nsr-ease: ${ease}\n---`,
             );
         } else {
             fileText =
@@ -634,7 +634,7 @@ export default class SRPlugin extends Plugin {
         note: TFile,
         deckPath: string[],
         buryOnly = false,
-        ignoreStats = false
+        ignoreStats = false,
     ): Promise<number> {
         let fileText: string = await this.app.vault.read(note);
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
@@ -654,7 +654,7 @@ export default class SRPlugin extends Plugin {
             settings.multilineReversedCardSeparator,
             settings.convertHighlightsToClozes,
             settings.convertBoldTextToClozes,
-            settings.convertCurlyBracketsToClozes
+            settings.convertCurlyBracketsToClozes,
         );
         for (const parsedCard of parsedCards) {
             deckPath = noteDeckPath;
@@ -748,7 +748,7 @@ export default class SRPlugin extends Plugin {
                     idx = cardText.indexOf(settings.singleLineReversedCardSeparator);
                     const side1: string = cardText.substring(0, idx),
                         side2: string = cardText.substring(
-                            idx + settings.singleLineReversedCardSeparator.length
+                            idx + settings.singleLineReversedCardSeparator.length,
                         );
                     siblingMatches.push([side1, side2]);
                     siblingMatches.push([side2, side1]);
@@ -762,7 +762,7 @@ export default class SRPlugin extends Plugin {
                     idx = cardText.indexOf("\n" + settings.multilineReversedCardSeparator + "\n");
                     const side1: string = cardText.substring(0, idx),
                         side2: string = cardText.substring(
-                            idx + 2 + settings.multilineReversedCardSeparator.length
+                            idx + 2 + settings.multilineReversedCardSeparator.length,
                         );
                     siblingMatches.push([side1, side2]);
                     siblingMatches.push([side2, side1]);
@@ -877,7 +877,7 @@ export default class SRPlugin extends Plugin {
             const flashcardsInNoteAvgEase: number = totalNoteEase / scheduledCount;
             const flashcardContribution: number = Math.min(
                 1.0,
-                Math.log(scheduledCount + 0.5) / Math.log(64)
+                Math.log(scheduledCount + 0.5) / Math.log(64),
             );
             return (
                 flashcardsInNoteAvgEase * flashcardContribution +
@@ -900,7 +900,7 @@ export default class SRPlugin extends Plugin {
     initView(): void {
         this.registerView(
             REVIEW_QUEUE_VIEW_TYPE,
-            (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this))
+            (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this)),
         );
 
         if (
