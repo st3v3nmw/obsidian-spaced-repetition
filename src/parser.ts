@@ -45,7 +45,7 @@ export function parse(
         if (cardText.length > 0) {
             cardText += "\n";
         }
-        cardText += currentLine.trim();
+        cardText += currentLine.trimEnd();
 
         if (
             currentLine.includes(singlelineReversedCardSeparator) ||
