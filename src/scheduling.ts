@@ -12,36 +12,6 @@ export enum ReviewResponse {
 
 // Flashcards
 
-export interface Card {
-    editLater: boolean;
-    // scheduling
-    isDue: boolean;
-    interval?: number;
-    ease?: number;
-    delayBeforeReview?: number;
-    // note
-    note: TFile;
-    lineNo: number;
-    // visuals
-    front: string;
-    back: string;
-    cardText: string;
-    context: string;
-    // types
-    cardType: CardType;
-    // information for sibling cards
-    siblingIdx: number;
-    siblings: Card[];
-}
-
-export enum CardType {
-    SingleLineBasic,
-    SingleLineReversed,
-    MultiLineBasic,
-    MultiLineReversed,
-    Cloze,
-}
-
 export function schedule(
     response: ReviewResponse,
     interval: number,

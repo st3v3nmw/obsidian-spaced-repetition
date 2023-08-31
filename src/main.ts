@@ -25,6 +25,7 @@ import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
 import { t } from "src/lang/helpers";
 import { parse } from "src/parser";
 import { appIcon } from "src/icons/appicon";
+import { TopicPath } from "./topic-path";
 
 interface PluginData {
     settings: SRSettings;
@@ -200,7 +201,7 @@ export default class SRPlugin extends Plugin {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
                     this.deckTree = new Deck("root", null);
-                    const deckPath: string[] = this.findDeckPath(openFile);
+                    const deckPath: TopicPath = this.findTopicPath(openFile);
                     await this.findFlashcardsInNote(openFile, deckPath);
                     new FlashcardModal(this.app, this).open();
                 }
@@ -214,7 +215,7 @@ export default class SRPlugin extends Plugin {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
                     this.deckTree = new Deck("root", null);
-                    const deckPath: string[] = this.findDeckPath(openFile);
+                    const deckPath: TopicPath = this.findTopicPath(openFile);
                     await this.findFlashcardsInNote(openFile, deckPath, false, true);
                     new FlashcardModal(this.app, this, true).open();
                 }
@@ -312,11 +313,11 @@ export default class SRPlugin extends Plugin {
                 }
             }
 
-            const deckPath: string[] = this.findDeckPath(note);
-            if (deckPath.length !== 0) {
+            const topicPath: TopicPath = this.findTopicPath(note);
+            if (topicPath.hasPath) {
                 const flashcardsInNoteAvgEase: number = await this.findFlashcardsInNote(
                     note,
-                    deckPath,
+                    topicPath,
                     false,
                     ignoreStats,
                 );
@@ -605,29 +606,36 @@ export default class SRPlugin extends Plugin {
         new Notice(t("ALL_CAUGHT_UP"));
     }
 
-    findDeckPath(note: TFile): string[] {
-        let deckPath: string[] = [];
-        if (this.data.settings.convertFoldersToDecks) {
-            deckPath = note.path.split("/");
-            deckPath.pop(); // remove filename
-            if (deckPath.length === 0) {
-                deckPath = ["/"];
-            }
-        } else {
-            const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
-            const tags = getAllTags(fileCachedData) || [];
+    findTopicPath(note: TFile): TopicPath {
+        return TopicPath.getTopicPathOfFile(note, this.data.settings, this.app.metadataCache);
+    }
 
-            outer: for (const tagToReview of this.data.settings.flashcardTags) {
-                for (const tag of tags) {
-                    if (tag === tagToReview || tag.startsWith(tagToReview + "/")) {
-                        deckPath = tag.substring(1).split("/");
-                        break outer;
-                    }
-                }
+    async something() { 
+        /* 
+                    if (cardText.includes(settings.editLaterTag)) {
+                continue;
             }
-        }
 
-        return deckPath;
+            this.deckTree.createDeck([...deckPath]);
+
+                        if (buryOnly) {
+                this.data.buryList.push(cardTextHash);
+                continue;
+            }
+
+                        // we have some extra scheduling dates to delete
+            if (scheduling.length > siblingMatches.length) {
+                const idxSched: number = cardText.lastIndexOf("<!--SR:") + 7;
+                let newCardText: string = cardText.substring(0, idxSched);
+                for (let i = 0; i < siblingMatches.length; i++)
+                    newCardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
+                newCardText += "-->";
+
+                const replacementRegex = new RegExp(escapeRegexString(cardText), "gm");
+                fileText = fileText.replace(replacementRegex, () => newCardText);
+                fileChanged = true;
+            }
+         */
     }
 
     async findFlashcardsInNote(
@@ -662,9 +670,9 @@ export default class SRPlugin extends Plugin {
                 lineNo: number = parsedCard[2];
             let cardText: string = parsedCard[1];
 
-            if (cardText.includes(settings.editLaterTag)) {
+            /* if (cardText.includes(settings.editLaterTag)) {
                 continue;
-            }
+            } */
 
             if (!settings.convertFoldersToDecks) {
                 const tagInCardRegEx = /^#[^\s#]+/gi;
@@ -679,7 +687,7 @@ export default class SRPlugin extends Plugin {
                 }
             }
 
-            this.deckTree.createDeck([...deckPath]);
+            /* this.deckTree.createDeck([...deckPath]); */
 
             const cardTextHash: string = cyrb53(cardText);
 
@@ -913,26 +921,4 @@ export default class SRPlugin extends Plugin {
             });
         }
     }
-}
-
-function getCardContext(cardLine: number, headings: HeadingCache[], note_title: string): string {
-    const stack: HeadingCache[] = [];
-    for (const heading of headings) {
-        if (heading.position.start.line > cardLine) {
-            break;
-        }
-
-        while (stack.length > 0 && stack[stack.length - 1].level >= heading.level) {
-            stack.pop();
-        }
-
-        stack.push(heading);
-    }
-
-    let context = `${note_title} > `;
-    for (const headingObj of stack) {
-        headingObj.heading = headingObj.heading.replace(/\[\^\d+\]/gm, "").trim();
-        context += `${headingObj.heading} > `;
-    }
-    return context.slice(0, -3);
 }

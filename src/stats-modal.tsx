@@ -20,6 +20,7 @@ import type SRPlugin from "src/main";
 import { getKeysPreserveType, getTypedObjectEntries } from "src/utils";
 import { textInterval } from "src/scheduling";
 import { t } from "src/lang/helpers";
+import { Stats } from "./stats";
 
 Chart.register(
     BarElement,
@@ -34,13 +35,6 @@ Chart.register(
     ArcElement,
 );
 
-export interface Stats {
-    eases: Record<number, number>;
-    intervals: Record<number, number>;
-    newCount: number;
-    youngCount: number;
-    matureCount: number;
-}
 
 export class StatsModal extends Modal {
     private plugin: SRPlugin;

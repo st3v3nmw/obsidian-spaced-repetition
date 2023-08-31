@@ -1,4 +1,5 @@
-import { CardType } from "src/scheduling";
+import { QuestionType } from "./question";
+
 
 /**
  * Returns flashcards found in `text`
@@ -19,10 +20,10 @@ export function parse(
     convertHighlightsToClozes: boolean,
     convertBoldTextToClozes: boolean,
     convertCurlyBracketsToClozes: boolean,
-): [CardType, string, number][] {
+): [QuestionType, string, number][] {
     let cardText = "";
-    const cards: [CardType, string, number][] = [];
-    let cardType: CardType | null = null;
+    const cards: [QuestionType, string, number][] = [];
+    let cardType: QuestionType | null = null;
     let lineNo = 0;
 
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
@@ -52,8 +53,8 @@ export function parse(
             currentLine.includes(singlelineCardSeparator)
         ) {
             cardType = lines[i].includes(singlelineReversedCardSeparator)
-                ? CardType.SingleLineReversed
-                : CardType.SingleLineBasic;
+                ? QuestionType.SingleLineReversed
+                : QuestionType.SingleLineBasic;
             cardText = lines[i];
             lineNo = i;
             if (i + 1 < lines.length && lines[i + 1].startsWith("<!--SR:")) {
@@ -69,13 +70,13 @@ export function parse(
                 (convertBoldTextToClozes && /\*\*.*?\*\*/gm.test(currentLine)) ||
                 (convertCurlyBracketsToClozes && /{{.*?}}/gm.test(currentLine)))
         ) {
-            cardType = CardType.Cloze;
+            cardType = QuestionType.Cloze;
             lineNo = i;
         } else if (currentLine.trim() === multilineCardSeparator) {
-            cardType = CardType.MultiLineBasic;
+            cardType = QuestionType.MultiLineBasic;
             lineNo = i;
         } else if (currentLine.trim() === multilineReversedCardSeparator) {
-            cardType = CardType.MultiLineReversed;
+            cardType = QuestionType.MultiLineReversed;
             lineNo = i;
         } else if (currentLine.startsWith("```") || currentLine.startsWith("~~~")) {
             const codeBlockClose = currentLine.match(/`+|~+/)[0];
