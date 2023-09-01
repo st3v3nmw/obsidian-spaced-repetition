@@ -100,6 +100,7 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
             if (a.index > b.index) {
                 return 1;
             }
+            // What is unit test to cover following statement; otherwise jest please ignore
             return 0;
         });
 
@@ -110,7 +111,7 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
                 deletionEnd: number = deletionStart + m[0].length;
             front =
                 questionText.substring(0, deletionStart) +
-                "<span style='color:#2196f3'>[...]</span>" +
+                QuestionType_ClozeUtil.renderClozeFront() +
                 questionText.substring(deletionEnd);
             front = front
                 .replace(/==/gm, "")
@@ -119,9 +120,7 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
                 .replace(/}}/gm, "");
             back =
                 questionText.substring(0, deletionStart) +
-                "<span style='color:#2196f3'>" +
-                questionText.substring(deletionStart, deletionEnd) +
-                "</span>" +
+                QuestionType_ClozeUtil.renderClozeBack(questionText.substring(deletionStart, deletionEnd)) + 
                 questionText.substring(deletionEnd);
             back = back
                 .replace(/==/gm, "")
@@ -132,6 +131,16 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
         }
     
         return result;
+    }
+}
+
+export class QuestionType_ClozeUtil {
+    static renderClozeFront(): string {
+        return "<span style='color:#2196f3'>[...]</span>";
+    }
+
+    static renderClozeBack(str: string): string {
+        return "<span style='color:#2196f3'>" + str + "</span>";
     }
 }
 
