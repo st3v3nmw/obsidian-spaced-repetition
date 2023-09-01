@@ -1,4 +1,4 @@
-import { QuestionType } from "./question";
+import { CardType } from "./question";
 
 
 /**
@@ -20,10 +20,10 @@ export function parse(
     convertHighlightsToClozes: boolean,
     convertBoldTextToClozes: boolean,
     convertCurlyBracketsToClozes: boolean,
-): [QuestionType, string, number][] {
+): [CardType, string, number][] {
     let cardText = "";
-    const cards: [QuestionType, string, number][] = [];
-    let cardType: QuestionType | null = null;
+    const cards: [CardType, string, number][] = [];
+    let cardType: CardType | null = null;
     let lineNo = 0;
 
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
@@ -53,8 +53,8 @@ export function parse(
             currentLine.includes(singlelineCardSeparator)
         ) {
             cardType = lines[i].includes(singlelineReversedCardSeparator)
-                ? QuestionType.SingleLineReversed
-                : QuestionType.SingleLineBasic;
+                ? CardType.SingleLineReversed
+                : CardType.SingleLineBasic;
             cardText = lines[i];
             lineNo = i;
             if (i + 1 < lines.length && lines[i + 1].startsWith("<!--SR:")) {
@@ -70,13 +70,13 @@ export function parse(
                 (convertBoldTextToClozes && /\*\*.*?\*\*/gm.test(currentLine)) ||
                 (convertCurlyBracketsToClozes && /{{.*?}}/gm.test(currentLine)))
         ) {
-            cardType = QuestionType.Cloze;
+            cardType = CardType.Cloze;
             lineNo = i;
         } else if (currentLine.trim() === multilineCardSeparator) {
-            cardType = QuestionType.MultiLineBasic;
+            cardType = CardType.MultiLineBasic;
             lineNo = i;
         } else if (currentLine.trim() === multilineReversedCardSeparator) {
-            cardType = QuestionType.MultiLineReversed;
+            cardType = CardType.MultiLineReversed;
             lineNo = i;
         } else if (currentLine.startsWith("```") || currentLine.startsWith("~~~")) {
             const codeBlockClose = currentLine.match(/`+|~+/)[0];

@@ -35,7 +35,7 @@ export class NoteFileLoader {
         
         const rawCardInfoList: Question[] = this.createRawCardInfoList();
         for (const rawCardInfo of rawCardInfoList) {
-            var { cardType, rawCardText, lineNo, hasEditLaterTag } = rawCardInfo;
+            var { questionType: cardType, rawQuestionText: rawCardText, lineNo, hasEditLaterTag } = rawCardInfo;
 
             // Each rawCardText can turn into multiple CardFrontBack's (e.g. CardType.Cloze, CardType.SingleLineReversed)
             let cardFrontBackList: CardFrontBack[] = this.createCardFrontBackList(cardType, rawCardText);
@@ -135,164 +135,10 @@ export class NoteFileLoader {
         return 0;
     }
 
-    private createCardScheduleInfoList(cardText: string): CardScheduleInfo[] {
-        let scheduling: RegExpMatchArray[] = [...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR)];
-        if (scheduling.length === 0)
-            scheduling = [...cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
-        
-        let result: CardScheduleInfo[] = [];
-        for (let i = 0; i < scheduling.length; i++) { 
-            let match: RegExpMatchArray = scheduling[i];
-            let rawDate = match[1];
-            let interval = parseInt(match[2]);
-            let ease = parseInt(match[3]);
-            let info: CardScheduleInfo = new CardScheduleInfo(rawDate, interval, ease);
-            result.push(info);
-        }
-        return result;
-    }
-
-    private createCardFrontBackList(cardType: CardType, cardText: string): CardFrontBack[] { 
-        let settings: SRSettings = this.settings;
-        const siblingMatches: CardFrontBack[] = [];
-        if (cardType === CardType.Cloze) {
-            const siblings: RegExpMatchArray[] = [];
-            if (settings.convertHighlightsToClozes) {
-                siblings.push(...cardText.matchAll(/==(.*?)==/gm));
-            }
-            if (settings.convertBoldTextToClozes) {
-                siblings.push(...cardText.matchAll(/\*\*(.*?)\*\*/gm));
-            }
-            if (settings.convertCurlyBracketsToClozes) {
-                siblings.push(...cardText.matchAll(/{{(.*?)}}/gm));
-            }
-            siblings.sort((a, b) => {
-                if (a.index < b.index) {
-                    return -1;
-                }
-                if (a.index > b.index) {
-                    return 1;
-                }
-                return 0;
-            });
-
-            let front: string, back: string;
-            for (const m of siblings) {
-                const deletionStart: number = m.index,
-                    deletionEnd: number = deletionStart + m[0].length;
-                front =
-                    cardText.substring(0, deletionStart) +
-                    "<span style='color:#2196f3'>[...]</span>" +
-                    cardText.substring(deletionEnd);
-                front = front
-                    .replace(/==/gm, "")
-                    .replace(/\*\*/gm, "")
-                    .replace(/{{/gm, "")
-                    .replace(/}}/gm, "");
-                back =
-                    cardText.substring(0, deletionStart) +
-                    "<span style='color:#2196f3'>" +
-                    cardText.substring(deletionStart, deletionEnd) +
-                    "</span>" +
-                    cardText.substring(deletionEnd);
-                back = back
-                    .replace(/==/gm, "")
-                    .replace(/\*\*/gm, "")
-                    .replace(/{{/gm, "")
-                    .replace(/}}/gm, "");
-                siblingMatches.push(new CardFrontBack(front, back));
-            }
-        } else {
-            let idx: number;
-            if (cardType === CardType.SingleLineBasic) {
-                idx = cardText.indexOf(settings.singleLineCardSeparator);
-                siblingMatches.push(new CardFrontBack(
-                    cardText.substring(0, idx),
-                    cardText.substring(idx + settings.singleLineCardSeparator.length),
-                ));
-            } else if (cardType === CardType.SingleLineReversed) {
-                idx = cardText.indexOf(settings.singleLineReversedCardSeparator);
-                const side1: string = cardText.substring(0, idx),
-                    side2: string = cardText.substring(
-                        idx + settings.singleLineReversedCardSeparator.length,
-                    );
-                siblingMatches.push(new CardFrontBack(side1, side2));
-                siblingMatches.push(new CardFrontBack(side2, side1));
-            } else if (cardType === CardType.MultiLineBasic) {
-                idx = cardText.indexOf("\n" + settings.multilineCardSeparator + "\n");
-                siblingMatches.push(new CardFrontBack(
-                    cardText.substring(0, idx),
-                    cardText.substring(idx + 2 + settings.multilineCardSeparator.length),
-                ));
-            } else if (cardType === CardType.MultiLineReversed) {
-                idx = cardText.indexOf("\n" + settings.multilineReversedCardSeparator + "\n");
-                const side1: string = cardText.substring(0, idx),
-                    side2: string = cardText.substring(
-                        idx + 2 + settings.multilineReversedCardSeparator.length,
-                    );
-                    siblingMatches.push(new CardFrontBack(side1, side2));
-                    siblingMatches.push(new CardFrontBack(side2, side1));
-                }
-        }
-        return siblingMatches;
-    }
-
-    private createCardList(rawCardInfo: Question, cardFrontBackList: CardFrontBack[], cardScheduleInfoList: CardScheduleInfo[]): Card[] { 
-
-        const siblings: Card[] = [];
-
-        // One card for each CardFrontBack, regardless if there is scheduled info for it
-        for (let i = 0; i < cardFrontBackList.length; i++) {
-
-            let { front, back } = cardFrontBackList[i];
-
-            const cardObj: Card = {
-                isDue: i < cardScheduleInfoList.length,
-                note: this.noteFile,
-                lineNo: rawCardInfo.lineNo,
-                cardTextHash: rawCardInfo.questionTextHash,
-                front,
-                back,
-                cardText: rawCardInfo.rawCardText,
-                context: rawCardInfo.context,
-                cardType: rawCardInfo.cardType,
-                siblingIdx: i,
-                siblings,
-                editLater: false,
-            };
-            siblings.push(cardObj);
-        }
-        return siblings;
-    }
 }
 
-class CardScheduleInfo { 
-    rawDate: string;
-    interval: number;
-    ease: number;
 
-    constructor(rawDate: string, interval: number, ease: number) { 
-        this.rawDate = rawDate;
-        this.interval = interval;
-        this.ease = ease;
-    }
 
-    dueUnix(): number { 
-        return window
-            .moment(this.rawDate, ["YYYY-MM-DD", "DD-MM-YYYY"])
-            .valueOf();
-    }
-}
-
-class CardFrontBack { 
-    front: string;
-    back: string;
-
-    constructor(front: string, back: string) { 
-        this.front = front.trim();
-        this.back = back.trim();
-    }
-}
 
 
 

@@ -14,7 +14,7 @@ import h from "vhtml";
 
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
-import { Card, CardType, schedule, textInterval, ReviewResponse } from "src/scheduling";
+import { schedule, textInterval, ReviewResponse } from "src/scheduling";
 import {
     COLLAPSE_ICON,
     MULTI_SCHEDULING_EXTRACTOR,
@@ -26,6 +26,8 @@ import {
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
 import { unwatchFile } from "fs";
+import { Card } from "./card";
+import { Deck } from "./deck";
 
 export enum FlashcardModalMode {
     DecksList,
