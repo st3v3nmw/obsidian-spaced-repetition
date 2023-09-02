@@ -1,3 +1,4 @@
+import moment from "moment";
 import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR } from "./constants";
 
 export class CardScheduleInfo { 
@@ -12,19 +13,18 @@ export class CardScheduleInfo {
     }
 
     dueUnix(): number { 
-        return window 
-            .moment(this.rawDate, ["YYYY-MM-DD", "DD-MM-YYYY"])
+        return moment(this.rawDate, ["YYYY-MM-DD", "DD-MM-YYYY"])
             .valueOf();
     }
 }
 
 export class NoteCardScheduleParser {
 
-    static createCardScheduleInfoList(cardText: string): CardScheduleInfo[] {
+    static createCardScheduleInfoList(questionText: string): CardScheduleInfo[] {
 
-        let scheduling: RegExpMatchArray[] = [...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR)];
+        let scheduling: RegExpMatchArray[] = [...questionText.matchAll(MULTI_SCHEDULING_EXTRACTOR)];
         if (scheduling.length === 0)
-            scheduling = [...cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
+            scheduling = [...questionText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
         
         let result: CardScheduleInfo[] = [];
         for (let i = 0; i < scheduling.length; i++) { 
