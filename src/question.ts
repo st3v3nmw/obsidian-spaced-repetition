@@ -158,13 +158,13 @@ export class NoteQuestionParser {
             let { front, back } = cardFrontBackList[i];
 
             let hasScheduleInfo: boolean = i < cardScheduleInfoList.length;
-            const cardObj: Card = {
+            const cardObj: Card = new Card({
                 isDue: hasScheduleInfo,
                 front,
                 back,
                 cardIdx: i,
                 question,
-            };
+            });
             cardObj.scheduleInfo = hasScheduleInfo ? cardScheduleInfoList[i] : null;
 
             siblings.push(cardObj);

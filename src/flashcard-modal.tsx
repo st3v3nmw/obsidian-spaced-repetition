@@ -724,4 +724,4 @@ export class FlashcardModal extends Modal {
         this.renderMarkdownWrapper(blockText, el, recursiveDepth + 1);
     }
 }
-enum CardListType {NewCard, DueCard}
+

@@ -1,110 +1,68 @@
 import { Card } from "./card";
 import { TopicPath } from "./topic-path";
 
+export enum CardListType {NewCard, DueCard, All}
+
 export class Deck {
     public deckName: string;
     public newFlashcards: Card[];
-    public newFlashcardsCount = 0; // counts those in subdecks too
     public dueFlashcards: Card[];
-    public dueFlashcardsCount = 0; // counts those in subdecks too
-    public totalFlashcards = 0; // counts those in subdecks too
     public subdecks: Deck[];
     public parent: Deck | null;
-    
 
-    public get thisDeckNewOrDueFlashcardsLength(): number {
-        return this.newFlashcards.length + this.dueFlashcards.length;
-    }
-    public get totalNewOrDueFlashcardsCount(): number {
-        return this.dueFlashcardsCount + this.newFlashcardsCount;
+    public getCardCount(cardListType: CardListType, includeSubdeckCounts: boolean): number {
+        let result: number = 0;
+        if ((cardListType == CardListType.NewCard) || (cardListType == CardListType.All))
+            result += this.newFlashcards.length;
+        if ((cardListType == CardListType.DueCard) || (cardListType == CardListType.All))
+            result += this.dueFlashcards.length;
+
+        if (includeSubdeckCounts) {
+            for (const deck of this.subdecks) {
+                result += deck.getCardCount(cardListType, includeSubdeckCounts);
+            }
+        }
+        return result;
     }
 
     constructor(deckName: string, parent: Deck | null) {
         this.deckName = deckName;
         this.newFlashcards = [];
-        this.newFlashcardsCount = 0;
         this.dueFlashcards = [];
-        this.dueFlashcardsCount = 0;
-        this.totalFlashcards = 0;
         this.subdecks = [];
         this.parent = parent;
     }
 
-    createDeck(topicPath: TopicPath): void {
+    createDeck(topicPath: TopicPath): Deck {
         if (!topicPath.hasPath) {
-            return;
+            return this;
         }
         const deckName: string = topicPath.shift();
-        for (const deck of this.subdecks) {
-            if (deckName === deck.deckName) {
-                deck.createDeck(topicPath);
-                return;
+        for (const subdeck of this.subdecks) {
+            if (deckName === subdeck.deckName) {
+                return subdeck.createDeck(topicPath);
             }
         }
 
-        const deck: Deck = new Deck(deckName, this);
-        this.subdecks.push(deck);
-        deck.createDeck(topicPath);
+        const subdeck: Deck = new Deck(deckName, this);
+        this.subdecks.push(subdeck);
+        return subdeck.createDeck(topicPath);
+    }
+
+    getCardList(cardListType: CardListType): Card[] {
+        return (cardListType == CardListType.DueCard) ? this.dueFlashcards : this.newFlashcards;
     }
 
     insertFlashcard(topicPath: TopicPath, cardObj: Card): void {
-        if (cardObj.isDue) {
-            this.dueFlashcardsCount++;
-        } else {
-            this.newFlashcardsCount++;
-        }
-        this.totalFlashcards++;
-
-        if (topicPath.hasEmptyPath) {
-            if (cardObj.isDue) {
-                this.dueFlashcards.push(cardObj);
-            } else {
-                this.newFlashcards.push(cardObj);
-            }
-            return;
-        }
-
-        const deckName: string = topicPath.shift();
-        for (const deck of this.subdecks) {
-            if (deckName === deck.deckName) {
-                deck.insertFlashcard(topicPath, cardObj);
-                return;
-            }
-        }
+        let deck: Deck = this.createDeck(topicPath);
+        let cardList: Card[] = deck.getCardList(cardObj.cardListType);
+        
+        cardList.push(cardObj);
     }
 
-    // count flashcards that have either been buried
-    // or aren't due yet
-    countFlashcard(topicPath: TopicPath, n = 1): void {
-        this.totalFlashcards += n;
-
-        const deckName: string = topicPath.shift();
-        for (const deck of this.subdecks) {
-            if (deckName === deck.deckName) {
-                deck.countFlashcard(topicPath, n);
-                return;
-            }
-        }
-    }
-
-    deleteFlashcardAtIndex(index: number, cardIsDue: boolean): void {
-        if (cardIsDue) {
-            this.dueFlashcards.splice(index, 1);
-            this.dueFlashcardsCount--;
-        } else {
-            this.newFlashcards.splice(index, 1);
-            this.newFlashcardsCount--;
-        }
-
-        let deck: Deck = this.parent;
-        while (deck !== null) {
-            if (cardIsDue) {
-                deck.dueFlashcardsCount--;
-            } else {
-                deck.newFlashcardsCount--;
-            }
-            deck = deck.parent;
-        }
+    deleteFlashcardAtIndex(index: number, cardListType: CardListType): void {
+        let cardList: Card[] = this.getCardList(cardListType);
+        cardList.splice(index, 1);
     }
 
     sortSubdecksList(): void {
@@ -121,7 +79,7 @@ export class Deck {
             deck.sortSubdecksList();
         }
     }
-
+/* 
 
     originalNextCard(modal: FlashcardModal): void {
         if (this.newFlashcards.length + this.dueFlashcards.length === 0) {
@@ -465,5 +423,5 @@ export class Deck {
             modal.contextView.setText(modal.currentCard.context);
 
 
-    }
+    } */
 }

@@ -8,12 +8,13 @@ export class TopicPath {
     constructor(path: string[]) { 
         if (!(path?.length > 0))
             throw "empty or null path";
-
+        if (path.some((str) => str.includes("/")))
+            throw "path entries must not contain '/'";
         this.path = path;
     }
 
     get hasPath(): boolean { 
-        return (this.path.length > 1) || ((this.path.length == 1) && (this.path[0] != "/"));
+        return (this.path.length > 0) || ((this.path.length == 1) && (this.path[0] != "/"));
     }
 
     get hasEmptyPath(): boolean { 
@@ -21,10 +22,12 @@ export class TopicPath {
     }
     
     static get rootPath(): TopicPath { 
-        return new TopicPath(["/"]);
+        return new TopicPath([]);
     }
 
-    shift(): string { 
+    shift(): string {
+        if (this.hasEmptyPath)
+            throw "can't shift an empty path"
         return this.path.shift();
     }
 
@@ -66,7 +69,7 @@ export class TopicPath {
     }
 
     static removeTopicPathFromCardText(cardText: string): string { 
-        return cardText.replaceAll(tagInCardRegEx, "");
+        return cardText.replaceAll(tagInCardRegEx, "").trim();
     }
 }
 
