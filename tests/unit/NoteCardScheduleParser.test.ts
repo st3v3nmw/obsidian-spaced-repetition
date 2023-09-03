@@ -15,7 +15,7 @@ test("Single schedule info for question (on separate line)", () => {
     expect(actual).toEqual([
         new CardScheduleInfo("2023-09-02", 4, 270)
     ]);
-    expect(actual[0].dueUnix()).toEqual(1693576800000);
+    expect(actual[0].date()).toEqual(1693576800000);
 });
 
 test("Single schedule info for question (on same line)", () => {

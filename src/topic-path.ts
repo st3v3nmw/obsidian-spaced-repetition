@@ -6,6 +6,9 @@ export class TopicPath {
     path: string[];
 
     constructor(path: string[]) { 
+        if (!(path?.length > 0))
+            throw "empty or null path";
+
         this.path = path;
     }
 
@@ -59,7 +62,7 @@ export class TopicPath {
             ?.slice(-1)[0]
             .replace("#", "")
             .split("/");
-        return new TopicPath(cardDeckPath);
+        return  (cardDeckPath?.length > 0) ? new TopicPath(cardDeckPath) : null;
     }
 
     static removeTopicPathFromCardText(cardText: string): string { 

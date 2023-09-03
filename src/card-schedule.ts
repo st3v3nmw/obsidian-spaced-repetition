@@ -12,7 +12,7 @@ export class CardScheduleInfo {
         this.ease = ease;
     }
 
-    dueUnix(): number { 
+    date(): number { 
         return moment(this.rawDate, ["YYYY-MM-DD", "DD-MM-YYYY"])
             .valueOf();
     }
@@ -38,4 +38,7 @@ export class NoteCardScheduleParser {
         return result;
     }
 
+    static removeCardScheduleInfo(questionText: string): string {
+        return questionText.replace(/<!--SR:.+-->/gm, "");
+    }
 }

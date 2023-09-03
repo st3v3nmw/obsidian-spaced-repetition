@@ -1,5 +1,6 @@
 import { TFile } from "obsidian";
 import { Question } from "./question";
+import { CardScheduleInfo } from "./card-schedule";
 
 export interface Card {
     question: Question;
@@ -7,9 +8,7 @@ export interface Card {
 
     // scheduling
     isDue: boolean;
-    interval?: number;
-    ease?: number;
-    delayBeforeReview?: number;
+    scheduleInfo?: CardScheduleInfo;
     
     // visuals
     front: string;

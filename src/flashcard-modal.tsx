@@ -28,6 +28,7 @@ import { t } from "src/lang/helpers";
 import { unwatchFile } from "fs";
 import { Card } from "./card";
 import { Deck } from "./deck";
+import { CardType } from "./question";
 
 export enum FlashcardModalMode {
     DecksList,
