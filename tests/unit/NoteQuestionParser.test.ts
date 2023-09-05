@@ -8,7 +8,7 @@ let parser: NoteQuestionParser = new NoteQuestionParser(DEFAULT_SETTINGS, questi
 
 test("No questions in the text", () => {
     let noteText: string = "An interesting note, but no questions";
-    let noteTopicPath: TopicPath = TopicPath.rootPath;
+    let noteTopicPath: TopicPath = TopicPath.emptyPath;
 
     expect(
         parser.createQuestionList(noteText, noteTopicPath)
@@ -22,7 +22,7 @@ test("Single question in the text: SingleLineBasic: No schedule info", () => {
 A::B
 `;
 
-    let noteTopicPath: TopicPath = TopicPath.rootPath;
+    let noteTopicPath: TopicPath = TopicPath.emptyPath;
     let card1 = {
         cardIdx: 0, 
         isDue: false, 
@@ -30,7 +30,7 @@ A::B
     };
     let expected = [{
         questionType: CardType.SingleLineBasic, 
-        topicPath: TopicPath.rootPath, 
+        topicPath: TopicPath.emptyPath, 
         originalQuestionText: `A::B`, 
         rawQuestionText: "A::B", 
         lineNo: 1, 
@@ -51,7 +51,7 @@ A::B
 <!--SR:!2023-09-03,1,230-->
 `;
 
-    let noteTopicPath: TopicPath = TopicPath.rootPath;
+    let noteTopicPath: TopicPath = TopicPath.emptyPath;
     let card1 = {
         cardIdx: 0, 
         isDue: true, 
@@ -59,7 +59,7 @@ A::B
     };
     let expected = [{
         questionType: CardType.SingleLineBasic, 
-        topicPath: TopicPath.rootPath, 
+        topicPath: TopicPath.emptyPath, 
         originalQuestionText: `A::B
 <!--SR:!2023-09-03,1,230-->`, 
         rawQuestionText: "A::B", 

@@ -18,8 +18,9 @@ export enum CardType {
 export class Question { 
     questionType: CardType;
     topicPath: TopicPath;
-    originalQuestionText: string;
-    rawQuestionText: string;
+    questionTextOriginal: string;
+    questionTextStrippedSR: string;
+    questionTextCleaned: string;
     lineNo: number;
     hasEditLaterTag: boolean;
     questionTextHash: string;
@@ -29,6 +30,19 @@ export class Question {
 
     constructor(init?: Partial<Question>) {
         Object.assign(this, init);
+    }
+
+    doesQuestionTextEndWithCodeBlock(): boolean {
+        return this.questionTextStrippedSR.endsWith("```");
+    }
+
+    getQuestionTextSeparator(settings: SRSettings): string {
+        let sep: string = settings.cardCommentOnSameLine ? " " : "\n";
+        // Override separator if last block is a codeblock
+        if (this.doesQuestionTextEndWithCodeBlock() && sep !== "\n") {
+            sep = "\n";
+        }
+        return sep;
     }
 }
 
@@ -80,10 +94,10 @@ export class NoteQuestionParser {
             let question: Question = this.createQuestionObject(parsedQuestionInfo);
 
             // Each rawCardText can turn into multiple CardFrontBack's (e.g. CardType.Cloze, CardType.SingleLineReversed)
-            let cardFrontBackList: CardFrontBack[] = CardFrontBackUtil.expand(question.questionType, question.rawQuestionText, this.settings);
+            let cardFrontBackList: CardFrontBack[] = CardFrontBackUtil.expand(question.questionType, question.questionTextCleaned, this.settings);
 
             // And if the card has been reviewed, then scheduling info as well
-            let cardScheduleInfoList: CardScheduleInfo[] = NoteCardScheduleParser.createCardScheduleInfoList(question.originalQuestionText);
+            let cardScheduleInfoList: CardScheduleInfo[] = NoteCardScheduleParser.createCardScheduleInfoList(question.questionTextOriginal);
 
             // we have some extra scheduling dates to delete
             let correctLength = cardFrontBackList.length;
@@ -136,8 +150,8 @@ export class NoteQuestionParser {
         let result: Question = { 
             questionType: cardType, 
             topicPath, 
-            originalQuestionText: originalQuestionText, 
-            rawQuestionText: rawQuestionText, 
+            questionTextOriginal: originalQuestionText, 
+            questionTextCleaned: rawQuestionText, 
             lineNo, 
             hasEditLaterTag, 
             questionTextHash, 

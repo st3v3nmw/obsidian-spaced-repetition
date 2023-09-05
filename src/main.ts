@@ -11,8 +11,8 @@ import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
 import { FlashcardModal } from "src/flashcard-modal";
-import { StatsModal, Stats } from "src/stats-modal";
-import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/sidebar";
+import { StatsModal, Stats } from "src/gui/stats-modal";
+import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/sidebar";
 import { ReviewResponse, schedule } from "src/scheduling";
 import {
     YAML_FRONT_MATTER_REGEX,

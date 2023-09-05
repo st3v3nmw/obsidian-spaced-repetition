@@ -1,4 +1,3 @@
-import { TFile } from "obsidian";
 import { Question } from "./question";
 import { CardScheduleInfo } from "./card-schedule";
 import { CardListType } from "./deck";
@@ -18,7 +17,12 @@ export class Card {
     constructor(init?: Partial<Card>) {
         Object.assign(this, init);
     }
+
     get cardListType(): CardListType {
         return this.isDue ? CardListType.DueCard : CardListType.NewCard;
+    }
+
+    get isNew(): boolean {
+        return !this.isDue;
     }
 }

@@ -6,27 +6,27 @@ export class TopicPath {
     path: string[];
 
     constructor(path: string[]) { 
-        if (!(path?.length > 0))
-            throw "empty or null path";
+        if (path == null)
+            throw "null path";
         if (path.some((str) => str.includes("/")))
             throw "path entries must not contain '/'";
         this.path = path;
     }
 
     get hasPath(): boolean { 
-        return (this.path.length > 0) || ((this.path.length == 1) && (this.path[0] != "/"));
+        return (this.path.length > 0);
     }
 
-    get hasEmptyPath(): boolean { 
+    get isEmptyPath(): boolean { 
         return !this.hasPath;
     }
     
-    static get rootPath(): TopicPath { 
+    static get emptyPath(): TopicPath { 
         return new TopicPath([]);
     }
 
     shift(): string {
-        if (this.hasEmptyPath)
+        if (this.isEmptyPath)
             throw "can't shift an empty path"
         return this.path.shift();
     }
@@ -39,7 +39,7 @@ export class TopicPath {
             deckPath = note.path.split("/");
             deckPath.pop(); // remove filename
             if (deckPath.length === 0) {
-                result = TopicPath.rootPath;
+                result = TopicPath.emptyPath;
             }
         } else {
             const fileCachedData = appMetadataCache.getFileCache(note) || {};

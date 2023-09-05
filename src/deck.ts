@@ -1,4 +1,5 @@
 import { Card } from "./card";
+import { Question } from "./question";
 import { TopicPath } from "./topic-path";
 
 export enum CardListType {NewCard, DueCard, All}
@@ -33,36 +34,70 @@ export class Deck {
         this.parent = parent;
     }
 
-    createDeck(topicPath: TopicPath): Deck {
+    get isRootDeck() {
+        return (this.parent == null);
+    }
+
+    getOrCreateDeck(topicPath: TopicPath): Deck {
         if (!topicPath.hasPath) {
             return this;
         }
         const deckName: string = topicPath.shift();
         for (const subdeck of this.subdecks) {
             if (deckName === subdeck.deckName) {
-                return subdeck.createDeck(topicPath);
+                return subdeck.getOrCreateDeck(topicPath);
             }
         }
-
-        const subdeck: Deck = new Deck(deckName, this);
+        
+        let parent: Deck = this;
+        const subdeck: Deck = new Deck(deckName, parent);
         this.subdecks.push(subdeck);
-        return subdeck.createDeck(topicPath);
+        return subdeck.getOrCreateDeck(topicPath);
     }
 
-    getCardList(cardListType: CardListType): Card[] {
+    getTopicPath(): TopicPath {
+        let list: string[] = [];
+        let deck: Deck = this;
+        while (!deck.isRootDeck) {
+            list.push(deck.deckName);
+            deck = deck.parent;
+        }
+        return new TopicPath(list.reverse());
+    }
+
+    getCardListForCardType(cardListType: CardListType): Card[] {
         return (cardListType == CardListType.DueCard) ? this.dueFlashcards : this.newFlashcards;
     }
 
     insertFlashcard(topicPath: TopicPath, cardObj: Card): void {
-        let deck: Deck = this.createDeck(topicPath);
-        let cardList: Card[] = deck.getCardList(cardObj.cardListType);
+        let deck: Deck = this.getOrCreateDeck(topicPath);
+        let cardList: Card[] = deck.getCardListForCardType(cardObj.cardListType);
         
         cardList.push(cardObj);
     }
 
     deleteFlashcardAtIndex(index: number, cardListType: CardListType): void {
-        let cardList: Card[] = this.getCardList(cardListType);
+        let cardList: Card[] = this.getCardListForCardType(cardListType);
         cardList.splice(index, 1);
+    }
+
+    deleteAllCardsForQuestion(question: Question): void {
+        for (const sibling of question.cards) {
+            const dueIdx = this.dueFlashcards.indexOf(sibling);
+            const newIdx = this.newFlashcards.indexOf(sibling);
+
+            if (dueIdx !== -1) {
+                this.deleteFlashcardAtIndex(
+                    dueIdx,
+                    CardListType.DueCard
+                );
+            } else if (newIdx !== -1) {
+                this.deleteFlashcardAtIndex(
+                    newIdx,
+                    CardListType.NewCard
+                );
+            }
+        }
     }
 
     sortSubdecksList(): void {

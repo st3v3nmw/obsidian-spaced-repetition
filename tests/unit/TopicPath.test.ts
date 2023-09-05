@@ -93,7 +93,7 @@ describe("getTopicPathFromCardText", () => {
 describe("removeTopicPathFromCardText", () => {
 
     test("Card text doesn't include tag", () => {
-        let cardText: string = "Card text doesn't include tag"; up
+        let cardText: string = "Card text doesn't include tag";
         let result: string = TopicPath.removeTopicPathFromCardText(cardText);
 
         expect(result).toEqual(cardText);

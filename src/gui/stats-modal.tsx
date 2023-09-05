@@ -20,7 +20,7 @@ import type SRPlugin from "src/main";
 import { getKeysPreserveType, getTypedObjectEntries } from "src/utils";
 import { textInterval } from "src/scheduling";
 import { t } from "src/lang/helpers";
-import { Stats } from "./stats";
+import { Stats } from "../stats";
 
 Chart.register(
     BarElement,

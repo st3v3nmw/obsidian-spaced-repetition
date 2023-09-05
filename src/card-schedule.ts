@@ -1,20 +1,31 @@
 import moment from "moment";
-import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR } from "./constants";
+import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR, PREFERRED_DATE_FORMAT } from "./constants";
 
 export class CardScheduleInfo { 
-    rawDate: string;
+    dueDate: Date;
     interval: number;
     ease: number;
+    delayBeforeReview: number;
 
-    constructor(rawDate: string, interval: number, ease: number) { 
-        this.rawDate = rawDate;
+    constructor(dueDate: Date, interval: number, ease: number, delayBeforeReview: number) { 
+        this.dueDate = dueDate;
         this.interval = interval;
         this.ease = ease;
+        this.delayBeforeReview = delayBeforeReview;
     }
 
-    date(): number { 
-        return moment(this.rawDate, ["YYYY-MM-DD", "DD-MM-YYYY"])
-            .valueOf();
+    static fromDueDateStr(dueDateStr: string, interval: number, ease: number, delayBeforeReview: number) { 
+        let dueDate: Date = moment(dueDateStr, [PREFERRED_DATE_FORMAT, "DD-MM-YYYY"]).toDate();
+        return new CardScheduleInfo(dueDate, interval, ease, delayBeforeReview);
+    }
+
+    static fromDueDateTicks(dueDateTicks: number, interval: number, ease: number, delayBeforeReview: number) { 
+        let dueDate: Date = new Date(dueDateTicks);
+        return new CardScheduleInfo(dueDate, interval, ease, delayBeforeReview);
+    }
+
+    static get initialInterval(): number {
+        return 1.0;
     }
 }
 
@@ -32,7 +43,7 @@ export class NoteCardScheduleParser {
             let rawDate = match[1];
             let interval = parseInt(match[2]);
             let ease = parseInt(match[3]);
-            let info: CardScheduleInfo = new CardScheduleInfo(rawDate, interval, ease);
+            let info: CardScheduleInfo = CardScheduleInfo.fromDueDateStr(rawDate, interval, ease);
             result.push(info);
         }
         return result;

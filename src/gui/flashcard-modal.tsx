@@ -26,9 +26,11 @@ import {
 import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
 import { unwatchFile } from "fs";
-import { Card } from "./card";
-import { Deck } from "./deck";
-import { CardType } from "./question";
+import { Card } from "../card";
+import { Deck } from "../deck";
+import { CardType } from "../question";
+import { IFlashcardsReviewSequencer } from "src/flashcard-review-sequencer";
+import { FlashcardEditModal } from "./flashcards-edit-modal";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -37,122 +39,6 @@ export enum FlashcardModalMode {
     Closed,
 }
 
-// from https://github.com/chhoumann/quickadd/blob/bce0b4cdac44b867854d6233796e3406dfd163c6/src/gui/GenericInputPrompt/GenericInputPrompt.ts#L5
-export class FlashcardEditModal extends Modal {
-    public plugin: SRPlugin;
-    public input: string;
-    public waitForClose: Promise<string>;
-
-    private resolvePromise: (input: string) => void;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private rejectPromise: (reason?: any) => void;
-    private didSubmit = false;
-    private inputComponent: TextAreaComponent;
-    private readonly modalText: string;
-
-    public static Prompt(app: App, plugin: SRPlugin, placeholder: string): Promise<string> {
-        const newPromptModal = new FlashcardEditModal(app, plugin, placeholder);
-        return newPromptModal.waitForClose;
-    }
-    constructor(app: App, plugin: SRPlugin, existingText: string) {
-        super(app);
-        this.plugin = plugin;
-        this.titleEl.setText(t("EDIT_CARD"));
-        this.titleEl.addClass("sr-centered");
-        this.modalText = existingText;
-
-        this.waitForClose = new Promise<string>((resolve, reject) => {
-            this.resolvePromise = resolve;
-            this.rejectPromise = reject;
-        });
-        this.display();
-        this.open();
-    }
-
-    private display() {
-        this.contentEl.empty();
-        this.modalEl.addClass("sr-flashcard-input-modal");
-
-        const mainContentContainer: HTMLDivElement = this.contentEl.createDiv();
-        mainContentContainer.addClass("sr-flashcard-input-area");
-        this.inputComponent = this.createInputField(mainContentContainer, this.modalText);
-        this.createButtonBar(mainContentContainer);
-    }
-
-    private createButton(
-        container: HTMLElement,
-        text: string,
-        callback: (evt: MouseEvent) => void,
-    ) {
-        const btn = new ButtonComponent(container);
-        btn.setButtonText(text).onClick(callback);
-        return btn;
-    }
-
-    private createButtonBar(mainContentContainer: HTMLDivElement) {
-        const buttonBarContainer: HTMLDivElement = mainContentContainer.createDiv();
-        buttonBarContainer.addClass("sr-flashcard-edit-button-bar");
-        this.createButton(
-            buttonBarContainer,
-            t("SAVE"),
-            this.submitClickCallback,
-        ).setCta().buttonEl.style.marginRight = "0";
-        this.createButton(buttonBarContainer, t("CANCEL"), this.cancelClickCallback);
-    }
-
-    protected createInputField(container: HTMLElement, value: string) {
-        const textComponent = new TextAreaComponent(container);
-
-        textComponent.inputEl.style.width = "100%";
-        textComponent
-            .setValue(value ?? "")
-            .onChange((value) => (this.input = value))
-            .inputEl.addEventListener("keydown", this.submitEnterCallback);
-
-        return textComponent;
-    }
-
-    private submitClickCallback = (_: MouseEvent) => this.submit();
-    private cancelClickCallback = (_: MouseEvent) => this.cancel();
-
-    private submitEnterCallback = (evt: KeyboardEvent) => {
-        if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter") {
-            evt.preventDefault();
-            this.submit();
-        }
-    };
-
-    private submit() {
-        this.didSubmit = true;
-
-        this.close();
-    }
-
-    private cancel() {
-        this.close();
-    }
-
-    onOpen() {
-        super.onOpen();
-
-        this.inputComponent.inputEl.focus();
-    }
-
-    onClose() {
-        super.onClose();
-        this.resolveInput();
-        this.removeInputListener();
-    }
-
-    private resolveInput() {
-        if (!this.didSubmit) this.rejectPromise(t("NO_INPUT"));
-        else this.resolvePromise(this.input);
-    }
-
-    private removeInputListener() {
-        this.inputComponent.inputEl.removeEventListener("keydown", this.submitEnterCallback);
-    }
-}
 
 export class FlashcardModal extends Modal {
     public plugin: SRPlugin;
@@ -166,17 +52,18 @@ export class FlashcardModal extends Modal {
     public resetButton: HTMLElement;
     public editButton: HTMLElement;
     public contextView: HTMLElement;
-    public currentCard: Card;
+    /* public currentCard: Card;
     public currentCardIdx: number;
-    public currentDeck: Deck;
-    public checkDeck: Deck;
+    public currentDeck: Deck; */
     public mode: FlashcardModalMode;
     public ignoreStats: boolean;
+    private reviewSequencer: IFlashcardsReviewSequencer;
 
-    constructor(app: App, plugin: SRPlugin, ignoreStats = false) {
+    constructor(app: App, plugin: SRPlugin, reviewSequencer: IFlashcardsReviewSequencer, ignoreStats = false) {
         super(app);
 
         this.plugin = plugin;
+        this.reviewSequencer = reviewSequencer;
         this.ignoreStats = ignoreStats;
 
         this.titleEl.setText(t("DECKS"));
@@ -233,15 +120,15 @@ export class FlashcardModal extends Modal {
     }
 
     onOpen(): void {
-        this.decksList();
+        this.renderDecksList();
     }
 
     onClose(): void {
         this.mode = FlashcardModalMode.Closed;
     }
 
-    decksList(): void {
-        const aimDeck = this.plugin.deckTree.subdecks.filter(
+    renderDecksList(): void {
+        /* const aimDeck = this.plugin.deckTree.subdecks.filter(
             (deck) => deck.deckName === this.plugin.data.historyDeck,
         );
         if (this.plugin.data.historyDeck && aimDeck.length > 0) {
@@ -251,7 +138,7 @@ export class FlashcardModal extends Modal {
             this.setupCardsView();
             deck.nextCard(this);
             return;
-        }
+        } */
 
         this.mode = FlashcardModalMode.DecksList;
         this.titleEl.setText(t("DECKS"));
@@ -284,7 +171,79 @@ export class FlashcardModal extends Modal {
         this.contentEl.setAttribute("id", "sr-flashcard-view");
 
         for (const deck of this.plugin.deckTree.subdecks) {
-            deck.render(this.contentEl, this);
+            this.renderDeck(deck, this.contentEl, this);
+        }
+    }
+
+    renderDeck(deck: Deck, containerEl: HTMLElement, modal: FlashcardModal): void {
+        const deckView: HTMLElement = containerEl.createDiv("tree-item");
+
+        const deckViewSelf: HTMLElement = deckView.createDiv(
+            "tree-item-self tag-pane-tag is-clickable",
+        );
+        const shouldBeInitiallyExpanded: boolean =
+            modal.plugin.data.settings.initiallyExpandAllSubdecksInTree;
+        let collapsed = !shouldBeInitiallyExpanded;
+        let collapseIconEl: HTMLElement | null = null;
+        if (deck.subdecks.length > 0) {
+            collapseIconEl = deckViewSelf.createDiv("tree-item-icon collapse-icon");
+            collapseIconEl.innerHTML = COLLAPSE_ICON;
+            (collapseIconEl.childNodes[0] as HTMLElement).style.transform = collapsed
+                ? "rotate(-90deg)"
+                : "";
+        }
+
+        const deckViewInner: HTMLElement = deckViewSelf.createDiv("tree-item-inner");
+        deckViewInner.addEventListener("click", () => {
+            /* modal.plugin.data.historyDeck = deck.deckName; */
+            this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
+            this.setupCardsView();
+            this.nextCard(modal);
+        });
+        const deckViewInnerText: HTMLElement = deckViewInner.createDiv("tag-pane-tag-text");
+        deckViewInnerText.innerHTML += <span class="tag-pane-tag-self">{deck.deckName}</span>;
+        const deckViewOuter: HTMLElement = deckViewSelf.createDiv("tree-item-flair-outer");
+        let deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
+        deckViewOuter.innerHTML += (
+            <span>
+                <span
+                    style="background-color:#4caf50;"
+                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                >
+                    {deckStats.dueCount.toString()}
+                </span>
+                <span
+                    style="background-color:#2196f3;"
+                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                >
+                    {deckStats.newCount.toString()}
+                </span>
+                <span
+                    style="background-color:#ff7043;"
+                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
+                >
+                    {deckStats.totalCount.toString()}
+                </span>
+            </span>
+        );
+
+        const deckViewChildren: HTMLElement = deckView.createDiv("tree-item-children");
+        deckViewChildren.style.display = collapsed ? "none" : "block";
+        if (deck.subdecks.length > 0) {
+            collapseIconEl.addEventListener("click", () => {
+                if (collapsed) {
+                    (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "";
+                    deckViewChildren.style.display = "block";
+                } else {
+                    (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
+                        "rotate(-90deg)";
+                    deckViewChildren.style.display = "none";
+                }
+                collapsed = !collapsed;
+            });
+        }
+        for (const subdeck of deck.subdecks) {
+            this.renderDeck(subdeck, deckViewChildren, modal);
         }
     }
 
@@ -293,67 +252,11 @@ export class FlashcardModal extends Modal {
 
         const flashCardMenu = this.contentEl.createDiv("sr-flashcard-menu");
 
-        const backButton = flashCardMenu.createEl("button");
-        backButton.addClass("sr-flashcard-menu-item");
-        setIcon(backButton, "arrow-left");
-        backButton.setAttribute("aria-label", t("BACK"));
-        backButton.addEventListener("click", () => {
-            this.plugin.data.historyDeck = "";
-            this.decksList();
-        });
-
-        this.editButton = flashCardMenu.createEl("button");
-        this.editButton.addClass("sr-flashcard-menu-item");
-        setIcon(this.editButton, "edit");
-        this.editButton.setAttribute("aria-label", t("EDIT_CARD"));
-        this.editButton.addEventListener("click", async () => {
-            // remove SR info from input modal prompt
-            const textPromptArr = this.currentCard.cardText.split("\n");
-            let textPrompt = "";
-            if (textPromptArr[textPromptArr.length - 1].startsWith("<!--SR:")) {
-                textPrompt = textPromptArr.slice(0, -1).join("\n");
-            } else {
-                textPrompt = this.currentCard.cardText;
-            }
-
-            const editModal = FlashcardEditModal.Prompt(this.app, this.plugin, textPrompt);
-            editModal
-                .then(async (modifiedCardText) => {
-                    this.modifyCardText(textPrompt, modifiedCardText);
-                })
-                .catch((reason) => console.log(reason));
-        });
-
-        this.resetButton = flashCardMenu.createEl("button");
-        this.resetButton.addClass("sr-flashcard-menu-item");
-        setIcon(this.resetButton, "refresh-cw");
-        this.resetButton.setAttribute("aria-label", t("RESET_CARD_PROGRESS"));
-        this.resetButton.addEventListener("click", () => {
-            this.processReview(ReviewResponse.Reset);
-        });
-
-        const cardInfo = flashCardMenu.createEl("button");
-        cardInfo.addClass("sr-flashcard-menu-item");
-        setIcon(cardInfo, "info");
-        cardInfo.setAttribute("aria-label", "View Card Info");
-        cardInfo.addEventListener("click", async () => {
-            const currentEaseStr =
-                t("CURRENT_EASE_HELP_TEXT") + (this.currentCard.ease ?? t("NEW"));
-            const currentIntervalStr =
-                t("CURRENT_INTERVAL_HELP_TEXT") + textInterval(this.currentCard.interval, false);
-            const generatedFromStr = t("CARD_GENERATED_FROM", {
-                notePath: this.currentCard.note.path,
-            });
-            new Notice(currentEaseStr + "\n" + currentIntervalStr + "\n" + generatedFromStr);
-        });
-
-        const skipButton = flashCardMenu.createEl("button");
-        skipButton.addClass("sr-flashcard-menu-item");
-        setIcon(skipButton, "chevrons-right");
-        skipButton.setAttribute("aria-label", t("SKIP"));
-        skipButton.addEventListener("click", () => {
-            this.skipCurrentCard();
-        });
+        createBackButton();
+        createEditButton();
+        createResetButton();
+        createCardInfoButton();
+        createSkipButton();
 
         if (this.plugin.data.settings.showContextInCards) {
             this.contextView = this.contentEl.createDiv();
@@ -363,39 +266,9 @@ export class FlashcardModal extends Modal {
         this.flashcardView = this.contentEl.createDiv("div");
         this.flashcardView.setAttribute("id", "sr-flashcard-view");
 
-        this.responseDiv = this.contentEl.createDiv("sr-flashcard-response");
+        createResponseButtons();
 
-        this.hardBtn = document.createElement("button");
-        this.hardBtn.setAttribute("id", "sr-hard-btn");
-        this.hardBtn.setText(this.plugin.data.settings.flashcardHardText);
-        this.hardBtn.addEventListener("click", () => {
-            this.processReview(ReviewResponse.Hard);
-        });
-        this.responseDiv.appendChild(this.hardBtn);
-
-        this.goodBtn = document.createElement("button");
-        this.goodBtn.setAttribute("id", "sr-good-btn");
-        this.goodBtn.setText(this.plugin.data.settings.flashcardGoodText);
-        this.goodBtn.addEventListener("click", () => {
-            this.processReview(ReviewResponse.Good);
-        });
-        this.responseDiv.appendChild(this.goodBtn);
-
-        this.easyBtn = document.createElement("button");
-        this.easyBtn.setAttribute("id", "sr-easy-btn");
-        this.easyBtn.setText(this.plugin.data.settings.flashcardEasyText);
-        this.easyBtn.addEventListener("click", () => {
-            this.processReview(ReviewResponse.Easy);
-        });
-        this.responseDiv.appendChild(this.easyBtn);
-        this.responseDiv.style.display = "none";
-
-        this.answerBtn = this.contentEl.createDiv();
-        this.answerBtn.setAttribute("id", "sr-show-answer");
-        this.answerBtn.setText(t("SHOW_ANSWER"));
-        this.answerBtn.addEventListener("click", () => {
-            this.showAnswer();
-        });
+        createShowAnswerButton();
 
         if (this.ignoreStats) {
             this.goodBtn.style.display = "none";
@@ -404,17 +277,107 @@ export class FlashcardModal extends Modal {
             this.easyBtn.addClass("sr-ignorestats-btn");
             this.hardBtn.addClass("sr-ignorestats-btn");
         }
-    }
 
-    private async modifyCardText(originalText: string, replacementText: string) {
-        if (!replacementText) return;
-        if (replacementText == originalText) return;
-        let fileText: string = await this.app.vault.read(this.currentCard.note);
-        const originalTextRegex = new RegExp(escapeRegexString(originalText), "gm");
-        fileText = fileText.replace(originalTextRegex, replacementText);
-        await this.app.vault.modify(this.currentCard.note, fileText);
-        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
-        this.burySiblingCards(false);
+        function createShowAnswerButton() {
+            this.answerBtn = this.contentEl.createDiv();
+            this.answerBtn.setAttribute("id", "sr-show-answer");
+            this.answerBtn.setText(t("SHOW_ANSWER"));
+            this.answerBtn.addEventListener("click", () => {
+                this.showAnswer();
+            });
+        }
+
+        function createResponseButtons() {
+            this.responseDiv = this.contentEl.createDiv("sr-flashcard-response");
+
+            this.hardBtn = document.createElement("button");
+            this.hardBtn.setAttribute("id", "sr-hard-btn");
+            this.hardBtn.setText(this.plugin.data.settings.flashcardHardText);
+            this.hardBtn.addEventListener("click", () => {
+                this.processReview(ReviewResponse.Hard);
+            });
+            this.responseDiv.appendChild(this.hardBtn);
+
+            this.goodBtn = document.createElement("button");
+            this.goodBtn.setAttribute("id", "sr-good-btn");
+            this.goodBtn.setText(this.plugin.data.settings.flashcardGoodText);
+            this.goodBtn.addEventListener("click", () => {
+                this.processReview(ReviewResponse.Good);
+            });
+            this.responseDiv.appendChild(this.goodBtn);
+
+            this.easyBtn = document.createElement("button");
+            this.easyBtn.setAttribute("id", "sr-easy-btn");
+            this.easyBtn.setText(this.plugin.data.settings.flashcardEasyText);
+            this.easyBtn.addEventListener("click", () => {
+                this.processReview(ReviewResponse.Easy);
+            });
+            this.responseDiv.appendChild(this.easyBtn);
+            this.responseDiv.style.display = "none";
+        }
+
+        function createSkipButton() {
+            const skipButton = flashCardMenu.createEl("button");
+            skipButton.addClass("sr-flashcard-menu-item");
+            setIcon(skipButton, "chevrons-right");
+            skipButton.setAttribute("aria-label", t("SKIP"));
+            skipButton.addEventListener("click", () => {
+                this.skipCurrentCard();
+            });
+        }
+
+        function createCardInfoButton() {
+            const cardInfo = flashCardMenu.createEl("button");
+            cardInfo.addClass("sr-flashcard-menu-item");
+            setIcon(cardInfo, "info");
+            cardInfo.setAttribute("aria-label", "View Card Info");
+            cardInfo.addEventListener("click", async () => {
+                const currentEaseStr = t("CURRENT_EASE_HELP_TEXT") + (this.currentCard.ease ?? t("NEW"));
+                const currentIntervalStr = t("CURRENT_INTERVAL_HELP_TEXT") + textInterval(this.currentCard.interval, false);
+                const generatedFromStr = t("CARD_GENERATED_FROM", {
+                    notePath: this.currentCard.note.path,
+                });
+                new Notice(currentEaseStr + "\n" + currentIntervalStr + "\n" + generatedFromStr);
+            });
+        }
+
+        function createBackButton() {
+            const backButton = flashCardMenu.createEl("button");
+            backButton.addClass("sr-flashcard-menu-item");
+            setIcon(backButton, "arrow-left");
+            backButton.setAttribute("aria-label", t("BACK"));
+            backButton.addEventListener("click", () => {
+                /* this.plugin.data.historyDeck = ""; */
+                this.renderDecksList();
+            });
+        }
+
+        function createEditButton() {
+            this.editButton = flashCardMenu.createEl("button");
+            this.editButton.addClass("sr-flashcard-menu-item");
+            setIcon(this.editButton, "edit");
+            this.editButton.setAttribute("aria-label", t("EDIT_CARD"));
+            this.editButton.addEventListener("click", async () => {
+                let textPrompt = this.reviewSequencer.currentQuestion.questionTextStrippedSR;
+
+                const editModal = FlashcardEditModal.Prompt(this.app, this.plugin, textPrompt);
+                editModal
+                    .then(async (modifiedCardText) => {
+                        this.reviewSequencer.modifyQuestionText(modifiedCardText);
+                    })
+                    .catch((reason) => console.log(reason));
+            });
+        }
+
+        function createResetButton() {
+            this.resetButton = flashCardMenu.createEl("button");
+            this.resetButton.addClass("sr-flashcard-menu-item");
+            setIcon(this.resetButton, "refresh-cw");
+            this.resetButton.setAttribute("aria-label", t("RESET_CARD_PROGRESS"));
+            this.resetButton.addEventListener("click", () => {
+                this.processReview(ReviewResponse.Reset);
+            });
+        }
     }
 
     private showAnswer(): void {

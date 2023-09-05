@@ -35,7 +35,7 @@ export class NoteFileLoader {
         
         const rawCardInfoList: Question[] = this.createRawCardInfoList();
         for (const rawCardInfo of rawCardInfoList) {
-            var { questionType: cardType, rawQuestionText: rawCardText, lineNo, hasEditLaterTag } = rawCardInfo;
+            var { questionType: cardType, questionTextCleaned: rawCardText, lineNo, hasEditLaterTag } = rawCardInfo;
 
             // Each rawCardText can turn into multiple CardFrontBack's (e.g. CardType.Cloze, CardType.SingleLineReversed)
             let cardFrontBackList: CardFrontBack[] = this.createCardFrontBackList(cardType, rawCardText);
