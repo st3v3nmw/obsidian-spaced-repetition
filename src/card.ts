@@ -1,6 +1,7 @@
 import { Question } from "./question";
 import { CardScheduleInfo } from "./card-schedule";
 import { CardListType } from "./deck";
+import { SRSettings } from "./settings";
 
 export class Card {
     question: Question;
@@ -24,5 +25,15 @@ export class Card {
 
     get isNew(): boolean {
         return !this.isDue;
+    }
+
+    formatSchedule(settings: SRSettings): string {
+        let temp: CardScheduleInfo = this.scheduleInfo;
+        if (temp == null) {
+            temp =  CardScheduleInfo.fromDueDateStr("2000-01-01", 
+                CardScheduleInfo.initialInterval, 
+                settings.baseEase, 0);
+        }
+        return temp.formatSchedule();
     }
 }

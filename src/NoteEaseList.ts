@@ -12,8 +12,12 @@ export class NoteEaseList implements INoteEaseList {
         this.settings = settings;
     }
 
+    get baseEase() {
+        return this.settings.baseEase;
+    }
+
     getEaseByPath(path: string): number {
-        let ease: number = this.settings.baseEase;
+        let ease: number = this.baseEase;
         if (
             Object.prototype.hasOwnProperty.call(
                 this.easeByPath,

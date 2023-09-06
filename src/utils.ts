@@ -54,3 +54,20 @@ export function cyrb53(str: string, seed = 0): string {
     h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
 }
+
+// ✅ Defining a reusable function
+function padTo2Digits(num: number) {
+  return num.toString().padStart(2, '0');
+}
+
+// 👇️ format as "YYYY-MM-DD"
+// https://bobbyhadz.com/blog/typescript-date-format
+export function formatDate_YYYY_MM_DD(date: Date): string {
+  return (
+    [
+      date.getFullYear(),
+      padTo2Digits(date.getMonth() + 1),
+      padTo2Digits(date.getDate()),
+    ].join('-')
+  );
+}

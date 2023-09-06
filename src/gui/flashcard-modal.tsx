@@ -28,9 +28,10 @@ import { t } from "src/lang/helpers";
 import { unwatchFile } from "fs";
 import { Card } from "../card";
 import { Deck } from "../deck";
-import { CardType } from "../question";
+import { CardType, Question } from "../question";
 import { IFlashcardsReviewSequencer } from "src/flashcard-review-sequencer";
 import { FlashcardEditModal } from "./flashcards-edit-modal";
+import { INoteUpdator, Note } from "src/note";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -58,12 +59,14 @@ export class FlashcardModal extends Modal {
     public mode: FlashcardModalMode;
     public ignoreStats: boolean;
     private reviewSequencer: IFlashcardsReviewSequencer;
+    private noteUpdator: INoteUpdator;
 
-    constructor(app: App, plugin: SRPlugin, reviewSequencer: IFlashcardsReviewSequencer, ignoreStats = false) {
+    constructor(app: App, plugin: SRPlugin, reviewSequencer: IFlashcardsReviewSequencer, noteUpdator: INoteUpdator, ignoreStats = false) {
         super(app);
 
         this.plugin = plugin;
         this.reviewSequencer = reviewSequencer;
+        this.noteUpdator = noteUpdator;
         this.ignoreStats = ignoreStats;
 
         this.titleEl.setText(t("DECKS"));
@@ -196,9 +199,7 @@ export class FlashcardModal extends Modal {
         const deckViewInner: HTMLElement = deckViewSelf.createDiv("tree-item-inner");
         deckViewInner.addEventListener("click", () => {
             /* modal.plugin.data.historyDeck = deck.deckName; */
-            this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
-            this.setupCardsView();
-            this.nextCard(modal);
+            this.startReviewOfDeck(deck);
         });
         const deckViewInnerText: HTMLElement = deckViewInner.createDiv("tag-pane-tag-text");
         deckViewInnerText.innerHTML += <span class="tag-pane-tag-self">{deck.deckName}</span>;
@@ -245,6 +246,12 @@ export class FlashcardModal extends Modal {
         for (const subdeck of deck.subdecks) {
             this.renderDeck(subdeck, deckViewChildren, modal);
         }
+    }
+
+    startReviewOfDeck(deck: Deck) {
+        this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
+        this.setupCardsView();
+        this.nextCard(modal);
     }
 
     setupCardsView(): void {
@@ -353,19 +360,13 @@ export class FlashcardModal extends Modal {
         }
 
         function createEditButton() {
+            this.reviewSequencer.currentQuestion.questionTextStrippedSR;
             this.editButton = flashCardMenu.createEl("button");
             this.editButton.addClass("sr-flashcard-menu-item");
             setIcon(this.editButton, "edit");
             this.editButton.setAttribute("aria-label", t("EDIT_CARD"));
             this.editButton.addEventListener("click", async () => {
-                let textPrompt = this.reviewSequencer.currentQuestion.questionTextStrippedSR;
-
-                const editModal = FlashcardEditModal.Prompt(this.app, this.plugin, textPrompt);
-                editModal
-                    .then(async (modifiedCardText) => {
-                        this.reviewSequencer.modifyQuestionText(modifiedCardText);
-                    })
-                    .catch((reason) => console.log(reason));
+                this.doEditQuestionText();
             });
         }
 
@@ -378,6 +379,19 @@ export class FlashcardModal extends Modal {
                 this.processReview(ReviewResponse.Reset);
             });
         }
+    }
+
+    async doEditQuestionText(): Promise<void> {
+        let currentQ: Question = this.reviewSequencer.currentQuestion;
+        let currentNote: Note = this.reviewSequencer.currentNote;
+        let textPrompt = currentQ.questionTextStrippedSR;
+
+        const editModal = FlashcardEditModal.Prompt(this.app, this.plugin, textPrompt);
+        editModal
+            .then(async (modifiedCardText) => {
+                this.noteUpdator.modifyQuestionText(currentNote.file, currentQ, modifiedCardText);
+            })
+            .catch((reason) => console.log(reason));
     }
 
     private showAnswer(): void {
@@ -465,6 +479,9 @@ export class FlashcardModal extends Modal {
             due = window.moment(Date.now());
             new Notice(t("CARD_PROGRESS_RESET"));
             this.currentDeck.nextCard(this);
+        }
+        if (response == ReviewResponse.Reset) {
+            new Notice(t("CARD_PROGRESS_RESET"));
             return;
         }
 

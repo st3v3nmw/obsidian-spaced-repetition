@@ -69,11 +69,18 @@ export class Deck {
         return (cardListType == CardListType.DueCard) ? this.dueFlashcards : this.newFlashcards;
     }
 
-    insertFlashcard(topicPath: TopicPath, cardObj: Card): void {
+    appendFlashcard(topicPath: TopicPath, cardObj: Card): void {
         let deck: Deck = this.getOrCreateDeck(topicPath);
         let cardList: Card[] = deck.getCardListForCardType(cardObj.cardListType);
         
         cardList.push(cardObj);
+    }
+
+    deleteFlashcard(card: Card): void {
+        let cardList: Card[] = this.getCardListForCardType(card.cardListType);
+        let idx = cardList.indexOf(card);
+        if (idx != -1)
+            cardList.splice(idx, 1);
     }
 
     deleteFlashcardAtIndex(index: number, cardListType: CardListType): void {
@@ -83,20 +90,7 @@ export class Deck {
 
     deleteAllCardsForQuestion(question: Question): void {
         for (const sibling of question.cards) {
-            const dueIdx = this.dueFlashcards.indexOf(sibling);
-            const newIdx = this.newFlashcards.indexOf(sibling);
-
-            if (dueIdx !== -1) {
-                this.deleteFlashcardAtIndex(
-                    dueIdx,
-                    CardListType.DueCard
-                );
-            } else if (newIdx !== -1) {
-                this.deleteFlashcardAtIndex(
-                    newIdx,
-                    CardListType.NewCard
-                );
-            }
+            this.deleteFlashcard(sibling);
         }
     }
 
