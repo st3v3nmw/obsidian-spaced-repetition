@@ -65,33 +65,56 @@ export class Deck {
         return new TopicPath(list.reverse());
     }
 
+    getRootDeck(): Deck {
+        let deck: Deck = this;
+        while (!deck.isRootDeck) {
+            deck = deck.parent;
+        }   
+        return deck;  
+    }
+
+    getCard(index: number, cardListType: CardListType): Card {
+        let cardList: Card[] = this.getCardListForCardType(cardListType);
+        return cardList[index];
+    }
+
     getCardListForCardType(cardListType: CardListType): Card[] {
         return (cardListType == CardListType.DueCard) ? this.dueFlashcards : this.newFlashcards;
     }
 
-    appendFlashcard(topicPath: TopicPath, cardObj: Card): void {
+    appendCard(topicPath: TopicPath, cardObj: Card): void {
         let deck: Deck = this.getOrCreateDeck(topicPath);
         let cardList: Card[] = deck.getCardListForCardType(cardObj.cardListType);
         
         cardList.push(cardObj);
     }
 
-    deleteFlashcard(card: Card): void {
+    deleteCard(card: Card): void {
         let cardList: Card[] = this.getCardListForCardType(card.cardListType);
         let idx = cardList.indexOf(card);
         if (idx != -1)
             cardList.splice(idx, 1);
     }
 
-    deleteFlashcardAtIndex(index: number, cardListType: CardListType): void {
+    deleteCardAtIndex(index: number, cardListType: CardListType): void {
         let cardList: Card[] = this.getCardListForCardType(cardListType);
         cardList.splice(index, 1);
     }
 
     deleteAllCardsForQuestion(question: Question): void {
-        for (const sibling of question.cards) {
-            this.deleteFlashcard(sibling);
+        for (let idx = question.cards.length - 1; idx >= 0; idx--) { 
+            this.deleteCardAtIndex(idx, question.cards[idx].cardListType);
         }
+    }
+
+    toDeckArray(): Deck[] {
+        let result: Deck[] = [];
+        if (!this.isRootDeck)
+            result.push(this);
+        for (const subdeck of this.subdecks) {
+            result.push(...subdeck.toDeckArray());
+        }
+        return result;
     }
 
     sortSubdecksList(): void {
@@ -107,6 +130,17 @@ export class Deck {
         for (const deck of this.subdecks) {
             deck.sortSubdecksList();
         }
+    }
+
+    static otherListType(cardListType: CardListType): CardListType {
+        var result: CardListType;
+        if (cardListType == CardListType.NewCard)
+            result = CardListType.DueCard;
+        else if (cardListType == CardListType.DueCard)
+            result = CardListType.NewCard;
+        else
+            throw "Invalid cardListType";
+        return result;
     }
 /* 
 

@@ -26,7 +26,7 @@ export class ObsidianTFile implements ISRFile {
     }
 }
 
-export class UnitTestFileFile implements ISRFile {
+export class UnitTestSRFile implements ISRFile {
     content: string;
 
     constructor(content: string) {

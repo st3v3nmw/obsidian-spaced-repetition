@@ -68,7 +68,7 @@ export class FlashcardsReviewSequencer implements IFlashcardsReviewSequencer {
     }
 
     private deleteCurrentCard(): void {
-        this.currentDeck.deleteFlashcard(this.currentCard);
+        this.currentDeck.deleteCard(this.currentCard);
     }
 
     private async processReview(response: ReviewResponse): Promise<void> {
@@ -89,7 +89,7 @@ export class FlashcardsReviewSequencer implements IFlashcardsReviewSequencer {
         
         if (moveCardToEnd) {
             this.deleteCurrentCard();
-            this.currentDeck.appendFlashcard(TopicPath.emptyPath, this.currentCard);
+            this.currentDeck.appendCard(TopicPath.emptyPath, this.currentCard);
         } else if (deleteCard) {
             this.deleteCurrentCard();
         }

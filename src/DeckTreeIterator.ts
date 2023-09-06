@@ -1,38 +1,89 @@
 import { Card } from "./card";
-import { Deck } from "./deck";
+import { CardListType, Deck } from "./deck";
 
 export interface IDeckTreeIterator {
     get currentDeck(): Deck;
     get currentCard(): Card;
-    setTree(remainingTree: Deck): void;
     setDeck(deck: Deck): void;
     nextCard(): boolean;
 }
 
 export class DeckTreeSequentialIterator implements IDeckTreeIterator {
-    setDeck(deck: Deck): void {
+    deckTree: Deck;
+    preferredCardListType: CardListType;
 
+    deckArray: Deck[];
+    deckIdx?: number;
+    cardIdx?: number;
+    cardListType?: CardListType;
+
+    get currentDeck(): Deck {
+        if (this.deckIdx == null)
+            throw "No current deck";
+        return this.deckArray[this.deckIdx];
+    }
+
+    get currentCard(): Card {
+        if ((this.deckIdx == null) || (this.cardIdx == null))
+            throw "No current card";
+        return this.deckArray[this.deckIdx].getCard(this.cardIdx, this.cardListType);
+    }
+
+    constructor(preferredCardListType: CardListType) {
+        this.preferredCardListType = preferredCardListType;
+    }
+
+    setDeck(deck: Deck): void {
+        this.deckTree = deck;
+        this.deckArray = deck.toDeckArray();
+        this.setDeckIdx(null);
+    }
+
+    private setDeckIdx(deckIdx?: number): void {
+        this.deckIdx = deckIdx;
+        this.cardIdx = null;
+        this.cardListType = null;
     }
 
     nextCard(): boolean {
-        if (this.newFlashcards.length + this.dueFlashcards.length === 0) {
-            if (this.dueFlashcardsCount + this.newFlashcardsCount > 0) {
-                for (const deck of this.subdecks) {
-                    if (deck.dueFlashcardsCount + deck.newFlashcardsCount > 0) {
-                        modal.currentDeck = deck;
-                        deck.nextCard(modal);
-                        return;
-                    }
-                }
-            }
-
-            if (this.parent == modal.checkDeck) {
-                modal.plugin.data.historyDeck = "";
-                modal.decksList();
-            } else {
-                this.parent.nextCard(modal);
-            }
-            return;
+        let result: boolean = false;
+        if (this.deckIdx == null) {
+            this.setDeckIdx(0);
         }
+        while (this.deckIdx < this.deckArray.length) {
+            if (this.nextCardWithinDeck()) {
+                result = true;
+                break;
+            }
+            this.deckIdx++;
+        }
+        if (!result)
+            this.deckIdx = null;
+        return result;
+    }
+
+    private nextCardWithinDeck(): boolean {
+        if (this.deckIdx == null)
+            throw "No current deck";
+        let deck: Deck = this.currentDeck;
+
+        if (this.cardIdx == null) {
+            this.cardIdx = -1;
+            this.cardListType = this.preferredCardListType;
+        }
+
+        let cardList: Card[] = deck.getCardListForCardType(this.cardListType);
+        this.cardIdx++;
+        if (this.cardIdx == cardList.length) {
+            // Try the other list type
+            this.cardListType = Deck.otherListType(this.cardListType);
+            this.cardIdx = 0;
+            cardList = deck.getCardListForCardType(this.cardListType);
+            if (this.cardIdx == cardList.length) {
+                this.cardIdx = null;
+                this.cardListType = null;
+            }
+        }
+        return this.cardIdx != null;
     }
 }

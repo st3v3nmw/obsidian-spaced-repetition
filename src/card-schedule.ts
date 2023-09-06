@@ -18,7 +18,7 @@ export class CardScheduleInfo {
         this.delayBeforeReview = delayBeforeReview;
     }
 
-    static get emptySchedule(): CardScheduleInfo
+    // static get emptySchedule(): CardScheduleInfo
 
     static parseDueDateStr(dueDateStr: string): Date {
         return moment(dueDateStr, [PREFERRED_DATE_FORMAT, "DD-MM-YYYY"]).toDate();
@@ -42,7 +42,7 @@ export class CardScheduleInfo {
         return formatDate_YYYY_MM_DD(this.dueDate);
     }
 
-     formatSchedule() {
+    formatSchedule() {
         return `!${this.formatDueDate()},${this.interval},${this.ease}`;
     }
 }

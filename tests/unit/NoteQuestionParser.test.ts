@@ -1,17 +1,20 @@
+import { IQuestionContextFinder, NoteQuestionParser, NullImpl_IQuestionContextFinder } from "src/NoteQuestionParser";
 import { CardScheduleInfo } from "src/card-schedule";
-import { CardType, IQuestionContextFinder, NoteQuestionParser, NullImpl_IQuestionContextFinder, Question } from "src/question";
+import { TICKS_PER_DAY } from "src/constants";
+import { CardType, Question } from "src/question";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { TopicPath } from "src/topic-path";
 
 let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
 let parser: NoteQuestionParser = new NoteQuestionParser(DEFAULT_SETTINGS, questionContextFinder);
+let refDate: Date = new Date(2023, 8, 6);
 
 test("No questions in the text", () => {
     let noteText: string = "An interesting note, but no questions";
     let noteTopicPath: TopicPath = TopicPath.emptyPath;
 
     expect(
-        parser.createQuestionList(noteText, noteTopicPath)
+        parser.createQuestionList(noteText, noteTopicPath, refDate)
     ).toEqual([
     ]);
 });
@@ -31,8 +34,8 @@ A::B
     let expected = [{
         questionType: CardType.SingleLineBasic, 
         topicPath: TopicPath.emptyPath, 
-        originalQuestionText: `A::B`, 
-        rawQuestionText: "A::B", 
+        questionTextOriginal: `A::B`, 
+        questionTextCleaned: "A::B", 
         lineNo: 1, 
         hasEditLaterTag: false, 
         context: "", 
@@ -40,7 +43,7 @@ A::B
         hasChanged: false
     }];
     expect(
-        parser.createQuestionList(noteText, noteTopicPath)
+        parser.createQuestionList(noteText, noteTopicPath, refDate)
     ).toMatchObject(expected);
 });
 
@@ -52,17 +55,18 @@ A::B
 `;
 
     let noteTopicPath: TopicPath = TopicPath.emptyPath;
+    let delayDays = 6 - 3;
     let card1 = {
         cardIdx: 0, 
         isDue: true, 
-        scheduleInfo: new CardScheduleInfo("2023-09-03", 1, 230), 
+        scheduleInfo: CardScheduleInfo.fromDueDateStr("2023-09-03", 1, 230, delayDays * TICKS_PER_DAY), 
     };
     let expected = [{
         questionType: CardType.SingleLineBasic, 
         topicPath: TopicPath.emptyPath, 
-        originalQuestionText: `A::B
+        questionTextOriginal: `A::B
 <!--SR:!2023-09-03,1,230-->`, 
-        rawQuestionText: "A::B", 
+        questionTextCleaned: "A::B", 
         lineNo: 1, 
         hasEditLaterTag: false, 
         questionTextHash: "1c6b0b01215dc4", 
@@ -71,6 +75,6 @@ A::B
         hasChanged: false
     }];
     expect(
-        parser.createQuestionList(noteText, noteTopicPath)
+        parser.createQuestionList(noteText, noteTopicPath, refDate)
     ).toMatchObject(expected);
 });

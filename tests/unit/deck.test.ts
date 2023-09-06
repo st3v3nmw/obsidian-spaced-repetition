@@ -1,5 +1,6 @@
 import { Deck } from "src/deck";
 import { TopicPath } from "src/topic-path";
+import { SampleItemDecks } from "./SampleItems";
 
 describe("constructor", () => {
     test("Deck name", () => {
@@ -91,3 +92,87 @@ describe("getOrCreateDeck()", () => {
     });
 });
 
+
+describe("getTopicPath()", () => {
+    test("Empty topic path", () => {
+        let deck: Deck = new Deck("Root", null);
+        let path: TopicPath = deck.getTopicPath();
+
+        expect(path.isEmptyPath).toEqual(true);
+    });
+
+    test("Single level topic path", () => {
+        let deck: Deck = new Deck("Root", null);
+        let subdeck: Deck = deck.getOrCreateDeck(new TopicPath(["Science"]));
+        let topicPath: TopicPath = subdeck.getTopicPath();
+
+        expect(topicPath.path).toEqual(["Science"]);
+    });
+
+    test("Multi level topic path", () => {
+        let deck: Deck = new Deck("Root", null);
+        let subdeck: Deck = deck.getOrCreateDeck(new TopicPath(["Science", "Chemistry"]));
+        let topicPath: TopicPath = subdeck.getTopicPath();
+
+        expect(topicPath.path).toEqual(["Science", "Chemistry"]);
+    });
+});
+
+describe("appendCard()", () => {
+    test("Append to root deck", () => {
+        let deck: Deck = new Deck("Root", null);
+        let path: TopicPath = deck.getTopicPath();
+
+        expect(path.isEmptyPath).toEqual(true);
+    });
+
+    test("Single level topic path", () => {
+        let deck: Deck = new Deck("Root", null);
+        let subdeck: Deck = deck.getOrCreateDeck(new TopicPath(["Science"]));
+        let topicPath: TopicPath = subdeck.getTopicPath();
+
+        expect(topicPath.path).toEqual(["Science"]);
+    });
+
+    test("Multi level topic path", () => {
+        let deck: Deck = new Deck("Root", null);
+        let subdeck: Deck = deck.getOrCreateDeck(new TopicPath(["Science", "Chemistry"]));
+        let topicPath: TopicPath = subdeck.getTopicPath();
+
+        expect(topicPath.path).toEqual(["Science", "Chemistry"]);
+    });
+});
+
+describe("toDeckArray()", () => {
+    test("Empty tree", () => {
+        let deckTree: Deck = new Deck("Root", null);
+        let deckArray: Deck[] = deckTree.toDeckArray();
+        let nameArray: string[] = deckArray.map((deck) => deck.deckName);
+        
+        expect(nameArray).toEqual([]);
+
+    });
+
+    test("Single level test", () => {
+        let deckTree: Deck = new Deck("Root", null);
+        deckTree.getOrCreateDeck(new TopicPath(["Aliens"]));
+        let deckArray: Deck[] = deckTree.toDeckArray();
+        let nameArray: string[] = deckArray.map((deck) => deck.deckName);
+        
+        let expectedArray: string[] = ["Aliens"]
+        expect(nameArray).toEqual(expectedArray);
+
+    });
+    
+    test("Multi level test", () => {
+        let deckTree: Deck = SampleItemDecks.createScienceTree();
+        let deckArray: Deck[] = deckTree.toDeckArray();
+        let nameArray: string[] = deckArray.map((deck) => deck.deckName);
+        
+        let expectedArray: string[] = ["Science", "Physics", "Electromagnetism", "Light", 
+            "Fluids", "Math", "Geometry", "Algebra", "Polynomials"];
+        expect(nameArray).toEqual(expectedArray);
+
+    });
+
+});
