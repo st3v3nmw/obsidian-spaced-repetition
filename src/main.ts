@@ -31,7 +31,9 @@ import { Stats } from "./stats";
 import { FlashcardReviewMode, FlashcardReviewSequencer as FlashcardReviewSequencer, IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "./FlashcardReviewSequencer";
 import { DeckTreeSequentialIterator } from "./DeckTreeIterator";
 import { CardScheduleCalculator } from "./CardSchedule";
-import { NoteUpdator } from "./note";
+import { INoteUpdator, Note, NoteUpdator } from "./note";
+import { NoteFileLoader } from "./NoteFileLoader";
+import { ObsidianTFile } from "./SRFile";
 
 interface PluginData {
     settings: SRSettings;
@@ -100,11 +102,7 @@ export default class SRPlugin extends Plugin {
         this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
             if (!this.syncLock) {
                 await this.sync();
-                let deckIterator = new DeckTreeSequentialIterator(CardListType.DueCard);
-                let cardScheduleCalculator = new CardScheduleCalculator();
-                let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(this.deckTree, FlashcardReviewMode.Review, deckIterator, this.data.settings, cardScheduleCalculator);
-                let noteUpdator = new NoteUpdator();
-                new FlashcardModal(this.app, this, reviewSequencer, noteUpdator).open();
+                this.openFlashcardModal(this.deckTree, FlashcardReviewMode.Review);
             }
         });
         
@@ -191,7 +189,7 @@ export default class SRPlugin extends Plugin {
             callback: async () => {
                 if (!this.syncLock) {
                     await this.sync();
-                    new FlashcardModal(this.app, this).open();
+                    this.openFlashcardModal(this.deckTree, FlashcardReviewMode.Review);
                 }
             },
         });
@@ -201,7 +199,7 @@ export default class SRPlugin extends Plugin {
             name: t("CRAM_ALL_CARDS"),
             callback: async () => {
                 await this.sync(true);
-                new FlashcardModal(this.app, this, true).open();
+                this.openFlashcardModal(this.deckTree, FlashcardReviewMode.Cram);
             },
         });
 
@@ -211,10 +209,9 @@ export default class SRPlugin extends Plugin {
             callback: async () => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
-                    this.deckTree = new Deck("root", null);
+                    let deck: Deck = new Deck("root", null);
                     const deckPath: TopicPath = this.findTopicPath(openFile);
-                    await this.findFlashcardsInNote(openFile, deckPath);
-                    new FlashcardModal(this.app, this).open();
+                    this.openFlashcardModal(deck, FlashcardReviewMode.Review);
                 }
             },
         });
@@ -225,10 +222,7 @@ export default class SRPlugin extends Plugin {
             callback: async () => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
-                    this.deckTree = new Deck("root", null);
-                    const deckPath: TopicPath = this.findTopicPath(openFile);
-                    await this.findFlashcardsInNote(openFile, deckPath, false, true);
-                    new FlashcardModal(this.app, this, true).open();
+                    this.openFlashcardModalForSingleCard(openFile, FlashcardReviewMode.Cram);
                 }
             },
         });
@@ -260,6 +254,24 @@ export default class SRPlugin extends Plugin {
         this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).forEach((leaf) => leaf.detach());
     }
 
+    private async openFlashcardModalForSingleCard(noteFile: TFile, reviewMode: FlashcardReviewMode): Promise<void> {
+        const topicPath: TopicPath = this.findTopicPath(noteFile);
+        let note: Note = await this.loadNote(noteFile, topicPath);
+        
+        let deck = new Deck("root", null);
+        note.appendCardsToDeck(deck);
+        this.openFlashcardModal(deck, reviewMode);
+}
+
+    private openFlashcardModal(deck: Deck, reviewMode: FlashcardReviewMode): void {
+        let deckIterator = new DeckTreeSequentialIterator(CardListType.DueCard);
+        let cardScheduleCalculator = new CardScheduleCalculator();
+        let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(deck, reviewMode, deckIterator, this.data.settings, cardScheduleCalculator);
+        let noteUpdator: INoteUpdator = new NoteUpdator();
+        new FlashcardModal(this.app, this, reviewSequencer, noteUpdator).open();
+
+    }
+
     async sync(ignoreStats = false): Promise<void> {
         if (this.syncLock) {
             return;
@@ -278,13 +290,13 @@ export default class SRPlugin extends Plugin {
         // reset flashcards stuff
         this.deckTree = new Deck("root", null);
         this.dueDatesFlashcards = {};
-        this.cardStats = {
+        this.cardStats = null; /* {
             eases: {},
             intervals: {},
             newCount: 0,
             youngCount: 0,
-            matureCount: 0,
-        };
+            matureCount: 0
+        }; */
 
         const now = window.moment(Date.now());
         const todayDate: string = now.format("YYYY-MM-DD");
@@ -295,20 +307,20 @@ export default class SRPlugin extends Plugin {
         }
 
         const notes: TFile[] = this.app.vault.getMarkdownFiles();
-        for (const note of notes) {
+        for (const noteFile of notes) {
             if (
                 this.data.settings.noteFoldersToIgnore.some((folder) =>
-                    note.path.startsWith(folder),
+                    noteFile.path.startsWith(folder),
                 )
             ) {
                 continue;
             }
 
-            if (this.incomingLinks[note.path] === undefined) {
-                this.incomingLinks[note.path] = [];
+            if (this.incomingLinks[noteFile.path] === undefined) {
+                this.incomingLinks[noteFile.path] = [];
             }
 
-            const links = this.app.metadataCache.resolvedLinks[note.path] || {};
+            const links = this.app.metadataCache.resolvedLinks[noteFile.path] || {};
             for (const targetPath in links) {
                 if (this.incomingLinks[targetPath] === undefined)
                     this.incomingLinks[targetPath] = [];
@@ -316,17 +328,19 @@ export default class SRPlugin extends Plugin {
                 // markdown files only
                 if (targetPath.split(".").pop().toLowerCase() === "md") {
                     this.incomingLinks[targetPath].push({
-                        sourcePath: note.path,
+                        sourcePath: noteFile.path,
                         linkCount: links[targetPath],
                     });
 
-                    graph.link(note.path, targetPath, links[targetPath]);
+                    graph.link(noteFile.path, targetPath, links[targetPath]);
                 }
             }
 
-            const topicPath: TopicPath = this.findTopicPath(note);
+            const topicPath: TopicPath = this.findTopicPath(noteFile);
             if (topicPath.hasPath) {
-                const flashcardsInNoteAvgEase: number = await this.findFlashcardsInNote(
+                let note: Note = await this.loadNote(noteFile, topicPath);
+                note.appendCardsToDeck(this.deckTree);
+                /* const flashcardsInNoteAvgEase: number = await this.findFlashcardsInNote(
                     note,
                     topicPath,
                     false,
@@ -335,10 +349,10 @@ export default class SRPlugin extends Plugin {
 
                 if (flashcardsInNoteAvgEase > 0) {
                     this.easeByPath[note.path] = flashcardsInNoteAvgEase;
-                }
+                } */
             }
 
-            const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
+            const fileCachedData = this.app.metadataCache.getFileCache(noteFile) || {};
 
             const frontmatter: FrontMatterCache | Record<string, unknown> =
                 fileCachedData.frontmatter || {};
@@ -370,7 +384,7 @@ export default class SRPlugin extends Plugin {
                 )
             ) {
                 for (const matchedNoteTag of matchedNoteTags) {
-                    this.reviewDecks[matchedNoteTag].newNotes.push(note);
+                    this.reviewDecks[matchedNoteTag].newNotes.push(noteFile);
                 }
                 continue;
             }
@@ -380,17 +394,17 @@ export default class SRPlugin extends Plugin {
                 .valueOf();
 
             for (const matchedNoteTag of matchedNoteTags) {
-                this.reviewDecks[matchedNoteTag].scheduledNotes.push({ note, dueUnix });
+                this.reviewDecks[matchedNoteTag].scheduledNotes.push({ note: noteFile, dueUnix });
                 if (dueUnix <= now.valueOf()) {
                     this.reviewDecks[matchedNoteTag].dueNotesCount++;
                 }
             }
 
-            if (Object.prototype.hasOwnProperty.call(this.easeByPath, note.path)) {
-                this.easeByPath[note.path] =
-                    (this.easeByPath[note.path] + frontmatter["sr-ease"]) / 2;
+            if (Object.prototype.hasOwnProperty.call(this.easeByPath, noteFile.path)) {
+                this.easeByPath[noteFile.path] =
+                    (this.easeByPath[noteFile.path] + frontmatter["sr-ease"]) / 2;
             } else {
-                this.easeByPath[note.path] = frontmatter["sr-ease"];
+                this.easeByPath[noteFile.path] = frontmatter["sr-ease"];
             }
 
             if (dueUnix <= now.valueOf()) {
@@ -431,7 +445,8 @@ export default class SRPlugin extends Plugin {
         this.statusBar.setText(
             t("STATUS_BAR", {
                 dueNotesCount: this.dueNotesCount,
-                dueFlashcardsCount: this.deckTree.dueFlashcardsCount,
+                dueFlashcardsCount: 100
+                /* dueFlashcardsCount: this.deckTree.dueFlashcardsCount, */
             }),
         );
 
@@ -439,8 +454,15 @@ export default class SRPlugin extends Plugin {
         this.syncLock = false;
     }
 
+    async loadNote(noteFile: TFile, topicPath: TopicPath): Promise<Note> {
+        let loader: NoteFileLoader = new NoteFileLoader();
+        let note: Note = await loader.Load(new ObsidianTFile(this.app.vault, noteFile), topicPath);
+        return note;
+
+    }
+
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
-        const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
+        /* const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         const frontmatter: FrontMatterCache | Record<string, unknown> =
             fileCachedData.frontmatter || {};
 
@@ -575,7 +597,7 @@ export default class SRPlugin extends Plugin {
         await this.sync();
         if (this.data.settings.autoNextNote) {
             this.reviewNextNote(this.lastSelectedReviewDeck);
-        }
+        } */
     }
 
     async reviewNextNoteModal(): Promise<void> {
@@ -649,7 +671,7 @@ export default class SRPlugin extends Plugin {
          */
     }
 
-    async findFlashcardsInNote(
+    /* async findFlashcardsInNote(
         note: TFile,
         deckPath: string[],
         buryOnly = false,
@@ -679,13 +701,13 @@ export default class SRPlugin extends Plugin {
             deckPath = noteDeckPath;
             const cardType: CardType = parsedCard[0],
                 lineNo: number = parsedCard[2];
-            let cardText: string = parsedCard[1];
+            let cardText: string = parsedCard[1]; */
 
             /* if (cardText.includes(settings.editLaterTag)) {
                 continue;
             } */
 
-            if (!settings.convertFoldersToDecks) {
+            /* if (!settings.convertFoldersToDecks) {
                 const tagInCardRegEx = /^#[^\s#]+/gi;
                 const cardDeckPath = cardText
                     .match(tagInCardRegEx)
@@ -696,11 +718,11 @@ export default class SRPlugin extends Plugin {
                     deckPath = cardDeckPath;
                     cardText = cardText.replaceAll(tagInCardRegEx, "");
                 }
-            }
+            } */
 
             /* this.deckTree.createDeck([...deckPath]); */
 
-            const cardTextHash: string = cyrb53(cardText);
+            /* const cardTextHash: string = cyrb53(cardText);
 
             if (buryOnly) {
                 this.data.buryList.push(cardTextHash);
@@ -714,7 +736,7 @@ export default class SRPlugin extends Plugin {
                     siblings.push(...cardText.matchAll(/==(.*?)==/gm));
                 }
                 if (settings.convertBoldTextToClozes) {
-                    siblings.push(...cardText.matchAll(/\*\*(.*?)\*\*/gm));
+                    siblings.push(...cardText.matchAll(/\*\*(.*?)\*\*ZZZ/gm));
                 }
                 if (settings.convertCurlyBracketsToClozes) {
                     siblings.push(...cardText.matchAll(/{{(.*?)}}/gm));
@@ -739,7 +761,7 @@ export default class SRPlugin extends Plugin {
                         cardText.substring(deletionEnd);
                     front = front
                         .replace(/==/gm, "")
-                        .replace(/\*\*/gm, "")
+                        .replace(/\*\*ZZZ/gm, "")
                         .replace(/{{/gm, "")
                         .replace(/}}/gm, "");
                     back =
@@ -750,7 +772,7 @@ export default class SRPlugin extends Plugin {
                         cardText.substring(deletionEnd);
                     back = back
                         .replace(/==/gm, "")
-                        .replace(/\*\*/gm, "")
+                        .replace(/\*\*ZZZ/gm, "")
                         .replace(/{{/gm, "")
                         .replace(/}}/gm, "");
                     siblingMatches.push([front, back]);
@@ -905,7 +927,7 @@ export default class SRPlugin extends Plugin {
         }
 
         return 0;
-    }
+    } */
 
     async loadPluginData(): Promise<void> {
         this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());

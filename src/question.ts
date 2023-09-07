@@ -1,7 +1,9 @@
 
 import { Card } from "./card";
 import { SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END } from "./constants";
+import { Note } from "./note";
 import { SRSettings } from "./settings";
+import { ISRFile } from "./SRFile";
 import { TopicPath } from "./TopicPath";
 
 export enum CardType {
@@ -13,6 +15,7 @@ export enum CardType {
 }
 
 export class Question { 
+    note: Note;
     questionType: CardType;
     topicPath: TopicPath;
     questionTextOriginal: string;

@@ -11,7 +11,24 @@ import { ISRFile } from "./SRFile";
 
 export class Note {
     file: ISRFile;
-    tfile
+    questionList: Question[];
+
+    get filePath(): string {
+        return this.file.path;
+    }
+
+    constructor(file: ISRFile, questionList: Question[]) {
+        this.file = file;
+        this.questionList = questionList;
+    }
+
+    appendCardsToDeck(deck: Deck): void {
+        for (const question of this.questionList) {
+            for (const card of question.cards) {
+                deck.appendCard(question.topicPath, card);
+            }
+        }
+    }
 }
 
 
@@ -45,7 +62,7 @@ function getCardContext(cardLine: number, headings: HeadingCache[], note_title: 
 
 export interface INoteUpdator {
     modifyQuestionText(noteFile: ISRFile, question: Question, replacementText: string): Promise<void>;
-    modifyQuestion(noteFile: ISRFile, question: Question): Promise<void>;
+//     modifyQuestion(noteFile: ISRFile, question: Question): Promise<void>;
 }
 
 export class NoteUpdator implements INoteUpdator {
@@ -61,7 +78,7 @@ export class NoteUpdator implements INoteUpdator {
         question.questionTextStrippedSR = replacementText;
     }
 
-
+/* 
     update(): void {
         const dueString: string = due.format("YYYY-MM-DD");
 
@@ -110,5 +127,5 @@ export class NoteUpdator implements INoteUpdator {
 
         await this.app.vault.modify(this.currentCard.note, fileText);
         this.currentDeck.nextCard(this);
-    }
+    } */
 }

@@ -21,7 +21,6 @@ export interface IFlashcardReviewSequencer {
 
     setCurrentDeck(topicPath: TopicPath): void;
     getDeckStats(topicPath: TopicPath): IDeckStats;
-    // getDeck(topicPath: TopicPath): Deck;
     skipCurrentCard(): void;
     processReview(response: ReviewResponse): Promise<void>;
 }
@@ -67,11 +66,27 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         return this.remainingDeckTree1;
     }
 
+    get currentNote(): Note {
+        return this.currentQuestion.note;
+    }
+
+    setCurrentDeck(topicPath: TopicPath): void {
+        throw "Not implemented";
+    }
+
+    getDeckStats(topicPath: TopicPath): IDeckStats {
+        throw "Not implemented";
+    }
+
+    skipCurrentCard(): void {
+
+    }
+
     private deleteCurrentCard(): void {
         this.currentDeck.deleteCard(this.currentCard);
     }
 
-    private async processReview(response: ReviewResponse): Promise<void> {
+    async processReview(response: ReviewResponse): Promise<void> {
         let deleteCard: boolean = false;
         let moveCardToEnd: boolean = false;
 
@@ -108,7 +123,8 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             if (currentCard.isDue) {
                 result = this.cardScheduleCalculator.calcUpdatedSchedule(response, currentCard.scheduleInfo);
             } else {
-                result = this.cardScheduleCalculator.getNewCardSchedule(response, this.note.path);
+                let currentNote: Note = currentCard.question.note;
+                result = this.cardScheduleCalculator.getNewCardSchedule(response, currentNote.filePath);
             }
         }
         return result;
