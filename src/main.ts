@@ -10,8 +10,8 @@ import {
 import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
-import { FlashcardModal } from "src/flashcard-modal";
-import { StatsModal, Stats } from "src/gui/stats-modal";
+import { FlashcardModal } from "src/gui/flashcard-modal";
+import { StatsModal } from "src/gui/stats-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/sidebar";
 import { ReviewResponse, schedule } from "src/scheduling";
 import {
@@ -25,7 +25,13 @@ import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
 import { t } from "src/lang/helpers";
 import { parse } from "src/parser";
 import { appIcon } from "src/icons/appicon";
-import { TopicPath } from "./topic-path";
+import { TopicPath } from "./TopicPath";
+import { CardListType, Deck } from "./deck";
+import { Stats } from "./stats";
+import { FlashcardReviewMode, FlashcardReviewSequencer as FlashcardReviewSequencer, IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "./FlashcardReviewSequencer";
+import { DeckTreeSequentialIterator } from "./DeckTreeIterator";
+import { CardScheduleCalculator } from "./CardSchedule";
+import { NoteUpdator } from "./note";
 
 interface PluginData {
     settings: SRSettings;
@@ -94,9 +100,14 @@ export default class SRPlugin extends Plugin {
         this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
             if (!this.syncLock) {
                 await this.sync();
-                new FlashcardModal(this.app, this).open();
+                let deckIterator = new DeckTreeSequentialIterator(CardListType.DueCard);
+                let cardScheduleCalculator = new CardScheduleCalculator();
+                let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(this.deckTree, FlashcardReviewMode.Review, deckIterator, this.data.settings, cardScheduleCalculator);
+                let noteUpdator = new NoteUpdator();
+                new FlashcardModal(this.app, this, reviewSequencer, noteUpdator).open();
             }
         });
+        
 
         if (!this.data.settings.disableFileMenuReviewOptions) {
             this.registerEvent(

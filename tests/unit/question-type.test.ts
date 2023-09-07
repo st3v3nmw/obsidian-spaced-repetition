@@ -1,5 +1,5 @@
 import { CardType } from "src/question";
-import { CardFrontBack, CardFrontBackUtil, QuestionType_ClozeUtil } from "src/question-type";
+import { CardFrontBack, CardFrontBackUtil, QuestionType_ClozeUtil } from "src/QuestionType";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 
 test("CardType.SingleLineBasic", () => {

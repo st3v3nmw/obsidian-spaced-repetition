@@ -6,7 +6,6 @@ import {
     Notice,
     Platform,
     TFile,
-    TextAreaComponent,
     setIcon,
 } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -17,8 +16,6 @@ import { SRSettings } from "src/settings";
 import { schedule, textInterval, ReviewResponse } from "src/scheduling";
 import {
     COLLAPSE_ICON,
-    MULTI_SCHEDULING_EXTRACTOR,
-    LEGACY_SCHEDULING_EXTRACTOR,
     IMAGE_FORMATS,
     AUDIO_FORMATS,
     VIDEO_FORMATS,
@@ -27,9 +24,9 @@ import { escapeRegexString, cyrb53 } from "src/utils";
 import { t } from "src/lang/helpers";
 import { unwatchFile } from "fs";
 import { Card } from "../card";
-import { Deck } from "../deck";
+import { CardListType, Deck } from "../deck";
 import { CardType, Question } from "../question";
-import { IFlashcardsReviewSequencer } from "src/flashcard-review-sequencer";
+import { IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "src/FlashcardReviewSequencer";
 import { FlashcardEditModal } from "./flashcards-edit-modal";
 import { INoteUpdator, Note } from "src/note";
 
@@ -50,18 +47,24 @@ export class FlashcardModal extends Modal {
     public easyBtn: HTMLElement;
     public nextBtn: HTMLElement;
     public responseDiv: HTMLElement;
-    public resetButton: HTMLElement;
+    public resetButton: HTMLButtonElement;
     public editButton: HTMLElement;
     public contextView: HTMLElement;
-    /* public currentCard: Card;
-    public currentCardIdx: number;
-    public currentDeck: Deck; */
     public mode: FlashcardModalMode;
     public ignoreStats: boolean;
-    private reviewSequencer: IFlashcardsReviewSequencer;
+    private reviewSequencer: IFlashcardReviewSequencer;
     private noteUpdator: INoteUpdator;
+    private currentNote: Note;
 
-    constructor(app: App, plugin: SRPlugin, reviewSequencer: IFlashcardsReviewSequencer, noteUpdator: INoteUpdator, ignoreStats = false) {
+    private get currentCard(): Card {
+        return this.reviewSequencer.currentCard;
+    }
+
+    private get currentQuestion(): Question {
+        return this.reviewSequencer.currentQuestion;
+    }
+
+    constructor(app: App, plugin: SRPlugin, reviewSequencer: IFlashcardReviewSequencer, noteUpdator: INoteUpdator, ignoreStats = false) {
         super(app);
 
         this.plugin = plugin;
@@ -152,21 +155,21 @@ export class FlashcardModal extends Modal {
                     aria-label={t("DUE_CARDS")}
                     class="tag-pane-tag-count tree-item-flair sr-deck-counts"
                 >
-                    {this.plugin.deckTree.dueFlashcardsCount.toString()}
+                    {this.plugin.deckTree.getCardCount(CardListType.All, true).toString()}
                 </span>
                 <span
                     style="background-color:#2196f3;"
                     aria-label={t("NEW_CARDS")}
                     class="tag-pane-tag-count tree-item-flair sr-deck-counts"
                 >
-                    {this.plugin.deckTree.newFlashcardsCount.toString()}
+                    {this.plugin.deckTree.getCardCount(CardListType.NewCard, true).toString()}
                 </span>
                 <span
                     style="background-color:#ff7043;"
                     aria-label={t("TOTAL_CARDS")}
                     class="tag-pane-tag-count tree-item-flair sr-deck-counts"
                 >
-                    {this.plugin.deckTree.totalFlashcards.toString()}
+                    {this.plugin.deckTree.getCardCount(CardListType.DueCard, true).toString()}
                 </span>
             </p>
         );
@@ -251,7 +254,6 @@ export class FlashcardModal extends Modal {
     startReviewOfDeck(deck: Deck) {
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         this.setupCardsView();
-        this.nextCard(modal);
     }
 
     setupCardsView(): void {
@@ -404,7 +406,7 @@ export class FlashcardModal extends Modal {
             this.resetButton.disabled = false;
         }
 
-        if (this.currentCard.cardType !== CardType.Cloze) {
+        if (this.currentQuestion.questionType !== CardType.Cloze) {
             const hr: HTMLElement = document.createElement("hr");
             hr.setAttribute("id", "sr-hr-card-divide");
             this.flashcardView.appendChild(hr);
@@ -416,97 +418,8 @@ export class FlashcardModal extends Modal {
     }
 
     private async processReview(response: ReviewResponse): Promise<void> {
-        /* if (this.ignoreStats) {
-            if (response == ReviewResponse.Easy) {
-                this.currentDeck.deleteFlashcardAtIndex(
-                    this.currentCardIdx,
-                    this.currentCard.isDue,
-                );
-            }
-            this.currentDeck.nextCard(this);
-            return;
-        } */
+        this.reviewSequencer.processReview(response);
 
-        /* let interval: number, ease: number, due;
-
-        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
-        if (response !== ReviewResponse.Reset) {
-            let schedObj: Record<string, number>;
-            // scheduled card
-            if (this.currentCard.isDue) {
-                schedObj = schedule(
-                    response,
-                    this.currentCard.interval,
-                    this.currentCard.ease,
-                    this.currentCard.delayBeforeReview,
-                    this.plugin.data.settings,
-                    this.plugin.dueDatesFlashcards,
-                );
-            } else {
-                let initial_ease: number = this.plugin.data.settings.baseEase;
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        this.plugin.easeByPath,
-                        this.currentCard.note.path,
-                    )
-                ) {
-                    initial_ease = Math.round(this.plugin.easeByPath[this.currentCard.note.path]);
-                }
-
-                schedObj = schedule(
-                    response,
-                    1.0,
-                    initial_ease,
-                    0,
-                    this.plugin.data.settings,
-                    this.plugin.dueDatesFlashcards,
-                );
-                interval = schedObj.interval;
-                ease = schedObj.ease;
-            }
-
-            interval = schedObj.interval;
-            ease = schedObj.ease;
-            due = window.moment(Date.now() + interval * 24 * 3600 * 1000);
-        } else {
-            this.currentCard.interval = 1.0;
-            this.currentCard.ease = this.plugin.data.settings.baseEase;
-            if (this.currentCard.isDue) {
-                this.currentDeck.dueFlashcards.push(this.currentCard);
-            } else {
-                this.currentDeck.newFlashcards.push(this.currentCard);
-            }
-            due = window.moment(Date.now());
-            new Notice(t("CARD_PROGRESS_RESET"));
-            this.currentDeck.nextCard(this);
-        }
-        if (response == ReviewResponse.Reset) {
-            new Notice(t("CARD_PROGRESS_RESET"));
-            return;
-        }
-
-        const dueString: string = due.format("YYYY-MM-DD");
-
-        let fileText: string = await this.app.vault.read(this.currentCard.note);
-        const replacementRegex = new RegExp(escapeRegexString(this.currentCard.cardText), "gm");
-
-        let sep: string = this.plugin.data.settings.cardCommentOnSameLine ? " " : "\n";
-        // Override separator if last block is a codeblock
-        if (this.currentCard.cardText.endsWith("```") && sep !== "\n") {
-            sep = "\n";
-        }
-
-
-        fileText = fileText.replace(replacementRegex, () => this.currentCard.cardText);
-        for (const sibling of this.currentCard.siblings) {
-            sibling.cardText = this.currentCard.cardText;
-        }
-        if (this.plugin.data.settings.burySiblingCards) {
-            this.burySiblingCards(true);
-        }
-
-        await this.app.vault.modify(this.currentCard.note, fileText);
-        this.currentDeck.nextCard(this); */
     }
 
 /*     private async burySiblingCards(tillNextDay: boolean): Promise<void> {
@@ -534,9 +447,7 @@ export class FlashcardModal extends Modal {
     } */
 
     private skipCurrentCard(): void {
-        this.currentDeck.deleteFlashcardAtIndex(this.currentCardIdx, this.currentCard.isDue);
-        this.burySiblingCards(false);
-        this.currentDeck.nextCard(this);
+        this.reviewSequencer.skipCurrentCard();
     }
 
     // slightly modified version of the renderMarkdown function in
@@ -551,7 +462,7 @@ export class FlashcardModal extends Modal {
         MarkdownRenderer.renderMarkdown(
             markdownString,
             containerEl,
-            this.currentCard.note.path,
+            this.currentNote.file.path,
             this.plugin,
         );
 
@@ -576,10 +487,10 @@ export class FlashcardModal extends Modal {
         const linkComponentsRegex =
             /^(?<file>[^#^]+)?(?:#(?!\^)(?<heading>.+)|#\^(?<blockId>.+)|#)?$/;
         const matched = typeof src === "string" && src.match(linkComponentsRegex);
-        const file = matched.groups.file || this.currentCard.note.path;
+        const file = matched.groups.file || this.currentNote.file.path;
         const target = this.plugin.app.metadataCache.getFirstLinkpathDest(
             file,
-            this.currentCard.note.path,
+            this.currentNote.file.path,
         );
         return {
             text: matched[0],

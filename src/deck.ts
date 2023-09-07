@@ -1,6 +1,6 @@
 import { Card } from "./card";
 import { Question } from "./question";
-import { TopicPath } from "./topic-path";
+import { TopicPath } from "./TopicPath";
 
 export enum CardListType {NewCard, DueCard, All}
 

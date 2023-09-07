@@ -2,7 +2,7 @@
 import { Card } from "./card";
 import { SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END } from "./constants";
 import { SRSettings } from "./settings";
-import { TopicPath } from "./topic-path";
+import { TopicPath } from "./TopicPath";
 
 export enum CardType {
     SingleLineBasic,
@@ -49,7 +49,7 @@ export class Question {
 
     formatScheduleAsHtmlComment(settings: SRSettings): string {
         let result: string = SR_HTML_COMMENT_BEGIN;
-        for (let i = 0; i < this.cards.length; i++) {
+        for (let i = 0; i < this.cards.length; i++)
             result += this.cards[i].formatSchedule(settings);
         result += SR_HTML_COMMENT_END;
         return result;

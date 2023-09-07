@@ -1,4 +1,4 @@
-import { TopicPath } from "src/topic-path";
+import { TopicPath } from "src/TopicPath";
 
 describe("Constructor exception handling", () => {
 

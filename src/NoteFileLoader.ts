@@ -1,9 +1,9 @@
 import { ISRFile } from "./SRFile";
-import { CardScheduleInfo } from "./card-schedule";
+import { CardScheduleInfo } from "./CardSchedule";
 import { Note } from "./note";
 import { Question } from "./question";
-import { CardFrontBack } from "./question-type";
-import { TopicPath } from "./topic-path";
+import { CardFrontBack } from "./QuestionType";
+import { TopicPath } from "./TopicPath";
 
 
 export class NoteFileLoader {

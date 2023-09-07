@@ -1,5 +1,5 @@
 import { Deck } from "src/deck";
-import { TopicPath } from "src/topic-path";
+import { TopicPath } from "src/TopicPath";
 import { SampleItemDecks } from "./SampleItems";
 
 describe("constructor", () => {

@@ -4,6 +4,7 @@ import {
 } from "obsidian";
 
 export interface ISRFile {
+    get path(): string;
     read(): Promise<string>;
     write(content: string): Promise<void>;
 }
@@ -15,6 +16,10 @@ export class ObsidianTFile implements ISRFile {
     constructor(vault: Vault, file: TFile) {
         this.vault = vault;
         this.file = file;
+    }
+
+    get path(): string {
+        return this.file.path;
     }
 
     async read(): Promise<string> {
@@ -31,6 +36,10 @@ export class UnitTestSRFile implements ISRFile {
 
     constructor(content: string) {
         this.content = content;
+    }
+
+    get path(): string {
+        throw "Not supported";
     }
 
     async read(): Promise<string> {

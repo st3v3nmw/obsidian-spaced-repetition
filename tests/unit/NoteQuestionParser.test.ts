@@ -1,9 +1,9 @@
 import { IQuestionContextFinder, NoteQuestionParser, NullImpl_IQuestionContextFinder } from "src/NoteQuestionParser";
-import { CardScheduleInfo } from "src/card-schedule";
+import { CardScheduleInfo } from "src/CardSchedule";
 import { TICKS_PER_DAY } from "src/constants";
 import { CardType, Question } from "src/question";
 import { DEFAULT_SETTINGS } from "src/settings";
-import { TopicPath } from "src/topic-path";
+import { TopicPath } from "src/TopicPath";
 
 let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
 let parser: NoteQuestionParser = new NoteQuestionParser(DEFAULT_SETTINGS, questionContextFinder);

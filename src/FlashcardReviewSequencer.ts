@@ -4,24 +4,24 @@ import { Deck } from "./deck";
 import { Question } from "./question";
 import { ReviewResponse, schedule } from "./scheduling";
 import { SRSettings } from "./settings";
-import { TopicPath } from "./topic-path";
+import { TopicPath } from "./TopicPath";
 import { escapeRegexString } from "./utils";
-import { CardScheduleInfo, ICardScheduleCalculator } from "./card-schedule";
+import { CardScheduleInfo, ICardScheduleCalculator } from "./CardSchedule";
 import { INoteEaseList } from "./NoteEaseList";
 import { TICKS_PER_DAY } from "./constants";
 import { t } from "./lang/helpers";
 import { Note } from "./note";
+import { IDeckTreeIterator } from "./DeckTreeIterator";
 
-export interface IFlashcardsReviewSequencer {
+export interface IFlashcardReviewSequencer {
     get currentCard(): Card;
     get currentQuestion(): Question;
     get currentNote(): Note;
     get currentDeck(): Deck;
-    get remainingDeckTree(): Deck;
 
     setCurrentDeck(topicPath: TopicPath): void;
     getDeckStats(topicPath: TopicPath): IDeckStats;
-    getDeck(topicPath: TopicPath): Deck;
+    // getDeck(topicPath: TopicPath): Deck;
     skipCurrentCard(): void;
     processReview(response: ReviewResponse): Promise<void>;
 }
@@ -36,7 +36,7 @@ export interface IDeckStats {
 
 export enum FlashcardReviewMode { Cram, Review };
 
-export class FlashcardsReviewSequencer implements IFlashcardsReviewSequencer {
+export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     remainingDeckTree1: Deck;
     reviewMode: FlashcardReviewMode;
     cardSequencer: IDeckTreeIterator;
@@ -52,7 +52,7 @@ export class FlashcardsReviewSequencer implements IFlashcardsReviewSequencer {
     }
 
     get currentCard(): Card {
-
+        return this.cardSequencer.currentCard;
     }
 
     get currentQuestion(): Question {
@@ -60,7 +60,7 @@ export class FlashcardsReviewSequencer implements IFlashcardsReviewSequencer {
     }
 
     get currentDeck(): Deck { 
-
+        return this.cardSequencer.currentDeck;
     }
 
     get remainingDeckTree(): Deck {
@@ -93,7 +93,8 @@ export class FlashcardsReviewSequencer implements IFlashcardsReviewSequencer {
         } else if (deleteCard) {
             this.deleteCurrentCard();
         }
-        this.nextCard();
+        else
+            this.nextCard();
     }
     
     private determineCardSchedule(response: ReviewResponse, currentCard: Card): CardScheduleInfo {

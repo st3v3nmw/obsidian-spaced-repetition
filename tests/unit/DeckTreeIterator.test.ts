@@ -1,5 +1,5 @@
+import { IQuestionContextFinder, NoteQuestionParser, NullImpl_IQuestionContextFinder } from "src/NoteQuestionParser";
 import { Deck } from "src/deck";
-import { IQuestionContextFinder, NoteQuestionParser, NullImpl_IQuestionContextFinder } from "src/question";
 import { DEFAULT_SETTINGS } from "src/settings";
 
 let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();

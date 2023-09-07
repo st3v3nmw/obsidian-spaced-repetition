@@ -5,6 +5,7 @@ export interface IDeckTreeIterator {
     get currentDeck(): Deck;
     get currentCard(): Card;
     setDeck(deck: Deck): void;
+    deleteCurrentCard(): boolean;
     nextCard(): boolean;
 }
 
@@ -85,5 +86,13 @@ export class DeckTreeSequentialIterator implements IDeckTreeIterator {
             }
         }
         return this.cardIdx != null;
+    }
+
+    deleteCurrentCard(): boolean {
+        if ((this.cardIdx == null) || (this.cardListType == null))
+            throw "no current card";
+        this.currentDeck.deleteCardAtIndex(this.cardIdx, this.cardListType);
+        this.cardIdx--;
+        return this.nextCard();
     }
 }

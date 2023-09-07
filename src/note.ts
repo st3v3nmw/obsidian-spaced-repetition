@@ -1,5 +1,5 @@
 import { App, CachedMetadata, HeadingCache, MetadataCache, TFile, Vault } from "obsidian";
-import { TopicPath } from "./topic-path";
+import { TopicPath } from "./TopicPath";
 import { SRSettings } from "./settings";
 import { parse } from "./parser";
 import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR, tagInCardRegEx } from "./constants";
@@ -11,6 +11,7 @@ import { ISRFile } from "./SRFile";
 
 export class Note {
     file: ISRFile;
+    tfile
 }
 
 

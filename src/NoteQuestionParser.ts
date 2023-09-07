@@ -1,10 +1,10 @@
 import { Card } from "./card";
-import { CardScheduleInfo, NoteCardScheduleParser } from "./card-schedule";
+import { CardScheduleInfo, NoteCardScheduleParser } from "./CardSchedule";
 import { parse } from "./parser";
 import { CardType, Question } from "./question";
-import { CardFrontBack, CardFrontBackUtil } from "./question-type";
+import { CardFrontBack, CardFrontBackUtil } from "./QuestionType";
 import { SRSettings } from "./settings";
-import { TopicPath } from "./topic-path";
+import { TopicPath } from "./TopicPath";
 import { cyrb53 } from "./utils";
 
 

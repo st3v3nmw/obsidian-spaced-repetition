@@ -1,4 +1,4 @@
-import { CardScheduleInfo, NoteCardScheduleParser } from "src/card-schedule";
+import { CardScheduleInfo, NoteCardScheduleParser } from "src/CardSchedule";
 
 test("No schedule info for question", () => {
     expect(

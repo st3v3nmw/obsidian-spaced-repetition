@@ -1,5 +1,5 @@
 import { Question } from "./question";
-import { CardScheduleInfo } from "./card-schedule";
+import { CardScheduleInfo } from "./CardSchedule";
 import { CardListType } from "./deck";
 import { SRSettings } from "./settings";
 

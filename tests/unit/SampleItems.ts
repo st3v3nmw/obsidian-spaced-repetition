@@ -1,8 +1,8 @@
 import { Deck } from "src/deck";
 import { CardType, Question } from "src/question";
-import { CardFrontBack, CardFrontBackUtil } from "src/question-type";
+import { CardFrontBack, CardFrontBackUtil } from "src/QuestionType";
 import { DEFAULT_SETTINGS } from "src/settings";
-import { TopicPath } from "src/topic-path";
+import { TopicPath } from "src/TopicPath";
 
 export class SampleItemDecks {
     static createScienceTree(): Deck {
