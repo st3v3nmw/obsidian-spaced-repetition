@@ -34,6 +34,7 @@ import { CardScheduleCalculator } from "./CardSchedule";
 import { INoteUpdator, Note, NoteUpdator } from "./note";
 import { NoteFileLoader } from "./NoteFileLoader";
 import { ObsidianTFile } from "./SRFile";
+import { IQuestionContextFinder, NullImpl_IQuestionContextFinder } from "./NoteQuestionParser";
 
 interface PluginData {
     settings: SRSettings;
@@ -261,15 +262,16 @@ export default class SRPlugin extends Plugin {
         let deck = new Deck("root", null);
         note.appendCardsToDeck(deck);
         this.openFlashcardModal(deck, reviewMode);
-}
+    }
 
     private openFlashcardModal(deck: Deck, reviewMode: FlashcardReviewMode): void {
         let deckIterator = new DeckTreeSequentialIterator(CardListType.DueCard);
         let cardScheduleCalculator = new CardScheduleCalculator();
-        let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(deck, reviewMode, deckIterator, this.data.settings, cardScheduleCalculator);
+        let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(reviewMode, deckIterator, this.data.settings, cardScheduleCalculator);
         let noteUpdator: INoteUpdator = new NoteUpdator();
-        new FlashcardModal(this.app, this, reviewSequencer, noteUpdator).open();
 
+        reviewSequencer.setDeckTree(deck);
+        new FlashcardModal(this.app, this, reviewSequencer, noteUpdator).open();
     }
 
     async sync(ignoreStats = false): Promise<void> {
@@ -455,7 +457,8 @@ export default class SRPlugin extends Plugin {
     }
 
     async loadNote(noteFile: TFile, topicPath: TopicPath): Promise<Note> {
-        let loader: NoteFileLoader = new NoteFileLoader();
+        let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
+        let loader: NoteFileLoader = new NoteFileLoader(this.data.settings, questionContextFinder);
         let note: Note = await loader.Load(new ObsidianTFile(this.app.vault, noteFile), topicPath);
         return note;
 

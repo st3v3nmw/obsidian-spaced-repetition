@@ -20,10 +20,12 @@ export class NoteParser {
         let questionParser: NoteQuestionParser = new NoteQuestionParser(this.settings, this.questionContextFinder);
         let noteText: string = await noteFile.read();
         let questions = questionParser.createQuestionList(noteText, noteTopicPath, refDate);
-        
-        let result: Note = new Note {
+        let totalCards: number = questions.reduce((accumulator, q) => accumulator + q.cards.length, 0);
 
-        };
+        throw `${noteText}, ${questions.length}, ${totalCards}`;
+        
+        let result: Note = new Note(noteFile, questions);
+        return result;
     }
 
 }

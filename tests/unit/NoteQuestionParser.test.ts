@@ -20,61 +20,129 @@ test("No questions in the text", () => {
 });
 
 
-test("Single question in the text: SingleLineBasic: No schedule info", () => {
-    let noteText: string = `#flashcards/test
+describe("Single question in the text", () => {
+    test("SingleLineBasic: No schedule info", () => {
+        let noteText: string = `#flashcards/test
 A::B
 `;
 
-    let noteTopicPath: TopicPath = TopicPath.emptyPath;
-    let card1 = {
-        cardIdx: 0, 
-        isDue: false, 
-        scheduleInfo: null as CardScheduleInfo, 
-    };
-    let expected = [{
-        questionType: CardType.SingleLineBasic, 
-        topicPath: TopicPath.emptyPath, 
-        questionTextOriginal: `A::B`, 
-        questionTextCleaned: "A::B", 
-        lineNo: 1, 
-        hasEditLaterTag: false, 
-        context: "", 
-        cards: [ card1 ], 
-        hasChanged: false
-    }];
-    expect(
-        parser.createQuestionList(noteText, noteTopicPath, refDate)
-    ).toMatchObject(expected);
-});
+            let noteTopicPath: TopicPath = TopicPath.emptyPath;
+            let card1 = {
+                cardIdx: 0, 
+                isDue: false, 
+                scheduleInfo: null as CardScheduleInfo, 
+            };
+            let expected = [{
+                questionType: CardType.SingleLineBasic, 
+                topicPath: TopicPath.emptyPath, 
+                questionTextOriginal: `A::B`, 
+                questionTextCleaned: "A::B", 
+                lineNo: 1, 
+                hasEditLaterTag: false, 
+                context: "", 
+                cards: [ card1 ], 
+                hasChanged: false
+            }];
+            expect(
+                parser.createQuestionList(noteText, noteTopicPath, refDate)
+            ).toMatchObject(expected);
+    });
 
-
-test("Single question in the text: SingleLineBasic: With schedule info", () => {
-    let noteText: string = `#flashcards/test
+    test("SingleLineBasic: With schedule info", () => {
+        let noteText: string = `#flashcards/test
 A::B
 <!--SR:!2023-09-03,1,230-->
+    `;
+
+        let noteTopicPath: TopicPath = TopicPath.emptyPath;
+        let delayDays = 6 - 3;
+        let card1 = {
+            cardIdx: 0, 
+            isDue: true, 
+            scheduleInfo: CardScheduleInfo.fromDueDateStr("2023-09-03", 1, 230, delayDays * TICKS_PER_DAY), 
+        };
+        let expected = [{
+            questionType: CardType.SingleLineBasic, 
+            topicPath: TopicPath.emptyPath, 
+            questionTextOriginal: `A::B
+<!--SR:!2023-09-03,1,230-->`, 
+            questionTextCleaned: "A::B", 
+            lineNo: 1, 
+            hasEditLaterTag: false, 
+            questionTextHash: "1c6b0b01215dc4", 
+            context: "", 
+            cards: [ card1 ], 
+            hasChanged: false
+        }];
+        expect(
+            parser.createQuestionList(noteText, noteTopicPath, refDate)
+        ).toMatchObject(expected);
+    });
+});
+
+
+describe("Multiple questions in the text", () => {
+    test("SingleLineBasic: No schedule info", () => {
+        let noteText: string = `#flashcards/test
+Q1::A1
+Q2::A2
 `;
 
-    let noteTopicPath: TopicPath = TopicPath.emptyPath;
-    let delayDays = 6 - 3;
-    let card1 = {
-        cardIdx: 0, 
-        isDue: true, 
-        scheduleInfo: CardScheduleInfo.fromDueDateStr("2023-09-03", 1, 230, delayDays * TICKS_PER_DAY), 
-    };
-    let expected = [{
-        questionType: CardType.SingleLineBasic, 
-        topicPath: TopicPath.emptyPath, 
-        questionTextOriginal: `A::B
-<!--SR:!2023-09-03,1,230-->`, 
-        questionTextCleaned: "A::B", 
-        lineNo: 1, 
-        hasEditLaterTag: false, 
-        questionTextHash: "1c6b0b01215dc4", 
-        context: "", 
-        cards: [ card1 ], 
-        hasChanged: false
-    }];
-    expect(
-        parser.createQuestionList(noteText, noteTopicPath, refDate)
-    ).toMatchObject(expected);
+            let noteTopicPath: TopicPath = TopicPath.emptyPath;
+            let questionList: Question[] = parser.createQuestionList(noteText, noteTopicPath, refDate);
+            expect(questionList.length).toEqual(2);
+
+            checkQuestion1(questionList[0]);
+            checkQuestion2(questionList[1]);
+    });
+    
 });
+
+function checkQuestion1(question: Question) {
+    expect(question.cards.length).toEqual(1);
+    let card1 = {
+        cardIdx: 0,
+        isDue: false,
+        front: "Q1",
+        back: "A1",
+        scheduleInfo: null as CardScheduleInfo,
+    };
+    let expected = {
+        questionType: CardType.SingleLineBasic,
+        topicPath: TopicPath.emptyPath,
+        questionTextOriginal: `Q1::A1`,
+        questionTextCleaned: "Q1::A1",
+        lineNo: 1,
+        hasEditLaterTag: false,
+        context: "",
+        hasChanged: false
+    };
+    expect(question).toMatchObject(expected);
+    expect(question.cards[0]).toMatchObject(card1);
+    return question;
+}
+
+function checkQuestion2(question: Question) {
+    expect(question.cards.length).toEqual(1);
+    let card1 = {
+        cardIdx: 0,
+        isDue: false,
+        front: "Q2",
+        back: "A2",
+        scheduleInfo: null as CardScheduleInfo,
+    };
+    let expected = {
+        questionType: CardType.SingleLineBasic,
+        topicPath: TopicPath.emptyPath,
+        questionTextOriginal: `Q2::A2`,
+        questionTextCleaned: "Q2::A2",
+        lineNo: 2,
+        hasEditLaterTag: false,
+        context: "",
+        hasChanged: false
+    };
+    expect(question).toMatchObject(expected);
+    expect(question.cards[0]).toMatchObject(card1);
+    return question;
+}
+

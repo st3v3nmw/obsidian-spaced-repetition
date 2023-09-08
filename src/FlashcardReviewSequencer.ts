@@ -19,16 +19,23 @@ export interface IFlashcardReviewSequencer {
     get currentNote(): Note;
     get currentDeck(): Deck;
 
+    setDeckTree(deckTree: Deck): void;
     setCurrentDeck(topicPath: TopicPath): void;
-    getDeckStats(topicPath: TopicPath): IDeckStats;
+    getDeckStats(topicPath: TopicPath): DeckStats;
     skipCurrentCard(): void;
     processReview(response: ReviewResponse): Promise<void>;
 }
 
-export interface IDeckStats {
-    dueCount: string;
-    newCount: string;
-    totalCount: string;
+export class DeckStats {
+    dueCount: number;
+    newCount: number;
+    totalCount: number;
+
+    constructor(dueCount: number, newCount: number, totalCount: number) {
+        this.dueCount = dueCount;
+        this.newCount = newCount;
+        this.totalCount = totalCount;
+    }
 }
 
 
@@ -36,14 +43,13 @@ export interface IDeckStats {
 export enum FlashcardReviewMode { Cram, Review };
 
 export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
-    remainingDeckTree1: Deck;
+    deckTree: Deck;
     reviewMode: FlashcardReviewMode;
     cardSequencer: IDeckTreeIterator;
     settings: SRSettings;
     cardScheduleCalculator: ICardScheduleCalculator;
 
-    constructor(remainingDeckTree: Deck, reviewMode: FlashcardReviewMode, cardSequencer: IDeckTreeIterator, settings: SRSettings, cardScheduleCalculator: ICardScheduleCalculator) {
-            this.remainingDeckTree1 = remainingDeckTree;
+    constructor(reviewMode: FlashcardReviewMode, cardSequencer: IDeckTreeIterator, settings: SRSettings, cardScheduleCalculator: ICardScheduleCalculator) {
             this.reviewMode = reviewMode;
             this.cardSequencer = cardSequencer;
             this.settings = settings;
@@ -63,19 +69,26 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     get remainingDeckTree(): Deck {
-        return this.remainingDeckTree1;
+        return this.deckTree;
     }
 
     get currentNote(): Note {
         return this.currentQuestion.note;
     }
 
-    setCurrentDeck(topicPath: TopicPath): void {
-        throw "Not implemented";
+    setDeckTree(deckTree: Deck): void {
+        this.deckTree = deckTree;
+        this.setCurrentDeck(TopicPath.emptyPath);
     }
 
-    getDeckStats(topicPath: TopicPath): IDeckStats {
-        throw "Not implemented";
+    setCurrentDeck(topicPath: TopicPath): void {
+        let deck: Deck = this.deckTree.getDeck(topicPath);
+        this.cardSequencer.setDeck(deck);
+        this.cardSequencer.nextCard();
+    }
+
+    getDeckStats(topicPath: TopicPath): DeckStats {
+        return new DeckStats(1, 2, 3);
     }
 
     skipCurrentCard(): void {

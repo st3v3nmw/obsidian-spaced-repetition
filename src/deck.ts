@@ -34,25 +34,41 @@ export class Deck {
         this.parent = parent;
     }
 
+    static get emptyDeck(): Deck {
+        return new Deck("Root", null);
+    }
+
     get isRootDeck() {
         return (this.parent == null);
     }
 
+    getDeck(topicPath: TopicPath): Deck {
+        return this._getOrCreateDeck(topicPath, false);
+    }
+
     getOrCreateDeck(topicPath: TopicPath): Deck {
+        return this._getOrCreateDeck(topicPath, true);
+    }
+
+    private _getOrCreateDeck(topicPath: TopicPath, createAllowed: boolean): Deck {
         if (!topicPath.hasPath) {
             return this;
         }
         const deckName: string = topicPath.shift();
         for (const subdeck of this.subdecks) {
             if (deckName === subdeck.deckName) {
-                return subdeck.getOrCreateDeck(topicPath);
+                return subdeck._getOrCreateDeck(topicPath, createAllowed);
             }
         }
         
-        let parent: Deck = this;
-        const subdeck: Deck = new Deck(deckName, parent);
-        this.subdecks.push(subdeck);
-        return subdeck.getOrCreateDeck(topicPath);
+        let result: Deck = null;
+        if (createAllowed) {
+            let parent: Deck = this;
+            const subdeck: Deck = new Deck(deckName, parent);
+            this.subdecks.push(subdeck);
+            result = subdeck._getOrCreateDeck(topicPath, createAllowed);
+        }
+        return result;
     }
 
     getTopicPath(): TopicPath {

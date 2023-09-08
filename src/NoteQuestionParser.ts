@@ -68,7 +68,7 @@ export class NoteQuestionParser {
 
             // Create the list of card objects, and attach to the question
             let cardList: Card[] = this.createCardList(cardFrontBackList, cardScheduleInfoList);
-            question.attachCardList(cardList);
+            question.setCardList(cardList);
             result.push(question);
         }
         return result;

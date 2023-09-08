@@ -18,7 +18,9 @@ export class NoteFileLoader {
     settings: SRSettings;
     questionContextFinder: IQuestionContextFinder;
 
-    constructor() { 
+    constructor(settings: SRSettings, questionContextFinder: IQuestionContextFinder) { 
+        this.settings = settings;
+        this.questionContextFinder = questionContextFinder;
     }
 
     async Load(noteFile: ISRFile, noteTopicPath: TopicPath): Promise<Note> { 

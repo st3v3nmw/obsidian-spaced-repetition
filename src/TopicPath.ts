@@ -33,7 +33,7 @@ export class TopicPath {
 
     static getTopicPathOfFile(note: TFile, settings: SRSettings, appMetadataCache: MetadataCache): TopicPath {
         var deckPath: string[] = [];
-        var result: TopicPath;
+        var result: TopicPath = TopicPath.emptyPath;
 
         if (settings.convertFoldersToDecks) {
             deckPath = note.path.split("/");

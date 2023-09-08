@@ -20,13 +20,13 @@ export class DeckTreeSequentialIterator implements IDeckTreeIterator {
 
     get currentDeck(): Deck {
         if (this.deckIdx == null)
-            throw "No current deck";
+            return null;
         return this.deckArray[this.deckIdx];
     }
 
     get currentCard(): Card {
         if ((this.deckIdx == null) || (this.cardIdx == null))
-            throw "No current card";
+            return null;
         return this.deckArray[this.deckIdx].getCard(this.cardIdx, this.cardListType);
     }
 

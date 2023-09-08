@@ -45,7 +45,7 @@ export class Question {
         return sep;
     }
 
-    attachCardList(cards: Card[]): void {
+    setCardList(cards: Card[]): void {
         this.cards = cards;
         this.cards.forEach((card) => card.question = this);
     }
