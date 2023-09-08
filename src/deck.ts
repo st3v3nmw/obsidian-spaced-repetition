@@ -148,6 +148,30 @@ export class Deck {
         }
     }
 
+    debugLogToConsole() {
+        console.log(this.toString());
+    }
+
+    toString(indent: number = 0): string {
+        let result: string = "";
+        let indentStr: string = " ".repeat(indent * 4);
+
+        result += `${indentStr}${this.deckName}\r\n`;
+        for (let i = 0; i < this.newFlashcards.length; i++) {
+            let card = this.newFlashcards[i];
+            result += `${indentStr}New: ${i}: ${card.front}::${card.back}\r\n`;
+        }
+        for (let i = 0; i < this.dueFlashcards.length; i++) {
+            let card = this.dueFlashcards[i];
+            result += `${indentStr}Due: ${i}: ${card.front}::${card.back}\r\n`;
+        }
+
+        for (const subdeck of this.subdecks) {
+            result += subdeck.toString(indent + 1);
+        }
+        return result;
+    }
+
     static otherListType(cardListType: CardListType): CardListType {
         var result: CardListType;
         if (cardListType == CardListType.NewCard)
@@ -158,6 +182,8 @@ export class Deck {
             throw "Invalid cardListType";
         return result;
     }
+
+
 /* 
 
     originalNextCard(modal: FlashcardModal): void {

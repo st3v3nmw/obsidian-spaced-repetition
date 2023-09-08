@@ -10,12 +10,10 @@ describe("Constructor exception handling", () => {
             expect(t).toThrow();
     });
 
-    test("Constructor rejects zero length array", () => {
+    test("Constructor allows zero length array", () => {
             
-        const t = () => {
-            let path: TopicPath = new TopicPath([]);
-        };
-        expect(t).toThrow();
+        let path: TopicPath = new TopicPath([]);
+        expect(path.hasPath).toEqual(false);
     });
 
     test("Constructor rejects path that includes '/'", () => {

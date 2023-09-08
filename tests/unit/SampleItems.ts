@@ -9,9 +9,17 @@ import { DEFAULT_SETTINGS } from "src/settings";
 import { UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
 
-let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
-let questionParser: NoteQuestionParser = new NoteQuestionParser(DEFAULT_SETTINGS, questionContextFinder);
-let refDate: Date = new Date(2000, 0, 1);
+export function createTest_NoteQuestionParser() : NoteQuestionParser {
+    let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
+    let questionParser: NoteQuestionParser = new NoteQuestionParser(DEFAULT_SETTINGS, questionContextFinder);
+    return questionParser;
+}
+export function createTest_NoteParser() : NoteParser {
+    let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
+    let result = new NoteParser(DEFAULT_SETTINGS, questionContextFinder);
+    return result;
+}
+export const test_RefDate_20230906: Date = new Date(2023, 8, 6);
 
 export class SampleItemDecks {
     static async createSingleLevelTree_NewCards(): Promise<Deck> {
@@ -36,8 +44,8 @@ Q3::A3`;
         let deck: Deck = new Deck("Root", null);
         let file: UnitTestSRFile = new UnitTestSRFile(text);
         let topicPath: TopicPath = TopicPath.emptyPath;
-        let noteParser: NoteParser = new NoteParser(DEFAULT_SETTINGS, questionContextFinder, noteTopicPath);
-        let note: Note = await noteParser.parse(file, noteTopicPath, refDate);
+        let noteParser: NoteParser = createTest_NoteParser();
+        let note: Note = await noteParser.parse(file, noteTopicPath, test_RefDate_20230906);
         note.appendCardsToDeck(deck);
         return deck;
     }
