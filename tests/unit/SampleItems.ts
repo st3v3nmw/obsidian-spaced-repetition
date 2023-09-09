@@ -5,13 +5,13 @@ import { NoteParser } from "src/NoteParser";
 import { IQuestionContextFinder, NoteQuestionParser, NullImpl_IQuestionContextFinder } from "src/NoteQuestionParser";
 import { CardType, Question } from "src/question";
 import { CardFrontBack, CardFrontBackUtil } from "src/QuestionType";
-import { DEFAULT_SETTINGS } from "src/settings";
+import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
 
-export function createTest_NoteQuestionParser() : NoteQuestionParser {
+export function createTest_NoteQuestionParser(settings: SRSettings) : NoteQuestionParser {
     let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
-    let questionParser: NoteQuestionParser = new NoteQuestionParser(DEFAULT_SETTINGS, questionContextFinder);
+    let questionParser: NoteQuestionParser = new NoteQuestionParser(settings, questionContextFinder);
     return questionParser;
 }
 export function createTest_NoteParser() : NoteParser {
