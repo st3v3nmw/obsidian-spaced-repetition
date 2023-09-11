@@ -4,9 +4,10 @@ import { parse } from "./parser";
 import { CardType, Question } from "./question";
 import { CardFrontBack, CardFrontBackUtil } from "./QuestionType";
 import { SRSettings } from "./settings";
+import { ISRFile, UnitTestSRFile } from "./SRFile";
 import { TopicPath } from "./TopicPath";
 import { cyrb53 } from "./utils";
-
+import { getAllTagsFromText } from "src/utils";
 
 export class ParsedQuestionInfo { 
     cardType: CardType;
@@ -43,7 +44,33 @@ export class NoteQuestionParser {
         this.questionContextFinder = questionContextFinder;
     }
 
-    createQuestionList(noteText: string, noteTopicPath: TopicPath, refDate: Date): Question[] { 
+    async createQuestionList(noteFile: ISRFile, folderTopicPath: TopicPath, refDate: Date): Promise<Question[]> { 
+        let noteText: string = await noteFile.read();
+        var noteTopicPath: TopicPath;
+        if (this.settings.convertFoldersToDecks) {
+            noteTopicPath = folderTopicPath;
+        } else {
+            let tagList: string[] = noteFile.getAllTags();
+            noteTopicPath = this.determineTopicPathFromTags(tagList);
+        }
+        var result: Question[] = this.doCreateQuestionList(noteText, noteTopicPath, refDate);
+        return result;
+    }
+
+    /* createQuestionList_WithNoteTags(noteText: string, tagList: string[], refDate: Date): Question[] { 
+        if (this.settings.convertFoldersToDecks)
+            throw "Invalid usage";
+        let noteTopicPath: TopicPath = this.determineTopicPathFromTags(tagList);
+        return this.doCreateQuestionList(noteText, noteTopicPath, refDate);
+    }
+
+    createQuestionList_WithFolderTopicPath(noteText: string, folderTopicPath: TopicPath, refDate: Date): Question[] { 
+        if (!this.settings.convertFoldersToDecks)
+            throw "Invalid usage";
+        return this.doCreateQuestionList(noteText, folderTopicPath, refDate);
+    } */
+
+    private doCreateQuestionList(noteText: string, noteTopicPath: TopicPath, refDate: Date): Question[] { 
         this.noteText = noteText;
         this.noteTopicPath = noteTopicPath;
 
@@ -143,6 +170,19 @@ export class NoteQuestionParser {
             siblings.push(cardObj);
         }
         return siblings;
+    }
+
+    private determineTopicPathFromTags(tagList: string[]): TopicPath {
+        let result: TopicPath = TopicPath.emptyPath;
+        outer: for (const tagToReview of this.settings.flashcardTags) {
+            for (const tag of tagList) {
+                if (tag === tagToReview || tag.startsWith(tagToReview + "/")) {
+                    result = TopicPath.getTopicPathFromTag(tag);
+                    break outer;
+                }
+            }
+        }
+        return result;
     }
 
 }

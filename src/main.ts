@@ -459,7 +459,7 @@ export default class SRPlugin extends Plugin {
     async loadNote(noteFile: TFile, topicPath: TopicPath): Promise<Note> {
         let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
         let loader: NoteFileLoader = new NoteFileLoader(this.data.settings, questionContextFinder);
-        let note: Note = await loader.Load(new ObsidianTFile(this.app.vault, noteFile), topicPath);
+        let note: Note = await loader.Load(new ObsidianTFile(this.app.vault, this.app.metadataCache, noteFile), topicPath);
         return note;
 
     }

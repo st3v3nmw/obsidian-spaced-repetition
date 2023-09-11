@@ -14,10 +14,9 @@ export class NoteParser {
         this.questionContextFinder = questionContextFinder;
     }
 
-    async parse(noteFile: ISRFile, noteTopicPath: TopicPath, refDate: Date) {
+    async parse(noteFile: ISRFile, folderTopicPath: TopicPath, refDate: Date) {
         let questionParser: NoteQuestionParser = new NoteQuestionParser(this.settings, this.questionContextFinder);
-        let noteText: string = await noteFile.read();
-        let questions = questionParser.createQuestionList(noteText, noteTopicPath, refDate);
+        let questions = await questionParser.createQuestionList(noteFile, folderTopicPath, refDate);
         let totalCards: number = questions.reduce((accumulator, q) => accumulator + q.cards.length, 0);
 
         // throw `${noteText}, ${questions.length}, ${totalCards}`;

@@ -1,10 +1,16 @@
 import {
+    MetadataCache,
     TFile,
     Vault,
+    getAllTags as ObsidianGetAllTags,
 } from "obsidian";
+import { OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "./constants";
+import { getAllTagsFromText } from "./utils";
+
 
 export interface ISRFile {
     get path(): string;
+    getAllTags(): string[];
     read(): Promise<string>;
     write(content: string): Promise<void>;
 }
@@ -12,14 +18,21 @@ export interface ISRFile {
 export class ObsidianTFile implements ISRFile {
     file: TFile;
     vault: Vault;
+    metadataCache: MetadataCache;
 
-    constructor(vault: Vault, file: TFile) {
+    constructor(vault: Vault, metadataCache: MetadataCache, file: TFile) {
         this.vault = vault;
+        this.metadataCache = metadataCache;
         this.file = file;
     }
 
     get path(): string {
         return this.file.path;
+    }
+
+    getAllTags(): string[] {
+        const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
+        return ObsidianGetAllTags(fileCachedData) || [];
     }
 
     async read(): Promise<string> {
@@ -40,6 +53,10 @@ export class UnitTestSRFile implements ISRFile {
 
     get path(): string {
         throw "Not supported";
+    }
+
+    getAllTags(): string[] {
+        return getAllTagsFromText(this.content);      
     }
 
     async read(): Promise<string> {

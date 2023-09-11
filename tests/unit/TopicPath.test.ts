@@ -77,6 +77,11 @@ describe("getTopicPathFromCardText", () => {
         let path: TopicPath = TopicPath.getTopicPathFromCardText(cardText);
 
         expect(path).toEqual(new TopicPath(["flashcards", "science", "chemistry"]));
+
+        cardText = "#flashcards/examination Q2::A2";
+        path = TopicPath.getTopicPathFromCardText(cardText);
+
+        expect(path).toEqual(new TopicPath(["flashcards", "examination"]));
     });
 
     test("Card text includes 2 multi level tags", () => {
@@ -109,5 +114,60 @@ describe("removeTopicPathFromCardText", () => {
         let result: string = TopicPath.removeTopicPathFromCardText(cardText);
 
         expect(result).toEqual("Card text does include tag");
+    });
+});
+
+describe("getTopicPathFromTag", () => {
+
+    test("Null string", () => {
+        const t = () => {
+            TopicPath.getTopicPathFromTag(null);
+        };
+        expect(t).toThrow();
+    });
+
+    test("Empty string", () => {
+        const t = () => {
+            TopicPath.getTopicPathFromTag("");
+        };
+        expect(t).toThrow();
+    });
+
+    test("String that doesn't start with a #", () => {
+        const t = () => {
+            TopicPath.getTopicPathFromTag("Invalid tag")
+        };
+        expect(t).toThrow();
+    });
+
+    test("String that is only the #", () => {
+        const t = () => {
+            TopicPath.getTopicPathFromTag("#")
+        };
+        expect(t).toThrow();
+    });
+
+    test("Single level tag", () => {
+        let result: TopicPath = TopicPath.getTopicPathFromTag("#flashcard");
+
+        expect(result.path).toEqual(["flashcard"]);
+    });
+
+    test("Multi level tag", () => {
+        let result: TopicPath = TopicPath.getTopicPathFromTag("#flashcard/science/physics");
+
+        expect(result.path).toEqual(["flashcard", "science", "physics"]);
+    });
+
+    test("Tag with trailing slash", () => {
+        let result: TopicPath = TopicPath.getTopicPathFromTag("#flashcard/science/physics/");
+
+        expect(result.path).toEqual(["flashcard", "science", "physics"]);
+    });
+
+    test("Tag with multiple adjacent slashes", () => {
+        let result: TopicPath = TopicPath.getTopicPathFromTag("#flashcard///science//physics");
+
+        expect(result.path).toEqual(["flashcard", "science", "physics"]);
     });
 });

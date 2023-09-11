@@ -71,3 +71,11 @@ export function formatDate_YYYY_MM_DD(date: Date): string {
     ].join('-')
   );
 }
+
+export function getAllTagsFromText(text: string): string[] {
+  const tagRegex = /#[^\s#]+/gi;
+  let result: RegExpMatchArray = text.match(tagRegex);
+  if (!result)
+    return [];
+  return result;      
+}
