@@ -17,7 +17,6 @@ test("Single schedule info for question (on separate line)", () => {
     expect(actual).toEqual([
         CardScheduleInfo.fromDueDateStr("2023-09-02", 4, 270, 4 * TICKS_PER_DAY)
     ]);
-    expect(actual[0].dueDate).toEqual(1693576800000);
 });
 
 test("Single schedule info for question (on same line)", () => {

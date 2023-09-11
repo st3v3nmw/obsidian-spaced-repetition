@@ -126,8 +126,7 @@ export class Deck {
 
     toDeckArray(): Deck[] {
         let result: Deck[] = [];
-        if (!this.isRootDeck)
-            result.push(this);
+        result.push(this);
         for (const subdeck of this.subdecks) {
             result.push(...subdeck.toDeckArray());
         }

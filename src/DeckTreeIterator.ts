@@ -76,13 +76,18 @@ export class DeckTreeSequentialIterator implements IDeckTreeIterator {
         let cardList: Card[] = deck.getCardListForCardType(this.cardListType);
         this.cardIdx++;
         if (this.cardIdx == cardList.length) {
-            // Try the other list type
-            this.cardListType = Deck.otherListType(this.cardListType);
-            this.cardIdx = 0;
-            cardList = deck.getCardListForCardType(this.cardListType);
-            if (this.cardIdx == cardList.length) {
+            if (this.cardListType == this.preferredCardListType) {
+                // Try the other list type
+                this.cardListType = Deck.otherListType(this.cardListType);
+                this.cardIdx = 0;
+                cardList = deck.getCardListForCardType(this.cardListType);
+                if (this.cardIdx == cardList.length) {
+                    this.cardIdx = null;
+                    this.cardListType = null;
+                }
+            }
+            else {
                 this.cardIdx = null;
-                this.cardListType = null;
             }
         }
         return this.cardIdx != null;

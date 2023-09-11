@@ -83,6 +83,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
     setCurrentDeck(topicPath: TopicPath): void {
         let deck: Deck = this.deckTree.getDeck(topicPath);
+        console.debug(`setCurrentDeck: [${topicPath?.path}]: ${deck?.deckName}\r\n`);
         this.cardSequencer.setDeck(deck);
         this.cardSequencer.nextCard();
     }

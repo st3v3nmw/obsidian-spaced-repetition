@@ -24,7 +24,7 @@ describe("setDeckTree", () => {
 Q1::A1
 Q2::A2
 Q3::A3`;
-        let deck: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["flashcards"]));
+        let deck: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
         deck.debugLogToConsole();
         expect(deck.newFlashcards.length).toEqual(3);
         reviewSequencer.setDeckTree(deck);
