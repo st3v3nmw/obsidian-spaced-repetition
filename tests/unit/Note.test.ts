@@ -11,7 +11,7 @@ let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContex
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS, questionContextFinder);
 let refDate: Date = new Date(2023, 8, 6);
 
-describe("appendCardsToDeck", () => {
+describe.only("appendCardsToDeck", () => {
 
     test("Multiple questions, single card per question", async () => {
         let noteText: string = `#flashcards/test
@@ -19,16 +19,16 @@ Q1::A1
 Q2::A2
 Q3::A3
 `;
-let file: UnitTestSRFile = new UnitTestSRFile(noteText);
-let noteTopicPath = TopicPath.emptyPath;
-            let note: Note = await parser.parse(file, noteTopicPath, refDate);
-            let deck: Deck = Deck.emptyDeck;
-            note.appendCardsToDeck(deck);
-            expect(deck.newFlashcards.length).toEqual(3);
-            expect(deck.newFlashcards[0].front).toEqual("Q1");
-            expect(deck.newFlashcards[1].front).toEqual("Q2");
-            expect(deck.newFlashcards[2].front).toEqual("Q3");
-            expect(deck.dueFlashcards.length).toEqual(0);
+        let file: UnitTestSRFile = new UnitTestSRFile(noteText);
+        let folderTopicPath = TopicPath.emptyPath;
+        let note: Note = await parser.parse(file, folderTopicPath, refDate);
+        let deck: Deck = Deck.emptyDeck;
+        note.appendCardsToDeck(deck);
+        let subdeck: Deck = deck.getDeck(new TopicPath(["flashcards", "test"]));
+        expect(subdeck.newFlashcards[0].front).toEqual("Q1");
+        expect(subdeck.newFlashcards[1].front).toEqual("Q2");
+        expect(subdeck.newFlashcards[2].front).toEqual("Q3");
+        expect(subdeck.dueFlashcards.length).toEqual(0);
     });
     
     test("Multiple questions, multiple cards per question", async () => {
@@ -37,16 +37,17 @@ Q1:::A1
 Q2:::A2
 Q3:::A3
 `;
-let file: UnitTestSRFile = new UnitTestSRFile(noteText);
-let noteTopicPath = TopicPath.emptyPath;
-            let note: Note = await parser.parse(file, noteTopicPath, refDate);
-            let deck: Deck = Deck.emptyDeck;
-            note.appendCardsToDeck(deck);
-            expect(deck.newFlashcards.length).toEqual(6);
-            let frontList = deck.newFlashcards.map((card) => card.front);
+        let file: UnitTestSRFile = new UnitTestSRFile(noteText);
+        let folderTopicPath = TopicPath.emptyPath;
+        let note: Note = await parser.parse(file, folderTopicPath, refDate);
+        let deck: Deck = Deck.emptyDeck;
+        note.appendCardsToDeck(deck);
+        let subdeck: Deck = deck.getDeck(new TopicPath(["flashcards", "test"]));
+        expect(subdeck.newFlashcards.length).toEqual(6);
+        let frontList = subdeck.newFlashcards.map((card) => card.front);
 
-            expect(frontList).toEqual(["Q1", "A1", "Q2", "A2", "Q3", "A3"]);
-            expect(deck.dueFlashcards.length).toEqual(0);
+        expect(frontList).toEqual(["Q1", "A1", "Q2", "A2", "Q3", "A3"]);
+        expect(subdeck.dueFlashcards.length).toEqual(0);
     });
     
     

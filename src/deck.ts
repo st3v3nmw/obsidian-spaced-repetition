@@ -54,10 +54,11 @@ export class Deck {
         if (!topicPath.hasPath) {
             return this;
         }
-        const deckName: string = topicPath.shift();
+        let t: TopicPath = topicPath.clone();
+        const deckName: string = t.shift();
         for (const subdeck of this.subdecks) {
             if (deckName === subdeck.deckName) {
-                return subdeck._getOrCreateDeck(topicPath, createAllowed);
+                return subdeck._getOrCreateDeck(t, createAllowed);
             }
         }
         
@@ -66,7 +67,7 @@ export class Deck {
             let parent: Deck = this;
             const subdeck: Deck = new Deck(deckName, parent);
             this.subdecks.push(subdeck);
-            result = subdeck._getOrCreateDeck(topicPath, createAllowed);
+            result = subdeck._getOrCreateDeck(t, createAllowed);
         }
         return result;
     }

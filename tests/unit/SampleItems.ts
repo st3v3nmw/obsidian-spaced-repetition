@@ -40,12 +40,12 @@ Q3::A3`;
         return deck;
     }
 
-    static async createDeckFromNote(text: string, noteTopicPath: TopicPath): Promise<Deck> {
+    static async createDeckFromNote(text: string, folderTopicPath: TopicPath): Promise<Deck> {
         let deck: Deck = new Deck("Root", null);
         let file: UnitTestSRFile = new UnitTestSRFile(text);
         let topicPath: TopicPath = TopicPath.emptyPath;
         let noteParser: NoteParser = createTest_NoteParser();
-        let note: Note = await noteParser.parse(file, noteTopicPath, test_RefDate_20230906);
+        let note: Note = await noteParser.parse(file, folderTopicPath, test_RefDate_20230906);
         note.appendCardsToDeck(deck);
         return deck;
     }

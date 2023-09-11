@@ -19,10 +19,10 @@ Q2::A2
 Q3::A3
 `;
         let file: UnitTestSRFile = new UnitTestSRFile(noteText);
-        let noteTopicPath = TopicPath.emptyPath;
-        let note: Note = await parser.parse(file, noteTopicPath, refDate);
+        let folderTopicPath = TopicPath.emptyPath;
+        let note: Note = await parser.parse(file, folderTopicPath, refDate);
         let questionList = note.questionList;
-        expect(questionList.length).toEqual(2);
+        expect(questionList.length).toEqual(3);
 
     });
     

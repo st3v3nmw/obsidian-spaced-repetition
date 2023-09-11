@@ -31,6 +31,10 @@ export class TopicPath {
         return this.path.shift();
     }
 
+    clone(): TopicPath {
+        return new TopicPath([...this.path]);
+    }
+
     static getTopicPathOfFile(note: TFile, settings: SRSettings, appMetadataCache: MetadataCache): TopicPath {
         var deckPath: string[] = [];
         var result: TopicPath = TopicPath.emptyPath;

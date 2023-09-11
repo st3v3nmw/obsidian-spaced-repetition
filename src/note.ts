@@ -30,12 +30,16 @@ export class Note {
             }
         }
     }
+
+    debugLogToConsole(desc: string = "") {
+        let str: string = `Note: ${desc}: ${this.questionList.length} questions\r\n`;
+        for (let i = 0; i < this.questionList.length; i++) {
+            let q: Question = this.questionList[i];
+            str += `[${i}]: ${q.questionType}: ${q.lineNo}: ${q.topicPath?.path}: ${q.questionTextOriginal}\r\n`;
+        }
+        console.debug(str);
+    }
 }
-
-
-
-
-
 
 function getCardContext(cardLine: number, headings: HeadingCache[], note_title: string): string {
     const stack: HeadingCache[] = [];
@@ -58,8 +62,6 @@ function getCardContext(cardLine: number, headings: HeadingCache[], note_title: 
     }
     return context.slice(0, -3);
 }
-
-
 
 export interface INoteUpdator {
     modifyQuestionText(noteFile: ISRFile, question: Question, replacementText: string): Promise<void>;
