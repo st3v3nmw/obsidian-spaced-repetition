@@ -33,8 +33,7 @@ export class NoteFileLoader {
         
         let questionParser: NoteQuestionParser = new NoteQuestionParser(this.settings, this.questionContextFinder);
 
-        this.fileText = await noteFile.read();
-        let questionList: Question[] = questionParser.createQuestionList(this.fileText, noteTopicPath, refDate);
+        let questionList: Question[] = await questionParser.createQuestionList(noteFile, noteTopicPath, refDate);
 
         let result: Note = new Note(noteFile, questionList);
         return result;

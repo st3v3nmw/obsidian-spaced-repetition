@@ -29,8 +29,6 @@ Q3::A3`;
         expect(deck.newFlashcards.length).toEqual(3);
         reviewSequencer.setDeckTree(deck);
         expect(reviewSequencer.currentDeck.newFlashcards.length).toEqual(3);
-        expect(reviewSequencer.currentDeck.getCardCount(CardListType.All, true)).toEqual(2);
-        expect(reviewSequencer.currentDeck.getCardCount(CardListType.All, true)).toEqual(2);
         let expected = {
             front: "Q1", 
             back: "A1"

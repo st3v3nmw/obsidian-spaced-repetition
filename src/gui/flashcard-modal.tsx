@@ -29,7 +29,7 @@ import { CardType, Question } from "../question";
 import { IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "src/FlashcardReviewSequencer";
 import { FlashcardEditModal } from "./flashcards-edit-modal";
 import { INoteUpdator, Note } from "src/note";
-import { RenderMarkdownWrapper } from "src/renderMarkdownWrapper";
+import { RenderMarkdownWrapper } from "src/RenderMarkdownWrapper";
 
 export enum FlashcardModalMode {
     DecksList,
