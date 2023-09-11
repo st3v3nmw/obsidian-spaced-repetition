@@ -149,7 +149,7 @@ describe("toDeckArray()", () => {
         let deckArray: Deck[] = deckTree.toDeckArray();
         let nameArray: string[] = deckArray.map((deck) => deck.deckName);
         
-        expect(nameArray).toEqual([]);
+        expect(nameArray).toEqual(["Root"]);
 
     });
 
@@ -159,7 +159,7 @@ describe("toDeckArray()", () => {
         let deckArray: Deck[] = deckTree.toDeckArray();
         let nameArray: string[] = deckArray.map((deck) => deck.deckName);
         
-        let expectedArray: string[] = ["Aliens"]
+        let expectedArray: string[] = ["Root", "Aliens"]
         expect(nameArray).toEqual(expectedArray);
 
     });
@@ -169,7 +169,7 @@ describe("toDeckArray()", () => {
         let deckArray: Deck[] = deckTree.toDeckArray();
         let nameArray: string[] = deckArray.map((deck) => deck.deckName);
         
-        let expectedArray: string[] = ["Science", "Physics", "Electromagnetism", "Light", 
+        let expectedArray: string[] = ["Root", "Science", "Physics", "Electromagnetism", "Light", 
             "Fluids", "Math", "Geometry", "Algebra", "Polynomials"];
         expect(nameArray).toEqual(expectedArray);
 

@@ -71,7 +71,7 @@ export class TopicPath {
     }
 
     static removeTopicPathFromCardText(cardText: string): string { 
-        return cardText.replaceAll(OBSIDIAN_TAG_AT_STARTOFLINE_REGEX, "").trim();
+        return cardText.trimStart().replaceAll(OBSIDIAN_TAG_AT_STARTOFLINE_REGEX, "").trim();
     }
 
     static getTopicPathFromTag(tag: string): TopicPath {

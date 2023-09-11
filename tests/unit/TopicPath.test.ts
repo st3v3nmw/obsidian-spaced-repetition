@@ -115,6 +115,13 @@ describe("removeTopicPathFromCardText", () => {
 
         expect(result).toEqual("Card text does include tag");
     });
+
+    test("White space present before topic tag", () => {
+        let cardText: string = "   #flashcards/science/chemistry Card text does include tag";
+        let result: string = TopicPath.removeTopicPathFromCardText(cardText);
+
+        expect(result).toEqual("Card text does include tag");
+    });
 });
 
 describe("getTopicPathFromTag", () => {

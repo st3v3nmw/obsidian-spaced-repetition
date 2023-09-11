@@ -242,6 +242,25 @@ Q1::A1
                 expect(questionList[i].topicPath).toEqual(expectedPath);
         });
     });
+
+    describe("Tags within question", () => {
+        expect(parserWithDefaultSettings.settings.convertFoldersToDecks).toEqual(false);
+
+        test("Leading white space before topic tag", async () => {
+            let noteText: string = `
+            #flashcards/science Q5::A5 <!--SR:!2023-09-02,4,270-->
+    `;
+            let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+            let expectedPath: TopicPath = new TopicPath(["flashcards", "science"]);
+            let folderTopicPath: TopicPath = TopicPath.emptyPath;
+            let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, test_RefDate_20230906);
+            expect(questionList.length).toEqual(1);
+            expect(questionList[0].topicPath).toEqual(expectedPath);
+            expect(questionList[0].cards.length).toEqual(1);
+            expect(questionList[0].cards[0].front).toEqual("Q5");
+        });
+    });
 });
 
 function checkQuestion1(question: Question) {
