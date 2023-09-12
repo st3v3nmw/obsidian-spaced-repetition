@@ -1,5 +1,5 @@
 import { IQuestionContextFinder, NoteQuestionParser, NullImpl_IQuestionContextFinder } from "src/NoteQuestionParser";
-import { CardListType, Deck } from "src/deck";
+import { CardListType, Deck } from "src/Deck";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { SampleItemDecks } from "./SampleItems";
 import { TopicPath } from "src/TopicPath";

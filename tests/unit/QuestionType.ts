@@ -1,4 +1,4 @@
-import { CardType } from "src/question";
+import { CardType } from "src/Question";
 import { CardFrontBack, CardFrontBackUtil, QuestionType_ClozeUtil } from "src/QuestionType";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 

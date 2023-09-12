@@ -2,8 +2,8 @@ import { NoteParser } from "src/NoteParser";
 import { IQuestionContextFinder, NullImpl_IQuestionContextFinder } from "src/NoteQuestionParser";
 import { UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
-import { Note } from "src/note";
-import { Question } from "src/question";
+import { Note } from "src/Note";
+import { Question } from "src/Question";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 

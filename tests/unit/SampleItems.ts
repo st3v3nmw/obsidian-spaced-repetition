@@ -1,9 +1,9 @@
-import { Card } from "src/card";
-import { Deck } from "src/deck";
-import { Note } from "src/note";
+import { Card } from "src/Card";
+import { Deck } from "src/Deck";
+import { Note } from "src/Note";
 import { NoteParser } from "src/NoteParser";
 import { IQuestionContextFinder, NoteQuestionParser, NullImpl_IQuestionContextFinder } from "src/NoteQuestionParser";
-import { CardType, Question } from "src/question";
+import { CardType, Question } from "src/Question";
 import { CardFrontBack, CardFrontBackUtil } from "src/QuestionType";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { UnitTestSRFile } from "src/SRFile";

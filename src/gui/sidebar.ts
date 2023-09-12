@@ -2,7 +2,7 @@ import { ItemView, WorkspaceLeaf, Menu, TFile } from "obsidian";
 
 import type SRPlugin from "src/main";
 import { COLLAPSE_ICON } from "src/constants";
-import { ReviewDeck } from "src/review-deck";
+import { ReviewDeck } from "src/ReviewDeck";
 import { t } from "src/lang/helpers";
 
 export const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";

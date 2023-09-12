@@ -21,17 +21,17 @@ import {
     MULTI_SCHEDULING_EXTRACTOR,
 } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/util/utils";
-import { ReviewDeck, ReviewDeckSelectionModal } from "src/review-deck";
+import { ReviewDeck, ReviewDeckSelectionModal } from "src/ReviewDeck";
 import { t } from "src/lang/helpers";
 import { parse } from "src/parser";
 import { appIcon } from "src/icons/appicon";
 import { TopicPath } from "./TopicPath";
-import { CardListType, Deck } from "./deck";
+import { CardListType, Deck } from "./Deck";
 import { Stats } from "./stats";
 import { FlashcardReviewMode, FlashcardReviewSequencer as FlashcardReviewSequencer, IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "./FlashcardReviewSequencer";
 import { DeckTreeSequentialIterator } from "./DeckTreeIterator";
 import { CardScheduleCalculator } from "./CardSchedule";
-import { INoteUpdator, Note, NoteUpdator } from "./note";
+import { INoteUpdator, Note, NoteUpdator } from "./Note";
 import { NoteFileLoader } from "./NoteFileLoader";
 import { ObsidianTFile } from "./SRFile";
 import { IQuestionContextFinder, NullImpl_IQuestionContextFinder } from "./NoteQuestionParser";

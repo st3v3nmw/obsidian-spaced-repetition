@@ -1,7 +1,7 @@
 
-import { Card } from "./card";
+import { Card } from "./Card";
 import { SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END } from "./constants";
-import { Note } from "./note";
+import { Note } from "./Note";
 import { SRSettings } from "./settings";
 import { ISRFile } from "./SRFile";
 import { TopicPath } from "./TopicPath";

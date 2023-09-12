@@ -2,7 +2,7 @@ import { CardScheduleCalculator } from "src/CardSchedule";
 import { DeckTreeSequentialIterator, IDeckTreeIterator } from "src/DeckTreeIterator";
 import { FlashcardReviewMode, FlashcardReviewSequencer, IFlashcardReviewSequencer } from "src/FlashcardReviewSequencer";
 import { TopicPath } from "src/TopicPath";
-import { CardListType, Deck } from "src/deck";
+import { CardListType, Deck } from "src/Deck";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { SampleItemDecks } from "./SampleItems";
 

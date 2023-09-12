@@ -1,5 +1,5 @@
-import { Card } from "./card";
-import { CardListType, Deck } from "./deck";
+import { Card } from "./Card";
+import { CardListType, Deck } from "./Deck";
 
 export interface IDeckTreeIterator {
     get currentDeck(): Deck;

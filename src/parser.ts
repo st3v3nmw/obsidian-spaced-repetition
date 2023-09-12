@@ -1,4 +1,4 @@
-import { CardType } from "./question";
+import { CardType } from "./Question";
 
 
 /**

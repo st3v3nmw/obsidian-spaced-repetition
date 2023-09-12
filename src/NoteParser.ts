@@ -1,6 +1,6 @@
 import { IQuestionContextFinder, NoteQuestionParser } from "./NoteQuestionParser";
 import { ISRFile } from "./SRFile";
-import { Note } from "./note";
+import { Note } from "./Note";
 import { SRSettings } from "./settings";
 import { TopicPath } from "./TopicPath";
 

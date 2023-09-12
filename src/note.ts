@@ -3,10 +3,10 @@ import { TopicPath } from "./TopicPath";
 import { SRSettings } from "./settings";
 import { parse } from "./parser";
 import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR, OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "./constants";
-import { Deck } from "./deck";
-import { Card } from "./card";
+import { Deck } from "./Deck";
+import { Card } from "./Card";
 import { cyrb53, escapeRegexString } from "./util/utils";
-import { Question } from "./question";
+import { Question } from "./Question";
 import { ISRFile } from "./SRFile";
 
 export class Note {

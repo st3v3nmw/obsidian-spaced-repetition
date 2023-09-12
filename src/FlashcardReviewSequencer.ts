@@ -1,7 +1,7 @@
 import { Notice, TFile, Vault } from "obsidian";
-import { Card } from "./card";
-import { Deck } from "./deck";
-import { Question } from "./question";
+import { Card } from "./Card";
+import { Deck } from "./Deck";
+import { Question } from "./Question";
 import { ReviewResponse, schedule } from "./scheduling";
 import { SRSettings } from "./settings";
 import { TopicPath } from "./TopicPath";
@@ -10,7 +10,7 @@ import { CardScheduleInfo, ICardScheduleCalculator } from "./CardSchedule";
 import { INoteEaseList } from "./NoteEaseList";
 import { TICKS_PER_DAY } from "./constants";
 import { t } from "./lang/helpers";
-import { Note } from "./note";
+import { Note } from "./Note";
 import { IDeckTreeIterator } from "./DeckTreeIterator";
 
 export interface IFlashcardReviewSequencer {
