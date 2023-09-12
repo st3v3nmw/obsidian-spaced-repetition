@@ -403,7 +403,7 @@ export class FlashcardModal extends Modal {
         this.answerBtn.style.display = "none";
         this.responseDiv.style.display = "grid";
 
-        if (this.currentCard.isDue) {
+        if (this.currentCard.hasSchedule) {
             this.resetButton.disabled = false;
         }
 

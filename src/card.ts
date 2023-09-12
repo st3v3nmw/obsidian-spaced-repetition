@@ -8,7 +8,9 @@ export class Card {
     cardIdx: number;
 
     // scheduling
-    isDue: boolean;
+    get hasSchedule(): boolean {
+        return (this.scheduleInfo != null);
+    }
     scheduleInfo?: CardScheduleInfo;
     
     // visuals
@@ -20,11 +22,11 @@ export class Card {
     }
 
     get cardListType(): CardListType {
-        return this.isDue ? CardListType.DueCard : CardListType.NewCard;
+        return this.hasSchedule ? CardListType.DueCard : CardListType.NewCard;
     }
 
     get isNew(): boolean {
-        return !this.isDue;
+        return !this.hasSchedule;
     }
 
     formatSchedule(settings: SRSettings): string {

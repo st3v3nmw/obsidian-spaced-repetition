@@ -39,7 +39,6 @@ A::B
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
             let card1 = {
                 cardIdx: 0, 
-                isDue: false, 
                 scheduleInfo: null as CardScheduleInfo, 
             };
             let expected = [{
@@ -69,7 +68,6 @@ A::B
         let delayDays = 6 - 3;
         let card1 = {
             cardIdx: 0, 
-            isDue: true, 
             scheduleInfo: CardScheduleInfo.fromDueDateStr("2023-09-03", 1, 230, delayDays * TICKS_PER_DAY), 
         };
         let expected = [{

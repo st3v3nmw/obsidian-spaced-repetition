@@ -138,7 +138,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             result = this.cardScheduleCalculator.getResetCardSchedule();
         } else {
             // scheduled card
-            if (currentCard.isDue) {
+            if (currentCard.hasSchedule) {
                 result = this.cardScheduleCalculator.calcUpdatedSchedule(response, currentCard.scheduleInfo);
             } else {
                 let currentNote: Note = currentCard.question.note;

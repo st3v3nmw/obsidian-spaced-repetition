@@ -160,7 +160,6 @@ export class NoteQuestionParser {
 
             let hasScheduleInfo: boolean = i < cardScheduleInfoList.length;
             const cardObj: Card = new Card({
-                isDue: hasScheduleInfo,
                 front,
                 back,
                 cardIdx: i
