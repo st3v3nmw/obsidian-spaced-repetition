@@ -29,11 +29,9 @@ export class NoteFileLoader {
         this.headings = this.fileCachedData.headings || [];
         this.fixesMade = false; */
             
-        const refDate: Date = new Date();
-        
         let questionParser: NoteQuestionParser = new NoteQuestionParser(this.settings, this.questionContextFinder);
 
-        let questionList: Question[] = await questionParser.createQuestionList(noteFile, noteTopicPath, refDate);
+        let questionList: Question[] = await questionParser.createQuestionList(noteFile, noteTopicPath);
 
         let result: Note = new Note(noteFile, questionList);
         return result;

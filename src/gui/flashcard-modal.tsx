@@ -20,7 +20,7 @@ import {
     AUDIO_FORMATS,
     VIDEO_FORMATS,
 } from "src/constants";
-import { escapeRegexString, cyrb53 } from "src/utils";
+import { escapeRegexString, cyrb53 } from "src/util/utils";
 import { t } from "src/lang/helpers";
 import { unwatchFile } from "fs";
 import { Card } from "../card";
@@ -29,7 +29,7 @@ import { CardType, Question } from "../question";
 import { IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "src/FlashcardReviewSequencer";
 import { FlashcardEditModal } from "./flashcards-edit-modal";
 import { INoteUpdator, Note } from "src/note";
-import { RenderMarkdownWrapper } from "src/RenderMarkdownWrapper";
+import { RenderMarkdownWrapper } from "src/util/RenderMarkdownWrapper";
 
 export enum FlashcardModalMode {
     DecksList,

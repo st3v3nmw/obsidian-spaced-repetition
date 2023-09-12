@@ -21,7 +21,7 @@ Q3::A3
 `;
         let file: UnitTestSRFile = new UnitTestSRFile(noteText);
         let folderTopicPath = TopicPath.emptyPath;
-        let note: Note = await parser.parse(file, folderTopicPath, refDate);
+        let note: Note = await parser.parse(file, folderTopicPath);
         let deck: Deck = Deck.emptyDeck;
         note.appendCardsToDeck(deck);
         let subdeck: Deck = deck.getDeck(new TopicPath(["flashcards", "test"]));
@@ -39,7 +39,7 @@ Q3:::A3
 `;
         let file: UnitTestSRFile = new UnitTestSRFile(noteText);
         let folderTopicPath = TopicPath.emptyPath;
-        let note: Note = await parser.parse(file, folderTopicPath, refDate);
+        let note: Note = await parser.parse(file, folderTopicPath);
         let deck: Deck = Deck.emptyDeck;
         note.appendCardsToDeck(deck);
         let subdeck: Deck = deck.getDeck(new TopicPath(["flashcards", "test"]));

@@ -4,14 +4,18 @@ import { TICKS_PER_DAY } from "src/constants";
 import { CardType, Question } from "src/question";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { TopicPath } from "src/TopicPath";
-import { createTest_NoteQuestionParser, test_RefDate_20230906 } from "./SampleItems";
+import { createTest_NoteQuestionParser } from "./SampleItems";
 import { ISRFile, UnitTestSRFile } from "src/SRFile";
+import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 
 let parserWithDefaultSettings: NoteQuestionParser = createTest_NoteQuestionParser(DEFAULT_SETTINGS);
 let settings_ConvertFoldersToDecks: SRSettings = { ...DEFAULT_SETTINGS };
 settings_ConvertFoldersToDecks.convertFoldersToDecks = true;
 let parser_ConvertFoldersToDecks: NoteQuestionParser = createTest_NoteQuestionParser(settings_ConvertFoldersToDecks);
 
+beforeAll(() =>  {
+    setupStaticDateProvider_20230906();
+})
 
 test("No questions in the text", async () => {
     let noteText: string = "An interesting note, but no questions";
@@ -19,7 +23,7 @@ test("No questions in the text", async () => {
     let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
     expect(
-        await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, test_RefDate_20230906)
+        await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath)
     ).toEqual([
     ]);
 });
@@ -50,7 +54,7 @@ A::B
                 hasChanged: false
             }];
             expect(
-                await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, test_RefDate_20230906)
+                await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath)
             ).toMatchObject(expected);
     });
 
@@ -82,7 +86,7 @@ A::B
             hasChanged: false
         }];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, test_RefDate_20230906)
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath)
         ).toMatchObject(expected);
     });
 });
@@ -96,7 +100,7 @@ Q2::A2
 `;
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
-        let questionList: Question[] = await parser_ConvertFoldersToDecks.createQuestionList(noteFile, folderTopicPath, test_RefDate_20230906);
+        let questionList: Question[] = await parser_ConvertFoldersToDecks.createQuestionList(noteFile, folderTopicPath);
         expect(questionList.length).toEqual(2);
 
             
@@ -111,7 +115,7 @@ Q3::A3
             let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
             let folderTopicPath: TopicPath = new TopicPath(["flashcards", "science"]);
-            let questionList: Question[] = await parser_ConvertFoldersToDecks.createQuestionList(noteFile, folderTopicPath, test_RefDate_20230906);
+            let questionList: Question[] = await parser_ConvertFoldersToDecks.createQuestionList(noteFile, folderTopicPath);
             expect(questionList.length).toEqual(3);
             expect(questionList[0].topicPath).toEqual(new TopicPath(["flashcards", "science"]));
             expect(questionList[1].topicPath).toEqual(new TopicPath(["flashcards", "science"]));
@@ -135,7 +139,7 @@ describe("Handling tags within note", () => {
 
             let noteFile: ISRFile = new UnitTestSRFile(noteText);
             let folderTopicPath: TopicPath = new TopicPath(["folder", "subfolder"]);
-            let questionList: Question[] = await parser2.createQuestionList(noteFile, folderTopicPath, test_RefDate_20230906);
+            let questionList: Question[] = await parser2.createQuestionList(noteFile, folderTopicPath);
             expect(questionList.length).toEqual(3);
             for (let i = 0; i < questionList.length; i++)
                 expect(questionList[i].topicPath).toEqual(new TopicPath(["folder", "subfolder"]));
@@ -148,7 +152,7 @@ Q1::A1
 
             let noteFile: ISRFile = new UnitTestSRFile(noteText);
             let folderTopicPath: TopicPath = new TopicPath(["folder", "subfolder"]);
-            let questionList: Question[] = await parser2.createQuestionList(noteFile, folderTopicPath, test_RefDate_20230906);
+            let questionList: Question[] = await parser2.createQuestionList(noteFile, folderTopicPath);
             expect(questionList.length).toEqual(1);
             expect(questionList[0].topicPath).toEqual(new TopicPath(["folder", "subfolder"]));
         });
@@ -164,7 +168,7 @@ Q1::A1
 
             let noteFile: ISRFile = new UnitTestSRFile(noteText);
             let folderTopicPath: TopicPath = new TopicPath(["folder", "subfolder"]);
-            let questionList: Question[] = await parser2.createQuestionList(noteFile, folderTopicPath, test_RefDate_20230906);
+            let questionList: Question[] = await parser2.createQuestionList(noteFile, folderTopicPath);
             expect(questionList.length).toEqual(1);
             expect(questionList[0].topicPath).toEqual(new TopicPath(["folder", "subfolder"]));
         });
@@ -183,7 +187,7 @@ Q1::A1
 
             let expectedPath: TopicPath = new TopicPath(["flashcards", "test"]);
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
-            let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, test_RefDate_20230906);
+            let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath);
             expect(questionList.length).toEqual(3);
             expect(questionList[0].topicPath).toEqual(expectedPath);
             expect(questionList[1].topicPath).toEqual(expectedPath);
@@ -199,7 +203,7 @@ Q1::A1
             let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
-            let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, test_RefDate_20230906);
+            let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath);
             expect(questionList.length).toEqual(3);
             expect(questionList[0].topicPath).toEqual(new TopicPath(["flashcards", "test"]));
             expect(questionList[1].topicPath).toEqual(new TopicPath(["flashcards", "examination"]));
@@ -218,7 +222,7 @@ Q1::A1
     
             let expectedPath: TopicPath = new TopicPath(["flashcards", "test"]);
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
-            let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, test_RefDate_20230906);
+            let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath);
             expect(questionList.length).toEqual(3);
             for (let i = 0; i < questionList.length; i++)
                 expect(questionList[i].topicPath).toEqual(expectedPath);
@@ -236,7 +240,7 @@ Q1::A1
     
             let expectedPath: TopicPath = new TopicPath(["flashcards", "test"]);
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
-            let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, test_RefDate_20230906);
+            let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath);
             expect(questionList.length).toEqual(3);
             for (let i = 0; i < questionList.length; i++)
                 expect(questionList[i].topicPath).toEqual(expectedPath);
@@ -254,7 +258,7 @@ Q1::A1
 
             let expectedPath: TopicPath = new TopicPath(["flashcards", "science"]);
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
-            let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, test_RefDate_20230906);
+            let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath);
             expect(questionList.length).toEqual(1);
             expect(questionList[0].topicPath).toEqual(expectedPath);
             expect(questionList[0].cards.length).toEqual(1);

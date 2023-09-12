@@ -6,8 +6,8 @@ import { CardFrontBack, CardFrontBackUtil } from "./QuestionType";
 import { SRSettings } from "./settings";
 import { ISRFile, UnitTestSRFile } from "./SRFile";
 import { TopicPath } from "./TopicPath";
-import { cyrb53 } from "./utils";
-import { getAllTagsFromText } from "src/utils";
+import { cyrb53 } from "./util/utils";
+import { getAllTagsFromText } from "src/util/utils";
 
 export class ParsedQuestionInfo { 
     cardType: CardType;
@@ -44,7 +44,7 @@ export class NoteQuestionParser {
         this.questionContextFinder = questionContextFinder;
     }
 
-    async createQuestionList(noteFile: ISRFile, folderTopicPath: TopicPath, refDate: Date): Promise<Question[]> { 
+    async createQuestionList(noteFile: ISRFile, folderTopicPath: TopicPath): Promise<Question[]> { 
         let noteText: string = await noteFile.read();
         var noteTopicPath: TopicPath;
         if (this.settings.convertFoldersToDecks) {
@@ -53,7 +53,7 @@ export class NoteQuestionParser {
             let tagList: string[] = noteFile.getAllTags();
             noteTopicPath = this.determineTopicPathFromTags(tagList);
         }
-        var result: Question[] = this.doCreateQuestionList(noteText, noteTopicPath, refDate);
+        var result: Question[] = this.doCreateQuestionList(noteText, noteTopicPath);
         return result;
     }
 
@@ -70,7 +70,7 @@ export class NoteQuestionParser {
         return this.doCreateQuestionList(noteText, folderTopicPath, refDate);
     } */
 
-    private doCreateQuestionList(noteText: string, noteTopicPath: TopicPath, refDate: Date): Question[] { 
+    private doCreateQuestionList(noteText: string, noteTopicPath: TopicPath): Question[] { 
         this.noteText = noteText;
         this.noteTopicPath = noteTopicPath;
 
@@ -84,7 +84,7 @@ export class NoteQuestionParser {
             let cardFrontBackList: CardFrontBack[] = CardFrontBackUtil.expand(question.questionType, question.questionTextCleaned, this.settings);
 
             // And if the card has been reviewed, then scheduling info as well
-            let cardScheduleInfoList: CardScheduleInfo[] = NoteCardScheduleParser.createCardScheduleInfoList(question.questionTextOriginal, refDate);
+            let cardScheduleInfoList: CardScheduleInfo[] = NoteCardScheduleParser.createCardScheduleInfoList(question.questionTextOriginal);
 
             // we have some extra scheduling dates to delete
             let correctLength = cardFrontBackList.length;

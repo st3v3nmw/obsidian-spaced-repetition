@@ -5,7 +5,7 @@ import { Question } from "./question";
 import { ReviewResponse, schedule } from "./scheduling";
 import { SRSettings } from "./settings";
 import { TopicPath } from "./TopicPath";
-import { escapeRegexString } from "./utils";
+import { escapeRegexString } from "./util/utils";
 import { CardScheduleInfo, ICardScheduleCalculator } from "./CardSchedule";
 import { INoteEaseList } from "./NoteEaseList";
 import { TICKS_PER_DAY } from "./constants";
@@ -82,7 +82,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     private createFilteredDeckTrees(): void {
         this.filteredDeckTree = this.originalDeckTree.copyWithCardFilter((card) => !card.question.hasEditLaterTag);
 
-        
+
     }
 
     setCurrentDeck(topicPath: TopicPath): void {

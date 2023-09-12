@@ -178,7 +178,7 @@ describe("toDeckArray()", () => {
 
 });
 
-describe.only("copyWithCardFilter()", () => {
+describe("copyWithCardFilter()", () => {
     describe("Single level tree", () => {
 
         test("No cards", () => {

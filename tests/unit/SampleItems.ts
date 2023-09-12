@@ -45,7 +45,7 @@ Q3::A3`;
         let file: UnitTestSRFile = new UnitTestSRFile(text);
         let topicPath: TopicPath = TopicPath.emptyPath;
         let noteParser: NoteParser = createTest_NoteParser();
-        let note: Note = await noteParser.parse(file, folderTopicPath, test_RefDate_20230906);
+        let note: Note = await noteParser.parse(file, folderTopicPath);
         note.appendCardsToDeck(deck);
         return deck;
     }

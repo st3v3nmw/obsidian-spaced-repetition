@@ -5,7 +5,7 @@ import {
     getAllTags as ObsidianGetAllTags,
 } from "obsidian";
 import { OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "./constants";
-import { getAllTagsFromText } from "./utils";
+import { getAllTagsFromText } from "./util/utils";
 
 
 export interface ISRFile {

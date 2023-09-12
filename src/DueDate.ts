@@ -1,4 +1,4 @@
-import { getKeysPreserveType, getTypedObjectEntries } from "./utils";
+import { getKeysPreserveType, getTypedObjectEntries } from "./util/utils";
 
 export class IntervalCountDict {
     dict: Record<number, number> = {}; // Record<# of days in future, due count>

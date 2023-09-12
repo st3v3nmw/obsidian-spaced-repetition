@@ -4,11 +4,15 @@ import { DEFAULT_SETTINGS } from "src/settings";
 import { SampleItemDecks } from "./SampleItems";
 import { TopicPath } from "src/TopicPath";
 import { DeckTreeSequentialIterator } from "src/DeckTreeIterator";
+import { StaticDateProvider, globalDateProvider, setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 
 let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
 let parser: NoteQuestionParser = new NoteQuestionParser(DEFAULT_SETTINGS, questionContextFinder);
-let refDate: Date = new Date(2023, 8, 6);
 var iterator: DeckTreeSequentialIterator;
+
+beforeAll(() =>  {
+    setupStaticDateProvider_20230906();
+})
 
 describe("setDeck", () => {
     test("currentDeck null immediately after setDeck", async () => {

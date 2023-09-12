@@ -1,6 +1,6 @@
 import { App, MarkdownRenderer, TFile } from "obsidian";
-import { AUDIO_FORMATS, IMAGE_FORMATS, VIDEO_FORMATS } from "./constants";
-import SRPlugin from "./main";
+import { AUDIO_FORMATS, IMAGE_FORMATS, VIDEO_FORMATS } from "../constants";
+import SRPlugin from "../main";
 
 
 export class RenderMarkdownWrapper {

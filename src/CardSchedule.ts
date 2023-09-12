@@ -3,7 +3,8 @@ import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR, PREFERRED_DATE
 import { INoteEaseList } from "./NoteEaseList";
 import { ReviewResponse, schedule } from "./scheduling";
 import { SRSettings } from "./settings";
-import { formatDate_YYYY_MM_DD } from "./utils";
+import { formatDate_YYYY_MM_DD } from "./util/utils";
+import { globalDateProvider } from "./util/DateProvider";
 
 export class CardScheduleInfo { 
     dueDate: Date;
@@ -105,7 +106,7 @@ export class CardScheduleCalculator {
 
 export class NoteCardScheduleParser {
 
-    static createCardScheduleInfoList(questionText: string, refDate: Date): CardScheduleInfo[] {
+    static createCardScheduleInfoList(questionText: string): CardScheduleInfo[] {
 
         let scheduling: RegExpMatchArray[] = [...questionText.matchAll(MULTI_SCHEDULING_EXTRACTOR)];
         if (scheduling.length === 0)
@@ -118,7 +119,7 @@ export class NoteCardScheduleParser {
             let interval = parseInt(match[2]);
             let ease = parseInt(match[3]);
             let dueDate: Date = CardScheduleInfo.parseDueDateStr(dueDateStr);
-            let delayBeforeReview: number = refDate.valueOf() - dueDate.valueOf();
+            let delayBeforeReview: number = globalDateProvider.today.valueOf() - dueDate.valueOf();
 
             let info: CardScheduleInfo = new CardScheduleInfo(dueDate, interval, ease, delayBeforeReview);
             result.push(info);

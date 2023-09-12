@@ -1,4 +1,4 @@
-import { getKeysPreserveType, getTypedObjectEntries } from "./utils";
+import { getKeysPreserveType, getTypedObjectEntries } from "./util/utils";
 
 export class Stats {
     eases: Record<number, number> = {};

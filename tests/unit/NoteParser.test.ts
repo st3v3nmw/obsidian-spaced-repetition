@@ -5,11 +5,15 @@ import { TopicPath } from "src/TopicPath";
 import { Note } from "src/note";
 import { Question } from "src/question";
 import { DEFAULT_SETTINGS } from "src/settings";
+import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 
 
 let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS, questionContextFinder);
-let refDate: Date = new Date(2023, 8, 6);
+
+beforeAll(() =>  {
+    setupStaticDateProvider_20230906();
+})
 
 describe("Multiple questions in the text", () => {
     test("SingleLineBasic: No schedule info", async () => {
@@ -20,7 +24,7 @@ Q3::A3
 `;
         let file: UnitTestSRFile = new UnitTestSRFile(noteText);
         let folderTopicPath = TopicPath.emptyPath;
-        let note: Note = await parser.parse(file, folderTopicPath, refDate);
+        let note: Note = await parser.parse(file, folderTopicPath);
         let questionList = note.questionList;
         expect(questionList.length).toEqual(3);
 
