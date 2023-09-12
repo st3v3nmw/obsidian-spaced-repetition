@@ -29,6 +29,10 @@ export class Card {
         return !this.hasSchedule;
     }
 
+    get isDue(): boolean {
+        return this.hasSchedule && this.scheduleInfo.isDue();
+    }
+
     formatSchedule(settings: SRSettings): string {
         let temp: CardScheduleInfo = this.scheduleInfo;
         if (temp == null) {

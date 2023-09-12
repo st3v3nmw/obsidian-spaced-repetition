@@ -195,7 +195,7 @@ describe("copyWithCardFilter()", () => {
             Q1::A1
             Q2::A2
             Q3::A3`;
-            let original: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+            let original: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
             let copy: Deck = original.copyWithCardFilter((card) => card.front.includes("2"));
             
             expect(copy.newFlashcards.length).toEqual(1);
@@ -207,7 +207,7 @@ describe("copyWithCardFilter()", () => {
             Q1::A1 <!--SR:!2023-09-02,4,270-->
             Q2::A2 <!--SR:!2023-09-02,4,270-->
             Q3::A3 <!--SR:!2023-09-02,4,270-->`;
-            let original: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+            let original: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
             let copy: Deck = original.copyWithCardFilter((card) => !card.front.includes("2"));
             
             expect(copy.newFlashcards.length).toEqual(0);
@@ -231,7 +231,7 @@ describe("copyWithCardFilter()", () => {
             #flashcards/science Q5::A5
             
             #flashcards/science/physics Q6::A6`;
-            let original: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+            let original: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
             let originalCountPreCopy: number = original.getCardCount(CardListType.All, true);
             expect(originalCountPreCopy).toEqual(6);
 
@@ -251,7 +251,7 @@ describe("copyWithCardFilter()", () => {
             #flashcards/science Q5::A5
             
             #flashcards/science/physics Q6::A6`;
-            let original: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+            let original: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
 
             let copy: Deck = original.copyWithCardFilter((card) => ((parseInt(card.front[1])) % 2) == 1);
 

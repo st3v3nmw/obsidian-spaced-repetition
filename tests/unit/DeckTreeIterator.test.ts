@@ -20,7 +20,7 @@ describe("setDeck", () => {
         Q1::A1
         Q2::A2
         Q3::A3`;
-        let deck: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+        let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
         let iterator: DeckTreeSequentialIterator = new DeckTreeSequentialIterator(CardListType.NewCard);
         iterator.setDeck(deck);
         expect(iterator.currentDeck).toEqual(null);
@@ -34,7 +34,7 @@ describe("nextCard", () => {
         Q1::A1
         Q2::A2
         Q3::A3`;
-        let deck: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+        let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
         let iterator: DeckTreeSequentialIterator = new DeckTreeSequentialIterator(CardListType.NewCard);
         iterator.setDeck(deck);
         
@@ -61,7 +61,7 @@ describe("nextCard", () => {
             Q4::A4 <!--SR:!2023-09-02,4,270-->
             Q5::A5 <!--SR:!2023-09-02,4,270-->
             Q6::A6`;
-            let deck: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+            let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
             iterator = new DeckTreeSequentialIterator(CardListType.NewCard);
             iterator.setDeck(deck);
             
@@ -88,7 +88,7 @@ describe("nextCard", () => {
             Q4::A4 <!--SR:!2023-09-02,4,270-->
             Q5::A5 <!--SR:!2023-09-02,4,270-->
             Q6::A6`;
-            let deck: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+            let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
             iterator = new DeckTreeSequentialIterator(CardListType.DueCard);
             iterator.setDeck(deck);
             
@@ -123,7 +123,7 @@ describe("nextCard", () => {
             
             #flashcards/science/chemistry Q8::A8
                         `;
-            let deck: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+            let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
             iterator = new DeckTreeSequentialIterator(CardListType.NewCard);
             iterator.setDeck(deck);
             
@@ -156,7 +156,7 @@ describe("deleteCurrentCard", () => {
         Q1::A1
         Q2::A2 usim
         Q3::A3`;
-        let deck: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+        let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
         iterator = new DeckTreeSequentialIterator(CardListType.NewCard);
         iterator.setDeck(deck);
         
@@ -176,7 +176,7 @@ describe("deleteCurrentCard", () => {
         Q1::A1
         Q2::A2
         Q3::A3`;
-        let deck: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+        let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
         expect(deck.newFlashcards.length).toEqual(3);
         iterator = new DeckTreeSequentialIterator(CardListType.NewCard);
         iterator.setDeck(deck);

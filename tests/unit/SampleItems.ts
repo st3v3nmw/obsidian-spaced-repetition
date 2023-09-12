@@ -27,7 +27,7 @@ export class SampleItemDecks {
 Q1::A1
 Q2::A2
 Q3::A3`;
-        return await SampleItemDecks.createDeckFromNote(text, new TopicPath(["flashcards"]));
+        return await SampleItemDecks.createDeckFromText(text, new TopicPath(["flashcards"]));
     }
 
     static createScienceTree(): Deck {
@@ -40,16 +40,19 @@ Q3::A3`;
         return deck;
     }
 
-    static async createDeckFromNote(text: string, folderTopicPath: TopicPath): Promise<Deck> {
-        let deck: Deck = new Deck("Root", null);
+    static async createDeckFromText(text: string, folderTopicPath: TopicPath): Promise<Deck> {
         let file: UnitTestSRFile = new UnitTestSRFile(text);
+        return await this.createDeckFromFile(file, folderTopicPath);
+    }
+
+    static async createDeckFromFile(file: UnitTestSRFile, folderTopicPath: TopicPath): Promise<Deck> {
+        let deck: Deck = new Deck("Root", null);
         let topicPath: TopicPath = TopicPath.emptyPath;
         let noteParser: NoteParser = createTest_NoteParser();
         let note: Note = await noteParser.parse(file, folderTopicPath);
         note.appendCardsToDeck(deck);
         return deck;
     }
-
 
 }
 

@@ -19,6 +19,10 @@ export class CardScheduleInfo {
         this.delayBeforeReview = delayBeforeReview;
     }
 
+    isDue(): boolean {
+        return (this.dueDate.valueOf() < globalDateProvider.today.valueOf());
+    }
+
     // static get emptySchedule(): CardScheduleInfo
 
     static parseDueDateStr(dueDateStr: string): Date {

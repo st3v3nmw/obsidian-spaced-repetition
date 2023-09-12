@@ -148,8 +148,9 @@ export class Deck {
         }
     }
 
-    debugLogToConsole() {
-        console.log(this.toString());
+    debugLogToConsole(desc: string = null) {
+        let str: string = (desc != null) ? `${desc}: ` : "";
+        console.log(str += this.toString());
     }
 
     toString(indent: number = 0): string {

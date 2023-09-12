@@ -1,6 +1,6 @@
 import { Notice, TFile, Vault } from "obsidian";
 import { Card } from "./Card";
-import { Deck } from "./Deck";
+import { CardListType, Deck } from "./Deck";
 import { Question } from "./Question";
 import { ReviewResponse, schedule } from "./scheduling";
 import { SRSettings } from "./settings";
@@ -14,6 +14,7 @@ import { Note } from "./Note";
 import { IDeckTreeIterator } from "./DeckTreeIterator";
 
 export interface IFlashcardReviewSequencer {
+    get hasCurrentCard(): boolean;
     get currentCard(): Card;
     get currentQuestion(): Question;
     get currentNote(): Note;
@@ -58,6 +59,10 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             this.cardScheduleCalculator = cardScheduleCalculator;
     }
 
+    get hasCurrentCard(): boolean {
+        return this.cardSequencer.currentCard != null;
+    }
+
     get currentCard(): Card {
         return this.cardSequencer.currentCard;
     }
@@ -76,28 +81,34 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
     setDeckTree(deckTree: Deck): void {
         this.originalDeckTree = deckTree;
+        this.createFilteredDeckTrees();
         this.setCurrentDeck(TopicPath.emptyPath);
     }
 
     private createFilteredDeckTrees(): void {
-        this.filteredDeckTree = this.originalDeckTree.copyWithCardFilter((card) => !card.question.hasEditLaterTag);
+        this.filteredDeckTree = this.originalDeckTree.copyWithCardFilter((card) => 
+            !card.question.hasEditLaterTag);
 
-
+        this.remainingDeckTree = this.filteredDeckTree.copyWithCardFilter((card) => 
+            (this.reviewMode == FlashcardReviewMode.Cram) || card.isNew || card.isDue);
     }
 
     setCurrentDeck(topicPath: TopicPath): void {
-        let deck: Deck = this.originalDeckTree.getDeck(topicPath);
-        console.debug(`setCurrentDeck: [${topicPath?.path}]: ${deck?.deckName}\r\n`);
+        let deck: Deck = this.remainingDeckTree.getDeck(topicPath);
         this.cardSequencer.setDeck(deck);
         this.cardSequencer.nextCard();
     }
 
     getDeckStats(topicPath: TopicPath): DeckStats {
-        return new DeckStats(1, 2, 3);
+        let totalCount: number = this.filteredDeckTree.getDeck(topicPath).getCardCount(CardListType.All, true);
+        let remainingDeck: Deck = this.remainingDeckTree.getDeck(topicPath);
+        let newCount: number = remainingDeck.getCardCount(CardListType.NewCard, true);
+        let dueCount: number = remainingDeck.getCardCount(CardListType.DueCard, true);
+        return new DeckStats(dueCount, newCount, totalCount);
     }
 
     skipCurrentCard(): void {
-
+        this.cardSequencer.deleteCurrentCard();
     }
 
     private deleteCurrentCard(): void {
