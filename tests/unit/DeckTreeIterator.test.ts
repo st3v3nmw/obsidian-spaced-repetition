@@ -173,7 +173,6 @@ describe("deleteCurrentCard", () => {
         Q2::A2
         Q3::A3`;
         let deck: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
-        deck.debugLogToConsole();
         expect(deck.newFlashcards.length).toEqual(3);
         iterator = new DeckTreeSequentialIterator(CardListType.NewCard);
         iterator.setDeck(deck);

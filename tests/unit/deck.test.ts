@@ -1,6 +1,7 @@
-import { Deck } from "src/deck";
+import { CardListType, Deck } from "src/deck";
 import { TopicPath } from "src/TopicPath";
 import { SampleItemDecks } from "./SampleItems";
+import { Card } from "src/card";
 
 describe("constructor", () => {
     test("Deck name", () => {
@@ -173,6 +174,99 @@ describe("toDeckArray()", () => {
             "Fluids", "Math", "Geometry", "Algebra", "Polynomials"];
         expect(nameArray).toEqual(expectedArray);
 
+    });
+
+});
+
+describe.only("copyWithCardFilter()", () => {
+    describe("Single level tree", () => {
+
+        test("No cards", () => {
+            let original: Deck = new Deck("Root", null);
+            let copy: Deck = original.copyWithCardFilter((card) => true);
+            
+            original.deckName = "New deck name";
+            expect(copy.deckName).toEqual("Root");
+
+        });
+
+        test("With new cards", async () => {
+            let text: string = `
+            Q1::A1
+            Q2::A2
+            Q3::A3`;
+            let original: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+            let copy: Deck = original.copyWithCardFilter((card) => card.front.includes("2"));
+            
+            expect(copy.newFlashcards.length).toEqual(1);
+            expect(copy.newFlashcards[0].front).toEqual("Q2");
+        });
+
+        test("With scheduled cards", async () => {
+            let text: string = `
+            Q1::A1 <!--SR:!2023-09-02,4,270-->
+            Q2::A2 <!--SR:!2023-09-02,4,270-->
+            Q3::A3 <!--SR:!2023-09-02,4,270-->`;
+            let original: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+            let copy: Deck = original.copyWithCardFilter((card) => !card.front.includes("2"));
+            
+            expect(copy.newFlashcards.length).toEqual(0);
+            expect(copy.dueFlashcards.length).toEqual(2);
+            expect(copy.dueFlashcards[0].front).toEqual("Q1");
+            expect(copy.dueFlashcards[1].front).toEqual("Q3");
+        });
+
+
+    });
+
+    describe("Multi level tree", () => {
+
+        test("No change in original deck after copy", async () => {
+            let text: string = `
+            #flashcards Q1::A1
+            #flashcards Q2::A2
+            #flashcards Q3::A3
+            
+            #flashcards/science Q4::A4
+            #flashcards/science Q5::A5
+            
+            #flashcards/science/physics Q6::A6`;
+            let original: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+            let originalCountPreCopy: number = original.getCardCount(CardListType.All, true);
+            expect(originalCountPreCopy).toEqual(6);
+
+            let copy: Deck = original.copyWithCardFilter((card) => ((parseInt(card.front[1])) % 2) == 1);
+            let originalCountPostCopy: number = original.getCardCount(CardListType.All, true);
+            expect(originalCountPreCopy).toEqual(originalCountPostCopy);
+
+        });
+
+        test("With new cards", async () => {
+            let text: string = `
+            #flashcards Q1::A1
+            #flashcards Q2::A2
+            #flashcards Q3::A3
+            
+            #flashcards/science Q4::A4
+            #flashcards/science Q5::A5
+            
+            #flashcards/science/physics Q6::A6`;
+            let original: Deck = await SampleItemDecks.createDeckFromNote(text, new TopicPath(["Root"]));
+
+            let copy: Deck = original.copyWithCardFilter((card) => ((parseInt(card.front[1])) % 2) == 1);
+
+            let subdeck:  Deck = copy.getDeck(new TopicPath(["flashcards"]));
+            expect(subdeck.newFlashcards.length).toEqual(2);
+            expect(subdeck.newFlashcards[0].front).toEqual("Q1");
+            expect(subdeck.newFlashcards[1].front).toEqual("Q3");
+
+            subdeck = copy.getDeck(new TopicPath(["flashcards", "science"]));
+            expect(subdeck.newFlashcards.length).toEqual(1);
+            expect(subdeck.newFlashcards[0].front).toEqual("Q5");
+
+            subdeck = copy.getDeck(new TopicPath(["flashcards", "science", "physics"]));
+            expect(subdeck.newFlashcards.length).toEqual(0);
+        });
     });
 
 });

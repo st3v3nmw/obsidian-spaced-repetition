@@ -43,11 +43,13 @@ export class DeckStats {
 export enum FlashcardReviewMode { Cram, Review };
 
 export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
-    deckTree: Deck;
-    reviewMode: FlashcardReviewMode;
-    cardSequencer: IDeckTreeIterator;
-    settings: SRSettings;
-    cardScheduleCalculator: ICardScheduleCalculator;
+    private originalDeckTree: Deck;
+    private filteredDeckTree: Deck;
+    private remainingDeckTree: Deck;
+    private reviewMode: FlashcardReviewMode;
+    private cardSequencer: IDeckTreeIterator;
+    private settings: SRSettings;
+    private cardScheduleCalculator: ICardScheduleCalculator;
 
     constructor(reviewMode: FlashcardReviewMode, cardSequencer: IDeckTreeIterator, settings: SRSettings, cardScheduleCalculator: ICardScheduleCalculator) {
             this.reviewMode = reviewMode;
@@ -68,21 +70,23 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         return this.cardSequencer.currentDeck;
     }
 
-    get remainingDeckTree(): Deck {
-        return this.deckTree;
-    }
-
     get currentNote(): Note {
         return this.currentQuestion.note;
     }
 
     setDeckTree(deckTree: Deck): void {
-        this.deckTree = deckTree;
+        this.originalDeckTree = deckTree;
         this.setCurrentDeck(TopicPath.emptyPath);
     }
 
+    private createFilteredDeckTrees(): void {
+        this.filteredDeckTree = this.originalDeckTree.copyWithCardFilter((card) => !card.question.hasEditLaterTag);
+
+        
+    }
+
     setCurrentDeck(topicPath: TopicPath): void {
-        let deck: Deck = this.deckTree.getDeck(topicPath);
+        let deck: Deck = this.originalDeckTree.getDeck(topicPath);
         console.debug(`setCurrentDeck: [${topicPath?.path}]: ${deck?.deckName}\r\n`);
         this.cardSequencer.setDeck(deck);
         this.cardSequencer.nextCard();

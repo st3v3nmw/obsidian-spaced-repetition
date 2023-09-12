@@ -172,6 +172,19 @@ export class Deck {
         return result;
     }
 
+    copyWithCardFilter(predicate: (value: Card) => boolean, parent: Deck = null): Deck {
+        let result: Deck = new Deck(this.deckName, parent);
+        result.newFlashcards = this.newFlashcards.filter((card) => predicate(card));
+        result.dueFlashcards = this.dueFlashcards.filter((card) => predicate(card));
+
+        for (const s of this.subdecks) {
+            let newParent = result;
+            let newDeck = s.copyWithCardFilter(predicate, newParent);
+            result.subdecks.push(newDeck);
+        }
+        return result;
+    }
+
     static otherListType(cardListType: CardListType): CardListType {
         var result: CardListType;
         if (cardListType == CardListType.NewCard)
