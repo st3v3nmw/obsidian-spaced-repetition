@@ -43,8 +43,8 @@ export class TopicPath {
         if (settings.convertFoldersToDecks) {
             deckPath = noteFile.path.split("/");
             deckPath.pop(); // remove filename
-            if (deckPath.length === 0) {
-                result = TopicPath.emptyPath;
+            if (deckPath.length != 0) {
+                result = new TopicPath(deckPath);
             }
         } else {
             let tagList: TopicPath[] = this.getTopicPathsFromTagList(noteFile.getAllTags());
@@ -64,7 +64,7 @@ export class TopicPath {
 
     isSameOrAncestorOf(topicPath: TopicPath): boolean {
         if (this.isEmptyPath)
-            return false;
+            return topicPath.isEmptyPath;
         if (this.path.length > topicPath.path.length)
             return false;
         for (let i = 0; i < this.path.length; i++) {
@@ -72,34 +72,6 @@ export class TopicPath {
                 return false;
         }
         return true;
-    }
-
-    static getTopicPathOfFileX(note: TFile, settings: SRSettings, appMetadataCache: MetadataCache): TopicPath {
-        var deckPath: string[] = [];
-        var result: TopicPath = TopicPath.emptyPath;
-
-        if (settings.convertFoldersToDecks) {
-            deckPath = note.path.split("/");
-            deckPath.pop(); // remove filename
-            if (deckPath.length === 0) {
-                result = TopicPath.emptyPath;
-            }
-        } else {
-            const fileCachedData = appMetadataCache.getFileCache(note) || {};
-            const tags = getAllTags(fileCachedData) || [];
-
-            outer: for (const tagToReview of settings.flashcardTags) {
-                for (const tag of tags) {
-                    if (tag === tagToReview || tag.startsWith(tagToReview + "/")) {
-                        deckPath = tag.substring(1).split("/");
-                        result = new TopicPath(deckPath);
-                        break outer;
-                    }
-                }
-            }
-        }
-
-        return result;
     }
 
     static getTopicPathFromCardText(cardText: string): TopicPath { 

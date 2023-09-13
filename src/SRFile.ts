@@ -46,13 +46,15 @@ export class ObsidianTFile implements ISRFile {
 
 export class UnitTestSRFile implements ISRFile {
     content: string;
+    _path: string;
 
-    constructor(content: string) {
+    constructor(content: string, path: string = null) {
         this.content = content;
+        this._path = path;
     }
 
     get path(): string {
-        throw "Not supported";
+        return this._path;
     }
 
     getAllTags(): string[] {

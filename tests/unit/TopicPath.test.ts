@@ -1,4 +1,6 @@
+import { ISRFile, UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
+import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 
 describe("Constructor exception handling", () => {
 
@@ -177,4 +179,121 @@ describe("getTopicPathFromTag", () => {
 
         expect(result.path).toEqual(["flashcard", "science", "physics"]);
     });
+});
+
+
+describe("isSameOrAncestorOf", () => {
+
+    test("a, b are both empty", () => {
+        let a: TopicPath = TopicPath.emptyPath;
+        let b: TopicPath = TopicPath.emptyPath;
+        expect(a.isSameOrAncestorOf(b)).toEqual(true);
+    });
+
+    test("a is empty, b has path", () => {
+        let a: TopicPath = TopicPath.emptyPath;
+        let b: TopicPath = new TopicPath(["flashcard"]);
+        expect(a.isSameOrAncestorOf(b)).toEqual(false);
+    });
+
+    test("a has path, b is empty", () => {
+        let a: TopicPath = new TopicPath(["flashcard"]);
+        let b: TopicPath = TopicPath.emptyPath;
+        expect(a.isSameOrAncestorOf(b)).toEqual(false);
+    });
+
+    describe("a, b both have paths", () => {
+        test("a same as b", () => {
+            let a: TopicPath = new TopicPath(["flashcard"]);
+            let b: TopicPath = new TopicPath(["flashcard"]);
+            expect(a.isSameOrAncestorOf(b)).toEqual(true);
+
+            a = new TopicPath(["flashcard", "science"]);
+            b = new TopicPath(["flashcard", "science"]);
+            expect(a.isSameOrAncestorOf(b)).toEqual(true);
+        });
+
+        test("a is ancestor of b", () => {
+            let a: TopicPath = new TopicPath(["flashcard"]);
+            let b: TopicPath = new TopicPath(["flashcard", "science"]);
+            expect(a.isSameOrAncestorOf(b)).toEqual(true);
+
+            a = new TopicPath(["flashcard"]);
+            b = new TopicPath(["flashcard", "science", "physics"]);
+            expect(a.isSameOrAncestorOf(b)).toEqual(true);
+        });
+
+        test("a is different to b", () => {
+            let a: TopicPath = new TopicPath(["flashcard", "math"]);
+            let b: TopicPath = new TopicPath(["flashcard", "science"]);
+            expect(a.isSameOrAncestorOf(b)).toEqual(false);
+
+            a = new TopicPath(["flashcard", "science", "physics"]);
+            b = new TopicPath(["flashcard", "science", "chemistry"]);
+            expect(a.isSameOrAncestorOf(b)).toEqual(false);
+        });
+    });
+});
+
+
+describe("clone", () => {
+
+    test("clone of empty", () => {
+        let a: TopicPath = TopicPath.emptyPath;
+        let b: TopicPath = a.clone();
+        expect(b.isEmptyPath).toEqual(true);
+    });
+
+    test("clone of path", () => {
+        let a: TopicPath = new TopicPath(["flashcard"]);
+        let b: TopicPath = a.clone();
+        expect(b.path).toEqual(["flashcard"]);
+
+        a = new TopicPath(["flashcard", "science"]);
+        b = a.clone();
+        expect(b.path).toEqual(["flashcard", "science"]);
+    });
+});
+
+
+describe("getTopicPathOfFile", () => {
+    describe("convertFoldersToDecks: false", () => {
+        test("Mixture of irrelevant tags and relevant ones", () => {
+            let content: string = `
+            #ignored Q1::A1
+            #ignored Q2::A2 <!--SR:!2023-09-02,4,270-->
+            #also-Ignored Q3::A3
+            #flashcards/science Q4::A4 <!--SR:!2023-09-02,4,270-->
+            #flashcards/science/physics Q5::A5 <!--SR:!2023-09-02,4,270-->
+            #flashcards/math Q6::A6`;
+            let file: ISRFile = new UnitTestSRFile(content);
+            let expected = ["flashcards", "science"];
+
+            expect(TopicPath.getTopicPathOfFile(file, DEFAULT_SETTINGS).path).toEqual(expected);
+        });
+
+    });
+
+    describe("convertFoldersToDecks: true", () => {
+        let settings_ConvertFoldersToDecks: SRSettings = { ...DEFAULT_SETTINGS };
+        settings_ConvertFoldersToDecks.convertFoldersToDecks = true;
+        test("Mixture of irrelevant tags and relevant ones", () => {
+
+            let ignoredContent: string = `
+            #ignored Q1::A1
+            #ignored Q2::A2 <!--SR:!2023-09-02,4,270-->
+            #also-Ignored Q3::A3
+            #flashcards/science Q4::A4 <!--SR:!2023-09-02,4,270-->
+            #flashcards/science/physics Q5::A5 <!--SR:!2023-09-02,4,270-->
+            #flashcards/math Q6::A6`;
+
+            let fakeFilePath: string = "history/modern/Greek.md"
+            let file: ISRFile = new UnitTestSRFile(ignoredContent, fakeFilePath);
+            let expected = ["history", "modern"];
+            let actual = TopicPath.getTopicPathOfFile(file, settings_ConvertFoldersToDecks);
+            expect(actual.path).toEqual(expected);
+        });
+
+    });
+
 });

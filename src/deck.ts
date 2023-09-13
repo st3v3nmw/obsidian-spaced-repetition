@@ -164,7 +164,8 @@ export class Deck {
         }
         for (let i = 0; i < this.dueFlashcards.length; i++) {
             let card = this.dueFlashcards[i];
-            result += `${indentStr}Due: ${i}: ${card.front}::${card.back}\r\n`;
+            let s = card.isDue ? "Due" : "Not due";
+            result += `${indentStr}${s}: ${i}: ${card.front}::${card.back}\r\n`;
         }
 
         for (const subdeck of this.subdecks) {
