@@ -1,42 +1,35 @@
-import moment from "moment";
-import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR, PREFERRED_DATE_FORMAT, TICKS_PER_DAY } from "./constants";
+import moment, { Duration, Moment } from "moment";
+import { ALLOWED_DATE_FORMATS, LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR, PREFERRED_DATE_FORMAT, TICKS_PER_DAY } from "./constants";
 import { INoteEaseList } from "./NoteEaseList";
 import { ReviewResponse, schedule } from "./scheduling";
 import { SRSettings } from "./settings";
 import { formatDate_YYYY_MM_DD } from "./util/utils";
-import { globalDateProvider } from "./util/DateProvider";
+import { DateUtil, globalDateProvider } from "./util/DateProvider";
 
 export class CardScheduleInfo { 
-    dueDate: Date;
+    dueDateTicks: Moment;
     interval: number;
     ease: number;
     delayBeforeReview: number;
 
-    constructor(dueDate: Date, interval: number, ease: number, delayBeforeReview: number) { 
-        this.dueDate = dueDate;
+    constructor(dueDateTicks: Moment, interval: number, ease: number, delayBeforeReview: number) { 
+        this.dueDateTicks = dueDateTicks;
         this.interval = interval;
         this.ease = ease;
         this.delayBeforeReview = delayBeforeReview;
     }
 
     isDue(): boolean {
-        return (this.dueDate.valueOf() < globalDateProvider.today.valueOf());
-    }
-
-    // static get emptySchedule(): CardScheduleInfo
-
-    static parseDueDateStr(dueDateStr: string): Date {
-        return moment(dueDateStr, [PREFERRED_DATE_FORMAT, "DD-MM-YYYY"]).toDate();
+        return this.dueDateTicks.isSameOrBefore(globalDateProvider.today);
     }
 
     static fromDueDateStr(dueDateStr: string, interval: number, ease: number, delayBeforeReview: number) { 
-        let dueDate: Date = this.parseDueDateStr(dueDateStr);
-        return new CardScheduleInfo(dueDate, interval, ease, delayBeforeReview);
+        let dueDateTicks: Moment = DateUtil.dateStrToMoment(dueDateStr);
+        return new CardScheduleInfo(dueDateTicks, interval, ease, delayBeforeReview);
     }
 
-    static fromDueDateTicks(dueDateTicks: number, interval: number, ease: number, delayBeforeReview: number) { 
-        let dueDate: Date = new Date(dueDateTicks);
-        return new CardScheduleInfo(dueDate, interval, ease, delayBeforeReview);
+    static fromDueDateTicks(dueDateTicks: Moment, interval: number, ease: number, delayBeforeReview: number) { 
+        return new CardScheduleInfo(dueDateTicks, interval, ease, delayBeforeReview);
     }
 
     static get initialInterval(): number {
@@ -44,7 +37,7 @@ export class CardScheduleInfo {
     }
 
     formatDueDate(): string {
-        return formatDate_YYYY_MM_DD(this.dueDate);
+        return formatDate_YYYY_MM_DD(this.dueDateTicks);
     }
 
     formatSchedule() {
@@ -63,10 +56,14 @@ export class CardScheduleCalculator {
     noteEaseList: INoteEaseList;
     dueDatesFlashcards: Record<number, number> = {}; // Record<# of days in future, due count>
 
+    constructor(settings: SRSettings) {
+        this.settings = settings;
+    }
+
     getResetCardSchedule(): CardScheduleInfo {
         let interval = CardScheduleInfo.initialInterval;
         let ease = this.settings.baseEase;
-        let dueDateTicks = Date.now() + interval * TICKS_PER_DAY;
+        let dueDateTicks = globalDateProvider.today.add(interval, "d");
         let delayBeforeReview = 0;
         return CardScheduleInfo.fromDueDateTicks(dueDateTicks, interval, ease, delayBeforeReview);
     }
@@ -86,7 +83,7 @@ export class CardScheduleCalculator {
 
         let interval = schedObj.interval;
         let ease = schedObj.ease;
-        let dueDateTicks = Date.now() + interval * TICKS_PER_DAY;
+        let dueDateTicks = globalDateProvider.today.add(interval, "d");
         return CardScheduleInfo.fromDueDateTicks(dueDateTicks, interval, ease, delayBeforeReview);
     }
 
@@ -102,8 +99,8 @@ export class CardScheduleCalculator {
             );
         let interval = schedObj.interval;
         let ease = schedObj.ease;
-        let dueDateTicks = Date.now() + interval * TICKS_PER_DAY;
-        let delayBeforeReview: number = 0;
+        let dueDateTicks = globalDateProvider.today.add(interval, "d");
+        let delayBeforeReview: 0;
         return CardScheduleInfo.fromDueDateTicks(dueDateTicks, interval, ease, delayBeforeReview);
     }
 }
@@ -122,7 +119,7 @@ export class NoteCardScheduleParser {
             let dueDateStr = match[1];
             let interval = parseInt(match[2]);
             let ease = parseInt(match[3]);
-            let dueDate: Date = CardScheduleInfo.parseDueDateStr(dueDateStr);
+            let dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
             let delayBeforeReview: number = globalDateProvider.today.valueOf() - dueDate.valueOf();
 
             let info: CardScheduleInfo = new CardScheduleInfo(dueDate, interval, ease, delayBeforeReview);

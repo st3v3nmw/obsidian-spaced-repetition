@@ -6,12 +6,19 @@ import { CardListType, Deck } from "src/Deck";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { SampleItemDecks } from "./SampleItems";
 import { UnitTestSRFile } from "src/SRFile";
+import { ticksFromDate } from "src/util/utils";
+import { ReviewResponse } from "src/scheduling";
+import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 
 let cardSequencer_PreferDue: IDeckTreeIterator = new DeckTreeSequentialIterator(CardListType.DueCard);
-let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator();
+let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(DEFAULT_SETTINGS);
 let reviewSequencer_PreferDue: IFlashcardReviewSequencer = new FlashcardReviewSequencer(FlashcardReviewMode.Review, cardSequencer_PreferDue, DEFAULT_SETTINGS, cardScheduleCalculator);
 var file: UnitTestSRFile;
 var originalText: string;
+
+beforeAll(() =>  {
+    setupStaticDateProvider_20230906();
+})
 
 describe("setDeckTree", () => {
 
@@ -73,8 +80,54 @@ describe("processReview", () => {
     describe("ReviewResponse.Reset", () => {
         test("Simple test", async () => {
             await setupSample1();
-            expect(reviewSequencer_PreferDue.currentCard.front).toEqual("Q2");
 
+            // State before calling processReview
+            let card = reviewSequencer_PreferDue.currentCard;
+            expect(card.front).toEqual("Q2");
+            expect(card.scheduleInfo).toMatchObject({
+                ease: 270, 
+                interval: 4
+            });
+
+            // State after calling processReview - same current card
+            // (only need to check ease, interval - dueDate & delayBeforeReview are not relevant)
+            reviewSequencer_PreferDue.processReview(ReviewResponse.Reset);
+            card = reviewSequencer_PreferDue.currentCard;
+            expect(card.front).toEqual("Q2");
+            expect(card.scheduleInfo).toMatchObject({
+                ease: 250, 
+                interval: 1
+            });
+
+        });
+    });
+
+    describe("ReviewResponse.Easy", () => {
+        test("Simple test", async () => {
+
+            await setupSample1();
+
+            // State before calling processReview
+            let card = reviewSequencer_PreferDue.currentCard;
+            expect(card.front).toEqual("Q2");
+            expect(card.scheduleInfo).toMatchObject({
+                ease: 270, 
+                interval: 4
+            });
+
+            // State after calling processReview - next card
+            reviewSequencer_PreferDue.processReview(ReviewResponse.Easy);
+            expect(reviewSequencer_PreferDue.currentCard.front).toEqual("Q1");
+
+            // Schedule for the reviewed card has been updated
+            expect(card.scheduleInfo).toMatchObject({
+                dueDateTicks: ticksFromDate(2023, 10, 6), // 30 days after base test date of 2023-09-06
+                ease: 290, 
+                interval: 30
+            });
+
+            // Note text has been updated
+            expect(await file.read()).toEqual("Hello");
         });
     });
 });
@@ -98,3 +151,4 @@ function skipAndCheck(sequencer: IFlashcardReviewSequencer, expectedFront: strin
     expect(sequencer.currentCard.front).toEqual(expectedFront);
 
 }
+

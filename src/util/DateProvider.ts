@@ -1,29 +1,42 @@
+import moment from "moment";
+import { Moment } from "moment";
+import { ALLOWED_DATE_FORMATS } from "src/constants";
 
 export interface IDateProvider {
-    get today(): Date;
+    get today(): Moment;
 }
 
 export class LiveDateProvider implements IDateProvider {
-    get today(): Date {
-        return new Date();
+    get today(): Moment {
+        return moment().startOf('day');
     }
 }
 
 export class StaticDateProvider implements IDateProvider {
-    private date: Date;
+    private ticks: Moment;
 
-    constructor(date: Date) {
-        this.date = date;
+    constructor(ticks: Moment) {
+        this.ticks = ticks;
     }
 
-    get today(): Date {
-        return this.date;
+    get today(): Moment {
+        return this.ticks;
     }
 
+    static fromDateStr(str: string): StaticDateProvider {
+        return new StaticDateProvider(DateUtil.dateStrToMoment(str));
+    }
+}
+
+export class DateUtil {
+    static dateStrToMoment(str: string): Moment {
+        return moment(str, ALLOWED_DATE_FORMATS);
+        // return ticks;
+    }
 }
 
 export var globalDateProvider: IDateProvider = new LiveDateProvider();
 
 export function setupStaticDateProvider_20230906() {
-    globalDateProvider = new StaticDateProvider(new Date(2023, 8, 6));
+    globalDateProvider = StaticDateProvider.fromDateStr("2023-09-06");
 }

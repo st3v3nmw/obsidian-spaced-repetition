@@ -11,7 +11,7 @@ let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContex
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS, questionContextFinder);
 let refDate: Date = new Date(2023, 8, 6);
 
-describe.only("appendCardsToDeck", () => {
+describe("appendCardsToDeck", () => {
 
     test("Multiple questions, single card per question", async () => {
         let noteText: string = `#flashcards/test

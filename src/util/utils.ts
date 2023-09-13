@@ -1,3 +1,6 @@
+import moment from "moment";
+import { Moment } from "moment";
+
 type Hex = number;
 
 // https://stackoverflow.com/a/69019874
@@ -60,16 +63,14 @@ function padTo2Digits(num: number) {
   return num.toString().padStart(2, '0');
 }
 
+export function ticksFromDate(year: number, month: number, day: number): number {
+  return moment({year, month, day}).utc().valueOf();
+}
+
 // 👇️ format as "YYYY-MM-DD"
 // https://bobbyhadz.com/blog/typescript-date-format
-export function formatDate_YYYY_MM_DD(date: Date): string {
-  return (
-    [
-      date.getFullYear(),
-      padTo2Digits(date.getMonth() + 1),
-      padTo2Digits(date.getDate()),
-    ].join('-')
-  );
+export function formatDate_YYYY_MM_DD(ticks: Moment): string {
+  return ticks.format("PREFERRED_DATE_FORMAT");
 }
 
 export function getAllTagsFromText(text: string): string[] {
