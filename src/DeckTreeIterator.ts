@@ -1,4 +1,4 @@
-import { Card } from "./__Card";
+import { Card } from "./Card";
 import { CardListType, Deck } from "./Deck";
 
 export interface IDeckTreeIterator {

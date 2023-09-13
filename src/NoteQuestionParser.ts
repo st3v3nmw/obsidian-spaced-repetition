@@ -1,4 +1,4 @@
-import { Card } from "./__Card";
+import { Card } from "./Card";
 import { CardScheduleInfo, NoteCardScheduleParser } from "./CardSchedule";
 import { parse } from "./parser";
 import { CardType, Question } from "./Question";

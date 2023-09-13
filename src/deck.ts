@@ -1,4 +1,4 @@
-import { Card } from "./__Card";
+import { Card } from "./Card";
 import { Question } from "./Question";
 import { TopicPath } from "./TopicPath";
 
