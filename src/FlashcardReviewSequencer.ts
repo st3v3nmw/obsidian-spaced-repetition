@@ -1,11 +1,9 @@
-import { Notice, TFile, Vault } from "obsidian";
 import { Card } from "./Card";
 import { CardListType, Deck } from "./Deck";
 import { Question } from "./Question";
 import { ReviewResponse, schedule } from "./scheduling";
 import { SRSettings } from "./settings";
 import { TopicPath } from "./TopicPath";
-import { escapeRegexString } from "./util/utils";
 import { CardScheduleInfo, ICardScheduleCalculator } from "./CardSchedule";
 import { INoteEaseList } from "./NoteEaseList";
 import { TICKS_PER_DAY } from "./constants";
@@ -91,7 +89,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
         this.remainingDeckTree = this.filteredDeckTree.copyWithCardFilter((card) => 
             (this.reviewMode == FlashcardReviewMode.Cram) || card.isNew || card.isDue);
-    }
+        }
 
     setCurrentDeck(topicPath: TopicPath): void {
         let deck: Deck = this.remainingDeckTree.getDeck(topicPath);

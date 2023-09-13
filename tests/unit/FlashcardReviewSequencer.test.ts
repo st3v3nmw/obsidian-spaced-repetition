@@ -9,6 +9,7 @@ import { UnitTestSRFile } from "src/SRFile";
 import { ticksFromDate } from "src/util/utils";
 import { ReviewResponse } from "src/scheduling";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
+import moment from "moment";
 
 let cardSequencer_PreferDue: IDeckTreeIterator = new DeckTreeSequentialIterator(CardListType.DueCard);
 let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(DEFAULT_SETTINGS);
@@ -35,7 +36,6 @@ Q1::A1
 Q2::A2
 Q3::A3`;
         let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
-        deck.debugLogToConsole();
         expect(deck.newFlashcards.length).toEqual(3);
         reviewSequencer_PreferDue.setDeckTree(deck);
         expect(reviewSequencer_PreferDue.currentDeck.newFlashcards.length).toEqual(3);
@@ -77,57 +77,82 @@ describe("skipCurrentCard", () => {
 
 describe("processReview", () => {
 
-    describe("ReviewResponse.Reset", () => {
-        test("Simple test", async () => {
-            await setupSample1();
+    describe("FlashcardReviewMode.Review", () => {
+        describe("ReviewResponse.Reset", () => {
+            test("Simple test - 3 cards all due in same deck - reset card moves to end of deck", async () => {
+                let text: string = `
+                    #flashcards Q1::A1 <!--SR:!2023-09-02,4,270-->
+                    #flashcards Q2::A2 <!--SR:!2023-09-02,5,270-->
+                    #flashcards Q3::A3 <!--SR:!2023-09-02,6,270-->`;
+                await setupSample(text);
 
-            // State before calling processReview
-            let card = reviewSequencer_PreferDue.currentCard;
-            expect(card.front).toEqual("Q2");
-            expect(card.scheduleInfo).toMatchObject({
-                ease: 270, 
-                interval: 4
+                // State before calling processReview
+                let card = reviewSequencer_PreferDue.currentCard;
+                expect(card.front).toEqual("Q1");
+                expect(card.scheduleInfo).toMatchObject({
+                    ease: 270, 
+                    interval: 4
+                });
+
+                // State after calling processReview - same current card
+                // (only need to check ease, interval - dueDate & delayBeforeReview are not relevant)
+                reviewSequencer_PreferDue.processReview(ReviewResponse.Reset);
+                card = reviewSequencer_PreferDue.currentCard;
+                expect(card.front).toEqual("Q2");
+                expect(card.scheduleInfo).toMatchObject({
+                    ease: 270, 
+                    interval: 5
+                });
+
+                reviewSequencer_PreferDue.skipCurrentCard();
+                card = reviewSequencer_PreferDue.currentCard;
+                expect(card.front).toEqual("Q3");
+                expect(card.scheduleInfo).toMatchObject({
+                    ease: 270, 
+                    interval: 6
+                });
+
+                // After skipping Q3, we should see Q1 the reset card with updated ease/interval
+                reviewSequencer_PreferDue.skipCurrentCard();
+                card = reviewSequencer_PreferDue.currentCard;
+                expect(card.front).toEqual("Q1");
+                expect(card.scheduleInfo).toMatchObject({
+                    ease: DEFAULT_SETTINGS.baseEase, 
+                    interval: 1
+                });
             });
-
-            // State after calling processReview - same current card
-            // (only need to check ease, interval - dueDate & delayBeforeReview are not relevant)
-            reviewSequencer_PreferDue.processReview(ReviewResponse.Reset);
-            card = reviewSequencer_PreferDue.currentCard;
-            expect(card.front).toEqual("Q2");
-            expect(card.scheduleInfo).toMatchObject({
-                ease: 250, 
-                interval: 1
-            });
-
         });
-    });
 
-    describe("ReviewResponse.Easy", () => {
-        test("Simple test", async () => {
+        describe("ReviewResponse.Easy", () => {
+            test("Card schedule is updated, next card becomes current", async () => {
 
-            await setupSample1();
+                let text: string = `
+                    #flashcards Q1::A1
+                    #flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
+                    #flashcards Q3::A3`;
+                await setupSample(text);
+        
+                // State before calling processReview
+                let card = reviewSequencer_PreferDue.currentCard;
+                expect(card.front).toEqual("Q2");
+                expect(card.scheduleInfo).toMatchObject({
+                    ease: 270, 
+                    interval: 4
+                });
 
-            // State before calling processReview
-            let card = reviewSequencer_PreferDue.currentCard;
-            expect(card.front).toEqual("Q2");
-            expect(card.scheduleInfo).toMatchObject({
-                ease: 270, 
-                interval: 4
+                // State after calling processReview - next card
+                reviewSequencer_PreferDue.processReview(ReviewResponse.Easy);
+                expect(reviewSequencer_PreferDue.currentCard.front).toEqual("Q1");
+
+                // Schedule for the reviewed card has been updated
+                expect(card.scheduleInfo.ease).toEqual(290);
+                expect(card.scheduleInfo.interval).toEqual(34);
+                expect(card.scheduleInfo.dueDateTicks.unix).toEqual(moment("2023-10-06").unix);
+
+                // Note text has been updated
+                let expectedText: string = originalText.replace("Q2::A2 <!--SR:!2023-09-02,4,270-->", "Q2::A2 <!--SR:!2023-10-16,4,270-->");
+                expect(await file.read()).toEqual(expectedText);
             });
-
-            // State after calling processReview - next card
-            reviewSequencer_PreferDue.processReview(ReviewResponse.Easy);
-            expect(reviewSequencer_PreferDue.currentCard.front).toEqual("Q1");
-
-            // Schedule for the reviewed card has been updated
-            expect(card.scheduleInfo).toMatchObject({
-                dueDateTicks: ticksFromDate(2023, 10, 6), // 30 days after base test date of 2023-09-06
-                ease: 290, 
-                interval: 30
-            });
-
-            // Note text has been updated
-            expect(await file.read()).toEqual("Hello");
         });
     });
 });
@@ -140,6 +165,11 @@ async function setupSample1() {
         #flashcards/science Q4::A4 <!--SR:!2023-09-02,4,270-->
         #flashcards/science/physics Q5::A5 <!--SR:!2023-09-02,4,270-->
         #flashcards/math Q6::A6`;
+    await setupSample(text);
+}
+
+async function setupSample(text: string) {
+
     file = new UnitTestSRFile(text);
     originalText = text;
     let deck: Deck = await SampleItemDecks.createDeckFromFile(file, new TopicPath(["Root"]));
