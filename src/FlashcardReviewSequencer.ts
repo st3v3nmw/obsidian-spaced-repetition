@@ -1,5 +1,5 @@
 import { Notice, TFile, Vault } from "obsidian";
-import { Card } from "./Card";
+import { Card } from "./__Card";
 import { CardListType, Deck } from "./Deck";
 import { Question } from "./Question";
 import { ReviewResponse, schedule } from "./scheduling";

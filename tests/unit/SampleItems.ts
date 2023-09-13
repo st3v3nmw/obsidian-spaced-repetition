@@ -1,4 +1,4 @@
-import { Card } from "src/Card";
+import { Card } from "src/__Card";
 import { Deck } from "src/Deck";
 import { Note } from "src/Note";
 import { NoteParser } from "src/NoteParser";

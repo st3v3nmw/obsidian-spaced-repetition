@@ -1,5 +1,5 @@
 
-import { Card } from "./Card";
+import { Card } from "./__Card";
 import { SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END } from "./constants";
 import { Note } from "./Note";
 import { SRSettings } from "./settings";

@@ -4,7 +4,7 @@ import { SRSettings } from "./settings";
 import { parse } from "./parser";
 import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR, OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "./constants";
 import { Deck } from "./Deck";
-import { Card } from "./Card";
+import { Card } from "./__Card";
 import { cyrb53, escapeRegexString } from "./util/utils";
 import { Question } from "./Question";
 import { ISRFile } from "./SRFile";
