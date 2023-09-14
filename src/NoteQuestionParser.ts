@@ -57,19 +57,6 @@ export class NoteQuestionParser {
         return result;
     }
 
-    /* createQuestionList_WithNoteTags(noteText: string, tagList: string[], refDate: Date): Question[] { 
-        if (this.settings.convertFoldersToDecks)
-            throw "Invalid usage";
-        let noteTopicPath: TopicPath = this.determineTopicPathFromTags(tagList);
-        return this.doCreateQuestionList(noteText, noteTopicPath, refDate);
-    }
-
-    createQuestionList_WithFolderTopicPath(noteText: string, folderTopicPath: TopicPath, refDate: Date): Question[] { 
-        if (!this.settings.convertFoldersToDecks)
-            throw "Invalid usage";
-        return this.doCreateQuestionList(noteText, folderTopicPath, refDate);
-    } */
-
     private doCreateQuestionList(noteText: string, noteTopicPath: TopicPath): Question[] { 
         this.noteText = noteText;
         this.noteTopicPath = noteTopicPath;
@@ -119,33 +106,10 @@ export class NoteQuestionParser {
 
     private createQuestionObject(parsedQuestionInfo: ParsedQuestionInfo): Question { 
         var {cardType, cardText, lineNo} = parsedQuestionInfo;
-        let originalQuestionText: string = cardText;
-        let rawQuestionText = originalQuestionText;
-        let hasEditLaterTag = rawQuestionText.includes(this.settings.editLaterTag);
-        let topicPath: TopicPath = this.noteTopicPath;
-        if (!this.settings.convertFoldersToDecks) {
-            const t = TopicPath.getTopicPathFromCardText(rawQuestionText);
-            if (t?.hasPath) {
-                topicPath = t;
-                rawQuestionText = TopicPath.removeTopicPathFromCardText(rawQuestionText)
-            }
-        }
-        rawQuestionText = NoteCardScheduleParser.removeCardScheduleInfo(rawQuestionText).trim();
 
+        let originalQuestionText: string = cardText;
         const context: string = this.questionContextFinder.getQuestionContext(lineNo);
-        const questionTextHash: string = cyrb53(rawQuestionText);
-        let result: Question = new Question({ 
-            questionType: cardType, 
-            topicPath, 
-            questionTextOriginal: originalQuestionText, 
-            questionTextCleaned: rawQuestionText, 
-            lineNo, 
-            hasEditLaterTag, 
-            questionTextHash, 
-            context, 
-            cards: null, 
-            hasChanged: false
-        });
+        let result = Question.Create(this.settings, cardType, this.noteTopicPath, cardText, lineNo, context);
         return result;
     }
 

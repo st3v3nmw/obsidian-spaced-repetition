@@ -126,36 +126,57 @@ describe("processReview", () => {
         describe("ReviewResponse.Easy", () => {
             test("Card schedule is updated, next card becomes current", async () => {
 
-                let text: string = `
-                    #flashcards Q1::A1
-                    #flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
-                    #flashcards Q3::A3`;
-                await setupSample(text);
-        
-                // State before calling processReview
-                let card = reviewSequencer_PreferDue.currentCard;
-                expect(card.front).toEqual("Q2");
-                expect(card.scheduleInfo).toMatchObject({
-                    ease: 270, 
-                    interval: 4
-                });
-
-                // State after calling processReview - next card
-                reviewSequencer_PreferDue.processReview(ReviewResponse.Easy);
-                expect(reviewSequencer_PreferDue.currentCard.front).toEqual("Q1");
-
-                // Schedule for the reviewed card has been updated
-                expect(card.scheduleInfo.ease).toEqual(290);
-                expect(card.scheduleInfo.interval).toEqual(34);
-                expect(card.scheduleInfo.dueDateTicks.unix).toEqual(moment("2023-10-06").unix);
-
-                // Note text has been updated
-                let expectedText: string = originalText.replace("Q2::A2 <!--SR:!2023-09-02,4,270-->", "Q2::A2 <!--SR:!2023-10-16,4,270-->");
-                expect(await file.read()).toEqual(expectedText);
+                const expected: Info1 = {
+                    cardQ2_PreReviewText: "Q2::A2 <!--SR:!2023-09-02,4,270-->", 
+                    cardQ2_PostReviewEase: 290, 
+                    cardQ2_PostReviewInterval: 34, 
+                    cardQ2_PostReviewDueDate: "2023-10-06", 
+                    cardQ2_PostReviewText: "Q2::A2 <!--SR:!2023-10-16,34,290-->"             
+                };
+                let cardQ2_PostReviewEase
+                await checkReviewResponse(ReviewResponse.Easy, expected);
             });
         });
     });
 });
+
+interface Info1 {
+    cardQ2_PreReviewText: string;
+    cardQ2_PostReviewEase: number;
+    cardQ2_PostReviewInterval: number;
+    cardQ2_PostReviewDueDate: string;
+    cardQ2_PostReviewText: string
+}
+
+async function checkReviewResponse(reviewResponse: ReviewResponse, info: Info1): Promise<void> {
+
+    let text: string = `
+        #flashcards Q1::A1
+        #flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
+        #flashcards Q3::A3`;
+    await setupSample(text);
+
+    // State before calling processReview
+    let card = reviewSequencer_PreferDue.currentCard;
+    expect(card.front).toEqual("Q2");
+    expect(card.scheduleInfo).toMatchObject({
+        ease: 270, 
+        interval: 4
+    });
+
+    // State after calling processReview - next card
+    reviewSequencer_PreferDue.processReview(reviewResponse);
+    expect(reviewSequencer_PreferDue.currentCard.front).toEqual("Q1");
+
+    // Schedule for the reviewed card has been updated
+    expect(card.scheduleInfo.ease).toEqual(info.cardQ2_PostReviewEase);
+    expect(card.scheduleInfo.interval).toEqual(info.cardQ2_PostReviewInterval);
+    expect(card.scheduleInfo.dueDateTicks.unix).toEqual(moment(info.cardQ2_PostReviewDueDate).unix);
+
+    // Note text has been updated
+    let expectedText: string = originalText.replace(info.cardQ2_PreReviewText, info.cardQ2_PostReviewText);
+    expect(await file.read()).toEqual(expectedText);
+};
 
 async function setupSample1() {
     let text: string = `

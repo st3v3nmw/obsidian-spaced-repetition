@@ -39,6 +39,8 @@ export class Note {
         }
         console.debug(str);
     }
+
+
 }
 
 function getCardContext(cardLine: number, headings: HeadingCache[], note_title: string): string {

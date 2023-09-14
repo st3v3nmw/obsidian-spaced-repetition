@@ -99,28 +99,28 @@ describe("removeTopicPathFromCardText", () => {
 
     test("Card text doesn't include tag", () => {
         let cardText: string = "Card text doesn't include tag";
-        let result: string = TopicPath.removeTopicPathFromCardText(cardText);
+        let result: string = TopicPath.removeTopicPathFromStartOfCardText(cardText);
 
         expect(result).toEqual(cardText);
     });
 
     test("Card text includes single level tag", () => {
         let cardText: string = "#flashcards Card text does include tag";
-        let result: string = TopicPath.removeTopicPathFromCardText(cardText);
+        let result: string = TopicPath.removeTopicPathFromStartOfCardText(cardText);
 
         expect(result).toEqual("Card text does include tag");
     });
 
     test("Card text includes multi level tag", () => {
         let cardText: string = "#flashcards/science/chemistry Card text does include tag";
-        let result: string = TopicPath.removeTopicPathFromCardText(cardText);
+        let result: string = TopicPath.removeTopicPathFromStartOfCardText(cardText);
 
         expect(result).toEqual("Card text does include tag");
     });
 
     test("White space present before topic tag", () => {
         let cardText: string = "   #flashcards/science/chemistry Card text does include tag";
-        let result: string = TopicPath.removeTopicPathFromCardText(cardText);
+        let result: string = TopicPath.removeTopicPathFromStartOfCardText(cardText);
 
         expect(result).toEqual("Card text does include tag");
     });
