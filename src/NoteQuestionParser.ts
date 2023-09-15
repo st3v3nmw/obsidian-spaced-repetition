@@ -68,10 +68,10 @@ export class NoteQuestionParser {
             let question: Question = this.createQuestionObject(parsedQuestionInfo);
 
             // Each rawCardText can turn into multiple CardFrontBack's (e.g. CardType.Cloze, CardType.SingleLineReversed)
-            let cardFrontBackList: CardFrontBack[] = CardFrontBackUtil.expand(question.questionType, question.questionTextCleaned, this.settings);
+            let cardFrontBackList: CardFrontBack[] = CardFrontBackUtil.expand(question.questionType, question.questionText.actualQuestion, this.settings);
 
             // And if the card has been reviewed, then scheduling info as well
-            let cardScheduleInfoList: CardScheduleInfo[] = NoteCardScheduleParser.createCardScheduleInfoList(question.questionTextOriginal);
+            let cardScheduleInfoList: CardScheduleInfo[] = NoteCardScheduleParser.createCardScheduleInfoList(question.questionText.original);
 
             // we have some extra scheduling dates to delete
             let correctLength = cardFrontBackList.length;

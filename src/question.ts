@@ -16,12 +16,84 @@ export enum CardType {
     Cloze,
 }
 
+// 
+// QuestionText comprises the following components:
+//      1. QuestionTopicPath (optional)
+//      2. Actual question text (mandatory)
+//      3. Card schedule info as HTML comment (optional)
+// 
+// For example
+// 
+//  Actual question text only:
+//      Q1::A1
+// 
+//  Question text with topic path:
+//      #flashcards/science  Q2::A2
+// 
+//  Question text with card schedule info:
+//      #flashcards/science  Q2::A2 <!--SR:!2023-10-16,34,290-->
+// 
+export class QuestionText {
+    // Complete text including all components, as read from file
+    original: string;
+
+    // The question topic path (only present if topic path included in original text)
+    topicPath: TopicPath;
+
+    // Just the question text, e.g. "Q1::A1"
+    actualQuestion: string;
+
+    // Hash of string  (topicPath + actualQuestion)
+    // Explicitly excludes the HTML comment with the scheduling info
+    textHash: string;
+
+    constructor(original: string, topicPath: TopicPath, actualQuestion: string) {
+        this.original = original;
+        this.topicPath = topicPath;
+        this.actualQuestion = actualQuestion;
+        this.textHash = cyrb53(this.formatForNote());
+    }
+
+    endsWithCodeBlock(): boolean {
+        return this.actualQuestion.endsWith("```");
+    }
+
+    static Parse(original: string, settings: SRSettings) {
+        let strippedSR = NoteCardScheduleParser.removeCardScheduleInfo(original).trim();
+        let actualQuestion: string = strippedSR;
+
+        let topicPath: TopicPath = TopicPath.emptyPath;
+        if (!settings.convertFoldersToDecks) {
+            const t = TopicPath.getTopicPathFromCardText(strippedSR);
+            if (t?.hasPath) {
+                topicPath = t;
+                actualQuestion = TopicPath.removeTopicPathFromStartOfCardText(strippedSR).trim();
+            }
+        }
+
+        return new QuestionText(original, topicPath, actualQuestion);
+    }
+
+    formatForNote(): string {
+        let result: string = "";
+        if (this.topicPath.hasPath)
+            result += `${this.topicPath.formatAsTag()} `;
+        result += this.actualQuestion;
+        return result;
+    }
+
+    /* static extractSrComments(text: string): string[] {
+        const regex = /(<!--SR:!.+-->)/g;
+        let result = [...text.matchAll(regex)];
+        return null;
+    } */
+}
+
 export class Question { 
     note: Note;
     questionType: CardType;
     topicPath: TopicPath;
-    questionTextStrippedSR: string;
-    questionTextCleaned: string;
+    questionText: QuestionText;
     lineNo: number;
     hasEditLaterTag: boolean;
     questionTextHash: string;
@@ -29,24 +101,14 @@ export class Question {
     cards: Card[];
     hasChanged: boolean;
 
-    private _questionTextOriginal: string;
-
-    get questionTextOriginal(): string {
-        return this._questionTextOriginal;
-    }
-
     constructor(init?: Partial<Question>) {
         Object.assign(this, init);
-    }
-
-    doesQuestionTextEndWithCodeBlock(): boolean {
-        return this.questionTextStrippedSR.endsWith("```");
     }
 
     getHtmlCommentSeparator(settings: SRSettings): string {
         let sep: string = settings.cardCommentOnSameLine ? " " : "\n";
         // Override separator if last block is a codeblock
-        if (this.doesQuestionTextEndWithCodeBlock() && sep !== "\n") {
+        if (this.questionText.endsWithCodeBlock() && sep !== "\n") {
             sep = "\n";
         }
         return sep;
@@ -66,8 +128,8 @@ export class Question {
     }
 
     formatForNote(settings: SRSettings): string {
-        let result = 
-            this.questionTextStrippedSR + 
+        let result: string = 
+            this.questionText.formatForNote() + 
             this.getHtmlCommentSeparator(settings) + 
             this.formatScheduleAsHtmlComment(settings);
         return result;
@@ -75,44 +137,37 @@ export class Question {
 
     async writeQuestion(settings: SRSettings): Promise<void> {
 
-        let originalText: string = this.questionTextOriginal;
+        let originalText: string = this.questionText.original;
         const originalTextRegex = new RegExp(escapeRegexString(originalText), "gm");
 
         let fileText: string = await this.note.file.read();
         let replacementText = this.formatForNote(settings);
-        let newText: string = fileText.replace(originalTextRegex, replacementText);
+        let newText: string = fileText.replace(originalText, replacementText);
         await this.note.file.write(newText);
-        this.questionTextStrippedSR = replacementText;
+        this.questionText = QuestionText.Parse(replacementText, settings);
     }
 
-    static Create(settings: SRSettings, questionType: CardType, noteTopicPath: TopicPath, questionTextOriginal: string, 
+    static Create(settings: SRSettings, questionType: CardType, noteTopicPath: TopicPath, originalText: string, 
         lineNo: number, context: string): Question {
 
-        let questionTextStrippedSR = NoteCardScheduleParser.removeCardScheduleInfo(questionTextOriginal).trim();
-        let questionTextCleaned = questionTextStrippedSR;
-        let hasEditLaterTag = questionTextStrippedSR.includes(settings.editLaterTag);
+        let hasEditLaterTag = originalText.includes(settings.editLaterTag);
+        let questionText: QuestionText = QuestionText.Parse(originalText, settings);
+
         let topicPath: TopicPath = noteTopicPath;
-        if (!settings.convertFoldersToDecks) {
-            const t = TopicPath.getTopicPathFromCardText(questionTextStrippedSR);
-            if (t?.hasPath) {
-                topicPath = t;
-                questionTextCleaned = TopicPath.removeTopicPathFromStartOfCardText(questionTextCleaned)
-            }
+        if (questionText.topicPath.hasPath) {
+            topicPath = questionText.topicPath;
         }
 
-        const questionTextHash: string = cyrb53(questionTextStrippedSR);
         let result: Question = new Question({ 
             questionType, 
             topicPath, 
-            questionTextCleaned, 
+            questionText, 
             lineNo, 
             hasEditLaterTag, 
-            questionTextHash, 
             context, 
             cards: null, 
             hasChanged: false
         });
-        result._questionTextOriginal = questionTextOriginal;
 
         return result;
     }

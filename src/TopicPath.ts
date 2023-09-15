@@ -36,6 +36,13 @@ export class TopicPath {
         return new TopicPath([...this.path]);
     }
 
+    formatAsTag(): string {
+        if (this.isEmptyPath)
+            throw "Empty path";
+        let result = "#" + this.path.join("/");
+        return result;
+    }
+
     static getTopicPathOfFile(noteFile: ISRFile, settings: SRSettings): TopicPath {
         var deckPath: string[] = [];
         var result: TopicPath = TopicPath.emptyPath;

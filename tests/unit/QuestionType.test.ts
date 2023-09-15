@@ -22,13 +22,15 @@ test("CardType.SingleLineReversed", () => {
 });
 
 
-test("CardType.MultiLineBasic", () => {
-    expect(
-        CardFrontBackUtil.expand(CardType.MultiLineBasic, "A1\nA2\n?\nB1\nB2", DEFAULT_SETTINGS),
-    ).toEqual([
-        new CardFrontBack("A1\nA2", "B1\nB2")
-    ]
-    );
+describe("CardType.MultiLineBasic", () => {
+    test("Basic", () => {
+        expect(
+            CardFrontBackUtil.expand(CardType.MultiLineBasic, "A1\nA2\n?\nB1\nB2", DEFAULT_SETTINGS),
+        ).toEqual([
+            new CardFrontBack("A1\nA2", "B1\nB2")
+        ]
+        );
+    });
 });
 
 

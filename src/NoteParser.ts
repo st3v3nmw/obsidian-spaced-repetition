@@ -14,7 +14,7 @@ export class NoteParser {
         this.questionContextFinder = questionContextFinder;
     }
 
-    async parse(noteFile: ISRFile, folderTopicPath: TopicPath) {
+    async parse(noteFile: ISRFile, folderTopicPath: TopicPath): Promise<Note> {
         let questionParser: NoteQuestionParser = new NoteQuestionParser(this.settings, this.questionContextFinder);
         let questions = await questionParser.createQuestionList(noteFile, folderTopicPath);
         let totalCards: number = questions.reduce((accumulator, q) => accumulator + q.cards.length, 0);

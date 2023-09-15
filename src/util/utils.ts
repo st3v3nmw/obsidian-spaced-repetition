@@ -1,5 +1,6 @@
 import moment from "moment";
 import { Moment } from "moment";
+import { PREFERRED_DATE_FORMAT } from "src/constants";
 
 type Hex = number;
 
@@ -70,7 +71,7 @@ export function ticksFromDate(year: number, month: number, day: number): number 
 // 👇️ format as "YYYY-MM-DD"
 // https://bobbyhadz.com/blog/typescript-date-format
 export function formatDate_YYYY_MM_DD(ticks: Moment): string {
-  return ticks.format("PREFERRED_DATE_FORMAT");
+  return ticks.format(PREFERRED_DATE_FORMAT);
 }
 
 export function getAllTagsFromText(text: string): string[] {

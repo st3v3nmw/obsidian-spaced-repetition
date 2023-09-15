@@ -122,6 +122,9 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
                 deleteCard = (response != ReviewResponse.Reset);
                 moveCardToEnd = (response == ReviewResponse.Reset);
                 this.currentCard.scheduleInfo = this.determineCardSchedule(response, this.currentCard);
+
+                // Update the source file with the updated schedule
+                await this.currentQuestion.writeQuestion(this.settings);
                 break;
 
             case FlashcardReviewMode.Cram:
@@ -129,6 +132,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
                 break;
         }
         
+        // Move/delete/skip the card
         if (moveCardToEnd) {
             let card = this.currentCard;
             this.deleteCurrentCard();

@@ -35,7 +35,7 @@ export class Note {
         let str: string = `Note: ${desc}: ${this.questionList.length} questions\r\n`;
         for (let i = 0; i < this.questionList.length; i++) {
             let q: Question = this.questionList[i];
-            str += `[${i}]: ${q.questionType}: ${q.lineNo}: ${q.topicPath?.path}: ${q.questionTextOriginal}\r\n`;
+            str += `[${i}]: ${q.questionType}: ${q.lineNo}: ${q.topicPath?.path}: ${q.questionText.original}\r\n`;
         }
         console.debug(str);
     }
@@ -70,7 +70,7 @@ export interface INoteUpdator {
 //     modifyQuestion(noteFile: ISRFile, question: Question): Promise<void>;
 }
 
-export class NoteUpdator implements INoteUpdator {
+/* export class NoteUpdator implements INoteUpdator {
 
     async modifyQuestionText(noteFile: ISRFile, question: Question, replacementText: string): Promise<void> {
 
@@ -83,7 +83,7 @@ export class NoteUpdator implements INoteUpdator {
         question.questionTextStrippedSR = replacementText;
     }
 
-/* 
+
     update(): void {
         const dueString: string = due.format("YYYY-MM-DD");
 
@@ -132,5 +132,5 @@ export class NoteUpdator implements INoteUpdator {
 
         await this.app.vault.modify(this.currentCard.note, fileText);
         this.currentDeck.nextCard(this);
-    } */
-}
+    }
+} */

@@ -20,7 +20,7 @@ export class StaticDateProvider implements IDateProvider {
     }
 
     get today(): Moment {
-        return this.ticks;
+        return this.ticks.clone();
     }
 
     static fromDateStr(str: string): StaticDateProvider {
@@ -31,7 +31,6 @@ export class StaticDateProvider implements IDateProvider {
 export class DateUtil {
     static dateStrToMoment(str: string): Moment {
         return moment(str, ALLOWED_DATE_FORMATS);
-        // return ticks;
     }
 }
 

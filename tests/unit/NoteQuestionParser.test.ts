@@ -44,8 +44,12 @@ A::B
             let expected = [{
                 questionType: CardType.SingleLineBasic, 
                 topicPath: TopicPath.emptyPath, 
-                questionTextOriginal: `A::B`, 
-                questionTextCleaned: "A::B", 
+                questionText: {
+                    original: `A::B`, 
+                    actualQuestion: "A::B", 
+                    topicPath: TopicPath.emptyPath, 
+                }, 
+    
                 lineNo: 1, 
                 hasEditLaterTag: false, 
                 context: "", 
@@ -73,12 +77,15 @@ A::B
         let expected = [{
             questionType: CardType.SingleLineBasic, 
             topicPath: new TopicPath(["flashcards", "test"]), 
-            questionTextOriginal: `A::B
+            questionText: {
+                original: `A::B
 <!--SR:!2023-09-03,1,230-->`, 
-            questionTextCleaned: "A::B", 
+                actualQuestion: "A::B", 
+                topicPath: TopicPath.emptyPath, 
+                textHash: "1c6b0b01215dc4"
+            }, 
             lineNo: 1, 
             hasEditLaterTag: false, 
-            questionTextHash: "1c6b0b01215dc4", 
             context: "", 
             cards: [ card1 ], 
             hasChanged: false
