@@ -1,11 +1,13 @@
 import { Card } from "./Card";
 import { CardListType, Deck } from "./Deck";
+import { TopicPath } from "./TopicPath";
 
 export interface IDeckTreeIterator {
     get currentDeck(): Deck;
     get currentCard(): Card;
     setDeck(deck: Deck): void;
     deleteCurrentCard(): boolean;
+    moveCurrentCardToEndOfList(): void;
     nextCard(): boolean;
 }
 
@@ -94,10 +96,24 @@ export class DeckTreeSequentialIterator implements IDeckTreeIterator {
     }
 
     deleteCurrentCard(): boolean {
-        if ((this.cardIdx == null) || (this.cardListType == null))
-            throw "no current card";
+        this.ensureCurrentCard();
         this.currentDeck.deleteCardAtIndex(this.cardIdx, this.cardListType);
         this.cardIdx--;
         return this.nextCard();
+    }
+
+    moveCurrentCardToEndOfList(): void {
+        this.ensureCurrentCard();
+        let cardList: Card[] = this.currentDeck.getCardListForCardType(this.cardListType);
+        if (this.cardIdx == cardList.length - 1)
+            return;
+        let card = this.currentCard;
+        this.currentDeck.deleteCardAtIndex(this.cardIdx, this.cardListType);
+        this.currentDeck.appendCard(TopicPath.emptyPath, card);
+    }
+
+    private ensureCurrentCard() {
+        if ((this.cardIdx == null) || (this.cardListType == null))
+            throw "no current card";
     }
 }

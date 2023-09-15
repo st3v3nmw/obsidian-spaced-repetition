@@ -131,7 +131,7 @@ describe("processReview", () => {
 
                 // State after calling processReview - same current card
                 // (only need to check ease, interval - dueDate & delayBeforeReview are not relevant)
-                c.reviewSequencer.processReview(ReviewResponse.Reset);
+                await c.reviewSequencer.processReview(ReviewResponse.Reset);
                 card = c.reviewSequencer.currentCard;
                 expect(card.front).toEqual("Q2");
                 expect(card.scheduleInfo).toMatchObject({

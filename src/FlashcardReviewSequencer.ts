@@ -134,9 +134,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         
         // Move/delete/skip the card
         if (moveCardToEnd) {
-            let card = this.currentCard;
-            this.deleteCurrentCard();
-            this.currentDeck.appendCard(TopicPath.emptyPath, card);
+            this.cardSequencer.moveCurrentCardToEndOfList();
         } else if (deleteCard) {
             this.deleteCurrentCard();
         }
