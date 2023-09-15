@@ -1,6 +1,6 @@
 import { Card } from "./Card";
 import { CardListType, Deck } from "./Deck";
-import { Question } from "./Question";
+import { Question, QuestionText } from "./Question";
 import { ReviewResponse, schedule } from "./scheduling";
 import { SRSettings } from "./settings";
 import { TopicPath } from "./TopicPath";
@@ -23,6 +23,7 @@ export interface IFlashcardReviewSequencer {
     getDeckStats(topicPath: TopicPath): DeckStats;
     skipCurrentCard(): void;
     processReview(response: ReviewResponse): Promise<void>;
+    updateCurrentQuestionText(text: string): Promise<void>;
 }
 
 export class DeckStats {
@@ -163,4 +164,15 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     private nextCard(): void {
 
     }
+
+    async updateCurrentQuestionText(text: string): Promise<void> {
+        let q = this.currentQuestion.questionText;
+        let [topicPath, actualQuestion] = QuestionText.SplitText(text, this.settings);
+        q.topicPath = topicPath;
+        q.actualQuestion = actualQuestion;
+
+        await this.currentQuestion.writeQuestion(this.settings);
+
+    }
+
 }

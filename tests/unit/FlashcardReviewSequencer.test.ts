@@ -6,7 +6,6 @@ import { CardListType, Deck } from "src/Deck";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { SampleItemDecks } from "./SampleItems";
 import { UnitTestSRFile } from "src/SRFile";
-import { ticksFromDate } from "src/util/utils";
 import { ReviewResponse } from "src/scheduling";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 import moment from "moment";
@@ -47,6 +46,72 @@ class TestContext {
         
     }
 }
+
+interface Info1 {
+    cardQ2_PreReviewText: string;
+    cardQ2_PostReviewEase: number;
+    cardQ2_PostReviewInterval: number;
+    cardQ2_PostReviewDueDate: string;
+    cardQ2_PostReviewText: string
+}
+
+async function checkReviewResponse(reviewResponse: ReviewResponse, info: Info1): Promise<void> {
+
+    let text: string = `
+#flashcards Q1::A1
+#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
+#flashcards Q3::A3`;
+
+    let str: string = moment().millisecond().toString();
+    let c: TestContext = TestContext.Create(CardListType.DueCard, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text, str);
+    let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
+
+    // State before calling processReview
+    let card = c.reviewSequencer.currentCard;
+    expect(card.front).toEqual("Q2");
+    expect(card.scheduleInfo).toMatchObject({
+        ease: 270, 
+        interval: 4
+    });
+
+    // State after calling processReview - next card
+    await c.reviewSequencer.processReview(reviewResponse);
+    expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
+
+    // Schedule for the reviewed card has been updated
+    expect(card.scheduleInfo.ease).toEqual(info.cardQ2_PostReviewEase);
+    expect(card.scheduleInfo.interval).toEqual(info.cardQ2_PostReviewInterval);
+    expect(card.scheduleInfo.dueDateTicks.unix).toEqual(moment(info.cardQ2_PostReviewDueDate).unix);
+
+    // Note text has been updated
+    let expectedText: string = c.originalText.replace(info.cardQ2_PreReviewText, info.cardQ2_PostReviewText);
+    expect(await c.file.read()).toEqual(expectedText);
+};
+
+async function setupSample1(): Promise<TestContext> {
+    let text: string = `
+#flashcards Q1::A1
+
+#flashcards Q2::A2
+<!--SR:!2023-09-02,4,270-->
+
+#flashcards Q3::A3
+#flashcards/science Q4::A4 <!--SR:!2023-09-02,4,270-->
+#flashcards/science/physics Q5::A5 <!--SR:!2023-09-02,4,270-->
+#flashcards/math Q6::A6`;
+    
+    let c: TestContext = TestContext.Create(CardListType.DueCard, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text);
+    await c.setSequencerDeckTreeFromOriginalText();
+    return c;
+}
+
+function skipAndCheck(sequencer: IFlashcardReviewSequencer, expectedFront: string): void {
+    sequencer.skipCurrentCard();
+    expect(sequencer.currentCard.front).toEqual(expectedFront);
+
+}
+
+//////////////////////////////////////////////////////////////////////
 
 beforeAll(() =>  {
     setupStaticDateProvider_20230906();
@@ -175,64 +240,18 @@ describe("processReview", () => {
     });
 });
 
-interface Info1 {
-    cardQ2_PreReviewText: string;
-    cardQ2_PostReviewEase: number;
-    cardQ2_PostReviewInterval: number;
-    cardQ2_PostReviewDueDate: string;
-    cardQ2_PostReviewText: string
-}
+describe.only("updateCurrentQuestionText", () => {
 
-async function checkReviewResponse(reviewResponse: ReviewResponse, info: Info1): Promise<void> {
+    test("Check that the note file is updated", async () => {
+        let c: TestContext = await setupSample1();
+        expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
 
-    let text: string = `
-#flashcards Q1::A1
-#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
-#flashcards Q3::A3`;
+        let originalQ: string = "#flashcards Q2::A2";
+        let updatedQ: string = "#flashcards A much more in depth question::A much more detailed answer";
+        await c.reviewSequencer.updateCurrentQuestionText(updatedQ);
 
-    let str: string = moment().millisecond().toString();
-    let c: TestContext = TestContext.Create(CardListType.DueCard, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text, str);
-    let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
+        let expectedText: string = c.originalText.replace(originalQ, updatedQ);
+        expect(await c.file.read()).toEqual(expectedText);
 
-    // State before calling processReview
-    let card = c.reviewSequencer.currentCard;
-    expect(card.front).toEqual("Q2");
-    expect(card.scheduleInfo).toMatchObject({
-        ease: 270, 
-        interval: 4
     });
-
-    // State after calling processReview - next card
-    await c.reviewSequencer.processReview(reviewResponse);
-    expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
-
-    // Schedule for the reviewed card has been updated
-    expect(card.scheduleInfo.ease).toEqual(info.cardQ2_PostReviewEase);
-    expect(card.scheduleInfo.interval).toEqual(info.cardQ2_PostReviewInterval);
-    expect(card.scheduleInfo.dueDateTicks.unix).toEqual(moment(info.cardQ2_PostReviewDueDate).unix);
-
-    // Note text has been updated
-    let expectedText: string = c.originalText.replace(info.cardQ2_PreReviewText, info.cardQ2_PostReviewText);
-    expect(await c.file.read()).toEqual(expectedText);
-};
-
-async function setupSample1(): Promise<TestContext> {
-    let text: string = `
-        #flashcards Q1::A1
-        #flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
-        #flashcards Q3::A3
-        #flashcards/science Q4::A4 <!--SR:!2023-09-02,4,270-->
-        #flashcards/science/physics Q5::A5 <!--SR:!2023-09-02,4,270-->
-        #flashcards/math Q6::A6`;
-    
-    let c: TestContext = TestContext.Create(CardListType.DueCard, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text);
-    await c.setSequencerDeckTreeFromOriginalText();
-    return c;
-}
-
-function skipAndCheck(sequencer: IFlashcardReviewSequencer, expectedFront: string): void {
-    sequencer.skipCurrentCard();
-    expect(sequencer.currentCard.front).toEqual(expectedFront);
-
-}
-
+});

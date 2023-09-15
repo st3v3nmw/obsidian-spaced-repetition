@@ -58,7 +58,13 @@ export class QuestionText {
         return this.actualQuestion.endsWith("```");
     }
 
-    static Parse(original: string, settings: SRSettings) {
+    static Create(original: string, settings: SRSettings): QuestionText {
+        let [topicPath, actualQuestion] = this.SplitText(original, settings);
+
+        return new QuestionText(original, topicPath, actualQuestion);
+    }
+
+    static SplitText(original: string, settings: SRSettings): [TopicPath, string] {
         let strippedSR = NoteCardScheduleParser.removeCardScheduleInfo(original).trim();
         let actualQuestion: string = strippedSR;
 
@@ -71,9 +77,8 @@ export class QuestionText {
             }
         }
 
-        return new QuestionText(original, topicPath, actualQuestion);
+        return [topicPath, actualQuestion];
     }
-
     formatForNote(): string {
         let result: string = "";
         if (this.topicPath.hasPath)
@@ -144,14 +149,14 @@ export class Question {
         let replacementText = this.formatForNote(settings);
         let newText: string = fileText.replace(originalText, replacementText);
         await this.note.file.write(newText);
-        this.questionText = QuestionText.Parse(replacementText, settings);
+        this.questionText = QuestionText.Create(replacementText, settings);
     }
 
     static Create(settings: SRSettings, questionType: CardType, noteTopicPath: TopicPath, originalText: string, 
         lineNo: number, context: string): Question {
 
         let hasEditLaterTag = originalText.includes(settings.editLaterTag);
-        let questionText: QuestionText = QuestionText.Parse(originalText, settings);
+        let questionText: QuestionText = QuestionText.Create(originalText, settings);
 
         let topicPath: TopicPath = noteTopicPath;
         if (questionText.topicPath.hasPath) {

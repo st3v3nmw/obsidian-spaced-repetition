@@ -392,7 +392,7 @@ export class FlashcardModal extends Modal {
         const editModal = FlashcardEditModal.Prompt(this.app, this.plugin, textPrompt);
         editModal
             .then(async (modifiedCardText) => {
-                this.noteUpdator.modifyQuestionText(currentNote.file, currentQ, modifiedCardText);
+                this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
             })
             .catch((reason) => console.log(reason));
     }
