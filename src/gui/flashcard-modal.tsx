@@ -28,7 +28,7 @@ import { CardListType, Deck } from "../Deck";
 import { CardType, Question } from "../Question";
 import { IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "src/FlashcardReviewSequencer";
 import { FlashcardEditModal } from "./flashcards-edit-modal";
-import { INoteUpdator, Note } from "src/Note";
+import { Note } from "src/Note";
 import { RenderMarkdownWrapper } from "src/util/RenderMarkdownWrapper";
 
 export enum FlashcardModalMode {
@@ -54,7 +54,6 @@ export class FlashcardModal extends Modal {
     public mode: FlashcardModalMode;
     public ignoreStats: boolean;
     private reviewSequencer: IFlashcardReviewSequencer;
-    private noteUpdator: INoteUpdator;
     private currentNote: Note;
 
     private get currentCard(): Card {
@@ -65,12 +64,11 @@ export class FlashcardModal extends Modal {
         return this.reviewSequencer.currentQuestion;
     }
 
-    constructor(app: App, plugin: SRPlugin, reviewSequencer: IFlashcardReviewSequencer, noteUpdator: INoteUpdator, ignoreStats = false) {
+    constructor(app: App, plugin: SRPlugin, reviewSequencer: IFlashcardReviewSequencer, ignoreStats = false) {
         super(app);
 
         this.plugin = plugin;
         this.reviewSequencer = reviewSequencer;
-        this.noteUpdator = noteUpdator;
         this.ignoreStats = ignoreStats;
 
         this.titleEl.setText(t("DECKS"));
@@ -386,7 +384,6 @@ export class FlashcardModal extends Modal {
 
     async doEditQuestionText(): Promise<void> {
         let currentQ: Question = this.reviewSequencer.currentQuestion;
-        let currentNote: Note = this.reviewSequencer.currentNote;
         let textPrompt = currentQ.questionText.formatForNote();
 
         const editModal = FlashcardEditModal.Prompt(this.app, this.plugin, textPrompt);
