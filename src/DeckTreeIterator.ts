@@ -5,6 +5,7 @@ import { TopicPath } from "./TopicPath";
 export interface IDeckTreeIterator {
     get currentDeck(): Deck;
     get currentCard(): Card;
+    get hasCurrentCard(): boolean;
     setDeck(deck: Deck): void;
     deleteCurrentCard(): boolean;
     moveCurrentCardToEndOfList(): void;
@@ -19,6 +20,10 @@ export class DeckTreeSequentialIterator implements IDeckTreeIterator {
     deckIdx?: number;
     cardIdx?: number;
     cardListType?: CardListType;
+
+    get hasCurrentCard(): boolean {
+        return (this.deckIdx != null) && (this.cardIdx != null);
+    }
 
     get currentDeck(): Deck {
         if (this.deckIdx == null)

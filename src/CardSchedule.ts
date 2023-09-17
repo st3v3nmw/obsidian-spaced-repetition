@@ -10,13 +10,17 @@ export class CardScheduleInfo {
     dueDateTicks: Moment;
     interval: number;
     ease: number;
-    delayBeforeReview: number;
+    delayBeforeReviewTicks: number;
 
     constructor(dueDateTicks: Moment, interval: number, ease: number, delayBeforeReview: number) { 
         this.dueDateTicks = dueDateTicks;
         this.interval = interval;
         this.ease = ease;
-        this.delayBeforeReview = delayBeforeReview;
+        this.delayBeforeReviewTicks = delayBeforeReview;
+    }
+
+    get delayBeforeReviewDays(): number {
+        return this.delayBeforeReviewTicks / TICKS_PER_DAY;
     }
 
     isDue(): boolean {
@@ -93,7 +97,7 @@ export class CardScheduleCalculator {
                 response,
                 cardSchedule.interval,
                 cardSchedule.ease,
-                cardSchedule.delayBeforeReview,
+                cardSchedule.delayBeforeReviewTicks,
                 this.settings,
                 this.dueDatesFlashcards,
             );

@@ -31,10 +31,12 @@ import { Stats } from "./stats";
 import { FlashcardReviewMode, FlashcardReviewSequencer as FlashcardReviewSequencer, IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "./FlashcardReviewSequencer";
 import { DeckTreeSequentialIterator } from "./DeckTreeIterator";
 import { CardScheduleCalculator } from "./CardSchedule";
-import { INoteUpdator, Note, NoteUpdator } from "./Note";
+import { Note } from "./Note";
 import { NoteFileLoader } from "./NoteFileLoader";
-import { ObsidianTFile } from "./SRFile";
+import { ISRFile, ObsidianTFile } from "./SRFile";
 import { IQuestionContextFinder, NullImpl_IQuestionContextFinder } from "./NoteQuestionParser";
+import { NoteEaseCalculator } from "./NoteEaseCalculator";
+import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 
 interface PluginData {
     settings: SRSettings;
@@ -72,8 +74,6 @@ export default class SRPlugin extends Plugin {
     public reviewDecks: { [deckKey: string]: ReviewDeck } = {};
     public lastSelectedReviewDeck: string;
 
-    public newNotes: TFile[] = [];
-    public scheduledNotes: SchedNote[] = [];
     public easeByPath: Record<string, number> = {};
     private incomingLinks: Record<string, LinkStat[]> = {};
     private pageranks: Record<string, number> = {};
@@ -81,7 +81,6 @@ export default class SRPlugin extends Plugin {
     public dueDatesNotes: Record<number, number> = {}; // Record<# of days in future, due count>
 
     public deckTree: Deck = new Deck("root", null);
-    public dueDatesFlashcards: Record<number, number> = {}; // Record<# of days in future, due count>
     public cardStats: Stats;
 
     async onload(): Promise<void> {
@@ -211,7 +210,7 @@ export default class SRPlugin extends Plugin {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
                     let deck: Deck = new Deck("root", null);
-                    const deckPath: TopicPath = this.findTopicPath(openFile);
+                    const deckPath: TopicPath = this.findTopicPath(this.createSrTFile(openFile));
                     this.openFlashcardModal(deck, FlashcardReviewMode.Review);
                 }
             },
@@ -256,7 +255,7 @@ export default class SRPlugin extends Plugin {
     }
 
     private async openFlashcardModalForSingleCard(noteFile: TFile, reviewMode: FlashcardReviewMode): Promise<void> {
-        const topicPath: TopicPath = this.findTopicPath(noteFile);
+        const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(noteFile));
         let note: Note = await this.loadNote(noteFile, topicPath);
         
         let deck = new Deck("root", null);
@@ -266,12 +265,11 @@ export default class SRPlugin extends Plugin {
 
     private openFlashcardModal(deck: Deck, reviewMode: FlashcardReviewMode): void {
         let deckIterator = new DeckTreeSequentialIterator(CardListType.DueCard);
-        let cardScheduleCalculator = new CardScheduleCalculator();
+        let cardScheduleCalculator = new CardScheduleCalculator(this.data.settings);
         let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(reviewMode, deckIterator, this.data.settings, cardScheduleCalculator);
-        let noteUpdator: INoteUpdator = new NoteUpdator();
 
         reviewSequencer.setDeckTree(deck);
-        new FlashcardModal(this.app, this, reviewSequencer, noteUpdator).open();
+        new FlashcardModal(this.app, this, reviewSequencer).open();
     }
 
     async sync(ignoreStats = false): Promise<void> {
@@ -291,14 +289,6 @@ export default class SRPlugin extends Plugin {
 
         // reset flashcards stuff
         this.deckTree = new Deck("root", null);
-        this.dueDatesFlashcards = {};
-        this.cardStats = null; /* {
-            eases: {},
-            intervals: {},
-            newCount: 0,
-            youngCount: 0,
-            matureCount: 0
-        }; */
 
         const now = window.moment(Date.now());
         const todayDate: string = now.format("YYYY-MM-DD");
@@ -338,20 +328,15 @@ export default class SRPlugin extends Plugin {
                 }
             }
 
-            const topicPath: TopicPath = this.findTopicPath(noteFile);
+            const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(noteFile));
             if (topicPath.hasPath) {
                 let note: Note = await this.loadNote(noteFile, topicPath);
+                let flashcardsInNoteAvgEase: number = NoteEaseCalculator.Calculate(note, this.data.settings);
                 note.appendCardsToDeck(this.deckTree);
-                /* const flashcardsInNoteAvgEase: number = await this.findFlashcardsInNote(
-                    note,
-                    topicPath,
-                    false,
-                    ignoreStats,
-                );
 
                 if (flashcardsInNoteAvgEase > 0) {
-                    this.easeByPath[note.path] = flashcardsInNoteAvgEase;
-                } */
+                    this.easeByPath[note.filePath] = flashcardsInNoteAvgEase;
+                }
             }
 
             const fileCachedData = this.app.metadataCache.getFileCache(noteFile) || {};
@@ -426,6 +411,9 @@ export default class SRPlugin extends Plugin {
 
         // sort the deck names
         this.deckTree.sortSubdecksList();
+        let calc: DeckTreeStatsCalculator = new DeckTreeStatsCalculator();
+        this.cardStats = calc.calculate(this.deckTree);
+        
         if (this.data.settings.showDebugMessages) {
             console.log(`SR: ${t("EASES")}`, this.easeByPath);
             console.log(`SR: ${t("DECKS")}`, this.deckTree);
@@ -459,7 +447,7 @@ export default class SRPlugin extends Plugin {
     async loadNote(noteFile: TFile, topicPath: TopicPath): Promise<Note> {
         let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
         let loader: NoteFileLoader = new NoteFileLoader(this.data.settings, questionContextFinder);
-        let note: Note = await loader.Load(new ObsidianTFile(this.app.vault, this.app.metadataCache, noteFile), topicPath);
+        let note: Note = await loader.Load(this.createSrTFile(noteFile), topicPath);
         return note;
 
     }
@@ -642,8 +630,12 @@ export default class SRPlugin extends Plugin {
         new Notice(t("ALL_CAUGHT_UP"));
     }
 
-    findTopicPath(note: TFile): TopicPath {
-        return TopicPath.getTopicPathOfFile(note, this.data.settings, this.app.metadataCache);
+    createSrTFile(note: TFile): ObsidianTFile {
+        return new ObsidianTFile(this.app.vault, this.app.metadataCache, note);
+    }
+
+    findTopicPath(note: ISRFile): TopicPath {
+        return TopicPath.getTopicPathOfFile(note, this.data.settings);
     }
 
     async something() { 

@@ -1,25 +1,22 @@
+import { ValueCountDict } from "./util/NumberCountDict";
 import { getKeysPreserveType, getTypedObjectEntries } from "./util/utils";
 
 export class Stats {
-    eases: Record<number, number> = {};
-    intervals: Record<number, number> = {};
-    newCount: number;
-    youngCount: number;
-    matureCount: number;
+    eases: ValueCountDict = new ValueCountDict;
+    intervals: ValueCountDict = new ValueCountDict;
+    delayedDays: ValueCountDict = new ValueCountDict;
+    newCount: number = 0;
+    youngCount: number = 0;
+    matureCount: number = 0;
 
     get totalCount(): number {
         return this.youngCount + this.matureCount;
     }
 
-    update(interval: number, ease: number) {
-        if (!Object.prototype.hasOwnProperty.call(this.intervals, interval)) {
-            this.intervals[interval] = 0;
-        }
-        this.intervals[interval]++;
-        if (!Object.prototype.hasOwnProperty.call(this.eases, ease)) {
-            this.eases[ease] = 0;
-        }
-        this.eases[ease]++;
+    update(delayedDays: number, interval: number, ease: number) {
+        this.intervals.incrementCount(interval);
+        this.eases.incrementCount(ease);
+        this.delayedDays.incrementCount(delayedDays);
 
         if (interval >= 32) {
             this.matureCount++;
@@ -29,20 +26,14 @@ export class Stats {
     }
     
     getMaxInterval(): number {
-        return Math.max(...getKeysPreserveType(this.intervals)) || 0;
+        return this.intervals.getMaxValue();
     }
 
     getAverageInterval(): number {
-        let v: number = getTypedObjectEntries(this.intervals)
-            .map(([interval, count]) => interval * count)
-            .reduce((a, b) => a + b, 0) || 0;
-        return v / this.totalCount;
+        return this.intervals.getTotalOfValueMultiplyCount() / this.totalCount;
     }
 
     getAverageEases(): number {
-        let v: number = getTypedObjectEntries(this.eases)
-            .map(([ease, count]) => ease * count)
-            .reduce((a, b) => a + b, 0) || 0;
-        return v / this.totalCount;
+        return this.eases.getTotalOfValueMultiplyCount() / this.totalCount;
     }
 }

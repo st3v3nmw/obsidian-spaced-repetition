@@ -1,11 +1,7 @@
-import { App, CachedMetadata, HeadingCache, MetadataCache, TFile, Vault } from "obsidian";
+import { HeadingCache } from "obsidian";
 import { TopicPath } from "./TopicPath";
 import { SRSettings } from "./settings";
-import { parse } from "./parser";
-import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR, OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "./constants";
 import { Deck } from "./Deck";
-import { Card } from "./Card";
-import { cyrb53, escapeRegexString } from "./util/utils";
 import { Question } from "./Question";
 import { ISRFile } from "./SRFile";
 
@@ -65,10 +61,6 @@ function getCardContext(cardLine: number, headings: HeadingCache[], note_title: 
     return context.slice(0, -3);
 }
 
-export interface INoteUpdator {
-    modifyQuestionText(noteFile: ISRFile, question: Question, replacementText: string): Promise<void>;
-//     modifyQuestion(noteFile: ISRFile, question: Question): Promise<void>;
-}
 
 /* export class NoteUpdator implements INoteUpdator {
 
