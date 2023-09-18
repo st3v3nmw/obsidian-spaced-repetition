@@ -37,6 +37,7 @@ import { ISRFile, ObsidianTFile } from "./SRFile";
 import { IQuestionContextFinder, NullImpl_IQuestionContextFinder } from "./NoteQuestionParser";
 import { NoteEaseCalculator } from "./NoteEaseCalculator";
 import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
+import { INoteEaseList, NoteEaseList } from "./NoteEaseList";
 
 interface PluginData {
     settings: SRSettings;
@@ -74,7 +75,7 @@ export default class SRPlugin extends Plugin {
     public reviewDecks: { [deckKey: string]: ReviewDeck } = {};
     public lastSelectedReviewDeck: string;
 
-    public easeByPath: Record<string, number> = {};
+    public easeByPath: NoteEaseList;
     private incomingLinks: Record<string, LinkStat[]> = {};
     private pageranks: Record<string, number> = {};
     private dueNotesCount = 0;
@@ -85,6 +86,8 @@ export default class SRPlugin extends Plugin {
 
     async onload(): Promise<void> {
         await this.loadPluginData();
+        this.easeByPath = new NoteEaseList(this.data.settings);;
+
 
         appIcon();
 
@@ -265,11 +268,11 @@ export default class SRPlugin extends Plugin {
 
     private openFlashcardModal(deck: Deck, reviewMode: FlashcardReviewMode): void {
         let deckIterator = new DeckTreeSequentialIterator(CardListType.DueCard);
-        let cardScheduleCalculator = new CardScheduleCalculator(this.data.settings);
+        let cardScheduleCalculator = new CardScheduleCalculator(this.data.settings, this.easeByPath);
         let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(reviewMode, deckIterator, this.data.settings, cardScheduleCalculator);
 
         reviewSequencer.setDeckTree(deck);
-        new FlashcardModal(this.app, this, reviewSequencer).open();
+        new FlashcardModal(this.app, this, this.data.settings, reviewSequencer).open();
     }
 
     async sync(ignoreStats = false): Promise<void> {
@@ -280,7 +283,7 @@ export default class SRPlugin extends Plugin {
 
         // reset notes stuff
         graph.reset();
-        this.easeByPath = {};
+        this.easeByPath = new NoteEaseList(this.data.settings);
         this.incomingLinks = {};
         this.pageranks = {};
         this.dueNotesCount = 0;
@@ -335,7 +338,7 @@ export default class SRPlugin extends Plugin {
                 note.appendCardsToDeck(this.deckTree);
 
                 if (flashcardsInNoteAvgEase > 0) {
-                    this.easeByPath[note.filePath] = flashcardsInNoteAvgEase;
+                    this.easeByPath.setEaseForPath(note.filePath, flashcardsInNoteAvgEase);
                 }
             }
 
@@ -387,12 +390,14 @@ export default class SRPlugin extends Plugin {
                 }
             }
 
-            if (Object.prototype.hasOwnProperty.call(this.easeByPath, noteFile.path)) {
-                this.easeByPath[noteFile.path] =
-                    (this.easeByPath[noteFile.path] + frontmatter["sr-ease"]) / 2;
+            var ease;
+            if (this.easeByPath.hasEaseForPath(noteFile.path)) {
+                ease = 
+                    (this.easeByPath.getEaseByPath(noteFile.path) + frontmatter["sr-ease"]) / 2;
             } else {
-                this.easeByPath[noteFile.path] = frontmatter["sr-ease"];
+                ease = frontmatter["sr-ease"];
             }
+            this.easeByPath.setEaseForPath(noteFile.path, ease);
 
             if (dueUnix <= now.valueOf()) {
                 this.dueNotesCount++;
@@ -415,7 +420,7 @@ export default class SRPlugin extends Plugin {
         this.cardStats = calc.calculate(this.deckTree);
         
         if (this.data.settings.showDebugMessages) {
-            console.log(`SR: ${t("EASES")}`, this.easeByPath);
+            console.log(`SR: ${t("EASES")}`, this.easeByPath.dict);
             console.log(`SR: ${t("DECKS")}`, this.deckTree);
         }
 
@@ -453,7 +458,7 @@ export default class SRPlugin extends Plugin {
     }
 
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
-        /* const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
+        const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         const frontmatter: FrontMatterCache | Record<string, unknown> =
             fileCachedData.frontmatter || {};
 
@@ -496,7 +501,7 @@ export default class SRPlugin extends Plugin {
                 totalLinkCount = 0;
 
             for (const statObj of this.incomingLinks[note.path] || []) {
-                const ease: number = this.easeByPath[statObj.sourcePath];
+                const ease: number = this.easeByPath.getEaseByPath(statObj.sourcePath);
                 if (ease) {
                     linkTotal += statObj.linkCount * this.pageranks[statObj.sourcePath] * ease;
                     linkPGTotal += this.pageranks[statObj.sourcePath] * statObj.linkCount;
@@ -506,7 +511,7 @@ export default class SRPlugin extends Plugin {
 
             const outgoingLinks = this.app.metadataCache.resolvedLinks[note.path] || {};
             for (const linkedFilePath in outgoingLinks) {
-                const ease: number = this.easeByPath[linkedFilePath];
+                const ease: number = this.easeByPath.getEaseByPath(linkedFilePath);
                 if (ease) {
                     linkTotal +=
                         outgoingLinks[linkedFilePath] * this.pageranks[linkedFilePath] * ease;
@@ -525,7 +530,7 @@ export default class SRPlugin extends Plugin {
                     : linkContribution * this.data.settings.baseEase);
             // add note's average flashcard ease if available
             if (Object.prototype.hasOwnProperty.call(this.easeByPath, note.path)) {
-                ease = (ease + this.easeByPath[note.path]) / 2;
+                ease = (ease + this.easeByPath.getEaseByPath(note.path)) / 2;
             }
             ease = Math.round(ease);
             interval = 1.0;
@@ -588,7 +593,7 @@ export default class SRPlugin extends Plugin {
         await this.sync();
         if (this.data.settings.autoNextNote) {
             this.reviewNextNote(this.lastSelectedReviewDeck);
-        } */
+        }
     }
 
     async reviewNextNoteModal(): Promise<void> {

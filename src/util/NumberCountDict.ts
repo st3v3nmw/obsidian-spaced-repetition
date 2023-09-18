@@ -3,8 +3,17 @@ import { getKeysPreserveType, getTypedObjectEntries } from "./utils";
 export class ValueCountDict {
     dict: Record<number, number> = {}; // Record<value, count>
 
+    clearCountIfMissing(value: number): void {
+        if (!this.hasValue(value))
+            this.dict[value] = 0;
+    }
+
+    hasValue(value: number): boolean {
+        return Object.prototype.hasOwnProperty.call(this.dict, value);
+    }
+
     incrementCount(value: number): void {
-        if (!Object.prototype.hasOwnProperty.call(this.dict, value)) {
+        if (!this.hasValue(value)) {
             this.dict[value] = 0;
         }
         this.dict[value]++;

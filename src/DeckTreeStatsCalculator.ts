@@ -13,10 +13,13 @@ export class DeckTreeStatsCalculator {
         iterator.setDeck(deckTree);
         while (iterator.nextCard()) {
             let card: Card = iterator.currentCard;
-            let schedule: CardScheduleInfo = card.scheduleInfo;
-            if (schedule != null) {
+            if (card.hasSchedule) {
+                let schedule: CardScheduleInfo = card.scheduleInfo;
                 result.update(schedule.delayBeforeReviewDays, schedule.interval, schedule.ease);
+            } else {
+                result.incrementNew();
             }
+
         }
         return result;
     }

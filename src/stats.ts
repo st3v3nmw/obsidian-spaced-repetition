@@ -13,6 +13,10 @@ export class Stats {
         return this.youngCount + this.matureCount;
     }
 
+    incrementNew() {
+        this.newCount++;
+    }
+
     update(delayedDays: number, interval: number, ease: number) {
         this.intervals.incrementCount(interval);
         this.eases.incrementCount(ease);

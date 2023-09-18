@@ -60,8 +60,9 @@ export class CardScheduleCalculator {
     noteEaseList: INoteEaseList;
     dueDatesFlashcards: Record<number, number> = {}; // Record<# of days in future, due count>
 
-    constructor(settings: SRSettings) {
+    constructor(settings: SRSettings, noteEaseList: INoteEaseList) {
         this.settings = settings;
+        this.noteEaseList = noteEaseList;
     }
 
     getResetCardSchedule(): CardScheduleInfo {

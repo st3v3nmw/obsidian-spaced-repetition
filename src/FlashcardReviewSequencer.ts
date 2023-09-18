@@ -22,6 +22,7 @@ export interface IFlashcardReviewSequencer {
     setCurrentDeck(topicPath: TopicPath): void;
     getDeckStats(topicPath: TopicPath): DeckStats;
     skipCurrentCard(): void;
+    determineCardSchedule(response: ReviewResponse, card: Card): CardScheduleInfo;
     processReview(response: ReviewResponse): Promise<void>;
     updateCurrentQuestionText(text: string): Promise<void>;
 }
@@ -143,7 +144,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             this.nextCard();
     }
     
-    private determineCardSchedule(response: ReviewResponse, currentCard: Card): CardScheduleInfo {
+    determineCardSchedule(response: ReviewResponse, card: Card): CardScheduleInfo {
         var result: CardScheduleInfo;
 
         if (response == ReviewResponse.Reset) {
@@ -151,10 +152,10 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             result = this.cardScheduleCalculator.getResetCardSchedule();
         } else {
             // scheduled card
-            if (currentCard.hasSchedule) {
-                result = this.cardScheduleCalculator.calcUpdatedSchedule(response, currentCard.scheduleInfo);
+            if (card.hasSchedule) {
+                result = this.cardScheduleCalculator.calcUpdatedSchedule(response, card.scheduleInfo);
             } else {
-                let currentNote: Note = currentCard.question.note;
+                let currentNote: Note = card.question.note;
                 result = this.cardScheduleCalculator.getNewCardSchedule(response, currentNote.filePath);
             }
         }
