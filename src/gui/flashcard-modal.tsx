@@ -141,17 +141,6 @@ export class FlashcardModal extends Modal {
     }
 
     renderDecksList(): void {
-        /* const aimDeck = this.plugin.deckTree.subdecks.filter(
-            (deck) => deck.deckName === this.plugin.data.historyDeck,
-        );
-        if (this.plugin.data.historyDeck && aimDeck.length > 0) {
-            const deck = aimDeck[0];
-            this.currentDeck = deck;
-            this.checkDeck = deck.parent;
-            this.setupCardsView();
-            deck.nextCard(this);
-            return;
-        } */
         this.mode = FlashcardModalMode.DecksList;
         this.titleEl.setText(t("DECKS"));
         this.titleEl.innerHTML += (
@@ -189,7 +178,7 @@ export class FlashcardModal extends Modal {
 
     renderDeck(deck: Deck, containerEl: HTMLElement, modal: FlashcardModal): void {
         const deckView: HTMLElement = containerEl.createDiv("tree-item");
-        console.log(`renderDeck: ${deck.deckName}`);
+        // console.log(`renderDeck3: ${deck.deckName}`);
 
         const deckViewSelf: HTMLElement = deckView.createDiv(
             "tree-item-self tag-pane-tag is-clickable",
@@ -261,7 +250,7 @@ export class FlashcardModal extends Modal {
     startReviewOfDeck(deck: Deck) {
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         this.setupCardsView();
-        this.showCurrentQuestion();
+        this.showCurrentCard();
     }
 
     setupCardsView(): void {
@@ -430,7 +419,9 @@ export class FlashcardModal extends Modal {
     }
 
     private async processReview(response: ReviewResponse): Promise<void> {
-        this.reviewSequencer.processReview(response);
+        await this.reviewSequencer.processReview(response);
+        // console.log(`processReview: ${response}: ${this.currentCard?.front ?? 'None'}`)
+        await this.handleNextCard();
 
     }
 
@@ -458,11 +449,20 @@ export class FlashcardModal extends Modal {
         }
     } */
 
-    private skipCurrentCard(): void {
+    private async skipCurrentCard(): Promise<void> {
         this.reviewSequencer.skipCurrentCard();
+        // console.log(`skipCurrentCard: ${this.currentCard?.front ?? 'None'}`)
+        await this.handleNextCard();
     }
 
-    private async showCurrentQuestion(): Promise<void> {
+    private async handleNextCard(): Promise<void> {
+        if (this.currentCard != null)
+            await this.showCurrentCard();
+        else
+            this.renderDecksList();
+    }
+
+    private async showCurrentCard(): Promise<void> {
         let deck: Deck = this.reviewSequencer.currentDeck;
 
         this.responseDiv.style.display = "none";
@@ -475,15 +475,6 @@ export class FlashcardModal extends Modal {
         this.flashcardView.empty();
         this.mode = FlashcardModalMode.Front;
 
-            /* if (
-                Object.prototype.hasOwnProperty.call(
-                    modal.plugin.easeByPath,
-                    modal.currentCard.note.path,
-                )
-            ) {
-                ease = modal.plugin.easeByPath[modal.currentCard.note.path];
-            } */
-
         let wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(this.app, this.plugin, this.currentNote.filePath);
         await wrapper.renderMarkdownWrapper(this.currentCard.front, this.flashcardView);
 
@@ -492,9 +483,9 @@ export class FlashcardModal extends Modal {
             this.hardBtn.setText(`${this.settings.flashcardHardText}`);
             this.easyBtn.setText(`${this.settings.flashcardEasyText}`);
         } else {
-            this.setupEaseButton(this.hardBtn, ReviewResponse.Hard);
-            this.setupEaseButton(this.goodBtn, ReviewResponse.Good);
-            this.setupEaseButton(this.easyBtn, ReviewResponse.Easy);
+            this.setupEaseButton(this.hardBtn, this.settings.flashcardHardText, ReviewResponse.Hard);
+            this.setupEaseButton(this.goodBtn, this.settings.flashcardGoodText, ReviewResponse.Good);
+            this.setupEaseButton(this.easyBtn, this.settings.flashcardEasyText, ReviewResponse.Easy);
         }
 
         if (this.settings.showContextInCards)
@@ -506,7 +497,7 @@ export class FlashcardModal extends Modal {
         return result;
     }
 
-    private setupEaseButton(button: HTMLElement, reviewResponse: ReviewResponse) {
+    private setupEaseButton(button: HTMLElement, buttonName: string, reviewResponse: ReviewResponse) {
         var schedule: CardScheduleInfo = this.reviewSequencer.determineCardSchedule(reviewResponse, this.currentCard);
         const interval: number = schedule.interval;
 
@@ -514,7 +505,7 @@ export class FlashcardModal extends Modal {
             button.setText(textInterval(interval, true));
         } else {
             button.setText(
-                `${this.settings.flashcardHardText} - ${textInterval(
+                `${buttonName} - ${textInterval(
                     interval,
                     false,
                 )}`,
