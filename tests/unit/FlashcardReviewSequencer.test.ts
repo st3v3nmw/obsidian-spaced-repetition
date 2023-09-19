@@ -245,17 +245,87 @@ describe("processReview", () => {
 });
 
 describe("updateCurrentQuestionText", () => {
+    describe("Settings - schedule on following line", () => {
 
-    test("Check that the note file is updated", async () => {
-        let c: TestContext = await setupSample1();
-        expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
+        test("Question has schedule on following line before/after", async () => {
+            let text: string = `
+#flashcards Q1::A1
 
-        let originalQ: string = "#flashcards Q2::A2";
-        let updatedQ: string = "#flashcards A much more in depth question::A much more detailed answer";
-        await c.reviewSequencer.updateCurrentQuestionText(updatedQ);
+#flashcards Q2::A2
+<!--SR:!2023-09-02,4,270-->
 
-        let expectedText: string = c.originalText.replace(originalQ, updatedQ);
-        expect(await c.file.read()).toEqual(expectedText);
+#flashcards Q3::A3`;
+                
+            let updatedQ: string = "#flashcards A much more in depth question::A much more detailed answer";
+            let originalStr: string = `#flashcards Q2::A2
+<!--SR:!2023-09-02,4,270-->`;
+            let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
+<!--SR:!2023-09-02,4,270-->`;
+            await checkUpdateCurrentQuestionText(text, updatedQ, originalStr, updatedStr, DEFAULT_SETTINGS);
+        });
 
+        test("Question has schedule on same line (but pushed to following line due to settings)", async () => {
+            let text: string = `
+#flashcards Q1::A1
+
+#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
+
+#flashcards Q3::A3`;
+                
+            let updatedQ: string = "#flashcards A much more in depth question::A much more detailed answer";
+            let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
+            let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
+<!--SR:!2023-09-02,4,270-->`;
+            await checkUpdateCurrentQuestionText(text, updatedQ, originalStr, updatedStr, DEFAULT_SETTINGS);
+        });    
+    });
+
+    describe("Settings - schedule on same line", () => {
+        let settings: SRSettings = { ...DEFAULT_SETTINGS };
+        settings.cardCommentOnSameLine = true;
+
+        test("Question has schedule on same line before/after", async () => {
+            let text1: string = `
+#flashcards Q1::A1
+
+#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
+
+#flashcards Q3::A3`;
+
+            let updatedQ: string = "#flashcards A much more in depth question::A much more detailed answer";
+            let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
+            let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
+            await checkUpdateCurrentQuestionText(text1, updatedQ, originalStr, updatedStr, settings);
+        });
+
+        test("Question has schedule on following line (but placed on same line due to settings)", async () => {
+            let text: string = `
+#flashcards Q1::A1
+
+#flashcards Q2::A2
+<!--SR:!2023-09-02,4,270-->
+
+#flashcards Q3::A3`;
+                
+            let updatedQ: string = "#flashcards A much more in depth question::A much more detailed answer";
+            let originalStr: string = `#flashcards Q2::A2
+<!--SR:!2023-09-02,4,270-->`;
+            let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
+            await checkUpdateCurrentQuestionText(text, updatedQ, originalStr, updatedStr, settings);
+        });    
     });
 });
+
+async function checkUpdateCurrentQuestionText(noteText: string, updatedQ: string, originalStr: string, updatedStr: string, settings: SRSettings): Promise<TestContext> {
+    let c: TestContext = TestContext.Create(CardListType.DueCard, FlashcardReviewMode.Review, settings, noteText);
+    await c.setSequencerDeckTreeFromOriginalText();
+    expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
+
+    await c.reviewSequencer.updateCurrentQuestionText(updatedQ);
+
+    // originalText should remain the same except for the specific substring change from originalStr => updatedStr
+    let expectedText: string = c.originalText.replace(originalStr, updatedStr);
+    expect(await c.file.read()).toEqual(expectedText);
+    return c;
+}
+
