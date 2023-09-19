@@ -9,9 +9,11 @@ import { UnitTestSRFile } from "src/SRFile";
 import { ReviewResponse } from "src/scheduling";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 import moment from "moment";
+import { INoteEaseList, NoteEaseList } from "src/NoteEaseList";
 
 class TestContext {
     cardSequencer: IDeckTreeIterator;
+    noteEaseList: INoteEaseList;
     cardScheduleCalculator: CardScheduleCalculator;
     reviewSequencer: IFlashcardReviewSequencer;
     file: UnitTestSRFile;
@@ -30,12 +32,14 @@ class TestContext {
 
     static Create(cardListType: CardListType, reviewMode: FlashcardReviewMode, settings: SRSettings, text: string, fakeFilePath?: string): TestContext {
         let cardSequencer: IDeckTreeIterator = new DeckTreeSequentialIterator(cardListType);
-        let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(settings);
+        let noteEaseList = new NoteEaseList(settings);
+        let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(settings, noteEaseList);
         let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(reviewMode, cardSequencer, settings, cardScheduleCalculator);
         var file: UnitTestSRFile = new UnitTestSRFile(text, fakeFilePath);
 
         let result: TestContext = new TestContext({
             cardSequencer, 
+            noteEaseList, 
             cardScheduleCalculator, 
             reviewSequencer, 
             file, 
@@ -240,7 +244,7 @@ describe("processReview", () => {
     });
 });
 
-describe.only("updateCurrentQuestionText", () => {
+describe("updateCurrentQuestionText", () => {
 
     test("Check that the note file is updated", async () => {
         let c: TestContext = await setupSample1();

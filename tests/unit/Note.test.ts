@@ -1,5 +1,4 @@
 import { NoteParser } from "src/NoteParser";
-import { IQuestionContextFinder, NullImpl_IQuestionContextFinder } from "src/NoteQuestionParser";
 import { UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
 import { Deck } from "src/Deck";
@@ -7,8 +6,7 @@ import { Note } from "src/Note";
 import { Question } from "src/Question";
 import { DEFAULT_SETTINGS } from "src/settings";
 
-let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
-let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS, questionContextFinder);
+let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 let refDate: Date = new Date(2023, 8, 6);
 
 describe("appendCardsToDeck", () => {

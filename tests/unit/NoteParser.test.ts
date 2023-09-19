@@ -1,5 +1,4 @@
 import { NoteParser } from "src/NoteParser";
-import { IQuestionContextFinder, NullImpl_IQuestionContextFinder } from "src/NoteQuestionParser";
 import { UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
 import { Note } from "src/Note";
@@ -8,8 +7,7 @@ import { DEFAULT_SETTINGS } from "src/settings";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 
 
-let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
-let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS, questionContextFinder);
+let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 
 beforeAll(() =>  {
     setupStaticDateProvider_20230906();

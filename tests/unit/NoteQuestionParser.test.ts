@@ -86,7 +86,6 @@ A::B
             }, 
             lineNo: 1, 
             hasEditLaterTag: false, 
-            context: "", 
             cards: [ card1 ], 
             hasChanged: false
         }];

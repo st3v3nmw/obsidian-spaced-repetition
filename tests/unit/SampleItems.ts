@@ -2,7 +2,7 @@ import { Card } from "src/Card";
 import { Deck } from "src/Deck";
 import { Note } from "src/Note";
 import { NoteParser } from "src/NoteParser";
-import { IQuestionContextFinder, NoteQuestionParser, NullImpl_IQuestionContextFinder } from "src/NoteQuestionParser";
+import { NoteQuestionParser } from "src/NoteQuestionParser";
 import { CardType, Question } from "src/Question";
 import { CardFrontBack, CardFrontBackUtil } from "src/QuestionType";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
@@ -10,13 +10,11 @@ import { UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
 
 export function createTest_NoteQuestionParser(settings: SRSettings) : NoteQuestionParser {
-    let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
-    let questionParser: NoteQuestionParser = new NoteQuestionParser(settings, questionContextFinder);
+    let questionParser: NoteQuestionParser = new NoteQuestionParser(settings);
     return questionParser;
 }
 export function createTest_NoteParser() : NoteParser {
-    let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
-    let result = new NoteParser(DEFAULT_SETTINGS, questionContextFinder);
+    let result = new NoteParser(DEFAULT_SETTINGS);
     return result;
 }
 export const test_RefDate_20230906: Date = new Date(2023, 8, 6);
