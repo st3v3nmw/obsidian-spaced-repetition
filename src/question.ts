@@ -101,8 +101,7 @@ export class Question {
     questionText: QuestionText;
     lineNo: number;
     hasEditLaterTag: boolean;
-    questionTextHash: string;
-    context: string;
+    questionContext: string[];
     cards: Card[];
     hasChanged: boolean;
 
@@ -153,7 +152,7 @@ export class Question {
     }
 
     static Create(settings: SRSettings, questionType: CardType, noteTopicPath: TopicPath, originalText: string, 
-        lineNo: number, context: string): Question {
+        lineNo: number, context: string[]): Question {
 
         let hasEditLaterTag = originalText.includes(settings.editLaterTag);
         let questionText: QuestionText = QuestionText.Create(originalText, settings);
@@ -169,7 +168,7 @@ export class Question {
             questionText, 
             lineNo, 
             hasEditLaterTag, 
-            context, 
+            questionContext: context, 
             cards: null, 
             hasChanged: false
         });

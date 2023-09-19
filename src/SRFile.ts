@@ -3,6 +3,7 @@ import {
     TFile,
     Vault,
     getAllTags as ObsidianGetAllTags,
+    HeadingCache,
 } from "obsidian";
 import { OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "./constants";
 import { getAllTagsFromText } from "./util/utils";
@@ -10,7 +11,9 @@ import { getAllTagsFromText } from "./util/utils";
 
 export interface ISRFile {
     get path(): string;
+    get basename(): string;
     getAllTags(): string[];
+    getQuestionContext(cardLine: number): string[];
     read(): Promise<string>;
     write(content: string): Promise<void>;
 }
@@ -30,10 +33,40 @@ export class ObsidianTFile implements ISRFile {
         return this.file.path;
     }
 
+    get basename(): string {
+        return this.file.basename;
+    }
+
     getAllTags(): string[] {
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
         return ObsidianGetAllTags(fileCachedData) || [];
     }
+
+        
+    getQuestionContext(cardLine: number): string[] {
+        const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
+        const headings: HeadingCache[] = fileCachedData.headings || [];
+        const stack: HeadingCache[] = [];
+        for (const heading of headings) {
+            if (heading.position.start.line > cardLine) {
+                break;
+            }
+
+            while (stack.length > 0 && stack[stack.length - 1].level >= heading.level) {
+                stack.pop();
+            }
+
+            stack.push(heading);
+        }
+
+        let result = [];
+        for (const headingObj of stack) {
+            headingObj.heading = headingObj.heading.replace(/\[\^\d+\]/gm, "").trim();
+            result.push(headingObj.heading);
+        }
+        return result;
+    }
+
 
     async read(): Promise<string> {
         return await this.vault.read(this.file);
@@ -57,8 +90,16 @@ export class UnitTestSRFile implements ISRFile {
         return this._path;
     }
 
+    get basename(): string {
+        return "";
+    }
+
     getAllTags(): string[] {
         return getAllTagsFromText(this.content);      
+    }
+
+    getQuestionContext(cardLine: number): string[] {
+        return [];
     }
 
     async read(): Promise<string> {

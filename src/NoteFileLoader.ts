@@ -4,32 +4,25 @@ import { Note } from "./Note";
 import { Question } from "./Question";
 import { CardFrontBack } from "./QuestionType";
 import { TopicPath } from "./TopicPath";
-import { IQuestionContextFinder, NoteQuestionParser } from "./NoteQuestionParser";
+import { NoteQuestionParser } from "./NoteQuestionParser";
 import { SRSettings } from "./settings";
 
 
 export class NoteFileLoader {
     fileText: string;
-    /* fileCachedData: CachedMetadata;
-    headings: HeadingCache[]; */
     fixesMade: boolean;
     noteTopicPath: TopicPath;
     noteFile: ISRFile;
     settings: SRSettings;
-    questionContextFinder: IQuestionContextFinder;
 
-    constructor(settings: SRSettings, questionContextFinder: IQuestionContextFinder) { 
+    constructor(settings: SRSettings) { 
         this.settings = settings;
-        this.questionContextFinder = questionContextFinder;
     }
 
     async Load(noteFile: ISRFile, noteTopicPath: TopicPath): Promise<Note> { 
         this.noteFile = noteFile;
-        /* this.fileCachedData = this.app.metadataCache.getFileCache(noteFile) || {};
-        this.headings = this.fileCachedData.headings || [];
-        this.fixesMade = false; */
             
-        let questionParser: NoteQuestionParser = new NoteQuestionParser(this.settings, this.questionContextFinder);
+        let questionParser: NoteQuestionParser = new NoteQuestionParser(this.settings);
 
         let questionList: Question[] = await questionParser.createQuestionList(noteFile, noteTopicPath);
 

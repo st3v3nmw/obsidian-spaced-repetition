@@ -22,29 +22,18 @@ export class ParsedQuestionInfo {
 }
 
 
-export interface IQuestionContextFinder { 
-    getQuestionContext(lineNo: number): string;
-}
-
-
-export class NullImpl_IQuestionContextFinder implements IQuestionContextFinder {
-    getQuestionContext(lineNo: number): string {
-        return "";
-    }
-}
-
 export class NoteQuestionParser { 
     settings: SRSettings;
-    questionContextFinder: IQuestionContextFinder;
+    noteFile: ISRFile;
     noteTopicPath: TopicPath;
     noteText: string;
 
-    constructor(settings: SRSettings, questionContextFinder: IQuestionContextFinder) { 
+    constructor(settings: SRSettings) { 
         this.settings = settings;
-        this.questionContextFinder = questionContextFinder;
     }
 
     async createQuestionList(noteFile: ISRFile, folderTopicPath: TopicPath): Promise<Question[]> { 
+        this.noteFile = noteFile;
         let noteText: string = await noteFile.read();
         var noteTopicPath: TopicPath;
         if (this.settings.convertFoldersToDecks) {
@@ -108,8 +97,8 @@ export class NoteQuestionParser {
         var {cardType, cardText, lineNo} = parsedQuestionInfo;
 
         let originalQuestionText: string = cardText;
-        const context: string = this.questionContextFinder.getQuestionContext(lineNo);
-        let result = Question.Create(this.settings, cardType, this.noteTopicPath, cardText, lineNo, context);
+        const questionContext: string[] = this.noteFile.getQuestionContext(lineNo);
+        let result = Question.Create(this.settings, cardType, this.noteTopicPath, cardText, lineNo, questionContext);
         return result;
     }
 

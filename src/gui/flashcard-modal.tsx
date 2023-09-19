@@ -26,7 +26,7 @@ import { unwatchFile } from "fs";
 import { Card } from "../Card";
 import { CardListType, Deck } from "../Deck";
 import { CardType, Question } from "../Question";
-import { IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "src/FlashcardReviewSequencer";
+import { FlashcardReviewMode, IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "src/FlashcardReviewSequencer";
 import { FlashcardEditModal } from "./flashcards-edit-modal";
 import { Note } from "src/Note";
 import { RenderMarkdownWrapper } from "src/util/RenderMarkdownWrapper";
@@ -54,9 +54,10 @@ export class FlashcardModal extends Modal {
     public editButton: HTMLElement;
     public contextView: HTMLElement;
     public mode: FlashcardModalMode;
-    public ignoreStats: boolean;
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
+    private reviewMode: FlashcardReviewMode;
+
 
     private get currentCard(): Card {
         return this.reviewSequencer.currentCard;
@@ -70,13 +71,13 @@ export class FlashcardModal extends Modal {
         return this.reviewSequencer.currentNote;
     }
 
-    constructor(app: App, plugin: SRPlugin, settings: SRSettings, reviewSequencer: IFlashcardReviewSequencer, ignoreStats = false) {
+    constructor(app: App, plugin: SRPlugin, settings: SRSettings, reviewSequencer: IFlashcardReviewSequencer, reviewMode: FlashcardReviewMode) {
         super(app);
 
         this.plugin = plugin;
         this.settings = settings;
         this.reviewSequencer = reviewSequencer;
-        this.ignoreStats = ignoreStats;
+        this.reviewMode = reviewMode;
 
         this.titleEl.setText(t("DECKS"));
         this.titleEl.addClass("sr-centered");
@@ -286,7 +287,7 @@ export class FlashcardModal extends Modal {
 
         this.createShowAnswerButton();
 
-        if (this.ignoreStats) {
+        if (this.reviewMode == FlashcardReviewMode.Cram) {
             this.goodBtn.style.display = "none";
 
             this.responseDiv.addClass("sr-ignorestats-response");
@@ -486,7 +487,7 @@ export class FlashcardModal extends Modal {
         let wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(this.app, this.plugin, this.currentNote.filePath);
         await wrapper.renderMarkdownWrapper(this.currentCard.front, this.flashcardView);
 
-        if (this.ignoreStats) {
+        if (this.reviewMode == FlashcardReviewMode.Cram) {
             // Same for mobile/desktop
             this.hardBtn.setText(`${this.settings.flashcardHardText}`);
             this.easyBtn.setText(`${this.settings.flashcardEasyText}`);
@@ -497,7 +498,12 @@ export class FlashcardModal extends Modal {
         }
 
         if (this.settings.showContextInCards)
-            this.contextView.setText(this.currentQuestion.context);
+            this.contextView.setText(this.formatQuestionContextText(this.currentQuestion.questionContext));
+    }
+
+    private formatQuestionContextText(questionContext: string[]): string {
+        let result = `${this.currentNote.file.basename} > ${questionContext.join(" > ")}`;
+        return result;
     }
 
     private setupEaseButton(button: HTMLElement, reviewResponse: ReviewResponse) {

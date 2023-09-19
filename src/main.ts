@@ -34,7 +34,6 @@ import { CardScheduleCalculator } from "./CardSchedule";
 import { Note } from "./Note";
 import { NoteFileLoader } from "./NoteFileLoader";
 import { ISRFile, ObsidianTFile } from "./SRFile";
-import { IQuestionContextFinder, NullImpl_IQuestionContextFinder } from "./NoteQuestionParser";
 import { NoteEaseCalculator } from "./NoteEaseCalculator";
 import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 import { INoteEaseList, NoteEaseList } from "./NoteEaseList";
@@ -272,7 +271,7 @@ export default class SRPlugin extends Plugin {
         let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(reviewMode, deckIterator, this.data.settings, cardScheduleCalculator);
 
         reviewSequencer.setDeckTree(deck);
-        new FlashcardModal(this.app, this, this.data.settings, reviewSequencer).open();
+        new FlashcardModal(this.app, this, this.data.settings, reviewSequencer, reviewMode).open();
     }
 
     async sync(ignoreStats = false): Promise<void> {
@@ -450,8 +449,7 @@ export default class SRPlugin extends Plugin {
     }
 
     async loadNote(noteFile: TFile, topicPath: TopicPath): Promise<Note> {
-        let questionContextFinder: IQuestionContextFinder = new NullImpl_IQuestionContextFinder();
-        let loader: NoteFileLoader = new NoteFileLoader(this.data.settings, questionContextFinder);
+        let loader: NoteFileLoader = new NoteFileLoader(this.data.settings);
         let note: Note = await loader.Load(this.createSrTFile(noteFile), topicPath);
         return note;
 
@@ -583,7 +581,11 @@ export default class SRPlugin extends Plugin {
         }
 
         if (this.data.settings.burySiblingCards) {
-            await this.findFlashcardsInNote(note, [], true); // bury all cards in current note
+            const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(note));
+            let noteX: Note = await this.loadNote(note, topicPath);
+            for (const question of noteX.questionList) {
+                this.data.buryList.push(question.questionText.textHash);
+            }
             await this.savePluginData();
         }
         await this.app.vault.modify(note, fileText);
