@@ -139,16 +139,23 @@ export class Question {
         return result;
     }
 
-    async writeQuestion(settings: SRSettings): Promise<void> {
+    updateQuestionText(noteText: string, settings: SRSettings): string {
 
         let originalText: string = this.questionText.original;
-        const originalTextRegex = new RegExp(escapeRegexString(originalText), "gm");
+
+        let replacementText = this.formatForNote(settings);
+        let newText: string = noteText.replace(originalText, replacementText);
+        this.questionText = QuestionText.Create(replacementText, settings);
+        return newText;
+    }
+
+    async writeQuestion(settings: SRSettings): Promise<void> {
 
         let fileText: string = await this.note.file.read();
-        let replacementText = this.formatForNote(settings);
-        let newText: string = fileText.replace(originalText, replacementText);
+
+        let newText: string = this.updateQuestionText(fileText, settings);
         await this.note.file.write(newText);
-        this.questionText = QuestionText.Create(replacementText, settings);
+        this.hasChanged = false;
     }
 
     static Create(settings: SRSettings, questionType: CardType, noteTopicPath: TopicPath, originalText: string, 

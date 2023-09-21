@@ -37,6 +37,7 @@ import { ISRFile, ObsidianTFile } from "./SRFile";
 import { NoteEaseCalculator } from "./NoteEaseCalculator";
 import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 import { INoteEaseList, NoteEaseList } from "./NoteEaseList";
+import { QuestionPostponementList } from "./QuestionPostponementList";
 
 interface PluginData {
     settings: SRSettings;
@@ -75,6 +76,7 @@ export default class SRPlugin extends Plugin {
     public lastSelectedReviewDeck: string;
 
     public easeByPath: NoteEaseList;
+    private cardPostponementList: QuestionPostponementList;
     private incomingLinks: Record<string, LinkStat[]> = {};
     private pageranks: Record<string, number> = {};
     private dueNotesCount = 0;
@@ -85,8 +87,8 @@ export default class SRPlugin extends Plugin {
 
     async onload(): Promise<void> {
         await this.loadPluginData();
-        this.easeByPath = new NoteEaseList(this.data.settings);;
-
+        this.easeByPath = new NoteEaseList(this.data.settings);
+        this.cardPostponementList = new QuestionPostponementList(this, this.data.settings, this.data.buryList);
 
         appIcon();
 
@@ -268,7 +270,8 @@ export default class SRPlugin extends Plugin {
     private openFlashcardModal(deck: Deck, reviewMode: FlashcardReviewMode): void {
         let deckIterator = new DeckTreeSequentialIterator(CardListType.DueCard);
         let cardScheduleCalculator = new CardScheduleCalculator(this.data.settings, this.easeByPath);
-        let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(reviewMode, deckIterator, this.data.settings, cardScheduleCalculator);
+        let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(reviewMode, deckIterator, 
+            this.data.settings, cardScheduleCalculator, this.cardPostponementList);
 
         reviewSequencer.setDeckTree(deck);
         new FlashcardModal(this.app, this, this.data.settings, reviewSequencer, reviewMode).open();
@@ -450,7 +453,9 @@ export default class SRPlugin extends Plugin {
 
     async loadNote(noteFile: TFile, topicPath: TopicPath): Promise<Note> {
         let loader: NoteFileLoader = new NoteFileLoader(this.data.settings);
-        let note: Note = await loader.Load(this.createSrTFile(noteFile), topicPath);
+        let note: Note = await loader.load(this.createSrTFile(noteFile), topicPath);
+        if (note.hasChanged)
+            note.writeNoteFile(this.data.settings);
         return note;
 
     }

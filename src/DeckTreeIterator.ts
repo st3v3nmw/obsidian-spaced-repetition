@@ -1,5 +1,6 @@
 import { Card } from "./Card";
 import { CardListType, Deck } from "./Deck";
+import { Question } from "./Question";
 import { TopicPath } from "./TopicPath";
 
 export interface IDeckTreeIterator {
@@ -8,6 +9,7 @@ export interface IDeckTreeIterator {
     get hasCurrentCard(): boolean;
     setDeck(deck: Deck): void;
     deleteCurrentCard(): boolean;
+    deleteCurrentQuestion(): boolean;
     moveCurrentCardToEndOfList(): void;
     nextCard(): boolean;
 }
@@ -63,6 +65,17 @@ class SingleDeckIterator {
             }
         }
         return this.cardIdx != null;
+    }
+
+    deleteCurrentQuestion(): void {
+        this.ensureCurrentCard();
+        let q: Question = this.currentCard.question;
+        let cards: Card[] = this.deck.getCardListForCardType(this.cardListType);
+        do {
+            this.deck.deleteCardAtIndex(this.cardIdx, this.cardListType);
+        }
+        while ((this.cardIdx < cards.length) && Object.is(q, cards[this.cardIdx].question))
+        this.cardIdx--;
     }
 
     deleteCurrentCard(): void {
@@ -149,6 +162,10 @@ export class DeckTreeSequentialIterator implements IDeckTreeIterator {
         return result;
     }
 
+    deleteCurrentQuestion(): boolean {
+        this.singleDeckIterator.deleteCurrentQuestion();
+        return this.nextCard();
+    }
 
     deleteCurrentCard(): boolean {
         this.singleDeckIterator.deleteCurrentCard();

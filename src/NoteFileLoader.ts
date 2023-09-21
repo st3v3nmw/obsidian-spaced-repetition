@@ -19,7 +19,7 @@ export class NoteFileLoader {
         this.settings = settings;
     }
 
-    async Load(noteFile: ISRFile, noteTopicPath: TopicPath): Promise<Note> { 
+    async load(noteFile: ISRFile, noteTopicPath: TopicPath): Promise<Note> { 
         this.noteFile = noteFile;
             
         let questionParser: NoteQuestionParser = new NoteQuestionParser(this.settings);

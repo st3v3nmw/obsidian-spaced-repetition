@@ -9,6 +9,10 @@ export class Note {
     file: ISRFile;
     questionList: Question[];
 
+    get hasChanged(): boolean {
+        return this.questionList.some((question) => question.hasChanged);
+    }
+
     get filePath(): string {
         return this.file.path;
     }
@@ -36,44 +40,23 @@ export class Note {
         console.debug(str);
     }
 
-
+    async writeNoteFile(settings: SRSettings): Promise<void> {
+        let fileText: string = await this.file.read();
+        for (const question of this.questionList) {
+            if (question.hasChanged) {
+                fileText = question.updateQuestionText(fileText, settings);
+            }
+        }
+        await this.file.write(fileText);
+        this.questionList.forEach((question) => question.hasChanged = false);
+    }
 }
 
-function getCardContext(cardLine: number, headings: HeadingCache[], note_title: string): string {
-    const stack: HeadingCache[] = [];
-    for (const heading of headings) {
-        if (heading.position.start.line > cardLine) {
-            break;
-        }
-
-        while (stack.length > 0 && stack[stack.length - 1].level >= heading.level) {
-            stack.pop();
-        }
-
-        stack.push(heading);
-    }
-
-    let context = `${note_title} > `;
-    for (const headingObj of stack) {
-        headingObj.heading = headingObj.heading.replace(/\[\^\d+\]/gm, "").trim();
-        context += `${headingObj.heading} > `;
-    }
-    return context.slice(0, -3);
-}
 
 
 /* export class NoteUpdator implements INoteUpdator {
 
-    async modifyQuestionText(noteFile: ISRFile, question: Question, replacementText: string): Promise<void> {
 
-        let originalText: string = question.questionTextStrippedSR;
-        const originalTextRegex = new RegExp(escapeRegexString(originalText), "gm");
-
-        let fileText: string = await noteFile.read();
-        let newText: string = fileText.replace(originalTextRegex, replacementText);
-        await noteFile.write(newText);
-        question.questionTextStrippedSR = replacementText;
-    }
 
 
     update(): void {

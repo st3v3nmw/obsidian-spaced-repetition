@@ -5,9 +5,10 @@ import { Deck } from "src/Deck";
 import { Note } from "src/Note";
 import { Question } from "src/Question";
 import { DEFAULT_SETTINGS } from "src/settings";
+import { NoteFileLoader } from "src/NoteFileLoader";
 
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
-let refDate: Date = new Date(2023, 8, 6);
+var noteFileLoader: NoteFileLoader = new NoteFileLoader(DEFAULT_SETTINGS);
 
 describe("appendCardsToDeck", () => {
 
@@ -48,6 +49,35 @@ Q3:::A3
         expect(subdeck.dueFlashcards.length).toEqual(0);
     });
     
+    
+});
+
+
+describe("writeNoteFile", () => {
+
+    test("Multiple questions, some with too many schedule details", async () => {
+        let originalText: string = `#flashcards/test
+Q1::A1
+#flashcards Q2::A2
+<!--SR:!2023-09-02,4,270!2023-09-02,5,270-->
+Q3:::A3
+<!--SR:!2023-09-02,4,270!2023-09-02,5,270!2023-09-02,6,270!2023-09-02,7,270-->
+`;
+        let file: UnitTestSRFile = new UnitTestSRFile(originalText);
+        let note: Note = await noteFileLoader.load(file, TopicPath.emptyPath);
+
+        await note.writeNoteFile(DEFAULT_SETTINGS);
+        let updatedText: string = file.content;
+
+        let expectedText: string = `#flashcards/test
+Q1::A1
+#flashcards Q2::A2
+<!--SR:!2023-09-02,4,270-->
+Q3:::A3
+<!--SR:!2023-09-02,4,270!2023-09-02,5,270-->
+`;
+        expect(updatedText).toEqual(expectedText);
+    });
     
 });
 

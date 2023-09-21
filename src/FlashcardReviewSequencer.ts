@@ -10,6 +10,7 @@ import { TICKS_PER_DAY } from "./constants";
 import { t } from "./lang/helpers";
 import { Note } from "./Note";
 import { IDeckTreeIterator } from "./DeckTreeIterator";
+import { IQuestionPostponementList } from "./QuestionPostponementList";
 
 export interface IFlashcardReviewSequencer {
     get hasCurrentCard(): boolean;
@@ -51,12 +52,15 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     private cardSequencer: IDeckTreeIterator;
     private settings: SRSettings;
     private cardScheduleCalculator: ICardScheduleCalculator;
+    private questionPostponementList: IQuestionPostponementList;
 
-    constructor(reviewMode: FlashcardReviewMode, cardSequencer: IDeckTreeIterator, settings: SRSettings, cardScheduleCalculator: ICardScheduleCalculator) {
+    constructor(reviewMode: FlashcardReviewMode, cardSequencer: IDeckTreeIterator, settings: SRSettings, cardScheduleCalculator: ICardScheduleCalculator, 
+        questionPostponementList: IQuestionPostponementList) {
             this.reviewMode = reviewMode;
             this.cardSequencer = cardSequencer;
             this.settings = settings;
             this.cardScheduleCalculator = cardScheduleCalculator;
+            this.questionPostponementList = questionPostponementList;
     }
 
     get hasCurrentCard(): boolean {
@@ -90,8 +94,9 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             !card.question.hasEditLaterTag);
 
         this.remainingDeckTree = this.filteredDeckTree.copyWithCardFilter((card) => 
-            (this.reviewMode == FlashcardReviewMode.Cram) || card.isNew || card.isDue);
-        }
+            ((this.reviewMode == FlashcardReviewMode.Cram) || card.isNew || card.isDue)
+            && !this.questionPostponementList.includes(card.question));
+    }
 
     setCurrentDeck(topicPath: TopicPath): void {
         let deck: Deck = this.remainingDeckTree.getDeck(topicPath);
@@ -108,7 +113,8 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     skipCurrentCard(): void {
-        this.cardSequencer.deleteCurrentCard();
+        this.questionPostponementList.addIfRequired(this.currentQuestion);
+        this.cardSequencer.deleteCurrentQuestion();
     }
 
     private deleteCurrentCard(): void {
