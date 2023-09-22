@@ -425,30 +425,6 @@ export class FlashcardModal extends Modal {
 
     }
 
-/*     private async burySiblingCards(tillNextDay: boolean): Promise<void> {
-        if (tillNextDay) {
-            this.plugin.data.buryList.push(cyrb53(this.currentCard.cardText));
-            await this.plugin.savePluginData();
-        }
-
-        for (const sibling of this.currentCard.siblings) {
-            const dueIdx = this.currentDeck.dueFlashcards.indexOf(sibling);
-            const newIdx = this.currentDeck.newFlashcards.indexOf(sibling);
-
-            if (dueIdx !== -1) {
-                this.currentDeck.deleteFlashcardAtIndex(
-                    dueIdx,
-                    this.currentDeck.dueFlashcards[dueIdx].isDue,
-                );
-            } else if (newIdx !== -1) {
-                this.currentDeck.deleteFlashcardAtIndex(
-                    newIdx,
-                    this.currentDeck.newFlashcards[newIdx].isDue,
-                );
-            }
-        }
-    } */
-
     private async skipCurrentCard(): Promise<void> {
         this.reviewSequencer.skipCurrentCard();
         // console.log(`skipCurrentCard: ${this.currentCard?.front ?? 'None'}`)

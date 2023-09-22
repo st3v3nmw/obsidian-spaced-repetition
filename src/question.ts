@@ -86,12 +86,6 @@ export class QuestionText {
         result += this.actualQuestion;
         return result;
     }
-
-    /* static extractSrComments(text: string): string[] {
-        const regex = /(<!--SR:!.+-->)/g;
-        let result = [...text.matchAll(regex)];
-        return null;
-    } */
 }
 
 export class Question { 

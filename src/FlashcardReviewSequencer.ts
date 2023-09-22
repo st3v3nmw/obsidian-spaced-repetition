@@ -5,9 +5,6 @@ import { ReviewResponse, schedule } from "./scheduling";
 import { SRSettings } from "./settings";
 import { TopicPath } from "./TopicPath";
 import { CardScheduleInfo, ICardScheduleCalculator } from "./CardSchedule";
-import { INoteEaseList } from "./NoteEaseList";
-import { TICKS_PER_DAY } from "./constants";
-import { t } from "./lang/helpers";
 import { Note } from "./Note";
 import { IDeckTreeIterator } from "./DeckTreeIterator";
 import { IQuestionPostponementList } from "./QuestionPostponementList";
@@ -46,7 +43,6 @@ export enum FlashcardReviewMode { Cram, Review };
 
 export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     private originalDeckTree: Deck;
-    private filteredDeckTree: Deck;
     private remainingDeckTree: Deck;
     private reviewMode: FlashcardReviewMode;
     private cardSequencer: IDeckTreeIterator;
@@ -113,34 +109,39 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     async processReview(response: ReviewResponse): Promise<void> {
-        let deleteCard: boolean = false;
-        let moveCardToEnd: boolean = false;
-
         switch (this.reviewMode) {
             case FlashcardReviewMode.Review:
-                deleteCard = (response != ReviewResponse.Reset);
-                moveCardToEnd = (response == ReviewResponse.Reset);
-                this.currentCard.scheduleInfo = this.determineCardSchedule(response, this.currentCard);
-
-                // Update the source file with the updated schedule
-                await this.currentQuestion.writeQuestion(this.settings);
+                await this.processReview_ReviewMode(response);
                 break;
 
             case FlashcardReviewMode.Cram:
-                deleteCard = (response == ReviewResponse.Easy);
+                await this.processReview_CramMode(response);
                 break;
         }
-        
-        // Move/delete/skip the card
-        if (moveCardToEnd) {
-            this.cardSequencer.moveCurrentCardToEndOfList();
-        } else if (deleteCard) {
-            this.deleteCurrentCard();
-        }
-        else
-            this.nextCard();
     }
-    
+
+    async processReview_ReviewMode(response: ReviewResponse): Promise<void> {
+        this.currentCard.scheduleInfo = this.determineCardSchedule(response, this.currentCard);
+
+        // Update the source file with the updated schedule
+        await this.currentQuestion.writeQuestion(this.settings);
+        
+        // Move/delete the card
+        if (response == ReviewResponse.Reset) {
+            this.cardSequencer.moveCurrentCardToEndOfList();
+        } else
+            this.deleteCurrentCard();
+    }
+
+    async processReview_CramMode(response: ReviewResponse): Promise<void> {
+
+        if (response == ReviewResponse.Easy)
+            this.deleteCurrentCard();
+        else
+            this.cardSequencer.cycleNextCard();
+    }
+
+
     determineCardSchedule(response: ReviewResponse, card: Card): CardScheduleInfo {
         var result: CardScheduleInfo;
 
@@ -157,10 +158,6 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             }
         }
         return result;
-    }
-
-    private nextCard(): void {
-
     }
 
     async updateCurrentQuestionText(text: string): Promise<void> {

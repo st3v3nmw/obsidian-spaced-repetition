@@ -3,6 +3,7 @@ import SRPlugin from "./main";
 import { SRSettings } from "./settings";
 
 export interface IQuestionPostponementList {
+    clear(): void;
     addIfRequired(question: Question): void;
     includes(question: Question): boolean;
     write(): Promise<void>;
@@ -18,6 +19,11 @@ export class QuestionPostponementList implements IQuestionPostponementList  {
         this.settings = settings;
         this.list = list;
     }
+
+    clear(): void {
+        this.list = [];
+    }
+
 
     addIfRequired(question: Question): void {
         if (this.settings.burySiblingCards)

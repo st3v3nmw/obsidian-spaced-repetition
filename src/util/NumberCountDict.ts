@@ -13,9 +13,7 @@ export class ValueCountDict {
     }
 
     incrementCount(value: number): void {
-        if (!this.hasValue(value)) {
-            this.dict[value] = 0;
-        }
+        this.clearCountIfMissing(value);
         this.dict[value]++;
     }
         

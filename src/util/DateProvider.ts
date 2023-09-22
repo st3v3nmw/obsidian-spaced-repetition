@@ -13,14 +13,14 @@ export class LiveDateProvider implements IDateProvider {
 }
 
 export class StaticDateProvider implements IDateProvider {
-    private ticks: Moment;
+    private moment: Moment;
 
-    constructor(ticks: Moment) {
-        this.ticks = ticks;
+    constructor(moment: Moment) {
+        this.moment = moment;
     }
 
     get today(): Moment {
-        return this.ticks.clone();
+        return this.moment.clone();
     }
 
     static fromDateStr(str: string): StaticDateProvider {

@@ -23,7 +23,6 @@ import {
 import { escapeRegexString, cyrb53 } from "src/util/utils";
 import { ReviewDeck, ReviewDeckSelectionModal } from "src/ReviewDeck";
 import { t } from "src/lang/helpers";
-import { parse } from "src/parser";
 import { appIcon } from "src/icons/appicon";
 import { TopicPath } from "./TopicPath";
 import { CardListType, Deck, DeckTreeFilter } from "./Deck";
@@ -33,7 +32,7 @@ import { DeckTreeSequentialIterator } from "./DeckTreeIterator";
 import { CardScheduleCalculator } from "./CardSchedule";
 import { Note } from "./Note";
 import { NoteFileLoader } from "./NoteFileLoader";
-import { ISRFile, ObsidianTFile } from "./SRFile";
+import { ISRFile, SrTFile as SrTFile } from "./SRFile";
 import { NoteEaseCalculator } from "./NoteEaseCalculator";
 import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 import { INoteEaseList, NoteEaseList } from "./NoteEaseList";
@@ -264,7 +263,7 @@ export default class SRPlugin extends Plugin {
         let deckTree = new Deck("root", null);
         note.appendCardsToDeck(deckTree);
         let remainingDeckTree = DeckTreeFilter.filterForRemainingCards(this.questionPostponementList, deckTree, reviewMode);
-        this.openFlashcardModal(deckTree, deckTree, reviewMode);
+        this.openFlashcardModal(deckTree, remainingDeckTree, reviewMode);
     }
 
     private openFlashcardModal(fullDeckTree: Deck, remainingDeckTree: Deck, reviewMode: FlashcardReviewMode): void {
@@ -293,14 +292,14 @@ export default class SRPlugin extends Plugin {
         this.reviewDecks = {};
 
         // reset flashcards stuff
-        let deckTree = new Deck("root", null);
+        let fullDeckTree = new Deck("root", null);
 
         const now = window.moment(Date.now());
         const todayDate: string = now.format("YYYY-MM-DD");
         // clear bury list if we've changed dates
         if (todayDate !== this.data.buryDate) {
             this.data.buryDate = todayDate;
-            this.data.buryList = [];
+            this.questionPostponementList.clear();
         }
 
         const notes: TFile[] = this.app.vault.getMarkdownFiles();
@@ -337,7 +336,7 @@ export default class SRPlugin extends Plugin {
             if (topicPath.hasPath) {
                 let note: Note = await this.loadNote(noteFile, topicPath);
                 let flashcardsInNoteAvgEase: number = NoteEaseCalculator.Calculate(note, this.data.settings);
-                note.appendCardsToDeck(deckTree);
+                note.appendCardsToDeck(fullDeckTree);
 
                 if (flashcardsInNoteAvgEase > 0) {
                     this.easeByPath.setEaseForPath(note.filePath, flashcardsInNoteAvgEase);
@@ -417,11 +416,11 @@ export default class SRPlugin extends Plugin {
         });
 
         // Reviewable cards are all except those with the "edit later" tag
-        this.deckTree = DeckTreeFilter.filterForReviewableCards(deckTree);
-        this.remainingDeckTree = DeckTreeFilter.filterForRemainingCards(this.questionPostponementList, this.deckTree, FlashcardReviewMode.Review);
+        this.deckTree = DeckTreeFilter.filterForReviewableCards(fullDeckTree);
 
         // sort the deck names
         this.deckTree.sortSubdecksList();
+        this.remainingDeckTree = DeckTreeFilter.filterForRemainingCards(this.questionPostponementList, this.deckTree, FlashcardReviewMode.Review);
         let calc: DeckTreeStatsCalculator = new DeckTreeStatsCalculator();
         this.cardStats = calc.calculate(this.deckTree);
         
@@ -645,299 +644,13 @@ export default class SRPlugin extends Plugin {
         new Notice(t("ALL_CAUGHT_UP"));
     }
 
-    createSrTFile(note: TFile): ObsidianTFile {
-        return new ObsidianTFile(this.app.vault, this.app.metadataCache, note);
+    createSrTFile(note: TFile): SrTFile {
+        return new SrTFile(this.app.vault, this.app.metadataCache, note);
     }
 
     findTopicPath(note: ISRFile): TopicPath {
         return TopicPath.getTopicPathOfFile(note, this.data.settings);
     }
-
-    async something() { 
-        /* 
-                    if (cardText.includes(settings.editLaterTag)) {
-                continue;
-            }
-
-            this.deckTree.createDeck([...deckPath]);
-
-                        if (buryOnly) {
-                this.data.buryList.push(cardTextHash);
-                continue;
-            }
-
-                        // we have some extra scheduling dates to delete
-            if (scheduling.length > siblingMatches.length) {
-                const idxSched: number = cardText.lastIndexOf("<!--SR:") + 7;
-                let newCardText: string = cardText.substring(0, idxSched);
-                for (let i = 0; i < siblingMatches.length; i++)
-                    newCardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
-                newCardText += "-->";
-
-                const replacementRegex = new RegExp(escapeRegexString(cardText), "gm");
-                fileText = fileText.replace(replacementRegex, () => newCardText);
-                fileChanged = true;
-            }
-         */
-    }
-
-    /* async findFlashcardsInNote(
-        note: TFile,
-        deckPath: string[],
-        buryOnly = false,
-        ignoreStats = false,
-    ): Promise<number> {
-        let fileText: string = await this.app.vault.read(note);
-        const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
-        const headings: HeadingCache[] = fileCachedData.headings || [];
-        let fileChanged = false,
-            totalNoteEase = 0,
-            scheduledCount = 0;
-        const settings: SRSettings = this.data.settings;
-        const noteDeckPath = deckPath;
-
-        const now: number = Date.now();
-        const parsedCards: [CardType, string, number][] = parse(
-            fileText,
-            settings.singleLineCardSeparator,
-            settings.singleLineReversedCardSeparator,
-            settings.multilineCardSeparator,
-            settings.multilineReversedCardSeparator,
-            settings.convertHighlightsToClozes,
-            settings.convertBoldTextToClozes,
-            settings.convertCurlyBracketsToClozes,
-        );
-        for (const parsedCard of parsedCards) {
-            deckPath = noteDeckPath;
-            const cardType: CardType = parsedCard[0],
-                lineNo: number = parsedCard[2];
-            let cardText: string = parsedCard[1]; */
-
-            /* if (cardText.includes(settings.editLaterTag)) {
-                continue;
-            } */
-
-            /* if (!settings.convertFoldersToDecks) {
-                const tagInCardRegEx = /^#[^\s#]+/gi;
-                const cardDeckPath = cardText
-                    .match(tagInCardRegEx)
-                    ?.slice(-1)[0]
-                    .replace("#", "")
-                    .split("/");
-                if (cardDeckPath) {
-                    deckPath = cardDeckPath;
-                    cardText = cardText.replaceAll(tagInCardRegEx, "");
-                }
-            } */
-
-            /* this.deckTree.createDeck([...deckPath]); */
-
-            /* const cardTextHash: string = cyrb53(cardText);
-
-            if (buryOnly) {
-                this.data.buryList.push(cardTextHash);
-                continue;
-            }
-
-            const siblingMatches: [string, string][] = [];
-            if (cardType === CardType.Cloze) {
-                const siblings: RegExpMatchArray[] = [];
-                if (settings.convertHighlightsToClozes) {
-                    siblings.push(...cardText.matchAll(/==(.*?)==/gm));
-                }
-                if (settings.convertBoldTextToClozes) {
-                    siblings.push(...cardText.matchAll(/\*\*(.*?)\*\*ZZZ/gm));
-                }
-                if (settings.convertCurlyBracketsToClozes) {
-                    siblings.push(...cardText.matchAll(/{{(.*?)}}/gm));
-                }
-                siblings.sort((a, b) => {
-                    if (a.index < b.index) {
-                        return -1;
-                    }
-                    if (a.index > b.index) {
-                        return 1;
-                    }
-                    return 0;
-                });
-
-                let front: string, back: string;
-                for (const m of siblings) {
-                    const deletionStart: number = m.index,
-                        deletionEnd: number = deletionStart + m[0].length;
-                    front =
-                        cardText.substring(0, deletionStart) +
-                        "<span style='color:#2196f3'>[...]</span>" +
-                        cardText.substring(deletionEnd);
-                    front = front
-                        .replace(/==/gm, "")
-                        .replace(/\*\*ZZZ/gm, "")
-                        .replace(/{{/gm, "")
-                        .replace(/}}/gm, "");
-                    back =
-                        cardText.substring(0, deletionStart) +
-                        "<span style='color:#2196f3'>" +
-                        cardText.substring(deletionStart, deletionEnd) +
-                        "</span>" +
-                        cardText.substring(deletionEnd);
-                    back = back
-                        .replace(/==/gm, "")
-                        .replace(/\*\*ZZZ/gm, "")
-                        .replace(/{{/gm, "")
-                        .replace(/}}/gm, "");
-                    siblingMatches.push([front, back]);
-                }
-            } else {
-                let idx: number;
-                if (cardType === CardType.SingleLineBasic) {
-                    idx = cardText.indexOf(settings.singleLineCardSeparator);
-                    siblingMatches.push([
-                        cardText.substring(0, idx),
-                        cardText.substring(idx + settings.singleLineCardSeparator.length),
-                    ]);
-                } else if (cardType === CardType.SingleLineReversed) {
-                    idx = cardText.indexOf(settings.singleLineReversedCardSeparator);
-                    const side1: string = cardText.substring(0, idx),
-                        side2: string = cardText.substring(
-                            idx + settings.singleLineReversedCardSeparator.length,
-                        );
-                    siblingMatches.push([side1, side2]);
-                    siblingMatches.push([side2, side1]);
-                } else if (cardType === CardType.MultiLineBasic) {
-                    idx = cardText.indexOf("\n" + settings.multilineCardSeparator + "\n");
-                    siblingMatches.push([
-                        cardText.substring(0, idx),
-                        cardText.substring(idx + 2 + settings.multilineCardSeparator.length),
-                    ]);
-                } else if (cardType === CardType.MultiLineReversed) {
-                    idx = cardText.indexOf("\n" + settings.multilineReversedCardSeparator + "\n");
-                    const side1: string = cardText.substring(0, idx),
-                        side2: string = cardText.substring(
-                            idx + 2 + settings.multilineReversedCardSeparator.length,
-                        );
-                    siblingMatches.push([side1, side2]);
-                    siblingMatches.push([side2, side1]);
-                }
-            }
-
-            let scheduling: RegExpMatchArray[] = [...cardText.matchAll(MULTI_SCHEDULING_EXTRACTOR)];
-            if (scheduling.length === 0)
-                scheduling = [...cardText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
-
-            // we have some extra scheduling dates to delete
-            if (scheduling.length > siblingMatches.length) {
-                const idxSched: number = cardText.lastIndexOf("<!--SR:") + 7;
-                let newCardText: string = cardText.substring(0, idxSched);
-                for (let i = 0; i < siblingMatches.length; i++)
-                    newCardText += `!${scheduling[i][1]},${scheduling[i][2]},${scheduling[i][3]}`;
-                newCardText += "-->";
-
-                const replacementRegex = new RegExp(escapeRegexString(cardText), "gm");
-                fileText = fileText.replace(replacementRegex, () => newCardText);
-                fileChanged = true;
-            }
-
-            const context: string = settings.showContextInCards
-                ? getCardContext(lineNo, headings, note.basename)
-                : "";
-            const siblings: Card[] = [];
-            for (let i = 0; i < siblingMatches.length; i++) {
-                const front: string = siblingMatches[i][0].trim(),
-                    back: string = siblingMatches[i][1].trim();
-
-                const cardObj: Card = {
-                    isDue: i < scheduling.length,
-                    note,
-                    lineNo,
-                    front,
-                    back,
-                    cardText,
-                    context,
-                    cardType,
-                    siblingIdx: i,
-                    siblings,
-                    editLater: false,
-                };
-
-                // card scheduled
-                if (ignoreStats) {
-                    this.cardStats.newCount++;
-                    cardObj.isDue = true;
-                    this.deckTree.insertFlashcard([...deckPath], cardObj);
-                } else if (i < scheduling.length) {
-                    const dueUnix: number = window
-                        .moment(scheduling[i][1], ["YYYY-MM-DD", "DD-MM-YYYY"])
-                        .valueOf();
-                    const nDays: number = Math.ceil((dueUnix - now) / (24 * 3600 * 1000));
-                    if (!Object.prototype.hasOwnProperty.call(this.dueDatesFlashcards, nDays)) {
-                        this.dueDatesFlashcards[nDays] = 0;
-                    }
-                    this.dueDatesFlashcards[nDays]++;
-
-                    const interval: number = parseInt(scheduling[i][2]),
-                        ease: number = parseInt(scheduling[i][3]);
-                    if (!Object.prototype.hasOwnProperty.call(this.cardStats.intervals, interval)) {
-                        this.cardStats.intervals[interval] = 0;
-                    }
-                    this.cardStats.intervals[interval]++;
-                    if (!Object.prototype.hasOwnProperty.call(this.cardStats.eases, ease)) {
-                        this.cardStats.eases[ease] = 0;
-                    }
-                    this.cardStats.eases[ease]++;
-                    totalNoteEase += ease;
-                    scheduledCount++;
-
-                    if (interval >= 32) {
-                        this.cardStats.matureCount++;
-                    } else {
-                        this.cardStats.youngCount++;
-                    }
-
-                    if (this.data.buryList.includes(cardTextHash)) {
-                        this.deckTree.countFlashcard([...deckPath]);
-                        continue;
-                    }
-
-                    if (dueUnix <= now) {
-                        cardObj.interval = interval;
-                        cardObj.ease = ease;
-                        cardObj.delayBeforeReview = now - dueUnix;
-                        this.deckTree.insertFlashcard([...deckPath], cardObj);
-                    } else {
-                        this.deckTree.countFlashcard([...deckPath]);
-                        continue;
-                    }
-                } else {
-                    this.cardStats.newCount++;
-                    if (this.data.buryList.includes(cyrb53(cardText))) {
-                        this.deckTree.countFlashcard([...deckPath]);
-                        continue;
-                    }
-                    this.deckTree.insertFlashcard([...deckPath], cardObj);
-                }
-
-                siblings.push(cardObj);
-            }
-        }
-
-        if (fileChanged) {
-            await this.app.vault.modify(note, fileText);
-        }
-
-        if (scheduledCount > 0) {
-            const flashcardsInNoteAvgEase: number = totalNoteEase / scheduledCount;
-            const flashcardContribution: number = Math.min(
-                1.0,
-                Math.log(scheduledCount + 0.5) / Math.log(64),
-            );
-            return (
-                flashcardsInNoteAvgEase * flashcardContribution +
-                settings.baseEase * (1.0 - flashcardContribution)
-            );
-        }
-
-        return 0;
-    } */
 
     async loadPluginData(): Promise<void> {
         this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());

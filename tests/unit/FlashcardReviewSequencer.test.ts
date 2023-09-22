@@ -90,7 +90,7 @@ async function checkReviewResponse(reviewResponse: ReviewResponse, info: Info1):
     // Schedule for the reviewed card has been updated
     expect(card.scheduleInfo.ease).toEqual(info.cardQ2_PostReviewEase);
     expect(card.scheduleInfo.interval).toEqual(info.cardQ2_PostReviewInterval);
-    expect(card.scheduleInfo.dueDateTicks.unix).toEqual(moment(info.cardQ2_PostReviewDueDate).unix);
+    expect(card.scheduleInfo.dueDate.unix).toEqual(moment(info.cardQ2_PostReviewDueDate).unix);
 
     // Note text has been updated
     let expectedText: string = c.originalText.replace(info.cardQ2_PreReviewText, info.cardQ2_PostReviewText);

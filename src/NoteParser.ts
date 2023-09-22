@@ -17,8 +17,6 @@ export class NoteParser {
         let questions = await questionParser.createQuestionList(noteFile, folderTopicPath);
         let totalCards: number = questions.reduce((accumulator, q) => accumulator + q.cards.length, 0);
 
-        // throw `${noteText}, ${questions.length}, ${totalCards}`;
-        
         let result: Note = new Note(noteFile, questions);
         return result;
     }

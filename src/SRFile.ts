@@ -18,7 +18,7 @@ export interface ISRFile {
     write(content: string): Promise<void>;
 }
 
-export class ObsidianTFile implements ISRFile {
+export class SrTFile implements ISRFile {
     file: TFile;
     vault: Vault;
     metadataCache: MetadataCache;

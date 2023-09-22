@@ -6,8 +6,6 @@ import { CardFrontBack, CardFrontBackUtil } from "./QuestionType";
 import { SRSettings } from "./settings";
 import { ISRFile, UnitTestSRFile } from "./SRFile";
 import { TopicPath } from "./TopicPath";
-import { cyrb53 } from "./util/utils";
-import { getAllTagsFromText } from "src/util/utils";
 
 export class ParsedQuestionInfo { 
     cardType: CardType;
