@@ -1,5 +1,7 @@
 import { Card } from "./Card";
+import { FlashcardReviewMode } from "./FlashcardReviewSequencer";
 import { Question } from "./Question";
+import { IQuestionPostponementList } from "./QuestionPostponementList";
 import { TopicPath } from "./TopicPath";
 
 export enum CardListType {NewCard, DueCard, All}
@@ -544,4 +546,20 @@ export class Deck {
 
 
     } */
+}
+
+
+export class DeckTreeFilter {
+
+    static filterForReviewableCards(reviewableDeckTree: Deck): Deck {
+        return reviewableDeckTree.copyWithCardFilter((card) => 
+            !card.question.hasEditLaterTag);
+    }
+
+    static filterForRemainingCards(questionPostponementList: IQuestionPostponementList, deckTree: Deck, reviewMode: FlashcardReviewMode): Deck {
+        return deckTree.copyWithCardFilter((card) => 
+            ((reviewMode == FlashcardReviewMode.Cram) || card.isNew || card.isDue)
+            && !questionPostponementList.includes(card.question));
+    }
+
 }

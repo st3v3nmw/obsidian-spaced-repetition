@@ -28,7 +28,7 @@ class TestContext {
 
     async setSequencerDeckTreeFromOriginalText(): Promise<Deck> {
         let deck: Deck = await SampleItemDecks.createDeckFromFile(this.file, new TopicPath(["Root"]));
-        this.reviewSequencer.setDeckTree(deck);
+        this.reviewSequencer.setDeckTree(deck, deck);
         return deck;
     }
 
@@ -150,7 +150,7 @@ describe("setDeckTree", () => {
 
     test("Empty deck", () => {
         let c: TestContext = TestContext.Create(CardListType.DueCard, FlashcardReviewMode.Review, DEFAULT_SETTINGS, "");
-        c.reviewSequencer.setDeckTree(Deck.emptyDeck);
+        c.reviewSequencer.setDeckTree(Deck.emptyDeck, Deck.emptyDeck);
         expect(c.reviewSequencer.currentDeck).toEqual(null);
         expect(c.reviewSequencer.currentCard).toEqual(null);
     });

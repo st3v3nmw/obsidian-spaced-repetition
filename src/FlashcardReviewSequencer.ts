@@ -19,7 +19,7 @@ export interface IFlashcardReviewSequencer {
     get currentNote(): Note;
     get currentDeck(): Deck;
 
-    setDeckTree(deckTree: Deck): void;
+    setDeckTree(originalDeckTree: Deck, remainingDeckTree: Deck): void;
     setCurrentDeck(topicPath: TopicPath): void;
     getDeckStats(topicPath: TopicPath): DeckStats;
     skipCurrentCard(): void;
@@ -83,19 +83,10 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         return this.currentQuestion.note;
     }
 
-    setDeckTree(deckTree: Deck): void {
-        this.originalDeckTree = deckTree;
-        this.createFilteredDeckTrees();
+    setDeckTree(originalDeckTree: Deck, remainingDeckTree: Deck): void {
+        this.originalDeckTree = originalDeckTree;
+        this.remainingDeckTree = remainingDeckTree;
         this.setCurrentDeck(TopicPath.emptyPath);
-    }
-
-    private createFilteredDeckTrees(): void {
-        this.filteredDeckTree = this.originalDeckTree.copyWithCardFilter((card) => 
-            !card.question.hasEditLaterTag);
-
-        this.remainingDeckTree = this.filteredDeckTree.copyWithCardFilter((card) => 
-            ((this.reviewMode == FlashcardReviewMode.Cram) || card.isNew || card.isDue)
-            && !this.questionPostponementList.includes(card.question));
     }
 
     setCurrentDeck(topicPath: TopicPath): void {
@@ -105,7 +96,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     getDeckStats(topicPath: TopicPath): DeckStats {
-        let totalCount: number = this.filteredDeckTree.getDeck(topicPath).getCardCount(CardListType.All, true);
+        let totalCount: number = this.originalDeckTree.getDeck(topicPath).getCardCount(CardListType.All, true);
         let remainingDeck: Deck = this.remainingDeckTree.getDeck(topicPath);
         let newCount: number = remainingDeck.getCardCount(CardListType.NewCard, true);
         let dueCount: number = remainingDeck.getCardCount(CardListType.DueCard, true);

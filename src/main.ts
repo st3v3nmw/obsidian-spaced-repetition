@@ -26,7 +26,7 @@ import { t } from "src/lang/helpers";
 import { parse } from "src/parser";
 import { appIcon } from "src/icons/appicon";
 import { TopicPath } from "./TopicPath";
-import { CardListType, Deck } from "./Deck";
+import { CardListType, Deck, DeckTreeFilter } from "./Deck";
 import { Stats } from "./stats";
 import { FlashcardReviewMode, FlashcardReviewSequencer as FlashcardReviewSequencer, IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "./FlashcardReviewSequencer";
 import { DeckTreeSequentialIterator } from "./DeckTreeIterator";
@@ -76,19 +76,20 @@ export default class SRPlugin extends Plugin {
     public lastSelectedReviewDeck: string;
 
     public easeByPath: NoteEaseList;
-    private cardPostponementList: QuestionPostponementList;
+    private questionPostponementList: QuestionPostponementList;
     private incomingLinks: Record<string, LinkStat[]> = {};
     private pageranks: Record<string, number> = {};
     private dueNotesCount = 0;
     public dueDatesNotes: Record<number, number> = {}; // Record<# of days in future, due count>
 
     public deckTree: Deck = new Deck("root", null);
+    private remainingDeckTree: Deck;
     public cardStats: Stats;
 
     async onload(): Promise<void> {
         await this.loadPluginData();
         this.easeByPath = new NoteEaseList(this.data.settings);
-        this.cardPostponementList = new QuestionPostponementList(this, this.data.settings, this.data.buryList);
+        this.questionPostponementList = new QuestionPostponementList(this, this.data.settings, this.data.buryList);
 
         appIcon();
 
@@ -106,7 +107,7 @@ export default class SRPlugin extends Plugin {
         this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
             if (!this.syncLock) {
                 await this.sync();
-                this.openFlashcardModal(this.deckTree, FlashcardReviewMode.Review);
+                this.openFlashcardModal(this.deckTree, this.remainingDeckTree, FlashcardReviewMode.Review);
             }
         });
         
@@ -193,7 +194,7 @@ export default class SRPlugin extends Plugin {
             callback: async () => {
                 if (!this.syncLock) {
                     await this.sync();
-                    this.openFlashcardModal(this.deckTree, FlashcardReviewMode.Review);
+                    this.openFlashcardModal(this.deckTree, this.remainingDeckTree, FlashcardReviewMode.Review);
                 }
             },
         });
@@ -203,7 +204,7 @@ export default class SRPlugin extends Plugin {
             name: t("CRAM_ALL_CARDS"),
             callback: async () => {
                 await this.sync(true);
-                this.openFlashcardModal(this.deckTree, FlashcardReviewMode.Cram);
+                this.openFlashcardModal(this.deckTree, this.deckTree, FlashcardReviewMode.Cram);
             },
         });
 
@@ -213,9 +214,7 @@ export default class SRPlugin extends Plugin {
             callback: async () => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
-                    let deck: Deck = new Deck("root", null);
-                    const deckPath: TopicPath = this.findTopicPath(this.createSrTFile(openFile));
-                    this.openFlashcardModal(deck, FlashcardReviewMode.Review);
+                    this.openFlashcardModalForSingleNote(openFile, FlashcardReviewMode.Review);
                 }
             },
         });
@@ -226,7 +225,7 @@ export default class SRPlugin extends Plugin {
             callback: async () => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
-                    this.openFlashcardModalForSingleCard(openFile, FlashcardReviewMode.Cram);
+                    this.openFlashcardModalForSingleNote(openFile, FlashcardReviewMode.Cram);
                 }
             },
         });
@@ -258,22 +257,23 @@ export default class SRPlugin extends Plugin {
         this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).forEach((leaf) => leaf.detach());
     }
 
-    private async openFlashcardModalForSingleCard(noteFile: TFile, reviewMode: FlashcardReviewMode): Promise<void> {
+    private async openFlashcardModalForSingleNote(noteFile: TFile, reviewMode: FlashcardReviewMode): Promise<void> {
         const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(noteFile));
         let note: Note = await this.loadNote(noteFile, topicPath);
         
-        let deck = new Deck("root", null);
-        note.appendCardsToDeck(deck);
-        this.openFlashcardModal(deck, reviewMode);
+        let deckTree = new Deck("root", null);
+        note.appendCardsToDeck(deckTree);
+        let remainingDeckTree = DeckTreeFilter.filterForRemainingCards(this.questionPostponementList, deckTree, reviewMode);
+        this.openFlashcardModal(deckTree, deckTree, reviewMode);
     }
 
-    private openFlashcardModal(deck: Deck, reviewMode: FlashcardReviewMode): void {
+    private openFlashcardModal(fullDeckTree: Deck, remainingDeckTree: Deck, reviewMode: FlashcardReviewMode): void {
         let deckIterator = new DeckTreeSequentialIterator(CardListType.DueCard);
         let cardScheduleCalculator = new CardScheduleCalculator(this.data.settings, this.easeByPath);
         let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(reviewMode, deckIterator, 
-            this.data.settings, cardScheduleCalculator, this.cardPostponementList);
+            this.data.settings, cardScheduleCalculator, this.questionPostponementList);
 
-        reviewSequencer.setDeckTree(deck);
+        reviewSequencer.setDeckTree(fullDeckTree, remainingDeckTree);
         new FlashcardModal(this.app, this, this.data.settings, reviewSequencer, reviewMode).open();
     }
 
@@ -293,7 +293,7 @@ export default class SRPlugin extends Plugin {
         this.reviewDecks = {};
 
         // reset flashcards stuff
-        this.deckTree = new Deck("root", null);
+        let deckTree = new Deck("root", null);
 
         const now = window.moment(Date.now());
         const todayDate: string = now.format("YYYY-MM-DD");
@@ -337,7 +337,7 @@ export default class SRPlugin extends Plugin {
             if (topicPath.hasPath) {
                 let note: Note = await this.loadNote(noteFile, topicPath);
                 let flashcardsInNoteAvgEase: number = NoteEaseCalculator.Calculate(note, this.data.settings);
-                note.appendCardsToDeck(this.deckTree);
+                note.appendCardsToDeck(deckTree);
 
                 if (flashcardsInNoteAvgEase > 0) {
                     this.easeByPath.setEaseForPath(note.filePath, flashcardsInNoteAvgEase);
@@ -416,6 +416,10 @@ export default class SRPlugin extends Plugin {
             this.pageranks[node] = rank * 10000;
         });
 
+        // Reviewable cards are all except those with the "edit later" tag
+        this.deckTree = DeckTreeFilter.filterForReviewableCards(deckTree);
+        this.remainingDeckTree = DeckTreeFilter.filterForRemainingCards(this.questionPostponementList, this.deckTree, FlashcardReviewMode.Review);
+
         // sort the deck names
         this.deckTree.sortSubdecksList();
         let calc: DeckTreeStatsCalculator = new DeckTreeStatsCalculator();
@@ -442,8 +446,7 @@ export default class SRPlugin extends Plugin {
         this.statusBar.setText(
             t("STATUS_BAR", {
                 dueNotesCount: this.dueNotesCount,
-                dueFlashcardsCount: 100
-                /* dueFlashcardsCount: this.deckTree.dueFlashcardsCount, */
+                dueFlashcardsCount: this.remainingDeckTree.getCardCount(CardListType.All, true)
             }),
         );
 
