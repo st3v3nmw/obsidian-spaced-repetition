@@ -15,6 +15,7 @@ export interface IFlashcardReviewSequencer {
     get currentQuestion(): Question;
     get currentNote(): Note;
     get currentDeck(): Deck;
+    get originalDeckTree(): Deck;
 
     setDeckTree(originalDeckTree: Deck, remainingDeckTree: Deck): void;
     setCurrentDeck(topicPath: TopicPath): void;
@@ -42,7 +43,7 @@ export class DeckStats {
 export enum FlashcardReviewMode { Cram, Review };
 
 export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
-    private originalDeckTree: Deck;
+    private _originalDeckTree: Deck;
     private remainingDeckTree: Deck;
     private reviewMode: FlashcardReviewMode;
     private cardSequencer: IDeckTreeIterator;
@@ -80,7 +81,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     setDeckTree(originalDeckTree: Deck, remainingDeckTree: Deck): void {
-        this.originalDeckTree = originalDeckTree;
+        this._originalDeckTree = originalDeckTree;
         this.remainingDeckTree = remainingDeckTree;
         this.setCurrentDeck(TopicPath.emptyPath);
     }
@@ -91,8 +92,12 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         this.cardSequencer.nextCard();
     }
 
+    get originalDeckTree(): Deck {
+        return this._originalDeckTree;
+    }
+
     getDeckStats(topicPath: TopicPath): DeckStats {
-        let totalCount: number = this.originalDeckTree.getDeck(topicPath).getCardCount(CardListType.All, true);
+        let totalCount: number = this._originalDeckTree.getDeck(topicPath).getCardCount(CardListType.All, true);
         let remainingDeck: Deck = this.remainingDeckTree.getDeck(topicPath);
         let newCount: number = remainingDeck.getCardCount(CardListType.NewCard, true);
         let dueCount: number = remainingDeck.getCardCount(CardListType.DueCard, true);

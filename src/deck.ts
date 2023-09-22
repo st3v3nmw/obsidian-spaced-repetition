@@ -160,6 +160,7 @@ export class Deck {
         let indentStr: string = " ".repeat(indent * 4);
 
         result += `${indentStr}${this.deckName}\r\n`;
+        indentStr += "  ";
         for (let i = 0; i < this.newFlashcards.length; i++) {
             let card = this.newFlashcards[i];
             result += `${indentStr}New: ${i}: ${card.front}::${card.back}\r\n`;

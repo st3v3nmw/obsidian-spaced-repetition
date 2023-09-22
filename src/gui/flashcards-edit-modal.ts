@@ -4,7 +4,6 @@ import SRPlugin from "src/main";
 
 // from https://github.com/chhoumann/quickadd/blob/bce0b4cdac44b867854d6233796e3406dfd163c6/src/gui/GenericInputPrompt/GenericInputPrompt.ts#L5
 export class FlashcardEditModal extends Modal {
-    public plugin: SRPlugin;
     public input: string;
     public waitForClose: Promise<string>;
 
@@ -15,13 +14,12 @@ export class FlashcardEditModal extends Modal {
     private inputComponent: TextAreaComponent;
     private readonly modalText: string;
 
-    public static Prompt(app: App, plugin: SRPlugin, placeholder: string): Promise<string> {
-        const newPromptModal = new FlashcardEditModal(app, plugin, placeholder);
+    public static Prompt(app: App, placeholder: string): Promise<string> {
+        const newPromptModal = new FlashcardEditModal(app, placeholder);
         return newPromptModal.waitForClose;
     }
-    constructor(app: App, plugin: SRPlugin, existingText: string) {
+    constructor(app: App, existingText: string) {
         super(app);
-        this.plugin = plugin;
         this.titleEl.setText(t("EDIT_CARD"));
         this.titleEl.addClass("sr-centered");
         this.modalText = existingText;

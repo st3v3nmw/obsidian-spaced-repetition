@@ -26,11 +26,12 @@ import { unwatchFile } from "fs";
 import { Card } from "../Card";
 import { CardListType, Deck } from "../Deck";
 import { CardType, Question } from "../Question";
-import { FlashcardReviewMode, IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "src/FlashcardReviewSequencer";
+import { DeckStats, FlashcardReviewMode, IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "src/FlashcardReviewSequencer";
 import { FlashcardEditModal } from "./flashcards-edit-modal";
 import { Note } from "src/Note";
 import { RenderMarkdownWrapper } from "src/util/RenderMarkdownWrapper";
 import { CardScheduleCalculator, CardScheduleInfo } from "src/CardSchedule";
+import { TopicPath } from "src/TopicPath";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -142,6 +143,7 @@ export class FlashcardModal extends Modal {
 
     renderDecksList(): void {
         this.mode = FlashcardModalMode.DecksList;
+        let stats: DeckStats = this.reviewSequencer.getDeckStats(TopicPath.emptyPath);
         this.titleEl.setText(t("DECKS"));
         this.titleEl.innerHTML += (
             <p style="margin:0px;line-height:12px;">
@@ -150,28 +152,28 @@ export class FlashcardModal extends Modal {
                     aria-label={t("DUE_CARDS")}
                     class="tag-pane-tag-count tree-item-flair sr-deck-counts"
                 >
-                    {this.plugin.deckTree.getCardCount(CardListType.DueCard, true).toString()}
+                    {stats.dueCount.toString()}
                 </span>
                 <span
                     style="background-color:#2196f3;"
                     aria-label={t("NEW_CARDS")}
                     class="tag-pane-tag-count tree-item-flair sr-deck-counts"
                 >
-                    {this.plugin.deckTree.getCardCount(CardListType.NewCard, true).toString()}
+                    {stats.newCount.toString()}
                 </span>
                 <span
                     style="background-color:#ff7043;"
                     aria-label={t("TOTAL_CARDS")}
                     class="tag-pane-tag-count tree-item-flair sr-deck-counts"
                 >
-                    {this.plugin.deckTree.getCardCount(CardListType.All, true).toString()}
+                    {stats.totalCount.toString()}
                 </span>
             </p>
         );
         this.contentEl.empty();
         this.contentEl.setAttribute("id", "sr-flashcard-view");
 
-        for (const deck of this.plugin.deckTree.subdecks) {
+        for (const deck of this.reviewSequencer.originalDeckTree.subdecks) {
             this.renderDeck(deck, this.contentEl, this);
         }
     }
@@ -249,8 +251,11 @@ export class FlashcardModal extends Modal {
 
     startReviewOfDeck(deck: Deck) {
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
-        this.setupCardsView();
-        this.showCurrentCard();
+        if (this.reviewSequencer.hasCurrentCard) {
+            this.setupCardsView();
+            this.showCurrentCard();
+        } else
+            this.renderDecksList();
     }
 
     setupCardsView(): void {
@@ -388,7 +393,7 @@ export class FlashcardModal extends Modal {
         let currentQ: Question = this.reviewSequencer.currentQuestion;
         let textPrompt = currentQ.questionText.formatForNote();
 
-        const editModal = FlashcardEditModal.Prompt(this.app, this.plugin, textPrompt);
+        const editModal = FlashcardEditModal.Prompt(this.app, textPrompt);
         editModal
             .then(async (modifiedCardText) => {
                 this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
