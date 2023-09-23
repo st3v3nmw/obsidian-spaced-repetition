@@ -1,5 +1,5 @@
 import { CardScheduleCalculator } from "src/CardSchedule";
-import { DeckTreeSequentialIterator, IDeckTreeIterator } from "src/DeckTreeIterator";
+import { DeckTreeSequentialIterator, IDeckTreeIterator, IIteratorOrder } from "src/DeckTreeIterator";
 import { FlashcardReviewMode, FlashcardReviewSequencer, IFlashcardReviewSequencer } from "src/FlashcardReviewSequencer";
 import { TopicPath } from "src/TopicPath";
 import { CardListType, Deck } from "src/Deck";
@@ -11,6 +11,7 @@ import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 import moment from "moment";
 import { INoteEaseList, NoteEaseList } from "src/NoteEaseList";
 import { QuestionPostponementList, IQuestionPostponementList } from "src/QuestionPostponementList";
+import { order_DueFirst_Sequential } from "./DeckTreeIterator.test";
 
 class TestContext {
     cardSequencer: IDeckTreeIterator;
@@ -32,8 +33,8 @@ class TestContext {
         return deck;
     }
 
-    static Create(cardListType: CardListType, reviewMode: FlashcardReviewMode, settings: SRSettings, text: string, fakeFilePath?: string): TestContext {
-        let cardSequencer: IDeckTreeIterator = new DeckTreeSequentialIterator(cardListType);
+    static Create(iteratorOrder: IIteratorOrder, reviewMode: FlashcardReviewMode, settings: SRSettings, text: string, fakeFilePath?: string): TestContext {
+        let cardSequencer: IDeckTreeIterator = new DeckTreeSequentialIterator(iteratorOrder);
         let noteEaseList = new NoteEaseList(settings);
         let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(settings, noteEaseList);
         let cardPostponementList: QuestionPostponementList = new QuestionPostponementList(null, settings, []);
@@ -72,7 +73,7 @@ async function checkReviewResponse(reviewResponse: ReviewResponse, info: Info1):
 #flashcards Q3::A3`;
 
     let str: string = moment().millisecond().toString();
-    let c: TestContext = TestContext.Create(CardListType.DueCard, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text, str);
+    let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text, str);
     let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
 
     // State before calling processReview
@@ -109,7 +110,7 @@ async function setupSample1(reviewMode: FlashcardReviewMode, settings: SRSetting
 #flashcards/science/physics Q5::A5 <!--SR:!2023-09-02,4,270-->
 #flashcards/math Q6::A6`;
     
-    let c: TestContext = TestContext.Create(CardListType.DueCard, reviewMode, settings, text);
+    let c: TestContext = TestContext.Create(order_DueFirst_Sequential, reviewMode, settings, text);
     await c.setSequencerDeckTreeFromOriginalText();
     return c;
 }
@@ -129,7 +130,7 @@ async function setupSample2(reviewMode: FlashcardReviewMode): Promise<TestContex
 <!--SR:!2023-09-02,4,270!2023-09-02,5,270!2023-09-02,6,270-->
 `;
     
-    let c: TestContext = TestContext.Create(CardListType.DueCard, reviewMode, DEFAULT_SETTINGS, text);
+    let c: TestContext = TestContext.Create(order_DueFirst_Sequential, reviewMode, DEFAULT_SETTINGS, text);
     await c.setSequencerDeckTreeFromOriginalText();
     return c;
 }
@@ -149,7 +150,7 @@ beforeAll(() =>  {
 describe("setDeckTree", () => {
 
     test("Empty deck", () => {
-        let c: TestContext = TestContext.Create(CardListType.DueCard, FlashcardReviewMode.Review, DEFAULT_SETTINGS, "");
+        let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Review, DEFAULT_SETTINGS, "");
         c.reviewSequencer.setDeckTree(Deck.emptyDeck, Deck.emptyDeck);
         expect(c.reviewSequencer.currentDeck).toEqual(null);
         expect(c.reviewSequencer.currentCard).toEqual(null);
@@ -161,7 +162,7 @@ describe("setDeckTree", () => {
 Q1::A1
 Q2::A2
 Q3::A3`;
-        let c: TestContext = TestContext.Create(CardListType.DueCard, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text);
+        let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text);
         let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
         expect(deck.newFlashcards.length).toEqual(3);
         
@@ -216,7 +217,7 @@ describe("skipCurrentCard", () => {
 <!--SR:!2023-09-02,4,270!2023-09-02,5,270!2023-09-02,6,270-->
 `;
             
-        let c: TestContext = TestContext.Create(CardListType.DueCard, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text);
+        let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text);
         await c.setSequencerDeckTreeFromOriginalText();
         expect(c.reviewSequencer.currentQuestion.cards.length).toEqual(1);
         expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
@@ -305,7 +306,7 @@ describe("processReview", () => {
                     #flashcards Q2::A2 <!--SR:!2023-09-02,5,270-->
                     #flashcards Q3::A3 <!--SR:!2023-09-02,6,270-->`;
 
-                let c: TestContext = TestContext.Create(CardListType.DueCard, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text);
+                let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text);
                 let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
 
                 // State before calling processReview
@@ -435,7 +436,7 @@ describe("updateCurrentQuestionText", () => {
 });
 
 async function checkUpdateCurrentQuestionText(noteText: string, updatedQ: string, originalStr: string, updatedStr: string, settings: SRSettings): Promise<TestContext> {
-    let c: TestContext = TestContext.Create(CardListType.DueCard, FlashcardReviewMode.Review, settings, noteText);
+    let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Review, settings, noteText);
     await c.setSequencerDeckTreeFromOriginalText();
     expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
 

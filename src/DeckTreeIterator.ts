@@ -3,6 +3,20 @@ import { CardListType, Deck } from "./Deck";
 import { Question } from "./Question";
 import { TopicPath } from "./TopicPath";
 
+export enum CardListOrder {NewFirst, DueFirst, Random}
+export enum OrderMethod {Sequential, Random}
+
+export interface IIteratorOrder {
+    // Choose decks in sequential order, or randomly
+    deckOrder: OrderMethod;
+
+    // Within a deck, choose: new cards first, due cards first, or randomly
+    cardListOrder: CardListOrder;
+
+    // Within a card list (i.e. either new or due), choose cards sequentially or randomly
+    cardOrder: OrderMethod;
+}
+
 export interface IDeckTreeIterator {
     get currentDeck(): Deck;
     get currentCard(): Card;
@@ -17,8 +31,8 @@ export interface IDeckTreeIterator {
 
 class SingleDeckIterator {
     deck: Deck;
+    iteratorOrder: IIteratorOrder;
     preferredCardListType: CardListType;
-
     cardIdx?: number;
     cardListType?: CardListType;
 
@@ -32,8 +46,9 @@ class SingleDeckIterator {
         return this.deck.getCard(this.cardIdx, this.cardListType);
     }
 
-    constructor(preferredCardListType: CardListType) {
-        this.preferredCardListType = preferredCardListType;
+    constructor(iteratorOrder: IIteratorOrder) {
+        this.iteratorOrder = iteratorOrder;
+        this.preferredCardListType = this.iteratorOrder.cardListOrder == CardListOrder.DueFirst ? CardListType.DueCard: CardListType.NewCard;
     }
 
     setDeck(deck: Deck): void {
@@ -105,6 +120,7 @@ class SingleDeckIterator {
 export class DeckTreeSequentialIterator implements IDeckTreeIterator {
     deckTree: Deck;
     preferredCardListType: CardListType;
+    iteratorOrder: IIteratorOrder;
 
     singleDeckIterator: SingleDeckIterator;
     deckArray: Deck[];
@@ -126,9 +142,9 @@ export class DeckTreeSequentialIterator implements IDeckTreeIterator {
         return this.singleDeckIterator.currentCard;
     }
 
-    constructor(preferredCardListType: CardListType) {
-        this.preferredCardListType = preferredCardListType;
-        this.singleDeckIterator = new SingleDeckIterator(preferredCardListType);
+    constructor(iteratorOrder: IIteratorOrder) {
+        this.singleDeckIterator = new SingleDeckIterator(iteratorOrder);
+        this.iteratorOrder = iteratorOrder;
     }
 
     setDeck(deck: Deck): void {

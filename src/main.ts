@@ -28,7 +28,7 @@ import { TopicPath } from "./TopicPath";
 import { CardListType, Deck, DeckTreeFilter } from "./Deck";
 import { Stats } from "./stats";
 import { FlashcardReviewMode, FlashcardReviewSequencer as FlashcardReviewSequencer, IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "./FlashcardReviewSequencer";
-import { DeckTreeSequentialIterator } from "./DeckTreeIterator";
+import { CardListOrder, DeckTreeSequentialIterator, IDeckTreeIterator, IIteratorOrder, OrderMethod } from "./DeckTreeIterator";
 import { CardScheduleCalculator } from "./CardSchedule";
 import { Note } from "./Note";
 import { NoteFileLoader } from "./NoteFileLoader";
@@ -267,13 +267,22 @@ export default class SRPlugin extends Plugin {
     }
 
     private openFlashcardModal(fullDeckTree: Deck, remainingDeckTree: Deck, reviewMode: FlashcardReviewMode): void {
-        let deckIterator = new DeckTreeSequentialIterator(CardListType.DueCard);
+        let deckIterator = SRPlugin.createDeckTreeIterator(this.data.settings);
         let cardScheduleCalculator = new CardScheduleCalculator(this.data.settings, this.easeByPath);
         let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(reviewMode, deckIterator, 
             this.data.settings, cardScheduleCalculator, this.questionPostponementList);
 
         reviewSequencer.setDeckTree(fullDeckTree, remainingDeckTree);
         new FlashcardModal(this.app, this, this.data.settings, reviewSequencer, reviewMode).open();
+    }
+
+    private static createDeckTreeIterator(settings: SRSettings): IDeckTreeIterator {
+        let iteratorOrder: IIteratorOrder = {
+            deckOrder: OrderMethod.Sequential, 
+            cardListOrder: CardListOrder.DueFirst, 
+            cardOrder: settings.randomizeCardOrder ? OrderMethod.Random : OrderMethod.Sequential
+        };
+        return new DeckTreeSequentialIterator(iteratorOrder);
     }
 
     async sync(ignoreStats = false): Promise<void> {
