@@ -134,6 +134,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         // Move/delete the card
         if (response == ReviewResponse.Reset) {
             this.cardSequencer.moveCurrentCardToEndOfList();
+            this.cardSequencer.nextCard();
         } else
             this.deleteCurrentCard();
     }
@@ -142,8 +143,10 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
         if (response == ReviewResponse.Easy)
             this.deleteCurrentCard();
-        else
-            this.cardSequencer.cycleNextCard();
+        else {
+            this.cardSequencer.moveCurrentCardToEndOfList();
+            this.cardSequencer.nextCard();
+        }
     }
 
 

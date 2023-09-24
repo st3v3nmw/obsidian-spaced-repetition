@@ -28,7 +28,7 @@ import { TopicPath } from "./TopicPath";
 import { CardListType, Deck, DeckTreeFilter } from "./Deck";
 import { Stats } from "./stats";
 import { FlashcardReviewMode, FlashcardReviewSequencer as FlashcardReviewSequencer, IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "./FlashcardReviewSequencer";
-import { CardListOrder, DeckTreeSequentialIterator, IDeckTreeIterator, IIteratorOrder, OrderMethod } from "./DeckTreeIterator";
+import { CardListOrder, DeckTreeIterator, IDeckTreeIterator, IIteratorOrder, OrderMethod } from "./DeckTreeIterator";
 import { CardScheduleCalculator } from "./CardSchedule";
 import { Note } from "./Note";
 import { NoteFileLoader } from "./NoteFileLoader";
@@ -282,7 +282,7 @@ export default class SRPlugin extends Plugin {
             cardListOrder: CardListOrder.DueFirst, 
             cardOrder: settings.randomizeCardOrder ? OrderMethod.Random : OrderMethod.Sequential
         };
-        return new DeckTreeSequentialIterator(iteratorOrder);
+        return new DeckTreeIterator(iteratorOrder);
     }
 
     async sync(ignoreStats = false): Promise<void> {

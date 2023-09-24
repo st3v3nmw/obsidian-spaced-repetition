@@ -1,5 +1,5 @@
 import { CardScheduleCalculator } from "src/CardSchedule";
-import { DeckTreeSequentialIterator, IDeckTreeIterator, IIteratorOrder } from "src/DeckTreeIterator";
+import { DeckTreeIterator, IDeckTreeIterator, IIteratorOrder } from "src/DeckTreeIterator";
 import { FlashcardReviewMode, FlashcardReviewSequencer, IFlashcardReviewSequencer } from "src/FlashcardReviewSequencer";
 import { TopicPath } from "src/TopicPath";
 import { CardListType, Deck } from "src/Deck";
@@ -34,7 +34,7 @@ class TestContext {
     }
 
     static Create(iteratorOrder: IIteratorOrder, reviewMode: FlashcardReviewMode, settings: SRSettings, text: string, fakeFilePath?: string): TestContext {
-        let cardSequencer: IDeckTreeIterator = new DeckTreeSequentialIterator(iteratorOrder);
+        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder);
         let noteEaseList = new NoteEaseList(settings);
         let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(settings, noteEaseList);
         let cardPostponementList: QuestionPostponementList = new QuestionPostponementList(null, settings, []);
@@ -65,7 +65,7 @@ interface Info1 {
     cardQ2_PostReviewText: string
 }
 
-async function checkReviewResponse(reviewResponse: ReviewResponse, info: Info1): Promise<void> {
+async function checkReviewResponse_ReviewMode(reviewResponse: ReviewResponse, info: Info1): Promise<void> {
 
     let text: string = `
 #flashcards Q1::A1
@@ -96,6 +96,42 @@ async function checkReviewResponse(reviewResponse: ReviewResponse, info: Info1):
     // Note text has been updated
     let expectedText: string = c.originalText.replace(info.cardQ2_PreReviewText, info.cardQ2_PostReviewText);
     expect(await c.file.read()).toEqual(expectedText);
+};
+
+async function checkReviewResponse_CramMode(reviewResponse: ReviewResponse): Promise<TestContext> {
+
+    let text: string = `
+#flashcards Q1::A1 <!--SR:!2023-09-02,4,270-->
+#flashcards Q2::A2 <!--SR:!2023-09-02,3,270-->
+#flashcards Q3::A3 <!--SR:!2023-09-02,5,270-->
+#flashcards Q4::A4 <!--SR:!2023-09-02,5,270-->`;
+
+    let str: string = moment().millisecond().toString();
+    let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Cram, DEFAULT_SETTINGS, text, str);
+    let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
+
+    // State before calling processReview
+    let card = c.reviewSequencer.currentCard;
+    expect(card.front).toEqual("Q1");
+    let expectInfo = {
+        ease: 270, 
+        interval: 4
+    };
+    expect(card.scheduleInfo).toMatchObject(expectInfo);
+
+    // State after calling processReview - next card
+    await c.reviewSequencer.processReview(reviewResponse);
+    expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
+
+    // No change to schedule for reviewed card in cram mode
+    expect(card.scheduleInfo).toMatchObject(expectInfo);
+    expect(card.scheduleInfo.dueDate.unix).toEqual(moment("2023-09-02").unix);
+
+    // Note text remains the same
+    let expectedText: string = c.originalText;
+    expect(await c.file.read()).toEqual(expectedText);
+
+    return c;
 };
 
 async function setupSample1(reviewMode: FlashcardReviewMode, settings: SRSettings): Promise<TestContext> {
@@ -357,9 +393,41 @@ describe("processReview", () => {
                     cardQ2_PostReviewText: `Q2::A2
 <!--SR:!2023-10-06,30,290-->`             
                 };
-                await checkReviewResponse(ReviewResponse.Easy, expected);
+                await checkReviewResponse_ReviewMode(ReviewResponse.Easy, expected);
             });
         });
+    });
+
+    describe("FlashcardReviewMode.Cram", () => {
+        describe("ReviewResponse.Easy", () => {
+            test("Next card after reviewed card becomes current; reviewed easy card doesn't resurface", async () => {
+                // [Q1, Q2, Q3] review Q1, then current becomes Q2
+                let c: TestContext = await checkReviewResponse_CramMode(ReviewResponse.Easy);
+                expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
+                skipThenCheckCardFront(c.reviewSequencer, "Q3");
+                skipThenCheckCardFront(c.reviewSequencer, "Q4");
+
+                c.reviewSequencer.skipCurrentCard();
+                expect(c.reviewSequencer.hasCurrentCard).toEqual(false);
+        
+            });
+        });
+
+        describe("ReviewResponse.Hard", () => {
+            test("Next card after reviewed card becomes current; reviewed hard card seen again", async () => {
+                // [Q1, Q2, Q3] review Q1, then current becomes Q2
+                let c: TestContext = await checkReviewResponse_CramMode(ReviewResponse.Hard);
+                expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
+                skipThenCheckCardFront(c.reviewSequencer, "Q3");
+                skipThenCheckCardFront(c.reviewSequencer, "Q4");
+                skipThenCheckCardFront(c.reviewSequencer, "Q1");
+
+                c.reviewSequencer.skipCurrentCard();
+                expect(c.reviewSequencer.hasCurrentCard).toEqual(false);
+        
+            });
+        });
+
     });
 });
 

@@ -2,6 +2,7 @@ import { Card } from "./Card";
 import { CardListType, Deck } from "./Deck";
 import { Question } from "./Question";
 import { TopicPath } from "./TopicPath";
+import { globalRandomNumberProvider } from "./util/RandomNumberProvider";
 
 export enum CardListOrder {NewFirst, DueFirst, Random}
 export enum OrderMethod {Sequential, Random}
@@ -53,27 +54,26 @@ class SingleDeckIterator {
 
     setDeck(deck: Deck): void {
         this.deck = deck;
+        this.setCardListType(null);
+    }
+
+    private setCardListType(cardListType?: CardListType): void {
+        this.cardListType = cardListType;
         this.cardIdx = null;
-        this.cardListType = null;
     }
 
     nextCard(): boolean {
-        if (this.cardIdx == null) {
-            this.cardIdx = -1;
-            this.cardListType = this.preferredCardListType;
+        // First return cards in the preferred list
+        if (this.cardListType == null) {
+            this.setCardListType(this.preferredCardListType);
         }
 
-        let cardList: Card[] = this.deck.getCardListForCardType(this.cardListType);
-        this.cardIdx++;
-        if (this.cardIdx == cardList.length) {
+        if (!this.nextCardWithinList()) {
             if (this.cardListType == this.preferredCardListType) {
-                // Try the non-preferred list type
-                this.cardListType = Deck.otherListType(this.cardListType);
-                this.cardIdx = 0;
-                cardList = this.deck.getCardListForCardType(this.cardListType);
-                if (this.cardIdx == cardList.length) {
-                    this.cardIdx = null;
-                    this.cardListType = null;
+                // Nothing left in the preferred list, so try the non-preferred list type
+                this.setCardListType(Deck.otherListType(this.cardListType));
+                if (!this.nextCardWithinList()) {
+                    this.setCardListType(null);
                 }
             }
             else {
@@ -81,6 +81,29 @@ class SingleDeckIterator {
             }
         }
         return this.cardIdx != null;
+    }
+
+    private nextCardWithinList(): boolean {
+        let result: boolean = false;
+        let cardList: Card[] = this.deck.getCardListForCardType(this.cardListType);
+
+        // Delete the current card so we don't return it again
+        if (this.hasCurrentCard) {
+            this.deleteCurrentCard();
+        }
+        result = (cardList.length > 0);
+        if (result) {
+            switch (this.iteratorOrder.cardOrder) {
+                case OrderMethod.Sequential:
+                    this.cardIdx = 0;
+                    break;
+
+                case OrderMethod.Random:
+                    this.cardIdx = globalRandomNumberProvider.getInteger(0, cardList.length - 1);
+                    break;
+            }
+        }
+        return result;
     }
 
     deleteCurrentQuestion(): void {
@@ -91,23 +114,28 @@ class SingleDeckIterator {
             this.deck.deleteCardAtIndex(this.cardIdx, this.cardListType);
         }
         while ((this.cardIdx < cards.length) && Object.is(q, cards[this.cardIdx].question))
-        this.cardIdx--;
+        this.setNoCurrentCard();
     }
 
     deleteCurrentCard(): void {
         this.ensureCurrentCard();
         this.deck.deleteCardAtIndex(this.cardIdx, this.cardListType);
-        this.cardIdx--;
+        this.setNoCurrentCard();
     }
 
     moveCurrentCardToEndOfList(): void {
         this.ensureCurrentCard();
         let cardList: Card[] = this.deck.getCardListForCardType(this.cardListType);
-        if (this.cardIdx == cardList.length - 1)
+        if (cardList.length <= 1)
             return;
         let card = this.currentCard;
         this.deck.deleteCardAtIndex(this.cardIdx, this.cardListType);
         this.deck.appendCard(TopicPath.emptyPath, card);
+        this.setNoCurrentCard();
+    }
+
+    private setNoCurrentCard() {
+        this.cardIdx = null;
     }
 
     private ensureCurrentCard() {
@@ -117,7 +145,7 @@ class SingleDeckIterator {
 
 }
 
-export class DeckTreeSequentialIterator implements IDeckTreeIterator {
+export class DeckTreeIterator implements IDeckTreeIterator {
     deckTree: Deck;
     preferredCardListType: CardListType;
     iteratorOrder: IIteratorOrder;
