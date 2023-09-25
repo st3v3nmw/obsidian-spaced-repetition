@@ -20,7 +20,7 @@ export class Note {
     constructor(file: ISRFile, questionList: Question[]) {
         this.file = file;
         this.questionList = questionList;
-        questionList.forEach((question) => question.note = this);
+        questionList.forEach((question) => (question.note = this));
     }
 
     appendCardsToDeck(deck: Deck): void {
@@ -48,6 +48,6 @@ export class Note {
             }
         }
         await this.file.write(fileText);
-        this.questionList.forEach((question) => question.hasChanged = false);
+        this.questionList.forEach((question) => (question.hasChanged = false));
     }
 }

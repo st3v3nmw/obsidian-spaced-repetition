@@ -27,8 +27,19 @@ import { appIcon } from "src/icons/appicon";
 import { TopicPath } from "./TopicPath";
 import { CardListType, Deck, DeckTreeFilter } from "./Deck";
 import { Stats } from "./stats";
-import { FlashcardReviewMode, FlashcardReviewSequencer as FlashcardReviewSequencer, IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "./FlashcardReviewSequencer";
-import { CardListOrder, DeckTreeIterator, IDeckTreeIterator, IIteratorOrder, IteratorDeckSource, OrderMethod } from "./DeckTreeIterator";
+import {
+    FlashcardReviewMode,
+    FlashcardReviewSequencer as FlashcardReviewSequencer,
+    IFlashcardReviewSequencer as IFlashcardReviewSequencer,
+} from "./FlashcardReviewSequencer";
+import {
+    CardListOrder,
+    DeckTreeIterator,
+    IDeckTreeIterator,
+    IIteratorOrder,
+    IteratorDeckSource,
+    OrderMethod,
+} from "./DeckTreeIterator";
 import { CardScheduleCalculator } from "./CardSchedule";
 import { Note } from "./Note";
 import { NoteFileLoader } from "./NoteFileLoader";
@@ -88,7 +99,11 @@ export default class SRPlugin extends Plugin {
     async onload(): Promise<void> {
         await this.loadPluginData();
         this.easeByPath = new NoteEaseList(this.data.settings);
-        this.questionPostponementList = new QuestionPostponementList(this, this.data.settings, this.data.buryList);
+        this.questionPostponementList = new QuestionPostponementList(
+            this,
+            this.data.settings,
+            this.data.buryList,
+        );
 
         appIcon();
 
@@ -106,10 +121,13 @@ export default class SRPlugin extends Plugin {
         this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
             if (!this.syncLock) {
                 await this.sync();
-                this.openFlashcardModal(this.deckTree, this.remainingDeckTree, FlashcardReviewMode.Review);
+                this.openFlashcardModal(
+                    this.deckTree,
+                    this.remainingDeckTree,
+                    FlashcardReviewMode.Review,
+                );
             }
         });
-        
 
         if (!this.data.settings.disableFileMenuReviewOptions) {
             this.registerEvent(
@@ -193,7 +211,11 @@ export default class SRPlugin extends Plugin {
             callback: async () => {
                 if (!this.syncLock) {
                     await this.sync();
-                    this.openFlashcardModal(this.deckTree, this.remainingDeckTree, FlashcardReviewMode.Review);
+                    this.openFlashcardModal(
+                        this.deckTree,
+                        this.remainingDeckTree,
+                        FlashcardReviewMode.Review,
+                    );
                 }
             },
         });
@@ -256,21 +278,40 @@ export default class SRPlugin extends Plugin {
         this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).forEach((leaf) => leaf.detach());
     }
 
-    private async openFlashcardModalForSingleNote(noteFile: TFile, reviewMode: FlashcardReviewMode): Promise<void> {
+    private async openFlashcardModalForSingleNote(
+        noteFile: TFile,
+        reviewMode: FlashcardReviewMode,
+    ): Promise<void> {
         const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(noteFile));
         let note: Note = await this.loadNote(noteFile, topicPath);
-        
+
         let deckTree = new Deck("root", null);
         note.appendCardsToDeck(deckTree);
-        let remainingDeckTree = DeckTreeFilter.filterForRemainingCards(this.questionPostponementList, deckTree, reviewMode);
+        let remainingDeckTree = DeckTreeFilter.filterForRemainingCards(
+            this.questionPostponementList,
+            deckTree,
+            reviewMode,
+        );
         this.openFlashcardModal(deckTree, remainingDeckTree, reviewMode);
     }
 
-    private openFlashcardModal(fullDeckTree: Deck, remainingDeckTree: Deck, reviewMode: FlashcardReviewMode): void {
+    private openFlashcardModal(
+        fullDeckTree: Deck,
+        remainingDeckTree: Deck,
+        reviewMode: FlashcardReviewMode,
+    ): void {
         let deckIterator = SRPlugin.createDeckTreeIterator(this.data.settings);
-        let cardScheduleCalculator = new CardScheduleCalculator(this.data.settings, this.easeByPath);
-        let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(reviewMode, deckIterator, 
-            this.data.settings, cardScheduleCalculator, this.questionPostponementList);
+        let cardScheduleCalculator = new CardScheduleCalculator(
+            this.data.settings,
+            this.easeByPath,
+        );
+        let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(
+            reviewMode,
+            deckIterator,
+            this.data.settings,
+            cardScheduleCalculator,
+            this.questionPostponementList,
+        );
 
         reviewSequencer.setDeckTree(fullDeckTree, remainingDeckTree);
         new FlashcardModal(this.app, this, this.data.settings, reviewSequencer, reviewMode).open();
@@ -278,9 +319,9 @@ export default class SRPlugin extends Plugin {
 
     private static createDeckTreeIterator(settings: SRSettings): IDeckTreeIterator {
         let iteratorOrder: IIteratorOrder = {
-            deckOrder: OrderMethod.Sequential, 
-            cardListOrder: CardListOrder.DueFirst, 
-            cardOrder: settings.randomizeCardOrder ? OrderMethod.Random : OrderMethod.Sequential
+            deckOrder: OrderMethod.Sequential,
+            cardListOrder: CardListOrder.DueFirst,
+            cardOrder: settings.randomizeCardOrder ? OrderMethod.Random : OrderMethod.Sequential,
         };
         return new DeckTreeIterator(iteratorOrder, IteratorDeckSource.UpdatedByIterator);
     }
@@ -344,7 +385,10 @@ export default class SRPlugin extends Plugin {
             const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(noteFile));
             if (topicPath.hasPath) {
                 let note: Note = await this.loadNote(noteFile, topicPath);
-                let flashcardsInNoteAvgEase: number = NoteEaseCalculator.Calculate(note, this.data.settings);
+                let flashcardsInNoteAvgEase: number = NoteEaseCalculator.Calculate(
+                    note,
+                    this.data.settings,
+                );
                 note.appendCardsToDeck(fullDeckTree);
 
                 if (flashcardsInNoteAvgEase > 0) {
@@ -402,8 +446,7 @@ export default class SRPlugin extends Plugin {
 
             var ease;
             if (this.easeByPath.hasEaseForPath(noteFile.path)) {
-                ease = 
-                    (this.easeByPath.getEaseByPath(noteFile.path) + frontmatter["sr-ease"]) / 2;
+                ease = (this.easeByPath.getEaseByPath(noteFile.path) + frontmatter["sr-ease"]) / 2;
             } else {
                 ease = frontmatter["sr-ease"];
             }
@@ -429,10 +472,14 @@ export default class SRPlugin extends Plugin {
 
         // sort the deck names
         this.deckTree.sortSubdecksList();
-        this.remainingDeckTree = DeckTreeFilter.filterForRemainingCards(this.questionPostponementList, this.deckTree, FlashcardReviewMode.Review);
+        this.remainingDeckTree = DeckTreeFilter.filterForRemainingCards(
+            this.questionPostponementList,
+            this.deckTree,
+            FlashcardReviewMode.Review,
+        );
         let calc: DeckTreeStatsCalculator = new DeckTreeStatsCalculator();
         this.cardStats = calc.calculate(this.deckTree);
-        
+
         if (this.data.settings.showDebugMessages) {
             console.log(`SR: ${t("EASES")}`, this.easeByPath.dict);
             console.log(`SR: ${t("DECKS")}`, this.deckTree);
@@ -454,7 +501,7 @@ export default class SRPlugin extends Plugin {
         this.statusBar.setText(
             t("STATUS_BAR", {
                 dueNotesCount: this.dueNotesCount,
-                dueFlashcardsCount: this.remainingDeckTree.getCardCount(CardListType.All, true)
+                dueFlashcardsCount: this.remainingDeckTree.getCardCount(CardListType.All, true),
             }),
         );
 
@@ -465,10 +512,8 @@ export default class SRPlugin extends Plugin {
     async loadNote(noteFile: TFile, topicPath: TopicPath): Promise<Note> {
         let loader: NoteFileLoader = new NoteFileLoader(this.data.settings);
         let note: Note = await loader.load(this.createSrTFile(noteFile), topicPath);
-        if (note.hasChanged)
-            note.writeNoteFile(this.data.settings);
+        if (note.hasChanged) note.writeNoteFile(this.data.settings);
         return note;
-
     }
 
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {

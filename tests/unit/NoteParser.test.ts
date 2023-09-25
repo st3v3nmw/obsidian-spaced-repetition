@@ -6,12 +6,11 @@ import { Question } from "src/Question";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 
-
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 
-beforeAll(() =>  {
+beforeAll(() => {
     setupStaticDateProvider_20230906();
-})
+});
 
 describe("Multiple questions in the text", () => {
     test("SingleLineBasic: No schedule info", async () => {
@@ -25,8 +24,5 @@ Q3::A3
         let note: Note = await parser.parse(file, folderTopicPath);
         let questionList = note.questionList;
         expect(questionList.length).toEqual(3);
-
     });
-    
 });
-

@@ -2,9 +2,9 @@ import { ValueCountDict } from "./util/NumberCountDict";
 import { getKeysPreserveType, getTypedObjectEntries } from "./util/utils";
 
 export class Stats {
-    eases: ValueCountDict = new ValueCountDict;
-    intervals: ValueCountDict = new ValueCountDict;
-    delayedDays: ValueCountDict = new ValueCountDict;
+    eases: ValueCountDict = new ValueCountDict();
+    intervals: ValueCountDict = new ValueCountDict();
+    delayedDays: ValueCountDict = new ValueCountDict();
     newCount: number = 0;
     youngCount: number = 0;
     matureCount: number = 0;
@@ -28,7 +28,7 @@ export class Stats {
             this.youngCount++;
         }
     }
-    
+
     getMaxInterval(): number {
         return this.intervals.getMaxValue();
     }

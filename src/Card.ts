@@ -9,10 +9,10 @@ export class Card {
 
     // scheduling
     get hasSchedule(): boolean {
-        return (this.scheduleInfo != null);
+        return this.scheduleInfo != null;
     }
     scheduleInfo?: CardScheduleInfo;
-    
+
     // visuals
     front: string;
     back: string;
@@ -35,10 +35,8 @@ export class Card {
 
     formatSchedule(): string {
         var result: string;
-        if (this.hasSchedule)
-            result = this.scheduleInfo.formatSchedule();
-        else
-            result = "New";
+        if (this.hasSchedule) result = this.scheduleInfo.formatSchedule();
+        else result = "New";
         return result;
     }
 }

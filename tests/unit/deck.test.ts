@@ -79,11 +79,11 @@ describe("getOrCreateDeck()", () => {
         expect(deck.deckName).toEqual("Root");
         expect(deck.subdecks.length).toEqual(1);
 
-        let subdeck1:Deck = deck.subdecks[0];
+        let subdeck1: Deck = deck.subdecks[0];
         expect(subdeck1.deckName).toEqual("Level1");
         expect(subdeck1.subdecks.length).toEqual(1);
 
-        let subdeck2:Deck = subdeck1.subdecks[0];
+        let subdeck2: Deck = subdeck1.subdecks[0];
         expect(subdeck2.deckName).toEqual("Level2");
         expect(subdeck2.subdecks.length).toEqual(1);
 
@@ -92,7 +92,6 @@ describe("getOrCreateDeck()", () => {
         expect(subdeck3.subdecks.length).toEqual(0);
     });
 });
-
 
 describe("getTopicPath()", () => {
     test("Empty topic path", () => {
@@ -149,9 +148,8 @@ describe("toDeckArray()", () => {
         let deckTree: Deck = new Deck("Root", null);
         let deckArray: Deck[] = deckTree.toDeckArray();
         let nameArray: string[] = deckArray.map((deck) => deck.deckName);
-        
-        expect(nameArray).toEqual(["Root"]);
 
+        expect(nameArray).toEqual(["Root"]);
     });
 
     test("Single level test", () => {
@@ -159,35 +157,40 @@ describe("toDeckArray()", () => {
         deckTree.getOrCreateDeck(new TopicPath(["Aliens"]));
         let deckArray: Deck[] = deckTree.toDeckArray();
         let nameArray: string[] = deckArray.map((deck) => deck.deckName);
-        
-        let expectedArray: string[] = ["Root", "Aliens"]
-        expect(nameArray).toEqual(expectedArray);
 
+        let expectedArray: string[] = ["Root", "Aliens"];
+        expect(nameArray).toEqual(expectedArray);
     });
-    
+
     test("Multi level test", () => {
         let deckTree: Deck = SampleItemDecks.createScienceTree();
         let deckArray: Deck[] = deckTree.toDeckArray();
         let nameArray: string[] = deckArray.map((deck) => deck.deckName);
-        
-        let expectedArray: string[] = ["Root", "Science", "Physics", "Electromagnetism", "Light", 
-            "Fluids", "Math", "Geometry", "Algebra", "Polynomials"];
+
+        let expectedArray: string[] = [
+            "Root",
+            "Science",
+            "Physics",
+            "Electromagnetism",
+            "Light",
+            "Fluids",
+            "Math",
+            "Geometry",
+            "Algebra",
+            "Polynomials",
+        ];
         expect(nameArray).toEqual(expectedArray);
-
     });
-
 });
 
 describe("copyWithCardFilter()", () => {
     describe("Single level tree", () => {
-
         test("No cards", () => {
             let original: Deck = new Deck("Root", null);
             let copy: Deck = original.copyWithCardFilter((card) => true);
-            
+
             original.deckName = "New deck name";
             expect(copy.deckName).toEqual("Root");
-
         });
 
         test("With new cards", async () => {
@@ -195,9 +198,12 @@ describe("copyWithCardFilter()", () => {
             Q1::A1
             Q2::A2
             Q3::A3`;
-            let original: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
+            let original: Deck = await SampleItemDecks.createDeckFromText(
+                text,
+                new TopicPath(["Root"]),
+            );
             let copy: Deck = original.copyWithCardFilter((card) => card.front.includes("2"));
-            
+
             expect(copy.newFlashcards.length).toEqual(1);
             expect(copy.newFlashcards[0].front).toEqual("Q2");
         });
@@ -207,20 +213,20 @@ describe("copyWithCardFilter()", () => {
             Q1::A1 <!--SR:!2023-09-02,4,270-->
             Q2::A2 <!--SR:!2023-09-02,4,270-->
             Q3::A3 <!--SR:!2023-09-02,4,270-->`;
-            let original: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
+            let original: Deck = await SampleItemDecks.createDeckFromText(
+                text,
+                new TopicPath(["Root"]),
+            );
             let copy: Deck = original.copyWithCardFilter((card) => !card.front.includes("2"));
-            
+
             expect(copy.newFlashcards.length).toEqual(0);
             expect(copy.dueFlashcards.length).toEqual(2);
             expect(copy.dueFlashcards[0].front).toEqual("Q1");
             expect(copy.dueFlashcards[1].front).toEqual("Q3");
         });
-
-
     });
 
     describe("Multi level tree", () => {
-
         test("No change in original deck after copy", async () => {
             let text: string = `
             #flashcards Q1::A1
@@ -231,14 +237,18 @@ describe("copyWithCardFilter()", () => {
             #flashcards/science Q5::A5
             
             #flashcards/science/physics Q6::A6`;
-            let original: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
+            let original: Deck = await SampleItemDecks.createDeckFromText(
+                text,
+                new TopicPath(["Root"]),
+            );
             let originalCountPreCopy: number = original.getCardCount(CardListType.All, true);
             expect(originalCountPreCopy).toEqual(6);
 
-            let copy: Deck = original.copyWithCardFilter((card) => ((parseInt(card.front[1])) % 2) == 1);
+            let copy: Deck = original.copyWithCardFilter(
+                (card) => parseInt(card.front[1]) % 2 == 1,
+            );
             let originalCountPostCopy: number = original.getCardCount(CardListType.All, true);
             expect(originalCountPreCopy).toEqual(originalCountPostCopy);
-
         });
 
         test("With new cards", async () => {
@@ -251,11 +261,16 @@ describe("copyWithCardFilter()", () => {
             #flashcards/science Q5::A5
             
             #flashcards/science/physics Q6::A6`;
-            let original: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
+            let original: Deck = await SampleItemDecks.createDeckFromText(
+                text,
+                new TopicPath(["Root"]),
+            );
 
-            let copy: Deck = original.copyWithCardFilter((card) => ((parseInt(card.front[1])) % 2) == 1);
+            let copy: Deck = original.copyWithCardFilter(
+                (card) => parseInt(card.front[1]) % 2 == 1,
+            );
 
-            let subdeck:  Deck = copy.getDeck(new TopicPath(["flashcards"]));
+            let subdeck: Deck = copy.getDeck(new TopicPath(["flashcards"]));
             expect(subdeck.newFlashcards.length).toEqual(2);
             expect(subdeck.newFlashcards[0].front).toEqual("Q1");
             expect(subdeck.newFlashcards[1].front).toEqual("Q3");
@@ -268,5 +283,4 @@ describe("copyWithCardFilter()", () => {
             expect(subdeck.newFlashcards.length).toEqual(0);
         });
     });
-
 });

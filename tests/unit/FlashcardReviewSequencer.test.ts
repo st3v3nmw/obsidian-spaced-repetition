@@ -1,6 +1,15 @@
 import { CardScheduleCalculator } from "src/CardSchedule";
-import { DeckTreeIterator, IDeckTreeIterator, IIteratorOrder, IteratorDeckSource } from "src/DeckTreeIterator";
-import { FlashcardReviewMode, FlashcardReviewSequencer, IFlashcardReviewSequencer } from "src/FlashcardReviewSequencer";
+import {
+    DeckTreeIterator,
+    IDeckTreeIterator,
+    IIteratorOrder,
+    IteratorDeckSource,
+} from "src/DeckTreeIterator";
+import {
+    FlashcardReviewMode,
+    FlashcardReviewSequencer,
+    IFlashcardReviewSequencer,
+} from "src/FlashcardReviewSequencer";
 import { TopicPath } from "src/TopicPath";
 import { CardListType, Deck } from "src/Deck";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
@@ -22,38 +31,61 @@ class TestContext {
     file: UnitTestSRFile;
     originalText: string;
     fakeFilePath: string;
-    
+
     constructor(init?: Partial<TestContext>) {
         Object.assign(this, init);
     }
 
     async setSequencerDeckTreeFromOriginalText(): Promise<Deck> {
-        let deck: Deck = await SampleItemDecks.createDeckFromFile(this.file, new TopicPath(["Root"]));
+        let deck: Deck = await SampleItemDecks.createDeckFromFile(
+            this.file,
+            new TopicPath(["Root"]),
+        );
         this.reviewSequencer.setDeckTree(deck, deck);
         return deck;
     }
 
-    static Create(iteratorOrder: IIteratorOrder, reviewMode: FlashcardReviewMode, settings: SRSettings, text: string, fakeFilePath?: string): TestContext {
-        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, IteratorDeckSource.UpdatedByIterator);
+    static Create(
+        iteratorOrder: IIteratorOrder,
+        reviewMode: FlashcardReviewMode,
+        settings: SRSettings,
+        text: string,
+        fakeFilePath?: string,
+    ): TestContext {
+        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(
+            iteratorOrder,
+            IteratorDeckSource.UpdatedByIterator,
+        );
         let noteEaseList = new NoteEaseList(settings);
-        let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(settings, noteEaseList);
-        let cardPostponementList: QuestionPostponementList = new QuestionPostponementList(null, settings, []);
-        let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(reviewMode, cardSequencer, settings, 
-            cardScheduleCalculator, cardPostponementList);
+        let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(
+            settings,
+            noteEaseList,
+        );
+        let cardPostponementList: QuestionPostponementList = new QuestionPostponementList(
+            null,
+            settings,
+            [],
+        );
+        let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(
+            reviewMode,
+            cardSequencer,
+            settings,
+            cardScheduleCalculator,
+            cardPostponementList,
+        );
         var file: UnitTestSRFile = new UnitTestSRFile(text, fakeFilePath);
 
         let result: TestContext = new TestContext({
-            cardSequencer, 
-            noteEaseList, 
-            cardScheduleCalculator, 
-            reviewSequencer, 
-            questionPostponementList: cardPostponementList, 
-            file, 
-            originalText: text, 
-            fakeFilePath
+            cardSequencer,
+            noteEaseList,
+            cardScheduleCalculator,
+            reviewSequencer,
+            questionPostponementList: cardPostponementList,
+            file,
+            originalText: text,
+            fakeFilePath,
         });
         return result;
-        
     }
 }
 
@@ -62,26 +94,34 @@ interface Info1 {
     cardQ2_PostReviewEase: number;
     cardQ2_PostReviewInterval: number;
     cardQ2_PostReviewDueDate: string;
-    cardQ2_PostReviewText: string
+    cardQ2_PostReviewText: string;
 }
 
-async function checkReviewResponse_ReviewMode(reviewResponse: ReviewResponse, info: Info1): Promise<void> {
-
+async function checkReviewResponse_ReviewMode(
+    reviewResponse: ReviewResponse,
+    info: Info1,
+): Promise<void> {
     let text: string = `
 #flashcards Q1::A1
 #flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
 #flashcards Q3::A3`;
 
     let fakeFilePath: string = moment().millisecond().toString();
-    let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text, fakeFilePath);
+    let c: TestContext = TestContext.Create(
+        order_DueFirst_Sequential,
+        FlashcardReviewMode.Review,
+        DEFAULT_SETTINGS,
+        text,
+        fakeFilePath,
+    );
     let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
 
     // State before calling processReview
     let card = c.reviewSequencer.currentCard;
     expect(card.front).toEqual("Q2");
     expect(card.scheduleInfo).toMatchObject({
-        ease: 270, 
-        interval: 4
+        ease: 270,
+        interval: 4,
     });
 
     // State after calling processReview - next card
@@ -94,12 +134,14 @@ async function checkReviewResponse_ReviewMode(reviewResponse: ReviewResponse, in
     expect(card.scheduleInfo.dueDate.unix).toEqual(moment(info.cardQ2_PostReviewDueDate).unix);
 
     // Note text has been updated
-    let expectedText: string = c.originalText.replace(info.cardQ2_PreReviewText, info.cardQ2_PostReviewText);
+    let expectedText: string = c.originalText.replace(
+        info.cardQ2_PreReviewText,
+        info.cardQ2_PostReviewText,
+    );
     expect(await c.file.read()).toEqual(expectedText);
-};
+}
 
 async function checkReviewResponse_CramMode(reviewResponse: ReviewResponse): Promise<TestContext> {
-
     let text: string = `
 #flashcards Q1::A1 <!--SR:!2023-09-02,4,270-->
 #flashcards Q2::A2 <!--SR:!2023-09-02,3,270-->
@@ -107,15 +149,21 @@ async function checkReviewResponse_CramMode(reviewResponse: ReviewResponse): Pro
 #flashcards Q4::A4 <!--SR:!2023-09-02,5,270-->`;
 
     let str: string = moment().millisecond().toString();
-    let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Cram, DEFAULT_SETTINGS, text, str);
+    let c: TestContext = TestContext.Create(
+        order_DueFirst_Sequential,
+        FlashcardReviewMode.Cram,
+        DEFAULT_SETTINGS,
+        text,
+        str,
+    );
     let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
 
     // State before calling processReview
     let card = c.reviewSequencer.currentCard;
     expect(card.front).toEqual("Q1");
     let expectInfo = {
-        ease: 270, 
-        interval: 4
+        ease: 270,
+        interval: 4,
     };
     expect(card.scheduleInfo).toMatchObject(expectInfo);
 
@@ -132,9 +180,12 @@ async function checkReviewResponse_CramMode(reviewResponse: ReviewResponse): Pro
     expect(await c.file.read()).toEqual(expectedText);
 
     return c;
-};
+}
 
-async function setupSample1(reviewMode: FlashcardReviewMode, settings: SRSettings): Promise<TestContext> {
+async function setupSample1(
+    reviewMode: FlashcardReviewMode,
+    settings: SRSettings,
+): Promise<TestContext> {
     let text: string = `
 #flashcards Q1::A1
 
@@ -145,7 +196,7 @@ async function setupSample1(reviewMode: FlashcardReviewMode, settings: SRSetting
 #flashcards/science Q4::A4 <!--SR:!2023-09-02,4,270-->
 #flashcards/science/physics Q5::A5 <!--SR:!2023-09-02,4,270-->
 #flashcards/math Q6::A6`;
-    
+
     let c: TestContext = TestContext.Create(order_DueFirst_Sequential, reviewMode, settings, text);
     await c.setSequencerDeckTreeFromOriginalText();
     return c;
@@ -165,8 +216,13 @@ async function setupSample2(reviewMode: FlashcardReviewMode): Promise<TestContex
 #flashcards This single ==question== turns into ==3 separate== ==cards==
 <!--SR:!2023-09-02,4,270!2023-09-02,5,270!2023-09-02,6,270-->
 `;
-    
-    let c: TestContext = TestContext.Create(order_DueFirst_Sequential, reviewMode, DEFAULT_SETTINGS, text);
+
+    let c: TestContext = TestContext.Create(
+        order_DueFirst_Sequential,
+        reviewMode,
+        DEFAULT_SETTINGS,
+        text,
+    );
     await c.setSequencerDeckTreeFromOriginalText();
     return c;
 }
@@ -174,19 +230,22 @@ async function setupSample2(reviewMode: FlashcardReviewMode): Promise<TestContex
 function skipThenCheckCardFront(sequencer: IFlashcardReviewSequencer, expectedFront: string): void {
     sequencer.skipCurrentCard();
     expect(sequencer.currentCard.front).toEqual(expectedFront);
-
 }
 
 //////////////////////////////////////////////////////////////////////
 
-beforeAll(() =>  {
+beforeAll(() => {
     setupStaticDateProvider_20230906();
-})
+});
 
 describe("setDeckTree", () => {
-
     test("Empty deck", () => {
-        let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Review, DEFAULT_SETTINGS, "");
+        let c: TestContext = TestContext.Create(
+            order_DueFirst_Sequential,
+            FlashcardReviewMode.Review,
+            DEFAULT_SETTINGS,
+            "",
+        );
         c.reviewSequencer.setDeckTree(Deck.emptyDeck, Deck.emptyDeck);
         expect(c.reviewSequencer.currentDeck).toEqual(null);
         expect(c.reviewSequencer.currentCard).toEqual(null);
@@ -198,25 +257,29 @@ describe("setDeckTree", () => {
 Q1::A1
 Q2::A2
 Q3::A3`;
-        let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text);
+        let c: TestContext = TestContext.Create(
+            order_DueFirst_Sequential,
+            FlashcardReviewMode.Review,
+            DEFAULT_SETTINGS,
+            text,
+        );
         let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
         expect(deck.newFlashcards.length).toEqual(3);
-        
+
         expect(c.reviewSequencer.currentDeck.newFlashcards.length).toEqual(3);
         let expected = {
-            front: "Q1", 
-            back: "A1"
+            front: "Q1",
+            back: "A1",
         };
         expect(c.reviewSequencer.currentCard).toMatchObject(expected);
     });
 });
 
 describe("skipCurrentCard", () => {
-
     test("Simple test", async () => {
         let c: TestContext = await setupSample1(FlashcardReviewMode.Review, DEFAULT_SETTINGS);
         expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
-        
+
         // No more due cards after current card, so we expect the first new card for topic #flashcards
         skipThenCheckCardFront(c.reviewSequencer, "Q1");
         skipThenCheckCardFront(c.reviewSequencer, "Q3");
@@ -225,7 +288,7 @@ describe("skipCurrentCard", () => {
     test("Skip repeatedly until no more", async () => {
         let c: TestContext = await setupSample1(FlashcardReviewMode.Review, DEFAULT_SETTINGS);
         expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
-        
+
         // No more due cards after current card, so we expect the first new card for topic #flashcards
         skipThenCheckCardFront(c.reviewSequencer, "Q1");
         skipThenCheckCardFront(c.reviewSequencer, "Q3");
@@ -252,15 +315,20 @@ describe("skipCurrentCard", () => {
 #flashcards This single ==question== turns into ==3 separate== ==cards==
 <!--SR:!2023-09-02,4,270!2023-09-02,5,270!2023-09-02,6,270-->
 `;
-            
-        let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text);
+
+        let c: TestContext = TestContext.Create(
+            order_DueFirst_Sequential,
+            FlashcardReviewMode.Review,
+            DEFAULT_SETTINGS,
+            text,
+        );
         await c.setSequencerDeckTreeFromOriginalText();
         expect(c.reviewSequencer.currentQuestion.cards.length).toEqual(1);
         expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
-        
+
         skipThenCheckCardFront(c.reviewSequencer, "Q2");
         expect(c.reviewSequencer.currentQuestion.cards.length).toEqual(2);
-        
+
         // Skipping Q2 skips over both Q2::A2 and A2::Q2, goes straight to Q3
         skipThenCheckCardFront(c.reviewSequencer, "Q3");
         expect(c.reviewSequencer.currentQuestion.cards.length).toEqual(1);
@@ -273,21 +341,18 @@ describe("skipCurrentCard", () => {
         // Skip over the cloze, skips all 3 cards, no cards left
         c.reviewSequencer.skipCurrentCard();
         expect(c.reviewSequencer.hasCurrentCard).toEqual(false);
-
-
     });
 
     describe("Checking postponement list", () => {
-       
         describe("FlashcardReviewMode.Review", () => {
             test("burySiblingCards=false - skipped question not added to postponement list", async () => {
-                let settings: SRSettings = {... DEFAULT_SETTINGS};
+                let settings: SRSettings = { ...DEFAULT_SETTINGS };
                 settings.burySiblingCards = false;
 
                 let c: TestContext = await setupSample1(FlashcardReviewMode.Review, settings);
                 expect(c.questionPostponementList.list.length).toEqual(0);
                 expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
-                
+
                 // Skip over these 2 questions
                 skipThenCheckCardFront(c.reviewSequencer, "Q1");
                 skipThenCheckCardFront(c.reviewSequencer, "Q3");
@@ -296,28 +361,27 @@ describe("skipCurrentCard", () => {
             });
 
             test("burySiblingCards=true - skipped question added to postponement list", async () => {
-                let settings: SRSettings = {... DEFAULT_SETTINGS};
+                let settings: SRSettings = { ...DEFAULT_SETTINGS };
                 settings.burySiblingCards = true;
 
                 let c: TestContext = await setupSample1(FlashcardReviewMode.Review, settings);
                 expect(c.questionPostponementList.list.length).toEqual(0);
                 expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
-                
+
                 // Skip over 2 questions
                 skipThenCheckCardFront(c.reviewSequencer, "Q1");
                 skipThenCheckCardFront(c.reviewSequencer, "Q3");
 
                 expect(c.questionPostponementList.list.length).toEqual(2);
             });
-
         });
-        
+
         describe("FlashcardReviewMode.Cram", () => {
             test("Cram mode - skipped question not added to postponement list", async () => {
                 let c: TestContext = await setupSample1(FlashcardReviewMode.Cram, DEFAULT_SETTINGS);
                 expect(c.questionPostponementList.list.length).toEqual(0);
                 expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
-                
+
                 // Skip over these questions
                 skipThenCheckCardFront(c.reviewSequencer, "Q1");
                 skipThenCheckCardFront(c.reviewSequencer, "Q3");
@@ -327,13 +391,12 @@ describe("skipCurrentCard", () => {
         });
     });
     // No postponement during cramming
-// Deletion of sibling cards after text modification
-// Deletion of sibling cards after card skip
-// Delete+postpone
+    // Deletion of sibling cards after text modification
+    // Deletion of sibling cards after card skip
+    // Delete+postpone
 });
 
 describe("processReview", () => {
-
     describe("FlashcardReviewMode.Review", () => {
         describe("ReviewResponse.Reset", () => {
             test("Simple test - 3 cards all due in same deck - reset card moves to end of deck", async () => {
@@ -342,15 +405,20 @@ describe("processReview", () => {
                     #flashcards Q2::A2 <!--SR:!2023-09-02,5,270-->
                     #flashcards Q3::A3 <!--SR:!2023-09-02,6,270-->`;
 
-                let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text);
+                let c: TestContext = TestContext.Create(
+                    order_DueFirst_Sequential,
+                    FlashcardReviewMode.Review,
+                    DEFAULT_SETTINGS,
+                    text,
+                );
                 let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
 
                 // State before calling processReview
                 let card = c.reviewSequencer.currentCard;
                 expect(card.front).toEqual("Q1");
                 expect(card.scheduleInfo).toMatchObject({
-                    ease: 270, 
-                    interval: 4
+                    ease: 270,
+                    interval: 4,
                 });
 
                 // State after calling processReview - same current card
@@ -359,16 +427,16 @@ describe("processReview", () => {
                 card = c.reviewSequencer.currentCard;
                 expect(card.front).toEqual("Q2");
                 expect(card.scheduleInfo).toMatchObject({
-                    ease: 270, 
-                    interval: 5
+                    ease: 270,
+                    interval: 5,
                 });
 
                 c.reviewSequencer.skipCurrentCard();
                 card = c.reviewSequencer.currentCard;
                 expect(card.front).toEqual("Q3");
                 expect(card.scheduleInfo).toMatchObject({
-                    ease: 270, 
-                    interval: 6
+                    ease: 270,
+                    interval: 6,
                 });
 
                 // After skipping Q3, we should see Q1 the reset card with updated ease/interval
@@ -376,22 +444,21 @@ describe("processReview", () => {
                 card = c.reviewSequencer.currentCard;
                 expect(card.front).toEqual("Q1");
                 expect(card.scheduleInfo).toMatchObject({
-                    ease: DEFAULT_SETTINGS.baseEase, 
-                    interval: 1
+                    ease: DEFAULT_SETTINGS.baseEase,
+                    interval: 1,
                 });
             });
         });
 
         describe("ReviewResponse.Easy", () => {
             test("Card schedule is updated, next card becomes current", async () => {
-
                 const expected: Info1 = {
-                    cardQ2_PreReviewText: "Q2::A2 <!--SR:!2023-09-02,4,270-->", 
-                    cardQ2_PostReviewEase: 290, 
-                    cardQ2_PostReviewInterval: 15, 
+                    cardQ2_PreReviewText: "Q2::A2 <!--SR:!2023-09-02,4,270-->",
+                    cardQ2_PostReviewEase: 290,
+                    cardQ2_PostReviewInterval: 15,
                     cardQ2_PostReviewDueDate: "2023-09-21", // 15 days after the unit testing fixed date of 2023-09-06
                     cardQ2_PostReviewText: `Q2::A2
-<!--SR:!2023-09-21,15,290-->`             
+<!--SR:!2023-09-21,15,290-->`,
                 };
                 await checkReviewResponse_ReviewMode(ReviewResponse.Easy, expected);
             });
@@ -409,7 +476,6 @@ describe("processReview", () => {
 
                 c.reviewSequencer.skipCurrentCard();
                 expect(c.reviewSequencer.hasCurrentCard).toEqual(false);
-        
             });
         });
 
@@ -424,16 +490,13 @@ describe("processReview", () => {
 
                 c.reviewSequencer.skipCurrentCard();
                 expect(c.reviewSequencer.hasCurrentCard).toEqual(false);
-        
             });
         });
-
     });
 });
 
 describe("updateCurrentQuestionText", () => {
     describe("Settings - schedule on following line", () => {
-
         test("Question has schedule on following line before/after", async () => {
             let text: string = `
 #flashcards Q1::A1
@@ -442,13 +505,20 @@ describe("updateCurrentQuestionText", () => {
 <!--SR:!2023-09-02,4,270-->
 
 #flashcards Q3::A3`;
-                
-            let updatedQ: string = "#flashcards A much more in depth question::A much more detailed answer";
+
+            let updatedQ: string =
+                "#flashcards A much more in depth question::A much more detailed answer";
             let originalStr: string = `#flashcards Q2::A2
 <!--SR:!2023-09-02,4,270-->`;
             let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
 <!--SR:!2023-09-02,4,270-->`;
-            await checkUpdateCurrentQuestionText(text, updatedQ, originalStr, updatedStr, DEFAULT_SETTINGS);
+            await checkUpdateCurrentQuestionText(
+                text,
+                updatedQ,
+                originalStr,
+                updatedStr,
+                DEFAULT_SETTINGS,
+            );
         });
 
         test("Question has schedule on same line (but pushed to following line due to settings)", async () => {
@@ -458,13 +528,20 @@ describe("updateCurrentQuestionText", () => {
 #flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
 
 #flashcards Q3::A3`;
-                
-            let updatedQ: string = "#flashcards A much more in depth question::A much more detailed answer";
+
+            let updatedQ: string =
+                "#flashcards A much more in depth question::A much more detailed answer";
             let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
             let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
 <!--SR:!2023-09-02,4,270-->`;
-            await checkUpdateCurrentQuestionText(text, updatedQ, originalStr, updatedStr, DEFAULT_SETTINGS);
-        });    
+            await checkUpdateCurrentQuestionText(
+                text,
+                updatedQ,
+                originalStr,
+                updatedStr,
+                DEFAULT_SETTINGS,
+            );
+        });
     });
 
     describe("Settings - schedule on same line", () => {
@@ -479,10 +556,17 @@ describe("updateCurrentQuestionText", () => {
 
 #flashcards Q3::A3`;
 
-            let updatedQ: string = "#flashcards A much more in depth question::A much more detailed answer";
+            let updatedQ: string =
+                "#flashcards A much more in depth question::A much more detailed answer";
             let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
             let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
-            await checkUpdateCurrentQuestionText(text1, updatedQ, originalStr, updatedStr, settings);
+            await checkUpdateCurrentQuestionText(
+                text1,
+                updatedQ,
+                originalStr,
+                updatedStr,
+                settings,
+            );
         });
 
         test("Question has schedule on following line (but placed on same line due to settings)", async () => {
@@ -493,18 +577,30 @@ describe("updateCurrentQuestionText", () => {
 <!--SR:!2023-09-02,4,270-->
 
 #flashcards Q3::A3`;
-                
-            let updatedQ: string = "#flashcards A much more in depth question::A much more detailed answer";
+
+            let updatedQ: string =
+                "#flashcards A much more in depth question::A much more detailed answer";
             let originalStr: string = `#flashcards Q2::A2
 <!--SR:!2023-09-02,4,270-->`;
             let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
             await checkUpdateCurrentQuestionText(text, updatedQ, originalStr, updatedStr, settings);
-        });    
+        });
     });
 });
 
-async function checkUpdateCurrentQuestionText(noteText: string, updatedQ: string, originalStr: string, updatedStr: string, settings: SRSettings): Promise<TestContext> {
-    let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Review, settings, noteText);
+async function checkUpdateCurrentQuestionText(
+    noteText: string,
+    updatedQ: string,
+    originalStr: string,
+    updatedStr: string,
+    settings: SRSettings,
+): Promise<TestContext> {
+    let c: TestContext = TestContext.Create(
+        order_DueFirst_Sequential,
+        FlashcardReviewMode.Review,
+        settings,
+        noteText,
+    );
     await c.setSequencerDeckTreeFromOriginalText();
     expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
 
@@ -515,4 +611,3 @@ async function checkUpdateCurrentQuestionText(noteText: string, updatedQ: string
     expect(await c.file.read()).toEqual(expectedText);
     return c;
 }
-

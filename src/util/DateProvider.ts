@@ -8,7 +8,7 @@ export interface IDateProvider {
 
 export class LiveDateProvider implements IDateProvider {
     get today(): Moment {
-        return moment().startOf('day');
+        return moment().startOf("day");
     }
 }
 

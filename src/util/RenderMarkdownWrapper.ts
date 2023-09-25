@@ -2,7 +2,6 @@ import { App, MarkdownRenderer, TFile } from "obsidian";
 import { AUDIO_FORMATS, IMAGE_FORMATS, VIDEO_FORMATS } from "../constants";
 import SRPlugin from "../main";
 
-
 export class RenderMarkdownWrapper {
     private app: App;
     private notePath: string;
@@ -13,7 +12,7 @@ export class RenderMarkdownWrapper {
         this.notePath = notePath;
         this.plugin = plugin;
     }
-    
+
     // slightly modified version of the renderMarkdown function in
     // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/KanbanView.tsx
     async renderMarkdownWrapper(
@@ -23,12 +22,7 @@ export class RenderMarkdownWrapper {
     ): Promise<void> {
         if (recursiveDepth > 4) return;
 
-        MarkdownRenderer.renderMarkdown(
-            markdownString,
-            containerEl,
-            this.notePath,
-            this.plugin,
-        );
+        MarkdownRenderer.renderMarkdown(markdownString, containerEl, this.notePath, this.plugin);
 
         containerEl.findAll(".internal-embed").forEach((el) => {
             const link = this.parseLink(el.getAttribute("src"));
@@ -52,10 +46,7 @@ export class RenderMarkdownWrapper {
             /^(?<file>[^#^]+)?(?:#(?!\^)(?<heading>.+)|#\^(?<blockId>.+)|#)?$/;
         const matched = typeof src === "string" && src.match(linkComponentsRegex);
         const file = matched.groups.file || this.notePath;
-        const target = this.plugin.app.metadataCache.getFirstLinkpathDest(
-            file,
-            this.notePath,
-        );
+        const target = this.plugin.app.metadataCache.getFirstLinkpathDest(file, this.notePath);
         return {
             text: matched[0],
             file: matched.groups.file,

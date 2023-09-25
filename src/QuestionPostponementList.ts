@@ -9,7 +9,7 @@ export interface IQuestionPostponementList {
     write(): Promise<void>;
 }
 
-export class QuestionPostponementList implements IQuestionPostponementList  {
+export class QuestionPostponementList implements IQuestionPostponementList {
     list: string[];
     plugin: SRPlugin;
     settings: SRSettings;
@@ -24,11 +24,9 @@ export class QuestionPostponementList implements IQuestionPostponementList  {
         this.list = [];
     }
 
-
     addIfRequired(question: Question): void {
-        if (this.settings.burySiblingCards)
-            this.list.push(question.questionText.textHash);
-   }
+        if (this.settings.burySiblingCards) this.list.push(question.questionText.textHash);
+    }
 
     includes(question: Question): boolean {
         return this.list.includes(question.questionText.textHash);
@@ -36,7 +34,5 @@ export class QuestionPostponementList implements IQuestionPostponementList  {
 
     async write(): Promise<void> {
         await this.plugin.savePluginData();
-
     }
-
 }

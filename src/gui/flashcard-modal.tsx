@@ -14,19 +14,18 @@ import h from "vhtml";
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
 import { schedule, textInterval, ReviewResponse } from "src/scheduling";
-import {
-    COLLAPSE_ICON,
-    IMAGE_FORMATS,
-    AUDIO_FORMATS,
-    VIDEO_FORMATS,
-} from "src/constants";
+import { COLLAPSE_ICON, IMAGE_FORMATS, AUDIO_FORMATS, VIDEO_FORMATS } from "src/constants";
 import { escapeRegexString, cyrb53 } from "src/util/utils";
 import { t } from "src/lang/helpers";
 import { unwatchFile } from "fs";
 import { Card } from "../Card";
 import { CardListType, Deck } from "../Deck";
 import { CardType, Question } from "../Question";
-import { DeckStats, FlashcardReviewMode, IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "src/FlashcardReviewSequencer";
+import {
+    DeckStats,
+    FlashcardReviewMode,
+    IFlashcardReviewSequencer as IFlashcardReviewSequencer,
+} from "src/FlashcardReviewSequencer";
 import { FlashcardEditModal } from "./flashcards-edit-modal";
 import { Note } from "src/Note";
 import { RenderMarkdownWrapper } from "src/util/RenderMarkdownWrapper";
@@ -39,7 +38,6 @@ export enum FlashcardModalMode {
     Back,
     Closed,
 }
-
 
 export class FlashcardModal extends Modal {
     public plugin: SRPlugin;
@@ -59,7 +57,6 @@ export class FlashcardModal extends Modal {
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
 
-
     private get currentCard(): Card {
         return this.reviewSequencer.currentCard;
     }
@@ -72,7 +69,13 @@ export class FlashcardModal extends Modal {
         return this.reviewSequencer.currentNote;
     }
 
-    constructor(app: App, plugin: SRPlugin, settings: SRSettings, reviewSequencer: IFlashcardReviewSequencer, reviewMode: FlashcardReviewMode) {
+    constructor(
+        app: App,
+        plugin: SRPlugin,
+        settings: SRSettings,
+        reviewSequencer: IFlashcardReviewSequencer,
+        reviewMode: FlashcardReviewMode,
+    ) {
         super(app);
 
         this.plugin = plugin;
@@ -185,8 +188,7 @@ export class FlashcardModal extends Modal {
         const deckViewSelf: HTMLElement = deckView.createDiv(
             "tree-item-self tag-pane-tag is-clickable",
         );
-        const shouldBeInitiallyExpanded: boolean =
-            modal.settings.initiallyExpandAllSubdecksInTree;
+        const shouldBeInitiallyExpanded: boolean = modal.settings.initiallyExpandAllSubdecksInTree;
         let collapsed = !shouldBeInitiallyExpanded;
         let collapseIconEl: HTMLElement | null = null;
         if (deck.subdecks.length > 0) {
@@ -254,8 +256,7 @@ export class FlashcardModal extends Modal {
         if (this.reviewSequencer.hasCurrentCard) {
             this.setupCardsView();
             this.showCurrentCard();
-        } else
-            this.renderDecksList();
+        } else this.renderDecksList();
     }
 
     setupCardsView(): void {
@@ -351,7 +352,8 @@ export class FlashcardModal extends Modal {
     displayCurrentCardInfoNotice() {
         let schedule = this.currentCard.scheduleInfo;
         const currentEaseStr = t("CURRENT_EASE_HELP_TEXT") + (schedule?.ease ?? t("NEW"));
-        const currentIntervalStr = t("CURRENT_INTERVAL_HELP_TEXT") + textInterval(schedule?.interval, false);
+        const currentIntervalStr =
+            t("CURRENT_INTERVAL_HELP_TEXT") + textInterval(schedule?.interval, false);
         const generatedFromStr = t("CARD_GENERATED_FROM", {
             notePath: this.currentQuestion.note.filePath,
         });
@@ -419,7 +421,11 @@ export class FlashcardModal extends Modal {
             this.flashcardView.empty();
         }
 
-        let wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(this.app, this.plugin, this.currentNote.filePath);
+        let wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
+            this.app,
+            this.plugin,
+            this.currentNote.filePath,
+        );
         wrapper.renderMarkdownWrapper(this.currentCard.back, this.flashcardView);
     }
 
@@ -427,7 +433,6 @@ export class FlashcardModal extends Modal {
         await this.reviewSequencer.processReview(response);
         // console.log(`processReview: ${response}: ${this.currentCard?.front ?? 'None'}`)
         await this.handleNextCard();
-
     }
 
     private async skipCurrentCard(): Promise<void> {
@@ -437,10 +442,8 @@ export class FlashcardModal extends Modal {
     }
 
     private async handleNextCard(): Promise<void> {
-        if (this.currentCard != null)
-            await this.showCurrentCard();
-        else
-            this.renderDecksList();
+        if (this.currentCard != null) await this.showCurrentCard();
+        else this.renderDecksList();
     }
 
     private async showCurrentCard(): Promise<void> {
@@ -448,15 +451,17 @@ export class FlashcardModal extends Modal {
 
         this.responseDiv.style.display = "none";
         this.resetButton.disabled = true;
-        this.titleEl.setText(
-            `${deck.deckName}: ${deck.getCardCount(CardListType.All, true)}`,
-        );
+        this.titleEl.setText(`${deck.deckName}: ${deck.getCardCount(CardListType.All, true)}`);
 
         this.answerBtn.style.display = "initial";
         this.flashcardView.empty();
         this.mode = FlashcardModalMode.Front;
 
-        let wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(this.app, this.plugin, this.currentNote.filePath);
+        let wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
+            this.app,
+            this.plugin,
+            this.currentNote.filePath,
+        );
         await wrapper.renderMarkdownWrapper(this.currentCard.front, this.flashcardView);
 
         if (this.reviewMode == FlashcardReviewMode.Cram) {
@@ -464,13 +469,27 @@ export class FlashcardModal extends Modal {
             this.hardBtn.setText(`${this.settings.flashcardHardText}`);
             this.easyBtn.setText(`${this.settings.flashcardEasyText}`);
         } else {
-            this.setupEaseButton(this.hardBtn, this.settings.flashcardHardText, ReviewResponse.Hard);
-            this.setupEaseButton(this.goodBtn, this.settings.flashcardGoodText, ReviewResponse.Good);
-            this.setupEaseButton(this.easyBtn, this.settings.flashcardEasyText, ReviewResponse.Easy);
+            this.setupEaseButton(
+                this.hardBtn,
+                this.settings.flashcardHardText,
+                ReviewResponse.Hard,
+            );
+            this.setupEaseButton(
+                this.goodBtn,
+                this.settings.flashcardGoodText,
+                ReviewResponse.Good,
+            );
+            this.setupEaseButton(
+                this.easyBtn,
+                this.settings.flashcardEasyText,
+                ReviewResponse.Easy,
+            );
         }
 
         if (this.settings.showContextInCards)
-            this.contextView.setText(this.formatQuestionContextText(this.currentQuestion.questionContext));
+            this.contextView.setText(
+                this.formatQuestionContextText(this.currentQuestion.questionContext),
+            );
     }
 
     private formatQuestionContextText(questionContext: string[]): string {
@@ -478,20 +497,21 @@ export class FlashcardModal extends Modal {
         return result;
     }
 
-    private setupEaseButton(button: HTMLElement, buttonName: string, reviewResponse: ReviewResponse) {
-        var schedule: CardScheduleInfo = this.reviewSequencer.determineCardSchedule(reviewResponse, this.currentCard);
+    private setupEaseButton(
+        button: HTMLElement,
+        buttonName: string,
+        reviewResponse: ReviewResponse,
+    ) {
+        var schedule: CardScheduleInfo = this.reviewSequencer.determineCardSchedule(
+            reviewResponse,
+            this.currentCard,
+        );
         const interval: number = schedule.interval;
 
         if (Platform.isMobile) {
             button.setText(textInterval(interval, true));
         } else {
-            button.setText(
-                `${buttonName} - ${textInterval(
-                    interval,
-                    false,
-                )}`,
-            );
-        }        
+            button.setText(`${buttonName} - ${textInterval(interval, false)}`);
+        }
     }
 }
-

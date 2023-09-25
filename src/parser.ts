@@ -1,6 +1,5 @@
 import { CardType } from "./Question";
 
-
 /**
  * Returns flashcards found in `text`
  *

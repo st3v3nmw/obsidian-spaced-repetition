@@ -6,29 +6,26 @@ import { ISRFile } from "./SRFile";
 export class TopicPath {
     path: string[];
 
-    constructor(path: string[]) { 
-        if (path == null)
-            throw "null path";
-        if (path.some((str) => str.includes("/")))
-            throw "path entries must not contain '/'";
+    constructor(path: string[]) {
+        if (path == null) throw "null path";
+        if (path.some((str) => str.includes("/"))) throw "path entries must not contain '/'";
         this.path = path;
     }
 
-    get hasPath(): boolean { 
-        return (this.path.length > 0);
+    get hasPath(): boolean {
+        return this.path.length > 0;
     }
 
-    get isEmptyPath(): boolean { 
+    get isEmptyPath(): boolean {
         return !this.hasPath;
     }
-    
-    static get emptyPath(): TopicPath { 
+
+    static get emptyPath(): TopicPath {
         return new TopicPath([]);
     }
 
     shift(): string {
-        if (this.isEmptyPath)
-            throw "can't shift an empty path"
+        if (this.isEmptyPath) throw "can't shift an empty path";
         return this.path.shift();
     }
 
@@ -37,8 +34,7 @@ export class TopicPath {
     }
 
     formatAsTag(): string {
-        if (this.isEmptyPath)
-            throw "Empty path";
+        if (this.isEmptyPath) throw "Empty path";
         let result = "#" + this.path.join("/");
         return result;
     }
@@ -56,7 +52,9 @@ export class TopicPath {
         } else {
             let tagList: TopicPath[] = this.getTopicPathsFromTagList(noteFile.getAllTags());
 
-            outer: for (const tagToReview of this.getTopicPathsFromTagList(settings.flashcardTags)) {
+            outer: for (const tagToReview of this.getTopicPathsFromTagList(
+                settings.flashcardTags,
+            )) {
                 for (const tag of tagList) {
                     if (tagToReview.isSameOrAncestorOf(tag)) {
                         result = tag;
@@ -70,58 +68,48 @@ export class TopicPath {
     }
 
     isSameOrAncestorOf(topicPath: TopicPath): boolean {
-        if (this.isEmptyPath)
-            return topicPath.isEmptyPath;
-        if (this.path.length > topicPath.path.length)
-            return false;
+        if (this.isEmptyPath) return topicPath.isEmptyPath;
+        if (this.path.length > topicPath.path.length) return false;
         for (let i = 0; i < this.path.length; i++) {
-            if (this.path[i] != topicPath.path[i])
-                return false;
+            if (this.path[i] != topicPath.path[i]) return false;
         }
         return true;
     }
 
-    static getTopicPathFromCardText(cardText: string): TopicPath { 
-        const path = cardText.trimStart()
-            .match(OBSIDIAN_TAG_AT_STARTOFLINE_REGEX)
-            ?.slice(-1)[0];
-        return  (path?.length > 0) ? TopicPath.getTopicPathFromTag(path) : null;
+    static getTopicPathFromCardText(cardText: string): TopicPath {
+        const path = cardText.trimStart().match(OBSIDIAN_TAG_AT_STARTOFLINE_REGEX)?.slice(-1)[0];
+        return path?.length > 0 ? TopicPath.getTopicPathFromTag(path) : null;
     }
 
-    static removeTopicPathFromStartOfCardText(cardText: string): string { 
+    static removeTopicPathFromStartOfCardText(cardText: string): string {
         return cardText.trimStart().replaceAll(OBSIDIAN_TAG_AT_STARTOFLINE_REGEX, "").trim();
     }
 
     static getTopicPathsFromTagList(tagList: string[]): TopicPath[] {
         let result: TopicPath[] = [];
         for (const tag of tagList) {
-            if (this.isValidTag(tag))
-                result.push(TopicPath.getTopicPathFromTag(tag));
+            if (this.isValidTag(tag)) result.push(TopicPath.getTopicPathFromTag(tag));
         }
         return result;
     }
 
     static isValidTag(tag: string): boolean {
-        if ((tag == null) || (tag.length == 0))
-            return false;
-        if (tag[0] != "#")
-            return false;
-        if (tag.length == 1)
-            return false;
+        if (tag == null || tag.length == 0) return false;
+        if (tag[0] != "#") return false;
+        if (tag.length == 1) return false;
 
         return true;
     }
 
     static getTopicPathFromTag(tag: string): TopicPath {
-        if ((tag == null) || (tag.length == 0))
-            throw "Null/empty tag";
-        if (tag[0] != "#")
-            throw "Tag must start with #";
-        if (tag.length == 1)
-            throw "Invalid tag";
+        if (tag == null || tag.length == 0) throw "Null/empty tag";
+        if (tag[0] != "#") throw "Tag must start with #";
+        if (tag.length == 1) throw "Invalid tag";
 
-        let  path: string[] = tag.replace("#", "").split("/").filter(str => str);
+        let path: string[] = tag
+            .replace("#", "")
+            .split("/")
+            .filter((str) => str);
         return new TopicPath(path);
     }
 }
-

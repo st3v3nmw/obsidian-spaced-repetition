@@ -1,4 +1,3 @@
-
 import { Card } from "./Card";
 import { CardScheduleInfo, NoteCardScheduleParser } from "./CardSchedule";
 import { SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END } from "./constants";
@@ -16,23 +15,23 @@ export enum CardType {
     Cloze,
 }
 
-// 
+//
 // QuestionText comprises the following components:
 //      1. QuestionTopicPath (optional)
 //      2. Actual question text (mandatory)
 //      3. Card schedule info as HTML comment (optional)
-// 
+//
 // For example
-// 
+//
 //  Actual question text only:
 //      Q1::A1
-// 
+//
 //  Question text with topic path:
 //      #flashcards/science  Q2::A2
-// 
+//
 //  Question text with card schedule info:
 //      #flashcards/science  Q2::A2 <!--SR:!2023-10-16,34,290-->
-// 
+//
 export class QuestionText {
     // Complete text including all components, as read from file
     original: string;
@@ -81,14 +80,13 @@ export class QuestionText {
     }
     formatForNote(): string {
         let result: string = "";
-        if (this.topicPath.hasPath)
-            result += `${this.topicPath.formatAsTag()} `;
+        if (this.topicPath.hasPath) result += `${this.topicPath.formatAsTag()} `;
         result += this.actualQuestion;
         return result;
     }
 }
 
-export class Question { 
+export class Question {
     note: Note;
     questionType: CardType;
     topicPath: TopicPath;
@@ -114,16 +112,19 @@ export class Question {
 
     setCardList(cards: Card[]): void {
         this.cards = cards;
-        this.cards.forEach((card) => card.question = this);
+        this.cards.forEach((card) => (card.question = this));
     }
 
     formatScheduleAsHtmlComment(settings: SRSettings): string {
         let result: string = SR_HTML_COMMENT_BEGIN;
 
         // We always want the correct schedule format, so we use this if there is no schedule for a card
-        let defaultSchedule: CardScheduleInfo = CardScheduleInfo.fromDueDateStr("2000-01-01", 
-            CardScheduleInfo.initialInterval, 
-            settings.baseEase, 0);
+        let defaultSchedule: CardScheduleInfo = CardScheduleInfo.fromDueDateStr(
+            "2000-01-01",
+            CardScheduleInfo.initialInterval,
+            settings.baseEase,
+            0,
+        );
 
         for (let i = 0; i < this.cards.length; i++) {
             let card: Card = this.cards[i];
@@ -135,15 +136,14 @@ export class Question {
     }
 
     formatForNote(settings: SRSettings): string {
-        let result: string = 
-            this.questionText.formatForNote() + 
-            this.getHtmlCommentSeparator(settings) + 
+        let result: string =
+            this.questionText.formatForNote() +
+            this.getHtmlCommentSeparator(settings) +
             this.formatScheduleAsHtmlComment(settings);
         return result;
     }
 
     updateQuestionText(noteText: string, settings: SRSettings): string {
-
         let originalText: string = this.questionText.original;
 
         let replacementText = this.formatForNote(settings);
@@ -153,7 +153,6 @@ export class Question {
     }
 
     async writeQuestion(settings: SRSettings): Promise<void> {
-
         let fileText: string = await this.note.file.read();
 
         let newText: string = this.updateQuestionText(fileText, settings);
@@ -161,9 +160,14 @@ export class Question {
         this.hasChanged = false;
     }
 
-    static Create(settings: SRSettings, questionType: CardType, noteTopicPath: TopicPath, originalText: string, 
-        lineNo: number, context: string[]): Question {
-
+    static Create(
+        settings: SRSettings,
+        questionType: CardType,
+        noteTopicPath: TopicPath,
+        originalText: string,
+        lineNo: number,
+        context: string[],
+    ): Question {
         let hasEditLaterTag = originalText.includes(settings.editLaterTag);
         let questionText: QuestionText = QuestionText.Create(originalText, settings);
 
@@ -172,19 +176,17 @@ export class Question {
             topicPath = questionText.topicPath;
         }
 
-        let result: Question = new Question({ 
-            questionType, 
-            topicPath, 
-            questionText, 
-            lineNo, 
-            hasEditLaterTag, 
-            questionContext: context, 
-            cards: null, 
-            hasChanged: false
+        let result: Question = new Question({
+            questionType,
+            topicPath,
+            questionText,
+            lineNo,
+            hasEditLaterTag,
+            questionContext: context,
+            cards: null,
+            hasChanged: false,
         });
 
         return result;
     }
 }
-
-

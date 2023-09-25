@@ -11,7 +11,6 @@ let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 var noteFileLoader: NoteFileLoader = new NoteFileLoader(DEFAULT_SETTINGS);
 
 describe("appendCardsToDeck", () => {
-
     test("Multiple questions, single card per question", async () => {
         let noteText: string = `#flashcards/test
 Q1::A1
@@ -29,7 +28,7 @@ Q3::A3
         expect(subdeck.newFlashcards[2].front).toEqual("Q3");
         expect(subdeck.dueFlashcards.length).toEqual(0);
     });
-    
+
     test("Multiple questions, multiple cards per question", async () => {
         let noteText: string = `#flashcards/test
 Q1:::A1
@@ -48,13 +47,9 @@ Q3:::A3
         expect(frontList).toEqual(["Q1", "A1", "Q2", "A2", "Q3", "A3"]);
         expect(subdeck.dueFlashcards.length).toEqual(0);
     });
-    
-    
 });
 
-
 describe("writeNoteFile", () => {
-
     test("Multiple questions, some with too many schedule details", async () => {
         let originalText: string = `#flashcards/test
 Q1::A1
@@ -78,6 +73,4 @@ Q3:::A3
 `;
         expect(updatedText).toEqual(expectedText);
     });
-    
 });
-

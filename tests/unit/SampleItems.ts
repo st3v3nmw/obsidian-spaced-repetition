@@ -9,11 +9,11 @@ import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
 
-export function createTest_NoteQuestionParser(settings: SRSettings) : NoteQuestionParser {
+export function createTest_NoteQuestionParser(settings: SRSettings): NoteQuestionParser {
     let questionParser: NoteQuestionParser = new NoteQuestionParser(settings);
     return questionParser;
 }
-export function createTest_NoteParser() : NoteParser {
+export function createTest_NoteParser(): NoteParser {
     let result = new NoteParser(DEFAULT_SETTINGS);
     return result;
 }
@@ -43,7 +43,10 @@ Q3::A3`;
         return await this.createDeckFromFile(file, folderTopicPath);
     }
 
-    static async createDeckFromFile(file: UnitTestSRFile, folderTopicPath: TopicPath): Promise<Deck> {
+    static async createDeckFromFile(
+        file: UnitTestSRFile,
+        folderTopicPath: TopicPath,
+    ): Promise<Deck> {
         let deck: Deck = new Deck("Root", null);
         let topicPath: TopicPath = TopicPath.emptyPath;
         let noteParser: NoteParser = createTest_NoteParser();
@@ -51,7 +54,4 @@ Q3::A3`;
         note.appendCardsToDeck(deck);
         return deck;
     }
-
 }
-
-

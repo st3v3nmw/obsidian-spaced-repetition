@@ -19,10 +19,7 @@ export class NoteEaseList implements INoteEaseList {
     }
 
     hasEaseForPath(path: string): boolean {
-        return Object.prototype.hasOwnProperty.call(
-            this.dict,
-            path
-        );
+        return Object.prototype.hasOwnProperty.call(this.dict, path);
     }
 
     getEaseByPath(path: string): number {

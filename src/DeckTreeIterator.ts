@@ -4,9 +4,19 @@ import { Question } from "./Question";
 import { TopicPath } from "./TopicPath";
 import { globalRandomNumberProvider } from "./util/RandomNumberProvider";
 
-export enum CardListOrder { NewFirst, DueFirst, Random }
-export enum OrderMethod { Sequential, Random }
-export enum IteratorDeckSource { UpdatedByIterator, CloneBeforeUse };
+export enum CardListOrder {
+    NewFirst,
+    DueFirst,
+    Random,
+}
+export enum OrderMethod {
+    Sequential,
+    Random,
+}
+export enum IteratorDeckSource {
+    UpdatedByIterator,
+    CloneBeforeUse,
+}
 
 export interface IIteratorOrder {
     // Choose decks in sequential order, or randomly
@@ -39,18 +49,20 @@ class SingleDeckIterator {
     cardListType?: CardListType;
 
     get hasCurrentCard(): boolean {
-        return (this.cardIdx != null);
+        return this.cardIdx != null;
     }
 
     get currentCard(): Card {
-        if (this.cardIdx == null)
-            return null;
+        if (this.cardIdx == null) return null;
         return this.deck.getCard(this.cardIdx, this.cardListType);
     }
 
     constructor(iteratorOrder: IIteratorOrder) {
         this.iteratorOrder = iteratorOrder;
-        this.preferredCardListType = this.iteratorOrder.cardListOrder == CardListOrder.DueFirst ? CardListType.DueCard: CardListType.NewCard;
+        this.preferredCardListType =
+            this.iteratorOrder.cardListOrder == CardListOrder.DueFirst
+                ? CardListType.DueCard
+                : CardListType.NewCard;
     }
 
     setDeck(deck: Deck): void {
@@ -76,8 +88,7 @@ class SingleDeckIterator {
                 if (!this.nextCardWithinList()) {
                     this.setCardListType(null);
                 }
-            }
-            else {
+            } else {
                 this.cardIdx = null;
             }
         }
@@ -92,7 +103,7 @@ class SingleDeckIterator {
         if (this.hasCurrentCard) {
             this.deleteCurrentCard();
         }
-        result = (cardList.length > 0);
+        result = cardList.length > 0;
         if (result) {
             switch (this.iteratorOrder.cardOrder) {
                 case OrderMethod.Sequential:
@@ -113,8 +124,7 @@ class SingleDeckIterator {
         let cards: Card[] = this.deck.getCardListForCardType(this.cardListType);
         do {
             this.deck.deleteCardAtIndex(this.cardIdx, this.cardListType);
-        }
-        while ((this.cardIdx < cards.length) && Object.is(q, cards[this.cardIdx].question))
+        } while (this.cardIdx < cards.length && Object.is(q, cards[this.cardIdx].question));
         this.setNoCurrentCard();
     }
 
@@ -127,8 +137,7 @@ class SingleDeckIterator {
     moveCurrentCardToEndOfList(): void {
         this.ensureCurrentCard();
         let cardList: Card[] = this.deck.getCardListForCardType(this.cardListType);
-        if (cardList.length <= 1)
-            return;
+        if (cardList.length <= 1) return;
         let card = this.currentCard;
         this.deck.deleteCardAtIndex(this.cardIdx, this.cardListType);
         this.deck.appendCard(TopicPath.emptyPath, card);
@@ -140,10 +149,8 @@ class SingleDeckIterator {
     }
 
     private ensureCurrentCard() {
-        if ((this.cardIdx == null) || (this.cardListType == null))
-            throw "no current card";
+        if (this.cardIdx == null || this.cardListType == null) throw "no current card";
     }
-
 }
 
 export class DeckTreeIterator implements IDeckTreeIterator {
@@ -157,18 +164,16 @@ export class DeckTreeIterator implements IDeckTreeIterator {
     deckIdx?: number;
 
     get hasCurrentCard(): boolean {
-        return (this.deckIdx != null) && this.singleDeckIterator.hasCurrentCard;
+        return this.deckIdx != null && this.singleDeckIterator.hasCurrentCard;
     }
 
     get currentDeck(): Deck {
-        if (this.deckIdx == null)
-            return null;
+        if (this.deckIdx == null) return null;
         return this.deckArray[this.deckIdx];
     }
 
     get currentCard(): Card {
-        if ((this.deckIdx == null) || !this.singleDeckIterator.hasCurrentCard)
-            return null;
+        if (this.deckIdx == null || !this.singleDeckIterator.hasCurrentCard) return null;
         return this.singleDeckIterator.currentCard;
     }
 
@@ -180,8 +185,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
 
     setDeck(deck: Deck): void {
         // We don't want to change the supplied deck, so first clone
-        if (this.deckSource == IteratorDeckSource.CloneBeforeUse)
-            deck = deck.clone();
+        if (this.deckSource == IteratorDeckSource.CloneBeforeUse) deck = deck.clone();
 
         this.deckTree = deck;
         this.deckArray = deck.toDeckArray();
@@ -190,8 +194,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
 
     private setDeckIdx(deckIdx?: number): void {
         this.deckIdx = deckIdx;
-        if (deckIdx != null)
-            this.singleDeckIterator.setDeck(this.deckArray[deckIdx]);
+        if (deckIdx != null) this.singleDeckIterator.setDeck(this.deckArray[deckIdx]);
     }
 
     nextCard(): boolean {
@@ -209,8 +212,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
                 this.singleDeckIterator.setDeck(this.deckArray[this.deckIdx]);
             }
         }
-        if (!result)
-            this.deckIdx = null;
+        if (!result) this.deckIdx = null;
         return result;
     }
 
@@ -222,7 +224,6 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         }
         return result;
     }
-
 
     deleteCurrentQuestion(): boolean {
         this.singleDeckIterator.deleteCurrentQuestion();

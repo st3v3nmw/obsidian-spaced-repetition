@@ -8,7 +8,6 @@ import {
 import { OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "./constants";
 import { getAllTagsFromText } from "./util/utils";
 
-
 export interface ISRFile {
     get path(): string;
     get basename(): string;
@@ -42,7 +41,6 @@ export class SrTFile implements ISRFile {
         return ObsidianGetAllTags(fileCachedData) || [];
     }
 
-        
     getQuestionContext(cardLine: number): string[] {
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
         const headings: HeadingCache[] = fileCachedData.headings || [];
@@ -66,7 +64,6 @@ export class SrTFile implements ISRFile {
         }
         return result;
     }
-
 
     async read(): Promise<string> {
         return await this.vault.read(this.file);
@@ -95,7 +92,7 @@ export class UnitTestSRFile implements ISRFile {
     }
 
     getAllTags(): string[] {
-        return getAllTagsFromText(this.content);      
+        return getAllTagsFromText(this.content);
     }
 
     getQuestionContext(cardLine: number): string[] {

@@ -3,23 +3,19 @@ import { TopicPath } from "src/TopicPath";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 
 describe("Constructor exception handling", () => {
-
     test("Constructor rejects null path", () => {
-            
-            const t = () => {
-                let path: TopicPath = new TopicPath(null);
-            };
-            expect(t).toThrow();
+        const t = () => {
+            let path: TopicPath = new TopicPath(null);
+        };
+        expect(t).toThrow();
     });
 
     test("Constructor allows zero length array", () => {
-            
         let path: TopicPath = new TopicPath([]);
         expect(path.hasPath).toEqual(false);
     });
 
     test("Constructor rejects path that includes '/'", () => {
-            
         const t = () => {
             let path: TopicPath = new TopicPath(["Hello/Goodbye"]);
         };
@@ -27,11 +23,9 @@ describe("Constructor exception handling", () => {
     });
 });
 
-
 describe("shift", () => {
-
     test("shift() on multi-part path", () => {
-        let path: TopicPath = new TopicPath(["Level1", "Level2", "Level3"])
+        let path: TopicPath = new TopicPath(["Level1", "Level2", "Level3"]);
         let result: string = path.shift();
 
         expect(result).toEqual("Level1");
@@ -39,7 +33,7 @@ describe("shift", () => {
     });
 
     test("shift() on single-part path", () => {
-        let path: TopicPath = new TopicPath(["Level1"])
+        let path: TopicPath = new TopicPath(["Level1"]);
         let result: string = path.shift();
 
         expect(result).toEqual("Level1");
@@ -47,7 +41,7 @@ describe("shift", () => {
     });
 
     test("shift() on empty path", () => {
-        let path: TopicPath = new TopicPath(["Level1"])
+        let path: TopicPath = new TopicPath(["Level1"]);
         let result: string = path.shift();
 
         const t = () => {
@@ -57,9 +51,7 @@ describe("shift", () => {
     });
 });
 
-
 describe("getTopicPathFromCardText", () => {
-
     test("Card text doesn't include tag", () => {
         let cardText: string = "Card text doesn't include tag";
         let path: TopicPath = TopicPath.getTopicPathFromCardText(cardText);
@@ -87,16 +79,15 @@ describe("getTopicPathFromCardText", () => {
     });
 
     test("Card text includes 2 multi level tags", () => {
-        let cardText: string = "#flashcards/science/chemistry Card text includes multiple tag #flashcards/test/chemistry";
+        let cardText: string =
+            "#flashcards/science/chemistry Card text includes multiple tag #flashcards/test/chemistry";
         let path: TopicPath = TopicPath.getTopicPathFromCardText(cardText);
 
         expect(path).toEqual(new TopicPath(["flashcards", "science", "chemistry"]));
     });
 });
 
-
 describe("removeTopicPathFromCardText", () => {
-
     test("Card text doesn't include tag", () => {
         let cardText: string = "Card text doesn't include tag";
         let result: string = TopicPath.removeTopicPathFromStartOfCardText(cardText);
@@ -127,7 +118,6 @@ describe("removeTopicPathFromCardText", () => {
 });
 
 describe("getTopicPathFromTag", () => {
-
     test("Null string", () => {
         const t = () => {
             TopicPath.getTopicPathFromTag(null);
@@ -144,14 +134,14 @@ describe("getTopicPathFromTag", () => {
 
     test("String that doesn't start with a #", () => {
         const t = () => {
-            TopicPath.getTopicPathFromTag("Invalid tag")
+            TopicPath.getTopicPathFromTag("Invalid tag");
         };
         expect(t).toThrow();
     });
 
     test("String that is only the #", () => {
         const t = () => {
-            TopicPath.getTopicPathFromTag("#")
+            TopicPath.getTopicPathFromTag("#");
         };
         expect(t).toThrow();
     });
@@ -181,9 +171,7 @@ describe("getTopicPathFromTag", () => {
     });
 });
 
-
 describe("isSameOrAncestorOf", () => {
-
     test("a, b are both empty", () => {
         let a: TopicPath = TopicPath.emptyPath;
         let b: TopicPath = TopicPath.emptyPath;
@@ -235,9 +223,7 @@ describe("isSameOrAncestorOf", () => {
     });
 });
 
-
 describe("clone", () => {
-
     test("clone of empty", () => {
         let a: TopicPath = TopicPath.emptyPath;
         let b: TopicPath = a.clone();
@@ -255,7 +241,6 @@ describe("clone", () => {
     });
 });
 
-
 describe("getTopicPathOfFile", () => {
     describe("convertFoldersToDecks: false", () => {
         test("Mixture of irrelevant tags and relevant ones", () => {
@@ -271,14 +256,12 @@ describe("getTopicPathOfFile", () => {
 
             expect(TopicPath.getTopicPathOfFile(file, DEFAULT_SETTINGS).path).toEqual(expected);
         });
-
     });
 
     describe("convertFoldersToDecks: true", () => {
         let settings_ConvertFoldersToDecks: SRSettings = { ...DEFAULT_SETTINGS };
         settings_ConvertFoldersToDecks.convertFoldersToDecks = true;
         test("Mixture of irrelevant tags and relevant ones", () => {
-
             let ignoredContent: string = `
             #ignored Q1::A1
             #ignored Q2::A2 <!--SR:!2023-09-02,4,270-->
@@ -287,13 +270,11 @@ describe("getTopicPathOfFile", () => {
             #flashcards/science/physics Q5::A5 <!--SR:!2023-09-02,4,270-->
             #flashcards/math Q6::A6`;
 
-            let fakeFilePath: string = "history/modern/Greek.md"
+            let fakeFilePath: string = "history/modern/Greek.md";
             let file: ISRFile = new UnitTestSRFile(ignoredContent, fakeFilePath);
             let expected = ["history", "modern"];
             let actual = TopicPath.getTopicPathOfFile(file, settings_ConvertFoldersToDecks);
             expect(actual.path).toEqual(expected);
         });
-
     });
-
 });

@@ -38,9 +38,10 @@ export class DeckStats {
     }
 }
 
-
-
-export enum FlashcardReviewMode { Cram, Review };
+export enum FlashcardReviewMode {
+    Cram,
+    Review,
+}
 
 export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     private _originalDeckTree: Deck;
@@ -51,13 +52,18 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     private cardScheduleCalculator: ICardScheduleCalculator;
     private questionPostponementList: IQuestionPostponementList;
 
-    constructor(reviewMode: FlashcardReviewMode, cardSequencer: IDeckTreeIterator, settings: SRSettings, cardScheduleCalculator: ICardScheduleCalculator, 
-        questionPostponementList: IQuestionPostponementList) {
-            this.reviewMode = reviewMode;
-            this.cardSequencer = cardSequencer;
-            this.settings = settings;
-            this.cardScheduleCalculator = cardScheduleCalculator;
-            this.questionPostponementList = questionPostponementList;
+    constructor(
+        reviewMode: FlashcardReviewMode,
+        cardSequencer: IDeckTreeIterator,
+        settings: SRSettings,
+        cardScheduleCalculator: ICardScheduleCalculator,
+        questionPostponementList: IQuestionPostponementList,
+    ) {
+        this.reviewMode = reviewMode;
+        this.cardSequencer = cardSequencer;
+        this.settings = settings;
+        this.cardScheduleCalculator = cardScheduleCalculator;
+        this.questionPostponementList = questionPostponementList;
     }
 
     get hasCurrentCard(): boolean {
@@ -72,7 +78,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         return this.currentCard?.question;
     }
 
-    get currentDeck(): Deck { 
+    get currentDeck(): Deck {
         return this.cardSequencer.currentDeck;
     }
 
@@ -97,7 +103,9 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     getDeckStats(topicPath: TopicPath): DeckStats {
-        let totalCount: number = this._originalDeckTree.getDeck(topicPath).getCardCount(CardListType.All, true);
+        let totalCount: number = this._originalDeckTree
+            .getDeck(topicPath)
+            .getCardCount(CardListType.All, true);
         let remainingDeck: Deck = this.remainingDeckTree.getDeck(topicPath);
         let newCount: number = remainingDeck.getCardCount(CardListType.NewCard, true);
         let dueCount: number = remainingDeck.getCardCount(CardListType.DueCard, true);
@@ -130,25 +138,21 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
         // Update the source file with the updated schedule
         await this.currentQuestion.writeQuestion(this.settings);
-        
+
         // Move/delete the card
         if (response == ReviewResponse.Reset) {
             this.cardSequencer.moveCurrentCardToEndOfList();
             this.cardSequencer.nextCard();
-        } else
-            this.deleteCurrentCard();
+        } else this.deleteCurrentCard();
     }
 
     async processReview_CramMode(response: ReviewResponse): Promise<void> {
-
-        if (response == ReviewResponse.Easy)
-            this.deleteCurrentCard();
+        if (response == ReviewResponse.Easy) this.deleteCurrentCard();
         else {
             this.cardSequencer.moveCurrentCardToEndOfList();
             this.cardSequencer.nextCard();
         }
     }
-
 
     determineCardSchedule(response: ReviewResponse, card: Card): CardScheduleInfo {
         var result: CardScheduleInfo;
@@ -159,10 +163,16 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         } else {
             // scheduled card
             if (card.hasSchedule) {
-                result = this.cardScheduleCalculator.calcUpdatedSchedule(response, card.scheduleInfo);
+                result = this.cardScheduleCalculator.calcUpdatedSchedule(
+                    response,
+                    card.scheduleInfo,
+                );
             } else {
                 let currentNote: Note = card.question.note;
-                result = this.cardScheduleCalculator.getNewCardSchedule(response, currentNote.filePath);
+                result = this.cardScheduleCalculator.getNewCardSchedule(
+                    response,
+                    currentNote.filePath,
+                );
             }
         }
         return result;
@@ -175,7 +185,5 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         q.actualQuestion = actualQuestion;
 
         await this.currentQuestion.writeQuestion(this.settings);
-
     }
-
 }

@@ -7,30 +7,29 @@ import { SRSettings } from "./settings";
 import { ISRFile, UnitTestSRFile } from "./SRFile";
 import { TopicPath } from "./TopicPath";
 
-export class ParsedQuestionInfo { 
+export class ParsedQuestionInfo {
     cardType: CardType;
     cardText: string;
     lineNo: number;
 
-    constructor(cardType: CardType, cardText: string, lineNo: number) { 
+    constructor(cardType: CardType, cardText: string, lineNo: number) {
         this.cardType = cardType;
         this.cardText = cardText;
         this.lineNo = lineNo;
     }
 }
 
-
-export class NoteQuestionParser { 
+export class NoteQuestionParser {
     settings: SRSettings;
     noteFile: ISRFile;
     noteTopicPath: TopicPath;
     noteText: string;
 
-    constructor(settings: SRSettings) { 
+    constructor(settings: SRSettings) {
         this.settings = settings;
     }
 
-    async createQuestionList(noteFile: ISRFile, folderTopicPath: TopicPath): Promise<Question[]> { 
+    async createQuestionList(noteFile: ISRFile, folderTopicPath: TopicPath): Promise<Question[]> {
         this.noteFile = noteFile;
         let noteText: string = await noteFile.read();
         var noteTopicPath: TopicPath;
@@ -44,7 +43,7 @@ export class NoteQuestionParser {
         return result;
     }
 
-    private doCreateQuestionList(noteText: string, noteTopicPath: TopicPath): Question[] { 
+    private doCreateQuestionList(noteText: string, noteTopicPath: TopicPath): Question[] {
         this.noteText = noteText;
         this.noteTopicPath = noteTopicPath;
 
@@ -55,10 +54,15 @@ export class NoteQuestionParser {
             let question: Question = this.createQuestionObject(parsedQuestionInfo);
 
             // Each rawCardText can turn into multiple CardFrontBack's (e.g. CardType.Cloze, CardType.SingleLineReversed)
-            let cardFrontBackList: CardFrontBack[] = CardFrontBackUtil.expand(question.questionType, question.questionText.actualQuestion, this.settings);
+            let cardFrontBackList: CardFrontBack[] = CardFrontBackUtil.expand(
+                question.questionType,
+                question.questionText.actualQuestion,
+                this.settings,
+            );
 
             // And if the card has been reviewed, then scheduling info as well
-            let cardScheduleInfoList: CardScheduleInfo[] = NoteCardScheduleParser.createCardScheduleInfoList(question.questionText.original);
+            let cardScheduleInfoList: CardScheduleInfo[] =
+                NoteCardScheduleParser.createCardScheduleInfoList(question.questionText.original);
 
             // we have some extra scheduling dates to delete
             let correctLength = cardFrontBackList.length;
@@ -75,7 +79,7 @@ export class NoteQuestionParser {
         return result;
     }
 
-    private parseQuestions(): [CardType, string, number][] { 
+    private parseQuestions(): [CardType, string, number][] {
         let settings: SRSettings = this.settings;
         const lines: string[] = this.noteText.replaceAll("\r\n", "\n").split("\n");
         const result: [CardType, string, number][] = parse(
@@ -91,29 +95,37 @@ export class NoteQuestionParser {
         return result;
     }
 
-    private createQuestionObject(parsedQuestionInfo: ParsedQuestionInfo): Question { 
-        var {cardType, cardText, lineNo} = parsedQuestionInfo;
+    private createQuestionObject(parsedQuestionInfo: ParsedQuestionInfo): Question {
+        var { cardType, cardText, lineNo } = parsedQuestionInfo;
 
         let originalQuestionText: string = cardText;
         const questionContext: string[] = this.noteFile.getQuestionContext(lineNo);
-        let result = Question.Create(this.settings, cardType, this.noteTopicPath, cardText, lineNo, questionContext);
+        let result = Question.Create(
+            this.settings,
+            cardType,
+            this.noteTopicPath,
+            cardText,
+            lineNo,
+            questionContext,
+        );
         return result;
     }
 
-    private createCardList(cardFrontBackList: CardFrontBack[], cardScheduleInfoList: CardScheduleInfo[]): Card[] { 
-
+    private createCardList(
+        cardFrontBackList: CardFrontBack[],
+        cardScheduleInfoList: CardScheduleInfo[],
+    ): Card[] {
         const siblings: Card[] = [];
 
         // One card for each CardFrontBack, regardless if there is scheduled info for it
         for (let i = 0; i < cardFrontBackList.length; i++) {
-
             let { front, back } = cardFrontBackList[i];
 
             let hasScheduleInfo: boolean = i < cardScheduleInfoList.length;
             const cardObj: Card = new Card({
                 front,
                 back,
-                cardIdx: i
+                cardIdx: i,
             });
             cardObj.scheduleInfo = hasScheduleInfo ? cardScheduleInfoList[i] : null;
 
@@ -134,5 +146,4 @@ export class NoteQuestionParser {
         }
         return result;
     }
-
 }

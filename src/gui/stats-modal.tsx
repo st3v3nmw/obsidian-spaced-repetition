@@ -36,7 +36,6 @@ Chart.register(
     ArcElement,
 );
 
-
 export class StatsModal extends Modal {
     private plugin: SRPlugin;
 
@@ -130,16 +129,11 @@ export class StatsModal extends Modal {
         // Add intervals
         const average_interval: string = textInterval(
                 Math.round(
-                    (cardStats.intervals.getTotalOfValueMultiplyCount() /
-                        scheduledCount) *
-                        10,
+                    (cardStats.intervals.getTotalOfValueMultiplyCount() / scheduledCount) * 10,
                 ) / 10 || 0,
                 false,
             ),
-            longest_interval: string = textInterval(
-                cardStats.intervals.getMaxValue(),
-                false,
-            );
+            longest_interval: string = textInterval(cardStats.intervals.getMaxValue(), false);
 
         createStatsChart(
             "bar",
@@ -160,9 +154,7 @@ export class StatsModal extends Modal {
             cardStats.eases.clearCountIfMissing(ease);
         }
         const average_ease: number =
-            Math.round(
-                cardStats.eases.getTotalOfValueMultiplyCount() / scheduledCount
-            ) || 0;
+            Math.round(cardStats.eases.getTotalOfValueMultiplyCount() / scheduledCount) || 0;
 
         createStatsChart(
             "bar",

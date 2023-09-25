@@ -4,7 +4,11 @@ import { Question } from "./Question";
 import { IQuestionPostponementList } from "./QuestionPostponementList";
 import { TopicPath } from "./TopicPath";
 
-export enum CardListType {NewCard, DueCard, All}
+export enum CardListType {
+    NewCard,
+    DueCard,
+    All,
+}
 
 export class Deck {
     public deckName: string;
@@ -15,9 +19,9 @@ export class Deck {
 
     public getCardCount(cardListType: CardListType, includeSubdeckCounts: boolean): number {
         let result: number = 0;
-        if ((cardListType == CardListType.NewCard) || (cardListType == CardListType.All))
+        if (cardListType == CardListType.NewCard || cardListType == CardListType.All)
             result += this.newFlashcards.length;
-        if ((cardListType == CardListType.DueCard) || (cardListType == CardListType.All))
+        if (cardListType == CardListType.DueCard || cardListType == CardListType.All)
             result += this.dueFlashcards.length;
 
         if (includeSubdeckCounts) {
@@ -41,7 +45,7 @@ export class Deck {
     }
 
     get isRootDeck() {
-        return (this.parent == null);
+        return this.parent == null;
     }
 
     getDeck(topicPath: TopicPath): Deck {
@@ -63,7 +67,7 @@ export class Deck {
                 return subdeck._getOrCreateDeck(t, createAllowed);
             }
         }
-        
+
         let result: Deck = null;
         if (createAllowed) {
             let parent: Deck = this;
@@ -88,8 +92,8 @@ export class Deck {
         let deck: Deck = this;
         while (!deck.isRootDeck) {
             deck = deck.parent;
-        }   
-        return deck;  
+        }
+        return deck;
     }
 
     getCard(index: number, cardListType: CardListType): Card {
@@ -98,21 +102,20 @@ export class Deck {
     }
 
     getCardListForCardType(cardListType: CardListType): Card[] {
-        return (cardListType == CardListType.DueCard) ? this.dueFlashcards : this.newFlashcards;
+        return cardListType == CardListType.DueCard ? this.dueFlashcards : this.newFlashcards;
     }
 
     appendCard(topicPath: TopicPath, cardObj: Card): void {
         let deck: Deck = this.getOrCreateDeck(topicPath);
         let cardList: Card[] = deck.getCardListForCardType(cardObj.cardListType);
-        
+
         cardList.push(cardObj);
     }
 
     deleteCard(card: Card): void {
         let cardList: Card[] = this.getCardListForCardType(card.cardListType);
         let idx = cardList.indexOf(card);
-        if (idx != -1)
-            cardList.splice(idx, 1);
+        if (idx != -1) cardList.splice(idx, 1);
     }
 
     deleteCardAtIndex(index: number, cardListType: CardListType): void {
@@ -121,7 +124,7 @@ export class Deck {
     }
 
     deleteAllCardsForQuestion(question: Question): void {
-        for (let idx = question.cards.length - 1; idx >= 0; idx--) { 
+        for (let idx = question.cards.length - 1; idx >= 0; idx--) {
             this.deleteCardAtIndex(idx, question.cards[idx].cardListType);
         }
     }
@@ -151,8 +154,8 @@ export class Deck {
     }
 
     debugLogToConsole(desc: string = null) {
-        let str: string = (desc != null) ? `${desc}: ` : "";
-        console.log(str += this.toString());
+        let str: string = desc != null ? `${desc}: ` : "";
+        console.log((str += this.toString()));
     }
 
     toString(indent: number = 0): string {
@@ -183,8 +186,8 @@ export class Deck {
 
     copyWithCardFilter(predicate: (value: Card) => boolean, parent: Deck = null): Deck {
         let result: Deck = new Deck(this.deckName, parent);
-        result.newFlashcards = [... this.newFlashcards.filter((card) => predicate(card))];
-        result.dueFlashcards = [... this.dueFlashcards.filter((card) => predicate(card))];
+        result.newFlashcards = [...this.newFlashcards.filter((card) => predicate(card))];
+        result.dueFlashcards = [...this.dueFlashcards.filter((card) => predicate(card))];
 
         for (const s of this.subdecks) {
             let newParent = result;
@@ -196,27 +199,27 @@ export class Deck {
 
     static otherListType(cardListType: CardListType): CardListType {
         var result: CardListType;
-        if (cardListType == CardListType.NewCard)
-            result = CardListType.DueCard;
-        else if (cardListType == CardListType.DueCard)
-            result = CardListType.NewCard;
-        else
-            throw "Invalid cardListType";
+        if (cardListType == CardListType.NewCard) result = CardListType.DueCard;
+        else if (cardListType == CardListType.DueCard) result = CardListType.NewCard;
+        else throw "Invalid cardListType";
         return result;
     }
 }
 
 export class DeckTreeFilter {
-
     static filterForReviewableCards(reviewableDeckTree: Deck): Deck {
-        return reviewableDeckTree.copyWithCardFilter((card) => 
-            !card.question.hasEditLaterTag);
+        return reviewableDeckTree.copyWithCardFilter((card) => !card.question.hasEditLaterTag);
     }
 
-    static filterForRemainingCards(questionPostponementList: IQuestionPostponementList, deckTree: Deck, reviewMode: FlashcardReviewMode): Deck {
-        return deckTree.copyWithCardFilter((card) => 
-            ((reviewMode == FlashcardReviewMode.Cram) || card.isNew || card.isDue)
-            && !questionPostponementList.includes(card.question));
+    static filterForRemainingCards(
+        questionPostponementList: IQuestionPostponementList,
+        deckTree: Deck,
+        reviewMode: FlashcardReviewMode,
+    ): Deck {
+        return deckTree.copyWithCardFilter(
+            (card) =>
+                (reviewMode == FlashcardReviewMode.Cram || card.isNew || card.isDue) &&
+                !questionPostponementList.includes(card.question),
+        );
     }
-
 }

@@ -61,23 +61,22 @@ export function cyrb53(str: string, seed = 0): string {
 
 // ✅ Defining a reusable function
 function padTo2Digits(num: number) {
-  return num.toString().padStart(2, '0');
+    return num.toString().padStart(2, "0");
 }
 
 export function ticksFromDate(year: number, month: number, day: number): number {
-  return moment({year, month, day}).utc().valueOf();
+    return moment({ year, month, day }).utc().valueOf();
 }
 
 // 👇️ format as "YYYY-MM-DD"
 // https://bobbyhadz.com/blog/typescript-date-format
 export function formatDate_YYYY_MM_DD(ticks: Moment): string {
-  return ticks.format(PREFERRED_DATE_FORMAT);
+    return ticks.format(PREFERRED_DATE_FORMAT);
 }
 
 export function getAllTagsFromText(text: string): string[] {
-  const tagRegex = /#[^\s#]+/gi;
-  let result: RegExpMatchArray = text.match(tagRegex);
-  if (!result)
-    return [];
-  return result;      
+    const tagRegex = /#[^\s#]+/gi;
+    let result: RegExpMatchArray = text.match(tagRegex);
+    if (!result) return [];
+    return result;
 }

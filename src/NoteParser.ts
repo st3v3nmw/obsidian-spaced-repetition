@@ -8,7 +8,7 @@ export class NoteParser {
     settings: SRSettings;
     noteText: string;
 
-    constructor(settings: SRSettings) { 
+    constructor(settings: SRSettings) {
         this.settings = settings;
     }
 
@@ -19,5 +19,4 @@ export class NoteParser {
         let result: Note = new Note(noteFile, questions);
         return result;
     }
-
 }

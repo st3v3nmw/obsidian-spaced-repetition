@@ -29,7 +29,7 @@ export class ReviewQueueListView extends ItemView {
     public getIcon(): string {
         return "SpacedRepIcon";
     }
- 
+
     public onHeaderMenu(menu: Menu): void {
         menu.addItem((item) => {
             item.setTitle(t("CLOSE"))
