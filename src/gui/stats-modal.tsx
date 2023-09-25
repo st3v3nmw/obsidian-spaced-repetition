@@ -72,13 +72,13 @@ export class StatsModal extends Modal {
 
         // Add forecast
         const cardStats: Stats = this.plugin.cardStats;
-        let maxN: number = cardStats.intervals.getMaxValue();
+        let maxN: number = cardStats.delayedDays.getMaxValue();
         for (let dueOffset = 0; dueOffset <= maxN; dueOffset++) {
-            cardStats.intervals.clearCountIfMissing(dueOffset);
+            cardStats.delayedDays.clearCountIfMissing(dueOffset);
         }
 
         const dueDatesFlashcardsCopy: Record<number, number> = { 0: 0 };
-        for (const [dueOffset, dueCount] of getTypedObjectEntries(cardStats.intervals.dict)) {
+        for (const [dueOffset, dueCount] of getTypedObjectEntries(cardStats.delayedDays.dict)) {
             if (dueOffset <= 0) {
                 dueDatesFlashcardsCopy[0] += dueCount;
             } else {
@@ -146,8 +146,8 @@ export class StatsModal extends Modal {
             "intervalsChart",
             t("INTERVALS"),
             t("INTERVALS_DESC"),
-            Object.keys(cardStats.intervals),
-            Object.values(cardStats.intervals),
+            Object.keys(cardStats.intervals.dict),
+            Object.values(cardStats.intervals.dict),
             t("INTERVALS_SUMMARY", { avg: average_interval, longest: longest_interval }),
             t("COUNT"),
             t("DAYS"),
@@ -169,8 +169,8 @@ export class StatsModal extends Modal {
             "easesChart",
             t("EASES"),
             "",
-            Object.keys(cardStats.eases),
-            Object.values(cardStats.eases),
+            Object.keys(cardStats.eases.dict),
+            Object.values(cardStats.eases.dict),
             t("EASES_SUMMARY", { avgEase: average_ease }),
             t("COUNT"),
             t("EASES"),

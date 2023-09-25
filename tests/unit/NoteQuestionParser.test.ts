@@ -68,7 +68,7 @@ A::B
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
-        let delayDays = 6 - 3;
+        let delayDays = 3 - 6;
         let card1 = {
             cardIdx: 0, 
             scheduleInfo: CardScheduleInfo.fromDueDateStr("2023-09-03", 1, 230, delayDays * TICKS_PER_DAY), 

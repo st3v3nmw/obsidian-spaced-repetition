@@ -12,28 +12,28 @@ export class CardScheduleInfo {
     ease: number;
     delayBeforeReviewTicks: number;
 
-    constructor(dueDate: Moment, interval: number, ease: number, delayBeforeReview: number) { 
+    constructor(dueDate: Moment, interval: number, ease: number, delayBeforeReviewTicks: number) { 
         this.dueDate = dueDate;
         this.interval = interval;
         this.ease = ease;
-        this.delayBeforeReviewTicks = delayBeforeReview;
+        this.delayBeforeReviewTicks = delayBeforeReviewTicks;
     }
 
-    get delayBeforeReviewDays(): number {
-        return this.delayBeforeReviewTicks / TICKS_PER_DAY;
+    get delayBeforeReviewDaysInt(): number {
+        return Math.ceil(this.delayBeforeReviewTicks / TICKS_PER_DAY);
     }
 
     isDue(): boolean {
         return this.dueDate.isSameOrBefore(globalDateProvider.today);
     }
 
-    static fromDueDateStr(dueDateStr: string, interval: number, ease: number, delayBeforeReview: number) { 
+    static fromDueDateStr(dueDateStr: string, interval: number, ease: number, delayBeforeReviewTicks: number) { 
         let dueDateTicks: Moment = DateUtil.dateStrToMoment(dueDateStr);
-        return new CardScheduleInfo(dueDateTicks, interval, ease, delayBeforeReview);
+        return new CardScheduleInfo(dueDateTicks, interval, ease, delayBeforeReviewTicks);
     }
 
-    static fromDueDateMoment(dueDateTicks: Moment, interval: number, ease: number, delayBeforeReview: number) { 
-        return new CardScheduleInfo(dueDateTicks, interval, ease, delayBeforeReview);
+    static fromDueDateMoment(dueDateTicks: Moment, interval: number, ease: number, delayBeforeReviewTicks: number) { 
+        return new CardScheduleInfo(dueDateTicks, interval, ease, delayBeforeReviewTicks);
     }
 
     static get initialInterval(): number {
@@ -125,9 +125,9 @@ export class NoteCardScheduleParser {
             let interval = parseInt(match[2]);
             let ease = parseInt(match[3]);
             let dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
-            let delayBeforeReview: number = globalDateProvider.today.valueOf() - dueDate.valueOf();
+            let delayBeforeReviewTicks: number = dueDate.valueOf() - globalDateProvider.today.valueOf();
 
-            let info: CardScheduleInfo = new CardScheduleInfo(dueDate, interval, ease, delayBeforeReview);
+            let info: CardScheduleInfo = new CardScheduleInfo(dueDate, interval, ease, delayBeforeReviewTicks);
             result.push(info);
         }
         return result;

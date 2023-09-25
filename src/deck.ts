@@ -177,10 +177,14 @@ export class Deck {
         return result;
     }
 
+    clone(): Deck {
+        return this.copyWithCardFilter((card) => true);
+    }
+
     copyWithCardFilter(predicate: (value: Card) => boolean, parent: Deck = null): Deck {
         let result: Deck = new Deck(this.deckName, parent);
-        result.newFlashcards = this.newFlashcards.filter((card) => predicate(card));
-        result.dueFlashcards = this.dueFlashcards.filter((card) => predicate(card));
+        result.newFlashcards = [... this.newFlashcards.filter((card) => predicate(card))];
+        result.dueFlashcards = [... this.dueFlashcards.filter((card) => predicate(card))];
 
         for (const s of this.subdecks) {
             let newParent = result;

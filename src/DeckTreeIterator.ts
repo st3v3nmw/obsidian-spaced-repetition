@@ -4,8 +4,9 @@ import { Question } from "./Question";
 import { TopicPath } from "./TopicPath";
 import { globalRandomNumberProvider } from "./util/RandomNumberProvider";
 
-export enum CardListOrder {NewFirst, DueFirst, Random}
-export enum OrderMethod {Sequential, Random}
+export enum CardListOrder { NewFirst, DueFirst, Random }
+export enum OrderMethod { Sequential, Random }
+export enum IteratorDeckSource { UpdatedByIterator, CloneBeforeUse };
 
 export interface IIteratorOrder {
     // Choose decks in sequential order, or randomly
@@ -149,6 +150,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
     deckTree: Deck;
     preferredCardListType: CardListType;
     iteratorOrder: IIteratorOrder;
+    deckSource: IteratorDeckSource;
 
     singleDeckIterator: SingleDeckIterator;
     deckArray: Deck[];
@@ -170,12 +172,17 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         return this.singleDeckIterator.currentCard;
     }
 
-    constructor(iteratorOrder: IIteratorOrder) {
+    constructor(iteratorOrder: IIteratorOrder, deckSource: IteratorDeckSource) {
         this.singleDeckIterator = new SingleDeckIterator(iteratorOrder);
         this.iteratorOrder = iteratorOrder;
+        this.deckSource = deckSource;
     }
 
     setDeck(deck: Deck): void {
+        // We don't want to change the supplied deck, so first clone
+        if (this.deckSource == IteratorDeckSource.CloneBeforeUse)
+            deck = deck.clone();
+
         this.deckTree = deck;
         this.deckArray = deck.toDeckArray();
         this.setDeckIdx(null);

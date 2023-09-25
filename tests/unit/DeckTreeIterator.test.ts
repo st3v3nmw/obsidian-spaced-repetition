@@ -3,7 +3,7 @@ import { CardListType, Deck } from "src/Deck";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { SampleItemDecks } from "./SampleItems";
 import { TopicPath } from "src/TopicPath";
-import { CardListOrder, DeckTreeIterator, IIteratorOrder, OrderMethod } from "src/DeckTreeIterator";
+import { CardListOrder, DeckTreeIterator, IIteratorOrder, IteratorDeckSource, OrderMethod } from "src/DeckTreeIterator";
 import { StaticDateProvider, globalDateProvider, setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 import { setupNextRandomNumber } from "src/util/RandomNumberProvider";
 
@@ -36,7 +36,7 @@ describe("setDeck", () => {
         Q2::A2
         Q3::A3`;
         let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
-        let iterator: DeckTreeIterator = new DeckTreeIterator(order_NewFirst_Sequential);
+        let iterator: DeckTreeIterator = new DeckTreeIterator(order_NewFirst_Sequential, IteratorDeckSource.UpdatedByIterator);
         iterator.setDeck(deck);
         expect(iterator.currentDeck).toEqual(null);
     });
@@ -52,7 +52,7 @@ describe("nextCard", () => {
                 Q2::A2
                 Q3::A3`;
                 let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
-                let iterator: DeckTreeIterator = new DeckTreeIterator(order_DueFirst_Sequential);
+                let iterator: DeckTreeIterator = new DeckTreeIterator(order_DueFirst_Sequential, IteratorDeckSource.UpdatedByIterator);
                 iterator.setDeck(deck);
                 
                 // No due cards, so expect the new ones immediately
@@ -80,7 +80,7 @@ describe("nextCard", () => {
                     Q5::A5 <!--SR:!2023-09-02,4,270-->
                     Q6::A6`;
                     let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
-                    iterator = new DeckTreeIterator(order_DueFirst_Sequential);
+                    iterator = new DeckTreeIterator(order_DueFirst_Sequential, IteratorDeckSource.UpdatedByIterator);
                     iterator.setDeck(deck);
                     
                     // Scheduled cards first
@@ -115,7 +115,7 @@ describe("nextCard", () => {
                     #flashcards/science/chemistry Q8::A8
                                 `;
                     let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
-                    iterator = new DeckTreeIterator(order_DueFirst_Sequential);
+                    iterator = new DeckTreeIterator(order_DueFirst_Sequential, IteratorDeckSource.UpdatedByIterator);
                     iterator.setDeck(deck);
                     
                     // Due root deck's cards first
@@ -150,7 +150,7 @@ describe("nextCard", () => {
                 Q2::A2
                 Q3::A3`;
                 let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
-                let iterator: DeckTreeIterator = new DeckTreeIterator(order_NewFirst_Sequential);
+                let iterator: DeckTreeIterator = new DeckTreeIterator(order_NewFirst_Sequential, IteratorDeckSource.UpdatedByIterator);
                 iterator.setDeck(deck);
                 
                 expect(iterator.nextCard()).toEqual(true);
@@ -177,7 +177,7 @@ describe("nextCard", () => {
                     Q5::A5 <!--SR:!2023-09-02,4,270-->
                     Q6::A6`;
                     let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
-                    iterator = new DeckTreeIterator(order_NewFirst_Sequential);
+                    iterator = new DeckTreeIterator(order_NewFirst_Sequential, IteratorDeckSource.UpdatedByIterator);
                     iterator.setDeck(deck);
                     
                     // New cards first
@@ -204,7 +204,7 @@ describe("nextCard", () => {
                     Q5::A5 <!--SR:!2023-09-02,4,270-->
                     Q6::A6`;
                     let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
-                    iterator = new DeckTreeIterator(order_DueFirst_Sequential);
+                    iterator = new DeckTreeIterator(order_DueFirst_Sequential, IteratorDeckSource.UpdatedByIterator);
                     iterator.setDeck(deck);
                     
                     // Scheduled cards first
@@ -239,7 +239,7 @@ describe("nextCard", () => {
                     #flashcards/science/chemistry Q8::A8
                                 `;
                     let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
-                    iterator = new DeckTreeIterator(order_NewFirst_Sequential);
+                    iterator = new DeckTreeIterator(order_NewFirst_Sequential, IteratorDeckSource.UpdatedByIterator);
                     iterator.setDeck(deck);
                     
                     // New root deck's cards first
@@ -278,7 +278,7 @@ describe("nextCard", () => {
                 Q5::A5
                 Q6::A6`;
                 let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
-                iterator = new DeckTreeIterator(order_DueFirst_Random);
+                iterator = new DeckTreeIterator(order_DueFirst_Random, IteratorDeckSource.UpdatedByIterator);
                 iterator.setDeck(deck);
                 
                 // [0, 1, 2, 3, 4, 5, 6]
@@ -319,7 +319,7 @@ describe("nextCard", () => {
                 QN3::A
                 QS3::Q <!--SR:!2023-09-02,4,270-->`;
                 let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
-                iterator = new DeckTreeIterator(order_DueFirst_Random);
+                iterator = new DeckTreeIterator(order_DueFirst_Random, IteratorDeckSource.UpdatedByIterator);
                 iterator.setDeck(deck);
                 
                 // Scheduled cards first

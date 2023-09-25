@@ -33,13 +33,12 @@ export class Card {
         return this.hasSchedule && this.scheduleInfo.isDue();
     }
 
-    formatSchedule(settings: SRSettings): string {
-        let temp: CardScheduleInfo = this.scheduleInfo;
-        if (temp == null) {
-            temp =  CardScheduleInfo.fromDueDateStr("2000-01-01", 
-                CardScheduleInfo.initialInterval, 
-                settings.baseEase, 0);
-        }
-        return temp.formatSchedule();
+    formatSchedule(): string {
+        var result: string;
+        if (this.hasSchedule)
+            result = this.scheduleInfo.formatSchedule();
+        else
+            result = "New";
+        return result;
     }
 }

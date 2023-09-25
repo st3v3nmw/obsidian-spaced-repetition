@@ -1,6 +1,6 @@
 
 import { Card } from "./Card";
-import { NoteCardScheduleParser } from "./CardSchedule";
+import { CardScheduleInfo, NoteCardScheduleParser } from "./CardSchedule";
 import { SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END } from "./constants";
 import { Note } from "./Note";
 import { SRSettings } from "./settings";
@@ -119,8 +119,17 @@ export class Question {
 
     formatScheduleAsHtmlComment(settings: SRSettings): string {
         let result: string = SR_HTML_COMMENT_BEGIN;
-        for (let i = 0; i < this.cards.length; i++)
-            result += this.cards[i].formatSchedule(settings);
+
+        // We always want the correct schedule format, so we use this if there is no schedule for a card
+        let defaultSchedule: CardScheduleInfo = CardScheduleInfo.fromDueDateStr("2000-01-01", 
+            CardScheduleInfo.initialInterval, 
+            settings.baseEase, 0);
+
+        for (let i = 0; i < this.cards.length; i++) {
+            let card: Card = this.cards[i];
+            let schedule: CardScheduleInfo = card.hasSchedule ? card.scheduleInfo : defaultSchedule;
+            result += schedule.formatSchedule();
+        }
         result += SR_HTML_COMMENT_END;
         return result;
     }

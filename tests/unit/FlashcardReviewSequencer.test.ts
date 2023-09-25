@@ -1,5 +1,5 @@
 import { CardScheduleCalculator } from "src/CardSchedule";
-import { DeckTreeIterator, IDeckTreeIterator, IIteratorOrder } from "src/DeckTreeIterator";
+import { DeckTreeIterator, IDeckTreeIterator, IIteratorOrder, IteratorDeckSource } from "src/DeckTreeIterator";
 import { FlashcardReviewMode, FlashcardReviewSequencer, IFlashcardReviewSequencer } from "src/FlashcardReviewSequencer";
 import { TopicPath } from "src/TopicPath";
 import { CardListType, Deck } from "src/Deck";
@@ -34,7 +34,7 @@ class TestContext {
     }
 
     static Create(iteratorOrder: IIteratorOrder, reviewMode: FlashcardReviewMode, settings: SRSettings, text: string, fakeFilePath?: string): TestContext {
-        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder);
+        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, IteratorDeckSource.UpdatedByIterator);
         let noteEaseList = new NoteEaseList(settings);
         let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(settings, noteEaseList);
         let cardPostponementList: QuestionPostponementList = new QuestionPostponementList(null, settings, []);
@@ -72,8 +72,8 @@ async function checkReviewResponse_ReviewMode(reviewResponse: ReviewResponse, in
 #flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
 #flashcards Q3::A3`;
 
-    let str: string = moment().millisecond().toString();
-    let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text, str);
+    let fakeFilePath: string = moment().millisecond().toString();
+    let c: TestContext = TestContext.Create(order_DueFirst_Sequential, FlashcardReviewMode.Review, DEFAULT_SETTINGS, text, fakeFilePath);
     let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
 
     // State before calling processReview
@@ -388,10 +388,10 @@ describe("processReview", () => {
                 const expected: Info1 = {
                     cardQ2_PreReviewText: "Q2::A2 <!--SR:!2023-09-02,4,270-->", 
                     cardQ2_PostReviewEase: 290, 
-                    cardQ2_PostReviewInterval: 30, 
-                    cardQ2_PostReviewDueDate: "2023-10-06", 
+                    cardQ2_PostReviewInterval: 15, 
+                    cardQ2_PostReviewDueDate: "2023-09-21", // 15 days after the unit testing fixed date of 2023-09-06
                     cardQ2_PostReviewText: `Q2::A2
-<!--SR:!2023-10-06,30,290-->`             
+<!--SR:!2023-09-21,15,290-->`             
                 };
                 await checkReviewResponse_ReviewMode(ReviewResponse.Easy, expected);
             });
