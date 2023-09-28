@@ -38,7 +38,6 @@ export interface IDeckTreeIterator {
     deleteCurrentQuestion(): boolean;
     moveCurrentCardToEndOfList(): void;
     nextCard(): boolean;
-    cycleNextCard(): boolean;
 }
 
 class SingleDeckIterator {
@@ -213,15 +212,6 @@ export class DeckTreeIterator implements IDeckTreeIterator {
             }
         }
         if (!result) this.deckIdx = null;
-        return result;
-    }
-
-    cycleNextCard(): boolean {
-        let result: boolean = this.nextCard();
-        if (!result) {
-            this.setDeckIdx(0);
-            result = this.nextCard();
-        }
         return result;
     }
 

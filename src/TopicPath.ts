@@ -53,8 +53,7 @@ export class TopicPath {
             let tagList: TopicPath[] = this.getTopicPathsFromTagList(noteFile.getAllTags());
 
             outer: for (const tagToReview of this.getTopicPathsFromTagList(
-                settings.flashcardTags,
-            )) {
+                settings.flashcardTags)) {
                 for (const tag of tagList) {
                     if (tagToReview.isSameOrAncestorOf(tag)) {
                         result = tag;

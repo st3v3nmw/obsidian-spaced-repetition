@@ -421,6 +421,36 @@ describe("nextCard", () => {
     });
 });
 
+describe("hasCurrentCard", () => {
+    test("false immediately after setDeck", async () => {
+        let text: string = `
+        Q1::A1
+        Q2::A2
+        Q3::A3`;
+        let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
+        let iterator: DeckTreeIterator = new DeckTreeIterator(
+            order_NewFirst_Sequential,
+            IteratorDeckSource.UpdatedByIterator,
+        );
+        iterator.setDeck(deck);
+        expect(iterator.hasCurrentCard).toEqual(false);
+    });
+
+    test("true immediately after nextCard", async () => {
+        let text: string = `
+        Q1::A1
+        Q2::A2
+        Q3::A3`;
+        let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
+        let iterator: DeckTreeIterator = new DeckTreeIterator(
+            order_NewFirst_Sequential,
+            IteratorDeckSource.UpdatedByIterator,
+        );
+        iterator.setDeck(deck);
+        expect(iterator.nextCard()).toEqual(true);
+        expect(iterator.hasCurrentCard).toEqual(true);
+    });
+});
 /* describe("deleteCurrentCard", () => {
     test("Delete after all cards iterated - exception throw", async () => {
         let text: string = `

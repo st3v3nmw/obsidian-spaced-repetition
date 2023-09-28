@@ -241,6 +241,34 @@ describe("clone", () => {
     });
 });
 
+describe("formatTag", () => {
+    test("Simple test", () => {
+        let topicPath: TopicPath = new TopicPath(["flashcards", "science"]);
+
+        expect(topicPath.formatAsTag()).toEqual("#flashcards/science");
+    });
+
+    test("Empty path", () => {
+        const t = () => {
+            let str: string = TopicPath.emptyPath.formatAsTag();
+        };
+        expect(t).toThrow();
+    });
+});
+
+describe("isValidTag", () => {
+    test("Invalid tags", () => {
+        expect(TopicPath.isValidTag(null)).toEqual(false);
+        expect(TopicPath.isValidTag("")).toEqual(false);
+        expect(TopicPath.isValidTag("!Flashcards")).toEqual(false);
+        expect(TopicPath.isValidTag("#")).toEqual(false);
+    });
+
+    test("Valid tags", () => {
+        expect(TopicPath.isValidTag("#flashcards")).toEqual(true);
+    });
+});
+
 describe("getTopicPathOfFile", () => {
     describe("convertFoldersToDecks: false", () => {
         test("Mixture of irrelevant tags and relevant ones", () => {
@@ -255,6 +283,19 @@ describe("getTopicPathOfFile", () => {
             let expected = ["flashcards", "science"];
 
             expect(TopicPath.getTopicPathOfFile(file, DEFAULT_SETTINGS).path).toEqual(expected);
+        });
+
+        test("No relevant tags", () => {
+            let content: string = `
+            #ignored Q1::A1
+            #ignored Q2::A2 <!--SR:!2023-09-02,4,270-->
+            #also-Ignored Q3::A3
+            Q4::A4 <!--SR:!2023-09-02,4,270-->
+            #ignored/science/physics Q5::A5 <!--SR:!2023-09-02,4,270-->
+            Q6::A6`;
+            let file: ISRFile = new UnitTestSRFile(content);
+
+            expect(TopicPath.getTopicPathOfFile(file, DEFAULT_SETTINGS).isEmptyPath).toEqual(true);
         });
     });
 
