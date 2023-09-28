@@ -764,6 +764,43 @@ await checkUpdateCurrentQuestionText(
     });
 });
 
+describe("Sequences", () => {
+    test("Update question text, followed by review response", async () => {
+
+        let text1: string = `
+#flashcards Q2::A2
+
+#flashcards Q3::A3`;
+
+        // Do the update step
+        let updatedQ: string =
+            "#flashcards A much more in depth question::A much more detailed answer";
+        let originalStr: string = `#flashcards Q2::A2`;
+        let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer`;
+
+        let c: TestContext = await checkUpdateCurrentQuestionText(
+            text1,
+            updatedQ,
+            originalStr,
+            updatedStr,
+            DEFAULT_SETTINGS,
+        );
+
+        // Now do the review step
+        await c.reviewSequencer.processReview(ReviewResponse.Hard);
+    
+        // Schedule for the reviewed card has been updated
+        let expectedText: string = `
+${updatedStr}
+<!--SR:!2023-09-07,1,230-->
+
+#flashcards Q3::A3`;
+
+        expect(await c.file.read()).toEqual(expectedText);
+    
+    });
+});
+
 async function checkUpdateCurrentQuestionText(
     noteText: string,
     updatedQ: string,
