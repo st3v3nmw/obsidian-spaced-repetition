@@ -5,7 +5,8 @@ import { Note } from "./Note";
 import { SRSettings } from "./settings";
 import { ISRFile } from "./SRFile";
 import { TopicPath } from "./TopicPath";
-import { cyrb53, escapeRegexString } from "./util/utils";
+import { MultiLineTextFinder } from "./util/MultiLineTextFinder";
+import { cyrb53, escapeRegexString, splitTextIntoLineArray } from "./util/utils";
 
 export enum CardType {
     SingleLineBasic,
@@ -57,13 +58,13 @@ export class QuestionText {
         return this.actualQuestion.endsWith("```");
     }
 
-    static Create(original: string, settings: SRSettings): QuestionText {
-        let [topicPath, actualQuestion] = this.SplitText(original, settings);
+    static create(original: string, settings: SRSettings): QuestionText {
+        let [topicPath, actualQuestion] = this.splitText(original, settings);
 
         return new QuestionText(original, topicPath, actualQuestion);
     }
 
-    static SplitText(original: string, settings: SRSettings): [TopicPath, string] {
+    static splitText(original: string, settings: SRSettings): [TopicPath, string] {
         let strippedSR = NoteCardScheduleParser.removeCardScheduleInfo(original).trim();
         let actualQuestion: string = strippedSR;
 
@@ -119,16 +120,10 @@ export class Question {
         let result: string = SR_HTML_COMMENT_BEGIN;
 
         // We always want the correct schedule format, so we use this if there is no schedule for a card
-        let defaultSchedule: CardScheduleInfo = CardScheduleInfo.fromDueDateStr(
-            "2000-01-01",
-            CardScheduleInfo.initialInterval,
-            settings.baseEase,
-            0,
-        );
 
         for (let i = 0; i < this.cards.length; i++) {
             let card: Card = this.cards[i];
-            let schedule: CardScheduleInfo = card.hasSchedule ? card.scheduleInfo : defaultSchedule;
+            let schedule: CardScheduleInfo = card.hasSchedule ? card.scheduleInfo : CardScheduleInfo.getDummySchedule(settings);
             result += schedule.formatSchedule();
         }
         result += SR_HTML_COMMENT_END;
@@ -136,19 +131,31 @@ export class Question {
     }
 
     formatForNote(settings: SRSettings): string {
-        let result: string =
-            this.questionText.formatForNote() +
-            this.getHtmlCommentSeparator(settings) +
-            this.formatScheduleAsHtmlComment(settings);
+        let result: string = this.questionText.formatForNote();
+        if (this.cards.some((card) => card.hasSchedule)) {
+            result += 
+                this.getHtmlCommentSeparator(settings) + 
+                this.formatScheduleAsHtmlComment(settings);
+        }
         return result;
     }
 
     updateQuestionText(noteText: string, settings: SRSettings): string {
         let originalText: string = this.questionText.original;
 
+        // Get the entire text for the question including:
+        //      1. the topic path (if present), 
+        //      2. the question text
+        //      3. the schedule HTML comment (if present)
         let replacementText = this.formatForNote(settings);
-        let newText: string = noteText.replace(originalText, replacementText);
-        this.questionText = QuestionText.Create(replacementText, settings);
+
+        var newText = MultiLineTextFinder.findAndReplace(noteText, originalText, replacementText);
+        if (newText) {
+            this.questionText = QuestionText.create(replacementText, settings);
+        } else {
+            console.error(`updateQuestionText: Text not found: ${originalText.substring(0, 100)} in note: ${noteText.substring(0, 100)}`);
+            newText = noteText;
+        }
         return newText;
     }
 
@@ -169,7 +176,7 @@ export class Question {
         context: string[],
     ): Question {
         let hasEditLaterTag = originalText.includes(settings.editLaterTag);
-        let questionText: QuestionText = QuestionText.Create(originalText, settings);
+        let questionText: QuestionText = QuestionText.create(originalText, settings);
 
         let topicPath: TopicPath = noteTopicPath;
         if (questionText.topicPath.hasPath) {

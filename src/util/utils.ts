@@ -80,3 +80,7 @@ export function getAllTagsFromText(text: string): string[] {
     if (!result) return [];
     return result;
 }
+
+export function splitTextIntoLineArray(text: string): string[] {
+    return text.replaceAll("\r\n", "\n").split("\n");
+}

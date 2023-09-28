@@ -33,6 +33,15 @@ export class CardScheduleInfo {
         return this.dueDate.isSameOrBefore(globalDateProvider.today);
     }
 
+    static getDummySchedule(settings: SRSettings): CardScheduleInfo {
+        return CardScheduleInfo.fromDueDateStr(
+            "2000-01-01",
+            CardScheduleInfo.initialInterval,
+            settings.baseEase,
+            0,
+        );
+    }
+
     static fromDueDateStr(
         dueDateStr: string,
         interval: number,

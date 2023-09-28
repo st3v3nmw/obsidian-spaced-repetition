@@ -496,8 +496,10 @@ describe("processReview", () => {
 });
 
 describe("updateCurrentQuestionText", () => {
-    describe("Settings - schedule on following line", () => {
-        test("Question has schedule on following line before/after", async () => {
+    let space: string = " ";
+
+    describe("Single line card type; Settings - schedule on following line", () => {
+        test("Question has schedule on following line before/after update", async () => {
             let text: string = `
 #flashcards Q1::A1
 
@@ -532,19 +534,19 @@ describe("updateCurrentQuestionText", () => {
             let updatedQ: string =
                 "#flashcards A much more in depth question::A much more detailed answer";
             let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
-            let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
+            let expectedUpdatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
 <!--SR:!2023-09-02,4,270-->`;
             await checkUpdateCurrentQuestionText(
                 text,
                 updatedQ,
                 originalStr,
-                updatedStr,
+                expectedUpdatedStr,
                 DEFAULT_SETTINGS,
             );
         });
     });
 
-    describe("Settings - schedule on same line", () => {
+    describe("Single line card type; Settings - schedule on same line", () => {
         let settings: SRSettings = { ...DEFAULT_SETTINGS };
         settings.cardCommentOnSameLine = true;
 
@@ -586,6 +588,180 @@ describe("updateCurrentQuestionText", () => {
             await checkUpdateCurrentQuestionText(text, updatedQ, originalStr, updatedStr, settings);
         });
     });
+
+    describe("Multiline card type; Settings - schedule on following line", () => {
+        test("Question starts immediately after tag; Existing schedule present", async () => {
+            let originalStr : string =  `#flashcards Q2
+?
+A2
+<!--SR:!2023-09-02,4,270-->`;
+
+            let text: string = `
+#flashcards Q1::A1
+
+${originalStr}
+
+#flashcards Q3::A3`;
+
+            let updatedQ: string =
+                `#flashcards Multiline question
+Question starting immediately after tag
+?
+A2 (answer now includes more detail)
+extra answer line 2`;
+
+            let expectedUpdatedStr: string = `#flashcards Multiline question
+Question starting immediately after tag
+?
+A2 (answer now includes more detail)
+extra answer line 2
+<!--SR:!2023-09-02,4,270-->`;
+       
+await checkUpdateCurrentQuestionText(
+                text,
+                updatedQ,
+                originalStr,
+                expectedUpdatedStr,
+                DEFAULT_SETTINGS,
+            );
+        });
+
+        test("Question starts on same line as tag (after two spaces); Existing schedule present", async () => {
+            let originalStr : string =  `#flashcards${space}${space}Q2
+?
+A2
+<!--SR:!2023-09-02,4,270-->`;
+
+            let text: string = `
+#flashcards Q1::A1
+
+${originalStr}
+
+#flashcards Q3::A3`;
+
+            let updatedQ: string =
+                `#flashcards Multiline question
+Question starting immediately after tag
+?
+A2 (answer now includes more detail)
+extra answer line 2`;
+
+            let expectedUpdatedStr: string = `#flashcards Multiline question
+Question starting immediately after tag
+?
+A2 (answer now includes more detail)
+extra answer line 2
+<!--SR:!2023-09-02,4,270-->`;
+       
+await checkUpdateCurrentQuestionText(
+                text,
+                updatedQ,
+                originalStr,
+                expectedUpdatedStr,
+                DEFAULT_SETTINGS,
+            );
+        });
+
+        test("Question starts line after tag; Existing schedule present", async () => {
+            let originalStr : string =  `#flashcards
+Q2
+?
+A2
+<!--SR:!2023-09-02,4,270-->`;
+
+            let text: string = `
+#flashcards Q1::A1
+
+${originalStr}
+
+#flashcards Q3::A3`;
+
+            let updatedQ: string =
+                `#flashcards Multiline question
+Question starting immediately after tag
+?
+A2 (answer now includes more detail)
+extra answer line 2`;
+
+            let expectedUpdatedStr: string = `#flashcards Multiline question
+Question starting immediately after tag
+?
+A2 (answer now includes more detail)
+extra answer line 2
+<!--SR:!2023-09-02,4,270-->`;
+       
+await checkUpdateCurrentQuestionText(
+                text,
+                updatedQ,
+                originalStr,
+                expectedUpdatedStr,
+                DEFAULT_SETTINGS,
+            );
+        });
+
+        test("Question starts line after tag (no white space after tag); New card", async () => {
+            let originalStr : string =  `#flashcards
+Q2
+?
+A2`;
+
+            let text: string = `
+${originalStr}
+
+#flashcards Q1::A1
+
+#flashcards Q3::A3`;
+
+            let updatedQ: string =
+                `#flashcards Multiline question
+Question starting immediately after tag
+?
+A2 (answer now includes more detail)
+extra answer line 2`;
+
+            let expectedUpdatedStr: string = updatedQ;
+       
+await checkUpdateCurrentQuestionText(
+                text,
+                updatedQ,
+                originalStr,
+                expectedUpdatedStr,
+                DEFAULT_SETTINGS,
+            );
+        });
+
+        test("Question starts line after tag (single space after tag before newline); New card", async () => {
+            let originalStr : string =  `#flashcards${space}
+Q2
+?
+A2`;
+
+            let text: string = `
+${originalStr}
+
+#flashcards Q1::A1
+
+#flashcards Q3::A3`;
+
+            let updatedQ: string =
+                `#flashcards Multiline question
+Question starting immediately after tag
+?
+A2 (answer now includes more detail)
+extra answer line 2`;
+
+            let expectedUpdatedStr: string = updatedQ;
+       
+await checkUpdateCurrentQuestionText(
+                text,
+                updatedQ,
+                originalStr,
+                expectedUpdatedStr,
+                DEFAULT_SETTINGS,
+            );
+        });
+
+    });
 });
 
 async function checkUpdateCurrentQuestionText(
@@ -607,7 +783,9 @@ async function checkUpdateCurrentQuestionText(
     await c.reviewSequencer.updateCurrentQuestionText(updatedQ);
 
     // originalText should remain the same except for the specific substring change from originalStr => updatedStr
-    let expectedText: string = c.originalText.replace(originalStr, updatedStr);
-    expect(await c.file.read()).toEqual(expectedText);
+    if (!c.originalText.includes(originalStr))
+        throw `Text not found: ${originalStr}`;
+    let expectedFileText: string = c.originalText.replace(originalStr, updatedStr);
+    expect(await c.file.read()).toEqual(expectedFileText);
     return c;
 }
