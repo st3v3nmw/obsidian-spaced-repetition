@@ -180,11 +180,8 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
     async updateCurrentQuestionText(text: string): Promise<void> {
         let q: QuestionText = this.currentQuestion.questionText;
-        let [topicPath, actualQuestion] = QuestionText.splitText(text, this.settings);
-        // console.log(`updateCurrentQuestionText: ${topicPath}: ${actualQuestion}`)
 
-        q.topicPath = topicPath;
-        q.actualQuestion = actualQuestion;
+        q.actualQuestion = text;
 
         await this.currentQuestion.writeQuestion(this.settings);
     }

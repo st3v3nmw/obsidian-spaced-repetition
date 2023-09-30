@@ -14,7 +14,7 @@ describe("Question", () => {
 
     
             let question: Question = new Question({
-                questionText: new QuestionText(text, TopicPath.emptyPath, text)
+                questionText: new QuestionText(text, TopicPath.emptyPath, "", text)
             });
 
             expect(question.getHtmlCommentSeparator(DEFAULT_SETTINGS)).toEqual("\n");
@@ -27,7 +27,7 @@ describe("Question", () => {
 
     
             let question: Question = new Question({
-                questionText: new QuestionText(text, TopicPath.emptyPath, text)
+                questionText: new QuestionText(text, TopicPath.emptyPath, "", text)
             });
 
             expect(question.getHtmlCommentSeparator(DEFAULT_SETTINGS)).toEqual("\n");

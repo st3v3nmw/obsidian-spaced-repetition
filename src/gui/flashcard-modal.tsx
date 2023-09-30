@@ -393,7 +393,9 @@ export class FlashcardModal extends Modal {
 
     async doEditQuestionText(): Promise<void> {
         let currentQ: Question = this.reviewSequencer.currentQuestion;
-        let textPrompt = currentQ.questionText.formatForNote();
+
+        // Just the question/answer text; without any preceding topic tag
+        let textPrompt = currentQ.questionText.actualQuestion;
 
         const editModal = FlashcardEditModal.Prompt(this.app, textPrompt);
         editModal

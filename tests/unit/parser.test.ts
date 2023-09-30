@@ -28,6 +28,9 @@ test("Test parsing of single line basic cards", () => {
         [CardType.SingleLineBasic, "Q1::A1", 2],
         [CardType.SingleLineBasic, "Q2:: A2", 3],
     ]);
+    expect(parse("#flashcards/science Question ::Answer", ...defaultArgs)).toEqual([
+        [CardType.SingleLineBasic, "#flashcards/science Question ::Answer", 0],
+    ]);
 });
 
 test("Test parsing of single line reversed cards", () => {
@@ -65,6 +68,9 @@ test("Test parsing of multi line basic cards", () => {
     expect(parse("#Title\n\nLine0\nQ1\n?\nA1\nAnswerExtra\n\nQ2\n?\nA2", ...defaultArgs)).toEqual([
         [CardType.MultiLineBasic, "Line0\nQ1\n?\nA1\nAnswerExtra", 4],
         [CardType.MultiLineBasic, "Q2\n?\nA2", 9],
+    ]);
+    expect(parse("#flashcards/tag-on-previous-line\nQuestion\n?\nAnswer", ...defaultArgs)).toEqual([
+        [CardType.MultiLineBasic, "#flashcards/tag-on-previous-line\nQuestion\n?\nAnswer", 2],
     ]);
 });
 

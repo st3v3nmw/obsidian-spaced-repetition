@@ -40,6 +40,10 @@ export class QuestionText {
     // The question topic path (only present if topic path included in original text)
     topicPath: TopicPath;
 
+    // The white space after the topic path, before the actualQuestion
+    // We keep this so that when a question is updated, we can retain the original spacing
+    postTopicPathWhiteSpace: string;
+
     // Just the question text, e.g. "Q1::A1"
     actualQuestion: string;
 
@@ -47,9 +51,10 @@ export class QuestionText {
     // Explicitly excludes the HTML comment with the scheduling info
     textHash: string;
 
-    constructor(original: string, topicPath: TopicPath, actualQuestion: string) {
+    constructor(original: string, topicPath: TopicPath, postTopicPathWhiteSpace: string, actualQuestion: string) {
         this.original = original;
         this.topicPath = topicPath;
+        this.postTopicPathWhiteSpace = postTopicPathWhiteSpace;
         this.actualQuestion = actualQuestion;
         this.textHash = cyrb53(this.formatForNote());
     }
@@ -59,29 +64,34 @@ export class QuestionText {
     }
 
     static create(original: string, settings: SRSettings): QuestionText {
-        let [topicPath, actualQuestion] = this.splitText(original, settings);
+        let [topicPath, postTopicPathWhiteSpace, actualQuestion] = this.splitText(original, settings);
 
-        return new QuestionText(original, topicPath, actualQuestion);
+        return new QuestionText(original, topicPath, postTopicPathWhiteSpace, actualQuestion);
     }
 
-    static splitText(original: string, settings: SRSettings): [TopicPath, string] {
+    static splitText(original: string, settings: SRSettings): [TopicPath, string, string] {
         let strippedSR = NoteCardScheduleParser.removeCardScheduleInfo(original).trim();
         let actualQuestion: string = strippedSR;
+        let whiteSpace: string = "";
 
         let topicPath: TopicPath = TopicPath.emptyPath;
         if (!settings.convertFoldersToDecks) {
             const t = TopicPath.getTopicPathFromCardText(strippedSR);
             if (t?.hasPath) {
                 topicPath = t;
-                actualQuestion = TopicPath.removeTopicPathFromStartOfCardText(strippedSR).trim();
+                [actualQuestion, whiteSpace] = TopicPath.removeTopicPathFromStartOfCardText(strippedSR);
             }
         }
 
-        return [topicPath, actualQuestion];
+        return [topicPath, whiteSpace, actualQuestion];
     }
+
     formatForNote(): string {
         let result: string = "";
-        if (this.topicPath.hasPath) result += `${this.topicPath.formatAsTag()} `;
+        if (this.topicPath.hasPath) {
+            result += this.topicPath.formatAsTag();
+            result += this.postTopicPathWhiteSpace ?? " ";
+        }
         result += this.actualQuestion;
         return result;
     }

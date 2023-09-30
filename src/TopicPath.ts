@@ -80,8 +80,12 @@ export class TopicPath {
         return path?.length > 0 ? TopicPath.getTopicPathFromTag(path) : null;
     }
 
-    static removeTopicPathFromStartOfCardText(cardText: string): string {
-        return cardText.trimStart().replaceAll(OBSIDIAN_TAG_AT_STARTOFLINE_REGEX, "").trim();
+    static removeTopicPathFromStartOfCardText(cardText: string): [string, string] {
+        let cardText1: string = cardText.trimStart().replaceAll(OBSIDIAN_TAG_AT_STARTOFLINE_REGEX, "");
+        let cardText2: string = cardText1.trimStart();
+        let whiteSpaceLength: number = cardText1.length - cardText2.length;
+        let whiteSpace: string = cardText1.substring(0, whiteSpaceLength);
+        return [cardText2, whiteSpace];
     }
 
     static getTopicPathsFromTagList(tagList: string[]): TopicPath[] {
