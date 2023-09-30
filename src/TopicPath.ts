@@ -53,7 +53,8 @@ export class TopicPath {
             let tagList: TopicPath[] = this.getTopicPathsFromTagList(noteFile.getAllTags());
 
             outer: for (const tagToReview of this.getTopicPathsFromTagList(
-                settings.flashcardTags)) {
+                settings.flashcardTags,
+            )) {
                 for (const tag of tagList) {
                     if (tagToReview.isSameOrAncestorOf(tag)) {
                         result = tag;
@@ -81,7 +82,9 @@ export class TopicPath {
     }
 
     static removeTopicPathFromStartOfCardText(cardText: string): [string, string] {
-        let cardText1: string = cardText.trimStart().replaceAll(OBSIDIAN_TAG_AT_STARTOFLINE_REGEX, "");
+        let cardText1: string = cardText
+            .trimStart()
+            .replaceAll(OBSIDIAN_TAG_AT_STARTOFLINE_REGEX, "");
         let cardText2: string = cardText1.trimStart();
         let whiteSpaceLength: number = cardText1.length - cardText2.length;
         let whiteSpace: string = cardText1.substring(0, whiteSpaceLength);

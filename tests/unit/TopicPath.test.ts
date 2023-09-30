@@ -122,7 +122,7 @@ describe("removeTopicPathFromCardText", () => {
     });
 
     test("Multiple spaces after topic tag", () => {
-        let spaces: string = "    "
+        let spaces: string = "    ";
         let cardText: string = `#flashcards/science/chemistry${spaces}Card text does include tag`;
         let [actualQuestion, whiteSpace] = TopicPath.removeTopicPathFromStartOfCardText(cardText);
 

@@ -508,8 +508,7 @@ describe("updateCurrentQuestionText", () => {
 
 #flashcards Q3::A3`;
 
-            let updatedQ: string =
-                "A much more in depth question::A much more detailed answer";
+            let updatedQ: string = "A much more in depth question::A much more detailed answer";
             let originalStr: string = `#flashcards Q2::A2
 <!--SR:!2023-09-02,4,270-->`;
             let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
@@ -531,8 +530,7 @@ describe("updateCurrentQuestionText", () => {
 
 #flashcards Q3::A3`;
 
-            let updatedQ: string =
-                "A much more in depth question::A much more detailed answer";
+            let updatedQ: string = "A much more in depth question::A much more detailed answer";
             let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
             let expectedUpdatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
 <!--SR:!2023-09-02,4,270-->`;
@@ -558,8 +556,7 @@ describe("updateCurrentQuestionText", () => {
 
 #flashcards Q3::A3`;
 
-            let updatedQ: string =
-                "A much more in depth question::A much more detailed answer";
+            let updatedQ: string = "A much more in depth question::A much more detailed answer";
             let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
             let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
             await checkUpdateCurrentQuestionText(
@@ -580,8 +577,7 @@ describe("updateCurrentQuestionText", () => {
 
 #flashcards Q3::A3`;
 
-            let updatedQ: string =
-                "A much more in depth question::A much more detailed answer";
+            let updatedQ: string = "A much more in depth question::A much more detailed answer";
             let originalStr: string = `#flashcards Q2::A2
 <!--SR:!2023-09-02,4,270-->`;
             let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
@@ -591,7 +587,7 @@ describe("updateCurrentQuestionText", () => {
 
     describe("Multiline card type; Settings - schedule on following line", () => {
         test("Question starts immediately after tag; Existing schedule present", async () => {
-            let originalStr : string =  `Q2
+            let originalStr: string = `Q2
 ?
 A2
 <!--SR:!2023-09-02,4,270-->`;
@@ -603,8 +599,7 @@ A2
 
 #flashcards Q3::A3`;
 
-            let updatedQ: string =
-                `Multiline question
+            let updatedQ: string = `Multiline question
 Question starting immediately after tag
 ?
 A2 (answer now includes more detail)
@@ -616,8 +611,8 @@ Question starting immediately after tag
 A2 (answer now includes more detail)
 extra answer line 2
 <!--SR:!2023-09-02,4,270-->`;
-       
-await checkUpdateCurrentQuestionText(
+
+            await checkUpdateCurrentQuestionText(
                 text,
                 updatedQ,
                 originalStr,
@@ -627,7 +622,7 @@ await checkUpdateCurrentQuestionText(
         });
 
         test("Question starts on same line as tag (after two spaces); Existing schedule present", async () => {
-            let originalStr : string =  `Q2
+            let originalStr: string = `Q2
 ?
 A2
 <!--SR:!2023-09-02,4,270-->`;
@@ -639,8 +634,7 @@ A2
 
 #flashcards Q3::A3`;
 
-            let updatedQ: string =
-                `Multiline question
+            let updatedQ: string = `Multiline question
 Question starting immediately after tag
 ?
 A2 (answer now includes more detail)
@@ -652,8 +646,8 @@ Question starting immediately after tag
 A2 (answer now includes more detail)
 extra answer line 2
 <!--SR:!2023-09-02,4,270-->`;
-       
-await checkUpdateCurrentQuestionText(
+
+            await checkUpdateCurrentQuestionText(
                 text,
                 updatedQ,
                 originalStr,
@@ -663,7 +657,7 @@ await checkUpdateCurrentQuestionText(
         });
 
         test("Question starts line after tag; Existing schedule present", async () => {
-            let originalStr : string =  `#flashcards
+            let originalStr: string = `#flashcards
 Q2
 ?
 A2
@@ -676,8 +670,7 @@ ${originalStr}
 
 #flashcards Q3::A3`;
 
-            let updatedQ: string =
-                `Multiline question
+            let updatedQ: string = `Multiline question
 Question starting line after tag
 ?
 A2 (answer now includes more detail)
@@ -690,8 +683,8 @@ Question starting line after tag
 A2 (answer now includes more detail)
 extra answer line 2
 <!--SR:!2023-09-02,4,270-->`;
-       
-await checkUpdateCurrentQuestionText(
+
+            await checkUpdateCurrentQuestionText(
                 text,
                 updatedQ,
                 originalStr,
@@ -701,7 +694,7 @@ await checkUpdateCurrentQuestionText(
         });
 
         test("Question starts line after tag (no white space after tag); New card", async () => {
-            let originalQuestionStr : string =  `#flashcards
+            let originalQuestionStr: string = `#flashcards
 Q2
 ?
 A2`;
@@ -713,8 +706,7 @@ ${originalQuestionStr}
 
 #flashcards Q3::A3`;
 
-            let updatedQuestionText: string =
-                `Multiline question
+            let updatedQuestionText: string = `Multiline question
 Question starting immediately after tag
 ?
 A2 (answer now includes more detail)
@@ -722,8 +714,8 @@ extra answer line 2`;
 
             let expectedUpdatedStr: string = `#flashcards
 ${updatedQuestionText}`;
-       
-await checkUpdateCurrentQuestionText(
+
+            await checkUpdateCurrentQuestionText(
                 fileText,
                 updatedQuestionText,
                 originalQuestionStr,
@@ -733,7 +725,7 @@ await checkUpdateCurrentQuestionText(
         });
 
         test("Question starts line after tag (single space after tag before newline); New card", async () => {
-            let originalQuestionStr : string =  `#flashcards${space}
+            let originalQuestionStr: string = `#flashcards${space}
 Q2
 ?
 A2`;
@@ -745,8 +737,7 @@ ${originalQuestionStr}
 
 #flashcards Q3::A3`;
 
-            let updatedQuestionText: string =
-                `Multiline question
+            let updatedQuestionText: string = `Multiline question
 Question starting immediately after tag
 ?
 A2 (answer now includes more detail)
@@ -754,8 +745,8 @@ extra answer line 2`;
 
             let expectedUpdatedStr: string = `#flashcards
 ${updatedQuestionText}`;
-       
-await checkUpdateCurrentQuestionText(
+
+            await checkUpdateCurrentQuestionText(
                 fileText,
                 updatedQuestionText,
                 originalQuestionStr,
@@ -763,21 +754,18 @@ await checkUpdateCurrentQuestionText(
                 DEFAULT_SETTINGS,
             );
         });
-
     });
 });
 
 describe("Sequences", () => {
     test("Update question text, followed by review response", async () => {
-
         let text1: string = `
 #flashcards Q2::A2
 
 #flashcards Q3::A3`;
 
         // Do the update step
-        let updatedQ: string =
-            "A much more in depth question::A much more detailed answer";
+        let updatedQ: string = "A much more in depth question::A much more detailed answer";
         let originalStr: string = `#flashcards Q2::A2`;
         let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer`;
 
@@ -791,7 +779,7 @@ describe("Sequences", () => {
 
         // Now do the review step
         await c.reviewSequencer.processReview(ReviewResponse.Hard);
-    
+
         // Schedule for the reviewed card has been updated
         let expectedText: string = `
 ${updatedStr}
@@ -800,7 +788,6 @@ ${updatedStr}
 #flashcards Q3::A3`;
 
         expect(await c.file.read()).toEqual(expectedText);
-    
     });
 });
 
@@ -823,8 +810,7 @@ async function checkUpdateCurrentQuestionText(
     await c.reviewSequencer.updateCurrentQuestionText(updatedQ);
 
     // originalText should remain the same except for the specific substring change from originalStr => updatedStr
-    if (!c.originalText.includes(originalStr))
-        throw `Text not found: ${originalStr}`;
+    if (!c.originalText.includes(originalStr)) throw `Text not found: ${originalStr}`;
     let expectedFileText: string = c.originalText.replace(originalStr, updatedStr);
     expect(await c.file.read()).toEqual(expectedFileText);
     return c;

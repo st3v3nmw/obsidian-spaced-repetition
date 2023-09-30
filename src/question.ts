@@ -51,7 +51,12 @@ export class QuestionText {
     // Explicitly excludes the HTML comment with the scheduling info
     textHash: string;
 
-    constructor(original: string, topicPath: TopicPath, postTopicPathWhiteSpace: string, actualQuestion: string) {
+    constructor(
+        original: string,
+        topicPath: TopicPath,
+        postTopicPathWhiteSpace: string,
+        actualQuestion: string,
+    ) {
         this.original = original;
         this.topicPath = topicPath;
         this.postTopicPathWhiteSpace = postTopicPathWhiteSpace;
@@ -64,7 +69,10 @@ export class QuestionText {
     }
 
     static create(original: string, settings: SRSettings): QuestionText {
-        let [topicPath, postTopicPathWhiteSpace, actualQuestion] = this.splitText(original, settings);
+        let [topicPath, postTopicPathWhiteSpace, actualQuestion] = this.splitText(
+            original,
+            settings,
+        );
 
         return new QuestionText(original, topicPath, postTopicPathWhiteSpace, actualQuestion);
     }
@@ -79,7 +87,8 @@ export class QuestionText {
             const t = TopicPath.getTopicPathFromCardText(strippedSR);
             if (t?.hasPath) {
                 topicPath = t;
-                [actualQuestion, whiteSpace] = TopicPath.removeTopicPathFromStartOfCardText(strippedSR);
+                [actualQuestion, whiteSpace] =
+                    TopicPath.removeTopicPathFromStartOfCardText(strippedSR);
             }
         }
 
@@ -133,7 +142,9 @@ export class Question {
 
         for (let i = 0; i < this.cards.length; i++) {
             let card: Card = this.cards[i];
-            let schedule: CardScheduleInfo = card.hasSchedule ? card.scheduleInfo : CardScheduleInfo.getDummySchedule(settings);
+            let schedule: CardScheduleInfo = card.hasSchedule
+                ? card.scheduleInfo
+                : CardScheduleInfo.getDummySchedule(settings);
             result += schedule.formatSchedule();
         }
         result += SR_HTML_COMMENT_END;
@@ -143,9 +154,8 @@ export class Question {
     formatForNote(settings: SRSettings): string {
         let result: string = this.questionText.formatForNote();
         if (this.cards.some((card) => card.hasSchedule)) {
-            result += 
-                this.getHtmlCommentSeparator(settings) + 
-                this.formatScheduleAsHtmlComment(settings);
+            result +=
+                this.getHtmlCommentSeparator(settings) + this.formatScheduleAsHtmlComment(settings);
         }
         return result;
     }
@@ -154,7 +164,7 @@ export class Question {
         let originalText: string = this.questionText.original;
 
         // Get the entire text for the question including:
-        //      1. the topic path (if present), 
+        //      1. the topic path (if present),
         //      2. the question text
         //      3. the schedule HTML comment (if present)
         let replacementText = this.formatForNote(settings);
@@ -163,7 +173,12 @@ export class Question {
         if (newText) {
             this.questionText = QuestionText.create(replacementText, settings);
         } else {
-            console.error(`updateQuestionText: Text not found: ${originalText.substring(0, 100)} in note: ${noteText.substring(0, 100)}`);
+            console.error(
+                `updateQuestionText: Text not found: ${originalText.substring(
+                    0,
+                    100,
+                )} in note: ${noteText.substring(0, 100)}`,
+            );
             newText = noteText;
         }
         return newText;
