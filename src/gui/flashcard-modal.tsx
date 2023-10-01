@@ -183,7 +183,6 @@ export class FlashcardModal extends Modal {
 
     renderDeck(deck: Deck, containerEl: HTMLElement, modal: FlashcardModal): void {
         const deckView: HTMLElement = containerEl.createDiv("tree-item");
-        // console.log(`renderDeck3: ${deck.deckName}`);
 
         const deckViewSelf: HTMLElement = deckView.createDiv(
             "tree-item-self tag-pane-tag is-clickable",
@@ -200,10 +199,6 @@ export class FlashcardModal extends Modal {
         }
 
         const deckViewInner: HTMLElement = deckViewSelf.createDiv("tree-item-inner");
-        deckViewInner.addEventListener("click", () => {
-            /* modal.plugin.data.historyDeck = deck.deckName; */
-            this.startReviewOfDeck(deck);
-        });
         const deckViewInnerText: HTMLElement = deckViewInner.createDiv("tag-pane-tag-text");
         deckViewInnerText.innerHTML += <span class="tag-pane-tag-self">{deck.deckName}</span>;
         const deckViewOuter: HTMLElement = deckViewSelf.createDiv("tree-item-flair-outer");
@@ -234,7 +229,7 @@ export class FlashcardModal extends Modal {
         const deckViewChildren: HTMLElement = deckView.createDiv("tree-item-children");
         deckViewChildren.style.display = collapsed ? "none" : "block";
         if (deck.subdecks.length > 0) {
-            collapseIconEl.addEventListener("click", () => {
+            collapseIconEl.addEventListener("click", (e) => {
                 if (collapsed) {
                     (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "";
                     deckViewChildren.style.display = "block";
@@ -243,9 +238,21 @@ export class FlashcardModal extends Modal {
                         "rotate(-90deg)";
                     deckViewChildren.style.display = "none";
                 }
+
+                // We stop the propagation of the event so that the click event for deckViewSelf doesn't get called
+                // if the user clicks on the collapse icon
+                e.stopPropagation();
                 collapsed = !collapsed;
             });
         }
+
+        // Add the click handler to deckViewSelf instead of deckViewInner so that it activates
+        // over the entire rectangle of the tree item, not just the text of the topic name
+        // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/709
+        deckViewSelf.addEventListener("click", () => {
+            this.startReviewOfDeck(deck);
+        });
+
         for (const subdeck of deck.subdecks) {
             this.renderDeck(subdeck, deckViewChildren, modal);
         }

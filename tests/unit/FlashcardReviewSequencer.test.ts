@@ -498,263 +498,297 @@ describe("processReview", () => {
 describe("updateCurrentQuestionText", () => {
     let space: string = " ";
 
-    describe("Single line card type; Settings - schedule on following line", () => {
-        test("Question has schedule on following line before/after update", async () => {
-            let text: string = `
-#flashcards Q1::A1
+    describe("Checking update to file", () => {
 
-#flashcards Q2::A2
-<!--SR:!2023-09-02,4,270-->
+        describe("Single line card type; Settings - schedule on following line", () => {
+            test("Question has schedule on following line before/after update", async () => {
+                let text: string = `
+    #flashcards Q1::A1
 
-#flashcards Q3::A3`;
+    #flashcards Q2::A2
+    <!--SR:!2023-09-02,4,270-->
 
-            let updatedQ: string = "A much more in depth question::A much more detailed answer";
-            let originalStr: string = `#flashcards Q2::A2
-<!--SR:!2023-09-02,4,270-->`;
-            let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
-<!--SR:!2023-09-02,4,270-->`;
-            await checkUpdateCurrentQuestionText(
-                text,
-                updatedQ,
-                originalStr,
-                updatedStr,
-                DEFAULT_SETTINGS,
-            );
+    #flashcards Q3::A3`;
+
+                let updatedQ: string = "A much more in depth question::A much more detailed answer";
+                let originalStr: string = `#flashcards Q2::A2
+    <!--SR:!2023-09-02,4,270-->`;
+                let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
+    <!--SR:!2023-09-02,4,270-->`;
+                await checkUpdateCurrentQuestionText(
+                    text,
+                    updatedQ,
+                    originalStr,
+                    updatedStr,
+                    DEFAULT_SETTINGS,
+                );
+            });
+
+            test("Question has schedule on same line (but pushed to following line due to settings)", async () => {
+                let text: string = `
+    #flashcards Q1::A1
+
+    #flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
+
+    #flashcards Q3::A3`;
+
+                let updatedQ: string = "A much more in depth question::A much more detailed answer";
+                let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
+                let expectedUpdatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
+    <!--SR:!2023-09-02,4,270-->`;
+                await checkUpdateCurrentQuestionText(
+                    text,
+                    updatedQ,
+                    originalStr,
+                    expectedUpdatedStr,
+                    DEFAULT_SETTINGS,
+                );
+            });
         });
 
-        test("Question has schedule on same line (but pushed to following line due to settings)", async () => {
-            let text: string = `
-#flashcards Q1::A1
+        describe("Single line card type; Settings - schedule on same line", () => {
+            let settings: SRSettings = { ...DEFAULT_SETTINGS };
+            settings.cardCommentOnSameLine = true;
 
-#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
+            test("Question has schedule on same line before/after", async () => {
+                let text1: string = `
+    #flashcards Q1::A1
 
-#flashcards Q3::A3`;
+    #flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
 
-            let updatedQ: string = "A much more in depth question::A much more detailed answer";
-            let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
-            let expectedUpdatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
-<!--SR:!2023-09-02,4,270-->`;
-            await checkUpdateCurrentQuestionText(
-                text,
-                updatedQ,
-                originalStr,
-                expectedUpdatedStr,
-                DEFAULT_SETTINGS,
-            );
+    #flashcards Q3::A3`;
+
+                let updatedQ: string = "A much more in depth question::A much more detailed answer";
+                let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
+                let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
+                await checkUpdateCurrentQuestionText(
+                    text1,
+                    updatedQ,
+                    originalStr,
+                    updatedStr,
+                    settings,
+                );
+            });
+
+            test("Question has schedule on following line (but placed on same line due to settings)", async () => {
+                let text: string = `
+    #flashcards Q1::A1
+
+    #flashcards Q2::A2
+    <!--SR:!2023-09-02,4,270-->
+
+    #flashcards Q3::A3`;
+
+                let updatedQ: string = "A much more in depth question::A much more detailed answer";
+                let originalStr: string = `#flashcards Q2::A2
+    <!--SR:!2023-09-02,4,270-->`;
+                let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
+                await checkUpdateCurrentQuestionText(text, updatedQ, originalStr, updatedStr, settings);
+            });
+        });
+
+        describe("Multiline card type; Settings - schedule on following line", () => {
+            test("Question starts immediately after tag; Existing schedule present", async () => {
+                let originalStr: string = `Q2
+    ?
+    A2
+    <!--SR:!2023-09-02,4,270-->`;
+
+                let text: string = `
+    #flashcards Q1::A1
+
+    #flashcards ${originalStr}
+
+    #flashcards Q3::A3`;
+
+                let updatedQ: string = `Multiline question
+    Question starting immediately after tag
+    ?
+    A2 (answer now includes more detail)
+    extra answer line 2`;
+
+                let expectedUpdatedStr: string = `Multiline question
+    Question starting immediately after tag
+    ?
+    A2 (answer now includes more detail)
+    extra answer line 2
+    <!--SR:!2023-09-02,4,270-->`;
+
+                await checkUpdateCurrentQuestionText(
+                    text,
+                    updatedQ,
+                    originalStr,
+                    expectedUpdatedStr,
+                    DEFAULT_SETTINGS,
+                );
+            });
+
+            test("Question starts on same line as tag (after two spaces); Existing schedule present", async () => {
+                let originalStr: string = `Q2
+    ?
+    A2
+    <!--SR:!2023-09-02,4,270-->`;
+
+                let text: string = `
+    #flashcards Q1::A1
+
+    #flashcards${space}${space}${originalStr}
+
+    #flashcards Q3::A3`;
+
+                let updatedQ: string = `Multiline question
+    Question starting immediately after tag
+    ?
+    A2 (answer now includes more detail)
+    extra answer line 2`;
+
+                let expectedUpdatedStr: string = `Multiline question
+    Question starting immediately after tag
+    ?
+    A2 (answer now includes more detail)
+    extra answer line 2
+    <!--SR:!2023-09-02,4,270-->`;
+
+                await checkUpdateCurrentQuestionText(
+                    text,
+                    updatedQ,
+                    originalStr,
+                    expectedUpdatedStr,
+                    DEFAULT_SETTINGS,
+                );
+            });
+
+            test("Question starts line after tag; Existing schedule present", async () => {
+                let originalStr: string = `#flashcards
+    Q2
+    ?
+    A2
+    <!--SR:!2023-09-02,4,270-->`;
+
+                let text: string = `
+    #flashcards Q1::A1
+
+    ${originalStr}
+
+    #flashcards Q3::A3`;
+
+                let updatedQ: string = `Multiline question
+    Question starting line after tag
+    ?
+    A2 (answer now includes more detail)
+    extra answer line 2`;
+
+                let expectedUpdatedStr: string = `#flashcards
+    Multiline question
+    Question starting line after tag
+    ?
+    A2 (answer now includes more detail)
+    extra answer line 2
+    <!--SR:!2023-09-02,4,270-->`;
+
+                await checkUpdateCurrentQuestionText(
+                    text,
+                    updatedQ,
+                    originalStr,
+                    expectedUpdatedStr,
+                    DEFAULT_SETTINGS,
+                );
+            });
+
+            test("Question starts line after tag (no white space after tag); New card", async () => {
+                let originalQuestionStr: string = `#flashcards
+    Q2
+    ?
+    A2`;
+
+                let fileText: string = `
+    ${originalQuestionStr}
+
+    #flashcards Q1::A1
+
+    #flashcards Q3::A3`;
+
+                let updatedQuestionText: string = `Multiline question
+    Question starting immediately after tag
+    ?
+    A2 (answer now includes more detail)
+    extra answer line 2`;
+
+                let expectedUpdatedStr: string = `#flashcards
+    ${updatedQuestionText}`;
+
+                await checkUpdateCurrentQuestionText(
+                    fileText,
+                    updatedQuestionText,
+                    originalQuestionStr,
+                    expectedUpdatedStr,
+                    DEFAULT_SETTINGS,
+                );
+            });
+
+            test("Question starts line after tag (single space after tag before newline); New card", async () => {
+                let originalQuestionStr: string = `#flashcards${space}
+    Q2
+    ?
+    A2`;
+
+                let fileText: string = `
+    ${originalQuestionStr}
+
+    #flashcards Q1::A1
+
+    #flashcards Q3::A3`;
+
+                let updatedQuestionText: string = `Multiline question
+    Question starting immediately after tag
+    ?
+    A2 (answer now includes more detail)
+    extra answer line 2`;
+
+                let expectedUpdatedStr: string = `#flashcards
+    ${updatedQuestionText}`;
+
+                await checkUpdateCurrentQuestionText(
+                    fileText,
+                    updatedQuestionText,
+                    originalQuestionStr,
+                    expectedUpdatedStr,
+                    DEFAULT_SETTINGS,
+                );
+            });
         });
     });
 
-    describe("Single line card type; Settings - schedule on same line", () => {
-        let settings: SRSettings = { ...DEFAULT_SETTINGS };
-        settings.cardCommentOnSameLine = true;
-
-        test("Question has schedule on same line before/after", async () => {
-            let text1: string = `
-#flashcards Q1::A1
-
-#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
-
-#flashcards Q3::A3`;
-
-            let updatedQ: string = "A much more in depth question::A much more detailed answer";
-            let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
-            let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
-            await checkUpdateCurrentQuestionText(
-                text1,
-                updatedQ,
-                originalStr,
-                updatedStr,
-                settings,
-            );
+    test("Checking updates to the current card", () => {
+        let originalQuestionStr: string = `#flashcards
+        Q2
+        ?
+        A2`;
+    
+                    let fileText: string = `
+        ${originalQuestionStr}
+    
+        #flashcards Q1::A1
+    
+        #flashcards Q3::A3`;
+    
+                    let updatedQuestionText: string = `Multiline question
+        Question starting immediately after tag
+        ?
+        A2 (answer now includes more detail)
+        extra answer line 2`;
+    
+                    let expectedUpdatedStr: string = `#flashcards
+        ${updatedQuestionText}`;
+    
+                    await checkUpdateCurrentQuestionText(
+                        fileText,
+                        updatedQuestionText,
+                        originalQuestionStr,
+                        expectedUpdatedStr,
+                        DEFAULT_SETTINGS,
+                    );
         });
-
-        test("Question has schedule on following line (but placed on same line due to settings)", async () => {
-            let text: string = `
-#flashcards Q1::A1
-
-#flashcards Q2::A2
-<!--SR:!2023-09-02,4,270-->
-
-#flashcards Q3::A3`;
-
-            let updatedQ: string = "A much more in depth question::A much more detailed answer";
-            let originalStr: string = `#flashcards Q2::A2
-<!--SR:!2023-09-02,4,270-->`;
-            let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
-            await checkUpdateCurrentQuestionText(text, updatedQ, originalStr, updatedStr, settings);
-        });
-    });
-
-    describe("Multiline card type; Settings - schedule on following line", () => {
-        test("Question starts immediately after tag; Existing schedule present", async () => {
-            let originalStr: string = `Q2
-?
-A2
-<!--SR:!2023-09-02,4,270-->`;
-
-            let text: string = `
-#flashcards Q1::A1
-
-#flashcards ${originalStr}
-
-#flashcards Q3::A3`;
-
-            let updatedQ: string = `Multiline question
-Question starting immediately after tag
-?
-A2 (answer now includes more detail)
-extra answer line 2`;
-
-            let expectedUpdatedStr: string = `Multiline question
-Question starting immediately after tag
-?
-A2 (answer now includes more detail)
-extra answer line 2
-<!--SR:!2023-09-02,4,270-->`;
-
-            await checkUpdateCurrentQuestionText(
-                text,
-                updatedQ,
-                originalStr,
-                expectedUpdatedStr,
-                DEFAULT_SETTINGS,
-            );
-        });
-
-        test("Question starts on same line as tag (after two spaces); Existing schedule present", async () => {
-            let originalStr: string = `Q2
-?
-A2
-<!--SR:!2023-09-02,4,270-->`;
-
-            let text: string = `
-#flashcards Q1::A1
-
-#flashcards${space}${space}${originalStr}
-
-#flashcards Q3::A3`;
-
-            let updatedQ: string = `Multiline question
-Question starting immediately after tag
-?
-A2 (answer now includes more detail)
-extra answer line 2`;
-
-            let expectedUpdatedStr: string = `Multiline question
-Question starting immediately after tag
-?
-A2 (answer now includes more detail)
-extra answer line 2
-<!--SR:!2023-09-02,4,270-->`;
-
-            await checkUpdateCurrentQuestionText(
-                text,
-                updatedQ,
-                originalStr,
-                expectedUpdatedStr,
-                DEFAULT_SETTINGS,
-            );
-        });
-
-        test("Question starts line after tag; Existing schedule present", async () => {
-            let originalStr: string = `#flashcards
-Q2
-?
-A2
-<!--SR:!2023-09-02,4,270-->`;
-
-            let text: string = `
-#flashcards Q1::A1
-
-${originalStr}
-
-#flashcards Q3::A3`;
-
-            let updatedQ: string = `Multiline question
-Question starting line after tag
-?
-A2 (answer now includes more detail)
-extra answer line 2`;
-
-            let expectedUpdatedStr: string = `#flashcards
-Multiline question
-Question starting line after tag
-?
-A2 (answer now includes more detail)
-extra answer line 2
-<!--SR:!2023-09-02,4,270-->`;
-
-            await checkUpdateCurrentQuestionText(
-                text,
-                updatedQ,
-                originalStr,
-                expectedUpdatedStr,
-                DEFAULT_SETTINGS,
-            );
-        });
-
-        test("Question starts line after tag (no white space after tag); New card", async () => {
-            let originalQuestionStr: string = `#flashcards
-Q2
-?
-A2`;
-
-            let fileText: string = `
-${originalQuestionStr}
-
-#flashcards Q1::A1
-
-#flashcards Q3::A3`;
-
-            let updatedQuestionText: string = `Multiline question
-Question starting immediately after tag
-?
-A2 (answer now includes more detail)
-extra answer line 2`;
-
-            let expectedUpdatedStr: string = `#flashcards
-${updatedQuestionText}`;
-
-            await checkUpdateCurrentQuestionText(
-                fileText,
-                updatedQuestionText,
-                originalQuestionStr,
-                expectedUpdatedStr,
-                DEFAULT_SETTINGS,
-            );
-        });
-
-        test("Question starts line after tag (single space after tag before newline); New card", async () => {
-            let originalQuestionStr: string = `#flashcards${space}
-Q2
-?
-A2`;
-
-            let fileText: string = `
-${originalQuestionStr}
-
-#flashcards Q1::A1
-
-#flashcards Q3::A3`;
-
-            let updatedQuestionText: string = `Multiline question
-Question starting immediately after tag
-?
-A2 (answer now includes more detail)
-extra answer line 2`;
-
-            let expectedUpdatedStr: string = `#flashcards
-${updatedQuestionText}`;
-
-            await checkUpdateCurrentQuestionText(
-                fileText,
-                updatedQuestionText,
-                originalQuestionStr,
-                expectedUpdatedStr,
-                DEFAULT_SETTINGS,
-            );
-        });
-    });
 });
 
 describe("Sequences", () => {
