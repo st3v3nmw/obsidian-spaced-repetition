@@ -113,7 +113,7 @@ export class FlashcardModal extends Modal {
                     consume();
                 } else if (
                     this.mode === FlashcardModalMode.Front &&
-                    (e.code === "Space" || e.code === "Enter")
+                    (e.code === "Space" || e.code === "Enter" || e.code === "NumpadEnter")
                 ) {
                     this.showAnswer();
                     consume();
