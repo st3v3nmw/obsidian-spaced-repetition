@@ -1,7 +1,7 @@
 import { NoteQuestionParser } from "src/NoteQuestionParser";
 import { CardScheduleInfo } from "src/CardSchedule";
 import { TICKS_PER_DAY } from "src/constants";
-import { CardType, Question } from "src/_question";
+import { CardType, Question } from "src/Question";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { TopicPath } from "src/TopicPath";
 import { createTest_NoteQuestionParser } from "./SampleItems";

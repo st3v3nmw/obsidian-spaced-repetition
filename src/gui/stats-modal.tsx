@@ -21,7 +21,7 @@ import { getKeysPreserveType, getTypedObjectEntries } from "src/util/utils";
 import { textInterval } from "src/scheduling";
 import { t } from "src/lang/helpers";
 import { Stats } from "../stats";
-import { CardListType } from "src/_deck";
+import { CardListType } from "src/Deck";
 
 Chart.register(
     BarElement,

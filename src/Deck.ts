@@ -1,6 +1,6 @@
 import { Card } from "./Card";
 import { FlashcardReviewMode } from "./FlashcardReviewSequencer";
-import { Question } from "./_question";
+import { Question } from "./Question";
 import { IQuestionPostponementList } from "./QuestionPostponementList";
 import { TopicPath } from "./TopicPath";
 

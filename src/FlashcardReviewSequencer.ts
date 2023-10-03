@@ -1,6 +1,6 @@
 import { Card } from "./Card";
-import { CardListType, Deck } from "./_deck";
-import { Question, QuestionText } from "./_question";
+import { CardListType, Deck } from "./Deck";
+import { Question, QuestionText } from "./Question";
 import { ReviewResponse, schedule } from "./scheduling";
 import { SRSettings } from "./settings";
 import { TopicPath } from "./TopicPath";

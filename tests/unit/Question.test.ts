@@ -1,6 +1,6 @@
 import { TopicPath } from "src/TopicPath";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
-import { Question, QuestionText } from "src/_question";
+import { Question, QuestionText } from "src/Question";
 
 let settings_cardCommentOnSameLine: SRSettings = { ...DEFAULT_SETTINGS };
 settings_cardCommentOnSameLine.cardCommentOnSameLine = true;
