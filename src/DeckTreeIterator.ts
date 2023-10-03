@@ -1,6 +1,6 @@
 import { Card } from "./Card";
-import { CardListType, Deck } from "./Deck";
-import { Question } from "./Question";
+import { CardListType, Deck } from "./_deck";
+import { Question } from "./_question";
 import { TopicPath } from "./TopicPath";
 import { globalRandomNumberProvider } from "./util/RandomNumberProvider";
 

@@ -11,7 +11,7 @@ import {
     IFlashcardReviewSequencer,
 } from "src/FlashcardReviewSequencer";
 import { TopicPath } from "src/TopicPath";
-import { CardListType, Deck } from "src/Deck";
+import { CardListType, Deck } from "src/_deck";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { SampleItemDecks } from "./SampleItems";
 import { UnitTestSRFile } from "src/SRFile";
@@ -499,7 +499,6 @@ describe("updateCurrentQuestionText", () => {
     let space: string = " ";
 
     describe("Checking update to file", () => {
-
         describe("Single line card type; Settings - schedule on following line", () => {
             test("Question has schedule on following line before/after update", async () => {
                 let text: string = `
@@ -583,7 +582,13 @@ describe("updateCurrentQuestionText", () => {
                 let originalStr: string = `#flashcards Q2::A2
     <!--SR:!2023-09-02,4,270-->`;
                 let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
-                await checkUpdateCurrentQuestionText(text, updatedQ, originalStr, updatedStr, settings);
+                await checkUpdateCurrentQuestionText(
+                    text,
+                    updatedQ,
+                    originalStr,
+                    updatedStr,
+                    settings,
+                );
             });
         });
 
@@ -759,36 +764,36 @@ describe("updateCurrentQuestionText", () => {
         });
     });
 
-    test("Checking updates to the current card", () => {
+    test("Checking updates to the current card", async () => {
         let originalQuestionStr: string = `#flashcards
         Q2
         ?
         A2`;
-    
-                    let fileText: string = `
+
+        let fileText: string = `
         ${originalQuestionStr}
     
         #flashcards Q1::A1
     
         #flashcards Q3::A3`;
-    
-                    let updatedQuestionText: string = `Multiline question
+
+        let updatedQuestionText: string = `Multiline question
         Question starting immediately after tag
         ?
         A2 (answer now includes more detail)
         extra answer line 2`;
-    
-                    let expectedUpdatedStr: string = `#flashcards
+
+        let expectedUpdatedStr: string = `#flashcards
         ${updatedQuestionText}`;
-    
-                    await checkUpdateCurrentQuestionText(
-                        fileText,
-                        updatedQuestionText,
-                        originalQuestionStr,
-                        expectedUpdatedStr,
-                        DEFAULT_SETTINGS,
-                    );
-        });
+
+        await checkUpdateCurrentQuestionText(
+            fileText,
+            updatedQuestionText,
+            originalQuestionStr,
+            expectedUpdatedStr,
+            DEFAULT_SETTINGS,
+        );
+    });
 });
 
 describe("Sequences", () => {

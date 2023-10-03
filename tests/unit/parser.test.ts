@@ -1,5 +1,5 @@
 import { parse } from "src/parser";
-import { CardType } from "src/Question";
+import { CardType } from "src/_question";
 
 const defaultArgs: [string, string, string, string, boolean, boolean, boolean] = [
     "::",

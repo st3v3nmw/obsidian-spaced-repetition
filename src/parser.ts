@@ -1,4 +1,4 @@
-import { CardType } from "./Question";
+import { CardType } from "./_question";
 
 /**
  * Returns flashcards found in `text`

@@ -1,4 +1,4 @@
-import { Question } from "./Question";
+import { Question } from "./_question";
 import SRPlugin from "./main";
 import { SRSettings } from "./settings";
 

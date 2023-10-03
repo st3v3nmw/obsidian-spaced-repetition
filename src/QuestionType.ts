@@ -1,5 +1,5 @@
 import { getDefaultHighWaterMark } from "stream";
-import { CardType } from "./Question";
+import { CardType } from "./_question";
 import { SRSettings } from "./settings";
 
 export class CardFrontBack {

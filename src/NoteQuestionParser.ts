@@ -1,7 +1,7 @@
 import { Card } from "./Card";
 import { CardScheduleInfo, NoteCardScheduleParser } from "./CardSchedule";
 import { parse } from "./parser";
-import { CardType, Question } from "./Question";
+import { CardType, Question } from "./_question";
 import { CardFrontBack, CardFrontBackUtil } from "./QuestionType";
 import { SRSettings } from "./settings";
 import { ISRFile, UnitTestSRFile } from "./SRFile";

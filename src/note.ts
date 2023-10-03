@@ -1,8 +1,8 @@
 import { HeadingCache } from "obsidian";
 import { TopicPath } from "./TopicPath";
 import { SRSettings } from "./settings";
-import { Deck } from "./Deck";
-import { Question } from "./Question";
+import { Deck } from "./_deck";
+import { Question } from "./_question";
 import { ISRFile } from "./SRFile";
 
 export class Note {

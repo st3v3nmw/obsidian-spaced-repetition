@@ -1,7 +1,7 @@
 import { ISRFile } from "./SRFile";
 import { CardScheduleInfo } from "./CardSchedule";
 import { Note } from "./Note";
-import { Question } from "./Question";
+import { Question } from "./_question";
 import { CardFrontBack } from "./QuestionType";
 import { TopicPath } from "./TopicPath";
 import { NoteQuestionParser } from "./NoteQuestionParser";

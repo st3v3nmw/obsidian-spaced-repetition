@@ -1,4 +1,4 @@
-import { CardListType, Deck } from "./Deck";
+import { CardListType, Deck } from "./_deck";
 import {
     CardListOrder,
     DeckTreeIterator,

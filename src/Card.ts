@@ -1,6 +1,6 @@
-import { Question } from "./Question";
+import { Question } from "./_question";
 import { CardScheduleInfo } from "./CardSchedule";
-import { CardListType } from "./Deck";
+import { CardListType } from "./_deck";
 import { SRSettings } from "./settings";
 
 export class Card {
