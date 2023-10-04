@@ -1,4 +1,4 @@
-import { Note } from "src/_Note";
+import { Note } from "src/Note";
 import { NoteFileLoader } from "src/NoteFileLoader";
 import { UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";

@@ -2,7 +2,7 @@ import { NoteParser } from "src/NoteParser";
 import { UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
 import { Deck } from "src/Deck";
-import { Note } from "src/_Note";
+import { Note } from "src/Note";
 import { Question } from "src/Question";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { NoteFileLoader } from "src/NoteFileLoader";

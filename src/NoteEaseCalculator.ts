@@ -1,4 +1,4 @@
-import { Note } from "./_Note";
+import { Note } from "./Note";
 import { SRSettings } from "./settings";
 
 export class NoteEaseCalculator {

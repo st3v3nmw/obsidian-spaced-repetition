@@ -1,7 +1,7 @@
 import { Card } from "./Card";
 import { CardScheduleInfo, NoteCardScheduleParser } from "./CardSchedule";
 import { SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END } from "./constants";
-import { Note } from "./_Note";
+import { Note } from "./Note";
 import { SRSettings } from "./settings";
 import { TopicPath } from "./TopicPath";
 import { MultiLineTextFinder } from "./util/MultiLineTextFinder";

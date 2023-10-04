@@ -1,5 +1,5 @@
 import { ISRFile } from "./SRFile";
-import { Note } from "./_Note";
+import { Note } from "./Note";
 import { Question } from "./Question";
 import { TopicPath } from "./TopicPath";
 import { NoteQuestionParser } from "./NoteQuestionParser";

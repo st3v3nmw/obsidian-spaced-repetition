@@ -27,7 +27,7 @@ import {
     OrderMethod,
 } from "./DeckTreeIterator";
 import { CardScheduleCalculator } from "./CardSchedule";
-import { Note } from "./_Note";
+import { Note } from "./Note";
 import { NoteFileLoader } from "./NoteFileLoader";
 import { ISRFile, SrTFile as SrTFile } from "./SRFile";
 import { NoteEaseCalculator } from "./NoteEaseCalculator";

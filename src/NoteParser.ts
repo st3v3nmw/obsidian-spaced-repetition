@@ -1,6 +1,6 @@
 import { NoteQuestionParser } from "./NoteQuestionParser";
 import { ISRFile } from "./SRFile";
-import { Note } from "./_Note";
+import { Note } from "./Note";
 import { SRSettings } from "./settings";
 import { TopicPath } from "./TopicPath";
 
