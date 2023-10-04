@@ -9,7 +9,17 @@ module.exports = {
     },
     moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node", "d.ts"],
     roots: ["<rootDir>/src/", "<rootDir>/tests/unit/"],
-    collectCoverageFrom: ["src/**/lang/*.ts", "utils.ts", "src/*.ts"],
+    collectCoverageFrom: [
+        "src/**/lang/*.ts",
+        "src/NoteEaseList.ts",
+        "src/NoteFileLoader.ts",
+        "src/NoteParser.ts",
+        "src/NoteQuestionParser.ts",
+        "src/TopicParser.ts",
+        "src/parser.ts",
+        "src/scheduling.ts",
+        "utils.ts",
+    ],
     coveragePathIgnorePatterns: [
         "/node_modules/",
         "src/lang/locale/",
