@@ -5,7 +5,7 @@ import { ReviewResponse } from "./scheduling";
 import { SRSettings } from "./settings";
 import { TopicPath } from "./TopicPath";
 import { CardScheduleInfo, ICardScheduleCalculator } from "./CardSchedule";
-import { Note } from "./Note";
+import { Note } from "./_Note";
 import { IDeckTreeIterator } from "./DeckTreeIterator";
 import { IQuestionPostponementList } from "./QuestionPostponementList";
 

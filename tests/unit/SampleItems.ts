@@ -1,6 +1,6 @@
 import { Card } from "src/Card";
 import { Deck } from "src/Deck";
-import { Note } from "src/Note";
+import { Note } from "src/_Note";
 import { NoteParser } from "src/NoteParser";
 import { NoteQuestionParser } from "src/NoteQuestionParser";
 import { CardType, Question } from "src/Question";
