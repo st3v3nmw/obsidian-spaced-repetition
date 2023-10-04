@@ -1,4 +1,3 @@
-import { MetadataCache, TFile, getAllTags } from "obsidian";
 import { SRSettings } from "src/settings";
 import { OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "./constants";
 import { ISRFile } from "./SRFile";
@@ -35,13 +34,13 @@ export class TopicPath {
 
     formatAsTag(): string {
         if (this.isEmptyPath) throw "Empty path";
-        let result = "#" + this.path.join("/");
+        const result = "#" + this.path.join("/");
         return result;
     }
 
     static getTopicPathOfFile(noteFile: ISRFile, settings: SRSettings): TopicPath {
-        var deckPath: string[] = [];
-        var result: TopicPath = TopicPath.emptyPath;
+        let deckPath: string[] = [];
+        let result: TopicPath = TopicPath.emptyPath;
 
         if (settings.convertFoldersToDecks) {
             deckPath = noteFile.path.split("/");
@@ -50,7 +49,7 @@ export class TopicPath {
                 result = new TopicPath(deckPath);
             }
         } else {
-            let tagList: TopicPath[] = this.getTopicPathsFromTagList(noteFile.getAllTags());
+            const tagList: TopicPath[] = this.getTopicPathsFromTagList(noteFile.getAllTags());
 
             outer: for (const tagToReview of this.getTopicPathsFromTagList(
                 settings.flashcardTags,
@@ -82,17 +81,17 @@ export class TopicPath {
     }
 
     static removeTopicPathFromStartOfCardText(cardText: string): [string, string] {
-        let cardText1: string = cardText
+        const cardText1: string = cardText
             .trimStart()
             .replaceAll(OBSIDIAN_TAG_AT_STARTOFLINE_REGEX, "");
-        let cardText2: string = cardText1.trimStart();
-        let whiteSpaceLength: number = cardText1.length - cardText2.length;
-        let whiteSpace: string = cardText1.substring(0, whiteSpaceLength);
+        const cardText2: string = cardText1.trimStart();
+        const whiteSpaceLength: number = cardText1.length - cardText2.length;
+        const whiteSpace: string = cardText1.substring(0, whiteSpaceLength);
         return [cardText2, whiteSpace];
     }
 
     static getTopicPathsFromTagList(tagList: string[]): TopicPath[] {
-        let result: TopicPath[] = [];
+        const result: TopicPath[] = [];
         for (const tag of tagList) {
             if (this.isValidTag(tag)) result.push(TopicPath.getTopicPathFromTag(tag));
         }
@@ -112,7 +111,7 @@ export class TopicPath {
         if (tag[0] != "#") throw "Tag must start with #";
         if (tag.length == 1) throw "Invalid tag";
 
-        let path: string[] = tag
+        const path: string[] = tag
             .replace("#", "")
             .split("/")
             .filter((str) => str);

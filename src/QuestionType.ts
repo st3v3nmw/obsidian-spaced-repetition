@@ -1,4 +1,3 @@
-import { getDefaultHighWaterMark } from "stream";
 import { CardType } from "./Question";
 import { SRSettings } from "./settings";
 
@@ -18,7 +17,7 @@ export class CardFrontBackUtil {
         questionText: string,
         settings: SRSettings,
     ): CardFrontBack[] {
-        let handler: IQuestionTypeHandler = QuestionTypeFactory.create(questionType);
+        const handler: IQuestionTypeHandler = QuestionTypeFactory.create(questionType);
         return handler.expand(questionText, settings);
     }
 }
@@ -29,24 +28,24 @@ export interface IQuestionTypeHandler {
 
 class QuestionType_SingleLineBasic implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
-        let idx: number = questionText.indexOf(settings.singleLineCardSeparator);
-        let item: CardFrontBack = new CardFrontBack(
+        const idx: number = questionText.indexOf(settings.singleLineCardSeparator);
+        const item: CardFrontBack = new CardFrontBack(
             questionText.substring(0, idx),
             questionText.substring(idx + settings.singleLineCardSeparator.length),
         );
-        let result: CardFrontBack[] = [item];
+        const result: CardFrontBack[] = [item];
         return result;
     }
 }
 
 class QuestionType_SingleLineReversed implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
-        let idx: number = questionText.indexOf(settings.singleLineReversedCardSeparator);
+        const idx: number = questionText.indexOf(settings.singleLineReversedCardSeparator);
         const side1: string = questionText.substring(0, idx),
             side2: string = questionText.substring(
                 idx + settings.singleLineReversedCardSeparator.length,
             );
-        let result: CardFrontBack[] = [
+        const result: CardFrontBack[] = [
             new CardFrontBack(side1, side2),
             new CardFrontBack(side2, side1),
         ];
@@ -56,25 +55,25 @@ class QuestionType_SingleLineReversed implements IQuestionTypeHandler {
 
 class QuestionType_MultiLineBasic implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
-        let idx = questionText.indexOf("\n" + settings.multilineCardSeparator + "\n");
-        let item: CardFrontBack = new CardFrontBack(
+        const idx = questionText.indexOf("\n" + settings.multilineCardSeparator + "\n");
+        const item: CardFrontBack = new CardFrontBack(
             questionText.substring(0, idx),
             questionText.substring(idx + 2 + settings.multilineCardSeparator.length),
         );
-        let result: CardFrontBack[] = [item];
+        const result: CardFrontBack[] = [item];
         return result;
     }
 }
 
 class QuestionType_MultiLineReversed implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
-        let idx = questionText.indexOf("\n" + settings.multilineReversedCardSeparator + "\n");
+        const idx = questionText.indexOf("\n" + settings.multilineReversedCardSeparator + "\n");
         const side1: string = questionText.substring(0, idx),
             side2: string = questionText.substring(
                 idx + 2 + settings.multilineReversedCardSeparator.length,
             );
 
-        let result: CardFrontBack[] = [
+        const result: CardFrontBack[] = [
             new CardFrontBack(side1, side2),
             new CardFrontBack(side2, side1),
         ];
@@ -106,7 +105,7 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
         });
 
         let front: string, back: string;
-        let result: CardFrontBack[] = [];
+        const result: CardFrontBack[] = [];
         for (const m of siblings) {
             const deletionStart: number = m.index,
                 deletionEnd: number = deletionStart + m[0].length;
@@ -149,7 +148,7 @@ export class QuestionType_ClozeUtil {
 
 export class QuestionTypeFactory {
     static create(questionType: CardType): IQuestionTypeHandler {
-        var handler: IQuestionTypeHandler;
+        let handler: IQuestionTypeHandler;
         switch (questionType) {
             case CardType.SingleLineBasic:
                 handler = new QuestionType_SingleLineBasic();

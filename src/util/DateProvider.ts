@@ -34,7 +34,7 @@ export class DateUtil {
     }
 }
 
-export var globalDateProvider: IDateProvider = new LiveDateProvider();
+export let globalDateProvider: IDateProvider = new LiveDateProvider();
 
 export function setupStaticDateProvider_20230906() {
     globalDateProvider = StaticDateProvider.fromDateStr("2023-09-06");

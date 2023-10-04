@@ -1,5 +1,3 @@
-import { TFile } from "obsidian";
-
 import { SRSettings } from "src/settings";
 import { t } from "src/lang/helpers";
 

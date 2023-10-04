@@ -1,7 +1,6 @@
 import { Question } from "./Question";
 import { CardScheduleInfo } from "./CardSchedule";
 import { CardListType } from "./Deck";
-import { SRSettings } from "./settings";
 
 export class Card {
     question: Question;
@@ -34,7 +33,7 @@ export class Card {
     }
 
     formatSchedule(): string {
-        var result: string;
+        let result: string = "";
         if (this.hasSchedule) result = this.scheduleInfo.formatSchedule();
         else result = "New";
         return result;

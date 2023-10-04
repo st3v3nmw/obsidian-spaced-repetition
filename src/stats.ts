@@ -1,5 +1,4 @@
 import { ValueCountDict } from "./util/NumberCountDict";
-import { getKeysPreserveType, getTypedObjectEntries } from "./util/utils";
 
 export class Stats {
     eases: ValueCountDict = new ValueCountDict();

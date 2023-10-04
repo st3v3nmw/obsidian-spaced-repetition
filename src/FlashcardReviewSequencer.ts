@@ -1,7 +1,7 @@
 import { Card } from "./Card";
 import { CardListType, Deck } from "./Deck";
 import { Question, QuestionText } from "./Question";
-import { ReviewResponse, schedule } from "./scheduling";
+import { ReviewResponse } from "./scheduling";
 import { SRSettings } from "./settings";
 import { TopicPath } from "./TopicPath";
 import { CardScheduleInfo, ICardScheduleCalculator } from "./CardSchedule";
@@ -93,7 +93,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     setCurrentDeck(topicPath: TopicPath): void {
-        let deck: Deck = this.remainingDeckTree.getDeck(topicPath);
+        const deck: Deck = this.remainingDeckTree.getDeck(topicPath);
         this.cardSequencer.setDeck(deck);
         this.cardSequencer.nextCard();
     }
@@ -103,12 +103,12 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     getDeckStats(topicPath: TopicPath): DeckStats {
-        let totalCount: number = this._originalDeckTree
+        const totalCount: number = this._originalDeckTree
             .getDeck(topicPath)
             .getCardCount(CardListType.All, true);
-        let remainingDeck: Deck = this.remainingDeckTree.getDeck(topicPath);
-        let newCount: number = remainingDeck.getCardCount(CardListType.NewCard, true);
-        let dueCount: number = remainingDeck.getCardCount(CardListType.DueCard, true);
+        const remainingDeck: Deck = this.remainingDeckTree.getDeck(topicPath);
+        const newCount: number = remainingDeck.getCardCount(CardListType.NewCard, true);
+        const dueCount: number = remainingDeck.getCardCount(CardListType.DueCard, true);
         return new DeckStats(dueCount, newCount, totalCount);
     }
 
@@ -155,7 +155,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     determineCardSchedule(response: ReviewResponse, card: Card): CardScheduleInfo {
-        var result: CardScheduleInfo;
+        let result: CardScheduleInfo;
 
         if (response == ReviewResponse.Reset) {
             // Resetting the card schedule
@@ -168,7 +168,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
                     card.scheduleInfo,
                 );
             } else {
-                let currentNote: Note = card.question.note;
+                const currentNote: Note = card.question.note;
                 result = this.cardScheduleCalculator.getNewCardSchedule(
                     response,
                     currentNote.filePath,
@@ -179,7 +179,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     async updateCurrentQuestionText(text: string): Promise<void> {
-        let q: QuestionText = this.currentQuestion.questionText;
+        const q: QuestionText = this.currentQuestion.questionText;
 
         q.actualQuestion = text;
 

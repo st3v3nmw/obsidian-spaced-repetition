@@ -1,23 +1,12 @@
-import {
-    ButtonComponent,
-    Modal,
-    App,
-    MarkdownRenderer,
-    Notice,
-    Platform,
-    TFile,
-    setIcon,
-} from "obsidian";
+import { Modal, App, Notice, Platform, setIcon } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
-import { schedule, textInterval, ReviewResponse } from "src/scheduling";
-import { COLLAPSE_ICON, IMAGE_FORMATS, AUDIO_FORMATS, VIDEO_FORMATS } from "src/constants";
-import { escapeRegexString, cyrb53 } from "src/util/utils";
+import { textInterval, ReviewResponse } from "src/scheduling";
+import { COLLAPSE_ICON } from "src/constants";
 import { t } from "src/lang/helpers";
-import { unwatchFile } from "fs";
 import { Card } from "../Card";
 import { CardListType, Deck } from "../Deck";
 import { CardType, Question } from "../Question";
@@ -29,7 +18,7 @@ import {
 import { FlashcardEditModal } from "./flashcards-edit-modal";
 import { Note } from "src/Note";
 import { RenderMarkdownWrapper } from "src/util/RenderMarkdownWrapper";
-import { CardScheduleCalculator, CardScheduleInfo } from "src/CardSchedule";
+import { CardScheduleInfo } from "src/CardSchedule";
 import { TopicPath } from "src/TopicPath";
 
 export enum FlashcardModalMode {
@@ -146,7 +135,7 @@ export class FlashcardModal extends Modal {
 
     renderDecksList(): void {
         this.mode = FlashcardModalMode.DecksList;
-        let stats: DeckStats = this.reviewSequencer.getDeckStats(TopicPath.emptyPath);
+        const stats: DeckStats = this.reviewSequencer.getDeckStats(TopicPath.emptyPath);
         this.titleEl.setText(t("DECKS"));
         this.titleEl.innerHTML += (
             <p style="margin:0px;line-height:12px;">
@@ -202,7 +191,7 @@ export class FlashcardModal extends Modal {
         const deckViewInnerText: HTMLElement = deckViewInner.createDiv("tag-pane-tag-text");
         deckViewInnerText.innerHTML += <span class="tag-pane-tag-self">{deck.deckName}</span>;
         const deckViewOuter: HTMLElement = deckViewSelf.createDiv("tree-item-flair-outer");
-        let deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
+        const deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
         deckViewOuter.innerHTML += (
             <span>
                 <span
@@ -357,7 +346,7 @@ export class FlashcardModal extends Modal {
     }
 
     displayCurrentCardInfoNotice() {
-        let schedule = this.currentCard.scheduleInfo;
+        const schedule = this.currentCard.scheduleInfo;
         const currentEaseStr = t("CURRENT_EASE_HELP_TEXT") + (schedule?.ease ?? t("NEW"));
         const currentIntervalStr =
             t("CURRENT_INTERVAL_HELP_TEXT") + textInterval(schedule?.interval, false);
@@ -399,10 +388,10 @@ export class FlashcardModal extends Modal {
     }
 
     async doEditQuestionText(): Promise<void> {
-        let currentQ: Question = this.reviewSequencer.currentQuestion;
+        const currentQ: Question = this.reviewSequencer.currentQuestion;
 
         // Just the question/answer text; without any preceding topic tag
-        let textPrompt = currentQ.questionText.actualQuestion;
+        const textPrompt = currentQ.questionText.actualQuestion;
 
         const editModal = FlashcardEditModal.Prompt(this.app, textPrompt);
         editModal
@@ -430,7 +419,7 @@ export class FlashcardModal extends Modal {
             this.flashcardView.empty();
         }
 
-        let wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
+        const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
             this.app,
             this.plugin,
             this.currentNote.filePath,
@@ -456,7 +445,7 @@ export class FlashcardModal extends Modal {
     }
 
     private async showCurrentCard(): Promise<void> {
-        let deck: Deck = this.reviewSequencer.currentDeck;
+        const deck: Deck = this.reviewSequencer.currentDeck;
 
         this.responseDiv.style.display = "none";
         this.resetButton.disabled = true;
@@ -466,7 +455,7 @@ export class FlashcardModal extends Modal {
         this.flashcardView.empty();
         this.mode = FlashcardModalMode.Front;
 
-        let wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
+        const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
             this.app,
             this.plugin,
             this.currentNote.filePath,
@@ -502,7 +491,7 @@ export class FlashcardModal extends Modal {
     }
 
     private formatQuestionContextText(questionContext: string[]): string {
-        let result = `${this.currentNote.file.basename} > ${questionContext.join(" > ")}`;
+        const result = `${this.currentNote.file.basename} > ${questionContext.join(" > ")}`;
         return result;
     }
 
@@ -511,7 +500,7 @@ export class FlashcardModal extends Modal {
         buttonName: string,
         reviewResponse: ReviewResponse,
     ) {
-        var schedule: CardScheduleInfo = this.reviewSequencer.determineCardSchedule(
+        const schedule: CardScheduleInfo = this.reviewSequencer.determineCardSchedule(
             reviewResponse,
             this.currentCard,
         );

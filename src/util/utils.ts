@@ -59,11 +59,6 @@ export function cyrb53(str: string, seed = 0): string {
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
 }
 
-// ✅ Defining a reusable function
-function padTo2Digits(num: number) {
-    return num.toString().padStart(2, "0");
-}
-
 export function ticksFromDate(year: number, month: number, day: number): number {
     return moment({ year, month, day }).utc().valueOf();
 }
@@ -76,7 +71,7 @@ export function formatDate_YYYY_MM_DD(ticks: Moment): string {
 
 export function getAllTagsFromText(text: string): string[] {
     const tagRegex = /#[^\s#]+/gi;
-    let result: RegExpMatchArray = text.match(tagRegex);
+    const result: RegExpMatchArray = text.match(tagRegex);
     if (!result) return [];
     return result;
 }

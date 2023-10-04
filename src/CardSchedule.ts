@@ -1,9 +1,7 @@
-import moment, { Moment } from "moment";
+import { Moment } from "moment";
 import {
-    ALLOWED_DATE_FORMATS,
     LEGACY_SCHEDULING_EXTRACTOR,
     MULTI_SCHEDULING_EXTRACTOR,
-    PREFERRED_DATE_FORMAT,
     TICKS_PER_DAY,
 } from "./constants";
 import { INoteEaseList } from "./NoteEaseList";
@@ -48,7 +46,7 @@ export class CardScheduleInfo {
         ease: number,
         delayBeforeReviewTicks: number,
     ) {
-        let dueDateTicks: Moment = DateUtil.dateStrToMoment(dueDateStr);
+        const dueDateTicks: Moment = DateUtil.dateStrToMoment(dueDateStr);
         return new CardScheduleInfo(dueDateTicks, interval, ease, delayBeforeReviewTicks);
     }
 
@@ -91,18 +89,18 @@ export class CardScheduleCalculator {
     }
 
     getResetCardSchedule(): CardScheduleInfo {
-        let interval = CardScheduleInfo.initialInterval;
-        let ease = this.settings.baseEase;
-        let dueDate = globalDateProvider.today.add(interval, "d");
-        let delayBeforeReview = 0;
+        const interval = CardScheduleInfo.initialInterval;
+        const ease = this.settings.baseEase;
+        const dueDate = globalDateProvider.today.add(interval, "d");
+        const delayBeforeReview = 0;
         return CardScheduleInfo.fromDueDateMoment(dueDate, interval, ease, delayBeforeReview);
     }
 
     getNewCardSchedule(response: ReviewResponse, notePath: string): CardScheduleInfo {
-        let initial_ease: number = this.noteEaseList.getEaseByPath(notePath);
-        let delayBeforeReview = 0;
+        const initial_ease: number = this.noteEaseList.getEaseByPath(notePath);
+        const delayBeforeReview = 0;
 
-        let schedObj: Record<string, number> = schedule(
+        const schedObj: Record<string, number> = schedule(
             response,
             CardScheduleInfo.initialInterval,
             initial_ease,
@@ -111,9 +109,9 @@ export class CardScheduleCalculator {
             this.dueDatesFlashcards,
         );
 
-        let interval = schedObj.interval;
-        let ease = schedObj.ease;
-        let dueDate = globalDateProvider.today.add(interval, "d");
+        const interval = schedObj.interval;
+        const ease = schedObj.ease;
+        const dueDate = globalDateProvider.today.add(interval, "d");
         return CardScheduleInfo.fromDueDateMoment(dueDate, interval, ease, delayBeforeReview);
     }
 
@@ -121,7 +119,7 @@ export class CardScheduleCalculator {
         response: ReviewResponse,
         cardSchedule: CardScheduleInfo,
     ): CardScheduleInfo {
-        let schedObj: Record<string, number> = schedule(
+        const schedObj: Record<string, number> = schedule(
             response,
             cardSchedule.interval,
             cardSchedule.ease,
@@ -129,10 +127,10 @@ export class CardScheduleCalculator {
             this.settings,
             this.dueDatesFlashcards,
         );
-        let interval = schedObj.interval;
-        let ease = schedObj.ease;
-        let dueDate = globalDateProvider.today.add(interval, "d");
-        let delayBeforeReview: 0;
+        const interval = schedObj.interval;
+        const ease = schedObj.ease;
+        const dueDate = globalDateProvider.today.add(interval, "d");
+        const delayBeforeReview = 0;
         return CardScheduleInfo.fromDueDateMoment(dueDate, interval, ease, delayBeforeReview);
     }
 }
@@ -143,17 +141,17 @@ export class NoteCardScheduleParser {
         if (scheduling.length === 0)
             scheduling = [...questionText.matchAll(LEGACY_SCHEDULING_EXTRACTOR)];
 
-        let result: CardScheduleInfo[] = [];
+        const result: CardScheduleInfo[] = [];
         for (let i = 0; i < scheduling.length; i++) {
-            let match: RegExpMatchArray = scheduling[i];
-            let dueDateStr = match[1];
-            let interval = parseInt(match[2]);
-            let ease = parseInt(match[3]);
-            let dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
-            let delayBeforeReviewTicks: number =
+            const match: RegExpMatchArray = scheduling[i];
+            const dueDateStr = match[1];
+            const interval = parseInt(match[2]);
+            const ease = parseInt(match[3]);
+            const dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
+            const delayBeforeReviewTicks: number =
                 dueDate.valueOf() - globalDateProvider.today.valueOf();
 
-            let info: CardScheduleInfo = new CardScheduleInfo(
+            const info: CardScheduleInfo = new CardScheduleInfo(
                 dueDate,
                 interval,
                 ease,

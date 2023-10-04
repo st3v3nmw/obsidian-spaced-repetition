@@ -21,7 +21,7 @@ export class ValueCountDict {
     }
 
     getTotalOfValueMultiplyCount(): number {
-        let v: number =
+        const v: number =
             getTypedObjectEntries(this.dict)
                 .map(([value, count]) => value * count)
                 .reduce((a, b) => a + b, 0) || 0;

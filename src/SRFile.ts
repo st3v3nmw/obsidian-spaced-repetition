@@ -5,7 +5,6 @@ import {
     getAllTags as ObsidianGetAllTags,
     HeadingCache,
 } from "obsidian";
-import { OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "./constants";
 import { getAllTagsFromText } from "./util/utils";
 
 export interface ISRFile {
@@ -57,7 +56,7 @@ export class SrTFile implements ISRFile {
             stack.push(heading);
         }
 
-        let result = [];
+        const result = [];
         for (const headingObj of stack) {
             headingObj.heading = headingObj.heading.replace(/\[\^\d+\]/gm, "").trim();
             result.push(headingObj.heading);
@@ -95,6 +94,7 @@ export class UnitTestSRFile implements ISRFile {
         return getAllTagsFromText(this.content);
     }
 
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     getQuestionContext(cardLine: number): string[] {
         return [];
     }

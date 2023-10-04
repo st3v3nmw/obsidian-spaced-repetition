@@ -1,5 +1,3 @@
-import { HeadingCache } from "obsidian";
-import { TopicPath } from "./TopicPath";
 import { SRSettings } from "./settings";
 import { Deck } from "./Deck";
 import { Question } from "./Question";
@@ -34,7 +32,7 @@ export class Note {
     debugLogToConsole(desc: string = "") {
         let str: string = `Note: ${desc}: ${this.questionList.length} questions\r\n`;
         for (let i = 0; i < this.questionList.length; i++) {
-            let q: Question = this.questionList[i];
+            const q: Question = this.questionList[i];
             str += `[${i}]: ${q.questionType}: ${q.lineNo}: ${q.topicPath?.path}: ${q.questionText.original}\r\n`;
         }
         console.debug(str);

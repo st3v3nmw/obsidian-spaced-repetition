@@ -1,4 +1,4 @@
-import { CardListType, Deck } from "./Deck";
+import { Deck } from "./Deck";
 import {
     CardListOrder,
     DeckTreeIterator,
@@ -16,21 +16,21 @@ export class DeckTreeStatsCalculator {
 
     calculate(deckTree: Deck): Stats {
         // Order doesn't matter as long as we iterate over everything
-        let iteratorOrder: IIteratorOrder = {
+        const iteratorOrder: IIteratorOrder = {
             deckOrder: OrderMethod.Sequential,
             cardListOrder: CardListOrder.DueFirst,
             cardOrder: OrderMethod.Sequential,
         };
-        let iterator: IDeckTreeIterator = new DeckTreeIterator(
+        const iterator: IDeckTreeIterator = new DeckTreeIterator(
             iteratorOrder,
             IteratorDeckSource.CloneBeforeUse,
         );
-        let result = new Stats();
+        const result = new Stats();
         iterator.setDeck(deckTree);
         while (iterator.nextCard()) {
-            let card: Card = iterator.currentCard;
+            const card: Card = iterator.currentCard;
             if (card.hasSchedule) {
-                let schedule: CardScheduleInfo = card.scheduleInfo;
+                const schedule: CardScheduleInfo = card.scheduleInfo;
                 result.update(schedule.delayBeforeReviewDaysInt, schedule.interval, schedule.ease);
             } else {
                 result.incrementNew();

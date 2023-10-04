@@ -60,7 +60,7 @@ export class Deck {
         if (!topicPath.hasPath) {
             return this;
         }
-        let t: TopicPath = topicPath.clone();
+        const t: TopicPath = topicPath.clone();
         const deckName: string = t.shift();
         for (const subdeck of this.subdecks) {
             if (deckName === subdeck.deckName) {
@@ -70,8 +70,7 @@ export class Deck {
 
         let result: Deck = null;
         if (createAllowed) {
-            let parent: Deck = this;
-            const subdeck: Deck = new Deck(deckName, parent);
+            const subdeck: Deck = new Deck(deckName, this /* parent */);
             this.subdecks.push(subdeck);
             result = subdeck._getOrCreateDeck(t, createAllowed);
         }
@@ -79,7 +78,8 @@ export class Deck {
     }
 
     getTopicPath(): TopicPath {
-        let list: string[] = [];
+        const list: string[] = [];
+        // eslint-disable-next-line  @typescript-eslint/no-this-alias
         let deck: Deck = this;
         while (!deck.isRootDeck) {
             list.push(deck.deckName);
@@ -89,6 +89,7 @@ export class Deck {
     }
 
     getRootDeck(): Deck {
+        // eslint-disable-next-line  @typescript-eslint/no-this-alias
         let deck: Deck = this;
         while (!deck.isRootDeck) {
             deck = deck.parent;
@@ -97,7 +98,7 @@ export class Deck {
     }
 
     getCard(index: number, cardListType: CardListType): Card {
-        let cardList: Card[] = this.getCardListForCardType(cardListType);
+        const cardList: Card[] = this.getCardListForCardType(cardListType);
         return cardList[index];
     }
 
@@ -106,20 +107,20 @@ export class Deck {
     }
 
     appendCard(topicPath: TopicPath, cardObj: Card): void {
-        let deck: Deck = this.getOrCreateDeck(topicPath);
-        let cardList: Card[] = deck.getCardListForCardType(cardObj.cardListType);
+        const deck: Deck = this.getOrCreateDeck(topicPath);
+        const cardList: Card[] = deck.getCardListForCardType(cardObj.cardListType);
 
         cardList.push(cardObj);
     }
 
     deleteCard(card: Card): void {
-        let cardList: Card[] = this.getCardListForCardType(card.cardListType);
-        let idx = cardList.indexOf(card);
+        const cardList: Card[] = this.getCardListForCardType(card.cardListType);
+        const idx = cardList.indexOf(card);
         if (idx != -1) cardList.splice(idx, 1);
     }
 
     deleteCardAtIndex(index: number, cardListType: CardListType): void {
-        let cardList: Card[] = this.getCardListForCardType(cardListType);
+        const cardList: Card[] = this.getCardListForCardType(cardListType);
         cardList.splice(index, 1);
     }
 
@@ -130,7 +131,7 @@ export class Deck {
     }
 
     toDeckArray(): Deck[] {
-        let result: Deck[] = [];
+        const result: Deck[] = [];
         result.push(this);
         for (const subdeck of this.subdecks) {
             result.push(...subdeck.toDeckArray());
@@ -165,12 +166,12 @@ export class Deck {
         result += `${indentStr}${this.deckName}\r\n`;
         indentStr += "  ";
         for (let i = 0; i < this.newFlashcards.length; i++) {
-            let card = this.newFlashcards[i];
+            const card = this.newFlashcards[i];
             result += `${indentStr}New: ${i}: ${card.front}::${card.back}\r\n`;
         }
         for (let i = 0; i < this.dueFlashcards.length; i++) {
-            let card = this.dueFlashcards[i];
-            let s = card.isDue ? "Due" : "Not due";
+            const card = this.dueFlashcards[i];
+            const s = card.isDue ? "Due" : "Not due";
             result += `${indentStr}${s}: ${i}: ${card.front}::${card.back}\r\n`;
         }
 
@@ -181,24 +182,24 @@ export class Deck {
     }
 
     clone(): Deck {
-        return this.copyWithCardFilter((card) => true);
+        return this.copyWithCardFilter(() => true);
     }
 
     copyWithCardFilter(predicate: (value: Card) => boolean, parent: Deck = null): Deck {
-        let result: Deck = new Deck(this.deckName, parent);
+        const result: Deck = new Deck(this.deckName, parent);
         result.newFlashcards = [...this.newFlashcards.filter((card) => predicate(card))];
         result.dueFlashcards = [...this.dueFlashcards.filter((card) => predicate(card))];
 
         for (const s of this.subdecks) {
-            let newParent = result;
-            let newDeck = s.copyWithCardFilter(predicate, newParent);
+            const newParent = result;
+            const newDeck = s.copyWithCardFilter(predicate, newParent);
             result.subdecks.push(newDeck);
         }
         return result;
     }
 
     static otherListType(cardListType: CardListType): CardListType {
-        var result: CardListType;
+        let result: CardListType;
         if (cardListType == CardListType.NewCard) result = CardListType.DueCard;
         else if (cardListType == CardListType.DueCard) result = CardListType.NewCard;
         else throw "Invalid cardListType";

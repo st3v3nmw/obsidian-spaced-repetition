@@ -13,10 +13,10 @@ export class NoteParser {
     }
 
     async parse(noteFile: ISRFile, folderTopicPath: TopicPath): Promise<Note> {
-        let questionParser: NoteQuestionParser = new NoteQuestionParser(this.settings);
-        let questions = await questionParser.createQuestionList(noteFile, folderTopicPath);
+        const questionParser: NoteQuestionParser = new NoteQuestionParser(this.settings);
+        const questions = await questionParser.createQuestionList(noteFile, folderTopicPath);
 
-        let result: Note = new Note(noteFile, questions);
+        const result: Note = new Note(noteFile, questions);
         return result;
     }
 }

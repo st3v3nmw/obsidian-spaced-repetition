@@ -96,7 +96,7 @@ class SingleDeckIterator {
 
     private nextCardWithinList(): boolean {
         let result: boolean = false;
-        let cardList: Card[] = this.deck.getCardListForCardType(this.cardListType);
+        const cardList: Card[] = this.deck.getCardListForCardType(this.cardListType);
 
         // Delete the current card so we don't return it again
         if (this.hasCurrentCard) {
@@ -119,8 +119,8 @@ class SingleDeckIterator {
 
     deleteCurrentQuestion(): void {
         this.ensureCurrentCard();
-        let q: Question = this.currentCard.question;
-        let cards: Card[] = this.deck.getCardListForCardType(this.cardListType);
+        const q: Question = this.currentCard.question;
+        const cards: Card[] = this.deck.getCardListForCardType(this.cardListType);
         do {
             this.deck.deleteCardAtIndex(this.cardIdx, this.cardListType);
         } while (this.cardIdx < cards.length && Object.is(q, cards[this.cardIdx].question));
@@ -135,9 +135,9 @@ class SingleDeckIterator {
 
     moveCurrentCardToEndOfList(): void {
         this.ensureCurrentCard();
-        let cardList: Card[] = this.deck.getCardListForCardType(this.cardListType);
+        const cardList: Card[] = this.deck.getCardListForCardType(this.cardListType);
         if (cardList.length <= 1) return;
-        let card = this.currentCard;
+        const card = this.currentCard;
         this.deck.deleteCardAtIndex(this.cardIdx, this.cardListType);
         this.deck.appendCard(TopicPath.emptyPath, card);
         this.setNoCurrentCard();

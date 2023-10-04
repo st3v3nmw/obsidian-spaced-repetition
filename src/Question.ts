@@ -3,10 +3,9 @@ import { CardScheduleInfo, NoteCardScheduleParser } from "./CardSchedule";
 import { SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END } from "./constants";
 import { Note } from "./Note";
 import { SRSettings } from "./settings";
-import { ISRFile } from "./SRFile";
 import { TopicPath } from "./TopicPath";
 import { MultiLineTextFinder } from "./util/MultiLineTextFinder";
-import { cyrb53, escapeRegexString, splitTextIntoLineArray } from "./util/utils";
+import { cyrb53 } from "./util/utils";
 
 export enum CardType {
     SingleLineBasic,
@@ -69,7 +68,7 @@ export class QuestionText {
     }
 
     static create(original: string, settings: SRSettings): QuestionText {
-        let [topicPath, postTopicPathWhiteSpace, actualQuestion] = this.splitText(
+        const [topicPath, postTopicPathWhiteSpace, actualQuestion] = this.splitText(
             original,
             settings,
         );
@@ -78,7 +77,7 @@ export class QuestionText {
     }
 
     static splitText(original: string, settings: SRSettings): [TopicPath, string, string] {
-        let strippedSR = NoteCardScheduleParser.removeCardScheduleInfo(original).trim();
+        const strippedSR = NoteCardScheduleParser.removeCardScheduleInfo(original).trim();
         let actualQuestion: string = strippedSR;
         let whiteSpace: string = "";
 
@@ -141,8 +140,8 @@ export class Question {
         // We always want the correct schedule format, so we use this if there is no schedule for a card
 
         for (let i = 0; i < this.cards.length; i++) {
-            let card: Card = this.cards[i];
-            let schedule: CardScheduleInfo = card.hasSchedule
+            const card: Card = this.cards[i];
+            const schedule: CardScheduleInfo = card.hasSchedule
                 ? card.scheduleInfo
                 : CardScheduleInfo.getDummySchedule(settings);
             result += schedule.formatSchedule();
@@ -161,15 +160,15 @@ export class Question {
     }
 
     updateQuestionText(noteText: string, settings: SRSettings): string {
-        let originalText: string = this.questionText.original;
+        const originalText: string = this.questionText.original;
 
         // Get the entire text for the question including:
         //      1. the topic path (if present),
         //      2. the question text
         //      3. the schedule HTML comment (if present)
-        let replacementText = this.formatForNote(settings);
+        const replacementText = this.formatForNote(settings);
 
-        var newText = MultiLineTextFinder.findAndReplace(noteText, originalText, replacementText);
+        let newText = MultiLineTextFinder.findAndReplace(noteText, originalText, replacementText);
         if (newText) {
             this.questionText = QuestionText.create(replacementText, settings);
         } else {
@@ -185,9 +184,9 @@ export class Question {
     }
 
     async writeQuestion(settings: SRSettings): Promise<void> {
-        let fileText: string = await this.note.file.read();
+        const fileText: string = await this.note.file.read();
 
-        let newText: string = this.updateQuestionText(fileText, settings);
+        const newText: string = this.updateQuestionText(fileText, settings);
         await this.note.file.write(newText);
         this.hasChanged = false;
     }
@@ -200,15 +199,15 @@ export class Question {
         lineNo: number,
         context: string[],
     ): Question {
-        let hasEditLaterTag = originalText.includes(settings.editLaterTag);
-        let questionText: QuestionText = QuestionText.create(originalText, settings);
+        const hasEditLaterTag = originalText.includes(settings.editLaterTag);
+        const questionText: QuestionText = QuestionText.create(originalText, settings);
 
         let topicPath: TopicPath = noteTopicPath;
         if (questionText.topicPath.hasPath) {
             topicPath = questionText.topicPath;
         }
 
-        let result: Question = new Question({
+        const result: Question = new Question({
             questionType,
             topicPath,
             questionText,
