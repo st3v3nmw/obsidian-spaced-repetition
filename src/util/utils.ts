@@ -1,3 +1,7 @@
+import moment from "moment";
+import { Moment } from "moment";
+import { PREFERRED_DATE_FORMAT } from "src/constants";
+
 type Hex = number;
 
 // https://stackoverflow.com/a/69019874
@@ -53,4 +57,25 @@ export function cyrb53(str: string, seed = 0): string {
     h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
     h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
+}
+
+export function ticksFromDate(year: number, month: number, day: number): number {
+    return moment({ year, month, day }).utc().valueOf();
+}
+
+// 👇️ format as "YYYY-MM-DD"
+// https://bobbyhadz.com/blog/typescript-date-format
+export function formatDate_YYYY_MM_DD(ticks: Moment): string {
+    return ticks.format(PREFERRED_DATE_FORMAT);
+}
+
+export function getAllTagsFromText(text: string): string[] {
+    const tagRegex = /#[^\s#]+/gi;
+    const result: RegExpMatchArray = text.match(tagRegex);
+    if (!result) return [];
+    return result;
+}
+
+export function splitTextIntoLineArray(text: string): string[] {
+    return text.replaceAll("\r\n", "\n").split("\n");
 }

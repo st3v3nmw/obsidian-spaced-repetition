@@ -1,5 +1,5 @@
 import { parse } from "src/parser";
-import { CardType } from "src/scheduling";
+import { CardType } from "src/Question";
 
 const defaultArgs: [string, string, string, string, boolean, boolean, boolean] = [
     "::",
@@ -27,6 +27,9 @@ test("Test parsing of single line basic cards", () => {
     expect(parse("#Title\n\nQ1::A1\nQ2:: A2", ...defaultArgs)).toEqual([
         [CardType.SingleLineBasic, "Q1::A1", 2],
         [CardType.SingleLineBasic, "Q2:: A2", 3],
+    ]);
+    expect(parse("#flashcards/science Question ::Answer", ...defaultArgs)).toEqual([
+        [CardType.SingleLineBasic, "#flashcards/science Question ::Answer", 0],
     ]);
 });
 
@@ -65,6 +68,9 @@ test("Test parsing of multi line basic cards", () => {
     expect(parse("#Title\n\nLine0\nQ1\n?\nA1\nAnswerExtra\n\nQ2\n?\nA2", ...defaultArgs)).toEqual([
         [CardType.MultiLineBasic, "Line0\nQ1\n?\nA1\nAnswerExtra", 4],
         [CardType.MultiLineBasic, "Q2\n?\nA2", 9],
+    ]);
+    expect(parse("#flashcards/tag-on-previous-line\nQuestion\n?\nAnswer", ...defaultArgs)).toEqual([
+        [CardType.MultiLineBasic, "#flashcards/tag-on-previous-line\nQuestion\n?\nAnswer", 2],
     ]);
 });
 
