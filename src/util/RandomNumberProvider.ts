@@ -36,21 +36,26 @@ export class WeightedRandomNumber {
 
     //
     // weights is a dictionary:
-    //      first number - a value that can be returned
-    //      second number - the weight that influences the probability of the
+    //      first number - a key that can be returned
+    //      second number - the "bucket size" - this is a weight that influences the probability of the
     //          first number being returned
     //
-    getRandomValues(weights: Record<number, number>): number {
+    // returns:
+    //      first number - one of the keys from the weights parameter
+    //      second number - an "index" value; 0 <= index < bucketSize
+    getRandomValues(weights: Record<number, number>): [number, number] {
         const total: number = WeightedRandomNumber.calcTotalOfCount(weights);
         if (Object.values(weights).some((i) => !Number.isInteger(i) || i < 0)) throw "All weights must be positive integers";
-        
+
         const v: number = this.provider.getInteger(0, total - 1);
         let x: number = 0;
         let result: number;
         for (const kvp in weights) {
             let [value, count] = [Number(kvp), weights[kvp] as number];
             if (v < x + count) {
-                return value;
+                // x <= v < x + count
+                const index: number = v - x;
+                return [value, index];
             }
             x += count;
         }

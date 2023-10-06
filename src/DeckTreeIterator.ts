@@ -2,16 +2,19 @@ import { Card } from "./Card";
 import { CardListType, Deck } from "./Deck";
 import { Question } from "./Question";
 import { TopicPath } from "./TopicPath";
-import { globalRandomNumberProvider } from "./util/RandomNumberProvider";
+import { WeightedRandomNumber, globalRandomNumberProvider } from "./util/RandomNumberProvider";
 
-export enum CardListOrder {
-    NewFirst,
-    DueFirst,
+export enum CardOrder {
+    NewFirstSequential,
+    NewFirstRandom,
+    DueFirstSequential,
+    DueFirstRandom,
     Random,
 }
-export enum OrderMethod {
-    Sequential,
-    Random,
+export enum DeckOrder {
+    PrevDeckComplete_Sequential,
+    PrevDeckComplete_Random,
+    TotallyRandom
 }
 export enum IteratorDeckSource {
     UpdatedByIterator,
@@ -19,14 +22,12 @@ export enum IteratorDeckSource {
 }
 
 export interface IIteratorOrder {
+    // Within a deck this specifies the order the cards should be reviewed
+    // e.g. new first, going sequentially
+    cardOrder: CardOrder;
+
     // Choose decks in sequential order, or randomly
-    deckOrder: OrderMethod;
-
-    // Within a deck, choose: new cards first, due cards first, or randomly
-    cardListOrder: CardListOrder;
-
-    // Within a card list (i.e. either new or due), choose cards sequentially or randomly
-    cardOrder: OrderMethod;
+    deckOrder: DeckOrder;
 }
 
 export interface IDeckTreeIterator {
@@ -46,6 +47,7 @@ class SingleDeckIterator {
     preferredCardListType: CardListType;
     cardIdx?: number;
     cardListType?: CardListType;
+    weightedRandomNumber: WeightedRandomNumber;
 
     get hasCurrentCard(): boolean {
         return this.cardIdx != null;
@@ -58,10 +60,8 @@ class SingleDeckIterator {
 
     constructor(iteratorOrder: IIteratorOrder) {
         this.iteratorOrder = iteratorOrder;
-        this.preferredCardListType =
-            this.iteratorOrder.cardListOrder == CardListOrder.DueFirst
-                ? CardListType.DueCard
-                : CardListType.NewCard;
+        this.preferredCardListType = SingleDeckIterator.getCardListTypeForIterator(this.iteratorOrder);
+        this.weightedRandomNumber = WeightedRandomNumber.create();
     }
 
     setDeck(deck: Deck): void {
@@ -69,47 +69,70 @@ class SingleDeckIterator {
         this.setCardListType(null);
     }
 
-    private setCardListType(cardListType?: CardListType): void {
+    private setCardListType(cardListType?: CardListType, cardIdx: number = null): void {
         this.cardListType = cardListType;
-        this.cardIdx = null;
+        this.cardIdx = cardIdx;
     }
 
     nextCard(): boolean {
-        // First return cards in the preferred list
-        if (this.cardListType == null) {
-            this.setCardListType(this.preferredCardListType);
-        }
-
-        if (!this.nextCardWithinList()) {
-            if (this.cardListType == this.preferredCardListType) {
-                // Nothing left in the preferred list, so try the non-preferred list type
-                this.setCardListType(Deck.otherListType(this.cardListType));
-                if (!this.nextCardWithinList()) {
-                    this.setCardListType(null);
-                }
-            } else {
-                this.cardIdx = null;
-            }
-        }
-        return this.cardIdx != null;
-    }
-
-    private nextCardWithinList(): boolean {
-        let result: boolean = false;
-        const cardList: Card[] = this.deck.getCardListForCardType(this.cardListType);
-
         // Delete the current card so we don't return it again
         if (this.hasCurrentCard) {
             this.deleteCurrentCard();
         }
-        result = cardList.length > 0;
+
+        if (this.iteratorOrder.cardOrder == CardOrder.Random) {
+            this.nextRandomCard();
+        } else {
+            // First return cards in the preferred list
+            if (this.cardListType == null) {
+                this.setCardListType(this.preferredCardListType);
+            }
+
+            if (!this.nextCardWithinCurrentList()) {
+                if (this.cardListType == this.preferredCardListType) {
+                    // Nothing left in the preferred list, so try the non-preferred list type
+                    this.setCardListType(Deck.otherListType(this.cardListType));
+                    if (!this.nextCardWithinCurrentList()) {
+                        this.setCardListType(null);
+                    }
+                } else {
+                    this.cardIdx = null;
+                }
+            }
+        }
+
+        return this.cardIdx != null;
+    }
+
+    private nextRandomCard(): void {
+        const newCount: number = this.deck.newFlashcards.length;
+        const dueCount: number = this.deck.dueFlashcards.length;
+        if (newCount + dueCount > 0) {
+            const weights: Partial<Record<CardListType, number>> = {};
+            if (newCount > 0)
+                weights[CardListType.NewCard] = newCount;
+            if (dueCount > 0)
+                weights[CardListType.DueCard] = dueCount;
+            const [cardListType, index] = this.weightedRandomNumber.getRandomValues(weights);
+            this.setCardListType(cardListType, index);
+        } else {
+            this.setCardListType(null);
+        }
+    }
+
+    private nextCardWithinCurrentList(): boolean {
+        const cardList: Card[] = this.deck.getCardListForCardType(this.cardListType);
+
+        let result: boolean = cardList.length > 0;
         if (result) {
             switch (this.iteratorOrder.cardOrder) {
-                case OrderMethod.Sequential:
-                    this.cardIdx = 0;
+                case CardOrder.DueFirstSequential:
+                case CardOrder.NewFirstSequential:
+                        this.cardIdx = 0;
                     break;
 
-                case OrderMethod.Random:
+                case CardOrder.DueFirstRandom:
+                case CardOrder.NewFirstRandom:
                     this.cardIdx = globalRandomNumberProvider.getInteger(0, cardList.length - 1);
                     break;
             }
@@ -149,6 +172,22 @@ class SingleDeckIterator {
 
     private ensureCurrentCard() {
         if (this.cardIdx == null || this.cardListType == null) throw "no current card";
+    }
+
+    private static getCardListTypeForIterator(iteratorOrder: IIteratorOrder): CardListType | null {
+        let result: CardListType = null;
+        switch (iteratorOrder.cardOrder) {
+            case CardOrder.DueFirstRandom:
+            case CardOrder.DueFirstSequential:
+                result = CardListType.DueCard;
+                break;
+
+            case CardOrder.NewFirstRandom:
+            case CardOrder.NewFirstSequential:
+                result = CardListType.NewCard;
+                break;
+        }
+        return result;
     }
 }
 

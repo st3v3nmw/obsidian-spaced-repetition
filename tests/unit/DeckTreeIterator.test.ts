@@ -4,11 +4,11 @@ import { DEFAULT_SETTINGS } from "src/settings";
 import { SampleItemDecks } from "./SampleItems";
 import { TopicPath } from "src/TopicPath";
 import {
-    CardListOrder,
+    CardOrder,
     DeckTreeIterator,
     IIteratorOrder,
     IteratorDeckSource,
-    OrderMethod,
+    DeckOrder,
 } from "src/DeckTreeIterator";
 import {
     StaticDateProvider,
@@ -18,19 +18,16 @@ import {
 import { setupNextRandomNumber, setupStaticRandomNumberProvider } from "src/util/RandomNumberProvider";
 
 export var order_DueFirst_Sequential: IIteratorOrder = {
-    cardOrder: OrderMethod.Sequential,
-    cardListOrder: CardListOrder.DueFirst,
-    deckOrder: OrderMethod.Sequential,
+    cardOrder: CardOrder.DueFirstSequential,
+    deckOrder: DeckOrder.PrevDeckComplete_Sequential
 };
 var order_DueFirst_Random: IIteratorOrder = {
-    cardOrder: OrderMethod.Random,
-    cardListOrder: CardListOrder.DueFirst,
-    deckOrder: OrderMethod.Sequential,
+    cardOrder: CardOrder.DueFirstRandom,
+    deckOrder: DeckOrder.PrevDeckComplete_Sequential
 };
 var order_NewFirst_Sequential: IIteratorOrder = {
-    cardOrder: OrderMethod.Sequential,
-    cardListOrder: CardListOrder.NewFirst,
-    deckOrder: OrderMethod.Sequential,
+    cardOrder: CardOrder.NewFirstSequential,
+    deckOrder: DeckOrder.PrevDeckComplete_Sequential
 };
 
 var iterator: DeckTreeIterator;
@@ -452,14 +449,15 @@ describe("hasCurrentCard", () => {
         expect(iterator.hasCurrentCard).toEqual(true);
     });
 });
-/* describe("deleteCurrentCard", () => {
+
+describe("deleteCurrentCard", () => {
     test("Delete after all cards iterated - exception throw", async () => {
         let text: string = `
-        Q1::A1
-        Q2::A2 usim
-        Q3::A3`;
+Q1::A1
+Q2::A2
+Q3::A3`;
         let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
-        iterator = new DeckTreeSequentialIterator(order_NewFirst_Sequential);
+        iterator = new DeckTreeIterator(order_NewFirst_Sequential, IteratorDeckSource.UpdatedByIterator);
         iterator.setDeck(deck);
         
         expect(iterator.nextCard()).toEqual(true);
@@ -475,12 +473,12 @@ describe("hasCurrentCard", () => {
 
     test("Delete card, with single card remaining after it", async () => {
         let text: string = `
-        Q1::A1
-        Q2::A2
-        Q3::A3`;
+Q1::A1
+Q2::A2
+Q3::A3`;
         let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
         expect(deck.newFlashcards.length).toEqual(3);
-        iterator = new DeckTreeSequentialIterator(order_NewFirst_Sequential);
+        iterator = new DeckTreeIterator(order_NewFirst_Sequential, IteratorDeckSource.UpdatedByIterator);
         iterator.setDeck(deck);
         
         nextCardThenCheck("Q1");
@@ -491,7 +489,7 @@ describe("hasCurrentCard", () => {
     });
 
 });
- */
+
 function nextCardThenCheck(expectedFront: string): void {
     expect(iterator.nextCard()).toEqual(true);
     expect(iterator.currentCard.front).toEqual(expectedFront);
