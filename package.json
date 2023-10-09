@@ -1,6 +1,6 @@
 {
     "name": "obsidian-spaced-repetition",
-    "version": "1.10.1",
+    "version": "1.10.2",
     "description": "Fight the forgetting curve by reviewing flashcards & entire notes.",
     "main": "main.js",
     "scripts": {
@@ -9,7 +9,7 @@
         "format": "npx prettier --write .",
         "lint": "npx prettier --check . && npx eslint src/",
         "test": "jest",
-        "changelog": "auto-changelog --template=compact --package && npx prettier --write CHANGELOG.md",
+        "changelog": "auto-changelog --template=compact --package && npx prettier --write docs/changelog.md",
         "e2e": "make setup_e2e && wdio run ./wdio.conf.js"
     },
     "keywords": [
