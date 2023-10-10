@@ -19,12 +19,12 @@ import {
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "./FlashcardReviewSequencer";
 import {
-    CardListOrder,
+    CardOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
     IteratorDeckSource,
-    OrderMethod,
+    DeckOrder,
 } from "./DeckTreeIterator";
 import { CardScheduleCalculator } from "./CardSchedule";
 import { Note } from "./Note";
@@ -305,9 +305,8 @@ export default class SRPlugin extends Plugin {
 
     private static createDeckTreeIterator(settings: SRSettings): IDeckTreeIterator {
         const iteratorOrder: IIteratorOrder = {
-            deckOrder: OrderMethod.Sequential,
-            cardListOrder: CardListOrder.DueFirst,
-            cardOrder: settings.randomizeCardOrder ? OrderMethod.Random : OrderMethod.Sequential,
+            deckOrder: DeckOrder.PrevDeckComplete_Sequential,
+            cardOrder: settings.randomizeCardOrder ? CardOrder.DueFirstRandom : CardOrder.DueFirstSequential
         };
         return new DeckTreeIterator(iteratorOrder, IteratorDeckSource.UpdatedByIterator);
     }
