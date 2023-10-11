@@ -14,7 +14,7 @@ export enum CardOrder {
 export enum DeckOrder {
     PrevDeckComplete_Sequential,
     PrevDeckComplete_Random,
-    EveryCardRandomDeck
+    EveryCardRandomDeckAndCard
 }
 export enum IteratorDeckSource {
     UpdatedByIterator,
@@ -261,11 +261,10 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         // Delete the current card so we don't return it again
         if (this.hasCurrentCard) {
             this.singleDeckIterator.deleteCurrentCard();
-            this.removeCurrentDeckIfEmpty();
         }
 
-        if (this.iteratorOrder.deckOrder == DeckOrder.EveryCardRandomDeck) {
-            this.nextCardRandomDeck();
+        if (this.iteratorOrder.deckOrder == DeckOrder.EveryCardRandomDeckAndCard) {
+            result = this.nextCard_EveryCardRandomDeck();
         } else {
             if (this.deckIdx == null) {
                 this.setDeckIdx(0);
@@ -275,7 +274,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
                     result = true;
                     break;
                 }
-                this.deckIdx++;
+                this.chooseNextDeck();
                 if (this.deckIdx < this.deckArray.length) {
                     this.singleDeckIterator.setDeck(this.deckArray[this.deckIdx]);
                 }
@@ -285,15 +284,49 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         return result;
     }
 
-    private nextCardRandomDeck(): void {
+    private chooseNextDeck(): void {
+        switch (this.iteratorOrder.deckOrder) {
+            case DeckOrder.PrevDeckComplete_Sequential:
+                this.deckIdx++;
+                break;
+            
+            case DeckOrder.PrevDeckComplete_Random:
+                // Equal probability of picking any deck that has cards within
+                let weights: Record<number, number> = {};
+                let hasDeck: boolean = false;
+                for (let i = 0; i < this.deckArray.length; i++) {
+                    if (this.deckArray[i].getCardCount(CardListType.All, false)) {
+                        weights[i] = 1;
+                        hasDeck = true;
+                    }
+                }
+                if (hasDeck) {
+                    let [deckIdx, _] = this.weightedRandomNumber.getRandomValues(weights);
+                    this.deckIdx = deckIdx;
+                } else {
+                    // Our signal that no deck with cards present
+                    this.deckIdx = this.deckArray.length;
+                }
+                break;
+        }
+    }
+
+    private nextCard_EveryCardRandomDeck(): boolean {
         // Make the chance of picking a specific deck proportional to the number of cards within
         let weights: Record<number, number> = {};
         for (let i = 0; i < this.deckArray.length; i++) {
-            weights[i] = this.deckArray[i].getCardCount(CardListType.All, false);
+            const cardCount: number = this.deckArray[i].getCardCount(CardListType.All, false);
+            if (cardCount) {
+                weights[i] = cardCount;
+            }
         }
+        if (Object.keys(weights).length == 0)
+            return false;
+
         let [deckIdx, cardIdx] = this.weightedRandomNumber.getRandomValues(weights);
         this.setDeckIdx(deckIdx);
         this.singleDeckIterator.setCard(cardIdx);
+        return true;
     }
 
     deleteCurrentQuestion(): boolean {
