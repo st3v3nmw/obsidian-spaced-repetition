@@ -9,12 +9,11 @@ export enum CardOrder {
     NewFirstRandom,
     DueFirstSequential,
     DueFirstRandom,
-    Random,
+    EveryCardRandomDeckAndCard,
 }
 export enum DeckOrder {
     PrevDeckComplete_Sequential,
-    PrevDeckComplete_Random,
-    EveryCardRandomDeckAndCard
+    PrevDeckComplete_Random
 }
 export enum IteratorDeckSource {
     UpdatedByIterator,
@@ -85,7 +84,7 @@ class SingleDeckIterator {
     }
 
     nextCard(): boolean {
-        if (this.iteratorOrder.cardOrder == CardOrder.Random) {
+        if (this.iteratorOrder.cardOrder == CardOrder.EveryCardRandomDeckAndCard) {
             this.nextRandomCard();
         } else {
             // First return cards in the preferred list
@@ -263,7 +262,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
             this.singleDeckIterator.deleteCurrentCard();
         }
 
-        if (this.iteratorOrder.deckOrder == DeckOrder.EveryCardRandomDeckAndCard) {
+        if (this.iteratorOrder.cardOrder == CardOrder.EveryCardRandomDeckAndCard) {
             result = this.nextCard_EveryCardRandomDeck();
         } else {
             if (this.deckIdx == null) {

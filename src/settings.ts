@@ -1,6 +1,7 @@
 import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
 import type SRPlugin from "src/main";
 import { t } from "src/lang/helpers";
+import { CardOrder, DeckOrder } from "./DeckTreeIterator";
 
 export interface SRSettings {
     // flashcards
@@ -15,6 +16,8 @@ export interface SRSettings {
     flashcardHeightPercentage: number;
     flashcardWidthPercentage: number;
     randomizeCardOrder: boolean;
+    flashcardCardOrder: string;
+    flashcardDeckOrder: string;
     convertHighlightsToClozes: boolean;
     convertBoldTextToClozes: boolean;
     convertCurlyBracketsToClozes: boolean;
@@ -55,7 +58,10 @@ export const DEFAULT_SETTINGS: SRSettings = {
     showContextInCards: true,
     flashcardHeightPercentage: Platform.isMobile ? 100 : 80,
     flashcardWidthPercentage: Platform.isMobile ? 100 : 40,
-    randomizeCardOrder: true,
+    randomizeCardOrder: null,
+    flashcardCardOrder: "DueFirstRandom", 
+    flashcardDeckOrder: "PrevDeckComplete_Sequential", 
+
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
     convertCurlyBracketsToClozes: false,
@@ -83,6 +89,21 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // logging
     showDebugMessages: false,
 };
+
+export function upgradeSettings(settings: SRSettings) {
+    if (settings.randomizeCardOrder != null && 
+        settings.flashcardCardOrder == null && 
+        settings.flashcardDeckOrder == null) {
+            console.log(`loadPluginData: Upgrading settings: ${settings.randomizeCardOrder}`);
+            settings.flashcardCardOrder = settings.randomizeCardOrder ? "DueFirstRandom" : "DueFirstSequential";
+            settings.flashcardDeckOrder = "PrevDeckComplete_Sequential";
+
+            // After the upgrade, we don't need the old attribute any more
+            settings.randomizeCardOrder = null;
+    }
+
+}
+
 
 // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
 let applyDebounceTimer = 0;
@@ -249,6 +270,46 @@ export class SRSettingTab extends PluginSettingTab {
                     this.plugin.data.settings.randomizeCardOrder = value;
                     await this.plugin.savePluginData();
                 }),
+        );
+
+        new Setting(this.containerEl)
+            .setName("Order cards in a deck are displayed during review")
+            .addDropdown((dropdown) =>
+                dropdown
+                .addOptions({
+                    NewFirstSequential: "Sequentially within a deck (All new cards first)", 
+                    DueFirstSequential: "Sequentially within a deck (All due cards first)", 
+                    NewFirstRandom: "Randomly within a deck (All new cards first)", 
+                    DueFirstRandom: "Randomly within a deck (All due cards first)", 
+                    EveryCardRandomDeckAndCard: "Random card from random deck"
+                })
+                .setValue(this.plugin.data.settings.flashcardCardOrder)
+                .onChange(async (value) => {
+                    this.plugin.data.settings.flashcardCardOrder = value;
+                    await this.plugin.savePluginData();
+
+                    // Need to redisplay as changing this setting affects the "deck order" setting
+                    this.display();
+                }),
+            );
+        
+        const deckOrderEnabled: boolean = this.plugin.data.settings.flashcardCardOrder != "EveryCardRandomDeckAndCard";
+        new Setting(this.containerEl)
+        .setName("Order decks are displayed during review")
+        .addDropdown((dropdown) =>
+            dropdown
+            .addOptions(deckOrderEnabled ? {
+                PrevDeckComplete_Sequential: "Sequentially (once all cards in previous deck reviewed)", 
+                PrevDeckComplete_Random: "Randomly (once all cards in previous deck reviewed)"
+            } : {
+                EveryCardRandomDeckAndCard: "Random card from random deck"
+            })
+            .setValue(deckOrderEnabled ? this.plugin.data.settings.flashcardDeckOrder : "EveryCardRandomDeckAndCard")
+            .setDisabled(!deckOrderEnabled)
+            .onChange(async (value) => {
+                this.plugin.data.settings.flashcardDeckOrder = value;
+                await this.plugin.savePluginData();
+            }),
         );
 
         new Setting(containerEl).setName(t("CONVERT_HIGHLIGHTS_TO_CLOZES")).addToggle((toggle) =>

@@ -1,7 +1,7 @@
 import { Notice, Plugin, TAbstractFile, TFile, getAllTags, FrontMatterCache } from "obsidian";
 import * as graph from "pagerank.js";
 
-import { SRSettingTab, SRSettings, DEFAULT_SETTINGS } from "src/settings";
+import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, upgradeSettings } from "src/settings";
 import { FlashcardModal } from "src/gui/flashcard-modal";
 import { StatsModal } from "src/gui/stats-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/sidebar";
@@ -304,9 +304,16 @@ export default class SRPlugin extends Plugin {
     }
 
     private static createDeckTreeIterator(settings: SRSettings): IDeckTreeIterator {
+        let cardOrder: CardOrder = CardOrder[settings.flashcardCardOrder as keyof typeof CardOrder];
+        if (cardOrder === undefined) cardOrder = CardOrder.DueFirstSequential;
+        let deckOrder: DeckOrder = DeckOrder[settings.flashcardDeckOrder as keyof typeof DeckOrder];
+        if (deckOrder === undefined) deckOrder = DeckOrder.PrevDeckComplete_Sequential;
+        console.log(`createDeckTreeIterator: ${cardOrder}, ${deckOrder}`);
+
         const iteratorOrder: IIteratorOrder = {
-            deckOrder: DeckOrder.PrevDeckComplete_Sequential,
-            cardOrder: settings.randomizeCardOrder ? CardOrder.DueFirstRandom : CardOrder.DueFirstSequential
+            // deckOrder: DeckOrder.PrevDeckComplete_Sequential,
+            deckOrder,
+            cardOrder
         };
         return new DeckTreeIterator(iteratorOrder, IteratorDeckSource.UpdatedByIterator);
     }
@@ -692,7 +699,9 @@ export default class SRPlugin extends Plugin {
     }
 
     async loadPluginData(): Promise<void> {
-        this.data = Object.assign({}, DEFAULT_DATA, await this.loadData());
+        const loadedData: PluginData = await this.loadData();
+        upgradeSettings(loadedData.settings);
+        this.data = Object.assign({}, DEFAULT_DATA, loadedData);
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
     }
 
