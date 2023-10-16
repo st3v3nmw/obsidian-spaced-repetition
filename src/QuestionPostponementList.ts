@@ -4,7 +4,7 @@ import { SRSettings } from "./settings";
 
 export interface IQuestionPostponementList {
     clear(): void;
-    addIfRequired(question: Question): void;
+    add(question: Question): void;
     includes(question: Question): boolean;
     write(): Promise<void>;
 }
@@ -24,8 +24,9 @@ export class QuestionPostponementList implements IQuestionPostponementList {
         this.list = [];
     }
 
-    addIfRequired(question: Question): void {
-        if (this.settings.burySiblingCards) this.list.push(question.questionText.textHash);
+    add(question: Question): void {
+        if (!this.includes(question))
+            this.list.push(question.questionText.textHash);
     }
 
     includes(question: Question): boolean {
