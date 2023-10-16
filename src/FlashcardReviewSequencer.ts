@@ -145,6 +145,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         } else {
             if (this.settings.burySiblingCards) {
                 this.questionPostponementList.add(this.currentQuestion);
+                await this.questionPostponementList.write();
                 this.cardSequencer.deleteCurrentQuestion();
             } else {
                 this.deleteCurrentCard();
