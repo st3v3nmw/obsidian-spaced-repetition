@@ -127,7 +127,8 @@ export class NoteQuestionParser {
                 back,
                 cardIdx: i,
             });
-            cardObj.scheduleInfo = hasScheduleInfo && !schedule.isDummyScheduleForNewCard() ? schedule: null;
+            cardObj.scheduleInfo =
+                hasScheduleInfo && !schedule.isDummyScheduleForNewCard() ? schedule : null;
 
             siblings.push(cardObj);
         }

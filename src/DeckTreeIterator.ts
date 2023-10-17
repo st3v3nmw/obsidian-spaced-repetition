@@ -131,8 +131,7 @@ class SingleDeckIterator {
     private deleteQuestionFromList(q: Question, cardListType: CardListType): void {
         const cards: Card[] = this.deck.getCardListForCardType(cardListType);
         for (let i = cards.length - 1; i >= 0; i--) {
-            if (Object.is(q, cards[i].question))
-                this.deck.deleteCardAtIndex(i, cardListType);
+            if (Object.is(q, cards[i].question)) this.deck.deleteCardAtIndex(i, cardListType);
         }
     }
 

@@ -25,8 +25,7 @@ export class QuestionPostponementList implements IQuestionPostponementList {
     }
 
     add(question: Question): void {
-        if (!this.includes(question))
-            this.list.push(question.questionText.textHash);
+        if (!this.includes(question)) this.list.push(question.questionText.textHash);
     }
 
     includes(question: Question): boolean {
