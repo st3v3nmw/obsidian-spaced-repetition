@@ -700,7 +700,8 @@ export default class SRPlugin extends Plugin {
 
     async loadPluginData(): Promise<void> {
         const loadedData: PluginData = await this.loadData();
-        upgradeSettings(loadedData.settings);
+        if (loadedData?.settings)
+            upgradeSettings(loadedData.settings);
         this.data = Object.assign({}, DEFAULT_DATA, loadedData);
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
     }
