@@ -36,6 +36,21 @@ export class DateUtil {
 
 export let globalDateProvider: IDateProvider = new LiveDateProvider();
 
+const originDate: string = "2023-09-06";
+
+export function setupStaticDateProvider(dateStr: string) {
+    globalDateProvider = StaticDateProvider.fromDateStr(dateStr);
+}
+
+function getOriginDateAsMoment(): Moment {
+    return DateUtil.dateStrToMoment(originDate);
+}
+
+export function setupStaticDateProvider_OriginDatePlusDays(days: number) {
+    const simulatedDate: Moment = getOriginDateAsMoment().add(days, "d");
+    globalDateProvider = new StaticDateProvider(simulatedDate);
+}
+
 export function setupStaticDateProvider_20230906() {
-    globalDateProvider = StaticDateProvider.fromDateStr("2023-09-06");
+    setupStaticDateProvider(originDate);
 }

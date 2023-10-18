@@ -113,7 +113,6 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     skipCurrentCard(): void {
-        this.questionPostponementList.addIfRequired(this.currentQuestion);
         this.cardSequencer.deleteCurrentQuestion();
     }
 
@@ -143,7 +142,15 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         if (response == ReviewResponse.Reset) {
             this.cardSequencer.moveCurrentCardToEndOfList();
             this.cardSequencer.nextCard();
-        } else this.deleteCurrentCard();
+        } else {
+            if (this.settings.burySiblingCards) {
+                this.questionPostponementList.add(this.currentQuestion);
+                await this.questionPostponementList.write();
+                this.cardSequencer.deleteCurrentQuestion();
+            } else {
+                this.deleteCurrentCard();
+            }
+        }
     }
 
     async processReview_CramMode(response: ReviewResponse): Promise<void> {

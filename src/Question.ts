@@ -143,7 +143,7 @@ export class Question {
             const card: Card = this.cards[i];
             const schedule: CardScheduleInfo = card.hasSchedule
                 ? card.scheduleInfo
-                : CardScheduleInfo.getDummySchedule(settings);
+                : CardScheduleInfo.getDummyScheduleForNewCard(settings);
             result += schedule.formatSchedule();
         }
         result += SR_HTML_COMMENT_END;
