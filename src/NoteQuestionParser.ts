@@ -120,12 +120,15 @@ export class NoteQuestionParser {
             const { front, back } = cardFrontBackList[i];
 
             const hasScheduleInfo: boolean = i < cardScheduleInfoList.length;
+            const schedule: CardScheduleInfo = cardScheduleInfoList[i];
+
             const cardObj: Card = new Card({
                 front,
                 back,
                 cardIdx: i,
             });
-            cardObj.scheduleInfo = hasScheduleInfo ? cardScheduleInfoList[i] : null;
+            cardObj.scheduleInfo =
+                hasScheduleInfo && !schedule.isDummyScheduleForNewCard() ? schedule : null;
 
             siblings.push(cardObj);
         }

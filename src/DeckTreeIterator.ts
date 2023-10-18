@@ -120,11 +120,19 @@ class SingleDeckIterator {
     deleteCurrentQuestion(): void {
         this.ensureCurrentCard();
         const q: Question = this.currentCard.question;
-        const cards: Card[] = this.deck.getCardListForCardType(this.cardListType);
-        do {
-            this.deck.deleteCardAtIndex(this.cardIdx, this.cardListType);
-        } while (this.cardIdx < cards.length && Object.is(q, cards[this.cardIdx].question));
+
+        // A question could have some cards in the new list and some in the due list
+        this.deleteQuestionFromList(q, CardListType.NewCard);
+        this.deleteQuestionFromList(q, CardListType.DueCard);
+
         this.setNoCurrentCard();
+    }
+
+    private deleteQuestionFromList(q: Question, cardListType: CardListType): void {
+        const cards: Card[] = this.deck.getCardListForCardType(cardListType);
+        for (let i = cards.length - 1; i >= 0; i--) {
+            if (Object.is(q, cards[i].question)) this.deck.deleteCardAtIndex(i, cardListType);
+        }
     }
 
     deleteCurrentCard(): void {

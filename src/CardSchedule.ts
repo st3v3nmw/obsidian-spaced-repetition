@@ -16,6 +16,15 @@ export class CardScheduleInfo {
     ease: number;
     delayBeforeReviewTicks: number;
 
+    // A question can have multiple cards. The schedule info for all sibling cards are formatted together
+    // in a single <!--SR: --> comment, such as:
+    // <!--SR:!2023-09-02,4,270!2023-09-02,5,270!2023-09-02,6,270!2023-09-02,7,270-->
+    //
+    // However, not all sibling cards may have been reviewed. Therefore we need a method of indicating that a particular card
+    // has not been reviewed, and should be considered "new"
+    // This is done by using this magic value for the date
+    private static dummyDueDateForNewCard: string = "2000-01-01";
+
     constructor(dueDate: Moment, interval: number, ease: number, delayBeforeReviewTicks: number) {
         this.dueDate = dueDate;
         this.interval = interval;
@@ -31,9 +40,13 @@ export class CardScheduleInfo {
         return this.dueDate.isSameOrBefore(globalDateProvider.today);
     }
 
-    static getDummySchedule(settings: SRSettings): CardScheduleInfo {
+    isDummyScheduleForNewCard(): boolean {
+        return this.formatDueDate() == CardScheduleInfo.dummyDueDateForNewCard;
+    }
+
+    static getDummyScheduleForNewCard(settings: SRSettings): CardScheduleInfo {
         return CardScheduleInfo.fromDueDateStr(
-            "2000-01-01",
+            CardScheduleInfo.dummyDueDateForNewCard,
             CardScheduleInfo.initialInterval,
             settings.baseEase,
             0,
