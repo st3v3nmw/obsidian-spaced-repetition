@@ -262,26 +262,18 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
-
-        new Setting(containerEl).setName(t("RANDOMIZE_CARD_ORDER")).addToggle((toggle) =>
-            toggle
-                .setValue(this.plugin.data.settings.randomizeCardOrder)
-                .onChange(async (value) => {
-                    this.plugin.data.settings.randomizeCardOrder = value;
-                    await this.plugin.savePluginData();
-                }),
-        );
-
+            
+            
         new Setting(this.containerEl)
-            .setName("Order cards in a deck are displayed during review")
+            .setName(t("REVIEW_CARD_ORDER_WITHIN_DECK"))
             .addDropdown((dropdown) =>
                 dropdown
                 .addOptions({
-                    NewFirstSequential: "Sequentially within a deck (All new cards first)", 
-                    DueFirstSequential: "Sequentially within a deck (All due cards first)", 
-                    NewFirstRandom: "Randomly within a deck (All new cards first)", 
-                    DueFirstRandom: "Randomly within a deck (All due cards first)", 
-                    EveryCardRandomDeckAndCard: "Random card from random deck"
+                    NewFirstSequential: t("REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL"), 
+                    DueFirstSequential: t("REVIEW_CARD_ORDER_DUE_FIRST_SEQUENTIAL"), 
+                    NewFirstRandom: t("REVIEW_CARD_ORDER_NEW_FIRST_RANDOM"), 
+                    DueFirstRandom: t("REVIEW_CARD_ORDER_DUE_FIRST_RANDOM"), 
+                    EveryCardRandomDeckAndCard: t("REVIEW_CARD_ORDER_RANDOM_DECK_AND_CARD")
                 })
                 .setValue(this.plugin.data.settings.flashcardCardOrder)
                 .onChange(async (value) => {
@@ -292,17 +284,17 @@ export class SRSettingTab extends PluginSettingTab {
                     this.display();
                 }),
             );
-        
+            
         const deckOrderEnabled: boolean = this.plugin.data.settings.flashcardCardOrder != "EveryCardRandomDeckAndCard";
         new Setting(this.containerEl)
-        .setName("Order decks are displayed during review")
+        .setName(t("REVIEW_DECK_ORDER"))
         .addDropdown((dropdown) =>
             dropdown
             .addOptions(deckOrderEnabled ? {
-                PrevDeckComplete_Sequential: "Sequentially (once all cards in previous deck reviewed)", 
-                PrevDeckComplete_Random: "Randomly (once all cards in previous deck reviewed)"
+                PrevDeckComplete_Sequential: t("REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL"), 
+                PrevDeckComplete_Random: t("REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM")
             } : {
-                EveryCardRandomDeckAndCard: "Random card from random deck"
+                EveryCardRandomDeckAndCard: t("REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD")
             })
             .setValue(deckOrderEnabled ? this.plugin.data.settings.flashcardDeckOrder : "EveryCardRandomDeckAndCard")
             .setDisabled(!deckOrderEnabled)

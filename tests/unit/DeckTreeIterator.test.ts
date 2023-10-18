@@ -518,8 +518,8 @@ describe("nextCard", () => {
             );
             iterator = new DeckTreeIterator(
                 {
-                    deckOrder: DeckOrder.EveryCardRandomDeckAndCard, 
-                    cardOrder: null,
+                    cardOrder: CardOrder.EveryCardRandomDeckAndCard,
+                    deckOrder: null, 
                 },
                 IteratorDeckSource.UpdatedByIterator,
             );
