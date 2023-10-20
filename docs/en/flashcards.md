@@ -22,6 +22,9 @@ The prompt and the answer are separated by `:::` (this can be configured in sett
 the question goes on this side:::answer goes here!
 ```
 
+Note: In the first review, the plugin will show non-reversed card and reversed card.
+If **Bury sibling cards until the next day?** turn on, only non-reversed card will appear.
+
 ### Multi-line Basic
 
 The front and the back of the card are separated by `?` (this can be configured in settings).
@@ -65,6 +68,8 @@ can be on multiple lines
 same goes for
 the answer
 ```
+
+Note: The behaviour is same as single line reversed.
 
 ### Cloze cards
 
