@@ -10,12 +10,12 @@ test("Check that localization entries are consistent across all files", () => {
             const unmapped_keys = expected_keys.filter((x) => !locale_keys.includes(x));
             expect(
                 unmapped_keys.length,
-                `The ${language_code} locale does not include translations for: ${unmapped_keys}.`
+                `The ${language_code} locale does not include translations for: ${unmapped_keys}.`,
             ).toBe(0);
             const extra_keys = locale_keys.filter((x) => !expected_keys.includes(x));
             expect(
                 extra_keys.length,
-                `The ${language_code} locale includes the following deprecated translations: ${extra_keys}.`
+                `The ${language_code} locale includes the following deprecated translations: ${extra_keys}.`,
             ).toBe(0);
         }
     });
@@ -69,7 +69,7 @@ test("Test translation with interpolation in English", () => {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const { t } = require("src/lang/helpers");
         expect(t("STATUS_BAR", { dueNotesCount: 1, dueFlashcardsCount: 2 })).toEqual(
-            "Review: 1 note(s), 2 card(s) due"
+            "Review: 1 note(s), 2 card(s) due",
         );
     });
 });
@@ -83,7 +83,7 @@ test("Test translation with interpolation in German", () => {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const { t } = require("src/lang/helpers");
         expect(t("STATUS_BAR", { dueNotesCount: 1, dueFlashcardsCount: 2 })).toEqual(
-            "Wiederholung: 1 Notiz(en), 2 Karte(n) anstehend"
+            "Wiederholung: 1 Notiz(en), 2 Karte(n) anstehend",
         );
     });
 });

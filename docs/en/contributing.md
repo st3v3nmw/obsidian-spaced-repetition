@@ -1,6 +1,6 @@
 # Contributing
 
-First off, thanks for wanting to contribute to the Spaced Repetition plugin! Your time and effort is highly appreciated.
+First off, thanks for wanting to contribute to the Spaced Repetition plugin!
 
 ## Bug Reports & Feature Requests
 
@@ -59,7 +59,7 @@ Please note that:
 ## Code
 
 1. Make your changes.
-2. Run `npm run dev` to test the changes inside Obsidian.
+2. Run `pnpm dev` to test the changes inside Obsidian.
 3. You could create symbolic links between the build files and the Obsidian vault, example:
 
     ```bash
@@ -76,7 +76,7 @@ Please note that:
 4. Document the "user-facing" changes e.g. new feature, UI change, etc.
 5. If your "business logic" is properly decoupled from Obsidian APIs, write some unit tests.
     - This project uses [jest](https://jestjs.io/), tests are stored in `tests/`.
-    - `npm run test`
+    - `pnpm test`
 6. Add your change to the `[Unreleased]` section of the changelog (`docs/changelog.md`).
     - The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), TL;DR:
         - `Added` for new features.
@@ -87,8 +87,8 @@ Please note that:
         - `Security` in case of vulnerabilities.
     - You can also append a link to your GitHub profile, example:
         - `Make flashcard text selectable [@st3v3nmw](https://github.com/st3v3nmw)`
-7. Before pushing your changes, run the linter: `npm run lint`
-    - Format the code in case any warnings are raised: `npm run format`
+7. Before pushing your changes, run the linter: `pnpm lint`
+    - Format the code in case any warnings are raised: `pnpm format`
 8. Open the pull request.
 
 ## Documentation
@@ -139,7 +139,7 @@ Example using `v1.9.2`:
         - `MINOR` version when you add functionality in a backwards compatible manner
         - `PATCH` version when you make backwards compatible bug fixes
     - If the new version uses new Obsidian APIs, update `minAppVersion` and `versions.json` to reflect this.
-3. Update the changelog (`docs/changelog.md`); use the new version to replace the `[Unreleased]` section.
+3. Run `pnpm changelog` to update the CHANGELOG.
 4. Commit and push the changes:
 
     ```bash
