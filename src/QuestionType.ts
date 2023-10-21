@@ -1,5 +1,6 @@
 import { CardType } from "./Question";
 import { SRSettings } from "./settings";
+import { escapeRegexString } from "./util/utils";
 
 export class CardFrontBack {
     front: string;
@@ -92,6 +93,18 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
         }
         if (settings.convertCurlyBracketsToClozes) {
             siblings.push(...questionText.matchAll(/{{(.*?)}}/gm));
+        }
+        if (settings.clozeOpeningToken !== "" && settings.clozeClosingToken !== "") {
+            siblings.push(
+                ...questionText.matchAll(
+                    new RegExp(
+                        `${escapeRegexString(settings.clozeOpeningToken)}.*?${escapeRegexString(
+                            settings.clozeClosingToken,
+                        )}`,
+                        "gm",
+                    ),
+                ),
+            );
         }
         siblings.sort((a, b) => {
             if (a.index < b.index) {
