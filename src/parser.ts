@@ -1,5 +1,5 @@
-import { CardType } from "src/scheduling";
-import { escapeRegexString } from "./utils";
+import { CardType } from "./Question";
+import { escapeRegexString } from "./util/utils";
 
 /**
  * Returns flashcards found in `text`
@@ -21,7 +21,7 @@ export function parse(
     convertBoldTextToClozes: boolean,
     convertCurlyBracketsToClozes: boolean,
     clozeOpeningToken: string,
-    clozeClosingToken: string
+    clozeClosingToken: string,
 ): [CardType, string, number][] {
     let cardText = "";
     const cards: [CardType, string, number][] = [];
@@ -30,7 +30,8 @@ export function parse(
 
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
     for (let i = 0; i < lines.length; i++) {
-        if (lines[i].length === 0) {
+        const currentLine = lines[i];
+        if (currentLine.length === 0) {
             if (cardType) {
                 cards.push([cardType, cardText, lineNo]);
                 cardType = null;
@@ -38,8 +39,8 @@ export function parse(
 
             cardText = "";
             continue;
-        } else if (lines[i].startsWith("<!--") && !lines[i].startsWith("<!--SR:")) {
-            while (i + 1 < lines.length && !lines[i].includes("-->")) i++;
+        } else if (currentLine.startsWith("<!--") && !currentLine.startsWith("<!--SR:")) {
+            while (i + 1 < lines.length && !currentLine.includes("-->")) i++;
             i++;
             continue;
         }
@@ -47,11 +48,11 @@ export function parse(
         if (cardText.length > 0) {
             cardText += "\n";
         }
-        cardText += lines[i];
+        cardText += currentLine.trimEnd();
 
         if (
-            lines[i].includes(singlelineReversedCardSeparator) ||
-            lines[i].includes(singlelineCardSeparator)
+            currentLine.includes(singlelineReversedCardSeparator) ||
+            currentLine.includes(singlelineCardSeparator)
         ) {
             cardType = lines[i].includes(singlelineReversedCardSeparator)
                 ? CardType.SingleLineReversed
@@ -67,9 +68,9 @@ export function parse(
             cardText = "";
         } else if (
             cardType === null &&
-            ((convertHighlightsToClozes && /==.*?==/gm.test(lines[i])) ||
-                (convertBoldTextToClozes && /\*\*.*?\*\*/gm.test(lines[i])) ||
-                (convertCurlyBracketsToClozes && /{{.*?}}/gm.test(lines[i])) ||
+            ((convertHighlightsToClozes && /==.*?==/gm.test(currentLine)) ||
+                (convertBoldTextToClozes && /\*\*.*?\*\*/gm.test(currentLine)) ||
+                (convertCurlyBracketsToClozes && /{{.*?}}/gm.test(currentLine)) ||
                 (clozeOpeningToken !== "" &&
                     clozeClosingToken !== "" &&
                     new RegExp(
@@ -77,18 +78,18 @@ export function parse(
                             clozeClosingToken
                         )}`,
                         "gm"
-                    ).test(lines[i])))
+                    ).test(currentLine)))
         ) {
             cardType = CardType.Cloze;
             lineNo = i;
-        } else if (lines[i] === multilineCardSeparator) {
+        } else if (currentLine.trim() === multilineCardSeparator) {
             cardType = CardType.MultiLineBasic;
             lineNo = i;
-        } else if (lines[i] === multilineReversedCardSeparator) {
+        } else if (currentLine.trim() === multilineReversedCardSeparator) {
             cardType = CardType.MultiLineReversed;
             lineNo = i;
-        } else if (lines[i].startsWith("```") || lines[i].startsWith("~~~")) {
-            const codeBlockClose = lines[i].match(/`+|~+/)[0];
+        } else if (currentLine.startsWith("```") || currentLine.startsWith("~~~")) {
+            const codeBlockClose = currentLine.match(/`+|~+/)[0];
             while (i + 1 < lines.length && !lines[i + 1].startsWith(codeBlockClose)) {
                 i++;
                 cardText += "\n" + lines[i];

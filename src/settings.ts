@@ -129,7 +129,7 @@ export class SRSettingTab extends PluginSettingTab {
                                 .filter((v) => v);
                             await this.plugin.savePluginData();
                         });
-                    })
+                    }),
             );
 
         containerEl.createEl("h3", { text: `${t("FLASHCARDS")}` });
@@ -145,7 +145,7 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings.flashcardTags = value.split(/\s+/);
                             await this.plugin.savePluginData();
                         });
-                    })
+                    }),
             );
 
         new Setting(containerEl)
@@ -157,7 +157,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         this.plugin.data.settings.convertFoldersToDecks = value;
                         await this.plugin.savePluginData();
-                    })
+                    }),
             );
 
         new Setting(containerEl)
@@ -169,7 +169,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         this.plugin.data.settings.cardCommentOnSameLine = value;
                         await this.plugin.savePluginData();
-                    })
+                    }),
             );
 
         new Setting(containerEl)
@@ -181,7 +181,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         this.plugin.data.settings.burySiblingCards = value;
                         await this.plugin.savePluginData();
-                    })
+                    }),
             );
 
         new Setting(containerEl)
@@ -193,7 +193,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         this.plugin.data.settings.showContextInCards = value;
                         await this.plugin.savePluginData();
-                    })
+                    }),
             );
 
         new Setting(containerEl)
@@ -207,7 +207,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         this.plugin.data.settings.flashcardHeightPercentage = value;
                         await this.plugin.savePluginData();
-                    })
+                    }),
             )
             .addExtraButton((button) => {
                 button
@@ -232,7 +232,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         this.plugin.data.settings.flashcardWidthPercentage = value;
                         await this.plugin.savePluginData();
-                    })
+                    }),
             )
             .addExtraButton((button) => {
                 button
@@ -252,7 +252,7 @@ export class SRSettingTab extends PluginSettingTab {
                 .onChange(async (value) => {
                     this.plugin.data.settings.randomizeCardOrder = value;
                     await this.plugin.savePluginData();
-                })
+                }),
         );
 
         new Setting(containerEl).setName(t("CONVERT_HIGHLIGHTS_TO_CLOZES")).addToggle((toggle) =>
@@ -261,7 +261,7 @@ export class SRSettingTab extends PluginSettingTab {
                 .onChange(async (value) => {
                     this.plugin.data.settings.convertHighlightsToClozes = value;
                     await this.plugin.savePluginData();
-                })
+                }),
         );
 
         new Setting(containerEl).setName(t("CONVERT_BOLD_TEXT_TO_CLOZES")).addToggle((toggle) =>
@@ -270,7 +270,7 @@ export class SRSettingTab extends PluginSettingTab {
                 .onChange(async (value) => {
                     this.plugin.data.settings.convertBoldTextToClozes = value;
                     await this.plugin.savePluginData();
-                })
+                }),
         );
 
         new Setting(containerEl)
@@ -281,7 +281,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         this.plugin.data.settings.convertCurlyBracketsToClozes = value;
                         await this.plugin.savePluginData();
-                    })
+                    }),
             );
 
         new Setting(containerEl)
@@ -347,7 +347,7 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings.singleLineCardSeparator = value;
                             await this.plugin.savePluginData();
                         });
-                    })
+                    }),
             )
             .addExtraButton((button) => {
                 button
@@ -372,7 +372,7 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings.singleLineReversedCardSeparator = value;
                             await this.plugin.savePluginData();
                         });
-                    })
+                    }),
             )
             .addExtraButton((button) => {
                 button
@@ -397,7 +397,7 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings.multilineCardSeparator = value;
                             await this.plugin.savePluginData();
                         });
-                    })
+                    }),
             )
             .addExtraButton((button) => {
                 button
@@ -422,7 +422,7 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings.multilineReversedCardSeparator = value;
                             await this.plugin.savePluginData();
                         });
-                    })
+                    }),
             )
             .addExtraButton((button) => {
                 button
@@ -445,7 +445,7 @@ export class SRSettingTab extends PluginSettingTab {
                         this.plugin.data.settings.flashcardEasyText = value;
                         await this.plugin.savePluginData();
                     });
-                })
+                }),
             )
             .addExtraButton((button) => {
                 button
@@ -468,7 +468,7 @@ export class SRSettingTab extends PluginSettingTab {
                         this.plugin.data.settings.flashcardGoodText = value;
                         await this.plugin.savePluginData();
                     });
-                })
+                }),
             )
             .addExtraButton((button) => {
                 button
@@ -491,7 +491,7 @@ export class SRSettingTab extends PluginSettingTab {
                         this.plugin.data.settings.flashcardHardText = value;
                         await this.plugin.savePluginData();
                     });
-                })
+                }),
             )
             .addExtraButton((button) => {
                 button
@@ -513,7 +513,7 @@ export class SRSettingTab extends PluginSettingTab {
                 .onChange(async (value) => {
                     this.plugin.data.settings.enableNoteReviewPaneOnStartup = value;
                     await this.plugin.savePluginData();
-                })
+                }),
         );
 
         new Setting(containerEl)
@@ -527,7 +527,7 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings.tagsToReview = value.split(/\s+/);
                             await this.plugin.savePluginData();
                         });
-                    })
+                    }),
             );
 
         new Setting(containerEl)
@@ -539,14 +539,14 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         this.plugin.data.settings.openRandomNote = value;
                         await this.plugin.savePluginData();
-                    })
+                    }),
             );
 
         new Setting(containerEl).setName(t("AUTO_NEXT_NOTE")).addToggle((toggle) =>
             toggle.setValue(this.plugin.data.settings.autoNextNote).onChange(async (value) => {
                 this.plugin.data.settings.autoNextNote = value;
                 await this.plugin.savePluginData();
-            })
+            }),
         );
 
         new Setting(containerEl)
@@ -558,7 +558,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         this.plugin.data.settings.disableFileMenuReviewOptions = value;
                         await this.plugin.savePluginData();
-                    })
+                    }),
             );
 
         new Setting(containerEl)
@@ -573,7 +573,7 @@ export class SRSettingTab extends PluginSettingTab {
                                 if (numValue < 1) {
                                     new Notice(t("MIN_ONE_DAY"));
                                     text.setValue(
-                                        this.plugin.data.settings.maxNDaysNotesReviewQueue.toString()
+                                        this.plugin.data.settings.maxNDaysNotesReviewQueue.toString(),
                                     );
                                     return;
                                 }
@@ -584,7 +584,7 @@ export class SRSettingTab extends PluginSettingTab {
                                 new Notice(t("VALID_NUMBER_WARNING"));
                             }
                         });
-                    })
+                    }),
             )
             .addExtraButton((button) => {
                 button
@@ -609,7 +609,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         this.plugin.data.settings.initiallyExpandAllSubdecksInTree = value;
                         await this.plugin.savePluginData();
-                    })
+                    }),
             );
 
         containerEl.createEl("h3", { text: `${t("ALGORITHM")}` });
@@ -637,7 +637,7 @@ export class SRSettingTab extends PluginSettingTab {
                             new Notice(t("VALID_NUMBER_WARNING"));
                         }
                     });
-                })
+                }),
             )
             .addExtraButton((button) => {
                 button
@@ -661,7 +661,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value: number) => {
                         this.plugin.data.settings.lapsesIntervalChange = value / 100;
                         await this.plugin.savePluginData();
-                    })
+                    }),
             )
             .addExtraButton((button) => {
                 button
@@ -688,7 +688,7 @@ export class SRSettingTab extends PluginSettingTab {
                                 if (numValue < 1.0) {
                                     new Notice(t("EASY_BONUS_MIN_WARNING"));
                                     text.setValue(
-                                        (this.plugin.data.settings.easyBonus * 100).toString()
+                                        (this.plugin.data.settings.easyBonus * 100).toString(),
                                     );
                                     return;
                                 }
@@ -699,7 +699,7 @@ export class SRSettingTab extends PluginSettingTab {
                                 new Notice(t("VALID_NUMBER_WARNING"));
                             }
                         });
-                    })
+                    }),
             )
             .addExtraButton((button) => {
                 button
@@ -725,7 +725,7 @@ export class SRSettingTab extends PluginSettingTab {
                                 if (numValue < 1) {
                                     new Notice(t("MAX_INTERVAL_MIN_WARNING"));
                                     text.setValue(
-                                        this.plugin.data.settings.maximumInterval.toString()
+                                        this.plugin.data.settings.maximumInterval.toString(),
                                     );
                                     return;
                                 }
@@ -736,7 +736,7 @@ export class SRSettingTab extends PluginSettingTab {
                                 new Notice(t("VALID_NUMBER_WARNING"));
                             }
                         });
-                    })
+                    }),
             )
             .addExtraButton((button) => {
                 button
@@ -761,7 +761,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value: number) => {
                         this.plugin.data.settings.maxLinkFactor = value / 100;
                         await this.plugin.savePluginData();
-                    })
+                    }),
             )
             .addExtraButton((button) => {
                 button
@@ -779,7 +779,7 @@ export class SRSettingTab extends PluginSettingTab {
             toggle.setValue(this.plugin.data.settings.showDebugMessages).onChange(async (value) => {
                 this.plugin.data.settings.showDebugMessages = value;
                 await this.plugin.savePluginData();
-            })
+            }),
         );
     }
 }

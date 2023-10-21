@@ -1,5 +1,3 @@
-import { TFile } from "obsidian";
-
 import { SRSettings } from "src/settings";
 import { t } from "src/lang/helpers";
 
@@ -12,43 +10,13 @@ export enum ReviewResponse {
 
 // Flashcards
 
-export interface Card {
-    editLater: boolean;
-    // scheduling
-    isDue: boolean;
-    interval?: number;
-    ease?: number;
-    delayBeforeReview?: number;
-    // note
-    note: TFile;
-    lineNo: number;
-    // visuals
-    front: string;
-    back: string;
-    cardText: string;
-    context: string;
-    // types
-    cardType: CardType;
-    // information for sibling cards
-    siblingIdx: number;
-    siblings: Card[];
-}
-
-export enum CardType {
-    SingleLineBasic,
-    SingleLineReversed,
-    MultiLineBasic,
-    MultiLineReversed,
-    Cloze,
-}
-
 export function schedule(
     response: ReviewResponse,
     interval: number,
     ease: number,
     delayBeforeReview: number,
     settingsObj: SRSettings,
-    dueDates?: Record<number, number>
+    dueDates?: Record<number, number>,
 ): Record<string, number> {
     delayBeforeReview = Math.max(0, Math.floor(delayBeforeReview / (24 * 3600 * 1000)));
 
@@ -62,7 +30,7 @@ export function schedule(
         ease = Math.max(130, ease - 20);
         interval = Math.max(
             1,
-            (interval + delayBeforeReview / 4) * settingsObj.lapsesIntervalChange
+            (interval + delayBeforeReview / 4) * settingsObj.lapsesIntervalChange,
         );
     }
 

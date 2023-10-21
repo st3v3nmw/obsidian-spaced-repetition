@@ -56,19 +56,21 @@ export default {
     SETTINGS_HEADER: "Extensión de Repetición Espaciada - Ajustes",
     CHECK_WIKI: 'Para más información revisa la <a href="${wiki_url}">wiki</a>.',
     FOLDERS_TO_IGNORE: "Directorios a ignorar",
-    FOLDERS_TO_IGNORE_DESC: "Escriba las rutas de los directorios separadas por saltos de línea, por ejemplo, Plantillas Extra/Guiones",
+    FOLDERS_TO_IGNORE_DESC:
+        "Escriba las rutas de los directorios separadas por saltos de línea, por ejemplo, Plantillas Extra/Guiones",
     FLASHCARDS: "Tarjetas de Memorización",
     FLASHCARD_EASY_LABEL: "Texto del botón: Fácil",
     FLASHCARD_GOOD_LABEL: "Texto del botón: Bien",
     FLASHCARD_HARD_LABEL: "Texto del botón: Difícil",
-    FLASHCARD_EASY_DESC: 'Personalize la etiqueta para el botón: Fácil',
-    FLASHCARD_GOOD_DESC: 'Personalize la etiqueta para el botón: Bien',
-    FLASHCARD_HARD_DESC: 'Personalize la etiqueta para el botón: Difícil',
+    FLASHCARD_EASY_DESC: "Personalize la etiqueta para el botón: Fácil",
+    FLASHCARD_GOOD_DESC: "Personalize la etiqueta para el botón: Bien",
+    FLASHCARD_HARD_DESC: "Personalize la etiqueta para el botón: Difícil",
     FLASHCARD_TAGS: "Etiquetas de las Tarjetas de Memorización",
     FLASHCARD_TAGS_DESC:
         "Escriba las etiquetas separadas por espacios o saltos de línea, por ejemplo, #memorizar #mazo2 #mazo3",
     CONVERT_FOLDERS_TO_DECKS: "¿Convertir directorios a mazos y submazos?",
-    CONVERT_FOLDERS_TO_DECKS_DESC: "Esta es una opción alternativa a las etiquetas de las Tarjetas de Memorización.",
+    CONVERT_FOLDERS_TO_DECKS_DESC:
+        "Esta es una opción alternativa a las etiquetas de las Tarjetas de Memorización.",
     INLINE_SCHEDULING_COMMENTS:
         "¿Guardar el comentario para programación de las tarjetas en la última línea?",
     INLINE_SCHEDULING_COMMENTS_DESC:
@@ -79,8 +81,7 @@ export default {
     SHOW_CARD_CONTEXT: "¿Mostrar contexto en las tarjetas?",
     SHOW_CARD_CONTEXT_DESC: "Por Ejemplo: Título > Cabecera > Sub-Cabecera > ... > Sub-Cabecera",
     CARD_MODAL_HEIGHT_PERCENT: "Porcentaje de la altura de las tarjetas de memoria",
-    CARD_MODAL_SIZE_PERCENT_DESC:
-        "Debería ser establecido en 100% si tienes imágenes grandes",
+    CARD_MODAL_SIZE_PERCENT_DESC: "Debería ser establecido en 100% si tienes imágenes grandes",
     RESET_DEFAULT: "Reiniciar a la configuración por defecto",
     CARD_MODAL_WIDTH_PERCENT: "Porcentaje del ancho de las tarjetas de memoria",
     RANDOMIZE_CARD_ORDER: "¿Aleatorizar el orden de las tarjetas para revisión?",
@@ -91,15 +92,19 @@ export default {
     INLINE_CARDS_SEPARATOR: "Separador de tarjetas de memorización en línea",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Note que después de cambiar este ajuste, tendrá que cambiar manualmente todas las notas que tenga.",
-    INLINE_REVERSED_CARDS_SEPARATOR: "Separador de tarjetas de memorización para tarjetas de notas invertidas",
+    INLINE_REVERSED_CARDS_SEPARATOR:
+        "Separador de tarjetas de memorización para tarjetas de notas invertidas",
     MULTILINE_CARDS_SEPARATOR: "Separador para tarjetas de memorización multilínea",
-    MULTILINE_REVERSED_CARDS_SEPARATOR: "Separador para tarjetas de memorización multilínea invertidas",
+    MULTILINE_REVERSED_CARDS_SEPARATOR:
+        "Separador para tarjetas de memorización multilínea invertidas",
     NOTES: "Notes",
     REVIEW_PANE_ON_STARTUP: "Activar panel de revisión de notas al arrancar",
     TAGS_TO_REVIEW: "Etiquetas a revisar",
-    TAGS_TO_REVIEW_DESC: "Escriba las etiquetas separadas por espacios o saltos de líneas, por ejemplo, #revisión #etiqueta2 #etiqueta3.",
+    TAGS_TO_REVIEW_DESC:
+        "Escriba las etiquetas separadas por espacios o saltos de líneas, por ejemplo, #revisión #etiqueta2 #etiqueta3.",
     OPEN_RANDOM_NOTE: "Abrir una nota al azar para revisar",
-    OPEN_RANDOM_NOTE_DESC: "Cuando deshabilita esto, las notas son ordenadas por importancia (Algoritmo PageRank).",
+    OPEN_RANDOM_NOTE_DESC:
+        "Cuando deshabilita esto, las notas son ordenadas por importancia (Algoritmo PageRank).",
     AUTO_NEXT_NOTE: "Abrir la siguiente nota automáticamente después de una revisión",
     DISABLE_FILE_MENU_REVIEW_OPTIONS:
         "Deshabilitar opciones de revisión en el menú de archivo, por ejemplo, Revisión: Fácil Bien Difícil",
@@ -118,14 +123,16 @@ export default {
     BASE_EASE: "Base ease",
     BASE_EASE_DESC: "El mínimo es 130, es preferible que esté aproximado a 250.",
     BASE_EASE_MIN_WARNING: "La facilidad base de las tarjetas debe ser al menos 130.",
-    LAPSE_INTERVAL_CHANGE: "El intervalo cambiará cuando se revise una tarjeta o nota como Difícil.",
+    LAPSE_INTERVAL_CHANGE:
+        "El intervalo cambiará cuando se revise una tarjeta o nota como Difícil.",
     LAPSE_INTERVAL_CHANGE_DESC: "NuevoInterval = ViejoIntervalo * CambioDeIntervalo / 100.",
     EASY_BONUS: "Bonificación para Fácil",
     EASY_BONUS_DESC:
-	"La bonificación para Fácil te permite establecer la diferencia entre intervalos al responder Bien y Fácil en las tarjetas o notas (mínimo = 100%).",
+        "La bonificación para Fácil te permite establecer la diferencia entre intervalos al responder Bien y Fácil en las tarjetas o notas (mínimo = 100%).",
     EASY_BONUS_MIN_WARNING: "El bono de facilidad debe ser al menos 100.",
     MAX_INTERVAL: "Intervalo máximo en días",
-    MAX_INTERVAL_DESC: "Te permite establecer un límite mayor en el intervalo (por defecto es de 100 años).",
+    MAX_INTERVAL_DESC:
+        "Te permite establecer un límite mayor en el intervalo (por defecto es de 100 años).",
     MAX_INTERVAL_MIN_WARNING: "El intervalo máximo debe ser de al menos un día.",
     MAX_LINK_CONTRIB: "Contribución máxima de las notas vinculadas.",
     MAX_LINK_CONTRIB_DESC:
