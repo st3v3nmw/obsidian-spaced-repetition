@@ -161,6 +161,10 @@ test("Test parsing of cloze cards", () => {
     ]);
 });
 
+test("Testing parsing of anki cloze cards", () => {
+    // TODO!
+});
+
 test("Test parsing of a mix of card types", () => {
     expect(
         parse(

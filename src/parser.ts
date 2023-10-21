@@ -1,5 +1,8 @@
 import { CardType } from "./Question";
 
+const ANKI_RE =
+    /((?:.+\n)*(?:.*\{\{[^{}]*::[^{}]*\}\}.*)(?:\n(?:^.{1,3}$|^.{4}(?<!<!--).*))*)(\n<!--SR:.+-->)?/gm;
+
 /**
  * Returns flashcards found in `text`
  *
@@ -24,6 +27,14 @@ export function parse(
     const cards: [CardType, string, number][] = [];
     let cardType: CardType | null = null;
     let lineNo = 0;
+
+    let match;
+    while ((match = ANKI_RE.exec(text)) !== null) {
+        const upTo = text.substring(0, match.index);
+        cards.push([CardType.AnkiCloze, match[0], upTo.split("\n").length]);
+
+        text = upTo + text.substring(match.index + match[0].length);
+    }
 
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
     for (let i = 0; i < lines.length; i++) {
