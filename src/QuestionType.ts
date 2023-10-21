@@ -130,7 +130,9 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
                 .replace(/==/gm, "")
                 .replace(/\*\*/gm, "")
                 .replace(/{{/gm, "")
-                .replace(/}}/gm, "");
+                .replace(/}}/gm, "")
+                .replaceAll(settings.clozeOpeningToken, "")
+                .replaceAll(settings.clozeClosingToken, "");
             back =
                 questionText.substring(0, deletionStart) +
                 QuestionType_ClozeUtil.renderClozeBack(
@@ -141,7 +143,9 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
                 .replace(/==/gm, "")
                 .replace(/\*\*/gm, "")
                 .replace(/{{/gm, "")
-                .replace(/}}/gm, "");
+                .replace(/}}/gm, "")
+                .replaceAll(settings.clozeOpeningToken, "")
+                .replaceAll(settings.clozeClosingToken, "");
             result.push(new CardFrontBack(front, back));
         }
 
