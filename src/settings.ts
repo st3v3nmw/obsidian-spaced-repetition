@@ -296,7 +296,7 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings.clozeOpeningToken = value;
                             await this.plugin.savePluginData();
                         });
-                    })
+                    }),
             )
             .addExtraButton((button) => {
                 button
@@ -322,7 +322,7 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings.clozeClosingToken = value;
                             await this.plugin.savePluginData();
                         });
-                    })
+                    }),
             )
             .addExtraButton((button) => {
                 button

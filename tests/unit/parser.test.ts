@@ -122,9 +122,9 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum ==p\ndolor won==", ...defaultArgs)).toEqual([]);
     expect(parse("lorem ipsum ==dolor won=", ...defaultArgs)).toEqual([]);
     // ==highlights== turned off
-    expect(parse("cloze ==deletion== test", "::", ":::", "?", "??", false, true, false, "", "")).toEqual(
-        [],
-    );
+    expect(
+        parse("cloze ==deletion== test", "::", ":::", "?", "??", false, true, false, "", ""),
+    ).toEqual([]);
 
     // **bolded**
     expect(parse("cloze **deletion** test", ...defaultArgs)).toEqual([
@@ -153,9 +153,9 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum **p\ndolor won**", ...defaultArgs)).toEqual([]);
     expect(parse("lorem ipsum **dolor won*", ...defaultArgs)).toEqual([]);
     // **bolded** turned off
-    expect(parse("cloze **deletion** test", "::", ":::", "?", "??", true, false, false, "", "")).toEqual(
-        [],
-    );
+    expect(
+        parse("cloze **deletion** test", "::", ":::", "?", "??", true, false, false, "", ""),
+    ).toEqual([]);
 
     // {=custom=}
     expect(parse("cloze {=deletion=} test", ...defaultArgs)).toEqual([
@@ -174,8 +174,8 @@ test("Test parsing of cloze cards", () => {
         parse(
             "some text before\n\na deletion on\nsuch {=wow=}\n\n" +
                 "many text\nsuch surprise {=wow=} more {=text=}\nsome text after\n\nHmm",
-            ...defaultArgs
-        )
+            ...defaultArgs,
+        ),
     ).toEqual([
         [CardType.Cloze, "a deletion on\nsuch {=wow=}", 3],
         [CardType.Cloze, "many text\nsuch surprise {=wow=} more {=text=}\nsome text after", 6],
@@ -186,18 +186,18 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum {=dolor won=", ...defaultArgs)).toEqual([]);
     // {=custom=} turned off
     expect(
-        parse("cloze {=deletion=} test", "::", ":::", "?", "??", true, true, true, "", "")
+        parse("cloze {=deletion=} test", "::", ":::", "?", "??", true, true, true, "", ""),
     ).toEqual([]);
     expect(
-        parse("cloze {=deletion=} test", "::", ":::", "?", "??", true, true, true, "{=", "")
+        parse("cloze {=deletion=} test", "::", ":::", "?", "??", true, true, true, "{=", ""),
     ).toEqual([]);
     expect(
-        parse("cloze {=deletion=} test", "::", ":::", "?", "??", true, true, true, "", "=}")
+        parse("cloze {=deletion=} test", "::", ":::", "?", "??", true, true, true, "", "=}"),
     ).toEqual([]);
 
     // all
     expect(
-        parse("cloze **deletion** test ==another deletion== {=custom deletion=}!", ...defaultArgs)
+        parse("cloze **deletion** test ==another deletion== {=custom deletion=}!", ...defaultArgs),
     ).toEqual([
         [CardType.Cloze, "cloze **deletion** test ==another deletion== {=custom deletion=}!", 0],
     ]);

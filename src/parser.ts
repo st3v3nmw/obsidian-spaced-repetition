@@ -75,9 +75,9 @@ export function parse(
                     clozeClosingToken !== "" &&
                     new RegExp(
                         `${escapeRegexString(clozeOpeningToken)}.*?${escapeRegexString(
-                            clozeClosingToken
+                            clozeClosingToken,
                         )}`,
-                        "gm"
+                        "gm",
                     ).test(currentLine)))
         ) {
             cardType = CardType.Cloze;
