@@ -4,13 +4,13 @@ Source / Inspiration: https://github.com/ankitects/anki/blob/80d807e08a6d3148f97
 The "BNF" for this.
 
 <number>       ::= [0-9]+
-<seperator>    ::= ::
+<separator>    ::= ::
 <c_open>       ::= {{c<number>
 <c_close>      ::= }}
 <text>         ::= .*
 <text_or_card> ::= <text> | <card>
-<card_inner>   ::= <text> | <card> | <text_or_card>?<seperator><text_or_card>?
-<card>         ::= <text>?<c_open><seperator><card_inner><seperator><c_close><text>?
+<card_inner>   ::= <text> | <card> | <text_or_card>?<separator><text_or_card>?
+<card>         ::= <text>?<c_open><separator><card_inner><separator><c_close><text>?
 */
 
 import { CardFrontBack, QuestionType_ClozeUtil } from "./QuestionType";
@@ -19,7 +19,7 @@ import { CardFrontBack, QuestionType_ClozeUtil } from "./QuestionType";
 enum TokenKind {
     Open = "C_OPEN",
     Close = "C_CLOSE",
-    Seperator = "SEPERATOR",
+    Separator = "SEPARATOR",
     Text = "TEXT",
 }
 
@@ -32,8 +32,8 @@ interface CloseToken {
     kind: TokenKind.Close;
     i: number;
 }
-interface SeperatorToken {
-    kind: TokenKind.Seperator;
+interface SeparatorToken {
+    kind: TokenKind.Separator;
     i: number;
 }
 interface TextToken {
@@ -42,14 +42,14 @@ interface TextToken {
     i: number;
 }
 
-type Token = OpenToken | CloseToken | SeperatorToken | TextToken;
+type Token = OpenToken | CloseToken | SeparatorToken | TextToken;
 
 // Returns the "Anki tokens" of a given text, given an anchor.
 // This does not return the TEXT token.
 function anki_tokens(
     input: string,
     i: number,
-): OpenToken | CloseToken | SeperatorToken | undefined {
+): OpenToken | CloseToken | SeparatorToken | undefined {
     // The following statements are sorted high -> low `i`.
     // Avoids any similar statements being mixed with each other.
 
@@ -75,12 +75,12 @@ function anki_tokens(
             i,
         } satisfies OpenToken;
     }
-    // SEPERATOR
+    // SEPARATOR
     else if (input.slice(i, i + 2) === "::") {
         return {
-            kind: TokenKind.Seperator,
+            kind: TokenKind.Separator,
             i: i + 2,
-        } satisfies SeperatorToken;
+        } satisfies SeparatorToken;
     }
     // C_CLOSE
     else if (input.slice(i, i + 2) === "}}") {
@@ -181,7 +181,7 @@ function parse_anki_tokens(tokens: Token[]): (ExtractedCloze | string)[] {
                 // Look ahead to see whether is a hint or not
                 if (
                     tokens[i - 2].kind != TokenKind.Open &&
-                    tokens[i - 1].kind == TokenKind.Seperator &&
+                    tokens[i - 1].kind == TokenKind.Separator &&
                     tokens[i + 1].kind == TokenKind.Close
                 ) {
                     last_open_cloze.hint = token.text;
@@ -209,7 +209,7 @@ function parse_anki_tokens(tokens: Token[]): (ExtractedCloze | string)[] {
                 break;
             }
             // Ignore
-            case TokenKind.Seperator: {
+            case TokenKind.Separator: {
                 break;
             }
         }
