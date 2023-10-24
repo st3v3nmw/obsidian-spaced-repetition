@@ -653,7 +653,7 @@ Q1::A1
 
                 // Review the card
                 await c.reviewSequencer.processReview(ReviewResponse.Hard);
-                
+
                 // Check that there are no questions on the postponement list
                 checkQuestionPostponementListCount(c, 0);
             });

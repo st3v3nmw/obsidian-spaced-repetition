@@ -40,10 +40,10 @@ export class Deck {
         return result;
     }
 
-    // 
+    //
     // Returns a count of the number of this question's cards are present in this deck.
     // (The returned value would be <= question.cards.length)
-    // 
+    //
     public getQuestionCardCount(question: Question): number {
         let result: number = 0;
         result += this.getQuestionCardCountForCardListType(question, this.newFlashcards);
