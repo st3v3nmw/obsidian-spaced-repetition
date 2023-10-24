@@ -541,6 +541,7 @@ export default class SRPlugin extends Plugin {
                 Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
             )
         ) {
+            console.log(`saveReviewResponse: A: ease: ${ease}, interval: ${interval}, delayBeforeReview: ${delayBeforeReview}`);
             let linkTotal = 0,
                 linkPGTotal = 0,
                 totalLinkCount = 0;
@@ -553,6 +554,7 @@ export default class SRPlugin extends Plugin {
                     totalLinkCount += statObj.linkCount;
                 }
             }
+            console.log(`saveReviewResponse: B: ease: ${ease}, interval: ${interval}, delayBeforeReview: ${delayBeforeReview}`);
 
             const outgoingLinks = this.app.metadataCache.resolvedLinks[note.path] || {};
             for (const linkedFilePath in outgoingLinks) {
@@ -564,6 +566,7 @@ export default class SRPlugin extends Plugin {
                     totalLinkCount += outgoingLinks[linkedFilePath];
                 }
             }
+            console.log(`saveReviewResponse: C: ease: ${ease}, interval: ${interval}, delayBeforeReview: ${delayBeforeReview}`);
 
             const linkContribution: number =
                 this.data.settings.maxLinkFactor *
@@ -580,6 +583,7 @@ export default class SRPlugin extends Plugin {
             ease = Math.round(ease);
             interval = 1.0;
             delayBeforeReview = 0;
+            console.log(`saveReviewResponse: D: ease: ${ease}, interval: ${interval}, delayBeforeReview: ${delayBeforeReview}`);
         } else {
             interval = frontmatter["sr-interval"];
             ease = frontmatter["sr-ease"];
@@ -588,8 +592,10 @@ export default class SRPlugin extends Plugin {
                 window
                     .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
                     .valueOf();
+            console.log(`saveReviewResponse: E: ease: ${ease}, interval: ${interval}, delayBeforeReview: ${delayBeforeReview}`);
         }
 
+        console.log(`saveReviewResponse: F: ease: ${ease}, interval: ${interval}, delayBeforeReview: ${delayBeforeReview}`);
         const schedObj: Record<string, number> = schedule(
             response,
             interval,
@@ -600,9 +606,11 @@ export default class SRPlugin extends Plugin {
         );
         interval = schedObj.interval;
         ease = schedObj.ease;
+        console.log(`saveReviewResponse: G: ease: ${ease}, interval: ${interval}`);
 
         const due = window.moment(now + interval * 24 * 3600 * 1000);
         const dueString: string = due.format("YYYY-MM-DD");
+        console.log(`saveReviewResponse: H: ease: ${ease}, interval: ${interval}, dueString: ${dueString}`);
 
         // check if scheduling info exists
         if (SCHEDULING_INFO_REGEX.test(fileText)) {
@@ -613,6 +621,7 @@ export default class SRPlugin extends Plugin {
                     `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
                     `${schedulingInfo[5]}---`,
             );
+            console.log(`saveReviewResponse: I`);
         } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
             // new note with existing YAML front matter
             const existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
@@ -621,10 +630,12 @@ export default class SRPlugin extends Plugin {
                 `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
                     `sr-interval: ${interval}\nsr-ease: ${ease}\n---`,
             );
+            console.log(`saveReviewResponse: J`);
         } else {
             fileText =
                 `---\nsr-due: ${dueString}\nsr-interval: ${interval}\n` +
                 `sr-ease: ${ease}\n---\n\n${fileText}`;
+                console.log(`saveReviewResponse: K`);
         }
 
         if (this.data.settings.burySiblingCards) {
