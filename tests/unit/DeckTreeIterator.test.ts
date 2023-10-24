@@ -54,7 +54,7 @@ describe("setDeck", () => {
 });
 
 describe("nextCard", () => {
-    describe("Sequential ordering", () => {
+    describe("DeckOrder.PrevDeckComplete_Sequential; Sequential card ordering", () => {
         describe("Due cards before new cards", () => {
             test("Single topic, new cards only", async () => {
                 let text: string = `
