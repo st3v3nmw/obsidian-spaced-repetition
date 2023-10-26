@@ -1,11 +1,11 @@
 import { Deck } from "./Deck";
 import {
     CardOrder,
+    DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
     IteratorDeckSource,
-    DeckOrder,
 } from "./DeckTreeIterator";
 import { Card } from "./Card";
 import { Stats } from "./stats";
@@ -18,7 +18,7 @@ export class DeckTreeStatsCalculator {
         // Order doesn't matter as long as we iterate over everything
         const iteratorOrder: IIteratorOrder = {
             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
-            cardOrder: CardOrder.DueFirstSequential
+            cardOrder: CardOrder.DueFirstSequential,
         };
         const iterator: IDeckTreeIterator = new DeckTreeIterator(
             iteratorOrder,
