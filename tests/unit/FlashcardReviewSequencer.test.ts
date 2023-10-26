@@ -534,7 +534,7 @@ Q1::A1
         });
 
         describe("Checking postponement list (after card reviewed, burySiblingCards=true)", () => {
-            test("reviewed question added to postponement list; sibling cards are buried", async () => {
+            test("Question with multiple cards; reviewed question added to postponement list; sibling cards are buried", async () => {
                 let settings: SRSettings = { ...DEFAULT_SETTINGS };
                 settings.burySiblingCards = true;
 
@@ -567,7 +567,7 @@ Q1::A1
                 checkQuestionPostponementListCount(c, 1);
             });
 
-            test("card reviewed as hard, after restarting the review process, that question skipped and next question is shown", async () => {
+            test("Question with multiple cards; card reviewed as hard, after restarting the review process, that whole question skipped and next question is shown", async () => {
                 let settings: SRSettings = { ...DEFAULT_SETTINGS };
                 settings.burySiblingCards = true;
 
@@ -631,6 +631,31 @@ Q1::A1
                     `<!--SR:!${expectedCard1Review}!${expectedCard2Review}!2000-01-01,1,250-->`,
                 );
                 expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
+            });
+
+            test("Question with single cards; card reviewed as hard, the question is NOT added to the postponement list", async () => {
+                let settings: SRSettings = { ...DEFAULT_SETTINGS };
+                settings.burySiblingCards = true;
+
+                // Question with a single card
+                let text: string = `#flashcards Q1::A1`;
+
+                // Create the test context
+                setupStaticDateProvider_OriginDatePlusDays(0);
+                const c: TestContext = TestContext.Create(
+                    order_DueFirst_Sequential,
+                    FlashcardReviewMode.Review,
+                    settings,
+                    text,
+                );
+                await c.setSequencerDeckTreeFromOriginalText();
+                expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
+
+                // Review the card
+                await c.reviewSequencer.processReview(ReviewResponse.Hard);
+
+                // Check that there are no questions on the postponement list
+                checkQuestionPostponementListCount(c, 0);
             });
         });
     });

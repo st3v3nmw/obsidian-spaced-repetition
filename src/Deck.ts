@@ -17,6 +17,14 @@ export class Deck {
     public subdecks: Deck[];
     public parent: Deck | null;
 
+    constructor(deckName: string, parent: Deck | null) {
+        this.deckName = deckName;
+        this.newFlashcards = [];
+        this.dueFlashcards = [];
+        this.subdecks = [];
+        this.parent = parent;
+    }
+
     public getCardCount(cardListType: CardListType, includeSubdeckCounts: boolean): number {
         let result: number = 0;
         if (cardListType == CardListType.NewCard || cardListType == CardListType.All)
@@ -32,12 +40,24 @@ export class Deck {
         return result;
     }
 
-    constructor(deckName: string, parent: Deck | null) {
-        this.deckName = deckName;
-        this.newFlashcards = [];
-        this.dueFlashcards = [];
-        this.subdecks = [];
-        this.parent = parent;
+    //
+    // Returns a count of the number of this question's cards are present in this deck.
+    // (The returned value would be <= question.cards.length)
+    //
+    public getQuestionCardCount(question: Question): number {
+        let result: number = 0;
+        result += this.getQuestionCardCountForCardListType(question, this.newFlashcards);
+        result += this.getQuestionCardCountForCardListType(question, this.dueFlashcards);
+        return result;
+    }
+
+    private getQuestionCardCountForCardListType(question: Question, cards: Card[]): number {
+        let result: number = 0;
+        for (let i = 0; i < cards.length; i++) {
+            const card = cards[i];
+            if (Object.is(question, cards[i].question)) result++;
+        }
+        return result;
     }
 
     static get emptyDeck(): Deck {
@@ -122,12 +142,6 @@ export class Deck {
     deleteCardAtIndex(index: number, cardListType: CardListType): void {
         const cardList: Card[] = this.getCardListForCardType(cardListType);
         cardList.splice(index, 1);
-    }
-
-    deleteAllCardsForQuestion(question: Question): void {
-        for (let idx = question.cards.length - 1; idx >= 0; idx--) {
-            this.deleteCardAtIndex(idx, question.cards[idx].cardListType);
-        }
     }
 
     toDeckArray(): Deck[] {
