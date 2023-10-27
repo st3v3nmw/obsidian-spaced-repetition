@@ -38,6 +38,22 @@ export const getKeysPreserveType = Object.keys as <T extends Record<string, unkn
 export const escapeRegexString = (text: string): string =>
     text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+export function literalStringReplace(
+    text: string,
+    searchStr: string,
+    replacementStr: string,
+): string {
+    let result: string = text;
+    const startIdx: number = text.indexOf(searchStr);
+    if (startIdx >= 0) {
+        const startStr: string = text.substring(0, startIdx);
+        const endIdx: number = startIdx + searchStr.length;
+        const endStr: string = text.substring(endIdx);
+        result = startStr + replacementStr + endStr;
+    }
+    return result;
+}
+
 /**
  * Returns the cyrb53 hash (hex string) of the input string
  * Please see https://stackoverflow.com/a/52171480 for more details
