@@ -571,14 +571,17 @@ export default class SRPlugin extends Plugin {
             const linkContribution: number =
                 this.data.settings.maxLinkFactor *
                 Math.min(1.0, Math.log(totalLinkCount + 0.5) / Math.log(64));
+            console.log(`saveReviewResponse: C1: maxLinkFactor: ${this.data.settings.maxLinkFactor}, totalLinkCount: ${totalLinkCount}, linkContribution: ${linkContribution}`);
             ease =
                 (1.0 - linkContribution) * this.data.settings.baseEase +
                 (totalLinkCount > 0
                     ? (linkContribution * linkTotal) / linkPGTotal
                     : linkContribution * this.data.settings.baseEase);
+            console.log(`saveReviewResponse: C2: baseEase: ${this.data.settings.baseEase}, ease: ${ease}, linkTotal: ${linkTotal}, linkPGTotal: ${linkPGTotal}`);
             // add note's average flashcard ease if available
-            if (Object.prototype.hasOwnProperty.call(this.easeByPath, note.path)) {
+            if (this.easeByPath.hasEaseForPath(note.path)) {
                 ease = (ease + this.easeByPath.getEaseByPath(note.path)) / 2;
+                console.log(`saveReviewResponse: C3: ease: ${ease}`);
             }
             ease = Math.round(ease);
             interval = 1.0;
