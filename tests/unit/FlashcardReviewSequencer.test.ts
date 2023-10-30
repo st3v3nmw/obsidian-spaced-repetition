@@ -658,6 +658,30 @@ Q1::A1
                 checkQuestionPostponementListCount(c, 0);
             });
         });
+
+        test("Answer includes MathJax within $$", async () => {
+            let fileText: string = `#flashcards
+What is Newman's equation for gravitational force
+?
+$$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$`;
+
+            let c: TestContext = TestContext.Create(
+                order_DueFirst_Sequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                fileText,
+            );
+            await c.setSequencerDeckTreeFromOriginalText();
+            expect(c.reviewSequencer.currentCard.front).toContain("What is Newman's equation");
+
+            // Reviewing the card doesn't change the question, only adds the schedule info
+            await c.reviewSequencer.processReview(ReviewResponse.Easy);
+            let expectedFileText: string = `${fileText}
+<!--SR:!2023-09-10,4,270-->`;
+
+            let actual: string = await c.file.read();
+            expect(actual).toEqual(expectedFileText);
+        });
     });
 
     describe("FlashcardReviewMode.Cram", () => {
