@@ -541,7 +541,7 @@ export default class SRPlugin extends Plugin {
                 Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
             )
         ) {
-            console.log(`saveReviewResponse: A: ease: ${ease}, interval: ${interval}, delayBeforeReview: ${delayBeforeReview}`);
+            console.log(`saveReviewResponse: A2: ease: ${ease}, interval: ${interval}, delayBeforeReview: ${delayBeforeReview}`);
             let linkTotal = 0,
                 linkPGTotal = 0,
                 totalLinkCount = 0;

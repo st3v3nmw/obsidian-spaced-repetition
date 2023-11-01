@@ -2,7 +2,7 @@ import { SRSettings } from "./settings";
 
 export interface INoteEaseList {
     hasEaseForPath(path: string): boolean;
-    getEaseByPath(path: string): number;
+    getEaseByPath(path: string): number | null;
     setEaseForPath(path: string, ease: number): void;
 }
 
@@ -22,8 +22,8 @@ export class NoteEaseList implements INoteEaseList {
         return Object.prototype.hasOwnProperty.call(this.dict, path);
     }
 
-    getEaseByPath(path: string): number {
-        let ease: number = this.baseEase;
+    getEaseByPath(path: string): number | null {
+        let ease: number = null;
         if (this.hasEaseForPath(path)) {
             ease = Math.round(this.dict[path]);
         }
