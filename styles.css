@@ -155,3 +155,16 @@
         width: 100px;
     }
 }
+
+@media only screen and (orientation: portrait) {
+
+    .modal {
+    
+    margin-top: 20%;
+    
+    width: 100% !important;
+
+    height: 80% !important;
+    
+    }
+}
