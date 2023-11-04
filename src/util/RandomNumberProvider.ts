@@ -45,7 +45,8 @@ export class WeightedRandomNumber {
     //      second number - an "index" value; 0 <= index < bucketSize
     getRandomValues(weights: Record<number, number>): [number, number] {
         const total: number = WeightedRandomNumber.calcTotalOfCount(weights);
-        if (Object.values(weights).some((i) => !Number.isInteger(i) || i < 0)) throw "All weights must be positive integers";
+        if (Object.values(weights).some((i) => !Number.isInteger(i) || i < 0))
+            throw "All weights must be positive integers";
 
         const v: number = this.provider.getInteger(0, total - 1);
         let x: number = 0;
@@ -63,9 +64,10 @@ export class WeightedRandomNumber {
     }
 
     private static calcTotalOfCount(weights: Record<number, number>): number {
-        const total: number = getTypedObjectEntries(weights)
-            .map(([value, count]) => count)
-            .reduce((a, b) => a + b, 0) || 0;
+        const total: number =
+            getTypedObjectEntries(weights)
+                .map(([value, count]) => count)
+                .reduce((a, b) => a + b, 0) || 0;
         return total;
     }
 }

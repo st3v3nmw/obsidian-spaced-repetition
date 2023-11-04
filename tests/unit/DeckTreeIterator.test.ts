@@ -15,11 +15,14 @@ import {
     globalDateProvider,
     setupStaticDateProvider_20230906,
 } from "src/util/DateProvider";
-import { setupNextRandomNumber, setupStaticRandomNumberProvider } from "src/util/RandomNumberProvider";
+import {
+    setupNextRandomNumber,
+    setupStaticRandomNumberProvider,
+} from "src/util/RandomNumberProvider";
 
 export var order_DueFirst_Sequential: IIteratorOrder = {
     cardOrder: CardOrder.DueFirstSequential,
-    deckOrder: DeckOrder.PrevDeckComplete_Sequential
+    deckOrder: DeckOrder.PrevDeckComplete_Sequential,
 };
 
 var iterator: DeckTreeIterator;
@@ -39,7 +42,7 @@ describe("setDeck", () => {
         let iterator: DeckTreeIterator = new DeckTreeIterator(
             {
                 cardOrder: CardOrder.NewFirstSequential,
-                deckOrder: DeckOrder.PrevDeckComplete_Sequential
+                deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
             IteratorDeckSource.UpdatedByIterator,
         );
@@ -63,7 +66,7 @@ describe("nextCard", () => {
                 let iterator: DeckTreeIterator = new DeckTreeIterator(
                     {
                         cardOrder: CardOrder.DueFirstSequential,
-                        deckOrder: DeckOrder.PrevDeckComplete_Sequential
+                        deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
                     IteratorDeckSource.UpdatedByIterator,
                 );
@@ -99,7 +102,7 @@ describe("nextCard", () => {
                     iterator = new DeckTreeIterator(
                         {
                             cardOrder: CardOrder.DueFirstSequential,
-                            deckOrder: DeckOrder.PrevDeckComplete_Sequential
+                            deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
                         IteratorDeckSource.UpdatedByIterator,
                     );
@@ -142,7 +145,7 @@ describe("nextCard", () => {
                     iterator = new DeckTreeIterator(
                         {
                             cardOrder: CardOrder.DueFirstSequential,
-                            deckOrder: DeckOrder.PrevDeckComplete_Sequential
+                            deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
                         IteratorDeckSource.UpdatedByIterator,
                     );
@@ -185,7 +188,7 @@ describe("nextCard", () => {
                 let iterator: DeckTreeIterator = new DeckTreeIterator(
                     {
                         cardOrder: CardOrder.NewFirstSequential,
-                        deckOrder: DeckOrder.PrevDeckComplete_Sequential
+                        deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
                     IteratorDeckSource.UpdatedByIterator,
                 );
@@ -220,7 +223,7 @@ describe("nextCard", () => {
                     iterator = new DeckTreeIterator(
                         {
                             cardOrder: CardOrder.NewFirstSequential,
-                            deckOrder: DeckOrder.PrevDeckComplete_Sequential
+                            deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
                         IteratorDeckSource.UpdatedByIterator,
                     );
@@ -255,7 +258,7 @@ describe("nextCard", () => {
                     iterator = new DeckTreeIterator(
                         {
                             cardOrder: CardOrder.DueFirstSequential,
-                            deckOrder: DeckOrder.PrevDeckComplete_Sequential
+                            deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
                         IteratorDeckSource.UpdatedByIterator,
                     );
@@ -298,7 +301,7 @@ describe("nextCard", () => {
                     iterator = new DeckTreeIterator(
                         {
                             cardOrder: CardOrder.NewFirstSequential,
-                            deckOrder: DeckOrder.PrevDeckComplete_Sequential
+                            deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
                         IteratorDeckSource.UpdatedByIterator,
                     );
@@ -345,7 +348,7 @@ describe("nextCard", () => {
                 iterator = new DeckTreeIterator(
                     {
                         cardOrder: CardOrder.DueFirstRandom,
-                        deckOrder: DeckOrder.PrevDeckComplete_Sequential
+                        deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
                     IteratorDeckSource.UpdatedByIterator,
                 );
@@ -394,7 +397,7 @@ describe("nextCard", () => {
                 iterator = new DeckTreeIterator(
                     {
                         cardOrder: CardOrder.DueFirstRandom,
-                        deckOrder: DeckOrder.PrevDeckComplete_Sequential
+                        deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
                     IteratorDeckSource.UpdatedByIterator,
                 );
@@ -462,7 +465,7 @@ describe("nextCard", () => {
             iterator = new DeckTreeIterator(
                 {
                     cardOrder: CardOrder.NewFirstSequential,
-                    deckOrder: DeckOrder.PrevDeckComplete_Random
+                    deckOrder: DeckOrder.PrevDeckComplete_Random,
                 },
                 IteratorDeckSource.UpdatedByIterator,
             );
@@ -519,7 +522,7 @@ describe("nextCard", () => {
             iterator = new DeckTreeIterator(
                 {
                     cardOrder: CardOrder.EveryCardRandomDeckAndCard,
-                    deckOrder: null, 
+                    deckOrder: null,
                 },
                 IteratorDeckSource.UpdatedByIterator,
             );
@@ -576,7 +579,7 @@ describe("hasCurrentCard", () => {
         let iterator: DeckTreeIterator = new DeckTreeIterator(
             {
                 cardOrder: CardOrder.NewFirstSequential,
-                deckOrder: DeckOrder.PrevDeckComplete_Sequential
+                deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
             IteratorDeckSource.UpdatedByIterator,
         );
@@ -593,7 +596,7 @@ describe("hasCurrentCard", () => {
         let iterator: DeckTreeIterator = new DeckTreeIterator(
             {
                 cardOrder: CardOrder.NewFirstSequential,
-                deckOrder: DeckOrder.PrevDeckComplete_Sequential
+                deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
             IteratorDeckSource.UpdatedByIterator,
         );
@@ -610,12 +613,15 @@ Q1::A1
 Q2::A2
 Q3::A3`;
         let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
-        iterator = new DeckTreeIterator({
-            cardOrder: CardOrder.NewFirstSequential,
-            deckOrder: DeckOrder.PrevDeckComplete_Sequential
-        }, IteratorDeckSource.UpdatedByIterator);
+        iterator = new DeckTreeIterator(
+            {
+                cardOrder: CardOrder.NewFirstSequential,
+                deckOrder: DeckOrder.PrevDeckComplete_Sequential,
+            },
+            IteratorDeckSource.UpdatedByIterator,
+        );
         iterator.setDeck(deck);
-        
+
         expect(iterator.nextCard()).toEqual(true);
         expect(iterator.nextCard()).toEqual(true);
         expect(iterator.nextCard()).toEqual(true);
@@ -634,19 +640,21 @@ Q2::A2
 Q3::A3`;
         let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
         expect(deck.newFlashcards.length).toEqual(3);
-        iterator = new DeckTreeIterator({
-            cardOrder: CardOrder.NewFirstSequential,
-            deckOrder: DeckOrder.PrevDeckComplete_Sequential
-        }, IteratorDeckSource.UpdatedByIterator);
+        iterator = new DeckTreeIterator(
+            {
+                cardOrder: CardOrder.NewFirstSequential,
+                deckOrder: DeckOrder.PrevDeckComplete_Sequential,
+            },
+            IteratorDeckSource.UpdatedByIterator,
+        );
         iterator.setDeck(deck);
-        
+
         nextCardThenCheck("Q1");
         nextCardThenCheck("Q2");
         expect(iterator.deleteCurrentCard()).toEqual(true);
         expect(iterator.currentCard.front).toEqual("Q3");
         expect(iterator.deleteCurrentCard()).toEqual(false);
     });
-
 });
 
 function nextCardThenCheck(expectedFront: string): void {

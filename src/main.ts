@@ -312,7 +312,7 @@ export default class SRPlugin extends Plugin {
 
         const iteratorOrder: IIteratorOrder = {
             deckOrder,
-            cardOrder
+            cardOrder,
         };
         return new DeckTreeIterator(iteratorOrder, IteratorDeckSource.UpdatedByIterator);
     }
@@ -702,8 +702,7 @@ export default class SRPlugin extends Plugin {
 
     async loadPluginData(): Promise<void> {
         const loadedData: PluginData = await this.loadData();
-        if (loadedData?.settings)
-            upgradeSettings(loadedData.settings);
+        if (loadedData?.settings) upgradeSettings(loadedData.settings);
         this.data = Object.assign({}, DEFAULT_DATA, loadedData);
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
     }

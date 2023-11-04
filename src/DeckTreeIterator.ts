@@ -13,7 +13,7 @@ export enum CardOrder {
 }
 export enum DeckOrder {
     PrevDeckComplete_Sequential,
-    PrevDeckComplete_Random
+    PrevDeckComplete_Random,
 }
 export enum IteratorDeckSource {
     UpdatedByIterator,
@@ -59,7 +59,9 @@ class SingleDeckIterator {
 
     constructor(iteratorOrder: IIteratorOrder) {
         this.iteratorOrder = iteratorOrder;
-        this.preferredCardListType = SingleDeckIterator.getCardListTypeForIterator(this.iteratorOrder);
+        this.preferredCardListType = SingleDeckIterator.getCardListTypeForIterator(
+            this.iteratorOrder,
+        );
         this.weightedRandomNumber = WeightedRandomNumber.create();
     }
 
@@ -68,9 +70,9 @@ class SingleDeckIterator {
         this.setCardListType(null);
     }
 
-    // 
+    //
     // 0 <= cardIndex < newFlashcards.length + dueFlashcards.length
-    // 
+    //
     setNewOrDueCardIdx(cardIndex: number): void {
         let cardListType: CardListType = CardListType.NewCard;
         let index: number = cardIndex;
@@ -119,10 +121,8 @@ class SingleDeckIterator {
             // regardless of whether the card is in the new/due list, or which list has more cards
             // I.e. we don't pick the new/due list first at 50/50 and then a random card within it
             const weights: Partial<Record<CardListType, number>> = {};
-            if (newCount > 0)
-                weights[CardListType.NewCard] = newCount;
-            if (dueCount > 0)
-                weights[CardListType.DueCard] = dueCount;
+            if (newCount > 0) weights[CardListType.NewCard] = newCount;
+            if (dueCount > 0) weights[CardListType.DueCard] = dueCount;
             const [cardListType, index] = this.weightedRandomNumber.getRandomValues(weights);
             this.setCardListType(cardListType, index);
         } else {
@@ -222,7 +222,6 @@ export class DeckTreeIterator implements IDeckTreeIterator {
     private deckIdx?: number;
     private weightedRandomNumber: WeightedRandomNumber;
 
-
     get hasCurrentCard(): boolean {
         return this.deckIdx != null && this.singleDeckIterator.hasCurrentCard;
     }
@@ -259,7 +258,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
             let deck: Deck = sourceArray[idx];
             let hasAnyCards = deck.getCardCount(CardListType.All, false) > 0;
             if (hasAnyCards) {
-                result.push(deck)
+                result.push(deck);
             }
         }
         return result;
@@ -305,7 +304,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
             case DeckOrder.PrevDeckComplete_Sequential:
                 this.deckIdx++;
                 break;
-            
+
             case DeckOrder.PrevDeckComplete_Random:
                 // Equal probability of picking any deck that has cards within
                 let weights: Record<number, number> = {};
@@ -336,8 +335,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
                 weights[i] = cardCount;
             }
         }
-        if (Object.keys(weights).length == 0)
-            return false;
+        if (Object.keys(weights).length == 0) return false;
 
         let [deckIdx, cardIdx] = this.weightedRandomNumber.getRandomValues(weights);
         this.setDeckIdx(deckIdx);
