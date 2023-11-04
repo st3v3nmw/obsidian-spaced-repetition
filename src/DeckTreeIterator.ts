@@ -68,7 +68,10 @@ class SingleDeckIterator {
         this.setCardListType(null);
     }
 
-    setCard(cardIndex: number): void {
+    // 
+    // 0 <= cardIndex < newFlashcards.length + dueFlashcards.length
+    // 
+    setNewOrDueCardIdx(cardIndex: number): void {
         let cardListType: CardListType = CardListType.NewCard;
         let index: number = cardIndex;
         if (cardIndex >= this.deck.newFlashcards.length) {
@@ -112,6 +115,9 @@ class SingleDeckIterator {
         const newCount: number = this.deck.newFlashcards.length;
         const dueCount: number = this.deck.dueFlashcards.length;
         if (newCount + dueCount > 0) {
+            // Generate a random number such that the probability of picking an individual card is the same
+            // regardless of whether the card is in the new/due list, or which list has more cards
+            // I.e. we don't pick the new/due list first at 50/50 and then a random card within it
             const weights: Partial<Record<CardListType, number>> = {};
             if (newCount > 0)
                 weights[CardListType.NewCard] = newCount;
@@ -132,7 +138,9 @@ class SingleDeckIterator {
             switch (this.iteratorOrder.cardOrder) {
                 case CardOrder.DueFirstSequential:
                 case CardOrder.NewFirstSequential:
-                        this.cardIdx = 0;
+                    // We always pick the card with index 0
+                    // Sequential retrieval occurs by the caller deleting the card at this index after it is used
+                    this.cardIdx = 0;
                     break;
 
                 case CardOrder.DueFirstRandom:
@@ -273,6 +281,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         if (this.iteratorOrder.cardOrder == CardOrder.EveryCardRandomDeckAndCard) {
             result = this.nextCard_EveryCardRandomDeck();
         } else {
+            // If we are just starting, then we want to start from the first deck
             if (this.deckIdx == null) {
                 this.setDeckIdx(0);
             }
@@ -332,7 +341,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
 
         let [deckIdx, cardIdx] = this.weightedRandomNumber.getRandomValues(weights);
         this.setDeckIdx(deckIdx);
-        this.singleDeckIterator.setCard(cardIdx);
+        this.singleDeckIterator.setNewOrDueCardIdx(cardIdx);
         return true;
     }
 
