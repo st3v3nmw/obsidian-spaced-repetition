@@ -341,6 +341,9 @@ export default class SRPlugin extends Plugin {
         if (todayDate !== this.data.buryDate) {
             this.data.buryDate = todayDate;
             this.questionPostponementList.clear();
+
+            // The following isn't needed for plug-in functionality; but can aid during debugging
+            await this.savePluginData();
         }
 
         const notes: TFile[] = this.app.vault.getMarkdownFiles();
