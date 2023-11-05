@@ -21,7 +21,7 @@ export class QuestionPostponementList implements IQuestionPostponementList {
     }
 
     clear(): void {
-        this.list = [];
+        this.list.splice(0);
     }
 
     add(question: Question): void {

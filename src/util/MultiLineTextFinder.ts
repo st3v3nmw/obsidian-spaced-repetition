@@ -1,4 +1,4 @@
-import { splitTextIntoLineArray } from "./utils";
+import { literalStringReplace, splitTextIntoLineArray } from "./utils";
 
 export class MultiLineTextFinder {
     static findAndReplace(
@@ -8,7 +8,7 @@ export class MultiLineTextFinder {
     ): string | null {
         let result: string = null;
         if (sourceText.includes(searchText)) {
-            result = sourceText.replace(searchText, replacementText);
+            result = literalStringReplace(sourceText, searchText, replacementText);
         } else {
             const sourceTextArray = splitTextIntoLineArray(sourceText);
             const searchTextArray = splitTextIntoLineArray(searchText);
