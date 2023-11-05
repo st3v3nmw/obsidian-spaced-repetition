@@ -33,7 +33,6 @@ export function schedule(
             (interval + delayBeforeReview / 4) * settingsObj.lapsesIntervalChange,
         );
     }
-    console.log(`schedule: A: ease: ${ease}, interval: ${interval}, delayBeforeReview: ${delayBeforeReview}`);
 
     // replaces random fuzz with load balancing over the fuzz interval
     if (dueDates !== undefined) {
@@ -64,7 +63,6 @@ export function schedule(
 
         dueDates[interval]++;
     }
-    console.log(`schedule: B: ease: ${ease}, interval: ${interval}, delayBeforeReview: ${delayBeforeReview}`);
 
     interval = Math.min(interval, settingsObj.maximumInterval);
 
