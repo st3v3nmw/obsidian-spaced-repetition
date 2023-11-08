@@ -577,7 +577,7 @@ export default class SRPlugin extends Plugin {
                     ? (linkContribution * linkTotal) / linkPGTotal
                     : linkContribution * this.data.settings.baseEase);
             // add note's average flashcard ease if available
-            if (Object.prototype.hasOwnProperty.call(this.easeByPath, note.path)) {
+            if (this.easeByPath.hasEaseForPath(note.path)) {
                 ease = (ease + this.easeByPath.getEaseByPath(note.path)) / 2;
             }
             ease = Math.round(ease);
@@ -608,6 +608,8 @@ export default class SRPlugin extends Plugin {
         const dueString: string = due.format("YYYY-MM-DD");
 
         // check if scheduling info exists
+        console.log(`saveReviewResponse: H: ease: ${ease}, interval: ${interval}, dueString: ${dueString}`);
+        console.log(`saveReviewResponse: H1: ${hexEncode(fileText.substring(0, 500))}`);
         if (SCHEDULING_INFO_REGEX.test(fileText)) {
             const schedulingInfo = SCHEDULING_INFO_REGEX.exec(fileText);
             fileText = fileText.replace(
@@ -616,6 +618,7 @@ export default class SRPlugin extends Plugin {
                     `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
                     `${schedulingInfo[5]}---`,
             );
+            console.log(`saveReviewResponse: H2`);
         } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
             // new note with existing YAML front matter
             const existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
@@ -624,10 +627,12 @@ export default class SRPlugin extends Plugin {
                 `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
                     `sr-interval: ${interval}\nsr-ease: ${ease}\n---`,
             );
+            console.log(`saveReviewResponse: H3`);
         } else {
             fileText =
                 `---\nsr-due: ${dueString}\nsr-interval: ${interval}\n` +
                 `sr-ease: ${ease}\n---\n\n${fileText}`;
+            console.log(`saveReviewResponse: H4`);
         }
 
         if (this.data.settings.burySiblingCards) {
@@ -720,4 +725,16 @@ export default class SRPlugin extends Plugin {
             });
         }
     }
+}
+
+function hexEncode(str: string): string{
+    var hex, i;
+
+    var result = "";
+    for (i=0; i<str.length; i++) {
+        hex = str.charCodeAt(i).toString(16);
+        result += ("000"+hex).slice(-4) + " ";
+    }
+
+    return result
 }
