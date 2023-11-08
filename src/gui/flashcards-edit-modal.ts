@@ -22,6 +22,7 @@ export class FlashcardEditModal extends Modal {
         this.titleEl.setText(t("EDIT_CARD"));
         this.titleEl.addClass("sr-centered");
         this.modalText = existingText;
+        this.input = existingText;
 
         this.waitForClose = new Promise<string>((resolve, reject) => {
             this.resolvePromise = resolve;
