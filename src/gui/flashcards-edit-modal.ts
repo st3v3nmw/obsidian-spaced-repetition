@@ -68,7 +68,6 @@ export class FlashcardEditModal extends Modal {
         textComponent.inputEl.style.width = "100%";
         textComponent
             .setValue(value ?? "")
-            .onChange((value) => (this.input = value))
             .inputEl.addEventListener("keydown", this.submitEnterCallback);
 
         return textComponent;
@@ -86,7 +85,7 @@ export class FlashcardEditModal extends Modal {
 
     private submit() {
         this.didSubmit = true;
-
+        this.input = this.inputComponent.getValue();
         this.close();
     }
 
