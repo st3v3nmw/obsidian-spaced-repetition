@@ -110,7 +110,10 @@ export class CardScheduleCalculator {
     }
 
     getNewCardSchedule(response: ReviewResponse, notePath: string): CardScheduleInfo {
-        const initial_ease: number = this.noteEaseList.getEaseByPath(notePath);
+        let initial_ease: number = this.settings.baseEase;
+        if (this.noteEaseList.hasEaseForPath(notePath)) {
+            initial_ease = Math.round(this.noteEaseList.getEaseByPath(notePath));
+        }
         const delayBeforeReview = 0;
 
         const schedObj: Record<string, number> = schedule(

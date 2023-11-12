@@ -577,7 +577,7 @@ export default class SRPlugin extends Plugin {
                     ? (linkContribution * linkTotal) / linkPGTotal
                     : linkContribution * this.data.settings.baseEase);
             // add note's average flashcard ease if available
-            if (Object.prototype.hasOwnProperty.call(this.easeByPath, note.path)) {
+            if (this.easeByPath.hasEaseForPath(note.path)) {
                 ease = (ease + this.easeByPath.getEaseByPath(note.path)) / 2;
             }
             ease = Math.round(ease);
