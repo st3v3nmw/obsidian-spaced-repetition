@@ -1,6 +1,7 @@
+// To cater for both LF and CR-LF line ending styles, "\r?\n" is used to match the newline character sequence
 export const SCHEDULING_INFO_REGEX =
-    /^---\n((?:.*\n)*)sr-due: (.+)\nsr-interval: (\d+)\nsr-ease: (\d+)\n((?:.*\n)?)---/;
-export const YAML_FRONT_MATTER_REGEX = /^---\n((?:.*\n)*?)---/;
+    /^---\r?\n((?:.*\r?\n)*)sr-due: (.+)\r?\nsr-interval: (\d+)\r?\nsr-ease: (\d+)\r?\n((?:.*\r?\n)?)---/;
+export const YAML_FRONT_MATTER_REGEX = /^---\r?\n((?:.*\r?\n)*?)---/;
 
 export const MULTI_SCHEDULING_EXTRACTOR = /!([\d-]+),(\d+),(\d+)/gm;
 export const LEGACY_SCHEDULING_EXTRACTOR = /<!--SR:([\d-]+),(\d+),(\d+)-->/gm;
