@@ -144,12 +144,22 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             this.cardSequencer.nextCard();
         } else {
             if (this.settings.burySiblingCards) {
-                this.questionPostponementList.add(this.currentQuestion);
-                await this.questionPostponementList.write();
+                await this.burySiblingCards();
                 this.cardSequencer.deleteCurrentQuestion();
             } else {
                 this.deleteCurrentCard();
             }
+        }
+    }
+
+    private async burySiblingCards(): Promise<void> {
+        // We check if there are any sibling cards still in the deck,
+        // We do this because otherwise we would be adding every reviewed card to the postponement list, even for a
+        // question with a single card. That isn't consistent with the 1.10.1 behavior
+        const remaining = this.currentDeck.getQuestionCardCount(this.currentQuestion);
+        if (remaining > 1) {
+            this.questionPostponementList.add(this.currentQuestion);
+            await this.questionPostponementList.write();
         }
     }
 

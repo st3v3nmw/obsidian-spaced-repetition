@@ -336,6 +336,9 @@ export default class SRPlugin extends Plugin {
         if (todayDate !== this.data.buryDate) {
             this.data.buryDate = todayDate;
             this.questionPostponementList.clear();
+
+            // The following isn't needed for plug-in functionality; but can aid during debugging
+            await this.savePluginData();
         }
 
         const notes: TFile[] = this.app.vault.getMarkdownFiles();
@@ -574,7 +577,7 @@ export default class SRPlugin extends Plugin {
                     ? (linkContribution * linkTotal) / linkPGTotal
                     : linkContribution * this.data.settings.baseEase);
             // add note's average flashcard ease if available
-            if (Object.prototype.hasOwnProperty.call(this.easeByPath, note.path)) {
+            if (this.easeByPath.hasEaseForPath(note.path)) {
                 ease = (ease + this.easeByPath.getEaseByPath(note.path)) / 2;
             }
             ease = Math.round(ease);
