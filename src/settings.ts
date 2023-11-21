@@ -253,15 +253,13 @@ export class SRSettingTab extends PluginSettingTab {
                 }),
         );
 
-        new Setting(containerEl).setName(t("MANY_CLOZE")).addToggle((toggle) => 
-            toggle
-                .setValue(this.plugin.data.settings.manyClozes)
-                .onChange(async (value) => {
-                    this.plugin.data.settings.manyClozes = value;
-                    await this.plugin.savePluginData();
-                })
+        new Setting(containerEl).setName(t("MANY_CLOZE")).addToggle((toggle) =>
+            toggle.setValue(this.plugin.data.settings.manyClozes).onChange(async (value) => {
+                this.plugin.data.settings.manyClozes = value;
+                await this.plugin.savePluginData();
+            }),
         );
-    
+
         new Setting(containerEl).setName(t("CONVERT_HIGHLIGHTS_TO_CLOZES")).addToggle((toggle) =>
             toggle
                 .setValue(this.plugin.data.settings.convertHighlightsToClozes)

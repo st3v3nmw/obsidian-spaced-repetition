@@ -121,12 +121,20 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
                 if (characterSet.length > 0) {
                     const expression = new RegExp(
                         `([${characterSet}])\\1(.+?)([${characterSet}])\\3`,
-                        "gm"
+                        "gm",
                     );
-                    result.push(new CardFrontBack(
-                        questionText.replace(expression, QuestionType_ClozeUtil.renderClozeFront()),
-                        questionText.replace(expression, QuestionType_ClozeUtil.renderClozeBack("$2"))
-                    ));
+                    result.push(
+                        new CardFrontBack(
+                            questionText.replace(
+                                expression,
+                                QuestionType_ClozeUtil.renderClozeFront(),
+                            ),
+                            questionText.replace(
+                                expression,
+                                QuestionType_ClozeUtil.renderClozeBack("$2"),
+                            ),
+                        ),
+                    );
                 }
             } else {
                 const deletionStart: number = m.index,
