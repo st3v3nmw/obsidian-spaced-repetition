@@ -83,6 +83,7 @@ export default {
     CARD_MODAL_WIDTH_PERCENT: "نسبة عرض البطاقة",
     RANDOMIZE_CARD_ORDER: "ترتيب بطاقة عشوائي أثناء المراجعة؟",
     DISABLE_CLOZE_CARDS: "؟cloze تعطيل بطاقات",
+    MULTILINE_CLOZE: "Multiline clozes?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Convert ==hightlights== to clozes?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "Convert **bolded text** to clozes?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Convert {{curly brackets}} to clozes?",

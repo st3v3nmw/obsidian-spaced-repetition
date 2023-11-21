@@ -4,6 +4,7 @@ import { CardType } from "./Question";
  * Returns flashcards found in `text`
  *
  * @param text - The text to extract flashcards from
+ * @param multilineCloze - Whether to extract clozes spanning multiple lines
  * @param singlelineCardSeparator - Separator for inline basic cards
  * @param singlelineReversedCardSeparator - Separator for inline reversed cards
  * @param multilineCardSeparator - Separator for multiline basic cards
@@ -12,6 +13,7 @@ import { CardType } from "./Question";
  */
 export function parse(
     text: string,
+    multilineCloze: boolean,
     singlelineCardSeparator: string,
     singlelineReversedCardSeparator: string,
     multilineCardSeparator: string,
@@ -71,6 +73,18 @@ export function parse(
         ) {
             cardType = CardType.Cloze;
             lineNo = i;
+
+            if (!multilineCloze) {
+                let clozeText = currentLine;
+                if (i + 1 < lines.length && lines[i + 1].startsWith("<!--SR:")) {
+                    clozeText += "\n" + lines[i + 1];
+                    i++;
+                }
+                cards.push([cardType, clozeText, lineNo]);
+                cardType = null;
+                cardText = "";
+                continue;
+            }
         } else if (currentLine.trim() === multilineCardSeparator) {
             cardType = CardType.MultiLineBasic;
             lineNo = i;

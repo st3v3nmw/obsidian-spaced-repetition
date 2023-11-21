@@ -92,6 +92,7 @@ export default {
     CARD_MODAL_WIDTH_PERCENT: "Ширина карточки в процентах",
     RANDOMIZE_CARD_ORDER: "Случайный порядок карточек во время повторения?",
     DISABLE_CLOZE_CARDS: "Выключить карты с пропусками (пример: [...])?",
+    MULTILINE_CLOZE: "Multiline clozes?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Конвертировать ==выделенный текст== в пропуски (пример: [...])?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "Конвертировать **жирный текст** в пропуски (пример: [...])?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES:

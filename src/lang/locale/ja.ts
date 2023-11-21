@@ -89,6 +89,7 @@ export default {
     CARD_MODAL_WIDTH_PERCENT: "フラッシュカードの横サイズのパーセンテージ",
     RANDOMIZE_CARD_ORDER: "レビュー中のカードの順番をランダムにしますか？",
     DISABLE_CLOZE_CARDS: "穴埋めカードを無効化しますか？",
+    MULTILINE_CLOZE: "Multiline clozes?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==ハイライト==を穴埋めとして使用しますか？",
     CONVERT_BOLD_TEXT_TO_CLOZES: "**ボールド体**を穴埋めとして使用しますか？",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "{{中括弧}}を穴埋めとして使用しますか？",

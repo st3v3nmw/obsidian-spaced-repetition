@@ -80,6 +80,7 @@ export default {
     CARD_MODAL_WIDTH_PERCENT: "卡片寬度百分比",
     RANDOMIZE_CARD_ORDER: "復習時隨機顯示卡片？",
     DISABLE_CLOZE_CARDS: "停用填空克漏字卡片？",
+    MULTILINE_CLOZE: "Multiline clozes?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "將 ==高亮== 轉換為填空克漏字？",
     CONVERT_BOLD_TEXT_TO_CLOZES: "將 **粗體** 轉換為填空克漏字？",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "將 {{大括號}} 轉換為填空克漏字？",

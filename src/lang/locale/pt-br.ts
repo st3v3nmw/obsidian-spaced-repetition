@@ -89,6 +89,7 @@ export default {
     CARD_MODAL_WIDTH_PERCENT: "Porcentagem de Largura do Flashcard",
     RANDOMIZE_CARD_ORDER: "Aleatorizar a ordem das cartas durante a revisão?",
     DISABLE_CLOZE_CARDS: "Desabilitar cartas que usam omissão de palavras?",
+    MULTILINE_CLOZE: "Multiline clozes?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Converter ==marca-texto== em omissões?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "Converter **texto em negrito** em omissões?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Converter {{chaves}} em omissões?",

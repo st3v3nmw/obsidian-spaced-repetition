@@ -83,6 +83,7 @@ export class NoteQuestionParser {
         const settings: SRSettings = this.settings;
         const result: [CardType, string, number][] = parse(
             this.noteText,
+            settings.multilineCloze,
             settings.singleLineCardSeparator,
             settings.singleLineReversedCardSeparator,
             settings.multilineCardSeparator,
