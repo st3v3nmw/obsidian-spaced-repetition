@@ -107,29 +107,52 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
         let front: string, back: string;
         const result: CardFrontBack[] = [];
         for (const m of siblings) {
-            const deletionStart: number = m.index,
-                deletionEnd: number = deletionStart + m[0].length;
-            front =
-                questionText.substring(0, deletionStart) +
-                QuestionType_ClozeUtil.renderClozeFront() +
-                questionText.substring(deletionEnd);
-            front = front
-                .replace(/==/gm, "")
-                .replace(/\*\*/gm, "")
-                .replace(/{{/gm, "")
-                .replace(/}}/gm, "");
-            back =
-                questionText.substring(0, deletionStart) +
-                QuestionType_ClozeUtil.renderClozeBack(
-                    questionText.substring(deletionStart, deletionEnd),
-                ) +
-                questionText.substring(deletionEnd);
-            back = back
-                .replace(/==/gm, "")
-                .replace(/\*\*/gm, "")
-                .replace(/{{/gm, "")
-                .replace(/}}/gm, "");
-            result.push(new CardFrontBack(front, back));
+            if (settings.manyClozes) {
+                let characterSet = "";
+                if (settings.convertHighlightsToClozes) {
+                    characterSet += "=";
+                }
+                if (settings.convertBoldTextToClozes) {
+                    characterSet += "*";
+                }
+                if (settings.convertCurlyBracketsToClozes) {
+                    characterSet += "{}";
+                }
+                if (characterSet.length > 0) {
+                    const expression = new RegExp(
+                        `([${characterSet}])\\1(.+?)([${characterSet}])\\3`,
+                        "gm"
+                    );
+                    result.push(new CardFrontBack(
+                        questionText.replace(expression, QuestionType_ClozeUtil.renderClozeFront()),
+                        questionText.replace(expression, QuestionType_ClozeUtil.renderClozeBack("$2"))
+                    ));
+                }
+            } else {
+                const deletionStart: number = m.index,
+                    deletionEnd: number = deletionStart + m[0].length;
+                front =
+                    questionText.substring(0, deletionStart) +
+                    QuestionType_ClozeUtil.renderClozeFront() +
+                    questionText.substring(deletionEnd);
+                front = front
+                    .replace(/==/gm, "")
+                    .replace(/\*\*/gm, "")
+                    .replace(/{{/gm, "")
+                    .replace(/}}/gm, "");
+                back =
+                    questionText.substring(0, deletionStart) +
+                    QuestionType_ClozeUtil.renderClozeBack(
+                        questionText.substring(deletionStart, deletionEnd),
+                    ) +
+                    questionText.substring(deletionEnd);
+                back = back
+                    .replace(/==/gm, "")
+                    .replace(/\*\*/gm, "")
+                    .replace(/{{/gm, "")
+                    .replace(/}}/gm, "");
+                result.push(new CardFrontBack(front, back));
+            }
         }
 
         return result;

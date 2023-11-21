@@ -92,6 +92,7 @@ export default {
     CARD_MODAL_WIDTH_PERCENT: "Breite einer Lernkarte in Prozent",
     RANDOMIZE_CARD_ORDER: "Während der Wiederhoung die Reihenfolge zufällig mischen?",
     DISABLE_CLOZE_CARDS: "Lückentextkarten (cloze deletions) deaktivieren?",
+    MANY_CLOZE: "Combine all clozes into one card?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==Hervorgehobenen== Text in Lückentextkarten umwandeln?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "**Fettgedruckten** Text in Lückentextkarten umwandeln?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES:

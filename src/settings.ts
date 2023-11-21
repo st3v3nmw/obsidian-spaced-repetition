@@ -15,6 +15,7 @@ export interface SRSettings {
     flashcardHeightPercentage: number;
     flashcardWidthPercentage: number;
     randomizeCardOrder: boolean;
+    manyClozes: boolean;
     convertHighlightsToClozes: boolean;
     convertBoldTextToClozes: boolean;
     convertCurlyBracketsToClozes: boolean;
@@ -56,6 +57,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardHeightPercentage: Platform.isMobile ? 100 : 80,
     flashcardWidthPercentage: Platform.isMobile ? 100 : 40,
     randomizeCardOrder: true,
+    manyClozes: false,
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
     convertCurlyBracketsToClozes: false,
@@ -251,6 +253,15 @@ export class SRSettingTab extends PluginSettingTab {
                 }),
         );
 
+        new Setting(containerEl).setName(t("MANY_CLOZE")).addToggle((toggle) => 
+            toggle
+                .setValue(this.plugin.data.settings.manyClozes)
+                .onChange(async (value) => {
+                    this.plugin.data.settings.manyClozes = value;
+                    await this.plugin.savePluginData();
+                })
+        );
+    
         new Setting(containerEl).setName(t("CONVERT_HIGHLIGHTS_TO_CLOZES")).addToggle((toggle) =>
             toggle
                 .setValue(this.plugin.data.settings.convertHighlightsToClozes)
