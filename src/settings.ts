@@ -57,7 +57,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardHeightPercentage: Platform.isMobile ? 100 : 80,
     flashcardWidthPercentage: Platform.isMobile ? 100 : 40,
     randomizeCardOrder: true,
-    multilineCloze: false,
+    multilineCloze: true,
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
     convertCurlyBracketsToClozes: false,
