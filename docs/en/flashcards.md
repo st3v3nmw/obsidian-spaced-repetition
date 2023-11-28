@@ -73,7 +73,7 @@ Note: The behaviour is same as single line reversed.
 
 ### Cloze cards
 
-You can easily add cloze deletion cards using `==highlights==`, `**bolded text**`, or `{{text in curly braces}}`.
+You can easily add cloze deletion cards using `==highlights==`, `**bolded text**`, `{{text in curly braces}}`, or `{=([text in user defined tokens}=])`.
 
 These can be turned on or off in settings.
 

@@ -1,5 +1,6 @@
 import { CardType } from "./Question";
 import { SRSettings } from "./settings";
+import { escapeRegexString } from "./util/utils";
 
 export class CardFrontBack {
     front: string;
@@ -93,6 +94,18 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
         if (settings.convertCurlyBracketsToClozes) {
             siblings.push(...questionText.matchAll(/{{(.*?)}}/gm));
         }
+        if (settings.clozeOpeningToken !== "" && settings.clozeClosingToken !== "") {
+            siblings.push(
+                ...questionText.matchAll(
+                    new RegExp(
+                        `${escapeRegexString(settings.clozeOpeningToken)}.*?${escapeRegexString(
+                            settings.clozeClosingToken,
+                        )}`,
+                        "gm",
+                    ),
+                ),
+            );
+        }
         siblings.sort((a, b) => {
             if (a.index < b.index) {
                 return -1;
@@ -117,7 +130,9 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
                 .replace(/==/gm, "")
                 .replace(/\*\*/gm, "")
                 .replace(/{{/gm, "")
-                .replace(/}}/gm, "");
+                .replace(/}}/gm, "")
+                .replaceAll(settings.clozeOpeningToken, "")
+                .replaceAll(settings.clozeClosingToken, "");
             back =
                 questionText.substring(0, deletionStart) +
                 QuestionType_ClozeUtil.renderClozeBack(
@@ -128,7 +143,9 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
                 .replace(/==/gm, "")
                 .replace(/\*\*/gm, "")
                 .replace(/{{/gm, "")
-                .replace(/}}/gm, "");
+                .replace(/}}/gm, "")
+                .replaceAll(settings.clozeOpeningToken, "")
+                .replaceAll(settings.clozeClosingToken, "");
             result.push(new CardFrontBack(front, back));
         }
 

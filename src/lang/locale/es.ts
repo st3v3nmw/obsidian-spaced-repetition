@@ -89,6 +89,9 @@ export default {
     CONVERT_HIGHLIGHTS_TO_CLOZES: "¿Convertir ==resaltados== a deletreo de huecos?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "¿Convertir **texto en negrita** a deletreo de huecos?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "¿Convertir {{llaves rizadas}} a deletreo de huecos?",
+    CLOZE_OPENING_TOKEN: "Opening token for clozes",
+    CLOZE_CLOSING_TOKEN: "Closing token for clozes",
+    CLOZE_TOKEN_DISABLED: "(Disabled)",
     INLINE_CARDS_SEPARATOR: "Separador de tarjetas de memorización en línea",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Note que después de cambiar este ajuste, tendrá que cambiar manualmente todas las notas que tenga.",

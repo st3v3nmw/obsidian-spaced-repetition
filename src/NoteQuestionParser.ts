@@ -90,6 +90,8 @@ export class NoteQuestionParser {
             settings.convertHighlightsToClozes,
             settings.convertBoldTextToClozes,
             settings.convertCurlyBracketsToClozes,
+            settings.clozeOpeningToken,
+            settings.clozeClosingToken,
         );
         return result;
     }

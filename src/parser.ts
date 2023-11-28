@@ -1,4 +1,5 @@
 import { CardType } from "./Question";
+import { escapeRegexString } from "./util/utils";
 
 /**
  * Returns flashcards found in `text`
@@ -19,6 +20,8 @@ export function parse(
     convertHighlightsToClozes: boolean,
     convertBoldTextToClozes: boolean,
     convertCurlyBracketsToClozes: boolean,
+    clozeOpeningToken: string,
+    clozeClosingToken: string,
 ): [CardType, string, number][] {
     let cardText = "";
     const cards: [CardType, string, number][] = [];
@@ -67,7 +70,15 @@ export function parse(
             cardType === null &&
             ((convertHighlightsToClozes && /==.*?==/gm.test(currentLine)) ||
                 (convertBoldTextToClozes && /\*\*.*?\*\*/gm.test(currentLine)) ||
-                (convertCurlyBracketsToClozes && /{{.*?}}/gm.test(currentLine)))
+                (convertCurlyBracketsToClozes && /{{.*?}}/gm.test(currentLine)) ||
+                (clozeOpeningToken !== "" &&
+                    clozeClosingToken !== "" &&
+                    new RegExp(
+                        `${escapeRegexString(clozeOpeningToken)}.*?${escapeRegexString(
+                            clozeClosingToken,
+                        )}`,
+                        "gm",
+                    ).test(currentLine)))
         ) {
             cardType = CardType.Cloze;
             lineNo = i;
