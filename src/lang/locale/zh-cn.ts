@@ -80,6 +80,7 @@ export default {
     CARD_MODAL_WIDTH_PERCENT: "卡片宽度百分比",
     RANDOMIZE_CARD_ORDER: "复习时随机显示卡片？",
     DISABLE_CLOZE_CARDS: "不进行完形填空？",
+    MANY_CLOZE: "Combine all clozes into one card?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "将 ==高亮== 转换为完形填空？",
     CONVERT_BOLD_TEXT_TO_CLOZES: "将 **粗体** 转换为完形填空？",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "将 {{大括号}} 转换为完形填空？",

@@ -85,6 +85,7 @@ export default {
     CARD_MODAL_WIDTH_PERCENT: "Flashcard Width Percentage",
     RANDOMIZE_CARD_ORDER: "Randomize card order during review?",
     DISABLE_CLOZE_CARDS: "Disable cloze cards?",
+    MANY_CLOZE: "Combine all clozes into one card?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Convert ==hightlights== to clozes?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "Convert **bolded text** to clozes?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Convert {{curly brackets}} to clozes?",
