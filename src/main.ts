@@ -608,6 +608,7 @@ export default class SRPlugin extends Plugin {
         const dueString: string = due.format("YYYY-MM-DD");
 
         // check if scheduling info exists
+        console.log(`bug-review-note-corrupts-metadata-776: 2023-11-29`);
         console.log(`saveReviewResponse: H: ease: ${ease}, interval: ${interval}, dueString: ${dueString}`);
         console.log(`saveReviewResponse: H1: ${hexEncode(fileText.substring(0, 500))}`);
         if (SCHEDULING_INFO_REGEX.test(fileText)) {
