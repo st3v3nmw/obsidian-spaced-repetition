@@ -22,6 +22,7 @@ export class FlashcardEditModal extends Modal {
         this.titleEl.setText(t("EDIT_CARD"));
         this.titleEl.addClass("sr-centered");
         this.modalText = existingText;
+        this.input = existingText;
 
         this.waitForClose = new Promise<string>((resolve, reject) => {
             this.resolvePromise = resolve;
@@ -68,7 +69,6 @@ export class FlashcardEditModal extends Modal {
         textComponent.inputEl.style.width = "100%";
         textComponent
             .setValue(value ?? "")
-            .onChange((value) => (this.input = value))
             .inputEl.addEventListener("keydown", this.submitEnterCallback);
 
         return textComponent;
@@ -86,7 +86,7 @@ export class FlashcardEditModal extends Modal {
 
     private submit() {
         this.didSubmit = true;
-
+        this.input = this.inputComponent.getValue();
         this.close();
     }
 
