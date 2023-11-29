@@ -119,7 +119,6 @@ export class Deck {
 
     getCard(index: number, cardListType: CardListType): Card {
         const cardList: Card[] = this.getCardListForCardType(cardListType);
-        console.log(`getCard: index: ${index}, length: ${cardList.length}`);
         return cardList[index];
     }
 

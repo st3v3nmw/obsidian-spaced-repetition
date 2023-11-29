@@ -54,10 +54,7 @@ class SingleDeckIterator {
 
     get currentCard(): Card {
         let result: Card = null;
-        console.log(`currentCard: A: cardIdx: ${this.cardIdx}, cardListType: ${this.cardListType}`);
-        if (this.cardIdx != null)
-            result = this.deck.getCard(this.cardIdx, this.cardListType);
-        console.log(`currentCard: B: ${result}`);
+        if (this.cardIdx != null) result = this.deck.getCard(this.cardIdx, this.cardListType);
         return result;
     }
 
@@ -70,7 +67,6 @@ class SingleDeckIterator {
     }
 
     setDeck(deck: Deck): void {
-        console.log(`setDeck: ${deck?.deckName}`);
         this.deck = deck;
         this.setCardListType(null);
     }
@@ -85,11 +81,10 @@ class SingleDeckIterator {
             cardListType = CardListType.DueCard;
             index = cardIndex - this.deck.newFlashcards.length;
         }
-        this.setCardListType(cardListType, cardIndex);
+        this.setCardListType(cardListType, index);
     }
 
     private setCardListType(cardListType?: CardListType, cardIdx: number = null): void {
-        console.log(`setCardListType: cardListType ${cardListType}, cardIdx: ${cardIdx}`);
         this.cardListType = cardListType;
         this.cardIdx = cardIdx;
     }
@@ -238,11 +233,9 @@ export class DeckTreeIterator implements IDeckTreeIterator {
     }
 
     get currentCard(): Card {
-        console.log(`currentCard: A: deckIdx ${this.deckIdx}, hasCurrentCard: ${this.singleDeckIterator?.hasCurrentCard}`);
         let result: Card = null;
         if (this.deckIdx != null && this.singleDeckIterator.hasCurrentCard)
             result = this.singleDeckIterator.currentCard;
-        console.log(`currentCard: B: result ${result}`);
         return result;
     }
 
@@ -283,7 +276,6 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         let result: boolean = false;
 
         // Delete the current card so we don't return it again
-        console.log(`nextCard: A: hasCurrentCard: ${this.hasCurrentCard}`);
         if (this.hasCurrentCard) {
             this.singleDeckIterator.deleteCurrentCard();
         }
@@ -307,7 +299,6 @@ export class DeckTreeIterator implements IDeckTreeIterator {
             }
         }
         if (!result) this.deckIdx = null;
-        console.log(`nextCard: Z: result: ${result}, hasCurrentCard: ${this.hasCurrentCard}`);
         return result;
     }
 
@@ -347,11 +338,9 @@ export class DeckTreeIterator implements IDeckTreeIterator {
                 weights[i] = cardCount;
             }
         }
-        console.log(`nextCard_EveryCardRandomDeck: A: weights.length ${Object.keys(weights).length}`);
         if (Object.keys(weights).length == 0) return false;
 
         let [deckIdx, cardIdx] = this.weightedRandomNumber.getRandomValues(weights);
-        console.log(`nextCard_EveryCardRandomDeck: B: deckIdx ${deckIdx}, cardIdx ${cardIdx}`);
         this.setDeckIdx(deckIdx);
         this.singleDeckIterator.setNewOrDueCardIdx(cardIdx);
         return true;
