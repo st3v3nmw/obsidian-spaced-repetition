@@ -684,7 +684,7 @@ $$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$`;
         });
     });
 
-    describe.only("Checking leading/trailing spaces", () => {
+    describe("Checking leading/trailing spaces", () => {
 
         test("Leading spaces are retained post review", async () => {
             // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/800
@@ -708,9 +708,9 @@ ${indent}- bar?::baz
 
             expect(c.reviewSequencer.currentCard.front).toMatch(`${indent}- bar?`);
 
-            // After reviewing, check the text
+            // After reviewing, check the text (explicitly text includes the whitespace before "- bar?::baz"at)
             await c.reviewSequencer.processReview(ReviewResponse.Easy);
-            const expectedText: string = `{text}\nHello`;
+            const expectedText: string = `${text}<!--SR:!2023-09-10,4,270-->\n`;
             expect(await c.file.read()).toEqual(expectedText);
 
         });

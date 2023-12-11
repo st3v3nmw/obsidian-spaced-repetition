@@ -13,7 +13,7 @@ describe("Question", () => {
                 "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```";
 
             let question: Question = new Question({
-                questionText: new QuestionText(text, TopicPath.emptyPath, "", text),
+                questionText: new QuestionText(text, null, text),
             });
 
             expect(question.getHtmlCommentSeparator(DEFAULT_SETTINGS)).toEqual("\n");
@@ -24,7 +24,7 @@ describe("Question", () => {
             let text: string = "Q1::A1";
 
             let question: Question = new Question({
-                questionText: new QuestionText(text, TopicPath.emptyPath, "", text),
+                questionText: new QuestionText(text, null, text),
             });
 
             expect(question.getHtmlCommentSeparator(DEFAULT_SETTINGS)).toEqual("\n");

@@ -87,50 +87,6 @@ describe("getTopicPathFromCardText", () => {
     });
 });
 
-describe("removeTopicPathFromCardText", () => {
-    test("Card text doesn't include tag", () => {
-        let cardText: string = "Card text doesn't include tag";
-        let expectedCardText: string = cardText;
-        let [actualQuestion, whiteSpace] = TopicPath.removeTopicPathFromStartOfCardText(cardText);
-
-        expect(actualQuestion).toEqual(expectedCardText);
-        expect(whiteSpace).toEqual("");
-    });
-
-    test("Card text includes single level tag", () => {
-        let cardText: string = "#flashcards Card text does include tag";
-        let [actualQuestion, whiteSpace] = TopicPath.removeTopicPathFromStartOfCardText(cardText);
-
-        expect(actualQuestion).toEqual("Card text does include tag");
-        expect(whiteSpace).toEqual(" ");
-    });
-
-    test("Card text includes multi level tag", () => {
-        let cardText: string = "#flashcards/science/chemistry Card text does include tag";
-        let [actualQuestion, whiteSpace] = TopicPath.removeTopicPathFromStartOfCardText(cardText);
-
-        expect(actualQuestion).toEqual("Card text does include tag");
-        expect(whiteSpace).toEqual(" ");
-    });
-
-    test("White space present before topic tag", () => {
-        let cardText: string = "   #flashcards/science/chemistry Card text does include tag";
-        let [actualQuestion, whiteSpace] = TopicPath.removeTopicPathFromStartOfCardText(cardText);
-
-        expect(actualQuestion).toEqual("Card text does include tag");
-        expect(whiteSpace).toEqual(" ");
-    });
-
-    test("Multiple spaces after topic tag", () => {
-        let spaces: string = "    ";
-        let cardText: string = `#flashcards/science/chemistry${spaces}Card text does include tag`;
-        let [actualQuestion, whiteSpace] = TopicPath.removeTopicPathFromStartOfCardText(cardText);
-
-        expect(actualQuestion).toEqual("Card text does include tag");
-        expect(whiteSpace).toEqual(spaces);
-    });
-});
-
 describe("getTopicPathFromTag", () => {
     test("Null string", () => {
         const t = () => {
