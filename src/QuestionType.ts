@@ -139,14 +139,10 @@ export class QuestionType_ClozeUtil {
 
     static removeClozeTokens(text: string, settings: SRSettings): string {
         let result: string = text;
-        if (settings.convertHighlightsToClozes)
-            result = result.replace(/==/gm, "");
-        if (settings.convertBoldTextToClozes)
-            result = result.replace(/\*\*/gm, "");
+        if (settings.convertHighlightsToClozes) result = result.replace(/==/gm, "");
+        if (settings.convertBoldTextToClozes) result = result.replace(/\*\*/gm, "");
         if (settings.convertCurlyBracketsToClozes) {
-            result = result
-                .replace(/{{/gm, "")
-                .replace(/}}/gm, "");
+            result = result.replace(/{{/gm, "").replace(/}}/gm, "");
         }
         return result;
     }
