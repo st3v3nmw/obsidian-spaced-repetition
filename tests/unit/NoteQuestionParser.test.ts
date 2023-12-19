@@ -47,7 +47,7 @@ A::B
                 topicPath: TopicPath.emptyPath,
                 questionText: {
                     original: `A::B`,
-                    actualQuestion: "A::B"
+                    actualQuestion: "A::B",
                 },
 
                 lineNo: 1,

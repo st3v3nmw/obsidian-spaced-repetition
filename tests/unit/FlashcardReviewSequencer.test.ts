@@ -56,9 +56,9 @@ class TestContext {
             IteratorDeckSource.UpdatedByIterator,
         );
         let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(
-                        this.reviewMode,
+            this.reviewMode,
             cardSequencer,
-this.settings,
+            this.settings,
             this.cardScheduleCalculator,
             this.questionPostponementList,
         );
@@ -685,13 +685,12 @@ $$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$`;
     });
 
     describe("Checking leading/trailing spaces", () => {
-
         test("Leading spaces are retained post review", async () => {
             // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/800
             let settings: SRSettings = { ...DEFAULT_SETTINGS };
             settings.burySiblingCards = true;
             let indent: string = "    ";
-            
+
             // Note that "- bar?::baz" is intentionally indented
             let text: string = `
 - foo
@@ -712,10 +711,9 @@ ${indent}- bar?::baz
             await c.reviewSequencer.processReview(ReviewResponse.Easy);
             const expectedText: string = `${text}<!--SR:!2023-09-10,4,270-->\n`;
             expect(await c.file.read()).toEqual(expectedText);
-
         });
     });
-    
+
     describe("FlashcardReviewMode.Cram", () => {
         describe("ReviewResponse.Easy", () => {
             test("Next card after reviewed card becomes current; reviewed easy card doesn't resurface", async () => {
