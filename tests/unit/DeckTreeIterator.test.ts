@@ -20,7 +20,7 @@ import {
     setupStaticRandomNumberProvider,
 } from "src/util/RandomNumberProvider";
 
-export var order_DueFirst_Sequential: IIteratorOrder = {
+let order_DueFirst_Sequential: IIteratorOrder = {
     cardOrder: CardOrder.DueFirstSequential,
     deckOrder: DeckOrder.PrevDeckComplete_Sequential,
 };
@@ -472,6 +472,7 @@ describe("nextCard", () => {
             iterator.setDeck(deck);
 
             // New root deck's cards first Q1/Q3, then due cards - Q2
+            setupNextRandomNumber({ lower: 0, upper: 3, next: 0 });
             nextCardThenCheck("Q1");
             nextCardThenCheck("Q3");
             nextCardThenCheck("Q2");
