@@ -308,7 +308,7 @@ export default class SRPlugin extends Plugin {
         if (cardOrder === undefined) cardOrder = CardOrder.DueFirstSequential;
         let deckOrder: DeckOrder = DeckOrder[settings.flashcardDeckOrder as keyof typeof DeckOrder];
         if (deckOrder === undefined) deckOrder = DeckOrder.PrevDeckComplete_Sequential;
-        console.log(`createDeckTreeIterator: ${cardOrder}, ${deckOrder}`);
+        console.log(`createDeckTreeIterator: CardOrder: ${cardOrder}, DeckOrder: ${deckOrder}`);
 
         const iteratorOrder: IIteratorOrder = {
             deckOrder,

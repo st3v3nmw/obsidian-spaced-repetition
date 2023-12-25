@@ -213,8 +213,6 @@ class SingleDeckIterator {
 }
 
 export class DeckTreeIterator implements IDeckTreeIterator {
-    private deckTree: Deck;
-    private preferredCardListType: CardListType;
     private iteratorOrder: IIteratorOrder;
     private deckSource: IteratorDeckSource;
 
@@ -250,7 +248,6 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         // We don't want to change the supplied deck, so first clone
         if (this.deckSource == IteratorDeckSource.CloneBeforeUse) deck = deck.clone();
 
-        this.deckTree = deck;
         this.deckArray = DeckTreeIterator.filterForDecksWithCards(deck.toDeckArray());
         this.setDeckIdx(null);
     }
@@ -283,29 +280,27 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         if (this.iteratorOrder.cardOrder == CardOrder.EveryCardRandomDeckAndCard) {
             result = this.nextCard_EveryCardRandomDeck();
         } else {
-            // If we are just starting, then we want to start from the first deck
+            // If we are just starting, then depending on settings we want to either start from the first deck,
+            // or a random deck
             if (this.deckIdx == null) {
-                this.setDeckIdx(0);
+                this.chooseNextDeck(true);
             }
             while (this.deckIdx < this.deckArray.length) {
                 if (this.singleDeckIterator.nextCard()) {
                     result = true;
                     break;
                 }
-                this.chooseNextDeck();
-                if (this.deckIdx < this.deckArray.length) {
-                    this.singleDeckIterator.setDeck(this.deckArray[this.deckIdx]);
-                }
+                this.chooseNextDeck(false);
             }
         }
         if (!result) this.deckIdx = null;
         return result;
     }
 
-    private chooseNextDeck(): void {
+    private chooseNextDeck(firstTime: boolean): void {
         switch (this.iteratorOrder.deckOrder) {
             case DeckOrder.PrevDeckComplete_Sequential:
-                this.deckIdx++;
+                this.deckIdx = firstTime ? 0 : this.deckIdx + 1;
                 break;
 
             case DeckOrder.PrevDeckComplete_Random:
@@ -326,6 +321,9 @@ export class DeckTreeIterator implements IDeckTreeIterator {
                     this.deckIdx = this.deckArray.length;
                 }
                 break;
+        }
+        if (this.deckIdx < this.deckArray.length) {
+            this.singleDeckIterator.setDeck(this.deckArray[this.deckIdx]);
         }
     }
 
@@ -348,13 +346,11 @@ export class DeckTreeIterator implements IDeckTreeIterator {
 
     deleteCurrentQuestion(): boolean {
         this.singleDeckIterator.deleteCurrentQuestion();
-        this.removeCurrentDeckIfEmpty();
         return this.nextCard();
     }
 
     deleteCurrentCard(): boolean {
         this.singleDeckIterator.deleteCurrentCard();
-        this.removeCurrentDeckIfEmpty();
         return this.nextCard();
     }
 
