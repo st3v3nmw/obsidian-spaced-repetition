@@ -5,9 +5,10 @@ export class CardFrontBack {
     front: string;
     back: string;
 
+    // The caller is responsible for any required trimming of leading/trailing spaces
     constructor(front: string, back: string) {
-        this.front = front.trim();
-        this.back = back.trim();
+        this.front = front;
+        this.back = back;
     }
 }
 

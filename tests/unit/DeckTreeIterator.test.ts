@@ -42,9 +42,9 @@ beforeAll(() => {
 describe("setDeck", () => {
     test("currentDeck null immediately after setDeck", async () => {
         let text: string = `
-        Q1::A1
-        Q2::A2
-        Q3::A3`;
+Q1::A1
+Q2::A2
+Q3::A3`;
         let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
         let iterator: DeckTreeIterator = new DeckTreeIterator(
             order_NewFirst_Sequential,
@@ -60,9 +60,9 @@ describe("nextCard", () => {
         describe("Due cards before new cards", () => {
             test("Single topic, new cards only", async () => {
                 let text: string = `
-                Q1::A1
-                Q2::A2
-                Q3::A3`;
+Q1::A1
+Q2::A2
+Q3::A3`;
                 let deck: Deck = await SampleItemDecks.createDeckFromText(
                     text,
                     new TopicPath(["Root"]),
@@ -90,12 +90,12 @@ describe("nextCard", () => {
             describe("Single topic, mixture of new and scheduled cards", () => {
                 test("Get the scheduled cards first", async () => {
                     let text: string = `
-                    Q1::A1
-                    Q2::A2 <!--SR:!2023-09-02,4,270-->
-                    Q3::A3
-                    Q4::A4 <!--SR:!2023-09-02,4,270-->
-                    Q5::A5 <!--SR:!2023-09-02,4,270-->
-                    Q6::A6`;
+Q1::A1
+Q2::A2 <!--SR:!2023-09-02,4,270-->
+Q3::A3
+Q4::A4 <!--SR:!2023-09-02,4,270-->
+Q5::A5 <!--SR:!2023-09-02,4,270-->
+Q6::A6`;
                     let deck: Deck = await SampleItemDecks.createDeckFromText(
                         text,
                         new TopicPath(["Root"]),
@@ -173,9 +173,9 @@ describe("nextCard", () => {
         describe("New cards before due cards", () => {
             test("Single topic, new cards only", async () => {
                 let text: string = `
-                Q1::A1
-                Q2::A2
-                Q3::A3`;
+Q1::A1
+Q2::A2
+Q3::A3`;
                 let deck: Deck = await SampleItemDecks.createDeckFromText(
                     text,
                     new TopicPath(["Root"]),
@@ -202,12 +202,12 @@ describe("nextCard", () => {
             describe("Single topic, mixture of new and scheduled cards", () => {
                 test("Get the new cards first", async () => {
                     let text: string = `
-                    Q1::A1
-                    Q2::A2 <!--SR:!2023-09-02,4,270-->
-                    Q3::A3
-                    Q4::A4 <!--SR:!2023-09-02,4,270-->
-                    Q5::A5 <!--SR:!2023-09-02,4,270-->
-                    Q6::A6`;
+Q1::A1
+Q2::A2 <!--SR:!2023-09-02,4,270-->
+Q3::A3
+Q4::A4 <!--SR:!2023-09-02,4,270-->
+Q5::A5 <!--SR:!2023-09-02,4,270-->
+Q6::A6`;
                     let deck: Deck = await SampleItemDecks.createDeckFromText(
                         text,
                         new TopicPath(["Root"]),
@@ -234,12 +234,12 @@ describe("nextCard", () => {
 
                 test("Get the scheduled cards first", async () => {
                     let text: string = `
-                    Q1::A1
-                    Q2::A2 <!--SR:!2023-09-02,4,270-->
-                    Q3::A3
-                    Q4::A4 <!--SR:!2023-09-02,4,270-->
-                    Q5::A5 <!--SR:!2023-09-02,4,270-->
-                    Q6::A6`;
+Q1::A1
+Q2::A2 <!--SR:!2023-09-02,4,270-->
+Q3::A3
+Q4::A4 <!--SR:!2023-09-02,4,270-->
+Q5::A5 <!--SR:!2023-09-02,4,270-->
+Q6::A6`;
                     let deck: Deck = await SampleItemDecks.createDeckFromText(
                         text,
                         new TopicPath(["Root"]),
@@ -317,13 +317,13 @@ describe("nextCard", () => {
         describe("Due cards before new cards", () => {
             test("All new cards", async () => {
                 let text: string = `
-                Q0::A0
-                Q1::A1
-                Q2::A2
-                Q3::A3
-                Q4::A4
-                Q5::A5
-                Q6::A6`;
+Q0::A0
+Q1::A1
+Q2::A2
+Q3::A3
+Q4::A4
+Q5::A5
+Q6::A6`;
                 let deck: Deck = await SampleItemDecks.createDeckFromText(
                     text,
                     new TopicPath(["Root"]),
@@ -362,14 +362,14 @@ describe("nextCard", () => {
 
             test("Mixture new/scheduled", async () => {
                 let text: string = `
-                QN0::A
-                QS0::A <!--SR:!2023-09-02,4,270-->
-                QN1::A
-                QS1::A <!--SR:!2023-09-02,4,270-->
-                QS2::A <!--SR:!2023-09-02,4,270-->
-                QN2::A
-                QN3::A
-                QS3::Q <!--SR:!2023-09-02,4,270-->`;
+QN0::A
+QS0::A <!--SR:!2023-09-02,4,270-->
+QN1::A
+QS1::A <!--SR:!2023-09-02,4,270-->
+QS2::A <!--SR:!2023-09-02,4,270-->
+QN2::A
+QN3::A
+QS3::Q <!--SR:!2023-09-02,4,270-->`;
                 let deck: Deck = await SampleItemDecks.createDeckFromText(
                     text,
                     new TopicPath(["Root"]),

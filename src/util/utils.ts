@@ -95,3 +95,10 @@ export function getAllTagsFromText(text: string): string[] {
 export function splitTextIntoLineArray(text: string): string[] {
     return text.replaceAll("\r\n", "\n").split("\n");
 }
+
+export function stringTrimStart(str: string): [string, string] {
+    const trimmed: string = str.trimStart();
+    const wsCount: number = str.length - trimmed.length;
+    const ws: string = str.substring(0, wsCount);
+    return [ws, trimmed];
+}
