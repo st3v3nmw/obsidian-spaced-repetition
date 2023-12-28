@@ -48,7 +48,6 @@ A::B
                 questionText: {
                     original: `A::B`,
                     actualQuestion: "A::B",
-                    topicPath: TopicPath.emptyPath,
                 },
 
                 lineNo: 1,
@@ -88,7 +87,6 @@ A::B
                     original: `A::B
 <!--SR:!2023-09-03,1,230-->`,
                     actualQuestion: "A::B",
-                    topicPath: TopicPath.emptyPath,
                     textHash: "1c6b0b01215dc4",
                 },
                 lineNo: 1,

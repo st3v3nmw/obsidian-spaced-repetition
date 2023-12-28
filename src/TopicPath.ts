@@ -1,6 +1,7 @@
 import { SRSettings } from "src/settings";
 import { OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "./constants";
 import { ISRFile } from "./SRFile";
+import { stringTrimStart } from "./util/utils";
 
 export class TopicPath {
     path: string[];
@@ -80,16 +81,6 @@ export class TopicPath {
         return path?.length > 0 ? TopicPath.getTopicPathFromTag(path) : null;
     }
 
-    static removeTopicPathFromStartOfCardText(cardText: string): [string, string] {
-        const cardText1: string = cardText
-            .trimStart()
-            .replaceAll(OBSIDIAN_TAG_AT_STARTOFLINE_REGEX, "");
-        const cardText2: string = cardText1.trimStart();
-        const whiteSpaceLength: number = cardText1.length - cardText2.length;
-        const whiteSpace: string = cardText1.substring(0, whiteSpaceLength);
-        return [cardText2, whiteSpace];
-    }
-
     static getTopicPathsFromTagList(tagList: string[]): TopicPath[] {
         const result: TopicPath[] = [];
         for (const tag of tagList) {
@@ -116,5 +107,27 @@ export class TopicPath {
             .split("/")
             .filter((str) => str);
         return new TopicPath(path);
+    }
+}
+
+export class TopicPathWithWs {
+    topicPath: TopicPath;
+
+    // The white space prior to the topic path
+    // We keep this so that when a question is updated, we can retain the original spacing
+    preWhitespace: string;
+
+    postWhitespace: string;
+
+    constructor(topicPath: TopicPath, preWhitespace: string, postWhitespace: string) {
+        if (!topicPath || topicPath.isEmptyPath) throw "topicPath null";
+
+        this.topicPath = topicPath;
+        this.preWhitespace = preWhitespace;
+        this.postWhitespace = postWhitespace;
+    }
+
+    formatWithWs(): string {
+        return `${this.preWhitespace}${this.topicPath.formatAsTag()}${this.postWhitespace}`;
     }
 }

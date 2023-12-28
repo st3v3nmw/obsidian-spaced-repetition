@@ -195,9 +195,9 @@ describe("copyWithCardFilter()", () => {
 
         test("With new cards", async () => {
             let text: string = `
-            Q1::A1
-            Q2::A2
-            Q3::A3`;
+Q1::A1
+Q2::A2
+Q3::A3`;
             let original: Deck = await SampleItemDecks.createDeckFromText(
                 text,
                 new TopicPath(["Root"]),
@@ -210,9 +210,9 @@ describe("copyWithCardFilter()", () => {
 
         test("With scheduled cards", async () => {
             let text: string = `
-            Q1::A1 <!--SR:!2023-09-02,4,270-->
-            Q2::A2 <!--SR:!2023-09-02,4,270-->
-            Q3::A3 <!--SR:!2023-09-02,4,270-->`;
+Q1::A1 <!--SR:!2023-09-02,4,270-->
+Q2::A2 <!--SR:!2023-09-02,4,270-->
+Q3::A3 <!--SR:!2023-09-02,4,270-->`;
             let original: Deck = await SampleItemDecks.createDeckFromText(
                 text,
                 new TopicPath(["Root"]),
