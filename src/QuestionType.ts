@@ -114,22 +114,14 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
                 questionText.substring(0, deletionStart) +
                 QuestionType_ClozeUtil.renderClozeFront() +
                 questionText.substring(deletionEnd);
-            front = front
-                .replace(/==/gm, "")
-                .replace(/\*\*/gm, "")
-                .replace(/{{/gm, "")
-                .replace(/}}/gm, "");
+            front = QuestionType_ClozeUtil.removeClozeTokens(front, settings);
             back =
                 questionText.substring(0, deletionStart) +
                 QuestionType_ClozeUtil.renderClozeBack(
                     questionText.substring(deletionStart, deletionEnd),
                 ) +
                 questionText.substring(deletionEnd);
-            back = back
-                .replace(/==/gm, "")
-                .replace(/\*\*/gm, "")
-                .replace(/{{/gm, "")
-                .replace(/}}/gm, "");
+            back = QuestionType_ClozeUtil.removeClozeTokens(back, settings);
             result.push(new CardFrontBack(front, back));
         }
 
@@ -144,6 +136,16 @@ export class QuestionType_ClozeUtil {
 
     static renderClozeBack(str: string): string {
         return "<span style='color:#2196f3'>" + str + "</span>";
+    }
+
+    static removeClozeTokens(text: string, settings: SRSettings): string {
+        let result: string = text;
+        if (settings.convertHighlightsToClozes) result = result.replace(/==/gm, "");
+        if (settings.convertBoldTextToClozes) result = result.replace(/\*\*/gm, "");
+        if (settings.convertCurlyBracketsToClozes) {
+            result = result.replace(/{{/gm, "").replace(/}}/gm, "");
+        }
+        return result;
     }
 }
 
