@@ -642,13 +642,12 @@ export default class SRPlugin extends Plugin {
 
         // Update note's due date across all decks and sort them to reflect the change.
         Object.values(this.reviewDecks).forEach((reviewDeck: ReviewDeck) => {
-            const scheduledNote: SchedNote | undefined = reviewDeck.scheduledNotes.find(
-                (scheduleNote: SchedNote) => scheduleNote.note.path === note.path,
-            );
-            if (scheduledNote) {
-                scheduledNote.dueUnix = due.valueOf();
-                reviewDeck.sortNotes(this.pageranks);
-            }
+            reviewDeck.scheduledNotes.forEach((scheduledNote: SchedNote) => {
+                if (scheduledNote.note.path === note.path) {
+                    scheduledNote.dueUnix = due.valueOf();
+                    reviewDeck.sortNotes(this.pageranks);
+                }
+            });
         });
 
         new Notice(t("RESPONSE_RECEIVED"));
