@@ -506,6 +506,7 @@ export default class SRPlugin extends Plugin {
     }
 
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
+        console.log("saveReviewResponse: Enter");
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         const frontmatter: FrontMatterCache | Record<string, unknown> =
             fileCachedData.frontmatter || {};
@@ -513,6 +514,7 @@ export default class SRPlugin extends Plugin {
         const tags = getAllTags(fileCachedData) || [];
         if (this.data.settings.noteFoldersToIgnore.some((folder) => note.path.startsWith(folder))) {
             new Notice(t("NOTE_IN_IGNORED_FOLDER"));
+            console.log("saveReviewResponse: NOTE_IN_IGNORED_FOLDER");
             return;
         }
 
@@ -529,10 +531,12 @@ export default class SRPlugin extends Plugin {
         }
 
         if (shouldIgnore) {
+            console.log("saveReviewResponse: PLEASE_TAG_NOTE");
             new Notice(t("PLEASE_TAG_NOTE"));
             return;
         }
 
+        console.log("saveReviewResponse: A");
         let fileText: string = await this.app.vault.read(note);
         let ease: number, interval: number, delayBeforeReview: number;
         const now: number = Date.now();
@@ -544,6 +548,7 @@ export default class SRPlugin extends Plugin {
                 Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
             )
         ) {
+            console.log("saveReviewResponse: B");
             let linkTotal = 0,
                 linkPGTotal = 0,
                 totalLinkCount = 0;
@@ -556,6 +561,7 @@ export default class SRPlugin extends Plugin {
                     totalLinkCount += statObj.linkCount;
                 }
             }
+            console.log("saveReviewResponse: C");
 
             const outgoingLinks = this.app.metadataCache.resolvedLinks[note.path] || {};
             for (const linkedFilePath in outgoingLinks) {
@@ -567,6 +573,7 @@ export default class SRPlugin extends Plugin {
                     totalLinkCount += outgoingLinks[linkedFilePath];
                 }
             }
+            console.log("saveReviewResponse: D");
 
             const linkContribution: number =
                 this.data.settings.maxLinkFactor *
@@ -583,7 +590,9 @@ export default class SRPlugin extends Plugin {
             ease = Math.round(ease);
             interval = 1.0;
             delayBeforeReview = 0;
+            console.log("saveReviewResponse: E");
         } else {
+            console.log("saveReviewResponse: P");
             interval = frontmatter["sr-interval"];
             ease = frontmatter["sr-ease"];
             delayBeforeReview =
@@ -592,6 +601,7 @@ export default class SRPlugin extends Plugin {
                     .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
                     .valueOf();
         }
+        console.log("saveReviewResponse: Q");
 
         const schedObj: Record<string, number> = schedule(
             response,
@@ -616,6 +626,7 @@ export default class SRPlugin extends Plugin {
                     `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
                     `${schedulingInfo[5]}---`,
             );
+            console.log("saveReviewResponse: R");
         } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
             // new note with existing YAML front matter
             const existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
@@ -629,6 +640,7 @@ export default class SRPlugin extends Plugin {
                 `---\nsr-due: ${dueString}\nsr-interval: ${interval}\n` +
                 `sr-ease: ${ease}\n---\n\n${fileText}`;
         }
+        console.log("saveReviewResponse: S");
 
         if (this.data.settings.burySiblingCards) {
             const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(note));
@@ -636,43 +648,70 @@ export default class SRPlugin extends Plugin {
             for (const question of noteX.questionList) {
                 this.data.buryList.push(question.questionText.textHash);
             }
+            console.log("saveReviewResponse: T");
             await this.savePluginData();
         }
+        console.log("saveReviewResponse: U");
         await this.app.vault.modify(note, fileText);
+        console.log("saveReviewResponse: V");
 
         new Notice(t("RESPONSE_RECEIVED"));
 
         await this.sync();
+        console.log("saveReviewResponse: W");
         if (this.data.settings.autoNextNote) {
+            console.log("saveReviewResponse: X");
+            if (!this.lastSelectedReviewDeck) {
+                console.log("saveReviewResponse: Y");
+                const reviewDeckKeys: string[] = Object.keys(this.reviewDecks);
+                console.log(`saveReviewResponse: reviewDeckKeys: ${reviewDeckKeys.join("|")}`);
+                if (reviewDeckKeys) this.lastSelectedReviewDeck = reviewDeckKeys[0];
+                else {
+                    console.log("saveReviewResponse: ALL_CAUGHT_UP");
+                    new Notice(t("ALL_CAUGHT_UP"));
+                    return;
+                }
+            }
             this.reviewNextNote(this.lastSelectedReviewDeck);
         }
     }
 
     async reviewNextNoteModal(): Promise<void> {
-        const reviewDeckNames: string[] = Object.keys(this.reviewDecks);
-        if (reviewDeckNames.length === 1) {
-            this.reviewNextNote(reviewDeckNames[0]);
+        const reviewDeckKeys: string[] = Object.keys(this.reviewDecks);
+        console.log(`reviewNextNoteModal: Enter: reviewDeckNames.length: ${reviewDeckKeys.length}`);
+        console.log(`reviewNextNoteModal: reviewDeckNames: ${reviewDeckKeys.join("|")}`);
+
+        if (reviewDeckKeys.length === 1) {
+            console.log("reviewNextNoteModal: A");
+            this.reviewNextNote(reviewDeckKeys[0]);
         } else {
-            const deckSelectionModal = new ReviewDeckSelectionModal(this.app, reviewDeckNames);
+            console.log("reviewNextNoteModal: B");
+            const deckSelectionModal = new ReviewDeckSelectionModal(this.app, reviewDeckKeys);
             deckSelectionModal.submitCallback = (deckKey: string) => this.reviewNextNote(deckKey);
             deckSelectionModal.open();
         }
     }
 
     async reviewNextNote(deckKey: string): Promise<void> {
+        console.log(`reviewNextNote: deckKey: ${deckKey}`);
+        const reviewDeckNames: string[] = Object.keys(this.reviewDecks);
+        console.log(`reviewNextNote: reviewDeckNames: ${reviewDeckNames.join("|")}`);
         if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, deckKey)) {
             new Notice(t("NO_DECK_EXISTS", { deckName: deckKey }));
+            console.log("reviewNextNote: NO_DECK_EXISTS");
             return;
         }
 
         this.lastSelectedReviewDeck = deckKey;
         const deck = this.reviewDecks[deckKey];
 
+        console.log(`reviewNextNote: deckKey: ${deckKey}, deck.dueNotesCount: ${deck.dueNotesCount}`);
         if (deck.dueNotesCount > 0) {
             const index = this.data.settings.openRandomNote
                 ? Math.floor(Math.random() * deck.dueNotesCount)
                 : 0;
-            await this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
+                console.log(`reviewNextNote: DueNote: Index: ${index}, filename: ${deck.scheduledNotes[index].note.path}`);
+                await this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
             return;
         }
 
@@ -680,10 +719,12 @@ export default class SRPlugin extends Plugin {
             const index = this.data.settings.openRandomNote
                 ? Math.floor(Math.random() * deck.newNotes.length)
                 : 0;
+                console.log(`reviewNextNote: NewNote: Index: ${index}, filename: ${deck.newNotes[index].path}`);
             this.app.workspace.getLeaf().openFile(deck.newNotes[index]);
             return;
         }
 
+        console.log("reviewNextNote: ALL_CAUGHT_UP");
         new Notice(t("ALL_CAUGHT_UP"));
     }
 
