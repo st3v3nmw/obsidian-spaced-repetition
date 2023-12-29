@@ -638,11 +638,21 @@ export default class SRPlugin extends Plugin {
             }
             await this.savePluginData();
         }
+
         await this.app.vault.modify(note, fileText);
+
+        Object.values(this.reviewDecks).forEach((reviewDeck: ReviewDeck) => {
+            const scheduledNote: SchedNote | undefined = reviewDeck.scheduledNotes.find(
+                (scheduleNote: SchedNote) => scheduleNote.note.path === note.path
+            );
+            if (scheduledNote) {
+                scheduledNote.dueUnix = due.valueOf();
+                reviewDeck.sortNotes(this.pageranks);
+            }
+        });
 
         new Notice(t("RESPONSE_RECEIVED"));
 
-        await this.sync();
         if (this.data.settings.autoNextNote) {
             this.reviewNextNote(this.lastSelectedReviewDeck);
         }
