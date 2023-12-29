@@ -638,9 +638,10 @@ export default class SRPlugin extends Plugin {
             }
             await this.savePluginData();
         }
-
         await this.app.vault.modify(note, fileText);
 
+
+        // Update note's due date across all decks and sort them to reflect the change.
         Object.values(this.reviewDecks).forEach((reviewDeck: ReviewDeck) => {
             const scheduledNote: SchedNote | undefined = reviewDeck.scheduledNotes.find(
                 (scheduleNote: SchedNote) => scheduleNote.note.path === note.path
