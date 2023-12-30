@@ -657,19 +657,18 @@ export default class SRPlugin extends Plugin {
     }
 
     async reviewNextNoteModal(): Promise<void> {
-        const reviewDeckKeys: string[] = Object.keys(this.reviewDecks);
+        const reviewDeckNames: string[] = Object.keys(this.reviewDecks);
 
-        if (reviewDeckKeys.length === 1) {
-            this.reviewNextNote(reviewDeckKeys[0]);
+        if (reviewDeckNames.length === 1) {
+            this.reviewNextNote(reviewDeckNames[0]);
         } else {
-            const deckSelectionModal = new ReviewDeckSelectionModal(this.app, reviewDeckKeys);
+            const deckSelectionModal = new ReviewDeckSelectionModal(this.app, reviewDeckNames);
             deckSelectionModal.submitCallback = (deckKey: string) => this.reviewNextNote(deckKey);
             deckSelectionModal.open();
         }
     }
 
     async reviewNextNote(deckKey: string): Promise<void> {
-        const reviewDeckNames: string[] = Object.keys(this.reviewDecks);
         if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, deckKey)) {
             new Notice(t("NO_DECK_EXISTS", { deckName: deckKey }));
             return;
