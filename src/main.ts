@@ -664,7 +664,7 @@ export default class SRPlugin extends Plugin {
                 }
             }
 
-            // It was a new note, so remove it from the new notes list and schedule it.
+            // It was a new note, remove it from the new notes and schedule it.
             if (!wasDueInDeck) {
                 reviewDeck.newNotes.splice(
                     reviewDeck.newNotes.findIndex((newNote: TFile) => newNote.path === note.path),
