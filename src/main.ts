@@ -487,7 +487,9 @@ export default class SRPlugin extends Plugin {
                     this.dueNotesCount++;
                 }
 
-                const nDays: number = Math.ceil((scheduledNote.dueUnix - now.valueOf()) / (24 * 3600 * 1000));
+                const nDays: number = Math.ceil(
+                    (scheduledNote.dueUnix - now.valueOf()) / (24 * 3600 * 1000),
+                );
                 if (!Object.prototype.hasOwnProperty.call(this.dueDatesNotes, nDays)) {
                     this.dueDatesNotes[nDays] = 0;
                 }
@@ -654,7 +656,7 @@ export default class SRPlugin extends Plugin {
 
         Object.values(this.reviewDecks).forEach((reviewDeck: ReviewDeck) => {
             let wasDueInDeck = false;
-            for (let scheduledNote of reviewDeck.scheduledNotes) { 
+            for (let scheduledNote of reviewDeck.scheduledNotes) {
                 if (scheduledNote.note.path === note.path) {
                     scheduledNote.dueUnix = due.valueOf();
                     wasDueInDeck = true;
@@ -663,12 +665,14 @@ export default class SRPlugin extends Plugin {
             }
 
             // It was a new note, so remove it from the new notes list and schedule it.
-            if (!wasDueInDeck) { 
-                reviewDeck.newNotes.splice(reviewDeck.newNotes.findIndex((newNote: TFile) => newNote.path === note.path), 1);
+            if (!wasDueInDeck) {
+                reviewDeck.newNotes.splice(
+                    reviewDeck.newNotes.findIndex((newNote: TFile) => newNote.path === note.path),
+                    1,
+                );
                 reviewDeck.scheduledNotes.push({ note, dueUnix: due.valueOf() });
             }
         });
-
 
         this.updateAndSortDueNotes();
 
