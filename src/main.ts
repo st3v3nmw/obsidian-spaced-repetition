@@ -656,7 +656,7 @@ export default class SRPlugin extends Plugin {
 
         Object.values(this.reviewDecks).forEach((reviewDeck: ReviewDeck) => {
             let wasDueInDeck = false;
-            for (let scheduledNote of reviewDeck.scheduledNotes) {
+            for (const scheduledNote of reviewDeck.scheduledNotes) {
                 if (scheduledNote.note.path === note.path) {
                     scheduledNote.dueUnix = due.valueOf();
                     wasDueInDeck = true;
