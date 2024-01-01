@@ -646,7 +646,7 @@ export default class SRPlugin extends Plugin {
         if (this.data.settings.autoNextNote) {
             if (!this.lastSelectedReviewDeck) {
                 const reviewDeckKeys: string[] = Object.keys(this.reviewDecks);
-                if (reviewDeckKeys) this.lastSelectedReviewDeck = reviewDeckKeys[0];
+                if (reviewDeckKeys.length > 0) this.lastSelectedReviewDeck = reviewDeckKeys[0];
                 else {
                     new Notice(t("ALL_CAUGHT_UP"));
                     return;
