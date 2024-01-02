@@ -1,5 +1,7 @@
 import { CardScheduleCalculator } from "src/CardSchedule";
 import {
+    CardOrder,
+    DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
@@ -24,7 +26,11 @@ import {
 import moment from "moment";
 import { INoteEaseList, NoteEaseList } from "src/NoteEaseList";
 import { QuestionPostponementList, IQuestionPostponementList } from "src/QuestionPostponementList";
-import { order_DueFirst_Sequential } from "./DeckTreeIterator.test";
+
+let order_DueFirst_Sequential: IIteratorOrder = {
+    cardOrder: CardOrder.DueFirstSequential,
+    deckOrder: DeckOrder.PrevDeckComplete_Sequential,
+};
 
 let clozeQuestion1: string = "This single ==question== turns into ==3 separate== ==cards==";
 let clozeQuestion1Card1: RegExp = /This single.+\.\.\..+turns into 3 separate cards/;
