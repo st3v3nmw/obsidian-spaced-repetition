@@ -686,7 +686,7 @@ export default class SRPlugin extends Plugin {
             const index = this.data.settings.openRandomNote
                 ? Math.floor(Math.random() * deck.dueNotesCount)
                 : 0;
-                await this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
+            await this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
             return;
         }
 
