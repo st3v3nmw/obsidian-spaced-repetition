@@ -1,5 +1,7 @@
 import { CardScheduleCalculator } from "src/CardSchedule";
 import {
+    CardOrder,
+    DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
@@ -24,7 +26,11 @@ import {
 import moment from "moment";
 import { INoteEaseList, NoteEaseList } from "src/NoteEaseList";
 import { QuestionPostponementList, IQuestionPostponementList } from "src/QuestionPostponementList";
-import { order_DueFirst_Sequential } from "./DeckTreeIterator.test";
+
+let order_DueFirst_Sequential: IIteratorOrder = {
+    cardOrder: CardOrder.DueFirstSequential,
+    deckOrder: DeckOrder.PrevDeckComplete_Sequential,
+};
 
 let clozeQuestion1: string = "This single ==question== turns into ==3 separate== ==cards==";
 let clozeQuestion1Card1: RegExp = /This single.+\.\.\..+turns into 3 separate cards/;
@@ -681,6 +687,36 @@ $$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$`;
 
             let actual: string = await c.file.read();
             expect(actual).toEqual(expectedFileText);
+        });
+    });
+
+    describe("Checking leading/trailing spaces", () => {
+        test("Leading spaces are retained post review", async () => {
+            // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/800
+            let settings: SRSettings = { ...DEFAULT_SETTINGS };
+            settings.burySiblingCards = true;
+            let indent: string = "    ";
+
+            // Note that "- bar?::baz" is intentionally indented
+            let text: string = `
+- foo
+${indent}- bar?::baz
+`;
+
+            let c: TestContext = TestContext.Create(
+                order_DueFirst_Sequential,
+                FlashcardReviewMode.Review,
+                settings,
+                text,
+            );
+            await c.setSequencerDeckTreeFromOriginalText();
+
+            expect(c.reviewSequencer.currentCard.front).toMatch(`${indent}- bar?`);
+
+            // After reviewing, check the text (explicitly text includes the whitespace before "- bar?::baz"at)
+            await c.reviewSequencer.processReview(ReviewResponse.Easy);
+            const expectedText: string = `${text}<!--SR:!2023-09-10,4,270-->\n`;
+            expect(await c.file.read()).toEqual(expectedText);
         });
     });
 

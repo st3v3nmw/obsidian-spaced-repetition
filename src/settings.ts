@@ -15,6 +15,8 @@ export interface SRSettings {
     flashcardHeightPercentage: number;
     flashcardWidthPercentage: number;
     randomizeCardOrder: boolean;
+    flashcardCardOrder: string;
+    flashcardDeckOrder: string;
     convertHighlightsToClozes: boolean;
     convertBoldTextToClozes: boolean;
     convertCurlyBracketsToClozes: boolean;
@@ -55,7 +57,10 @@ export const DEFAULT_SETTINGS: SRSettings = {
     showContextInCards: true,
     flashcardHeightPercentage: Platform.isMobile ? 100 : 80,
     flashcardWidthPercentage: Platform.isMobile ? 100 : 40,
-    randomizeCardOrder: true,
+    randomizeCardOrder: null,
+    flashcardCardOrder: "DueFirstRandom",
+    flashcardDeckOrder: "PrevDeckComplete_Sequential",
+
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
     convertCurlyBracketsToClozes: false,
@@ -83,6 +88,23 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // logging
     showDebugMessages: false,
 };
+
+export function upgradeSettings(settings: SRSettings) {
+    if (
+        settings.randomizeCardOrder != null &&
+        settings.flashcardCardOrder == null &&
+        settings.flashcardDeckOrder == null
+    ) {
+        console.log(`loadPluginData: Upgrading settings: ${settings.randomizeCardOrder}`);
+        settings.flashcardCardOrder = settings.randomizeCardOrder
+            ? "DueFirstRandom"
+            : "DueFirstSequential";
+        settings.flashcardDeckOrder = "PrevDeckComplete_Sequential";
+
+        // After the upgrade, we don't need the old attribute any more
+        settings.randomizeCardOrder = null;
+    }
+}
 
 // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
 let applyDebounceTimer = 0;
@@ -242,11 +264,55 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
-        new Setting(containerEl).setName(t("RANDOMIZE_CARD_ORDER")).addToggle((toggle) =>
-            toggle
-                .setValue(this.plugin.data.settings.randomizeCardOrder)
+        new Setting(this.containerEl)
+            .setName(t("REVIEW_CARD_ORDER_WITHIN_DECK"))
+            .addDropdown((dropdown) =>
+                dropdown
+                    .addOptions({
+                        NewFirstSequential: t("REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL"),
+                        DueFirstSequential: t("REVIEW_CARD_ORDER_DUE_FIRST_SEQUENTIAL"),
+                        NewFirstRandom: t("REVIEW_CARD_ORDER_NEW_FIRST_RANDOM"),
+                        DueFirstRandom: t("REVIEW_CARD_ORDER_DUE_FIRST_RANDOM"),
+                        EveryCardRandomDeckAndCard: t("REVIEW_CARD_ORDER_RANDOM_DECK_AND_CARD"),
+                    })
+                    .setValue(this.plugin.data.settings.flashcardCardOrder)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.flashcardCardOrder = value;
+                        await this.plugin.savePluginData();
+
+                        // Need to redisplay as changing this setting affects the "deck order" setting
+                        this.display();
+                    }),
+            );
+
+        const deckOrderEnabled: boolean =
+            this.plugin.data.settings.flashcardCardOrder != "EveryCardRandomDeckAndCard";
+        new Setting(this.containerEl).setName(t("REVIEW_DECK_ORDER")).addDropdown((dropdown) =>
+            dropdown
+                .addOptions(
+                    deckOrderEnabled
+                        ? {
+                              PrevDeckComplete_Sequential: t(
+                                  "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
+                              ),
+                              PrevDeckComplete_Random: t(
+                                  "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
+                              ),
+                          }
+                        : {
+                              EveryCardRandomDeckAndCard: t(
+                                  "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
+                              ),
+                          },
+                )
+                .setValue(
+                    deckOrderEnabled
+                        ? this.plugin.data.settings.flashcardDeckOrder
+                        : "EveryCardRandomDeckAndCard",
+                )
+                .setDisabled(!deckOrderEnabled)
                 .onChange(async (value) => {
-                    this.plugin.data.settings.randomizeCardOrder = value;
+                    this.plugin.data.settings.flashcardDeckOrder = value;
                     await this.plugin.savePluginData();
                 }),
         );
