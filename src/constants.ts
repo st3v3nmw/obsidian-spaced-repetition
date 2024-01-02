@@ -7,6 +7,13 @@ export const YAML_FRONT_MATTER_REGEX = /^---\r?\n((?:.*\r?\n)*?)---/;
 export const MULTI_SCHEDULING_EXTRACTOR = /!([\d-]+),(\d+),(\d+)/gm;
 export const LEGACY_SCHEDULING_EXTRACTOR = /<!--SR:([\d-]+),(\d+),(\d+)-->/gm;
 export const OBSIDIAN_TAG_AT_STARTOFLINE_REGEX = /^#[^\s#]+/gi;
+
+// https://help.obsidian.md/Linking+notes+and+files/Internal+links#Link+to+a+block+in+a+note
+// Block identifiers can only consist of letters, numbers, and dashes.
+// RZ: 2024-01-01 Empirically determined that obsidian only recognizes a block identifier if the
+// "^" is preceded by a space
+export const OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX = / (\^[a-zA-Z0-9\-]+)$/;
+
 export const PREFERRED_DATE_FORMAT = "YYYY-MM-DD";
 export const ALLOWED_DATE_FORMATS = [PREFERRED_DATE_FORMAT, "DD-MM-YYYY", "ddd MMM DD YYYY"];
 
