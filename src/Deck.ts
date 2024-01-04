@@ -2,7 +2,7 @@ import { Card } from "./Card";
 import { FlashcardReviewMode } from "./FlashcardReviewSequencer";
 import { Question } from "./Question";
 import { IQuestionPostponementList } from "./QuestionPostponementList";
-import { TopicPath } from "./TopicPath";
+import { TopicPath, TopicPathList } from "./TopicPath";
 
 export enum CardListType {
     NewCard,
@@ -125,7 +125,17 @@ export class Deck {
         return cardListType == CardListType.DueCard ? this.dueFlashcards : this.newFlashcards;
     }
 
-    appendCard(topicPath: TopicPath, cardObj: Card): void {
+    appendCard(topicPathList: TopicPathList, cardObj: Card): void {
+        for (const topicPath of topicPathList.list) {
+            this.appendCard_SingleTopic(topicPath, cardObj);
+        }
+    }
+
+    appendCardToRootDeck(cardObj: Card): void {
+        this.appendCard_SingleTopic(TopicPath.emptyPath, cardObj);
+    }
+
+    appendCard_SingleTopic(topicPath: TopicPath, cardObj: Card): void {
         const deck: Deck = this.getOrCreateDeck(topicPath);
         const cardList: Card[] = deck.getCardListForCardType(cardObj.cardListType);
 

@@ -39,29 +39,20 @@ export class TopicPath {
         return result;
     }
 
-    static getTopicPathOfFile(noteFile: ISRFile, settings: SRSettings): TopicPath {
+    static getFlashcardFilteredTopicPathListOfFile(noteFile: ISRFile, settings: SRSettings): TopicPathList {
         let deckPath: string[] = [];
-        let result: TopicPath = TopicPath.emptyPath;
+        let result: TopicPathList;
 
         if (settings.convertFoldersToDecks) {
             deckPath = noteFile.path.split("/");
             deckPath.pop(); // remove filename
             if (deckPath.length != 0) {
-                result = new TopicPath(deckPath);
+                result = new TopicPathList([new TopicPath(deckPath)]);
             }
         } else {
-            const tagList: TopicPath[] = this.getTopicPathsFromTagList(noteFile.getAllTags());
-
-            outer: for (const tagToReview of this.getTopicPathsFromTagList(
-                settings.flashcardTags,
-            )) {
-                for (const tag of tagList) {
-                    if (tagToReview.isSameOrAncestorOf(tag)) {
-                        result = tag;
-                        break outer;
-                    }
-                }
-            }
+            const validTopicPathList: TopicPathList = this.getFlashcardSettingsTopicPathList(settings);
+            const tagList: TopicPathList = this.convertTagListToTopicPathList(noteFile.getAllTags());
+            result = this.filterValidTopicPathsFromTagList(tagList, validTopicPathList);
         }
 
         return result;
@@ -81,12 +72,38 @@ export class TopicPath {
         return path?.length > 0 ? TopicPath.getTopicPathFromTag(path) : null;
     }
 
-    static getTopicPathsFromTagList(tagList: string[]): TopicPath[] {
+    static getFlashcardSettingsTopicPathList(settings: SRSettings): TopicPathList {
+        return this.convertTagListToTopicPathList(settings.flashcardTags);
+    }
+
+    // 
+    // tagList is a list of tags such as:
+    //      ["#flashcards/computing", "#boring-stuff", "#news-worthy"]
+    // validTopicPathList is a list of valid tags, such as those from settings.flashcardTags,E.g. 
+    //      ["#flashcards"]
+    // 
+    // This returns a filtered version of tagList, containing only topic paths that are considered valid.
+    // Validity is defined as "isAnyElementSameOrAncestorOf", and "#flashcards" is considered the ancestor of
+    // "#flashcards/computing".
+    // 
+    // Therefore this would return:
+    //      "#flashcards/computing" (but not "#boring-stuff" or "#news-worthy")
+    // 
+    static filterValidTopicPathsFromTagList(list: TopicPathList, validTopicPathList: TopicPathList): TopicPathList {
+        let result: TopicPath[] = [];
+        for (const tag of list.list) {
+            if (validTopicPathList.isAnyElementSameOrAncestorOf(tag)) result.push(tag);
+        }
+
+        return new TopicPathList(result);
+    }
+
+    static convertTagListToTopicPathList(tagList: string[]): TopicPathList {
         const result: TopicPath[] = [];
         for (const tag of tagList) {
             if (this.isValidTag(tag)) result.push(TopicPath.getTopicPathFromTag(tag));
         }
-        return result;
+        return new TopicPathList(result);
     }
 
     static isValidTag(tag: string): boolean {
@@ -107,6 +124,31 @@ export class TopicPath {
             .split("/")
             .filter((str) => str);
         return new TopicPath(path);
+    }
+}
+
+export class TopicPathList {
+    list: TopicPath[];
+
+    constructor(list: TopicPath[]) {
+        if (list == null) throw "TopicPathList null";
+        this.list = list;
+    }
+
+    isAnyElementSameOrAncestorOf(topicPath: TopicPath): boolean {
+        return this.list.some((item) => item.isSameOrAncestorOf(topicPath));
+    }
+
+    formatPsv() {
+        return this.format("|");
+    }
+
+    format(sep: string) {
+        return this.list.map((topicPath) => topicPath.formatAsTag()).join(sep);
+    }
+
+    static empty(): TopicPathList {
+        return new TopicPathList([]);
     }
 }
 

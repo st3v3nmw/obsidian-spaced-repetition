@@ -7,7 +7,7 @@ import {
 } from "./constants";
 import { Note } from "./Note";
 import { SRSettings } from "./settings";
-import { TopicPath, TopicPathWithWs } from "./TopicPath";
+import { TopicPath, TopicPathList, TopicPathWithWs } from "./TopicPath";
 import { MultiLineTextFinder } from "./util/MultiLineTextFinder";
 import { cyrb53, stringTrimStart } from "./util/utils";
 
@@ -138,7 +138,7 @@ export class QuestionText {
 export class Question {
     note: Note;
     questionType: CardType;
-    topicPath: TopicPath;
+    topicPathList: TopicPathList;
     questionText: QuestionText;
     lineNo: number;
     hasEditLaterTag: boolean;
@@ -223,10 +223,14 @@ export class Question {
         this.hasChanged = false;
     }
 
+    formatTopicPathList(): string {
+        return this.topicPathList.format("|");
+    }
+
     static Create(
         settings: SRSettings,
         questionType: CardType,
-        noteTopicPath: TopicPath,
+        noteTopicPathList: TopicPathList,
         originalText: string,
         lineNo: number,
         context: string[],
@@ -234,14 +238,14 @@ export class Question {
         const hasEditLaterTag = originalText.includes(settings.editLaterTag);
         const questionText: QuestionText = QuestionText.create(originalText, settings);
 
-        let topicPath: TopicPath = noteTopicPath;
+        let topicPathList: TopicPathList = noteTopicPathList;
         if (questionText.topicPathWithWs) {
-            topicPath = questionText.topicPathWithWs.topicPath;
+            topicPathList = new TopicPathList([ questionText.topicPathWithWs.topicPath]);
         }
 
         const result: Question = new Question({
             questionType,
-            topicPath,
+            topicPathList,
             questionText,
             lineNo,
             hasEditLaterTag,

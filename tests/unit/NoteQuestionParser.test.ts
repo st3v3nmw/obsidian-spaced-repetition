@@ -3,7 +3,7 @@ import { CardScheduleInfo } from "src/CardSchedule";
 import { TICKS_PER_DAY } from "src/constants";
 import { CardType, Question } from "src/Question";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
-import { TopicPath } from "src/TopicPath";
+import { TopicPath, TopicPathList } from "src/TopicPath";
 import { createTest_NoteQuestionParser } from "./SampleItems";
 import { ISRFile, UnitTestSRFile } from "src/SRFile";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
@@ -44,7 +44,7 @@ A::B
         let expected = [
             {
                 questionType: CardType.SingleLineBasic,
-                topicPath: TopicPath.emptyPath,
+                topicPathList: TopicPathList.empty(),
                 questionText: {
                     original: `A::B`,
                     actualQuestion: "A::B",
@@ -82,7 +82,7 @@ A::B
         let expected = [
             {
                 questionType: CardType.SingleLineBasic,
-                topicPath: new TopicPath(["flashcards", "test"]),
+                topicPathList: new TopicPathList([new TopicPath(["flashcards", "test"])]),
                 questionText: {
                     original: `A::B
 <!--SR:!2023-09-03,1,230-->`,
@@ -130,9 +130,9 @@ Q3::A3
             folderTopicPath,
         );
         expect(questionList.length).toEqual(3);
-        expect(questionList[0].topicPath).toEqual(new TopicPath(["flashcards", "science"]));
-        expect(questionList[1].topicPath).toEqual(new TopicPath(["flashcards", "science"]));
-        expect(questionList[2].topicPath).toEqual(new TopicPath(["flashcards", "science"]));
+        expect(questionList[0].topicPathList.formatPsv()).toEqual("#flashcards/science");
+        expect(questionList[1].topicPathList.formatPsv()).toEqual("#flashcards/science");
+        expect(questionList[2].topicPathList.formatPsv()).toEqual("#flashcards/science");
     });
 });
 
@@ -157,7 +157,7 @@ describe("Handling tags within note", () => {
             );
             expect(questionList.length).toEqual(3);
             for (let i = 0; i < questionList.length; i++)
-                expect(questionList[i].topicPath).toEqual(new TopicPath(["folder", "subfolder"]));
+                expect(questionList[i].topicPathList.formatPsv()).toEqual("#folder/subfolder");
         });
 
         test("Topic tag within note is ignored (outside all questions)", async () => {
@@ -172,7 +172,7 @@ Q1::A1
                 folderTopicPath,
             );
             expect(questionList.length).toEqual(1);
-            expect(questionList[0].topicPath).toEqual(new TopicPath(["folder", "subfolder"]));
+            expect(questionList[0].topicPathList.formatPsv()).toEqual("#folder/subfolder");
         });
 
         // Behavior here mimics SR_ORIGINAL
@@ -190,7 +190,7 @@ Q1::A1
                 folderTopicPath,
             );
             expect(questionList.length).toEqual(1);
-            expect(questionList[0].topicPath).toEqual(new TopicPath(["folder", "subfolder"]));
+            expect(questionList[0].topicPathList.formatPsv()).toEqual("#folder/subfolder");
         });
     });
 
@@ -205,16 +205,16 @@ Q1::A1
     `;
             let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
-            let expectedPath: TopicPath = new TopicPath(["flashcards", "test"]);
+            let expectedPath: string = "#flashcards/test";
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
                 noteFile,
                 folderTopicPath,
             );
             expect(questionList.length).toEqual(3);
-            expect(questionList[0].topicPath).toEqual(expectedPath);
-            expect(questionList[1].topicPath).toEqual(expectedPath);
-            expect(questionList[2].topicPath).toEqual(expectedPath);
+            expect(questionList[0].topicPathList.formatPsv()).toEqual(expectedPath);
+            expect(questionList[1].topicPathList.formatPsv()).toEqual(expectedPath);
+            expect(questionList[2].topicPathList.formatPsv()).toEqual(expectedPath);
         });
 
         test("Topic tag within question overrides the note topic, for that topic only", async () => {
@@ -231,9 +231,9 @@ Q1::A1
                 folderTopicPath,
             );
             expect(questionList.length).toEqual(3);
-            expect(questionList[0].topicPath).toEqual(new TopicPath(["flashcards", "test"]));
-            expect(questionList[1].topicPath).toEqual(new TopicPath(["flashcards", "examination"]));
-            expect(questionList[2].topicPath).toEqual(new TopicPath(["flashcards", "test"]));
+            expect(questionList[0].topicPathList.formatPsv()).toEqual("#flashcards/test");
+            expect(questionList[1].topicPathList.formatPsv()).toEqual("#flashcards/examination");
+            expect(questionList[2].topicPathList.formatPsv()).toEqual("#flashcards/test");
         });
 
         test("First topic tag within note (outside questions) is used as the note's topic tag, even if it appears after the first question", async () => {
@@ -253,7 +253,7 @@ Q1::A1
             );
             expect(questionList.length).toEqual(3);
             for (let i = 0; i < questionList.length; i++)
-                expect(questionList[i].topicPath).toEqual(expectedPath);
+                expect(questionList[i].topicPathList).toEqual(expectedPath);
         });
 
         test("Only first topic tag within note (outside questions) is used as the note's topic tag, subsequent ignored", async () => {
@@ -274,7 +274,7 @@ Q1::A1
             );
             expect(questionList.length).toEqual(3);
             for (let i = 0; i < questionList.length; i++)
-                expect(questionList[i].topicPath).toEqual(expectedPath);
+                expect(questionList[i].topicPathList).toEqual(expectedPath);
         });
     });
 
@@ -294,7 +294,7 @@ Q1::A1
                 folderTopicPath,
             );
             expect(questionList.length).toEqual(1);
-            expect(questionList[0].topicPath).toEqual(expectedPath);
+            expect(questionList[0].topicPathList).toEqual(expectedPath);
             expect(questionList[0].cards.length).toEqual(1);
             expect(questionList[0].cards[0].front).toEqual("Q5");
         });

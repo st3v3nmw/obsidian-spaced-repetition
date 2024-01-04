@@ -239,7 +239,7 @@ describe("isValidTag", () => {
     });
 });
 
-describe("getTopicPathOfFile", () => {
+describe("getFlashcardFilteredTopicPathListOfFile", () => {
     describe("convertFoldersToDecks: false", () => {
         test("Mixture of irrelevant tags and relevant ones", () => {
             let content: string = `
@@ -251,8 +251,12 @@ describe("getTopicPathOfFile", () => {
             #flashcards/math Q6::A6`;
             let file: ISRFile = new UnitTestSRFile(content);
             let expected = ["flashcards", "science"];
+            const actual: TopicPath[] = TopicPath.getFlashcardFilteredTopicPathListOfFile(file, DEFAULT_SETTINGS).list;
 
-            expect(TopicPath.getTopicPathOfFile(file, DEFAULT_SETTINGS).path).toEqual(expected);
+            expect(actual.length).toEqual(3);
+            expect(actual[0].formatAsTag()).toEqual("#flashcards/science");
+            expect(actual[1].formatAsTag()).toEqual("#flashcards/science/physics");
+            expect(actual[2].formatAsTag()).toEqual("#flashcards/math");
         });
 
         test("No relevant tags", () => {
@@ -264,15 +268,16 @@ describe("getTopicPathOfFile", () => {
             #ignored/science/physics Q5::A5 <!--SR:!2023-09-02,4,270-->
             Q6::A6`;
             let file: ISRFile = new UnitTestSRFile(content);
+            const actual: TopicPath[] = TopicPath.getFlashcardFilteredTopicPathListOfFile(file, DEFAULT_SETTINGS).list;
 
-            expect(TopicPath.getTopicPathOfFile(file, DEFAULT_SETTINGS).isEmptyPath).toEqual(true);
+            expect(actual.length).toEqual(0);
         });
     });
 
     describe("convertFoldersToDecks: true", () => {
         let settings_ConvertFoldersToDecks: SRSettings = { ...DEFAULT_SETTINGS };
         settings_ConvertFoldersToDecks.convertFoldersToDecks = true;
-        test("Mixture of irrelevant tags and relevant ones", () => {
+        test("All tags are irrelevant (because convertFoldersToDecks: true)", () => {
             let ignoredContent: string = `
             #ignored Q1::A1
             #ignored Q2::A2 <!--SR:!2023-09-02,4,270-->
@@ -283,9 +288,9 @@ describe("getTopicPathOfFile", () => {
 
             let fakeFilePath: string = "history/modern/Greek.md";
             let file: ISRFile = new UnitTestSRFile(ignoredContent, fakeFilePath);
-            let expected = ["history", "modern"];
-            let actual = TopicPath.getTopicPathOfFile(file, settings_ConvertFoldersToDecks);
-            expect(actual.path).toEqual(expected);
+            let actual = TopicPath.getFlashcardFilteredTopicPathListOfFile(file, settings_ConvertFoldersToDecks).list;
+            expect(actual.length).toEqual(1);
+            expect(actual[0].formatAsTag()).toEqual("#history/modern");
         });
     });
 });
