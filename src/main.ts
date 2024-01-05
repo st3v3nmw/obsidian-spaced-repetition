@@ -10,7 +10,7 @@ import { YAML_FRONT_MATTER_REGEX, SCHEDULING_INFO_REGEX } from "src/constants";
 import { ReviewDeck, ReviewDeckSelectionModal } from "src/ReviewDeck";
 import { t } from "src/lang/helpers";
 import { appIcon } from "src/icons/appicon";
-import { TopicPath } from "./TopicPath";
+import { TopicPath, TopicPathList } from "./TopicPath";
 import { CardListType, Deck, DeckTreeFilter } from "./Deck";
 import { Stats } from "./stats";
 import {
@@ -268,8 +268,8 @@ export default class SRPlugin extends Plugin {
         noteFile: TFile,
         reviewMode: FlashcardReviewMode,
     ): Promise<void> {
-        const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(noteFile));
-        const note: Note = await this.loadNote(noteFile, topicPath);
+        const topicPathList: TopicPathList = this.findTopicPathList(this.createSrTFile(noteFile));
+        const note: Note = await this.loadNote(noteFile, topicPathList);
 
         const deckTree = new Deck("root", null);
         note.appendCardsToDeck(deckTree);
@@ -376,7 +376,7 @@ export default class SRPlugin extends Plugin {
                 }
             }
 
-            const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(noteFile));
+            const topicPath: TopicPath = this.findTopicPathList(this.createSrTFile(noteFile));
             if (topicPath.hasPath) {
                 const note: Note = await this.loadNote(noteFile, topicPath);
                 const flashcardsInNoteAvgEase: number = NoteEaseCalculator.Calculate(
@@ -636,7 +636,7 @@ export default class SRPlugin extends Plugin {
         }
 
         if (this.data.settings.burySiblingCards) {
-            const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(note));
+            const topicPath: TopicPath = this.findTopicPathList(this.createSrTFile(note));
             const noteX: Note = await this.loadNote(note, topicPath);
             for (const question of noteX.questionList) {
                 this.data.buryList.push(question.questionText.textHash);
@@ -696,7 +696,7 @@ export default class SRPlugin extends Plugin {
         return new SrTFile(this.app.vault, this.app.metadataCache, note);
     }
 
-    findTopicPath(note: ISRFile): TopicPath {
+    findTopicPathList(note: ISRFile): TopicPathList {
         return TopicPath.getFlashcardFilteredTopicPathListOfFile(note, this.data.settings);
     }
 

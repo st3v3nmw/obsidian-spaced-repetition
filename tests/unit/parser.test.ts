@@ -1,4 +1,4 @@
-import { parseEx, ParserQuestionItem } from "src/parser";
+import { parseEx, ParsedQuestionInfo } from "src/parser";
 import { CardType } from "src/Question";
 
 const defaultArgs: [string, string, string, string, boolean, boolean, boolean] = [
@@ -12,14 +12,7 @@ const defaultArgs: [string, string, string, string, boolean, boolean, boolean] =
 ];
 
 /**
- * Returns flashcards found in `text`
- *
- * @param text - The text to extract flashcards from
- * @param singlelineCardSeparator - Separator for inline basic cards
- * @param singlelineReversedCardSeparator - Separator for inline reversed cards
- * @param multilineCardSeparator - Separator for multiline basic cards
- * @param multilineReversedCardSeparator - Separator for multiline basic card
- * @returns An array of [CardType, card text, line number] tuples
+ * 
  */
 export function parse(
     text: string,
@@ -30,93 +23,93 @@ export function parse(
     convertHighlightsToClozes: boolean,
     convertBoldTextToClozes: boolean,
     convertCurlyBracketsToClozes: boolean,
-): [CardType, string, number][] {
-    const list: ParserQuestionItem[] = parseEx(text, singlelineCardSeparator, singlelineReversedCardSeparator, multilineCardSeparator, 
+): [CardType, string, number, number][] {
+    const list: ParsedQuestionInfo[] = parseEx(text, singlelineCardSeparator, singlelineReversedCardSeparator, multilineCardSeparator, 
         multilineReversedCardSeparator, convertHighlightsToClozes, convertBoldTextToClozes, convertCurlyBracketsToClozes);
-    const result: [CardType, string, number][] = [];
+    const result: [CardType, string, number, number][] = [];
     for (const item of list) {
-        result.push([item.cardType, item.text, item.legacyLineNum]);
+        result.push([item.cardType, item.text, item.firstLineNum, item.lastLineNum]);
     }
     return result;
 }
 
 test("Test parsing of single line basic cards", () => {
     expect(parse("Question::Answer", ...defaultArgs)).toEqual([
-        [CardType.SingleLineBasic, "Question::Answer", 0],
+        [CardType.SingleLineBasic, "Question::Answer", 0, 0],
     ]);
     expect(parse("Question::Answer\n<!--SR:!2021-08-11,4,270-->", ...defaultArgs)).toEqual([
-        [CardType.SingleLineBasic, "Question::Answer\n<!--SR:!2021-08-11,4,270-->", 0],
+        [CardType.SingleLineBasic, "Question::Answer\n<!--SR:!2021-08-11,4,270-->", 0, 1],
     ]);
     expect(parse("Question::Answer <!--SR:2021-08-11,4,270-->", ...defaultArgs)).toEqual([
-        [CardType.SingleLineBasic, "Question::Answer <!--SR:2021-08-11,4,270-->", 0],
+        [CardType.SingleLineBasic, "Question::Answer <!--SR:2021-08-11,4,270-->", 0, 0],
     ]);
     expect(parse("Some text before\nQuestion ::Answer", ...defaultArgs)).toEqual([
-        [CardType.SingleLineBasic, "Question ::Answer", 1],
+        [CardType.SingleLineBasic, "Question ::Answer", 1, 1],
     ]);
     expect(parse("#Title\n\nQ1::A1\nQ2:: A2", ...defaultArgs)).toEqual([
-        [CardType.SingleLineBasic, "Q1::A1", 2],
-        [CardType.SingleLineBasic, "Q2:: A2", 3],
+        [CardType.SingleLineBasic, "Q1::A1", 2, 2],
+        [CardType.SingleLineBasic, "Q2:: A2", 3, 3],
     ]);
     expect(parse("#flashcards/science Question ::Answer", ...defaultArgs)).toEqual([
-        [CardType.SingleLineBasic, "#flashcards/science Question ::Answer", 0],
+        [CardType.SingleLineBasic, "#flashcards/science Question ::Answer", 0, 0],
     ]);
 });
 
 test("Test parsing of single line reversed cards", () => {
     expect(parse("Question:::Answer", ...defaultArgs)).toEqual([
-        [CardType.SingleLineReversed, "Question:::Answer", 0],
+        [CardType.SingleLineReversed, "Question:::Answer", 0, 0],
     ]);
     expect(parse("Some text before\nQuestion :::Answer", ...defaultArgs)).toEqual([
-        [CardType.SingleLineReversed, "Question :::Answer", 1],
+        [CardType.SingleLineReversed, "Question :::Answer", 1, 1],
     ]);
     expect(parse("#Title\n\nQ1:::A1\nQ2::: A2", ...defaultArgs)).toEqual([
-        [CardType.SingleLineReversed, "Q1:::A1", 2],
-        [CardType.SingleLineReversed, "Q2::: A2", 3],
+        [CardType.SingleLineReversed, "Q1:::A1", 2, 2],
+        [CardType.SingleLineReversed, "Q2::: A2", 3, 3],
     ]);
 });
 
 test("Test parsing of multi line basic cards", () => {
     expect(parse("Question\n?\nAnswer", ...defaultArgs)).toEqual([
-        [CardType.MultiLineBasic, "Question\n?\nAnswer", 1],
+        [CardType.MultiLineBasic, "Question\n?\nAnswer", 0, 2],
     ]);
     expect(parse("Question\n? \nAnswer", ...defaultArgs)).toEqual([
-        [CardType.MultiLineBasic, "Question\n?\nAnswer", 1],
+        [CardType.MultiLineBasic, "Question\n?\nAnswer", 0, 2],
     ]);
     expect(parse("Question\n?\nAnswer <!--SR:!2021-08-11,4,270-->", ...defaultArgs)).toEqual([
-        [CardType.MultiLineBasic, "Question\n?\nAnswer <!--SR:!2021-08-11,4,270-->", 1],
+        [CardType.MultiLineBasic, "Question\n?\nAnswer <!--SR:!2021-08-11,4,270-->", 0, 2],
     ]);
     expect(parse("Question\n?\nAnswer\n<!--SR:2021-08-11,4,270-->", ...defaultArgs)).toEqual([
-        [CardType.MultiLineBasic, "Question\n?\nAnswer\n<!--SR:2021-08-11,4,270-->", 1],
+        [CardType.MultiLineBasic, "Question\n?\nAnswer\n<!--SR:2021-08-11,4,270-->", 0, 3],
     ]);
-    expect(parse("Some text before\nQuestion\n?\nAnswer", ...defaultArgs)).toEqual([
-        [CardType.MultiLineBasic, "Some text before\nQuestion\n?\nAnswer", 2],
+    expect(parse("Question line 1\nQuestion line 2\n?\nAnswer", ...defaultArgs)).toEqual([
+        [CardType.MultiLineBasic, "Question line 1\nQuestion line 2\n?\nAnswer", 0, 3],
     ]);
-    expect(parse("Question\n?\nAnswer\nSome text after!", ...defaultArgs)).toEqual([
-        [CardType.MultiLineBasic, "Question\n?\nAnswer\nSome text after!", 1],
+    expect(parse("Question\n?\nAnswer line 1\nAnswer line 2", ...defaultArgs)).toEqual([
+        [CardType.MultiLineBasic, "Question\n?\nAnswer line 1\nAnswer line 2", 0, 3],
     ]);
     expect(parse("#Title\n\nLine0\nQ1\n?\nA1\nAnswerExtra\n\nQ2\n?\nA2", ...defaultArgs)).toEqual([
-        [CardType.MultiLineBasic, "Line0\nQ1\n?\nA1\nAnswerExtra", 4],
-        [CardType.MultiLineBasic, "Q2\n?\nA2", 9],
+        [CardType.MultiLineBasic, "Line0\nQ1\n?\nA1\nAnswerExtra", /* Line0 */ 2, /* AnswerExtra */ 6],
+        [CardType.MultiLineBasic, "Q2\n?\nA2", 8, 10],
     ]);
     expect(parse("#flashcards/tag-on-previous-line\nQuestion\n?\nAnswer", ...defaultArgs)).toEqual([
-        [CardType.MultiLineBasic, "#flashcards/tag-on-previous-line\nQuestion\n?\nAnswer", 2],
+        [CardType.MultiLineBasic, "#flashcards/tag-on-previous-line\nQuestion\n?\nAnswer", 0, 3],
     ]);
 });
 
 test("Test parsing of multi line reversed cards", () => {
     expect(parse("Question\n??\nAnswer", ...defaultArgs)).toEqual([
-        [CardType.MultiLineReversed, "Question\n??\nAnswer", 1],
+        [CardType.MultiLineReversed, "Question\n??\nAnswer", 0, 2],
     ]);
-    expect(parse("Some text before\nQuestion\n??\nAnswer", ...defaultArgs)).toEqual([
-        [CardType.MultiLineReversed, "Some text before\nQuestion\n??\nAnswer", 2],
+    expect(parse("Question line 1\nQuestion line 2\n??\nAnswer", ...defaultArgs)).toEqual([
+        [CardType.MultiLineReversed, "Question line 1\nQuestion line 2\n??\nAnswer", 0, 3],
     ]);
-    expect(parse("Question\n??\nAnswer\nSome text after!", ...defaultArgs)).toEqual([
-        [CardType.MultiLineReversed, "Question\n??\nAnswer\nSome text after!", 1],
+    expect(parse("Question\n??\nAnswer line 1\nAnswer line 2", ...defaultArgs)).toEqual([
+        [CardType.MultiLineReversed, "Question\n??\nAnswer line 1\nAnswer line 2", 0, 3],
     ]);
     expect(parse("#Title\n\nLine0\nQ1\n??\nA1\nAnswerExtra\n\nQ2\n??\nA2", ...defaultArgs)).toEqual(
         [
-            [CardType.MultiLineReversed, "Line0\nQ1\n??\nA1\nAnswerExtra", 4],
-            [CardType.MultiLineReversed, "Q2\n??\nA2", 9],
+            [CardType.MultiLineReversed, "Line0\nQ1\n??\nA1\nAnswerExtra", /* Line0 */ 2, /* AnswerExtra */ 6],
+            [CardType.MultiLineReversed, "Q2\n??\nA2", 8, 10],
         ],
     );
 });
@@ -124,16 +117,16 @@ test("Test parsing of multi line reversed cards", () => {
 test("Test parsing of cloze cards", () => {
     // ==highlights==
     expect(parse("cloze ==deletion== test", ...defaultArgs)).toEqual([
-        [CardType.Cloze, "cloze ==deletion== test", 0],
+        [CardType.Cloze, "cloze ==deletion== test", 0, 0],
     ]);
     expect(parse("cloze ==deletion== test\n<!--SR:2021-08-11,4,270-->", ...defaultArgs)).toEqual([
-        [CardType.Cloze, "cloze ==deletion== test\n<!--SR:2021-08-11,4,270-->", 0],
+        [CardType.Cloze, "cloze ==deletion== test\n<!--SR:2021-08-11,4,270-->", 0, 1],
     ]);
     expect(parse("cloze ==deletion== test <!--SR:2021-08-11,4,270-->", ...defaultArgs)).toEqual([
-        [CardType.Cloze, "cloze ==deletion== test <!--SR:2021-08-11,4,270-->", 0],
+        [CardType.Cloze, "cloze ==deletion== test <!--SR:2021-08-11,4,270-->", 0, 0],
     ]);
     expect(parse("==this== is a ==deletion==\n", ...defaultArgs)).toEqual([
-        [CardType.Cloze, "==this== is a ==deletion==", 0],
+        [CardType.Cloze, "==this== is a ==deletion==", 0, 0],
     ]);
     expect(
         parse(
@@ -142,8 +135,8 @@ test("Test parsing of cloze cards", () => {
             ...defaultArgs,
         ),
     ).toEqual([
-        [CardType.Cloze, "a deletion on\nsuch ==wow==", 3],
-        [CardType.Cloze, "many text\nsuch surprise ==wow== more ==text==\nsome text after", 6],
+        [CardType.Cloze, "a deletion on\nsuch ==wow==", 2, 3],
+        [CardType.Cloze, "many text\nsuch surprise ==wow== more ==text==\nsome text after", 5, 7],
     ]);
     expect(parse("srdf ==", ...defaultArgs)).toEqual([]);
     expect(parse("lorem ipsum ==p\ndolor won==", ...defaultArgs)).toEqual([]);
@@ -155,16 +148,16 @@ test("Test parsing of cloze cards", () => {
 
     // **bolded**
     expect(parse("cloze **deletion** test", ...defaultArgs)).toEqual([
-        [CardType.Cloze, "cloze **deletion** test", 0],
+        [CardType.Cloze, "cloze **deletion** test", 0, 0],
     ]);
     expect(parse("cloze **deletion** test\n<!--SR:2021-08-11,4,270-->", ...defaultArgs)).toEqual([
-        [CardType.Cloze, "cloze **deletion** test\n<!--SR:2021-08-11,4,270-->", 0],
+        [CardType.Cloze, "cloze **deletion** test\n<!--SR:2021-08-11,4,270-->", 0, 1],
     ]);
     expect(parse("cloze **deletion** test <!--SR:2021-08-11,4,270-->", ...defaultArgs)).toEqual([
-        [CardType.Cloze, "cloze **deletion** test <!--SR:2021-08-11,4,270-->", 0],
+        [CardType.Cloze, "cloze **deletion** test <!--SR:2021-08-11,4,270-->", 0, 0],
     ]);
     expect(parse("**this** is a **deletion**\n", ...defaultArgs)).toEqual([
-        [CardType.Cloze, "**this** is a **deletion**", 0],
+        [CardType.Cloze, "**this** is a **deletion**", 0, 0],
     ]);
     expect(
         parse(
@@ -173,8 +166,8 @@ test("Test parsing of cloze cards", () => {
             ...defaultArgs,
         ),
     ).toEqual([
-        [CardType.Cloze, "a deletion on\nsuch **wow**", 3],
-        [CardType.Cloze, "many text\nsuch surprise **wow** more **text**\nsome text after", 6],
+        [CardType.Cloze, "a deletion on\nsuch **wow**", 2, 3],
+        [CardType.Cloze, "many text\nsuch surprise **wow** more **text**\nsome text after", 5, 7],
     ]);
     expect(parse("srdf **", ...defaultArgs)).toEqual([]);
     expect(parse("lorem ipsum **p\ndolor won**", ...defaultArgs)).toEqual([]);
@@ -186,7 +179,7 @@ test("Test parsing of cloze cards", () => {
 
     // both
     expect(parse("cloze **deletion** test ==another deletion==!", ...defaultArgs)).toEqual([
-        [CardType.Cloze, "cloze **deletion** test ==another deletion==!", 0],
+        [CardType.Cloze, "cloze **deletion** test ==another deletion==!", 0, 0],
     ]);
 });
 
@@ -206,12 +199,14 @@ test("Test parsing of a mix of card types", () => {
                 "Duis magna arcu, eleifend rhoncus ==euismod non,==\n" +
                 "laoreet vitae enim.",
             2,
+            4
         ],
-        [CardType.SingleLineBasic, "Fusce placerat::velit in pharetra gravida", 6],
+        [CardType.SingleLineBasic, "Fusce placerat::velit in pharetra gravida", 6, 6],
         [
             CardType.MultiLineReversed,
             "Donec dapibus ullamcorper aliquam.\n??\nDonec dapibus ullamcorper aliquam.\n<!--SR:2021-08-11,4,270-->",
-            9,
+            8,
+            11 /* <!--SR:2021-08-11,4,270--> */
         ],
     ]);
 });
@@ -229,7 +224,8 @@ test("Test codeblocks", () => {
             CardType.MultiLineBasic,
             "How do you ... Python?\n?\n" +
                 "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
-            1,
+            0,
+            6 /* ``` */
         ],
     ]);
 
@@ -245,7 +241,8 @@ test("Test codeblocks", () => {
             CardType.MultiLineBasic,
             "How do you ... Python?\n?\n" +
                 "```\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
-            1,
+            0,
+            9 /* ``` */
         ],
     ]);
 
@@ -277,7 +274,8 @@ test("Test codeblocks", () => {
                 "print('hello world')\n" +
                 "~~~\n" +
                 "````",
-            1,
+            0,
+            12 /* ``` */
         ],
     ]);
 });

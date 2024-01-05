@@ -126,8 +126,12 @@ export class Deck {
     }
 
     appendCard(topicPathList: TopicPathList, cardObj: Card): void {
-        for (const topicPath of topicPathList.list) {
-            this.appendCard_SingleTopic(topicPath, cardObj);
+        if (topicPathList.list.length == 0) {
+            this.appendCardToRootDeck(cardObj);
+        } else {
+            for (const topicPath of topicPathList.list) {
+                this.appendCard_SingleTopic(topicPath, cardObj);
+            }
         }
     }
 

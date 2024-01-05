@@ -1,23 +1,11 @@
 import { Card } from "./Card";
 import { CardScheduleInfo, NoteCardScheduleParser } from "./CardSchedule";
-import { parse } from "./parser";
+import { parseEx, ParsedQuestionInfo } from "./parser";
 import { CardType, Question } from "./Question";
 import { CardFrontBack, CardFrontBackUtil } from "./QuestionType";
 import { SRSettings } from "./settings";
 import { ISRFile } from "./SRFile";
 import { TopicPath, TopicPathList } from "./TopicPath";
-
-export class ParsedQuestionInfo {
-    cardType: CardType;
-    cardText: string;
-    lineNo: number;
-
-    constructor(cardType: CardType, cardText: string, lineNo: number) {
-        this.cardType = cardType;
-        this.cardText = cardText;
-        this.lineNo = lineNo;
-    }
-}
 
 export class NoteQuestionParser {
     settings: SRSettings;
@@ -48,9 +36,8 @@ export class NoteQuestionParser {
         this.noteTopicPathList = noteTopicPathList;
 
         const result: Question[] = [];
-        const parsedQuestionInfoList: [CardType, string, number][] = this.parseQuestions();
-        for (const t of parsedQuestionInfoList) {
-            const parsedQuestionInfo: ParsedQuestionInfo = new ParsedQuestionInfo(t[0], t[1], t[2]);
+        const parsedQuestionInfoList: ParsedQuestionInfo[] = this.parseQuestions();
+        for (const parsedQuestionInfo of parsedQuestionInfoList) {
             const question: Question = this.createQuestionObject(parsedQuestionInfo);
 
             // Each rawCardText can turn into multiple CardFrontBack's (e.g. CardType.Cloze, CardType.SingleLineReversed)
@@ -79,9 +66,9 @@ export class NoteQuestionParser {
         return result;
     }
 
-    private parseQuestions(): [CardType, string, number][] {
+    private parseQuestions(): ParsedQuestionInfo[] {
         const settings: SRSettings = this.settings;
-        const result: [CardType, string, number][] = parse(
+        const result: ParsedQuestionInfo[] = parseEx(
             this.noteText,
             settings.singleLineCardSeparator,
             settings.singleLineReversedCardSeparator,
@@ -95,15 +82,12 @@ export class NoteQuestionParser {
     }
 
     private createQuestionObject(parsedQuestionInfo: ParsedQuestionInfo): Question {
-        const { cardType, cardText, lineNo } = parsedQuestionInfo;
 
-        const questionContext: string[] = this.noteFile.getQuestionContext(lineNo);
+        const questionContext: string[] = this.noteFile.getQuestionContext(parsedQuestionInfo.firstLineNum);
         const result = Question.Create(
             this.settings,
-            cardType,
+            parsedQuestionInfo,
             this.noteTopicPathList,
-            cardText,
-            lineNo,
             questionContext,
         );
         return result;

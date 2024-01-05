@@ -6,6 +6,7 @@ import {
     SR_HTML_COMMENT_END,
 } from "./constants";
 import { Note } from "./Note";
+import { ParsedQuestionInfo } from "./parser";
 import { SRSettings } from "./settings";
 import { TopicPath, TopicPathList, TopicPathWithWs } from "./TopicPath";
 import { MultiLineTextFinder } from "./util/MultiLineTextFinder";
@@ -137,15 +138,21 @@ export class QuestionText {
 
 export class Question {
     note: Note;
-    questionType: CardType;
+    parsedQuestionInfo: ParsedQuestionInfo;
     topicPathList: TopicPathList;
     questionText: QuestionText;
-    lineNo: number;
     hasEditLaterTag: boolean;
     questionContext: string[];
     cards: Card[];
     hasChanged: boolean;
 
+    get questionType(): CardType {
+        return this.parsedQuestionInfo.cardType;
+    }
+    get lineNo(): number {
+        return this.parsedQuestionInfo.firstLineNum;
+    }
+    
     constructor(init?: Partial<Question>) {
         Object.assign(this, init);
     }
@@ -229,14 +236,12 @@ export class Question {
 
     static Create(
         settings: SRSettings,
-        questionType: CardType,
+        parsedQuestionInfo: ParsedQuestionInfo,
         noteTopicPathList: TopicPathList,
-        originalText: string,
-        lineNo: number,
         context: string[],
     ): Question {
-        const hasEditLaterTag = originalText.includes(settings.editLaterTag);
-        const questionText: QuestionText = QuestionText.create(originalText, settings);
+        const hasEditLaterTag = parsedQuestionInfo.text.includes(settings.editLaterTag);
+        const questionText: QuestionText = QuestionText.create(parsedQuestionInfo.text, settings);
 
         let topicPathList: TopicPathList = noteTopicPathList;
         if (questionText.topicPathWithWs) {
@@ -244,10 +249,9 @@ export class Question {
         }
 
         const result: Question = new Question({
-            questionType,
+            parsedQuestionInfo,
             topicPathList,
             questionText,
-            lineNo,
             hasEditLaterTag,
             questionContext: context,
             cards: null,

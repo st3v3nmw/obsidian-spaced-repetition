@@ -1,14 +1,16 @@
 import { CardType } from "./Question";
 
-export class ParserQuestionItem {
+export class ParsedQuestionInfo {
     cardType: CardType;
     text: string;
-    legacyLineNum: number;
+    firstLineNum: number;
+    lastLineNum: number;
 
-    constructor(cardType: CardType, text: string, legacyLineNum: number) {
+    constructor(cardType: CardType, text: string, firstLineNum: number, lastLineNum: number) {
         this.cardType = cardType;
         this.text = text;
-        this.legacyLineNum = legacyLineNum;
+        this.firstLineNum = firstLineNum;
+        this.lastLineNum = lastLineNum;
     }
 }
 
@@ -31,18 +33,20 @@ export function parseEx(
     convertHighlightsToClozes: boolean,
     convertBoldTextToClozes: boolean,
     convertCurlyBracketsToClozes: boolean,
-): ParserQuestionItem[] {
+): ParsedQuestionInfo[] {
     let cardText = "";
-    const cards: ParserQuestionItem[] = [];
+    const cards: ParsedQuestionInfo[] = [];
     let cardType: CardType | null = null;
-    let lineNo = 0;
+    let firstLineNo = 0;
+    let lastLineNo = 0;
 
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
     for (let i = 0; i < lines.length; i++) {
         const currentLine = lines[i];
         if (currentLine.length === 0) {
             if (cardType) {
-                cards.push(new ParserQuestionItem(cardType, cardText, lineNo));
+                lastLineNo = i - 1;
+                cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
                 cardType = null;
             }
 
@@ -56,6 +60,9 @@ export function parseEx(
 
         if (cardText.length > 0) {
             cardText += "\n";
+        } else if (cardText.length === 0) {
+            // This could be the first line of a multi line question
+            firstLineNo = i;
         }
         cardText += currentLine.trimEnd();
 
@@ -67,12 +74,13 @@ export function parseEx(
                 ? CardType.SingleLineReversed
                 : CardType.SingleLineBasic;
             cardText = lines[i];
-            lineNo = i;
+            firstLineNo = i;
             if (i + 1 < lines.length && lines[i + 1].startsWith("<!--SR:")) {
                 cardText += "\n" + lines[i + 1];
                 i++;
             }
-            cards.push(new ParserQuestionItem(cardType, cardText, lineNo));
+            lastLineNo = i;
+            cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
             cardType = null;
             cardText = "";
         } else if (
@@ -82,13 +90,15 @@ export function parseEx(
                 (convertCurlyBracketsToClozes && /{{.*?}}/gm.test(currentLine)))
         ) {
             cardType = CardType.Cloze;
-            lineNo = i;
+
+            // Explicitly don't change firstLineNo, as we might not see the cloze markers on the first line
+            // of a multi line cloze question. I.e. firstLineNo may be less than i;
         } else if (currentLine.trim() === multilineCardSeparator) {
             cardType = CardType.MultiLineBasic;
-            lineNo = i;
+            // Explicitly don't change firstLineNo, as per above comment
         } else if (currentLine.trim() === multilineReversedCardSeparator) {
             cardType = CardType.MultiLineReversed;
-            lineNo = i;
+            // Explicitly don't change firstLineNo, as per above comment
         } else if (currentLine.startsWith("```") || currentLine.startsWith("~~~")) {
             const codeBlockClose = currentLine.match(/`+|~+/)[0];
             while (i + 1 < lines.length && !lines[i + 1].startsWith(codeBlockClose)) {
@@ -101,7 +111,8 @@ export function parseEx(
     }
 
     if (cardType && cardText) {
-        cards.push(new ParserQuestionItem(cardType, cardText, lineNo));
+        lastLineNo = lines.length - 1;
+        cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
     }
 
     return cards;
