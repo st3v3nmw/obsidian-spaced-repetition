@@ -1,4 +1,4 @@
-import { parse } from "src/parser";
+import { parseEx, ParserQuestionItem } from "src/parser";
 import { CardType } from "src/Question";
 
 const defaultArgs: [string, string, string, string, boolean, boolean, boolean] = [
@@ -10,6 +10,35 @@ const defaultArgs: [string, string, string, string, boolean, boolean, boolean] =
     true,
     true,
 ];
+
+/**
+ * Returns flashcards found in `text`
+ *
+ * @param text - The text to extract flashcards from
+ * @param singlelineCardSeparator - Separator for inline basic cards
+ * @param singlelineReversedCardSeparator - Separator for inline reversed cards
+ * @param multilineCardSeparator - Separator for multiline basic cards
+ * @param multilineReversedCardSeparator - Separator for multiline basic card
+ * @returns An array of [CardType, card text, line number] tuples
+ */
+export function parse(
+    text: string,
+    singlelineCardSeparator: string,
+    singlelineReversedCardSeparator: string,
+    multilineCardSeparator: string,
+    multilineReversedCardSeparator: string,
+    convertHighlightsToClozes: boolean,
+    convertBoldTextToClozes: boolean,
+    convertCurlyBracketsToClozes: boolean,
+): [CardType, string, number][] {
+    const list: ParserQuestionItem[] = parseEx(text, singlelineCardSeparator, singlelineReversedCardSeparator, multilineCardSeparator, 
+        multilineReversedCardSeparator, convertHighlightsToClozes, convertBoldTextToClozes, convertCurlyBracketsToClozes);
+    const result: [CardType, string, number][] = [];
+    for (const item of list) {
+        result.push([item.cardType, item.text, item.legacyLineNum]);
+    }
+    return result;
+}
 
 test("Test parsing of single line basic cards", () => {
     expect(parse("Question::Answer", ...defaultArgs)).toEqual([

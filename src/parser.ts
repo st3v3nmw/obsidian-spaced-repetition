@@ -1,5 +1,17 @@
 import { CardType } from "./Question";
 
+export class ParserQuestionItem {
+    cardType: CardType;
+    text: string;
+    legacyLineNum: number;
+
+    constructor(cardType: CardType, text: string, legacyLineNum: number) {
+        this.cardType = cardType;
+        this.text = text;
+        this.legacyLineNum = legacyLineNum;
+    }
+}
+
 /**
  * Returns flashcards found in `text`
  *
@@ -10,7 +22,7 @@ import { CardType } from "./Question";
  * @param multilineReversedCardSeparator - Separator for multiline basic card
  * @returns An array of [CardType, card text, line number] tuples
  */
-export function parse(
+export function parseEx(
     text: string,
     singlelineCardSeparator: string,
     singlelineReversedCardSeparator: string,
@@ -19,9 +31,9 @@ export function parse(
     convertHighlightsToClozes: boolean,
     convertBoldTextToClozes: boolean,
     convertCurlyBracketsToClozes: boolean,
-): [CardType, string, number][] {
+): ParserQuestionItem[] {
     let cardText = "";
-    const cards: [CardType, string, number][] = [];
+    const cards: ParserQuestionItem[] = [];
     let cardType: CardType | null = null;
     let lineNo = 0;
 
@@ -30,7 +42,7 @@ export function parse(
         const currentLine = lines[i];
         if (currentLine.length === 0) {
             if (cardType) {
-                cards.push([cardType, cardText, lineNo]);
+                cards.push(new ParserQuestionItem(cardType, cardText, lineNo));
                 cardType = null;
             }
 
@@ -60,7 +72,7 @@ export function parse(
                 cardText += "\n" + lines[i + 1];
                 i++;
             }
-            cards.push([cardType, cardText, lineNo]);
+            cards.push(new ParserQuestionItem(cardType, cardText, lineNo));
             cardType = null;
             cardText = "";
         } else if (
@@ -89,7 +101,7 @@ export function parse(
     }
 
     if (cardType && cardText) {
-        cards.push([cardType, cardText, lineNo]);
+        cards.push(new ParserQuestionItem(cardType, cardText, lineNo));
     }
 
     return cards;
