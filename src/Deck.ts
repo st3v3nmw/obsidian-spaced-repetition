@@ -67,6 +67,10 @@ export class Deck {
         return this.parent == null;
     }
 
+    getDeckByTopicTag(tag: string): Deck {
+        return this.getDeck(TopicPath.getTopicPathFromTag(tag));
+    }
+
     getDeck(topicPath: TopicPath): Deck {
         return this._getOrCreateDeck(topicPath, false);
     }

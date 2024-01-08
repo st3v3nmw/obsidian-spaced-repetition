@@ -106,6 +106,21 @@ export function upgradeSettings(settings: SRSettings) {
     }
 }
 
+export class SettingsUtil {
+    static isFlashcardTag(settings: SRSettings, tag: string): boolean {
+        return SettingsUtil.isTagInList(settings.flashcardTags, tag);
+    }
+
+    private static isTagInList(tagList: string[], tag: string): boolean {
+        for (const tagFromList of tagList) {
+            if (tag === tagFromList || tag.startsWith(tagFromList + "/")) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
 // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
 let applyDebounceTimer = 0;
 function applySettingsUpdate(callback: () => void): void {

@@ -39,25 +39,6 @@ export class TopicPath {
         return result;
     }
 
-    static getFlashcardFilteredTopicPathListOfFile(noteFile: ISRFile, settings: SRSettings): TopicPathList {
-        let deckPath: string[] = [];
-        let result: TopicPathList;
-
-        if (settings.convertFoldersToDecks) {
-            deckPath = noteFile.path.split("/");
-            deckPath.pop(); // remove filename
-            if (deckPath.length != 0) {
-                result = new TopicPathList([new TopicPath(deckPath)]);
-            }
-        } else {
-            const validTopicPathList: TopicPathList = this.getFlashcardSettingsTopicPathList(settings);
-            const tagList: TopicPathList = this.convertTagListToTopicPathList(noteFile.getAllTags());
-            result = this.filterValidTopicPathsFromTagList(tagList, validTopicPathList);
-        }
-
-        return result;
-    }
-
     isSameOrAncestorOf(topicPath: TopicPath): boolean {
         if (this.isEmptyPath) return topicPath.isEmptyPath;
         if (this.path.length > topicPath.path.length) return false;
@@ -70,6 +51,59 @@ export class TopicPath {
     static getTopicPathFromCardText(cardText: string): TopicPath {
         const path = cardText.trimStart().match(OBSIDIAN_TAG_AT_STARTOFLINE_REGEX)?.slice(-1)[0];
         return path?.length > 0 ? TopicPath.getTopicPathFromTag(path) : null;
+    }
+
+    static isValidTag(tag: string): boolean {
+        if (tag == null || tag.length == 0) return false;
+        if (tag[0] != "#") return false;
+        if (tag.length == 1) return false;
+
+        return true;
+    }
+
+    static getTopicPathFromTag(tag: string): TopicPath {
+        if (tag == null || tag.length == 0) throw "Null/empty tag";
+        if (tag[0] != "#") throw "Tag must start with #";
+        if (tag.length == 1) throw "Invalid tag";
+
+        const path: string[] = tag
+            .replace("#", "")
+            .split("/")
+            .filter((str) => str);
+        return new TopicPath(path);
+    }
+}
+
+export class TopicPathList {
+    list: TopicPath[];
+    lineNum: number;
+
+    constructor(list: TopicPath[], lineNum: number = null) {
+        if (list == null) throw "TopicPathList null";
+        this.list = list;
+        this.lineNum = lineNum;
+    }
+
+    isAnyElementSameOrAncestorOf(topicPath: TopicPath): boolean {
+        return this.list.some((item) => item.isSameOrAncestorOf(topicPath));
+    }
+
+    formatPsv() {
+        return this.format("|");
+    }
+
+    format(sep: string) {
+        return this.list.map((topicPath) => topicPath.formatAsTag()).join(sep);
+    }
+
+    static empty(): TopicPathList {
+        return new TopicPathList([]);
+    }
+
+    static fromPsv(str: string, lineNum: number): TopicPathList {
+        const result: TopicPathList = TopicPathList.convertTagListToTopicPathList(str.split("|"));
+        result.lineNum = lineNum;
+        return result;
     }
 
     static getFlashcardSettingsTopicPathList(settings: SRSettings): TopicPathList {
@@ -101,54 +135,9 @@ export class TopicPath {
     static convertTagListToTopicPathList(tagList: string[]): TopicPathList {
         const result: TopicPath[] = [];
         for (const tag of tagList) {
-            if (this.isValidTag(tag)) result.push(TopicPath.getTopicPathFromTag(tag));
+            if (TopicPath.isValidTag(tag)) result.push(TopicPath.getTopicPathFromTag(tag));
         }
         return new TopicPathList(result);
-    }
-
-    static isValidTag(tag: string): boolean {
-        if (tag == null || tag.length == 0) return false;
-        if (tag[0] != "#") return false;
-        if (tag.length == 1) return false;
-
-        return true;
-    }
-
-    static getTopicPathFromTag(tag: string): TopicPath {
-        if (tag == null || tag.length == 0) throw "Null/empty tag";
-        if (tag[0] != "#") throw "Tag must start with #";
-        if (tag.length == 1) throw "Invalid tag";
-
-        const path: string[] = tag
-            .replace("#", "")
-            .split("/")
-            .filter((str) => str);
-        return new TopicPath(path);
-    }
-}
-
-export class TopicPathList {
-    list: TopicPath[];
-
-    constructor(list: TopicPath[]) {
-        if (list == null) throw "TopicPathList null";
-        this.list = list;
-    }
-
-    isAnyElementSameOrAncestorOf(topicPath: TopicPath): boolean {
-        return this.list.some((item) => item.isSameOrAncestorOf(topicPath));
-    }
-
-    formatPsv() {
-        return this.format("|");
-    }
-
-    format(sep: string) {
-        return this.list.map((topicPath) => topicPath.formatAsTag()).join(sep);
-    }
-
-    static empty(): TopicPathList {
-        return new TopicPathList([]);
     }
 }
 

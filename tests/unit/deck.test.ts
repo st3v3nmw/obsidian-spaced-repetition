@@ -194,30 +194,32 @@ describe("copyWithCardFilter()", () => {
         });
 
         test("With new cards", async () => {
-            let text: string = `
+            let text: string = `#flashcards
 Q1::A1
 Q2::A2
 Q3::A3`;
             let original: Deck = await SampleItemDecks.createDeckFromText(
                 text,
-                new TopicPath(["Root"]),
+                TopicPath.emptyPath,
             );
             let copy: Deck = original.copyWithCardFilter((card) => card.front.includes("2"));
+            copy = copy.getDeckByTopicTag("#flashcards");
 
             expect(copy.newFlashcards.length).toEqual(1);
             expect(copy.newFlashcards[0].front).toEqual("Q2");
         });
 
         test("With scheduled cards", async () => {
-            let text: string = `
+            let text: string = `#flashcards
 Q1::A1 <!--SR:!2023-09-02,4,270-->
 Q2::A2 <!--SR:!2023-09-02,4,270-->
 Q3::A3 <!--SR:!2023-09-02,4,270-->`;
             let original: Deck = await SampleItemDecks.createDeckFromText(
                 text,
-                new TopicPath(["Root"]),
+                TopicPath.emptyPath,
             );
             let copy: Deck = original.copyWithCardFilter((card) => !card.front.includes("2"));
+            copy = copy.getDeck(TopicPath.getTopicPathFromTag("#flashcards"))
 
             expect(copy.newFlashcards.length).toEqual(0);
             expect(copy.dueFlashcards.length).toEqual(2);

@@ -697,7 +697,7 @@ export default class SRPlugin extends Plugin {
     }
 
     findTopicPathList(note: ISRFile): TopicPathList {
-        return TopicPath.getFlashcardFilteredTopicPathListOfFile(note, this.data.settings);
+        // return TopicPathList.getFlashcardFilteredTopicPathListOfFile(note, this.data.settings);
     }
 
     async loadPluginData(): Promise<void> {

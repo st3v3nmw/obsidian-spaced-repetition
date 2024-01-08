@@ -1,5 +1,5 @@
 import { YAML_FRONT_MATTER_REGEX } from "src/constants";
-import { literalStringReplace } from "src/util/utils";
+import { extractFrontmatter, literalStringReplace } from "src/util/utils";
 
 describe("literalStringReplace", () => {
     test("Replacement string doesn't have any dollar signs", async () => {
@@ -89,5 +89,73 @@ describe("YAML_FRONT_MATTER_REGEX", () => {
         const sep: string = String.fromCharCode(13, 10);
         const text: string = createTestStr1(sep);
         expect(YAML_FRONT_MATTER_REGEX.test(text)).toEqual(true);
+    });
+});
+
+
+describe("extractFrontmatter", () => {
+    test("No frontmatter", () => {
+        let text: string = `Hello
+Goodbye`;
+        let frontmatter: string;
+        let content: string;
+         [frontmatter, content] = extractFrontmatter(text);
+        expect(frontmatter).toEqual("");
+        expect(content).toEqual(text);
+
+        text = `---
+Goodbye`;
+         [frontmatter, content] = extractFrontmatter(text);
+        expect(frontmatter).toEqual("");
+        expect(content).toEqual(text);
+});
+
+    test("With frontmatter (and nothing else)", () => {
+
+        let frontmatter: string = `---
+sr-due: 2024-01-17
+sr-interval: 16
+sr-ease: 278
+tags:
+  - flashcards/aws
+  - flashcards/datascience
+---`;
+        const text: string = frontmatter;
+        let content: string;
+        [frontmatter, content] = extractFrontmatter(text);
+        expect(frontmatter).toEqual(text);
+        expect(content).toEqual("");
+    });
+
+    test("With frontmatter (and content)", () => {
+
+        let frontmatter: string = `---
+sr-due: 2024-01-17
+sr-interval: 16
+sr-ease: 278
+tags:
+  - flashcards/aws
+  - flashcards/datascience
+---`;
+const content: string =  `#flashcards/science/chemistry
+
+# Questions
+
+Chemistry Question from file underelephant 4A::goodby
+<!--SR:!2023-11-02,17,290-->
+Chemistry Question from file underdog 4B::goodby
+<!--SR:!2023-12-18,57,310-->
+Chemistry Question from file underdog 4C::goodby
+<!--SR:!2023-10-25,3,210-->
+This single {{question}} turns into {{3 separate}} {{cards}}
+<!--SR:!2023-10-20,1,241!2023-10-25,3,254!2023-10-23,1,221-->
+
+`;
+const text: string =  `${frontmatter}
+${content}`;
+
+        const [f, c] = extractFrontmatter(text);
+        expect(f).toEqual(frontmatter);
+        expect(c).toEqual(content);
     });
 });

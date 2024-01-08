@@ -4,13 +4,13 @@ import {
     Vault,
     getAllTags as ObsidianGetAllTags,
     HeadingCache,
+    TagCache,
 } from "obsidian";
-import { getAllTagsFromText } from "./util/utils";
 
 export interface ISRFile {
     get path(): string;
     get basename(): string;
-    getAllTags(): string[];
+    getAllTagsFromText(): TagCache[];
     getQuestionContext(cardLine: number): string[];
     read(): Promise<string>;
     write(content: string): Promise<void>;
@@ -35,9 +35,12 @@ export class SrTFile implements ISRFile {
         return this.file.basename;
     }
 
-    getAllTags(): string[] {
+    getAllTagsFromText(): TagCache[] {
+        let result: TagCache[];
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
-        return ObsidianGetAllTags(fileCachedData) || [];
+        if (fileCachedData.tags?.length > 0) result = fileCachedData.tags;
+        else result = [] as TagCache[];
+        return result;
     }
 
     getQuestionContext(cardLine: number): string[] {
@@ -70,40 +73,5 @@ export class SrTFile implements ISRFile {
 
     async write(content: string): Promise<void> {
         await this.vault.modify(this.file, content);
-    }
-}
-
-export class UnitTestSRFile implements ISRFile {
-    content: string;
-    _path: string;
-
-    constructor(content: string, path: string = null) {
-        this.content = content;
-        this._path = path;
-    }
-
-    get path(): string {
-        return this._path;
-    }
-
-    get basename(): string {
-        return "";
-    }
-
-    getAllTags(): string[] {
-        return getAllTagsFromText(this.content);
-    }
-
-    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
-    getQuestionContext(cardLine: number): string[] {
-        return [];
-    }
-
-    async read(): Promise<string> {
-        return this.content;
-    }
-
-    async write(content: string): Promise<void> {
-        this.content = content;
     }
 }

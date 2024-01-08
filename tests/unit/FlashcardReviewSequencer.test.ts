@@ -16,7 +16,6 @@ import { TopicPath } from "src/TopicPath";
 import { CardListType, Deck, DeckTreeFilter } from "src/Deck";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { SampleItemDecks } from "./SampleItems";
-import { UnitTestSRFile } from "src/SRFile";
 import { ReviewResponse } from "src/scheduling";
 import {
     setupStaticDateProvider,
@@ -26,6 +25,7 @@ import {
 import moment from "moment";
 import { INoteEaseList, NoteEaseList } from "src/NoteEaseList";
 import { QuestionPostponementList, IQuestionPostponementList } from "src/QuestionPostponementList";
+import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
 
 let order_DueFirst_Sequential: IIteratorOrder = {
     cardOrder: CardOrder.DueFirstSequential,
@@ -80,10 +80,14 @@ class TestContext {
     }
 
     async setSequencerDeckTreeFromOriginalText(): Promise<Deck> {
-        const deckTree: Deck = await SampleItemDecks.createDeckFromFile(
+        let deckTree: Deck = await SampleItemDecks.createDeckFromFile(
             this.file,
             new TopicPath(["Root"]),
         );
+        if ((deckTree.getCardCount(CardListType.All, false) == 0) && (deckTree.subdecks.length == 1)) {
+            // For some tests, all cards are within the subdeck (e.g. "#flashcards")
+            deckTree = deckTree.subdecks[0];
+        }
         const remainingDeckTree = DeckTreeFilter.filterForRemainingCards(
             this.questionPostponementList,
             deckTree,
@@ -323,7 +327,7 @@ describe("setDeckTree", () => {
 
     // After setDeckTree, the first card in the deck is the current card
     test("Single level deck with some new cards", async () => {
-        let text: string = `
+        let text: string = `#flashcards
 Q1::A1
 Q2::A2
 Q3::A3`;
@@ -334,6 +338,7 @@ Q3::A3`;
             text,
         );
         let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
+        const flashcardDeck: Deck = deck.getDeckByTopicTag("#flashcards");
         expect(deck.newFlashcards.length).toEqual(3);
 
         expect(c.reviewSequencer.currentDeck.newFlashcards.length).toEqual(3);
@@ -505,7 +510,8 @@ describe("processReview", () => {
                 let settings: SRSettings = { ...DEFAULT_SETTINGS };
                 settings.burySiblingCards = false;
 
-                let text: string = `
+                let text: string = `#flashcards
+
 #flashcards This single ==question== turns into ==3 separate== ==cards==
 
 Q1::A1
@@ -547,6 +553,7 @@ Q1::A1
                 let text: string = `
 #flashcards ${clozeQuestion1}
 
+#flashcards
 Q1::A1
     `;
 
@@ -580,6 +587,7 @@ Q1::A1
                 let text: string = `
 #flashcards ${clozeQuestion1}
 
+#flashcards
 Q1::A1
     `;
 
@@ -698,7 +706,7 @@ $$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$`;
             let indent: string = "    ";
 
             // Note that "- bar?::baz" is intentionally indented
-            let text: string = `
+            let text: string = `#flashcards
 - foo
 ${indent}- bar?::baz
 `;
