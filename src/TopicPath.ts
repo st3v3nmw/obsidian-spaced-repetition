@@ -128,20 +128,23 @@ export class TopicPathList {
         return this.convertTagListToTopicPathList(settings.flashcardTags);
     }
 
-    // 
+    //
     // tagList is a list of tags such as:
     //      ["#flashcards/computing", "#boring-stuff", "#news-worthy"]
-    // validTopicPathList is a list of valid tags, such as those from settings.flashcardTags,E.g. 
+    // validTopicPathList is a list of valid tags, such as those from settings.flashcardTags,E.g.
     //      ["#flashcards"]
-    // 
+    //
     // This returns a filtered version of tagList, containing only topic paths that are considered valid.
     // Validity is defined as "isAnyElementSameOrAncestorOf", and "#flashcards" is considered the ancestor of
     // "#flashcards/computing".
-    // 
+    //
     // Therefore this would return:
     //      "#flashcards/computing" (but not "#boring-stuff" or "#news-worthy")
-    // 
-    static filterValidTopicPathsFromTagList(list: TopicPathList, validTopicPathList: TopicPathList): TopicPathList {
+    //
+    static filterValidTopicPathsFromTagList(
+        list: TopicPathList,
+        validTopicPathList: TopicPathList,
+    ): TopicPathList {
         let result: TopicPath[] = [];
         for (const tag of list.list) {
             if (validTopicPathList.isAnyElementSameOrAncestorOf(tag)) result.push(tag);

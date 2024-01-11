@@ -114,8 +114,12 @@ export function extractFrontmatter(str: string): [string, string] {
 
         if (frontmatterEndLineNum) {
             const frontmatterStartLineNum: number = 0;
-            const frontmatterLineCount: number = (frontmatterEndLineNum - frontmatterStartLineNum) + 1;
-            const frontmatterLines: string[] = lines.splice(frontmatterStartLineNum, frontmatterLineCount);
+            const frontmatterLineCount: number =
+                frontmatterEndLineNum - frontmatterStartLineNum + 1;
+            const frontmatterLines: string[] = lines.splice(
+                frontmatterStartLineNum,
+                frontmatterLineCount,
+            );
             frontmatter = frontmatterLines.join("\n");
             content = lines.join("\n");
         }
@@ -123,4 +127,3 @@ export function extractFrontmatter(str: string): [string, string] {
     if (frontmatter.length == 0) content = str;
     return [frontmatter, content];
 }
-

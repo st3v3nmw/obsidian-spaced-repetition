@@ -49,7 +49,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
     // This is set by the caller, and must have the same deck hierarchy as originalDeckTree.
     private remainingDeckTree: Deck;
-    
+
     private reviewMode: FlashcardReviewMode;
     private cardSequencer: IDeckTreeIterator;
     private settings: SRSettings;

@@ -21,10 +21,7 @@ export class DeckTreeStatsCalculator {
             cardOrder: CardOrder.DueFirstSequential,
         };
         // Iteration is a destructive operation on the supplied tree, so we first take a copy
-        const iterator: IDeckTreeIterator = new DeckTreeIterator(
-            iteratorOrder,
-            deckTree.clone ()
-        );
+        const iterator: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, deckTree.clone());
         const result = new Stats();
         iterator.setIteratorTopicPath(TopicPath.emptyPath);
         while (iterator.nextCard()) {

@@ -25,7 +25,7 @@ export class NoteFileLoader {
         const questionList: Question[] = await questionParser.createQuestionList(
             noteFile,
             folderTopicPath,
-            onlyKeepQuestionsWithTopicPath
+            onlyKeepQuestionsWithTopicPath,
         );
 
         const result: Note = new Note(noteFile, questionList);

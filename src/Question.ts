@@ -152,7 +152,7 @@ export class Question {
     get lineNo(): number {
         return this.parsedQuestionInfo.firstLineNum;
     }
-    
+
     constructor(init?: Partial<Question>) {
         Object.assign(this, init);
     }
@@ -245,7 +245,7 @@ export class Question {
 
         let topicPathList: TopicPathList = noteTopicPathList;
         if (questionText.topicPathWithWs) {
-            topicPathList = new TopicPathList([ questionText.topicPathWithWs.topicPath]);
+            topicPathList = new TopicPathList([questionText.topicPathWithWs.topicPath]);
         }
 
         const result: Question = new Question({

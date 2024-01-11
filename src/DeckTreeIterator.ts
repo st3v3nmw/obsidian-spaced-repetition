@@ -185,20 +185,20 @@ class SingleDeckIterator {
     }
 }
 
-// 
+//
 // Note that this iterator is destructive over the deck tree supplied to setBaseDeck()
 // The caller is required to first make a clone if this behavior is unwanted.
-// 
+//
 // Handling of multi-deck cards (implemented for https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/495):
 //      A "multi-deck card" is a card that is present in multiple decks, e.g. the following cat question is present in
 //      two separate decks.
-//  
-//      #flashcards/language/words #flashcards/trivia/interesting 
+//
+//      #flashcards/language/words #flashcards/trivia/interesting
 //      A group of cats is called a::clowder
-// 
+//
 //      1. Whilst iterating, any multi-deck card is only returned once.
 //      2. All copies are removed from the deck tree supplied to setBaseDeck()
-// 
+//
 export class DeckTreeIterator implements IDeckTreeIterator {
     private iteratorOrder: IIteratorOrder;
 

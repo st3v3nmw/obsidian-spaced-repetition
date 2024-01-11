@@ -92,26 +92,24 @@ describe("YAML_FRONT_MATTER_REGEX", () => {
     });
 });
 
-
 describe("extractFrontmatter", () => {
     test("No frontmatter", () => {
         let text: string = `Hello
 Goodbye`;
         let frontmatter: string;
         let content: string;
-         [frontmatter, content] = extractFrontmatter(text);
+        [frontmatter, content] = extractFrontmatter(text);
         expect(frontmatter).toEqual("");
         expect(content).toEqual(text);
 
         text = `---
 Goodbye`;
-         [frontmatter, content] = extractFrontmatter(text);
+        [frontmatter, content] = extractFrontmatter(text);
         expect(frontmatter).toEqual("");
         expect(content).toEqual(text);
-});
+    });
 
     test("With frontmatter (and nothing else)", () => {
-
         let frontmatter: string = `---
 sr-due: 2024-01-17
 sr-interval: 16
@@ -128,7 +126,6 @@ tags:
     });
 
     test("With frontmatter (and content)", () => {
-
         let frontmatter: string = `---
 sr-due: 2024-01-17
 sr-interval: 16
@@ -137,7 +134,7 @@ tags:
   - flashcards/aws
   - flashcards/datascience
 ---`;
-const content: string =  `#flashcards/science/chemistry
+        const content: string = `#flashcards/science/chemistry
 
 # Questions
 
@@ -151,7 +148,7 @@ This single {{question}} turns into {{3 separate}} {{cards}}
 <!--SR:!2023-10-20,1,241!2023-10-25,3,254!2023-10-23,1,221-->
 
 `;
-const text: string =  `${frontmatter}
+        const text: string = `${frontmatter}
 ${content}`;
 
         const [f, c] = extractFrontmatter(text);

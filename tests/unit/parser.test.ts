@@ -26,8 +26,16 @@ function parse(
     convertBoldTextToClozes: boolean,
     convertCurlyBracketsToClozes: boolean,
 ): [CardType, string, number, number][] {
-    const list: ParsedQuestionInfo[] = parseEx(text, singlelineCardSeparator, singlelineReversedCardSeparator, multilineCardSeparator, 
-        multilineReversedCardSeparator, convertHighlightsToClozes, convertBoldTextToClozes, convertCurlyBracketsToClozes);
+    const list: ParsedQuestionInfo[] = parseEx(
+        text,
+        singlelineCardSeparator,
+        singlelineReversedCardSeparator,
+        multilineCardSeparator,
+        multilineReversedCardSeparator,
+        convertHighlightsToClozes,
+        convertBoldTextToClozes,
+        convertCurlyBracketsToClozes,
+    );
     const result: [CardType, string, number, number][] = [];
     for (const item of list) {
         result.push([item.cardType, item.text, item.firstLineNum, item.lastLineNum]);
@@ -90,7 +98,12 @@ test("Test parsing of multi line basic cards", () => {
         [CardType.MultiLineBasic, "Question\n?\nAnswer line 1\nAnswer line 2", 0, 3],
     ]);
     expect(parse("#Title\n\nLine0\nQ1\n?\nA1\nAnswerExtra\n\nQ2\n?\nA2", ...defaultArgs)).toEqual([
-        [CardType.MultiLineBasic, "Line0\nQ1\n?\nA1\nAnswerExtra", /* Line0 */ 2, /* AnswerExtra */ 6],
+        [
+            CardType.MultiLineBasic,
+            "Line0\nQ1\n?\nA1\nAnswerExtra",
+            /* Line0 */ 2,
+            /* AnswerExtra */ 6,
+        ],
         [CardType.MultiLineBasic, "Q2\n?\nA2", 8, 10],
     ]);
     expect(parse("#flashcards/tag-on-previous-line\nQuestion\n?\nAnswer", ...defaultArgs)).toEqual([
@@ -110,7 +123,12 @@ test("Test parsing of multi line reversed cards", () => {
     ]);
     expect(parse("#Title\n\nLine0\nQ1\n??\nA1\nAnswerExtra\n\nQ2\n??\nA2", ...defaultArgs)).toEqual(
         [
-            [CardType.MultiLineReversed, "Line0\nQ1\n??\nA1\nAnswerExtra", /* Line0 */ 2, /* AnswerExtra */ 6],
+            [
+                CardType.MultiLineReversed,
+                "Line0\nQ1\n??\nA1\nAnswerExtra",
+                /* Line0 */ 2,
+                /* AnswerExtra */ 6,
+            ],
             [CardType.MultiLineReversed, "Q2\n??\nA2", 8, 10],
         ],
     );
@@ -201,14 +219,14 @@ test("Test parsing of a mix of card types", () => {
                 "Duis magna arcu, eleifend rhoncus ==euismod non,==\n" +
                 "laoreet vitae enim.",
             2,
-            4
+            4,
         ],
         [CardType.SingleLineBasic, "Fusce placerat::velit in pharetra gravida", 6, 6],
         [
             CardType.MultiLineReversed,
             "Donec dapibus ullamcorper aliquam.\n??\nDonec dapibus ullamcorper aliquam.\n<!--SR:2021-08-11,4,270-->",
             8,
-            11 /* <!--SR:2021-08-11,4,270--> */
+            11 /* <!--SR:2021-08-11,4,270--> */,
         ],
     ]);
 });
@@ -227,7 +245,7 @@ test("Test codeblocks", () => {
             "How do you ... Python?\n?\n" +
                 "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
             0,
-            6 /* ``` */
+            6 /* ``` */,
         ],
     ]);
 
@@ -244,7 +262,7 @@ test("Test codeblocks", () => {
             "How do you ... Python?\n?\n" +
                 "```\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
             0,
-            9 /* ``` */
+            9 /* ``` */,
         ],
     ]);
 
@@ -277,7 +295,7 @@ test("Test codeblocks", () => {
                 "~~~\n" +
                 "````",
             0,
-            12 /* ``` */
+            12 /* ``` */,
         ],
     ]);
 });

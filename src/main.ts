@@ -1,4 +1,12 @@
-import { Notice, Plugin, TAbstractFile, TFile, getAllTags, FrontMatterCache, TagCache } from "obsidian";
+import {
+    Notice,
+    Plugin,
+    TAbstractFile,
+    TFile,
+    getAllTags,
+    FrontMatterCache,
+    TagCache,
+} from "obsidian";
 import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, upgradeSettings } from "src/settings";
@@ -490,7 +498,10 @@ export default class SRPlugin extends Plugin {
         this.statusBar.setText(
             t("STATUS_BAR", {
                 dueNotesCount: this.dueNotesCount,
-                dueFlashcardsCount: this.remainingDeckTree.getDistinctCardCount(CardListType.All, true),
+                dueFlashcardsCount: this.remainingDeckTree.getDistinctCardCount(
+                    CardListType.All,
+                    true,
+                ),
             }),
         );
 
@@ -501,7 +512,10 @@ export default class SRPlugin extends Plugin {
     async loadNote(noteFile: TFile): Promise<Note> {
         const loader: NoteFileLoader = new NoteFileLoader(this.data.settings);
         const srFile: ISRFile = this.createSrTFile(noteFile);
-        const folderTopicPath: TopicPath = TopicPath.getFolderPathFromFilename(srFile, this.data.settings);
+        const folderTopicPath: TopicPath = TopicPath.getFolderPathFromFilename(
+            srFile,
+            this.data.settings,
+        );
 
         const note: Note = await loader.load(this.createSrTFile(noteFile), folderTopicPath);
         if (note.hasChanged) {

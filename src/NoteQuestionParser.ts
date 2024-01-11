@@ -24,24 +24,34 @@ export class NoteQuestionParser {
         this.settings = settings;
     }
 
-    async createQuestionList(noteFile: ISRFile, folderTopicPath: TopicPath, onlyKeepQuestionsWithTopicPath: boolean): Promise<Question[]> {
+    async createQuestionList(
+        noteFile: ISRFile,
+        folderTopicPath: TopicPath,
+        onlyKeepQuestionsWithTopicPath: boolean,
+    ): Promise<Question[]> {
         this.noteFile = noteFile;
         const noteText: string = await noteFile.read();
 
         // Get the list of tags, and analyse for the topic list
         const tagCacheList: TagCache[] = noteFile.getAllTagsFromText();
 
-        const hasTopicPaths = tagCacheList.some((item) => SettingsUtil.isFlashcardTag(this.settings, item.tag)) || 
+        const hasTopicPaths =
+            tagCacheList.some((item) => SettingsUtil.isFlashcardTag(this.settings, item.tag)) ||
             folderTopicPath.hasPath;
         if (hasTopicPaths) {
             // The following analysis can require fair computation.
             // There is no point doing it if there aren't any topic paths
 
             // Create the question list
-            this.questionList = this.doCreateQuestionList(noteText, folderTopicPath, this.tagCacheList);
+            this.questionList = this.doCreateQuestionList(
+                noteText,
+                folderTopicPath,
+                this.tagCacheList,
+            );
 
             // For each question, determine it's TopicPathList
-            [ this.frontmatterTopicPathList, this.contentTopicPathInfo ] = this.analyseTagCacheList(tagCacheList);
+            [this.frontmatterTopicPathList, this.contentTopicPathInfo] =
+                this.analyseTagCacheList(tagCacheList);
             for (const question of this.questionList) {
                 question.topicPathList = this.determineQuestionTopicPathList(question);
             }
@@ -56,7 +66,11 @@ export class NoteQuestionParser {
         return this.questionList;
     }
 
-    private doCreateQuestionList(noteText: string, folderTopicPath: TopicPath, tagCacheList: TagCache[]): Question[] {
+    private doCreateQuestionList(
+        noteText: string,
+        folderTopicPath: TopicPath,
+        tagCacheList: TagCache[],
+    ): Question[] {
         this.noteText = noteText;
         this.noteLines = splitTextIntoLineArray(noteText);
         this.folderTopicPath = folderTopicPath;
@@ -109,8 +123,9 @@ export class NoteQuestionParser {
     }
 
     private createQuestionObject(parsedQuestionInfo: ParsedQuestionInfo): Question {
-
-        const questionContext: string[] = this.noteFile.getQuestionContext(parsedQuestionInfo.firstLineNum);
+        const questionContext: string[] = this.noteFile.getQuestionContext(
+            parsedQuestionInfo.firstLineNum,
+        );
         const result = Question.Create(
             this.settings,
             parsedQuestionInfo,
@@ -146,7 +161,7 @@ export class NoteQuestionParser {
         return siblings;
     }
 
-    // 
+    //
     // Given the complete list of tags within a note:
     // 1.   Only keep tags that are specified in the user settings as flashcardTags
     // 2.   Filter out tags that are question specific
@@ -155,42 +170,48 @@ export class NoteQuestionParser {
     //      - All tags present on the same line grouped together
     //      - All tags within frontmatter grouped together (note that multiple tags
     //      within frontmatter appear on separate lines)
-    //  
-    private analyseTagCacheList(tagCacheList: TagCache[]): [ TopicPathList, TopicPathList[]] {
+    //
+    private analyseTagCacheList(tagCacheList: TagCache[]): [TopicPathList, TopicPathList[]] {
         let frontmatterTopicPathList: TopicPathList = null;
         const contentTopicPathList: TopicPathList[] = [] as TopicPathList[];
 
         // Only keep tags that are:
         //      1. specified in the user settings as flashcardTags, and
         //      2. is not question specific (determined by line number)
-        const filteredTagCacheList: TagCache[] = tagCacheList.filter((item) => 
-            SettingsUtil.isFlashcardTag(this.settings, item.tag) && 
-            this.questionList.every((q) => !q.parsedQuestionInfo.isQuestionLineNum(item.position.start.line))
+        const filteredTagCacheList: TagCache[] = tagCacheList.filter(
+            (item) =>
+                SettingsUtil.isFlashcardTag(this.settings, item.tag) &&
+                this.questionList.every(
+                    (q) => !q.parsedQuestionInfo.isQuestionLineNum(item.position.start.line),
+                ),
         );
         let frontmatterLineCount: number = null;
         if (filteredTagCacheList.length > 0) {
-
             // To simplify analysis, ensure that the supplied list is ordered by line number
-            tagCacheList.sort((a,b) => a.position.start.line - b.position.start.line);
+            tagCacheList.sort((a, b) => a.position.start.line - b.position.start.line);
 
             // Treat the frontmatter slightly differently (all tags grouped together even if on separate lines)
             const [frontmatter, _] = extractFrontmatter(this.noteText);
             if (frontmatter) {
                 frontmatterLineCount = splitTextIntoLineArray(frontmatter).length;
-                const frontmatterTagCacheList = filteredTagCacheList.filter((item) => item.position.start.line < frontmatterLineCount);
+                const frontmatterTagCacheList = filteredTagCacheList.filter(
+                    (item) => item.position.start.line < frontmatterLineCount,
+                );
 
                 // Doesn't matter what line number we specify, as long as it's less than frontmatterLineCount
                 if (frontmatterTagCacheList.length > 0)
                     frontmatterTopicPathList = this.createTopicPathList(tagCacheList, 0);
             }
         }
-        // 
-        const contentStartLineNum: number = (frontmatterLineCount > 0) ? frontmatterLineCount + 1 : 0;
-        const contentTagCacheList: TagCache[] = filteredTagCacheList.filter((item) => item.position.start.line >= contentStartLineNum);
+        //
+        const contentStartLineNum: number = frontmatterLineCount > 0 ? frontmatterLineCount + 1 : 0;
+        const contentTagCacheList: TagCache[] = filteredTagCacheList.filter(
+            (item) => item.position.start.line >= contentStartLineNum,
+        );
 
         let list: TagCache[] = [] as TagCache[];
         for (const t of contentTagCacheList) {
-            if (list.length != 0) { 
+            if (list.length != 0) {
                 const startLineNum: number = list[0].position.start.line;
                 if (startLineNum != t.position.start.line) {
                     contentTopicPathList.push(this.createTopicPathList(list, startLineNum));
@@ -204,7 +225,7 @@ export class NoteQuestionParser {
             contentTopicPathList.push(this.createTopicPathList(list, startLineNum));
         }
 
-        return [ frontmatterTopicPathList, contentTopicPathList ];
+        return [frontmatterTopicPathList, contentTopicPathList];
     }
 
     private createTopicPathList(tagCacheList: TagCache[], lineNum: number): TopicPathList {
@@ -215,24 +236,23 @@ export class NoteQuestionParser {
         return new TopicPathList(list, lineNum);
     }
 
-
-    // 
+    //
     // A question can be associated with multiple topics (hence returning TopicPathList and not just TopicPath).
-    // 
+    //
     // If the question has an associated question specific TopicPath, then that is returned.
-    // 
+    //
     // Else the first TopicPathList prior to the question (in the order present in the file) is returned.
     // That could be either the tags within the note's frontmatter, or tags on lines within the note's content.
-    // 
-    private determineQuestionTopicPathList(question: Question) : TopicPathList {
+    //
+    private determineQuestionTopicPathList(question: Question): TopicPathList {
         let result: TopicPathList;
         if (this.settings.convertFoldersToDecks) {
-            result = new TopicPathList([ this.folderTopicPath ]);
+            result = new TopicPathList([this.folderTopicPath]);
         } else {
             // If present, the question specific TopicPath takes precedence over everything else
             const questionText: QuestionText = question.questionText;
             if (questionText.topicPathWithWs)
-                result = new TopicPathList([ questionText.topicPathWithWs.topicPath ]);
+                result = new TopicPathList([questionText.topicPathWithWs.topicPath]);
             else {
                 // By default we start off with any TopicPathList present in the frontmatter
                 result = this.frontmatterTopicPathList;
@@ -251,7 +271,6 @@ export class NoteQuestionParser {
                 if (!result && this.contentTopicPathInfo.length > 0) {
                     result = this.contentTopicPathInfo[0];
                 }
-        
             }
         }
         return result;

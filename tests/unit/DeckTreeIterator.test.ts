@@ -3,12 +3,7 @@ import { CardListType, Deck } from "src/Deck";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { SampleItemDecks } from "./SampleItems";
 import { TopicPath } from "src/TopicPath";
-import {
-    CardOrder,
-    DeckTreeIterator,
-    IIteratorOrder,
-    DeckOrder,
-} from "src/DeckTreeIterator";
+import { CardOrder, DeckTreeIterator, IIteratorOrder, DeckOrder } from "src/DeckTreeIterator";
 import {
     StaticDateProvider,
     globalDateProvider,
@@ -41,9 +36,9 @@ Q3::A3`;
         let iterator: DeckTreeIterator = new DeckTreeIterator(
             {
                 cardOrder: CardOrder.NewFirstSequential,
-                deckOrder: DeckOrder.PrevDeckComplete_Sequential
+                deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
-            deck
+            deck,
         );
         iterator.setIteratorTopicPath(TopicPath.emptyPath);
         expect(iterator.currentDeck).toEqual(null);
@@ -67,7 +62,7 @@ Q3::A3`;
                         cardOrder: CardOrder.DueFirstSequential,
                         deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
-                    deck
+                    deck,
                 );
                 iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
@@ -103,7 +98,7 @@ Q6::A6`;
                             cardOrder: CardOrder.DueFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
-                        deck
+                        deck,
                     );
                     iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
@@ -146,7 +141,7 @@ Q6::A6`;
                             cardOrder: CardOrder.DueFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
-                        deck
+                        deck,
                     );
                     iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
@@ -189,7 +184,7 @@ Q3::A3`;
                         cardOrder: CardOrder.NewFirstSequential,
                         deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
-                    deck
+                    deck,
                 );
                 iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
@@ -224,7 +219,7 @@ Q6::A6`;
                             cardOrder: CardOrder.NewFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
-                        deck
+                        deck,
                     );
                     iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
@@ -259,7 +254,7 @@ Q6::A6`;
                             cardOrder: CardOrder.DueFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
-                        deck
+                        deck,
                     );
                     iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
@@ -302,7 +297,7 @@ Q6::A6`;
                             cardOrder: CardOrder.NewFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
-                        deck
+                        deck,
                     );
                     iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
@@ -349,7 +344,7 @@ Q6::A6`;
                         cardOrder: CardOrder.DueFirstRandom,
                         deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
-                    deck
+                    deck,
                 );
                 iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
@@ -398,7 +393,7 @@ QS3::Q <!--SR:!2023-09-02,4,270-->`;
                         cardOrder: CardOrder.DueFirstRandom,
                         deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
-                    deck
+                    deck,
                 );
                 iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
@@ -457,16 +452,13 @@ QS3::Q <!--SR:!2023-09-02,4,270-->`;
 
 #flashcards/science/chemistry Q8::A8
                         `;
-            let deck: Deck = await SampleItemDecks.createDeckFromText(
-                text,
-                TopicPath.emptyPath,
-            );
+            let deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
             iterator = new DeckTreeIterator(
                 {
                     cardOrder: CardOrder.NewFirstSequential,
                     deckOrder: DeckOrder.PrevDeckComplete_Random,
                 },
-                deck
+                deck,
             );
             iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
@@ -515,16 +507,13 @@ QS3::Q <!--SR:!2023-09-02,4,270-->`;
 
 #flashcards/science/chemistry Q8::A8
                         `;
-            let deck: Deck = await SampleItemDecks.createDeckFromText(
-                text,
-                TopicPath.emptyPath,
-            );
+            let deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
             iterator = new DeckTreeIterator(
                 {
                     cardOrder: CardOrder.EveryCardRandomDeckAndCard,
                     deckOrder: null,
                 },
-                deck
+                deck,
             );
             iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
@@ -572,7 +561,7 @@ QS3::Q <!--SR:!2023-09-02,4,270-->`;
 describe("nextCard - Some cards present in multiple decks", () => {
     describe("DeckOrder.PrevDeckComplete_Sequential; Sequential card ordering", () => {
         test("Iterating over complete deck tree", async () => {
-    let text: string = `#flashcards
+            let text: string = `#flashcards
 Q1::A1
 
 #flashcards/folder1
@@ -585,7 +574,7 @@ Q31::A31
 Q11::A11
 Q12::A12
 `;
-            const [ deck, iterator ] = await SampleItemDecks.createDeckAndIteratorFromText(
+            const [deck, iterator] = await SampleItemDecks.createDeckAndIteratorFromText(
                 text,
                 TopicPath.emptyPath,
                 CardOrder.DueFirstSequential,
@@ -605,7 +594,6 @@ Q12::A12
             expect(iterator.currentCard.front).toEqual("Q11"); // Common to #flashcards/folder1 & folder2
             expect(iterator.nextCard()).toEqual(true);
             expect(iterator.currentCard.front).toEqual("Q12"); // Common to #flashcards/folder1 & folder2
-            
 
             // Now those in #flashcards/folder2
             expect(iterator.nextCard()).toEqual(true);
@@ -615,7 +603,7 @@ Q12::A12
             // i.e. we don't see Q11 or Q12 again
             expect(iterator.nextCard()).toEqual(false);
         });
-        
+
         test("Iterating over portion of deck tree still deletes hard-linked cards in non-iterated portion of the deck", async () => {
             let text: string = `#flashcards
 Q1::A1
@@ -630,7 +618,7 @@ Q31::A31
 Q11::A11
 Q12::A12
 `;
-            const [ deck, iterator ] = await SampleItemDecks.createDeckAndIteratorFromText(
+            const [deck, iterator] = await SampleItemDecks.createDeckAndIteratorFromText(
                 text,
                 TopicPath.emptyPath,
                 CardOrder.DueFirstSequential,
@@ -655,7 +643,6 @@ Q12::A12
             // After iterating folder2, there are (1 + 0) cards in folder1
             subdeck = deck.getDeckByTopicTag("#flashcards/folder1");
             expect(subdeck.getCardCount(CardListType.All, false)).toEqual(1);
-
         });
     });
 });
@@ -672,7 +659,7 @@ describe("hasCurrentCard", () => {
                 cardOrder: CardOrder.NewFirstSequential,
                 deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
-            deck
+            deck,
         );
         iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
@@ -690,7 +677,7 @@ describe("hasCurrentCard", () => {
                 cardOrder: CardOrder.NewFirstSequential,
                 deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
-            deck
+            deck,
         );
         iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
@@ -711,7 +698,7 @@ Q3::A3`;
                 cardOrder: CardOrder.NewFirstSequential,
                 deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
-            deck
+            deck,
         );
         iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
@@ -739,7 +726,7 @@ Q3::A3`;
                 cardOrder: CardOrder.NewFirstSequential,
                 deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
-            deck
+            deck,
         );
         iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 

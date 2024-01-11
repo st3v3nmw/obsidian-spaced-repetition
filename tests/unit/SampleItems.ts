@@ -39,22 +39,29 @@ Q3::A3`;
         return deck;
     }
 
-    static async createDeckFromText(text: string, folderTopicPath: TopicPath = TopicPath.emptyPath): Promise<Deck> {
+    static async createDeckFromText(
+        text: string,
+        folderTopicPath: TopicPath = TopicPath.emptyPath,
+    ): Promise<Deck> {
         let file: UnitTestSRFile = new UnitTestSRFile(text);
         return await this.createDeckFromFile(file, folderTopicPath);
     }
 
-    static async createDeckAndIteratorFromText(text: string, folderTopicPath: TopicPath, cardOrder: CardOrder, 
-        deckOrder: DeckOrder): Promise<[Deck, DeckTreeIterator]> {
+    static async createDeckAndIteratorFromText(
+        text: string,
+        folderTopicPath: TopicPath,
+        cardOrder: CardOrder,
+        deckOrder: DeckOrder,
+    ): Promise<[Deck, DeckTreeIterator]> {
         let deck: Deck = await SampleItemDecks.createDeckFromText(text, folderTopicPath);
         let iterator: DeckTreeIterator = new DeckTreeIterator(
             {
                 cardOrder,
                 deckOrder,
             },
-            deck
+            deck,
         );
-        return [ deck, iterator ];
+        return [deck, iterator];
     }
 
     static async createDeckFromFile(

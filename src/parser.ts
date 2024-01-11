@@ -14,7 +14,7 @@ export class ParsedQuestionInfo {
     }
 
     isQuestionLineNum(lineNum: number): boolean {
-        return (lineNum >= this.firstLineNum) && (lineNum <= this.lastLineNum);
+        return lineNum >= this.firstLineNum && lineNum <= this.lastLineNum;
     }
 }
 

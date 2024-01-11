@@ -10,12 +10,12 @@ export enum CardListType {
     All,
 }
 
-// 
+//
 // The same card can be added to multiple decks e.g.
 //      #flashcards/language/words
 //      #flashcards/trivia
 // To simplify certain functions (e.g. getDistinctCardCount), we explicitly use the same card object (and not a copy)
-// 
+//
 export class Deck {
     public deckName: string;
     public newFlashcards: Card[];
@@ -55,17 +55,27 @@ export class Deck {
         return distinctCardSet.size;
     }
 
-    public getFlattenedCardArray(cardListType: CardListType, includeSubdeckCounts: boolean): Card[] {
+    public getFlattenedCardArray(
+        cardListType: CardListType,
+        includeSubdeckCounts: boolean,
+    ): Card[] {
         let result: Card[] = [] as Card[];
         switch (cardListType) {
-            case CardListType.NewCard: result = this.newFlashcards; break;
-            case CardListType.DueCard: result = this.dueFlashcards; break;
-            case CardListType.All: result = this.newFlashcards.concat(this.dueFlashcards);
+            case CardListType.NewCard:
+                result = this.newFlashcards;
+                break;
+            case CardListType.DueCard:
+                result = this.dueFlashcards;
+                break;
+            case CardListType.All:
+                result = this.newFlashcards.concat(this.dueFlashcards);
         }
 
         if (includeSubdeckCounts) {
             for (const subdeck of this.subdecks) {
-                result = result.concat(subdeck.getFlattenedCardArray(cardListType, includeSubdeckCounts));
+                result = result.concat(
+                    subdeck.getFlattenedCardArray(cardListType, includeSubdeckCounts),
+                );
             }
         }
         return result;
@@ -185,10 +195,10 @@ export class Deck {
         cardList.push(cardObj);
     }
 
-    // 
+    //
     // The question lists all the topics in which this card is included.
     // The topics are relative to the base deck, and this method must be called on that deck
-    // 
+    //
     deleteQuestionFromAllDecks(question: Question, exceptionIfMissing: boolean): void {
         const topicPathList: TopicPathList = question.topicPathList;
         for (const card of question.cards) {
@@ -202,10 +212,10 @@ export class Deck {
         }
     }
 
-    // 
+    //
     // The card's question lists all the topics in which this card is included.
     // The topics are relative to the base deck, and this method must be called on that deck
-    // 
+    //
     deleteCardFromAllDecks(card: Card, exceptionIfMissing: boolean): void {
         const topicPathList: TopicPathList = card.question.topicPathList;
         for (const topicPath of topicPathList.list) {
@@ -219,7 +229,7 @@ export class Deck {
         if (newIdx != -1) this.newFlashcards.splice(newIdx, 1);
         const dueIdx = this.dueFlashcards.indexOf(card);
         if (dueIdx != -1) this.dueFlashcards.splice(dueIdx, 1);
-        if ((newIdx == -1) && (dueIdx == -1) && exceptionIfMissing) {
+        if (newIdx == -1 && dueIdx == -1 && exceptionIfMissing) {
             throw `deleteCardFromThisDeck: Card: ${card.front} not found in deck: ${this.deckName}`;
         }
     }

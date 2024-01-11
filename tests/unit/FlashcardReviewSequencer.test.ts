@@ -57,10 +57,7 @@ class TestContext {
     async resetContext(text: string, daysAfterOrigin: number): Promise<void> {
         this.originalText = text;
         this.file.content = text;
-        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(
-            this.iteratorOrder,
-            null
-        );
+        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(this.iteratorOrder, null);
         let reviewSequencer: FlashcardReviewSequencer = new FlashcardReviewSequencer(
             this.reviewMode,
             cardSequencer,
@@ -95,7 +92,6 @@ class TestContext {
 
     getDeckStats(topicTag: string): DeckStats {
         return this.reviewSequencer.getDeckStats(TopicPath.getTopicPathFromTag(topicTag));
-
     }
 
     static Create(
@@ -105,10 +101,7 @@ class TestContext {
         text: string,
         fakeFilePath?: string,
     ): TestContext {
-        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(
-            iteratorOrder,
-            null
-        );
+        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, null);
         let noteEaseList = new NoteEaseList(settings);
         let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(
             settings,
@@ -1089,20 +1082,23 @@ Q4::A4 <!--SR:!2023-01-21,15,290-->
             await checkStats(c, "#flashcards", [
                 [new DeckStats(1, 3, 4), "Q4", ReviewResponse.Easy], // This is the first card as we are using order_DueFirst_Sequential
                 [new DeckStats(0, 3, 4), "Q1", ReviewResponse.Easy], // Iterated through all the due cards, now the new ones
-                [new DeckStats(0, 2, 4), "Q2", ReviewResponse.Easy], 
+                [new DeckStats(0, 2, 4), "Q2", ReviewResponse.Easy],
             ]);
         });
     });
 });
 
-async function checkStats(c: TestContext, topicPath: string, expectedStats: [DeckStats, string, ReviewResponse][]): Promise<void> {
+async function checkStats(
+    c: TestContext,
+    topicPath: string,
+    expectedStats: [DeckStats, string, ReviewResponse][],
+): Promise<void> {
     for (const item of expectedStats) {
         const [expectedDeckStats, expectedCardFront, reviewResponse] = item;
         expect(c.getDeckStats(topicPath)).toEqual(expectedDeckStats);
         if (expectedCardFront)
             expect(c.reviewSequencer.currentCard.front).toEqual(expectedCardFront);
-        if (reviewResponse != null)
-            await c.reviewSequencer.processReview(reviewResponse);
+        if (reviewResponse != null) await c.reviewSequencer.processReview(reviewResponse);
     }
 }
 

@@ -26,9 +26,9 @@ describe("No flashcard questions", () => {
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
-        expect(await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true)).toEqual(
-            [],
-        );
+        expect(
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+        ).toEqual([]);
     });
 
     test("A question in the text, but no flashcard tag", async () => {
@@ -36,11 +36,10 @@ describe("No flashcard questions", () => {
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
-        expect(await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true)).toEqual(
-            [],
-        );
+        expect(
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+        ).toEqual([]);
     });
-
 });
 
 describe("Single question in the text", () => {
@@ -125,7 +124,7 @@ Q2::A2
         let questionList: Question[] = await parser_ConvertFoldersToDecks.createQuestionList(
             noteFile,
             folderTopicPath,
-            true
+            true,
         );
         expect(questionList.length).toEqual(2);
     });
@@ -142,7 +141,7 @@ Q3::A3
         let questionList: Question[] = await parser_ConvertFoldersToDecks.createQuestionList(
             noteFile,
             folderTopicPath,
-            true
+            true,
         );
         expect(questionList.length).toEqual(3);
         expect(questionList[0].topicPathList.formatPsv()).toEqual("#flashcards/science");
@@ -168,7 +167,7 @@ Q3::A3
         let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
             noteFile,
             folderTopicPath,
-            true
+            true,
         );
         expect(questionList.length).toEqual(3);
         expect(questionList[0].topicPathList.formatPsv()).toEqual("#flashcards/aws");
@@ -195,7 +194,7 @@ describe("Handling tags within note", () => {
             let questionList: Question[] = await parser2.createQuestionList(
                 noteFile,
                 folderTopicPath,
-                true
+                true,
             );
             expect(questionList.length).toEqual(3);
             for (let i = 0; i < questionList.length; i++)
@@ -212,7 +211,7 @@ Q1::A1
             let questionList: Question[] = await parser2.createQuestionList(
                 noteFile,
                 folderTopicPath,
-                true
+                true,
             );
             expect(questionList.length).toEqual(1);
             expect(questionList[0].topicPathList.formatPsv()).toEqual("#folder/subfolder");
@@ -231,7 +230,7 @@ Q1::A1
             let questionList: Question[] = await parser2.createQuestionList(
                 noteFile,
                 folderTopicPath,
-                true
+                true,
             );
             expect(questionList.length).toEqual(1);
             expect(questionList[0].topicPathList.formatPsv()).toEqual("#folder/subfolder");
@@ -254,7 +253,7 @@ Q1::A1
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
                 noteFile,
                 folderTopicPath,
-                true
+                true,
             );
             expect(questionList.length).toEqual(3);
             expect(questionList[0].topicPathList.formatPsv()).toEqual(expectedPath);
@@ -274,7 +273,7 @@ Q1::A1
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
                 noteFile,
                 folderTopicPath,
-                true
+                true,
             );
             expect(questionList.length).toEqual(3);
             expect(questionList[0].topicPathList.formatPsv()).toEqual("#flashcards/test");
@@ -296,7 +295,7 @@ Q1::A1
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
                 noteFile,
                 folderTopicPath,
-                true
+                true,
             );
             expect(questionList.length).toEqual(3);
             for (let i = 0; i < questionList.length; i++)
@@ -317,7 +316,7 @@ Q1::A1
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
                 noteFile,
                 folderTopicPath,
-                true
+                true,
             );
             expect(questionList.length).toEqual(3);
             expect(questionList[0].topicPathList.formatPsv()).toEqual("#flashcards/test");
@@ -340,7 +339,7 @@ Q1::A1
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
                 noteFile,
                 folderTopicPath,
-                true
+                true,
             );
             expect(questionList.length).toEqual(1);
             expect(questionList[0].topicPathList.formatPsv()).toEqual("#flashcards/science");

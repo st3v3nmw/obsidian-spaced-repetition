@@ -169,7 +169,7 @@ Q21::A21
         // #flashcards and subdecks
         subdeck = deck.getDeckByTopicTag("#flashcards");
         expect(subdeck.getDistinctCardCount(CardListType.NewCard, true)).toEqual(3 + 3 + 1);
-        expect(subdeck.getDistinctCardCount(CardListType.DueCard, true)).toEqual(1 + 2 + 0);    
+        expect(subdeck.getDistinctCardCount(CardListType.DueCard, true)).toEqual(1 + 2 + 0);
     });
 });
 
@@ -299,7 +299,7 @@ Q3::A3 <!--SR:!2023-09-02,4,270-->`;
                 TopicPath.emptyPath,
             );
             let copy: Deck = original.copyWithCardFilter((card) => !card.front.includes("2"));
-            copy = copy.getDeck(TopicPath.getTopicPathFromTag("#flashcards"))
+            copy = copy.getDeck(TopicPath.getTopicPathFromTag("#flashcards"));
 
             expect(copy.newFlashcards.length).toEqual(0);
             expect(copy.dueFlashcards.length).toEqual(2);
@@ -384,7 +384,6 @@ Q4::A4 <!--SR:!2023-09-02,4,270-->`;
         expect(flashcardDeck.newFlashcards[0].front).toEqual("Q1");
         expect(flashcardDeck.newFlashcards[1].front).toEqual("Q3");
         expect(flashcardDeck.dueFlashcards[0].front).toEqual("Q4");
-
     });
 
     test("Deck hierarchy - with duplicate cards", async () => {

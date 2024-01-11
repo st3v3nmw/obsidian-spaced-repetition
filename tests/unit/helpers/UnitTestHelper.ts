@@ -3,16 +3,16 @@ import { extractFrontmatter, splitTextIntoLineArray } from "src/util/utils";
 
 export function unitTest_CreateTagCache(tag: string, lineNum: number): TagCache {
     return {
-        tag, 
-        position:  {
-            start: { line: lineNum, col: null, offset: null},
-            end: { line: lineNum, col: null, offset: null},
-        }
-    }
+        tag,
+        position: {
+            start: { line: lineNum, col: null, offset: null },
+            end: { line: lineNum, col: null, offset: null },
+        },
+    };
 }
 
 export function unitTest_GetAllTagsFromTextEx(text: string): TagCache[] {
-    const [ frontmatter, content] = extractFrontmatter(text);
+    const [frontmatter, content] = extractFrontmatter(text);
     const result = [] as TagCache[];
     let lines: string[];
 
@@ -34,7 +34,6 @@ export function unitTest_GetAllTagsFromTextEx(text: string): TagCache[] {
                     foundTagHeading = true;
                 }
             }
-
         }
     }
     lines = splitTextIntoLineArray(text);
@@ -43,13 +42,13 @@ export function unitTest_GetAllTagsFromTextEx(text: string): TagCache[] {
         const matchList: RegExpMatchArray = lines[i].match(tagRegex);
         if (matchList) {
             for (const match of matchList) {
-                const tag: TagCache =  {
-                    tag: match, 
-                    position:  {
-                        start: { line: i, col: null, offset: null},
-                        end: { line: i, col: null, offset: null},
-                    }
-                }
+                const tag: TagCache = {
+                    tag: match,
+                    position: {
+                        start: { line: i, col: null, offset: null },
+                        end: { line: i, col: null, offset: null },
+                    },
+                };
                 result.push(tag);
             }
         }

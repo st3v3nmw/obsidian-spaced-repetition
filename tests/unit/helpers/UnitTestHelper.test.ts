@@ -4,9 +4,6 @@ import { unitTest_GetAllTagsFromTextEx } from "./UnitTestHelper";
 describe("unitTest_GetAllTagsFromTextEx", () => {
     describe("Without frontmatter", () => {
         test("Tags on multiple lines", () => {
-
-
-
             // The next line is numbered as line 0, therefore #review is line 2
             const text: string = `
 
@@ -29,19 +26,16 @@ This single {{question}} turns into {{3 separate}} {{cards}}
 #flashcards/science/misc
 
     `;
-    const actual: TagCache[] = unitTest_GetAllTagsFromTextEx(text);
-    const expected: TagCache[] = [
-        createTagCacheObj("#review", 2), 
-        createTagCacheObj("#flashcards/science/chemistry", 5), 
-        createTagCacheObj("#flashcards/science/misc", 18), 
-    ];
-    expect(actual).toEqual(expected);
-});
+            const actual: TagCache[] = unitTest_GetAllTagsFromTextEx(text);
+            const expected: TagCache[] = [
+                createTagCacheObj("#review", 2),
+                createTagCacheObj("#flashcards/science/chemistry", 5),
+                createTagCacheObj("#flashcards/science/misc", 18),
+            ];
+            expect(actual).toEqual(expected);
+        });
 
         test("Multiple tags on same line", () => {
-
-
-
             // The next line is numbered as line 0, therefore #review is line 2
             const text: string = `
 
@@ -52,8 +46,8 @@ This single {{question}} turns into {{3 separate}} {{cards}}
     `;
             const actual: TagCache[] = unitTest_GetAllTagsFromTextEx(text);
             const expected: TagCache[] = [
-                createTagCacheObj("#flashcards/science/chemistry", 2), 
-                createTagCacheObj("#flashcards/science/misc", 2), 
+                createTagCacheObj("#flashcards/science/chemistry", 2),
+                createTagCacheObj("#flashcards/science/misc", 2),
             ];
             expect(actual).toEqual(expected);
         });
@@ -62,10 +56,10 @@ This single {{question}} turns into {{3 separate}} {{cards}}
 
 function createTagCacheObj(tag: string, line: number): any {
     return {
-        tag: tag, 
-        position:  {
-            start: { line: line, col: null, offset: null},
-            end: { line: line, col: null, offset: null},
-        }
+        tag: tag,
+        position: {
+            start: { line: line, col: null, offset: null },
+            end: { line: line, col: null, offset: null },
+        },
     };
 }
