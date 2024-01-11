@@ -5,9 +5,9 @@ import {
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
-    IteratorDeckSource,
 } from "src/DeckTreeIterator";
 import {
+    DeckStats,
     FlashcardReviewMode,
     FlashcardReviewSequencer,
     IFlashcardReviewSequencer,
@@ -44,7 +44,7 @@ class TestContext {
     cardSequencer: IDeckTreeIterator;
     noteEaseList: INoteEaseList;
     cardScheduleCalculator: CardScheduleCalculator;
-    reviewSequencer: IFlashcardReviewSequencer;
+    reviewSequencer: FlashcardReviewSequencer;
     questionPostponementList: QuestionPostponementList;
     file: UnitTestSRFile;
     originalText: string;
@@ -59,9 +59,9 @@ class TestContext {
         this.file.content = text;
         let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(
             this.iteratorOrder,
-            IteratorDeckSource.UpdatedByIterator,
+            null
         );
-        let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(
+        let reviewSequencer: FlashcardReviewSequencer = new FlashcardReviewSequencer(
             this.reviewMode,
             cardSequencer,
             this.settings,
@@ -84,10 +84,6 @@ class TestContext {
             this.file,
             new TopicPath(["Root"]),
         );
-        if ((deckTree.getCardCount(CardListType.All, false) == 0) && (deckTree.subdecks.length == 1)) {
-            // For some tests, all cards are within the subdeck (e.g. "#flashcards")
-            deckTree = deckTree.subdecks[0];
-        }
         const remainingDeckTree = DeckTreeFilter.filterForRemainingCards(
             this.questionPostponementList,
             deckTree,
@@ -95,6 +91,11 @@ class TestContext {
         );
         this.reviewSequencer.setDeckTree(deckTree, remainingDeckTree);
         return deckTree;
+    }
+
+    getDeckStats(topicTag: string): DeckStats {
+        return this.reviewSequencer.getDeckStats(TopicPath.getTopicPathFromTag(topicTag));
+
     }
 
     static Create(
@@ -106,7 +107,7 @@ class TestContext {
     ): TestContext {
         let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(
             iteratorOrder,
-            IteratorDeckSource.UpdatedByIterator,
+            null
         );
         let noteEaseList = new NoteEaseList(settings);
         let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(
@@ -118,7 +119,7 @@ class TestContext {
             settings,
             [],
         );
-        let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(
+        let reviewSequencer: FlashcardReviewSequencer = new FlashcardReviewSequencer(
             reviewMode,
             cardSequencer,
             settings,
@@ -320,6 +321,7 @@ describe("setDeckTree", () => {
             DEFAULT_SETTINGS,
             "",
         );
+        c.setSequencerDeckTreeFromOriginalText();
         c.reviewSequencer.setDeckTree(Deck.emptyDeck, Deck.emptyDeck);
         expect(c.reviewSequencer.currentDeck).toEqual(null);
         expect(c.reviewSequencer.currentCard).toEqual(null);
@@ -339,7 +341,7 @@ Q3::A3`;
         );
         let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
         const flashcardDeck: Deck = deck.getDeckByTopicTag("#flashcards");
-        expect(deck.newFlashcards.length).toEqual(3);
+        expect(flashcardDeck.newFlashcards.length).toEqual(3);
 
         expect(c.reviewSequencer.currentDeck.newFlashcards.length).toEqual(3);
         let expected = {
@@ -1027,6 +1029,82 @@ ${updatedQuestionText}`;
         });
     });
 });
+
+describe("getDeckStats", () => {
+    describe("Single level deck with some new and due cards", () => {
+        test("Initial stats", async () => {
+            let text: string = `#flashcards
+Q1::A1
+Q2::A2
+Q3::A3
+Q4::A4 <!--SR:!2023-01-21,15,290-->
+`;
+            let c: TestContext = TestContext.Create(
+                order_DueFirst_Sequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                text,
+            );
+            let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
+            expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(1, 3, 4));
+        });
+
+        test("Reduction in due count after skipping card", async () => {
+            let text: string = `#flashcards
+Q1::A1
+Q2::A2
+Q3::A3
+Q4::A4 <!--SR:!2023-01-21,15,290-->
+`;
+            let c: TestContext = TestContext.Create(
+                order_DueFirst_Sequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                text,
+            );
+            let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
+
+            expect(c.reviewSequencer.currentCard.front).toEqual("Q4"); // This is the first card as we are using order_DueFirst_Sequential
+            expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(1, 3, 4));
+            c.reviewSequencer.skipCurrentCard();
+            // One less due card
+            expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(0, 3, 4));
+        });
+
+        test("Change in stats after reviewing each card", async () => {
+            let text: string = `#flashcards
+Q1::A1
+Q2::A2
+Q3::A3
+Q4::A4 <!--SR:!2023-01-21,15,290-->
+`;
+            let c: TestContext = TestContext.Create(
+                order_DueFirst_Sequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                text,
+            );
+            let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
+
+            await checkStats(c, "#flashcards", [
+                [new DeckStats(1, 3, 4), "Q4", ReviewResponse.Easy], // This is the first card as we are using order_DueFirst_Sequential
+                [new DeckStats(0, 3, 4), "Q1", ReviewResponse.Easy], // Iterated through all the due cards, now the new ones
+                [new DeckStats(0, 2, 4), "Q2", ReviewResponse.Easy], 
+            ]);
+        });
+    });
+});
+
+async function checkStats(c: TestContext, topicPath: string, expectedStats: [DeckStats, string, ReviewResponse][]): Promise<void> {
+    for (const item of expectedStats) {
+        const [expectedDeckStats, expectedCardFront, reviewResponse] = item;
+        expect(c.getDeckStats(topicPath)).toEqual(expectedDeckStats);
+        if (expectedCardFront)
+            expect(c.reviewSequencer.currentCard.front).toEqual(expectedCardFront);
+        if (reviewResponse != null)
+            await c.reviewSequencer.processReview(reviewResponse);
+    }
+}
 
 describe("Sequences", () => {
     test("Update question text, followed by review response", async () => {

@@ -72,6 +72,20 @@ export class TopicPath {
             .filter((str) => str);
         return new TopicPath(path);
     }
+
+    static getFolderPathFromFilename(noteFile: ISRFile, settings: SRSettings): TopicPath {
+        let result: TopicPath = TopicPath.emptyPath;
+
+        if (settings.convertFoldersToDecks) {
+            let deckPath: string[] = noteFile.path.split("/");
+            deckPath.pop(); // remove filename
+            if (deckPath.length != 0) {
+                result = new TopicPath(deckPath);
+            }
+        }
+
+        return result;
+    }
 }
 
 export class TopicPathList {
@@ -82,6 +96,10 @@ export class TopicPathList {
         if (list == null) throw "TopicPathList null";
         this.list = list;
         this.lineNum = lineNum;
+    }
+
+    get length(): number {
+        return this.list.length;
     }
 
     isAnyElementSameOrAncestorOf(topicPath: TopicPath): boolean {

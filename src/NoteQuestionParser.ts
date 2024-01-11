@@ -27,20 +27,31 @@ export class NoteQuestionParser {
     async createQuestionList(noteFile: ISRFile, folderTopicPath: TopicPath, onlyKeepQuestionsWithTopicPath: boolean): Promise<Question[]> {
         this.noteFile = noteFile;
         const noteText: string = await noteFile.read();
+
+        // Get the list of tags, and analyse for the topic list
         const tagCacheList: TagCache[] = noteFile.getAllTagsFromText();
 
-        // Create the question list
-        this.questionList = this.doCreateQuestionList(noteText, folderTopicPath, this.tagCacheList);
+        const hasTopicPaths = tagCacheList.some((item) => SettingsUtil.isFlashcardTag(this.settings, item.tag)) || 
+            folderTopicPath.hasPath;
+        if (hasTopicPaths) {
+            // The following analysis can require fair computation.
+            // There is no point doing it if there aren't any topic paths
 
-        // For each question, determine it's TopicPathList
-        [ this.frontmatterTopicPathList, this.contentTopicPathInfo ] = this.analyseTagCacheList(tagCacheList);
-        for (const question of this.questionList) {
-            question.topicPathList = this.determineQuestionTopicPathList(question);
-        }
+            // Create the question list
+            this.questionList = this.doCreateQuestionList(noteText, folderTopicPath, this.tagCacheList);
 
-        // Now only keep questions that have a topic list
-        if (onlyKeepQuestionsWithTopicPath) {
-            this.questionList = this.questionList.filter((q) => q.topicPathList);
+            // For each question, determine it's TopicPathList
+            [ this.frontmatterTopicPathList, this.contentTopicPathInfo ] = this.analyseTagCacheList(tagCacheList);
+            for (const question of this.questionList) {
+                question.topicPathList = this.determineQuestionTopicPathList(question);
+            }
+
+            // Now only keep questions that have a topic list
+            if (onlyKeepQuestionsWithTopicPath) {
+                this.questionList = this.questionList.filter((q) => q.topicPathList);
+            }
+        } else {
+            this.questionList = [] as Question[];
         }
         return this.questionList;
     }
