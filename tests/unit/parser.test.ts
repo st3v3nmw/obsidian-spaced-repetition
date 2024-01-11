@@ -12,9 +12,11 @@ const defaultArgs: [string, string, string, string, boolean, boolean, boolean] =
 ];
 
 /**
- * 
+ * This function is a small wrapper around parseEx used for testing only.
+ * Created when the actual parser changed from returning [CardType, string, number, number] to ParsedQuestionInfo.
+ * It's purpose is to minimise changes to all the test cases here during the parser()->parserEx() change.
  */
-export function parse(
+function parse(
     text: string,
     singlelineCardSeparator: string,
     singlelineReversedCardSeparator: string,
