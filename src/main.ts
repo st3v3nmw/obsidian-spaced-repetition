@@ -5,7 +5,6 @@ import {
     TFile,
     getAllTags,
     FrontMatterCache,
-    TagCache,
 } from "obsidian";
 import * as graph from "pagerank.js";
 
@@ -18,7 +17,7 @@ import { YAML_FRONT_MATTER_REGEX, SCHEDULING_INFO_REGEX } from "src/constants";
 import { ReviewDeck, ReviewDeckSelectionModal } from "src/ReviewDeck";
 import { t } from "src/lang/helpers";
 import { appIcon } from "src/icons/appicon";
-import { TopicPath, TopicPathList } from "./TopicPath";
+import { TopicPath } from "./TopicPath";
 import { CardListType, Deck, DeckTreeFilter } from "./Deck";
 import { Stats } from "./stats";
 import {

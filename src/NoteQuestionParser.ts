@@ -2,7 +2,7 @@ import { TagCache } from "obsidian";
 import { Card } from "./Card";
 import { CardScheduleInfo, NoteCardScheduleParser } from "./CardSchedule";
 import { parseEx, ParsedQuestionInfo } from "./parser";
-import { CardType, Question, QuestionText } from "./Question";
+import { Question, QuestionText } from "./Question";
 import { CardFrontBack, CardFrontBackUtil } from "./QuestionType";
 import { SRSettings, SettingsUtil } from "./settings";
 import { ISRFile } from "./SRFile";

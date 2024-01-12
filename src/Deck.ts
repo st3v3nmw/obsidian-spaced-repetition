@@ -217,8 +217,7 @@ export class Deck {
     // The topics are relative to the base deck, and this method must be called on that deck
     //
     deleteCardFromAllDecks(card: Card, exceptionIfMissing: boolean): void {
-        const topicPathList: TopicPathList = card.question.topicPathList;
-        for (const topicPath of topicPathList.list) {
+        for (const topicPath of card.question.topicPathList.list) {
             const deck: Deck = this.getDeck(topicPath);
             deck.deleteCardFromThisDeck(card, exceptionIfMissing);
         }

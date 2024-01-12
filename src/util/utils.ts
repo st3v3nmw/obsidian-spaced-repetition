@@ -1,6 +1,5 @@
 import moment from "moment";
 import { Moment } from "moment";
-import { TagCache } from "obsidian";
 import { PREFERRED_DATE_FORMAT, YAML_FRONT_MATTER_REGEX } from "src/constants";
 
 type Hex = number;

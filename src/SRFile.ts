@@ -2,7 +2,6 @@ import {
     MetadataCache,
     TFile,
     Vault,
-    getAllTags as ObsidianGetAllTags,
     HeadingCache,
     TagCache,
 } from "obsidian";

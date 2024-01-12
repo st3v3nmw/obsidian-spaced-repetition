@@ -1,7 +1,6 @@
 import { SRSettings } from "src/settings";
 import { OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "./constants";
 import { ISRFile } from "./SRFile";
-import { stringTrimStart } from "./util/utils";
 
 export class TopicPath {
     path: string[];
@@ -77,7 +76,7 @@ export class TopicPath {
         let result: TopicPath = TopicPath.emptyPath;
 
         if (settings.convertFoldersToDecks) {
-            let deckPath: string[] = noteFile.path.split("/");
+            const deckPath: string[] = noteFile.path.split("/");
             deckPath.pop(); // remove filename
             if (deckPath.length != 0) {
                 result = new TopicPath(deckPath);
@@ -145,7 +144,7 @@ export class TopicPathList {
         list: TopicPathList,
         validTopicPathList: TopicPathList,
     ): TopicPathList {
-        let result: TopicPath[] = [];
+        const result: TopicPath[] = [];
         for (const tag of list.list) {
             if (validTopicPathList.isAnyElementSameOrAncestorOf(tag)) result.push(tag);
         }
