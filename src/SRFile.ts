@@ -1,10 +1,4 @@
-import {
-    MetadataCache,
-    TFile,
-    Vault,
-    HeadingCache,
-    TagCache,
-} from "obsidian";
+import { MetadataCache, TFile, Vault, HeadingCache, TagCache } from "obsidian";
 
 export interface ISRFile {
     get path(): string;

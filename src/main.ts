@@ -1,11 +1,4 @@
-import {
-    Notice,
-    Plugin,
-    TAbstractFile,
-    TFile,
-    getAllTags,
-    FrontMatterCache,
-} from "obsidian";
+import { Notice, Plugin, TAbstractFile, TFile, getAllTags, FrontMatterCache } from "obsidian";
 import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, upgradeSettings } from "src/settings";
