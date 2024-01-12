@@ -120,7 +120,7 @@ export default class SRPlugin extends Plugin {
                 this.app.workspace.on("file-menu", (menu, fileish: TAbstractFile) => {
                     if (fileish instanceof TFile && fileish.extension === "md") {
                         menu.addItem((item) => {
-                            item.setTitle(t("REVIEW_EASY_FILE_MENU"))
+                            item.setTitle(t("REVIEW_DIFFICULTY_FILE_MENU", { difficulty: this.data.settings.flashcardEasyText }))
                                 .setIcon("SpacedRepIcon")
                                 .onClick(() => {
                                     this.saveReviewResponse(fileish, ReviewResponse.Easy);
@@ -128,7 +128,7 @@ export default class SRPlugin extends Plugin {
                         });
 
                         menu.addItem((item) => {
-                            item.setTitle(t("REVIEW_GOOD_FILE_MENU"))
+                            item.setTitle(t("REVIEW_DIFFICULTY_FILE_MENU", { difficulty: this.data.settings.flashcardGoodText }))
                                 .setIcon("SpacedRepIcon")
                                 .onClick(() => {
                                     this.saveReviewResponse(fileish, ReviewResponse.Good);
@@ -136,7 +136,7 @@ export default class SRPlugin extends Plugin {
                         });
 
                         menu.addItem((item) => {
-                            item.setTitle(t("REVIEW_HARD_FILE_MENU"))
+                            item.setTitle(t("REVIEW_DIFFICULTY_FILE_MENU", { difficulty: this.data.settings.flashcardHardText }))
                                 .setIcon("SpacedRepIcon")
                                 .onClick(() => {
                                     this.saveReviewResponse(fileish, ReviewResponse.Hard);
@@ -160,7 +160,7 @@ export default class SRPlugin extends Plugin {
 
         this.addCommand({
             id: "srs-note-review-easy",
-            name: t("REVIEW_NOTE_EASY_CMD"),
+            name: t("REVIEW_NOTE_DIFFICULTY_CMD", { difficulty: this.data.settings.flashcardEasyText }),
             callback: () => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
@@ -171,7 +171,7 @@ export default class SRPlugin extends Plugin {
 
         this.addCommand({
             id: "srs-note-review-good",
-            name: t("REVIEW_NOTE_GOOD_CMD"),
+            name: t("REVIEW_NOTE_DIFFICULTY_CMD", { difficulty: this.data.settings.flashcardGoodText }),
             callback: () => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
@@ -182,7 +182,7 @@ export default class SRPlugin extends Plugin {
 
         this.addCommand({
             id: "srs-note-review-hard",
-            name: t("REVIEW_NOTE_HARD_CMD"),
+            name: t("REVIEW_NOTE_DIFFICULTY_CMD", { difficulty: this.data.settings.flashcardHardText }),
             callback: () => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
