@@ -6,6 +6,9 @@
 // Микко Ведру
 // https://github.com/mikkovedru
 
+// Калашников Иван
+// https://github.com/Steindvart
+
 export default {
     // flashcard-modal.tsx
     DECKS: "Колоды",
@@ -91,18 +94,18 @@ export default {
     RESET_DEFAULT: "Настройки по умолчанию",
     CARD_MODAL_WIDTH_PERCENT: "Ширина карточки в процентах",
     RANDOMIZE_CARD_ORDER: "Случайный порядок карточек во время повторения?",
-    REVIEW_CARD_ORDER_WITHIN_DECK: "Order cards in a deck are displayed during review",
-    REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL: "Sequentially within a deck (All new cards first)",
-    REVIEW_CARD_ORDER_DUE_FIRST_SEQUENTIAL: "Sequentially within a deck (All due cards first)",
-    REVIEW_CARD_ORDER_NEW_FIRST_RANDOM: "Randomly within a deck (All new cards first)",
-    REVIEW_CARD_ORDER_DUE_FIRST_RANDOM: "Randomly within a deck (All due cards first)",
-    REVIEW_CARD_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
-    REVIEW_DECK_ORDER: "Order decks are displayed during review",
+    REVIEW_CARD_ORDER_WITHIN_DECK: "Порядок отображения карт колоды во время изучения",
+    REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL: "Последовательно внутри колоды (сначала все новые карты)",
+    REVIEW_CARD_ORDER_DUE_FIRST_SEQUENTIAL: "Последовательно внутри колоды (сначала все повторяемые карты)",
+    REVIEW_CARD_ORDER_NEW_FIRST_RANDOM: "Случайно внутри колоды (сначала все новые карты)",
+    REVIEW_CARD_ORDER_DUE_FIRST_RANDOM: "Случайно внутри колоды (сначала все повторяемые карты)",
+    REVIEW_CARD_ORDER_RANDOM_DECK_AND_CARD: "Случайная карта из случайной колоды",
+    REVIEW_DECK_ORDER: "Порядок отображения колод во время изучения",
     REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL:
-        "Sequentially (once all cards in previous deck reviewed)",
+        "Последовательно  (после изучения всех карт из предыдущей колоды)",
     REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM:
-        "Randomly (once all cards in previous deck reviewed)",
-    REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
+        "Случайно (после изучения всех карт из предыдущей колоды)",
+    REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Случайная карта из случайной колоды",
     DISABLE_CLOZE_CARDS: "Выключить карты с пропусками (пример: [...])?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Конвертировать ==выделенный текст== в пропуски (пример: [...])?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "Конвертировать **жирный текст** в пропуски (пример: [...])?",
