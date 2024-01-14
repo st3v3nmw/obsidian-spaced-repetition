@@ -1,6 +1,7 @@
 import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
 import type SRPlugin from "src/main";
 import { t } from "src/lang/helpers";
+import { TabStructure, createTabs } from "./gui/Tabs";
 
 export interface SRSettings {
     // flashcards
@@ -115,6 +116,7 @@ function applySettingsUpdate(callback: () => void): void {
 
 export class SRSettingTab extends PluginSettingTab {
     private plugin: SRPlugin;
+    private tab_structure: TabStructure;
 
     constructor(app: App, plugin: SRPlugin) {
         super(app, plugin);
@@ -129,10 +131,62 @@ export class SRSettingTab extends PluginSettingTab {
         const header = containerEl.createEl("h1", { text: `${t("SETTINGS_HEADER")}` });
         header.addClass("sr-centered");
 
+        this.tab_structure = createTabs(
+            containerEl,
+            {
+                "main-main": {
+                    title: "General",
+                    icon: "run-command",
+                    content_generator: (container_element: HTMLElement) => this.tabMain(container_element),
+                },
+                "main-flashcards": {
+                    title: t("FLASHCARDS"),
+                    icon: "stacked-levels",
+                    content_generator: (container_element: HTMLElement) => this.tabFlashcards(container_element),
+                },
+                "main-notes": {
+                    title: t("NOTES"),
+                    icon: "note-glyph",
+                    content_generator: (container_element: HTMLElement) => this.tabNotes(container_element),
+                },
+                "main-ui-preferences": {
+                    title: t("UI_PREFERENCES"),
+                    icon: "lines-of-text",
+                    content_generator: (container_element: HTMLElement) => this.tabUiPreferences(container_element),
+                },
+                "main-developer": {
+                    title: "Developer",
+                    icon: "dice",
+                    content_generator: (container_element: HTMLElement) => this.tabDeveloper(container_element),
+                },
+            },
+            this.last_position.tab_name,
+        );
+
+        containerEl.createEl("hr");
         containerEl.createDiv().innerHTML = t("CHECK_WIKI", {
             wiki_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/",
         });
 
+        // Documentation link & GitHub links
+        containerEl.createEl("hr").insertAdjacentHTML("beforeend");
+
+        // Copyright notice
+        const copyright_paragraph = containerEl.createEl("p");
+        copyright_paragraph.addClass("SC-small-font");
+        copyright_paragraph.insertAdjacentHTML("beforeend", `
+            <em>Shell commands</em> plugin Copyright &copy; 2021 - 2023 Jarkko Linnanvirta. This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. See more information in the license: <a href="${GitHub.license}">GNU GPL-3.0</a>.
+        `);
+
+        // KEEP THIS AFTER CREATING ALL ELEMENTS:
+        // Scroll to the position when the settings modal was last open, but do it after content generating has finished.
+        // In practise, shell command previews may take some time to appear.
+        this.tab_structure.contentGeneratorPromises[this.tab_structure.active_tab_id].then(() => {
+            this.rememberLastPosition(containerEl);
+        });
+    }
+
+    private async tabMain(containerEl: HTMLElement): Promise<void> {
         new Setting(containerEl)
             .setName(t("FOLDERS_TO_IGNORE"))
             .setDesc(t("FOLDERS_TO_IGNORE_DESC"))
@@ -149,8 +203,9 @@ export class SRSettingTab extends PluginSettingTab {
                         });
                     }),
             );
+    }
 
-        containerEl.createEl("h3", { text: `${t("FLASHCARDS")}` });
+    private async tabFlashcards(containerEl: HTMLElement): Promise<void> {
 
         new Setting(containerEl)
             .setName(t("FLASHCARD_TAGS"))
@@ -264,7 +319,7 @@ export class SRSettingTab extends PluginSettingTab {
                     });
             });
 
-        new Setting(this.containerEl)
+        new Setting(containerEl)
             .setName(t("REVIEW_CARD_ORDER_WITHIN_DECK"))
             .addDropdown((dropdown) =>
                 dropdown
@@ -287,7 +342,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         const deckOrderEnabled: boolean =
             this.plugin.data.settings.flashcardCardOrder != "EveryCardRandomDeckAndCard";
-        new Setting(this.containerEl).setName(t("REVIEW_DECK_ORDER")).addDropdown((dropdown) =>
+        new Setting(containerEl).setName(t("REVIEW_DECK_ORDER")).addDropdown((dropdown) =>
             dropdown
                 .addOptions(
                     deckOrderEnabled
@@ -514,8 +569,9 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
+    }
 
-        containerEl.createEl("h3", { text: `${t("NOTES")}` });
+    private async tabNotes(containerEl: HTMLElement): Promise<void> {
 
         new Setting(containerEl).setName(t("REVIEW_PANE_ON_STARTUP")).addToggle((toggle) =>
             toggle
@@ -607,8 +663,9 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
+    }
 
-        containerEl.createEl("h3", { text: `${t("UI_PREFERENCES")}` });
+    private async tabUiPreferences(containerEl: HTMLElement): Promise<void> {
 
         new Setting(containerEl)
             .setName(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE"))
@@ -621,8 +678,10 @@ export class SRSettingTab extends PluginSettingTab {
                         await this.plugin.savePluginData();
                     }),
             );
+    }
 
-        containerEl.createEl("h3", { text: `${t("ALGORITHM")}` });
+    private async tabAlgorithm(containerEl: HTMLElement): Promise<void> {
+
         containerEl.createDiv().innerHTML = t("CHECK_ALGORITHM_WIKI", {
             algo_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
         });
@@ -783,13 +842,48 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
+    }
 
-        containerEl.createEl("h3", { text: `${t("LOGGING")}` });
+    private async tabDeveloper(containerEl: HTMLElement): Promise<void> {
+
         new Setting(containerEl).setName(t("DISPLAY_DEBUG_INFO")).addToggle((toggle) =>
             toggle.setValue(this.plugin.data.settings.showDebugMessages).onChange(async (value) => {
                 this.plugin.data.settings.showDebugMessages = value;
                 await this.plugin.savePluginData();
             }),
         );
+    }
+
+    private last_position: {
+        scroll_position: number;
+        tab_name: string;
+    } = {
+        scroll_position: 0,
+        tab_name: "main-shell-commands",
+    };
+    private rememberLastPosition(container_element: HTMLElement) {
+        const last_position = this.last_position;
+
+        // Go to last position now
+        this.tab_structure.buttons[last_position.tab_name].click();
+        // window.setTimeout(() => { // Need to delay the scrolling a bit. Without this, something else would override scrolling and scroll back to 0.
+            container_element.scrollTo({
+                top: this.last_position.scroll_position,
+                behavior: "auto",
+            });
+        // }, 0); // 'timeout' can be 0 ms, no need to wait any longer.
+        // I guess there's no need for setTimeout() anymore, as rememberLastPosition() is now called after waiting for asynchronous tab content generating is finished.
+        // TODO: Remove the commented code after a while.
+
+        // Listen to changes
+        container_element.addEventListener("scroll", (event) => {
+            this.last_position.scroll_position = container_element.scrollTop;
+        });
+        for (const tab_name in this.tab_structure.buttons) {
+            const button = this.tab_structure.buttons[tab_name];
+            button.onClickEvent((event: MouseEvent) => {
+                last_position.tab_name = tab_name;
+            });
+        }
     }
 }
