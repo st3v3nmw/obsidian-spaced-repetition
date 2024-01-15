@@ -12,8 +12,11 @@ export class MultiLineTextFinder {
         } else {
             const sourceTextArray = splitTextIntoLineArray(sourceText);
             const searchTextArray = splitTextIntoLineArray(searchText);
-            const lineNo: number = MultiLineTextFinder.find(sourceTextArray, searchTextArray);
-            if (lineNo) {
+            const lineNo: number | null = MultiLineTextFinder.find(
+                sourceTextArray,
+                searchTextArray,
+            );
+            if (lineNo !== null) {
                 const replacementTextArray = splitTextIntoLineArray(replacementText);
                 const linesToRemove: number = searchTextArray.length;
                 sourceTextArray.splice(lineNo, linesToRemove, ...replacementTextArray);
