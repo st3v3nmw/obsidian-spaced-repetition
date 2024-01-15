@@ -702,12 +702,21 @@ export default class SRPlugin extends Plugin {
         new Notice(t("RESPONSE_RECEIVED"));
 
         if (this.data.settings.autoNextNote) {
+            if (!this.lastSelectedReviewDeck) {
+                const reviewDeckKeys: string[] = Object.keys(this.reviewDecks);
+                if (reviewDeckKeys.length > 0) this.lastSelectedReviewDeck = reviewDeckKeys[0];
+                else {
+                    new Notice(t("ALL_CAUGHT_UP"));
+                    return;
+                }
+            }
             this.reviewNextNote(this.lastSelectedReviewDeck);
         }
     }
 
     async reviewNextNoteModal(): Promise<void> {
         const reviewDeckNames: string[] = Object.keys(this.reviewDecks);
+
         if (reviewDeckNames.length === 1) {
             this.reviewNextNote(reviewDeckNames[0]);
         } else {
