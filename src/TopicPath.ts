@@ -1,7 +1,6 @@
 import { SRSettings } from "src/settings";
 import { OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "./constants";
 import { ISRFile } from "./SRFile";
-import { stringTrimStart } from "./util/utils";
 
 export class TopicPath {
     path: string[];
