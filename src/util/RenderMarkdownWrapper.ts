@@ -1,5 +1,10 @@
 import { App, MarkdownRenderer, TFile } from "obsidian";
-import { AUDIO_FORMATS, IMAGE_FORMATS, VIDEO_FORMATS } from "../constants";
+import {
+    AUDIO_FORMATS,
+    IMAGE_FORMATS,
+    VIDEO_FORMATS,
+    NON_LETTER_SYMBOLS_REGEX,
+} from "../constants";
 import SRPlugin from "../main";
 
 export class RenderMarkdownWrapper {
@@ -119,7 +124,7 @@ export class RenderMarkdownWrapper {
         const text = await this.app.vault.cachedRead(link.target);
         let blockText;
         if (link.heading) {
-            const clean = (s: string) => s.replace(/[\W\s]/g, "");
+            const clean = (s: string) => s.replace(NON_LETTER_SYMBOLS_REGEX, "");
             const headingIndex = cache.headings?.findIndex(
                 (h) => clean(h.heading) === clean(link.heading),
             );
