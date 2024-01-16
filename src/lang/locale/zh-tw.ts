@@ -32,6 +32,7 @@ export default {
     REVIEW_ALL_CARDS: "復習所有筆記中的卡片",
     CRAM_CARDS_IN_NOTE: "不計難易度復習此筆記中的卡片",
     VIEW_STATS: "檢視數據",
+    OPEN_REVIEW_QUEUE_VIEW: "Open Notes Review Queue in sidebar",
     STATUS_BAR: "復習: ${dueNotesCount} 筆記, ${dueFlashcardsCount} 卡片已到期",
     SYNC_TIME_TAKEN: "同步時間 ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "筆記儲存在已被忽略的路徑中（檢查設定選項）。",

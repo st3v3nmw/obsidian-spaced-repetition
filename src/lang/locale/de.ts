@@ -35,6 +35,7 @@ export default {
     REVIEW_CARDS_IN_NOTE: "Lernkarten in dieser Notiz wiederholen",
     CRAM_CARDS_IN_NOTE: "Lernkarten in dieser Notiz pauken.",
     VIEW_STATS: "Statistiken anzeigen",
+    OPEN_REVIEW_QUEUE_VIEW: "Open Notes Review Queue in sidebar",
     STATUS_BAR:
         "Wiederholung: ${dueNotesCount} Notiz(en), ${dueFlashcardsCount} Karte(n) anstehend",
     SYNC_TIME_TAKEN: "Sync dauerte ${t}ms",
