@@ -35,4 +35,8 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
 
 Check the [docs](https://www.stephenmwangi.com/obsidian-spaced-repetition/) for more details.
 
+## Supported By
+
 <a href='https://ko-fi.com/M4M44DEN6' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi3.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
+<a href="https://jb.gg/OpenSourceSupport" target="_blank"><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" height='128' style='border:0px;height:128px;' alt="JetBrains Logo (Main) logo."></a>
