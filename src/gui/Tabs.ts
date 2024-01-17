@@ -144,7 +144,9 @@ export function createTabs(container_element: HTMLElement, tabs: Tabs, activateT
             // Do nothing else (I don't know if this is needed or not)
             event.preventDefault();
         };
-        setIcon(button, tab.icon);
+        if (tab.icon)
+            setIcon(button, tab.icon);
+
         button.insertAdjacentText("beforeend", " " + tab.title);
         tab_buttons[tab_id] = button;
 
