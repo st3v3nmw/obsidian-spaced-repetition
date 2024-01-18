@@ -149,11 +149,6 @@ export class SRSettingTab extends PluginSettingTab {
                     icon: null, // "dot-network",
                     content_generator: (container_element: HTMLElement) => this.tabAlgorithm(container_element),
                 },
-                "main-advanced": {
-                    title: "Advanced",
-                    icon: null, // "vertical-three-dots",
-                    content_generator: (container_element: HTMLElement) => this.tabAdvanced(container_element),
-                },
                 "main-ui-preferences": {
                     title: t("UI_PREFERENCES"),
                     icon: null, // "presentation",
@@ -181,27 +176,8 @@ export class SRSettingTab extends PluginSettingTab {
         });
     }
 
-    private async tabAdvanced(containerEl: HTMLElement): Promise<void> {
-        containerEl.createEl("br");
-        new Setting(containerEl)
-            .setName(t("FOLDERS_TO_IGNORE"))
-            .setDesc(t("FOLDERS_TO_IGNORE_DESC"))
-            .addTextArea((text) =>
-                text
-                    .setValue(this.plugin.data.settings.noteFoldersToIgnore.join("\n"))
-                    .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            this.plugin.data.settings.noteFoldersToIgnore = value
-                                .split(/\n+/)
-                                .map((v) => v.trim())
-                                .filter((v) => v);
-                            await this.plugin.savePluginData();
-                        });
-                    }),
-            );
-    }
-
     private async tabFlashcards(containerEl: HTMLElement): Promise<void> {
+        console.log(`tabFlashcards`);
 
         containerEl.createEl("h3", { text: `Tags & Folders` });
         {
@@ -230,6 +206,7 @@ export class SRSettingTab extends PluginSettingTab {
                             await this.plugin.savePluginData();
                         }),
             );
+            this.createSetting_FoldersToIgnore(containerEl);
         }
         
         containerEl.createEl("h3", { text: `Flashcard Review` });
@@ -449,7 +426,7 @@ export class SRSettingTab extends PluginSettingTab {
     }
 
     private async tabNotes(containerEl: HTMLElement): Promise<void> {
-
+console.log(`tabNotes`);
         containerEl.createEl("br");
         new Setting(containerEl).setName(t("REVIEW_PANE_ON_STARTUP")).addToggle((toggle) =>
             toggle
@@ -473,6 +450,8 @@ export class SRSettingTab extends PluginSettingTab {
                         });
                     }),
             );
+
+        this.createSetting_FoldersToIgnore(containerEl);
 
         new Setting(containerEl)
             .setName(t("OPEN_RANDOM_NOTE"))
@@ -541,6 +520,25 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
+    }
+
+    private async createSetting_FoldersToIgnore(containerEl: HTMLElement): Promise<void> {
+        new Setting(containerEl)
+            .setName(t("FOLDERS_TO_IGNORE"))
+            .setDesc(t("FOLDERS_TO_IGNORE_DESC"))
+            .addTextArea((text) =>
+                text
+                    .setValue(this.plugin.data.settings.noteFoldersToIgnore.join("\n"))
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.noteFoldersToIgnore = value
+                                .split(/\n+/)
+                                .map((v) => v.trim())
+                                .filter((v) => v);
+                            await this.plugin.savePluginData();
+                        });
+                    }),
+            );
     }
 
     private async tabUiPreferences(containerEl: HTMLElement): Promise<void> {

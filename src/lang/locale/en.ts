@@ -62,7 +62,8 @@ export default {
     TRANSLATION_CONTRIBUTION_INFO: 'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
     PROJECT_CONTRIBUTIONS: 'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Folders to ignore",
-    FOLDERS_TO_IGNORE_DESC: "Enter folder paths separated by newlines i.e. Templates Meta/Scripts",
+    FOLDERS_TO_IGNORE_DESC: `Enter folder paths separated by newlines e.g. Templates Meta/Scripts.
+Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARDS: "Flashcards",
     FLASHCARD_EASY_LABEL: "Easy Button Text",
     FLASHCARD_GOOD_LABEL: "Good Button Text",
