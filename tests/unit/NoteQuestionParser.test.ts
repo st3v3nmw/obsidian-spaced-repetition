@@ -120,7 +120,7 @@ A::B ^d7cee0
                 questionText: {
                     original: `A::B ^d7cee0`,
                     actualQuestion: "A::B",
-                    obsidianBlockId: "^d7cee0"
+                    obsidianBlockId: "^d7cee0",
                 },
 
                 lineNo: 1,
@@ -161,7 +161,7 @@ A::B ^d7cee0
 <!--SR:!2023-09-03,1,230-->`,
                     actualQuestion: "A::B",
                     textHash: "1c6b0b01215dc4",
-                    obsidianBlockId: "^d7cee0"
+                    obsidianBlockId: "^d7cee0",
                 },
                 lineNo: 1,
                 hasEditLaterTag: false,
@@ -199,7 +199,7 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
                     original: `A::B <!--SR:!2023-09-03,1,230--> ^d7cee0`,
                     actualQuestion: "A::B",
                     textHash: "1c6b0b01215dc4",
-                    obsidianBlockId: "^d7cee0"
+                    obsidianBlockId: "^d7cee0",
                 },
                 lineNo: 1,
                 hasEditLaterTag: false,
@@ -236,7 +236,7 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
                 questionText: {
                     original: `#flashcards/test A::B <!--SR:!2023-09-03,1,230--> ^d7cee0`,
                     actualQuestion: "A::B",
-                    obsidianBlockId: "^d7cee0"
+                    obsidianBlockId: "^d7cee0",
                 },
                 lineNo: 1,
                 hasEditLaterTag: false,
