@@ -1,5 +1,6 @@
 import { App, ButtonComponent, Modal, TextAreaComponent } from "obsidian";
 import { t } from "src/lang/helpers";
+import { TextDirection } from "src/util/TextDirection";
 
 // from https://github.com/chhoumann/quickadd/blob/bce0b4cdac44b867854d6233796e3406dfd163c6/src/gui/GenericInputPrompt/GenericInputPrompt.ts#L5
 export class FlashcardEditModal extends Modal {
@@ -12,17 +13,19 @@ export class FlashcardEditModal extends Modal {
     private didSubmit = false;
     private inputComponent: TextAreaComponent;
     private readonly modalText: string;
+    private textDirection: TextDirection;
 
-    public static Prompt(app: App, placeholder: string): Promise<string> {
-        const newPromptModal = new FlashcardEditModal(app, placeholder);
+    public static Prompt(app: App, placeholder: string, textDirection: TextDirection): Promise<string> {
+        const newPromptModal = new FlashcardEditModal(app, placeholder, textDirection);
         return newPromptModal.waitForClose;
     }
-    constructor(app: App, existingText: string) {
+    constructor(app: App, existingText: string, textDirection: TextDirection) {
         super(app);
         this.titleEl.setText(t("EDIT_CARD"));
         this.titleEl.addClass("sr-centered");
         this.modalText = existingText;
         this.input = existingText;
+        this.textDirection = textDirection;
 
         this.waitForClose = new Promise<string>((resolve, reject) => {
             this.resolvePromise = resolve;
@@ -38,6 +41,9 @@ export class FlashcardEditModal extends Modal {
 
         const mainContentContainer: HTMLDivElement = this.contentEl.createDiv();
         mainContentContainer.addClass("sr-flashcard-input-area");
+        if (this.textDirection == TextDirection.Rtl) {
+            mainContentContainer.setAttribute("dir", "rtl");
+        }
         this.inputComponent = this.createInputField(mainContentContainer, this.modalText);
         this.createButtonBar(mainContentContainer);
     }
