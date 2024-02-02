@@ -6,12 +6,14 @@ import {
     HeadingCache,
 } from "obsidian";
 import { getAllTagsFromText } from "./util/utils";
+import { TextDirection } from "./util/TextDirection";
 
 export interface ISRFile {
     get path(): string;
     get basename(): string;
     getAllTags(): string[];
     getQuestionContext(cardLine: number): string[];
+    getTextDirection(): TextDirection | null;
     read(): Promise<string>;
     write(content: string): Promise<void>;
 }
@@ -64,6 +66,21 @@ export class SrTFile implements ISRFile {
         return result;
     }
 
+    getTextDirection(): TextDirection | null {
+        let result: TextDirection = null;
+		const fileCache = this.metadataCache.getFileCache(this.file);
+		const frontMatter = fileCache?.frontmatter;
+		if (frontMatter && frontMatter?.direction) {
+            // Don't know why the try/catch is needed; but copied from Obsidian RTL plug-in getFrontMatterDirection()
+			try {
+				const str: string = (frontMatter.direction + '').toLowerCase();
+				result = (str == "rtl") ? TextDirection.Rtl : TextDirection.Ltr;
+			}
+			catch (error) {}
+		}
+        return result;
+    }
+
     async read(): Promise<string> {
         return await this.vault.read(this.file);
     }
@@ -97,6 +114,10 @@ export class UnitTestSRFile implements ISRFile {
     // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     getQuestionContext(cardLine: number): string[] {
         return [];
+    }
+
+    getTextDirection(): TextDirection | null {
+        return null;
     }
 
     async read(): Promise<string> {

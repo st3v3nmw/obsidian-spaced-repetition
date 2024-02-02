@@ -8,6 +8,7 @@ import { CardFrontBack, CardFrontBackUtil } from "src/QuestionType";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
+import { TextDirection } from "src/util/TextDirection";
 
 export function createTest_NoteQuestionParser(settings: SRSettings): NoteQuestionParser {
     let questionParser: NoteQuestionParser = new NoteQuestionParser(settings);
@@ -50,7 +51,7 @@ Q3::A3`;
         let deck: Deck = new Deck("Root", null);
         let topicPath: TopicPath = TopicPath.emptyPath;
         let noteParser: NoteParser = createTest_NoteParser();
-        let note: Note = await noteParser.parse(file, folderTopicPath);
+        let note: Note = await noteParser.parse(file, TextDirection.Ltr, folderTopicPath);
         note.appendCardsToDeck(deck);
         return deck;
     }

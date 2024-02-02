@@ -1,5 +1,5 @@
 import { YAML_FRONT_MATTER_REGEX } from "src/constants";
-import { literalStringReplace } from "src/util/utils";
+import { convertToStringOrEmpty, literalStringReplace } from "src/util/utils";
 
 describe("literalStringReplace", () => {
     test("Replacement string doesn't have any dollar signs", async () => {
@@ -71,6 +71,28 @@ $$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$
 
         const actual: string = literalStringReplace(originalStr, searchStr, replacementStr);
         expect(actual).toEqual(expectedStr);
+    });
+});
+
+describe("convertToStringOrEmpty", () => {
+    test("undefined returns empty string", () => {
+        expect(convertToStringOrEmpty(undefined)).toEqual("");
+    });
+
+    test("null returns empty string", () => {
+        expect(convertToStringOrEmpty(null)).toEqual("");
+    });
+
+    test("empty string returns empty string", () => {
+        expect(convertToStringOrEmpty("")).toEqual("");
+    });
+
+    test("string returned unchanged", () => {
+        expect(convertToStringOrEmpty("Hello")).toEqual("Hello");
+    });
+
+    test("number is converted to string", () => {
+        expect(convertToStringOrEmpty(5)).toEqual("5");
     });
 });
 

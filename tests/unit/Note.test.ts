@@ -6,6 +6,7 @@ import { Note } from "src/Note";
 import { Question } from "src/Question";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { NoteFileLoader } from "src/NoteFileLoader";
+import { TextDirection } from "src/util/TextDirection";
 
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 var noteFileLoader: NoteFileLoader = new NoteFileLoader(DEFAULT_SETTINGS);
@@ -19,7 +20,7 @@ Q3::A3
 `;
         let file: UnitTestSRFile = new UnitTestSRFile(noteText);
         let folderTopicPath = TopicPath.emptyPath;
-        let note: Note = await parser.parse(file, folderTopicPath);
+        let note: Note = await parser.parse(file, TextDirection.Ltr, folderTopicPath);
         let deck: Deck = Deck.emptyDeck;
         note.appendCardsToDeck(deck);
         let subdeck: Deck = deck.getDeck(new TopicPath(["flashcards", "test"]));
@@ -37,7 +38,7 @@ Q3:::A3
 `;
         let file: UnitTestSRFile = new UnitTestSRFile(noteText);
         let folderTopicPath = TopicPath.emptyPath;
-        let note: Note = await parser.parse(file, folderTopicPath);
+        let note: Note = await parser.parse(file, TextDirection.Ltr, folderTopicPath);
         let deck: Deck = Deck.emptyDeck;
         note.appendCardsToDeck(deck);
         let subdeck: Deck = deck.getDeck(new TopicPath(["flashcards", "test"]));
@@ -59,7 +60,7 @@ Q3:::A3
 <!--SR:!2023-09-02,4,270!2023-09-02,5,270!2023-09-02,6,270!2023-09-02,7,270-->
 `;
         let file: UnitTestSRFile = new UnitTestSRFile(originalText);
-        let note: Note = await noteFileLoader.load(file, TopicPath.emptyPath);
+        let note: Note = await noteFileLoader.load(file, TextDirection.Ltr, TopicPath.emptyPath);
 
         await note.writeNoteFile(DEFAULT_SETTINGS);
         let updatedText: string = file.content;

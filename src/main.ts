@@ -34,6 +34,8 @@ import { NoteEaseCalculator } from "./NoteEaseCalculator";
 import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 import { NoteEaseList } from "./NoteEaseList";
 import { QuestionPostponementList } from "./QuestionPostponementList";
+import { TextDirection } from "./util/TextDirection";
+import { convertToStringOrEmpty } from "./util/utils";
 
 interface PluginData {
     settings: SRSettings;
@@ -326,7 +328,6 @@ export default class SRPlugin extends Plugin {
         if (cardOrder === undefined) cardOrder = CardOrder.DueFirstSequential;
         let deckOrder: DeckOrder = DeckOrder[settings.flashcardDeckOrder as keyof typeof DeckOrder];
         if (deckOrder === undefined) deckOrder = DeckOrder.PrevDeckComplete_Sequential;
-        console.log(`createDeckTreeIterator: CardOrder: ${cardOrder}, DeckOrder: ${deckOrder}`);
 
         const iteratorOrder: IIteratorOrder = {
             deckOrder,
@@ -534,11 +535,17 @@ export default class SRPlugin extends Plugin {
 
     async loadNote(noteFile: TFile, topicPath: TopicPath): Promise<Note> {
         const loader: NoteFileLoader = new NoteFileLoader(this.data.settings);
-        const note: Note = await loader.load(this.createSrTFile(noteFile), topicPath);
+        const note: Note = await loader.load(this.createSrTFile(noteFile), this.getObsidianRtlSetting(), topicPath);
         if (note.hasChanged) note.writeNoteFile(this.data.settings);
         return note;
     }
 
+    private getObsidianRtlSetting(): TextDirection {
+        // Get the direction with Obsidian's own setting
+        const v: any = (this.app.vault as any).getConfig('rightToLeft');
+		return (convertToStringOrEmpty(v) == "true") ? TextDirection.Rtl : TextDirection.Ltr;
+    }
+    
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         const frontmatter: FrontMatterCache | Record<string, unknown> =

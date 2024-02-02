@@ -10,6 +10,7 @@ import { Note } from "./Note";
 import { SRSettings } from "./settings";
 import { TopicPath, TopicPathWithWs } from "./TopicPath";
 import { MultiLineTextFinder } from "./util/MultiLineTextFinder";
+import { TextDirection } from "./util/TextDirection";
 import { cyrb53, stringTrimStart } from "./util/utils";
 
 export enum CardType {
@@ -86,6 +87,9 @@ export class QuestionText {
     // The question text, e.g. "Q1::A1" with leading/trailing whitespace as described above
     actualQuestion: string;
 
+    // Either LTR or RTL
+    textDirection: TextDirection;
+
     // The block identifier (optional), e.g. "^quote-of-the-day"
     // Format of block identifiers:
     //      https://help.obsidian.md/Linking+notes+and+files/Internal+links#Link+to+a+block+in+a+note
@@ -101,11 +105,13 @@ export class QuestionText {
         original: string,
         topicPathWithWs: TopicPathWithWs,
         actualQuestion: string,
+        textDirection: TextDirection, 
         blockId: string,
     ) {
         this.original = original;
         this.topicPathWithWs = topicPathWithWs;
         this.actualQuestion = actualQuestion;
+        this.textDirection = textDirection;
         this.obsidianBlockId = blockId;
 
         // The hash is generated based on the topic and question, explicitly not the schedule or obsidian block ID
@@ -116,10 +122,10 @@ export class QuestionText {
         return this.actualQuestion.endsWith("```");
     }
 
-    static create(original: string, settings: SRSettings): QuestionText {
+    static create(original: string, textDirection: TextDirection, settings: SRSettings): QuestionText {
         const [topicPathWithWs, actualQuestion, blockId] = this.splitText(original, settings);
 
-        return new QuestionText(original, topicPathWithWs, actualQuestion, blockId);
+        return new QuestionText(original, topicPathWithWs, actualQuestion, textDirection, blockId);
     }
 
     static splitText(original: string, settings: SRSettings): [TopicPathWithWs, string, string] {
@@ -257,7 +263,8 @@ export class Question {
 
         let newText = MultiLineTextFinder.findAndReplace(noteText, originalText, replacementText);
         if (newText) {
-            this.questionText = QuestionText.create(replacementText, settings);
+            // Don't support changing the textDirection setting
+            this.questionText = QuestionText.create(replacementText, this.questionText.textDirection, settings);
         } else {
             console.error(
                 `updateQuestionText: Text not found: ${originalText.substring(
@@ -283,11 +290,12 @@ export class Question {
         questionType: CardType,
         noteTopicPath: TopicPath,
         originalText: string,
+        textDirection: TextDirection, 
         lineNo: number,
         context: string[],
     ): Question {
         const hasEditLaterTag = originalText.includes(settings.editLaterTag);
-        const questionText: QuestionText = QuestionText.create(originalText, settings);
+        const questionText: QuestionText = QuestionText.create(originalText, textDirection, settings);
 
         let topicPath: TopicPath = noteTopicPath;
         if (questionText.topicPathWithWs) {

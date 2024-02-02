@@ -424,7 +424,7 @@ export class FlashcardModal extends Modal {
             this.plugin,
             this.currentNote.filePath,
         );
-        wrapper.renderMarkdownWrapper(this.currentCard.back, this.flashcardView);
+        wrapper.renderMarkdownWrapper(this.currentCard.back, this.flashcardView, this.currentQuestion.questionText.textDirection);
     }
 
     private async processReview(response: ReviewResponse): Promise<void> {
@@ -460,7 +460,7 @@ export class FlashcardModal extends Modal {
             this.plugin,
             this.currentNote.filePath,
         );
-        await wrapper.renderMarkdownWrapper(this.currentCard.front, this.flashcardView);
+        await wrapper.renderMarkdownWrapper(this.currentCard.front, this.flashcardView, this.currentQuestion.questionText.textDirection);
 
         if (this.reviewMode == FlashcardReviewMode.Cram) {
             // Same for mobile/desktop

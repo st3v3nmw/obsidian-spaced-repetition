@@ -102,3 +102,11 @@ export function stringTrimStart(str: string): [string, string] {
     const ws: string = str.substring(0, wsCount);
     return [ws, trimmed];
 }
+
+export function convertToStringOrEmpty(v: any): string {
+    let result: string = "";
+    if (v != null && v != undefined) {
+        result = v + "";
+    }
+    return result;
+}
