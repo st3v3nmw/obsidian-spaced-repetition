@@ -119,7 +119,11 @@ export default class SRPlugin extends Plugin {
                 this.app.workspace.on("file-menu", (menu, fileish: TAbstractFile) => {
                     if (fileish instanceof TFile && fileish.extension === "md") {
                         menu.addItem((item) => {
-                            item.setTitle(t("REVIEW_EASY_FILE_MENU"))
+                            item.setTitle(
+                                t("REVIEW_DIFFICULTY_FILE_MENU", {
+                                    difficulty: this.data.settings.flashcardEasyText,
+                                }),
+                            )
                                 .setIcon("SpacedRepIcon")
                                 .onClick(() => {
                                     this.saveReviewResponse(fileish, ReviewResponse.Easy);
@@ -127,7 +131,11 @@ export default class SRPlugin extends Plugin {
                         });
 
                         menu.addItem((item) => {
-                            item.setTitle(t("REVIEW_GOOD_FILE_MENU"))
+                            item.setTitle(
+                                t("REVIEW_DIFFICULTY_FILE_MENU", {
+                                    difficulty: this.data.settings.flashcardGoodText,
+                                }),
+                            )
                                 .setIcon("SpacedRepIcon")
                                 .onClick(() => {
                                     this.saveReviewResponse(fileish, ReviewResponse.Good);
@@ -135,7 +143,11 @@ export default class SRPlugin extends Plugin {
                         });
 
                         menu.addItem((item) => {
-                            item.setTitle(t("REVIEW_HARD_FILE_MENU"))
+                            item.setTitle(
+                                t("REVIEW_DIFFICULTY_FILE_MENU", {
+                                    difficulty: this.data.settings.flashcardHardText,
+                                }),
+                            )
                                 .setIcon("SpacedRepIcon")
                                 .onClick(() => {
                                     this.saveReviewResponse(fileish, ReviewResponse.Hard);
@@ -159,7 +171,9 @@ export default class SRPlugin extends Plugin {
 
         this.addCommand({
             id: "srs-note-review-easy",
-            name: t("REVIEW_NOTE_EASY_CMD"),
+            name: t("REVIEW_NOTE_DIFFICULTY_CMD", {
+                difficulty: this.data.settings.flashcardEasyText,
+            }),
             callback: () => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
@@ -170,7 +184,9 @@ export default class SRPlugin extends Plugin {
 
         this.addCommand({
             id: "srs-note-review-good",
-            name: t("REVIEW_NOTE_GOOD_CMD"),
+            name: t("REVIEW_NOTE_DIFFICULTY_CMD", {
+                difficulty: this.data.settings.flashcardGoodText,
+            }),
             callback: () => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
@@ -181,7 +197,9 @@ export default class SRPlugin extends Plugin {
 
         this.addCommand({
             id: "srs-note-review-hard",
-            name: t("REVIEW_NOTE_HARD_CMD"),
+            name: t("REVIEW_NOTE_DIFFICULTY_CMD", {
+                difficulty: this.data.settings.flashcardHardText,
+            }),
             callback: () => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
@@ -325,8 +343,6 @@ export default class SRPlugin extends Plugin {
         this.easeByPath = new NoteEaseList(this.data.settings);
         this.incomingLinks = {};
         this.pageranks = {};
-        this.dueNotesCount = 0;
-        this.dueDatesNotes = {};
         this.reviewDecks = {};
 
         // reset flashcards stuff
@@ -426,13 +442,6 @@ export default class SRPlugin extends Plugin {
                 .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
                 .valueOf();
 
-            for (const matchedNoteTag of matchedNoteTags) {
-                this.reviewDecks[matchedNoteTag].scheduledNotes.push({ note: noteFile, dueUnix });
-                if (dueUnix <= now.valueOf()) {
-                    this.reviewDecks[matchedNoteTag].dueNotesCount++;
-                }
-            }
-
             let ease: number;
             if (this.easeByPath.hasEaseForPath(noteFile.path)) {
                 ease = (this.easeByPath.getEaseByPath(noteFile.path) + frontmatter["sr-ease"]) / 2;
@@ -441,15 +450,10 @@ export default class SRPlugin extends Plugin {
             }
             this.easeByPath.setEaseForPath(noteFile.path, ease);
 
-            if (dueUnix <= now.valueOf()) {
-                this.dueNotesCount++;
+            // schedule the note
+            for (const matchedNoteTag of matchedNoteTags) {
+                this.reviewDecks[matchedNoteTag].scheduledNotes.push({ note: noteFile, dueUnix });
             }
-
-            const nDays: number = Math.ceil((dueUnix - now.valueOf()) / (24 * 3600 * 1000));
-            if (!Object.prototype.hasOwnProperty.call(this.dueDatesNotes, nDays)) {
-                this.dueDatesNotes[nDays] = 0;
-            }
-            this.dueDatesNotes[nDays]++;
         }
 
         graph.rank(0.85, 0.000001, (node: string, rank: number) => {
@@ -474,10 +478,6 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("DECKS")}`, this.deckTree);
         }
 
-        for (const deckKey in this.reviewDecks) {
-            this.reviewDecks[deckKey].sortNotes(this.pageranks);
-        }
-
         if (this.data.settings.showDebugMessages) {
             console.log(
                 "SR: " +
@@ -486,6 +486,36 @@ export default class SRPlugin extends Plugin {
                     }),
             );
         }
+
+        this.updateAndSortDueNotes();
+
+        this.syncLock = false;
+    }
+
+    private updateAndSortDueNotes() {
+        this.dueNotesCount = 0;
+        this.dueDatesNotes = {};
+
+        const now = window.moment(Date.now());
+        Object.values(this.reviewDecks).forEach((reviewDeck: ReviewDeck) => {
+            reviewDeck.dueNotesCount = 0;
+            reviewDeck.scheduledNotes.forEach((scheduledNote: SchedNote) => {
+                if (scheduledNote.dueUnix <= now.valueOf()) {
+                    reviewDeck.dueNotesCount++;
+                    this.dueNotesCount++;
+                }
+
+                const nDays: number = Math.ceil(
+                    (scheduledNote.dueUnix - now.valueOf()) / (24 * 3600 * 1000),
+                );
+                if (!Object.prototype.hasOwnProperty.call(this.dueDatesNotes, nDays)) {
+                    this.dueDatesNotes[nDays] = 0;
+                }
+                this.dueDatesNotes[nDays]++;
+            });
+
+            reviewDeck.sortNotes(this.pageranks);
+        });
 
         this.statusBar.setText(
             t("STATUS_BAR", {
@@ -498,7 +528,6 @@ export default class SRPlugin extends Plugin {
         );
 
         if (this.data.settings.enableNoteReviewPaneOnStartup) this.reviewQueueView.redraw();
-        this.syncLock = false;
     }
 
     async loadNote(noteFile: TFile): Promise<Note> {
@@ -650,16 +679,49 @@ export default class SRPlugin extends Plugin {
         }
         await this.app.vault.modify(note, fileText);
 
+        // Update note's properties to update our due notes.
+        this.easeByPath.setEaseForPath(note.path, ease);
+
+        Object.values(this.reviewDecks).forEach((reviewDeck: ReviewDeck) => {
+            let wasDueInDeck = false;
+            for (const scheduledNote of reviewDeck.scheduledNotes) {
+                if (scheduledNote.note.path === note.path) {
+                    scheduledNote.dueUnix = due.valueOf();
+                    wasDueInDeck = true;
+                    break;
+                }
+            }
+
+            // It was a new note, remove it from the new notes and schedule it.
+            if (!wasDueInDeck) {
+                reviewDeck.newNotes.splice(
+                    reviewDeck.newNotes.findIndex((newNote: TFile) => newNote.path === note.path),
+                    1,
+                );
+                reviewDeck.scheduledNotes.push({ note, dueUnix: due.valueOf() });
+            }
+        });
+
+        this.updateAndSortDueNotes();
+
         new Notice(t("RESPONSE_RECEIVED"));
 
-        await this.sync();
         if (this.data.settings.autoNextNote) {
+            if (!this.lastSelectedReviewDeck) {
+                const reviewDeckKeys: string[] = Object.keys(this.reviewDecks);
+                if (reviewDeckKeys.length > 0) this.lastSelectedReviewDeck = reviewDeckKeys[0];
+                else {
+                    new Notice(t("ALL_CAUGHT_UP"));
+                    return;
+                }
+            }
             this.reviewNextNote(this.lastSelectedReviewDeck);
         }
     }
 
     async reviewNextNoteModal(): Promise<void> {
         const reviewDeckNames: string[] = Object.keys(this.reviewDecks);
+
         if (reviewDeckNames.length === 1) {
             this.reviewNextNote(reviewDeckNames[0]);
         } else {
