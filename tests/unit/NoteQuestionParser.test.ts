@@ -196,7 +196,7 @@ A::B ^d7cee0
         ).toMatchObject(expected);
     });
 
-    test.only("SingleLineBasic: With schedule info (same line)", async () => {
+    test("SingleLineBasic: With schedule info (same line)", async () => {
         let noteText: string = `#flashcards/test
 A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
     `;
@@ -217,7 +217,7 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
             {
                 topicPathList: {
                     list: [TopicPath.getTopicPathFromTag("#flashcards/test")],
-                    lineNum: 1,
+                    lineNum: 0, // Line numbers start at zero
                 },
                 parsedQuestionInfo: {
                     cardType: CardType.SingleLineBasic,

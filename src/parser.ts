@@ -3,6 +3,8 @@ import { CardType } from "./Question";
 export class ParsedQuestionInfo {
     cardType: CardType;
     text: string;
+
+    // Line numbers start at 0
     firstLineNum: number;
     lastLineNum: number;
 
