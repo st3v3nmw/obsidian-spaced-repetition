@@ -37,7 +37,7 @@ export class SrTFile implements ISRFile {
 
         // RZ: 2024-01-28 fileCachedData.tags doesn't include the tags within the frontmatter, need to access those separately
         // This is different to the Obsidian function getAllTags() which does return all tags including those within the
-        // frontmatter
+        // frontmatter.
         result.push(...this.getFrontmatterTags(fileCachedData.frontmatter));
 
         return result;
