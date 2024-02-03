@@ -252,7 +252,7 @@ export class NoteQuestionParser {
             // If present, the question specific TopicPath takes precedence over everything else
             const questionText: QuestionText = question.questionText;
             if (questionText.topicPathWithWs)
-                result = new TopicPathList([questionText.topicPathWithWs.topicPath]);
+                result = new TopicPathList([questionText.topicPathWithWs.topicPath], question.parsedQuestionInfo.firstLineNum);
             else {
                 // By default we start off with any TopicPathList present in the frontmatter
                 result = this.frontmatterTopicPathList;

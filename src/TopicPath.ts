@@ -123,7 +123,7 @@ export class TopicPathList {
         return result;
     }
 
-    static getFlashcardSettingsTopicPathList(settings: SRSettings): TopicPathList {
+    static getFlashcardSettingsTopicPathList(settings: SRSettings, lineNum: number): TopicPathList {
         return this.convertTagListToTopicPathList(settings.flashcardTags);
     }
 
@@ -142,14 +142,15 @@ export class TopicPathList {
     //
     static filterValidTopicPathsFromTagList(
         list: TopicPathList,
-        validTopicPathList: TopicPathList,
+        validTopicPathList: TopicPathList, 
+        lineNum: number = null
     ): TopicPathList {
         const result: TopicPath[] = [];
         for (const tag of list.list) {
             if (validTopicPathList.isAnyElementSameOrAncestorOf(tag)) result.push(tag);
         }
 
-        return new TopicPathList(result);
+        return new TopicPathList(result, lineNum);
     }
 
     static convertTagListToTopicPathList(tagList: string[]): TopicPathList {

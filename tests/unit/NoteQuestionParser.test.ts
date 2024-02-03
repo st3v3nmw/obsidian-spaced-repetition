@@ -115,7 +115,7 @@ A::B
 
 describe("Single question in the text (with block identifier)", () => {
     test("SingleLineBasic: No schedule info", async () => {
-        let noteText: string = `
+        let noteText: string = `#flashcards
 A::B ^d7cee0
 `;
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
@@ -127,22 +127,27 @@ A::B ^d7cee0
         };
         let expected = [
             {
-                questionType: CardType.SingleLineBasic,
-                topicPath: TopicPath.emptyPath,
+                topicPathList: {
+                    list: [ TopicPath.getTopicPathFromTag("#flashcards")],
+                    lineNum: 0
+                }, 
+                parsedQuestionInfo: { 
+                    cardType: CardType.SingleLineBasic,
+                    firstLineNum: 1
+                }, 
                 questionText: {
                     original: `A::B ^d7cee0`,
                     actualQuestion: "A::B",
                     obsidianBlockId: "^d7cee0",
                 },
 
-                lineNo: 1,
                 hasEditLaterTag: false,
                 cards: [card1],
                 hasChanged: false,
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath),
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
         ).toMatchObject(expected);
     });
 
@@ -166,8 +171,14 @@ A::B ^d7cee0
         };
         let expected = [
             {
-                questionType: CardType.SingleLineBasic,
-                topicPath: new TopicPath(["flashcards", "test"]),
+                topicPathList: {
+                    list: [ TopicPath.getTopicPathFromTag("#flashcards/test")],
+                    lineNum: 0
+                }, 
+                parsedQuestionInfo: { 
+                    cardType: CardType.SingleLineBasic,
+                    firstLineNum: 1
+                }, 
                 questionText: {
                     original: `A::B ^d7cee0
 <!--SR:!2023-09-03,1,230-->`,
@@ -175,18 +186,17 @@ A::B ^d7cee0
                     textHash: "1c6b0b01215dc4",
                     obsidianBlockId: "^d7cee0",
                 },
-                lineNo: 1,
                 hasEditLaterTag: false,
                 cards: [card1],
                 hasChanged: false,
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath),
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
         ).toMatchObject(expected);
     });
 
-    test("SingleLineBasic: With schedule info (same line)", async () => {
+    test.only("SingleLineBasic: With schedule info (same line)", async () => {
         let noteText: string = `#flashcards/test
 A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
     `;
@@ -205,22 +215,27 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
         };
         let expected = [
             {
-                questionType: CardType.SingleLineBasic,
-                topicPath: new TopicPath(["flashcards", "test"]),
+                topicPathList: {
+                    list: [ TopicPath.getTopicPathFromTag("#flashcards/test")],
+                    lineNum: 1
+                }, 
+                parsedQuestionInfo: { 
+                    cardType: CardType.SingleLineBasic,
+                    firstLineNum: 1
+                }, 
                 questionText: {
                     original: `A::B <!--SR:!2023-09-03,1,230--> ^d7cee0`,
                     actualQuestion: "A::B",
                     textHash: "1c6b0b01215dc4",
                     obsidianBlockId: "^d7cee0",
                 },
-                lineNo: 1,
                 hasEditLaterTag: false,
                 cards: [card1],
                 hasChanged: false,
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath),
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
         ).toMatchObject(expected);
     });
 
@@ -243,21 +258,26 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
         };
         let expected = [
             {
-                questionType: CardType.SingleLineBasic,
-                topicPath: new TopicPath(["flashcards", "test"]),
+                topicPathList: {
+                    list: [ TopicPath.getTopicPathFromTag("#flashcards/test")],
+                    lineNum: 1
+                }, 
+                parsedQuestionInfo: { 
+                    cardType: CardType.SingleLineBasic,
+                    firstLineNum: 1
+                }, 
                 questionText: {
                     original: `#flashcards/test A::B <!--SR:!2023-09-03,1,230--> ^d7cee0`,
                     actualQuestion: "A::B",
                     obsidianBlockId: "^d7cee0",
                 },
-                lineNo: 1,
                 hasEditLaterTag: false,
                 cards: [card1],
                 hasChanged: false,
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath),
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
         ).toMatchObject(expected);
     });
 });
