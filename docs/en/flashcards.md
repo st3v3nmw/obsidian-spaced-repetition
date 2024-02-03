@@ -101,6 +101,7 @@ A single file can contain cards for multiple different decks.
 This is possible because a tag pertains to all subsequent cards in a file until any subsequent tag.
 
 For example:
+
 ```markdown
 #flashcards/deckA
 Question1 (in deckA)::Answer1
@@ -113,7 +114,6 @@ Question5 (also in deckB)::Answer5
 
 #flashcards/deckC
 Question6 (in deckC)::Answer6
-
 ```
 
 #### A Single Card Within Multiple Decks
@@ -121,6 +121,7 @@ Question6 (in deckC)::Answer6
 Usually the content of a card is only relevant to a single deck. However, sometimes content doesn't fall neatly into a single deck of the hierarchy.
 
 In these cases, a card can be tagged as being part of multiple decks. The following card is specified as being in the three different decks listed.
+
 ```markdown
 #flashcards/language/words #flashcards/trivia #flashcards/learned-from-tv
 A group of cats is called a::clowder
@@ -133,6 +134,7 @@ Note that as shown in the above example, all tags must be placed on the same lin
 A tag that is present at the start of the first line of a card is "question specific", and applies only to that card.
 
 For example:
+
 ```markdown
 #flashcards/deckA
 Question1 (in deckA)::Answer1
@@ -142,7 +144,6 @@ Question3 (also in deckA)::Answer3
 #flashcards/deckB Question4 (in deckB)::Answer4
 
 Question6 (in deckA)::Answer6
-
 ```
 
 Here `Question6` will be part of `deckA` and not `deckB` as `deckB` is specific to `Question4` only.

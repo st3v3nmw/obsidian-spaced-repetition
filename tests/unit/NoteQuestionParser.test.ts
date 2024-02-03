@@ -128,13 +128,13 @@ A::B ^d7cee0
         let expected = [
             {
                 topicPathList: {
-                    list: [ TopicPath.getTopicPathFromTag("#flashcards")],
-                    lineNum: 0
-                }, 
-                parsedQuestionInfo: { 
+                    list: [TopicPath.getTopicPathFromTag("#flashcards")],
+                    lineNum: 0,
+                },
+                parsedQuestionInfo: {
                     cardType: CardType.SingleLineBasic,
-                    firstLineNum: 1
-                }, 
+                    firstLineNum: 1,
+                },
                 questionText: {
                     original: `A::B ^d7cee0`,
                     actualQuestion: "A::B",
@@ -172,13 +172,13 @@ A::B ^d7cee0
         let expected = [
             {
                 topicPathList: {
-                    list: [ TopicPath.getTopicPathFromTag("#flashcards/test")],
-                    lineNum: 0
-                }, 
-                parsedQuestionInfo: { 
+                    list: [TopicPath.getTopicPathFromTag("#flashcards/test")],
+                    lineNum: 0,
+                },
+                parsedQuestionInfo: {
                     cardType: CardType.SingleLineBasic,
-                    firstLineNum: 1
-                }, 
+                    firstLineNum: 1,
+                },
                 questionText: {
                     original: `A::B ^d7cee0
 <!--SR:!2023-09-03,1,230-->`,
@@ -216,13 +216,13 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
         let expected = [
             {
                 topicPathList: {
-                    list: [ TopicPath.getTopicPathFromTag("#flashcards/test")],
-                    lineNum: 1
-                }, 
-                parsedQuestionInfo: { 
+                    list: [TopicPath.getTopicPathFromTag("#flashcards/test")],
+                    lineNum: 1,
+                },
+                parsedQuestionInfo: {
                     cardType: CardType.SingleLineBasic,
-                    firstLineNum: 1
-                }, 
+                    firstLineNum: 1,
+                },
                 questionText: {
                     original: `A::B <!--SR:!2023-09-03,1,230--> ^d7cee0`,
                     actualQuestion: "A::B",
@@ -259,13 +259,13 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
         let expected = [
             {
                 topicPathList: {
-                    list: [ TopicPath.getTopicPathFromTag("#flashcards/test")],
-                    lineNum: 1
-                }, 
-                parsedQuestionInfo: { 
+                    list: [TopicPath.getTopicPathFromTag("#flashcards/test")],
+                    lineNum: 1,
+                },
+                parsedQuestionInfo: {
                     cardType: CardType.SingleLineBasic,
-                    firstLineNum: 1
-                }, 
+                    firstLineNum: 1,
+                },
                 questionText: {
                     original: `#flashcards/test A::B <!--SR:!2023-09-03,1,230--> ^d7cee0`,
                     actualQuestion: "A::B",

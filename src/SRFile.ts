@@ -29,7 +29,7 @@ export class SrTFile implements ISRFile {
     }
 
     getAllTagsFromText(): TagCache[] {
-        let result: TagCache[] = [] as TagCache[];
+        const result: TagCache[] = [] as TagCache[];
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
         if (fileCachedData.tags?.length > 0) {
             result.push(...fileCachedData.tags);
@@ -44,8 +44,8 @@ export class SrTFile implements ISRFile {
     }
 
     private getFrontmatterTags(frontmatter: FrontMatterCache): TagCache[] {
-        let result: TagCache[] = [] as TagCache[];
-        const frontmatterTags: string = (frontmatter != null) ? frontmatter["tags"] + '' : null;
+        const result: TagCache[] = [] as TagCache[];
+        const frontmatterTags: string = frontmatter != null ? frontmatter["tags"] + "" : null;
         if (frontmatterTags) {
             // The frontmatter doesn't include the line number for the specific tag, defining as line 1 is good enough.
             // (determineQuestionTopicPathList() only needs to know that these frontmatter tags come before all others

@@ -123,10 +123,6 @@ export class TopicPathList {
         return result;
     }
 
-    static getFlashcardSettingsTopicPathList(settings: SRSettings, lineNum: number): TopicPathList {
-        return this.convertTagListToTopicPathList(settings.flashcardTags);
-    }
-
     //
     // tagList is a list of tags such as:
     //      ["#flashcards/computing", "#boring-stuff", "#news-worthy"]
@@ -142,8 +138,8 @@ export class TopicPathList {
     //
     static filterValidTopicPathsFromTagList(
         list: TopicPathList,
-        validTopicPathList: TopicPathList, 
-        lineNum: number = null
+        validTopicPathList: TopicPathList,
+        lineNum: number = null,
     ): TopicPathList {
         const result: TopicPath[] = [];
         for (const tag of list.list) {
