@@ -102,3 +102,23 @@ export function stringTrimStart(str: string): [string, string] {
     const ws: string = str.substring(0, wsCount);
     return [ws, trimmed];
 }
+
+//
+// Returns the index of the line that consists of the search string.
+//
+// A line is considered a match if it is identical to the search string, (ignoring leading and
+// trailing spaces of the line)
+//
+export function findLineIndexOfSearchStringIgnoringWs(
+    lines: string[],
+    searchString: string,
+): number {
+    let result: number = -1;
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].trim() == searchString) {
+            result = i;
+            break;
+        }
+    }
+    return result;
+}
