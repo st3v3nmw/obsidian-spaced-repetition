@@ -43,7 +43,7 @@ body:not(.native-scrollbars) .modal-close-button {
 .sr-flashcard-response {
     display: inline-grid;
     width: 100%;
-    grid-template-columns: auto auto auto auto;
+    grid-template-columns: auto auto auto;
     position: absolute;
     bottom: 0;
 }
