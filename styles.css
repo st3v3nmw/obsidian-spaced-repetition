@@ -1,3 +1,7 @@
+body:not(.native-scrollbars) .modal-close-button {
+    top: 12px;
+}
+
 .sr-flashcard-menu {
     width: 100%;
     display: flex;
