@@ -1,15 +1,14 @@
 .sr-flashcard-menu {
-    display: block;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: row;
+    gap: 1rem;
 }
 
 .sr-flashcard-menu-item {
     box-shadow: none !important;
-    margin-right: 1rem;
     cursor: pointer;
 }
 
