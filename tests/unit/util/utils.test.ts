@@ -1,5 +1,5 @@
 import { YAML_FRONT_MATTER_REGEX } from "src/constants";
-import { literalStringReplace } from "src/util/utils";
+import { findLineIndexOfSearchStringIgnoringWs, literalStringReplace } from "src/util/utils";
 
 describe("literalStringReplace", () => {
     test("Replacement string doesn't have any dollar signs", async () => {
@@ -89,5 +89,70 @@ describe("YAML_FRONT_MATTER_REGEX", () => {
         const sep: string = String.fromCharCode(13, 10);
         const text: string = createTestStr1(sep);
         expect(YAML_FRONT_MATTER_REGEX.test(text)).toEqual(true);
+    });
+});
+
+describe("findLineIndexOfSearchStringIgnoringWs", () => {
+    const space: string = " ";
+    test("Search string not present", () => {
+        const lines: string[] = [
+            "A very boring multi-line question.",
+            "(With this extra info, not so boring after all)",
+            "?",
+            "A very boring multi-line answer.",
+            "(With this extra info, not so boring after all)",
+        ];
+        expect(findLineIndexOfSearchStringIgnoringWs(lines, "??")).toEqual(-1);
+    });
+
+    test("Search string present, but only on a line with other text", () => {
+        const lines: string[] = [
+            "What do you think of this multi-line question?",
+            "??",
+            "A very boring multi-line answer.",
+            "(With this extra info, not so boring after all)",
+        ];
+        expect(findLineIndexOfSearchStringIgnoringWs(lines, "?")).toEqual(-1);
+    });
+
+    test("Search string found at start of text (exactly)", () => {
+        const lines: string[] = [
+            "?",
+            "A very boring multi-line answer.",
+            "(With this extra info, not so boring after all)",
+        ];
+        expect(findLineIndexOfSearchStringIgnoringWs(lines, "?")).toEqual(0);
+    });
+
+    test("Search line found at start of text (text has whitespace)", () => {
+        const lines: string[] = [
+            `${space}?${space}`,
+            "A very boring multi-line answer.",
+            "(With this extra info, not so boring after all)",
+        ];
+        expect(findLineIndexOfSearchStringIgnoringWs(lines, "?")).toEqual(0);
+    });
+
+    test("Search line found in middle line of text (exactly)", () => {
+        const lines: string[] = [
+            "What do you think of this multi-line question?",
+            "(With this extra info, not so boring after all)",
+            "??",
+            "A very boring multi-line answer.",
+            "(With this extra info, not so boring after all)",
+        ];
+        expect(findLineIndexOfSearchStringIgnoringWs(lines, "??")).toEqual(2);
+    });
+
+    test("Search line found in middle line of text (text has whitespace)", () => {
+        const lines: string[] = [
+            "What do you think of this multi-line question?",
+            "(With this extra info, not so boring after all)",
+            `${space}??`,
+            "A very boring multi-line answer.",
+            "(With this extra info, not so boring after all)",
+        ];
+
+        expect(findLineIndexOfSearchStringIgnoringWs(lines, "??")).toEqual(2);
     });
 });
