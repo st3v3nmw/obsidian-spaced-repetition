@@ -29,7 +29,7 @@ export class DecksListView {
         reviewSequencer: IFlashcardReviewSequencer,
         titleEl: HTMLElement,
         contentEl: HTMLElement,
-        startReviewOfDeck: (deck: Deck) => void
+        startReviewOfDeck: (deck: Deck) => void,
     ) {
         this.plugin = plugin;
         this.settings = settings;

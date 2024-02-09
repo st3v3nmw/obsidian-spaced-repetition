@@ -81,7 +81,7 @@ export class FlashcardModal extends Modal {
             this.reviewSequencer,
             this.titleEl,
             this.contentEl,
-            this.startReviewOfDeck.bind(this)
+            this.startReviewOfDeck.bind(this),
         ).show();
     }
 
@@ -97,7 +97,7 @@ export class FlashcardModal extends Modal {
                 this.titleEl,
                 this.contentEl,
                 this.showDecksList.bind(this),
-                this.doEditQuestionText.bind(this)
+                this.doEditQuestionText.bind(this),
             ).showCurrentCard();
         } else {
             this.showDecksList();

@@ -61,7 +61,7 @@ export class FlashcardReviewView {
         titleEl: HTMLElement,
         contentEl: HTMLElement,
         backClickHandler: () => void,
-        editClickHandler: () => void
+        editClickHandler: () => void,
     ) {
         this.app = app;
         this.plugin = plugin;
@@ -92,7 +92,9 @@ export class FlashcardReviewView {
             document.activeElement.nodeName === "TEXTAREA" ||
             this.mode === FlashcardModalMode.DecksList ||
             this.mode === FlashcardModalMode.Closed
-        ) { return; }
+        ) {
+            return;
+        }
 
         const consumeKeyEvent = () => {
             e.preventDefault();
