@@ -83,44 +83,69 @@ export class FlashcardReviewView {
             this.contentEl.style.display = "block";
         }
 
-        // TODO: refactor into event handler?
-        document.body.onkeydown = (e) => {
-            // TODO: Please fix this. It's ugly.
-            // Checks if the input textbox is in focus before processing keyboard shortcuts.
-            if (
-                document.activeElement.nodeName !== "TEXTAREA" &&
-                this.mode !== FlashcardModalMode.DecksList
-            ) {
-                const consume = () => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                };
-                if (this.mode !== FlashcardModalMode.Closed && e.code === "KeyS") {
-                    this.skipCurrentCard();
-                    consume();
-                } else if (
-                    this.mode === FlashcardModalMode.Front &&
-                    (e.code === "Space" || e.code === "Enter" || e.code === "NumpadEnter")
-                ) {
-                    this.showAnswer();
-                    consume();
-                } else if (this.mode === FlashcardModalMode.Back) {
-                    if (e.code === "Numpad1" || e.code === "Digit1") {
-                        this.processReview(ReviewResponse.Hard);
-                        consume();
-                    } else if (e.code === "Numpad2" || e.code === "Digit2" || e.code === "Space") {
-                        this.processReview(ReviewResponse.Good);
-                        consume();
-                    } else if (e.code === "Numpad3" || e.code === "Digit3") {
-                        this.processReview(ReviewResponse.Easy);
-                        consume();
-                    } else if (e.code === "Numpad0" || e.code === "Digit0") {
-                        this.processReview(ReviewResponse.Reset);
-                        consume();
-                    }
-                }
-            }
+        document.addEventListener("keydown", this.keydownHandler.bind(this));
+    }
+
+    keydownHandler(e: KeyboardEvent): void {
+        // Checks if the input textbox is in focus before processing keyboard shortcuts.
+        if (
+            document.activeElement.nodeName === "TEXTAREA" ||
+            this.mode === FlashcardModalMode.DecksList ||
+            this.mode === FlashcardModalMode.Closed
+        ) { return; }
+
+        const consumeKeyEvent = () => {
+            e.preventDefault();
+            e.stopPropagation();
         };
+
+        switch (e.code) {
+            case "KeyS":
+                this.skipCurrentCard();
+                consumeKeyEvent();
+                break;
+            case "Space":
+                if (this.mode === FlashcardModalMode.Front) {
+                    this.showAnswer();
+                    consumeKeyEvent();
+                } else if (this.mode === FlashcardModalMode.Back) {
+                    this.processReview(ReviewResponse.Good);
+                    consumeKeyEvent();
+                }
+                break;
+            case "Enter":
+            case "NumpadEnter":
+                if (this.mode !== FlashcardModalMode.Front) break;
+                this.showAnswer();
+                consumeKeyEvent();
+                break;
+            case "Numpad1":
+            case "Digit1":
+                if (this.mode !== FlashcardModalMode.Back) break;
+                this.processReview(ReviewResponse.Hard);
+                consumeKeyEvent();
+                break;
+            case "Numpad2":
+            case "Digit2":
+                if (this.mode !== FlashcardModalMode.Back) break;
+                this.processReview(ReviewResponse.Good);
+                consumeKeyEvent();
+                break;
+            case "Numpad3":
+            case "Digit3":
+                if (this.mode !== FlashcardModalMode.Back) break;
+                this.processReview(ReviewResponse.Easy);
+                consumeKeyEvent();
+                break;
+            case "Numpad0":
+            case "Digit0":
+                if (this.mode !== FlashcardModalMode.Back) break;
+                this.processReview(ReviewResponse.Reset);
+                consumeKeyEvent();
+                break;
+            default:
+                break;
+        }
     }
 
     async showCurrentCard(): Promise<void> {
