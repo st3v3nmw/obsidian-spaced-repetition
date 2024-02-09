@@ -117,31 +117,41 @@ export class FlashcardReviewView {
                 break;
             case "Enter":
             case "NumpadEnter":
-                if (this.mode !== FlashcardModalMode.Front) break;
+                if (this.mode !== FlashcardModalMode.Front) {
+                    break;
+                }
                 this.showAnswer();
                 consumeKeyEvent();
                 break;
             case "Numpad1":
             case "Digit1":
-                if (this.mode !== FlashcardModalMode.Back) break;
+                if (this.mode !== FlashcardModalMode.Back) {
+                    break;
+                }
                 this.processReview(ReviewResponse.Hard);
                 consumeKeyEvent();
                 break;
             case "Numpad2":
             case "Digit2":
-                if (this.mode !== FlashcardModalMode.Back) break;
+                if (this.mode !== FlashcardModalMode.Back) {
+                    break;
+                }
                 this.processReview(ReviewResponse.Good);
                 consumeKeyEvent();
                 break;
             case "Numpad3":
             case "Digit3":
-                if (this.mode !== FlashcardModalMode.Back) break;
+                if (this.mode !== FlashcardModalMode.Back) {
+                    break;
+                }
                 this.processReview(ReviewResponse.Easy);
                 consumeKeyEvent();
                 break;
             case "Numpad0":
             case "Digit0":
-                if (this.mode !== FlashcardModalMode.Back) break;
+                if (this.mode !== FlashcardModalMode.Back) {
+                    break;
+                }
                 this.processReview(ReviewResponse.Reset);
                 consumeKeyEvent();
                 break;
