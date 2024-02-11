@@ -76,7 +76,6 @@ export class DecksListView {
         this._createHeaderStats();
 
         this.content.empty();
-
         for (const deck of this.reviewSequencer.originalDeckTree.subdecks) {
             this._renderDeck(deck, this.content);
         }
@@ -106,85 +105,91 @@ export class DecksListView {
         statsContainer.addClasses(["tag-pane-tag-count", "tree-item-flair", "sr-header-stats-count", statsClass]);
 
         const lable = statsContainer.createDiv();
-        lable.setText(statsLable+":");
+        lable.setText(statsLable + ":");
+
         const number = statsContainer.createDiv();
         number.setText(statsNumber.toString());
     }
 
-    private _renderDeck(deck: Deck, containerEl: HTMLElement): void {
-        const deckView: HTMLElement = containerEl.createDiv("tree-item");
-
-        const deckViewSelf: HTMLElement = deckView.createDiv(
+    private _renderDeck(deck: Deck, container: HTMLElement): void {
+        const deckTree: HTMLElement = container.createDiv("tree-item");
+        const deckTreeSelf: HTMLElement = deckTree.createDiv(
             "tree-item-self tag-pane-tag is-clickable",
         );
+
         const shouldBeInitiallyExpanded: boolean = this.settings.initiallyExpandAllSubdecksInTree;
         let collapsed = !shouldBeInitiallyExpanded;
         let collapseIconEl: HTMLElement | null = null;
         if (deck.subdecks.length > 0) {
-            collapseIconEl = deckViewSelf.createDiv("tree-item-icon collapse-icon");
+            collapseIconEl = deckTreeSelf.createDiv("tree-item-icon collapse-icon");
             collapseIconEl.innerHTML = COLLAPSE_ICON;
             (collapseIconEl.childNodes[0] as HTMLElement).style.transform = collapsed
                 ? "rotate(-90deg)"
                 : "";
         }
 
-        const deckViewInner: HTMLElement = deckViewSelf.createDiv("tree-item-inner");
-        const deckViewInnerText: HTMLElement = deckViewInner.createDiv("tag-pane-tag-text");
-        deckViewInnerText.innerHTML += <span class="tag-pane-tag-self">{deck.deckName}</span>;
-        const deckViewOuter: HTMLElement = deckViewSelf.createDiv("tree-item-flair-outer");
-        const deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
-        deckViewOuter.innerHTML += (
-            <span>
-                <span
-                    style="background-color:#4caf50;"
-                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
-                >
-                    {deckStats.dueCount.toString()}
-                </span>
-                <span
-                    style="background-color:#2196f3;"
-                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
-                >
-                    {deckStats.newCount.toString()}
-                </span>
-                <span
-                    style="background-color:#ff7043;"
-                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
-                >
-                    {deckStats.totalCount.toString()}
-                </span>
-            </span>
-        );
+        const deckTreeInner: HTMLElement = deckTreeSelf.createDiv("tree-item-inner");
+        const deckTreeInnerText: HTMLElement = deckTreeInner.createDiv("tag-pane-tag-text");
+        deckTreeInnerText.innerHTML += <span class="tag-pane-tag-self">{deck.deckName}</span>;
 
-        const deckViewChildren: HTMLElement = deckView.createDiv("tree-item-children");
-        deckViewChildren.style.display = collapsed ? "none" : "block";
+        const deckTreeOuter: HTMLDivElement = deckTreeSelf.createDiv();
+        deckTreeOuter.addClasses(["tree-item-flair-outer", "sr-tree-stats-container"]);
+
+        const deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
+        this._createStats(deckStats, deckTreeOuter);
+
+        const deckTreeChildren: HTMLElement = deckTree.createDiv("tree-item-children");
+        deckTreeChildren.style.display = collapsed ? "none" : "block";
         if (deck.subdecks.length > 0) {
             collapseIconEl.addEventListener("click", (e) => {
                 if (collapsed) {
                     (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "";
-                    deckViewChildren.style.display = "block";
+                    deckTreeChildren.style.display = "block";
                 } else {
                     (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
                         "rotate(-90deg)";
-                    deckViewChildren.style.display = "none";
+                    deckTreeChildren.style.display = "none";
                 }
 
-                // We stop the propagation of the event so that the click event for deckViewSelf doesn't get called
+                // We stop the propagation of the event so that the click event for deckTreeSelf doesn't get called
                 // if the user clicks on the collapse icon
                 e.stopPropagation();
                 collapsed = !collapsed;
             });
         }
 
-        // Add the click handler to deckViewSelf instead of deckViewInner so that it activates
+        // Add the click handler to deckTreeSelf instead of deckTreeInner so that it activates
         // over the entire rectangle of the tree item, not just the text of the topic name
         // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/709
-        deckViewSelf.addEventListener("click", () => {
+        deckTreeSelf.addEventListener("click", () => {
             this.startReviewOfDeck(deck);
         });
 
         for (const subdeck of deck.subdecks) {
-            this._renderDeck(subdeck, deckViewChildren);
+            this._renderDeck(subdeck, deckTreeChildren);
         }
+    }
+
+    private _createStats(statistics: DeckStats, statsWrapper: HTMLDivElement) {
+        statsWrapper.empty();
+
+        this._createStatsContainer(t("TOTAL_CARDS"), statistics.totalCount, "sr-bg-red", statsWrapper);
+        this._createStatsContainer(t("NEW_CARDS"), statistics.newCount, "sr-bg-blue", statsWrapper);
+        this._createStatsContainer(t("DUE_CARDS"), statistics.dueCount, "sr-bg-green", statsWrapper);
+    }
+
+    private _createStatsContainer(statsLable: string, statsNumber: number, statsClass: string, statsWrapper: HTMLDivElement): void {
+        const statsContainer = statsWrapper.createDiv();
+
+        statsContainer.ariaLabel = statsLable;
+
+        statsContainer.addClasses([
+            "tag-pane-tag-count",
+            "tree-item-flair",
+            "sr-tree-stats-count",
+            statsClass
+        ]);
+
+        statsContainer.setText(statsNumber.toString());
     }
 }

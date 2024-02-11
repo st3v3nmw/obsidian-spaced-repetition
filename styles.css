@@ -14,6 +14,12 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     display: none;
 }
 
+.sr-bg-blue,
+.sr-bg-green,
+.sr-bg-red {
+    color: #ffffff;
+}
+
 .sr-bg-green {
     background-color: #4caf50;
 }
@@ -73,6 +79,19 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
 .sr-deck-list .sr-header-stats-count > *:last-child {
     min-width: 3ch;
     text-align: right;
+}
+
+.sr-deck-list .sr-tree-stats-container {
+    display: flex;
+    gap: 8px;
+}
+
+.sr-deck-list .sr-tree-stats-count {
+    min-width: 3ch;
+    padding: 2px 4px;
+    box-sizing: content-box;
+    text-align: center;
+    color: #ffffff !important;
 }
 
 .sr-flashcard-menu {

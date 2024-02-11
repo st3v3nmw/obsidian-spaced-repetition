@@ -28,6 +28,7 @@ export class FlashcardModal extends Modal {
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
+    private deckView: DecksListView;
 
     constructor(
         app: App,
@@ -51,6 +52,14 @@ export class FlashcardModal extends Modal {
         if (Platform.isMobile) {
             this.contentEl.style.display = "block";
         }
+
+        this.deckView = new DecksListView(
+            this.plugin,
+            this.settings,
+            this.reviewSequencer,
+            this.contentEl,
+            this.startReviewOfDeck.bind(this),
+        );
     }
 
     onOpen(): void {
@@ -62,16 +71,15 @@ export class FlashcardModal extends Modal {
     }
 
     showDecksList(): void {
-        new DecksListView(
-            this.plugin,
-            this.settings,
-            this.reviewSequencer,
-            this.contentEl,
-            this.startReviewOfDeck.bind(this),
-        ).show();
+        this.deckView.show();
+    }
+
+    hideDecksList(): void {
+        this.deckView.hide();
     }
 
     startReviewOfDeck(deck: Deck) {
+        this.hideDecksList();
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         if (this.reviewSequencer.hasCurrentCard) {
             new FlashcardReviewView(
