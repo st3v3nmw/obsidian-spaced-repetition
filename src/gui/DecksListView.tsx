@@ -24,8 +24,6 @@ export class DecksListView {
     public title: HTMLDivElement;
     public stats: HTMLDivElement;
     public content: HTMLDivElement;
-    public treeHeader: HTMLDivElement;
-    public treeContent: HTMLDivElement;
 
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
@@ -51,23 +49,21 @@ export class DecksListView {
      */
     init(): void {
         this.view = this.modalContentEl.createDiv();
-        this.view.addClasses(["sr-deck-list-view", "sr-is-hidden"]);
+        this.view.addClasses(["sr-deck-list", "sr-is-hidden"]);
 
         this.header = this.view.createDiv();
-        this.header.addClass("sr-deck-list-header");
+        this.header.addClass("sr-header");
 
         this.title = this.header.createDiv();
-        this.title.addClass("sr-deck-list-title");
+        this.title.addClass("sr-title");
         this.title.setText(t("DECKS"));
 
         this.stats = this.header.createDiv();
-        this.stats.addClass("sr-deck-list-header-stats-container");
+        this.stats.addClass("sr-header-stats-container");
         this._createHeaderStats();
 
         this.content = this.view.createDiv();
-        this.content.addClass("sr-deck-list-content");
-
-
+        this.content.addClass("sr-content");
     }
 
     /**
@@ -107,7 +103,7 @@ export class DecksListView {
     private _createHeaderStatsContainer(statsLable: string, statsNumber: number, statsClass: string): void {
         const statsContainer = this.stats.createDiv();
         statsContainer.ariaLabel = statsLable;
-        statsContainer.addClasses(["tag-pane-tag-count", "tree-item-flair", "sr-deck-list-header-stats-count", statsClass]);
+        statsContainer.addClasses(["tag-pane-tag-count", "tree-item-flair", "sr-header-stats-count", statsClass]);
 
         const lable = statsContainer.createDiv();
         lable.setText(statsLable);
