@@ -106,7 +106,7 @@ export class DecksListView {
         statsContainer.addClasses(["tag-pane-tag-count", "tree-item-flair", "sr-header-stats-count", statsClass]);
 
         const lable = statsContainer.createDiv();
-        lable.setText(statsLable);
+        lable.setText(statsLable+":");
         const number = statsContainer.createDiv();
         number.setText(statsNumber.toString());
     }

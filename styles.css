@@ -32,9 +32,11 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding-bottom: 14px;
     width: 100%;
     justify-content: center;
     align-items: center;
+    border-bottom: 1px solid var(--hr-color);
 }
 
 .sr-deck-list .sr-title {
@@ -53,17 +55,16 @@
     display: flex;
     color: #ffffff;
     padding: 4px;
+    gap: 4px;
 }
 
 .sr-deck-list .sr-header-stats-count > *:first-child {
     min-width: 10ch;
-    border-right: 1px solid #ffffff;
 }
 
 .sr-deck-list .sr-header-stats-count > *:last-child {
-    min-width: 5ch;
-    padding-left: 4px;
-    text-align: center;
+    min-width: 3ch;
+    text-align: right;
 }
 
 .sr-flashcard-menu {
