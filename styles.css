@@ -1,3 +1,11 @@
+.sr-modal .modal-close-button {
+    z-index: 21;
+}
+
+body:not(.native-scrollbars) .sr-modal .modal-close-button {
+    top: 12px;
+}
+
 .sr-modal-content {
     position: relative;
 }
