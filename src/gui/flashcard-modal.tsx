@@ -1,17 +1,13 @@
-import { Modal, App, Notice, Platform, setIcon } from "obsidian";
+import { Modal, App, Platform } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
-import { textInterval, ReviewResponse } from "src/scheduling";
-import { COLLAPSE_ICON } from "src/constants";
-import { t } from "src/lang/helpers";
-import { Card } from "../Card";
-import { CardListType, Deck } from "../Deck";
-import { CardType, Question } from "../Question";
+
+import { Deck } from "../Deck";
+import { Question } from "../Question";
 import {
-    DeckStats,
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/FlashcardReviewSequencer";
