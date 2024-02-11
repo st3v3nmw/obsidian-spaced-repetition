@@ -20,19 +20,29 @@ import { FlashcardModalMode } from "./flashcard-modal";
 export class FlashcardReviewView {
     public app: App;
     public plugin: SRPlugin;
-    public answerBtn: HTMLElement;
-    public titleEl: HTMLElement;
-    public contentEl: HTMLElement;
-    public flashcardView: HTMLElement;
-    private flashCardMenu: HTMLDivElement;
-    public hardBtn: HTMLElement;
-    public goodBtn: HTMLElement;
-    public easyBtn: HTMLElement;
-    public nextBtn: HTMLElement;
-    public responseDiv: HTMLElement;
+    public modalContentEl: HTMLElement;
+
+    public view: HTMLDivElement;
+
+    public header: HTMLDivElement;
+    public title: HTMLDivElement;
+    public backButton: HTMLButtonElement;
+
+    public controls: HTMLDivElement;
+    public editButton: HTMLButtonElement;
     public resetButton: HTMLButtonElement;
-    public editButton: HTMLElement;
-    public contextView: HTMLElement;
+    public infoButton: HTMLButtonElement;
+    public skipButton: HTMLButtonElement;
+
+    public content: HTMLDivElement;
+    public context: HTMLElement;
+
+    public response: HTMLDivElement;
+    public hardButton: HTMLButtonElement;
+    public goodButton: HTMLButtonElement;
+    public easyButton: HTMLButtonElement;
+    public answerButton: HTMLButtonElement;
+
     public mode: FlashcardModalMode;
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
@@ -40,25 +50,12 @@ export class FlashcardReviewView {
     private backClickHandler: () => void;
     private editClickHandler: () => void;
 
-    private get currentCard(): Card {
-        return this.reviewSequencer.currentCard;
-    }
-
-    private get currentQuestion(): Question {
-        return this.reviewSequencer.currentQuestion;
-    }
-
-    private get currentNote(): Note {
-        return this.reviewSequencer.currentNote;
-    }
-
     constructor(
         app: App,
         plugin: SRPlugin,
         settings: SRSettings,
         reviewSequencer: IFlashcardReviewSequencer,
         reviewMode: FlashcardReviewMode,
-        titleEl: HTMLElement,
         contentEl: HTMLElement,
         backClickHandler: () => void,
         editClickHandler: () => void,
@@ -71,22 +68,194 @@ export class FlashcardReviewView {
         this.backClickHandler = backClickHandler;
         this.editClickHandler = editClickHandler;
 
-        this.titleEl = titleEl;
-        this.contentEl = contentEl;
+        this.modalContentEl = contentEl;
 
-        this.titleEl.addClass("sr-centered");
+        document.addEventListener("keydown", this._keydownHandler.bind(this));
 
-        this.contentEl.style.position = "relative";
-        this.contentEl.style.height = "92%";
-        this.contentEl.addClass("sr-modal-content");
-        if (Platform.isMobile) {
-            this.contentEl.style.display = "block";
-        }
-
-        document.addEventListener("keydown", this.keydownHandler.bind(this));
+        this.init();
     }
 
-    keydownHandler(e: KeyboardEvent): void {
+    /**
+     * Initializes all Elements in the FlashcardView
+     */
+    init() {
+        this.view = this.modalContentEl.createDiv();
+        this.view.addClasses(["sr-flashcard", "sr-is-hidden"]);
+
+        this.header = this.view.createDiv();
+        this.header.addClass("sr-header");
+
+        this._createBackButton();
+
+        this.title = this.header.createDiv();
+        this.title.addClass("sr-title");
+
+        this.controls = this.header.createDiv();
+        this.controls.addClass("sr-controls");
+
+        this._createControls();
+
+        if (this.settings.showContextInCards) {
+            this.context = this.view.createDiv();
+            this.context.addClass("sr-context");
+        }
+
+        this.content = this.view.createDiv();
+        this.content.addClass("sr-content");
+
+        this.response = this.view.createDiv();
+        this.response.addClass("sr-response");
+
+        this._createResponseButtons();
+    }
+
+    /**
+     * Shows the FlashcardView
+     */
+    async show() {
+        this.mode = FlashcardModalMode.Front;
+        const deck: Deck = this.reviewSequencer.currentDeck;
+
+        this._setTitle(deck);
+        this.resetButton.disabled = true;
+
+        if (this.settings.showContextInCards) {
+            this.context.setText(
+                this._formatQuestionContextText(this._currentQuestion.questionContext),
+            );
+        }
+
+        this.content.empty();
+
+        const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
+            this.app,
+            this.plugin,
+            this._currentNote.filePath,
+        );
+        await wrapper.renderMarkdownWrapper(this._currentCard.front, this.content);
+
+        this._resetResponseButtons();
+
+        if (this.view.hasClass("sr-is-hidden")) {
+            this.view.removeClass("sr-is-hidden");
+        }
+    }
+
+    /**
+     * Hides the FlashcardView
+     */
+    hide() {
+        if (!this.view.hasClass("sr-is-hidden")) {
+            this.view.addClass("sr-is-hidden");
+        }
+    }
+
+    private _createBackButton() {
+        this.backButton = this.header.createEl("button");
+        this.backButton.addClasses(["sr-button", "sr-back-button"]);
+        setIcon(this.backButton, "arrow-left");
+        this.backButton.setAttribute("aria-label", t("BACK"));
+        this.backButton.addEventListener("click", () => {
+            /* this.plugin.data.historyDeck = ""; */
+            this.backClickHandler();
+        });
+    }
+
+    private _setTitle(deck: Deck) {
+        this.title.setText(`${deck.deckName}: ${deck.getCardCount(CardListType.All, true)}`);
+    }
+
+    private _createControls() {
+        this._createEditButton();
+        this._createResetButton();
+        this._createCardInfoButton();
+        this._createSkipButton();
+    }
+
+    private _createEditButton() {
+        this.editButton = this.controls.createEl("button");
+        this.editButton.addClasses(["sr-button", "sr-edit-button"]);
+        setIcon(this.editButton, "edit");
+        this.editButton.setAttribute("aria-label", t("EDIT_CARD"));
+        this.editButton.addEventListener("click", async () => {
+            this.editClickHandler();
+        });
+    }
+
+    private _createResetButton() {
+        this.resetButton = this.controls.createEl("button");
+        this.resetButton.addClasses(["sr-button", "sr-reset-button"]);
+        setIcon(this.resetButton, "refresh-cw");
+        this.resetButton.setAttribute("aria-label", t("RESET_CARD_PROGRESS"));
+        this.resetButton.addEventListener("click", () => {
+            this._processReview(ReviewResponse.Reset);
+        });
+    }
+
+    private _createCardInfoButton() {
+        this.infoButton = this.controls.createEl("button");
+        this.infoButton.addClasses(["sr-button", "sr-info-button"]);
+        setIcon(this.infoButton, "info");
+        this.infoButton.setAttribute("aria-label", "View Card Info");
+        this.infoButton.addEventListener("click", async () => {
+            this._displayCurrentCardInfoNotice();
+        });
+    }
+
+    private _createSkipButton() {
+        this.skipButton = this.controls.createEl("button");
+        this.skipButton.addClasses(["sr-button", "sr-skip-button"]);
+        setIcon(this.skipButton, "chevrons-right");
+        this.skipButton.setAttribute("aria-label", t("SKIP"));
+        this.skipButton.addEventListener("click", () => {
+            this._skipCurrentCard();
+        });
+    }
+
+    private _createResponseButtons() {
+        this._createShowAnswerButton();
+        this._createHardButton();
+        this._createGoodButton();
+        this._createEasyButton();
+    }
+
+    private _createShowAnswerButton() {
+        this.answerButton = this.response.createEl("button");
+        this.answerButton.addClasses(["sr-response-button", "sr-show-answer-button", "sr-bg-blue"]);
+        this.answerButton.setText(t("SHOW_ANSWER"));
+        this.answerButton.addEventListener("click", () => {
+            this._showAnswer();
+        });
+    }
+
+    private _createHardButton() {
+        this.hardButton = this.response.createEl("button");
+        this.hardButton.addClasses(["sr-response-button", "sr-hard-button", "sr-bg-red", "sr-is-hidden"]);
+        this.hardButton.setText(this.settings.flashcardHardText);
+        this.hardButton.addEventListener("click", () => {
+            this._processReview(ReviewResponse.Hard);
+        });
+    }
+
+    private _createGoodButton() {
+        this.goodButton = this.response.createEl("button");
+        this.goodButton.addClasses(["sr-response-button", "sr-good-button", "sr-bg-blue", "sr-is-hidden"]);
+        this.goodButton.setText(this.settings.flashcardGoodText);
+        this.goodButton.addEventListener("click", () => {
+            this._processReview(ReviewResponse.Good);
+        });
+    }
+
+    private _createEasyButton() {
+        this.easyButton = this.response.createEl("button");
+        this.easyButton.addClasses(["sr-response-button", "sr-hard-button", "sr-bg-green", "sr-is-hidden"]);
+        this.easyButton.setText(this.settings.flashcardEasyText);
+        this.easyButton.addEventListener("click", () => {
+            this._processReview(ReviewResponse.Easy);
+        });
+    }
+
+    private _keydownHandler(e: KeyboardEvent): void {
         // Checks if the input textbox is in focus before processing keyboard shortcuts.
         if (
             document.activeElement.nodeName === "TEXTAREA" ||
@@ -103,15 +272,15 @@ export class FlashcardReviewView {
 
         switch (e.code) {
             case "KeyS":
-                this.skipCurrentCard();
+                this._skipCurrentCard();
                 consumeKeyEvent();
                 break;
             case "Space":
                 if (this.mode === FlashcardModalMode.Front) {
-                    this.showAnswer();
+                    this._showAnswer();
                     consumeKeyEvent();
                 } else if (this.mode === FlashcardModalMode.Back) {
-                    this.processReview(ReviewResponse.Good);
+                    this._processReview(ReviewResponse.Good);
                     consumeKeyEvent();
                 }
                 break;
@@ -120,7 +289,7 @@ export class FlashcardReviewView {
                 if (this.mode !== FlashcardModalMode.Front) {
                     break;
                 }
-                this.showAnswer();
+                this._showAnswer();
                 consumeKeyEvent();
                 break;
             case "Numpad1":
@@ -128,7 +297,7 @@ export class FlashcardReviewView {
                 if (this.mode !== FlashcardModalMode.Back) {
                     break;
                 }
-                this.processReview(ReviewResponse.Hard);
+                this._processReview(ReviewResponse.Hard);
                 consumeKeyEvent();
                 break;
             case "Numpad2":
@@ -136,7 +305,7 @@ export class FlashcardReviewView {
                 if (this.mode !== FlashcardModalMode.Back) {
                     break;
                 }
-                this.processReview(ReviewResponse.Good);
+                this._processReview(ReviewResponse.Good);
                 consumeKeyEvent();
                 break;
             case "Numpad3":
@@ -144,7 +313,7 @@ export class FlashcardReviewView {
                 if (this.mode !== FlashcardModalMode.Back) {
                     break;
                 }
-                this.processReview(ReviewResponse.Easy);
+                this._processReview(ReviewResponse.Easy);
                 consumeKeyEvent();
                 break;
             case "Numpad0":
@@ -152,7 +321,7 @@ export class FlashcardReviewView {
                 if (this.mode !== FlashcardModalMode.Back) {
                     break;
                 }
-                this.processReview(ReviewResponse.Reset);
+                this._processReview(ReviewResponse.Reset);
                 consumeKeyEvent();
                 break;
             default:
@@ -160,242 +329,120 @@ export class FlashcardReviewView {
         }
     }
 
-    async showCurrentCard(): Promise<void> {
-        this.setupView();
-
-        const deck: Deck = this.reviewSequencer.currentDeck;
-
-        this.responseDiv.style.display = "none";
-        this.resetButton.disabled = true;
-        this.titleEl.setText(`${deck.deckName}: ${deck.getCardCount(CardListType.All, true)}`);
-
-        this.answerBtn.style.display = "initial";
-        this.flashcardView.empty();
-        this.mode = FlashcardModalMode.Front;
-
-        const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
-            this.app,
-            this.plugin,
-            this.currentNote.filePath,
-        );
-        await wrapper.renderMarkdownWrapper(this.currentCard.front, this.flashcardView);
-
-        if (this.reviewMode == FlashcardReviewMode.Cram) {
-            // Same for mobile/desktop
-            this.hardBtn.setText(`${this.settings.flashcardHardText}`);
-            this.easyBtn.setText(`${this.settings.flashcardEasyText}`);
-        } else {
-            this.setupEaseButton(
-                this.hardBtn,
-                this.settings.flashcardHardText,
-                ReviewResponse.Hard,
-            );
-            this.setupEaseButton(
-                this.goodBtn,
-                this.settings.flashcardGoodText,
-                ReviewResponse.Good,
-            );
-            this.setupEaseButton(
-                this.easyBtn,
-                this.settings.flashcardEasyText,
-                ReviewResponse.Easy,
-            );
-        }
-
-        if (this.settings.showContextInCards)
-            this.contextView.setText(
-                this.formatQuestionContextText(this.currentQuestion.questionContext),
-            );
-    }
-
-    createShowAnswerButton() {
-        this.answerBtn = this.contentEl.createDiv();
-        this.answerBtn.setAttribute("id", "sr-show-answer");
-        this.answerBtn.setText(t("SHOW_ANSWER"));
-        this.answerBtn.addEventListener("click", () => {
-            this.showAnswer();
-        });
-    }
-
-    createResponseButtons() {
-        this.responseDiv = this.contentEl.createDiv("sr-flashcard-response");
-
-        this.hardBtn = document.createElement("button");
-        this.hardBtn.setAttribute("id", "sr-hard-btn");
-        this.hardBtn.setText(this.settings.flashcardHardText);
-        this.hardBtn.addEventListener("click", () => {
-            this.processReview(ReviewResponse.Hard);
-        });
-        this.responseDiv.appendChild(this.hardBtn);
-
-        this.goodBtn = document.createElement("button");
-        this.goodBtn.setAttribute("id", "sr-good-btn");
-        this.goodBtn.setText(this.settings.flashcardGoodText);
-        this.goodBtn.addEventListener("click", () => {
-            this.processReview(ReviewResponse.Good);
-        });
-        this.responseDiv.appendChild(this.goodBtn);
-
-        this.easyBtn = document.createElement("button");
-        this.easyBtn.setAttribute("id", "sr-easy-btn");
-        this.easyBtn.setText(this.settings.flashcardEasyText);
-        this.easyBtn.addEventListener("click", () => {
-            this.processReview(ReviewResponse.Easy);
-        });
-        this.responseDiv.appendChild(this.easyBtn);
-        this.responseDiv.style.display = "none";
-    }
-
-    createSkipButton() {
-        const skipButton = this.flashCardMenu.createEl("button");
-        skipButton.addClass("sr-flashcard-menu-item");
-        setIcon(skipButton, "chevrons-right");
-        skipButton.setAttribute("aria-label", t("SKIP"));
-        skipButton.addEventListener("click", () => {
-            this.skipCurrentCard();
-        });
-    }
-
-    createCardInfoButton() {
-        const cardInfo = this.flashCardMenu.createEl("button");
-        cardInfo.addClass("sr-flashcard-menu-item");
-        setIcon(cardInfo, "info");
-        cardInfo.setAttribute("aria-label", "View Card Info");
-        cardInfo.addEventListener("click", async () => {
-            this.displayCurrentCardInfoNotice();
-        });
-    }
-
-    displayCurrentCardInfoNotice() {
-        const schedule = this.currentCard.scheduleInfo;
+    private _displayCurrentCardInfoNotice() {
+        const schedule = this._currentCard.scheduleInfo;
         const currentEaseStr = t("CURRENT_EASE_HELP_TEXT") + (schedule?.ease ?? t("NEW"));
         const currentIntervalStr =
             t("CURRENT_INTERVAL_HELP_TEXT") + textInterval(schedule?.interval, false);
         const generatedFromStr = t("CARD_GENERATED_FROM", {
-            notePath: this.currentQuestion.note.filePath,
+            notePath: this._currentQuestion.note.filePath,
         });
         new Notice(currentEaseStr + "\n" + currentIntervalStr + "\n" + generatedFromStr);
     }
 
-    createBackButton() {
-        const backButton = this.flashCardMenu.createEl("button");
-        backButton.addClass("sr-flashcard-menu-item");
-        setIcon(backButton, "arrow-left");
-        backButton.setAttribute("aria-label", t("BACK"));
-        backButton.addEventListener("click", () => {
-            /* this.plugin.data.historyDeck = ""; */
-            this.backClickHandler();
-        });
+    private _resetResponseButtons() {
+        this.answerButton.removeClass("sr-is-hidden");
+        this.hardButton.addClass("sr-is-hidden");
+        this.goodButton.addClass("sr-is-hidden");
+        this.easyButton.addClass("sr-is-hidden");
     }
 
-    createResetButton() {
-        this.resetButton = this.flashCardMenu.createEl("button");
-        this.resetButton.addClass("sr-flashcard-menu-item");
-        setIcon(this.resetButton, "refresh-cw");
-        this.resetButton.setAttribute("aria-label", t("RESET_CARD_PROGRESS"));
-        this.resetButton.addEventListener("click", () => {
-            this.processReview(ReviewResponse.Reset);
-        });
+    private get _currentCard(): Card {
+        return this.reviewSequencer.currentCard;
     }
 
-    createEditButton() {
-        this.editButton = this.flashCardMenu.createEl("button");
-        this.editButton.addClass("sr-flashcard-menu-item");
-        setIcon(this.editButton, "edit");
-        this.editButton.setAttribute("aria-label", t("EDIT_CARD"));
-        this.editButton.addEventListener("click", async () => {
-            this.editClickHandler();
-        });
+    private get _currentQuestion(): Question {
+        return this.reviewSequencer.currentQuestion;
     }
 
-    private setupView(): void {
-        this.contentEl.empty();
-
-        this.flashCardMenu = this.contentEl.createDiv("sr-flashcard-menu");
-
-        this.createBackButton();
-        this.createEditButton();
-        this.createResetButton();
-        this.createCardInfoButton();
-        this.createSkipButton();
-
-        if (this.settings.showContextInCards) {
-            this.contextView = this.contentEl.createDiv();
-            this.contextView.setAttribute("id", "sr-context");
-        }
-
-        this.flashcardView = this.contentEl.createDiv("div");
-        this.flashcardView.setAttribute("id", "sr-flashcard-view");
-
-        this.createResponseButtons();
-
-        this.createShowAnswerButton();
-
-        if (this.reviewMode == FlashcardReviewMode.Cram) {
-            this.goodBtn.style.display = "none";
-
-            this.responseDiv.addClass("sr-ignorestats-response");
-            this.easyBtn.addClass("sr-ignorestats-btn");
-            this.hardBtn.addClass("sr-ignorestats-btn");
-        }
+    private get _currentNote(): Note {
+        return this.reviewSequencer.currentNote;
     }
 
-    private showAnswer(): void {
+    private _showAnswer(): void {
         this.mode = FlashcardModalMode.Back;
 
-        this.answerBtn.style.display = "none";
-        this.responseDiv.style.display = "grid";
-
-        if (this.currentCard.hasSchedule) {
+        if (this._currentCard.hasSchedule) {
             this.resetButton.disabled = false;
         }
 
-        if (this.currentQuestion.questionType !== CardType.Cloze) {
+        if (this._currentQuestion.questionType !== CardType.Cloze) {
             const hr: HTMLElement = document.createElement("hr");
-            hr.setAttribute("id", "sr-hr-card-divide");
-            this.flashcardView.appendChild(hr);
+            hr.addClass("sr-card-divide");
+            this.content.appendChild(hr);
         } else {
-            this.flashcardView.empty();
+            this.content.empty();
         }
 
         const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
             this.app,
             this.plugin,
-            this.currentNote.filePath,
+            this._currentNote.filePath,
         );
-        wrapper.renderMarkdownWrapper(this.currentCard.back, this.flashcardView);
+        wrapper.renderMarkdownWrapper(this._currentCard.back, this.content);
+
+        this.answerButton.addClass("sr-is-hidden");
+        this.hardButton.removeClass("sr-is-hidden");
+        this.easyButton.removeClass("sr-is-hidden");
+
+        if (this.reviewMode === FlashcardReviewMode.Cram) {
+            this.response.addClass("is-cram");
+            this.hardButton.setText(`${this.settings.flashcardHardText}`);
+            this.easyButton.setText(`${this.settings.flashcardEasyText}`);
+        } else {
+            this.goodButton.removeClass("sr-is-hidden");
+            this._setupEaseButton(
+                this.hardButton,
+                this.settings.flashcardHardText,
+                ReviewResponse.Hard,
+            );
+            this._setupEaseButton(
+                this.goodButton,
+                this.settings.flashcardGoodText,
+                ReviewResponse.Good,
+            );
+            this._setupEaseButton(
+                this.easyButton,
+                this.settings.flashcardEasyText,
+                ReviewResponse.Easy,
+            );
+        }
     }
 
-    private async processReview(response: ReviewResponse): Promise<void> {
+    private async _processReview(response: ReviewResponse): Promise<void> {
         await this.reviewSequencer.processReview(response);
         // console.log(`processReview: ${response}: ${this.currentCard?.front ?? 'None'}`)
-        await this.handleNextCard();
+        await this._handleSkipCard();
     }
 
-    private async skipCurrentCard(): Promise<void> {
+    private async _skipCurrentCard(): Promise<void> {
         this.reviewSequencer.skipCurrentCard();
         // console.log(`skipCurrentCard: ${this.currentCard?.front ?? 'None'}`)
-        await this.handleNextCard();
+        await this._handleSkipCard();
     }
 
-    private async handleNextCard(): Promise<void> {
-        if (this.currentCard != null) await this.showCurrentCard();
+    private async _handleSkipCard(): Promise<void> {
+        if (this._currentCard != null) await this.show();
         else this.backClickHandler();
     }
 
-    private formatQuestionContextText(questionContext: string[]): string {
-        const result = `${this.currentNote.file.basename} > ${questionContext.join(" > ")}`;
-        return result;
+    private _formatQuestionContextText(questionContext: string[]): string {
+        const separator: string = " > ";
+        let result = this._currentNote.file.basename;
+        if (questionContext.length > 0) {
+            result += separator + questionContext.join(separator);
+        }
+        return result + separator + "...";
     }
 
-    private setupEaseButton(
+    private _setupEaseButton(
         button: HTMLElement,
         buttonName: string,
         reviewResponse: ReviewResponse,
     ) {
         const schedule: CardScheduleInfo = this.reviewSequencer.determineCardSchedule(
             reviewResponse,
-            this.currentCard,
+            this._currentCard,
         );
         const interval: number = schedule.interval;
 

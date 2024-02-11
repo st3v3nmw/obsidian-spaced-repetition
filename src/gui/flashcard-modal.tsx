@@ -29,6 +29,7 @@ export class FlashcardModal extends Modal {
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
     private deckView: DecksListView;
+    private flashcardView: FlashcardReviewView;
 
     constructor(
         app: App,
@@ -60,6 +61,17 @@ export class FlashcardModal extends Modal {
             this.contentEl,
             this.startReviewOfDeck.bind(this),
         );
+
+        this.flashcardView = new FlashcardReviewView(
+            this.app,
+            this.plugin,
+            this.settings,
+            this.reviewSequencer,
+            this.reviewMode,
+            this.contentEl,
+            this.showDecksList.bind(this),
+            this.doEditQuestionText.bind(this),
+        );
     }
 
     onOpen(): void {
@@ -71,6 +83,7 @@ export class FlashcardModal extends Modal {
     }
 
     showDecksList(): void {
+        this.hideFlashcard();
         this.deckView.show();
     }
 
@@ -78,21 +91,19 @@ export class FlashcardModal extends Modal {
         this.deckView.hide();
     }
 
-    startReviewOfDeck(deck: Deck) {
+    showFlashcard(): void {
         this.hideDecksList();
+        this.flashcardView.show();
+    }
+
+    hideFlashcard(): void {
+        this.flashcardView.hide();
+    }
+
+    startReviewOfDeck(deck: Deck) {
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         if (this.reviewSequencer.hasCurrentCard) {
-            new FlashcardReviewView(
-                this.app,
-                this.plugin,
-                this.settings,
-                this.reviewSequencer,
-                this.reviewMode,
-                this.titleEl,
-                this.contentEl,
-                this.showDecksList.bind(this),
-                this.doEditQuestionText.bind(this),
-            ).showCurrentCard();
+            this.showFlashcard();
         } else {
             this.showDecksList();
         }

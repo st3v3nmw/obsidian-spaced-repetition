@@ -11,25 +11,40 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
 }
 
 .sr-is-hidden {
-    display: none;
+    display: none !important;
 }
 
 .sr-bg-blue,
 .sr-bg-green,
 .sr-bg-red {
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
 .sr-bg-green {
-    background-color: #4caf50;
+    background-color: #4caf50 !important;
 }
 
 .sr-bg-blue {
-    background-color: #2094f3;
+    background-color: #2094f3 !important;
 }
 
 .sr-bg-red {
-    background-color: #ff7043;
+    background-color: #ff7043 !important;
+}
+
+.sr-deck-list .sr-tree-item-row:hover .sr-bg-green,
+.sr-flashcard .sr-response-button.sr-bg-green:hover {
+    background-color: hsl(122, 39%, 44%) !important;
+}
+
+.sr-deck-list .sr-tree-item-row:hover .sr-bg-blue,
+.sr-flashcard .sr-response-button.sr-bg-blue:hover {
+    background-color: hsl(207, 90%, 49%) !important;
+}
+
+.sr-deck-list .sr-tree-item-row:hover .sr-bg-red,
+.sr-flashcard .sr-response-button.sr-bg-red:hover {
+    background-color: hsl(14, 100%, 58%) !important;
 }
 
 .sr-deck-list,
@@ -37,26 +52,29 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
 .sr-edit-view {
     display: flex;
     flex-direction: column;
-    gap: 20px;
     width: 100%;
     height: 100%;
 }
 
-.sr-deck-list .sr-header {
+.sr-header {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding-bottom: 14px;
-    width: 100%;
     justify-content: center;
     align-items: center;
+    width: 100%;
     border-bottom: 1px solid var(--hr-color);
 }
 
-.sr-deck-list .sr-title {
+.sr-deck-list .sr-header {
+    gap: 8px;
+    padding-bottom: 14px;
+    margin-bottom: 24px;
+}
+
+.sr-title {
     font-size: var(--font-ui-large);
     font-weight: var(--font-semibold);
-    text-align: left;
+    text-align: center;
     line-height: var(--line-height-tight);
 }
 
@@ -87,18 +105,6 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     margin-bottom: 0;
 }
 
-.sr-deck-list .sr-tree-item-row:hover .sr-bg-green {
-    background-color: hsl(122, 39%, 44%);
-}
-
-.sr-deck-list .sr-tree-item-row:hover .sr-bg-blue {
-    background-color: hsl(207, 90%, 49%);
-}
-
-.sr-deck-list .sr-tree-item-row:hover .sr-bg-red {
-    background-color: hsl(14, 100%, 58%);
-}
-
 .sr-deck-list .sr-tree-stats-container {
     display: flex;
     gap: 4px;
@@ -112,23 +118,78 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     color: #ffffff !important;
 }
 
-.sr-flashcard-menu {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: row;
-    gap: 1rem;
+.sr-flashcard .sr-header {
+    position: relative;
+    gap: 8px;
+    padding-bottom: 8px;
 }
 
-.sr-flashcard-menu-item {
+.sr-flashcard .sr-button {
     box-shadow: none !important;
     cursor: pointer;
 }
 
-.sr-flashcard-menu-item:disabled {
+.sr-flashcard .sr-button:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.sr-flashcard .sr-button:disabled {
     cursor: not-allowed;
 }
+
+.sr-flashcard .sr-back-button {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 21;
+}
+
+.sr-flashcard .sr-controls {
+    display: flex;
+    gap: var(--size-4-4);
+}
+
+.sr-flashcard .sr-context {
+    font-style: italic;
+    color: var(--text-faint);
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+}
+
+.sr-flashcard .sr-content {
+    font-size: var(--font-text-size);
+    overflow-y: auto;
+    user-select: text;
+    padding-inline: 8px;
+    width: 100%;
+    flex-grow: 1;
+}
+
+.sr-flashcard .sr-card-divide {
+    backdrop-filter: invert(40%);
+    border-top-style: dashed;
+}
+
+.sr-flashcard .sr-response {
+    display: flex;
+    width: 100%;
+    margin-top: var(--size-4-4);
+    gap: var(--size-4-4);
+}
+
+.sr-flashcard .sr-response-button {
+    height: 48px;
+    flex-grow: 1;
+    margin: auto;
+    line-height: 48px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 4px;
+    user-select: text;
+}
+
+/* OLD stuff */
 
 .sr-flashcard-input-modal {
     height: 80%;
@@ -150,84 +211,11 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     margin-top: 1rem;
 }
 
-.sr-flashcard-response {
-    display: inline-grid;
-    width: 100%;
-    grid-template-columns: auto auto auto;
-    position: absolute;
-    bottom: 0;
-}
-
-.sr-ignorestats-btn {
-    width: 100%;
-}
-
-.sr-ignorestats-response {
-    grid-template-columns: auto auto;
-    gap: var(--size-4-4);
-}
-
 .sr-centered {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-}
-
-#sr-show-answer {
-    height: 48px;
-    line-height: 48px;
-    width: 100%;
-    text-align: center;
-    position: absolute;
-    bottom: 0;
-    cursor: pointer;
-    background-color: #2196f3;
-    color: #ffffff;
-    border-radius: 4px;
-    user-select: text;
-}
-
-#sr-hr-card-divide {
-    backdrop-filter: invert(40%);
-    border: none;
-    height: 2px;
-}
-
-#sr-hard-btn,
-#sr-good-btn,
-#sr-easy-btn {
-    height: 48px;
-    margin: auto;
-    color: #ffffff;
-    cursor: pointer;
-}
-
-#sr-hard-btn {
-    background-color: #f44336;
-}
-
-#sr-good-btn {
-    background-color: #2196f3;
-}
-
-#sr-easy-btn {
-    background-color: #4caf50;
-}
-
-#sr-context {
-    font-style: italic;
-    font-weight: bold;
-    margin-top: 16px;
-    display: block;
-    width: 100%;
-}
-
-#sr-flashcard-view {
-    font-size: var(--font-text-size);
-    overflow-y: auto;
-    height: 80%;
-    user-select: text;
 }
 
 #sr-chart-period {
@@ -236,7 +224,7 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
 }
 
 @media only screen and (max-width: 600px) {
-    .sr-back-btn {
+    .sr-back-button {
         width: initial !important;
     }
 
@@ -245,19 +233,8 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     }
 
     .sr-modal-content::-webkit-scrollbar,
-    #sr-flashcard-view::-webkit-scrollbar {
+    .sr-deck-list .sr-content::-webkit-scrollbar,
+    .sr-flashcard .sr-content::-webkit-scrollbar {
         display: none;
-    }
-
-    .sr-flashcard-response,
-    #sr-show-answer {
-        width: 93.5% !important;
-        line-height: 60px;
-    }
-
-    #sr-hard-btn,
-    #sr-good-btn,
-    #sr-easy-btn {
-        width: 100px;
     }
 }

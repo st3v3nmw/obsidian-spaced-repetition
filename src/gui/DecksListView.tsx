@@ -79,14 +79,18 @@ export class DecksListView {
             this._createTree(deck, this.content);
         }
 
-        this.view.removeClass("sr-is-hidden");
+        if(this.view.hasClass("sr-is-hidden")){
+            this.view.removeClass("sr-is-hidden");
+        }
     }
 
     /**
      * Hides the DeckListView
      */
     hide() {
-        this.view.addClass("sr-is-hidden");
+        if(!this.view.hasClass("sr-is-hidden")){
+            this.view.addClass("sr-is-hidden");
+        }
     }
 
     private _createHeaderStats() {
