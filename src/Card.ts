@@ -21,11 +21,11 @@ export class Card {
     }
 
     get cardListType(): CardListType {
-        return this.hasSchedule ? CardListType.DueCard : CardListType.NewCard;
+        return this.isNew ? CardListType.NewCard : CardListType.DueCard;
     }
 
     get isNew(): boolean {
-        return !this.hasSchedule;
+        return !this.hasSchedule || this.scheduleInfo.isDummyScheduleForNewCard();
     }
 
     get isDue(): boolean {
