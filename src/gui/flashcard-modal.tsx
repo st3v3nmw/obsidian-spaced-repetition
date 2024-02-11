@@ -64,6 +64,11 @@ export class FlashcardModal extends Modal {
 
         this.modalEl.style.height = this.settings.flashcardHeightPercentage + "%";
         this.modalEl.style.width = this.settings.flashcardWidthPercentage + "%";
+
+        this.contentEl.addClass("sr-modal-content");
+        if (Platform.isMobile) {
+            this.contentEl.style.display = "block";
+        }
     }
 
     onOpen(): void {
@@ -79,7 +84,6 @@ export class FlashcardModal extends Modal {
             this.plugin,
             this.settings,
             this.reviewSequencer,
-            this.titleEl,
             this.contentEl,
             this.startReviewOfDeck.bind(this),
         ).show();

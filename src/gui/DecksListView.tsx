@@ -17,8 +17,16 @@ import { FlashcardModalMode } from "./flashcard-modal";
 export class DecksListView {
     public plugin: SRPlugin;
     public mode: FlashcardModalMode;
-    public titleEl: HTMLElement;
-    public contentEl: HTMLElement;
+    public modalContentEl: HTMLElement;
+
+    public view: HTMLDivElement;
+    public header: HTMLDivElement;
+    public title: HTMLDivElement;
+    public stats: HTMLDivElement;
+    public content: HTMLDivElement;
+    public treeHeader: HTMLDivElement;
+    public treeContent: HTMLDivElement;
+
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private startReviewOfDeck: (deck: Deck) => void;
@@ -27,71 +35,87 @@ export class DecksListView {
         plugin: SRPlugin,
         settings: SRSettings,
         reviewSequencer: IFlashcardReviewSequencer,
-        titleEl: HTMLElement,
         contentEl: HTMLElement,
         startReviewOfDeck: (deck: Deck) => void,
     ) {
         this.plugin = plugin;
         this.settings = settings;
         this.reviewSequencer = reviewSequencer;
-
+        this.modalContentEl = contentEl;
         this.startReviewOfDeck = startReviewOfDeck;
-
-        this.titleEl = titleEl;
-        this.contentEl = contentEl;
-
-        this.titleEl.addClass("sr-centered");
-
-        this.contentEl.style.position = "relative";
-        this.contentEl.style.height = "92%";
-        this.contentEl.addClass("sr-modal-content");
-        if (Platform.isMobile) {
-            this.contentEl.style.display = "block";
-        }
+        this.init();
     }
+
+    /**
+     * Initializes all elements in the DeckListView
+     */
+    init(): void {
+        this.view = this.modalContentEl.createDiv();
+        this.view.addClasses(["sr-deck-list-view", "sr-is-hidden"]);
+
+        this.header = this.view.createDiv();
+        this.header.addClass("sr-deck-list-header");
+
+        this.title = this.header.createDiv();
+        this.title.addClass("sr-deck-list-title");
+        this.title.setText(t("DECKS"));
+
+        this.stats = this.header.createDiv();
+        this.stats.addClass("sr-deck-list-header-stats-container");
+        this._createHeaderStats();
+
+        this.content = this.view.createDiv();
+        this.content.addClass("sr-deck-list-content");
+
+
+    }
+
     /**
      * Shows the DeckListView
      */
     show(): void {
         this.mode = FlashcardModalMode.DecksList;
 
-        const stats: DeckStats = this.reviewSequencer.getDeckStats(TopicPath.emptyPath);
+        // Redraw in case the stats have changed
+        this._createHeaderStats();
 
-        this.titleEl.setText(t("DECKS"));
-        this.titleEl.innerHTML += (
-            <p style="margin:0px;line-height:12px;">
-                <span
-                    style="background-color:#4caf50;color:#ffffff;"
-                    aria-label={t("DUE_CARDS")}
-                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
-                >
-                    {stats.dueCount.toString()}
-                </span>
-                <span
-                    style="background-color:#2196f3;"
-                    aria-label={t("NEW_CARDS")}
-                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
-                >
-                    {stats.newCount.toString()}
-                </span>
-                <span
-                    style="background-color:#ff7043;"
-                    aria-label={t("TOTAL_CARDS")}
-                    class="tag-pane-tag-count tree-item-flair sr-deck-counts"
-                >
-                    {stats.totalCount.toString()}
-                </span>
-            </p>
-        );
-        this.contentEl.empty();
-        this.contentEl.setAttribute("id", "sr-flashcard-view");
+        this.content.empty();
 
         for (const deck of this.reviewSequencer.originalDeckTree.subdecks) {
-            this.renderDeck(deck, this.contentEl);
+            this._renderDeck(deck, this.content);
         }
+
+        this.view.removeClass("sr-is-hidden");
     }
 
-    renderDeck(deck: Deck, containerEl: HTMLElement): void {
+    /**
+     * Hides the DeckListView
+     */
+    hide() {
+        this.view.addClass("sr-is-hidden");
+    }
+
+    private _createHeaderStats() {
+        const statistics: DeckStats = this.reviewSequencer.getDeckStats(TopicPath.emptyPath);
+        this.stats.empty();
+
+        this._createHeaderStatsContainer(t("TOTAL_CARDS"), statistics.totalCount, "sr-bg-red");
+        this._createHeaderStatsContainer(t("NEW_CARDS"), statistics.newCount, "sr-bg-blue");
+        this._createHeaderStatsContainer(t("DUE_CARDS"), statistics.dueCount, "sr-bg-green");
+    }
+
+    private _createHeaderStatsContainer(statsLable: string, statsNumber: number, statsClass: string): void {
+        const statsContainer = this.stats.createDiv();
+        statsContainer.ariaLabel = statsLable;
+        statsContainer.addClasses(["tag-pane-tag-count", "tree-item-flair", "sr-deck-list-header-stats-count", statsClass]);
+
+        const lable = statsContainer.createDiv();
+        lable.setText(statsLable);
+        const number = statsContainer.createDiv();
+        number.setText(statsNumber.toString());
+    }
+
+    private _renderDeck(deck: Deck, containerEl: HTMLElement): void {
         const deckView: HTMLElement = containerEl.createDiv("tree-item");
 
         const deckViewSelf: HTMLElement = deckView.createDiv(
@@ -164,7 +188,7 @@ export class DecksListView {
         });
 
         for (const subdeck of deck.subdecks) {
-            this.renderDeck(subdeck, deckViewChildren);
+            this._renderDeck(subdeck, deckViewChildren);
         }
     }
 }
