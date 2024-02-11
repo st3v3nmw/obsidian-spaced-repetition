@@ -1,4 +1,3 @@
-import { Platform } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
@@ -77,7 +76,7 @@ export class DecksListView {
 
         this.content.empty();
         for (const deck of this.reviewSequencer.originalDeckTree.subdecks) {
-            this._renderDeck(deck, this.content);
+            this._createTree(deck, this.content);
         }
 
         this.view.removeClass("sr-is-hidden");
@@ -111,10 +110,10 @@ export class DecksListView {
         number.setText(statsNumber.toString());
     }
 
-    private _renderDeck(deck: Deck, container: HTMLElement): void {
-        const deckTree: HTMLElement = container.createDiv("tree-item");
+    private _createTree(deck: Deck, container: HTMLElement): void {
+        const deckTree: HTMLElement = container.createDiv("tree-item sr-tree-item-container");
         const deckTreeSelf: HTMLElement = deckTree.createDiv(
-            "tree-item-self tag-pane-tag is-clickable",
+            "tree-item-self tag-pane-tag is-clickable sr-tree-item-row",
         );
 
         const shouldBeInitiallyExpanded: boolean = this.settings.initiallyExpandAllSubdecksInTree;
@@ -166,7 +165,7 @@ export class DecksListView {
         });
 
         for (const subdeck of deck.subdecks) {
-            this._renderDeck(subdeck, deckTreeChildren);
+            this._createTree(subdeck, deckTreeChildren);
         }
     }
 

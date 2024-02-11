@@ -25,7 +25,7 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
 }
 
 .sr-bg-blue {
-    background-color: #2196f3;
+    background-color: #2094f3;
 }
 
 .sr-bg-red {
@@ -37,7 +37,7 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
 .sr-edit-view {
     display: flex;
     flex-direction: column;
-    gap: var(--size-4-4);
+    gap: 20px;
     width: 100%;
     height: 100%;
 }
@@ -81,14 +81,32 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     text-align: right;
 }
 
+.sr-deck-list .sr-tree-item-row {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-bottom: 0;
+}
+
+.sr-deck-list .sr-tree-item-row:hover .sr-bg-green {
+    background-color: hsl(122, 39%, 44%);
+}
+
+.sr-deck-list .sr-tree-item-row:hover .sr-bg-blue {
+    background-color: hsl(207, 90%, 49%);
+}
+
+.sr-deck-list .sr-tree-item-row:hover .sr-bg-red {
+    background-color: hsl(14, 100%, 58%);
+}
+
 .sr-deck-list .sr-tree-stats-container {
     display: flex;
-    gap: 8px;
+    gap: 4px;
 }
 
 .sr-deck-list .sr-tree-stats-count {
     min-width: 3ch;
-    padding: 2px 4px;
+    padding: 4px;
     box-sizing: content-box;
     text-align: center;
     color: #ffffff !important;
