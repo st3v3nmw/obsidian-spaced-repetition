@@ -16,10 +16,6 @@ import {
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/FlashcardReviewSequencer";
 import { FlashcardEditModal } from "./flashcards-edit-modal";
-import { Note } from "src/Note";
-import { RenderMarkdownWrapper } from "src/util/RenderMarkdownWrapper";
-import { CardScheduleInfo } from "src/CardSchedule";
-import { TopicPath } from "src/TopicPath";
 import { DecksListView } from "./DecksListView";
 import { FlashcardReviewView } from "./FlashcardReviewView";
 
@@ -32,17 +28,6 @@ export enum FlashcardModalMode {
 
 export class FlashcardModal extends Modal {
     public plugin: SRPlugin;
-    public answerBtn: HTMLElement;
-    public flashcardView: HTMLElement;
-    private flashCardMenu: HTMLDivElement;
-    public hardBtn: HTMLElement;
-    public goodBtn: HTMLElement;
-    public easyBtn: HTMLElement;
-    public nextBtn: HTMLElement;
-    public responseDiv: HTMLElement;
-    public resetButton: HTMLButtonElement;
-    public editButton: HTMLElement;
-    public contextView: HTMLElement;
     public mode: FlashcardModalMode;
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
