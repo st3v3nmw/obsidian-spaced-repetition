@@ -1,3 +1,4 @@
+/* -> General styling */
 .sr-modal .modal-close-button {
     z-index: 21;
 }
@@ -12,6 +13,56 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
 
 .sr-is-hidden {
     display: none !important;
+}
+
+.sr-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.sr-deck-list,
+.sr-flashcard,
+.sr-edit-view {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.sr-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    border-bottom: 1px solid var(--hr-color);
+}
+
+.sr-title {
+    font-size: var(--font-ui-large);
+    font-weight: var(--font-semibold);
+    text-align: center;
+    line-height: var(--line-height-tight);
+}
+
+.sr-response {
+    display: flex;
+    width: 100%;
+    margin-top: var(--size-4-4);
+    gap: var(--size-4-4);
+}
+
+.sr-response-button {
+    height: 48px;
+    flex-grow: 1;
+    margin: auto;
+    line-height: 48px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 4px;
+    user-select: text;
 }
 
 .sr-bg-blue,
@@ -47,35 +98,12 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     background-color: hsl(14, 100%, 58%) !important;
 }
 
-.sr-deck-list,
-.sr-flashcard,
-.sr-edit-view {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-}
-
-.sr-header {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    border-bottom: 1px solid var(--hr-color);
-}
+/* -> DeckListView */
 
 .sr-deck-list .sr-header {
     gap: 8px;
     padding-bottom: 14px;
     margin-bottom: 24px;
-}
-
-.sr-title {
-    font-size: var(--font-ui-large);
-    font-weight: var(--font-semibold);
-    text-align: center;
-    line-height: var(--line-height-tight);
 }
 
 .sr-deck-list .sr-header-stats-container {
@@ -117,6 +145,8 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     text-align: center;
     color: #ffffff !important;
 }
+
+/* -> FlashcardReviewView */
 
 .sr-flashcard .sr-header {
     position: relative;
@@ -171,23 +201,7 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     border-top-style: dashed;
 }
 
-.sr-response {
-    display: flex;
-    width: 100%;
-    margin-top: var(--size-4-4);
-    gap: var(--size-4-4);
-}
-
-.sr-response-button {
-    height: 48px;
-    flex-grow: 1;
-    margin: auto;
-    line-height: 48px;
-    text-align: center;
-    cursor: pointer;
-    border-radius: 4px;
-    user-select: text;
-}
+/* -> EditModal */
 
 .sr-edit-modal {
     height: 80%;
@@ -225,19 +239,14 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     cursor: default;
 }
 
-/* OLD stuff */
-
-.sr-centered {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
+/*  -> Statistics */
 
 #sr-chart-period {
     appearance: menulist;
     border-right: 8px solid transparent;
 }
+
+/* -> Responsive styles */
 
 @media only screen and (max-width: 600px) {
     .sr-modal-content {
