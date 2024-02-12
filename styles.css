@@ -1,4 +1,15 @@
 /* -> General styling */
+.is-phone .sr-modal {
+    --top-space: calc(var(--safe-area-inset-top) + var(--header-height) + var(--size-4-2));
+    width: 100vw !important;
+    height: calc(100vh - var(--top-space)) !important;
+    margin-top: var(--top-space);
+}
+
+.sr-modal .modal-title{
+    display: none;
+}
+
 .sr-modal .modal-close-button {
     z-index: 21;
 }
@@ -113,6 +124,7 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
 
 .sr-deck-list .sr-header-stats-container {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
 }
 
@@ -249,18 +261,4 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
 #sr-chart-period {
     appearance: menulist;
     border-right: 8px solid transparent;
-}
-
-/* -> Responsive styles */
-
-@media only screen and (max-width: 600px) {
-    .sr-modal-content {
-        width: 98% !important;
-    }
-
-    .sr-modal-content::-webkit-scrollbar,
-    .sr-deck-list .sr-content::-webkit-scrollbar,
-    .sr-flashcard .sr-content::-webkit-scrollbar {
-        display: none;
-    }
 }
