@@ -9,6 +9,7 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
 
 .sr-modal-content {
     position: relative;
+    overflow: hidden;
 }
 
 .sr-is-hidden {
@@ -45,6 +46,10 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     font-weight: var(--font-semibold);
     text-align: center;
     line-height: var(--line-height-tight);
+}
+
+.sr-content {
+    overflow-y: auto;
 }
 
 .sr-response {
