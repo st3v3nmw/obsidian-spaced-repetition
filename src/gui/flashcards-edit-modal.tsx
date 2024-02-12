@@ -6,6 +6,12 @@ export class FlashcardEditModal extends Modal {
     public input: string;
     public waitForClose: Promise<string>;
 
+    public title: HTMLDivElement;
+    public textArea: HTMLTextAreaElement;
+    public response: HTMLDivElement;
+    public saveButton: HTMLButtonElement;
+    public cancelButton: HTMLButtonElement;
+
     private resolvePromise: (input: string) => void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private rejectPromise: (reason?: any) => void;
@@ -17,10 +23,10 @@ export class FlashcardEditModal extends Modal {
         const newPromptModal = new FlashcardEditModal(app, placeholder);
         return newPromptModal.waitForClose;
     }
+
     constructor(app: App, existingText: string) {
         super(app);
-        this.titleEl.setText(t("EDIT_CARD"));
-        this.titleEl.addClass("sr-centered");
+
         this.modalText = existingText;
         this.input = existingText;
 
@@ -28,50 +34,55 @@ export class FlashcardEditModal extends Modal {
             this.resolvePromise = resolve;
             this.rejectPromise = reject;
         });
-        this.display();
+
+        this.modalEl.addClass("sr-edit-modal");
+
+        this.init();
         this.open();
     }
 
-    private display() {
+    /**
+     * Initializes all components of the EditModal
+     */
+    init() {
         this.contentEl.empty();
-        this.modalEl.addClass("sr-flashcard-input-modal");
+        this.contentEl.addClass("sr-edit-view");
 
-        const mainContentContainer: HTMLDivElement = this.contentEl.createDiv();
-        mainContentContainer.addClass("sr-flashcard-input-area");
-        this.inputComponent = this.createInputField(mainContentContainer, this.modalText);
-        this.createButtonBar(mainContentContainer);
+        this.title = this.contentEl.createDiv();
+        this.title.setText(t("EDIT_CARD"));
+        this.title.addClass("sr-title");
+
+        this.textArea = this.contentEl.createEl("textarea");
+        this.textArea.addClass("sr-input");
+        this.textArea.setText(this.modalText ?? "");
+        this.textArea.addEventListener("keydown", this.submitEnterCallback);
+
+        this.createResponse(this.contentEl);
     }
 
-    private createButton(
+    private _createResponseButton(
         container: HTMLElement,
         text: string,
+        colorClass: string,
         callback: (evt: MouseEvent) => void,
     ) {
-        const btn = new ButtonComponent(container);
-        btn.setButtonText(text).onClick(callback);
-        return btn;
+        const button = container.createEl("button");
+        button.addClasses(["sr-response-button", colorClass]);
+        button.setText(text);
+        button.addEventListener("click", callback);
     }
 
-    private createButtonBar(mainContentContainer: HTMLDivElement) {
-        const buttonBarContainer: HTMLDivElement = mainContentContainer.createDiv();
-        buttonBarContainer.addClass("sr-flashcard-edit-button-bar");
-        this.createButton(
-            buttonBarContainer,
+    private createResponse(mainContentContainer: HTMLElement) {
+        const response: HTMLDivElement = mainContentContainer.createDiv();
+        response.addClass("sr-response");
+        this._createResponseButton(response, t("CANCEL"), "sr-bg-red", this.cancelClickCallback);
+        this._createResponseButton(response, "", "sr-spacer", () => { });
+        this._createResponseButton(
+            response,
             t("SAVE"),
+            "sr-bg-green",
             this.submitClickCallback,
-        ).setCta().buttonEl.style.marginRight = "0";
-        this.createButton(buttonBarContainer, t("CANCEL"), this.cancelClickCallback);
-    }
-
-    protected createInputField(container: HTMLElement, value: string) {
-        const textComponent = new TextAreaComponent(container);
-
-        textComponent.inputEl.style.width = "100%";
-        textComponent
-            .setValue(value ?? "")
-            .inputEl.addEventListener("keydown", this.submitEnterCallback);
-
-        return textComponent;
+        );
     }
 
     private submitClickCallback = (_: MouseEvent) => this.submit();
@@ -86,7 +97,7 @@ export class FlashcardEditModal extends Modal {
 
     private submit() {
         this.didSubmit = true;
-        this.input = this.inputComponent.getValue();
+        this.input = this.textArea.value;
         this.close();
     }
 
@@ -97,7 +108,7 @@ export class FlashcardEditModal extends Modal {
     onOpen() {
         super.onOpen();
 
-        this.inputComponent.inputEl.focus();
+        this.textArea.focus();
     }
 
     onClose() {
@@ -112,6 +123,6 @@ export class FlashcardEditModal extends Modal {
     }
 
     private removeInputListener() {
-        this.inputComponent.inputEl.removeEventListener("keydown", this.submitEnterCallback);
+        this.textArea.removeEventListener("keydown", this.submitEnterCallback);
     }
 }

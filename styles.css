@@ -33,17 +33,17 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
 }
 
 .sr-deck-list .sr-tree-item-row:hover .sr-bg-green,
-.sr-flashcard .sr-response-button.sr-bg-green:hover {
+.sr-response-button.sr-bg-green:hover {
     background-color: hsl(122, 39%, 44%) !important;
 }
 
 .sr-deck-list .sr-tree-item-row:hover .sr-bg-blue,
-.sr-flashcard .sr-response-button.sr-bg-blue:hover {
+.sr-response-button.sr-bg-blue:hover {
     background-color: hsl(207, 90%, 49%) !important;
 }
 
 .sr-deck-list .sr-tree-item-row:hover .sr-bg-red,
-.sr-flashcard .sr-response-button.sr-bg-red:hover {
+.sr-response-button.sr-bg-red:hover {
     background-color: hsl(14, 100%, 58%) !important;
 }
 
@@ -171,14 +171,14 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     border-top-style: dashed;
 }
 
-.sr-flashcard .sr-response {
+.sr-response {
     display: flex;
     width: 100%;
     margin-top: var(--size-4-4);
     gap: var(--size-4-4);
 }
 
-.sr-flashcard .sr-response-button {
+.sr-response-button {
     height: 48px;
     flex-grow: 1;
     margin: auto;
@@ -189,27 +189,43 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     user-select: text;
 }
 
-/* OLD stuff */
-
-.sr-flashcard-input-modal {
-    height: 80%;
+.sr-edit-modal {
+    height: 80%
 }
 
-.sr-flashcard-input-area {
-    height: 80%;
-}
-
-.sr-flashcard-input-area > textarea {
+.sr-edit-view {
     height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--size-4-4)
 }
 
-.sr-flashcard-edit-button-bar {
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: space-between;
+.sr-edit-view .sr-input {
+    flex-grow: 1;
     width: 100%;
-    margin-top: 1rem;
+    resize: none;
 }
+
+.sr-edit-view .sr-response {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    width: 100%;
+    margin-top: 0;
+}
+
+.sr-edit-view .sr-response-button {
+    width: 100%;
+}
+
+.sr-edit-view .sr-response-button.sr-spacer {
+    opacity: 0;
+    cursor: default;
+}
+
+/* OLD stuff */
 
 .sr-centered {
     display: flex;
@@ -224,10 +240,6 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
 }
 
 @media only screen and (max-width: 600px) {
-    .sr-back-button {
-        width: initial !important;
-    }
-
     .sr-modal-content {
         width: 98% !important;
     }
