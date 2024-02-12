@@ -1,4 +1,4 @@
-import { App, ButtonComponent, Modal, TextAreaComponent } from "obsidian";
+import { App, Modal } from "obsidian";
 import { t } from "src/lang/helpers";
 
 // from https://github.com/chhoumann/quickadd/blob/bce0b4cdac44b867854d6233796e3406dfd163c6/src/gui/GenericInputPrompt/GenericInputPrompt.ts#L5
@@ -16,7 +16,6 @@ export class FlashcardEditModal extends Modal {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private rejectPromise: (reason?: any) => void;
     private didSubmit = false;
-    private inputComponent: TextAreaComponent;
     private readonly modalText: string;
 
     public static Prompt(app: App, placeholder: string): Promise<string> {

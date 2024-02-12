@@ -11,7 +11,7 @@ import {
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/FlashcardReviewSequencer";
 import { TopicPath } from "src/TopicPath";
-import { FlashcardModalMode } from "./flashcard-modal";
+import { FlashcardModalMode } from "./FlashcardModal";
 
 export class DecksListView {
     public plugin: SRPlugin;
@@ -79,7 +79,7 @@ export class DecksListView {
             this._createTree(deck, this.content);
         }
 
-        if(this.view.hasClass("sr-is-hidden")){
+        if (this.view.hasClass("sr-is-hidden")) {
             this.view.removeClass("sr-is-hidden");
         }
     }
@@ -88,7 +88,7 @@ export class DecksListView {
      * Hides the DeckListView
      */
     hide() {
-        if(!this.view.hasClass("sr-is-hidden")){
+        if (!this.view.hasClass("sr-is-hidden")) {
             this.view.addClass("sr-is-hidden");
         }
     }

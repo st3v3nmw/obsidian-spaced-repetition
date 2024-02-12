@@ -11,7 +11,7 @@ import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/FlashcardReviewSequencer";
-import { FlashcardEditModal } from "./flashcards-edit-modal";
+import { FlashcardEditModal } from "./FlashcardsEditModal";
 import { DecksListView } from "./DecksListView";
 import { FlashcardReviewView } from "./FlashcardReviewView";
 

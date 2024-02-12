@@ -2,9 +2,9 @@ import { Notice, Plugin, TAbstractFile, TFile, getAllTags, FrontMatterCache } fr
 import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, upgradeSettings } from "src/settings";
-import { FlashcardModal } from "src/gui/flashcard-modal";
-import { StatsModal } from "src/gui/stats-modal";
-import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/sidebar";
+import { FlashcardModal } from "src/gui/FlashcardModal";
+import { StatsModal } from "src/gui/StatsModal";
+import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/Sidebar";
 import { ReviewResponse, schedule } from "src/scheduling";
 import { YAML_FRONT_MATTER_REGEX, SCHEDULING_INFO_REGEX } from "src/constants";
 import { ReviewDeck, ReviewDeckSelectionModal } from "src/ReviewDeck";
@@ -486,9 +486,9 @@ export default class SRPlugin extends Plugin {
         if (this.data.settings.showDebugMessages) {
             console.log(
                 "SR: " +
-                    t("SYNC_TIME_TAKEN", {
-                        t: Date.now() - now.valueOf(),
-                    }),
+                t("SYNC_TIME_TAKEN", {
+                    t: Date.now() - now.valueOf(),
+                }),
             );
         }
 
@@ -647,8 +647,8 @@ export default class SRPlugin extends Plugin {
             fileText = fileText.replace(
                 SCHEDULING_INFO_REGEX,
                 `---\n${schedulingInfo[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
-                    `${schedulingInfo[5]}---`,
+                `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
+                `${schedulingInfo[5]}---`,
             );
         } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
             // new note with existing YAML front matter
@@ -656,7 +656,7 @@ export default class SRPlugin extends Plugin {
             fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
                 `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n---`,
+                `sr-interval: ${interval}\nsr-ease: ${ease}\n---`,
             );
         } else {
             fileText =

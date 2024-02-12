@@ -15,7 +15,7 @@ import {
 import { Note } from "src/Note";
 import { RenderMarkdownWrapper } from "src/util/RenderMarkdownWrapper";
 import { CardScheduleInfo } from "src/CardSchedule";
-import { FlashcardModalMode } from "./flashcard-modal";
+import { FlashcardModalMode } from "./FlashcardModal";
 
 export class FlashcardReviewView {
     public app: App;
