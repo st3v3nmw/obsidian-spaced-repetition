@@ -35,7 +35,7 @@ export class FlashcardEditModal extends Modal {
         });
 
         // Init static elements in ui
-        this.modalEl.addClasses(["sr-modal","sr-edit-modal"]);
+        this.modalEl.addClasses(["sr-modal", "sr-edit-modal"]);
         this.init();
 
         this.open();
