@@ -64,6 +64,7 @@ export class FlashcardModal extends Modal {
 
         this.modalEl.style.height = this.settings.flashcardHeightPercentage + "%";
         this.modalEl.style.width = this.settings.flashcardWidthPercentage + "%";
+        this.modalEl.addClass("sr-modal");
     }
 
     onOpen(): void {
