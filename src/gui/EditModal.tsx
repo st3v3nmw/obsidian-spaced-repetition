@@ -3,7 +3,7 @@ import { t } from "src/lang/helpers";
 
 // from https://github.com/chhoumann/quickadd/blob/bce0b4cdac44b867854d6233796e3406dfd163c6/src/gui/GenericInputPrompt/GenericInputPrompt.ts#L5
 export class FlashcardEditModal extends Modal {
-    public input: string;
+    public changedText: string;
     public waitForClose: Promise<string>;
 
     public title: HTMLDivElement;
@@ -15,7 +15,7 @@ export class FlashcardEditModal extends Modal {
     private resolvePromise: (input: string) => void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private rejectPromise: (reason?: any) => void;
-    private didSubmit = false;
+    private didSaveChanges = false;
     private readonly modalText: string;
 
     public static Prompt(app: App, placeholder: string): Promise<string> {
@@ -27,16 +27,17 @@ export class FlashcardEditModal extends Modal {
         super(app);
 
         this.modalText = existingText;
-        this.input = existingText;
+        this.changedText = existingText;
 
         this.waitForClose = new Promise<string>((resolve, reject) => {
             this.resolvePromise = resolve;
             this.rejectPromise = reject;
         });
 
+        // Init static elements in ui
         this.modalEl.addClass("sr-edit-modal");
-
         this.init();
+
         this.open();
     }
 
@@ -54,10 +55,62 @@ export class FlashcardEditModal extends Modal {
         this.textArea = this.contentEl.createEl("textarea");
         this.textArea.addClass("sr-input");
         this.textArea.setText(this.modalText ?? "");
-        this.textArea.addEventListener("keydown", this.submitEnterCallback);
+        this.textArea.addEventListener("keydown", this.saveOnEnterCallback);
 
-        this.createResponse(this.contentEl);
+        this._createResponse(this.contentEl);
     }
+
+    /**
+     * Opens the EditModal
+     */
+    onOpen() {
+        super.onOpen();
+
+        this.textArea.focus();
+    }
+
+    /**
+     * Closes the EditModal
+     */
+    onClose() {
+        super.onClose();
+        this.resolveInput();
+        this.removeInputListener();
+    }
+
+    // -> Functions & helpers
+
+    private saveClickCallback = (_: MouseEvent) => this.save();
+
+    private cancelClickCallback = (_: MouseEvent) => this.cancel();
+
+    private saveOnEnterCallback = (evt: KeyboardEvent) => {
+        if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter") {
+            evt.preventDefault();
+            this.save();
+        }
+    };
+
+    private save() {
+        this.didSaveChanges = true;
+        this.changedText = this.textArea.value;
+        this.close();
+    }
+
+    private cancel() {
+        this.close();
+    }
+
+    private resolveInput() {
+        if (!this.didSaveChanges) this.rejectPromise(t("NO_INPUT"));
+        else this.resolvePromise(this.changedText);
+    }
+
+    private removeInputListener() {
+        this.textArea.removeEventListener("keydown", this.saveOnEnterCallback);
+    }
+
+    // -> Response section
 
     private _createResponseButton(
         container: HTMLElement,
@@ -71,57 +124,11 @@ export class FlashcardEditModal extends Modal {
         button.addEventListener("click", callback);
     }
 
-    private createResponse(mainContentContainer: HTMLElement) {
+    private _createResponse(mainContentContainer: HTMLElement) {
         const response: HTMLDivElement = mainContentContainer.createDiv();
         response.addClass("sr-response");
         this._createResponseButton(response, t("CANCEL"), "sr-bg-red", this.cancelClickCallback);
-        this._createResponseButton(response, "", "sr-spacer", () => { });
-        this._createResponseButton(
-            response,
-            t("SAVE"),
-            "sr-bg-green",
-            this.submitClickCallback,
-        );
-    }
-
-    private submitClickCallback = (_: MouseEvent) => this.submit();
-    private cancelClickCallback = (_: MouseEvent) => this.cancel();
-
-    private submitEnterCallback = (evt: KeyboardEvent) => {
-        if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter") {
-            evt.preventDefault();
-            this.submit();
-        }
-    };
-
-    private submit() {
-        this.didSubmit = true;
-        this.input = this.textArea.value;
-        this.close();
-    }
-
-    private cancel() {
-        this.close();
-    }
-
-    onOpen() {
-        super.onOpen();
-
-        this.textArea.focus();
-    }
-
-    onClose() {
-        super.onClose();
-        this.resolveInput();
-        this.removeInputListener();
-    }
-
-    private resolveInput() {
-        if (!this.didSubmit) this.rejectPromise(t("NO_INPUT"));
-        else this.resolvePromise(this.input);
-    }
-
-    private removeInputListener() {
-        this.textArea.removeEventListener("keydown", this.submitEnterCallback);
+        this._createResponseButton(response, "", "sr-spacer", () => {});
+        this._createResponseButton(response, t("SAVE"), "sr-bg-green", this.saveClickCallback);
     }
 }

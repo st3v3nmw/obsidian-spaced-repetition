@@ -190,7 +190,7 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
 }
 
 .sr-edit-modal {
-    height: 80%
+    height: 80%;
 }
 
 .sr-edit-view {
@@ -200,7 +200,7 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: var(--size-4-4)
+    gap: var(--size-4-4);
 }
 
 .sr-edit-view .sr-input {

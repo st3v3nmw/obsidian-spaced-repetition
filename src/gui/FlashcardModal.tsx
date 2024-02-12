@@ -11,8 +11,8 @@ import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/FlashcardReviewSequencer";
-import { FlashcardEditModal } from "./FlashcardsEditModal";
-import { DecksListView } from "./DecksListView";
+import { FlashcardEditModal } from "./EditModal";
+import { DeckListView } from "./DeckListView";
 import { FlashcardReviewView } from "./FlashcardReviewView";
 
 export enum FlashcardModalMode {
@@ -28,7 +28,7 @@ export class FlashcardModal extends Modal {
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
-    private deckView: DecksListView;
+    private deckView: DeckListView;
     private flashcardView: FlashcardReviewView;
 
     constructor(
@@ -40,11 +40,13 @@ export class FlashcardModal extends Modal {
     ) {
         super(app);
 
+        // Init properties
         this.plugin = plugin;
         this.settings = settings;
         this.reviewSequencer = reviewSequencer;
         this.reviewMode = reviewMode;
 
+        // Setup base containers
         this.modalEl.style.height = this.settings.flashcardHeightPercentage + "%";
         this.modalEl.style.width = this.settings.flashcardWidthPercentage + "%";
         this.modalEl.addClass("sr-modal");
@@ -54,12 +56,13 @@ export class FlashcardModal extends Modal {
             this.contentEl.style.display = "block";
         }
 
-        this.deckView = new DecksListView(
+        // Init static elements in views
+        this.deckView = new DeckListView(
             this.plugin,
             this.settings,
             this.reviewSequencer,
             this.contentEl,
-            this.startReviewOfDeck.bind(this),
+            this._startReviewOfDeck.bind(this),
         );
 
         this.flashcardView = new FlashcardReviewView(
@@ -69,47 +72,49 @@ export class FlashcardModal extends Modal {
             this.reviewSequencer,
             this.reviewMode,
             this.contentEl,
-            this.showDecksList.bind(this),
-            this.doEditQuestionText.bind(this),
+            this._showDecksList.bind(this),
+            this._doEditQuestionText.bind(this),
         );
     }
 
     onOpen(): void {
-        this.showDecksList();
+        this._showDecksList();
     }
 
     onClose(): void {
+        this.deckView.hide();
+        this.flashcardView.hide();
         this.mode = FlashcardModalMode.Closed;
     }
 
-    showDecksList(): void {
-        this.hideFlashcard();
+    private _showDecksList(): void {
+        this._hideFlashcard();
         this.deckView.show();
     }
 
-    hideDecksList(): void {
+    private _hideDecksList(): void {
         this.deckView.hide();
     }
 
-    showFlashcard(): void {
-        this.hideDecksList();
+    private _showFlashcard(): void {
+        this._hideDecksList();
         this.flashcardView.show();
     }
 
-    hideFlashcard(): void {
+    private _hideFlashcard(): void {
         this.flashcardView.hide();
     }
 
-    startReviewOfDeck(deck: Deck) {
+    private _startReviewOfDeck(deck: Deck) {
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         if (this.reviewSequencer.hasCurrentCard) {
-            this.showFlashcard();
+            this._showFlashcard();
         } else {
-            this.showDecksList();
+            this._showDecksList();
         }
     }
 
-    async doEditQuestionText(): Promise<void> {
+    private async _doEditQuestionText(): Promise<void> {
         const currentQ: Question = this.reviewSequencer.currentQuestion;
 
         // Just the question/answer text; without any preceding topic tag

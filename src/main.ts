@@ -486,9 +486,9 @@ export default class SRPlugin extends Plugin {
         if (this.data.settings.showDebugMessages) {
             console.log(
                 "SR: " +
-                t("SYNC_TIME_TAKEN", {
-                    t: Date.now() - now.valueOf(),
-                }),
+                    t("SYNC_TIME_TAKEN", {
+                        t: Date.now() - now.valueOf(),
+                    }),
             );
         }
 
@@ -647,8 +647,8 @@ export default class SRPlugin extends Plugin {
             fileText = fileText.replace(
                 SCHEDULING_INFO_REGEX,
                 `---\n${schedulingInfo[1]}sr-due: ${dueString}\n` +
-                `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
-                `${schedulingInfo[5]}---`,
+                    `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
+                    `${schedulingInfo[5]}---`,
             );
         } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
             // new note with existing YAML front matter
@@ -656,7 +656,7 @@ export default class SRPlugin extends Plugin {
             fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
                 `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
-                `sr-interval: ${interval}\nsr-ease: ${ease}\n---`,
+                    `sr-interval: ${interval}\nsr-ease: ${ease}\n---`,
             );
         } else {
             fileText =

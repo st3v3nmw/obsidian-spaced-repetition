@@ -13,7 +13,7 @@ import {
 import { TopicPath } from "src/TopicPath";
 import { FlashcardModalMode } from "./FlashcardModal";
 
-export class DecksListView {
+export class DeckListView {
     public plugin: SRPlugin;
     public mode: FlashcardModalMode;
     public modalContentEl: HTMLElement;
@@ -35,16 +35,19 @@ export class DecksListView {
         contentEl: HTMLElement,
         startReviewOfDeck: (deck: Deck) => void,
     ) {
+        // Init properties
         this.plugin = plugin;
         this.settings = settings;
         this.reviewSequencer = reviewSequencer;
         this.modalContentEl = contentEl;
         this.startReviewOfDeck = startReviewOfDeck;
+
+        // Build ui
         this.init();
     }
 
     /**
-     * Initializes all elements in the DeckListView
+     * Initializes all static elements in the DeckListView
      */
     init(): void {
         this.view = this.modalContentEl.createDiv();
@@ -66,7 +69,7 @@ export class DecksListView {
     }
 
     /**
-     * Shows the DeckListView
+     * Shows the DeckListView & rerenders dynamic elements
      */
     show(): void {
         this.mode = FlashcardModalMode.DecksList;
@@ -93,6 +96,8 @@ export class DecksListView {
         }
     }
 
+    // -> Header
+
     private _createHeaderStats() {
         const statistics: DeckStats = this.reviewSequencer.getDeckStats(TopicPath.emptyPath);
         this.stats.empty();
@@ -102,10 +107,19 @@ export class DecksListView {
         this._createHeaderStatsContainer(t("DUE_CARDS"), statistics.dueCount, "sr-bg-green");
     }
 
-    private _createHeaderStatsContainer(statsLable: string, statsNumber: number, statsClass: string): void {
+    private _createHeaderStatsContainer(
+        statsLable: string,
+        statsNumber: number,
+        statsClass: string,
+    ): void {
         const statsContainer = this.stats.createDiv();
         statsContainer.ariaLabel = statsLable;
-        statsContainer.addClasses(["tag-pane-tag-count", "tree-item-flair", "sr-header-stats-count", statsClass]);
+        statsContainer.addClasses([
+            "tag-pane-tag-count",
+            "tree-item-flair",
+            "sr-header-stats-count",
+            statsClass,
+        ]);
 
         const lable = statsContainer.createDiv();
         lable.setText(statsLable + ":");
@@ -113,6 +127,8 @@ export class DecksListView {
         const number = statsContainer.createDiv();
         number.setText(statsNumber.toString());
     }
+
+    // -> Tree content
 
     private _createTree(deck: Deck, container: HTMLElement): void {
         const deckTree: HTMLElement = container.createDiv("tree-item sr-tree-item-container");
@@ -176,12 +192,27 @@ export class DecksListView {
     private _createStats(statistics: DeckStats, statsWrapper: HTMLDivElement) {
         statsWrapper.empty();
 
-        this._createStatsContainer(t("TOTAL_CARDS"), statistics.totalCount, "sr-bg-red", statsWrapper);
+        this._createStatsContainer(
+            t("TOTAL_CARDS"),
+            statistics.totalCount,
+            "sr-bg-red",
+            statsWrapper,
+        );
         this._createStatsContainer(t("NEW_CARDS"), statistics.newCount, "sr-bg-blue", statsWrapper);
-        this._createStatsContainer(t("DUE_CARDS"), statistics.dueCount, "sr-bg-green", statsWrapper);
+        this._createStatsContainer(
+            t("DUE_CARDS"),
+            statistics.dueCount,
+            "sr-bg-green",
+            statsWrapper,
+        );
     }
 
-    private _createStatsContainer(statsLable: string, statsNumber: number, statsClass: string, statsWrapper: HTMLDivElement): void {
+    private _createStatsContainer(
+        statsLable: string,
+        statsNumber: number,
+        statsClass: string,
+        statsWrapper: HTMLDivElement,
+    ): void {
         const statsContainer = statsWrapper.createDiv();
 
         statsContainer.ariaLabel = statsLable;
@@ -190,7 +221,7 @@ export class DecksListView {
             "tag-pane-tag-count",
             "tree-item-flair",
             "sr-tree-stats-count",
-            statsClass
+            statsClass,
         ]);
 
         statsContainer.setText(statsNumber.toString());
