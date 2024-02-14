@@ -1,5 +1,6 @@
 import { CardType } from "./Question";
 import { SRSettings } from "./settings";
+import { findLineIndexOfSearchStringIgnoringWs } from "./util/utils";
 
 export class CardFrontBack {
     front: string;
@@ -56,23 +57,30 @@ class QuestionType_SingleLineReversed implements IQuestionTypeHandler {
 
 class QuestionType_MultiLineBasic implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
-        const idx = questionText.indexOf("\n" + settings.multilineCardSeparator + "\n");
-        const item: CardFrontBack = new CardFrontBack(
-            questionText.substring(0, idx),
-            questionText.substring(idx + 2 + settings.multilineCardSeparator.length),
+        // We don't need to worry about "\r\n", as multi line questions processed by parse() concatenates lines explicitly with "\n"
+        const questionLines = questionText.split("\n");
+        const lineIdx = findLineIndexOfSearchStringIgnoringWs(
+            questionLines,
+            settings.multilineCardSeparator,
         );
-        const result: CardFrontBack[] = [item];
+        const side1: string = questionLines.slice(0, lineIdx).join("\n");
+        const side2: string = questionLines.slice(lineIdx + 1).join("\n");
+
+        const result: CardFrontBack[] = [new CardFrontBack(side1, side2)];
         return result;
     }
 }
 
 class QuestionType_MultiLineReversed implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
-        const idx = questionText.indexOf("\n" + settings.multilineReversedCardSeparator + "\n");
-        const side1: string = questionText.substring(0, idx),
-            side2: string = questionText.substring(
-                idx + 2 + settings.multilineReversedCardSeparator.length,
-            );
+        // We don't need to worry about "\r\n", as multi line questions processed by parse() concatenates lines explicitly with "\n"
+        const questionLines = questionText.split("\n");
+        const lineIdx = findLineIndexOfSearchStringIgnoringWs(
+            questionLines,
+            settings.multilineReversedCardSeparator,
+        );
+        const side1: string = questionLines.slice(0, lineIdx).join("\n");
+        const side2: string = questionLines.slice(lineIdx + 1).join("\n");
 
         const result: CardFrontBack[] = [
             new CardFrontBack(side1, side2),

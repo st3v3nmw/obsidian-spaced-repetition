@@ -343,6 +343,53 @@ Q3::A3
         expect(questionList[1].topicPathList.formatPsv()).toEqual("#flashcards/aws");
         expect(questionList[2].topicPathList.formatPsv()).toEqual("#flashcards/aws");
     });
+
+    test("MultiLine: Space before multi line separator", async () => {
+        // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/853
+        let noteText: string = `
+#flashcards/test/b853 
+
+Question::Answer
+
+Multiline question
+ ?
+Multiline answer
+
+Multiline question2
+ ??
+Multiline answer2
+ 
+`;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
+            noteFile,
+            TopicPath.emptyPath,
+        );
+        expect(questionList.length).toEqual(3);
+        expect(questionList[0].cards).toMatchObject([
+            {
+                front: "Question",
+                back: "Answer",
+            },
+        ]);
+        expect(questionList[1].cards).toMatchObject([
+            {
+                front: "Multiline question",
+                back: "Multiline answer",
+            },
+        ]);
+        expect(questionList[2].cards).toMatchObject([
+            {
+                front: "Multiline question2",
+                back: "Multiline answer2",
+            },
+            {
+                front: "Multiline answer2",
+                back: "Multiline question2",
+            },
+        ]);
+    });
 });
 
 describe("Handling tags within note", () => {
