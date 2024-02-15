@@ -365,6 +365,7 @@ Multiline answer2
         let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
             noteFile,
             TopicPath.emptyPath,
+            true,
         );
         expect(questionList.length).toEqual(3);
         expect(questionList[0].cards).toMatchObject([
