@@ -125,6 +125,7 @@ export function extractFrontmatter(str: string): [string, string] {
     }
     if (frontmatter.length == 0) content = str;
     return [frontmatter, content];
+}
 
 //
 // Returns the index of the line that consists of the search string.
