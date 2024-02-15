@@ -1,5 +1,9 @@
 import { YAML_FRONT_MATTER_REGEX } from "src/constants";
-import { extractFrontmatter, findLineIndexOfSearchStringIgnoringWs, literalStringReplace } from "src/util/utils";
+import {
+    extractFrontmatter,
+    findLineIndexOfSearchStringIgnoringWs,
+    literalStringReplace,
+} from "src/util/utils";
 
 describe("literalStringReplace", () => {
     test("Replacement string doesn't have any dollar signs", async () => {
@@ -154,6 +158,8 @@ ${content}`;
         const [f, c] = extractFrontmatter(text);
         expect(f).toEqual(frontmatter);
         expect(c).toEqual(content);
+    });
+});
 
 describe("findLineIndexOfSearchStringIgnoringWs", () => {
     const space: string = " ";
