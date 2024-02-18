@@ -12,11 +12,9 @@ import {
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/FlashcardReviewSequencer";
 import { TopicPath } from "src/TopicPath";
-import { FlashcardModalMode } from "./flashcard-modal";
 
 export class DecksListView {
     public plugin: SRPlugin;
-    public mode: FlashcardModalMode;
     public titleEl: HTMLElement;
     public contentEl: HTMLElement;
     private reviewSequencer: IFlashcardReviewSequencer;
@@ -53,8 +51,6 @@ export class DecksListView {
      * Shows the DeckListView
      */
     show(): void {
-        this.mode = FlashcardModalMode.DecksList;
-
         const stats: DeckStats = this.reviewSequencer.getDeckStats(TopicPath.emptyPath);
 
         this.titleEl.setText(t("DECKS"));

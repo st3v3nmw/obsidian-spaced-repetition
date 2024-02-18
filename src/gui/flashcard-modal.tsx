@@ -1,25 +1,16 @@
-import { Modal, App, Notice, Platform, setIcon } from "obsidian";
+import { Modal, App } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
-import { textInterval, ReviewResponse } from "src/scheduling";
-import { COLLAPSE_ICON } from "src/constants";
-import { t } from "src/lang/helpers";
-import { Card } from "../Card";
-import { CardListType, Deck } from "../Deck";
-import { CardType, Question } from "../Question";
+import { Deck } from "../Deck";
+import { Question } from "../Question";
 import {
-    DeckStats,
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/FlashcardReviewSequencer";
 import { FlashcardEditModal } from "./flashcards-edit-modal";
-import { Note } from "src/Note";
-import { RenderMarkdownWrapper } from "src/util/RenderMarkdownWrapper";
-import { CardScheduleInfo } from "src/CardSchedule";
-import { TopicPath } from "src/TopicPath";
 import { DecksListView } from "./DecksListView";
 import { FlashcardReviewView } from "./FlashcardReviewView";
 
@@ -32,17 +23,6 @@ export enum FlashcardModalMode {
 
 export class FlashcardModal extends Modal {
     public plugin: SRPlugin;
-    public answerBtn: HTMLElement;
-    public flashcardView: HTMLElement;
-    private flashCardMenu: HTMLDivElement;
-    public hardBtn: HTMLElement;
-    public goodBtn: HTMLElement;
-    public easyBtn: HTMLElement;
-    public nextBtn: HTMLElement;
-    public responseDiv: HTMLElement;
-    public resetButton: HTMLButtonElement;
-    public editButton: HTMLElement;
-    public contextView: HTMLElement;
     public mode: FlashcardModalMode;
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
