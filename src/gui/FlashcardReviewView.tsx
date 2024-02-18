@@ -142,11 +142,10 @@ export class FlashcardReviewView {
         this._resetResponseButtons();
 
         // Prevents the following code, from running if this show is just a redraw and not an unhide
-        if (this.view.hasClass("sr-is-hidden")) {
-            this.view.removeClass("sr-is-hidden");
-            this.backButton.removeClass("sr-is-hidden");
-            document.addEventListener("keydown", this._keydownHandler.bind(this));
-        }
+        if (!this.view.hasClass("sr-is-hidden")) { return; }
+        this.view.removeClass("sr-is-hidden");
+        this.backButton.removeClass("sr-is-hidden");
+        document.addEventListener("keydown", this._keydownHandler);
     }
 
     /**
@@ -154,24 +153,23 @@ export class FlashcardReviewView {
      */
     hide() {
         // Prevents the following code, from running if this was executed multiple times after one another
-        if (!this.view.hasClass("sr-is-hidden")) {
-            this.view.addClass("sr-is-hidden");
-            this.backButton.addClass("sr-is-hidden");
-            document.removeEventListener("keydown", this._keydownHandler.bind(this));
-        }
+        if (this.view.hasClass("sr-is-hidden")) { return; }
+        this.view.addClass("sr-is-hidden");
+        this.backButton.addClass("sr-is-hidden");
+        document.removeEventListener("keydown", this._keydownHandler);
     }
 
     /**
      * Closes the FlashcardView
      */
     close() {
-        document.removeEventListener("keydown", this._keydownHandler.bind(this));
+        document.removeEventListener("keydown", this._keydownHandler);
         this.hide();
     }
 
     // -> Functions & helpers
 
-    private _keydownHandler(e: KeyboardEvent): void {
+    private _keydownHandler = (e: KeyboardEvent) => {
         // Prevents any input, if the edit modal is open
         if (document.activeElement.nodeName === "TEXTAREA" || this.mode === FlashcardModalMode.Closed) {
             return;
@@ -239,7 +237,7 @@ export class FlashcardReviewView {
             default:
                 break;
         }
-    }
+    };
 
     private _displayCurrentCardInfoNotice() {
         const schedule = this._currentCard.scheduleInfo;
