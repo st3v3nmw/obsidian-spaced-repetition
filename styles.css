@@ -221,6 +221,8 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     display: block;
     width: 100%;
     margin-top: 12px;
+    margin-bottom: 4px;
+    margin-left: 8px;
 }
 
 .sr-flashcard .sr-content {
