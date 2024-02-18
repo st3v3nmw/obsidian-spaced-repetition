@@ -5,10 +5,6 @@
     margin-top: var(--top-space);
 }
 
-.sr-modal .modal-title {
-    display: none;
-}
-
 .sr-flashcard-menu {
     width: 100%;
     display: flex;
