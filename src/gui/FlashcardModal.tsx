@@ -49,7 +49,7 @@ export class FlashcardModal extends Modal {
         // Setup base containers
         this.modalEl.style.height = this.settings.flashcardHeightPercentage + "%";
         this.modalEl.style.width = this.settings.flashcardWidthPercentage + "%";
-        this.modalEl.addClass("sr-modal");
+        this.modalEl.setAttribute("id", "sr-modal");
 
         this.contentEl.addClass("sr-modal-content");
         // if (Platform.isMobile) {
@@ -72,6 +72,7 @@ export class FlashcardModal extends Modal {
             this.reviewSequencer,
             this.reviewMode,
             this.contentEl,
+            this.modalEl,
             this._showDecksList.bind(this),
             this._doEditQuestionText.bind(this),
         );

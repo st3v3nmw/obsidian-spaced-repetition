@@ -1,20 +1,20 @@
 /* -> General styling */
-.is-phone .sr-modal {
+.is-phone #sr-modal {
     --top-space: calc(var(--safe-area-inset-top) + var(--header-height) + var(--size-4-2));
     width: 100vw !important;
     height: calc(100vh - var(--top-space)) !important;
     margin-top: var(--top-space);
 }
 
-.sr-modal .modal-title {
+#sr-modal .modal-title {
     display: none;
 }
 
-.sr-modal .modal-close-button {
+#sr-modal .modal-close-button {
     z-index: 21;
 }
 
-body:not(.native-scrollbars) .sr-modal .modal-close-button {
+body:not(.native-scrollbars) #sr-modal .modal-close-button {
     top: 12px;
 }
 
@@ -61,6 +61,34 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
 
 .sr-content {
     overflow-y: auto;
+}
+
+.sr-button {
+    box-shadow: none !important;
+    cursor: pointer;
+}
+
+.sr-back-button {
+    z-index: 21;
+    cursor: var(--cursor);
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 26px;
+    line-height: 22px;
+    height: 26px;
+    width: 26px;
+    padding: 0 var(--size-2-2);
+    border-radius: var(--radius-s);
+    color: var(--text-muted);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sr-back-button:hover,
+.sr-button:hover {
+    background-color: var(--background-modifier-hover);
 }
 
 .sr-response {
@@ -169,15 +197,6 @@ body:not(.native-scrollbars) .sr-modal .modal-close-button {
     position: relative;
     gap: 8px;
     padding-bottom: 8px;
-}
-
-.sr-flashcard .sr-button {
-    box-shadow: none !important;
-    cursor: pointer;
-}
-
-.sr-flashcard .sr-button:hover {
-    background-color: var(--background-modifier-hover);
 }
 
 .sr-flashcard .sr-button:disabled {

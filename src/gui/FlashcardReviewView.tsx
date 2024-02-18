@@ -21,13 +21,14 @@ export class FlashcardReviewView {
     public app: App;
     public plugin: SRPlugin;
     public modalContentEl: HTMLElement;
+    public modalEl: HTMLElement;
     public mode: FlashcardModalMode;
 
     public view: HTMLDivElement;
 
     public header: HTMLDivElement;
     public title: HTMLDivElement;
-    public backButton: HTMLButtonElement;
+    public backButton: HTMLDivElement;
 
     public controls: HTMLDivElement;
     public editButton: HTMLButtonElement;
@@ -57,6 +58,7 @@ export class FlashcardReviewView {
         reviewSequencer: IFlashcardReviewSequencer,
         reviewMode: FlashcardReviewMode,
         contentEl: HTMLElement,
+        modalEl: HTMLElement,
         backClickHandler: () => void,
         editClickHandler: () => void,
     ) {
@@ -69,6 +71,7 @@ export class FlashcardReviewView {
         this.backClickHandler = backClickHandler;
         this.editClickHandler = editClickHandler;
         this.modalContentEl = contentEl;
+        this.modalEl = modalEl;
 
         // Build ui
         this.init();
@@ -141,6 +144,7 @@ export class FlashcardReviewView {
         // Prevents the following code, from running if this show is just a redraw and not an unhide
         if (this.view.hasClass("sr-is-hidden")) {
             this.view.removeClass("sr-is-hidden");
+            this.backButton.removeClass("sr-is-hidden");
             document.addEventListener("keydown", this._keydownHandler.bind(this));
         }
     }
@@ -152,6 +156,7 @@ export class FlashcardReviewView {
         // Prevents the following code, from running if this was executed multiple times after one another
         if (!this.view.hasClass("sr-is-hidden")) {
             this.view.addClass("sr-is-hidden");
+            this.backButton.addClass("sr-is-hidden");
             document.removeEventListener("keydown", this._keydownHandler.bind(this));
         }
     }
@@ -334,8 +339,8 @@ export class FlashcardReviewView {
     // -> Header
 
     private _createBackButton() {
-        this.backButton = this.header.createEl("button");
-        this.backButton.addClasses(["sr-button", "sr-back-button"]);
+        this.backButton = this.modalEl.createDiv();
+        this.backButton.addClasses(["sr-back-button", "sr-is-hidden"]);
         setIcon(this.backButton, "arrow-left");
         this.backButton.setAttribute("aria-label", t("BACK"));
         this.backButton.addEventListener("click", () => {
