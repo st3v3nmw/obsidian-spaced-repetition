@@ -96,6 +96,13 @@ export class DeckListView {
         }
     }
 
+    /**
+     * Closes the DeckListView
+     */
+    close() {
+        this.hide();
+    }
+
     // -> Header
 
     private _createHeaderStats() {

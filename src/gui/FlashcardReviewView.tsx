@@ -161,11 +161,19 @@ export class FlashcardReviewView {
         }
     }
 
+    /**
+     * Closes the FlashcardView
+     */
+    close() {
+        document.removeEventListener("keydown", this._keydownHandler.bind(this));
+        this.hide();
+    }
+
     // -> Functions & helpers
 
     private _keydownHandler(e: KeyboardEvent): void {
         // Prevents any input, if the edit modal is open
-        if (document.activeElement.nodeName === "TEXTAREA") {
+        if (document.activeElement.nodeName === "TEXTAREA" || this.mode === FlashcardModalMode.Closed) {
             return;
         }
 
