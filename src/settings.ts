@@ -106,6 +106,36 @@ export function upgradeSettings(settings: SRSettings) {
     }
 }
 
+
+export class SettingsUtil {
+    static isFlashcardTag(settings: SRSettings, tag: string): boolean {
+        return SettingsUtil.isTagInList(settings.flashcardTags, tag);
+    }
+
+    static isPathInNoteIgnoreFolder(settings: SRSettings, path: string): boolean {
+        return settings.noteFoldersToIgnore.some((folder) => path.startsWith(folder));
+    }
+
+    static isAnyTagANoteReviewTag(settings: SRSettings, tags: string[]): boolean {
+        for (const tag of tags) {
+            if (settings.tagsToReview.some(
+                (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/"))) {
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private static isTagInList(tagList: string[], tag: string): boolean {
+        for (const tagFromList of tagList) {
+            if (tag === tagFromList || tag.startsWith(tagFromList + "/")) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
 // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
 let applyDebounceTimer = 0;
 function applySettingsUpdate(callback: () => void): void {
@@ -120,8 +150,13 @@ export class SRSettingTab extends PluginSettingTab {
         super(app, plugin);
         this.plugin = plugin;
     }
+    
+    hide(): any {
+        console.log(`SRSettingTab: hide()`);
+    }
 
     display(): void {
+        console.log(`SRSettingTab: display()`);
         const { containerEl } = this;
 
         containerEl.empty();

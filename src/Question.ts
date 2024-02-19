@@ -1,11 +1,11 @@
 import { Card } from "./Card";
-import { CardScheduleInfo, NoteCardScheduleParser } from "./CardSchedule";
 import {
     OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX,
     OBSIDIAN_TAG_AT_STARTOFLINE_REGEX,
     SR_HTML_COMMENT_BEGIN,
     SR_HTML_COMMENT_END,
 } from "./constants";
+import { DataStore } from "./dataStore/base/DataStore";
 import { Note } from "./Note";
 import { SRSettings } from "./settings";
 import { TopicPath, TopicPathWithWs } from "./TopicPath";
@@ -123,7 +123,7 @@ export class QuestionText {
     }
 
     static splitText(original: string, settings: SRSettings): [TopicPathWithWs, string, string] {
-        const originalWithoutSR = NoteCardScheduleParser.removeCardScheduleInfo(original);
+        const originalWithoutSR = DataStore.getInstance().questionRemoveScheduleInfo(original);
         let actualQuestion: string = originalWithoutSR.trimEnd();
 
         let topicPathWithWs: TopicPathWithWs = null;
@@ -209,29 +209,13 @@ export class Question {
         this.cards.forEach((card) => (card.question = this));
     }
 
-    formatScheduleAsHtmlComment(settings: SRSettings): string {
-        let result: string = SR_HTML_COMMENT_BEGIN;
-
-        // We always want the correct schedule format, so we use this if there is no schedule for a card
-
-        for (let i = 0; i < this.cards.length; i++) {
-            const card: Card = this.cards[i];
-            const schedule: CardScheduleInfo = card.hasSchedule
-                ? card.scheduleInfo
-                : CardScheduleInfo.getDummyScheduleForNewCard(settings);
-            result += schedule.formatSchedule();
-        }
-        result += SR_HTML_COMMENT_END;
-        return result;
-    }
-
     formatForNote(settings: SRSettings): string {
         let result: string = this.questionText.formatTopicAndQuestion();
         const blockId: string = this.questionText.obsidianBlockId;
         const hasSchedule: boolean = this.cards.some((card) => card.hasSchedule);
         if (hasSchedule) {
             result = result.trimEnd();
-            const scheduleHtml = this.formatScheduleAsHtmlComment(settings);
+            const scheduleHtml = DataStore.getInstance().questionFormatScheduleAsHtmlComment(this);
             if (blockId) {
                 if (this.isCardCommentsOnSameLine(settings))
                     result += ` ${scheduleHtml} ${blockId}`;
@@ -246,7 +230,7 @@ export class Question {
         return result;
     }
 
-    updateQuestionText(noteText: string, settings: SRSettings): string {
+    updateQuestionWithinNoteText(noteText: string, settings: SRSettings): string {
         const originalText: string = this.questionText.original;
 
         // Get the entire text for the question including:
@@ -268,14 +252,6 @@ export class Question {
             newText = noteText;
         }
         return newText;
-    }
-
-    async writeQuestion(settings: SRSettings): Promise<void> {
-        const fileText: string = await this.note.file.read();
-
-        const newText: string = this.updateQuestionText(fileText, settings);
-        await this.note.file.write(newText);
-        this.hasChanged = false;
     }
 
     static Create(

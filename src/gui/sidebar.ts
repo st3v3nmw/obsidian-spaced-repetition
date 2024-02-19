@@ -2,7 +2,7 @@ import { ItemView, WorkspaceLeaf, Menu, TFile } from "obsidian";
 
 import type SRPlugin from "src/main";
 import { COLLAPSE_ICON } from "src/constants";
-import { ReviewDeck } from "src/ReviewDeck";
+import { NoteReviewDeck } from "src/NoteReviewDeck";
 import { t } from "src/lang/helpers";
 
 export const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
@@ -47,7 +47,7 @@ export class ReviewQueueListView extends ItemView {
         const childrenEl: HTMLElement = rootEl.createDiv("nav-folder-children");
 
         for (const deckKey in this.plugin.reviewDecks) {
-            const deck: ReviewDeck = this.plugin.reviewDecks[deckKey];
+            const deck: NoteReviewDeck = this.plugin.reviewDecks[deckKey];
 
             const deckCollapsed = !deck.activeFolders.has(deck.deckName);
 
@@ -152,7 +152,7 @@ export class ReviewQueueListView extends ItemView {
         folderTitle: string,
         collapsed: boolean,
         hidden: boolean,
-        deck: ReviewDeck,
+        deck: NoteReviewDeck,
     ): HTMLElement {
         const folderEl: HTMLDivElement = parentEl.createDiv("nav-folder");
         const folderTitleEl: HTMLDivElement = folderEl.createDiv("nav-folder-title");
@@ -195,7 +195,7 @@ export class ReviewQueueListView extends ItemView {
         file: TFile,
         fileElActive: boolean,
         hidden: boolean,
-        deck: ReviewDeck,
+        deck: NoteReviewDeck,
         plugin: SRPlugin,
     ): void {
         const navFileEl: HTMLElement = folderEl

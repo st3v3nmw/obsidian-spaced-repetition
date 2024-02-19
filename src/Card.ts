@@ -1,22 +1,19 @@
 import { Question } from "./Question";
-import { CardScheduleInfo } from "./CardSchedule";
 import { CardListType } from "./Deck";
+import { RepetitionItem } from "./algorithms/base/RepetitionItem";
 
-export class Card {
+export class Card extends RepetitionItem {
     question: Question;
     cardIdx: number;
 
-    // scheduling
-    get hasSchedule(): boolean {
-        return this.scheduleInfo != null;
-    }
-    scheduleInfo?: CardScheduleInfo;
+    // scheduleInfo?: CardScheduleInfo;
 
     // visuals
     front: string;
     back: string;
 
     constructor(init?: Partial<Card>) {
+        super();
         Object.assign(this, init);
     }
 
@@ -24,17 +21,9 @@ export class Card {
         return this.isNew ? CardListType.NewCard : CardListType.DueCard;
     }
 
-    get isNew(): boolean {
-        return !this.hasSchedule || this.scheduleInfo.isDummyScheduleForNewCard();
-    }
-
-    get isDue(): boolean {
-        return this.hasSchedule && this.scheduleInfo.isDue();
-    }
-
     formatSchedule(): string {
         let result: string = "";
-        if (this.hasSchedule) result = this.scheduleInfo.formatSchedule();
+        if (this.hasSchedule) result = this.scheduleInfo.formatCardScheduleForHtmlComment();
         else result = "New";
         return result;
     }

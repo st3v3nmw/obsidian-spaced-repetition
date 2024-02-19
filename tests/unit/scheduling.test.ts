@@ -1,4 +1,4 @@
-import { schedule, ReviewResponse, textInterval } from "src/scheduling";
+import { schedule, ReviewResponse, textInterval } from "src/algorithms/osr/scheduling";
 import { DEFAULT_SETTINGS } from "src/settings";
 
 test("Test reviewing with default settings", () => {

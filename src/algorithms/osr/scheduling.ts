@@ -1,12 +1,8 @@
 import { SRSettings } from "src/settings";
 import { t } from "src/lang/helpers";
+import { ReviewResponse } from "../base/RepetitionItem";
 
-export enum ReviewResponse {
-    Easy,
-    Good,
-    Hard,
-    Reset,
-}
+
 
 // Flashcards
 

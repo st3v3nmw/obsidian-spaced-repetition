@@ -18,7 +18,7 @@ import {
 
 import type SRPlugin from "src/main";
 import { getKeysPreserveType, getTypedObjectEntries } from "src/util/utils";
-import { textInterval } from "src/scheduling";
+import { textInterval } from "src/algorithms/osr/scheduling";
 import { t } from "src/lang/helpers";
 import { Stats } from "../stats";
 import { CardListType } from "src/Deck";

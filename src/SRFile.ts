@@ -10,6 +10,7 @@ import { getAllTagsFromText } from "./util/utils";
 export interface ISRFile {
     get path(): string;
     get basename(): string;
+    getFrontmatter(): Map<string, string>;
     getAllTags(): string[];
     getQuestionContext(cardLine: number): string[];
     read(): Promise<string>;
@@ -33,6 +34,14 @@ export class SrTFile implements ISRFile {
 
     get basename(): string {
         return this.file.basename;
+    }
+
+    getFrontmatter(): Map<string, number> {
+        const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
+
+        const frontmatter: FrontMatterCache | Record<string, unknown> =
+            fileCachedData.frontmatter || {};
+
     }
 
     getAllTags(): string[] {

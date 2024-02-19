@@ -1,9 +1,12 @@
 import { App, FuzzySuggestModal, TFile } from "obsidian";
-
-import { SchedNote } from "src/main";
 import { t } from "src/lang/helpers";
 
-export class ReviewDeck {
+export interface SchedNote {
+    note: TFile;
+    dueUnix: number;
+}
+
+export class NoteReviewDeck {
     public deckName: string;
     public newNotes: TFile[] = [];
     public scheduledNotes: SchedNote[] = [];

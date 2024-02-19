@@ -4,7 +4,7 @@ import h from "vhtml";
 
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
-import { textInterval, ReviewResponse } from "src/scheduling";
+import { textInterval, ReviewResponse } from "src/algorithms/osr/scheduling";
 import { COLLAPSE_ICON } from "src/constants";
 import { t } from "src/lang/helpers";
 import { Card } from "../Card";

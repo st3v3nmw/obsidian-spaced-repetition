@@ -1,7 +1,7 @@
 import { Note } from "./Note";
 import { SRSettings } from "./settings";
 
-export class NoteEaseCalculator {
+export class NoteEaseCalculator2 {
     static Calculate(note: Note, settings: SRSettings): number {
         let totalEase: number = 0;
         let scheduledCount: number = 0;

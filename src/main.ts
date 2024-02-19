@@ -1,13 +1,12 @@
 import { Notice, Plugin, TAbstractFile, TFile, getAllTags, FrontMatterCache } from "obsidian";
-import * as graph from "pagerank.js";
 
-import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, upgradeSettings } from "src/settings";
+import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, upgradeSettings, SettingsUtil } from "src/settings";
 import { FlashcardModal } from "src/gui/flashcard-modal";
 import { StatsModal } from "src/gui/stats-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/sidebar";
-import { ReviewResponse, schedule } from "src/scheduling";
+import { schedule } from "src/algorithms/osr/scheduling";
 import { YAML_FRONT_MATTER_REGEX, SCHEDULING_INFO_REGEX } from "src/constants";
-import { ReviewDeck, ReviewDeckSelectionModal } from "src/ReviewDeck";
+import { NoteReviewDeck, ReviewDeckSelectionModal } from "src/NoteReviewDeck";
 import { t } from "src/lang/helpers";
 import { appIcon } from "src/icons/appicon";
 import { TopicPath } from "./TopicPath";
@@ -26,7 +25,6 @@ import {
     IteratorDeckSource,
     DeckOrder,
 } from "./DeckTreeIterator";
-import { CardScheduleCalculator } from "./CardSchedule";
 import { Note } from "./Note";
 import { NoteFileLoader } from "./NoteFileLoader";
 import { ISRFile, SrTFile as SrTFile } from "./SRFile";
@@ -34,6 +32,11 @@ import { NoteEaseCalculator } from "./NoteEaseCalculator";
 import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 import { NoteEaseList } from "./NoteEaseList";
 import { QuestionPostponementList } from "./QuestionPostponementList";
+import { ReviewResponse } from "./algorithms/base/RepetitionItem";
+import { SrsAlgorithm } from "./algorithms/base/SrsAlgorithm";
+import { OsrNoteGraph } from "./algorithms/osr/OsrNoteGraph";
+import { DataStore } from "./dataStore/base/DataStore";
+import { RepItemScheduleInfo } from "./algorithms/base/RepItemScheduleInfo";
 
 interface PluginData {
     settings: SRSettings;
@@ -52,29 +55,18 @@ const DEFAULT_DATA: PluginData = {
     historyDeck: null,
 };
 
-export interface SchedNote {
-    note: TFile;
-    dueUnix: number;
-}
-
-export interface LinkStat {
-    sourcePath: string;
-    linkCount: number;
-}
-
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     private reviewQueueView: ReviewQueueListView;
     public data: PluginData;
     public syncLock = false;
 
-    public reviewDecks: { [deckKey: string]: ReviewDeck } = {};
+    public reviewDecks: { [deckKey: string]: NoteReviewDeck } = {};
     public lastSelectedReviewDeck: string;
 
-    public easeByPath: NoteEaseList;
+    // public easeByPath: NoteEaseList;
     private questionPostponementList: QuestionPostponementList;
-    private incomingLinks: Record<string, LinkStat[]> = {};
-    private pageranks: Record<string, number> = {};
+    private osrNoteGraph: OsrNoteGraph;
     private dueNotesCount = 0;
     public dueDatesNotes: Record<number, number> = {}; // Record<# of days in future, due count>
 
@@ -83,6 +75,7 @@ export default class SRPlugin extends Plugin {
     public cardStats: Stats;
 
     async onload(): Promise<void> {
+        // console.log("onload: Branch: bug-495-multiple-deck-tags-ignored, Date: 2024-02-14");
         await this.loadPluginData();
         this.easeByPath = new NoteEaseList(this.data.settings);
         this.questionPostponementList = new QuestionPostponementList(
@@ -305,15 +298,11 @@ export default class SRPlugin extends Plugin {
         reviewMode: FlashcardReviewMode,
     ): void {
         const deckIterator = SRPlugin.createDeckTreeIterator(this.data.settings);
-        const cardScheduleCalculator = new CardScheduleCalculator(
-            this.data.settings,
-            this.easeByPath,
-        );
         const reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(
             reviewMode,
             deckIterator,
             this.data.settings,
-            cardScheduleCalculator,
+            SrsAlgorithm.getInstance(),
             this.questionPostponementList,
         );
 
@@ -342,10 +331,8 @@ export default class SRPlugin extends Plugin {
         this.syncLock = true;
 
         // reset notes stuff
-        graph.reset();
+        this.osrNoteGraph = new OsrNoteGraph(this.app.metadataCache);
         this.easeByPath = new NoteEaseList(this.data.settings);
-        this.incomingLinks = {};
-        this.pageranks = {};
         this.reviewDecks = {};
 
         // reset flashcards stuff
@@ -364,48 +351,28 @@ export default class SRPlugin extends Plugin {
 
         const notes: TFile[] = this.app.vault.getMarkdownFiles();
         for (const noteFile of notes) {
-            if (
-                this.data.settings.noteFoldersToIgnore.some((folder) =>
-                    noteFile.path.startsWith(folder),
-                )
-            ) {
+            if (SettingsUtil.isPathInNoteIgnoreFolder(this.data.settings, noteFile.path) {
                 continue;
             }
 
-            if (this.incomingLinks[noteFile.path] === undefined) {
-                this.incomingLinks[noteFile.path] = [];
-            }
-
-            const links = this.app.metadataCache.resolvedLinks[noteFile.path] || {};
-            for (const targetPath in links) {
-                if (this.incomingLinks[targetPath] === undefined)
-                    this.incomingLinks[targetPath] = [];
-
-                // markdown files only
-                if (targetPath.split(".").pop().toLowerCase() === "md") {
-                    this.incomingLinks[targetPath].push({
-                        sourcePath: noteFile.path,
-                        linkCount: links[targetPath],
-                    });
-
-                    graph.link(noteFile.path, targetPath, links[targetPath]);
-                }
-            }
-
+            // Does the note contain any tags that are specified as flashcard tags in the settings
+            // (Doing this check first saves us from loading and parsing the note if not necessary)
             const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(noteFile));
             if (topicPath.hasPath) {
                 const note: Note = await this.loadNote(noteFile, topicPath);
+                note.appendCardsToDeck(fullDeckTree);
+
+                // Algorithm
                 const flashcardsInNoteAvgEase: number = NoteEaseCalculator.Calculate(
                     note,
                     this.data.settings,
                 );
-                note.appendCardsToDeck(fullDeckTree);
-
                 if (flashcardsInNoteAvgEase > 0) {
                     this.easeByPath.setEaseForPath(note.filePath, flashcardsInNoteAvgEase);
                 }
             }
 
+            // Data store
             const fileCachedData = this.app.metadataCache.getFileCache(noteFile) || {};
 
             const frontmatter: FrontMatterCache | Record<string, unknown> =
@@ -418,7 +385,7 @@ export default class SRPlugin extends Plugin {
             for (const tagToReview of this.data.settings.tagsToReview) {
                 if (tags.some((tag) => tag === tagToReview || tag.startsWith(tagToReview + "/"))) {
                     if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, tagToReview)) {
-                        this.reviewDecks[tagToReview] = new ReviewDeck(tagToReview);
+                        this.reviewDecks[tagToReview] = new NoteReviewDeck(tagToReview);
                     }
                     matchedNoteTags.push(tagToReview);
                     shouldIgnore = false;
@@ -430,6 +397,7 @@ export default class SRPlugin extends Plugin {
             }
 
             // file has no scheduling information
+            // Data store
             if (
                 !(
                     Object.prototype.hasOwnProperty.call(frontmatter, "sr-due") &&
@@ -437,16 +405,19 @@ export default class SRPlugin extends Plugin {
                     Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
                 )
             ) {
+                // Common
                 for (const matchedNoteTag of matchedNoteTags) {
                     this.reviewDecks[matchedNoteTag].newNotes.push(noteFile);
                 }
                 continue;
             }
 
+            // Data store
             const dueUnix: number = window
                 .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
                 .valueOf();
 
+            // Algorithm
             let ease: number;
             if (this.easeByPath.hasEaseForPath(noteFile.path)) {
                 ease = (this.easeByPath.getEaseByPath(noteFile.path) + frontmatter["sr-ease"]) / 2;
@@ -461,9 +432,7 @@ export default class SRPlugin extends Plugin {
             }
         }
 
-        graph.rank(0.85, 0.000001, (node: string, rank: number) => {
-            this.pageranks[node] = rank * 10000;
-        });
+        this.osrNoteGraph.generatePageRanks();
 
         // Reviewable cards are all except those with the "edit later" tag
         this.deckTree = DeckTreeFilter.filterForReviewableCards(fullDeckTree);
@@ -502,7 +471,7 @@ export default class SRPlugin extends Plugin {
         this.dueDatesNotes = {};
 
         const now = window.moment(Date.now());
-        Object.values(this.reviewDecks).forEach((reviewDeck: ReviewDeck) => {
+        Object.values(this.reviewDecks).forEach((reviewDeck: NoteReviewDeck) => {
             reviewDeck.dueNotesCount = 0;
             reviewDeck.scheduledNotes.forEach((scheduledNote: SchedNote) => {
                 if (scheduledNote.dueUnix <= now.valueOf()) {
@@ -519,7 +488,7 @@ export default class SRPlugin extends Plugin {
                 this.dueDatesNotes[nDays]++;
             });
 
-            reviewDeck.sortNotes(this.pageranks);
+            reviewDeck.sortNotes(this.osrNoteGraph.pageranks);
         });
 
         this.statusBar.setText(
@@ -540,130 +509,28 @@ export default class SRPlugin extends Plugin {
     }
 
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
+        const noteSrTFile: ISRFile = this.createSrTFile(note);
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         const frontmatter: FrontMatterCache | Record<string, unknown> =
             fileCachedData.frontmatter || {};
 
-        const tags = getAllTags(fileCachedData) || [];
-        if (this.data.settings.noteFoldersToIgnore.some((folder) => note.path.startsWith(folder))) {
+        if (SettingsUtil.isPathInNoteIgnoreFolder(this.data.settings, note.path)) {
             new Notice(t("NOTE_IN_IGNORED_FOLDER"));
             return;
         }
 
-        let shouldIgnore = true;
-        for (const tag of tags) {
-            if (
-                this.data.settings.tagsToReview.some(
-                    (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/"),
-                )
-            ) {
-                shouldIgnore = false;
-                break;
-            }
-        }
-
-        if (shouldIgnore) {
+        const tags = getAllTags(fileCachedData) || [];
+        if (!SettingsUtil.isAnyTagANoteReviewTag(this.data.settings, tags)) {
             new Notice(t("PLEASE_TAG_NOTE"));
             return;
         }
 
-        let fileText: string = await this.app.vault.read(note);
-        let ease: number, interval: number, delayBeforeReview: number;
-        const now: number = Date.now();
-        // new note
-        if (
-            !(
-                Object.prototype.hasOwnProperty.call(frontmatter, "sr-due") &&
-                Object.prototype.hasOwnProperty.call(frontmatter, "sr-interval") &&
-                Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
-            )
-        ) {
-            let linkTotal = 0,
-                linkPGTotal = 0,
-                totalLinkCount = 0;
+        // 
+        const noteSchedule: RepItemScheduleInfo = await DataStore.getInstance().noteGetSchedule(noteSrTFile);
+        const updatedNoteSchedule: RepItemScheduleInfo = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(noteSchedule, response);
+        await DataStore.getInstance().noteSetSchedule(this.createSrTFile(note), updatedNoteSchedule);
 
-            for (const statObj of this.incomingLinks[note.path] || []) {
-                const ease: number = this.easeByPath.getEaseByPath(statObj.sourcePath);
-                if (ease) {
-                    linkTotal += statObj.linkCount * this.pageranks[statObj.sourcePath] * ease;
-                    linkPGTotal += this.pageranks[statObj.sourcePath] * statObj.linkCount;
-                    totalLinkCount += statObj.linkCount;
-                }
-            }
-
-            const outgoingLinks = this.app.metadataCache.resolvedLinks[note.path] || {};
-            for (const linkedFilePath in outgoingLinks) {
-                const ease: number = this.easeByPath.getEaseByPath(linkedFilePath);
-                if (ease) {
-                    linkTotal +=
-                        outgoingLinks[linkedFilePath] * this.pageranks[linkedFilePath] * ease;
-                    linkPGTotal += this.pageranks[linkedFilePath] * outgoingLinks[linkedFilePath];
-                    totalLinkCount += outgoingLinks[linkedFilePath];
-                }
-            }
-
-            const linkContribution: number =
-                this.data.settings.maxLinkFactor *
-                Math.min(1.0, Math.log(totalLinkCount + 0.5) / Math.log(64));
-            ease =
-                (1.0 - linkContribution) * this.data.settings.baseEase +
-                (totalLinkCount > 0
-                    ? (linkContribution * linkTotal) / linkPGTotal
-                    : linkContribution * this.data.settings.baseEase);
-            // add note's average flashcard ease if available
-            if (this.easeByPath.hasEaseForPath(note.path)) {
-                ease = (ease + this.easeByPath.getEaseByPath(note.path)) / 2;
-            }
-            ease = Math.round(ease);
-            interval = 1.0;
-            delayBeforeReview = 0;
-        } else {
-            interval = frontmatter["sr-interval"];
-            ease = frontmatter["sr-ease"];
-            delayBeforeReview =
-                now -
-                window
-                    .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
-                    .valueOf();
-        }
-
-        const schedObj: Record<string, number> = schedule(
-            response,
-            interval,
-            ease,
-            delayBeforeReview,
-            this.data.settings,
-            this.dueDatesNotes,
-        );
-        interval = schedObj.interval;
-        ease = schedObj.ease;
-
-        const due = window.moment(now + interval * 24 * 3600 * 1000);
-        const dueString: string = due.format("YYYY-MM-DD");
-
-        // check if scheduling info exists
-        if (SCHEDULING_INFO_REGEX.test(fileText)) {
-            const schedulingInfo = SCHEDULING_INFO_REGEX.exec(fileText);
-            fileText = fileText.replace(
-                SCHEDULING_INFO_REGEX,
-                `---\n${schedulingInfo[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
-                    `${schedulingInfo[5]}---`,
-            );
-        } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
-            // new note with existing YAML front matter
-            const existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
-            fileText = fileText.replace(
-                YAML_FRONT_MATTER_REGEX,
-                `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n---`,
-            );
-        } else {
-            fileText =
-                `---\nsr-due: ${dueString}\nsr-interval: ${interval}\n` +
-                `sr-ease: ${ease}\n---\n\n${fileText}`;
-        }
-
+        // Common
         if (this.data.settings.burySiblingCards) {
             const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(note));
             const noteX: Note = await this.loadNote(note, topicPath);
@@ -672,12 +539,12 @@ export default class SRPlugin extends Plugin {
             }
             await this.savePluginData();
         }
-        await this.app.vault.modify(note, fileText);
 
         // Update note's properties to update our due notes.
+        // Algorithm
         this.easeByPath.setEaseForPath(note.path, ease);
 
-        Object.values(this.reviewDecks).forEach((reviewDeck: ReviewDeck) => {
+        Object.values(this.reviewDecks).forEach((reviewDeck: NoteReviewDeck) => {
             let wasDueInDeck = false;
             for (const scheduledNote of reviewDeck.scheduledNotes) {
                 if (scheduledNote.note.path === note.path) {
@@ -701,6 +568,9 @@ export default class SRPlugin extends Plugin {
 
         new Notice(t("RESPONSE_RECEIVED"));
 
+    }
+
+    async autoReviewNextNote(): Promise<void> {
         if (this.data.settings.autoNextNote) {
             if (!this.lastSelectedReviewDeck) {
                 const reviewDeckKeys: string[] = Object.keys(this.reviewDecks);
