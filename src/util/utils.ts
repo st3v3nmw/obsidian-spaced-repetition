@@ -1,6 +1,6 @@
 import moment from "moment";
 import { Moment } from "moment";
-import { PREFERRED_DATE_FORMAT } from "src/constants";
+import { PREFERRED_DATE_FORMAT, YAML_FRONT_MATTER_REGEX } from "src/constants";
 
 type Hex = number;
 
@@ -101,6 +101,37 @@ export function stringTrimStart(str: string): [string, string] {
     const wsCount: number = str.length - trimmed.length;
     const ws: string = str.substring(0, wsCount);
     return [ws, trimmed];
+}
+
+export function splitNoteIntoFrontmatterAndContent(str: string): [string, string] {
+    let frontmatter: string = "";
+    let content: string = "";
+    let frontmatterEndLineNum: number = null;
+    if (YAML_FRONT_MATTER_REGEX.test) {
+        const lines: string[] = splitTextIntoLineArray(str);
+
+        // The end "---" marker must be on the third line (index 2) or later
+        for (let i = 2; i < lines.length; i++) {
+            if (lines[i] == "---") {
+                frontmatterEndLineNum = i;
+                break;
+            }
+        }
+
+        if (frontmatterEndLineNum) {
+            const frontmatterStartLineNum: number = 0;
+            const frontmatterLineCount: number =
+                frontmatterEndLineNum - frontmatterStartLineNum + 1;
+            const frontmatterLines: string[] = lines.splice(
+                frontmatterStartLineNum,
+                frontmatterLineCount,
+            );
+            frontmatter = frontmatterLines.join("\n");
+            content = lines.join("\n");
+        }
+    }
+    if (frontmatter.length == 0) content = str;
+    return [frontmatter, content];
 }
 
 //

@@ -82,7 +82,7 @@ export class SrTFile implements ISRFile {
     }
 }
 
-export class UnitTestSRFile implements ISRFile {
+/* export class UnitTestSRFile implements ISRFile {
     content: string;
     _path: string;
 
@@ -119,4 +119,4 @@ export class UnitTestSRFile implements ISRFile {
     async write(content: string): Promise<void> {
         this.content = content;
     }
-}
+} */
