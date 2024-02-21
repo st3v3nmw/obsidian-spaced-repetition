@@ -17,7 +17,7 @@ import { CardListType, Deck, DeckTreeFilter } from "src/Deck";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { SampleItemDecks } from "./SampleItems";
 import { UnitTestSRFile } from "src/SRFile";
-import { ReviewResponse } from "src/algorithms/osr/scheduling";
+import { ReviewResponse } from "src/algorithms/osr/NoteScheduling";
 import {
     setupStaticDateProvider,
     setupStaticDateProvider_20230906,

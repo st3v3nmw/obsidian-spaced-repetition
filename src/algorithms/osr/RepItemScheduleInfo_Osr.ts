@@ -1,11 +1,9 @@
 import { Moment } from "moment";
 import { RepItemScheduleInfo } from "../base/RepItemScheduleInfo";
 import { SRSettings } from "src/settings";
-import { DateUtil } from "src/util/DateProvider";
+import { DateUtil, globalDateProvider } from "src/util/DateProvider";
 
 export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
-    interval: number;
-
     // A question can have multiple cards. The schedule info for all sibling cards are formatted together
     // in a single <!--SR: --> comment, such as:
     // <!--SR:!2023-09-02,4,270!2023-09-02,5,270!2023-09-02,6,270!2023-09-02,7,270-->
@@ -15,12 +13,15 @@ export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
     // This is done by using this magic value for the date
     public static dummyDueDateForNewCard: string = "2000-01-01";
 
-    constructor(dueDate: Moment, interval: number, latestEase: number, delayBeforeReviewTicks: number) {
+    constructor(dueDate: Moment, interval: number, latestEase: number, delayedBeforeReviewTicks: number | null = null) {
         super();
         this.dueDate = dueDate;
         this.interval = interval;
         this.latestEase = latestEase;
-        this.delayBeforeReviewTicks = ReviewTicks;
+        this.delayedBeforeReviewTicks = delayedBeforeReviewTicks;
+        if (dueDate && delayedBeforeReviewTicks == null) {
+            this.delayedBeforeReviewTicks = globalDateProvider.today.valueOf() - dueDate.valueOf()
+        }
     }
 
     formatCardScheduleForHtmlComment(): string {
@@ -42,14 +43,14 @@ export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
         );
     }
 
-    static fromDueDateMoment(
+    /* static fromDueDateMoment(
         dueDateTicks: Moment,
         interval: number,
         ease: number,
         delayBeforeReviewTicks: number,
     ) {
-        return new RepItemScheduleInfo_Osr(dueDateTicks, interval, ease, delayBeforeReviewTicks);
-    }
+        return new RepItemScheduleInfo_Osr(dueDateTicks, interval, ease);
+    } */
 
     static fromDueDateStr(
         dueDateStr: string,
@@ -57,8 +58,8 @@ export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
         ease: number,
         delayBeforeReviewTicks: number,
     ) {
-        const dueDateTicks: Moment = DateUtil.dateStrToMoment(dueDateStr);
-        return new RepItemScheduleInfo_Osr(dueDateTicks, interval, ease, delayBeforeReviewTicks);
+        const dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
+        return new RepItemScheduleInfo_Osr(dueDate, interval, ease);
     }
 
 }

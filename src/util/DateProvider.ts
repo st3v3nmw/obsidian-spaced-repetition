@@ -3,10 +3,15 @@ import { Moment } from "moment";
 import { ALLOWED_DATE_FORMATS } from "src/constants";
 
 export interface IDateProvider {
+    get now(): Moment;
     get today(): Moment;
 }
 
 export class LiveDateProvider implements IDateProvider {
+    get now(): Moment {
+        return moment();
+    }
+
     get today(): Moment {
         return moment().startOf("day");
     }
@@ -19,8 +24,12 @@ export class StaticDateProvider implements IDateProvider {
         this.moment = moment;
     }
 
-    get today(): Moment {
+    get now(): Moment {
         return this.moment.clone();
+    }
+
+    get today(): Moment {
+        return this.moment.clone().startOf("day");
     }
 
     static fromDateStr(str: string): StaticDateProvider {

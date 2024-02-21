@@ -18,73 +18,10 @@ import { NoteEaseList } from "src/NoteEaseList";
 export class DataStore_StoreInNote implements IDataStore {
     private settings: SRSettings;
     app: App;
-    osrNoteGraph: OsrNoteGraph;
     easeByPath: NoteEaseList;
 
     constructor(settings: SRSettings) {
         this.settings = settings;
-    }
-
-    async noteGetSchedule(note: ISRFile): Promise<RepItemScheduleInfo> {
-        let fileText: string = await note.read();
-        let ease: number, interval: number, delayBeforeReview: number;
-        const now: number = Date.now();
-        const incomingLinks: Record<string, LinkStat[]> = this.osrNoteGraph.incomingLinks;
-        const pageranks: Record<string, number> = this.osrNoteGraph.pageranks;
-
-        const fileCachedData = this.app.metadataCache.getFileCache(noteFile) || {};
-
-        const frontmatter: FrontMatterCache | Record<string, unknown> =
-            fileCachedData.frontmatter || {};
-
-        // new note?
-        if (
-            !(
-                Object.prototype.hasOwnProperty.call(frontmatter, "sr-due") &&
-                Object.prototype.hasOwnProperty.call(frontmatter, "sr-interval") &&
-                Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
-            )
-        ) {
-        } else {
-            interval = frontmatter["sr-interval"];
-            ease = frontmatter["sr-ease"];
-            delayBeforeReview =
-                now -
-                window
-                    .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
-                    .valueOf();
-        }
-    }
-
-    async noteSetSchedule(note: ISRFile, repItemScheduleInfo: RepItemScheduleInfo): Promise<void> {
-        let fileText: string = await note.read();
-
-        // check if scheduling info exists
-        const repItemScheduleInfo2: RepItemScheduleInfo_Osr = repitem
-        if (SCHEDULING_INFO_REGEX.test(fileText)) {
-            const schedulingInfo = SCHEDULING_INFO_REGEX.exec(fileText);
-            fileText = fileText.replace(
-                SCHEDULING_INFO_REGEX,
-                `---\n${schedulingInfo[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
-                    `${schedulingInfo[5]}---`,
-            );
-        } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
-            // new note with existing YAML front matter
-            const existingYaml = YAML_FRONT_MATTER_REGEX.exec(fileText);
-            fileText = fileText.replace(
-                YAML_FRONT_MATTER_REGEX,
-                `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n---`,
-            );
-        } else {
-            fileText =
-                `---\nsr-due: ${dueString}\nsr-interval: ${interval}\n` +
-                `sr-ease: ${ease}\n---\n\n${fileText}`;
-        }
-
-        this.easeByPath.setEaseForPath(note.path, ease);
-
     }
 
     questionCreateSchedule(originalQuestionText: string, storageInfo: RepItemStorageInfo): RepItemScheduleInfo[] {

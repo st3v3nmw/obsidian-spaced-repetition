@@ -5,9 +5,6 @@ import { Question } from "src/Question";
 import { ISRFile } from "src/SRFile";
 
 export interface IDataStore {
-    noteGetSchedule(note: ISRFile): Promise<RepItemScheduleInfo>;
-    noteSetSchedule(note: ISRFile, scheduleInfo: RepItemScheduleInfo): Promise<void>;
-
     // noteStore: INoteStore;
     questionCreateSchedule(originalQuestionText: string, storageInfo: RepItemStorageInfo): RepItemScheduleInfo[];
     questionRemoveScheduleInfo(questionText: string): string;

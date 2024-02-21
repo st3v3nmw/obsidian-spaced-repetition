@@ -4,7 +4,7 @@ import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, upgradeSettings, SettingsUt
 import { FlashcardModal } from "src/gui/flashcard-modal";
 import { StatsModal } from "src/gui/stats-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/sidebar";
-import { schedule } from "src/algorithms/osr/scheduling";
+import { osrSchedule } from "src/algorithms/osr/NoteScheduling";
 import { YAML_FRONT_MATTER_REGEX, SCHEDULING_INFO_REGEX } from "src/constants";
 import { NoteReviewDeck, ReviewDeckSelectionModal } from "src/NoteReviewDeck";
 import { t } from "src/lang/helpers";
@@ -37,6 +37,8 @@ import { SrsAlgorithm } from "./algorithms/base/SrsAlgorithm";
 import { OsrNoteGraph } from "./algorithms/osr/OsrNoteGraph";
 import { DataStore } from "./dataStore/base/DataStore";
 import { RepItemScheduleInfo } from "./algorithms/base/RepItemScheduleInfo";
+import { DataStoreAlgorithm } from "./dataStoreAlgorithm/DataStoreAlgorithm";
+import { NoteReviewQueue } from "./NoteReviewQueue";
 
 interface PluginData {
     settings: SRSettings;
@@ -61,14 +63,12 @@ export default class SRPlugin extends Plugin {
     public data: PluginData;
     public syncLock = false;
 
-    public reviewDecks: { [deckKey: string]: NoteReviewDeck } = {};
     public lastSelectedReviewDeck: string;
 
     // public easeByPath: NoteEaseList;
     private questionPostponementList: QuestionPostponementList;
     private osrNoteGraph: OsrNoteGraph;
-    private dueNotesCount = 0;
-    public dueDatesNotes: Record<number, number> = {}; // Record<# of days in future, due count>
+    private noteReviewQueue: NoteReviewQueue;
 
     public deckTree: Deck = new Deck("root", null);
     private remainingDeckTree: Deck;
@@ -77,7 +77,7 @@ export default class SRPlugin extends Plugin {
     async onload(): Promise<void> {
         // console.log("onload: Branch: bug-495-multiple-deck-tags-ignored, Date: 2024-02-14");
         await this.loadPluginData();
-        this.easeByPath = new NoteEaseList(this.data.settings);
+        this.noteReviewQueue = new NoteReviewQueue();
         this.questionPostponementList = new QuestionPostponementList(
             this,
             this.data.settings,
@@ -332,8 +332,7 @@ export default class SRPlugin extends Plugin {
 
         // reset notes stuff
         this.osrNoteGraph = new OsrNoteGraph(this.app.metadataCache);
-        this.easeByPath = new NoteEaseList(this.data.settings);
-        this.reviewDecks = {};
+        this.noteReviewQueue.init();
 
         // reset flashcards stuff
         const fullDeckTree = new Deck("root", null);
@@ -351,85 +350,35 @@ export default class SRPlugin extends Plugin {
 
         const notes: TFile[] = this.app.vault.getMarkdownFiles();
         for (const noteFile of notes) {
-            if (SettingsUtil.isPathInNoteIgnoreFolder(this.data.settings, noteFile.path) {
+            if (SettingsUtil.isPathInNoteIgnoreFolder(this.data.settings, noteFile.path)) {
                 continue;
             }
 
             // Does the note contain any tags that are specified as flashcard tags in the settings
             // (Doing this check first saves us from loading and parsing the note if not necessary)
-            const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(noteFile));
+            const noteSrTFile: SrTFile = this.createSrTFile(noteFile);
+            const topicPath: TopicPath = this.findTopicPath(noteSrTFile);
             if (topicPath.hasPath) {
                 const note: Note = await this.loadNote(noteFile, topicPath);
                 note.appendCardsToDeck(fullDeckTree);
 
-                // Algorithm
-                const flashcardsInNoteAvgEase: number = NoteEaseCalculator.Calculate(
-                    note,
-                    this.data.settings,
-                );
-                if (flashcardsInNoteAvgEase > 0) {
-                    this.easeByPath.setEaseForPath(note.filePath, flashcardsInNoteAvgEase);
-                }
+                // Give the algorithm a chance to do something with the loaded note
+                // e.g. OSR - calculate the average ease across all the questions within the note
+                // TODO:  should this move to this.loadNote
+                SrsAlgorithm.getInstance().noteOnLoadedNote(note);
             }
 
             // Data store
             const fileCachedData = this.app.metadataCache.getFileCache(noteFile) || {};
-
-            const frontmatter: FrontMatterCache | Record<string, unknown> =
-                fileCachedData.frontmatter || {};
             const tags = getAllTags(fileCachedData) || [];
 
-            let shouldIgnore = true;
-            const matchedNoteTags = [];
-
-            for (const tagToReview of this.data.settings.tagsToReview) {
-                if (tags.some((tag) => tag === tagToReview || tag.startsWith(tagToReview + "/"))) {
-                    if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, tagToReview)) {
-                        this.reviewDecks[tagToReview] = new NoteReviewDeck(tagToReview);
-                    }
-                    matchedNoteTags.push(tagToReview);
-                    shouldIgnore = false;
-                    break;
-                }
-            }
-            if (shouldIgnore) {
+            const matchedNoteTags = SettingsUtil.filterForNoteReviewTag(this.data.settings, tags);
+            if (matchedNoteTags.length == 0) {
                 continue;
             }
 
-            // file has no scheduling information
-            // Data store
-            if (
-                !(
-                    Object.prototype.hasOwnProperty.call(frontmatter, "sr-due") &&
-                    Object.prototype.hasOwnProperty.call(frontmatter, "sr-interval") &&
-                    Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
-                )
-            ) {
-                // Common
-                for (const matchedNoteTag of matchedNoteTags) {
-                    this.reviewDecks[matchedNoteTag].newNotes.push(noteFile);
-                }
-                continue;
-            }
-
-            // Data store
-            const dueUnix: number = window
-                .moment(frontmatter["sr-due"], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"])
-                .valueOf();
-
-            // Algorithm
-            let ease: number;
-            if (this.easeByPath.hasEaseForPath(noteFile.path)) {
-                ease = (this.easeByPath.getEaseByPath(noteFile.path) + frontmatter["sr-ease"]) / 2;
-            } else {
-                ease = frontmatter["sr-ease"];
-            }
-            this.easeByPath.setEaseForPath(noteFile.path, ease);
-
-            // schedule the note
-            for (const matchedNoteTag of matchedNoteTags) {
-                this.reviewDecks[matchedNoteTag].scheduledNotes.push({ note: noteFile, dueUnix });
-            }
+            const noteSchedule: RepItemScheduleInfo = await DataStoreAlgorithm.getInstance().noteGetSchedule(noteSrTFile);
+            this.noteReviewQueue.addNoteToQueue(noteSrTFile, noteSchedule, matchedNoteTags);
         }
 
         this.osrNoteGraph.generatePageRanks();
@@ -488,7 +437,7 @@ export default class SRPlugin extends Plugin {
                 this.dueDatesNotes[nDays]++;
             });
 
-            reviewDeck.sortNotes(this.osrNoteGraph.pageranks);
+            reviewDeck.sortNotesByDateAndImportance(this.osrNoteGraph.pageranks);
         });
 
         this.statusBar.setText(
@@ -511,8 +460,6 @@ export default class SRPlugin extends Plugin {
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
         const noteSrTFile: ISRFile = this.createSrTFile(note);
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
-        const frontmatter: FrontMatterCache | Record<string, unknown> =
-            fileCachedData.frontmatter || {};
 
         if (SettingsUtil.isPathInNoteIgnoreFolder(this.data.settings, note.path)) {
             new Notice(t("NOTE_IN_IGNORED_FOLDER"));
@@ -528,11 +475,11 @@ export default class SRPlugin extends Plugin {
         // 
         const noteSchedule: RepItemScheduleInfo = await DataStore.getInstance().noteGetSchedule(noteSrTFile);
         const updatedNoteSchedule: RepItemScheduleInfo = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(noteSchedule, response);
-        await DataStore.getInstance().noteSetSchedule(this.createSrTFile(note), updatedNoteSchedule);
+        await DataStore.getInstance().noteSetSchedule(noteSrTFile, updatedNoteSchedule);
 
         // Common
         if (this.data.settings.burySiblingCards) {
-            const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(note));
+            const topicPath: TopicPath = this.findTopicPath(noteSrTFile);
             const noteX: Note = await this.loadNote(note, topicPath);
             for (const question of noteX.questionList) {
                 this.data.buryList.push(question.questionText.textHash);
@@ -542,7 +489,6 @@ export default class SRPlugin extends Plugin {
 
         // Update note's properties to update our due notes.
         // Algorithm
-        this.easeByPath.setEaseForPath(note.path, ease);
 
         Object.values(this.reviewDecks).forEach((reviewDeck: NoteReviewDeck) => {
             let wasDueInDeck = false;

@@ -1,14 +1,15 @@
 import { App, FuzzySuggestModal, TFile } from "obsidian";
 import { t } from "src/lang/helpers";
+import { ISRFile } from "./SRFile";
 
 export interface SchedNote {
-    note: TFile;
+    note: ISRFile;
     dueUnix: number;
 }
 
 export class NoteReviewDeck {
     public deckName: string;
-    public newNotes: TFile[] = [];
+    public newNotes: ISRFile[] = [];
     public scheduledNotes: SchedNote[] = [];
     public activeFolders: Set<string>;
     public dueNotesCount = 0;
@@ -18,10 +19,10 @@ export class NoteReviewDeck {
         this.activeFolders = new Set([this.deckName, t("TODAY")]);
     }
 
-    public sortNotes(pageranks: Record<string, number>): void {
+    public sortNotesByDateAndImportance(pageranks: Record<string, number>): void {
         // sort new notes by importance
         this.newNotes = this.newNotes.sort(
-            (a: TFile, b: TFile) => (pageranks[b.path] || 0) - (pageranks[a.path] || 0),
+            (a: ISRFile, b: ISRFile) => (pageranks[b.path] || 0) - (pageranks[a.path] || 0),
         );
 
         // sort scheduled notes by date & within those days, sort them by importance

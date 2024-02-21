@@ -36,12 +36,12 @@ export class SrTFile implements ISRFile {
         return this.file.basename;
     }
 
-    getFrontmatter(): Map<string, number> {
+    getFrontmatter(): Map<string, string> {
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
 
         const frontmatter: FrontMatterCache | Record<string, unknown> =
             fileCachedData.frontmatter || {};
-
+        return null;
     }
 
     getAllTags(): string[] {
@@ -98,7 +98,11 @@ export class UnitTestSRFile implements ISRFile {
     get basename(): string {
         return "";
     }
+    
+    getFrontmatter(): Map<string, string> {
 
+    }
+    
     getAllTags(): string[] {
         return getAllTagsFromText(this.content);
     }

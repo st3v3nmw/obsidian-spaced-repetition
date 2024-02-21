@@ -4,7 +4,7 @@ import h from "vhtml";
 
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
-import { textInterval, ReviewResponse } from "src/algorithms/osr/scheduling";
+import { textInterval } from "src/algorithms/osr/NoteScheduling";
 import { COLLAPSE_ICON } from "src/constants";
 import { t } from "src/lang/helpers";
 import { Card } from "../Card";
@@ -18,8 +18,9 @@ import {
 import { FlashcardEditModal } from "./flashcards-edit-modal";
 import { Note } from "src/Note";
 import { RenderMarkdownWrapper } from "src/util/RenderMarkdownWrapper";
-import { CardScheduleInfo } from "src/CardSchedule";
 import { TopicPath } from "src/TopicPath";
+import { ReviewResponse } from "src/algorithms/base/RepetitionItem";
+import { RepItemScheduleInfo } from "src/algorithms/base/RepItemScheduleInfo";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -347,7 +348,7 @@ export class FlashcardModal extends Modal {
 
     displayCurrentCardInfoNotice() {
         const schedule = this.currentCard.scheduleInfo;
-        const currentEaseStr = t("CURRENT_EASE_HELP_TEXT") + (schedule?.ease ?? t("NEW"));
+        const currentEaseStr = t("CURRENT_EASE_HELP_TEXT") + (schedule?.latestEase ?? t("NEW"));
         const currentIntervalStr =
             t("CURRENT_INTERVAL_HELP_TEXT") + textInterval(schedule?.interval, false);
         const generatedFromStr = t("CARD_GENERATED_FROM", {
@@ -500,7 +501,7 @@ export class FlashcardModal extends Modal {
         buttonName: string,
         reviewResponse: ReviewResponse,
     ) {
-        const schedule: CardScheduleInfo = this.reviewSequencer.determineCardSchedule(
+        const schedule: RepItemScheduleInfo = this.reviewSequencer.determineCardSchedule(
             reviewResponse,
             this.currentCard,
         );

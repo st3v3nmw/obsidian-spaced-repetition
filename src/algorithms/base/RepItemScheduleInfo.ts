@@ -5,7 +5,12 @@ import { formatDate_YYYY_MM_DD } from "src/util/utils";
 export abstract class RepItemScheduleInfo {
     dueDate: Moment;
     latestEase: number;
-    delayBeforeReviewTicks: number;
+    interval: number;
+    delayedBeforeReviewTicks: number;
+
+    get dueDateAsUnix(): number {
+        return this.dueDate.valueOf();
+    }
     
     isDue(): boolean {
         return this.dueDate && this.dueDate.isSameOrBefore(globalDateProvider.today);
@@ -15,5 +20,5 @@ export abstract class RepItemScheduleInfo {
         return formatDate_YYYY_MM_DD(this.dueDate);
     }
 
-    abstract formatCardScheduleForHtmlComment(): string
+    abstract formatCardScheduleForHtmlComment(): string;
 }

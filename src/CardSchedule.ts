@@ -5,7 +5,7 @@ import {
     TICKS_PER_DAY,
 } from "./constants";
 import { INoteEaseList } from "./NoteEaseList";
-import { schedule } from "./algorithms/osr/scheduling";
+import { osrSchedule } from "./algorithms/osr/NoteScheduling";
 import { SRSettings } from "./settings";
 import { formatDate_YYYY_MM_DD } from "./util/utils";
 import { DateUtil, globalDateProvider } from "./util/DateProvider";

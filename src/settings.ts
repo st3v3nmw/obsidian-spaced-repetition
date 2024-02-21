@@ -126,6 +126,17 @@ export class SettingsUtil {
         return false;
     }
 
+    // Given a list of tags, return the subset that is in settings.tagsToReview
+    static filterForNoteReviewTag(settings: SRSettings, tags: string[]): string[] {
+        const result: string[] = [];
+        for (const tagToReview of settings.tagsToReview) {
+            if (tags.some((tag) => tag === tagToReview || tag.startsWith(tagToReview + "/"))) {
+                result.push(tagToReview);
+            }
+        }
+        return result;
+    }
+
     private static isTagInList(tagList: string[], tag: string): boolean {
         for (const tagFromList of tagList) {
             if (tag === tagFromList || tag.startsWith(tagFromList + "/")) {
