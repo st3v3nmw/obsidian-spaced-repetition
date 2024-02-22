@@ -1,19 +1,23 @@
-import { ItemView, WorkspaceLeaf, Menu, TFile } from "obsidian";
+import { ItemView, WorkspaceLeaf, Menu, TFile, App } from "obsidian";
 
-import type SRPlugin from "src/main";
 import { COLLAPSE_ICON } from "src/constants";
 import { NoteReviewDeck } from "src/NoteReviewDeck";
 import { t } from "src/lang/helpers";
+import { NoteReviewQueue } from "src/NoteReviewQueue";
+import { SRSettings } from "src/settings";
+import { SrTFile } from "src/SRFile";
 
 export const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
 
 export class ReviewQueueListView extends ItemView {
-    private plugin: SRPlugin;
+    private noteReviewQueue: NoteReviewQueue;
+    private settings: SRSettings;
 
-    constructor(leaf: WorkspaceLeaf, plugin: SRPlugin) {
+    constructor(leaf: WorkspaceLeaf, app: App, noteReviewQueue: NoteReviewQueue, settings: SRSettings) {
         super(leaf);
 
-        this.plugin = plugin;
+        this.noteReviewQueue = noteReviewQueue;
+        this.settings = settings;
         this.registerEvent(this.app.workspace.on("file-open", () => this.redraw()));
         this.registerEvent(this.app.vault.on("rename", () => this.redraw()));
     }
@@ -46,8 +50,8 @@ export class ReviewQueueListView extends ItemView {
         const rootEl: HTMLElement = createDiv("nav-folder mod-root");
         const childrenEl: HTMLElement = rootEl.createDiv("nav-folder-children");
 
-        for (const deckKey in this.plugin.reviewDecks) {
-            const deck: NoteReviewDeck = this.plugin.reviewDecks[deckKey];
+        for (const deckKey in this.noteReviewQueue.reviewDecks) {
+            const deck: NoteReviewDeck = this.noteReviewQueue.reviewDecks.get(deckKey);
 
             const deckCollapsed = !deck.activeFolders.has(deck.deckName);
 
@@ -78,11 +82,10 @@ export class ReviewQueueListView extends ItemView {
                     }
                     this.createRightPaneFile(
                         newNotesFolderEl,
-                        newFile,
+                        newFile.tfile,
                         fileIsOpen,
                         !deck.activeFolders.has(t("NEW")),
                         deck,
-                        this.plugin,
                     );
                 }
             }
@@ -92,7 +95,7 @@ export class ReviewQueueListView extends ItemView {
                 let currUnix = -1;
                 let schedFolderEl: HTMLElement | null = null,
                     folderTitle = "";
-                const maxDaysToRender: number = this.plugin.data.settings.maxNDaysNotesReviewQueue;
+                const maxDaysToRender: number = this.settings.maxNDaysNotesReviewQueue;
 
                 for (const sNote of deck.scheduledNotes) {
                     if (sNote.dueUnix != currUnix) {
@@ -132,11 +135,10 @@ export class ReviewQueueListView extends ItemView {
 
                     this.createRightPaneFile(
                         schedFolderEl,
-                        sNote.note,
+                        sNote.note.tfile,
                         fileIsOpen,
                         !deck.activeFolders.has(folderTitle),
                         deck,
-                        this.plugin,
                     );
                 }
             }
@@ -196,7 +198,6 @@ export class ReviewQueueListView extends ItemView {
         fileElActive: boolean,
         hidden: boolean,
         deck: NoteReviewDeck,
-        plugin: SRPlugin,
     ): void {
         const navFileEl: HTMLElement = folderEl
             .getElementsByClassName("nav-folder-children")[0]
@@ -215,7 +216,7 @@ export class ReviewQueueListView extends ItemView {
             "click",
             async (event: MouseEvent) => {
                 event.preventDefault();
-                plugin.lastSelectedReviewDeck = deck.deckName;
+                this.noteReviewQueue.lastSelectedReviewDeck = deck.deckName;
                 await this.app.workspace.getLeaf().openFile(file);
                 return false;
             },

@@ -1,5 +1,5 @@
-import { TagCache } from "obsidian";
-import { ISRFile, YamlValue } from "src/SRFile";
+import { TFile, TagCache } from "obsidian";
+import { ISRFile } from "src/SRFile";
 import { unitTest_BasicFrontmatterParser, unitTest_GetAllTagsFromTextEx } from "./UnitTestHelper";
 import { splitNoteIntoFrontmatterAndContent } from "src/util/utils";
 
@@ -19,8 +19,12 @@ export class UnitTestSRFile implements ISRFile {
     get basename(): string {
         return "";
     }
-    
-    async getFrontmatter(): Promise<Map<string, YamlValue[]>> {
+
+    get tfile(): TFile {
+        throw "Not supported";
+    }    
+
+    async getFrontmatter(): Promise<Map<string, string[]>> {
         return unitTest_BasicFrontmatterParser(await this.read());
     }
 

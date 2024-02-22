@@ -28,9 +28,7 @@ import {
 import { Note } from "./Note";
 import { NoteFileLoader } from "./NoteFileLoader";
 import { ISRFile, SrTFile as SrTFile } from "./SRFile";
-import { NoteEaseCalculator } from "./NoteEaseCalculator";
 import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
-import { NoteEaseList } from "./NoteEaseList";
 import { QuestionPostponementList } from "./QuestionPostponementList";
 import { ReviewResponse } from "./algorithms/base/RepetitionItem";
 import { SrsAlgorithm } from "./algorithms/base/SrsAlgorithm";
@@ -63,7 +61,6 @@ export default class SRPlugin extends Plugin {
     public data: PluginData;
     public syncLock = false;
 
-    public lastSelectedReviewDeck: string;
 
     // public easeByPath: NoteEaseList;
     private questionPostponementList: QuestionPostponementList;
@@ -93,7 +90,7 @@ export default class SRPlugin extends Plugin {
         this.statusBar.addEventListener("click", async () => {
             if (!this.syncLock) {
                 await this.sync();
-                this.reviewNextNoteModal();
+                this.noteReviewQueue.reviewNextNoteModal();
             }
         });
 
@@ -158,7 +155,7 @@ export default class SRPlugin extends Plugin {
             callback: async () => {
                 if (!this.syncLock) {
                     await this.sync();
-                    this.reviewNextNoteModal();
+                    this.noteReviewQueue.reviewNextNoteModal();
                 }
             },
         });
@@ -397,7 +394,7 @@ export default class SRPlugin extends Plugin {
         this.cardStats = calc.calculate(this.deckTree);
 
         if (this.data.settings.showDebugMessages) {
-            console.log(`SR: ${t("EASES")}`, this.easeByPath.dict);
+            // TODO: console.log(`SR: ${t("EASES")}`, this.easeByPath.dict);
             console.log(`SR: ${t("DECKS")}`, this.deckTree);
         }
 
@@ -416,33 +413,11 @@ export default class SRPlugin extends Plugin {
     }
 
     private updateAndSortDueNotes() {
-        this.dueNotesCount = 0;
-        this.dueDatesNotes = {};
-
-        const now = window.moment(Date.now());
-        Object.values(this.reviewDecks).forEach((reviewDeck: NoteReviewDeck) => {
-            reviewDeck.dueNotesCount = 0;
-            reviewDeck.scheduledNotes.forEach((scheduledNote: SchedNote) => {
-                if (scheduledNote.dueUnix <= now.valueOf()) {
-                    reviewDeck.dueNotesCount++;
-                    this.dueNotesCount++;
-                }
-
-                const nDays: number = Math.ceil(
-                    (scheduledNote.dueUnix - now.valueOf()) / (24 * 3600 * 1000),
-                );
-                if (!Object.prototype.hasOwnProperty.call(this.dueDatesNotes, nDays)) {
-                    this.dueDatesNotes[nDays] = 0;
-                }
-                this.dueDatesNotes[nDays]++;
-            });
-
-            reviewDeck.sortNotesByDateAndImportance(this.osrNoteGraph.pageranks);
-        });
+        this.noteReviewQueue.determineScheduleInfo(this.osrNoteGraph);
 
         this.statusBar.setText(
             t("STATUS_BAR", {
-                dueNotesCount: this.dueNotesCount,
+                dueNotesCount: this.noteReviewQueue.dueNotesCount,
                 dueFlashcardsCount: this.remainingDeckTree.getCardCount(CardListType.All, true),
             }),
         );
@@ -473,9 +448,9 @@ export default class SRPlugin extends Plugin {
         }
 
         // 
-        const noteSchedule: RepItemScheduleInfo = await DataStore.getInstance().noteGetSchedule(noteSrTFile);
-        const updatedNoteSchedule: RepItemScheduleInfo = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(noteSchedule, response);
-        await DataStore.getInstance().noteSetSchedule(noteSrTFile, updatedNoteSchedule);
+        const noteSchedule: RepItemScheduleInfo = await DataStoreAlgorithm.getInstance().noteGetSchedule(noteSrTFile);
+        const updatedNoteSchedule: RepItemScheduleInfo = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(note.path, noteSchedule, response);
+        await DataStoreAlgorithm.getInstance().noteSetSchedule(noteSrTFile, updatedNoteSchedule);
 
         // Common
         if (this.data.settings.burySiblingCards) {
@@ -489,85 +464,12 @@ export default class SRPlugin extends Plugin {
 
         // Update note's properties to update our due notes.
         // Algorithm
-
-        Object.values(this.reviewDecks).forEach((reviewDeck: NoteReviewDeck) => {
-            let wasDueInDeck = false;
-            for (const scheduledNote of reviewDeck.scheduledNotes) {
-                if (scheduledNote.note.path === note.path) {
-                    scheduledNote.dueUnix = due.valueOf();
-                    wasDueInDeck = true;
-                    break;
-                }
-            }
-
-            // It was a new note, remove it from the new notes and schedule it.
-            if (!wasDueInDeck) {
-                reviewDeck.newNotes.splice(
-                    reviewDeck.newNotes.findIndex((newNote: TFile) => newNote.path === note.path),
-                    1,
-                );
-                reviewDeck.scheduledNotes.push({ note, dueUnix: due.valueOf() });
-            }
-        });
+        this.noteReviewQueue.updateScheduleInfo(noteSrTFile, updatedNoteSchedule);
 
         this.updateAndSortDueNotes();
 
         new Notice(t("RESPONSE_RECEIVED"));
 
-    }
-
-    async autoReviewNextNote(): Promise<void> {
-        if (this.data.settings.autoNextNote) {
-            if (!this.lastSelectedReviewDeck) {
-                const reviewDeckKeys: string[] = Object.keys(this.reviewDecks);
-                if (reviewDeckKeys.length > 0) this.lastSelectedReviewDeck = reviewDeckKeys[0];
-                else {
-                    new Notice(t("ALL_CAUGHT_UP"));
-                    return;
-                }
-            }
-            this.reviewNextNote(this.lastSelectedReviewDeck);
-        }
-    }
-
-    async reviewNextNoteModal(): Promise<void> {
-        const reviewDeckNames: string[] = Object.keys(this.reviewDecks);
-
-        if (reviewDeckNames.length === 1) {
-            this.reviewNextNote(reviewDeckNames[0]);
-        } else {
-            const deckSelectionModal = new ReviewDeckSelectionModal(this.app, reviewDeckNames);
-            deckSelectionModal.submitCallback = (deckKey: string) => this.reviewNextNote(deckKey);
-            deckSelectionModal.open();
-        }
-    }
-
-    async reviewNextNote(deckKey: string): Promise<void> {
-        if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, deckKey)) {
-            new Notice(t("NO_DECK_EXISTS", { deckName: deckKey }));
-            return;
-        }
-
-        this.lastSelectedReviewDeck = deckKey;
-        const deck = this.reviewDecks[deckKey];
-
-        if (deck.dueNotesCount > 0) {
-            const index = this.data.settings.openRandomNote
-                ? Math.floor(Math.random() * deck.dueNotesCount)
-                : 0;
-            await this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
-            return;
-        }
-
-        if (deck.newNotes.length > 0) {
-            const index = this.data.settings.openRandomNote
-                ? Math.floor(Math.random() * deck.newNotes.length)
-                : 0;
-            this.app.workspace.getLeaf().openFile(deck.newNotes[index]);
-            return;
-        }
-
-        new Notice(t("ALL_CAUGHT_UP"));
     }
 
     createSrTFile(note: TFile): SrTFile {
@@ -592,7 +494,7 @@ export default class SRPlugin extends Plugin {
     initView(): void {
         this.registerView(
             REVIEW_QUEUE_VIEW_TYPE,
-            (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this)),
+            (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this.app, this.noteReviewQueue, this.data.settings)),
         );
 
         if (

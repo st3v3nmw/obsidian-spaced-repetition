@@ -8,15 +8,11 @@ import {
 } from "obsidian";
 import { getAllTagsFromText } from "./util/utils";
 
-export interface YamlValue {
-    lineNum: number;
-    value: string;
-}
-
 export interface ISRFile {
     get path(): string;
     get basename(): string;
-    getFrontmatter(): Promise<Map<string, YamlValue[]>>;
+    get tfile(): TFile;
+    getFrontmatter(): Promise<Map<string, string[]>>;
     getAllTags(): string[];
     getQuestionContext(cardLine: number): string[];
     read(): Promise<string>;
@@ -42,7 +38,11 @@ export class SrTFile implements ISRFile {
         return this.file.basename;
     }
 
-    async getFrontmatter(): Promise<Map<string, YamlValue[]>> {
+    get tfile(): TFile {
+        return this.file;
+    }
+
+    async getFrontmatter(): Promise<Map<string, string[]>> {
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
 
         const frontmatter: FrontMatterCache | Record<string, unknown> =

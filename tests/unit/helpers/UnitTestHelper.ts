@@ -1,5 +1,4 @@
 import { TagCache } from "obsidian";
-import { YamlValue } from "src/SRFile";
 import { splitNoteIntoFrontmatterAndContent, splitTextIntoLineArray } from "src/util/utils";
 
 export function unitTest_CreateTagCache(tag: string, lineNum: number): TagCache {
@@ -64,9 +63,9 @@ export function unitTest_GetAllTagsFromText(text: string): string[] {
     return result;
 }
 
-export function unitTest_BasicFrontmatterParser(text: string): Map<string, YamlValue[]> {
+export function unitTest_BasicFrontmatterParser(text: string): Map<string, string[]> {
     const [frontmatter, _] = splitNoteIntoFrontmatterAndContent(text);
-    const result = new Map<string, YamlValue[]>;
+    const result = new Map<string, string[]>;
 
     if (!frontmatter) return;
 
@@ -74,7 +73,7 @@ export function unitTest_BasicFrontmatterParser(text: string): Map<string, YamlV
     const dataRegex = /^(\s+)-\s+(.+)$/;
     const lines: string[] = splitTextIntoLineArray(frontmatter);
     let keyName: string = null;
-    let yamlValueList: YamlValue[] = [] as YamlValue[];
+    let valueList: string[] = [] as string[];
 
     for (let i = 0; i < lines.length; i++) {
         const line: string = lines[i];
@@ -83,13 +82,13 @@ export function unitTest_BasicFrontmatterParser(text: string): Map<string, YamlV
         const keyMatch: RegExpMatchArray = line.match(keyRegex);
         if (keyMatch) {
             if (keyName) {
-                result.set(keyName, yamlValueList);
+                result.set(keyName, valueList);
             }
             keyName = keyMatch.groups[0];
-            yamlValueList = [] as YamlValue[];
+            valueList = [] as string[];
             const value = keyMatch.groups[1].trim();
             if (value) {
-                yamlValueList.push({lineNum: i, value});
+                valueList.push(value);
             }
         } else {
             // Just a value, related to the last key
@@ -97,13 +96,13 @@ export function unitTest_BasicFrontmatterParser(text: string): Map<string, YamlV
             if (keyName && dataMatch) {
                 const value = keyMatch.groups[0].trim();
                 if (value) {
-                    yamlValueList.push({lineNum: i, value: value});
+                    valueList.push(value);
                 }
             }
         }
     }
     if (keyName) {
-        result.set(keyName, yamlValueList);
+        result.set(keyName, valueList);
     }
     return result;
 }

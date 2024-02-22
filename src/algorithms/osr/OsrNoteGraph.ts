@@ -81,6 +81,7 @@ export class OsrNoteGraph {
             settings.maxLinkFactor *
             Math.min(1.0, Math.log(totalLinkCount + 0.5) / Math.log(64));
 
+            return {linkTotal, linkPGTotal, totalLinkCount};
     }
 
     generatePageRanks() {
