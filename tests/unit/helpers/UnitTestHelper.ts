@@ -1,4 +1,5 @@
 import { TagCache } from "obsidian";
+import { YamlValue } from "src/SRFile";
 import { splitNoteIntoFrontmatterAndContent, splitTextIntoLineArray } from "src/util/utils";
 
 export function unitTest_CreateTagCache(tag: string, lineNum: number): TagCache {
@@ -60,5 +61,49 @@ export function unitTest_GetAllTagsFromText(text: string): string[] {
     const tagRegex = /#[^\s#]+/gi;
     const result: RegExpMatchArray = text.match(tagRegex);
     if (!result) return [];
+    return result;
+}
+
+export function unitTest_BasicFrontmatterParser(text: string): Map<string, YamlValue[]> {
+    const [frontmatter, _] = splitNoteIntoFrontmatterAndContent(text);
+    const result = new Map<string, YamlValue[]>;
+
+    if (!frontmatter) return;
+
+    const keyRegex = /^(\w+):(.*)$/;
+    const dataRegex = /^(\s+)-\s+(.+)$/;
+    const lines: string[] = splitTextIntoLineArray(frontmatter);
+    let keyName: string = null;
+    let yamlValueList: YamlValue[] = [] as YamlValue[];
+
+    for (let i = 0; i < lines.length; i++) {
+        const line: string = lines[i];
+
+        // Is there a key, and optional value?
+        const keyMatch: RegExpMatchArray = line.match(keyRegex);
+        if (keyMatch) {
+            if (keyName) {
+                result.set(keyName, yamlValueList);
+            }
+            keyName = keyMatch.groups[0];
+            yamlValueList = [] as YamlValue[];
+            const value = keyMatch.groups[1].trim();
+            if (value) {
+                yamlValueList.push({lineNum: i, value});
+            }
+        } else {
+            // Just a value, related to the last key
+            const dataMatch: RegExpMatchArray = line.match(dataRegex);
+            if (keyName && dataMatch) {
+                const value = keyMatch.groups[0].trim();
+                if (value) {
+                    yamlValueList.push({lineNum: i, value: value});
+                }
+            }
+        }
+    }
+    if (keyName) {
+        result.set(keyName, yamlValueList);
+    }
     return result;
 }

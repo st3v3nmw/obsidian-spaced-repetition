@@ -1,6 +1,7 @@
 import { TagCache } from "obsidian";
-import { ISRFile } from "src/SRFile";
-import { unitTest_GetAllTagsFromTextEx } from "./UnitTestHelper";
+import { ISRFile, YamlValue } from "src/SRFile";
+import { unitTest_BasicFrontmatterParser, unitTest_GetAllTagsFromTextEx } from "./UnitTestHelper";
+import { splitNoteIntoFrontmatterAndContent } from "src/util/utils";
 
 export class UnitTestSRFile implements ISRFile {
     content: string;
@@ -19,8 +20,12 @@ export class UnitTestSRFile implements ISRFile {
         return "";
     }
     
-    getFrontmatter(): Map<string, string> {
+    async getFrontmatter(): Promise<Map<string, YamlValue[]>> {
+        return unitTest_BasicFrontmatterParser(await this.read());
+    }
 
+    getAllTags(): string[] {
+        return this.getAllTagsFromText().map((item) => item.tag);
     }
     
     getAllTagsFromText(): TagCache[] {

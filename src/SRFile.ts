@@ -4,13 +4,19 @@ import {
     Vault,
     getAllTags as ObsidianGetAllTags,
     HeadingCache,
+    FrontMatterCache,
 } from "obsidian";
 import { getAllTagsFromText } from "./util/utils";
+
+export interface YamlValue {
+    lineNum: number;
+    value: string;
+}
 
 export interface ISRFile {
     get path(): string;
     get basename(): string;
-    getFrontmatter(): Map<string, string>;
+    getFrontmatter(): Promise<Map<string, YamlValue[]>>;
     getAllTags(): string[];
     getQuestionContext(cardLine: number): string[];
     read(): Promise<string>;
@@ -36,7 +42,7 @@ export class SrTFile implements ISRFile {
         return this.file.basename;
     }
 
-    getFrontmatter(): Map<string, string> {
+    async getFrontmatter(): Promise<Map<string, YamlValue[]>> {
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
 
         const frontmatter: FrontMatterCache | Record<string, unknown> =
