@@ -1,12 +1,12 @@
 import { NoteQuestionParser } from "src/NoteQuestionParser";
-import { CardScheduleInfo } from "src/CardSchedule";
 import { TICKS_PER_DAY } from "src/constants";
 import { CardType, Question } from "src/Question";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { TopicPath } from "src/TopicPath";
 import { createTest_NoteQuestionParser } from "./SampleItems";
-import { ISRFile, UnitTestSRFile } from "src/SRFile";
+import { ISRFile } from "src/SRFile";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
+import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
 
 let parserWithDefaultSettings: NoteQuestionParser = createTest_NoteQuestionParser(DEFAULT_SETTINGS);
 let settings_ConvertFoldersToDecks: SRSettings = { ...DEFAULT_SETTINGS };

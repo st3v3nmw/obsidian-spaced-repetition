@@ -8,6 +8,14 @@ export class DueDateHistogram {
     dueNotesCount: number;
     dueDatesNotes: Map<number, number> = new Map<number, number>;
 
+    constructor(rec: Record<number, number> = null) {
+        if (rec == null) return;
+        
+        Object.entries(rec).forEach(([key, value]) => {
+            this.dueDatesNotes.set(Number(key), value);
+        });
+    }
+
     init(): void {
         this.dueNotesCount = 0;
         this.dueDatesNotes = new Map<number, number>;
