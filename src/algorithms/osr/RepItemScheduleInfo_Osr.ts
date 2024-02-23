@@ -39,7 +39,6 @@ export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
             RepItemScheduleInfo_Osr.dummyDueDateForNewCard,
             RepItemScheduleInfo_Osr.initialInterval,
             settings.baseEase,
-            0,
         );
     }
 
@@ -56,7 +55,6 @@ export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
         dueDateStr: string,
         interval: number,
         ease: number,
-        delayBeforeReviewTicks: number,
     ) {
         const dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
         return new RepItemScheduleInfo_Osr(dueDate, interval, ease);

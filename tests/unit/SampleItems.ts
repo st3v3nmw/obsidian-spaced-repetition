@@ -6,8 +6,8 @@ import { NoteQuestionParser } from "src/NoteQuestionParser";
 import { CardType, Question } from "src/Question";
 import { CardFrontBack, CardFrontBackUtil } from "src/QuestionType";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
-import { UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
+import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
 
 export function createTest_NoteQuestionParser(settings: SRSettings): NoteQuestionParser {
     let questionParser: NoteQuestionParser = new NoteQuestionParser(settings);

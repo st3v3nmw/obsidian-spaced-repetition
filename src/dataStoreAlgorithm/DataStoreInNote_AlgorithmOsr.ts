@@ -1,4 +1,4 @@
-import { ISRFile, YamlValue } from "src/SRFile";
+import { ISRFile } from "src/SRFile";
 import { IDataStoreAlgorithm } from "./IDataStoreAlgorithm";
 import { RepItemScheduleInfo } from "src/algorithms/base/RepItemScheduleInfo";
 import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/RepItemScheduleInfo_Osr";
@@ -17,7 +17,7 @@ export class DataStoreInNote_AlgorithmOsr implements IDataStoreAlgorithm {
 
     async noteGetSchedule(note: ISRFile): Promise<RepItemScheduleInfo> {
         let result: RepItemScheduleInfo = null;
-        const frontmatter: Map<string, YamlValue[]> = note.getFrontmatter();
+        const frontmatter: Map<string, string[]> = await note.getFrontmatter();
 
         if (frontmatter.has("sr-due") && frontmatter.has("sr-interval") && frontmatter.has("sr-ease")) {
             const dueDate: Moment = moment(frontmatter.get("sr-due")[0], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"]);
