@@ -1,4 +1,3 @@
-import { CardScheduleCalculator } from "src/CardSchedule";
 import {
     CardOrder,
     DeckOrder,
@@ -16,8 +15,6 @@ import { TopicPath } from "src/TopicPath";
 import { CardListType, Deck, DeckTreeFilter } from "src/Deck";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { SampleItemDecks } from "./SampleItems";
-import { UnitTestSRFile } from "src/SRFile";
-import { ReviewResponse } from "src/algorithms/osr/NoteScheduling";
 import {
     setupStaticDateProvider,
     setupStaticDateProvider_20230906,
@@ -26,6 +23,10 @@ import {
 import moment from "moment";
 import { INoteEaseList, NoteEaseList } from "src/NoteEaseList";
 import { QuestionPostponementList, IQuestionPostponementList } from "src/QuestionPostponementList";
+import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
+import { ReviewResponse } from "src/algorithms/base/RepetitionItem";
+import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
+import { SrsAlgorithm } from "src/algorithms/base/SrsAlgorithm";
 
 let order_DueFirst_Sequential: IIteratorOrder = {
     cardOrder: CardOrder.DueFirstSequential,
@@ -43,7 +44,6 @@ class TestContext {
     iteratorOrder: IIteratorOrder;
     cardSequencer: IDeckTreeIterator;
     noteEaseList: INoteEaseList;
-    cardScheduleCalculator: CardScheduleCalculator;
     reviewSequencer: IFlashcardReviewSequencer;
     questionPostponementList: QuestionPostponementList;
     file: UnitTestSRFile;
@@ -65,7 +65,7 @@ class TestContext {
             this.reviewMode,
             cardSequencer,
             this.settings,
-            this.cardScheduleCalculator,
+            SrsAlgorithm.getInstance(),
             this.questionPostponementList,
         );
         setupStaticDateProvider_OriginDatePlusDays(daysAfterOrigin);
@@ -105,10 +105,7 @@ class TestContext {
             IteratorDeckSource.UpdatedByIterator,
         );
         let noteEaseList = new NoteEaseList(settings);
-        let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(
-            settings,
-            noteEaseList,
-        );
+        unitTestSetup_StandardDataStoreAlgorithm(settings, noteEaseList);
         let cardPostponementList: QuestionPostponementList = new QuestionPostponementList(
             null,
             settings,
@@ -118,7 +115,7 @@ class TestContext {
             reviewMode,
             cardSequencer,
             settings,
-            cardScheduleCalculator,
+            SrsAlgorithm.getInstance(),
             cardPostponementList,
         );
         var file: UnitTestSRFile = new UnitTestSRFile(text, fakeFilePath);
@@ -129,7 +126,6 @@ class TestContext {
             iteratorOrder,
             cardSequencer,
             noteEaseList,
-            cardScheduleCalculator,
             reviewSequencer,
             questionPostponementList: cardPostponementList,
             file,
@@ -171,7 +167,7 @@ async function checkReviewResponse_ReviewMode(
     let card = c.reviewSequencer.currentCard;
     expect(card.front).toEqual("Q2");
     expect(card.scheduleInfo).toMatchObject({
-        ease: 270,
+        latestEase: 270,
         interval: 4,
     });
 
@@ -180,7 +176,7 @@ async function checkReviewResponse_ReviewMode(
     expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
 
     // Schedule for the reviewed card has been updated
-    expect(card.scheduleInfo.ease).toEqual(info.cardQ2_PostReviewEase);
+    expect(card.scheduleInfo.latestEase).toEqual(info.cardQ2_PostReviewEase);
     expect(card.scheduleInfo.interval).toEqual(info.cardQ2_PostReviewInterval);
     expect(card.scheduleInfo.dueDate.unix).toEqual(moment(info.cardQ2_PostReviewDueDate).unix);
 
@@ -213,7 +209,7 @@ async function checkReviewResponse_CramMode(reviewResponse: ReviewResponse): Pro
     let card = c.reviewSequencer.currentCard;
     expect(card.front).toEqual("Q1");
     let expectInfo = {
-        ease: 270,
+        latestEase: 270,
         interval: 4,
     };
     expect(card.scheduleInfo).toMatchObject(expectInfo);
@@ -453,7 +449,7 @@ describe("processReview", () => {
                 let card = c.reviewSequencer.currentCard;
                 expect(card.front).toEqual("Q1");
                 expect(card.scheduleInfo).toMatchObject({
-                    ease: 270,
+                    latestEase: 270,
                     interval: 4,
                 });
 
@@ -463,7 +459,7 @@ describe("processReview", () => {
                 card = c.reviewSequencer.currentCard;
                 expect(card.front).toEqual("Q2");
                 expect(card.scheduleInfo).toMatchObject({
-                    ease: 270,
+                    latestEase: 270,
                     interval: 5,
                 });
 
@@ -471,7 +467,7 @@ describe("processReview", () => {
                 card = c.reviewSequencer.currentCard;
                 expect(card.front).toEqual("Q3");
                 expect(card.scheduleInfo).toMatchObject({
-                    ease: 270,
+                    latestEase: 270,
                     interval: 6,
                 });
 
@@ -480,7 +476,7 @@ describe("processReview", () => {
                 card = c.reviewSequencer.currentCard;
                 expect(card.front).toEqual("Q1");
                 expect(card.scheduleInfo).toMatchObject({
-                    ease: DEFAULT_SETTINGS.baseEase,
+                    latestEase: DEFAULT_SETTINGS.baseEase,
                     interval: 1,
                 });
             });

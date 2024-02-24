@@ -1,14 +1,21 @@
 import { NoteParser } from "src/NoteParser";
-import { UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
 import { Deck } from "src/Deck";
 import { Note } from "src/Note";
 import { Question } from "src/Question";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { NoteFileLoader } from "src/NoteFileLoader";
+import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
+import { NoteEaseList } from "src/NoteEaseList";
+import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
 
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 var noteFileLoader: NoteFileLoader = new NoteFileLoader(DEFAULT_SETTINGS);
+let noteEaseList: NoteEaseList = new NoteEaseList(DEFAULT_SETTINGS);
+
+beforeAll(() => {
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS, noteEaseList);
+});
 
 describe("appendCardsToDeck", () => {
     test("Multiple questions, single card per question", async () => {
