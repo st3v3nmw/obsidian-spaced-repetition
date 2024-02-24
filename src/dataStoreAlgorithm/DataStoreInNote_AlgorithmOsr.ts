@@ -4,8 +4,11 @@ import { RepItemScheduleInfo } from "src/algorithms/base/RepItemScheduleInfo";
 import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/RepItemScheduleInfo_Osr";
 import { Moment } from "moment";
 import moment from "moment";
-import { SCHEDULING_INFO_REGEX, YAML_FRONT_MATTER_REGEX } from "src/constants";
+import { SCHEDULING_INFO_REGEX, SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END, YAML_FRONT_MATTER_REGEX } from "src/constants";
 import { formatDate_YYYY_MM_DD } from "src/util/utils";
+import { Question } from "src/Question";
+import { Card } from "src/Card";
+import { SRSettings } from "src/settings";
 
 // 
 // Algorithm: The original OSR algorithm
@@ -14,7 +17,12 @@ import { formatDate_YYYY_MM_DD } from "src/util/utils";
 // Data Store: With data stored in the note's markdown file
 // 
 export class DataStoreInNote_AlgorithmOsr implements IDataStoreAlgorithm {
+    private settings: SRSettings;
 
+    constructor(settings: SRSettings) {
+        this.settings = settings;
+    }
+    
     async noteGetSchedule(note: ISRFile): Promise<RepItemScheduleInfo> {
         let result: RepItemScheduleInfo = null;
         const frontmatter: Map<string, string[]> = await note.getFrontmatter();
@@ -60,4 +68,26 @@ export class DataStoreInNote_AlgorithmOsr implements IDataStoreAlgorithm {
                 `sr-ease: ${ease}\n---\n\n${fileText}`;
         }
     }
+
+    questionFormatScheduleAsHtmlComment(question: Question): string {
+        let result: string = SR_HTML_COMMENT_BEGIN;
+
+        for (let i = 0; i < question.cards.length; i++) {
+            const card: Card = question.cards[i];
+            result += this.formatCardSchedule(card);
+        }
+        result += SR_HTML_COMMENT_END;
+        return result;
+    }
+
+    formatCardSchedule(card: Card) {
+        let result: string;
+        if (card.hasSchedule) {
+            const schedule = card.scheduleInfo as RepItemScheduleInfo_Osr;
+            result = `!${formatDate_YYYY_MM_DD(schedule.dueDate)},${schedule.interval},${schedule.latestEase}`;
+        } else {
+            result = `!${RepItemScheduleInfo_Osr.dummyDueDateForNewCard},${RepItemScheduleInfo_Osr.initialInterval},${this.settings.baseEase}`;
+        }
+    }
+
 }

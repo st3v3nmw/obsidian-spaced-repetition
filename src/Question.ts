@@ -6,6 +6,7 @@ import {
     SR_HTML_COMMENT_END,
 } from "./constants";
 import { DataStore } from "./dataStore/base/DataStore";
+import { DataStoreAlgorithm } from "./dataStoreAlgorithm/DataStoreAlgorithm";
 import { Note } from "./Note";
 import { SRSettings } from "./settings";
 import { TopicPath, TopicPathWithWs } from "./TopicPath";
@@ -215,7 +216,7 @@ export class Question {
         const hasSchedule: boolean = this.cards.some((card) => card.hasSchedule);
         if (hasSchedule) {
             result = result.trimEnd();
-            const scheduleHtml = DataStore.getInstance().questionFormatScheduleAsHtmlComment(this);
+            const scheduleHtml = DataStoreAlgorithm.getInstance().questionFormatScheduleAsHtmlComment(this);
             if (blockId) {
                 if (this.isCardCommentsOnSameLine(settings))
                     result += ` ${scheduleHtml} ${blockId}`;

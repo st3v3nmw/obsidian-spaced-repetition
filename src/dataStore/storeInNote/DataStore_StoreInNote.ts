@@ -54,17 +54,6 @@ export class DataStore_StoreInNote implements IDataStore {
     
     }
 
-    questionFormatScheduleAsHtmlComment(question: Question): string {
-        let result: string = SR_HTML_COMMENT_BEGIN;
-
-        for (let i = 0; i < question.cards.length; i++) {
-            const card: Card = question.cards[i];
-            result += card.scheduleInfo.formatCardScheduleForHtmlComment();
-        }
-        result += SR_HTML_COMMENT_END;
-        return result;
-    }
-
     questionRemoveScheduleInfo(questionText: string): string {
         return questionText.replace(/<!--SR:.+-->/gm, "");
     }

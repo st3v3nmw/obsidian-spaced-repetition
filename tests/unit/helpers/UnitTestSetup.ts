@@ -10,5 +10,5 @@ import { SRSettings } from "src/settings";
 export function unitTestSetup_StandardDataStoreAlgorithm(settings: SRSettings, noteEaseList: INoteEaseList) {
     DataStore.instance = new DataStore_StoreInNote(settings);
     SrsAlgorithm.instance = new SrsAlgorithm_Osr(settings, noteEaseList);
-    DataStoreAlgorithm.instance = new DataStoreInNote_AlgorithmOsr();
+    DataStoreAlgorithm.instance = new DataStoreInNote_AlgorithmOsr(settings);
 }

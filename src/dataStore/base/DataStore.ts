@@ -8,7 +8,6 @@ export interface IDataStore {
     // noteStore: INoteStore;
     questionCreateSchedule(originalQuestionText: string, storageInfo: RepItemStorageInfo): RepItemScheduleInfo[];
     questionRemoveScheduleInfo(questionText: string): string;
-    questionFormatScheduleAsHtmlComment(question: Question): string;
     questionWrite(question: Question): Promise<void>;
     questionWriteSchedule(question: Question): Promise<void>;
 }

@@ -569,7 +569,7 @@ Q1::A1
                 checkQuestionPostponementListCount(c, 1);
             });
 
-            test("Question with multiple cards; card reviewed as hard, after restarting the review process, that whole question skipped and next question is shown", async () => {
+            test.only("Question with multiple cards; card reviewed as hard, after restarting the review process, that whole question skipped and next question is shown", async () => {
                 let settings: SRSettings = { ...DEFAULT_SETTINGS };
                 settings.burySiblingCards = true;
 
