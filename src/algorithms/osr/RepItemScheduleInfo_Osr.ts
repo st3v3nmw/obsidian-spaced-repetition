@@ -16,7 +16,7 @@ export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
     constructor(dueDate: Moment, interval: number, latestEase: number, delayedBeforeReviewTicks: number | null = null) {
         super();
         this.dueDate = dueDate;
-        this.interval = interval;
+        this.interval = Math.round(interval);
         this.latestEase = latestEase;
         this.delayedBeforeReviewTicks = delayedBeforeReviewTicks;
         if (dueDate && delayedBeforeReviewTicks == null) {

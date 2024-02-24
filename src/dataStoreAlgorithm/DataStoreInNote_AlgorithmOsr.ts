@@ -84,10 +84,12 @@ export class DataStoreInNote_AlgorithmOsr implements IDataStoreAlgorithm {
         let result: string;
         if (card.hasSchedule) {
             const schedule = card.scheduleInfo as RepItemScheduleInfo_Osr;
-            result = `!${formatDate_YYYY_MM_DD(schedule.dueDate)},${schedule.interval},${schedule.latestEase}`;
+            const dateStr = schedule.dueDate ? formatDate_YYYY_MM_DD(schedule.dueDate) : RepItemScheduleInfo_Osr.dummyDueDateForNewCard;
+            result = `!${dateStr},${schedule.interval},${schedule.latestEase}`;
         } else {
             result = `!${RepItemScheduleInfo_Osr.dummyDueDateForNewCard},${RepItemScheduleInfo_Osr.initialInterval},${this.settings.baseEase}`;
         }
+        return result;
     }
 
 }

@@ -2,6 +2,15 @@ import { CardListType, Deck } from "src/Deck";
 import { TopicPath } from "src/TopicPath";
 import { SampleItemDecks } from "./SampleItems";
 import { Card } from "src/Card";
+import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
+import { NoteEaseList } from "src/NoteEaseList";
+import { DEFAULT_SETTINGS } from "src/settings";
+
+let noteEaseList: NoteEaseList = new NoteEaseList(DEFAULT_SETTINGS);
+
+beforeAll(() => {
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS, noteEaseList);
+});
 
 describe("constructor", () => {
     test("Deck name", () => {
