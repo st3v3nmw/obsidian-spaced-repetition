@@ -35,19 +35,21 @@ export class DataStore_StoreInNote implements IDataStore {
                 const dueDateStr = match[1];
                 const interval = parseInt(match[2]);
                 const ease = parseInt(match[3]);
-                let dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
+                const dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
+                let info: RepItemScheduleInfo;
                 if (formatDate_YYYY_MM_DD(dueDate) == RepItemScheduleInfo_Osr.dummyDueDateForNewCard) {
-                    dueDate = null;
+                    info = null;
+                } else {
+                    const delayBeforeReviewTicks: number = (dueDate != null) ? 
+                        dueDate.valueOf() - globalDateProvider.today.valueOf() : null;
+        
+                    info = new RepItemScheduleInfo_Osr(
+                        dueDate,
+                        interval,
+                        ease,
+                        delayBeforeReviewTicks,
+                    );
                 }
-                const delayBeforeReviewTicks: number = (dueDate != null) ? 
-                    dueDate.valueOf() - globalDateProvider.today.valueOf() : null;
-    
-                const info: RepItemScheduleInfo = new RepItemScheduleInfo_Osr(
-                    dueDate,
-                    interval,
-                    ease,
-                    delayBeforeReviewTicks,
-                );
                 result.push(info);
             }
             return result;

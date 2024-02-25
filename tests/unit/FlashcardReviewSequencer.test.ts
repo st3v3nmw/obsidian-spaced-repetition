@@ -100,28 +100,29 @@ class TestContext {
         text: string,
         fakeFilePath?: string,
     ): TestContext {
+        const settingsClone: SRSettings = {...settings};
         let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(
             iteratorOrder,
             IteratorDeckSource.UpdatedByIterator,
         );
-        let noteEaseList = new NoteEaseList(settings);
-        unitTestSetup_StandardDataStoreAlgorithm(settings, noteEaseList);
+        let noteEaseList = new NoteEaseList(settingsClone);
+        unitTestSetup_StandardDataStoreAlgorithm(settingsClone, noteEaseList);
         let cardPostponementList: QuestionPostponementList = new QuestionPostponementList(
             null,
-            settings,
+            settingsClone,
             [],
         );
         let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(
             reviewMode,
             cardSequencer,
-            settings,
+            settingsClone,
             SrsAlgorithm.getInstance(),
             cardPostponementList,
         );
         var file: UnitTestSRFile = new UnitTestSRFile(text, fakeFilePath);
 
         let result: TestContext = new TestContext({
-            settings,
+            settings: settingsClone,
             reviewMode,
             iteratorOrder,
             cardSequencer,

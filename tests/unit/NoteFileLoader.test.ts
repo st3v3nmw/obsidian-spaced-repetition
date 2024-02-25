@@ -3,8 +3,15 @@ import { NoteFileLoader } from "src/NoteFileLoader";
 import { TopicPath } from "src/TopicPath";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
+import { NoteEaseList } from "src/NoteEaseList";
+import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
 
 var noteFileLoader: NoteFileLoader = new NoteFileLoader(DEFAULT_SETTINGS);
+let noteEaseList: NoteEaseList = new NoteEaseList(DEFAULT_SETTINGS);
+
+beforeAll(() => {
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS, noteEaseList);
+});
 
 describe("load", () => {
     test("Multiple questions, none with too many schedule details", async () => {

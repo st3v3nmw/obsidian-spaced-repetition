@@ -55,9 +55,10 @@ export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
         dueDateStr: string,
         interval: number,
         ease: number,
+        delayedBeforeReviewTicks: number | null = null
     ) {
         const dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
-        return new RepItemScheduleInfo_Osr(dueDate, interval, ease);
+        return new RepItemScheduleInfo_Osr(dueDate, interval, ease, delayedBeforeReviewTicks);
     }
 
 }
