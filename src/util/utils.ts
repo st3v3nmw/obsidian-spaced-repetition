@@ -153,3 +153,7 @@ export function findLineIndexOfSearchStringIgnoringWs(
     }
     return result;
 }
+
+export function isSupportedFileType(path: string): boolean {
+    return path.split(".").pop().toLowerCase() === "md";
+}

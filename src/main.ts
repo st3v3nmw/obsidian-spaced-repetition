@@ -32,7 +32,7 @@ import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 import { QuestionPostponementList } from "./QuestionPostponementList";
 import { ReviewResponse } from "./algorithms/base/RepetitionItem";
 import { SrsAlgorithm } from "./algorithms/base/SrsAlgorithm";
-import { OsrNoteGraph } from "./algorithms/osr/OsrNoteGraph";
+import { ObsidianVaultNoteLinkInfoFinder, OsrNoteGraph } from "./algorithms/osr/OsrNoteGraph";
 import { DataStore } from "./dataStore/base/DataStore";
 import { RepItemScheduleInfo } from "./algorithms/base/RepItemScheduleInfo";
 import { DataStoreAlgorithm } from "./dataStoreAlgorithm/DataStoreAlgorithm";
@@ -72,7 +72,7 @@ export default class SRPlugin extends Plugin {
     public cardStats: Stats;
 
     async onload(): Promise<void> {
-        // console.log("onload: Branch: bug-495-multiple-deck-tags-ignored, Date: 2024-02-14");
+        console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-02-28");
         await this.loadPluginData();
         this.noteReviewQueue = new NoteReviewQueue();
         this.questionPostponementList = new QuestionPostponementList(
@@ -328,7 +328,7 @@ export default class SRPlugin extends Plugin {
         this.syncLock = true;
 
         // reset notes stuff
-        this.osrNoteGraph = new OsrNoteGraph(this.app.metadataCache);
+        this.osrNoteGraph = new OsrNoteGraph(new ObsidianVaultNoteLinkInfoFinder(this.app.metadataCache));
         this.noteReviewQueue.init();
 
         // reset flashcards stuff

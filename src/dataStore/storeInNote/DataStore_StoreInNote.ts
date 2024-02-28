@@ -1,5 +1,4 @@
 import { RepItemScheduleInfo } from "src/algorithms/base/RepItemScheduleInfo";
-import { INoteStore } from "../base/NoteStore";
 import { RepItemStorageInfo } from "../base/RepItemStorageInfo";
 import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR, SCHEDULING_INFO_REGEX, SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END, YAML_FRONT_MATTER_REGEX } from "src/constants";
 import { Moment } from "moment";
@@ -37,11 +36,10 @@ export class DataStore_StoreInNote implements IDataStore {
                 const ease = parseInt(match[3]);
                 const dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
                 let info: RepItemScheduleInfo;
-                if (formatDate_YYYY_MM_DD(dueDate) == RepItemScheduleInfo_Osr.dummyDueDateForNewCard) {
+                if ((dueDate == null) || (formatDate_YYYY_MM_DD(dueDate) == RepItemScheduleInfo_Osr.dummyDueDateForNewCard)) {
                     info = null;
                 } else {
-                    const delayBeforeReviewTicks: number = (dueDate != null) ? 
-                        dueDate.valueOf() - globalDateProvider.today.valueOf() : null;
+                    const delayBeforeReviewTicks: number = dueDate.valueOf() - globalDateProvider.today.valueOf();
         
                     info = new RepItemScheduleInfo_Osr(
                         dueDate,

@@ -11,6 +11,9 @@ module.exports = {
     roots: ["<rootDir>/src/", "<rootDir>/tests/unit/"],
     collectCoverageFrom: [
         "src/**/lang/*.ts",
+        "src/algorithms/**/*.ts",
+        "src/dataStore/**/*.ts",
+        "src/dataStoreAlgorithm/**/*.ts",
         "src/NoteEaseList.ts",
         "src/NoteFileLoader.ts",
         "src/NoteParser.ts",
@@ -22,6 +25,11 @@ module.exports = {
     ],
     coveragePathIgnorePatterns: [
         "/node_modules/",
+        "src/algorithms/base/ISrsAlgorithm", 
+        "src/algorithms/base/RepItemScheduleInfo", 
+        "src/algorithms/base/SrsAlgorithm", 
+        "src/dataStoreAlgorithm/DataStoreAlgorithm", 
+        "src/dataStoreAlgorithm/IDataStoreAlgorithm", 
         "src/lang/locale/",
         "src/constants",
         "src/icons",
