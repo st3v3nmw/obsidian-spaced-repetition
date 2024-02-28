@@ -45,9 +45,12 @@ export class SrTFile implements ISRFile {
     async getFrontmatter(): Promise<Map<string, string[]>> {
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
 
-        const frontmatter: FrontMatterCache | Record<string, unknown> =
-            fileCachedData.frontmatter || {};
-        return null;
+        const frontmatter: FrontMatterCache = fileCachedData.frontmatter || {};
+        const result: Map<string, string[]> = new Map<string, string[]>;
+        for (const [key, value] of Object.entries(frontmatter) as [string, string[]][]) {
+            result.set(key, value);
+        }
+        return result;
     }
 
     getAllTags(): string[] {

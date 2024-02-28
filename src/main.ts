@@ -37,47 +37,27 @@ import { DataStore } from "./dataStore/base/DataStore";
 import { RepItemScheduleInfo } from "./algorithms/base/RepItemScheduleInfo";
 import { DataStoreAlgorithm } from "./dataStoreAlgorithm/DataStoreAlgorithm";
 import { NoteReviewQueue } from "./NoteReviewQueue";
+import { DataStoreInNote_AlgorithmOsr } from "./dataStoreAlgorithm/DataStoreInNote_AlgorithmOsr";
+import { DataStore_StoreInNote } from "./dataStore/storeInNote/DataStore_StoreInNote";
+import { SrsAlgorithm_Osr } from "./algorithms/osr/SrsAlgorithm_Osr";
+import { NoteEaseList } from "./NoteEaseList";
+import { OsrVaultData } from "./OsrVaultData";
+import { DEFAULT_DATA, PluginData } from "./PluginData";
 
-interface PluginData {
-    settings: SRSettings;
-    buryDate: string;
-    // hashes of card texts
-    // should work as long as user doesn't modify card's text
-    // which covers most of the cases
-    buryList: string[];
-    historyDeck: string | null;
-}
 
-const DEFAULT_DATA: PluginData = {
-    settings: DEFAULT_SETTINGS,
-    buryDate: "",
-    buryList: [],
-    historyDeck: null,
-};
 
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     private reviewQueueView: ReviewQueueListView;
     public data: PluginData;
-    public syncLock = false;
+    private osrVaultData: OsrVaultData;
 
-
-    // public easeByPath: NoteEaseList;
-    private questionPostponementList: QuestionPostponementList;
-    private osrNoteGraph: OsrNoteGraph;
-    private noteReviewQueue: NoteReviewQueue;
-
-    public deckTree: Deck = new Deck("root", null);
-    private remainingDeckTree: Deck;
-    public cardStats: Stats;
 
     async onload(): Promise<void> {
         console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-02-28");
         await this.loadPluginData();
-        this.noteReviewQueue = new NoteReviewQueue();
-        this.questionPostponementList = new QuestionPostponementList(
-            this,
-            this.data.settings,
+        this.osrVaultData = new OsrVaultData();
+        this.osrVaultData.init(this, this.data.settings,
             this.data.buryList,
         );
 
@@ -88,18 +68,18 @@ export default class SRPlugin extends Plugin {
         this.statusBar.setAttribute("aria-label", t("OPEN_NOTE_FOR_REVIEW"));
         this.statusBar.setAttribute("aria-label-position", "top");
         this.statusBar.addEventListener("click", async () => {
-            if (!this.syncLock) {
+            if (!this.osrVaultData.syncLock) {
                 await this.sync();
-                this.noteReviewQueue.reviewNextNoteModal();
+                this.osrVaultData.noteReviewQueue.reviewNextNoteModal();
             }
         });
 
         this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
-            if (!this.syncLock) {
+            if (!this.osrVaultData.syncLock) {
                 await this.sync();
                 this.openFlashcardModal(
-                    this.deckTree,
-                    this.remainingDeckTree,
+                    this.osrVaultData.deckTree,
+                    this.osrVaultData.remainingDeckTree,
                     FlashcardReviewMode.Review,
                 );
             }
@@ -153,9 +133,9 @@ export default class SRPlugin extends Plugin {
             id: "srs-note-review-open-note",
             name: t("OPEN_NOTE_FOR_REVIEW"),
             callback: async () => {
-                if (!this.syncLock) {
+                if (!this.osrVaultData.syncLock) {
                     await this.sync();
-                    this.noteReviewQueue.reviewNextNoteModal();
+                    this.osrVaultData.noteReviewQueue.reviewNextNoteModal();
                 }
             },
         });
@@ -203,11 +183,11 @@ export default class SRPlugin extends Plugin {
             id: "srs-review-flashcards",
             name: t("REVIEW_ALL_CARDS"),
             callback: async () => {
-                if (!this.syncLock) {
+                if (!this.osrVaultData.syncLock) {
                     await this.sync();
                     this.openFlashcardModal(
-                        this.deckTree,
-                        this.remainingDeckTree,
+                        this.osrVaultData.deckTree,
+                        this.osrVaultData.remainingDeckTree,
                         FlashcardReviewMode.Review,
                     );
                 }
@@ -219,7 +199,7 @@ export default class SRPlugin extends Plugin {
             name: t("CRAM_ALL_CARDS"),
             callback: async () => {
                 await this.sync();
-                this.openFlashcardModal(this.deckTree, this.deckTree, FlashcardReviewMode.Cram);
+                this.openFlashcardModal(this.osrVaultData.deckTree, this.osrVaultData.deckTree, FlashcardReviewMode.Cram);
             },
         });
 
@@ -249,7 +229,7 @@ export default class SRPlugin extends Plugin {
             id: "srs-view-stats",
             name: t("VIEW_STATS"),
             callback: async () => {
-                if (!this.syncLock) {
+                if (!this.osrVaultData.syncLock) {
                     await this.sync();
                     new StatsModal(this.app, this).open();
                 }
@@ -261,7 +241,7 @@ export default class SRPlugin extends Plugin {
         this.app.workspace.onLayoutReady(() => {
             this.initView();
             setTimeout(async () => {
-                if (!this.syncLock) {
+                if (!this.osrVaultData.syncLock) {
                     await this.sync();
                 }
             }, 2000);
@@ -282,7 +262,7 @@ export default class SRPlugin extends Plugin {
         const deckTree = new Deck("root", null);
         note.appendCardsToDeck(deckTree);
         const remainingDeckTree = DeckTreeFilter.filterForRemainingCards(
-            this.questionPostponementList,
+            this.osrVaultData.questionPostponementList,
             deckTree,
             reviewMode,
         );
@@ -322,30 +302,24 @@ export default class SRPlugin extends Plugin {
     }
 
     async sync(): Promise<void> {
-        if (this.syncLock) {
+        if (this.osrVaultData.syncLock) {
             return;
         }
-        this.syncLock = true;
 
-        // reset notes stuff
-        this.osrNoteGraph = new OsrNoteGraph(new ObsidianVaultNoteLinkInfoFinder(this.app.metadataCache));
-        this.noteReviewQueue.init();
-
-        // reset flashcards stuff
-        const fullDeckTree = new Deck("root", null);
-
+        if (this.osrVaultData.clearPostponementListIfNewDay(this.data)) {
+            // The following isn't needed for plug-in functionality; but can aid during debugging
+            await this.savePluginData();
+        }
         const now = window.moment(Date.now());
-        const todayDate: string = now.format("YYYY-MM-DD");
+/*         const todayDate: string = now.format("YYYY-MM-DD");
         // clear bury list if we've changed dates
         if (todayDate !== this.data.buryDate) {
             this.data.buryDate = todayDate;
             this.questionPostponementList.clear();
 
-            // The following isn't needed for plug-in functionality; but can aid during debugging
-            await this.savePluginData();
-        }
+        } */
 
-        const notes: TFile[] = this.app.vault.getMarkdownFiles();
+        /* const notes: TFile[] = this.app.vault.getMarkdownFiles();
         for (const noteFile of notes) {
             if (SettingsUtil.isPathInNoteIgnoreFolder(this.data.settings, noteFile.path)) {
                 continue;
@@ -391,11 +365,11 @@ export default class SRPlugin extends Plugin {
             FlashcardReviewMode.Review,
         );
         const calc: DeckTreeStatsCalculator = new DeckTreeStatsCalculator();
-        this.cardStats = calc.calculate(this.deckTree);
+        this.cardStats = calc.calculate(this.deckTree); */
 
         if (this.data.settings.showDebugMessages) {
             // TODO: console.log(`SR: ${t("EASES")}`, this.easeByPath.dict);
-            console.log(`SR: ${t("DECKS")}`, this.deckTree);
+            console.log(`SR: ${t("DECKS")}`, this.osrVaultData.deckTree);
         }
 
         if (this.data.settings.showDebugMessages) {
@@ -406,10 +380,6 @@ export default class SRPlugin extends Plugin {
                     }),
             );
         }
-
-        this.updateAndSortDueNotes();
-
-        this.syncLock = false;
     }
 
     private updateAndSortDueNotes() {
@@ -417,8 +387,8 @@ export default class SRPlugin extends Plugin {
 
         this.statusBar.setText(
             t("STATUS_BAR", {
-                dueNotesCount: this.noteReviewQueue.dueNotesCount,
-                dueFlashcardsCount: this.remainingDeckTree.getCardCount(CardListType.All, true),
+                dueNotesCount: this.osrVaultData.noteReviewQueue.dueNotesCount,
+                dueFlashcardsCount: this.osrVaultData.remainingDeckTree.getCardCount(CardListType.All, true),
             }),
         );
 
@@ -485,6 +455,15 @@ export default class SRPlugin extends Plugin {
         if (loadedData?.settings) upgradeSettings(loadedData.settings);
         this.data = Object.assign({}, DEFAULT_DATA, loadedData);
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
+
+        this.setupDataStoreAndAlgorithmInstances();
+    }
+
+    setupDataStoreAndAlgorithmInstances(): void {
+        const settings: SRSettings = this.data.settings;
+        DataStore.instance = new DataStore_StoreInNote(settings);
+        DataStoreAlgorithm.instance = new DataStoreInNote_AlgorithmOsr(settings);
+        SrsAlgorithm.instance = new SrsAlgorithm_Osr(settings, this.osrVaultData.easeByPath);
     }
 
     async savePluginData(): Promise<void> {
