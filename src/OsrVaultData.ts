@@ -1,4 +1,4 @@
-import { App, TFile } from "obsidian";
+import { App, TFile, Vault } from "obsidian";
 import { Deck, DeckTreeFilter } from "./Deck";
 import { NoteEaseList } from "./NoteEaseList";
 import { NoteReviewQueue } from "./NoteReviewQueue";
@@ -27,10 +27,12 @@ export interface IOsrVaultEvents {
 export class OsrVaultData {
     private app: App;
     private settings: SRSettings;
+    // private vaultEvents: IOsrVaultEvents;
+    private dataChangedHandler: () => void;
+    private osrNoteGraph: OsrNoteGraph;
     private _syncLock = false;
     private _easeByPath: NoteEaseList;
     private _questionPostponementList: QuestionPostponementList;
-    private osrNoteGraph: OsrNoteGraph;
     private _noteReviewQueue: NoteReviewQueue;
 
     private fullDeckTree: Deck;
@@ -66,7 +68,11 @@ export class OsrVaultData {
         return this._cardStats;
     }
 
-    init(plugin: SRPlugin, settings: SRSettings, buryList: string[]): void {
+    init(plugin: SRPlugin, settings: SRSettings, buryList: string[], /* vaultEvents: IOsrVaultEvents, */ dataChangedHandler: () => void): void {
+        this.app = plugin.app;
+        this.settings = settings;
+        // this.vaultEvents = vaultEvents;
+        this.dataChangedHandler = dataChangedHandler;
         this._noteReviewQueue = new NoteReviewQueue();
         this._questionPostponementList = new QuestionPostponementList(
             plugin,
@@ -89,18 +95,16 @@ export class OsrVaultData {
         return newDay;      
     }
     
-    async sync(app: App, settings: SRSettings): Promise<void> {
+    async loadVault(): Promise<void> {
         if (this._syncLock) {
             return;
         }
         this._syncLock = true;
-        this.app = app;
-        this.settings = settings;
 
         try {
             const notes: TFile[] = app.vault.getMarkdownFiles();
             for (const noteFile of notes) {
-                if (SettingsUtil.isPathInNoteIgnoreFolder(settings, noteFile.path)) {
+                if (SettingsUtil.isPathInNoteIgnoreFolder(this.settings, noteFile.path)) {
                     continue;
                 }
     
@@ -167,25 +171,46 @@ export class OsrVaultData {
         const calc: DeckTreeStatsCalculator = new DeckTreeStatsCalculator();
         this._cardStats = calc.calculate(this._reviewableDeckTree);
 
-        this.updateAndSortDueNotes();
+        // Generate the note review queue
+        this.noteReviewQueue.determineScheduleInfo(this.osrNoteGraph);
+
+        // Tell the interested party that the data has changed
+        if (this.dataChangedHandler) this.dataChangedHandler();
     }
 
-    async saveNoteReviewResponse(noteFile: ISRFile, response: ReviewResponse, settings: SRSettings, buryList: string[]): Promise<boolean> {
+    async saveNoteReviewResponse(noteFile: ISRFile, response: ReviewResponse, settings: SRSettings, buryList: string[]): Promise<void> {
+
+        // Get the current schedule for the note
         const noteSchedule: RepItemScheduleInfo = await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
+
+        // Calculate the updated schedule
         const updatedNoteSchedule: RepItemScheduleInfo = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(noteFile.path, noteSchedule, response);
+
+        // Store away the new schedule info
         await DataStoreAlgorithm.getInstance().noteSetSchedule(noteFile, updatedNoteSchedule);
 
-        // Common
-        let result: boolean = false;
+        // Generate the note review queue
+        this.noteReviewQueue.determineScheduleInfo(this.osrNoteGraph);
+
+        // If configured in the settings, bury all cards within the note
+        await this.buryAllCardsInNote(settings, noteFile);
+
+        // Tell the interested party that the data has changed
+        if (this.dataChangedHandler) this.dataChangedHandler();
+    }
+
+    private async buryAllCardsInNote(settings: SRSettings, noteFile: ISRFile): Promise<void> {
         if (settings.burySiblingCards) {
             const topicPath: TopicPath = this.findTopicPath(noteFile);
             const noteX: Note = await this.loadNote(noteFile, topicPath);
-            for (const question of noteX.questionList) {
-                buryList.push(question.questionText.textHash);
+
+            if (noteX.questionList.length > 0) {
+                for (const question of noteX.questionList) {
+                    this._questionPostponementList.add(question);
+                }
+                await this._questionPostponementList.write();
             }
-            result = true;
         }
-        return result;
     }
 
     async loadNote(noteFile: ISRFile, topicPath: TopicPath): Promise<Note> {

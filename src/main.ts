@@ -59,6 +59,7 @@ export default class SRPlugin extends Plugin {
         this.osrVaultData = new OsrVaultData();
         this.osrVaultData.init(this, this.data.settings,
             this.data.buryList,
+            this.onOsrVaultDataChanged.bind(this),
         );
 
         appIcon();
@@ -307,13 +308,11 @@ export default class SRPlugin extends Plugin {
             return;
         }
 
-        if (this.osrVaultData.questionPostponementList.clearIfNewDay(this.data)) {
-            // The following isn't needed for plug-in functionality; but can aid during debugging
-            await this.savePluginData();
-        }
+        this.osrVaultData.questionPostponementList.clearIfNewDay(this.data);
+
         const now = window.moment(Date.now());
 
-        this.osrVaultData.sync(this.app, this.data.settings);
+        this.osrVaultData.loadVault();
 
         if (this.data.settings.showDebugMessages) {
             // TODO: console.log(`SR: ${t("EASES")}`, this.easeByPath.dict);
@@ -327,9 +326,7 @@ export default class SRPlugin extends Plugin {
         }
     }
 
-    private updateAndSortDueNotes() {
-        this.noteReviewQueue.determineScheduleInfo(this.osrNoteGraph);
-
+    private onOsrVaultDataChanged() {
         this.statusBar.setText(
             t("STATUS_BAR", {
                 dueNotesCount: this.osrVaultData.noteReviewQueue.dueNotesCount,
@@ -356,21 +353,10 @@ export default class SRPlugin extends Plugin {
         }
 
         // 
-        const buryListChanged: boolean = await this.osrVaultData.saveNoteReviewResponse(noteSrTFile, response, this.data.settings, this.data.buryList);
-        if (buryListChanged) {
-            await this.savePluginData();
-        }
-
-        // Update note's properties to update our due notes.
-        // Algorithm
-        this.noteReviewQueue.updateScheduleInfo(noteSrTFile, updatedNoteSchedule);
-
-        this.updateAndSortDueNotes();
+        await this.osrVaultData.saveNoteReviewResponse(noteSrTFile, response, this.data.settings, this.data.buryList);
 
         new Notice(t("RESPONSE_RECEIVED"));
     }
-
-    private onOsrVault
 
     createSrTFile(note: TFile): SrTFile {
         return new SrTFile(this.app.vault, this.app.metadataCache, note);
@@ -389,6 +375,10 @@ export default class SRPlugin extends Plugin {
         this.setupDataStoreAndAlgorithmInstances();
     }
 
+    async savePluginData(): Promise<void> {
+        await this.saveData(this.data);
+    }
+
     setupDataStoreAndAlgorithmInstances(): void {
         const settings: SRSettings = this.data.settings;
         DataStore.instance = new DataStore_StoreInNote(settings);
@@ -396,14 +386,10 @@ export default class SRPlugin extends Plugin {
         SrsAlgorithm.instance = new SrsAlgorithm_Osr(settings, this.osrVaultData.easeByPath);
     }
 
-    async savePluginData(): Promise<void> {
-        await this.saveData(this.data);
-    }
-
     initView(): void {
         this.registerView(
             REVIEW_QUEUE_VIEW_TYPE,
-            (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this.app, this.noteReviewQueue, this.data.settings)),
+            (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this.app, this.osrVaultData.noteReviewQueue, this.data.settings)),
         );
 
         if (
