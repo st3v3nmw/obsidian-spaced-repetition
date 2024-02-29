@@ -17,6 +17,12 @@ import { FlashcardReviewMode } from "./FlashcardReviewSequencer";
 import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 import { t } from "./lang/helpers";
 import SRPlugin from "./main";
+import { NoteFileLoader } from "./NoteFileLoader";
+import { ReviewResponse } from "./algorithms/base/RepetitionItem";
+
+export interface IOsrVaultEvents {
+    dataChanged: () => void;
+}
 
 export class OsrVaultData {
     private app: App;
@@ -28,9 +34,9 @@ export class OsrVaultData {
     private _noteReviewQueue: NoteReviewQueue;
 
     private fullDeckTree: Deck;
-    private _deckTree: Deck = new Deck("root", null);
+    private _reviewableDeckTree: Deck = new Deck("root", null);
     private _remainingDeckTree: Deck;
-    public cardStats: Stats;
+    private _cardStats: Stats;
 
     get syncLock(): boolean {
         return 
@@ -44,8 +50,8 @@ export class OsrVaultData {
         return this._remainingDeckTree;
     }
 
-    get deckTree(): Deck {
-        return this._deckTree;
+    get reviewableDeckTree(): Deck {
+        return this._reviewableDeckTree;
     }
 
     get questionPostponementList(): QuestionPostponementList {
@@ -54,6 +60,10 @@ export class OsrVaultData {
 
     get easeByPath(): NoteEaseList {
         return this._easeByPath;
+    }
+
+    get cardStats(): Stats {
+        return this._cardStats;
     }
 
     init(plugin: SRPlugin, settings: SRSettings, buryList: string[]): void {
@@ -116,52 +126,77 @@ export class OsrVaultData {
     
     private async processFile(noteFile: ISRFile): Promise<void> {
 
+        // Does the note contain any tags that are specified as flashcard tags in the settings
+        // (Doing this check first saves us from loading and parsing the note if not necessary)
+        const topicPath: TopicPath = this.findTopicPath(noteFile);
+        if (topicPath.hasPath) {
+            const note: Note = await this.loadNote(noteFile, topicPath);
+            note.appendCardsToDeck(this.fullDeckTree);
 
-
-            // Does the note contain any tags that are specified as flashcard tags in the settings
-            // (Doing this check first saves us from loading and parsing the note if not necessary)
-            const topicPath: TopicPath = this.findTopicPath(noteFile);
-            if (topicPath.hasPath) {
-                const note: Note = await this.loadNote(noteFile, topicPath);
-                note.appendCardsToDeck(this.fullDeckTree);
-
-                // Give the algorithm a chance to do something with the loaded note
-                // e.g. OSR - calculate the average ease across all the questions within the note
-                // TODO:  should this move to this.loadNote
-                SrsAlgorithm.getInstance().noteOnLoadedNote(note);
-            }
-
-            const tags = noteFile.getAllTags()
-
-            const matchedNoteTags = SettingsUtil.filterForNoteReviewTag(this.settings, tags);
-            if (matchedNoteTags.length == 0) {
-                return;
-            }
-
-            const noteSchedule: RepItemScheduleInfo = await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
-            this._noteReviewQueue.addNoteToQueue(noteFile, noteSchedule, matchedNoteTags);
+            // Give the algorithm a chance to do something with the loaded note
+            // e.g. OSR - calculate the average ease across all the questions within the note
+            // TODO:  should this move to this.loadNote
+            SrsAlgorithm.getInstance().noteOnLoadedNote(note);
         }
 
-        private finaliseLoad(): void {
+        const tags = noteFile.getAllTags()
+
+        const matchedNoteTags = SettingsUtil.filterForNoteReviewTag(this.settings, tags);
+        if (matchedNoteTags.length == 0) {
+            return;
+        }
+
+        const noteSchedule: RepItemScheduleInfo = await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
+        this._noteReviewQueue.addNoteToQueue(noteFile, noteSchedule, matchedNoteTags);
+    }
+
+    private finaliseLoad(): void {
 
         this.osrNoteGraph.generatePageRanks();
         
         // Reviewable cards are all except those with the "edit later" tag
-        this._deckTree = DeckTreeFilter.filterForReviewableCards(this.fullDeckTree);
+        this._reviewableDeckTree = DeckTreeFilter.filterForReviewableCards(this.fullDeckTree);
 
         // sort the deck names
-        this._deckTree.sortSubdecksList();
+        this._reviewableDeckTree.sortSubdecksList();
         this._remainingDeckTree = DeckTreeFilter.filterForRemainingCards(
             this._questionPostponementList,
-            this._deckTree,
+            this._reviewableDeckTree,
             FlashcardReviewMode.Review,
         );
         const calc: DeckTreeStatsCalculator = new DeckTreeStatsCalculator();
-        this.cardStats = calc.calculate(this._deckTree);
+        this._cardStats = calc.calculate(this._reviewableDeckTree);
 
         this.updateAndSortDueNotes();
     }
 
+    async saveNoteReviewResponse(noteFile: ISRFile, response: ReviewResponse, settings: SRSettings, buryList: string[]): Promise<boolean> {
+        const noteSchedule: RepItemScheduleInfo = await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
+        const updatedNoteSchedule: RepItemScheduleInfo = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(noteFile.path, noteSchedule, response);
+        await DataStoreAlgorithm.getInstance().noteSetSchedule(noteFile, updatedNoteSchedule);
+
+        // Common
+        let result: boolean = false;
+        if (settings.burySiblingCards) {
+            const topicPath: TopicPath = this.findTopicPath(noteFile);
+            const noteX: Note = await this.loadNote(noteFile, topicPath);
+            for (const question of noteX.questionList) {
+                buryList.push(question.questionText.textHash);
+            }
+            result = true;
+        }
+        return result;
+    }
+
+    async loadNote(noteFile: ISRFile, topicPath: TopicPath): Promise<Note> {
+        const loader: NoteFileLoader = new NoteFileLoader(this.settings);
+        const note: Note = await loader.load(noteFile, topicPath);
+        if (note.hasChanged) {
+            note.writeNoteFile(this.settings);
+        }
+        return note;
+    }
+    
     createSrTFile(note: TFile): SrTFile {
         return new SrTFile(this.app.vault, this.app.metadataCache, note);
     }
