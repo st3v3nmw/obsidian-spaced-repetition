@@ -26,6 +26,7 @@ export function parse(
     let lineNo = 0;
 
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
+    let readingCodeBlock = false;
     for (let i = 0; i < lines.length; i++) {
         const currentLine = lines[i];
         if (currentLine.length === 0) {
@@ -77,20 +78,33 @@ export function parse(
         } else if (currentLine.trim() === multilineReversedCardSeparator) {
             cardType = CardType.MultiLineReversed;
             lineNo = i;
-        } else if (currentLine.startsWith("```") || currentLine.startsWith("~~~")) {
-            const codeBlockClose = currentLine.match(/`+|~+/)[0];
-            while (i + 1 < lines.length && !lines[i + 1].startsWith(codeBlockClose)) {
+        } else if (isCodeBlock(currentLine) && !isAdmonition(currentLine)) {
+            if (!readingCodeBlock) {
+                const codeBlockClose = currentLine.match(/`+|~+/)[0];
+                while (i + 1 < lines.length && !lines[i + 1].startsWith(codeBlockClose)) {
+                    i++;
+                    cardText += "\n" + lines[i];
+                }
+                cardText += "\n" + codeBlockClose;
                 i++;
-                cardText += "\n" + lines[i];
+            } else {
+                readingCodeBlock = false;
             }
-            cardText += "\n" + codeBlockClose;
-            i++;
+        } else if (isAdmonition(currentLine)) {
+            readingCodeBlock = true;
         }
     }
-
+    //  } else if (currentLine.startsWith("```") || currentLine.startsWith("~~~")) {
     if (cardType && cardText) {
         cards.push([cardType, cardText, lineNo]);
     }
 
     return cards;
+}
+
+function isAdmonition(text: string): boolean {
+    return text.startsWith("```ad-") || text.startsWith("~~~ad-");
+}
+function isCodeBlock(text: string): boolean {
+    return text.startsWith("```") || text.startsWith("~~~");
 }
