@@ -5,7 +5,7 @@ import { NoteReviewQueue } from "./NoteReviewQueue";
 import { PluginData } from "./PluginData";
 import { QuestionPostponementList } from "./QuestionPostponementList";
 import { ISRFile, SrTFile } from "./SRFile";
-import { ObsidianVaultNoteLinkInfoFinder, OsrNoteGraph } from "./algorithms/osr/OsrNoteGraph";
+import { IOsrVaultNoteLinkInfoFinder, ObsidianVaultNoteLinkInfoFinder, OsrNoteGraph } from "./algorithms/osr/OsrNoteGraph";
 import { Stats } from "./stats";
 import { SRSettings, SettingsUtil } from "./settings";
 import { TopicPath } from "./TopicPath";
@@ -24,13 +24,12 @@ export interface IOsrVaultEvents {
     dataChanged: () => void;
 }
 
-export class OsrVaultData {
-    private app: App;
-    private settings: SRSettings;
+export class OsrCore {
+    protected settings: SRSettings;
     // private vaultEvents: IOsrVaultEvents;
     private dataChangedHandler: () => void;
     private osrNoteGraph: OsrNoteGraph;
-    private _syncLock = false;
+    private osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder;
     private _easeByPath: NoteEaseList;
     private _questionPostponementList: QuestionPostponementList;
     private _noteReviewQueue: NoteReviewQueue;
@@ -39,10 +38,6 @@ export class OsrVaultData {
     private _reviewableDeckTree: Deck = new Deck("root", null);
     private _remainingDeckTree: Deck;
     private _cardStats: Stats;
-
-    get syncLock(): boolean {
-        return 
-    }
 
     get noteReviewQueue(): NoteReviewQueue {
         return this._noteReviewQueue;
@@ -68,67 +63,25 @@ export class OsrVaultData {
         return this._cardStats;
     }
 
-    init(plugin: SRPlugin, settings: SRSettings, buryList: string[], /* vaultEvents: IOsrVaultEvents, */ dataChangedHandler: () => void): void {
-        this.app = plugin.app;
+    init(questionPostponementList: QuestionPostponementList, osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder, settings: SRSettings, dataChangedHandler: () => void): void {
         this.settings = settings;
-        // this.vaultEvents = vaultEvents;
+        this.osrNoteLinkInfoFinder = osrNoteLinkInfoFinder;
         this.dataChangedHandler = dataChangedHandler;
         this._noteReviewQueue = new NoteReviewQueue();
-        this._questionPostponementList = new QuestionPostponementList(
-            plugin,
-            settings,
-            buryList,
-        );
+        this._questionPostponementList = questionPostponementList;
 
     }
 
-    clearPostponementListIfNewDay(data: PluginData): boolean {
-        const now = window.moment(Date.now());
-        const todayDate: string = now.format("YYYY-MM-DD");
-
-        // clear bury list if we've changed dates
-        const newDay: boolean = todayDate !== data.buryDate;
-        if (newDay) {
-            data.buryDate = todayDate;
-            this._questionPostponementList.clear();
-        }  
-        return newDay;      
-    }
-    
-    async loadVault(): Promise<void> {
-        if (this._syncLock) {
-            return;
-        }
-        this._syncLock = true;
-
-        try {
-            const notes: TFile[] = app.vault.getMarkdownFiles();
-            for (const noteFile of notes) {
-                if (SettingsUtil.isPathInNoteIgnoreFolder(this.settings, noteFile.path)) {
-                    continue;
-                }
-    
-                // Does the note contain any tags that are specified as flashcard tags in the settings
-                // (Doing this check first saves us from loading and parsing the note if not necessary)
-                const file: SrTFile = this.createSrTFile(noteFile);
-                await this.processFile(file);
-            }
-        } finally {
-            this._syncLock = false;
-        }        
-    }
-
-    private loadInit(): void {
+    protected loadInit(): void {
         // reset notes stuff
-        this.osrNoteGraph = new OsrNoteGraph(new ObsidianVaultNoteLinkInfoFinder(this.app.metadataCache));
+        this.osrNoteGraph = new OsrNoteGraph(this.osrNoteLinkInfoFinder);
         this._noteReviewQueue.init();
 
         // reset flashcards stuff
         this.fullDeckTree = new Deck("root", null);
-
     }
     
-    private async processFile(noteFile: ISRFile): Promise<void> {
+    protected async processFile(noteFile: ISRFile): Promise<void> {
 
         // Does the note contain any tags that are specified as flashcard tags in the settings
         // (Doing this check first saves us from loading and parsing the note if not necessary)
@@ -154,7 +107,7 @@ export class OsrVaultData {
         this._noteReviewQueue.addNoteToQueue(noteFile, noteSchedule, matchedNoteTags);
     }
 
-    private finaliseLoad(): void {
+    protected finaliseLoad(): void {
 
         this.osrNoteGraph.generatePageRanks();
         
@@ -221,13 +174,50 @@ export class OsrVaultData {
         }
         return note;
     }
-    
-    createSrTFile(note: TFile): SrTFile {
-        return new SrTFile(this.app.vault, this.app.metadataCache, note);
-    }
 
     private findTopicPath(note: ISRFile): TopicPath {
         return TopicPath.getTopicPathOfFile(note, this.settings);
+    }
+
+}
+
+export class OsrAppCore extends OsrCore {
+    private app: App;
+    private _syncLock = false;
+
+    get syncLock(): boolean {
+        return 
+    }
+    
+    async loadVault(): Promise<void> {
+        if (this._syncLock) {
+            return;
+        }
+        this._syncLock = true;
+
+        try {
+            this.loadInit();
+
+            const notes: TFile[] = this.app.vault.getMarkdownFiles();
+            for (const noteFile of notes) {
+                if (SettingsUtil.isPathInNoteIgnoreFolder(this.settings, noteFile.path)) {
+                    continue;
+                }
+    
+                // Does the note contain any tags that are specified as flashcard tags in the settings
+                // (Doing this check first saves us from loading and parsing the note if not necessary)
+                const file: SrTFile = this.createSrTFile(noteFile);
+                await this.processFile(file);
+            }
+
+            this.finaliseLoad();
+        } finally {
+            this._syncLock = false;
+        }        
+    }
+    
+    createSrTFile(note: TFile): SrTFile {
+        return new SrTFile(this.app.vault, this.app.metadataCache, note);
     }
 
 }
