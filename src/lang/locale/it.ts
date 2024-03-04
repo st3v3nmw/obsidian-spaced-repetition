@@ -35,7 +35,8 @@ export default {
     STATUS_BAR: "Da rivedere: ${dueNotesCount} scheda/e, ${dueFlashcardsCount} schede in ritardo",
     SYNC_TIME_TAKEN: "Sincronizzato in ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "La nota è salvata in una cartella ignorata (rivedi le impostazioni).",
-    PLEASE_TAG_NOTE: "Per favore etichetta la nota appropriatamente per la revisione (nelle impostazioni).",
+    PLEASE_TAG_NOTE:
+        "Per favore etichetta la nota appropriatamente per la revisione (nelle impostazioni).",
     RESPONSE_RECEIVED: "Risposta ricevuta.",
     NO_DECK_EXISTS: "Non esistono mazzi per ${deckName}",
     ALL_CAUGHT_UP: "Sei al passo! :D.",
@@ -52,7 +53,8 @@ export default {
     SETTINGS_HEADER: "Plugin per ripetizione spaziata - Impostazioni",
     CHECK_WIKI: 'Per maggiori informazioni, rivolgersi alla <a href="${wiki_url}">wiki</a>.',
     FOLDERS_TO_IGNORE: "Cartelle da ignorare",
-    FOLDERS_TO_IGNORE_DESC: "Inserisci i percorsi delle cartelle separati da a capo, per esempio, Templates Meta/Scripts",
+    FOLDERS_TO_IGNORE_DESC:
+        "Inserisci i percorsi delle cartelle separati da a capo, per esempio, Templates Meta/Scripts",
     FLASHCARDS: "Schede",
     FLASHCARD_EASY_LABEL: "Testo del bottone facile",
     FLASHCARD_GOOD_LABEL: "Testo del bottone buono",
@@ -64,7 +66,8 @@ export default {
     FLASHCARD_TAGS_DESC:
         "Inserire etichette separate da spazi o a capi, per esempio #flashcards #deck2 #deck3.",
     CONVERT_FOLDERS_TO_DECKS: "Trasformare cartelle in mazzi e sotto-mazzi?",
-    CONVERT_FOLDERS_TO_DECKS_DESC: "Questa è un'alternativa all'opzione delle etichette delle schede sopra.",
+    CONVERT_FOLDERS_TO_DECKS_DESC:
+        "Questa è un'alternativa all'opzione delle etichette delle schede sopra.",
     INLINE_SCHEDULING_COMMENTS:
         "Salvare il commento per l'orario sulla stessa linea dell'ultimna linea della scheda?",
     INLINE_SCHEDULING_COMMENTS_DESC:
@@ -73,16 +76,19 @@ export default {
     BURY_SIBLINGS_TILL_NEXT_DAY_DESC:
         "Le schede sorelle sono schede generate dallo stesso testo della scheda, per esempio i.e. cloze deletions",
     SHOW_CARD_CONTEXT: "Mostrare contesto nelle schede?",
-    SHOW_CARD_CONTEXT_DESC: "per esempio, Titolo > Intestazione 1 > Sottotitolo 1 > ... > Sottotitolo",
+    SHOW_CARD_CONTEXT_DESC:
+        "per esempio, Titolo > Intestazione 1 > Sottotitolo 1 > ... > Sottotitolo",
     CARD_MODAL_HEIGHT_PERCENT: "Percentuale altezza schede",
     CARD_MODAL_SIZE_PERCENT_DESC:
         "Dovrebbe essere 100% se sei su telefono o se hai immagini molto grandi",
     RESET_DEFAULT: "Reimposta alle impostazioni iniziali",
     CARD_MODAL_WIDTH_PERCENT: "Percentuale di larghezza delle schede",
     RANDOMIZE_CARD_ORDER: "Rendere casuale l'ordine delle schede durante la revisione?",
-    REVIEW_CARD_ORDER_WITHIN_DECK: "L'ordine in cui le schede saranno visualizzate all'interno del mazzo",
+    REVIEW_CARD_ORDER_WITHIN_DECK:
+        "L'ordine in cui le schede saranno visualizzate all'interno del mazzo",
     REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL: "Sequenzialmente dentro il mazzo (prima schede nuove)",
-    REVIEW_CARD_ORDER_DUE_FIRST_SEQUENTIAL: "Sequenzialmente dentro il mazzo (prima schede in ritardo)",
+    REVIEW_CARD_ORDER_DUE_FIRST_SEQUENTIAL:
+        "Sequenzialmente dentro il mazzo (prima schede in ritardo)",
     REVIEW_CARD_ORDER_NEW_FIRST_RANDOM: "A caso dentro il mazzo (prima schede nuove)",
     REVIEW_CARD_ORDER_DUE_FIRST_RANDOM: "A caso dentro il mazzo (prima schede in ritardo)",
     REVIEW_CARD_ORDER_RANDOM_DECK_AND_CARD: "Scheda a caso da mazzo a caso",
@@ -105,9 +111,11 @@ export default {
     NOTES: "Note",
     REVIEW_PANE_ON_STARTUP: "Abilita il pannello di revisione note all'avvio",
     TAGS_TO_REVIEW: "Etichette da rivedere",
-    TAGS_TO_REVIEW_DESC: "Inserisci le etichette separate da spazi o a capi, tipo #review #tag2 #tag3.",
+    TAGS_TO_REVIEW_DESC:
+        "Inserisci le etichette separate da spazi o a capi, tipo #review #tag2 #tag3.",
     OPEN_RANDOM_NOTE: "Apri una nota a caso per revisione",
-    OPEN_RANDOM_NOTE_DESC: "Quando lo disabiliti, le note saranno ordinate per importanza (PageRank).",
+    OPEN_RANDOM_NOTE_DESC:
+        "Quando lo disabiliti, le note saranno ordinate per importanza (PageRank).",
     AUTO_NEXT_NOTE: "Apri la prossima nota automaticamente dopo la revisione",
     DISABLE_FILE_MENU_REVIEW_OPTIONS:
         "Disabilita le opzioni di revisioni nel menù di file, per esempio Revisione: Facile Buono Difficile",
@@ -117,7 +125,8 @@ export default {
     MIN_ONE_DAY: "Il numero di giorni deve essere almeno 1.",
     VALID_NUMBER_WARNING: "Per favore, mettere un numero valido.",
     UI_PREFERENCES: "Preferenze di interfaccia",
-    INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Alberti di mazzi dovrebbero essere inizialmente visualizzate come espansi",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE:
+        "Alberti di mazzi dovrebbero essere inizialmente visualizzate come espansi",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "Disabilitami per collassare mazzi annidati nella stessa scheda. Utile se hai schede che appartengono a più mazzi nello stesso file.",
     ALGORITHM: "Algoritmo",
@@ -133,7 +142,8 @@ export default {
         "Il bonus facilità ti permette di impostare le differenze negli intervalli tra il rispondere Buono e Facile su una scheda o nota (minimo 100%).",
     EASY_BONUS_MIN_WARNING: "Il bonus facilità deve essere di almeno 100.",
     MAX_INTERVAL: "Intervallo massimo in giorni",
-    MAX_INTERVAL_DESC: "Ti permette di mettere un limite massimo all'intervallo (default 100 anni).",
+    MAX_INTERVAL_DESC:
+        "Ti permette di mettere un limite massimo all'intervallo (default 100 anni).",
     MAX_INTERVAL_MIN_WARNING: "L'intervallo massimo deve essere di almeno 1 giorno.",
     MAX_LINK_CONTRIB: "Contributo massimo delle note collegate",
     MAX_LINK_CONTRIB_DESC:
