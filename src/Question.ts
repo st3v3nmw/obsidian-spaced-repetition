@@ -18,6 +18,7 @@ export enum CardType {
     MultiLineBasic,
     MultiLineReversed,
     Cloze,
+    AnkiCloze,
 }
 
 //

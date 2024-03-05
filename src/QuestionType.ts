@@ -1,3 +1,4 @@
+import { text_to_cards } from "./AnkiParser";
 import { CardType } from "./Question";
 import { SRSettings } from "./settings";
 import { findLineIndexOfSearchStringIgnoringWs } from "./util/utils";
@@ -137,9 +138,15 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
     }
 }
 
+class QuestionType_AnkiCloze implements IQuestionTypeHandler {
+    expand(questionText: string, _settings: SRSettings): CardFrontBack[] {
+        return text_to_cards(questionText);
+    }
+}
+
 export class QuestionType_ClozeUtil {
-    static renderClozeFront(): string {
-        return "<span style='color:#2196f3'>[...]</span>";
+    static renderClozeFront(hint?: string): string {
+        return `<span style='color:#2196f3'>[${hint || "..."}]</span>`;
     }
 
     static renderClozeBack(str: string): string {
@@ -175,6 +182,9 @@ export class QuestionTypeFactory {
                 break;
             case CardType.Cloze:
                 handler = new QuestionType_Cloze();
+                break;
+            case CardType.AnkiCloze:
+                handler = new QuestionType_AnkiCloze();
                 break;
         }
         return handler;
