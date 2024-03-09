@@ -5,11 +5,11 @@ import {
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
-    IteratorDeckSource,
 } from "./DeckTreeIterator";
 import { Card } from "./Card";
 import { Stats } from "./stats";
 import { CardScheduleInfo } from "./CardSchedule";
+import { TopicPath } from "./TopicPath";
 
 export class DeckTreeStatsCalculator {
     private deckTree: Deck;
@@ -20,12 +20,10 @@ export class DeckTreeStatsCalculator {
             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             cardOrder: CardOrder.DueFirstSequential,
         };
-        const iterator: IDeckTreeIterator = new DeckTreeIterator(
-            iteratorOrder,
-            IteratorDeckSource.CloneBeforeUse,
-        );
+        // Iteration is a destructive operation on the supplied tree, so we first take a copy
+        const iterator: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, deckTree.clone());
         const result = new Stats();
-        iterator.setDeck(deckTree);
+        iterator.setIteratorTopicPath(TopicPath.emptyPath);
         while (iterator.nextCard()) {
             const card: Card = iterator.currentCard;
             if (card.hasSchedule) {

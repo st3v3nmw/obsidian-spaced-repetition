@@ -23,7 +23,6 @@ import {
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
-    IteratorDeckSource,
     DeckOrder,
 } from "./DeckTreeIterator";
 import { CardScheduleCalculator } from "./CardSchedule";
@@ -286,8 +285,7 @@ export default class SRPlugin extends Plugin {
         noteFile: TFile,
         reviewMode: FlashcardReviewMode,
     ): Promise<void> {
-        const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(noteFile));
-        const note: Note = await this.loadNote(noteFile, topicPath);
+        const note: Note = await this.loadNote(noteFile);
 
         const deckTree = new Deck("root", null);
         note.appendCardsToDeck(deckTree);
@@ -304,7 +302,7 @@ export default class SRPlugin extends Plugin {
         remainingDeckTree: Deck,
         reviewMode: FlashcardReviewMode,
     ): void {
-        const deckIterator = SRPlugin.createDeckTreeIterator(this.data.settings);
+        const deckIterator = SRPlugin.createDeckTreeIterator(this.data.settings, remainingDeckTree);
         const cardScheduleCalculator = new CardScheduleCalculator(
             this.data.settings,
             this.easeByPath,
@@ -321,18 +319,17 @@ export default class SRPlugin extends Plugin {
         new FlashcardModal(this.app, this, this.data.settings, reviewSequencer, reviewMode).open();
     }
 
-    private static createDeckTreeIterator(settings: SRSettings): IDeckTreeIterator {
+    private static createDeckTreeIterator(settings: SRSettings, baseDeck: Deck): IDeckTreeIterator {
         let cardOrder: CardOrder = CardOrder[settings.flashcardCardOrder as keyof typeof CardOrder];
         if (cardOrder === undefined) cardOrder = CardOrder.DueFirstSequential;
         let deckOrder: DeckOrder = DeckOrder[settings.flashcardDeckOrder as keyof typeof DeckOrder];
         if (deckOrder === undefined) deckOrder = DeckOrder.PrevDeckComplete_Sequential;
-        console.log(`createDeckTreeIterator: CardOrder: ${cardOrder}, DeckOrder: ${deckOrder}`);
 
         const iteratorOrder: IIteratorOrder = {
             deckOrder,
             cardOrder,
         };
-        return new DeckTreeIterator(iteratorOrder, IteratorDeckSource.UpdatedByIterator);
+        return new DeckTreeIterator(iteratorOrder, baseDeck);
     }
 
     async sync(): Promise<void> {
@@ -392,9 +389,8 @@ export default class SRPlugin extends Plugin {
                 }
             }
 
-            const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(noteFile));
-            if (topicPath.hasPath) {
-                const note: Note = await this.loadNote(noteFile, topicPath);
+            const note: Note = await this.loadNote(noteFile);
+            if (note.questionList.length > 0) {
                 const flashcardsInNoteAvgEase: number = NoteEaseCalculator.Calculate(
                     note,
                     this.data.settings,
@@ -405,7 +401,6 @@ export default class SRPlugin extends Plugin {
                     this.easeByPath.setEaseForPath(note.filePath, flashcardsInNoteAvgEase);
                 }
             }
-
             const fileCachedData = this.app.metadataCache.getFileCache(noteFile) || {};
 
             const frontmatter: FrontMatterCache | Record<string, unknown> =
@@ -525,17 +520,28 @@ export default class SRPlugin extends Plugin {
         this.statusBar.setText(
             t("STATUS_BAR", {
                 dueNotesCount: this.dueNotesCount,
-                dueFlashcardsCount: this.remainingDeckTree.getCardCount(CardListType.All, true),
+                dueFlashcardsCount: this.remainingDeckTree.getDistinctCardCount(
+                    CardListType.All,
+                    true,
+                ),
             }),
         );
 
         if (this.data.settings.enableNoteReviewPaneOnStartup) this.reviewQueueView.redraw();
     }
 
-    async loadNote(noteFile: TFile, topicPath: TopicPath): Promise<Note> {
+    async loadNote(noteFile: TFile): Promise<Note> {
         const loader: NoteFileLoader = new NoteFileLoader(this.data.settings);
-        const note: Note = await loader.load(this.createSrTFile(noteFile), topicPath);
-        if (note.hasChanged) note.writeNoteFile(this.data.settings);
+        const srFile: ISRFile = this.createSrTFile(noteFile);
+        const folderTopicPath: TopicPath = TopicPath.getFolderPathFromFilename(
+            srFile,
+            this.data.settings,
+        );
+
+        const note: Note = await loader.load(this.createSrTFile(noteFile), folderTopicPath);
+        if (note.hasChanged) {
+            note.writeNoteFile(this.data.settings);
+        }
         return note;
     }
 
@@ -665,8 +671,7 @@ export default class SRPlugin extends Plugin {
         }
 
         if (this.data.settings.burySiblingCards) {
-            const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(note));
-            const noteX: Note = await this.loadNote(note, topicPath);
+            const noteX: Note = await this.loadNote(note);
             for (const question of noteX.questionList) {
                 this.data.buryList.push(question.questionText.textHash);
             }
@@ -756,10 +761,6 @@ export default class SRPlugin extends Plugin {
 
     createSrTFile(note: TFile): SrTFile {
         return new SrTFile(this.app.vault, this.app.metadataCache, note);
-    }
-
-    findTopicPath(note: ISRFile): TopicPath {
-        return TopicPath.getTopicPathOfFile(note, this.data.settings);
     }
 
     async loadPluginData(): Promise<void> {
