@@ -32,6 +32,7 @@ export default {
     REVIEW_CARDS_IN_NOTE: "Revidovat kartičky v této poznámce.",
     CRAM_CARDS_IN_NOTE: "Cram kartičky v této poznámce.",
     VIEW_STATS: "Ukázat statistiky",
+    OPEN_REVIEW_QUEUE_VIEW: "Open Notes Review Queue in sidebar",
     STATUS_BAR: "Revize: ${dueNotesCount} poznámek, ${dueFlashcardsCount} kartiček po termínu",
     SYNC_TIME_TAKEN: "Synchronizace trvala ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "Poznámka je uložena v ignorované složce (zkontrolujte nastavení).",

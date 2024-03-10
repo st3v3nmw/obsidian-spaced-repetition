@@ -32,6 +32,7 @@ export default {
     REVIEW_CARDS_IN_NOTE: "Revisar tarjetas en esta nota",
     CRAM_CARDS_IN_NOTE: "Memorizar tarjetas en esta nota",
     VIEW_STATS: "Ver estadísticas",
+    OPEN_REVIEW_QUEUE_VIEW: "Open Notes Review Queue in sidebar",
     STATUS_BAR: "Revisar: ${dueNotesCount} nota(s), ${dueFlashcardsCount} tarjetas vencidas",
     SYNC_TIME_TAKEN: "La sincronización tomó ${t} milisegundos",
     NOTE_IN_IGNORED_FOLDER: "La nota está guardada en un directorio ignorado (revisa los ajustes).",
