@@ -449,7 +449,9 @@ export class FlashcardModal extends Modal {
 
         this.responseDiv.style.display = "none";
         this.resetButton.disabled = true;
-        this.titleEl.setText(`${deck.deckName}: ${deck.getCardCount(CardListType.All, true)}`);
+        this.titleEl.setText(
+            `${deck.deckName}: ${deck.getDistinctCardCount(CardListType.All, true)}`,
+        );
 
         this.answerBtn.style.display = "initial";
         this.flashcardView.empty();
