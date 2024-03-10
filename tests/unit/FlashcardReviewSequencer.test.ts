@@ -1,11 +1,13 @@
 import { CardScheduleCalculator } from "src/CardSchedule";
 import {
+    CardOrder,
+    DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
-    IteratorDeckSource,
 } from "src/DeckTreeIterator";
 import {
+    DeckStats,
     FlashcardReviewMode,
     FlashcardReviewSequencer,
     IFlashcardReviewSequencer,
@@ -14,7 +16,6 @@ import { TopicPath } from "src/TopicPath";
 import { CardListType, Deck, DeckTreeFilter } from "src/Deck";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { SampleItemDecks } from "./SampleItems";
-import { UnitTestSRFile } from "src/SRFile";
 import { ReviewResponse } from "src/scheduling";
 import {
     setupStaticDateProvider,
@@ -24,7 +25,12 @@ import {
 import moment from "moment";
 import { INoteEaseList, NoteEaseList } from "src/NoteEaseList";
 import { QuestionPostponementList, IQuestionPostponementList } from "src/QuestionPostponementList";
-import { order_DueFirst_Sequential } from "./DeckTreeIterator.test";
+import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
+
+let order_DueFirst_Sequential: IIteratorOrder = {
+    cardOrder: CardOrder.DueFirstSequential,
+    deckOrder: DeckOrder.PrevDeckComplete_Sequential,
+};
 
 let clozeQuestion1: string = "This single ==question== turns into ==3 separate== ==cards==";
 let clozeQuestion1Card1: RegExp = /This single.+\.\.\..+turns into 3 separate cards/;
@@ -38,7 +44,7 @@ class TestContext {
     cardSequencer: IDeckTreeIterator;
     noteEaseList: INoteEaseList;
     cardScheduleCalculator: CardScheduleCalculator;
-    reviewSequencer: IFlashcardReviewSequencer;
+    reviewSequencer: FlashcardReviewSequencer;
     questionPostponementList: QuestionPostponementList;
     file: UnitTestSRFile;
     originalText: string;
@@ -51,11 +57,8 @@ class TestContext {
     async resetContext(text: string, daysAfterOrigin: number): Promise<void> {
         this.originalText = text;
         this.file.content = text;
-        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(
-            this.iteratorOrder,
-            IteratorDeckSource.UpdatedByIterator,
-        );
-        let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(
+        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(this.iteratorOrder, null);
+        let reviewSequencer: FlashcardReviewSequencer = new FlashcardReviewSequencer(
             this.reviewMode,
             cardSequencer,
             this.settings,
@@ -74,7 +77,7 @@ class TestContext {
     }
 
     async setSequencerDeckTreeFromOriginalText(): Promise<Deck> {
-        const deckTree: Deck = await SampleItemDecks.createDeckFromFile(
+        let deckTree: Deck = await SampleItemDecks.createDeckFromFile(
             this.file,
             new TopicPath(["Root"]),
         );
@@ -87,6 +90,10 @@ class TestContext {
         return deckTree;
     }
 
+    getDeckStats(topicTag: string): DeckStats {
+        return this.reviewSequencer.getDeckStats(TopicPath.getTopicPathFromTag(topicTag));
+    }
+
     static Create(
         iteratorOrder: IIteratorOrder,
         reviewMode: FlashcardReviewMode,
@@ -94,10 +101,7 @@ class TestContext {
         text: string,
         fakeFilePath?: string,
     ): TestContext {
-        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(
-            iteratorOrder,
-            IteratorDeckSource.UpdatedByIterator,
-        );
+        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, null);
         let noteEaseList = new NoteEaseList(settings);
         let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(
             settings,
@@ -108,7 +112,7 @@ class TestContext {
             settings,
             [],
         );
-        let reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(
+        let reviewSequencer: FlashcardReviewSequencer = new FlashcardReviewSequencer(
             reviewMode,
             cardSequencer,
             settings,
@@ -310,6 +314,7 @@ describe("setDeckTree", () => {
             DEFAULT_SETTINGS,
             "",
         );
+        c.setSequencerDeckTreeFromOriginalText();
         c.reviewSequencer.setDeckTree(Deck.emptyDeck, Deck.emptyDeck);
         expect(c.reviewSequencer.currentDeck).toEqual(null);
         expect(c.reviewSequencer.currentCard).toEqual(null);
@@ -317,7 +322,7 @@ describe("setDeckTree", () => {
 
     // After setDeckTree, the first card in the deck is the current card
     test("Single level deck with some new cards", async () => {
-        let text: string = `
+        let text: string = `#flashcards
 Q1::A1
 Q2::A2
 Q3::A3`;
@@ -328,7 +333,8 @@ Q3::A3`;
             text,
         );
         let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
-        expect(deck.newFlashcards.length).toEqual(3);
+        const flashcardDeck: Deck = deck.getDeckByTopicTag("#flashcards");
+        expect(flashcardDeck.newFlashcards.length).toEqual(3);
 
         expect(c.reviewSequencer.currentDeck.newFlashcards.length).toEqual(3);
         let expected = {
@@ -499,7 +505,8 @@ describe("processReview", () => {
                 let settings: SRSettings = { ...DEFAULT_SETTINGS };
                 settings.burySiblingCards = false;
 
-                let text: string = `
+                let text: string = `#flashcards
+
 #flashcards This single ==question== turns into ==3 separate== ==cards==
 
 Q1::A1
@@ -534,13 +541,14 @@ Q1::A1
         });
 
         describe("Checking postponement list (after card reviewed, burySiblingCards=true)", () => {
-            test("reviewed question added to postponement list; sibling cards are buried", async () => {
+            test("Question with multiple cards; reviewed question added to postponement list; sibling cards are buried", async () => {
                 let settings: SRSettings = { ...DEFAULT_SETTINGS };
                 settings.burySiblingCards = true;
 
                 let text: string = `
 #flashcards ${clozeQuestion1}
 
+#flashcards
 Q1::A1
     `;
 
@@ -567,13 +575,14 @@ Q1::A1
                 checkQuestionPostponementListCount(c, 1);
             });
 
-            test("card reviewed as hard, after restarting the review process, that question skipped and next question is shown", async () => {
+            test("Question with multiple cards; card reviewed as hard, after restarting the review process, that whole question skipped and next question is shown", async () => {
                 let settings: SRSettings = { ...DEFAULT_SETTINGS };
                 settings.burySiblingCards = true;
 
                 let text: string = `
 #flashcards ${clozeQuestion1}
 
+#flashcards
 Q1::A1
     `;
 
@@ -632,6 +641,85 @@ Q1::A1
                 );
                 expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
             });
+
+            test("Question with single cards; card reviewed as hard, the question is NOT added to the postponement list", async () => {
+                let settings: SRSettings = { ...DEFAULT_SETTINGS };
+                settings.burySiblingCards = true;
+
+                // Question with a single card
+                let text: string = `#flashcards Q1::A1`;
+
+                // Create the test context
+                setupStaticDateProvider_OriginDatePlusDays(0);
+                const c: TestContext = TestContext.Create(
+                    order_DueFirst_Sequential,
+                    FlashcardReviewMode.Review,
+                    settings,
+                    text,
+                );
+                await c.setSequencerDeckTreeFromOriginalText();
+                expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
+
+                // Review the card
+                await c.reviewSequencer.processReview(ReviewResponse.Hard);
+
+                // Check that there are no questions on the postponement list
+                checkQuestionPostponementListCount(c, 0);
+            });
+        });
+
+        test("Answer includes MathJax within $$", async () => {
+            let fileText: string = `#flashcards
+What is Newman's equation for gravitational force
+?
+$$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$`;
+
+            let c: TestContext = TestContext.Create(
+                order_DueFirst_Sequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                fileText,
+            );
+            await c.setSequencerDeckTreeFromOriginalText();
+            expect(c.reviewSequencer.currentCard.front).toContain("What is Newman's equation");
+
+            // Reviewing the card doesn't change the question, only adds the schedule info
+            await c.reviewSequencer.processReview(ReviewResponse.Easy);
+            let expectedFileText: string = `${fileText}
+<!--SR:!2023-09-10,4,270-->`;
+
+            let actual: string = await c.file.read();
+            expect(actual).toEqual(expectedFileText);
+        });
+    });
+
+    describe("Checking leading/trailing spaces", () => {
+        test("Leading spaces are retained post review", async () => {
+            // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/800
+            let settings: SRSettings = { ...DEFAULT_SETTINGS };
+            settings.burySiblingCards = true;
+            let indent: string = "    ";
+
+            // Note that "- bar?::baz" is intentionally indented
+            let text: string = `#flashcards
+- foo
+${indent}- bar?::baz
+`;
+
+            let c: TestContext = TestContext.Create(
+                order_DueFirst_Sequential,
+                FlashcardReviewMode.Review,
+                settings,
+                text,
+            );
+            await c.setSequencerDeckTreeFromOriginalText();
+
+            expect(c.reviewSequencer.currentCard.front).toMatch(`${indent}- bar?`);
+
+            // After reviewing, check the text (explicitly text includes the whitespace before "- bar?::baz"at)
+            await c.reviewSequencer.processReview(ReviewResponse.Easy);
+            const expectedText: string = `${text}<!--SR:!2023-09-10,4,270-->\n`;
+            expect(await c.file.read()).toEqual(expectedText);
         });
     });
 
@@ -934,6 +1022,85 @@ ${updatedQuestionText}`;
         });
     });
 });
+
+describe("getDeckStats", () => {
+    describe("Single level deck with some new and due cards", () => {
+        test("Initial stats", async () => {
+            let text: string = `#flashcards
+Q1::A1
+Q2::A2
+Q3::A3
+Q4::A4 <!--SR:!2023-01-21,15,290-->
+`;
+            let c: TestContext = TestContext.Create(
+                order_DueFirst_Sequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                text,
+            );
+            let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
+            expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(1, 3, 4));
+        });
+
+        test("Reduction in due count after skipping card", async () => {
+            let text: string = `#flashcards
+Q1::A1
+Q2::A2
+Q3::A3
+Q4::A4 <!--SR:!2023-01-21,15,290-->
+`;
+            let c: TestContext = TestContext.Create(
+                order_DueFirst_Sequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                text,
+            );
+            let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
+
+            expect(c.reviewSequencer.currentCard.front).toEqual("Q4"); // This is the first card as we are using order_DueFirst_Sequential
+            expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(1, 3, 4));
+            c.reviewSequencer.skipCurrentCard();
+            // One less due card
+            expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(0, 3, 4));
+        });
+
+        test("Change in stats after reviewing each card", async () => {
+            let text: string = `#flashcards
+Q1::A1
+Q2::A2
+Q3::A3
+Q4::A4 <!--SR:!2023-01-21,15,290-->
+`;
+            let c: TestContext = TestContext.Create(
+                order_DueFirst_Sequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                text,
+            );
+            let deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
+
+            await checkStats(c, "#flashcards", [
+                [new DeckStats(1, 3, 4), "Q4", ReviewResponse.Easy], // This is the first card as we are using order_DueFirst_Sequential
+                [new DeckStats(0, 3, 4), "Q1", ReviewResponse.Easy], // Iterated through all the due cards, now the new ones
+                [new DeckStats(0, 2, 4), "Q2", ReviewResponse.Easy],
+            ]);
+        });
+    });
+});
+
+async function checkStats(
+    c: TestContext,
+    topicPath: string,
+    expectedStats: [DeckStats, string, ReviewResponse][],
+): Promise<void> {
+    for (const item of expectedStats) {
+        const [expectedDeckStats, expectedCardFront, reviewResponse] = item;
+        expect(c.getDeckStats(topicPath)).toEqual(expectedDeckStats);
+        if (expectedCardFront)
+            expect(c.reviewSequencer.currentCard.front).toEqual(expectedCardFront);
+        if (reviewResponse != null) await c.reviewSequencer.processReview(reviewResponse);
+    }
+}
 
 describe("Sequences", () => {
     test("Update question text, followed by review response", async () => {

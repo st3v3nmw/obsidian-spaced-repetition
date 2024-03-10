@@ -1,13 +1,15 @@
 import { CardType } from "./Question";
 import { SRSettings } from "./settings";
+import { findLineIndexOfSearchStringIgnoringWs } from "./util/utils";
 
 export class CardFrontBack {
     front: string;
     back: string;
 
+    // The caller is responsible for any required trimming of leading/trailing spaces
     constructor(front: string, back: string) {
-        this.front = front.trim();
-        this.back = back.trim();
+        this.front = front;
+        this.back = back;
     }
 }
 
@@ -55,23 +57,30 @@ class QuestionType_SingleLineReversed implements IQuestionTypeHandler {
 
 class QuestionType_MultiLineBasic implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
-        const idx = questionText.indexOf("\n" + settings.multilineCardSeparator + "\n");
-        const item: CardFrontBack = new CardFrontBack(
-            questionText.substring(0, idx),
-            questionText.substring(idx + 2 + settings.multilineCardSeparator.length),
+        // We don't need to worry about "\r\n", as multi line questions processed by parse() concatenates lines explicitly with "\n"
+        const questionLines = questionText.split("\n");
+        const lineIdx = findLineIndexOfSearchStringIgnoringWs(
+            questionLines,
+            settings.multilineCardSeparator,
         );
-        const result: CardFrontBack[] = [item];
+        const side1: string = questionLines.slice(0, lineIdx).join("\n");
+        const side2: string = questionLines.slice(lineIdx + 1).join("\n");
+
+        const result: CardFrontBack[] = [new CardFrontBack(side1, side2)];
         return result;
     }
 }
 
 class QuestionType_MultiLineReversed implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
-        const idx = questionText.indexOf("\n" + settings.multilineReversedCardSeparator + "\n");
-        const side1: string = questionText.substring(0, idx),
-            side2: string = questionText.substring(
-                idx + 2 + settings.multilineReversedCardSeparator.length,
-            );
+        // We don't need to worry about "\r\n", as multi line questions processed by parse() concatenates lines explicitly with "\n"
+        const questionLines = questionText.split("\n");
+        const lineIdx = findLineIndexOfSearchStringIgnoringWs(
+            questionLines,
+            settings.multilineReversedCardSeparator,
+        );
+        const side1: string = questionLines.slice(0, lineIdx).join("\n");
+        const side2: string = questionLines.slice(lineIdx + 1).join("\n");
 
         const result: CardFrontBack[] = [
             new CardFrontBack(side1, side2),
@@ -113,22 +122,14 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
                 questionText.substring(0, deletionStart) +
                 QuestionType_ClozeUtil.renderClozeFront() +
                 questionText.substring(deletionEnd);
-            front = front
-                .replace(/==/gm, "")
-                .replace(/\*\*/gm, "")
-                .replace(/{{/gm, "")
-                .replace(/}}/gm, "");
+            front = QuestionType_ClozeUtil.removeClozeTokens(front, settings);
             back =
                 questionText.substring(0, deletionStart) +
                 QuestionType_ClozeUtil.renderClozeBack(
                     questionText.substring(deletionStart, deletionEnd),
                 ) +
                 questionText.substring(deletionEnd);
-            back = back
-                .replace(/==/gm, "")
-                .replace(/\*\*/gm, "")
-                .replace(/{{/gm, "")
-                .replace(/}}/gm, "");
+            back = QuestionType_ClozeUtil.removeClozeTokens(back, settings);
             result.push(new CardFrontBack(front, back));
         }
 
@@ -143,6 +144,16 @@ export class QuestionType_ClozeUtil {
 
     static renderClozeBack(str: string): string {
         return "<span style='color:#2196f3'>" + str + "</span>";
+    }
+
+    static removeClozeTokens(text: string, settings: SRSettings): string {
+        let result: string = text;
+        if (settings.convertHighlightsToClozes) result = result.replace(/==/gm, "");
+        if (settings.convertBoldTextToClozes) result = result.replace(/\*\*/gm, "");
+        if (settings.convertCurlyBracketsToClozes) {
+            result = result.replace(/{{/gm, "").replace(/}}/gm, "");
+        }
+        return result;
     }
 }
 

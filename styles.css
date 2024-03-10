@@ -1,15 +1,14 @@
 .sr-flashcard-menu {
-    display: block;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: row;
+    gap: 1rem;
 }
 
 .sr-flashcard-menu-item {
     box-shadow: none !important;
-    margin-right: 1rem;
     cursor: pointer;
 }
 
@@ -40,19 +39,18 @@
 .sr-flashcard-response {
     display: inline-grid;
     width: 100%;
-    grid-template-columns: auto auto auto auto;
+    grid-template-columns: auto auto auto;
     position: absolute;
     bottom: 0;
 }
 
 .sr-ignorestats-btn {
-    /* Bit of a hack, but it works. */
-    margin: 0px !important;
-    margin-right: 12px !important;
+    width: 100%;
 }
 
 .sr-ignorestats-response {
-    grid-template-columns: auto auto !important;
+    grid-template-columns: auto auto;
+    gap: var(--size-4-4);
 }
 
 .sr-centered {

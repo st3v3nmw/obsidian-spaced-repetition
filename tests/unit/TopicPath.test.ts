@@ -1,6 +1,7 @@
-import { ISRFile, UnitTestSRFile } from "src/SRFile";
-import { TopicPath } from "src/TopicPath";
+import { ISRFile } from "src/SRFile";
+import { TopicPath, TopicPathList } from "src/TopicPath";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
+import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
 
 describe("Constructor exception handling", () => {
     test("Constructor rejects null path", () => {
@@ -84,50 +85,6 @@ describe("getTopicPathFromCardText", () => {
         let path: TopicPath = TopicPath.getTopicPathFromCardText(cardText);
 
         expect(path).toEqual(new TopicPath(["flashcards", "science", "chemistry"]));
-    });
-});
-
-describe("removeTopicPathFromCardText", () => {
-    test("Card text doesn't include tag", () => {
-        let cardText: string = "Card text doesn't include tag";
-        let expectedCardText: string = cardText;
-        let [actualQuestion, whiteSpace] = TopicPath.removeTopicPathFromStartOfCardText(cardText);
-
-        expect(actualQuestion).toEqual(expectedCardText);
-        expect(whiteSpace).toEqual("");
-    });
-
-    test("Card text includes single level tag", () => {
-        let cardText: string = "#flashcards Card text does include tag";
-        let [actualQuestion, whiteSpace] = TopicPath.removeTopicPathFromStartOfCardText(cardText);
-
-        expect(actualQuestion).toEqual("Card text does include tag");
-        expect(whiteSpace).toEqual(" ");
-    });
-
-    test("Card text includes multi level tag", () => {
-        let cardText: string = "#flashcards/science/chemistry Card text does include tag";
-        let [actualQuestion, whiteSpace] = TopicPath.removeTopicPathFromStartOfCardText(cardText);
-
-        expect(actualQuestion).toEqual("Card text does include tag");
-        expect(whiteSpace).toEqual(" ");
-    });
-
-    test("White space present before topic tag", () => {
-        let cardText: string = "   #flashcards/science/chemistry Card text does include tag";
-        let [actualQuestion, whiteSpace] = TopicPath.removeTopicPathFromStartOfCardText(cardText);
-
-        expect(actualQuestion).toEqual("Card text does include tag");
-        expect(whiteSpace).toEqual(" ");
-    });
-
-    test("Multiple spaces after topic tag", () => {
-        let spaces: string = "    ";
-        let cardText: string = `#flashcards/science/chemistry${spaces}Card text does include tag`;
-        let [actualQuestion, whiteSpace] = TopicPath.removeTopicPathFromStartOfCardText(cardText);
-
-        expect(actualQuestion).toEqual("Card text does include tag");
-        expect(whiteSpace).toEqual(spaces);
     });
 });
 
@@ -280,56 +237,5 @@ describe("isValidTag", () => {
 
     test("Valid tags", () => {
         expect(TopicPath.isValidTag("#flashcards")).toEqual(true);
-    });
-});
-
-describe("getTopicPathOfFile", () => {
-    describe("convertFoldersToDecks: false", () => {
-        test("Mixture of irrelevant tags and relevant ones", () => {
-            let content: string = `
-            #ignored Q1::A1
-            #ignored Q2::A2 <!--SR:!2023-09-02,4,270-->
-            #also-Ignored Q3::A3
-            #flashcards/science Q4::A4 <!--SR:!2023-09-02,4,270-->
-            #flashcards/science/physics Q5::A5 <!--SR:!2023-09-02,4,270-->
-            #flashcards/math Q6::A6`;
-            let file: ISRFile = new UnitTestSRFile(content);
-            let expected = ["flashcards", "science"];
-
-            expect(TopicPath.getTopicPathOfFile(file, DEFAULT_SETTINGS).path).toEqual(expected);
-        });
-
-        test("No relevant tags", () => {
-            let content: string = `
-            #ignored Q1::A1
-            #ignored Q2::A2 <!--SR:!2023-09-02,4,270-->
-            #also-Ignored Q3::A3
-            Q4::A4 <!--SR:!2023-09-02,4,270-->
-            #ignored/science/physics Q5::A5 <!--SR:!2023-09-02,4,270-->
-            Q6::A6`;
-            let file: ISRFile = new UnitTestSRFile(content);
-
-            expect(TopicPath.getTopicPathOfFile(file, DEFAULT_SETTINGS).isEmptyPath).toEqual(true);
-        });
-    });
-
-    describe("convertFoldersToDecks: true", () => {
-        let settings_ConvertFoldersToDecks: SRSettings = { ...DEFAULT_SETTINGS };
-        settings_ConvertFoldersToDecks.convertFoldersToDecks = true;
-        test("Mixture of irrelevant tags and relevant ones", () => {
-            let ignoredContent: string = `
-            #ignored Q1::A1
-            #ignored Q2::A2 <!--SR:!2023-09-02,4,270-->
-            #also-Ignored Q3::A3
-            #flashcards/science Q4::A4 <!--SR:!2023-09-02,4,270-->
-            #flashcards/science/physics Q5::A5 <!--SR:!2023-09-02,4,270-->
-            #flashcards/math Q6::A6`;
-
-            let fakeFilePath: string = "history/modern/Greek.md";
-            let file: ISRFile = new UnitTestSRFile(ignoredContent, fakeFilePath);
-            let expected = ["history", "modern"];
-            let actual = TopicPath.getTopicPathOfFile(file, settings_ConvertFoldersToDecks);
-            expect(actual.path).toEqual(expected);
-        });
     });
 });
