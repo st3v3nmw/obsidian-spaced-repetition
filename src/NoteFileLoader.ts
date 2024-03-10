@@ -16,14 +16,16 @@ export class NoteFileLoader {
         this.settings = settings;
     }
 
-    async load(noteFile: ISRFile, noteTopicPath: TopicPath): Promise<Note> {
+    async load(noteFile: ISRFile, folderTopicPath: TopicPath): Promise<Note | null> {
         this.noteFile = noteFile;
 
         const questionParser: NoteQuestionParser = new NoteQuestionParser(this.settings);
 
+        const onlyKeepQuestionsWithTopicPath: boolean = true;
         const questionList: Question[] = await questionParser.createQuestionList(
             noteFile,
-            noteTopicPath,
+            folderTopicPath,
+            onlyKeepQuestionsWithTopicPath,
         );
 
         const result: Note = new Note(noteFile, questionList);
