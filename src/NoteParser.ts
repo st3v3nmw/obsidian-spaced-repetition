@@ -14,7 +14,7 @@ export class NoteParser {
 
     async parse(noteFile: ISRFile, folderTopicPath: TopicPath): Promise<Note> {
         const questionParser: NoteQuestionParser = new NoteQuestionParser(this.settings);
-        const questions = await questionParser.createQuestionList(noteFile, folderTopicPath);
+        const questions = await questionParser.createQuestionList(noteFile, folderTopicPath, true);
 
         const result: Note = new Note(noteFile, questions);
         return result;
