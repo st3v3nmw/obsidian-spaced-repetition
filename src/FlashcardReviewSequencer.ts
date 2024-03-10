@@ -139,10 +139,16 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     async processReview_ReviewMode(response: ReviewResponse): Promise<void> {
-        this.currentCard.scheduleInfo = this.determineCardSchedule(response, this.currentCard);
+        if (response != ReviewResponse.Reset || this.currentCard.hasSchedule) {
+            // We need to update the schedule if:
+            //  (1) the user reviewed with easy/good/hard (either a new or due card),
+            //  (2) or reset a due card
+            // Nothing to do if a user resets a new card
+            this.currentCard.scheduleInfo = this.determineCardSchedule(response, this.currentCard);
 
-        // Update the source file with the updated schedule
-        await this.currentQuestion.writeQuestion(this.settings);
+            // Update the source file with the updated schedule
+            await this.currentQuestion.writeQuestion(this.settings);
+        }
 
         // Move/delete the card
         if (response == ReviewResponse.Reset) {

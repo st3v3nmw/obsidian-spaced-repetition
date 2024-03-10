@@ -407,9 +407,7 @@ export class FlashcardModal extends Modal {
         this.answerBtn.style.display = "none";
         this.responseDiv.style.display = "grid";
 
-        if (this.currentCard.hasSchedule) {
-            this.resetButton.disabled = false;
-        }
+        this.resetButton.disabled = false;
 
         if (this.currentQuestion.questionType !== CardType.Cloze) {
             const hr: HTMLElement = document.createElement("hr");
