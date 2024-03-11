@@ -1,10 +1,10 @@
 import { NoteParser } from "src/NoteParser";
-import { UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
 import { Note } from "src/Note";
 import { Question } from "src/Question";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
+import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
 
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 
