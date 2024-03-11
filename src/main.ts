@@ -6,7 +6,7 @@ import { StatsModal } from "src/gui/stats-modal";
 import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/sidebar";
 import { osrSchedule } from "src/algorithms/osr/NoteScheduling";
 import { YAML_FRONT_MATTER_REGEX, SCHEDULING_INFO_REGEX } from "src/constants";
-import { NoteReviewDeck, ReviewDeckSelectionModal } from "src/NoteReviewDeck";
+import { NoteReviewDeck } from "src/NoteReviewDeck";
 import { t } from "src/lang/helpers";
 import { appIcon } from "src/icons/appicon";
 import { TopicPath } from "./TopicPath";
@@ -40,6 +40,7 @@ import { DataStore_StoreInNote } from "./dataStore/storeInNote/DataStore_StoreIn
 import { SrsAlgorithm_Osr } from "./algorithms/osr/SrsAlgorithm_Osr";
 import { OsrAppCore } from "./OsrAppCore";
 import { DEFAULT_DATA, PluginData } from "./PluginData";
+import { NextNoteReviewHandler } from "./NextNoteReviewHandler";
 
 
 
@@ -76,7 +77,7 @@ export default class SRPlugin extends Plugin {
         this.statusBar.addEventListener("click", async () => {
             if (!this.osrAppCore.syncLock) {
                 await this.sync();
-                this.osrAppCore.noteReviewQueue.reviewNextNoteModal();
+                this.osrAppCore.nextNoteReviewHandler.reviewNextNoteModal();
             }
         });
 
@@ -141,7 +142,7 @@ export default class SRPlugin extends Plugin {
             callback: async () => {
                 if (!this.osrAppCore.syncLock) {
                     await this.sync();
-                    this.osrAppCore.noteReviewQueue.reviewNextNoteModal();
+                    this.osrAppCore.nextNoteReviewHandler.reviewNextNoteModal();
                 }
             },
         });
@@ -399,7 +400,10 @@ export default class SRPlugin extends Plugin {
     initView(): void {
         this.registerView(
             REVIEW_QUEUE_VIEW_TYPE,
-            (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this.app, this.osrAppCore.noteReviewQueue, this.data.settings)),
+            (leaf) => {
+                const nextNoteReviewHandler: NextNoteReviewHandler = new NextNoteReviewHandler(this.app, this.data.settings, this.app.workspace, this.osrAppCore.noteReviewQueue); 
+                return this.reviewQueueView = new ReviewQueueListView(leaf, this.app, nextNoteReviewHandler, this.data.settings); 
+            },
         );
 
         if (

@@ -20,5 +20,10 @@ export abstract class RepItemScheduleInfo {
         return formatDate_YYYY_MM_DD(this.dueDate);
     }
 
+    delayedBeforeReviewDaysInt(): number {
+        return Math.max(0, Math.floor(this.delayedBeforeReviewTicks / (24 * 3600 * 1000)));
+    }
+
+
     abstract formatCardScheduleForHtmlComment(): string;
 }

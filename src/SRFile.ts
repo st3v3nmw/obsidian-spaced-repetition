@@ -5,14 +5,15 @@ import {
     getAllTags as ObsidianGetAllTags,
     HeadingCache,
     FrontMatterCache,
+    TagCache,
 } from "obsidian";
-import { getAllTagsFromText } from "./util/utils";
 
 export interface ISRFile {
     get path(): string;
     get basename(): string;
     get tfile(): TFile;
     getFrontmatter(): Promise<Map<string, string[]>>;
+    getAllTags(): string[];
     getAllTagsFromText(): TagCache[];
     getQuestionContext(cardLine: number): string[];
     read(): Promise<string>;
@@ -51,6 +52,11 @@ export class SrTFile implements ISRFile {
             result.set(key, value);
         }
         return result;
+    }
+
+    getAllTags(): string[] {
+        const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
+        return ObsidianGetAllTags(fileCachedData) || [];
     }
 
     getAllTagsFromText(): TagCache[] {

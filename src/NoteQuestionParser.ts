@@ -1,8 +1,6 @@
 import { RepItemScheduleInfo } from "./algorithms/base/RepItemScheduleInfo";
 import { DataStore } from "./dataStore/base/DataStore";
-import { Question } from "./Question";
 import { TagCache } from "obsidian";
-import { CardScheduleInfo, NoteCardScheduleParser } from "./CardSchedule";
 import { CardType, Question, QuestionText } from "./Question";
 import { Card } from "./Card";
 import { parseEx, ParsedQuestionInfo } from "./parser";
@@ -10,7 +8,7 @@ import { CardFrontBack, CardFrontBackUtil } from "./QuestionType";
 import { SRSettings, SettingsUtil } from "./settings";
 import { ISRFile } from "./SRFile";
 import { TopicPath, TopicPathList } from "./TopicPath";
-import { extractFrontmatter, splitTextIntoLineArray } from "./util/utils";
+import { splitNoteIntoFrontmatterAndContent, splitTextIntoLineArray } from "./util/utils";
 
 export class NoteQuestionParser {
     settings: SRSettings;
@@ -194,7 +192,7 @@ export class NoteQuestionParser {
             tagCacheList.sort((a, b) => a.position.start.line - b.position.start.line);
 
             // Treat the frontmatter slightly differently (all tags grouped together even if on separate lines)
-            const [frontmatter, _] = extractFrontmatter(this.noteText);
+            const [frontmatter, _] = splitNoteIntoFrontmatterAndContent(this.noteText);
             if (frontmatter) {
                 frontmatterLineCount = splitTextIntoLineArray(frontmatter).length;
                 const frontmatterTagCacheList = filteredTagCacheList.filter(

@@ -6,17 +6,21 @@ import { t } from "src/lang/helpers";
 import { NoteReviewQueue } from "src/NoteReviewQueue";
 import { SRSettings } from "src/settings";
 import { SrTFile } from "src/SRFile";
+import { NextNoteReviewHandler } from "src/NextNoteReviewHandler";
 
 export const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
 
 export class ReviewQueueListView extends ItemView {
-    private noteReviewQueue: NoteReviewQueue;
+    private get noteReviewQueue(): NoteReviewQueue {
+        return this.nextNoteReviewHandler.noteReviewQueue
+    };
     private settings: SRSettings;
+    private nextNoteReviewHandler: NextNoteReviewHandler;
 
-    constructor(leaf: WorkspaceLeaf, app: App, noteReviewQueue: NoteReviewQueue, settings: SRSettings) {
+    constructor(leaf: WorkspaceLeaf, app: App, nextNoteReviewHandler: NextNoteReviewHandler, settings: SRSettings) {
         super(leaf);
 
-        this.noteReviewQueue = noteReviewQueue;
+        this.nextNoteReviewHandler = nextNoteReviewHandler;
         this.settings = settings;
         this.registerEvent(this.app.workspace.on("file-open", () => this.redraw()));
         this.registerEvent(this.app.vault.on("rename", () => this.redraw()));
@@ -216,7 +220,7 @@ export class ReviewQueueListView extends ItemView {
             "click",
             async (event: MouseEvent) => {
                 event.preventDefault();
-                this.noteReviewQueue.lastSelectedReviewDeck = deck.deckName;
+                this.nextNoteReviewHandler.lastSelectedReviewDeck = deck.deckName;
                 await this.app.workspace.getLeaf().openFile(file);
                 return false;
             },

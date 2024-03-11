@@ -38,6 +38,34 @@ export class TopicPath {
         return result;
     }
 
+    static getTopicPathOfFile(noteFile: ISRFile, settings: SRSettings): TopicPath {
+        let deckPath: string[] = [];
+        let result: TopicPath = TopicPath.emptyPath;
+
+        if (settings.convertFoldersToDecks) {
+            deckPath = noteFile.path.split("/");
+            deckPath.pop(); // remove filename
+            if (deckPath.length != 0) {
+                result = new TopicPath(deckPath);
+            }
+        } else {
+            const tagList: TopicPath[] = this.getTopicPathsFromTagList(noteFile.getAllTags());
+
+            outer: for (const tagToReview of this.getTopicPathsFromTagList(
+                settings.flashcardTags,
+            )) {
+                for (const tag of tagList) {
+                    if (tagToReview.isSameOrAncestorOf(tag)) {
+                        result = tag;
+                        break outer;
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
     isSameOrAncestorOf(topicPath: TopicPath): boolean {
         if (this.isEmptyPath) return topicPath.isEmptyPath;
         if (this.path.length > topicPath.path.length) return false;
@@ -52,6 +80,14 @@ export class TopicPath {
         return path?.length > 0 ? TopicPath.getTopicPathFromTag(path) : null;
     }
 
+    static getTopicPathsFromTagList(tagList: string[]): TopicPath[] {
+        const result: TopicPath[] = [];
+        for (const tag of tagList) {
+            if (this.isValidTag(tag)) result.push(TopicPath.getTopicPathFromTag(tag));
+        }
+        return result;
+    }
+    
     static isValidTag(tag: string): boolean {
         if (tag == null || tag.length == 0) return false;
         if (tag[0] != "#") return false;

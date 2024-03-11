@@ -1,6 +1,5 @@
 import { unitTest_BasicFrontmatterParser, unitTest_GetAllTagsFromTextEx } from "./UnitTestHelper";
 import { splitNoteIntoFrontmatterAndContent } from "src/util/utils";
-import { unitTest_GetAllTagsFromTextEx } from "./UnitTestHelper";
 import { TFile, TagCache } from "obsidian";
 import { ISRFile } from "src/SRFile";
 

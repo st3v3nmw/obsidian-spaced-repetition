@@ -104,7 +104,7 @@ class TestContext {
         const settingsClone: SRSettings = {...settings};
         let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(
             iteratorOrder,
-            IteratorDeckSource.UpdatedByIterator,
+            null,
         );
         let noteEaseList = new NoteEaseList(settingsClone);
         unitTestSetup_StandardDataStoreAlgorithm(settingsClone, noteEaseList);

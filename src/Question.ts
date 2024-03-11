@@ -265,7 +265,7 @@ export class Question {
     async writeQuestion(settings: SRSettings): Promise<void> {
         const fileText: string = await this.note.file.read();
 
-        const newText: string = this.updateQuestionText(fileText, settings);
+        const newText: string = this.updateQuestionWithinNoteText(fileText, settings);
         await this.note.file.write(newText);
         this.hasChanged = false;
     }

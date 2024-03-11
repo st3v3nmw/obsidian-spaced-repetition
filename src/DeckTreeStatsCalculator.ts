@@ -8,8 +8,8 @@ import {
 } from "./DeckTreeIterator";
 import { Card } from "./Card";
 import { Stats } from "./stats";
-import { CardScheduleInfo } from "./CardSchedule";
 import { TopicPath } from "./TopicPath";
+import { RepItemScheduleInfo } from "./algorithms/base/RepItemScheduleInfo";
 
 export class DeckTreeStatsCalculator {
     private deckTree: Deck;
@@ -27,8 +27,8 @@ export class DeckTreeStatsCalculator {
         while (iterator.nextCard()) {
             const card: Card = iterator.currentCard;
             if (card.hasSchedule) {
-                const schedule: CardScheduleInfo = card.scheduleInfo;
-                result.update(schedule.delayBeforeReviewDaysInt, schedule.interval, schedule.ease);
+                const schedule: RepItemScheduleInfo = card.scheduleInfo;
+                result.update(schedule.delayedBeforeReviewDaysInt(), schedule.interval, schedule.latestEase);
             } else {
                 result.incrementNew();
             }
