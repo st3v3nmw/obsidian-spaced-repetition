@@ -32,6 +32,7 @@ export default {
     REVIEW_CARDS_IN_NOTE: "Review flashcards in this note",
     CRAM_CARDS_IN_NOTE: "Cram flashcards in this note",
     VIEW_STATS: "View statistics",
+    OPEN_REVIEW_QUEUE_VIEW: "Open Notes Review Queue in sidebar",
     STATUS_BAR: "Review: ${dueNotesCount} note(s), ${dueFlashcardsCount} card(s) due",
     SYNC_TIME_TAKEN: "Sync took ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "Note is saved under ignored folder (check settings).",
