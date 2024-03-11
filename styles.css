@@ -1,3 +1,10 @@
+.is-mobile .sr-modal {
+    --top-space: calc(var(--safe-area-inset-top) + var(--header-height) + var(--size-4-2));
+    width: 100vw !important;
+    height: calc(100vh - var(--top-space)) !important;
+    margin-top: var(--top-space);
+}
+
 .sr-flashcard-menu {
     width: 100%;
     display: flex;

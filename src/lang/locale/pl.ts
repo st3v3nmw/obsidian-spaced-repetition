@@ -32,6 +32,7 @@ export default {
     REVIEW_CARDS_IN_NOTE: "Przeglądaj fiszki w tej notatce",
     CRAM_CARDS_IN_NOTE: "Intensywne uczenie fiszek w tej notatce",
     VIEW_STATS: "Wyświetl statystyki",
+    OPEN_REVIEW_QUEUE_VIEW: "Open Notes Review Queue in sidebar",
     STATUS_BAR: "Przeglądaj: ${dueNotesCount} notatek, ${dueFlashcardsCount} fiszek z terminem",
     SYNC_TIME_TAKEN: "Synchronizacja zajęła ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "Notatka jest zapisana w folderze zignorowanym (sprawdź ustawienia).",

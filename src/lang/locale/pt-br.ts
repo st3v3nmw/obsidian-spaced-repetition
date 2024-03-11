@@ -33,6 +33,7 @@ export default {
     REVIEW_CARDS_IN_NOTE: "Revisar flashcards nessa nota",
     CRAM_CARDS_IN_NOTE: "Revisar todas as flashcards nessa nota",
     VIEW_STATS: "Ver estatísticas",
+    OPEN_REVIEW_QUEUE_VIEW: "Open Notes Review Queue in sidebar",
     STATUS_BAR:
         "Revisão: ${dueNotesCount} nota(s), ${dueFlashcardsCount} Carta(s) para colocar em dia",
     SYNC_TIME_TAKEN: "Sincronização levou ${t}ms",

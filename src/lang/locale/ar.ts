@@ -32,6 +32,7 @@ export default {
     REVIEW_CARDS_IN_NOTE: "مراجعة البطاقات  من هذه الملاحظة",
     CRAM_CARDS_IN_NOTE: "أحشر جميع بطاقات هذه الملاحظة",
     VIEW_STATS: "عرض الإحصائيات",
+    OPEN_REVIEW_QUEUE_VIEW: "Open Notes Review Queue in sidebar",
     STATUS_BAR: "البطاقات المستحقة ${dueFlashcardsCount},ملاحظات ${dueNotesCount}:مراجعة",
     SYNC_TIME_TAKEN: "${t}ms استغراق المزامنة",
     NOTE_IN_IGNORED_FOLDER: ".الملاحظة يتم حفظها ضمن المجلد الذي تم تجاهله (تحقق من الإعدادات)",
