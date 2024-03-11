@@ -2,7 +2,7 @@ import { Card } from "./Card";
 import { FlashcardReviewMode } from "./FlashcardReviewSequencer";
 import { Question } from "./Question";
 import { IQuestionPostponementList } from "./QuestionPostponementList";
-import { TopicPath } from "./TopicPath";
+import { TopicPath, TopicPathList } from "./TopicPath";
 
 export enum CardListType {
     NewCard,
@@ -10,6 +10,12 @@ export enum CardListType {
     All,
 }
 
+//
+// The same card can be added to multiple decks e.g.
+//      #flashcards/language/words
+//      #flashcards/trivia
+// To simplify certain functions (e.g. getDistinctCardCount), we explicitly use the same card object (and not a copy)
+//
 export class Deck {
     public deckName: string;
     public newFlashcards: Card[];
@@ -40,6 +46,41 @@ export class Deck {
         return result;
     }
 
+    public getDistinctCardCount(cardListType: CardListType, includeSubdeckCounts: boolean): number {
+        const cardList: Card[] = this.getFlattenedCardArray(cardListType, includeSubdeckCounts);
+
+        // The following selects distinct cards from cardList (based on reference equality)
+        const distinctCardSet = new Set(cardList);
+        // console.log(`getDistinctCardCount: ${this.deckName} ${distinctCardSet.size} ${this.getCardCount(cardListType, includeSubdeckCounts)}`);
+        return distinctCardSet.size;
+    }
+
+    public getFlattenedCardArray(
+        cardListType: CardListType,
+        includeSubdeckCounts: boolean,
+    ): Card[] {
+        let result: Card[] = [] as Card[];
+        switch (cardListType) {
+            case CardListType.NewCard:
+                result = this.newFlashcards;
+                break;
+            case CardListType.DueCard:
+                result = this.dueFlashcards;
+                break;
+            case CardListType.All:
+                result = this.newFlashcards.concat(this.dueFlashcards);
+        }
+
+        if (includeSubdeckCounts) {
+            for (const subdeck of this.subdecks) {
+                result = result.concat(
+                    subdeck.getFlattenedCardArray(cardListType, includeSubdeckCounts),
+                );
+            }
+        }
+        return result;
+    }
+
     //
     // Returns a count of the number of this question's cards are present in this deck.
     // (The returned value would be <= question.cards.length)
@@ -65,6 +106,10 @@ export class Deck {
 
     get isRootDeck() {
         return this.parent == null;
+    }
+
+    getDeckByTopicTag(tag: string): Deck {
+        return this.getDeck(TopicPath.getTopicPathFromTag(tag));
     }
 
     getDeck(topicPath: TopicPath): Deck {
@@ -100,6 +145,8 @@ export class Deck {
         const list: string[] = [];
         // eslint-disable-next-line  @typescript-eslint/no-this-alias
         let deck: Deck = this;
+        // The root deck may have a dummy deck name, which we don't want
+        // So we first check that this isn't the root deck
         while (!deck.isRootDeck) {
             list.push(deck.deckName);
             deck = deck.parent;
@@ -125,17 +172,64 @@ export class Deck {
         return cardListType == CardListType.DueCard ? this.dueFlashcards : this.newFlashcards;
     }
 
-    appendCard(topicPath: TopicPath, cardObj: Card): void {
+    appendCard(topicPathList: TopicPathList, cardObj: Card): void {
+        if (topicPathList.list.length == 0) {
+            this.appendCardToRootDeck(cardObj);
+        } else {
+            // We explicitly are adding the same card object to each of the specified decks
+            // This is required by getDistinctCardCount()
+            for (const topicPath of topicPathList.list) {
+                this.appendCard_SingleTopic(topicPath, cardObj);
+            }
+        }
+    }
+
+    appendCardToRootDeck(cardObj: Card): void {
+        this.appendCard_SingleTopic(TopicPath.emptyPath, cardObj);
+    }
+
+    appendCard_SingleTopic(topicPath: TopicPath, cardObj: Card): void {
         const deck: Deck = this.getOrCreateDeck(topicPath);
         const cardList: Card[] = deck.getCardListForCardType(cardObj.cardListType);
 
         cardList.push(cardObj);
     }
 
-    deleteCard(card: Card): void {
-        const cardList: Card[] = this.getCardListForCardType(card.cardListType);
-        const idx = cardList.indexOf(card);
-        if (idx != -1) cardList.splice(idx, 1);
+    //
+    // The question lists all the topics in which this card is included.
+    // The topics are relative to the base deck, and this method must be called on that deck
+    //
+    deleteQuestionFromAllDecks(question: Question, exceptionIfMissing: boolean): void {
+        for (const card of question.cards) {
+            this.deleteCardFromAllDecks(card, exceptionIfMissing);
+        }
+    }
+
+    deleteQuestion(question: Question, exceptionIfMissing: boolean): void {
+        for (const card of question.cards) {
+            this.deleteCardFromThisDeck(card, exceptionIfMissing);
+        }
+    }
+
+    //
+    // The card's question lists all the topics in which this card is included.
+    // The topics are relative to the base deck, and this method must be called on that deck
+    //
+    deleteCardFromAllDecks(card: Card, exceptionIfMissing: boolean): void {
+        for (const topicPath of card.question.topicPathList.list) {
+            const deck: Deck = this.getDeck(topicPath);
+            deck.deleteCardFromThisDeck(card, exceptionIfMissing);
+        }
+    }
+
+    deleteCardFromThisDeck(card: Card, exceptionIfMissing: boolean): void {
+        const newIdx = this.newFlashcards.indexOf(card);
+        if (newIdx != -1) this.newFlashcards.splice(newIdx, 1);
+        const dueIdx = this.dueFlashcards.indexOf(card);
+        if (dueIdx != -1) this.dueFlashcards.splice(dueIdx, 1);
+        if (newIdx == -1 && dueIdx == -1 && exceptionIfMissing) {
+            throw `deleteCardFromThisDeck: Card: ${card.front} not found in deck: ${this.deckName}`;
+        }
     }
 
     deleteCardAtIndex(index: number, cardListType: CardListType): void {
@@ -167,9 +261,9 @@ export class Deck {
         }
     }
 
-    debugLogToConsole(desc: string = null) {
+    debugLogToConsole(desc: string = null, indent: number = 0) {
         let str: string = desc != null ? `${desc}: ` : "";
-        console.log((str += this.toString()));
+        console.log((str += this.toString(indent)));
     }
 
     toString(indent: number = 0): string {

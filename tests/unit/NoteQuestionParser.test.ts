@@ -2,7 +2,7 @@ import { NoteQuestionParser } from "src/NoteQuestionParser";
 import { TICKS_PER_DAY } from "src/constants";
 import { CardType, Question } from "src/Question";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
-import { TopicPath } from "src/TopicPath";
+import { TopicPath, TopicPathList } from "src/TopicPath";
 import { createTest_NoteQuestionParser } from "./SampleItems";
 import { ISRFile } from "src/SRFile";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
@@ -25,19 +25,31 @@ beforeAll(() => {
     unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS, noteEaseList);
 });
 
-test("No questions in the text", async () => {
-    let noteText: string = "An interesting note, but no questions";
-    let folderTopicPath: TopicPath = TopicPath.emptyPath;
-    let noteFile: ISRFile = new UnitTestSRFile(noteText);
+describe("No flashcard questions", () => {
+    test("No questions in the text", async () => {
+        let noteText: string = "An interesting note, but no questions";
+        let folderTopicPath: TopicPath = TopicPath.emptyPath;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
-    expect(await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath)).toEqual(
-        [],
-    );
+        expect(
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+        ).toEqual([]);
+    });
+
+    test("A question in the text, but no flashcard tag", async () => {
+        let noteText: string = "A::B";
+        let folderTopicPath: TopicPath = TopicPath.emptyPath;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        expect(
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+        ).toEqual([]);
+    });
 });
 
 describe("Single question in the text (without block identifier)", () => {
     test("SingleLineBasic: No schedule info", async () => {
-        let noteText: string = `
+        let noteText: string = `#flashcards
 A::B
 `;
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
@@ -50,20 +62,19 @@ A::B
         let expected = [
             {
                 questionType: CardType.SingleLineBasic,
-                topicPath: TopicPath.emptyPath,
+                topicPathList: TopicPathList.fromPsv("#flashcards", 0),
                 questionText: {
                     original: `A::B`,
                     actualQuestion: "A::B",
                 },
 
-                lineNo: 1,
                 hasEditLaterTag: false,
                 cards: [card1],
                 hasChanged: false,
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath),
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
         ).toMatchObject(expected);
     });
 
@@ -88,7 +99,7 @@ A::B
         let expected = [
             {
                 questionType: CardType.SingleLineBasic,
-                topicPath: new TopicPath(["flashcards", "test"]),
+                topicPathList: TopicPathList.fromPsv("#flashcards/test", 0),
                 questionText: {
                     original: `A::B
 <!--SR:!2023-09-03,1,230-->`,
@@ -102,14 +113,14 @@ A::B
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath),
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
         ).toMatchObject(expected);
     });
 });
 
 describe("Single question in the text (with block identifier)", () => {
     test("SingleLineBasic: No schedule info", async () => {
-        let noteText: string = `
+        let noteText: string = `#flashcards
 A::B ^d7cee0
 `;
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
@@ -121,22 +132,27 @@ A::B ^d7cee0
         };
         let expected = [
             {
-                questionType: CardType.SingleLineBasic,
-                topicPath: TopicPath.emptyPath,
+                topicPathList: {
+                    list: [TopicPath.getTopicPathFromTag("#flashcards")],
+                    lineNum: 0,
+                },
+                parsedQuestionInfo: {
+                    cardType: CardType.SingleLineBasic,
+                    firstLineNum: 1,
+                },
                 questionText: {
                     original: `A::B ^d7cee0`,
                     actualQuestion: "A::B",
                     obsidianBlockId: "^d7cee0",
                 },
 
-                lineNo: 1,
                 hasEditLaterTag: false,
                 cards: [card1],
                 hasChanged: false,
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath),
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
         ).toMatchObject(expected);
     });
 
@@ -161,8 +177,14 @@ A::B ^d7cee0
         };
         let expected = [
             {
-                questionType: CardType.SingleLineBasic,
-                topicPath: new TopicPath(["flashcards", "test"]),
+                topicPathList: {
+                    list: [TopicPath.getTopicPathFromTag("#flashcards/test")],
+                    lineNum: 0,
+                },
+                parsedQuestionInfo: {
+                    cardType: CardType.SingleLineBasic,
+                    firstLineNum: 1,
+                },
                 questionText: {
                     original: `A::B ^d7cee0
 <!--SR:!2023-09-03,1,230-->`,
@@ -170,14 +192,13 @@ A::B ^d7cee0
                     textHash: "1c6b0b01215dc4",
                     obsidianBlockId: "^d7cee0",
                 },
-                lineNo: 1,
                 hasEditLaterTag: false,
                 cards: [card1],
                 hasChanged: false,
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath),
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
         ).toMatchObject(expected);
     });
 
@@ -200,22 +221,27 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
         };
         let expected = [
             {
-                questionType: CardType.SingleLineBasic,
-                topicPath: new TopicPath(["flashcards", "test"]),
+                topicPathList: {
+                    list: [TopicPath.getTopicPathFromTag("#flashcards/test")],
+                    lineNum: 0, // Line numbers start at zero
+                },
+                parsedQuestionInfo: {
+                    cardType: CardType.SingleLineBasic,
+                    firstLineNum: 1,
+                },
                 questionText: {
                     original: `A::B <!--SR:!2023-09-03,1,230--> ^d7cee0`,
                     actualQuestion: "A::B",
                     textHash: "1c6b0b01215dc4",
                     obsidianBlockId: "^d7cee0",
                 },
-                lineNo: 1,
                 hasEditLaterTag: false,
                 cards: [card1],
                 hasChanged: false,
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath),
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
         ).toMatchObject(expected);
     });
 
@@ -238,21 +264,26 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
         };
         let expected = [
             {
-                questionType: CardType.SingleLineBasic,
-                topicPath: new TopicPath(["flashcards", "test"]),
+                topicPathList: {
+                    list: [TopicPath.getTopicPathFromTag("#flashcards/test")],
+                    lineNum: 1,
+                },
+                parsedQuestionInfo: {
+                    cardType: CardType.SingleLineBasic,
+                    firstLineNum: 1,
+                },
                 questionText: {
                     original: `#flashcards/test A::B <!--SR:!2023-09-03,1,230--> ^d7cee0`,
                     actualQuestion: "A::B",
                     obsidianBlockId: "^d7cee0",
                 },
-                lineNo: 1,
                 hasEditLaterTag: false,
                 cards: [card1],
                 hasChanged: false,
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath),
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
         ).toMatchObject(expected);
     });
 });
@@ -268,6 +299,7 @@ Q2::A2
         let questionList: Question[] = await parser_ConvertFoldersToDecks.createQuestionList(
             noteFile,
             folderTopicPath,
+            true,
         );
         expect(questionList.length).toEqual(2);
     });
@@ -284,11 +316,38 @@ Q3::A3
         let questionList: Question[] = await parser_ConvertFoldersToDecks.createQuestionList(
             noteFile,
             folderTopicPath,
+            true,
         );
         expect(questionList.length).toEqual(3);
-        expect(questionList[0].topicPath).toEqual(new TopicPath(["flashcards", "science"]));
-        expect(questionList[1].topicPath).toEqual(new TopicPath(["flashcards", "science"]));
-        expect(questionList[2].topicPath).toEqual(new TopicPath(["flashcards", "science"]));
+        expect(questionList[0].topicPathList.formatPsv()).toEqual("#flashcards/science");
+        expect(questionList[1].topicPathList.formatPsv()).toEqual("#flashcards/science");
+        expect(questionList[2].topicPathList.formatPsv()).toEqual("#flashcards/science");
+    });
+
+    test("SingleLineBasic: Tags within frontmatter applies to all questions when not overriden", async () => {
+        let noteText: string = `---
+sr-due: 2024-01-17
+sr-interval: 16
+sr-ease: 278
+tags:
+  - flashcards/aws
+---
+Q1::A1
+Q2::A2
+Q3::A3
+`;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        let folderTopicPath: TopicPath = TopicPath.emptyPath;
+        let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
+            noteFile,
+            folderTopicPath,
+            true,
+        );
+        expect(questionList.length).toEqual(3);
+        expect(questionList[0].topicPathList.formatPsv()).toEqual("#flashcards/aws");
+        expect(questionList[1].topicPathList.formatPsv()).toEqual("#flashcards/aws");
+        expect(questionList[2].topicPathList.formatPsv()).toEqual("#flashcards/aws");
     });
 
     test("MultiLine: Space before multi line separator", async () => {
@@ -312,6 +371,7 @@ Multiline answer2
         let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
             noteFile,
             TopicPath.emptyPath,
+            true,
         );
         expect(questionList.length).toEqual(3);
         expect(questionList[0].cards).toMatchObject([
@@ -357,10 +417,11 @@ describe("Handling tags within note", () => {
             let questionList: Question[] = await parser2.createQuestionList(
                 noteFile,
                 folderTopicPath,
+                true,
             );
             expect(questionList.length).toEqual(3);
             for (let i = 0; i < questionList.length; i++)
-                expect(questionList[i].topicPath).toEqual(new TopicPath(["folder", "subfolder"]));
+                expect(questionList[i].topicPathList.formatPsv()).toEqual("#folder/subfolder");
         });
 
         test("Topic tag within note is ignored (outside all questions)", async () => {
@@ -373,9 +434,10 @@ Q1::A1
             let questionList: Question[] = await parser2.createQuestionList(
                 noteFile,
                 folderTopicPath,
+                true,
             );
             expect(questionList.length).toEqual(1);
-            expect(questionList[0].topicPath).toEqual(new TopicPath(["folder", "subfolder"]));
+            expect(questionList[0].topicPathList.formatPsv()).toEqual("#folder/subfolder");
         });
 
         // Behavior here mimics SR_ORIGINAL
@@ -391,9 +453,10 @@ Q1::A1
             let questionList: Question[] = await parser2.createQuestionList(
                 noteFile,
                 folderTopicPath,
+                true,
             );
             expect(questionList.length).toEqual(1);
-            expect(questionList[0].topicPath).toEqual(new TopicPath(["folder", "subfolder"]));
+            expect(questionList[0].topicPathList.formatPsv()).toEqual("#folder/subfolder");
         });
     });
 
@@ -408,16 +471,17 @@ Q1::A1
     `;
             let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
-            let expectedPath: TopicPath = new TopicPath(["flashcards", "test"]);
+            let expectedPath: string = "#flashcards/test";
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
                 noteFile,
                 folderTopicPath,
+                true,
             );
             expect(questionList.length).toEqual(3);
-            expect(questionList[0].topicPath).toEqual(expectedPath);
-            expect(questionList[1].topicPath).toEqual(expectedPath);
-            expect(questionList[2].topicPath).toEqual(expectedPath);
+            expect(questionList[0].topicPathList.formatPsv()).toEqual(expectedPath);
+            expect(questionList[1].topicPathList.formatPsv()).toEqual(expectedPath);
+            expect(questionList[2].topicPathList.formatPsv()).toEqual(expectedPath);
         });
 
         test("Topic tag within question overrides the note topic, for that topic only", async () => {
@@ -432,11 +496,12 @@ Q1::A1
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
                 noteFile,
                 folderTopicPath,
+                true,
             );
             expect(questionList.length).toEqual(3);
-            expect(questionList[0].topicPath).toEqual(new TopicPath(["flashcards", "test"]));
-            expect(questionList[1].topicPath).toEqual(new TopicPath(["flashcards", "examination"]));
-            expect(questionList[2].topicPath).toEqual(new TopicPath(["flashcards", "test"]));
+            expect(questionList[0].topicPathList.formatPsv()).toEqual("#flashcards/test");
+            expect(questionList[1].topicPathList.formatPsv()).toEqual("#flashcards/examination");
+            expect(questionList[2].topicPathList.formatPsv()).toEqual("#flashcards/test");
         });
 
         test("First topic tag within note (outside questions) is used as the note's topic tag, even if it appears after the first question", async () => {
@@ -453,31 +518,33 @@ Q1::A1
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
                 noteFile,
                 folderTopicPath,
+                true,
             );
             expect(questionList.length).toEqual(3);
             for (let i = 0; i < questionList.length; i++)
-                expect(questionList[i].topicPath).toEqual(expectedPath);
+                expect(questionList[i].topicPathList.formatPsv()).toEqual("#flashcards/test");
         });
 
-        test("Only first topic tag within note (outside questions) is used as the note's topic tag, subsequent ignored", async () => {
+        test("The last topic tag within note prior to the question is used as the note's topic tag", async () => {
             let noteText: string = `
     Q1::A1
     #flashcards/test
     Q2::A2
     #flashcards/examination
-    Q3::This has the "flashcards/test" topic, not "flashcards/examination"
+    Q3::This has the "flashcards/examination" topic, not "flashcards/test"
     `;
             let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
-            let expectedPath: TopicPath = new TopicPath(["flashcards", "test"]);
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
                 noteFile,
                 folderTopicPath,
+                true,
             );
             expect(questionList.length).toEqual(3);
-            for (let i = 0; i < questionList.length; i++)
-                expect(questionList[i].topicPath).toEqual(expectedPath);
+            expect(questionList[0].topicPathList.formatPsv()).toEqual("#flashcards/test");
+            expect(questionList[1].topicPathList.formatPsv()).toEqual("#flashcards/test");
+            expect(questionList[2].topicPathList.formatPsv()).toEqual("#flashcards/examination");
         });
     });
 
@@ -495,9 +562,10 @@ Q1::A1
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
                 noteFile,
                 folderTopicPath,
+                true,
             );
             expect(questionList.length).toEqual(1);
-            expect(questionList[0].topicPath).toEqual(expectedPath);
+            expect(questionList[0].topicPathList.formatPsv()).toEqual("#flashcards/science");
             expect(questionList[0].cards.length).toEqual(1);
             expect(questionList[0].cards[0].front).toEqual("Q5");
         });

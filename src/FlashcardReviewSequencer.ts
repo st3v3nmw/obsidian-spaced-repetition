@@ -46,8 +46,12 @@ export enum FlashcardReviewMode {
 }
 
 export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
+    // We need the original deck tree so that we can still provide the total cards in each deck
     private _originalDeckTree: Deck;
+
+    // This is set by the caller, and must have the same deck hierarchy as originalDeckTree.
     private remainingDeckTree: Deck;
+
     private reviewMode: FlashcardReviewMode;
     private cardSequencer: IDeckTreeIterator;
     private settings: SRSettings;
@@ -88,15 +92,17 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         return this.currentQuestion.note;
     }
 
+    // originalDeckTree isn't modified by the review process
+    // Only remainingDeckTree
     setDeckTree(originalDeckTree: Deck, remainingDeckTree: Deck): void {
+        this.cardSequencer.setBaseDeck(remainingDeckTree);
         this._originalDeckTree = originalDeckTree;
         this.remainingDeckTree = remainingDeckTree;
         this.setCurrentDeck(TopicPath.emptyPath);
     }
 
     setCurrentDeck(topicPath: TopicPath): void {
-        const deck: Deck = this.remainingDeckTree.getDeck(topicPath);
-        this.cardSequencer.setDeck(deck);
+        this.cardSequencer.setIteratorTopicPath(topicPath);
         this.cardSequencer.nextCard();
     }
 
@@ -107,19 +113,19 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     getDeckStats(topicPath: TopicPath): DeckStats {
         const totalCount: number = this._originalDeckTree
             .getDeck(topicPath)
-            .getCardCount(CardListType.All, true);
+            .getDistinctCardCount(CardListType.All, true);
         const remainingDeck: Deck = this.remainingDeckTree.getDeck(topicPath);
-        const newCount: number = remainingDeck.getCardCount(CardListType.NewCard, true);
-        const dueCount: number = remainingDeck.getCardCount(CardListType.DueCard, true);
+        const newCount: number = remainingDeck.getDistinctCardCount(CardListType.NewCard, true);
+        const dueCount: number = remainingDeck.getDistinctCardCount(CardListType.DueCard, true);
         return new DeckStats(dueCount, newCount, totalCount);
     }
 
     skipCurrentCard(): void {
-        this.cardSequencer.deleteCurrentQuestion();
+        this.cardSequencer.deleteCurrentQuestionFromAllDecks();
     }
 
     private deleteCurrentCard(): void {
-        this.cardSequencer.deleteCurrentCard();
+        this.cardSequencer.deleteCurrentCardFromAllDecks();
     }
 
     async processReview(response: ReviewResponse): Promise<void> {
@@ -135,10 +141,16 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     async processReview_ReviewMode(response: ReviewResponse): Promise<void> {
-        this.currentCard.scheduleInfo = this.determineCardSchedule(response, this.currentCard);
+        if (response != ReviewResponse.Reset || this.currentCard.hasSchedule) {
+            // We need to update the schedule if:
+            //  (1) the user reviewed with easy/good/hard (either a new or due card),
+            //  (2) or reset a due card
+            // Nothing to do if a user resets a new card
+            this.currentCard.scheduleInfo = this.determineCardSchedule(response, this.currentCard);
 
-        // Update the source file with the updated schedule
-        await DataStore.getInstance().questionWriteSchedule(this.currentQuestion);
+			// Update the source file with the updated schedule
+			await DataStore.getInstance().questionWriteSchedule(this.currentQuestion);
+        }
 
         // Move/delete the card
         if (response == ReviewResponse.Reset) {
@@ -147,7 +159,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         } else {
             if (this.settings.burySiblingCards) {
                 await this.burySiblingCards();
-                this.cardSequencer.deleteCurrentQuestion();
+                this.cardSequencer.deleteCurrentQuestionFromAllDecks();
             } else {
                 this.deleteCurrentCard();
             }

@@ -408,9 +408,7 @@ export class FlashcardModal extends Modal {
         this.answerBtn.style.display = "none";
         this.responseDiv.style.display = "grid";
 
-        if (this.currentCard.hasSchedule) {
-            this.resetButton.disabled = false;
-        }
+        this.resetButton.disabled = false;
 
         if (this.currentQuestion.questionType !== CardType.Cloze) {
             const hr: HTMLElement = document.createElement("hr");
@@ -450,7 +448,9 @@ export class FlashcardModal extends Modal {
 
         this.responseDiv.style.display = "none";
         this.resetButton.disabled = true;
-        this.titleEl.setText(`${deck.deckName}: ${deck.getCardCount(CardListType.All, true)}`);
+        this.titleEl.setText(
+            `${deck.deckName}: ${deck.getDistinctCardCount(CardListType.All, true)}`,
+        );
 
         this.answerBtn.style.display = "initial";
         this.flashcardView.empty();

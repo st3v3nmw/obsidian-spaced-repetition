@@ -85,13 +85,6 @@ export function formatDate_YYYY_MM_DD(ticks: Moment): string {
     return ticks.format(PREFERRED_DATE_FORMAT);
 }
 
-export function getAllTagsFromText(text: string): string[] {
-    const tagRegex = /#[^\s#]+/gi;
-    const result: RegExpMatchArray = text.match(tagRegex);
-    if (!result) return [];
-    return result;
-}
-
 export function splitTextIntoLineArray(text: string): string[] {
     return text.replaceAll("\r\n", "\n").split("\n");
 }

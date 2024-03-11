@@ -106,7 +106,6 @@ export function upgradeSettings(settings: SRSettings) {
     }
 }
 
-
 export class SettingsUtil {
     static isFlashcardTag(settings: SRSettings, tag: string): boolean {
         return SettingsUtil.isTagInList(settings.flashcardTags, tag);

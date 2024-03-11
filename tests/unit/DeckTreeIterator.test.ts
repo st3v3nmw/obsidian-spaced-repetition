@@ -3,13 +3,7 @@ import { CardListType, Deck } from "src/Deck";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { SampleItemDecks } from "./SampleItems";
 import { TopicPath } from "src/TopicPath";
-import {
-    CardOrder,
-    DeckTreeIterator,
-    IIteratorOrder,
-    IteratorDeckSource,
-    DeckOrder,
-} from "src/DeckTreeIterator";
+import { CardOrder, DeckTreeIterator, IIteratorOrder, DeckOrder } from "src/DeckTreeIterator";
 import {
     StaticDateProvider,
     globalDateProvider,
@@ -49,37 +43,37 @@ Q3::A3`;
                 cardOrder: CardOrder.NewFirstSequential,
                 deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
-            IteratorDeckSource.UpdatedByIterator,
+            deck,
         );
-        iterator.setDeck(deck);
+        iterator.setIteratorTopicPath(TopicPath.emptyPath);
         expect(iterator.currentDeck).toEqual(null);
     });
 });
 
-describe("nextCard", () => {
+describe("nextCard - Cards only present in a single deck", () => {
     describe("DeckOrder.PrevDeckComplete_Sequential; Sequential card ordering", () => {
         describe("Due cards before new cards", () => {
             test("Single topic, new cards only", async () => {
-                let text: string = `
+                let text: string = `#flashcards
 Q1::A1
 Q2::A2
 Q3::A3`;
                 let deck: Deck = await SampleItemDecks.createDeckFromText(
                     text,
-                    new TopicPath(["Root"]),
+                    TopicPath.emptyPath,
                 );
                 let iterator: DeckTreeIterator = new DeckTreeIterator(
                     {
                         cardOrder: CardOrder.DueFirstSequential,
                         deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
-                    IteratorDeckSource.UpdatedByIterator,
+                    deck,
                 );
-                iterator.setDeck(deck);
+                iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
                 // No due cards, so expect the new ones immediately
                 expect(iterator.nextCard()).toEqual(true);
-                expect(iterator.currentDeck.deckName).toEqual("Root");
+                expect(iterator.currentDeck.deckName).toEqual("flashcards");
                 expect(iterator.currentCard.front).toEqual("Q1");
 
                 expect(iterator.nextCard()).toEqual(true);
@@ -93,7 +87,7 @@ Q3::A3`;
 
             describe("Single topic, mixture of new and scheduled cards", () => {
                 test("Get the scheduled cards first", async () => {
-                    let text: string = `
+                    let text: string = `#flashcards
 Q1::A1
 Q2::A2 <!--SR:!2023-09-02,4,270-->
 Q3::A3
@@ -102,16 +96,16 @@ Q5::A5 <!--SR:!2023-09-02,4,270-->
 Q6::A6`;
                     let deck: Deck = await SampleItemDecks.createDeckFromText(
                         text,
-                        new TopicPath(["Root"]),
+                        TopicPath.emptyPath,
                     );
                     iterator = new DeckTreeIterator(
                         {
                             cardOrder: CardOrder.DueFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
-                        IteratorDeckSource.UpdatedByIterator,
+                        deck,
                     );
-                    iterator.setDeck(deck);
+                    iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
                     // Scheduled cards first
                     nextCardThenCheck("Q2");
@@ -145,16 +139,16 @@ Q6::A6`;
                                 `;
                     let deck: Deck = await SampleItemDecks.createDeckFromText(
                         text,
-                        new TopicPath(["Root"]),
+                        TopicPath.emptyPath,
                     );
                     iterator = new DeckTreeIterator(
                         {
                             cardOrder: CardOrder.DueFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
-                        IteratorDeckSource.UpdatedByIterator,
+                        deck,
                     );
-                    iterator.setDeck(deck);
+                    iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
                     // Due root deck's cards first
                     nextCardThenCheck("Q2");
@@ -182,25 +176,25 @@ Q6::A6`;
 
         describe("New cards before due cards", () => {
             test("Single topic, new cards only", async () => {
-                let text: string = `
+                let text: string = `#flashcards
 Q1::A1
 Q2::A2
 Q3::A3`;
                 let deck: Deck = await SampleItemDecks.createDeckFromText(
                     text,
-                    new TopicPath(["Root"]),
+                    TopicPath.emptyPath,
                 );
                 let iterator: DeckTreeIterator = new DeckTreeIterator(
                     {
                         cardOrder: CardOrder.NewFirstSequential,
                         deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
-                    IteratorDeckSource.UpdatedByIterator,
+                    deck,
                 );
-                iterator.setDeck(deck);
+                iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
                 expect(iterator.nextCard()).toEqual(true);
-                expect(iterator.currentDeck.deckName).toEqual("Root");
+                expect(iterator.currentDeck.deckName).toEqual("flashcards");
                 expect(iterator.currentCard.front).toEqual("Q1");
 
                 expect(iterator.nextCard()).toEqual(true);
@@ -214,7 +208,7 @@ Q3::A3`;
 
             describe("Single topic, mixture of new and scheduled cards", () => {
                 test("Get the new cards first", async () => {
-                    let text: string = `
+                    let text: string = `#flashcards
 Q1::A1
 Q2::A2 <!--SR:!2023-09-02,4,270-->
 Q3::A3
@@ -223,16 +217,16 @@ Q5::A5 <!--SR:!2023-09-02,4,270-->
 Q6::A6`;
                     let deck: Deck = await SampleItemDecks.createDeckFromText(
                         text,
-                        new TopicPath(["Root"]),
+                        TopicPath.emptyPath,
                     );
                     iterator = new DeckTreeIterator(
                         {
                             cardOrder: CardOrder.NewFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
-                        IteratorDeckSource.UpdatedByIterator,
+                        deck,
                     );
-                    iterator.setDeck(deck);
+                    iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
                     // New cards first
                     nextCardThenCheck("Q1");
@@ -249,7 +243,7 @@ Q6::A6`;
                 });
 
                 test("Get the scheduled cards first", async () => {
-                    let text: string = `
+                    let text: string = `#flashcards
 Q1::A1
 Q2::A2 <!--SR:!2023-09-02,4,270-->
 Q3::A3
@@ -258,16 +252,16 @@ Q5::A5 <!--SR:!2023-09-02,4,270-->
 Q6::A6`;
                     let deck: Deck = await SampleItemDecks.createDeckFromText(
                         text,
-                        new TopicPath(["Root"]),
+                        TopicPath.emptyPath,
                     );
                     iterator = new DeckTreeIterator(
                         {
                             cardOrder: CardOrder.DueFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
-                        IteratorDeckSource.UpdatedByIterator,
+                        deck,
                     );
-                    iterator.setDeck(deck);
+                    iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
                     // Scheduled cards first
                     nextCardThenCheck("Q2");
@@ -301,16 +295,16 @@ Q6::A6`;
                                 `;
                     let deck: Deck = await SampleItemDecks.createDeckFromText(
                         text,
-                        new TopicPath(["Root"]),
+                        TopicPath.emptyPath,
                     );
                     iterator = new DeckTreeIterator(
                         {
                             cardOrder: CardOrder.NewFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
-                        IteratorDeckSource.UpdatedByIterator,
+                        deck,
                     );
-                    iterator.setDeck(deck);
+                    iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
                     // New root deck's cards first
                     nextCardThenCheck("Q1");
@@ -338,7 +332,7 @@ Q6::A6`;
     describe("DeckOrder.PrevDeckComplete_Sequential; Random card ordering", () => {
         describe("Due cards before new cards", () => {
             test("All new cards", async () => {
-                let text: string = `
+                let text: string = `#flashcards
 Q0::A0
 Q1::A1
 Q2::A2
@@ -348,16 +342,16 @@ Q5::A5
 Q6::A6`;
                 let deck: Deck = await SampleItemDecks.createDeckFromText(
                     text,
-                    new TopicPath(["Root"]),
+                    TopicPath.emptyPath,
                 );
                 iterator = new DeckTreeIterator(
                     {
                         cardOrder: CardOrder.DueFirstRandom,
                         deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
-                    IteratorDeckSource.UpdatedByIterator,
+                    deck,
                 );
-                iterator.setDeck(deck);
+                iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
                 // [0, 1, 2, 3, 4, 5, 6]
                 setupNextRandomNumber({ lower: 0, upper: 6, next: 5 });
@@ -386,7 +380,7 @@ Q6::A6`;
             });
 
             test("Mixture new/scheduled", async () => {
-                let text: string = `
+                let text: string = `#flashcards
 QN0::A
 QS0::A <!--SR:!2023-09-02,4,270-->
 QN1::A
@@ -397,16 +391,16 @@ QN3::A
 QS3::Q <!--SR:!2023-09-02,4,270-->`;
                 let deck: Deck = await SampleItemDecks.createDeckFromText(
                     text,
-                    new TopicPath(["Root"]),
+                    TopicPath.emptyPath,
                 );
                 iterator = new DeckTreeIterator(
                     {
                         cardOrder: CardOrder.DueFirstRandom,
                         deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
-                    IteratorDeckSource.UpdatedByIterator,
+                    deck,
                 );
-                iterator.setDeck(deck);
+                iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
                 // Scheduled cards first
                 // [QN0, QN1, QN2, QN3], [QS0, QS1, QS2, QS3]
@@ -463,18 +457,15 @@ QS3::Q <!--SR:!2023-09-02,4,270-->`;
 
 #flashcards/science/chemistry Q8::A8
                         `;
-            let deck: Deck = await SampleItemDecks.createDeckFromText(
-                text,
-                new TopicPath(["Root"]),
-            );
+            let deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
             iterator = new DeckTreeIterator(
                 {
                     cardOrder: CardOrder.NewFirstSequential,
                     deckOrder: DeckOrder.PrevDeckComplete_Random,
                 },
-                IteratorDeckSource.UpdatedByIterator,
+                deck,
             );
-            iterator.setDeck(deck);
+            iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
             // New root deck's cards first Q1/Q3, then due cards - Q2
             setupNextRandomNumber({ lower: 0, upper: 3, next: 0 });
@@ -521,18 +512,15 @@ QS3::Q <!--SR:!2023-09-02,4,270-->`;
 
 #flashcards/science/chemistry Q8::A8
                         `;
-            let deck: Deck = await SampleItemDecks.createDeckFromText(
-                text,
-                new TopicPath(["Root"]),
-            );
+            let deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
             iterator = new DeckTreeIterator(
                 {
                     cardOrder: CardOrder.EveryCardRandomDeckAndCard,
                     deckOrder: null,
                 },
-                IteratorDeckSource.UpdatedByIterator,
+                deck,
             );
-            iterator.setDeck(deck);
+            iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
             // 8 cards to choose from (hence we expect the random number provider to be asked
             // for a random number 0... 7):
@@ -575,38 +563,129 @@ QS3::Q <!--SR:!2023-09-02,4,270-->`;
     });
 });
 
+describe("nextCard - Some cards present in multiple decks", () => {
+    describe("DeckOrder.PrevDeckComplete_Sequential; Sequential card ordering", () => {
+        test("Iterating over complete deck tree", async () => {
+            let text: string = `#flashcards
+Q1::A1
+
+#flashcards/folder1
+Q21::A21
+
+#flashcards/folder2
+Q31::A31
+
+#flashcards/folder1 #flashcards/folder2
+Q11::A11
+Q12::A12
+`;
+            const [deck, iterator] = await SampleItemDecks.createDeckAndIteratorFromText(
+                text,
+                TopicPath.emptyPath,
+                CardOrder.DueFirstSequential,
+                DeckOrder.PrevDeckComplete_Sequential,
+            );
+            iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
+
+            // Start off with cards in the top most deck, i.e. #flashcards
+            expect(iterator.nextCard()).toEqual(true);
+            expect(iterator.currentDeck.deckName).toEqual("flashcards");
+            expect(iterator.currentCard.front).toEqual("Q1");
+
+            // Now those in #flashcards/folder1
+            expect(iterator.nextCard()).toEqual(true);
+            expect(iterator.currentCard.front).toEqual("Q21"); // Specific to #flashcards/folder1
+            expect(iterator.nextCard()).toEqual(true);
+            expect(iterator.currentCard.front).toEqual("Q11"); // Common to #flashcards/folder1 & folder2
+            expect(iterator.nextCard()).toEqual(true);
+            expect(iterator.currentCard.front).toEqual("Q12"); // Common to #flashcards/folder1 & folder2
+
+            // Now those in #flashcards/folder2
+            expect(iterator.nextCard()).toEqual(true);
+            expect(iterator.currentCard.front).toEqual("Q31");
+
+            // Ones common to both folder1 and folder2 are not returned for folder2
+            // i.e. we don't see Q11 or Q12 again
+            expect(iterator.nextCard()).toEqual(false);
+        });
+
+        test("Iterating over portion of deck tree still deletes hard-linked cards in non-iterated portion of the deck", async () => {
+            let text: string = `#flashcards
+Q1::A1
+
+#flashcards/folder1
+Q21::A21
+
+#flashcards/folder2
+Q31::A31
+
+#flashcards/folder1 #flashcards/folder2
+Q11::A11
+Q12::A12
+`;
+            const [deck, iterator] = await SampleItemDecks.createDeckAndIteratorFromText(
+                text,
+                TopicPath.emptyPath,
+                CardOrder.DueFirstSequential,
+                DeckOrder.PrevDeckComplete_Sequential,
+            );
+
+            // Before iterating folder2, there are (1 + 2) cards in folder1
+            let subdeck: Deck = deck.getDeckByTopicTag("#flashcards/folder1");
+            expect(subdeck.getCardCount(CardListType.All, false)).toEqual(3);
+
+            // Iterate cards in #flashcards/folder2
+            iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards/folder2"));
+
+            expect(iterator.nextCard()).toEqual(true);
+            expect(iterator.currentCard.front).toEqual("Q31");
+            expect(iterator.nextCard()).toEqual(true);
+            expect(iterator.currentCard.front).toEqual("Q11");
+            expect(iterator.nextCard()).toEqual(true);
+            expect(iterator.currentCard.front).toEqual("Q12");
+            expect(iterator.nextCard()).toEqual(false);
+
+            // After iterating folder2, there are (1 + 0) cards in folder1
+            subdeck = deck.getDeckByTopicTag("#flashcards/folder1");
+            expect(subdeck.getCardCount(CardListType.All, false)).toEqual(1);
+        });
+    });
+});
+
 describe("hasCurrentCard", () => {
     test("false immediately after setDeck", async () => {
-        let text: string = `
+        let text: string = `#flashcards
         Q1::A1
         Q2::A2
         Q3::A3`;
-        let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
+        let deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
         let iterator: DeckTreeIterator = new DeckTreeIterator(
             {
                 cardOrder: CardOrder.NewFirstSequential,
                 deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
-            IteratorDeckSource.UpdatedByIterator,
+            deck,
         );
-        iterator.setDeck(deck);
+        iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
+
         expect(iterator.hasCurrentCard).toEqual(false);
     });
 
     test("true immediately after nextCard", async () => {
-        let text: string = `
+        let text: string = `#flashcards
         Q1::A1
         Q2::A2
         Q3::A3`;
-        let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
+        let deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
         let iterator: DeckTreeIterator = new DeckTreeIterator(
             {
                 cardOrder: CardOrder.NewFirstSequential,
                 deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
-            IteratorDeckSource.UpdatedByIterator,
+            deck,
         );
-        iterator.setDeck(deck);
+        iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
+
         expect(iterator.nextCard()).toEqual(true);
         expect(iterator.hasCurrentCard).toEqual(true);
     });
@@ -614,19 +693,19 @@ describe("hasCurrentCard", () => {
 
 describe("deleteCurrentCard", () => {
     test("Delete after all cards iterated - exception throw", async () => {
-        let text: string = `
+        let text: string = `#flashcards
 Q1::A1
 Q2::A2
 Q3::A3`;
-        let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
+        let deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
         iterator = new DeckTreeIterator(
             {
                 cardOrder: CardOrder.NewFirstSequential,
                 deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
-            IteratorDeckSource.UpdatedByIterator,
+            deck,
         );
-        iterator.setDeck(deck);
+        iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
         expect(iterator.nextCard()).toEqual(true);
         expect(iterator.nextCard()).toEqual(true);
@@ -634,32 +713,33 @@ Q3::A3`;
         expect(iterator.nextCard()).toEqual(false);
 
         const t = () => {
-            iterator.deleteCurrentCard();
+            iterator.deleteCurrentCardFromAllDecks();
         };
         expect(t).toThrow();
     });
 
     test("Delete card, with single card remaining after it", async () => {
-        let text: string = `
+        let text: string = `#flashcards
 Q1::A1
 Q2::A2
 Q3::A3`;
-        let deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
-        expect(deck.newFlashcards.length).toEqual(3);
+        let deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
+        const flashcardDeck: Deck = deck.getDeckByTopicTag("#flashcards");
+        expect(flashcardDeck.newFlashcards.length).toEqual(3);
         iterator = new DeckTreeIterator(
             {
                 cardOrder: CardOrder.NewFirstSequential,
                 deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
-            IteratorDeckSource.UpdatedByIterator,
+            deck,
         );
-        iterator.setDeck(deck);
+        iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
         nextCardThenCheck("Q1");
         nextCardThenCheck("Q2");
-        expect(iterator.deleteCurrentCard()).toEqual(true);
+        expect(iterator.deleteCurrentCardFromAllDecks()).toEqual(true);
         expect(iterator.currentCard.front).toEqual("Q3");
-        expect(iterator.deleteCurrentCard()).toEqual(false);
+        expect(iterator.deleteCurrentCardFromAllDecks()).toEqual(false);
     });
 });
 
