@@ -1,4 +1,12 @@
-import { Notice, Plugin, TAbstractFile, TFile, getAllTags, FrontMatterCache } from "obsidian";
+import {
+    Notice,
+    Plugin,
+    TAbstractFile,
+    TFile,
+    getAllTags,
+    FrontMatterCache,
+    WorkspaceLeaf,
+} from "obsidian";
 import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, upgradeSettings } from "src/settings";
@@ -265,10 +273,18 @@ export default class SRPlugin extends Plugin {
             },
         });
 
+        this.addCommand({
+            id: "srs-open-review-queue-view",
+            name: t("OPEN_REVIEW_QUEUE_VIEW"),
+            callback: async () => {
+                await this.openReviewQueueView();
+            },
+        });
+
         this.addSettingTab(new SRSettingTab(this.app, this));
 
-        this.app.workspace.onLayoutReady(() => {
-            this.initView();
+        this.app.workspace.onLayoutReady(async () => {
+            await this.initReviewQueueView();
             setTimeout(async () => {
                 if (!this.syncLock) {
                     await this.sync();
@@ -527,7 +543,7 @@ export default class SRPlugin extends Plugin {
             }),
         );
 
-        if (this.data.settings.enableNoteReviewPaneOnStartup) this.reviewQueueView.redraw();
+        if (this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE)) this.reviewQueueView.redraw();
     }
 
     async loadNote(noteFile: TFile): Promise<Note> {
@@ -774,7 +790,16 @@ export default class SRPlugin extends Plugin {
         await this.saveData(this.data);
     }
 
-    initView(): void {
+    private getActiveLeaf(type: string): WorkspaceLeaf | null {
+        const leaves = this.app.workspace.getLeavesOfType(type);
+        if (leaves.length == 0) {
+            return null;
+        }
+
+        return leaves[0];
+    }
+
+    private async initReviewQueueView() {
         this.registerView(
             REVIEW_QUEUE_VIEW_TYPE,
             (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this)),
@@ -782,12 +807,29 @@ export default class SRPlugin extends Plugin {
 
         if (
             this.data.settings.enableNoteReviewPaneOnStartup &&
-            app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).length == 0
+            this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE) == null
         ) {
-            this.app.workspace.getRightLeaf(false).setViewState({
-                type: REVIEW_QUEUE_VIEW_TYPE,
-                active: true,
-            });
+            await this.activateReviewQueueViewPanel();
+        }
+    }
+
+    private async activateReviewQueueViewPanel() {
+        await this.app.workspace.getRightLeaf(false).setViewState({
+            type: REVIEW_QUEUE_VIEW_TYPE,
+            active: true,
+        });
+    }
+
+    private async openReviewQueueView() {
+        let reviewQueueLeaf = this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE);
+        if (reviewQueueLeaf == null) {
+            await this.activateReviewQueueViewPanel();
+            reviewQueueLeaf = this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE);
+        }
+
+        if (reviewQueueLeaf !== null) {
+            this.app.workspace.revealLeaf(reviewQueueLeaf);
+            this.updateAndSortDueNotes();
         }
     }
 }

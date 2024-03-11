@@ -32,6 +32,7 @@ export default {
     REVIEW_CARDS_IN_NOTE: "このノートのフラッシュカードをレビューする",
     CRAM_CARDS_IN_NOTE: "このノートのフラッシュカードを詰め込み学習する",
     VIEW_STATS: "統計を閲覧する",
+    OPEN_REVIEW_QUEUE_VIEW: "Open Notes Review Queue in sidebar",
     STATUS_BAR: "レビュー: ${dueNotesCount}ノート, ${dueFlashcardsCount}カードが期日",
     SYNC_TIME_TAKEN: "同期に${t}msかかりました。",
     NOTE_IN_IGNORED_FOLDER: "ノートが無視するフォルダに保存されています(設定を確認してください)。",

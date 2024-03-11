@@ -32,6 +32,7 @@ export default {
     REVIEW_CARDS_IN_NOTE: "Rivedi schede in questa nota",
     CRAM_CARDS_IN_NOTE: "Memorizza schede in questa nota",
     VIEW_STATS: "Vedi statistiche",
+    OPEN_REVIEW_QUEUE_VIEW: "Open Notes Review Queue in sidebar",
     STATUS_BAR: "Da rivedere: ${dueNotesCount} scheda/e, ${dueFlashcardsCount} schede in ritardo",
     SYNC_TIME_TAKEN: "Sincronizzato in ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "La nota è salvata in una cartella ignorata (rivedi le impostazioni).",
