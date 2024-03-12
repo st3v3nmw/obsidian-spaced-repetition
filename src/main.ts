@@ -1,11 +1,10 @@
-import { Notice, Plugin, TAbstractFile, TFile, getAllTags, FrontMatterCache } from "obsidian";
+import { Notice, Plugin, TAbstractFile, TFile, getAllTags, FrontMatterCache, WorkspaceLeaf } from "obsidian";
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, upgradeSettings, SettingsUtil } from "src/settings";
 import { FlashcardModal } from "src/gui/flashcard-modal";
 import { StatsModal } from "src/gui/stats-modal";
-import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/sidebar";
+import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/ReviewQueueListView";
 import { osrSchedule } from "src/algorithms/osr/NoteScheduling";
 import { YAML_FRONT_MATTER_REGEX, SCHEDULING_INFO_REGEX } from "src/constants";
-import { NoteReviewDeck } from "src/NoteReviewDeck";
 import { t } from "src/lang/helpers";
 import { appIcon } from "src/icons/appicon";
 import { TopicPath } from "./TopicPath";
@@ -40,33 +39,42 @@ import { SrsAlgorithm_Osr } from "./algorithms/osr/SrsAlgorithm_Osr";
 import { OsrAppCore } from "./OsrAppCore";
 import { DEFAULT_DATA, PluginData } from "./PluginData";
 import { NextNoteReviewHandler } from "./NextNoteReviewHandler";
+import { OsrSidebar } from "./gui/OsrSidebar";
 
 
 
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
-    private reviewQueueView: ReviewQueueListView;
     public data: PluginData;
     private osrAppCore: OsrAppCore;
-
+    private osrSidebar: OsrSidebar;
+    private nextNoteReviewHandler: NextNoteReviewHandler;
 
     async onload(): Promise<void> {
         console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-02-28");
         await this.loadPluginData();
 
+        this.initLogicClasses();
+
+        this.initGuiItems();
+    }
+
+    private initLogicClasses() {
         const questionPostponementList: QuestionPostponementList = new QuestionPostponementList(
             this,
             this.data.settings,
-            this.data.buryList,
+            this.data.buryList
         );
 
         const osrNoteLinkInfoFinder: ObsidianVaultNoteLinkInfoFinder = new ObsidianVaultNoteLinkInfoFinder(this.app.metadataCache);
 
         this.osrAppCore = new OsrAppCore();
         this.osrAppCore.init(questionPostponementList, osrNoteLinkInfoFinder, this.data.settings,
-            this.onOsrVaultDataChanged.bind(this),
+            this.onOsrVaultDataChanged.bind(this)
         );
+    }
 
+    private initGuiItems() {
         appIcon();
 
         this.statusBar = this.addStatusBarItem();
@@ -76,7 +84,7 @@ export default class SRPlugin extends Plugin {
         this.statusBar.addEventListener("click", async () => {
             if (!this.osrAppCore.syncLock) {
                 await this.sync();
-                this.osrAppCore.nextNoteReviewHandler.reviewNextNoteModal();
+                this.nextNoteReviewHandler.reviewNextNoteModal();
             }
         });
 
@@ -86,11 +94,28 @@ export default class SRPlugin extends Plugin {
                 this.openFlashcardModal(
                     this.osrAppCore.reviewableDeckTree,
                     this.osrAppCore.remainingDeckTree,
-                    FlashcardReviewMode.Review,
+                    FlashcardReviewMode.Review
                 );
             }
         });
 
+        this.addFileMenuItems();
+
+        this.addPluginCommands();
+
+        this.addSettingTab(new SRSettingTab(this.app, this));
+
+        this.app.workspace.onLayoutReady(async () => {
+            await this.osrSidebar.init();
+            setTimeout(async () => {
+                if (!this.osrAppCore.syncLock) {
+                    await this.sync();
+                }
+            }, 2000);
+        });
+    }
+
+    private addFileMenuItems() {
         if (!this.data.settings.disableFileMenuReviewOptions) {
             this.registerEvent(
                 this.app.workspace.on("file-menu", (menu, fileish: TAbstractFile) => {
@@ -99,7 +124,7 @@ export default class SRPlugin extends Plugin {
                             item.setTitle(
                                 t("REVIEW_DIFFICULTY_FILE_MENU", {
                                     difficulty: this.data.settings.flashcardEasyText,
-                                }),
+                                })
                             )
                                 .setIcon("SpacedRepIcon")
                                 .onClick(() => {
@@ -111,7 +136,7 @@ export default class SRPlugin extends Plugin {
                             item.setTitle(
                                 t("REVIEW_DIFFICULTY_FILE_MENU", {
                                     difficulty: this.data.settings.flashcardGoodText,
-                                }),
+                                })
                             )
                                 .setIcon("SpacedRepIcon")
                                 .onClick(() => {
@@ -123,7 +148,7 @@ export default class SRPlugin extends Plugin {
                             item.setTitle(
                                 t("REVIEW_DIFFICULTY_FILE_MENU", {
                                     difficulty: this.data.settings.flashcardHardText,
-                                }),
+                                })
                             )
                                 .setIcon("SpacedRepIcon")
                                 .onClick(() => {
@@ -131,17 +156,19 @@ export default class SRPlugin extends Plugin {
                                 });
                         });
                     }
-                }),
+                })
             );
         }
+    }
 
+    private addPluginCommands() {
         this.addCommand({
             id: "srs-note-review-open-note",
             name: t("OPEN_NOTE_FOR_REVIEW"),
             callback: async () => {
                 if (!this.osrAppCore.syncLock) {
                     await this.sync();
-                    this.osrAppCore.nextNoteReviewHandler.reviewNextNoteModal();
+                    this.nextNoteReviewHandler.reviewNextNoteModal();
                 }
             },
         });
@@ -194,7 +221,7 @@ export default class SRPlugin extends Plugin {
                     this.openFlashcardModal(
                         this.osrAppCore.reviewableDeckTree,
                         this.osrAppCore.remainingDeckTree,
-                        FlashcardReviewMode.Review,
+                        FlashcardReviewMode.Review
                     );
                 }
             },
@@ -246,19 +273,8 @@ export default class SRPlugin extends Plugin {
             id: "srs-open-review-queue-view",
             name: t("OPEN_REVIEW_QUEUE_VIEW"),
             callback: async () => {
-                await this.openReviewQueueView();
+                await this.osrSidebar.openReviewQueueView();
             },
-        });
-
-        this.addSettingTab(new SRSettingTab(this.app, this));
-
-        this.app.workspace.onLayoutReady(async () => {
-            await this.initReviewQueueView();
-            setTimeout(async () => {
-                if (!this.osrAppCore.syncLock) {
-                    await this.sync();
-                }
-            }, 2000);
         });
     }
 
@@ -300,7 +316,7 @@ export default class SRPlugin extends Plugin {
         new FlashcardModal(this.app, this, this.data.settings, reviewSequencer, reviewMode).open();
     }
 
-    private static createDeckTreeIterator(settings: SRSettings, baseDeck: Deck): IDeckTreeIterator {
+    private static createDeckTreeIterator(settings: SRSettings): IDeckTreeIterator {
         let cardOrder: CardOrder = CardOrder[settings.flashcardCardOrder as keyof typeof CardOrder];
         if (cardOrder === undefined) cardOrder = CardOrder.DueFirstSequential;
         let deckOrder: DeckOrder = DeckOrder[settings.flashcardDeckOrder as keyof typeof DeckOrder];
@@ -310,7 +326,7 @@ export default class SRPlugin extends Plugin {
             deckOrder,
             cardOrder,
         };
-        return new DeckTreeIterator(iteratorOrder, baseDeck);
+        return new DeckTreeIterator(iteratorOrder, null);
     }
 
     async sync(): Promise<void> {
@@ -341,8 +357,7 @@ export default class SRPlugin extends Plugin {
                 dueFlashcardsCount: this.osrAppCore.remainingDeckTree.getCardCount(CardListType.All, true),
             }),
         );
-
-        if (this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE)) this.reviewQueueView.redraw();
+        this.osrSidebar.redraw();
     }
 
     async loadNote(noteFile: TFile): Promise<Note> {
@@ -390,57 +405,17 @@ export default class SRPlugin extends Plugin {
         this.data = Object.assign({}, DEFAULT_DATA, loadedData);
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
 
-        this.setupDataStoreAndAlgorithmInstances();
+        this.setupDataStoreAndAlgorithmInstances(this.data.settings);
+    }
+
+    setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
+        // For now we can hardcoded as we only support the one data store and one algorithm
+        DataStore.instance = new DataStore_StoreInNote(settings);
+        SrsAlgorithm.instance = new SrsAlgorithm_Osr(settings);
+        DataStoreAlgorithm.instance = new DataStoreInNote_AlgorithmOsr(settings);
     }
 
     async savePluginData(): Promise<void> {
         await this.saveData(this.data);
-    }
-
-    private getActiveLeaf(type: string): WorkspaceLeaf | null {
-        const leaves = this.app.workspace.getLeavesOfType(type);
-        if (leaves.length == 0) {
-            return null;
-        }
-
-        return leaves[0];
-    }
-
-    private async initReviewQueueView() {
-
-        this.registerView(
-            REVIEW_QUEUE_VIEW_TYPE,
-            (leaf) => {
-                const nextNoteReviewHandler: NextNoteReviewHandler = new NextNoteReviewHandler(this.app, this.data.settings, this.app.workspace, this.osrAppCore.noteReviewQueue); 
-                return this.reviewQueueView = new ReviewQueueListView(leaf, this.app, nextNoteReviewHandler, this.data.settings); 
-            },
-        );
-
-        if (
-            this.data.settings.enableNoteReviewPaneOnStartup &&
-            this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE) == null
-        ) {
-            await this.activateReviewQueueViewPanel();
-        }
-    }
-
-    private async activateReviewQueueViewPanel() {
-        await this.app.workspace.getRightLeaf(false).setViewState({
-            type: REVIEW_QUEUE_VIEW_TYPE,
-            active: true,
-        });
-    }
-
-    private async openReviewQueueView() {
-        let reviewQueueLeaf = this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE);
-        if (reviewQueueLeaf == null) {
-            await this.activateReviewQueueViewPanel();
-            reviewQueueLeaf = this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE);
-        }
-
-        if (reviewQueueLeaf !== null) {
-            this.app.workspace.revealLeaf(reviewQueueLeaf);
-            this.updateAndSortDueNotes();
-        }
     }
 }

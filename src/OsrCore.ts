@@ -30,7 +30,6 @@ export class OsrCore {
     private _easeByPath: NoteEaseList;
     private _questionPostponementList: QuestionPostponementList;
     private _noteReviewQueue: NoteReviewQueue;
-    private _nextNoteReviewHandler: NextNoteReviewHandler;
 
     private fullDeckTree: Deck;
     private _reviewableDeckTree: Deck = new Deck("root", null);
@@ -39,10 +38,6 @@ export class OsrCore {
 
     get noteReviewQueue(): NoteReviewQueue {
         return this._noteReviewQueue;
-    }
-
-    get nextNoteReviewHandler(): NextNoteReviewHandler {
-        return this._nextNoteReviewHandler;
     }
 
     get remainingDeckTree(): Deck {

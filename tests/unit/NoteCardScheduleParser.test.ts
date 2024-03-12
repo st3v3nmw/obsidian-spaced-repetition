@@ -7,11 +7,9 @@ import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetu
 import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/RepItemScheduleInfo_Osr";
 import { RepItemScheduleInfo } from "src/algorithms/base/RepItemScheduleInfo";
 
-let noteEaseList: NoteEaseList = new NoteEaseList(DEFAULT_SETTINGS);
-
 beforeAll(() => {
     setupStaticDateProvider_20230906();
-    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS, noteEaseList);
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 test("No schedule info for question", () => {

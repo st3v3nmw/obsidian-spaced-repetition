@@ -1,5 +1,4 @@
 import { App, Notice, Workspace } from "obsidian";
-import { CardListType } from "./Deck";
 import { DueDateHistogram } from "./DueDateHistogram";
 import { NoteReviewDeck, SchedNote } from "./NoteReviewDeck";
 import { ISRFile } from "./SRFile";
@@ -9,14 +8,26 @@ import { globalDateProvider } from "./util/DateProvider";
 import { SRSettings } from "./settings";
 
 export class NoteReviewQueue {
-    public reviewDecks: Map<string, NoteReviewDeck>;
-    public dueNotesCount: number = 0;
-    public dueDatesHistogram: DueDateHistogram;
+    private _reviewDecks: Map<string, NoteReviewDeck>;
+    private _dueNotesCount: number = 0;
+    private _dueDatesHistogram: DueDateHistogram;
 
-    init() {
-        this.reviewDecks = new Map<string, NoteReviewDeck>();
-        this.dueNotesCount = 0;
-        this.dueDatesHistogram = new DueDateHistogram();
+    get reviewDecks(): Map<string, NoteReviewDeck> {
+        return this._reviewDecks;
+    }
+
+    get dueNotesCount(): number {
+        return this._dueNotesCount;
+    }
+
+    get dueDatesHistogram(): DueDateHistogram {
+        return this._dueDatesHistogram;
+    }
+
+    init(): void {
+        this._reviewDecks = new Map<string, NoteReviewDeck>();
+        this._dueNotesCount = 0;
+        this._dueDatesHistogram = new DueDateHistogram();
     }
 
     addNoteToQueue(noteFile: ISRFile, noteSchedule: RepItemScheduleInfo, matchedNoteTags: string[]): void {
@@ -37,9 +48,9 @@ export class NoteReviewQueue {
         }
     }
     
-    determineScheduleInfo(osrNoteGraph: OsrNoteGraph) {
-        this.dueNotesCount = 0;
-        this.dueDatesHistogram = new DueDateHistogram();
+    determineScheduleInfo(osrNoteGraph: OsrNoteGraph): void {
+        this._dueNotesCount = 0;
+        this._dueDatesHistogram = new DueDateHistogram();
 
         const today = globalDateProvider.today;
         Object.values(this.reviewDecks).forEach((reviewDeck: NoteReviewDeck) => {
@@ -47,7 +58,7 @@ export class NoteReviewQueue {
             reviewDeck.scheduledNotes.forEach((scheduledNote: SchedNote) => {
                 if (scheduledNote.dueUnix <= today.valueOf()) {
                     reviewDeck.dueNotesCount++;
-                    this.dueNotesCount++;
+                    this._dueNotesCount++;
                 }
 
                 const nDays: number = Math.ceil(

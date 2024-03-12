@@ -3,7 +3,6 @@ import { App, Notice, Platform, setIcon } from "obsidian";
 
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
-import { textInterval, ReviewResponse } from "src/scheduling";
 import { t } from "src/lang/helpers";
 import { Card } from "../Card";
 import { CardListType, Deck } from "../Deck";
@@ -14,8 +13,10 @@ import {
 } from "src/FlashcardReviewSequencer";
 import { Note } from "src/Note";
 import { RenderMarkdownWrapper } from "src/util/RenderMarkdownWrapper";
-import { CardScheduleInfo } from "src/CardSchedule";
 import { FlashcardModalMode } from "./flashcard-modal";
+import { ReviewResponse } from "src/algorithms/base/RepetitionItem";
+import { textInterval } from "src/algorithms/osr/NoteScheduling";
+import { RepItemScheduleInfo } from "src/algorithms/base/RepItemScheduleInfo";
 
 export class FlashcardReviewView {
     public app: App;
@@ -268,7 +269,7 @@ export class FlashcardReviewView {
 
     displayCurrentCardInfoNotice() {
         const schedule = this.currentCard.scheduleInfo;
-        const currentEaseStr = t("CURRENT_EASE_HELP_TEXT") + (schedule?.ease ?? t("NEW"));
+        const currentEaseStr = t("CURRENT_EASE_HELP_TEXT") + (schedule?.latestEase ?? t("NEW"));
         const currentIntervalStr =
             t("CURRENT_INTERVAL_HELP_TEXT") + textInterval(schedule?.interval, false);
         const generatedFromStr = t("CARD_GENERATED_FROM", {
@@ -393,7 +394,7 @@ export class FlashcardReviewView {
         buttonName: string,
         reviewResponse: ReviewResponse,
     ) {
-        const schedule: CardScheduleInfo = this.reviewSequencer.determineCardSchedule(
+        const schedule: RepItemScheduleInfo = this.reviewSequencer.determineCardSchedule(
             reviewResponse,
             this.currentCard,
         );

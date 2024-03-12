@@ -11,10 +11,9 @@ import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetu
 
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 var noteFileLoader: NoteFileLoader = new NoteFileLoader(DEFAULT_SETTINGS);
-let noteEaseList: NoteEaseList = new NoteEaseList(DEFAULT_SETTINGS);
 
 beforeAll(() => {
-    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS, noteEaseList);
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 describe("appendCardsToDeck", () => {

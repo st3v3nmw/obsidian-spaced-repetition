@@ -1,5 +1,4 @@
 import { ItemView, WorkspaceLeaf, Menu, TFile, App } from "obsidian";
-
 import { COLLAPSE_ICON } from "src/constants";
 import { NoteReviewDeck } from "src/NoteReviewDeck";
 import { t } from "src/lang/helpers";
@@ -220,8 +219,7 @@ export class ReviewQueueListView extends ItemView {
             "click",
             async (event: MouseEvent) => {
                 event.preventDefault();
-                this.nextNoteReviewHandler.lastSelectedReviewDeck = deck.deckName;
-                await this.app.workspace.getLeaf().openFile(file);
+                await this.nextNoteReviewHandler.openNote(deck.deckName, file);
                 return false;
             },
             false,

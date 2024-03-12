@@ -43,7 +43,6 @@ class TestContext {
     reviewMode: FlashcardReviewMode;
     iteratorOrder: IIteratorOrder;
     cardSequencer: IDeckTreeIterator;
-    noteEaseList: INoteEaseList;
     reviewSequencer: IFlashcardReviewSequencer;
     questionPostponementList: QuestionPostponementList;
     file: UnitTestSRFile;
@@ -106,8 +105,7 @@ class TestContext {
             iteratorOrder,
             null,
         );
-        let noteEaseList = new NoteEaseList(settingsClone);
-        unitTestSetup_StandardDataStoreAlgorithm(settingsClone, noteEaseList);
+        unitTestSetup_StandardDataStoreAlgorithm(settingsClone);
         let cardPostponementList: QuestionPostponementList = new QuestionPostponementList(
             null,
             settingsClone,
@@ -127,7 +125,6 @@ class TestContext {
             reviewMode,
             iteratorOrder,
             cardSequencer,
-            noteEaseList,
             reviewSequencer,
             questionPostponementList: cardPostponementList,
             file,

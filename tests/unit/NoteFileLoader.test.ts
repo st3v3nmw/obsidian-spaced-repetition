@@ -7,10 +7,9 @@ import { NoteEaseList } from "src/NoteEaseList";
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
 
 var noteFileLoader: NoteFileLoader = new NoteFileLoader(DEFAULT_SETTINGS);
-let noteEaseList: NoteEaseList = new NoteEaseList(DEFAULT_SETTINGS);
 
 beforeAll(() => {
-    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS, noteEaseList);
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 describe("load", () => {

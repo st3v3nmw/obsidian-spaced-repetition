@@ -9,11 +9,10 @@ import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetu
 import { NoteEaseList } from "src/NoteEaseList";
 
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
-let noteEaseList: NoteEaseList = new NoteEaseList(DEFAULT_SETTINGS);
 
 beforeAll(() => {
     setupStaticDateProvider_20230906();
-    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS, noteEaseList);
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 describe("Multiple questions in the text", () => {

@@ -1,4 +1,4 @@
-import { App, Notice, Workspace } from "obsidian";
+import { App, Notice, TFile, Workspace } from "obsidian";
 import { SRSettings } from "./settings";
 import { NoteReviewQueue } from "./NoteReviewQueue";
 import { t } from "./lang/helpers";
@@ -9,7 +9,11 @@ export class NextNoteReviewHandler {
     private settings: SRSettings;
     private workspace: Workspace;
     public noteReviewQueue: NoteReviewQueue;
-    public lastSelectedReviewDeck: string;
+    private _lastSelectedReviewDeck: string;
+
+    get lastSelectedReviewDeck(): string {
+        return this._lastSelectedReviewDeck;
+    }
     
     constructor(app: App, settings: SRSettings, workspace: Workspace, noteReviewQueue: NoteReviewQueue) {
         this.app = app;
@@ -20,15 +24,15 @@ export class NextNoteReviewHandler {
    
     async autoReviewNextNote(): Promise<void> {
         if (this.settings.autoNextNote) {
-            if (!this.lastSelectedReviewDeck) {
+            if (!this._lastSelectedReviewDeck) {
                 const reviewDeckKeys: string[] = Object.keys(this.noteReviewQueue.reviewDecks);
-                if (reviewDeckKeys.length > 0) this.lastSelectedReviewDeck = reviewDeckKeys[0];
+                if (reviewDeckKeys.length > 0) this._lastSelectedReviewDeck = reviewDeckKeys[0];
                 else {
                     new Notice(t("ALL_CAUGHT_UP"));
                     return;
                 }
             }
-            this.reviewNextNote(this.lastSelectedReviewDeck);
+            this.reviewNextNote(this._lastSelectedReviewDeck);
         }
     }
 
@@ -50,14 +54,14 @@ export class NextNoteReviewHandler {
             return;
         }
 
-        this.lastSelectedReviewDeck = deckKey;
+        this._lastSelectedReviewDeck = deckKey;
         const deck = this.noteReviewQueue.reviewDecks.get(deckKey);
 
         if (deck.dueNotesCount > 0) {
             const index = this.settings.openRandomNote
                 ? Math.floor(Math.random() * deck.dueNotesCount)
                 : 0;
-            await this.workspace.getLeaf().openFile(deck.scheduledNotes[index].note.tfile);
+            await this.openNote(deckKey, deck.scheduledNotes[index].note.tfile);
             return;
         }
 
@@ -65,11 +69,15 @@ export class NextNoteReviewHandler {
             const index = this.settings.openRandomNote
                 ? Math.floor(Math.random() * deck.newNotes.length)
                 : 0;
-            this.workspace.getLeaf().openFile(deck.newNotes[index].tfile);
+                await this.openNote(deckKey, deck.newNotes[index].tfile);
             return;
         }
 
         new Notice(t("ALL_CAUGHT_UP"));
     }
 
+    async openNote(deckName: string, file: TFile): Promise<void> {
+        this._lastSelectedReviewDeck = deckName;
+        await this.app.workspace.getLeaf().openFile(file);
+    }
 }

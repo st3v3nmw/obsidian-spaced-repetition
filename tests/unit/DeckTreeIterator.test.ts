@@ -23,12 +23,10 @@ let order_DueFirst_Sequential: IIteratorOrder = {
 
 var iterator: DeckTreeIterator;
 
-let noteEaseList: NoteEaseList = new NoteEaseList(DEFAULT_SETTINGS);
-
 beforeAll(() => {
     setupStaticDateProvider_20230906();
     setupStaticRandomNumberProvider();
-    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS, noteEaseList);
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 describe("setDeck", () => {

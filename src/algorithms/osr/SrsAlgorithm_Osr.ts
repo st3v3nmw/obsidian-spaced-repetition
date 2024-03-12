@@ -4,12 +4,11 @@ import { Moment } from "moment";
 import { RepItemScheduleInfo_Osr } from "./RepItemScheduleInfo_Osr";
 import { ReviewResponse } from "../base/RepetitionItem";
 import { SRSettings } from "src/settings";
-import { INoteEaseList } from "src/NoteEaseList";
+import { INoteEaseList, NoteEaseList } from "src/NoteEaseList";
 import { osrSchedule } from "src/algorithms/osr/NoteScheduling";
 import { ISrsAlgorithm } from "../base/ISrsAlgorithm";
 import { ISRFile } from "src/SRFile";
 import { LinkStat, NoteLinkStat, OsrNoteGraph } from "./OsrNoteGraph";
-import { App } from "obsidian";
 import { Question } from "src/Question";
 import { Note } from "src/Note";
 import moment from "moment";
@@ -17,16 +16,15 @@ import { DueDateHistogram } from "src/DueDateHistogram";
 
 
 export class SrsAlgorithm_Osr implements ISrsAlgorithm {
-    app: App;
-    settings: SRSettings;
-    noteEaseList: INoteEaseList;
-    dueDateFlashcardHistogram: DueDateHistogram;
-    dueDateNoteHistogram: DueDateHistogram;
-    osrNoteGraph: OsrNoteGraph;
+    private settings: SRSettings;
+    private noteEaseList: INoteEaseList;
+    private dueDateFlashcardHistogram: DueDateHistogram;
+    private dueDateNoteHistogram: DueDateHistogram;
+    private osrNoteGraph: OsrNoteGraph;
 
-    constructor(settings: SRSettings, noteEaseList: INoteEaseList) {
+    constructor(settings: SRSettings) {
         this.settings = settings;
-        this.noteEaseList = noteEaseList;
+        this.noteEaseList = new NoteEaseList(settings);
     }
 
     static get initialInterval(): number {

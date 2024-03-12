@@ -18,11 +18,10 @@ settings_ConvertFoldersToDecks.convertFoldersToDecks = true;
 let parser_ConvertFoldersToDecks: NoteQuestionParser = createTest_NoteQuestionParser(
     settings_ConvertFoldersToDecks,
 );
-let noteEaseList: NoteEaseList = new NoteEaseList(DEFAULT_SETTINGS);
 
 beforeAll(() => {
     setupStaticDateProvider_20230906();
-    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS, noteEaseList);
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 describe("No flashcard questions", () => {

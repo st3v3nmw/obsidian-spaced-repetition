@@ -6,10 +6,8 @@ import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetu
 import { NoteEaseList } from "src/NoteEaseList";
 import { DEFAULT_SETTINGS } from "src/settings";
 
-let noteEaseList: NoteEaseList = new NoteEaseList(DEFAULT_SETTINGS);
-
 beforeAll(() => {
-    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS, noteEaseList);
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 describe("constructor", () => {
