@@ -66,7 +66,6 @@ export class OsrCore {
         this.dataChangedHandler = dataChangedHandler;
         this._noteReviewQueue = new NoteReviewQueue();
         this._questionPostponementList = questionPostponementList;
-
     }
 
     protected loadInit(): void {

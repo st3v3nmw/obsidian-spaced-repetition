@@ -27,7 +27,7 @@ export class DataStoreInNote_AlgorithmOsr implements IDataStoreAlgorithm {
         let result: RepItemScheduleInfo = null;
         const frontmatter: Map<string, string[]> = await note.getFrontmatter();
 
-        if (frontmatter.has("sr-due") && frontmatter.has("sr-interval") && frontmatter.has("sr-ease")) {
+        if (frontmatter && frontmatter.has("sr-due") && frontmatter.has("sr-interval") && frontmatter.has("sr-ease")) {
             const dueDate: Moment = moment(frontmatter.get("sr-due")[0], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"]);
             const interval: number = parseFloat(frontmatter.get("sr-interval")[0]);
             const ease: number = parseFloat(frontmatter.get("sr-ease")[0]);

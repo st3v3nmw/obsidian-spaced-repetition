@@ -1,5 +1,5 @@
+import * as fs from "fs";
 import { unitTest_BasicFrontmatterParser, unitTest_GetAllTagsFromTextEx } from "./UnitTestHelper";
-import { splitNoteIntoFrontmatterAndContent } from "src/util/utils";
 import { TFile, TagCache } from "obsidian";
 import { ISRFile } from "src/SRFile";
 
@@ -47,5 +47,10 @@ export class UnitTestSRFile implements ISRFile {
 
     async write(content: string): Promise<void> {
         this.content = content;
+    }
+
+    static CreateFromFsFile(path: string): UnitTestSRFile {
+        const content: string = fs.readFileSync(path, "utf8");
+        return new UnitTestSRFile(content, path);
     }
 }

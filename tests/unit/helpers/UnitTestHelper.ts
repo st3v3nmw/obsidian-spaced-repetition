@@ -16,6 +16,12 @@ export function unitTest_GetAllTagsFromTextEx(text: string): TagCache[] {
     const result = [] as TagCache[];
     let lines: string[];
 
+    const map: Map<string, string[]> = unitTest_BasicFrontmatterParser(text);
+    /* for (let [key, value] of map) {
+        const tagStr: string = value[value.length - 1];
+        result.push(unitTest_CreateTagCache("#" + tagStr, 0));
+        // console.log(key + " is " + value);
+    } */
     if (frontmatter) {
         const dataPrefix: string = "  - ";
         lines = splitTextIntoLineArray(frontmatter);
@@ -69,7 +75,7 @@ export function unitTest_BasicFrontmatterParser(text: string): Map<string, strin
 
     if (!frontmatter) return;
 
-    const keyRegex = /^(\w+):(.*)$/;
+    const keyRegex = /^([A-Za-z0-9_-]+):(.*)$/;
     const dataRegex = /^(\s+)-\s+(.+)$/;
     const lines: string[] = splitTextIntoLineArray(frontmatter);
     let keyName: string = null;
@@ -84,9 +90,9 @@ export function unitTest_BasicFrontmatterParser(text: string): Map<string, strin
             if (keyName) {
                 result.set(keyName, valueList);
             }
-            keyName = keyMatch.groups[0];
+            keyName = keyMatch[1];
             valueList = [] as string[];
-            const value = keyMatch.groups[1].trim();
+            const value = keyMatch[2].trim();
             if (value) {
                 valueList.push(value);
             }
@@ -94,7 +100,7 @@ export function unitTest_BasicFrontmatterParser(text: string): Map<string, strin
             // Just a value, related to the last key
             const dataMatch: RegExpMatchArray = line.match(dataRegex);
             if (keyName && dataMatch) {
-                const value = keyMatch.groups[0].trim();
+                const value = dataMatch[1].trim();
                 if (value) {
                     valueList.push(value);
                 }
