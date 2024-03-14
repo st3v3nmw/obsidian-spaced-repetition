@@ -52,9 +52,6 @@ export class FlashcardModal extends Modal {
         this.modalEl.setAttribute("id", "sr-modal");
 
         this.contentEl.addClass("sr-modal-content");
-        // if (Platform.isMobile) {
-        //     this.contentEl.style.display = "block";
-        // }
 
         // Init static elements in views
         this.deckView = new DeckListView(
