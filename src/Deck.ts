@@ -51,7 +51,6 @@ export class Deck {
 
         // The following selects distinct cards from cardList (based on reference equality)
         const distinctCardSet = new Set(cardList);
-        // console.log(`getDistinctCardCount: ${this.deckName} ${distinctCardSet.size} ${this.getCardCount(cardListType, includeSubdeckCounts)}`);
         return distinctCardSet.size;
     }
 

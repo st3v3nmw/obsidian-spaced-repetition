@@ -346,9 +346,7 @@ export class FlashcardReviewView {
         this.answerBtn.style.display = "none";
         this.responseDiv.style.display = "grid";
 
-        if (this.currentCard.hasSchedule) {
-            this.resetButton.disabled = false;
-        }
+        this.resetButton.disabled = false;
 
         if (this.currentQuestion.questionType !== CardType.Cloze) {
             const hr: HTMLElement = document.createElement("hr");
@@ -368,13 +366,11 @@ export class FlashcardReviewView {
 
     private async processReview(response: ReviewResponse): Promise<void> {
         await this.reviewSequencer.processReview(response);
-        // console.log(`processReview: ${response}: ${this.currentCard?.front ?? 'None'}`)
         await this.handleNextCard();
     }
 
     private async skipCurrentCard(): Promise<void> {
         this.reviewSequencer.skipCurrentCard();
-        // console.log(`skipCurrentCard: ${this.currentCard?.front ?? 'None'}`)
         await this.handleNextCard();
     }
 
