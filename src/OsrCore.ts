@@ -127,16 +127,21 @@ export class OsrCore {
         if (this.dataChangedHandler) this.dataChangedHandler();
     }
 
-    async saveNoteReviewResponse(noteFile: ISRFile, response: ReviewResponse, settings: SRSettings, buryList: string[]): Promise<void> {
+    async saveNoteReviewResponse(noteFile: ISRFile, response: ReviewResponse, settings: SRSettings): Promise<void> {
 
-        // Get the current schedule for the note
-        const noteSchedule: RepItemScheduleInfo = await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
+        // Get the current schedule for the note (null if new note)
+        const originalNoteSchedule: RepItemScheduleInfo = await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
 
-        // Calculate the updated schedule
-        const updatedNoteSchedule: RepItemScheduleInfo = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(noteFile.path, noteSchedule, response);
+        // Calculate the new/updated schedule
+        let noteSchedule: RepItemScheduleInfo;
+        if (originalNoteSchedule == null) {
+            noteSchedule = SrsAlgorithm.getInstance().noteCalcNewSchedule(noteFile.path, this.osrNoteGraph, response);
+        } else {
+            noteSchedule = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(noteFile.path, originalNoteSchedule, response);
+        }
 
         // Store away the new schedule info
-        await DataStoreAlgorithm.getInstance().noteSetSchedule(noteFile, updatedNoteSchedule);
+        await DataStoreAlgorithm.getInstance().noteSetSchedule(noteFile, noteSchedule);
 
         // Generate the note review queue
         this.noteReviewQueue.determineScheduleInfo(this.osrNoteGraph);

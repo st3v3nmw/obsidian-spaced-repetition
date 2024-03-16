@@ -20,7 +20,6 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
     private noteEaseList: INoteEaseList;
     private dueDateFlashcardHistogram: DueDateHistogram;
     private dueDateNoteHistogram: DueDateHistogram;
-    private osrNoteGraph: OsrNoteGraph;
 
     constructor(settings: SRSettings) {
         this.settings = settings;
@@ -31,8 +30,8 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
         return 1.0;
     }
 
-    noteCalcNewSchedule(notePath: string, response: ReviewResponse): RepItemScheduleInfo {
-        const noteLinkStat: NoteLinkStat = this.osrNoteGraph.calcNoteLinkStat(notePath, this.noteEaseList, this.settings);
+    noteCalcNewSchedule(notePath: string, osrNoteGraph: OsrNoteGraph, response: ReviewResponse): RepItemScheduleInfo {
+        const noteLinkStat: NoteLinkStat = osrNoteGraph.calcNoteLinkStat(notePath, this.noteEaseList, this.settings);
 
         const linkContribution: number =
             this.settings.maxLinkFactor *

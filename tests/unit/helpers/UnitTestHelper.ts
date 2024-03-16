@@ -112,3 +112,14 @@ export function unitTest_BasicFrontmatterParser(text: string): Map<string, strin
     }
     return result;
 }
+
+export function unitTest_ParseForOutgoingLinks(text: string): string[] {
+    const linkRegex = /\[\[([\w\s]+)\]\]+/gi;
+    const matches = text.matchAll(linkRegex);
+    const result: string[] = [] as string[];
+    for (const m of matches) {
+        result.push(m[1]);
+    }
+    return result;
+
+}

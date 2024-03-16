@@ -10,8 +10,7 @@ import { SRSettings } from "src/settings";
 import { IDataStore } from "../base/DataStore";
 import { Card } from "src/Card";
 import { ISRFile } from "src/SRFile";
-import { App, FrontMatterCache } from "obsidian";
-import { LinkStat, OsrNoteGraph } from "src/algorithms/osr/OsrNoteGraph";
+import { App } from "obsidian";
 import { NoteEaseList } from "src/NoteEaseList";
 
 export class DataStore_StoreInNote implements IDataStore {

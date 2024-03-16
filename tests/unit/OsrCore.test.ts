@@ -1,12 +1,13 @@
 import { OsrCore } from "src/OsrCore";
 import { UnitTestOsrCore } from "./helpers/UnitTestOsrCore";
-import { DEFAULT_SETTINGS } from "src/settings";
+import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { CardListType } from "src/Deck";
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
 import { NoteReviewDeck, SchedNote } from "src/NoteReviewDeck";
 import { DateUtil } from "src/util/DateProvider";
 import { formatDate_YYYY_MM_DD } from "src/util/utils";
 import moment from "moment";
+import { ReviewResponse } from "src/algorithms/base/RepetitionItem";
 
 interface IExpected {
     dueNotesCount: number;
@@ -87,4 +88,20 @@ describe("Notes", () => {
             });
         });    
     });
+
+    describe("Saving note's review response", () => {
+        test("New note", async () => {
+            const settings: SRSettings = { ...DEFAULT_SETTINGS };
+            const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+            await osrCore.loadVault("notes1");
+
+            // Review the note
+            const file = osrCore.getFile("Computation Graph.md");
+            await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings)
+            const noteContent: string = file.content;
+
+            // TODO: Check note frontmatter
+        });
+    });
 });
+

@@ -29,7 +29,7 @@ import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 import { QuestionPostponementList } from "./QuestionPostponementList";
 import { ReviewResponse } from "./algorithms/base/RepetitionItem";
 import { SrsAlgorithm } from "./algorithms/base/SrsAlgorithm";
-import { ObsidianVaultNoteLinkInfoFinder, OsrNoteGraph } from "./algorithms/osr/OsrNoteGraph";
+import { ObsidianVaultNoteLinkInfoFinder } from "./algorithms/osr/OsrNoteGraph";
 import { DataStore } from "./dataStore/base/DataStore";
 import { DataStoreAlgorithm } from "./dataStoreAlgorithm/DataStoreAlgorithm";
 import { NoteReviewQueue } from "./NoteReviewQueue";
@@ -390,7 +390,7 @@ export default class SRPlugin extends Plugin {
         }
 
         // 
-        await this.osrAppCore.saveNoteReviewResponse(noteSrTFile, response, this.data.settings, this.data.buryList);
+        await this.osrAppCore.saveNoteReviewResponse(noteSrTFile, response, this.data.settings);
 
         new Notice(t("RESPONSE_RECEIVED"));
     }
