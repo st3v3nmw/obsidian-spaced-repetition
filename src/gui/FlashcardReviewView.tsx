@@ -274,9 +274,7 @@ export class FlashcardReviewView {
     private _showAnswer(): void {
         this.mode = FlashcardModalMode.Back;
 
-        if (this._currentCard.hasSchedule) {
-            this.resetButton.disabled = false;
-        }
+        this.resetButton.disabled = false;
 
         // Show answer text
         if (this._currentQuestion.questionType !== CardType.Cloze) {
@@ -325,13 +323,11 @@ export class FlashcardReviewView {
 
     private async _processReview(response: ReviewResponse): Promise<void> {
         await this.reviewSequencer.processReview(response);
-        // console.log(`processReview: ${response}: ${this.currentCard?.front ?? 'None'}`)
         await this._handleSkipCard();
     }
 
     private async _skipCurrentCard(): Promise<void> {
         this.reviewSequencer.skipCurrentCard();
-        // console.log(`skipCurrentCard: ${this.currentCard?.front ?? 'None'}`)
         await this._handleSkipCard();
     }
 
