@@ -111,6 +111,57 @@ A::B
             await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
         ).toMatchObject(expected);
     });
+
+    test("SingleLineBasic: Multiple topics", async () => {
+        let noteText: string = `#flashcards/science #flashcards/poetry
+A::B
+    `;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        let folderTopicPath: TopicPath = TopicPath.emptyPath;
+        let expected = [
+            {
+                questionType: CardType.SingleLineBasic,
+                topicPathList: TopicPathList.fromPsv("#flashcards/science|#flashcards/poetry", 0),
+                questionText: {
+                    original: `A::B`,
+                    actualQuestion: "A::B",
+                },
+            },
+        ];
+        expect(
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+        ).toMatchObject(expected);
+    });
+
+    // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/908
+    test("SingleLineBasic: Multiple tags in note (including non-flashcard ones)", async () => {
+        let noteText: string = `---
+created: 2024-03-11 10:41
+tags:
+  - flashcards
+  - data-structure
+---
+#2024/03-11
+
+**What is a Heap?**
+?
+In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!
+    `;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        let folderTopicPath: TopicPath = TopicPath.emptyPath;
+        let expected = [
+            {
+                questionType: CardType.MultiLineBasic,
+                // Explicitly checking that #data-structure and #2024/03-11 are not included
+                topicPathList: TopicPathList.fromPsv("#flashcards", 0),
+            },
+        ];
+        expect(
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+        ).toMatchObject(expected);
+    });
 });
 
 describe("Single question in the text (with block identifier)", () => {
