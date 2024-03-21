@@ -109,9 +109,9 @@ export class DeckListView {
         const statistics: DeckStats = this.reviewSequencer.getDeckStats(TopicPath.emptyPath);
         this.stats.empty();
 
-        this._createHeaderStatsContainer(t("TOTAL_CARDS"), statistics.totalCount, "sr-bg-red");
-        this._createHeaderStatsContainer(t("NEW_CARDS"), statistics.newCount, "sr-bg-blue");
         this._createHeaderStatsContainer(t("DUE_CARDS"), statistics.dueCount, "sr-bg-green");
+        this._createHeaderStatsContainer(t("NEW_CARDS"), statistics.newCount, "sr-bg-blue");
+        this._createHeaderStatsContainer(t("TOTAL_CARDS"), statistics.totalCount, "sr-bg-red");
     }
 
     private _createHeaderStatsContainer(
@@ -200,16 +200,16 @@ export class DeckListView {
         statsWrapper.empty();
 
         this._createStatsContainer(
-            t("TOTAL_CARDS"),
-            statistics.totalCount,
-            "sr-bg-red",
+            t("DUE_CARDS"),
+            statistics.dueCount,
+            "sr-bg-green",
             statsWrapper,
         );
         this._createStatsContainer(t("NEW_CARDS"), statistics.newCount, "sr-bg-blue", statsWrapper);
         this._createStatsContainer(
-            t("DUE_CARDS"),
-            statistics.dueCount,
-            "sr-bg-green",
+            t("TOTAL_CARDS"),
+            statistics.totalCount,
+            "sr-bg-red",
             statsWrapper,
         );
     }
