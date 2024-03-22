@@ -47,6 +47,7 @@ export class DecksListView {
             this.contentEl.style.display = "block";
         }
     }
+
     /**
      * Shows the DeckListView
      */
