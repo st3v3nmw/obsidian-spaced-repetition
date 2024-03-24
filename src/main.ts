@@ -756,20 +756,33 @@ export default class SRPlugin extends Plugin {
         this.lastSelectedReviewDeck = deckKey;
         const deck = this.reviewDecks[deckKey];
 
-        if (deck.dueNotesCount > 0) {
-            const index = this.data.settings.openRandomNote
-                ? Math.floor(Math.random() * deck.dueNotesCount)
-                : 0;
-            await this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
-            return;
+        const noteChoserMap = {
+            due: async () => {
+                if (deck.newNotes.length > 0) {
+                    const index = this.data.settings.openRandomNote
+                        ? Math.floor(Math.random() * deck.newNotes.length)
+                        : 0;
+                    await this.app.workspace.getLeaf().openFile(deck.newNotes[index]);
+                    return;
+                }
+            },
+            new: async () => {
+                if (deck.dueNotesCount > 0) {
+                    const index = this.data.settings.openRandomNote
+                        ? Math.floor(Math.random() * deck.dueNotesCount)
+                        : 0;
+                    await this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
+                    return;
+                }
+            }
         }
 
-        if (deck.newNotes.length > 0) {
-            const index = this.data.settings.openRandomNote
-                ? Math.floor(Math.random() * deck.newNotes.length)
-                : 0;
-            this.app.workspace.getLeaf().openFile(deck.newNotes[index]);
-            return;
+        if (this.data.settings.autoNextNewNote) {
+            await noteChooserMap.new();
+            await noteChooserMap.due();
+        } else {
+            await noteChooserMap.due();
+            await noteChooserMap.new();
         }
 
         new Notice(t("ALL_CAUGHT_UP"));

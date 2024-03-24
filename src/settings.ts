@@ -31,6 +31,7 @@ export interface SRSettings {
     noteFoldersToIgnore: string[];
     openRandomNote: boolean;
     autoNextNote: boolean;
+    autoNextNewNote: boolean;
     disableFileMenuReviewOptions: boolean;
     maxNDaysNotesReviewQueue: number;
     // UI preferences
@@ -75,6 +76,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     noteFoldersToIgnore: [],
     openRandomNote: false,
     autoNextNote: false,
+    autoNextNewNote: false,
     disableFileMenuReviewOptions: false,
     maxNDaysNotesReviewQueue: 365,
     // UI settings
@@ -570,6 +572,13 @@ export class SRSettingTab extends PluginSettingTab {
         new Setting(containerEl).setName(t("AUTO_NEXT_NOTE")).addToggle((toggle) =>
             toggle.setValue(this.plugin.data.settings.autoNextNote).onChange(async (value) => {
                 this.plugin.data.settings.autoNextNote = value;
+                await this.plugin.savePluginData();
+            }),
+        );
+
+        new Setting(containerEl).setName(t("AUTO_NEXT_NEW_NOTE")).addToggle((toggle) =>
+            toggle.setValue(this.plugin.data.settings.autoNextNewNote).onChange(async (value) => {
+                this.plugin.data.settings.autoNextNewNote = value;
                 await this.plugin.savePluginData();
             }),
         );
