@@ -756,7 +756,7 @@ export default class SRPlugin extends Plugin {
         this.lastSelectedReviewDeck = deckKey;
         const deck = this.reviewDecks[deckKey];
 
-        const noteChoserMap = {
+        const noteChooserMap = {
             due: async () => {
                 if (deck.newNotes.length > 0) {
                     const index = this.data.settings.openRandomNote
@@ -774,8 +774,8 @@ export default class SRPlugin extends Plugin {
                     await this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
                     return;
                 }
-            }
-        }
+            },
+        };
 
         if (this.data.settings.autoNextNewNote) {
             await noteChooserMap.new();
