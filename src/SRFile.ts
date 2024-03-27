@@ -53,7 +53,7 @@ export class SrTFile implements ISRFile {
             // in the file)
             const line: number = 1;
 
-            // Frontmatter tags are comma separated and don't include the "#", so we need to add that in
+            // Parse the frontmatter tag string into a list, each entry including the leading "#"
             const tagStrList: string[] = parseObsidianFrontmatterTag(frontmatterTags);
             for (const str of tagStrList) {
                 const tag: TagCache = {
