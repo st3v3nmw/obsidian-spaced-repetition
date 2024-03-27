@@ -1,4 +1,5 @@
 import { MetadataCache, TFile, Vault, HeadingCache, TagCache, FrontMatterCache } from "obsidian";
+import { parseObsidianFrontmatterTag } from "./util/utils";
 
 export interface ISRFile {
     get path(): string;
@@ -52,11 +53,11 @@ export class SrTFile implements ISRFile {
             // in the file)
             const line: number = 1;
 
-            // Frontmatter tags are comma separated and don't include the "#", so we need to add that in
-            const tagStrList: string[] = frontmatterTags.split(",");
+            // Parse the frontmatter tag string into a list, each entry including the leading "#"
+            const tagStrList: string[] = parseObsidianFrontmatterTag(frontmatterTags);
             for (const str of tagStrList) {
                 const tag: TagCache = {
-                    tag: "#" + str,
+                    tag: str,
                     position: {
                         start: { line: line, col: null, offset: null },
                         end: { line: line, col: null, offset: null },
