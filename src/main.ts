@@ -10,9 +10,9 @@ import {
 import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, upgradeSettings } from "src/settings";
-import { FlashcardModal } from "src/gui/flashcard-modal";
-import { StatsModal } from "src/gui/stats-modal";
-import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/sidebar";
+import { FlashcardModal } from "src/gui/FlashcardModal";
+import { StatsModal } from "src/gui/StatsModal";
+import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/Sidebar";
 import { ReviewResponse, schedule } from "src/scheduling";
 import { YAML_FRONT_MATTER_REGEX, SCHEDULING_INFO_REGEX } from "src/constants";
 import { ReviewDeck, ReviewDeckSelectionModal } from "src/ReviewDeck";

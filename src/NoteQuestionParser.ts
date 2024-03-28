@@ -188,7 +188,7 @@ export class NoteQuestionParser {
         let frontmatterLineCount: number = null;
         if (filteredTagCacheList.length > 0) {
             // To simplify analysis, ensure that the supplied list is ordered by line number
-            tagCacheList.sort((a, b) => a.position.start.line - b.position.start.line);
+            filteredTagCacheList.sort((a, b) => a.position.start.line - b.position.start.line);
 
             // Treat the frontmatter slightly differently (all tags grouped together even if on separate lines)
             const [frontmatter, _] = extractFrontmatter(this.noteText);
@@ -200,7 +200,7 @@ export class NoteQuestionParser {
 
                 // Doesn't matter what line number we specify, as long as it's less than frontmatterLineCount
                 if (frontmatterTagCacheList.length > 0)
-                    frontmatterTopicPathList = this.createTopicPathList(tagCacheList, 0);
+                    frontmatterTopicPathList = this.createTopicPathList(frontmatterTagCacheList, 0);
             }
         }
         //
