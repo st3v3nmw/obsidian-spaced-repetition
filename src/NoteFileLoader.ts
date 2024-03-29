@@ -11,6 +11,11 @@ export class NoteFileLoader {
     noteTopicPath: TopicPath;
     noteFile: ISRFile;
     settings: SRSettings;
+    private _hasTopicPaths: boolean;
+
+    public get hasTopicPaths(): boolean {
+        return this._hasTopicPaths;
+    }
 
     constructor(settings: SRSettings) {
         this.settings = settings;
@@ -27,6 +32,7 @@ export class NoteFileLoader {
             folderTopicPath,
             onlyKeepQuestionsWithTopicPath,
         );
+        this._hasTopicPaths = questionParser.hasTopicPaths;
 
         const result: Note = new Note(noteFile, questionList);
         return result;

@@ -88,9 +88,13 @@ export default class SRPlugin extends Plugin {
     public deckTree: Deck = new Deck("root", null);
     private remainingDeckTree: Deck;
     public cardStats: Stats;
+    private withFlashcardTagCount: number;
+    private hasChangedCount: number;
+    private withFlashcardCount: number;
 
     async onload(): Promise<void> {
         await this.loadPluginData();
+        console.log(`OSR: onload: bug-914-slow-load: v2`);
         this.easeByPath = new NoteEaseList(this.data.settings);
         this.questionPostponementList = new QuestionPostponementList(
             this,
@@ -349,6 +353,11 @@ export default class SRPlugin extends Plugin {
     }
 
     async sync(): Promise<void> {
+        let markdownCount: number = 0;
+        this.withFlashcardTagCount = 0;
+        this.withFlashcardCount = 0;
+        this.hasChangedCount = 0;
+
         if (this.syncLock) {
             return;
         }
@@ -377,6 +386,8 @@ export default class SRPlugin extends Plugin {
 
         const notes: TFile[] = this.app.vault.getMarkdownFiles();
         for (const noteFile of notes) {
+            markdownCount++;
+
             if (
                 this.data.settings.noteFoldersToIgnore.some((folder) =>
                     noteFile.path.startsWith(folder),
@@ -492,6 +503,7 @@ export default class SRPlugin extends Plugin {
         if (this.data.settings.showDebugMessages) {
             console.log(`SR: ${t("EASES")}`, this.easeByPath.dict);
             console.log(`SR: ${t("DECKS")}`, this.deckTree);
+            console.log(`sync: markdownCount: ${markdownCount}, withFlashcardTagCount: ${this.withFlashcardTagCount}, withFlashcardCount: ${this.withFlashcardCount}, hasChangedCount: ${this.hasChangedCount}`);
         }
 
         if (this.data.settings.showDebugMessages) {
@@ -555,7 +567,10 @@ export default class SRPlugin extends Plugin {
         );
 
         const note: Note = await loader.load(this.createSrTFile(noteFile), folderTopicPath);
+        if (loader.hasTopicPaths) this.withFlashcardTagCount++;
+        if (note.questionList.length > 0) this.withFlashcardCount++;
         if (note.hasChanged) {
+            this.hasChangedCount++;
             note.writeNoteFile(this.data.settings);
         }
         return note;
