@@ -5,9 +5,10 @@ import { CardType, Question } from "src/Question";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { TopicPath, TopicPathList } from "src/TopicPath";
 import { createTest_NoteQuestionParser } from "./SampleItems";
-import { ISRFile } from "src/SRFile";
+import { ISRFile, frontmatterTagPseudoLineNum } from "src/SRFile";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
+import { Card } from "src/Card";
 
 let parserWithDefaultSettings: NoteQuestionParser = createTest_NoteQuestionParser(DEFAULT_SETTINGS);
 let settings_ConvertFoldersToDecks: SRSettings = { ...DEFAULT_SETTINGS };
@@ -155,7 +156,7 @@ In computer-science, a *heap* is a tree-based data-structure, that satisfies the
             {
                 questionType: CardType.MultiLineBasic,
                 // Explicitly checking that #data-structure and #2024/03-11 are not included
-                topicPathList: TopicPathList.fromPsv("#flashcards", 0),
+                topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
             },
         ];
         expect(
@@ -614,6 +615,113 @@ Q1::A1
             expect(questionList[0].cards.length).toEqual(1);
             expect(questionList[0].cards[0].front).toEqual("Q5");
         });
+    });
+});
+
+describe("Questions immediately after closing line of frontmatter", () => {
+    // The frontmatter should be discarded
+    // (only the specified question text should be used)
+    test("Multi-line with question", async () => {
+        let noteText: string = `---
+created: 2024-03-11 10:41
+tags:
+  - flashcards
+  - data-structure
+---
+**What is a Heap?**
+?
+In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!
+`;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        let folderTopicPath: TopicPath = TopicPath.emptyPath;
+        let expected = [
+            {
+                questionType: CardType.MultiLineBasic,
+                // Explicitly checking that #data-structure is not included
+                topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
+                cards: [
+                    new Card({
+                        front: `**What is a Heap?**`, 
+                        back: "In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!"
+                    })
+                ]
+            },
+        ];
+        expect(
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+        ).toMatchObject(expected);
+    });
+
+    test("Multi-line without question (i.e. question is blank)", async () => {
+        let noteText: string = `---
+created: 2024-03-11 10:41
+tags:
+  - flashcards
+  - data-structure
+---
+?
+In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!
+    `;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        let folderTopicPath: TopicPath = TopicPath.emptyPath;
+        let expected = [
+            {
+                questionType: CardType.MultiLineBasic,
+                // Explicitly checking that #data-structure is not included
+                topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
+                cards: [
+                    new Card({
+                        front: "", 
+                        back: "In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!"
+                    })
+                ]
+            },
+        ];
+        expect(
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+        ).toMatchObject(expected);
+    });
+
+    test("single-line question", async () => {
+        let noteText: string = `---
+created: 2024-03-11 10:41
+tags:
+  - flashcards
+  - data-structure
+---
+In computer-science, a *heap* is::a tree-based data-structure
+A::B
+    `;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        let folderTopicPath: TopicPath = TopicPath.emptyPath;
+        let expected = [
+            {
+                questionType: CardType.SingleLineBasic,
+                topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
+                cards: [
+                    new Card({
+                        front: "In computer-science, a *heap* is", 
+                        back: "a tree-based data-structure"
+                    })
+                ]
+            },
+            {
+                questionType: CardType.SingleLineBasic,
+                topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
+                cards: [
+                    new Card({
+                        front: "A", 
+                        back: "B"
+                    })
+                ]
+            },
+        ];
+        expect(
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+        ).toMatchObject(expected);
     });
 });
 
