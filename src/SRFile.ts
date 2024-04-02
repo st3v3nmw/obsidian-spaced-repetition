@@ -1,6 +1,7 @@
 import { MetadataCache, TFile, Vault, HeadingCache, TagCache, FrontMatterCache } from "obsidian";
 import { parseObsidianFrontmatterTag } from "./util/utils";
 
+// NOTE: Line numbers are zero based
 export interface ISRFile {
     get path(): string;
     get basename(): string;
@@ -14,6 +15,7 @@ export interface ISRFile {
 // We define as -1 so that we can differentiate tags within the frontmatter and tags within the content
 export const frontmatterTagPseudoLineNum: number = -1;
 
+// NOTE: Line numbers are zero based
 export class SrTFile implements ISRFile {
     file: TFile;
     vault: Vault;
@@ -37,6 +39,7 @@ export class SrTFile implements ISRFile {
         const result: TagCache[] = [] as TagCache[];
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
         if (fileCachedData.tags?.length > 0) {
+            // console.log(`getAllTagsFromText: tags: ${fileCachedData.tags.map((item) => `(${item.position.start.line}: ${item.tag})`).join("|")}`);
             result.push(...fileCachedData.tags);
         }
 
@@ -72,6 +75,7 @@ export class SrTFile implements ISRFile {
     getQuestionContext(cardLine: number): string[] {
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
         const headings: HeadingCache[] = fileCachedData.headings || [];
+        // console.log(`getQuestionContext: headings: ${headings.map((item) => `(${item.position.start.line}: ${item.heading})`).join("|")}`);
         const stack: HeadingCache[] = [];
         for (const heading of headings) {
             if (heading.position.start.line > cardLine) {

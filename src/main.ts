@@ -91,7 +91,7 @@ export default class SRPlugin extends Plugin {
 
     async onload(): Promise<void> {
         await this.loadPluginData();
-        console.log(`OSR: onload(): bug-922-923-card-after-frontmatter: v1`);
+        console.log(`OSR: onload(): bug-915-922-923-missing-cards: v2`);
         this.easeByPath = new NoteEaseList(this.data.settings);
         this.questionPostponementList = new QuestionPostponementList(
             this,

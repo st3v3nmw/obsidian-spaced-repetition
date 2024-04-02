@@ -530,6 +530,38 @@ Q1::A1
             expect(questionList[2].topicPathList.formatPsv()).toEqual(expectedPath);
         });
 
+        // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/915#issuecomment-2017508391
+        test("Topic tag on first line after frontmatter", async () => {
+            let noteText: string = `---
+created: 2023-10-26T07:34
+---
+#flashcards/English 
+
+## taunting & teasing & irony & sarcasm
+
+Stop trying ==to milk the crowd== for sympathy. // доить толпу
+`;
+            let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+            let expectedPath: string = "#flashcards/English";
+            let folderTopicPath: TopicPath = TopicPath.emptyPath;
+            let expected = [
+                {
+                    questionType: CardType.Cloze,
+                    topicPathList: TopicPathList.fromPsv("#flashcards/English", 3), // #flashcards/English is on the 4th line, line number 3
+                    cards: [
+                        new Card({
+                            front: "Stop trying <span style='color:#2196f3'>[...]</span> for sympathy. // доить толпу", 
+                            back: `Stop trying <span style='color:#2196f3'>to milk the crowd</span> for sympathy. // доить толпу`, 
+                        })
+                    ]
+                },
+            ];
+            expect(
+                await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+            ).toMatchObject(expected);
+        });
+
         test("Topic tag within question overrides the note topic, for that topic only", async () => {
             let noteText: string = `#flashcards/test
     Q1::A1
@@ -615,6 +647,43 @@ Q1::A1
             expect(questionList[0].cards.length).toEqual(1);
             expect(questionList[0].cards[0].front).toEqual("Q5");
         });
+
+        // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/915#issuecomment-2016580471
+        test("Topic tag at end of line", async () => {
+            let noteText: string = `---
+Title: "The Taliban at war: 2001-2018"
+Authors: "Antonio Giustozzi"
+Year: 2019
+URL: 
+DOI: 
+Unique Citekey: Talibanwar20012018
+Zotero Link: zotero://select/items/@Talibanwar20012018
+---
+> [!PDF|255, 208, 0] [[The Taliban at War_ 2001 - 2018.pdf#page=10&annotation=1440R|The Taliban at War_ 2001 - 2018, page 10]]
+> > The Taliban Emirate, established in 1996, was in 2001 overthrown relatively easily by a coalition of US forces and various Afghan anti-Taliban groups. Few at the end of 2001 expected to hear again from the Taliban, except in the annals of history. Even as signs emerged in 2003 of a Taliban comeback, in the shape of an insurgency against the post-2001 Afghan government and its international sponsors, many did not take it seriously. It was hard to imagine that the Taliban would be able to mount a resilient challenge to a large-scale commitment of forces by the US and its allies.
+
+What year was the Taliban Emirate founded?::1996 #flashcards
+`;
+            let noteFile: ISRFile = new UnitTestSRFile(noteText);
+    
+            let folderTopicPath: TopicPath = TopicPath.emptyPath;
+            let expected = [
+                {
+                    questionType: CardType.SingleLineBasic,
+                    topicPathList: TopicPathList.fromPsv("#flashcards", 12),
+                    cards: [
+                        new Card({
+                            front: "What year was the Taliban Emirate founded?", 
+                            back: "1996 #flashcards"
+                        })
+                    ]
+                },
+            ];
+            expect(
+                await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+            ).toMatchObject(expected);
+        });
+    
     });
 });
 
