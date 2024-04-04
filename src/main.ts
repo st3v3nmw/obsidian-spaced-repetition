@@ -41,6 +41,7 @@ import { NoteEaseCalculator } from "./NoteEaseCalculator";
 import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 import { NoteEaseList } from "./NoteEaseList";
 import { QuestionPostponementList } from "./QuestionPostponementList";
+import { testTimeFormatLapInfo, testTimeGetLapTime, testTimeLog, testTimeStart } from "./util/DateProvider";
 
 interface PluginData {
     settings: SRSettings;
@@ -94,7 +95,7 @@ export default class SRPlugin extends Plugin {
 
     async onload(): Promise<void> {
         await this.loadPluginData();
-        console.log(`OSR: onload: bug-914-slow-load: v2`);
+        console.log(`OSR: onload: bug-914-slow-load: B`);
         this.easeByPath = new NoteEaseList(this.data.settings);
         this.questionPostponementList = new QuestionPostponementList(
             this,
@@ -384,8 +385,16 @@ export default class SRPlugin extends Plugin {
             await this.savePluginData();
         }
 
+        testTimeStart();
+        let totalLapTime: number = 0;
+        let info: string = "";
         const notes: TFile[] = this.app.vault.getMarkdownFiles();
         for (const noteFile of notes) {
+            if (markdownCount != 0) {
+                info += `sync:\t${markdownCount}\t${testTimeFormatLapInfo()}\t`;
+                totalLapTime += testTimeGetLapTime();
+            }
+            testTimeStart();
             markdownCount++;
 
             if (
@@ -417,6 +426,7 @@ export default class SRPlugin extends Plugin {
             }
 
             const note: Note = await this.loadNote(noteFile);
+            testTimeLog("sync.A");
             if (note.questionList.length > 0) {
                 const flashcardsInNoteAvgEase: number = NoteEaseCalculator.Calculate(
                     note,
@@ -447,6 +457,7 @@ export default class SRPlugin extends Plugin {
                     break;
                 }
             }
+            testTimeLog("sync.B");
             if (shouldIgnore) {
                 continue;
             }
@@ -482,6 +493,12 @@ export default class SRPlugin extends Plugin {
                 this.reviewDecks[matchedNoteTag].scheduledNotes.push({ note: noteFile, dueUnix });
             }
         }
+        if (markdownCount != 0) {
+            info += `sync:\t${markdownCount}\t${testTimeFormatLapInfo()}\t`;
+            totalLapTime += testTimeGetLapTime();
+        }
+        console.log(`sync:\t${info}`);
+        console.log(`sync:\tTotalLapTime\t${totalLapTime}`);
 
         graph.rank(0.85, 0.000001, (node: string, rank: number) => {
             this.pageranks[node] = rank * 10000;
