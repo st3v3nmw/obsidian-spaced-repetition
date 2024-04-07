@@ -37,17 +37,18 @@ export class NoteQuestionParser {
         this.noteFile = noteFile;
         // For efficiency, we first get the tag list from the Obsidian cache
         // (this only gives the tag names, not the line numbers, but this is sufficient for this first step)
-        const tagList: string[] = noteFile.getAllTagsFromCache();
+        const tagCacheList: string[] = noteFile.getAllTagsFromCache();
         this._hasTopicPaths =
-            tagList.some((item) => SettingsUtil.isFlashcardTag(this.settings, item)) ||
+            tagCacheList.some((item) => SettingsUtil.isFlashcardTag(this.settings, item)) ||
             folderTopicPath.hasPath;
 
         if (this._hasTopicPaths) {
+            // Reading the file is relatively an expensive operation, so we only do this when needed
             const noteText: string = await noteFile.read();
 
             // Now that we know there are relevant flashcard tags in the file, we can get the more detailed info
             // that includes the line numbers of each tag
-            const tagCacheList: TagCache[] = noteFile.getAllTagsFromText();
+            const tagCompleteList: TagCache[] = noteFile.getAllTagsFromText();
 
             // The following analysis can require fair computation.
             // There is no point doing it if there aren't any topic paths
@@ -61,7 +62,7 @@ export class NoteQuestionParser {
 
             // For each question, determine it's TopicPathList
             [this.frontmatterTopicPathList, this.contentTopicPathInfo] =
-                this.analyseTagCacheList(tagCacheList);
+                this.analyseTagCacheList(tagCompleteList);
             for (const question of this.questionList) {
                 question.topicPathList = this.determineQuestionTopicPathList(question);
             }

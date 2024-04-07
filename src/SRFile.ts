@@ -1,5 +1,12 @@
-import { MetadataCache, TFile, Vault, HeadingCache, getAllTags as ObsidianGetAllTags,
-    TagCache, FrontMatterCache } from "obsidian";
+import {
+    MetadataCache,
+    TFile,
+    Vault,
+    HeadingCache,
+    getAllTags as ObsidianGetAllTags,
+    TagCache,
+    FrontMatterCache,
+} from "obsidian";
 import { parseObsidianFrontmatterTag } from "./util/utils";
 
 export interface ISRFile {

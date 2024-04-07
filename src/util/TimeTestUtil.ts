@@ -3,15 +3,15 @@ import moment from "moment";
 // These functions were used to diagnose performance issue
 // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/914
 
-var testTimeInfo: [ string, number ][];
+let testTimeInfo: [string, number][];
 
 export function testTimeStart(): void {
-    testTimeInfo = [ [ "Start", moment().valueOf() ] ];
+    testTimeInfo = [["Start", moment().valueOf()]];
 }
 
 export function testTimeLog(desc: string): void {
-    if (testTimeInfo == null)  testTimeStart();
-    testTimeInfo.push([ desc, moment().valueOf() ]);
+    if (testTimeInfo == null) testTimeStart();
+    testTimeInfo.push([desc, moment().valueOf()]);
 }
 
 export function testTimeGetLapTime(): number {
@@ -29,4 +29,3 @@ export function testTimeFormatLapInfo(): string {
     result += `\tLapTime\t${testTimeGetLapTime()}|`;
     return result;
 }
-
