@@ -377,7 +377,6 @@ export default class SRPlugin extends Plugin {
 
         const notes: TFile[] = this.app.vault.getMarkdownFiles();
         for (const noteFile of notes) {
-
             if (
                 this.data.settings.noteFoldersToIgnore.some((folder) =>
                     noteFile.path.startsWith(folder),
