@@ -8,7 +8,6 @@ import { SRSettings, SettingsUtil } from "./settings";
 import { ISRFile } from "./SRFile";
 import { TopicPath, TopicPathList } from "./TopicPath";
 import { extractFrontmatter, splitTextIntoLineArray } from "./util/utils";
-import { testTimeLog } from "./util/DateProvider";
 
 export class NoteQuestionParser {
     settings: SRSettings;
@@ -42,16 +41,13 @@ export class NoteQuestionParser {
         this._hasTopicPaths =
             tagList.some((item) => SettingsUtil.isFlashcardTag(this.settings, item)) ||
             folderTopicPath.hasPath;
-        testTimeLog("cql.A");
 
         if (this._hasTopicPaths) {
             const noteText: string = await noteFile.read();
 
-            testTimeLog(`cql.B\t${noteText.length}`);
             // Now that we know there are relevant flashcard tags in the file, we can get the more detailed info
             // that includes the line numbers of each tag
             const tagCacheList: TagCache[] = noteFile.getAllTagsFromText();
-            testTimeLog("cql.C1");
 
             // The following analysis can require fair computation.
             // There is no point doing it if there aren't any topic paths
@@ -75,11 +71,8 @@ export class NoteQuestionParser {
                 this.questionList = this.questionList.filter((q) => q.topicPathList);
             }
         } else {
-            testTimeLog("cql.B");
-            testTimeLog("cql.C2");
             this.questionList = [] as Question[];
         }
-        testTimeLog("cql.D");
         return this.questionList;
     }
 
