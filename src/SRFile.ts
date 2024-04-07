@@ -4,14 +4,15 @@ import {
     Vault,
     getAllTags as ObsidianGetAllTags,
     HeadingCache,
+    TagCache,
+    FrontMatterCache,
 } from "obsidian";
-import { getAllTagsFromText } from "./util/utils";
 import { TextDirection } from "./util/TextDirection";
 
 export interface ISRFile {
     get path(): string;
     get basename(): string;
-    getAllTags(): string[];
+    getAllTagsFromText(): TagCache[];
     getQuestionContext(cardLine: number): string[];
     getTextDirection(): TextDirection | null;
     read(): Promise<string>;
@@ -37,9 +38,44 @@ export class SrTFile implements ISRFile {
         return this.file.basename;
     }
 
-    getAllTags(): string[] {
+    getAllTagsFromText(): TagCache[] {
+        const result: TagCache[] = [] as TagCache[];
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
-        return ObsidianGetAllTags(fileCachedData) || [];
+        if (fileCachedData.tags?.length > 0) {
+            result.push(...fileCachedData.tags);
+        }
+
+        // RZ: 2024-01-28 fileCachedData.tags doesn't include the tags within the frontmatter, need to access those separately
+        // This is different to the Obsidian function getAllTags() which does return all tags including those within the
+        // frontmatter.
+        result.push(...this.getFrontmatterTags(fileCachedData.frontmatter));
+
+        return result;
+    }
+
+    private getFrontmatterTags(frontmatter: FrontMatterCache): TagCache[] {
+        const result: TagCache[] = [] as TagCache[];
+        const frontmatterTags: string = frontmatter != null ? frontmatter["tags"] + "" : null;
+        if (frontmatterTags) {
+            // The frontmatter doesn't include the line number for the specific tag, defining as line 1 is good enough.
+            // (determineQuestionTopicPathList() only needs to know that these frontmatter tags come before all others
+            // in the file)
+            const line: number = 1;
+
+            // Parse the frontmatter tag string into a list, each entry including the leading "#"
+            const tagStrList: string[] = parseObsidianFrontmatterTag(frontmatterTags);
+            for (const str of tagStrList) {
+                const tag: TagCache = {
+                    tag: str,
+                    position: {
+                        start: { line: line, col: null, offset: null },
+                        end: { line: line, col: null, offset: null },
+                    },
+                };
+                result.push(tag);
+            }
+        }
+        return result;
     }
 
     getQuestionContext(cardLine: number): string[] {
@@ -87,44 +123,5 @@ export class SrTFile implements ISRFile {
 
     async write(content: string): Promise<void> {
         await this.vault.modify(this.file, content);
-    }
-}
-
-export class UnitTestSRFile implements ISRFile {
-    content: string;
-    _path: string;
-
-    constructor(content: string, path: string = null) {
-        this.content = content;
-        this._path = path;
-    }
-
-    get path(): string {
-        return this._path;
-    }
-
-    get basename(): string {
-        return "";
-    }
-
-    getAllTags(): string[] {
-        return getAllTagsFromText(this.content);
-    }
-
-    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
-    getQuestionContext(cardLine: number): string[] {
-        return [];
-    }
-
-    getTextDirection(): TextDirection | null {
-        return null;
-    }
-
-    async read(): Promise<string> {
-        return this.content;
-    }
-
-    async write(content: string): Promise<void> {
-        this.content = content;
     }
 }

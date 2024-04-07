@@ -1,6 +1,6 @@
 import moment from "moment";
 import { Moment } from "moment";
-import { PREFERRED_DATE_FORMAT } from "src/constants";
+import { PREFERRED_DATE_FORMAT, YAML_FRONT_MATTER_REGEX } from "src/constants";
 
 type Hex = number;
 
@@ -85,13 +85,6 @@ export function formatDate_YYYY_MM_DD(ticks: Moment): string {
     return ticks.format(PREFERRED_DATE_FORMAT);
 }
 
-export function getAllTagsFromText(text: string): string[] {
-    const tagRegex = /#[^\s#]+/gi;
-    const result: RegExpMatchArray = text.match(tagRegex);
-    if (!result) return [];
-    return result;
-}
-
 export function splitTextIntoLineArray(text: string): string[] {
     return text.replaceAll("\r\n", "\n").split("\n");
 }
@@ -107,6 +100,119 @@ export function convertToStringOrEmpty(v: any): string {
     let result: string = "";
     if (v != null && v != undefined) {
         result = v + "";
+    }
+    return result;
+}
+
+export function extractFrontmatter(str: string): [string, string] {
+    let frontmatter: string = "";
+    let content: string = "";
+    let frontmatterEndLineNum: number = null;
+    if (YAML_FRONT_MATTER_REGEX.test) {
+        const lines: string[] = splitTextIntoLineArray(str);
+
+        // The end "---" marker must be on the third line (index 2) or later
+        for (let i = 2; i < lines.length; i++) {
+            if (lines[i] == "---") {
+                frontmatterEndLineNum = i;
+                break;
+            }
+        }
+
+        if (frontmatterEndLineNum) {
+            const frontmatterStartLineNum: number = 0;
+            const frontmatterLineCount: number =
+                frontmatterEndLineNum - frontmatterStartLineNum + 1;
+            const frontmatterLines: string[] = lines.splice(
+                frontmatterStartLineNum,
+                frontmatterLineCount,
+            );
+            frontmatter = frontmatterLines.join("\n");
+            content = lines.join("\n");
+        }
+    }
+    if (frontmatter.length == 0) content = str;
+    return [frontmatter, content];
+}
+
+//
+// Returns the index of the line that consists of the search string.
+//
+// A line is considered a match if it is identical to the search string, (ignoring leading and
+// trailing spaces of the line)
+//
+export function findLineIndexOfSearchStringIgnoringWs(
+    lines: string[],
+    searchString: string,
+): number {
+    let result: number = -1;
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].trim() == searchString) {
+            result = i;
+            break;
+        }
+    }
+    return result;
+}
+
+/* 
+Prompted by flashcards being missed, here are some "experiments" with different frontmatter,
+showing the difference in the value of CachedMetadata.frontmatter["tags"]
+
+----------------- EXPERIMENT 1
+
+---
+tags:
+  - flashcards/philosophy/philosophers
+  - flashcards/toes
+---
+
+CachedMetadata.frontmatter["tags"]: flashcards/philosophy/philosophers,flashcards/toes
+
+
+----------------- EXPERIMENT 2
+
+---
+tags:
+  - "#flashcards/philosophy/philosophers"
+---
+
+CachedMetadata.frontmatter["tags"]: #flashcards/philosophy/philosophers
+
+
+----------------- EXPERIMENT 3
+
+---
+tags:
+  - "#flashcards/philosophy/philosophers"
+  - "#flashcards/toes"
+---
+
+CachedMetadata.frontmatter["tags"]: #flashcardsX/philosophy/philosophers,#flashcardsX/toes
+
+
+----------------- EXPERIMENT 4
+
+---
+tags:
+  - #flashcards/philosophy/philosophers
+---
+
+Obsidian does not recognize that the frontmatter has any tags
+(i.e. if the frontmatter includes the "#" it must be enclosed in quotes)
+
+----------------- CONCLUSION
+
+CachedMetadata.frontmatter["tags"]: tags are comma separated. They may or may not include the "#".
+Any double quotes in the frontmatter are stripped by Obsidian and not present in this variable.
+
+*/
+
+export function parseObsidianFrontmatterTag(tagStr: string): string[] {
+    const result: string[] = [] as string[];
+    const tagStrList: string[] = tagStr.split(",");
+    for (const tag of tagStrList) {
+        result.push(tag.startsWith("#") ? tag : "#" + tag);
     }
     return result;
 }

@@ -1,5 +1,4 @@
 import { NoteParser } from "src/NoteParser";
-import { UnitTestSRFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
 import { Deck } from "src/Deck";
 import { Note } from "src/Note";
@@ -7,6 +6,7 @@ import { Question } from "src/Question";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { NoteFileLoader } from "src/NoteFileLoader";
 import { TextDirection } from "src/util/TextDirection";
+import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
 
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 var noteFileLoader: NoteFileLoader = new NoteFileLoader(DEFAULT_SETTINGS);

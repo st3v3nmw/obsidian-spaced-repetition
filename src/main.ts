@@ -1,10 +1,18 @@
-import { Notice, Plugin, TAbstractFile, TFile, getAllTags, FrontMatterCache } from "obsidian";
+import {
+    Notice,
+    Plugin,
+    TAbstractFile,
+    TFile,
+    getAllTags,
+    FrontMatterCache,
+    WorkspaceLeaf,
+} from "obsidian";
 import * as graph from "pagerank.js";
 
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, upgradeSettings } from "src/settings";
-import { FlashcardModal } from "src/gui/flashcard-modal";
-import { StatsModal } from "src/gui/stats-modal";
-import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/sidebar";
+import { FlashcardModal } from "src/gui/FlashcardModal";
+import { StatsModal } from "src/gui/StatsModal";
+import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/Sidebar";
 import { ReviewResponse, schedule } from "src/scheduling";
 import { YAML_FRONT_MATTER_REGEX, SCHEDULING_INFO_REGEX } from "src/constants";
 import { ReviewDeck, ReviewDeckSelectionModal } from "src/ReviewDeck";
@@ -23,7 +31,6 @@ import {
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
-    IteratorDeckSource,
     DeckOrder,
 } from "./DeckTreeIterator";
 import { CardScheduleCalculator } from "./CardSchedule";
@@ -268,10 +275,18 @@ export default class SRPlugin extends Plugin {
             },
         });
 
+        this.addCommand({
+            id: "srs-open-review-queue-view",
+            name: t("OPEN_REVIEW_QUEUE_VIEW"),
+            callback: async () => {
+                await this.openReviewQueueView();
+            },
+        });
+
         this.addSettingTab(new SRSettingTab(this.app, this));
 
-        this.app.workspace.onLayoutReady(() => {
-            this.initView();
+        this.app.workspace.onLayoutReady(async () => {
+            await this.initReviewQueueView();
             setTimeout(async () => {
                 if (!this.syncLock) {
                     await this.sync();
@@ -288,8 +303,7 @@ export default class SRPlugin extends Plugin {
         noteFile: TFile,
         reviewMode: FlashcardReviewMode,
     ): Promise<void> {
-        const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(noteFile));
-        const note: Note = await this.loadNote(noteFile, topicPath);
+        const note: Note = await this.loadNote(noteFile);
 
         const deckTree = new Deck("root", null);
         note.appendCardsToDeck(deckTree);
@@ -306,7 +320,7 @@ export default class SRPlugin extends Plugin {
         remainingDeckTree: Deck,
         reviewMode: FlashcardReviewMode,
     ): void {
-        const deckIterator = SRPlugin.createDeckTreeIterator(this.data.settings);
+        const deckIterator = SRPlugin.createDeckTreeIterator(this.data.settings, remainingDeckTree);
         const cardScheduleCalculator = new CardScheduleCalculator(
             this.data.settings,
             this.easeByPath,
@@ -323,7 +337,7 @@ export default class SRPlugin extends Plugin {
         new FlashcardModal(this.app, this, this.data.settings, reviewSequencer, reviewMode).open();
     }
 
-    private static createDeckTreeIterator(settings: SRSettings): IDeckTreeIterator {
+    private static createDeckTreeIterator(settings: SRSettings, baseDeck: Deck): IDeckTreeIterator {
         let cardOrder: CardOrder = CardOrder[settings.flashcardCardOrder as keyof typeof CardOrder];
         if (cardOrder === undefined) cardOrder = CardOrder.DueFirstSequential;
         let deckOrder: DeckOrder = DeckOrder[settings.flashcardDeckOrder as keyof typeof DeckOrder];
@@ -333,7 +347,7 @@ export default class SRPlugin extends Plugin {
             deckOrder,
             cardOrder,
         };
-        return new DeckTreeIterator(iteratorOrder, IteratorDeckSource.UpdatedByIterator);
+        return new DeckTreeIterator(iteratorOrder, baseDeck);
     }
 
     async sync(): Promise<void> {
@@ -393,9 +407,8 @@ export default class SRPlugin extends Plugin {
                 }
             }
 
-            const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(noteFile));
-            if (topicPath.hasPath) {
-                const note: Note = await this.loadNote(noteFile, topicPath);
+            const note: Note = await this.loadNote(noteFile);
+            if (note.questionList.length > 0) {
                 const flashcardsInNoteAvgEase: number = NoteEaseCalculator.Calculate(
                     note,
                     this.data.settings,
@@ -406,7 +419,6 @@ export default class SRPlugin extends Plugin {
                     this.easeByPath.setEaseForPath(note.filePath, flashcardsInNoteAvgEase);
                 }
             }
-
             const fileCachedData = this.app.metadataCache.getFileCache(noteFile) || {};
 
             const frontmatter: FrontMatterCache | Record<string, unknown> =
@@ -526,18 +538,35 @@ export default class SRPlugin extends Plugin {
         this.statusBar.setText(
             t("STATUS_BAR", {
                 dueNotesCount: this.dueNotesCount,
-                dueFlashcardsCount: this.remainingDeckTree.getCardCount(CardListType.All, true),
+                dueFlashcardsCount: this.remainingDeckTree.getDistinctCardCount(
+                    CardListType.All,
+                    true,
+                ),
             }),
         );
 
-        if (this.data.settings.enableNoteReviewPaneOnStartup) this.reviewQueueView.redraw();
+        if (this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE)) this.reviewQueueView.redraw();
     }
 
     async loadNote(noteFile: TFile, topicPath: TopicPath): Promise<Note> {
         const loader: NoteFileLoader = new NoteFileLoader(this.data.settings);
+/* HEAD
         const note: Note = await loader.load(this.createSrTFile(noteFile), this.getObsidianRtlSetting(), topicPath);
         if (note.hasChanged) note.writeNoteFile(this.data.settings);
-        return note;
+
+        const srFile: ISRFile = this.createSrTFile(noteFile);
+        const folderTopicPath: TopicPath = TopicPath.getFolderPathFromFilename(
+            srFile,
+            this.data.settings,
+        );
+
+        const note: Note = await loader.load(this.createSrTFile(noteFile), folderTopicPath);
+        if (note.hasChanged) {
+            note.writeNoteFile(this.data.settings);
+        }
+upstream/master
+        return note; */
+        return null;
     }
 
     private getObsidianRtlSetting(): TextDirection {
@@ -673,7 +702,7 @@ export default class SRPlugin extends Plugin {
 
         if (this.data.settings.burySiblingCards) {
             const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(note));
-            const noteX: Note = await this.loadNote(note, topicPath);
+            const noteX: Note = await this.loadNote(note);
             for (const question of noteX.questionList) {
                 this.data.buryList.push(question.questionText.textHash);
             }
@@ -765,10 +794,6 @@ export default class SRPlugin extends Plugin {
         return new SrTFile(this.app.vault, this.app.metadataCache, note);
     }
 
-    findTopicPath(note: ISRFile): TopicPath {
-        return TopicPath.getTopicPathOfFile(note, this.data.settings);
-    }
-
     async loadPluginData(): Promise<void> {
         const loadedData: PluginData = await this.loadData();
         if (loadedData?.settings) upgradeSettings(loadedData.settings);
@@ -780,7 +805,20 @@ export default class SRPlugin extends Plugin {
         await this.saveData(this.data);
     }
 
-    initView(): void {
+    findTopicPath(note: ISRFile): TopicPath {
+        return TopicPath.getTopicPathOfFile(note, this.data.settings);
+    }
+
+    private getActiveLeaf(type: string): WorkspaceLeaf | null {
+        const leaves = this.app.workspace.getLeavesOfType(type);
+        if (leaves.length == 0) {
+            return null;
+        }
+
+        return leaves[0];
+    }
+
+    private async initReviewQueueView() {
         this.registerView(
             REVIEW_QUEUE_VIEW_TYPE,
             (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this)),
@@ -788,12 +826,29 @@ export default class SRPlugin extends Plugin {
 
         if (
             this.data.settings.enableNoteReviewPaneOnStartup &&
-            app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).length == 0
+            this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE) == null
         ) {
-            this.app.workspace.getRightLeaf(false).setViewState({
-                type: REVIEW_QUEUE_VIEW_TYPE,
-                active: true,
-            });
+            await this.activateReviewQueueViewPanel();
+        }
+    }
+
+    private async activateReviewQueueViewPanel() {
+        await this.app.workspace.getRightLeaf(false).setViewState({
+            type: REVIEW_QUEUE_VIEW_TYPE,
+            active: true,
+        });
+    }
+
+    private async openReviewQueueView() {
+        let reviewQueueLeaf = this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE);
+        if (reviewQueueLeaf == null) {
+            await this.activateReviewQueueViewPanel();
+            reviewQueueLeaf = this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE);
+        }
+
+        if (reviewQueueLeaf !== null) {
+            this.app.workspace.revealLeaf(reviewQueueLeaf);
+            this.updateAndSortDueNotes();
         }
     }
 }

@@ -1,7 +1,7 @@
 {
     "id": "obsidian-spaced-repetition",
     "name": "Spaced Repetition",
-    "version": "1.11.1",
+    "version": "1.12.2",
     "minAppVersion": "0.15.4",
     "description": "Fight the forgetting curve by reviewing flashcards & entire notes.",
     "author": "Stephen Mwangi",
