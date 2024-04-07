@@ -95,7 +95,7 @@ export default class SRPlugin extends Plugin {
 
     async onload(): Promise<void> {
         await this.loadPluginData();
-        console.log(`OSR: onload: bug-914-slow-load: B`);
+        console.log(`OSR: onload: bug-914-slow-load: D`);
         this.easeByPath = new NoteEaseList(this.data.settings);
         this.questionPostponementList = new QuestionPostponementList(
             this,
@@ -517,13 +517,13 @@ export default class SRPlugin extends Plugin {
         const calc: DeckTreeStatsCalculator = new DeckTreeStatsCalculator();
         this.cardStats = calc.calculate(this.deckTree);
 
+        console.log(`sync: markdownCount: ${markdownCount}, withFlashcardTagCount: ${this.withFlashcardTagCount}, withFlashcardCount: ${this.withFlashcardCount}, hasChangedCount: ${this.hasChangedCount}`);
         if (this.data.settings.showDebugMessages) {
             console.log(`SR: ${t("EASES")}`, this.easeByPath.dict);
             console.log(`SR: ${t("DECKS")}`, this.deckTree);
-            console.log(`sync: markdownCount: ${markdownCount}, withFlashcardTagCount: ${this.withFlashcardTagCount}, withFlashcardCount: ${this.withFlashcardCount}, hasChangedCount: ${this.hasChangedCount}`);
         }
 
-        if (this.data.settings.showDebugMessages) {
+        if (this.data.settings.showDebugMessages || true) {
             console.log(
                 "SR: " +
                     t("SYNC_TIME_TAKEN", {
@@ -576,12 +576,14 @@ export default class SRPlugin extends Plugin {
     }
 
     async loadNote(noteFile: TFile): Promise<Note> {
+        testTimeLog("ln.A");
         const loader: NoteFileLoader = new NoteFileLoader(this.data.settings);
         const srFile: ISRFile = this.createSrTFile(noteFile);
         const folderTopicPath: TopicPath = TopicPath.getFolderPathFromFilename(
             srFile,
             this.data.settings,
         );
+        testTimeLog("ln.B");
 
         const note: Note = await loader.load(this.createSrTFile(noteFile), folderTopicPath);
         if (loader.hasTopicPaths) this.withFlashcardTagCount++;
@@ -590,6 +592,7 @@ export default class SRPlugin extends Plugin {
             this.hasChangedCount++;
             note.writeNoteFile(this.data.settings);
         }
+        testTimeLog("ln.C");
         return note;
     }
 

@@ -1,6 +1,7 @@
 import { MetadataCache, TFile, Vault, HeadingCache, getAllTags as ObsidianGetAllTags,
     TagCache, FrontMatterCache } from "obsidian";
 import { parseObsidianFrontmatterTag } from "./util/utils";
+import { testTimeLog } from "./util/DateProvider";
 
 export interface ISRFile {
     get path(): string;
@@ -32,8 +33,12 @@ export class SrTFile implements ISRFile {
     }
 
     getAllTagsFromCache(): string[] {
+        testTimeLog("gatfc.A");
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
-        return ObsidianGetAllTags(fileCachedData) || [];
+        testTimeLog("gatfc.B");
+        const result: string[] = ObsidianGetAllTags(fileCachedData) || [];
+        testTimeLog("gatfc.C");
+        return result;
     }
 
     getAllTagsFromText(): TagCache[] {
