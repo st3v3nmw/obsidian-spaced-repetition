@@ -125,13 +125,8 @@ export function extractFrontmatter(str: string): [string, string] {
 
         if (frontmatterEndLineNum) {
             const frontmatterStartLineNum: number = 0;
-            const frontmatterLineCount: number =
-                frontmatterEndLineNum - frontmatterStartLineNum + 1;
-            const frontmatterLines: string[] = []; /* [ ...lines].splice(
-                frontmatterStartLineNum,
-                frontmatterLineCount,
-            ); */
-            for (let i = 0; i <= frontmatterEndLineNum; i++) {
+            const frontmatterLines: string[] = [];
+            for (let i = frontmatterStartLineNum; i <= frontmatterEndLineNum; i++) {
                 frontmatterLines.push(lines[i]);
                 lines[i] = "";
             }

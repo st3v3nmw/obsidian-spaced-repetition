@@ -649,7 +649,7 @@ Stop trying ==to milk the crowd== for sympathy. // доить толпу
         });
 
         // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/915#issuecomment-2016580471
-        test("Topic tag at end of line", async () => {
+        test("Topic tag at end of line question line (no other tags present)", async () => {
             let noteText: string = `---
 Title: "The Taliban at war: 2001-2018"
 Authors: "Antonio Giustozzi"
