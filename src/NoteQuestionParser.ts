@@ -44,15 +44,21 @@ export class NoteQuestionParser {
         onlyKeepQuestionsWithTopicPath: boolean,
     ): Promise<Question[]> {
         this.noteFile = noteFile;
-        const noteText: string = await noteFile.read();
-
-        // Get the list of tags, and analyse for the topic list
-        const tagCacheList: TagCache[] = noteFile.getAllTagsFromText();
-
-        const hasTopicPaths =
-            tagCacheList.some((item) => SettingsUtil.isFlashcardTag(this.settings, item.tag)) ||
+        // For efficiency, we first get the tag list from the Obsidian cache
+        // (this only gives the tag names, not the line numbers, but this is sufficient for this first step)
+        const tagCacheList: string[] = noteFile.getAllTagsFromCache();
+        const hasTopicPaths: boolean =
+            tagCacheList.some((item) => SettingsUtil.isFlashcardTag(this.settings, item)) ||
             folderTopicPath.hasPath;
+
         if (hasTopicPaths) {
+            // Reading the file is relatively an expensive operation, so we only do this when needed
+            const noteText: string = await noteFile.read();
+
+            // Now that we know there are relevant flashcard tags in the file, we can get the more detailed info
+            // that includes the line numbers of each tag
+            const tagCompleteList: TagCache[] = noteFile.getAllTagsFromText();
+
             // The following analysis can require fair computation.
             // There is no point doing it if there aren't any topic paths
             [this.frontmatterText, this.contentText] = extractFrontmatter(noteText);
@@ -66,7 +72,7 @@ export class NoteQuestionParser {
 
             // For each question, determine it's TopicPathList
             [this.frontmatterTopicPathList, this.contentTopicPathInfo] =
-                this.analyseTagCacheList(tagCacheList);
+                this.analyseTagCacheList(tagCompleteList);
             for (const question of this.questionList) {
                 question.topicPathList = this.determineQuestionTopicPathList(question);
             }

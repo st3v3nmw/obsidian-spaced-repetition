@@ -56,10 +56,3 @@ export function unitTest_GetAllTagsFromTextEx(text: string): TagCache[] {
     }
     return result;
 }
-
-export function unitTest_GetAllTagsFromText(text: string): string[] {
-    const tagRegex = /#[^\s#]+/gi;
-    const result: RegExpMatchArray = text.match(tagRegex);
-    if (!result) return [];
-    return result;
-}
