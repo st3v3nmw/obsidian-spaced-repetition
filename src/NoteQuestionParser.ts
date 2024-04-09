@@ -53,10 +53,9 @@ export class NoteQuestionParser {
             tagCacheList.some((item) => SettingsUtil.isFlashcardTag(this.settings, item.tag)) ||
             folderTopicPath.hasPath;
         if (hasTopicPaths) {
-
             // The following analysis can require fair computation.
             // There is no point doing it if there aren't any topic paths
-             [this.frontmatterText, this.contentText] = extractFrontmatter(noteText);
+            [this.frontmatterText, this.contentText] = extractFrontmatter(noteText);
 
             // Create the question list
             this.questionList = this.doCreateQuestionList(
@@ -189,10 +188,9 @@ export class NoteQuestionParser {
     //      within frontmatter appear on separate lines)
     //
     private analyseTagCacheList(tagCacheList: TagCache[]): [TopicPathList, TopicPathList[]] {
-
         // The tag (e.g. "#flashcards") must be a valid flashcard tag as per the user settings
-        this.flashcardTagList = tagCacheList.filter(
-            (item) => SettingsUtil.isFlashcardTag(this.settings, item.tag)
+        this.flashcardTagList = tagCacheList.filter((item) =>
+            SettingsUtil.isFlashcardTag(this.settings, item.tag),
         );
         if (this.flashcardTagList.length > 0) {
             // To simplify analysis, sort the flashcard list ordered by line number
@@ -204,20 +202,31 @@ export class NoteQuestionParser {
             frontmatterLineCount = splitTextIntoLineArray(this.frontmatterText).length;
         }
 
-        const frontmatterTopicPathList: TopicPathList = this.determineFrontmatterTopicPathList(this.flashcardTagList, frontmatterLineCount);
-        const contentTopicPathList: TopicPathList[] = this.determineContentTopicPathList(this.flashcardTagList, frontmatterLineCount);
+        const frontmatterTopicPathList: TopicPathList = this.determineFrontmatterTopicPathList(
+            this.flashcardTagList,
+            frontmatterLineCount,
+        );
+        const contentTopicPathList: TopicPathList[] = this.determineContentTopicPathList(
+            this.flashcardTagList,
+            frontmatterLineCount,
+        );
 
         return [frontmatterTopicPathList, contentTopicPathList];
     }
 
-    private determineFrontmatterTopicPathList(flashcardTagList: TagCache[], frontmatterLineCount: number): TopicPathList {
+    private determineFrontmatterTopicPathList(
+        flashcardTagList: TagCache[],
+        frontmatterLineCount: number,
+    ): TopicPathList {
         let result: TopicPathList = null;
 
         // Filter for tags that are:
         //      1. specified in the user settings as flashcardTags, and
         //      2. is not question specific (determined by line number) - i.e. is "note level"
         const noteLevelTagList: TagCache[] = flashcardTagList.filter(
-            (item) => (item.position.start.line == frontmatterTagPseudoLineNum) && this.isNoteLevelFlashcardTag(item)
+            (item) =>
+                item.position.start.line == frontmatterTagPseudoLineNum &&
+                this.isNoteLevelFlashcardTag(item),
         );
         if (noteLevelTagList.length > 0) {
             // Treat the frontmatter slightly differently (all tags grouped together even if on separate lines)
@@ -227,19 +236,27 @@ export class NoteQuestionParser {
                 );
 
                 if (frontmatterTagCacheList.length > 0)
-                    result = this.createTopicPathList(frontmatterTagCacheList, frontmatterTagPseudoLineNum);
+                    result = this.createTopicPathList(
+                        frontmatterTagCacheList,
+                        frontmatterTagPseudoLineNum,
+                    );
             }
         }
         return result;
     }
 
-    private determineContentTopicPathList(flashcardTagList: TagCache[], frontmatterLineCount: number): TopicPathList[] {
+    private determineContentTopicPathList(
+        flashcardTagList: TagCache[],
+        frontmatterLineCount: number,
+    ): TopicPathList[] {
         const result: TopicPathList[] = [] as TopicPathList[];
 
         // NOTE: Line numbers are zero based, therefore don't add 1 to frontmatterLineCount to get contentStartLineNum
         const contentStartLineNum: number = frontmatterLineCount;
         const contentTagCacheList: TagCache[] = flashcardTagList.filter(
-            (item) => (item.position.start.line >= contentStartLineNum) && this.isNoteLevelFlashcardTag(item),
+            (item) =>
+                item.position.start.line >= contentStartLineNum &&
+                this.isNoteLevelFlashcardTag(item),
         );
 
         // We group together all tags that are on the same line, taking advantage of flashcardTagList being ordered by line number
@@ -265,8 +282,8 @@ export class NoteQuestionParser {
         const tagLineNum: number = tagItem.position.start.line;
 
         // Check that the tag is not question specific (determined by line number)
-        const isQuestionSpecific: boolean = this.questionList.some(
-            (q) => q.parsedQuestionInfo.isQuestionLineNum(tagLineNum)
+        const isQuestionSpecific: boolean = this.questionList.some((q) =>
+            q.parsedQuestionInfo.isQuestionLineNum(tagLineNum),
         );
         return !isQuestionSpecific;
     }

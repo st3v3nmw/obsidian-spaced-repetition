@@ -96,18 +96,18 @@ export function stringTrimStart(str: string): [string, string] {
     return [ws, trimmed];
 }
 
-// 
+//
 // This returns [frontmatter, content]
-// 
+//
 // The returned content has the same number of lines as the supplied str string, but with the
 // frontmatter lines (if present) blanked out.
-// 
+//
 // 1. We don't want the parser to see the frontmatter, as it would deem it to be part of a multi-line question
 // if one started on the line immediately after the "---" closing marker.
-// 
+//
 // 2. The lines are blanked out rather than deleted so that line numbers are not affected
 // e.g. for calls to getQuestionContext(cardLine: number)
-// 
+//
 export function extractFrontmatter(str: string): [string, string] {
     let frontmatter: string = "";
     let content: string = "";

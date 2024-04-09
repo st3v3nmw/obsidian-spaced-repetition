@@ -551,10 +551,10 @@ Stop trying ==to milk the crowd== for sympathy. // доить толпу
                     topicPathList: TopicPathList.fromPsv("#flashcards/English", 3), // #flashcards/English is on the 4th line, line number 3
                     cards: [
                         new Card({
-                            front: "Stop trying <span style='color:#2196f3'>[...]</span> for sympathy. // доить толпу", 
-                            back: `Stop trying <span style='color:#2196f3'>to milk the crowd</span> for sympathy. // доить толпу`, 
-                        })
-                    ]
+                            front: "Stop trying <span style='color:#2196f3'>[...]</span> for sympathy. // доить толпу",
+                            back: `Stop trying <span style='color:#2196f3'>to milk the crowd</span> for sympathy. // доить толпу`,
+                        }),
+                    ],
                 },
             ];
             expect(
@@ -665,7 +665,7 @@ Zotero Link: zotero://select/items/@Talibanwar20012018
 What year was the Taliban Emirate founded?::1996 #flashcards
 `;
             let noteFile: ISRFile = new UnitTestSRFile(noteText);
-    
+
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
             let expected = [
                 {
@@ -673,17 +673,16 @@ What year was the Taliban Emirate founded?::1996 #flashcards
                     topicPathList: TopicPathList.fromPsv("#flashcards", 12),
                     cards: [
                         new Card({
-                            front: "What year was the Taliban Emirate founded?", 
-                            back: "1996 #flashcards"
-                        })
-                    ]
+                            front: "What year was the Taliban Emirate founded?",
+                            back: "1996 #flashcards",
+                        }),
+                    ],
                 },
             ];
             expect(
                 await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
             ).toMatchObject(expected);
         });
-    
     });
 });
 
@@ -711,10 +710,10 @@ In computer-science, a *heap* is a tree-based data-structure, that satisfies the
                 topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
                 cards: [
                     new Card({
-                        front: `**What is a Heap?**`, 
-                        back: "In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!"
-                    })
-                ]
+                        front: `**What is a Heap?**`,
+                        back: "In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!",
+                    }),
+                ],
             },
         ];
         expect(
@@ -742,10 +741,10 @@ In computer-science, a *heap* is a tree-based data-structure, that satisfies the
                 topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
                 cards: [
                     new Card({
-                        front: "", 
-                        back: "In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!"
-                    })
-                ]
+                        front: "",
+                        back: "In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!",
+                    }),
+                ],
             },
         ];
         expect(
@@ -772,20 +771,20 @@ A::B
                 topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
                 cards: [
                     new Card({
-                        front: "In computer-science, a *heap* is", 
-                        back: "a tree-based data-structure"
-                    })
-                ]
+                        front: "In computer-science, a *heap* is",
+                        back: "a tree-based data-structure",
+                    }),
+                ],
             },
             {
                 questionType: CardType.SingleLineBasic,
                 topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
                 cards: [
                     new Card({
-                        front: "A", 
-                        back: "B"
-                    })
-                ]
+                        front: "A",
+                        back: "B",
+                    }),
+                ],
             },
         ];
         expect(
