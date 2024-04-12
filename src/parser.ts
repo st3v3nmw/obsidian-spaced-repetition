@@ -1,3 +1,4 @@
+import { ClozeCrafter } from "clozecraft";
 import { CardType } from "./Question";
 
 export class ParsedQuestionInfo {
@@ -36,15 +37,14 @@ export function parseEx(
     singlelineReversedCardSeparator: string,
     multilineCardSeparator: string,
     multilineReversedCardSeparator: string,
-    convertHighlightsToClozes: boolean,
-    convertBoldTextToClozes: boolean,
-    convertCurlyBracketsToClozes: boolean,
+    clozePatterns: string[],
 ): ParsedQuestionInfo[] {
     let cardText = "";
     const cards: ParsedQuestionInfo[] = [];
     let cardType: CardType | null = null;
     let firstLineNo = 0;
     let lastLineNo = 0;
+    const clozecrafter = new ClozeCrafter(clozePatterns);
 
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
     for (let i = 0; i < lines.length; i++) {
@@ -90,10 +90,7 @@ export function parseEx(
             cardType = null;
             cardText = "";
         } else if (
-            cardType === null &&
-            ((convertHighlightsToClozes && /==.*?==/gm.test(currentLine)) ||
-                (convertBoldTextToClozes && /\*\*.*?\*\*/gm.test(currentLine)) ||
-                (convertCurlyBracketsToClozes && /{{.*?}}/gm.test(currentLine)))
+            cardType === null && clozecrafter.isClozeNote(currentLine)
         ) {
             cardType = CardType.Cloze;
 

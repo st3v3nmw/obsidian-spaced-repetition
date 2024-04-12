@@ -48,6 +48,7 @@
     },
     "dependencies": {
         "chart.js": "^4.4.2",
+        "clozecraft": "^0.4.0",
         "pagerank.js": "^1.0.2"
     },
     "packageManager": "npm@8.18.0"
