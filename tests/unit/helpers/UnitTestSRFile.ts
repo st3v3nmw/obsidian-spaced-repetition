@@ -20,6 +20,10 @@ export class UnitTestSRFile implements ISRFile {
         return "";
     }
 
+    getAllTagsFromCache(): string[] {
+        return unitTest_GetAllTagsFromTextEx(this.content).map((item) => item.tag);
+    }
+
     getAllTagsFromText(): TagCache[] {
         return unitTest_GetAllTagsFromTextEx(this.content);
     }

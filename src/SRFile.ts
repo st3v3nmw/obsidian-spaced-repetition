@@ -8,10 +8,12 @@ import {
     FrontMatterCache,
 } from "obsidian";
 import { TextDirection } from "./util/TextDirection";
+import { parseObsidianFrontmatterTag } from "./util/utils";
 
 export interface ISRFile {
     get path(): string;
     get basename(): string;
+    getAllTagsFromCache(): string[];
     getAllTagsFromText(): TagCache[];
     getQuestionContext(cardLine: number): string[];
     getTextDirection(): TextDirection | null;
@@ -36,6 +38,12 @@ export class SrTFile implements ISRFile {
 
     get basename(): string {
         return this.file.basename;
+    }
+
+    getAllTagsFromCache(): string[] {
+        const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
+        const result: string[] = ObsidianGetAllTags(fileCachedData) || [];
+        return result;
     }
 
     getAllTagsFromText(): TagCache[] {
