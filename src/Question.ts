@@ -304,7 +304,7 @@ export class Question {
         context: string[],
     ): Question {
         const hasEditLaterTag = parsedQuestionInfo.text.includes(settings.editLaterTag);
-        const questionText: QuestionText = QuestionText.create(parsedQuestionInfo.text, settings);
+        const questionText: QuestionText = QuestionText.create(parsedQuestionInfo.text, textDirection, settings);
 
         let topicPathList: TopicPathList = noteTopicPathList;
         if (questionText.topicPathWithWs) {
@@ -316,7 +316,6 @@ export class Question {
             topicPathList,
             questionText,
             hasEditLaterTag,
-            textDirection, 
             questionContext: context,
             cards: null,
             hasChanged: false,

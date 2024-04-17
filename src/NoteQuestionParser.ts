@@ -47,9 +47,11 @@ export class NoteQuestionParser {
             // There is no point doing it if there aren't any topic paths
 
             // Create the question list
+            let textDirection: TextDirection | null = noteFile.getTextDirection();
+            if (textDirection == null) textDirection = defaultTextDirection;
             this.questionList = this.doCreateQuestionList(
                 noteText,
-                defaultTextDirection, 
+                textDirection, 
                 folderTopicPath,
                 this.tagCacheList,
             );
@@ -68,10 +70,7 @@ export class NoteQuestionParser {
         } else {
             this.questionList = [] as Question[];
         }
-        let textDirection: TextDirection | null = noteFile.getTextDirection();
-        if (textDirection == null) textDirection = defaultTextDirection;
-        const result: Question[] = this.doCreateQuestionList(noteText, textDirection, folderTopicPath, tagCacheList);
-        return result;
+        return this.questionList;
     }
 
     private doCreateQuestionList(noteText: string, textDirection: TextDirection, folderTopicPath: TopicPath,
@@ -84,7 +83,7 @@ export class NoteQuestionParser {
         const result: Question[] = [];
         const parsedQuestionInfoList: ParsedQuestionInfo[] = this.parseQuestions();
         for (const parsedQuestionInfo of parsedQuestionInfoList) {
-            const question: Question = this.createQuestionObject(parsedQuestionInfo);
+            const question: Question = this.createQuestionObject(parsedQuestionInfo, textDirection);
 
             // Each rawCardText can turn into multiple CardFrontBack's (e.g. CardType.Cloze, CardType.SingleLineReversed)
             const cardFrontBackList: CardFrontBack[] = CardFrontBackUtil.expand(
@@ -135,7 +134,6 @@ export class NoteQuestionParser {
             this.settings,
             parsedQuestionInfo,
             null, // We haven't worked out the TopicPathList yet
-            this.folderTopicPath, 
             textDirection, 
             questionContext,
         );

@@ -548,25 +548,19 @@ export default class SRPlugin extends Plugin {
         if (this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE)) this.reviewQueueView.redraw();
     }
 
-    async loadNote(noteFile: TFile, topicPath: TopicPath): Promise<Note> {
+    async loadNote(noteFile: TFile): Promise<Note> {
         const loader: NoteFileLoader = new NoteFileLoader(this.data.settings);
-/* HEAD
-        const note: Note = await loader.load(this.createSrTFile(noteFile), this.getObsidianRtlSetting(), topicPath);
-        if (note.hasChanged) note.writeNoteFile(this.data.settings);
-
         const srFile: ISRFile = this.createSrTFile(noteFile);
         const folderTopicPath: TopicPath = TopicPath.getFolderPathFromFilename(
             srFile,
             this.data.settings,
         );
 
-        const note: Note = await loader.load(this.createSrTFile(noteFile), folderTopicPath);
+        const note: Note = await loader.load(this.createSrTFile(noteFile), this.getObsidianRtlSetting(), folderTopicPath);
         if (note.hasChanged) {
             note.writeNoteFile(this.data.settings);
         }
-upstream/master
-        return note; */
-        return null;
+        return note;
     }
 
     private getObsidianRtlSetting(): TextDirection {
@@ -701,7 +695,6 @@ upstream/master
         }
 
         if (this.data.settings.burySiblingCards) {
-            const topicPath: TopicPath = this.findTopicPath(this.createSrTFile(note));
             const noteX: Note = await this.loadNote(note);
             for (const question of noteX.questionList) {
                 this.data.buryList.push(question.questionText.textHash);
@@ -803,10 +796,6 @@ upstream/master
 
     async savePluginData(): Promise<void> {
         await this.saveData(this.data);
-    }
-
-    findTopicPath(note: ISRFile): TopicPath {
-        return TopicPath.getTopicPathOfFile(note, this.data.settings);
     }
 
     private getActiveLeaf(type: string): WorkspaceLeaf | null {
