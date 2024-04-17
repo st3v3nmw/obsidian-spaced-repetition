@@ -20,7 +20,11 @@ export class FlashcardEditModal extends Modal {
     private readonly modalText: string;
     private textDirection: TextDirection;
 
-    public static Prompt(app: App, placeholder: string, textDirection: TextDirection): Promise<string> {
+    public static Prompt(
+        app: App,
+        placeholder: string,
+        textDirection: TextDirection,
+    ): Promise<string> {
         const newPromptModal = new FlashcardEditModal(app, placeholder, textDirection);
         return newPromptModal.waitForClose;
     }
@@ -54,7 +58,6 @@ export class FlashcardEditModal extends Modal {
         this.title = this.contentEl.createDiv();
         this.title.setText(t("EDIT_CARD"));
         this.title.addClass("sr-title");
-
 
         this.textArea = this.contentEl.createEl("textarea");
         this.textArea.addClass("sr-input");

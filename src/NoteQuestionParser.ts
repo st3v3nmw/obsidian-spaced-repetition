@@ -25,8 +25,12 @@ export class NoteQuestionParser {
         this.settings = settings;
     }
 
-    async createQuestionList(noteFile: ISRFile, defaultTextDirection: TextDirection, folderTopicPath: TopicPath, 
-        onlyKeepQuestionsWithTopicPath: boolean): Promise<Question[]> {
+    async createQuestionList(
+        noteFile: ISRFile,
+        defaultTextDirection: TextDirection,
+        folderTopicPath: TopicPath,
+        onlyKeepQuestionsWithTopicPath: boolean,
+    ): Promise<Question[]> {
         this.noteFile = noteFile;
         // For efficiency, we first get the tag list from the Obsidian cache
         // (this only gives the tag names, not the line numbers, but this is sufficient for this first step)
@@ -51,7 +55,7 @@ export class NoteQuestionParser {
             if (textDirection == null) textDirection = defaultTextDirection;
             this.questionList = this.doCreateQuestionList(
                 noteText,
-                textDirection, 
+                textDirection,
                 folderTopicPath,
                 this.tagCacheList,
             );
@@ -73,8 +77,12 @@ export class NoteQuestionParser {
         return this.questionList;
     }
 
-    private doCreateQuestionList(noteText: string, textDirection: TextDirection, folderTopicPath: TopicPath,
-        tagCacheList: TagCache[]): Question[] {
+    private doCreateQuestionList(
+        noteText: string,
+        textDirection: TextDirection,
+        folderTopicPath: TopicPath,
+        tagCacheList: TagCache[],
+    ): Question[] {
         this.noteText = noteText;
         this.noteLines = splitTextIntoLineArray(noteText);
         this.folderTopicPath = folderTopicPath;
@@ -126,7 +134,10 @@ export class NoteQuestionParser {
         return result;
     }
 
-    private createQuestionObject(parsedQuestionInfo: ParsedQuestionInfo, textDirection: TextDirection): Question {
+    private createQuestionObject(
+        parsedQuestionInfo: ParsedQuestionInfo,
+        textDirection: TextDirection,
+    ): Question {
         const questionContext: string[] = this.noteFile.getQuestionContext(
             parsedQuestionInfo.firstLineNum,
         );
@@ -134,7 +145,7 @@ export class NoteQuestionParser {
             this.settings,
             parsedQuestionInfo,
             null, // We haven't worked out the TopicPathList yet
-            textDirection, 
+            textDirection,
             questionContext,
         );
         return result;

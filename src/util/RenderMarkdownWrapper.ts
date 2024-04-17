@@ -24,7 +24,7 @@ export class RenderMarkdownWrapper {
     async renderMarkdownWrapper(
         markdownString: string,
         containerEl: HTMLElement,
-        textDirection: TextDirection | null, 
+        textDirection: TextDirection,
         recursiveDepth = 0,
     ): Promise<void> {
         if (recursiveDepth > 4) return;
@@ -155,7 +155,7 @@ export class RenderMarkdownWrapper {
 
         // We are operating here within the parent container.
         // It already has the rtl div if necessary.
-        // We don't need another rtl div, so we can set direction to null
-        this.renderMarkdownWrapper(blockText, el, null, recursiveDepth + 1);
+        // We don't need another rtl div, so we can set direction to Unspecified
+        this.renderMarkdownWrapper(blockText, el, TextDirection.Unspecified, recursiveDepth + 1);
     }
 }

@@ -1,6 +1,7 @@
 import { YAML_FRONT_MATTER_REGEX } from "src/constants";
 import {
-    convertToStringOrEmpty, extractFrontmatter,
+    convertToStringOrEmpty,
+    extractFrontmatter,
     findLineIndexOfSearchStringIgnoringWs,
     literalStringReplace,
 } from "src/util/utils";

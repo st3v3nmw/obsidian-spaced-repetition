@@ -34,7 +34,7 @@ export class UnitTestSRFile implements ISRFile {
     }
 
     getTextDirection(): TextDirection | null {
-        return null;
+        return TextDirection.Unspecified;
     }
 
     async read(): Promise<string> {

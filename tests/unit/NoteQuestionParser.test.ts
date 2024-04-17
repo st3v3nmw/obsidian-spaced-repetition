@@ -28,7 +28,12 @@ describe("No flashcard questions", () => {
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, TextDirection.Ltr, folderTopicPath, true),
+            await parserWithDefaultSettings.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
         ).toEqual([]);
     });
 
@@ -38,7 +43,12 @@ describe("No flashcard questions", () => {
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, TextDirection.Ltr, folderTopicPath, true),
+            await parserWithDefaultSettings.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
         ).toEqual([]);
     });
 });
@@ -70,7 +80,12 @@ A::B
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, TextDirection.Ltr, folderTopicPath, true),
+            await parserWithDefaultSettings.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
         ).toMatchObject(expected);
     });
 
@@ -109,7 +124,12 @@ A::B
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, TextDirection.Ltr, folderTopicPath, true),
+            await parserWithDefaultSettings.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
         ).toMatchObject(expected);
     });
 
@@ -131,7 +151,12 @@ A::B
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, TextDirection.Ltr, folderTopicPath, true),
+            await parserWithDefaultSettings.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
         ).toMatchObject(expected);
     });
 
@@ -160,7 +185,12 @@ In computer-science, a *heap* is a tree-based data-structure, that satisfies the
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, TextDirection.Ltr, folderTopicPath, true),
+            await parserWithDefaultSettings.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
         ).toMatchObject(expected);
     });
 });
@@ -199,7 +229,12 @@ A::B ^d7cee0
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, TextDirection.Ltr, folderTopicPath, true),
+            await parserWithDefaultSettings.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
         ).toMatchObject(expected);
     });
 
@@ -244,7 +279,12 @@ A::B ^d7cee0
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, TextDirection.Ltr, folderTopicPath, true),
+            await parserWithDefaultSettings.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
         ).toMatchObject(expected);
     });
 
@@ -287,7 +327,12 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, TextDirection.Ltr, folderTopicPath, true),
+            await parserWithDefaultSettings.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
         ).toMatchObject(expected);
     });
 
@@ -329,7 +374,12 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, TextDirection.Ltr, folderTopicPath, true),
+            await parserWithDefaultSettings.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
         ).toMatchObject(expected);
     });
 });
@@ -343,7 +393,7 @@ Q2::A2
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
         let questionList: Question[] = await parser_ConvertFoldersToDecks.createQuestionList(
-            noteFile, 
+            noteFile,
             TextDirection.Ltr,
             folderTopicPath,
             true,
@@ -361,7 +411,7 @@ Q3::A3
 
         let folderTopicPath: TopicPath = new TopicPath(["flashcards", "science"]);
         let questionList: Question[] = await parser_ConvertFoldersToDecks.createQuestionList(
-            noteFile, 
+            noteFile,
             TextDirection.Ltr,
             folderTopicPath,
             true,
@@ -388,7 +438,8 @@ Q3::A3
 
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
         let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
-            noteFile, TextDirection.Ltr,
+            noteFile,
+            TextDirection.Ltr,
             folderTopicPath,
             true,
         );
@@ -417,7 +468,8 @@ Multiline answer2
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
         let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
-            noteFile, TextDirection.Ltr,
+            noteFile,
+            TextDirection.Ltr,
             TopicPath.emptyPath,
             true,
         );
@@ -463,7 +515,7 @@ describe("Handling tags within note", () => {
             let noteFile: ISRFile = new UnitTestSRFile(noteText);
             let folderTopicPath: TopicPath = new TopicPath(["folder", "subfolder"]);
             let questionList: Question[] = await parser2.createQuestionList(
-                noteFile, 
+                noteFile,
                 TextDirection.Ltr,
                 folderTopicPath,
                 true,
@@ -481,7 +533,7 @@ Q1::A1
             let noteFile: ISRFile = new UnitTestSRFile(noteText);
             let folderTopicPath: TopicPath = new TopicPath(["folder", "subfolder"]);
             let questionList: Question[] = await parser2.createQuestionList(
-                noteFile, 
+                noteFile,
                 TextDirection.Ltr,
                 folderTopicPath,
                 true,
@@ -501,7 +553,7 @@ Q1::A1
             let noteFile: ISRFile = new UnitTestSRFile(noteText);
             let folderTopicPath: TopicPath = new TopicPath(["folder", "subfolder"]);
             let questionList: Question[] = await parser2.createQuestionList(
-                noteFile, 
+                noteFile,
                 TextDirection.Ltr,
                 folderTopicPath,
                 true,
@@ -525,7 +577,7 @@ Q1::A1
             let expectedPath: string = "#flashcards/test";
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
-                noteFile, 
+                noteFile,
                 TextDirection.Ltr,
                 folderTopicPath,
                 true,
@@ -546,7 +598,7 @@ Q1::A1
 
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
-                noteFile, 
+                noteFile,
                 TextDirection.Ltr,
                 folderTopicPath,
                 true,
@@ -569,7 +621,7 @@ Q1::A1
             let expectedPath: TopicPath = new TopicPath(["flashcards", "test"]);
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
-                noteFile, 
+                noteFile,
                 TextDirection.Ltr,
                 folderTopicPath,
                 true,
@@ -591,7 +643,7 @@ Q1::A1
 
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
-                noteFile, 
+                noteFile,
                 TextDirection.Ltr,
                 folderTopicPath,
                 true,
@@ -615,7 +667,7 @@ Q1::A1
             let expectedPath: TopicPath = new TopicPath(["flashcards", "science"]);
             let folderTopicPath: TopicPath = TopicPath.emptyPath;
             let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
-                noteFile, 
+                noteFile,
                 TextDirection.Ltr,
                 folderTopicPath,
                 true,

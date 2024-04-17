@@ -16,7 +16,7 @@ export interface ISRFile {
     getAllTagsFromCache(): string[];
     getAllTagsFromText(): TagCache[];
     getQuestionContext(cardLine: number): string[];
-    getTextDirection(): TextDirection | null;
+    getTextDirection(): TextDirection;
     read(): Promise<string>;
     write(content: string): Promise<void>;
 }
@@ -110,18 +110,19 @@ export class SrTFile implements ISRFile {
         return result;
     }
 
-    getTextDirection(): TextDirection | null {
-        let result: TextDirection = null;
-		const fileCache = this.metadataCache.getFileCache(this.file);
-		const frontMatter = fileCache?.frontmatter;
-		if (frontMatter && frontMatter?.direction) {
+    getTextDirection(): TextDirection {
+        let result: TextDirection = TextDirection.Unspecified;
+        const fileCache = this.metadataCache.getFileCache(this.file);
+        const frontMatter = fileCache?.frontmatter;
+        if (frontMatter && frontMatter?.direction) {
             // Don't know why the try/catch is needed; but copied from Obsidian RTL plug-in getFrontMatterDirection()
-			try {
-				const str: string = (frontMatter.direction + '').toLowerCase();
-				result = (str == "rtl") ? TextDirection.Rtl : TextDirection.Ltr;
-			}
-			catch (error) {}
-		}
+            try {
+                const str: string = (frontMatter.direction + "").toLowerCase();
+                result = str == "rtl" ? TextDirection.Rtl : TextDirection.Ltr;
+            } catch (error) {
+                // continue regardless of error
+            }
+        }
         return result;
     }
 

@@ -106,7 +106,7 @@ export class QuestionText {
         original: string,
         topicPathWithWs: TopicPathWithWs,
         actualQuestion: string,
-        textDirection: TextDirection, 
+        textDirection: TextDirection,
         blockId: string,
     ) {
         this.original = original;
@@ -123,7 +123,11 @@ export class QuestionText {
         return this.actualQuestion.endsWith("```");
     }
 
-    static create(original: string, textDirection: TextDirection, settings: SRSettings): QuestionText {
+    static create(
+        original: string,
+        textDirection: TextDirection,
+        settings: SRSettings,
+    ): QuestionText {
         const [topicPathWithWs, actualQuestion, blockId] = this.splitText(original, settings);
 
         return new QuestionText(original, topicPathWithWs, actualQuestion, textDirection, blockId);
@@ -271,7 +275,11 @@ export class Question {
         let newText = MultiLineTextFinder.findAndReplace(noteText, originalText, replacementText);
         if (newText) {
             // Don't support changing the textDirection setting
-            this.questionText = QuestionText.create(replacementText, this.questionText.textDirection, settings);
+            this.questionText = QuestionText.create(
+                replacementText,
+                this.questionText.textDirection,
+                settings,
+            );
         } else {
             console.error(
                 `updateQuestionText: Text not found: ${originalText.substring(
@@ -300,11 +308,15 @@ export class Question {
         settings: SRSettings,
         parsedQuestionInfo: ParsedQuestionInfo,
         noteTopicPathList: TopicPathList,
-        textDirection: TextDirection, 
+        textDirection: TextDirection,
         context: string[],
     ): Question {
         const hasEditLaterTag = parsedQuestionInfo.text.includes(settings.editLaterTag);
-        const questionText: QuestionText = QuestionText.create(parsedQuestionInfo.text, textDirection, settings);
+        const questionText: QuestionText = QuestionText.create(
+            parsedQuestionInfo.text,
+            textDirection,
+            settings,
+        );
 
         let topicPathList: TopicPathList = noteTopicPathList;
         if (questionText.topicPathWithWs) {

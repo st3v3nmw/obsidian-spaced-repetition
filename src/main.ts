@@ -556,7 +556,11 @@ export default class SRPlugin extends Plugin {
             this.data.settings,
         );
 
-        const note: Note = await loader.load(this.createSrTFile(noteFile), this.getObsidianRtlSetting(), folderTopicPath);
+        const note: Note = await loader.load(
+            this.createSrTFile(noteFile),
+            this.getObsidianRtlSetting(),
+            folderTopicPath,
+        );
         if (note.hasChanged) {
             note.writeNoteFile(this.data.settings);
         }
@@ -565,12 +569,14 @@ export default class SRPlugin extends Plugin {
 
     private getObsidianRtlSetting(): TextDirection {
         // Get the direction with Obsidian's own setting
-        const v: any = (this.app.vault as any).getConfig('rightToLeft');
-		return (convertToStringOrEmpty(v) == "true") ? TextDirection.Rtl : TextDirection.Ltr;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const v: any = (this.app.vault as any).getConfig("rightToLeft");
+        return convertToStringOrEmpty(v) == "true" ? TextDirection.Rtl : TextDirection.Ltr;
     }
-    
+
     async saveReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const frontmatter: FrontMatterCache | Record<string, unknown> =
             fileCachedData.frontmatter || {};
 
