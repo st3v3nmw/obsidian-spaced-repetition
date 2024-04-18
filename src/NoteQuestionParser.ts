@@ -51,8 +51,8 @@ export class NoteQuestionParser {
             // There is no point doing it if there aren't any topic paths
 
             // Create the question list
-            let textDirection: TextDirection | null = noteFile.getTextDirection();
-            if (textDirection == null) textDirection = defaultTextDirection;
+            let textDirection: TextDirection = noteFile.getTextDirection();
+            if (textDirection == TextDirection.Unspecified) textDirection = defaultTextDirection;
             this.questionList = this.doCreateQuestionList(
                 noteText,
                 textDirection,

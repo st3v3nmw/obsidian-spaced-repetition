@@ -33,7 +33,7 @@ export class UnitTestSRFile implements ISRFile {
         return [];
     }
 
-    getTextDirection(): TextDirection | null {
+    getTextDirection(): TextDirection {
         return TextDirection.Unspecified;
     }
 
