@@ -9,6 +9,7 @@ import {
 } from "obsidian";
 import { parseObsidianFrontmatterTag } from "./util/utils";
 
+// NOTE: Line numbers are zero based
 export interface ISRFile {
     get path(): string;
     get basename(): string;
@@ -19,6 +20,11 @@ export interface ISRFile {
     write(content: string): Promise<void>;
 }
 
+// The Obsidian frontmatter cache doesn't include the line number for the specific tag.
+// We define as -1 so that we can differentiate tags within the frontmatter and tags within the content
+export const frontmatterTagPseudoLineNum: number = -1;
+
+// NOTE: Line numbers are zero based
 export class SrTFile implements ISRFile {
     file: TFile;
     vault: Vault;
@@ -48,6 +54,7 @@ export class SrTFile implements ISRFile {
         const result: TagCache[] = [] as TagCache[];
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
         if (fileCachedData.tags?.length > 0) {
+            // console.log(`getAllTagsFromText: tags: ${fileCachedData.tags.map((item) => `(${item.position.start.line}: ${item.tag})`).join("|")}`);
             result.push(...fileCachedData.tags);
         }
 
@@ -63,19 +70,14 @@ export class SrTFile implements ISRFile {
         const result: TagCache[] = [] as TagCache[];
         const frontmatterTags: string = frontmatter != null ? frontmatter["tags"] + "" : null;
         if (frontmatterTags) {
-            // The frontmatter doesn't include the line number for the specific tag, defining as line 1 is good enough.
-            // (determineQuestionTopicPathList() only needs to know that these frontmatter tags come before all others
-            // in the file)
-            const line: number = 1;
-
             // Parse the frontmatter tag string into a list, each entry including the leading "#"
             const tagStrList: string[] = parseObsidianFrontmatterTag(frontmatterTags);
             for (const str of tagStrList) {
                 const tag: TagCache = {
                     tag: str,
                     position: {
-                        start: { line: line, col: null, offset: null },
-                        end: { line: line, col: null, offset: null },
+                        start: { line: frontmatterTagPseudoLineNum, col: null, offset: null },
+                        end: { line: frontmatterTagPseudoLineNum, col: null, offset: null },
                     },
                 };
                 result.push(tag);
@@ -87,6 +89,7 @@ export class SrTFile implements ISRFile {
     getQuestionContext(cardLine: number): string[] {
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
         const headings: HeadingCache[] = fileCachedData.headings || [];
+        // console.log(`getQuestionContext: headings: ${headings.map((item) => `(${item.position.start.line}: ${item.heading})`).join("|")}`);
         const stack: HeadingCache[] = [];
         for (const heading of headings) {
             if (heading.position.start.line > cardLine) {
