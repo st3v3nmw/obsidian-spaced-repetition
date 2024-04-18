@@ -158,9 +158,10 @@ This is an alternative to the tagging option and can be enabled in settings.
 
 There are two ways that the plugin can be used with RTL languages, such as Arabic, Hebrew, Persian (Farsi).
 
-If all cards are in a RTL language, then simply enable the global Obsidian option  `Editor → Right-to-left (RTL)`.
+If all cards are in a RTL language, then simply enable the global Obsidian option `Editor → Right-to-left (RTL)`.
 
 If all cards within a single note have the same LTR/RTL direction, then frontmatter can be used to specify the text direction. For example:
+
 ```
 ---
 direction: rtl
