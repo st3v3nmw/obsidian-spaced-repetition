@@ -105,6 +105,18 @@ export function convertToStringOrEmpty(v: any): string {
     return result;
 }
 
+//
+// This returns [frontmatter, content]
+//
+// The returned content has the same number of lines as the supplied str string, but with the
+// frontmatter lines (if present) blanked out.
+//
+// 1. We don't want the parser to see the frontmatter, as it would deem it to be part of a multi-line question
+// if one started on the line immediately after the "---" closing marker.
+//
+// 2. The lines are blanked out rather than deleted so that line numbers are not affected
+// e.g. for calls to getQuestionContext(cardLine: number)
+//
 export function extractFrontmatter(str: string): [string, string] {
     let frontmatter: string = "";
     let content: string = "";
@@ -122,12 +134,11 @@ export function extractFrontmatter(str: string): [string, string] {
 
         if (frontmatterEndLineNum) {
             const frontmatterStartLineNum: number = 0;
-            const frontmatterLineCount: number =
-                frontmatterEndLineNum - frontmatterStartLineNum + 1;
-            const frontmatterLines: string[] = lines.splice(
-                frontmatterStartLineNum,
-                frontmatterLineCount,
-            );
+            const frontmatterLines: string[] = [];
+            for (let i = frontmatterStartLineNum; i <= frontmatterEndLineNum; i++) {
+                frontmatterLines.push(lines[i]);
+                lines[i] = "";
+            }
             frontmatter = frontmatterLines.join("\n");
             content = lines.join("\n");
         }

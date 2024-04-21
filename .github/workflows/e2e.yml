@@ -6,6 +6,7 @@ on: workflow_dispatch
 
 env:
     OBSIDIAN_VERSION: 1.2.8
+    COREPACK_ENABLE_STRICT: 0
 
 jobs:
     e2e:

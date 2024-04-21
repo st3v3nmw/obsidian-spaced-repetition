@@ -4,6 +4,9 @@ on:
     pull_request:
         branches: [master]
 
+env:
+    COREPACK_ENABLE_STRICT: 0
+
 jobs:
     lint_and_test:
         runs-on: ubuntu-latest
