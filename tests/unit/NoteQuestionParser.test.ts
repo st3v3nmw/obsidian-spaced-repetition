@@ -617,7 +617,12 @@ Stop trying ==to milk the crowd== for sympathy. // доить толпу
                 },
             ];
             expect(
-                await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+                await parserWithDefaultSettings.createQuestionList(
+                    noteFile,
+                    TextDirection.Ltr,
+                    folderTopicPath,
+                    true,
+                ),
             ).toMatchObject(expected);
         });
 
@@ -743,7 +748,12 @@ What year was the Taliban Emirate founded?::1996 #flashcards
                 },
             ];
             expect(
-                await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+                await parserWithDefaultSettings.createQuestionList(
+                    noteFile,
+                    TextDirection.Ltr,
+                    folderTopicPath,
+                    true,
+                ),
             ).toMatchObject(expected);
         });
     });
@@ -780,7 +790,12 @@ In computer-science, a *heap* is a tree-based data-structure, that satisfies the
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+            await parserWithDefaultSettings.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
         ).toMatchObject(expected);
     });
 
@@ -811,7 +826,12 @@ In computer-science, a *heap* is a tree-based data-structure, that satisfies the
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+            await parserWithDefaultSettings.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
         ).toMatchObject(expected);
     });
 
@@ -851,7 +871,12 @@ A::B
             },
         ];
         expect(
-            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+            await parserWithDefaultSettings.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
         ).toMatchObject(expected);
     });
 });
