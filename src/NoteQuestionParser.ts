@@ -5,7 +5,7 @@ import { parseEx, ParsedQuestionInfo } from "./parser";
 import { Question, QuestionText } from "./Question";
 import { CardFrontBack, CardFrontBackUtil } from "./QuestionType";
 import { SRSettings, SettingsUtil } from "./settings";
-import { ISRFile } from "./SRFile";
+import { ISRFile, frontmatterTagPseudoLineNum } from "./SRFile";
 import { TopicPath, TopicPathList } from "./TopicPath";
 import { extractFrontmatter, splitTextIntoLineArray } from "./util/utils";
 
@@ -14,10 +14,24 @@ export class NoteQuestionParser {
     noteFile: ISRFile;
     folderTopicPath: TopicPath;
     noteText: string;
+    frontmatterText: string;
+
+    // This is the note text, but with the frontmatter blanked out (see extractFrontmatter for reasoning)
+    contentText: string;
     noteLines: string[];
+
+    // Complete list of tags
     tagCacheList: TagCache[];
+
+    // tagCacheList filtered to those specified in the user settings (e.g. "#flashcards")
+    flashcardTagList: TagCache[];
+
+    // flashcardTagList filtered to those within the frontmatter
     frontmatterTopicPathList: TopicPathList;
+
+    // flashcardTagList filtered to those within the note's content and are note-level tags (i.e. not question specific)
     contentTopicPathInfo: TopicPathList[];
+
     questionList: Question[];
 
     constructor(settings: SRSettings) {
@@ -47,6 +61,7 @@ export class NoteQuestionParser {
 
             // The following analysis can require fair computation.
             // There is no point doing it if there aren't any topic paths
+            [this.frontmatterText, this.contentText] = extractFrontmatter(noteText);
 
             // Create the question list
             this.questionList = this.doCreateQuestionList(
@@ -114,9 +129,10 @@ export class NoteQuestionParser {
     }
 
     private parseQuestions(): ParsedQuestionInfo[] {
+        // We pass contentText which has the frontmatter blanked out; see extractFrontmatter for reasoning
         const settings: SRSettings = this.settings;
         const result: ParsedQuestionInfo[] = parseEx(
-            this.noteText,
+            this.contentText,
             settings.singleLineCardSeparator,
             settings.singleLineReversedCardSeparator,
             settings.multilineCardSeparator,
@@ -176,60 +192,104 @@ export class NoteQuestionParser {
     //      within frontmatter appear on separate lines)
     //
     private analyseTagCacheList(tagCacheList: TagCache[]): [TopicPathList, TopicPathList[]] {
-        let frontmatterTopicPathList: TopicPathList = null;
-        const contentTopicPathList: TopicPathList[] = [] as TopicPathList[];
-
-        // Only keep tags that are:
-        //      1. specified in the user settings as flashcardTags, and
-        //      2. is not question specific (determined by line number)
-        const filteredTagCacheList: TagCache[] = tagCacheList.filter(
-            (item) =>
-                SettingsUtil.isFlashcardTag(this.settings, item.tag) &&
-                this.questionList.every(
-                    (q) => !q.parsedQuestionInfo.isQuestionLineNum(item.position.start.line),
-                ),
+        // The tag (e.g. "#flashcards") must be a valid flashcard tag as per the user settings
+        this.flashcardTagList = tagCacheList.filter((item) =>
+            SettingsUtil.isFlashcardTag(this.settings, item.tag),
         );
-        let frontmatterLineCount: number = null;
-        if (filteredTagCacheList.length > 0) {
-            // To simplify analysis, ensure that the supplied list is ordered by line number
-            filteredTagCacheList.sort((a, b) => a.position.start.line - b.position.start.line);
+        if (this.flashcardTagList.length > 0) {
+            // To simplify analysis, sort the flashcard list ordered by line number
+            this.flashcardTagList.sort((a, b) => a.position.start.line - b.position.start.line);
+        }
 
+        let frontmatterLineCount: number = 0;
+        if (this.frontmatterText) {
+            frontmatterLineCount = splitTextIntoLineArray(this.frontmatterText).length;
+        }
+
+        const frontmatterTopicPathList: TopicPathList = this.determineFrontmatterTopicPathList(
+            this.flashcardTagList,
+            frontmatterLineCount,
+        );
+        const contentTopicPathList: TopicPathList[] = this.determineContentTopicPathList(
+            this.flashcardTagList,
+            frontmatterLineCount,
+        );
+
+        return [frontmatterTopicPathList, contentTopicPathList];
+    }
+
+    private determineFrontmatterTopicPathList(
+        flashcardTagList: TagCache[],
+        frontmatterLineCount: number,
+    ): TopicPathList {
+        let result: TopicPathList = null;
+
+        // Filter for tags that are:
+        //      1. specified in the user settings as flashcardTags, and
+        //      2. is not question specific (determined by line number) - i.e. is "note level"
+        const noteLevelTagList: TagCache[] = flashcardTagList.filter(
+            (item) =>
+                item.position.start.line == frontmatterTagPseudoLineNum &&
+                this.isNoteLevelFlashcardTag(item),
+        );
+        if (noteLevelTagList.length > 0) {
             // Treat the frontmatter slightly differently (all tags grouped together even if on separate lines)
-            const [frontmatter, _] = extractFrontmatter(this.noteText);
-            if (frontmatter) {
-                frontmatterLineCount = splitTextIntoLineArray(frontmatter).length;
-                const frontmatterTagCacheList = filteredTagCacheList.filter(
+            if (this.frontmatterText) {
+                const frontmatterTagCacheList = noteLevelTagList.filter(
                     (item) => item.position.start.line < frontmatterLineCount,
                 );
 
-                // Doesn't matter what line number we specify, as long as it's less than frontmatterLineCount
                 if (frontmatterTagCacheList.length > 0)
-                    frontmatterTopicPathList = this.createTopicPathList(frontmatterTagCacheList, 0);
+                    result = this.createTopicPathList(
+                        frontmatterTagCacheList,
+                        frontmatterTagPseudoLineNum,
+                    );
             }
         }
-        //
-        const contentStartLineNum: number = frontmatterLineCount > 0 ? frontmatterLineCount + 1 : 0;
-        const contentTagCacheList: TagCache[] = filteredTagCacheList.filter(
-            (item) => item.position.start.line >= contentStartLineNum,
+        return result;
+    }
+
+    private determineContentTopicPathList(
+        flashcardTagList: TagCache[],
+        frontmatterLineCount: number,
+    ): TopicPathList[] {
+        const result: TopicPathList[] = [] as TopicPathList[];
+
+        // NOTE: Line numbers are zero based, therefore don't add 1 to frontmatterLineCount to get contentStartLineNum
+        const contentStartLineNum: number = frontmatterLineCount;
+        const contentTagCacheList: TagCache[] = flashcardTagList.filter(
+            (item) =>
+                item.position.start.line >= contentStartLineNum &&
+                this.isNoteLevelFlashcardTag(item),
         );
 
+        // We group together all tags that are on the same line, taking advantage of flashcardTagList being ordered by line number
         let list: TagCache[] = [] as TagCache[];
-        for (const t of contentTagCacheList) {
+        for (const tag of contentTagCacheList) {
             if (list.length != 0) {
                 const startLineNum: number = list[0].position.start.line;
-                if (startLineNum != t.position.start.line) {
-                    contentTopicPathList.push(this.createTopicPathList(list, startLineNum));
+                if (startLineNum != tag.position.start.line) {
+                    result.push(this.createTopicPathList(list, startLineNum));
                     list = [] as TagCache[];
                 }
             }
-            list.push(t);
+            list.push(tag);
         }
         if (list.length > 0) {
             const startLineNum: number = list[0].position.start.line;
-            contentTopicPathList.push(this.createTopicPathList(list, startLineNum));
+            result.push(this.createTopicPathList(list, startLineNum));
         }
+        return result;
+    }
 
-        return [frontmatterTopicPathList, contentTopicPathList];
+    private isNoteLevelFlashcardTag(tagItem: TagCache): boolean {
+        const tagLineNum: number = tagItem.position.start.line;
+
+        // Check that the tag is not question specific (determined by line number)
+        const isQuestionSpecific: boolean = this.questionList.some((q) =>
+            q.parsedQuestionInfo.isQuestionLineNum(tagLineNum),
+        );
+        return !isQuestionSpecific;
     }
 
     private createTopicPathList(tagCacheList: TagCache[], lineNum: number): TopicPathList {
@@ -238,6 +298,11 @@ export class NoteQuestionParser {
             list.push(TopicPath.getTopicPathFromTag(tagCache.tag));
         }
         return new TopicPathList(list, lineNum);
+    }
+
+    private createTopicPathList_FromSingleTag(tagCache: TagCache): TopicPathList {
+        const list: TopicPath[] = [TopicPath.getTopicPathFromTag(tagCache.tag)];
+        return new TopicPathList(list, tagCache.position.start.line);
     }
 
     //
@@ -266,17 +331,18 @@ export class NoteQuestionParser {
 
                 // Find the last TopicPathList prior to the question (in the order present in the file)
                 for (let i = this.contentTopicPathInfo.length - 1; i >= 0; i--) {
-                    const info: TopicPathList = this.contentTopicPathInfo[i];
-                    if (info.lineNum < question.parsedQuestionInfo.firstLineNum) {
-                        result = info;
+                    const topicPathList: TopicPathList = this.contentTopicPathInfo[i];
+                    if (topicPathList.lineNum < question.parsedQuestionInfo.firstLineNum) {
+                        result = topicPathList;
                         break;
                     }
                 }
 
                 // For backward compatibility with functionality pre https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/495:
                 // if nothing matched, then use the first one
-                if (!result && this.contentTopicPathInfo.length > 0) {
-                    result = this.contentTopicPathInfo[0];
+                // This could occur if the only topic tags present are question specific
+                if (!result && this.flashcardTagList.length > 0) {
+                    result = this.createTopicPathList_FromSingleTag(this.flashcardTagList[0]);
                 }
             }
         }

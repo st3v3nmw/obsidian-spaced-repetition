@@ -126,7 +126,15 @@ tags:
         let content: string;
         [frontmatter, content] = extractFrontmatter(text);
         expect(frontmatter).toEqual(text);
-        expect(content).toEqual("");
+        const frontmatterBlankedOut: string = `
+
+
+
+
+
+
+`;
+        expect(content).toEqual(frontmatterBlankedOut);
     });
 
     test("With frontmatter (and content)", () => {
@@ -157,7 +165,17 @@ ${content}`;
 
         const [f, c] = extractFrontmatter(text);
         expect(f).toEqual(frontmatter);
-        expect(c).toEqual(content);
+        const frontmatterBlankedOut: string = `
+
+
+
+
+
+
+`;
+        const expectedContent: string = `${frontmatterBlankedOut}
+${content}`;
+        expect(c).toEqual(expectedContent);
     });
 });
 
