@@ -756,11 +756,13 @@ export default class SRPlugin extends Plugin {
         this.lastSelectedReviewDeck = deckKey;
         const deck = this.reviewDecks[deckKey];
 
-        if (deck.dueNotesCount > 0) {
+        const nowUnix = Date.now();
+        const dueNotes = deck.scheduledNotes.filter((note) => note.dueUnix <= nowUnix);
+        if (dueNotes.length > 0) {
             const index = this.data.settings.openRandomNote
-                ? Math.floor(Math.random() * deck.dueNotesCount)
+                ? Math.floor(Math.random() * dueNotes.length)
                 : 0;
-            await this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
+            await this.app.workspace.getLeaf().openFile(dueNotes[index].note);
             return;
         }
 
