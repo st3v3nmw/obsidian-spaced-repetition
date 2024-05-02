@@ -16,7 +16,7 @@ export interface NoteLinkStat {
 }
 
 export interface IOsrVaultNoteLinkInfoFinder {
-    getResolvedLinks(path: string): Record<string, number>;
+    getResolvedTargetLinksForNotePath(sourcePath: string): Record<string, number>;
 }
 
 export class ObsidianVaultNoteLinkInfoFinder implements IOsrVaultNoteLinkInfoFinder {
@@ -26,13 +26,17 @@ export class ObsidianVaultNoteLinkInfoFinder implements IOsrVaultNoteLinkInfoFin
         this.metadataCache = metadataCache;
     }
 
-    getResolvedLinks(path: string): Record<string, number> {
+    getResolvedTargetLinksForNotePath(path: string): Record<string, number> {
         return this.metadataCache.resolvedLinks[path];
     }
 }
 
 export class OsrNoteGraph {
     private vaultNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder;
+    // Key: targetFilename
+    // Value: Map<sourceFilename, linkCount>
+    // This is the number of links from sourceFilename to targetFilename
+    // For simplicity, we just store the filename without the directory or filename extension
     incomingLinks: Record<string, LinkStat[]> = {};
     pageranks: Record<string, number> = {};
 
@@ -52,8 +56,8 @@ export class OsrNoteGraph {
             this.incomingLinks[path] = [];
         }
 
-        const links = this.vaultNoteLinkInfoFinder.getResolvedLinks(path) || {};
-        for (const targetPath in links) {
+        const targetLinks = this.vaultNoteLinkInfoFinder.getResolvedTargetLinksForNotePath(path) || {};
+        for (const targetPath in targetLinks) {
             if (this.incomingLinks[targetPath] === undefined)
                 this.incomingLinks[targetPath] = [];
 
@@ -61,10 +65,10 @@ export class OsrNoteGraph {
             if (isSupportedFileType(targetPath)) {
                 this.incomingLinks[targetPath].push({
                     sourcePath: path,
-                    linkCount: links[targetPath],
+                    linkCount: targetLinks[targetPath],
                 });
 
-                graph.link(path, targetPath, links[targetPath]);
+                graph.link(path, targetPath, targetLinks[targetPath]);
             }
         }
     }
@@ -83,7 +87,7 @@ export class OsrNoteGraph {
             }
         }
 
-        const outgoingLinks = this.vaultNoteLinkInfoFinder.getResolvedLinks(notePath) || {};
+        const outgoingLinks = this.vaultNoteLinkInfoFinder.getResolvedTargetLinksForNotePath(notePath) || {};
         for (const linkedFilePath in outgoingLinks) {
             const ease: number = noteEaseList.getEaseByPath(linkedFilePath);
             if (ease) {

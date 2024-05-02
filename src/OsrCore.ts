@@ -25,7 +25,7 @@ export class OsrCore {
     protected settings: SRSettings;
     // private vaultEvents: IOsrVaultEvents;
     private dataChangedHandler: () => void;
-    private osrNoteGraph: OsrNoteGraph;
+    protected osrNoteGraph: OsrNoteGraph;
     private osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder;
     private _easeByPath: NoteEaseList;
     private _questionPostponementList: QuestionPostponementList;
@@ -78,27 +78,28 @@ export class OsrCore {
     }
     
     protected async processFile(noteFile: ISRFile): Promise<void> {
+        const schedule: RepItemScheduleInfo = await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
+        let note: Note = null;
 
         // Does the note contain any tags that are specified as flashcard tags in the settings
         // (Doing this check first saves us from loading and parsing the note if not necessary)
         const topicPath: TopicPath = this.findTopicPath(noteFile);
         if (topicPath.hasPath) {
-            const note: Note = await this.loadNote(noteFile, topicPath);
+            note = await this.loadNote(noteFile, topicPath);
             note.appendCardsToDeck(this.fullDeckTree);
-
-            // Give the algorithm a chance to do something with the loaded note
-            // e.g. OSR - calculate the average ease across all the questions within the note
-            // TODO:  should this move to this.loadNote
-            SrsAlgorithm.getInstance().noteOnLoadedNote(note);
         }
 
-        const tags = noteFile.getAllTags()
+        // Give the algorithm a chance to do something with the loaded note
+        // e.g. OSR - calculate the average ease across all the questions within the note
+        // TODO:  should this move to this.loadNote
+        SrsAlgorithm.getInstance().noteOnLoadedNote(noteFile.path, note, schedule?.latestEase);
+
+        const tags = noteFile.getAllTags();
 
         const matchedNoteTags = SettingsUtil.filterForNoteReviewTag(this.settings, tags);
         if (matchedNoteTags.length == 0) {
             return;
         }
-
         const noteSchedule: RepItemScheduleInfo = await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
         this._noteReviewQueue.addNoteToQueue(noteFile, noteSchedule, matchedNoteTags);
     }
@@ -135,7 +136,7 @@ export class OsrCore {
         // Calculate the new/updated schedule
         let noteSchedule: RepItemScheduleInfo;
         if (originalNoteSchedule == null) {
-            noteSchedule = SrsAlgorithm.getInstance().noteCalcNewSchedule(noteFile.path, this.osrNoteGraph, response);
+            noteSchedule = SrsAlgorithm.getInstance().noteCalcNewCardSchedule(noteFile.path, this.osrNoteGraph, response);
         } else {
             noteSchedule = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(noteFile.path, originalNoteSchedule, response);
         }

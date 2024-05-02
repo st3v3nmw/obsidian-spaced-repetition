@@ -67,6 +67,8 @@ export class DataStoreInNote_AlgorithmOsr implements IDataStoreAlgorithm {
                 `---\nsr-due: ${dueString}\nsr-interval: ${interval}\n` +
                 `sr-ease: ${ease}\n---\n\n${fileText}`;
         }
+
+        await note.write(fileText);
     }
 
     questionFormatScheduleAsHtmlComment(question: Question): string {

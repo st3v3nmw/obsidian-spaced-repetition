@@ -5,8 +5,8 @@ import { Note } from "src/Note";
 import { OsrNoteGraph } from "../osr/OsrNoteGraph";
 
 export interface ISrsAlgorithm {
-    noteOnLoadedNote(note: Note): void;
-    noteCalcNewSchedule(notePath: string, osrNoteGraph: OsrNoteGraph, response: ReviewResponse): RepItemScheduleInfo;
+    noteOnLoadedNote(path: string, note: Note, noteEase: number): void;
+    noteCalcNewCardSchedule(notePath: string, osrNoteGraph: OsrNoteGraph, response: ReviewResponse): RepItemScheduleInfo;
     noteCalcUpdatedSchedule(notePath: string, noteSchedule: RepItemScheduleInfo, response: ReviewResponse): RepItemScheduleInfo;
 
     cardGetResetSchedule(): RepItemScheduleInfo;

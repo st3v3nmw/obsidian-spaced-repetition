@@ -30,7 +30,7 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
         return 1.0;
     }
 
-    noteCalcNewSchedule(notePath: string, osrNoteGraph: OsrNoteGraph, response: ReviewResponse): RepItemScheduleInfo {
+    noteCalcNewCardSchedule(notePath: string, osrNoteGraph: OsrNoteGraph, response: ReviewResponse): RepItemScheduleInfo {
         const noteLinkStat: NoteLinkStat = osrNoteGraph.calcNoteLinkStat(notePath, this.noteEaseList, this.settings);
 
         const linkContribution: number =
@@ -53,16 +53,30 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
         ease = Math.round(ease);
         const temp: RepItemScheduleInfo_Osr = new RepItemScheduleInfo_Osr(dueDate, interval, ease);
 
-        return this.calcSchedule(temp, response, this.dueDateNoteHistogram);
+        const result: RepItemScheduleInfo_Osr = this.calcSchedule(temp, response, this.dueDateNoteHistogram);
+
+        // Calculate the due date now that we know the interval
+        result.dueDate = moment(globalDateProvider.today.add(result.interval, "d"));
+        return result;
     }
 
-    noteOnLoadedNote(note: Note): void {
-        const flashcardsInNoteAvgEase: number = SrsAlgorithm_Osr.calculateFlashcardAvgEase(
-            note.questionList,
-            this.settings,
-        );
-        if (flashcardsInNoteAvgEase > 0) {
-            this.noteEaseList.setEaseForPath(note.filePath, flashcardsInNoteAvgEase);
+    noteOnLoadedNote(path: string, note: Note, noteEase: number): void {
+        let flashcardsInNoteAvgEase: number = null;
+        if (note) {
+            flashcardsInNoteAvgEase = SrsAlgorithm_Osr.calculateFlashcardAvgEase(
+                note.questionList,
+                this.settings,
+            );
+        }
+        let ease: number = null;
+        if (flashcardsInNoteAvgEase && noteEase) {
+            ease = (flashcardsInNoteAvgEase + noteEase) / 2;
+        } else {
+            ease = (flashcardsInNoteAvgEase) ? flashcardsInNoteAvgEase : noteEase;
+        }
+
+        if (ease) {
+            this.noteEaseList.setEaseForPath(path, ease);
         }
 
     }
@@ -104,7 +118,7 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
         const interval: number = temp.interval;
         const ease: number = temp.latestEase;
 
-        const dueDate: Moment = moment(globalDateProvider.now.valueOf() + interval * 24 * 3600 * 1000);
+        const dueDate: Moment = moment(globalDateProvider.today.add(interval, "d"));
         this.noteEaseList.setEaseForPath(notePath, ease);
         return new RepItemScheduleInfo_Osr(dueDate, interval, ease);
     }

@@ -4,14 +4,11 @@ import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { CardListType } from "src/Deck";
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
 import { NoteReviewDeck, SchedNote } from "src/NoteReviewDeck";
-import { DateUtil } from "src/util/DateProvider";
+import { DateUtil, setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 import { formatDate_YYYY_MM_DD } from "src/util/utils";
 import moment from "moment";
 import { ReviewResponse } from "src/algorithms/base/RepetitionItem";
-
-interface IExpected {
-    dueNotesCount: number;
-}
+import { unitTest_CheckNoteFrontmatter } from "./helpers/UnitTestHelper";
 
 function checkDeckTreeCounts(osrCore: UnitTestOsrCore, expectedReviewableCount: number, expectedRemainingCount: number): void {
     expect(osrCore.reviewableDeckTree.getCardCount(CardListType.All, true)).toEqual(expectedReviewableCount);
@@ -32,15 +29,13 @@ function checkScheduledNote(actual: SchedNote, expected: any): void {
 }
 
 beforeAll(() => {
+    setupStaticDateProvider_20230906();
     unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 test("No questions in the text; no files tagged as notes", async () => {
     const osrCore: UnitTestOsrCore = new UnitTestOsrCore(DEFAULT_SETTINGS);
-    await osrCore.loadVault("filesButNoQuestions");
-    const expected: IExpected =  {
-        dueNotesCount: 0
-    };
+    await osrCore.loadTestVault("filesButNoQuestions");
     expect(osrCore.noteReviewQueue.dueNotesCount).toEqual(0);
     expect(osrCore.noteReviewQueue.reviewDecks.size).toEqual(0);
     checkDeckTreeCounts(osrCore, 0, 0);
@@ -51,7 +46,7 @@ describe("Notes", () => {
     describe("Loading from vault", () => {
         test("Tagged as note, but no OSR frontmatter", async () => {
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(DEFAULT_SETTINGS);
-            await osrCore.loadVault("notes1");
+            await osrCore.loadTestVault("notes1");
 
             expect(osrCore.noteReviewQueue.dueNotesCount).toEqual(0);
             expect(osrCore.noteReviewQueue.reviewDecks.size).toEqual(1);
@@ -69,7 +64,7 @@ describe("Notes", () => {
 
         test("Tagged as note, and includes OSR frontmatter", async () => {
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(DEFAULT_SETTINGS);
-            await osrCore.loadVault("notes2");
+            await osrCore.loadTestVault("notes2");
 
             expect(osrCore.noteReviewQueue.dueNotesCount).toEqual(0);
             expect(osrCore.noteReviewQueue.reviewDecks.size).toEqual(1);
@@ -89,18 +84,63 @@ describe("Notes", () => {
         });    
     });
 
-    describe("Saving note's review response", () => {
-        test("New note", async () => {
+    describe("New note - review response", () => {
+        test("New note without any backlinks", async () => {
             const settings: SRSettings = { ...DEFAULT_SETTINGS };
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
-            await osrCore.loadVault("notes1");
+            await osrCore.loadTestVault("notes1");
 
             // Review the note
-            const file = osrCore.getFile("Computation Graph.md");
-            await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings)
-            const noteContent: string = file.content;
+            const file = osrCore.getFileByNoteName("Computation Graph");
+            await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
 
-            // TODO: Check note frontmatter
+            // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
+            const expectedDueDate: string = "2023-09-10";
+            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
+        });
+
+        // The notes that have links to [[A]] themselves haven't been reviewed,
+        // So the expected post-review schedule is the same as if no files had links to [[A]]
+        test("New note with some backlinks (source files without reviews)", async () => {
+            const settings: SRSettings = { ...DEFAULT_SETTINGS };
+            const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+            await osrCore.loadTestVault("notes3");
+
+            // Review the note
+            const file = osrCore.getFileByNoteName("A");
+            await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
+
+            // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
+            const expectedDueDate: string = "2023-09-10";
+            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
+        });
+
+        test("New note with a backlink (one source file already reviewed)", async () => {
+            const settings: SRSettings = { ...DEFAULT_SETTINGS };
+            const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+            await osrCore.loadTestVault("notes4");
+
+            // Review note B 
+            // 
+            // "note A.md" contains:
+            //      frontmatter (from OSR plugin 1.12.4 review of EASY)
+            //      A link to "note B.md"
+            // 
+            // "note B.md" contains:
+            //      No frontmatter
+            // 
+            // "note C.md" contains:
+            //      No link to "note B.md"
+            // 
+            // "note D.md" contains:
+            //      No frontmatter
+            //      2 links to "note B.md"
+            const file = osrCore.getFileByNoteName("B");
+            await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
+
+            // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
+            const expectedDueDate: string = "2023-09-10";
+            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 272);
         });
     });
 });

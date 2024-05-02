@@ -18,6 +18,8 @@ module.exports = {
         "src/NoteFileLoader.ts",
         "src/NoteParser.ts",
         "src/NoteQuestionParser.ts",
+        "src/NoteReviewQueue.ts",
+        "src/OsrCore.ts",
         "src/TopicParser.ts",
         "src/parser.ts",
         "src/scheduling.ts",

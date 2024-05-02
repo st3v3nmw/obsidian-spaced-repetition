@@ -16,12 +16,7 @@ export function unitTest_GetAllTagsFromTextEx(text: string): TagCache[] {
     const result = [] as TagCache[];
     let lines: string[];
 
-    const map: Map<string, string[]> = unitTest_BasicFrontmatterParser(text);
-    /* for (let [key, value] of map) {
-        const tagStr: string = value[value.length - 1];
-        result.push(unitTest_CreateTagCache("#" + tagStr, 0));
-        // console.log(key + " is " + value);
-    } */
+    const map: Map<string, string[]> = unitTest_BasicFrontmatterParserEx(text);
     if (frontmatter) {
         const dataPrefix: string = "  - ";
         lines = splitTextIntoLineArray(frontmatter);
@@ -69,7 +64,16 @@ export function unitTest_GetAllTagsFromText(text: string): string[] {
     return result;
 }
 
-export function unitTest_BasicFrontmatterParser(text: string): Map<string, string[]> {
+export function unitTest_BasicFrontmatterParser(text: string): Map<string, string> {
+    const result = new Map<string, string>;
+    const map: Map<string, string[]> = unitTest_BasicFrontmatterParserEx(text);
+    map.forEach((value, key) => {
+        result.set(key, value.pop());
+    });
+    return result;
+}
+
+export function unitTest_BasicFrontmatterParserEx(text: string): Map<string, string[]> {
     const [frontmatter, _] = splitNoteIntoFrontmatterAndContent(text);
     const result = new Map<string, string[]>;
 
@@ -122,4 +126,13 @@ export function unitTest_ParseForOutgoingLinks(text: string): string[] {
     }
     return result;
 
+}
+
+export function unitTest_CheckNoteFrontmatter(text: string, expectedDueDate: string, expectedInterval: number, expectedEase: number): void {
+    const frontmatter: Map<string, string> = unitTest_BasicFrontmatterParser(text);
+
+    expect(frontmatter).toBeTruthy();
+    expect(frontmatter.get("sr-due")).toEqual(expectedDueDate);
+    expect(frontmatter.get("sr-interval")).toEqual(expectedInterval + "");
+    expect(frontmatter.get("sr-ease")).toEqual(expectedEase + "");
 }

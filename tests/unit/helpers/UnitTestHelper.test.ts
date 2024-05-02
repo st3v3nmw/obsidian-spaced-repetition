@@ -3,6 +3,13 @@ import { unitTest_GetAllTagsFromTextEx, unitTest_ParseForOutgoingLinks } from ".
 import { UnitTestOsrCore } from "./UnitTestOsrCore";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { UnitTestLinkInfoFinder } from "./UnitTestLinkInfoFinder";
+import { unitTestSetup_StandardDataStoreAlgorithm } from "./UnitTestSetup";
+
+let linkInfoFinder: UnitTestLinkInfoFinder;
+
+beforeAll(() => {
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+});
 
 describe("unitTest_GetAllTagsFromTextEx", () => {
     describe("Without frontmatter", () => {
@@ -97,30 +104,42 @@ The triboelectric effect describes electric charge [[triboelectrification]], or 
     });
 });
 
+function check_getResolvedLinks(linkName: string, expected: Map<string, number>): void {
+    let e: Record<string, number> = {};
+    expected.forEach((n, linkName) => {
+        const filename: string = linkInfoFinder.getFilenameForLink(linkName);
+        e[filename] = n;
+    });
+    expect(linkInfoFinder.getResolvedTargetLinksForNoteLink(linkName)).toEqual(e);
+}
+
 describe("UnitTestLinkInfoFinder", () => {
     test("No outgoing links", async () => {
         const osrCore: UnitTestOsrCore = new UnitTestOsrCore(DEFAULT_SETTINGS);
-        await osrCore.loadVault("notes3");
-        const linkInfoFinder: UnitTestLinkInfoFinder = new UnitTestLinkInfoFinder();
+        await osrCore.loadTestVault("notes3");
+        linkInfoFinder = new UnitTestLinkInfoFinder();
         linkInfoFinder.init(osrCore.getFileMap());
 
-        // One link from D to A
-        expect(linkInfoFinder.getResolvedLinks("A.md")).toEqual({
-           "D": 1
-        });
+        // One link from A to each of B, C, D
+        check_getResolvedLinks("A", new Map([
+            ["B", 1], 
+            ["C", 1], 
+            ["D", 1], 
+        ]));
 
-        // One link from A to B; two links from D to B
-        expect(linkInfoFinder.getResolvedLinks("B.md")).toEqual({
-            "A": 1, 
-            "D": 2
-        });
-        expect(linkInfoFinder.getResolvedLinks("C.md")).toEqual({
-            "A": 1, 
-        });
-        expect(linkInfoFinder.getResolvedLinks("D.md")).toEqual({
-            "A": 1, 
-            "C": 1, 
-        });
+        // No links from B
+        check_getResolvedLinks("B", new Map([
+        ]));
+
+        // One link from C to D
+        check_getResolvedLinks("C", new Map([
+            ["D", 1], 
+        ]));
+
+        check_getResolvedLinks("D", new Map([
+            ["A", 1], 
+            ["B", 2], 
+        ]));
       });
 });
 
