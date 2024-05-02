@@ -376,7 +376,7 @@ export default class SRPlugin extends Plugin {
         }
 
         const notes: TFile[] = this.app.vault.getMarkdownFiles();
-        for (const noteFile of notes) {
+        for (const noteFile of notes) {  // for each file in the vault...? 
             if (
                 this.data.settings.noteFoldersToIgnore.some((folder) =>
                     noteFile.path.startsWith(folder),
@@ -423,22 +423,27 @@ export default class SRPlugin extends Plugin {
                 fileCachedData.frontmatter || {};
             const tags = getAllTags(fileCachedData) || [];
 
-            let firstMatchedNoteTag = "";  // first tag in the note that matches a tag in tagsToReview
+            // Compile list of negative and positive review tags
+            const tagsToReview = this.data.settings.tagsToReview.filter(tag => !tag.startsWith("-"));
+            const negativeTagsToReview = this.data.settings.tagsToReview.filter(tag => tag.startsWith("-")).map(tag => tag.slice(1));
 
-            for (const tagToReview of this.data.settings.tagsToReview) {
-                if (tags.some((tag) => tag === tagToReview || tag.startsWith(tagToReview + "/"))) {
-                    if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, tagToReview)) {
-                        this.reviewDecks[tagToReview] = new ReviewDeck(tagToReview);
-                    }
-                    firstMatchedNoteTag = tagToReview;
-                    break;
-                }
-            }
-            if (firstMatchedNoteTag == "") {
-                continue;
+            // Skip this item if any tags match a negative review tag
+            if (negativeTagsToReview.some((negativeTag) => {
+                return tags.some((tag) => tag === negativeTag || tag.startsWith(negativeTag + "/"));
+            })) { continue; }
+            
+            // Add item to first matched review tag
+            const firstMatchedNoteTag = (tagsToReview.find((reviewTag) =>
+                tags.some((tag) => tag === reviewTag || tag.startsWith(reviewTag + "/"))
+            ));
+            if (firstMatchedNoteTag == undefined) { continue; }
+
+            // Create review deck if it doesn't exist
+            if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, firstMatchedNoteTag)) {
+                this.reviewDecks[firstMatchedNoteTag] = new ReviewDeck(firstMatchedNoteTag);
             }
 
-            // file has no scheduling information
+            // if file has no existing scheduling information, add it to its reviewDeck
             if (
                 !(
                     Object.prototype.hasOwnProperty.call(frontmatter, "sr-due") &&
