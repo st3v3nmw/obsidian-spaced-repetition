@@ -424,14 +424,14 @@ export default class SRPlugin extends Plugin {
             const tags = getAllTags(fileCachedData) || [];
 
             let shouldIgnore = true;
-            const matchedNoteTags = [];
+            let firstMatchedNoteTag = "";  // first tag in the note that matches a tag in tagsToReview
 
             for (const tagToReview of this.data.settings.tagsToReview) {
                 if (tags.some((tag) => tag === tagToReview || tag.startsWith(tagToReview + "/"))) {
                     if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, tagToReview)) {
                         this.reviewDecks[tagToReview] = new ReviewDeck(tagToReview);
                     }
-                    matchedNoteTags.push(tagToReview);
+                    firstMatchedNoteTag = tagToReview;
                     shouldIgnore = false;
                     break;
                 }
@@ -448,10 +448,7 @@ export default class SRPlugin extends Plugin {
                     Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
                 )
             ) {
-                for (const matchedNoteTag of matchedNoteTags) {
-                    this.reviewDecks[matchedNoteTag].newNotes.push(noteFile);
-                }
-                continue;
+                this.reviewDecks[firstMatchedNoteTag].newNotes.push(noteFile);
             }
 
             const dueUnix: number = window
@@ -467,9 +464,7 @@ export default class SRPlugin extends Plugin {
             this.easeByPath.setEaseForPath(noteFile.path, ease);
 
             // schedule the note
-            for (const matchedNoteTag of matchedNoteTags) {
-                this.reviewDecks[matchedNoteTag].scheduledNotes.push({ note: noteFile, dueUnix });
-            }
+            this.reviewDecks[firstMatchedNoteTag].scheduledNotes.push({ note: noteFile, dueUnix });
         }
 
         graph.rank(0.85, 0.000001, (node: string, rank: number) => {
