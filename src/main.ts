@@ -423,7 +423,6 @@ export default class SRPlugin extends Plugin {
                 fileCachedData.frontmatter || {};
             const tags = getAllTags(fileCachedData) || [];
 
-            let shouldIgnore = true;
             let firstMatchedNoteTag = "";  // first tag in the note that matches a tag in tagsToReview
 
             for (const tagToReview of this.data.settings.tagsToReview) {
@@ -432,11 +431,10 @@ export default class SRPlugin extends Plugin {
                         this.reviewDecks[tagToReview] = new ReviewDeck(tagToReview);
                     }
                     firstMatchedNoteTag = tagToReview;
-                    shouldIgnore = false;
                     break;
                 }
             }
-            if (shouldIgnore) {
+            if (firstMatchedNoteTag == "") {
                 continue;
             }
 
