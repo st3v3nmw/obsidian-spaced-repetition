@@ -43,7 +43,7 @@ test("No questions in the text; no files tagged as notes", async () => {
 });
 
 describe("Notes", () => {
-    describe("Loading from vault", () => {
+    describe("Testing code that loads from test vault", () => {
         test("Tagged as note, but no OSR frontmatter", async () => {
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(DEFAULT_SETTINGS);
             await osrCore.loadTestVault("notes1");
@@ -84,7 +84,7 @@ describe("Notes", () => {
         });    
     });
 
-    describe("New note - review response", () => {
+    describe("Review New note (i.e. not previously reviewed); no questions present", () => {
         test("New note without any backlinks", async () => {
             const settings: SRSettings = { ...DEFAULT_SETTINGS };
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
@@ -101,7 +101,7 @@ describe("Notes", () => {
 
         // The notes that have links to [[A]] themselves haven't been reviewed,
         // So the expected post-review schedule is the same as if no files had links to [[A]]
-        test("New note with some backlinks (source files without reviews)", async () => {
+        test("Review note with some backlinks (source files without reviews)", async () => {
             const settings: SRSettings = { ...DEFAULT_SETTINGS };
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
             await osrCore.loadTestVault("notes3");
@@ -115,26 +115,98 @@ describe("Notes", () => {
             unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
         });
 
-        test("New note with a backlink (one source file already reviewed)", async () => {
+        test("Review note with a backlink (one source file already reviewed)", async () => {
             const settings: SRSettings = { ...DEFAULT_SETTINGS };
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+
+            // See: tests\vaults\readme.md
             await osrCore.loadTestVault("notes4");
 
             // Review note B 
-            // 
-            // "note A.md" contains:
-            //      frontmatter (from OSR plugin 1.12.4 review of EASY)
-            //      A link to "note B.md"
-            // 
-            // "note B.md" contains:
-            //      No frontmatter
-            // 
-            // "note C.md" contains:
-            //      No link to "note B.md"
-            // 
-            // "note D.md" contains:
-            //      No frontmatter
-            //      2 links to "note B.md"
+            const file = osrCore.getFileByNoteName("B");
+            await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
+
+            // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
+            const expectedDueDate: string = "2023-09-10";
+            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 272);
+        });
+    });
+
+    describe("Review Old note (i.e. previously reviewed); no questions present", () => {
+        test("Review note with a backlink - Good", async () => {
+            const settings: SRSettings = { ...DEFAULT_SETTINGS };
+            const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+
+            // See: tests/vaults/readme.md
+            // See: tests/vaults/notes4/readme.md
+            await osrCore.loadTestVault("notes4");
+
+            // Review note A 
+            const file = osrCore.getFileByNoteName("A");
+            await osrCore.saveNoteReviewResponse(file, ReviewResponse.Good, settings);
+
+            // Check note frontmatter - 11 days after the simulated test date of 2023-09-06
+            const expectedDueDate: string = "2023-09-17";
+            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 11, 270);
+        });
+
+        test("Review note with a backlink - Hard", async () => {
+            const settings: SRSettings = { ...DEFAULT_SETTINGS };
+            const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+
+            // See: tests/vaults/readme.md
+            // See: tests/vaults/notes4/readme.md
+            await osrCore.loadTestVault("notes4");
+
+            // Review note A 
+            const file = osrCore.getFileByNoteName("A");
+            await osrCore.saveNoteReviewResponse(file, ReviewResponse.Hard, settings);
+
+            // Check note frontmatter - 2 days after the simulated test date of 2023-09-06
+            const expectedDueDate: string = "2023-09-08";
+            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 2, 250);
+        });
+    });
+
+    describe("Review New note (i.e. not previously reviewed); questions present and some previously reviewed", () => {
+        test("New note without any backlinks", async () => {
+            const settings: SRSettings = { ...DEFAULT_SETTINGS };
+            const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+            await osrCore.loadTestVault("notes1");
+
+            // Review the note
+            const file = osrCore.getFileByNoteName("Computation Graph");
+            await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
+
+            // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
+            const expectedDueDate: string = "2023-09-10";
+            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
+        });
+
+        // The notes that have links to [[A]] themselves haven't been reviewed,
+        // So the expected post-review schedule is the same as if no files had links to [[A]]
+        test("Review note with some backlinks (source files without reviews)", async () => {
+            const settings: SRSettings = { ...DEFAULT_SETTINGS };
+            const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+            await osrCore.loadTestVault("notes3");
+
+            // Review the note
+            const file = osrCore.getFileByNoteName("A");
+            await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
+
+            // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
+            const expectedDueDate: string = "2023-09-10";
+            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
+        });
+
+        test("Review note with a backlink (one source file already reviewed)", async () => {
+            const settings: SRSettings = { ...DEFAULT_SETTINGS };
+            const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+
+            // See: tests\vaults\readme.md
+            await osrCore.loadTestVault("notes4");
+
+            // Review note B 
             const file = osrCore.getFileByNoteName("B");
             await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
 
