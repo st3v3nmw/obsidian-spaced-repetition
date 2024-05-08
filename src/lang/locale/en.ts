@@ -106,7 +106,7 @@ export default {
     NOTES: "Notes",
     REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "Tags to review",
-    TAGS_TO_REVIEW_DESC: "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.",
+    TAGS_TO_REVIEW_DESC: "Enter tags separated by spaces or newlines i.e. #review -#unread #paper. Notes with negative tags (i.e. -#unread) will be ignored even if a note also contains review tags.",
     OPEN_RANDOM_NOTE: "Open a random note for review",
     OPEN_RANDOM_NOTE_DESC: "When you turn this off, notes are ordered by importance (PageRank).",
     AUTO_NEXT_NOTE: "Open next note automatically after a review",
