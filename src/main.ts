@@ -452,6 +452,7 @@ export default class SRPlugin extends Plugin {
                 )
             ) {
                 this.reviewDecks[firstMatchedNoteTag].newNotes.push(noteFile);
+                continue;
             }
 
             const dueUnix: number = window
