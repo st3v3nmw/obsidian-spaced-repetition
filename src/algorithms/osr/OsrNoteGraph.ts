@@ -3,6 +3,7 @@ import * as graph from "pagerank.js";
 import { INoteEaseList } from "src/NoteEaseList";
 import { SRSettings } from "src/settings";
 import { isSupportedFileType } from "src/util/utils";
+import { IOsrVaultNoteLinkInfoFinder } from "./ObsidianVaultNoteLinkInfoFinder";
 
 export interface LinkStat {
     sourcePath: string;
@@ -13,22 +14,6 @@ export interface NoteLinkStat {
     linkTotal: number;
     linkPGTotal: number;
     totalLinkCount: number;
-}
-
-export interface IOsrVaultNoteLinkInfoFinder {
-    getResolvedTargetLinksForNotePath(sourcePath: string): Record<string, number>;
-}
-
-export class ObsidianVaultNoteLinkInfoFinder implements IOsrVaultNoteLinkInfoFinder {
-    private metadataCache: MetadataCache;
-
-    constructor(metadataCache: MetadataCache) {
-        this.metadataCache = metadataCache;
-    }
-
-    getResolvedTargetLinksForNotePath(path: string): Record<string, number> {
-        return this.metadataCache.resolvedLinks[path];
-    }
 }
 
 export class OsrNoteGraph {
