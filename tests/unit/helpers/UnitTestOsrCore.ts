@@ -2,7 +2,6 @@ import * as fs from "fs";
 import * as path from "path";
 import { OsrCore } from "src/OsrCore";
 import { QuestionPostponementList } from "src/QuestionPostponementList";
-import { IOsrVaultNoteLinkInfoFinder } from "src/algorithms/osr/OsrNoteGraph";
 import { SRSettings } from "src/settings";
 import { UnitTestSRFile } from "./UnitTestSRFile";
 import { UnitTestLinkInfoFinder } from "./UnitTestLinkInfoFinder";

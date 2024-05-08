@@ -84,11 +84,7 @@ describe("Notes", () => {
         });    
     });
 
-<<<<<<< Updated upstream
     describe("Review New note (i.e. not previously reviewed); no questions present", () => {
-=======
-    describe("New note - review response", () => {
->>>>>>> Stashed changes
         test("New note without any backlinks", async () => {
             const settings: SRSettings = { ...DEFAULT_SETTINGS };
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
@@ -105,11 +101,7 @@ describe("Notes", () => {
 
         // The notes that have links to [[A]] themselves haven't been reviewed,
         // So the expected post-review schedule is the same as if no files had links to [[A]]
-<<<<<<< Updated upstream
         test("Review note with some backlinks (source files without reviews)", async () => {
-=======
-        test("New note with some backlinks (source files without reviews)", async () => {
->>>>>>> Stashed changes
             const settings: SRSettings = { ...DEFAULT_SETTINGS };
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
             await osrCore.loadTestVault("notes3");
@@ -123,7 +115,6 @@ describe("Notes", () => {
             unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
         });
 
-<<<<<<< Updated upstream
         test("Review note with a backlink (one source file already reviewed)", async () => {
             const settings: SRSettings = { ...DEFAULT_SETTINGS };
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
@@ -216,17 +207,6 @@ describe("Notes", () => {
             await osrCore.loadTestVault("notes4");
 
             // Review note B 
-=======
-        test.only("New note with a backlink (one source file already reviewed)", async () => {
-            const settings: SRSettings = { ...DEFAULT_SETTINGS };
-            const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
-            await osrCore.loadTestVault("notes4");
-
-            // Review note B 
-            // note A.md contains:
-            //      frontmatter from OSR plugin review of EASY
-            //      A link to B.md
->>>>>>> Stashed changes
             const file = osrCore.getFileByNoteName("B");
             await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
 

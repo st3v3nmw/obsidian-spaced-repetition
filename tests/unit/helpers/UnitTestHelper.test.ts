@@ -110,11 +110,7 @@ function check_getResolvedLinks(linkName: string, expected: Map<string, number>)
         const filename: string = linkInfoFinder.getFilenameForLink(linkName);
         e[filename] = n;
     });
-<<<<<<< Updated upstream
     expect(linkInfoFinder.getResolvedTargetLinksForNoteLink(linkName)).toEqual(e);
-=======
-    expect(linkInfoFinder.getResolvedLinksForNoteLink(linkName)).toEqual(e);
->>>>>>> Stashed changes
 }
 
 describe("UnitTestLinkInfoFinder", () => {
@@ -124,7 +120,6 @@ describe("UnitTestLinkInfoFinder", () => {
         linkInfoFinder = new UnitTestLinkInfoFinder();
         linkInfoFinder.init(osrCore.getFileMap());
 
-<<<<<<< Updated upstream
         // One link from A to each of B, C, D
         check_getResolvedLinks("A", new Map([
             ["B", 1], 
@@ -144,25 +139,6 @@ describe("UnitTestLinkInfoFinder", () => {
         check_getResolvedLinks("D", new Map([
             ["A", 1], 
             ["B", 2], 
-=======
-        // One link from D to A
-        check_getResolvedLinks("A", new Map([
-            ["D", 1], 
-        ]));
-
-        // One link from A to B; two links from D to B
-        check_getResolvedLinks("B", new Map([
-            ["A", 1], 
-            ["D", 2], 
-        ]));
-
-        check_getResolvedLinks("C", new Map([
-            ["A", 1], 
-        ]));
-        check_getResolvedLinks("D", new Map([
-            ["A", 1], 
-            ["C", 1], 
->>>>>>> Stashed changes
         ]));
       });
 });

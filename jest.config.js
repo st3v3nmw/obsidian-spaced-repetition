@@ -30,6 +30,7 @@ module.exports = {
         "src/algorithms/base/ISrsAlgorithm", 
         "src/algorithms/base/RepItemScheduleInfo", 
         "src/algorithms/base/SrsAlgorithm", 
+        "src/algorithms/osr/ObsidianVaultNoteLinkInfoFinder", 
         "src/dataStoreAlgorithm/DataStoreAlgorithm", 
         "src/dataStoreAlgorithm/IDataStoreAlgorithm", 
         "src/lang/locale/",

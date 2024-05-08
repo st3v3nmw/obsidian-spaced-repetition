@@ -29,7 +29,6 @@ import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 import { QuestionPostponementList } from "./QuestionPostponementList";
 import { ReviewResponse } from "./algorithms/base/RepetitionItem";
 import { SrsAlgorithm } from "./algorithms/base/SrsAlgorithm";
-import { ObsidianVaultNoteLinkInfoFinder } from "./algorithms/osr/OsrNoteGraph";
 import { DataStore } from "./dataStore/base/DataStore";
 import { DataStoreAlgorithm } from "./dataStoreAlgorithm/DataStoreAlgorithm";
 import { NoteReviewQueue } from "./NoteReviewQueue";
@@ -40,6 +39,7 @@ import { OsrAppCore } from "./OsrAppCore";
 import { DEFAULT_DATA, PluginData } from "./PluginData";
 import { NextNoteReviewHandler } from "./NextNoteReviewHandler";
 import { OsrSidebar } from "./gui/OsrSidebar";
+import { ObsidianVaultNoteLinkInfoFinder } from "./algorithms/osr/ObsidianVaultNoteLinkInfoFinder";
 
 
 
