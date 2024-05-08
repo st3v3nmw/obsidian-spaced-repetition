@@ -17,6 +17,14 @@ export function unitTest_GetAllTagsFromTextEx(text: string): TagCache[] {
     let lines: string[];
 
     const map: Map<string, string[]> = unitTest_BasicFrontmatterParserEx(text);
+<<<<<<< Updated upstream
+=======
+    /* for (let [key, value] of map) {
+        const tagStr: string = value[value.length - 1];
+        result.push(unitTest_CreateTagCache("#" + tagStr, 0));
+        // console.log(key + " is " + value);
+    } */
+>>>>>>> Stashed changes
     if (frontmatter) {
         const dataPrefix: string = "  - ";
         lines = splitTextIntoLineArray(frontmatter);

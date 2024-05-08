@@ -3,7 +3,7 @@ import { NoteEaseList } from "./NoteEaseList";
 import { NoteReviewQueue } from "./NoteReviewQueue";
 import { QuestionPostponementList } from "./QuestionPostponementList";
 import { ISRFile, SrTFile } from "./SRFile";
-import { IOsrVaultNoteLinkInfoFinder, ObsidianVaultNoteLinkInfoFinder, OsrNoteGraph } from "./algorithms/osr/OsrNoteGraph";
+import { OsrNoteGraph } from "./algorithms/osr/OsrNoteGraph";
 import { Stats } from "./stats";
 import { SRSettings, SettingsUtil } from "./settings";
 import { TopicPath } from "./TopicPath";
@@ -16,6 +16,7 @@ import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 import { NoteFileLoader } from "./NoteFileLoader";
 import { ReviewResponse } from "./algorithms/base/RepetitionItem";
 import { NextNoteReviewHandler } from "./NextNoteReviewHandler";
+import { IOsrVaultNoteLinkInfoFinder } from "./algorithms/osr/ObsidianVaultNoteLinkInfoFinder";
 
 export interface IOsrVaultEvents {
     dataChanged: () => void;

@@ -5,11 +5,19 @@ import path from "path";
 
 export class UnitTestLinkInfoFinder implements IOsrVaultNoteLinkInfoFinder {
     private linkPathMap: Map<string, string>;
+<<<<<<< Updated upstream
     // Key: sourceFilename
     // Value: Map<targetFilename, linkCount>
     //      This is the number of links from sourceFilename to targetFilename
     //      For simplicity, we just store the filename without the directory or filename extension
     private outgoingLinks: Map<string, Map<string, number>>;
+=======
+    // Key: targetFilename
+    // Value: Map<sourceFilename, linkCount>
+    // This is the number of links from sourceFilename to targetFilename
+    // For simplicity, we just store the filename without the directory or filename extension
+    private targetSourceLinkCountRecord: Map<string, Map<string, number>>;
+>>>>>>> Stashed changes
 
     init(fileMap: Map<string, UnitTestSRFile>) {
         // We first need to generate a map between the link names (e.g. the "A" in "[[A]]"), and it's file path)
@@ -24,9 +32,15 @@ export class UnitTestLinkInfoFinder implements IOsrVaultNoteLinkInfoFinder {
             // Find all the (outgoing) links present in the file
             const outgoingLinks2: string[] = unitTest_ParseForOutgoingLinks(file.content);
 
+<<<<<<< Updated upstream
             for (const targetLink of outgoingLinks2) {
                 const targetFilename: string = this.linkPathMap.get(targetLink);
                 this.incrementOutgoingLinksCount(sourceFilename, targetFilename);
+=======
+            for (const targetLink of outgoingLinks) {
+                const targetFilename: string = this.linkPathMap.get(targetLink);
+                this.incrementTargetSourceCount(sourceFilename, targetFilename);
+>>>>>>> Stashed changes
             }
         });
     }
@@ -50,12 +64,21 @@ export class UnitTestLinkInfoFinder implements IOsrVaultNoteLinkInfoFinder {
         return this.linkPathMap.get(linkName);
     }
 
+<<<<<<< Updated upstream
     getResolvedTargetLinksForNoteLink(linkName: string): Record<string, number> {
         const filename = this.linkPathMap.get(linkName);
         return this.getResolvedTargetLinksForNotePath(filename);
     }
 
     getResolvedTargetLinksForNotePath(sourcePath: string): Record<string, number> {
+=======
+    getResolvedLinksForNoteLink(linkName: string): Record<string, number> {
+        const filename = this.linkPathMap.get(linkName);
+        return this.getResolvedLinksByNotePath(filename);
+    }
+
+    getResolvedLinksByNotePath(filename: string): Record<string, number> {
+>>>>>>> Stashed changes
         let result: Record<string, number> = {};
         if (this.outgoingLinks.has(sourcePath)) {
             const rec = this.outgoingLinks.get(sourcePath)

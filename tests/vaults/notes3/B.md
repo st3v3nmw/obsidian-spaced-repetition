@@ -1,5 +1,6 @@
 #review
 
+<<<<<<< Updated upstream
 Very interesting but doesn't reference any other notes
 
 # Frontmatter Determination
@@ -8,3 +9,6 @@ Very interesting but doesn't reference any other notes
 - OSR 1.10.0
 - this note reviewed as easy
 - Plugin determined interval 4, ease 270
+=======
+Very interesting but doesn't reference any other notes
+>>>>>>> Stashed changes
