@@ -11,11 +11,11 @@ Tag any notes that you'd like to review as `#review`.
 
 ## Tagging
 
-Review tags can be changed in the settings. You can have multiple review tags. 
+Review tags can be changed in the settings. You can have multiple review tags.
 
 Additionally, if you want to ignore tags, you can tag them with a '-' before the hashtag (e.g. `-#unread`). Notes with negative review tags will be ignored even if they also have positive review tags.
 
-If a note has multiple review tags, it will be listed under the first relevant tag. 
+If a note has multiple review tags, it will be listed under the first relevant tag.
 
 ## New Notes
 

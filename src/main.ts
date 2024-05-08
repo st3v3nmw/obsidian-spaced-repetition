@@ -376,7 +376,8 @@ export default class SRPlugin extends Plugin {
         }
 
         const notes: TFile[] = this.app.vault.getMarkdownFiles();
-        for (const noteFile of notes) {  // for each file in the vault...? 
+        for (const noteFile of notes) {
+            // for each file in the vault...?
             if (
                 this.data.settings.noteFoldersToIgnore.some((folder) =>
                     noteFile.path.startsWith(folder),
@@ -424,19 +425,31 @@ export default class SRPlugin extends Plugin {
             const tags = getAllTags(fileCachedData) || [];
 
             // Compile list of negative and positive review tags
-            const tagsToReview = this.data.settings.tagsToReview.filter(tag => !tag.startsWith("-"));
-            const negativeTagsToReview = this.data.settings.tagsToReview.filter(tag => tag.startsWith("-")).map(tag => tag.slice(1));
+            const tagsToReview = this.data.settings.tagsToReview.filter(
+                (tag) => !tag.startsWith("-"),
+            );
+            const negativeTagsToReview = this.data.settings.tagsToReview
+                .filter((tag) => tag.startsWith("-"))
+                .map((tag) => tag.slice(1));
 
             // Skip this item if any tags match a negative review tag
-            if (negativeTagsToReview.some((negativeTag) => {
-                return tags.some((tag) => tag === negativeTag || tag.startsWith(negativeTag + "/"));
-            })) { continue; }
-            
+            if (
+                negativeTagsToReview.some((negativeTag) => {
+                    return tags.some(
+                        (tag) => tag === negativeTag || tag.startsWith(negativeTag + "/"),
+                    );
+                })
+            ) {
+                continue;
+            }
+
             // Add item to first matched review tag
-            const firstMatchedNoteTag = (tagsToReview.find((reviewTag) =>
-                tags.some((tag) => tag === reviewTag || tag.startsWith(reviewTag + "/"))
-            ));
-            if (firstMatchedNoteTag == undefined) { continue; }
+            const firstMatchedNoteTag = tagsToReview.find((reviewTag) =>
+                tags.some((tag) => tag === reviewTag || tag.startsWith(reviewTag + "/")),
+            );
+            if (firstMatchedNoteTag == undefined) {
+                continue;
+            }
 
             // Create review deck if it doesn't exist
             if (!Object.prototype.hasOwnProperty.call(this.reviewDecks, firstMatchedNoteTag)) {
