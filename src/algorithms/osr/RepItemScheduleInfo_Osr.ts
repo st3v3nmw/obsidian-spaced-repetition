@@ -42,15 +42,6 @@ export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
         );
     }
 
-    /* static fromDueDateMoment(
-        dueDateTicks: Moment,
-        interval: number,
-        ease: number,
-        delayBeforeReviewTicks: number,
-    ) {
-        return new RepItemScheduleInfo_Osr(dueDateTicks, interval, ease);
-    } */
-
     static fromDueDateStr(
         dueDateStr: string,
         interval: number,
