@@ -198,8 +198,6 @@ export class FlashcardReviewView {
         this._resetResponseButtons();
     }
 
-    // -> Functions & helpers
-
     private _keydownHandler = (e: KeyboardEvent) => {
         // Prevents any input, if the edit modal is open
         if (
@@ -387,11 +385,11 @@ export class FlashcardReviewView {
     private _setTitle(deck: Deck) {
         const isRandomMode = this.settings.flashcardCardOrder === "EveryCardRandomDeckAndCard";
         let text = deck.deckName;
-        if (!isRandomMode) {
-            const deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
-            const cardsInQueue = deckStats.dueCount + deckStats.newCount;
-            text += `: ${cardsInQueue}`;
-        }
+
+        const deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
+        const cardsInQueue = deckStats.dueCount + deckStats.newCount;
+        text += `: ${cardsInQueue}`;
+
         this.title.setText(text);
     }
 
