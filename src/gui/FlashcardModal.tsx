@@ -94,7 +94,7 @@ export class FlashcardModal extends Modal {
         this.deckView.hide();
     }
 
-    private _showFlashcard(deck:Deck): void {
+    private _showFlashcard(deck: Deck): void {
         this._hideDecksList();
         this.flashcardView.show(deck);
     }
