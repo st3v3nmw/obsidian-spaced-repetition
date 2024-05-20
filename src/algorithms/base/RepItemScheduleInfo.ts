@@ -1,4 +1,5 @@
 import { Moment } from "moment";
+import { TICKS_PER_DAY } from "src/constants";
 import { globalDateProvider } from "src/util/DateProvider";
 import { formatDate_YYYY_MM_DD } from "src/util/utils";
 
@@ -21,7 +22,7 @@ export abstract class RepItemScheduleInfo {
     }
 
     delayedBeforeReviewDaysInt(): number {
-        return Math.max(0, Math.floor(this.delayedBeforeReviewTicks / (24 * 3600 * 1000)));
+        return Math.max(0, Math.floor(this.delayedBeforeReviewTicks / TICKS_PER_DAY));
     }
 
 

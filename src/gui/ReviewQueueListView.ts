@@ -1,5 +1,5 @@
 import { ItemView, WorkspaceLeaf, Menu, TFile, App } from "obsidian";
-import { COLLAPSE_ICON } from "src/constants";
+import { COLLAPSE_ICON, TICKS_PER_DAY } from "src/constants";
 import { NoteReviewDeck } from "src/NoteReviewDeck";
 import { t } from "src/lang/helpers";
 import { NoteReviewQueue } from "src/NoteReviewQueue";
@@ -102,7 +102,7 @@ export class ReviewQueueListView extends ItemView {
 
                 for (const sNote of deck.scheduledNotes) {
                     if (sNote.dueUnix != currUnix) {
-                        const nDays: number = Math.ceil((sNote.dueUnix - now) / (24 * 3600 * 1000));
+                        const nDays: number = Math.ceil((sNote.dueUnix - now) / TICKS_PER_DAY);
 
                         if (nDays > maxDaysToRender) {
                             break;

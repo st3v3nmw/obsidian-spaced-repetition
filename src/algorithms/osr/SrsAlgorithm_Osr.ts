@@ -18,8 +18,6 @@ import { DueDateHistogram } from "src/DueDateHistogram";
 export class SrsAlgorithm_Osr implements ISrsAlgorithm {
     private settings: SRSettings;
     private noteEaseList: INoteEaseList;
-    private dueDateFlashcardHistogram: DueDateHistogram;
-    private dueDateNoteHistogram: DueDateHistogram;
 
     constructor(settings: SRSettings) {
         this.settings = settings;
@@ -30,7 +28,7 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
         return 1.0;
     }
 
-    noteCalcNewCardSchedule(notePath: string, osrNoteGraph: OsrNoteGraph, response: ReviewResponse): RepItemScheduleInfo {
+    noteCalcNewCardSchedule(notePath: string, osrNoteGraph: OsrNoteGraph, response: ReviewResponse, dueDateNoteHistogram: DueDateHistogram): RepItemScheduleInfo {
         const noteLinkStat: NoteLinkStat = osrNoteGraph.calcNoteLinkStat(notePath, this.noteEaseList, this.settings);
 
         const linkContribution: number =
@@ -53,7 +51,7 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
         ease = Math.round(ease);
         const temp: RepItemScheduleInfo_Osr = new RepItemScheduleInfo_Osr(dueDate, interval, ease);
 
-        const result: RepItemScheduleInfo_Osr = this.calcSchedule(temp, response, this.dueDateNoteHistogram);
+        const result: RepItemScheduleInfo_Osr = this.calcSchedule(temp, response, dueDateNoteHistogram);
 
         // Calculate the due date now that we know the interval
         result.dueDate = moment(globalDateProvider.today.add(result.interval, "d"));
@@ -108,12 +106,12 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
         return result;
     }
 
-    noteCalcUpdatedSchedule(notePath: string, noteSchedule: RepItemScheduleInfo, response: ReviewResponse): RepItemScheduleInfo {
+    noteCalcUpdatedSchedule(notePath: string, noteSchedule: RepItemScheduleInfo, response: ReviewResponse, dueDateNoteHistogram: DueDateHistogram): RepItemScheduleInfo {
         const noteScheduleOsr: RepItemScheduleInfo_Osr = noteSchedule as RepItemScheduleInfo_Osr;
         const temp: RepItemScheduleInfo_Osr = this.calcSchedule(
             noteScheduleOsr,
             response,
-            this.dueDateNoteHistogram,
+            dueDateNoteHistogram,
         );
         const interval: number = temp.interval;
         const ease: number = temp.latestEase;
@@ -143,7 +141,7 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
         return new RepItemScheduleInfo_Osr(dueDate, interval, ease);
     }
 
-    cardGetNewSchedule(response: ReviewResponse, notePath: string): RepItemScheduleInfo {
+    cardGetNewSchedule(response: ReviewResponse, notePath: string, dueDateFlashcardHistogram: DueDateHistogram): RepItemScheduleInfo {
         let initial_ease: number = this.settings.baseEase;
         if (this.noteEaseList.hasEaseForPath(notePath)) {
             initial_ease = Math.round(this.noteEaseList.getEaseByPath(notePath));
@@ -156,7 +154,7 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
             initial_ease,
             delayBeforeReview,
             this.settings,
-            this.dueDateFlashcardHistogram,
+            dueDateFlashcardHistogram,
         );
 
         const interval = schedObj.interval;
@@ -167,7 +165,8 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
 
     cardCalcUpdatedSchedule(
         response: ReviewResponse,
-        cardSchedule: RepItemScheduleInfo,
+        cardSchedule: RepItemScheduleInfo, 
+        dueDateFlashcardHistogram: DueDateHistogram
     ): RepItemScheduleInfo {
         const cardScheduleOsr: RepItemScheduleInfo_Osr = cardSchedule as RepItemScheduleInfo_Osr;
         const schedObj: Record<string, number> = osrSchedule(
@@ -176,7 +175,7 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
             cardSchedule.latestEase,
             cardSchedule.delayedBeforeReviewTicks,
             this.settings,
-            this.dueDateFlashcardHistogram,
+            dueDateFlashcardHistogram,
         );
         const interval = schedObj.interval;
         const ease = schedObj.ease;

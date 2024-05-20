@@ -9,6 +9,7 @@ import { formatDate_YYYY_MM_DD } from "src/util/utils";
 import moment from "moment";
 import { ReviewResponse } from "src/algorithms/base/RepetitionItem";
 import { unitTest_CheckNoteFrontmatter } from "./helpers/UnitTestHelper";
+import { DueDateHistogram, NoteDueDateHistogram } from "src/DueDateHistogram";
 
 function checkDeckTreeCounts(osrCore: UnitTestOsrCore, expectedReviewableCount: number, expectedRemainingCount: number): void {
     expect(osrCore.reviewableDeckTree.getCardCount(CardListType.All, true)).toEqual(expectedReviewableCount);
@@ -36,7 +37,7 @@ beforeAll(() => {
 test("No questions in the text; no files tagged as notes", async () => {
     const osrCore: UnitTestOsrCore = new UnitTestOsrCore(DEFAULT_SETTINGS);
     await osrCore.loadTestVault("filesButNoQuestions");
-    expect(osrCore.noteReviewQueue.dueNotesCount).toEqual(0);
+    expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
     expect(osrCore.noteReviewQueue.reviewDecks.size).toEqual(0);
     checkDeckTreeCounts(osrCore, 0, 0);
     expect(osrCore.questionPostponementList.list.length).toEqual(0);
@@ -48,7 +49,7 @@ describe("Notes", () => {
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(DEFAULT_SETTINGS);
             await osrCore.loadTestVault("notes1");
 
-            expect(osrCore.noteReviewQueue.dueNotesCount).toEqual(0);
+            expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
             expect(osrCore.noteReviewQueue.reviewDecks.size).toEqual(1);
 
             // Single deck "#review", with single new note "Computation Graph.md"
@@ -66,7 +67,7 @@ describe("Notes", () => {
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(DEFAULT_SETTINGS);
             await osrCore.loadTestVault("notes2");
 
-            expect(osrCore.noteReviewQueue.dueNotesCount).toEqual(0);
+            expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
             expect(osrCore.noteReviewQueue.reviewDecks.size).toEqual(1);
 
             // Single deck "#review", with single scheduled note "Triboelectric Effect.md", 
@@ -90,6 +91,9 @@ describe("Notes", () => {
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
             await osrCore.loadTestVault("notes1");
 
+            // Initial status
+            expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
+
             // Review the note
             const file = osrCore.getFileByNoteName("Computation Graph");
             await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
@@ -97,6 +101,13 @@ describe("Notes", () => {
             // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
             const expectedDueDate: string = "2023-09-10";
             unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
+
+            // Check histogram - in 4 days there is one card due
+            expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
+            const expectedHistogram: NoteDueDateHistogram = new NoteDueDateHistogram({
+                4: 1,
+            });
+            expect(osrCore.dueDateNoteHistogram).toEqual(expectedHistogram);
         });
 
         // The notes that have links to [[A]] themselves haven't been reviewed,

@@ -27,6 +27,7 @@ import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
 import { ReviewResponse } from "src/algorithms/base/RepetitionItem";
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
 import { SrsAlgorithm } from "src/algorithms/base/SrsAlgorithm";
+import { CardDueDateHistogram } from "src/DueDateHistogram";
 
 let order_DueFirst_Sequential: IIteratorOrder = {
     cardOrder: CardOrder.DueFirstSequential,
@@ -45,6 +46,7 @@ class TestContext {
     cardSequencer: IDeckTreeIterator;
     reviewSequencer: IFlashcardReviewSequencer;
     questionPostponementList: QuestionPostponementList;
+    dueDateFlashcardHistogram: CardDueDateHistogram;
     file: UnitTestSRFile;
     originalText: string;
     fakeFilePath: string;
@@ -63,6 +65,7 @@ class TestContext {
             this.settings,
             SrsAlgorithm.getInstance(),
             this.questionPostponementList,
+            this.dueDateFlashcardHistogram
         );
         setupStaticDateProvider_OriginDatePlusDays(daysAfterOrigin);
 
@@ -111,12 +114,14 @@ class TestContext {
             settingsClone,
             [],
         );
+        let dueDateFlashcardHistogram: CardDueDateHistogram = new CardDueDateHistogram();
         let reviewSequencer: FlashcardReviewSequencer = new FlashcardReviewSequencer(
             reviewMode,
             cardSequencer,
             settingsClone,
             SrsAlgorithm.getInstance(),
             cardPostponementList,
+            dueDateFlashcardHistogram
         );
         var file: UnitTestSRFile = new UnitTestSRFile(text, fakeFilePath);
 

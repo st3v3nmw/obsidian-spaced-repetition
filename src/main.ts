@@ -310,6 +310,7 @@ export default class SRPlugin extends Plugin {
             this.data.settings,
             SrsAlgorithm.getInstance(),
             this.osrAppCore.questionPostponementList,
+            this.osrAppCore.dueDateFlashcardHistogram
         );
 
         reviewSequencer.setDeckTree(fullDeckTree, remainingDeckTree);

@@ -17,6 +17,7 @@ import { NoteFileLoader } from "./NoteFileLoader";
 import { ReviewResponse } from "./algorithms/base/RepetitionItem";
 import { NextNoteReviewHandler } from "./NextNoteReviewHandler";
 import { IOsrVaultNoteLinkInfoFinder } from "./algorithms/osr/ObsidianVaultNoteLinkInfoFinder";
+import { CardDueDateHistogram, DueDateHistogram, NoteDueDateHistogram } from "./DueDateHistogram";
 
 export interface IOsrVaultEvents {
     dataChanged: () => void;
@@ -36,6 +37,8 @@ export class OsrCore {
     private _reviewableDeckTree: Deck = new Deck("root", null);
     private _remainingDeckTree: Deck;
     private _cardStats: Stats;
+    private _dueDateFlashcardHistogram: CardDueDateHistogram;
+    private _dueDateNoteHistogram: NoteDueDateHistogram;
 
     get noteReviewQueue(): NoteReviewQueue {
         return this._noteReviewQueue;
@@ -53,6 +56,14 @@ export class OsrCore {
         return this._questionPostponementList;
     }
 
+    get dueDateFlashcardHistogram(): CardDueDateHistogram {
+        return this._dueDateFlashcardHistogram;
+    }
+
+    get dueDateNoteHistogram(): NoteDueDateHistogram {
+        return this._dueDateNoteHistogram;
+    }
+
     get easeByPath(): NoteEaseList {
         return this._easeByPath;
     }
@@ -67,6 +78,8 @@ export class OsrCore {
         this.dataChangedHandler = dataChangedHandler;
         this._noteReviewQueue = new NoteReviewQueue();
         this._questionPostponementList = questionPostponementList;
+        this._dueDateFlashcardHistogram = new CardDueDateHistogram();
+        this._dueDateNoteHistogram = new NoteDueDateHistogram();
     }
 
     protected loadInit(): void {
@@ -122,8 +135,9 @@ export class OsrCore {
         const calc: DeckTreeStatsCalculator = new DeckTreeStatsCalculator();
         this._cardStats = calc.calculate(this._reviewableDeckTree);
 
-        // Generate the note review queue
-        this.noteReviewQueue.determineScheduleInfo(this.osrNoteGraph);
+        // Generate the histogram for the due dates for (1) all the notes (2) all the cards
+        this._dueDateNoteHistogram.calculateFromReviewDecksAndSort(this.noteReviewQueue.reviewDecks, this.osrNoteGraph);
+        this._dueDateFlashcardHistogram.calculateFromDeckTree(this._reviewableDeckTree);
 
         // Tell the interested party that the data has changed
         if (this.dataChangedHandler) this.dataChangedHandler();
@@ -137,16 +151,19 @@ export class OsrCore {
         // Calculate the new/updated schedule
         let noteSchedule: RepItemScheduleInfo;
         if (originalNoteSchedule == null) {
-            noteSchedule = SrsAlgorithm.getInstance().noteCalcNewCardSchedule(noteFile.path, this.osrNoteGraph, response);
+            noteSchedule = SrsAlgorithm.getInstance().noteCalcNewCardSchedule(noteFile.path, this.osrNoteGraph, response, this._dueDateNoteHistogram);
         } else {
-            noteSchedule = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(noteFile.path, originalNoteSchedule, response);
+            noteSchedule = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(noteFile.path, originalNoteSchedule, response, this._dueDateNoteHistogram);
         }
 
         // Store away the new schedule info
         await DataStoreAlgorithm.getInstance().noteSetSchedule(noteFile, noteSchedule);
 
-        // Generate the note review queue
-        this.noteReviewQueue.determineScheduleInfo(this.osrNoteGraph);
+        // Generate the histogram for the due dates for all the notes
+        // (This could be optimized to make the small adjustments to the histogram, but simpler to implement
+        // by recalculating from scratch)
+        this._noteReviewQueue.updateScheduleInfo(noteFile, noteSchedule);
+        this._dueDateNoteHistogram.calculateFromReviewDecksAndSort(this.noteReviewQueue.reviewDecks, this.osrNoteGraph);
 
         // If configured in the settings, bury all cards within the note
         await this.buryAllCardsInNote(settings, noteFile);

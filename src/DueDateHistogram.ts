@@ -1,66 +1,72 @@
+import { Card } from "./Card";
+import { Deck } from "./Deck";
+import { CardOrder, DeckOrder, DeckTreeIterator, IDeckTreeIterator, IIteratorOrder } from "./DeckTreeIterator";
 import { NoteReviewDeck, SchedNote } from "./NoteReviewDeck";
+import { TopicPath } from "./TopicPath";
+import { RepItemScheduleInfo } from "./algorithms/base/RepItemScheduleInfo";
 import { OsrNoteGraph } from "./algorithms/osr/OsrNoteGraph";
+import { TICKS_PER_DAY } from "./constants";
 import { globalDateProvider } from "./util/DateProvider";
 
+
 export class DueDateHistogram {
+    // The key for dueDatesNotes is the number of days after today
+    // therefore the key to lookup how many cards are due today is 0
+    public static dueNowNDays: number = 0;
+
     // Key - # of days in future
     // Value - Count of notes due
-    dueNotesCount: number;
-    dueDatesNotes: Map<number, number> = new Map<number, number>;
+    dueDatesMap: Map<number, number> = new Map<number, number>;
 
     constructor(rec: Record<number, number> = null) {
-        if (rec == null) return;
-        
-        Object.entries(rec).forEach(([key, value]) => {
-            this.dueDatesNotes.set(Number(key), value);
-        });
+        this.dueDatesMap = new Map<number, number>;
+        if (rec != null) {
+            Object.entries(rec).forEach(([key, value]) => {
+                this.dueDatesMap.set(Number(key), value);
+            });
+        }
     }
 
-    init(): void {
-        this.dueNotesCount = 0;
-        this.dueDatesNotes = new Map<number, number>;
+    get dueNotesCount(): number {
+        let result: number = 0;
+        if (this.dueDatesMap.has(DueDateHistogram.dueNowNDays))
+            result = this.dueDatesMap.get(DueDateHistogram.dueNowNDays)
+        return result;
     }
 
     hasEntryForDays(days: number): boolean {
-        return this.dueDatesNotes.has(days);
+        return this.dueDatesMap.has(days);
     }
 
     set(days: number, value: number): void {
-        this.dueDatesNotes.set(days, value);
+        this.dueDatesMap.set(days, value);
+    }
+
+    get(days: number): number {
+        return this.dueDatesMap.get(days);
     }
 
     increment(days: number): void {
         let value: number = 0;
-        if (this.dueDatesNotes.has(days)) {
-            value = this.dueDatesNotes.get(days);
+        if (this.dueDatesMap.has(days)) {
+            value = this.dueDatesMap.get(days);
         }
-        this.dueDatesNotes.set(days, value + 1);
+        this.dueDatesMap.set(days, value + 1);
     }
 
-    calculateFromReviewDecksAndSort(reviewDecks: Map<string, NoteReviewDeck>, osrNoteGraph: OsrNoteGraph): void {
-        this.dueNotesCount = 0;
-        this.dueDatesNotes = new Map<number, number>;
-
-        const now: number = globalDateProvider.now.valueOf();
-        Object.values(reviewDecks).forEach((reviewDeck: NoteReviewDeck) => {
-            reviewDeck.dueNotesCount = 0;
-            reviewDeck.scheduledNotes.forEach((scheduledNote: SchedNote) => {
-                if (scheduledNote.dueUnix <= now) {
-                    reviewDeck.dueNotesCount++;
-                    this.dueNotesCount++;
-                }
-
-                const nDays: number = Math.ceil(
-                    (scheduledNote.dueUnix - now) / (24 * 3600 * 1000),
-                );
-                this.increment(nDays);
-            });
-
-            reviewDeck.sortNotesByDateAndImportance(osrNoteGraph.pageranks);
-        });
+    decrement(days: number): void {
+        let value: number = 0;
+        if (this.dueDatesMap.has(days)) {
+            value = this.dueDatesMap.get(days);
+            this.dueDatesMap.set(days, value - 1);
+        }
     }
 
     findLeastUsedIntervalOverRange(originalInterval: number, fuzz: number): number {
+        if (!this.hasEntryForDays(originalInterval)) {
+            // There are no entries for the interval originalInterval - can't get a better result
+            return originalInterval;
+        }
         let interval: number = originalInterval;
         outer: for (let i = 1; i <= fuzz; i++) {
             for (const ivl of [originalInterval - i, originalInterval + i]) {
@@ -71,9 +77,62 @@ export class DueDateHistogram {
                 }
 
                 // We've found a better result, but keep searching
-                if (this.dueDatesNotes.get(ivl) < this.dueDatesNotes.get(interval)) interval = ivl;
+                if (this.dueDatesMap.get(ivl) < this.dueDatesMap.get(interval)) interval = ivl;
             }
         }
         return interval;
+    }
+}
+
+export class NoteDueDateHistogram extends DueDateHistogram {
+
+    calculateFromReviewDecksAndSort(reviewDecks: Map<string, NoteReviewDeck>, osrNoteGraph: OsrNoteGraph): void {
+        this.dueDatesMap = new Map<number, number>;
+
+        const today: number = globalDateProvider.today.valueOf();
+        reviewDecks.forEach((reviewDeck: NoteReviewDeck) => {
+            reviewDeck.dueNotesCount = 0;
+            reviewDeck.scheduledNotes.forEach((scheduledNote: SchedNote) => {
+                if (scheduledNote.dueUnix <= today) {
+                    reviewDeck.dueNotesCount++;
+                }
+
+                const nDays: number = Math.ceil(
+                    (scheduledNote.dueUnix - today) / TICKS_PER_DAY,
+                );
+                this.increment(nDays);
+            });
+
+            reviewDeck.sortNotesByDateAndImportance(osrNoteGraph.pageranks);
+        });
+    }
+}
+
+export class CardDueDateHistogram extends DueDateHistogram {
+
+    calculateFromDeckTree(deckTree: Deck): void {
+        this.dueDatesMap = new Map<number, number>;
+        
+        // Order doesn't matter as long as we iterate over everything
+        const iteratorOrder: IIteratorOrder = {
+            deckOrder: DeckOrder.PrevDeckComplete_Sequential,
+            cardOrder: CardOrder.DueFirstSequential,
+        };
+
+        // Iteration is a destructive operation on the supplied tree, so we first take a copy
+        const today: number = globalDateProvider.today.valueOf();
+        const iterator: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, deckTree.clone());
+        iterator.setIteratorTopicPath(TopicPath.emptyPath);
+        while (iterator.nextCard()) {
+            const card: Card = iterator.currentCard;
+            if (card.hasSchedule) {
+                const scheduledCard: RepItemScheduleInfo = card.scheduleInfo;
+
+                const nDays: number = Math.ceil(
+                    (scheduledCard.dueDateAsUnix - today) / TICKS_PER_DAY,
+                );
+                this.increment(nDays);
+            }
+        }
     }
 }

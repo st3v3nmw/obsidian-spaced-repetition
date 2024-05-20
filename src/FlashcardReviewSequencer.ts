@@ -10,6 +10,7 @@ import { ISrsAlgorithm } from "./algorithms/base/ISrsAlgorithm";
 import { ReviewResponse } from "./algorithms/base/RepetitionItem";
 import { RepItemScheduleInfo } from "./algorithms/base/RepItemScheduleInfo";
 import { DataStore } from "./dataStore/base/DataStore";
+import { DueDateHistogram } from "./DueDateHistogram";
 
 export interface IFlashcardReviewSequencer {
     get hasCurrentCard(): boolean;
@@ -57,6 +58,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     private settings: SRSettings;
     private srsAlgorithm: ISrsAlgorithm;
     private questionPostponementList: IQuestionPostponementList;
+    private dueDateFlashcardHistogram: DueDateHistogram;
 
     constructor(
         reviewMode: FlashcardReviewMode,
@@ -64,12 +66,14 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         settings: SRSettings,
         srsAlgorithm: ISrsAlgorithm,
         questionPostponementList: IQuestionPostponementList,
+        dueDateFlashcardHistogram: DueDateHistogram
     ) {
         this.reviewMode = reviewMode;
         this.cardSequencer = cardSequencer;
         this.settings = settings;
         this.srsAlgorithm = srsAlgorithm;
         this.questionPostponementList = questionPostponementList;
+        this.dueDateFlashcardHistogram = dueDateFlashcardHistogram;
     }
 
     get hasCurrentCard(): boolean {
@@ -197,12 +201,14 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
                 result = this.srsAlgorithm.cardCalcUpdatedSchedule(
                     response,
                     card.scheduleInfo,
+                    this.dueDateFlashcardHistogram
                 );
             } else {
                 const currentNote: Note = card.question.note;
                 result = this.srsAlgorithm.cardGetNewSchedule(
                     response,
                     currentNote.filePath,
+                    this.dueDateFlashcardHistogram
                 );
             }
         }
