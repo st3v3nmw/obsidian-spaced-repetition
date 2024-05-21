@@ -10,6 +10,7 @@ import moment from "moment";
 import { ReviewResponse } from "src/algorithms/base/RepetitionItem";
 import { unitTest_CheckNoteFrontmatter } from "./helpers/UnitTestHelper";
 import { DueDateHistogram, NoteDueDateHistogram } from "src/DueDateHistogram";
+import { ISRFile } from "src/SRFile";
 
 function checkDeckTreeCounts(osrCore: UnitTestOsrCore, expectedReviewableCount: number, expectedRemainingCount: number): void {
     expect(osrCore.reviewableDeckTree.getCardCount(CardListType.All, true)).toEqual(expectedReviewableCount);
@@ -91,9 +92,6 @@ describe("Notes", () => {
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
             await osrCore.loadTestVault("notes1");
 
-            // Initial status
-            expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
-
             // Review the note
             const file = osrCore.getFileByNoteName("Computation Graph");
             await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
@@ -101,13 +99,6 @@ describe("Notes", () => {
             // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
             const expectedDueDate: string = "2023-09-10";
             unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
-
-            // Check histogram - in 4 days there is one card due
-            expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
-            const expectedHistogram: NoteDueDateHistogram = new NoteDueDateHistogram({
-                4: 1,
-            });
-            expect(osrCore.dueDateNoteHistogram).toEqual(expectedHistogram);
         });
 
         // The notes that have links to [[A]] themselves haven't been reviewed,
@@ -152,6 +143,13 @@ describe("Notes", () => {
             // See: tests/vaults/notes4/readme.md
             await osrCore.loadTestVault("notes4");
 
+            // Initial histogram
+            expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
+            let expectedHistogram: NoteDueDateHistogram = new NoteDueDateHistogram({
+                4: 1,
+            });
+            expect(osrCore.dueDateNoteHistogram).toEqual(expectedHistogram);
+
             // Review note A 
             const file = osrCore.getFileByNoteName("A");
             await osrCore.saveNoteReviewResponse(file, ReviewResponse.Good, settings);
@@ -159,6 +157,13 @@ describe("Notes", () => {
             // Check note frontmatter - 11 days after the simulated test date of 2023-09-06
             const expectedDueDate: string = "2023-09-17";
             unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 11, 270);
+
+            expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
+            expectedHistogram = new NoteDueDateHistogram({
+                11: 1,
+            });
+            expect(osrCore.dueDateNoteHistogram).toEqual(expectedHistogram);
+            
         });
 
         test("Review note with a backlink - Hard", async () => {
@@ -226,5 +231,135 @@ describe("Notes", () => {
             unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 272);
         });
     });
+
+    describe("loadNote", () => {
+        test("There is schedule info for 3 cards, but only 2 cards in the question", async () => {
+            const settings: SRSettings = { ...DEFAULT_SETTINGS };
+            settings.convertCurlyBracketsToClozes = true;
+            const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+            await osrCore.loadTestVault("notes6");
+
+            /* 
+A {{question}} with multiple parts {{Navevo part}}
+<!--SR:!2024-05-22,1,230!2024-05-25,4,270!2033-03-03,3,333-->
+The final schedule info "!2033-03-03,3,333" has been deleted
+             */
+            const file = osrCore.getFileByNoteName("A");
+            expect(file.content).toContain("<!--SR:!2024-05-22,1,230!2024-05-25,4,270-->");
+        });
+    });
 });
 
+describe("Note Due Date Histogram", () => {
+    test("New note", async () => {
+        const settings: SRSettings = { ...DEFAULT_SETTINGS };
+        const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+        await osrCore.loadTestVault("notes1");
+
+        // Initial status
+        expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
+
+        // Review the note
+        const file = osrCore.getFileByNoteName("Computation Graph");
+        await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
+
+        // Check histogram - in 4 days there is one card due
+        expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
+        const expectedHistogram: NoteDueDateHistogram = new NoteDueDateHistogram({
+            4: 1,
+        });
+        expect(osrCore.dueDateNoteHistogram).toEqual(expectedHistogram);
+    });
+
+    test("Review old note - Good", async () => {
+        const settings: SRSettings = { ...DEFAULT_SETTINGS };
+        const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+
+        // See: tests/vaults/readme.md
+        // See: tests/vaults/notes4/readme.md
+        await osrCore.loadTestVault("notes4");
+
+        // Initial histogram
+        expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
+        let expectedHistogram: NoteDueDateHistogram = new NoteDueDateHistogram({
+            4: 1,
+        });
+        expect(osrCore.dueDateNoteHistogram).toEqual(expectedHistogram);
+
+        // Review note A 
+        const file = osrCore.getFileByNoteName("A");
+        await osrCore.saveNoteReviewResponse(file, ReviewResponse.Good, settings);
+
+        expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
+        expectedHistogram = new NoteDueDateHistogram({
+            11: 1,
+        });
+        expect(osrCore.dueDateNoteHistogram).toEqual(expectedHistogram);
+        
+    });
+
+    test("Review multiple notes", async () => {
+        const settings: SRSettings = { ...DEFAULT_SETTINGS };
+        const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+
+        // See: tests/vaults/readme.md
+        // See: tests/vaults/notes4/readme.md
+        await osrCore.loadTestVault("notes4");
+
+        // Review all the notes
+        let file: ISRFile = osrCore.getFileByNoteName("A");
+        await osrCore.saveNoteReviewResponse(file, ReviewResponse.Good, settings);
+        file = osrCore.getFileByNoteName("B");
+        await osrCore.saveNoteReviewResponse(file, ReviewResponse.Hard, settings);
+        file = osrCore.getFileByNoteName("C");
+        await osrCore.saveNoteReviewResponse(file, ReviewResponse.Hard, settings);
+        file = osrCore.getFileByNoteName("D");
+        await osrCore.saveNoteReviewResponse(file, ReviewResponse.Good, settings);
+
+        expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
+        let expectedHistogram: NoteDueDateHistogram = new NoteDueDateHistogram({
+            1: 2,
+            3: 1,
+            11: 1,
+        });
+        expect(osrCore.dueDateNoteHistogram).toEqual(expectedHistogram);
+        
+    });
+
+});
+
+describe("Note review - bury all flashcards", () => {
+    test("burySiblingCards - false", async () => {
+        const settings: SRSettings = { ...DEFAULT_SETTINGS };
+        settings.burySiblingCards = false;
+        const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+        await osrCore.loadTestVault("notes5");
+
+        // Nothing initially on the postponement list
+        expect(osrCore.questionPostponementList.list.length).toEqual(0);
+
+        // Review the note
+        const file = osrCore.getFileByNoteName("D");
+        await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
+
+        // Because burySiblingCards is false, nothing has been added to the postponement list
+        expect(osrCore.questionPostponementList.list.length).toEqual(0);
+    });
+
+    test("burySiblingCards - true", async () => {
+        const settings: SRSettings = { ...DEFAULT_SETTINGS };
+        settings.burySiblingCards = true;
+        const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
+        await osrCore.loadTestVault("notes5");
+
+        // Nothing initially on the postponement list
+        expect(osrCore.questionPostponementList.list.length).toEqual(0);
+
+        // Review the note
+        const file = osrCore.getFileByNoteName("D");
+        await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
+
+        // The two cards in note D have been added to the postponement list
+        expect(osrCore.questionPostponementList.list.length).toEqual(2);
+    });
+});
