@@ -6,8 +6,6 @@ export class Card extends RepetitionItem {
     question: Question;
     cardIdx: number;
 
-    // scheduleInfo?: CardScheduleInfo;
-
     // visuals
     front: string;
     back: string;

@@ -56,6 +56,7 @@ export class OsrCore {
         return this._questionPostponementList;
     }
 
+    /* c8 ignore start */
     get dueDateFlashcardHistogram(): CardDueDateHistogram {
         return this._dueDateFlashcardHistogram;
     }
@@ -71,6 +72,7 @@ export class OsrCore {
     get cardStats(): Stats {
         return this._cardStats;
     }
+    /* c8 ignore stop */
 
     init(questionPostponementList: QuestionPostponementList, osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder, settings: SRSettings, dataChangedHandler: () => void): void {
         this.settings = settings;

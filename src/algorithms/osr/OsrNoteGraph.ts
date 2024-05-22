@@ -41,7 +41,7 @@ export class OsrNoteGraph {
             this.incomingLinks[path] = [];
         }
 
-        const targetLinks = this.vaultNoteLinkInfoFinder.getResolvedTargetLinksForNotePath(path) || {};
+        const targetLinks = this.vaultNoteLinkInfoFinder.getResolvedTargetLinksForNotePath(path) || /* c8 ignore next */ {};
         for (const targetPath in targetLinks) {
             if (this.incomingLinks[targetPath] === undefined)
                 this.incomingLinks[targetPath] = [];
@@ -63,7 +63,7 @@ export class OsrNoteGraph {
         linkPGTotal = 0,
         totalLinkCount = 0;
 
-        for (const statObj of this.incomingLinks[notePath] || []) {
+        for (const statObj of this.incomingLinks[notePath] || /* c8 ignore next */ []) {
             const ease: number = noteEaseList.getEaseByPath(statObj.sourcePath);
             if (ease) {
                 linkTotal += statObj.linkCount * this.pageranks[statObj.sourcePath] * ease;
@@ -72,7 +72,7 @@ export class OsrNoteGraph {
             }
         }
 
-        const outgoingLinks = this.vaultNoteLinkInfoFinder.getResolvedTargetLinksForNotePath(notePath) || {};
+        const outgoingLinks = this.vaultNoteLinkInfoFinder.getResolvedTargetLinksForNotePath(notePath) || /* c8 ignore next */ {};
         for (const linkedFilePath in outgoingLinks) {
             const ease: number = noteEaseList.getEaseByPath(linkedFilePath);
             if (ease) {

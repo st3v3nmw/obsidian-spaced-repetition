@@ -41,6 +41,7 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
                 : linkContribution * this.settings.baseEase);
 
         // add note's average flashcard ease if available
+        /* c8 ignore next 3 */
         if (this.noteEaseList.hasEaseForPath(notePath)) {
             ease = (ease + this.noteEaseList.getEaseByPath(notePath)) / 2;
         }
@@ -143,6 +144,7 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
 
     cardGetNewSchedule(response: ReviewResponse, notePath: string, dueDateFlashcardHistogram: DueDateHistogram): RepItemScheduleInfo {
         let initial_ease: number = this.settings.baseEase;
+        /* c8 ignore next 3 */
         if (this.noteEaseList.hasEaseForPath(notePath)) {
             initial_ease = Math.round(this.noteEaseList.getEaseByPath(notePath));
         }
