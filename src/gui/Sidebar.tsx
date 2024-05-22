@@ -73,8 +73,8 @@ export class ReviewQueueListView extends ItemView {
                     if (fileIsOpen) {
                         deck.activeFolders.add(deck.deckName);
                         deck.activeFolders.add(t("NEW"));
-                        this.changeFolderIconToExpanded(newNotesFolderEl);
-                        this.changeFolderIconToExpanded(deckFolderEl);
+                        this.changeFolderFolding(newNotesFolderEl);
+                        this.changeFolderFolding(deckFolderEl);
                     }
                     this.createRightPaneFile(
                         newNotesFolderEl,
@@ -126,8 +126,8 @@ export class ReviewQueueListView extends ItemView {
                     if (fileIsOpen) {
                         deck.activeFolders.add(deck.deckName);
                         deck.activeFolders.add(folderTitle);
-                        this.changeFolderIconToExpanded(schedFolderEl);
-                        this.changeFolderIconToExpanded(deckFolderEl);
+                        this.changeFolderFolding(schedFolderEl);
+                        this.changeFolderFolding(deckFolderEl);
                     }
 
                     this.createRightPaneFile(
@@ -162,9 +162,7 @@ export class ReviewQueueListView extends ItemView {
         );
 
         collapseIconEl.innerHTML = COLLAPSE_ICON;
-        if (collapsed) {
-            (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "rotate(-90deg)";
-        }
+		this.changeFolderFolding(folderEl, collapsed);
 
         folderTitleEl.createDiv("tree-item-inner nav-folder-title-content").setText(folderTitle);
 
@@ -173,18 +171,8 @@ export class ReviewQueueListView extends ItemView {
         }
 
         folderTitleEl.onClickEvent(() => {
-            for (const child of childrenEl.childNodes as NodeListOf<HTMLElement>) {
-                if (child.style.display === "block" || child.style.display === "") {
-                    child.style.display = "none";
-                    (collapseIconEl.childNodes[0] as HTMLElement).style.transform =
-                        "rotate(-90deg)";
-                    deck.activeFolders.delete(folderTitle);
-                } else {
-                    child.style.display = "block";
-                    (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "";
-                    deck.activeFolders.add(folderTitle);
-                }
-            }
+			this.changeFolderFolding(folderEl, !folderEl.hasClass("is-collapsed"));
+			childrenEl.style.display = !folderEl.hasClass("is-collapsed") ? "block" : "none";
         });
 
         return folderEl;
@@ -238,8 +226,17 @@ export class ReviewQueueListView extends ItemView {
         );
     }
 
-    private changeFolderIconToExpanded(folderEl: HTMLElement): void {
-        const collapseIconEl = folderEl.find("div.nav-folder-collapse-indicator");
-        (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "";
+    private changeFolderFolding(folderEl: HTMLElement, collapsed = false): void {
+		if(collapsed) {
+			folderEl.addClass("is-collapsed");
+			const collapseIconEl = folderEl.find("div.nav-folder-collapse-indicator");
+			collapseIconEl.addClass("is-collapsed");
+		}
+		else
+		{
+			folderEl.removeClass("is-collapsed");
+			const collapseIconEl = folderEl.find("div.nav-folder-collapse-indicator");
+			collapseIconEl.removeClass("is-collapsed");
+		}
     }
 }
