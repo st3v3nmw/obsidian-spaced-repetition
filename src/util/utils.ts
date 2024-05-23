@@ -90,6 +90,12 @@ export function splitTextIntoLineArray(text: string): string[] {
     return text.replaceAll("\r\n", "\n").split("\n");
 }
 
+export function getLineCount(text: string): number {
+	if(text.length === 0) 
+		return 0;
+    return text.replaceAll("\r\n", "\n").split("\n").length;
+}
+
 export function stringTrimStart(str: string): [string, string] {
     const trimmed: string = str.trimStart();
     const wsCount: number = str.length - trimmed.length;
@@ -111,8 +117,13 @@ export function stringTrimStart(str: string): [string, string] {
 //
 export function extractFrontmatter(str: string): [string, string] {
 	let frontMatterInfo = getFrontMatterInfo(str);
-	let frontmatter: string = str.substring(0, frontMatterInfo.contentStart);
-	let content: string = str.substring(frontMatterInfo.contentStart);
+	let frontmatter: string = str.substring(0, frontMatterInfo.contentStart - 1);
+	let frontmatterLineCount = getLineCount(frontmatter);
+	let content: string = "";
+	for(let i = 0; i < frontmatterLineCount; i++) {
+		content += "\n";
+	}
+	content += str.substring(frontMatterInfo.contentStart);
 	
     return [frontmatter, content];
 }
