@@ -339,17 +339,17 @@ export class FlashcardReviewView {
     private _formatQuestionContextText(questionContext: string[]): string {
         const separator: string = " > ";
         let result = this._currentNote.file.basename;
-		questionContext.forEach(context => {
-			// Check for links trim [[ ]]
-			if(context.startsWith("[[") && context.endsWith("]]")) {
-				context = context.replace("[[", "").replace("]]", "");
-				// Use replacement text if any
-				if(context.contains("|")) {
-					context = context.split("|")[1];
-				}
-			}
-			result += separator + context;
-		});
+        questionContext.forEach((context) => {
+            // Check for links trim [[ ]]
+            if (context.startsWith("[[") && context.endsWith("]]")) {
+                context = context.replace("[[", "").replace("]]", "");
+                // Use replacement text if any
+                if (context.contains("|")) {
+                    context = context.split("|")[1];
+                }
+            }
+            result += separator + context;
+        });
         return result + separator + "...";
     }
 
