@@ -177,6 +177,176 @@ ${content}`;
 ${content}`;
         expect(c).toEqual(expectedContent);
     });
+
+    test("With frontmatter and content (Horizontal line)", () => {
+        const frontmatter: string = `---
+sr-due: 2024-01-17
+sr-interval: 16
+sr-ease: 278
+tags:
+  - flashcards/aws
+  - flashcards/datascience
+---`;
+        const frontmatterBlankedOut: string = `
+
+
+
+
+
+
+`;
+        const content: string = `#flashcards/science/chemistry
+
+
+---
+# Questions
+---
+
+
+Chemistry Question from file underelephant 4A::goodby
+
+<!--SR:!2023-11-02,17,290-->
+
+Chemistry Question from file underdog 4B::goodby
+
+<!--SR:!2023-12-18,57,310-->
+
+---
+
+Chemistry Question from file underdog 4C::goodby
+
+<!--SR:!2023-10-25,3,210-->
+
+This single {{question}} turns into {{3 separate}} {{cards}}
+
+<!--SR:!2023-10-20,1,241!2023-10-25,3,254!2023-10-23,1,221-->
+
+---`;
+
+        const text: string = `${frontmatter}
+${content}`;
+        const expectedContent: string = `${frontmatterBlankedOut}
+${content}`;
+
+        const [f, c] = extractFrontmatter(text);
+        expect(f).toEqual(frontmatter);
+        expect(c).toEqual(expectedContent);
+    });
+
+    test("With frontmatter and content (Horizontal line newLine)", () => {
+        const frontmatter: string = `---
+sr-due: 2024-01-17
+sr-interval: 16
+sr-ease: 278
+tags:
+  - flashcards/aws
+  - flashcards/datascience
+---`;
+        const frontmatterBlankedOut: string = `
+
+
+
+
+
+
+`;
+        const content: string = `#flashcards/science/chemistry
+
+
+---
+# Questions
+---
+
+
+Chemistry Question from file underelephant 4A::goodby
+
+<!--SR:!2023-11-02,17,290-->
+
+Chemistry Question from file underdog 4B::goodby
+
+<!--SR:!2023-12-18,57,310-->
+
+---
+
+Chemistry Question from file underdog 4C::goodby
+
+<!--SR:!2023-10-25,3,210-->
+
+This single {{question}} turns into {{3 separate}} {{cards}}
+
+<!--SR:!2023-10-20,1,241!2023-10-25,3,254!2023-10-23,1,221-->
+
+---
+`;
+
+        const text: string = `${frontmatter}
+${content}`;
+        const expectedContent: string = `${frontmatterBlankedOut}
+${content}`;
+
+        const [f, c] = extractFrontmatter(text);
+        expect(f).toEqual(frontmatter);
+        expect(c).toEqual(expectedContent);
+    });
+
+    test("With frontmatter and content (Horizontal line codeblock)", () => {
+        const frontmatter: string = `---
+sr-due: 2024-01-17
+sr-interval: 16
+sr-ease: 278
+tags:
+  - flashcards/aws
+  - flashcards/datascience
+---`;
+        const frontmatterBlankedOut: string = `
+
+
+
+
+
+
+`;
+        const content: string = [
+            "```",
+            "---",
+            "```",
+            "#flashcards/science/chemistry",
+            "# Questions",
+            "  ",
+            "",
+            "Chemistry Question from file underelephant 4A::goodby",
+            "",
+            "<!--SR:!2023-11-02,17,290-->",
+            "",
+            "Chemistry Question from file underdog 4B::goodby",
+            "",
+            "<!--SR:!2023-12-18,57,310-->",
+            "```",
+            "---",
+            "```",
+            "",
+            "Chemistry Question from file underdog 4C::goodby",
+            "",
+            "<!--SR:!2023-10-25,3,210-->",
+            "",
+            "This single {{question}} turns into {{3 separate}} {{cards}}",
+            "",
+            "<!--SR:!2023-10-20,1,241!2023-10-25,3,254!2023-10-23,1,221-->",
+            "",
+            "```",
+            "---",
+            "```",
+        ].join("\n");
+
+        const text: string = `${frontmatter}
+${content}`;
+        const expectedContent: string = `${frontmatterBlankedOut}
+${content}`;
+
+        const [f, c] = extractFrontmatter(text);
+        expect(f).toEqual(frontmatter);
+        expect(c).toEqual(expectedContent);
+    });
 });
 
 describe("findLineIndexOfSearchStringIgnoringWs", () => {
