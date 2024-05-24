@@ -1,5 +1,6 @@
 import moment from "moment";
 import { Moment } from "moment";
+import { normalize, sep } from "path";
 import { PREFERRED_DATE_FORMAT, YAML_FRONT_MATTER_REGEX } from "src/constants";
 
 type Hex = number;
@@ -94,6 +95,36 @@ export function stringTrimStart(str: string): [string, string] {
     const wsCount: number = str.length - trimmed.length;
     const ws: string = str.substring(0, wsCount);
     return [ws, trimmed];
+}
+
+/**
+ * Checks a path is equal or a subpath of the other rootPath
+ *
+ * @param toCheck The path to check it is equal or a subpath of path.
+ * @param rootPath The ref path to check the other is equal to or a subpath of this.
+ * @tutorial
+ * rootPath = "root/sub/sub2"
+ * if toCheck = "notRoot/..." -> false
+ * if toCheck = "root" -> true
+ * if toCheck = "root/sub" -> true
+ * if toCheck = "root/s" -> false
+ */
+export function isEqualOrSubPath(toCheck: string, rootPath: string): boolean {
+    const rootPathSections = normalize(rootPath.toLowerCase())
+        .split(sep)
+        .filter((p) => p !== "");
+    const pathSections = normalize(toCheck.toLowerCase())
+        .split(sep)
+        .filter((p) => p !== "");
+    if (pathSections.length < rootPathSections.length) {
+        return false;
+    }
+    for (let i = 0; i < rootPathSections.length; i++) {
+        if (rootPathSections[i] !== pathSections[i]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 //
