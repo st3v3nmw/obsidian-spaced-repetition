@@ -88,11 +88,16 @@ export default {
     RESET_DEFAULT: "Standardeinstellung wiederherstellen",
     CARD_MODAL_WIDTH_PERCENT: "Breite einer Lernkarte in Prozent",
     RANDOMIZE_CARD_ORDER: "Während der Wiederhoung die Reihenfolge zufällig mischen?",
-    REVIEW_CARD_ORDER_WITHIN_DECK: "Reihenfolge der Karten innerhalb eines Stapels während der Wiederholung",
-    REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL: "Sequentielle Reihenfolge innerhalb eines Stapels (Alle neuen Karten zuerst)",
-    REVIEW_CARD_ORDER_DUE_FIRST_SEQUENTIAL: "Sequentielle Reihenfolge innerhalb eines Stapels (Alle fälligen Karten zuerst)",
-    REVIEW_CARD_ORDER_NEW_FIRST_RANDOM: "Zufällige Reihenfolge innerhalb eines Stapels (Alle neuen Karten zuerst)",
-    REVIEW_CARD_ORDER_DUE_FIRST_RANDOM: "Zufällige Reihenfolge innerhalb eines Stapels (Alle fälligen Karten zuerst)",
+    REVIEW_CARD_ORDER_WITHIN_DECK:
+        "Reihenfolge der Karten innerhalb eines Stapels während der Wiederholung",
+    REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL:
+        "Sequentielle Reihenfolge innerhalb eines Stapels (Alle neuen Karten zuerst)",
+    REVIEW_CARD_ORDER_DUE_FIRST_SEQUENTIAL:
+        "Sequentielle Reihenfolge innerhalb eines Stapels (Alle fälligen Karten zuerst)",
+    REVIEW_CARD_ORDER_NEW_FIRST_RANDOM:
+        "Zufällige Reihenfolge innerhalb eines Stapels (Alle neuen Karten zuerst)",
+    REVIEW_CARD_ORDER_DUE_FIRST_RANDOM:
+        "Zufällige Reihenfolge innerhalb eines Stapels (Alle fälligen Karten zuerst)",
     REVIEW_CARD_ORDER_RANDOM_DECK_AND_CARD: "Zufällige Karte von zufälligem Stapel",
     REVIEW_DECK_ORDER: "Reihenfolge der Stapel während der Wiederholung",
     REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL:
@@ -129,7 +134,8 @@ export default {
     MIN_ONE_DAY: "Anzahl der Tage muss mindestens 1 sein.",
     VALID_NUMBER_WARNING: "Bitte eine gültige Zahl eingeben.",
     UI_PREFERENCES: "Einstellungen der Benutzeroberfläche",
-    INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Stapelverzeichnis soll beim öffnen erweitert angezeigt werden",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE:
+        "Stapelverzeichnis soll beim öffnen erweitert angezeigt werden",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "Deaktivieren Sie dies, um verschachtelte Stapel in derselben Karte zu reduzieren. Nützlich, wenn Sie Karten haben, die zu vielen Stapeln in derselben Datei gehören.",
     ALGORITHM: "Algorithmus",
