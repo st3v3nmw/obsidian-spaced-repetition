@@ -156,13 +156,15 @@ export class ReviewQueueListView extends ItemView {
     ): HTMLElement {
         const folderEl: HTMLDivElement = parentEl.createDiv("tree-item nav-folder");
         const folderTitleEl: HTMLDivElement = folderEl.createDiv("tree-item-self nav-folder-title");
-        const childrenEl: HTMLDivElement = folderEl.createDiv("tree-item-children nav-folder-children");
+        const childrenEl: HTMLDivElement = folderEl.createDiv(
+            "tree-item-children nav-folder-children",
+        );
         const collapseIconEl: HTMLDivElement = folderTitleEl.createDiv(
             "tree-item-icon collapse-icon nav-folder-collapse-indicator",
         );
 
         collapseIconEl.innerHTML = COLLAPSE_ICON;
-		this.changeFolderFolding(folderEl, collapsed);
+        this.changeFolderFolding(folderEl, collapsed);
 
         folderTitleEl.createDiv("tree-item-inner nav-folder-title-content").setText(folderTitle);
 
@@ -171,8 +173,8 @@ export class ReviewQueueListView extends ItemView {
         }
 
         folderTitleEl.onClickEvent(() => {
-			this.changeFolderFolding(folderEl, !folderEl.hasClass("is-collapsed"));
-			childrenEl.style.display = !folderEl.hasClass("is-collapsed") ? "block" : "none";
+            this.changeFolderFolding(folderEl, !folderEl.hasClass("is-collapsed"));
+            childrenEl.style.display = !folderEl.hasClass("is-collapsed") ? "block" : "none";
         });
 
         return folderEl;
@@ -227,16 +229,14 @@ export class ReviewQueueListView extends ItemView {
     }
 
     private changeFolderFolding(folderEl: HTMLElement, collapsed = false): void {
-		if(collapsed) {
-			folderEl.addClass("is-collapsed");
-			const collapseIconEl = folderEl.find("div.nav-folder-collapse-indicator");
-			collapseIconEl.addClass("is-collapsed");
-		}
-		else
-		{
-			folderEl.removeClass("is-collapsed");
-			const collapseIconEl = folderEl.find("div.nav-folder-collapse-indicator");
-			collapseIconEl.removeClass("is-collapsed");
-		}
+        if (collapsed) {
+            folderEl.addClass("is-collapsed");
+            const collapseIconEl = folderEl.find("div.nav-folder-collapse-indicator");
+            collapseIconEl.addClass("is-collapsed");
+        } else {
+            folderEl.removeClass("is-collapsed");
+            const collapseIconEl = folderEl.find("div.nav-folder-collapse-indicator");
+            collapseIconEl.removeClass("is-collapsed");
+        }
     }
 }
