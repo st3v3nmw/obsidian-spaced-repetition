@@ -107,7 +107,7 @@ export function stringTrimStart(str: string): [string, string] {
  * @returns [frontmatter, content]
  */
 export function extractFrontmatter(str: string): [string, string] {
-    let lines = splitTextIntoLineArray(str);
+    const lines = splitTextIntoLineArray(str);
     let lineIndex = 0;
     let hasFrontmatter = false;
     do {
@@ -129,9 +129,9 @@ export function extractFrontmatter(str: string): [string, string] {
         lineIndex = 0;
     }
 
-    let frontmatter: string = lines.slice(0, lineIndex).join("\n");
-    let emptyLines: string[] = lineIndex > 0 ? Array(lineIndex).join(".").split(".") : [];
-    let content: string = emptyLines.concat(lines.slice(lineIndex)).join("\n");
+    const frontmatter: string = lines.slice(0, lineIndex).join("\n");
+    const emptyLines: string[] = lineIndex > 0 ? Array(lineIndex).join(".").split(".") : [];
+    const content: string = emptyLines.concat(lines.slice(lineIndex)).join("\n");
 
     return [frontmatter, content];
 }
