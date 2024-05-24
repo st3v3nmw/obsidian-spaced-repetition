@@ -1,6 +1,5 @@
 import moment from "moment";
 import { Moment } from "moment";
-import { getFrontMatterInfo } from "obsidian";
 import { PREFERRED_DATE_FORMAT } from "src/constants";
 
 type Hex = number;
@@ -90,12 +89,6 @@ export function splitTextIntoLineArray(text: string): string[] {
     return text.replaceAll("\r\n", "\n").split("\n");
 }
 
-export function getLineCount(text: string): number {
-	if(text.length === 0) 
-		return 0;
-    return text.replaceAll("\r\n", "\n").split("\n").length;
-}
-
 export function stringTrimStart(str: string): [string, string] {
     const trimmed: string = str.trimStart();
     const wsCount: number = str.length - trimmed.length;
@@ -103,28 +96,43 @@ export function stringTrimStart(str: string): [string, string] {
     return [ws, trimmed];
 }
 
-//
-// This returns [frontmatter, content]
-//
-// The returned content has the same number of lines as the supplied str string, but with the
-// frontmatter lines (if present) blanked out.
-//
-// 1. We don't want the parser to see the frontmatter, as it would deem it to be part of a multi-line question
-// if one started on the line immediately after the "---" closing marker.
-//
-// 2. The lines are blanked out rather than deleted so that line numbers are not affected
-// e.g. for calls to getQuestionContext(cardLine: number)
-//
+/**
+ * The returned content has the same number of lines as the supplied string, but with the frontmatter lines (if present) blanked out.
+ *
+ * 1. We don't want the parser to see the frontmatter, as it would deem it to be part of a multi-line question if one started on the line immediately after the "---" closing marker.
+ *
+ * 2. The lines are blanked out rather than deleted so that line numbers are not affected e.g. for calls to getQuestionContext(cardLine: number)
+ *
+ * @param str The file content as string
+ * @returns [frontmatter, content]
+ */
 export function extractFrontmatter(str: string): [string, string] {
-	let frontMatterInfo = getFrontMatterInfo(str);
-	let frontmatter: string = str.substring(0, frontMatterInfo.contentStart - 1);
-	let frontmatterLineCount = getLineCount(frontmatter);
-	let content: string = "";
-	for(let i = 0; i < frontmatterLineCount; i++) {
-		content += "\n";
-	}
-	content += str.substring(frontMatterInfo.contentStart);
-	
+    let lines = splitTextIntoLineArray(str);
+    let lineIndex = 0;
+    let hasFrontmatter = false;
+    do {
+        // Starts file with '---'
+        if (lineIndex === 0 && lines[lineIndex] === "---") {
+            hasFrontmatter = true;
+        }
+        // Line is end of front matter
+        else if (hasFrontmatter && lines[lineIndex] === "---") {
+            hasFrontmatter = false;
+            lineIndex++;
+        }
+        if (hasFrontmatter) {
+            lineIndex++;
+        }
+    } while (hasFrontmatter && lineIndex < lines.length);
+    // No end of Frontmatter found
+    if (hasFrontmatter) {
+        lineIndex = 0;
+    }
+
+    let frontmatter: string = lines.slice(0, lineIndex).join("\n");
+    let emptyLines: string[] = lineIndex > 0 ? Array(lineIndex).join(".").split(".") : [];
+    let content: string = emptyLines.concat(lines.slice(lineIndex)).join("\n");
+
     return [frontmatter, content];
 }
 
