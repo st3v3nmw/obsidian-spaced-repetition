@@ -110,10 +110,12 @@ export function stringTrimStart(str: string): [string, string] {
  * if toCheck = "root/s" -> false
  */
 export function isEqualOrSubPath(toCheck: string, rootPath: string): boolean {
-    const rootPathSections = normalize(rootPath.toLowerCase().replaceAll(/(\\\\|\/)/g, sep))
+    const rootPathSections = normalize(rootPath.toLowerCase())
+        .replaceAll(/(\\|\/)/g, sep)
         .split(sep)
         .filter((p) => p !== "");
-    const pathSections = normalize(toCheck.toLowerCase().replaceAll(/(\\\\|\/)/g, sep))
+    const pathSections = normalize(toCheck.toLowerCase())
+        .replaceAll(/(\\|\/)/g, sep)
         .split(sep)
         .filter((p) => p !== "");
     if (pathSections.length < rootPathSections.length) {
