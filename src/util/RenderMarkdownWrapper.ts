@@ -27,7 +27,7 @@ export class RenderMarkdownWrapper {
     ): Promise<void> {
         if (recursiveDepth > 4) return;
 
-        MarkdownRenderer.renderMarkdown(markdownString, containerEl, this.notePath, this.plugin);
+        MarkdownRenderer.render(this.app, markdownString, containerEl, this.notePath, this.plugin);
 
         containerEl.findAll(".internal-embed").forEach((el) => {
             const link = this.parseLink(el.getAttribute("src"));
