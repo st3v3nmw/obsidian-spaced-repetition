@@ -2,6 +2,7 @@ import { YAML_FRONT_MATTER_REGEX } from "src/constants";
 import {
     extractFrontmatter,
     findLineIndexOfSearchStringIgnoringWs,
+    isEqualOrSubPath,
     literalStringReplace,
 } from "src/util/utils";
 
@@ -241,5 +242,115 @@ describe("findLineIndexOfSearchStringIgnoringWs", () => {
         ];
 
         expect(findLineIndexOfSearchStringIgnoringWs(lines, "??")).toEqual(2);
+    });
+});
+
+describe("isEqualOrSubPath", () => {
+    const winSep = "\\";
+    const linSep = "/";
+    const root = "root";
+    const sub_1 = "plugins";
+    const sub_2 = "obsidian-spaced-repetition";
+    const sub_3 = "data";
+    const noMatch = "notRoot";
+    const caseMatch = "Root";
+
+    describe("Windows", () => {
+        const sep = winSep;
+        const rootPath = root + sep + sub_1;
+
+        test("Upper and lower case letters", () => {
+            expect(isEqualOrSubPath(caseMatch, root)).toBe(true);
+            expect(isEqualOrSubPath(caseMatch.toUpperCase(), root)).toBe(true);
+        });
+
+        test("Seperator auto correction", () => {
+            expect(isEqualOrSubPath(root + winSep + sub_1, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + winSep + sub_1 + winSep, rootPath)).toBe(true);
+
+            expect(isEqualOrSubPath(root + linSep + sub_1, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + linSep + sub_1 + linSep, rootPath)).toBe(true);
+        });
+
+        test("Differnent path", () => {
+            expect(isEqualOrSubPath(noMatch, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(noMatch + sep, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(noMatch + sep + sub_1, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(noMatch + sep + sub_1 + sep + sub_2, rootPath)).toBe(false);
+        });
+
+        test("Partially Match path", () => {
+            expect(isEqualOrSubPath("roo", rootPath)).toBe(false);
+            expect(isEqualOrSubPath("roo" + sep, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep + "plug", rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep + "plug" + sep, rootPath)).toBe(false);
+        });
+
+        test("Same path", () => {
+            expect(isEqualOrSubPath(rootPath, rootPath)).toBe(true);
+        });
+
+        test("Subpath", () => {
+            expect(isEqualOrSubPath(root, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep + sub_1, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(rootPath, rootPath + sep)).toBe(true);
+            expect(isEqualOrSubPath(rootPath + sep, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2 + sep, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2 + sep + sub_3, rootPath)).toBe(
+                true,
+            );
+        });
+    });
+    describe("Linux", () => {
+        const sep = linSep;
+        const rootPath = root + sep + sub_1;
+
+        test("Upper and lower case letters", () => {
+            expect(isEqualOrSubPath(caseMatch, root)).toBe(true);
+            expect(isEqualOrSubPath(caseMatch.toUpperCase(), root)).toBe(true);
+        });
+
+        test("Seperator auto correction", () => {
+            expect(isEqualOrSubPath(root + winSep + sub_1, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + winSep + sub_1 + winSep, rootPath)).toBe(true);
+
+            expect(isEqualOrSubPath(root + linSep + sub_1, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + linSep + sub_1 + linSep, rootPath)).toBe(true);
+        });
+
+        test("Differnent path", () => {
+            expect(isEqualOrSubPath(noMatch, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(noMatch + sep, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(noMatch + sep + sub_1, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(noMatch + sep + sub_1 + sep + sub_2, rootPath)).toBe(false);
+        });
+
+        test("Partially Match path", () => {
+            expect(isEqualOrSubPath("roo", rootPath)).toBe(false);
+            expect(isEqualOrSubPath("roo" + sep, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep + "plug", rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep + "plug" + sep, rootPath)).toBe(false);
+        });
+
+        test("Same path", () => {
+            expect(isEqualOrSubPath(rootPath, rootPath)).toBe(true);
+        });
+
+        test("Subpath", () => {
+            expect(isEqualOrSubPath(root, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep + sub_1, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(rootPath, rootPath + sep)).toBe(true);
+            expect(isEqualOrSubPath(rootPath + sep, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2 + sep, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2 + sep + sub_3, rootPath)).toBe(
+                true,
+            );
+        });
     });
 });
