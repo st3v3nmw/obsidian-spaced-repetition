@@ -20,6 +20,7 @@ export interface SRSettings {
     convertHighlightsToClozes: boolean;
     convertBoldTextToClozes: boolean;
     convertCurlyBracketsToClozes: boolean;
+    clozePatterns: string[];
     singleLineCardSeparator: string;
     singleLineReversedCardSeparator: string;
     multilineCardSeparator: string;
@@ -64,6 +65,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
     convertCurlyBracketsToClozes: false,
+    clozePatterns: ["==[123;;]answer[;;hint]=="],
     singleLineCardSeparator: "::",
     singleLineReversedCardSeparator: ":::",
     multilineCardSeparator: "?",
@@ -336,8 +338,19 @@ export class SRSettingTab extends PluginSettingTab {
             toggle
                 .setValue(this.plugin.data.settings.convertHighlightsToClozes)
                 .onChange(async (value) => {
+                    const hightlightPattern = "==[123;;]answer[;;hint]==";
+                    const clozePatternSet = new Set(this.plugin.data.settings.clozePatterns);
+
+                    if (value) {
+                        clozePatternSet.add(hightlightPattern);
+                    } else {
+                        clozePatternSet.delete(hightlightPattern);
+                    }
+
+                    this.plugin.data.settings.clozePatterns = [...clozePatternSet];
                     this.plugin.data.settings.convertHighlightsToClozes = value;
                     await this.plugin.savePluginData();
+                    this.display();
                 }),
         );
 
@@ -345,8 +358,19 @@ export class SRSettingTab extends PluginSettingTab {
             toggle
                 .setValue(this.plugin.data.settings.convertBoldTextToClozes)
                 .onChange(async (value) => {
+                    const boldPattern = "**[123;;]answer[;;hint]**";
+                    const clozePatternSet = new Set(this.plugin.data.settings.clozePatterns);
+                    
+                    if (value) {
+                        clozePatternSet.add(boldPattern);
+                    } else {
+                        clozePatternSet.delete(boldPattern);
+                    }
+
+                    this.plugin.data.settings.clozePatterns = [...clozePatternSet];
                     this.plugin.data.settings.convertBoldTextToClozes = value;
                     await this.plugin.savePluginData();
+                    this.display();
                 }),
         );
 
@@ -356,8 +380,62 @@ export class SRSettingTab extends PluginSettingTab {
                 toggle
                     .setValue(this.plugin.data.settings.convertCurlyBracketsToClozes)
                     .onChange(async (value) => {
+                        const curlyBracketsPattern = "{{[123;;]answer[;;hint]}}";
+                        const clozePatternSet = new Set(this.plugin.data.settings.clozePatterns);
+
+                        if (value) {
+                            clozePatternSet.add(curlyBracketsPattern);
+                        } else {
+                            clozePatternSet.delete(curlyBracketsPattern);
+                        }
+
+                        this.plugin.data.settings.clozePatterns = [...clozePatternSet];
                         this.plugin.data.settings.convertCurlyBracketsToClozes = value;
                         await this.plugin.savePluginData();
+                        this.display();
+                    }),
+            );
+
+        new Setting(containerEl)
+            .setName(t("CLOZE_PATTERNS"))
+            .setDesc(t("CLOZE_PATTERNS_DESC"))
+            .addTextArea((text) =>
+                text
+                    .setPlaceholder("Example:\n==[123;;]answer[;;hint]==\n**[123;;]answer[;;hint]**\n{{[123;;]answer[;;hint]}}")
+                    .setValue(this.plugin.data.settings.clozePatterns.join("\n"))
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            const hightlightPattern = "==[123;;]answer[;;hint]==";
+                            const boldPattern = "**[123;;]answer[;;hint]**";
+                            const curlyBracketsPattern = "{{[123;;]answer[;;hint]}}";
+
+                            const clozePatternSet = new Set( value
+                                .split(/\n+/)
+                                .map((v) => v.trim())
+                                .filter((v) => v)
+                                );
+
+                            if (clozePatternSet.has(hightlightPattern)) {
+                                this.plugin.data.settings.convertHighlightsToClozes = true;
+                            } else {
+                                this.plugin.data.settings.convertHighlightsToClozes = false;
+                            }
+
+                            if (clozePatternSet.has(boldPattern)) {
+                                this.plugin.data.settings.convertBoldTextToClozes = true;
+                            } else {
+                                this.plugin.data.settings.convertBoldTextToClozes = false;
+                            }
+
+                            if (clozePatternSet.has(curlyBracketsPattern)) {
+                                this.plugin.data.settings.convertCurlyBracketsToClozes = true;
+                            } else {
+                                this.plugin.data.settings.convertCurlyBracketsToClozes = false;
+                            }
+
+                            this.plugin.data.settings.clozePatterns = [...clozePatternSet];
+                            await this.plugin.savePluginData();
+                        });
                     }),
             );
 

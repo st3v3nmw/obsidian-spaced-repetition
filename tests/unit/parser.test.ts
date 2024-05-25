@@ -1,14 +1,16 @@
 import { parseEx, ParsedQuestionInfo } from "src/parser";
 import { CardType } from "src/Question";
 
-const defaultArgs: [string, string, string, string, boolean, boolean, boolean] = [
+const defaultArgs: [string, string, string, string, string[]] = [
     "::",
     ":::",
     "?",
     "??",
-    true,
-    true,
-    true,
+    [
+        "==[123;;]answer[;;hint]==",
+        "**[123;;]answer[;;hint]**",
+        "{{[123;;]answer[;;hint]}}"
+    ]
 ];
 
 /**
@@ -22,9 +24,7 @@ function parse(
     singlelineReversedCardSeparator: string,
     multilineCardSeparator: string,
     multilineReversedCardSeparator: string,
-    convertHighlightsToClozes: boolean,
-    convertBoldTextToClozes: boolean,
-    convertCurlyBracketsToClozes: boolean,
+    clozePatterns: string[],
 ): [CardType, string, number, number][] {
     const list: ParsedQuestionInfo[] = parseEx(
         text,
@@ -32,9 +32,7 @@ function parse(
         singlelineReversedCardSeparator,
         multilineCardSeparator,
         multilineReversedCardSeparator,
-        convertHighlightsToClozes,
-        convertBoldTextToClozes,
-        convertCurlyBracketsToClozes,
+        clozePatterns,
     );
     const result: [CardType, string, number, number][] = [];
     for (const item of list) {
@@ -162,7 +160,7 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum ==p\ndolor won==", ...defaultArgs)).toEqual([]);
     expect(parse("lorem ipsum ==dolor won=", ...defaultArgs)).toEqual([]);
     // ==highlights== turned off
-    expect(parse("cloze ==deletion== test", "::", ":::", "?", "??", false, true, false)).toEqual(
+    expect(parse("cloze ==deletion== test", "::", ":::", "?", "??", ["**[123;;]answer[;;hint]**"])).toEqual(
         [],
     );
 
@@ -193,7 +191,7 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum **p\ndolor won**", ...defaultArgs)).toEqual([]);
     expect(parse("lorem ipsum **dolor won*", ...defaultArgs)).toEqual([]);
     // **bolded** turned off
-    expect(parse("cloze **deletion** test", "::", ":::", "?", "??", true, false, false)).toEqual(
+    expect(parse("cloze **deletion** test", "::", ":::", "?", "??", ["==[123;;]answer[;;hint]=="])).toEqual(
         [],
     );
 
