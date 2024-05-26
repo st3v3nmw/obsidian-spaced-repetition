@@ -86,11 +86,27 @@ export function formatDate_YYYY_MM_DD(ticks: Moment): string {
     return ticks.format(PREFERRED_DATE_FORMAT);
 }
 
+/**
+ * Splits the input text into an array of lines.
+ * Normalizes line endings to \n before splitting.
+ *
+ * @param text The input text to be split into lines.
+ * @returns The array of lines from the input text.
+ */
 export function splitTextIntoLineArray(text: string): string[] {
-    return text.replaceAll("\r\n", "\n").split("\n");
+    return text.replaceAll(/\r\n|\r/g, "\n").split("\n");
 }
 
+/**
+ * Trims the leading whitespace from the input string and returns both the leading whitespace and the trimmed string.
+ *
+ * @param str The input string to be trimmed.
+ * @returns A tuple where the first element is the leading whitespace and the second is the trimmed string.
+ */
 export function stringTrimStart(str: string): [string, string] {
+    if (!str) {
+        return ["", ""];
+    }
     const trimmed: string = str.trimStart();
     const wsCount: number = str.length - trimmed.length;
     const ws: string = str.substring(0, wsCount);
@@ -277,9 +293,13 @@ Any double quotes in the frontmatter are stripped by Obsidian and not present in
 
 export function parseObsidianFrontmatterTag(tagStr: string): string[] {
     const result: string[] = [] as string[];
-    const tagStrList: string[] = tagStr.split(",");
-    for (const tag of tagStrList) {
-        result.push(tag.startsWith("#") ? tag : "#" + tag);
+    if (tagStr) {
+        const tagStrList: string[] = tagStr.split(",");
+        for (const tag of tagStrList) {
+            if (tag !== "") {
+                result.push(tag.startsWith("#") ? tag : "#" + tag);
+            }
+        }
     }
     return result;
 }

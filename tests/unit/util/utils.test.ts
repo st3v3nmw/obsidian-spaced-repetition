@@ -1,3 +1,4 @@
+import moment from "moment";
 import { YAML_FRONT_MATTER_REGEX } from "src/constants";
 import {
     convertToStringOrEmpty,
@@ -5,7 +6,108 @@ import {
     isEqualOrSubPath,
     literalStringReplace,
     splitNoteIntoFrontmatterAndContent,
+    cyrb53,
+    escapeRegexString,
+    formatDate_YYYY_MM_DD,
+    getKeysPreserveType,
+    getTypedObjectEntries,
+    splitTextIntoLineArray,
+    stringTrimStart,
+    ticksFromDate,
+    parseObsidianFrontmatterTag,
 } from "src/util/utils";
+
+describe("getTypedObjectEntries", () => {
+    test("should handle basic object", () => {
+        expect(getTypedObjectEntries({ name: "Alice", age: 30, isStudent: false })).toEqual([
+            ["name", "Alice"],
+            ["age", 30],
+            ["isStudent", false],
+        ]);
+    });
+
+    test("should handle empty object", () => {
+        expect(getTypedObjectEntries({})).toEqual([]);
+    });
+
+    test("should handle object with different value types", () => {
+        expect(
+            getTypedObjectEntries({ a: 1, b: "string", c: true, d: null, e: undefined }),
+        ).toEqual([
+            ["a", 1],
+            ["b", "string"],
+            ["c", true],
+            ["d", null],
+            ["e", undefined],
+        ]);
+    });
+
+    test("should handle object with nested objects", () => {
+        expect(getTypedObjectEntries({ obj: { nestedKey: "nestedValue" } })).toEqual([
+            ["obj", { nestedKey: "nestedValue" }],
+        ]);
+    });
+
+    test("should handle object with array values", () => {
+        expect(getTypedObjectEntries({ arr: [1, 2, 3] })).toEqual([["arr", [1, 2, 3]]]);
+    });
+
+    test("should handle object with function values", () => {
+        const output = getTypedObjectEntries({ func: () => "result" });
+        expect(output.length).toBe(1);
+        expect(output[0][0]).toBe("func");
+        expect(typeof output[0][1]).toBe("function");
+        expect(output[0][1]()).toBe("result");
+    });
+});
+
+describe("getKeysPreserveType", () => {
+    test("should return keys of a basic object", () => {
+        expect(getKeysPreserveType({ name: "Alice", age: 30, isStudent: false })).toEqual([
+            "name",
+            "age",
+            "isStudent",
+        ]);
+    });
+
+    test("should return an empty array for an empty object", () => {
+        expect(getKeysPreserveType({})).toEqual([]);
+    });
+
+    test("should return keys of an object with different value types", () => {
+        expect(getKeysPreserveType({ a: 1, b: "string", c: true })).toEqual(["a", "b", "c"]);
+    });
+
+    test("should return keys of an object with a function value", () => {
+        expect(getKeysPreserveType({ func: () => "result" })).toEqual(["func"]);
+    });
+});
+
+describe("escapeRegexString", () => {
+    test("should escape special regex characters", () => {
+        const input = ".*+?^${}()|[]\\";
+        const expected = "\\.\\*\\+\\?\\^\\$\\{\\}\\(\\)\\|\\[\\]\\\\";
+        expect(escapeRegexString(input)).toBe(expected);
+    });
+
+    test("should handle a string without special characters", () => {
+        const input = "abc123";
+        const expected = "abc123";
+        expect(escapeRegexString(input)).toBe(expected);
+    });
+
+    test("should handle an empty string", () => {
+        const input = "";
+        const expected = "";
+        expect(escapeRegexString(input)).toBe(expected);
+    });
+
+    test("should handle a mixed string with special and normal characters", () => {
+        const input = "Hello.*+?^${}()|[]\\World";
+        const expected = "Hello\\.\\*\\+\\?\\^\\$\\{\\}\\(\\)\\|\\[\\]\\\\World";
+        expect(escapeRegexString(input)).toBe(expected);
+    });
+});
 
 describe("literalStringReplace", () => {
     test("Replacement string doesn't have any dollar signs", async () => {
@@ -102,21 +204,127 @@ describe("convertToStringOrEmpty", () => {
     });
 });
 
-function createTestStr1(sep: string): string {
-    return `---${sep}sr-due: 2024-08-10${sep}sr-interval: 273${sep}sr-ease: 309${sep}---`;
-}
-
-describe("YAML_FRONT_MATTER_REGEX", () => {
-    test("New line is line feed", async () => {
-        const sep: string = String.fromCharCode(10);
-        const text: string = createTestStr1(sep);
-        expect(YAML_FRONT_MATTER_REGEX.test(text)).toEqual(true);
+describe("cyrb53", () => {
+    test("should generate hash for a simple string without seed", () => {
+        const input = "hello";
+        const expectedHash = "106f3a63cd7226";
+        expect(cyrb53(input)).toBe(expectedHash);
     });
 
-    test("New line is carriage return line feed", async () => {
-        const sep: string = String.fromCharCode(13, 10);
-        const text: string = createTestStr1(sep);
-        expect(YAML_FRONT_MATTER_REGEX.test(text)).toEqual(true);
+    test("should generate hash for a simple string with seed", () => {
+        const input = "hello";
+        const seed = 123;
+        const expectedHash = "6677dacb8051";
+        expect(cyrb53(input, seed)).toBe(expectedHash);
+    });
+
+    test("should generate hash for an empty string without seed", () => {
+        const input = "";
+        const expectedHash = "bdcb81aee8d83";
+        expect(cyrb53(input)).toBe(expectedHash);
+    });
+
+    test("should generate hash for an empty string with seed", () => {
+        const input = "";
+        const seed = 987;
+        const expectedHash = "aba1aab9aab71";
+        expect(cyrb53(input, seed)).toBe(expectedHash);
+    });
+
+    test("should generate hash for a string with special characters without seed", () => {
+        const input = "!@#$%^&*()";
+        const expectedHash = "d86f2f9eb5a3a";
+        expect(cyrb53(input)).toBe(expectedHash);
+    });
+
+    test("should generate hash for a string with special characters with seed", () => {
+        const input = "!@#$%^&*()";
+        const seed = 555;
+        const expectedHash = "1484280e499f6c";
+        expect(cyrb53(input, seed)).toBe(expectedHash);
+    });
+});
+
+describe("Ticks from date", () => {
+    test("2024 05 26", () => {
+        const year = 2024;
+        const month = 5;
+        const day = 26;
+        const ticks = 1719352800000;
+
+        expect(ticksFromDate(year, month, day)).toEqual(ticks);
+    });
+});
+
+describe("Format date YYYY_MM_DD", () => {
+    test("2024 05 26", () => {
+        expect(formatDate_YYYY_MM_DD(moment(1719352800000))).toEqual("2024-06-26");
+        expect(formatDate_YYYY_MM_DD(moment(1410715640579))).toEqual("2014-09-14");
+    });
+});
+
+describe("Split Text to array of lines", () => {
+    const textCR = `Line 1\rLine 2\rLine 3\rLine 4\rLine 5`;
+    const textLF = `Line 1\nLine 2\nLine 3\nLine 4\nLine 5`;
+    const textCRLF = `Line 1\r\nLine 2\r\nLine 3\r\nLine 4\r\nLine 5`;
+    const lines = ["Line 1", "Line 2", "Line 3", "Line 4", "Line 5"];
+
+    test("Line Feed", () => {
+        expect(splitTextIntoLineArray(textLF)).toStrictEqual(lines);
+    });
+
+    test("Carriage Return", () => {
+        expect(splitTextIntoLineArray(textCR)).toStrictEqual(lines);
+    });
+
+    test("Carriage Return + Line Feed", () => {
+        expect(splitTextIntoLineArray(textCRLF)).toStrictEqual(lines);
+    });
+});
+
+describe("stringTrimStart", () => {
+    test("Empty string", () => {
+        expect(stringTrimStart("")).toEqual(["", ""]);
+        expect(stringTrimStart(undefined)).toEqual(["", ""]);
+    });
+    test("No white spaces", () => {
+        expect(stringTrimStart("any text here")).toEqual(["", "any text here"]);
+    });
+    test("Only white spaces", () => {
+        expect(stringTrimStart(" ")).toEqual([" ", ""]);
+        expect(stringTrimStart("   ")).toEqual(["   ", ""]);
+    });
+    test("Leading white spaces", () => {
+        expect(stringTrimStart(" any text here")).toEqual([" ", "any text here"]);
+        expect(stringTrimStart("  any text here")).toEqual(["  ", "any text here"]);
+    });
+    test("Trailing white spaces", () => {
+        expect(stringTrimStart("any text here ")).toEqual(["", "any text here "]);
+        expect(stringTrimStart("any text here  ")).toEqual(["", "any text here  "]);
+    });
+    test("Leading tabs", () => {
+        expect(stringTrimStart("\tany text here")).toEqual(["\t", "any text here"]);
+        expect(stringTrimStart("\t\tany text here")).toEqual(["\t\t", "any text here"]);
+    });
+    test("Trailing tabs", () => {
+        expect(stringTrimStart("any text here\t")).toEqual(["", "any text here\t"]);
+        expect(stringTrimStart("any text here\t\t")).toEqual(["", "any text here\t\t"]);
+    });
+    test("Mixed leading whitespace (spaces and tabs)", () => {
+        expect(stringTrimStart(" \tany text here")).toEqual([" \t", "any text here"]);
+        expect(stringTrimStart("\t any text here")).toEqual(["\t ", "any text here"]);
+        expect(stringTrimStart(" \t any text here")).toEqual([" \t ", "any text here"]);
+    });
+    test("Mixed trailing whitespace (spaces and tabs)", () => {
+        expect(stringTrimStart("any text here \t")).toEqual(["", "any text here \t"]);
+        expect(stringTrimStart("any text here\t ")).toEqual(["", "any text here\t "]);
+        expect(stringTrimStart("any text here \t ")).toEqual(["", "any text here \t "]);
+    });
+    test("Newlines and leading spaces", () => {
+        expect(stringTrimStart("\nany text here")).toEqual(["\n", "any text here"]);
+        expect(stringTrimStart("\n any text here")).toEqual(["\n ", "any text here"]);
+        expect(stringTrimStart(" \nany text here")).toEqual([" \n", "any text here"]);
+        expect(stringTrimStart(" \n any text here")).toEqual([" \n ", "any text here"]);
     });
 });
 
@@ -505,6 +713,7 @@ describe("isEqualOrSubPath", () => {
             expect(isEqualOrSubPath(root + winSep + linSep + sub_1, root)).toBe(true);
         });
     });
+
     describe("Linux", () => {
         const sep = linSep;
         const rootPath = root + sep + sub_1;
@@ -562,11 +771,88 @@ describe("isEqualOrSubPath", () => {
             expect(isEqualOrSubPath(root + winSep + linSep + sub_1, root)).toBe(true);
         });
     });
+
     test("Examples", () => {
         expect(isEqualOrSubPath("/user/docs/letter.txt", "/user/docs")).toBe(true);
         expect(isEqualOrSubPath("/user/docs", "/user/docs")).toBe(true);
         expect(isEqualOrSubPath("/user/docs/letter.txt", "/user/projects")).toBe(false);
         expect(isEqualOrSubPath("/User/Docs", "/user/docs")).toBe(true);
         expect(isEqualOrSubPath("C:\\user\\docs", "C:/user/docs")).toBe(true);
+    });
+});
+
+describe("Parse Obsidian Frontmatter Tag", () => {
+    test("No tag", () => {
+        expect(parseObsidianFrontmatterTag("")).toEqual([]);
+        expect(parseObsidianFrontmatterTag(undefined)).toEqual([]);
+    });
+    test("Singel tag without #", () => {
+        expect(parseObsidianFrontmatterTag("flashcards")).toEqual(["#flashcards"]);
+        expect(parseObsidianFrontmatterTag("flashcards/philosophy/philosophers")).toEqual([
+            "#flashcards/philosophy/philosophers",
+        ]);
+    });
+    test("Singel tag with #", () => {
+        expect(parseObsidianFrontmatterTag("#flashcards")).toEqual(["#flashcards"]);
+        expect(parseObsidianFrontmatterTag("#flashcards/philosophy/philosophers")).toEqual([
+            "#flashcards/philosophy/philosophers",
+        ]);
+    });
+    test("Multiple tags without #", () => {
+        expect(parseObsidianFrontmatterTag("flashcardsX,flashcardsX")).toEqual([
+            "#flashcardsX",
+            "#flashcardsX",
+        ]);
+        expect(parseObsidianFrontmatterTag("flashcardsX,flashcardsX/toes")).toEqual([
+            "#flashcardsX",
+            "#flashcardsX/toes",
+        ]);
+        expect(
+            parseObsidianFrontmatterTag("flashcardsX/philosophy/philosophers,flashcardsX/toes"),
+        ).toEqual(["#flashcardsX/philosophy/philosophers", "#flashcardsX/toes"]);
+    });
+    test("Multiple tags with #", () => {
+        expect(parseObsidianFrontmatterTag("#flashcardsX,#flashcardsX")).toEqual([
+            "#flashcardsX",
+            "#flashcardsX",
+        ]);
+        expect(parseObsidianFrontmatterTag("#flashcardsX,#flashcardsX/toes")).toEqual([
+            "#flashcardsX",
+            "#flashcardsX/toes",
+        ]);
+        expect(
+            parseObsidianFrontmatterTag("#flashcardsX/philosophy/philosophers,#flashcardsX/toes"),
+        ).toEqual(["#flashcardsX/philosophy/philosophers", "#flashcardsX/toes"]);
+    });
+    test("Multiple tags with and without #", () => {
+        expect(parseObsidianFrontmatterTag("#flashcardsX,flashcardsX")).toEqual([
+            "#flashcardsX",
+            "#flashcardsX",
+        ]);
+        expect(parseObsidianFrontmatterTag("#flashcardsX,flashcardsX/toes")).toEqual([
+            "#flashcardsX",
+            "#flashcardsX/toes",
+        ]);
+        expect(
+            parseObsidianFrontmatterTag("#flashcardsX/philosophy/philosophers,flashcardsX/toes"),
+        ).toEqual(["#flashcardsX/philosophy/philosophers", "#flashcardsX/toes"]);
+    });
+});
+
+describe("YAML_FRONT_MATTER_REGEX", () => {
+    function createTestStr1(sep: string): string {
+        return `---${sep}sr-due: 2024-08-10${sep}sr-interval: 273${sep}sr-ease: 309${sep}---`;
+    }
+
+    test("New line is line feed", async () => {
+        const sep: string = String.fromCharCode(10);
+        const text: string = createTestStr1(sep);
+        expect(YAML_FRONT_MATTER_REGEX.test(text)).toEqual(true);
+    });
+
+    test("New line is carriage return line feed", async () => {
+        const sep: string = String.fromCharCode(13, 10);
+        const text: string = createTestStr1(sep);
+        expect(YAML_FRONT_MATTER_REGEX.test(text)).toEqual(true);
     });
 });
