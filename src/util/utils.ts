@@ -130,6 +130,7 @@ export function parseDateToTicks(
  * @param month The month 1-12
  * @param day The Day 1-31
  * @param format Format string
+ * @returns The date as string
  */
 export function formatDate(year: number, month: number, day: number, format?: string): string;
 /**
@@ -141,6 +142,7 @@ export function formatDate(year: number, month: number, day: number, format?: st
  *
  * @param date A date object
  * @param format Format string
+ * @returns The date as string
  */
 export function formatDate(date: Date, format?: string): string;
 /**
@@ -155,7 +157,6 @@ export function formatDate(date: Date, format?: string): string;
  * @returns The date as string
  */
 export function formatDate(ticks: number, format?: string): string;
-
 export function formatDate(
     arg1: unknown,
     arg2?: unknown,

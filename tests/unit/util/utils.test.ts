@@ -1,4 +1,3 @@
-import moment from "moment";
 import { YAML_FRONT_MATTER_REGEX } from "src/constants";
 import {
     cyrb53,
@@ -6,7 +5,6 @@ import {
     extractFrontmatter,
     findLineIndexOfSearchStringIgnoringWs,
     formatDate,
-    formatDate_YYYY_MM_DD,
     getKeysPreserveType,
     getTypedObjectEntries,
     literalStringReplace,
@@ -14,7 +12,6 @@ import {
     parseObsidianFrontmatterTag,
     splitTextIntoLineArray,
     stringTrimStart,
-    ticksFromDate,
 } from "src/util/utils";
 
 describe("getTypedObjectEntries", () => {
