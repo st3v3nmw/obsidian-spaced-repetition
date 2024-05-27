@@ -1,7 +1,6 @@
-import moment from "moment";
-import { Moment } from "moment";
 import { sep } from "path";
 import { PREFERRED_DATE_FORMAT } from "src/constants";
+import moment, { Moment } from "moment";
 
 type Hex = number;
 
@@ -76,14 +75,110 @@ export function cyrb53(str: string, seed = 0): string {
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
 }
 
+/**
+ * @deprecated use parseDateToTicks() instead
+ */
 export function ticksFromDate(year: number, month: number, day: number): number {
     return moment({ year, month, day }).utc().valueOf();
 }
 
-// 👇️ format as "YYYY-MM-DD"
-// https://bobbyhadz.com/blog/typescript-date-format
+/**
+ * 👇️ format as "YYYY-MM-DD"
+ * https://bobbyhadz.com/blog/typescript-date-format
+ *
+ * @param ticks
+ * @returns
+ * @deprecated use formatDate() instead
+ */
 export function formatDate_YYYY_MM_DD(ticks: Moment): string {
     return ticks.format(PREFERRED_DATE_FORMAT);
+}
+
+/**
+ * Retruns the Ticks of the date since 1970-01-01
+ *
+ * @param year The Year
+ * @param month The month 1-12
+ * @param day The Day 1-31
+ * @param utc Universal time code
+ * @returns The ticks
+ */
+export function parseDateToTicks(
+    year: number,
+    month: number,
+    day: number,
+    utc: boolean = false,
+): number {
+    let timestamp: number;
+    if (utc) {
+        timestamp = Date.UTC(year, month - 1, day, 0, 0, 0, 0);
+    } else {
+        const _date = new Date(year, month - 1, day);
+        timestamp = _date.getTime();
+    }
+
+    return timestamp;
+}
+
+/**
+ * Converts the ticks to a date formatted string.
+ * Allowed format
+ * YYYY = Year
+ * MM = Month
+ * DD = Day
+ *
+ * @param year The Year
+ * @param month The month 1-12
+ * @param day The Day 1-31
+ * @param format Format string
+ */
+export function formatDate(year: number, month: number, day: number, format?: string): string;
+/**
+ * Converts the ticks to a date formatted string.
+ * Allowed format
+ * YYYY = Year
+ * MM = Month
+ * DD = Day
+ *
+ * @param date A date object
+ * @param format Format string
+ */
+export function formatDate(date: Date, format?: string): string;
+/**
+ * Converts the ticks to a date formatted string.
+ * Allowed format
+ * YYYY = Year
+ * MM = Month
+ * DD = Day
+ *
+ * @param ticks The ticks in milliseconds
+ * @param format Format string
+ * @returns The date as string
+ */
+export function formatDate(ticks: number, format?: string): string;
+
+export function formatDate(
+    arg1: unknown,
+    arg2?: unknown,
+    arg3?: unknown,
+    format: string = PREFERRED_DATE_FORMAT,
+): string {
+    let _date: Date;
+    if (typeof arg1 === "number" && typeof arg2 === "number" && typeof arg3 === "number") {
+        _date = new Date(arg1, arg2 - 1, arg3);
+    } else if (typeof arg1 === "number") {
+        _date = new Date(arg1);
+    } else if (typeof arg1 === typeof new Date()) {
+        _date = arg1 as Date;
+    }
+
+    let result: string = format;
+
+    result = result.replaceAll(/YYYY/g, _date.getFullYear().toString().padStart(4, "0"));
+    result = result.replaceAll(/MM/g, (_date.getMonth() + 1).toString().padStart(2, "0"));
+    result = result.replaceAll(/DD/g, _date.getDate().toString().padStart(2, "0"));
+
+    return result;
 }
 
 /**
@@ -238,7 +333,7 @@ export function isSupportedFileType(path: string): boolean {
     return path.split(".").pop().toLowerCase() === "md";
 }
 
-/* 
+/*
 Prompted by flashcards being missed, here are some "experiments" with different frontmatter,
 showing the difference in the value of CachedMetadata.frontmatter["tags"]
 
