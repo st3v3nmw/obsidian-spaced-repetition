@@ -5,10 +5,12 @@ import {
     escapeRegexString,
     extractFrontmatter,
     findLineIndexOfSearchStringIgnoringWs,
+    formatDate,
     formatDate_YYYY_MM_DD,
     getKeysPreserveType,
     getTypedObjectEntries,
     literalStringReplace,
+    parseDateToTicks,
     parseObsidianFrontmatterTag,
     splitTextIntoLineArray,
     stringTrimStart,
@@ -221,21 +223,26 @@ describe("cyrb53", () => {
     });
 });
 
-describe("Ticks from date", () => {
-    test("2024 05 26", () => {
-        const year = 2024;
-        const month = 5;
-        const day = 26;
-        const ticks = 1719352800000;
-
-        expect(ticksFromDate(year, month, day)).toEqual(ticks);
+describe("Parse date to ticks", () => {
+    test("Test with normal year", () => {
+        // January 1, 2023
+        expect(parseDateToTicks(2023, 1, 1, true)).toBe(1672531200000);
+    });
+    test("Test with a leap year", () => {
+        // February 29, 2020 (leap year)
+        expect(parseDateToTicks(2020, 2, 29, true)).toBe(1582934400000);
     });
 });
 
-describe("Format date YYYY_MM_DD", () => {
-    test("2024 05 26", () => {
-        expect(formatDate_YYYY_MM_DD(moment(1719352800000))).toEqual("2024-06-26");
-        expect(formatDate_YYYY_MM_DD(moment(1410715640579))).toEqual("2014-09-14");
+describe("Format date", () => {
+    test("Different input overloads", () => {
+        expect(formatDate(new Date(2023, 0, 1))).toBe("2023-01-01");
+        expect(formatDate(2023, 1, 1)).toBe("2023-01-01");
+        expect(formatDate(1672531200000)).toBe("2023-01-01");
+    });
+
+    test("handles a leap year date", () => {
+        expect(formatDate(2020, 2, 29)).toBe("2020-02-29");
     });
 });
 
