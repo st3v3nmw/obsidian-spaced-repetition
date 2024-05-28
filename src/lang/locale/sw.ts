@@ -1,3 +1,0 @@
-// Swahili
-
-export default {};
