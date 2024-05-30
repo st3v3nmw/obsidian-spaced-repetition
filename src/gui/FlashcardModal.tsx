@@ -118,7 +118,11 @@ export class FlashcardModal extends Modal {
         // Just the question/answer text; without any preceding topic tag
         const textPrompt = currentQ.questionText.actualQuestion;
 
-        const editModal = FlashcardEditModal.Prompt(this.app, textPrompt);
+        const editModal = FlashcardEditModal.Prompt(
+            this.app,
+            textPrompt,
+            currentQ.questionText.textDirection,
+        );
         editModal
             .then(async (modifiedCardText) => {
                 this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);

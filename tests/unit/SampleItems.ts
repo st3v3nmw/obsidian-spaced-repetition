@@ -7,6 +7,7 @@ import { CardType, Question } from "src/Question";
 import { CardFrontBack, CardFrontBackUtil } from "src/QuestionType";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { TopicPath } from "src/TopicPath";
+import { TextDirection } from "src/util/TextDirection";
 import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
 import { CardOrder, DeckOrder, DeckTreeIterator } from "src/DeckTreeIterator";
 
@@ -70,7 +71,7 @@ Q3::A3`;
     ): Promise<Deck> {
         let deck: Deck = new Deck("Root", null);
         let noteParser: NoteParser = createTest_NoteParser();
-        let note: Note = await noteParser.parse(file, folderTopicPath);
+        let note: Note = await noteParser.parse(file, TextDirection.Ltr, folderTopicPath);
         note.appendCardsToDeck(deck);
         return deck;
     }

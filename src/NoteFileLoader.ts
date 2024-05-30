@@ -4,6 +4,7 @@ import { Question } from "./Question";
 import { TopicPath } from "./TopicPath";
 import { NoteQuestionParser } from "./NoteQuestionParser";
 import { SRSettings } from "./settings";
+import { TextDirection } from "./util/TextDirection";
 
 export class NoteFileLoader {
     fileText: string;
@@ -16,7 +17,11 @@ export class NoteFileLoader {
         this.settings = settings;
     }
 
-    async load(noteFile: ISRFile, folderTopicPath: TopicPath): Promise<Note | null> {
+    async load(
+        noteFile: ISRFile,
+        defaultTextDirection: TextDirection,
+        folderTopicPath: TopicPath,
+    ): Promise<Note | null> {
         this.noteFile = noteFile;
 
         const questionParser: NoteQuestionParser = new NoteQuestionParser(this.settings);
@@ -24,6 +29,7 @@ export class NoteFileLoader {
         const onlyKeepQuestionsWithTopicPath: boolean = true;
         const questionList: Question[] = await questionParser.createQuestionList(
             noteFile,
+            defaultTextDirection,
             folderTopicPath,
             onlyKeepQuestionsWithTopicPath,
         );

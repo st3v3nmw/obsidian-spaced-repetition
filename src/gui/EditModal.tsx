@@ -1,5 +1,6 @@
 import { App, Modal } from "obsidian";
 import { t } from "src/lang/helpers";
+import { TextDirection } from "src/util/TextDirection";
 
 // from https://github.com/chhoumann/quickadd/blob/bce0b4cdac44b867854d6233796e3406dfd163c6/src/gui/GenericInputPrompt/GenericInputPrompt.ts#L5
 export class FlashcardEditModal extends Modal {
@@ -17,17 +18,23 @@ export class FlashcardEditModal extends Modal {
     private rejectPromise: (reason?: any) => void;
     private didSaveChanges = false;
     private readonly modalText: string;
+    private textDirection: TextDirection;
 
-    public static Prompt(app: App, placeholder: string): Promise<string> {
-        const newPromptModal = new FlashcardEditModal(app, placeholder);
+    public static Prompt(
+        app: App,
+        placeholder: string,
+        textDirection: TextDirection,
+    ): Promise<string> {
+        const newPromptModal = new FlashcardEditModal(app, placeholder, textDirection);
         return newPromptModal.waitForClose;
     }
 
-    constructor(app: App, existingText: string) {
+    constructor(app: App, existingText: string, textDirection: TextDirection) {
         super(app);
 
         this.modalText = existingText;
         this.changedText = existingText;
+        this.textDirection = textDirection;
 
         this.waitForClose = new Promise<string>((resolve, reject) => {
             this.resolvePromise = resolve;
@@ -56,6 +63,9 @@ export class FlashcardEditModal extends Modal {
         this.textArea.addClass("sr-input");
         this.textArea.setText(this.modalText ?? "");
         this.textArea.addEventListener("keydown", this.saveOnEnterCallback);
+        if (this.textDirection == TextDirection.Rtl) {
+            this.textArea.setAttribute("dir", "rtl");
+        }
 
         this._createResponse(this.contentEl);
     }
