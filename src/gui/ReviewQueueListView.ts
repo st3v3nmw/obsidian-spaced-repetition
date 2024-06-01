@@ -48,13 +48,14 @@ export class ReviewQueueListView extends ItemView {
     }
 
     public redraw(): void {
+
         const activeFile: TFile | null = this.app.workspace.getActiveFile();
 
         const rootEl: HTMLElement = createDiv("nav-folder mod-root");
         const childrenEl: HTMLElement = rootEl.createDiv("nav-folder-children");
 
-        for (const deckKey in this.noteReviewQueue.reviewDecks) {
-            const deck: NoteReviewDeck = this.noteReviewQueue.reviewDecks.get(deckKey);
+        let deck: NoteReviewDeck;
+        for (let [ deckKey, deck ] of this.noteReviewQueue.reviewDecks) {
 
             const deckCollapsed = !deck.activeFolders.has(deck.deckName);
 

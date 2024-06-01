@@ -4,7 +4,7 @@ import { RepItemScheduleInfo } from "src/algorithms/base/RepItemScheduleInfo";
 import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/RepItemScheduleInfo_Osr";
 import { Moment } from "moment";
 import moment from "moment";
-import { SCHEDULING_INFO_REGEX, SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END, YAML_FRONT_MATTER_REGEX } from "src/constants";
+import { ALLOWED_DATE_FORMATS, SCHEDULING_INFO_REGEX, SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END, YAML_FRONT_MATTER_REGEX } from "src/constants";
 import { formatDate_YYYY_MM_DD } from "src/util/utils";
 import { Question } from "src/Question";
 import { Card } from "src/Card";
@@ -22,17 +22,16 @@ export class DataStoreInNote_AlgorithmOsr implements IDataStoreAlgorithm {
     constructor(settings: SRSettings) {
         this.settings = settings;
     }
-    
+
     async noteGetSchedule(note: ISRFile): Promise<RepItemScheduleInfo> {
         let result: RepItemScheduleInfo = null;
-        const frontmatter: Map<string, string[]> = await note.getFrontmatter();
+        const frontmatter: Map<string, string> = await note.getFrontmatter();
 
         if (frontmatter && frontmatter.has("sr-due") && frontmatter.has("sr-interval") && frontmatter.has("sr-ease")) {
-            const dueDate: Moment = moment(frontmatter.get("sr-due")[0], ["YYYY-MM-DD", "DD-MM-YYYY", "ddd MMM DD YYYY"]);
-            const interval: number = parseFloat(frontmatter.get("sr-interval")[0]);
-            const ease: number = parseFloat(frontmatter.get("sr-ease")[0]);
-
-            result = new RepItemScheduleInfo_Osr(dueDate, interval, ease)
+            const dueDate: Moment = moment(frontmatter.get("sr-due"), ALLOWED_DATE_FORMATS);
+            const interval: number = parseFloat(frontmatter.get("sr-interval"));
+            const ease: number = parseFloat(frontmatter.get("sr-ease"));
+            result = new RepItemScheduleInfo_Osr(dueDate, interval, ease);
         }
         return result;
     }

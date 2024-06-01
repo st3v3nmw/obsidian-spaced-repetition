@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { unitTest_BasicFrontmatterParserEx, unitTest_GetAllTagsFromTextEx } from "./UnitTestHelper";
+import { unitTest_BasicFrontmatterParser, unitTest_BasicFrontmatterParserEx, unitTest_GetAllTagsFromTextEx } from "./UnitTestHelper";
 import { TFile, TagCache } from "obsidian";
 import { ISRFile } from "src/SRFile";
 
@@ -24,8 +24,8 @@ export class UnitTestSRFile implements ISRFile {
         throw "Not supported";
     }    
 
-    async getFrontmatter(): Promise<Map<string, string[]>> {
-        return unitTest_BasicFrontmatterParserEx(await this.read());
+    async getFrontmatter(): Promise<Map<string, string>> {
+        return unitTest_BasicFrontmatterParser(await this.read());
     }
 
     getAllTags(): string[] {
