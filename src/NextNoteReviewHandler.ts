@@ -8,24 +8,28 @@ export class NextNoteReviewHandler {
     private app: App;
     private settings: SRSettings;
     private workspace: Workspace;
-    public noteReviewQueue: NoteReviewQueue;
+    private _noteReviewQueue: NoteReviewQueue;
     private _lastSelectedReviewDeck: string;
 
     get lastSelectedReviewDeck(): string {
         return this._lastSelectedReviewDeck;
+    }
+
+    get noteReviewQueue(): NoteReviewQueue {
+        return this._noteReviewQueue;
     }
     
     constructor(app: App, settings: SRSettings, workspace: Workspace, noteReviewQueue: NoteReviewQueue) {
         this.app = app;
         this.settings = settings;
         this.workspace = workspace;
-        this.noteReviewQueue = noteReviewQueue;
+        this._noteReviewQueue = noteReviewQueue;
     }
    
     async autoReviewNextNote(): Promise<void> {
         if (this.settings.autoNextNote) {
             if (!this._lastSelectedReviewDeck) {
-                const reviewDeckKeys: string[] = Object.keys(this.noteReviewQueue.reviewDecks);
+                const reviewDeckKeys: string[] = Object.keys(this._noteReviewQueue.reviewDecks);
                 if (reviewDeckKeys.length > 0) this._lastSelectedReviewDeck = reviewDeckKeys[0];
                 else {
                     new Notice(t("ALL_CAUGHT_UP"));
@@ -37,7 +41,7 @@ export class NextNoteReviewHandler {
     }
 
     async reviewNextNoteModal(): Promise<void> {
-        const reviewDeckNames: string[] = Object.keys(this.noteReviewQueue.reviewDecks);
+        const reviewDeckNames: string[] = Object.keys(this._noteReviewQueue.reviewDecks);
 
         if (reviewDeckNames.length === 1) {
             this.reviewNextNote(reviewDeckNames[0]);
@@ -49,13 +53,13 @@ export class NextNoteReviewHandler {
     }
 
     async reviewNextNote(deckKey: string): Promise<void> {
-        if (!Object.prototype.hasOwnProperty.call(this.noteReviewQueue.reviewDecks, deckKey)) {
+        if (!Object.prototype.hasOwnProperty.call(this._noteReviewQueue.reviewDecks, deckKey)) {
             new Notice(t("NO_DECK_EXISTS", { deckName: deckKey }));
             return;
         }
 
         this._lastSelectedReviewDeck = deckKey;
-        const deck = this.noteReviewQueue.reviewDecks.get(deckKey);
+        const deck = this._noteReviewQueue.reviewDecks.get(deckKey);
 
         if (deck.dueNotesCount > 0) {
             const index = this.settings.openRandomNote

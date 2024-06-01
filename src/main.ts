@@ -51,7 +51,7 @@ export default class SRPlugin extends Plugin {
     private nextNoteReviewHandler: NextNoteReviewHandler;
 
     async onload(): Promise<void> {
-        console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-02-28");
+        console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-06-01");
         await this.loadPluginData();
 
         this.initLogicClasses();
@@ -68,13 +68,15 @@ export default class SRPlugin extends Plugin {
 
         const osrNoteLinkInfoFinder: ObsidianVaultNoteLinkInfoFinder = new ObsidianVaultNoteLinkInfoFinder(this.app.metadataCache);
 
-        this.osrAppCore = new OsrAppCore();
+        this.osrAppCore = new OsrAppCore(this.app);
         this.osrAppCore.init(questionPostponementList, osrNoteLinkInfoFinder, this.data.settings,
             this.onOsrVaultDataChanged.bind(this)
         );
     }
 
     private initGuiItems() {
+        this.nextNoteReviewHandler = new NextNoteReviewHandler(this.app, this.data.settings, this.app.workspace, 
+            this.osrAppCore.noteReviewQueue);
         appIcon();
 
         this.statusBar = this.addStatusBarItem();
@@ -105,6 +107,7 @@ export default class SRPlugin extends Plugin {
 
         this.addSettingTab(new SRSettingTab(this.app, this));
 
+        this.osrSidebar = new OsrSidebar(this, this.data.settings, this.nextNoteReviewHandler);
         this.app.workspace.onLayoutReady(async () => {
             await this.osrSidebar.init();
             setTimeout(async () => {

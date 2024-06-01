@@ -8,7 +8,12 @@ export class OsrAppCore extends OsrCore {
     private _syncLock = false;
 
     get syncLock(): boolean {
-        return 
+        return this._syncLock;
+    }
+
+    constructor(app: App) {
+        super();
+        this.app = app;
     }
     
     async loadVault(): Promise<void> {

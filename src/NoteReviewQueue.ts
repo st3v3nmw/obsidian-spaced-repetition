@@ -14,6 +14,13 @@ export class NoteReviewQueue {
         return this._reviewDecks;
     }
 
+    get dueNotesCount(): number {
+        let result: number = 0;
+        this._reviewDecks.forEach((reviewDeck: NoteReviewDeck) => {
+            result += reviewDeck.dueNotesCount;
+        });
+        return result;
+    }
 
     init(): void {
         this._reviewDecks = new Map<string, NoteReviewDeck>();
