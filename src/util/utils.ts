@@ -219,3 +219,21 @@ export function parseObsidianFrontmatterTag(tagStr: string): string[] {
     }
     return result;
 }
+
+/**
+ * Checks a text contains one of the given seperators.
+ * Priority: Exact match > position in text > order of input seperators
+ *
+ * @param text Text to check one of the seperators is included
+ * @param seperators The seperators to check for
+ * @returns The first seperator that is included or null if none of them included.
+ */
+export function includedSeperator(text: string, seperators: string[]): string | null {
+    // https://www.30secondsofcode.org/js/s/array-has-only-one-match-or-many/
+    const sep = seperators.filter((value) => text.includes(value));
+    if (sep.length <= 0) {
+        return null;
+    }
+    sep.sort((a, b) => (a.includes(b) || b.includes(a) ? b.length - a.length : 0));
+    return sep[0];
+}

@@ -2,6 +2,7 @@ import { YAML_FRONT_MATTER_REGEX } from "src/constants";
 import {
     extractFrontmatter,
     findLineIndexOfSearchStringIgnoringWs,
+    includedSeperator,
     literalStringReplace,
 } from "src/util/utils";
 
@@ -241,5 +242,27 @@ describe("findLineIndexOfSearchStringIgnoringWs", () => {
         ];
 
         expect(findLineIndexOfSearchStringIgnoringWs(lines, "??")).toEqual(2);
+    });
+});
+
+describe("includedSperator", () => {
+    const sep = ["::", ":::", "?", "??"];
+
+    test("No Match", () => {
+        expect(includedSeperator("Question!!Answer", sep)).toBe(null);
+        expect(includedSeperator("Question:Answer", sep)).toBe(null);
+    });
+    test("No sep", () => {
+        expect(includedSeperator("Question!!Answer", [])).toBe(null);
+    });
+    test("One Match", () => {
+        expect(includedSeperator("Question::Answer", sep)).toBe("::");
+        expect(includedSeperator("Question?Answer", sep)).toBe("?");
+    });
+    test("Multiple Match", () => {
+        expect(includedSeperator("Question::Answer?", sep)).toBe("::");
+        expect(includedSeperator("Question:::Answer::", sep)).toBe(":::");
+        expect(includedSeperator("Question??Answer::", sep)).toBe("::");
+        expect(includedSeperator("Question??Answer?", sep)).toBe("??");
     });
 });
