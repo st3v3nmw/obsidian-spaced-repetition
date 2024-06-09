@@ -303,6 +303,7 @@ export default class ContentManager {
         this.plugin.uiManager.setUIState(UIState.EditModal);
         const editModal = FlashcardEditModal.Prompt(
             this.app,
+            this.settings,
             textPrompt,
             currentQ.questionText.textDirection,
         );

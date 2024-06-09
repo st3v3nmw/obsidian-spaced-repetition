@@ -2,7 +2,8 @@ import "src/ui/obsidian-ui-components/modals/edit-modal.css";
 import { App, ButtonComponent, Modal } from "obsidian";
 
 import { t } from "src/lang/helpers";
-import { TextDirection } from "src/utils/strings";
+import { TextDirection, includedSeparator } from "src/utils/strings";
+import { SRSettings } from "src/settings";
 
 // from https://github.com/chhoumann/quickadd/blob/bce0b4cdac44b867854d6233796e3406dfd163c6/src/gui/GenericInputPrompt/GenericInputPrompt.ts#L5
 export class FlashcardEditModal extends Modal {
@@ -10,7 +11,8 @@ export class FlashcardEditModal extends Modal {
     public waitForClose: Promise<string>;
 
     public title: HTMLDivElement;
-    public textArea: HTMLTextAreaElement;
+    public textAreaFront: HTMLTextAreaElement;
+    public textAreaBack: HTMLTextAreaElement;
     public response: HTMLDivElement;
     public saveButton: ButtonComponent;
     public cancelButton: ButtonComponent;
@@ -21,22 +23,47 @@ export class FlashcardEditModal extends Modal {
     private didSaveChanges = false;
     private readonly modalText: string;
     private textDirection: TextDirection;
+    private textFront: string;
+    private textBack: string;
+    private separator: string;
+    private multilineSeparator: boolean;
 
     public static Prompt(
         app: App,
+        settings: SRSettings,
         placeholder: string,
         textDirection: TextDirection,
     ): Promise<string> {
-        const newPromptModal = new FlashcardEditModal(app, placeholder, textDirection);
+        const newPromptModal = new FlashcardEditModal(app, settings, placeholder, textDirection);
         return newPromptModal.waitForClose;
     }
 
-    constructor(app: App, existingText: string, textDirection: TextDirection) {
+    constructor(app: App, settings: SRSettings, existingText: string, textDirection: TextDirection) {
         super(app);
 
         this.modalText = existingText;
         this.changedText = existingText;
         this.textDirection = textDirection;
+
+        // Select the separator used
+        this.separator = includedSeparator(this.modalText, [
+            settings.singleLineReversedCardSeparator,
+            settings.multilineReversedCardSeparator,
+            settings.singleLineCardSeparator,
+            settings.multilineCardSeparator,
+        ]);
+        // Split Text based on the separator
+        [this.textFront, this.textBack] = this.modalText.split(this.separator);
+        // Trim leading \n for multiline
+        this.multilineSeparator = this.separator
+            ? [settings.multilineCardSeparator, settings.multilineReversedCardSeparator].contains(
+                this.separator,
+            )
+            : false;
+        if (this.multilineSeparator) {
+            this.textBack = this.textBack.trimStart();
+            this.textFront = this.textFront.trimEnd();
+        }
 
         this.waitForClose = new Promise<string>((resolve, reject) => {
             this.resolvePromise = resolve;
@@ -61,12 +88,23 @@ export class FlashcardEditModal extends Modal {
         this.title.setText(t("EDIT_CARD"));
         this.title.addClass("sr-title");
 
-        this.textArea = this.contentEl.createEl("textarea");
-        this.textArea.addClass("sr-input");
-        this.textArea.setText(this.modalText ?? "");
-        this.textArea.addEventListener("keydown", this.saveOnEnterCallback);
+        this.textAreaFront = this.contentEl.createEl("textarea");
+        this.textAreaFront.addClass("sr-input");
+        this.textAreaFront.setText(this.textFront ?? "");
+        this.textAreaFront.addEventListener("keydown", this.saveOnEnterCallback);
         if (this.textDirection === TextDirection.Rtl) {
-            this.textArea.setAttribute("dir", "rtl");
+            this.textAreaFront.setAttribute("dir", "rtl");
+        }
+
+        // Only for cards with seperator
+        if (this.separator) {
+            this.textAreaBack = this.contentEl.createEl("textarea");
+            this.textAreaBack.addClass("sr-input");
+            this.textAreaBack.setText(this.textBack ?? "");
+            this.textAreaBack.addEventListener("keydown", this.saveOnEnterCallback);
+            if (this.textDirection === TextDirection.Rtl) {
+                this.textAreaBack.setAttribute("dir", "rtl");
+            }
         }
 
         this._createResponse(this.contentEl);
@@ -78,7 +116,7 @@ export class FlashcardEditModal extends Modal {
     onOpen() {
         super.onOpen();
 
-        this.textArea.focus();
+        this.textAreaFront.focus();
     }
 
     /**
@@ -105,7 +143,19 @@ export class FlashcardEditModal extends Modal {
 
     private save() {
         this.didSaveChanges = true;
-        this.changedText = this.textArea.value;
+        this.changedText = this.textAreaFront.value;
+        if (this.separator) {
+            // New line at end of Front
+            if (this.multilineSeparator && !this.textAreaFront.value.endsWith("\n")) {
+                this.changedText += "\n";
+            }
+            this.changedText += this.separator;
+            // New line at start of Back
+            if (this.multilineSeparator && !this.textAreaBack.value.startsWith("\n")) {
+                this.changedText += "\n";
+            }
+            this.changedText += this.textAreaBack.value;
+        }
         this.close();
     }
 
@@ -119,7 +169,7 @@ export class FlashcardEditModal extends Modal {
     }
 
     private removeInputListener() {
-        this.textArea.removeEventListener("keydown", this.saveOnEnterCallback);
+        this.textAreaFront.removeEventListener("keydown", this.saveOnEnterCallback);
     }
 
     // -> Response section
