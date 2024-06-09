@@ -8,6 +8,7 @@ import {
     splitNoteIntoFrontmatterAndContent,
     splitTextIntoLineArray,
     stringTrimStart,
+    includedSeparator,
 } from "src/utils/strings";
 
 describe("escapeRegexString", () => {
@@ -739,3 +740,25 @@ function checkFindResult(text: string, searchStr: string, expectedResult: number
     const result: number = MultiLineTextFinder.find(textArray, searchArray);
     expect(result).toEqual(expectedResult);
 }
+
+describe("includedSperator", () => {
+    const sep = ["::", ":::", "?", "??"];
+
+    test("No Match", () => {
+        expect(includedSeparator("Question!!Answer", sep)).toBe(null);
+        expect(includedSeparator("Question:Answer", sep)).toBe(null);
+    });
+    test("No sep", () => {
+        expect(includedSeparator("Question!!Answer", [])).toBe(null);
+    });
+    test("One Match", () => {
+        expect(includedSeparator("Question::Answer", sep)).toBe("::");
+        expect(includedSeparator("Question?Answer", sep)).toBe("?");
+    });
+    test("Multiple Match", () => {
+        expect(includedSeparator("Question::Answer?", sep)).toBe("::");
+        expect(includedSeparator("Question:::Answer::", sep)).toBe(":::");
+        expect(includedSeparator("Question??Answer::", sep)).toBe("::");
+        expect(includedSeparator("Question??Answer?", sep)).toBe("??");
+    });
+});
