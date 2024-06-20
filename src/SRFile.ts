@@ -2,20 +2,29 @@ import {
     MetadataCache,
     TFile,
     Vault,
-    getAllTags as ObsidianGetAllTags,
     HeadingCache,
+    getAllTags as ObsidianGetAllTags,
+    TagCache,
+    FrontMatterCache,
 } from "obsidian";
-import { getAllTagsFromText } from "./util/utils";
+import { parseObsidianFrontmatterTag } from "./util/utils";
 
+// NOTE: Line numbers are zero based
 export interface ISRFile {
     get path(): string;
     get basename(): string;
-    getAllTags(): string[];
+    getAllTagsFromCache(): string[];
+    getAllTagsFromText(): TagCache[];
     getQuestionContext(cardLine: number): string[];
     read(): Promise<string>;
     write(content: string): Promise<void>;
 }
 
+// The Obsidian frontmatter cache doesn't include the line number for the specific tag.
+// We define as -1 so that we can differentiate tags within the frontmatter and tags within the content
+export const frontmatterTagPseudoLineNum: number = -1;
+
+// NOTE: Line numbers are zero based
 export class SrTFile implements ISRFile {
     file: TFile;
     vault: Vault;
@@ -35,14 +44,52 @@ export class SrTFile implements ISRFile {
         return this.file.basename;
     }
 
-    getAllTags(): string[] {
+    getAllTagsFromCache(): string[] {
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
-        return ObsidianGetAllTags(fileCachedData) || [];
+        const result: string[] = ObsidianGetAllTags(fileCachedData) || [];
+        return result;
+    }
+
+    getAllTagsFromText(): TagCache[] {
+        const result: TagCache[] = [] as TagCache[];
+        const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
+        if (fileCachedData.tags?.length > 0) {
+            // console.log(`getAllTagsFromText: tags: ${fileCachedData.tags.map((item) => `(${item.position.start.line}: ${item.tag})`).join("|")}`);
+            result.push(...fileCachedData.tags);
+        }
+
+        // RZ: 2024-01-28 fileCachedData.tags doesn't include the tags within the frontmatter, need to access those separately
+        // This is different to the Obsidian function getAllTags() which does return all tags including those within the
+        // frontmatter.
+        result.push(...this.getFrontmatterTags(fileCachedData.frontmatter));
+
+        return result;
+    }
+
+    private getFrontmatterTags(frontmatter: FrontMatterCache): TagCache[] {
+        const result: TagCache[] = [] as TagCache[];
+        const frontmatterTags: string = frontmatter != null ? frontmatter["tags"] + "" : null;
+        if (frontmatterTags) {
+            // Parse the frontmatter tag string into a list, each entry including the leading "#"
+            const tagStrList: string[] = parseObsidianFrontmatterTag(frontmatterTags);
+            for (const str of tagStrList) {
+                const tag: TagCache = {
+                    tag: str,
+                    position: {
+                        start: { line: frontmatterTagPseudoLineNum, col: null, offset: null },
+                        end: { line: frontmatterTagPseudoLineNum, col: null, offset: null },
+                    },
+                };
+                result.push(tag);
+            }
+        }
+        return result;
     }
 
     getQuestionContext(cardLine: number): string[] {
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
         const headings: HeadingCache[] = fileCachedData.headings || [];
+        // console.log(`getQuestionContext: headings: ${headings.map((item) => `(${item.position.start.line}: ${item.heading})`).join("|")}`);
         const stack: HeadingCache[] = [];
         for (const heading of headings) {
             if (heading.position.start.line > cardLine) {
@@ -70,40 +117,5 @@ export class SrTFile implements ISRFile {
 
     async write(content: string): Promise<void> {
         await this.vault.modify(this.file, content);
-    }
-}
-
-export class UnitTestSRFile implements ISRFile {
-    content: string;
-    _path: string;
-
-    constructor(content: string, path: string = null) {
-        this.content = content;
-        this._path = path;
-    }
-
-    get path(): string {
-        return this._path;
-    }
-
-    get basename(): string {
-        return "";
-    }
-
-    getAllTags(): string[] {
-        return getAllTagsFromText(this.content);
-    }
-
-    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
-    getQuestionContext(cardLine: number): string[] {
-        return [];
-    }
-
-    async read(): Promise<string> {
-        return this.content;
-    }
-
-    async write(content: string): Promise<void> {
-        this.content = content;
     }
 }
