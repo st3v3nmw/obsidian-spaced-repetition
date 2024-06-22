@@ -42,3 +42,13 @@ describe("determineScheduleInfo", () => {
     });
     
 });
+
+describe("dueNotesCount", () => {
+    test("No notes due", async () => {
+        const osrCore: UnitTestOsrCore = new UnitTestOsrCore(DEFAULT_SETTINGS);
+
+        // A.md due 2023-09-10 (in 4 days time)
+        await osrCore.loadTestVault("notes4");
+        expect(osrCore.noteReviewQueue.dueNotesCount).toEqual(1);
+    });
+});
