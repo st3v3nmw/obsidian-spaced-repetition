@@ -77,7 +77,7 @@ export function unitTest_BasicFrontmatterParserEx(text: string): Map<string, str
     const [frontmatter, _] = splitNoteIntoFrontmatterAndContent(text);
     const result = new Map<string, string[]>;
 
-    if (!frontmatter) return;
+    if (!frontmatter) return result;
 
     const keyRegex = /^([A-Za-z0-9_-]+):(.*)$/;
     const dataRegex = /^(\s+)-\s+(.+)$/;
