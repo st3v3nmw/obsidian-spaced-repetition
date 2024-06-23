@@ -20,6 +20,14 @@ export class UnitTestSRFile implements ISRFile {
         return "";
     }
 
+    get tfile(): TFile {
+        throw "Not supported";
+    }    
+
+    async getFrontmatter(): Promise<Map<string, string>> {
+        return unitTest_BasicFrontmatterParser(await this.read());
+    }
+
     getAllTagsFromCache(): string[] {
         return unitTest_GetAllTagsFromTextEx(this.content).map((item) => item.tag);
     }

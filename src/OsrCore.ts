@@ -110,7 +110,7 @@ export class OsrCore {
         // TODO:  should this move to this.loadNote
         SrsAlgorithm.getInstance().noteOnLoadedNote(noteFile.path, note, schedule?.latestEase);
 
-        const tags = noteFile.getAllTags();
+        const tags = noteFile.getAllTagsFromCache();
 
         const matchedNoteTags = SettingsUtil.filterForNoteReviewTag(this.settings, tags);
         if (matchedNoteTags.length == 0) {

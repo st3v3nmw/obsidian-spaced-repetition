@@ -49,7 +49,7 @@ export class TopicPath {
                 result = new TopicPath(deckPath);
             }
         } else {
-            const tagList: TopicPath[] = this.getTopicPathsFromTagList(noteFile.getAllTags());
+            const tagList: TopicPath[] = this.getTopicPathsFromTagList(noteFile.getAllTagsFromCache());
 
             outer: for (const tagToReview of this.getTopicPathsFromTagList(
                 settings.flashcardTags,

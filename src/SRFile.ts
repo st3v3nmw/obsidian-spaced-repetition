@@ -14,6 +14,7 @@ export interface ISRFile {
     get path(): string;
     get basename(): string;
     get tfile(): TFile;
+    getFrontmatter(): Promise<Map<string, string>>;
     getAllTagsFromCache(): string[];
     getAllTagsFromText(): TagCache[];
     getQuestionContext(cardLine: number): string[];
@@ -61,11 +62,6 @@ export class SrTFile implements ISRFile {
             result.set(key, v);
         }
         return result;
-    }
-
-    getAllTags(): string[] {
-        const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
-        return ObsidianGetAllTags(fileCachedData) || [];
     }
 
     getAllTagsFromCache(): string[] {
