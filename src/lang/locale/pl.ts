@@ -1,4 +1,4 @@
-//język polski
+// język polski
 
 export default {
     // flashcard-modal.tsx

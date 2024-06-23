@@ -1,4 +1,5 @@
 import { TagCache } from "obsidian";
+import { frontmatterTagPseudoLineNum } from "src/SRFile";
 import { splitNoteIntoFrontmatterAndContent, splitTextIntoLineArray } from "src/util/utils";
 
 export function unitTest_CreateTagCache(tag: string, lineNum: number): TagCache {
@@ -26,7 +27,7 @@ export function unitTest_GetAllTagsFromTextEx(text: string): TagCache[] {
             if (foundTagHeading) {
                 if (line.startsWith(dataPrefix)) {
                     const tagStr: string = line.substring(dataPrefix.length);
-                    result.push(unitTest_CreateTagCache("#" + tagStr, i));
+                    result.push(unitTest_CreateTagCache("#" + tagStr, frontmatterTagPseudoLineNum));
                 } else {
                     break;
                 }

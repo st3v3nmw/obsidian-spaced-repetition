@@ -4,13 +4,14 @@ import { CardType, Question } from "src/Question";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { TopicPath, TopicPathList } from "src/TopicPath";
 import { createTest_NoteQuestionParser } from "./SampleItems";
-import { ISRFile } from "src/SRFile";
+import { ISRFile, frontmatterTagPseudoLineNum } from "src/SRFile";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
 import { RepItemScheduleInfo } from "src/algorithms/base/RepItemScheduleInfo";
 import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/RepItemScheduleInfo_Osr";
 import { NoteEaseList } from "src/NoteEaseList";
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
+import { Card } from "src/Card";
 
 let parserWithDefaultSettings: NoteQuestionParser = createTest_NoteQuestionParser(DEFAULT_SETTINGS);
 let settings_ConvertFoldersToDecks: SRSettings = { ...DEFAULT_SETTINGS };
@@ -109,6 +110,57 @@ A::B
                 hasEditLaterTag: false,
                 cards: [card1],
                 hasChanged: false,
+            },
+        ];
+        expect(
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+        ).toMatchObject(expected);
+    });
+
+    test("SingleLineBasic: Multiple topics", async () => {
+        let noteText: string = `#flashcards/science #flashcards/poetry
+A::B
+    `;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        let folderTopicPath: TopicPath = TopicPath.emptyPath;
+        let expected = [
+            {
+                questionType: CardType.SingleLineBasic,
+                topicPathList: TopicPathList.fromPsv("#flashcards/science|#flashcards/poetry", 0),
+                questionText: {
+                    original: `A::B`,
+                    actualQuestion: "A::B",
+                },
+            },
+        ];
+        expect(
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+        ).toMatchObject(expected);
+    });
+
+    // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/908
+    test("SingleLineBasic: Multiple tags in note (including non-flashcard ones)", async () => {
+        let noteText: string = `---
+created: 2024-03-11 10:41
+tags:
+  - flashcards
+  - data-structure
+---
+#2024/03-11
+
+**What is a Heap?**
+?
+In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!
+    `;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        let folderTopicPath: TopicPath = TopicPath.emptyPath;
+        let expected = [
+            {
+                questionType: CardType.MultiLineBasic,
+                // Explicitly checking that #data-structure and #2024/03-11 are not included
+                topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
             },
         ];
         expect(
@@ -483,6 +535,38 @@ Q1::A1
             expect(questionList[2].topicPathList.formatPsv()).toEqual(expectedPath);
         });
 
+        // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/915#issuecomment-2017508391
+        test("Topic tag on first line after frontmatter", async () => {
+            let noteText: string = `---
+created: 2023-10-26T07:34
+---
+#flashcards/English 
+
+## taunting & teasing & irony & sarcasm
+
+Stop trying ==to milk the crowd== for sympathy. // доить толпу
+`;
+            let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+            let expectedPath: string = "#flashcards/English";
+            let folderTopicPath: TopicPath = TopicPath.emptyPath;
+            let expected = [
+                {
+                    questionType: CardType.Cloze,
+                    topicPathList: TopicPathList.fromPsv("#flashcards/English", 3), // #flashcards/English is on the 4th line, line number 3
+                    cards: [
+                        new Card({
+                            front: "Stop trying <span style='color:#2196f3'>[...]</span> for sympathy. // доить толпу",
+                            back: `Stop trying <span style='color:#2196f3'>to milk the crowd</span> for sympathy. // доить толпу`,
+                        }),
+                    ],
+                },
+            ];
+            expect(
+                await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+            ).toMatchObject(expected);
+        });
+
         test("Topic tag within question overrides the note topic, for that topic only", async () => {
             let noteText: string = `#flashcards/test
     Q1::A1
@@ -568,6 +652,149 @@ Q1::A1
             expect(questionList[0].cards.length).toEqual(1);
             expect(questionList[0].cards[0].front).toEqual("Q5");
         });
+
+        // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/915#issuecomment-2016580471
+        test("Topic tag at end of line question line (no other tags present)", async () => {
+            let noteText: string = `---
+Title: "The Taliban at war: 2001-2018"
+Authors: "Antonio Giustozzi"
+Year: 2019
+URL: 
+DOI: 
+Unique Citekey: Talibanwar20012018
+Zotero Link: zotero://select/items/@Talibanwar20012018
+---
+> [!PDF|255, 208, 0] [[The Taliban at War_ 2001 - 2018.pdf#page=10&annotation=1440R|The Taliban at War_ 2001 - 2018, page 10]]
+> > The Taliban Emirate, established in 1996, was in 2001 overthrown relatively easily by a coalition of US forces and various Afghan anti-Taliban groups. Few at the end of 2001 expected to hear again from the Taliban, except in the annals of history. Even as signs emerged in 2003 of a Taliban comeback, in the shape of an insurgency against the post-2001 Afghan government and its international sponsors, many did not take it seriously. It was hard to imagine that the Taliban would be able to mount a resilient challenge to a large-scale commitment of forces by the US and its allies.
+
+What year was the Taliban Emirate founded?::1996 #flashcards
+`;
+            let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+            let folderTopicPath: TopicPath = TopicPath.emptyPath;
+            let expected = [
+                {
+                    questionType: CardType.SingleLineBasic,
+                    topicPathList: TopicPathList.fromPsv("#flashcards", 12),
+                    cards: [
+                        new Card({
+                            front: "What year was the Taliban Emirate founded?",
+                            back: "1996 #flashcards",
+                        }),
+                    ],
+                },
+            ];
+            expect(
+                await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+            ).toMatchObject(expected);
+        });
+    });
+});
+
+describe("Questions immediately after closing line of frontmatter", () => {
+    // The frontmatter should be discarded
+    // (only the specified question text should be used)
+    test("Multi-line with question", async () => {
+        let noteText: string = `---
+created: 2024-03-11 10:41
+tags:
+  - flashcards
+  - data-structure
+---
+**What is a Heap?**
+?
+In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!
+`;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        let folderTopicPath: TopicPath = TopicPath.emptyPath;
+        let expected = [
+            {
+                questionType: CardType.MultiLineBasic,
+                // Explicitly checking that #data-structure is not included
+                topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
+                cards: [
+                    new Card({
+                        front: `**What is a Heap?**`,
+                        back: "In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!",
+                    }),
+                ],
+            },
+        ];
+        expect(
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+        ).toMatchObject(expected);
+    });
+
+    test("Multi-line without question (i.e. question is blank)", async () => {
+        let noteText: string = `---
+created: 2024-03-11 10:41
+tags:
+  - flashcards
+  - data-structure
+---
+?
+In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!
+    `;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        let folderTopicPath: TopicPath = TopicPath.emptyPath;
+        let expected = [
+            {
+                questionType: CardType.MultiLineBasic,
+                // Explicitly checking that #data-structure is not included
+                topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
+                cards: [
+                    new Card({
+                        front: "",
+                        back: "In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!",
+                    }),
+                ],
+            },
+        ];
+        expect(
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+        ).toMatchObject(expected);
+    });
+
+    test("single-line question", async () => {
+        let noteText: string = `---
+created: 2024-03-11 10:41
+tags:
+  - flashcards
+  - data-structure
+---
+In computer-science, a *heap* is::a tree-based data-structure
+A::B
+    `;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        let folderTopicPath: TopicPath = TopicPath.emptyPath;
+        let expected = [
+            {
+                questionType: CardType.SingleLineBasic,
+                topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
+                cards: [
+                    new Card({
+                        front: "In computer-science, a *heap* is",
+                        back: "a tree-based data-structure",
+                    }),
+                ],
+            },
+            {
+                questionType: CardType.SingleLineBasic,
+                topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
+                cards: [
+                    new Card({
+                        front: "A",
+                        back: "B",
+                    }),
+                ],
+            },
+        ];
+        expect(
+            await parserWithDefaultSettings.createQuestionList(noteFile, folderTopicPath, true),
+        ).toMatchObject(expected);
     });
 });
 

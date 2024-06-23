@@ -1,15 +1,10 @@
 import { Notice, Plugin, TAbstractFile, TFile, getAllTags, FrontMatterCache, WorkspaceLeaf } from "obsidian";
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, upgradeSettings, SettingsUtil } from "src/settings";
-import { FlashcardModal } from "src/gui/flashcard-modal";
-import { StatsModal } from "src/gui/stats-modal";
-import { ReviewQueueListView, REVIEW_QUEUE_VIEW_TYPE } from "src/gui/ReviewQueueListView";
-import { osrSchedule } from "src/algorithms/osr/NoteScheduling";
-import { YAML_FRONT_MATTER_REGEX, SCHEDULING_INFO_REGEX } from "src/constants";
+import {  REVIEW_QUEUE_VIEW_TYPE } from "src/gui/ReviewQueueListView";
 import { t } from "src/lang/helpers";
 import { appIcon } from "src/icons/appicon";
 import { TopicPath } from "./TopicPath";
 import { CardListType, Deck, DeckTreeFilter } from "./Deck";
-import { Stats } from "./stats";
 import {
     FlashcardReviewMode,
     FlashcardReviewSequencer as FlashcardReviewSequencer,
@@ -25,13 +20,11 @@ import {
 import { Note } from "./Note";
 import { NoteFileLoader } from "./NoteFileLoader";
 import { ISRFile, SrTFile as SrTFile } from "./SRFile";
-import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 import { QuestionPostponementList } from "./QuestionPostponementList";
 import { ReviewResponse } from "./algorithms/base/RepetitionItem";
 import { SrsAlgorithm } from "./algorithms/base/SrsAlgorithm";
 import { DataStore } from "./dataStore/base/DataStore";
 import { DataStoreAlgorithm } from "./dataStoreAlgorithm/DataStoreAlgorithm";
-import { NoteReviewQueue } from "./NoteReviewQueue";
 import { DataStoreInNote_AlgorithmOsr } from "./dataStoreAlgorithm/DataStoreInNote_AlgorithmOsr";
 import { DataStore_StoreInNote } from "./dataStore/storeInNote/DataStore_StoreInNote";
 import { SrsAlgorithm_Osr } from "./algorithms/osr/SrsAlgorithm_Osr";
@@ -40,6 +33,8 @@ import { DEFAULT_DATA, PluginData } from "./PluginData";
 import { NextNoteReviewHandler } from "./NextNoteReviewHandler";
 import { OsrSidebar } from "./gui/OsrSidebar";
 import { ObsidianVaultNoteLinkInfoFinder } from "./algorithms/osr/ObsidianVaultNoteLinkInfoFinder";
+import { StatsModal } from "./gui/StatsModal";
+import { FlashcardModal } from "./gui/FlashcardModal";
 
 
 

@@ -96,6 +96,18 @@ export function stringTrimStart(str: string): [string, string] {
     return [ws, trimmed];
 }
 
+//
+// This returns [frontmatter, content]
+//
+// The returned content has the same number of lines as the supplied str string, but with the
+// frontmatter lines (if present) blanked out.
+//
+// 1. We don't want the parser to see the frontmatter, as it would deem it to be part of a multi-line question
+// if one started on the line immediately after the "---" closing marker.
+//
+// 2. The lines are blanked out rather than deleted so that line numbers are not affected
+// e.g. for calls to getQuestionContext(cardLine: number)
+//
 export function splitNoteIntoFrontmatterAndContent(str: string): [string, string] {
     let frontmatter: string = "";
     let content: string = "";
@@ -113,12 +125,11 @@ export function splitNoteIntoFrontmatterAndContent(str: string): [string, string
 
         if (frontmatterEndLineNum) {
             const frontmatterStartLineNum: number = 0;
-            const frontmatterLineCount: number =
-                frontmatterEndLineNum - frontmatterStartLineNum + 1;
-            const frontmatterLines: string[] = lines.splice(
-                frontmatterStartLineNum,
-                frontmatterLineCount,
-            );
+            const frontmatterLines: string[] = [];
+            for (let i = frontmatterStartLineNum; i <= frontmatterEndLineNum; i++) {
+                frontmatterLines.push(lines[i]);
+                lines[i] = "";
+            }
             frontmatter = frontmatterLines.join("\n");
             content = lines.join("\n");
         }
@@ -149,4 +160,66 @@ export function findLineIndexOfSearchStringIgnoringWs(
 
 export function isSupportedFileType(path: string): boolean {
     return path.split(".").pop().toLowerCase() === "md";
+}
+
+/* 
+Prompted by flashcards being missed, here are some "experiments" with different frontmatter,
+showing the difference in the value of CachedMetadata.frontmatter["tags"]
+
+----------------- EXPERIMENT 1
+
+---
+tags:
+  - flashcards/philosophy/philosophers
+  - flashcards/toes
+---
+
+CachedMetadata.frontmatter["tags"]: flashcards/philosophy/philosophers,flashcards/toes
+
+
+----------------- EXPERIMENT 2
+
+---
+tags:
+  - "#flashcards/philosophy/philosophers"
+---
+
+CachedMetadata.frontmatter["tags"]: #flashcards/philosophy/philosophers
+
+
+----------------- EXPERIMENT 3
+
+---
+tags:
+  - "#flashcards/philosophy/philosophers"
+  - "#flashcards/toes"
+---
+
+CachedMetadata.frontmatter["tags"]: #flashcardsX/philosophy/philosophers,#flashcardsX/toes
+
+
+----------------- EXPERIMENT 4
+
+---
+tags:
+  - #flashcards/philosophy/philosophers
+---
+
+Obsidian does not recognize that the frontmatter has any tags
+(i.e. if the frontmatter includes the "#" it must be enclosed in quotes)
+
+----------------- CONCLUSION
+
+CachedMetadata.frontmatter["tags"]: tags are comma separated. They may or may not include the "#".
+Any double quotes in the frontmatter are stripped by Obsidian and not present in this variable.
+
+*/
+
+export function parseObsidianFrontmatterTag(tagStr: string): string[] {
+    const result: string[] = [] as string[];
+    const tagStrList: string[] = tagStr.split(",");
+    for (const tag of tagStrList) {
+        result.push(tag.startsWith("#") ? tag : "#" + tag);
+    }
+    return result;
 }
