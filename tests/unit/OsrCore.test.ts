@@ -241,6 +241,7 @@ describe("Notes", () => {
     describe("loadNote", () => {
         test("There is schedule info for 3 cards, but only 2 cards in the question", async () => {
             const settings: SRSettings = { ...DEFAULT_SETTINGS };
+            settings.cardCommentOnSameLine = true;
             settings.convertCurlyBracketsToClozes = true;
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
             await osrCore.loadTestVault("notes6");
