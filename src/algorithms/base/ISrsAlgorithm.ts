@@ -7,7 +7,7 @@ import { DueDateHistogram } from "src/DueDateHistogram";
 
 export interface ISrsAlgorithm {
     noteOnLoadedNote(path: string, note: Note, noteEase: number): void;
-    noteCalcNewCardSchedule(notePath: string, osrNoteGraph: OsrNoteGraph, response: ReviewResponse, dueDateNoteHistogram: DueDateHistogram): RepItemScheduleInfo;
+    noteCalcNewSchedule(notePath: string, osrNoteGraph: OsrNoteGraph, response: ReviewResponse, dueDateNoteHistogram: DueDateHistogram): RepItemScheduleInfo;
     noteCalcUpdatedSchedule(notePath: string, noteSchedule: RepItemScheduleInfo, response: ReviewResponse, dueDateNoteHistogram: DueDateHistogram): RepItemScheduleInfo;
 
     cardGetResetSchedule(): RepItemScheduleInfo;

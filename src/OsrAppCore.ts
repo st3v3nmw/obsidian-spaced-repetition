@@ -31,8 +31,6 @@ export class OsrAppCore extends OsrCore {
                     continue;
                 }
     
-                // Does the note contain any tags that are specified as flashcard tags in the settings
-                // (Doing this check first saves us from loading and parsing the note if not necessary)
                 const file: SrTFile = this.createSrTFile(noteFile);
                 await this.processFile(file);
             }

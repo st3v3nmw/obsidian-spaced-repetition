@@ -97,6 +97,10 @@ export class OsrCore {
         const schedule: RepItemScheduleInfo = await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
         let note: Note = null;
 
+        // Update the graph of links between notes
+        // (Performance note: This only requires accessing Obsidian's metadata cache and not loading the file)
+        this.osrNoteGraph.processLinks(noteFile.path);
+
         // Does the note contain any tags that are specified as flashcard tags in the settings
         // (Doing this check first saves us from loading and parsing the note if not necessary)
         const topicPath: TopicPath = this.findTopicPath(noteFile);
@@ -153,7 +157,7 @@ export class OsrCore {
         // Calculate the new/updated schedule
         let noteSchedule: RepItemScheduleInfo;
         if (originalNoteSchedule == null) {
-            noteSchedule = SrsAlgorithm.getInstance().noteCalcNewCardSchedule(noteFile.path, this.osrNoteGraph, response, this._dueDateNoteHistogram);
+            noteSchedule = SrsAlgorithm.getInstance().noteCalcNewSchedule(noteFile.path, this.osrNoteGraph, response, this._dueDateNoteHistogram);
         } else {
             noteSchedule = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(noteFile.path, originalNoteSchedule, response, this._dueDateNoteHistogram);
         }
@@ -192,7 +196,7 @@ export class OsrCore {
         const loader: NoteFileLoader = new NoteFileLoader(this.settings);
         const note: Note = await loader.load(noteFile, topicPath);
         if (note.hasChanged) {
-            note.writeNoteFile(this.settings);
+            await note.writeNoteFile(this.settings);
         }
         return note;
     }

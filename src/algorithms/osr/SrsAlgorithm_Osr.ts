@@ -28,7 +28,7 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
         return 1.0;
     }
 
-    noteCalcNewCardSchedule(notePath: string, osrNoteGraph: OsrNoteGraph, response: ReviewResponse, dueDateNoteHistogram: DueDateHistogram): RepItemScheduleInfo {
+    noteCalcNewSchedule(notePath: string, osrNoteGraph: OsrNoteGraph, response: ReviewResponse, dueDateNoteHistogram: DueDateHistogram): RepItemScheduleInfo {
         const noteLinkStat: NoteLinkStat = osrNoteGraph.calcNoteLinkStat(notePath, this.noteEaseList, this.settings);
 
         const linkContribution: number =

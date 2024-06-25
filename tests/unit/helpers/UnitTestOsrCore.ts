@@ -22,30 +22,36 @@ export class UnitTestOsrCore extends OsrCore {
 
         });
     }
-    
-    async loadTestVault(vaultSubfolder: string): Promise<void> {
 
-        this.loadInit();
+    // Needed for unit testing: Setup fileMap and the link "info finder"
+    initializeFileMap(dir: string, files: string[]): void {
         this.fileMap = new Map<string, UnitTestSRFile>();
 
-        const dir: string = path.join(__dirname, "..", "..", "vaults", vaultSubfolder);
-        const files: string[] = fs.readdirSync(dir).filter((f) => f != ".obsidian");
-
-        // Pass 1: Setup fileMap
         for (const filename of files) {
             const fullPath: string = path.join(dir, filename);
             const f: UnitTestSRFile = UnitTestSRFile.CreateFromFsFile(fullPath);
             this.fileMap.set(fullPath, f);
-            await this.processFile(f);
         }
 
-        // Analyse the links between the notes before calling finaliseLoad()
+        // Analyse the links between the notes before calling  processFile() finaliseLoad()
         this.infoFinder.init(this.fileMap);
+    }
+    
+    async loadTestVault(vaultSubfolder: string): Promise<void> {
 
-        // Pass 2: Setup osrNoteGraph (depends on infoFinder)
+        this.loadInit();
+
+        const dir: string = path.join(__dirname, "..", "..", "vaults", vaultSubfolder);
+        const files: string[] = fs.readdirSync(dir).filter((f) => f != ".obsidian");
+
+        // Pass 1
+        this.initializeFileMap(dir, files);
+        
+        // Pass 2: Process all files
         for (const filename of files) {
             const fullPath: string = path.join(dir, filename);
-            this.osrNoteGraph.processNote(fullPath);
+            const f: UnitTestSRFile = this.fileMap.get(fullPath);
+            await this.processFile(f);
         }
 
         this.finaliseLoad();

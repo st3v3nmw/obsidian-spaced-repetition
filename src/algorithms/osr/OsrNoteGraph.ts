@@ -36,7 +36,7 @@ export class OsrNoteGraph {
         graph.reset();
     }
 
-    processNote(path: string) {
+    processLinks(path: string) {
         if (this.incomingLinks[path] === undefined) {
             this.incomingLinks[path] = [];
         }
@@ -48,12 +48,13 @@ export class OsrNoteGraph {
 
             // markdown files only
             if (isSupportedFileType(targetPath)) {
+                const linkCount: number = targetLinks[targetPath];
                 this.incomingLinks[targetPath].push({
                     sourcePath: path,
-                    linkCount: targetLinks[targetPath],
+                    linkCount,
                 });
 
-                graph.link(path, targetPath, targetLinks[targetPath]);
+                graph.link(path, targetPath, linkCount);
             }
         }
     }
@@ -73,13 +74,14 @@ export class OsrNoteGraph {
         }
 
         const outgoingLinks = this.vaultNoteLinkInfoFinder.getResolvedTargetLinksForNotePath(notePath) || /* c8 ignore next */ {};
-        for (const linkedFilePath in outgoingLinks) {
-            const ease: number = noteEaseList.getEaseByPath(linkedFilePath);
+        for (const outgoingLink in outgoingLinks) {
+            const ease: number = noteEaseList.getEaseByPath(outgoingLink);
+            const linkCount: number = outgoingLinks[outgoingLink];
+            const pageRank: number = this.pageranks[outgoingLink];
             if (ease) {
-                linkTotal +=
-                    outgoingLinks[linkedFilePath] * this.pageranks[linkedFilePath] * ease;
-                linkPGTotal += this.pageranks[linkedFilePath] * outgoingLinks[linkedFilePath];
-                totalLinkCount += outgoingLinks[linkedFilePath];
+                linkTotal += linkCount * pageRank * ease;
+                linkPGTotal += pageRank * linkCount;
+                totalLinkCount += linkCount;
             }
         }
 

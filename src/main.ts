@@ -1,4 +1,4 @@
-import { Notice, Plugin, TAbstractFile, TFile, getAllTags, FrontMatterCache, WorkspaceLeaf } from "obsidian";
+import { Notice, Plugin, TAbstractFile, TFile } from "obsidian";
 import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, upgradeSettings, SettingsUtil } from "src/settings";
 import {  REVIEW_QUEUE_VIEW_TYPE } from "src/gui/ReviewQueueListView";
 import { t } from "src/lang/helpers";
@@ -46,7 +46,7 @@ export default class SRPlugin extends Plugin {
     private nextNoteReviewHandler: NextNoteReviewHandler;
 
     async onload(): Promise<void> {
-        // console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-06-22");
+        // console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-06-25 v3");
         await this.loadPluginData();
 
         this.initLogicClasses();
@@ -335,7 +335,7 @@ export default class SRPlugin extends Plugin {
 
         const now = window.moment(Date.now());
 
-        this.osrAppCore.loadVault();
+        await this.osrAppCore.loadVault();
 
         if (this.data.settings.showDebugMessages) {
             // TODO: console.log(`SR: ${t("EASES")}`, this.easeByPath.dict);
@@ -382,7 +382,7 @@ export default class SRPlugin extends Plugin {
             return;
         }
 
-        const tags = noteSrTFile.getAllTags();
+        const tags = noteSrTFile.getAllTagsFromCache();
         if (!SettingsUtil.isAnyTagANoteReviewTag(this.data.settings, tags)) {
             new Notice(t("PLEASE_TAG_NOTE"));
             return;
