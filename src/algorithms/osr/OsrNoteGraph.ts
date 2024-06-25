@@ -1,7 +1,5 @@
-import { MetadataCache } from "obsidian";
 import * as graph from "pagerank.js";
 import { INoteEaseList } from "src/NoteEaseList";
-import { SRSettings } from "src/settings";
 import { isSupportedFileType } from "src/util/utils";
 import { IOsrVaultNoteLinkInfoFinder } from "./ObsidianVaultNoteLinkInfoFinder";
 
@@ -41,10 +39,11 @@ export class OsrNoteGraph {
             this.incomingLinks[path] = [];
         }
 
-        const targetLinks = this.vaultNoteLinkInfoFinder.getResolvedTargetLinksForNotePath(path) || /* c8 ignore next */ {};
+        const targetLinks =
+            this.vaultNoteLinkInfoFinder.getResolvedTargetLinksForNotePath(path) ||
+            /* c8 ignore next */ {};
         for (const targetPath in targetLinks) {
-            if (this.incomingLinks[targetPath] === undefined)
-                this.incomingLinks[targetPath] = [];
+            if (this.incomingLinks[targetPath] === undefined) this.incomingLinks[targetPath] = [];
 
             // markdown files only
             if (isSupportedFileType(targetPath)) {
@@ -59,10 +58,10 @@ export class OsrNoteGraph {
         }
     }
 
-    calcNoteLinkStat(notePath: string, noteEaseList: INoteEaseList, settings: SRSettings): NoteLinkStat {
+    calcNoteLinkStat(notePath: string, noteEaseList: INoteEaseList): NoteLinkStat {
         let linkTotal = 0,
-        linkPGTotal = 0,
-        totalLinkCount = 0;
+            linkPGTotal = 0,
+            totalLinkCount = 0;
 
         for (const statObj of this.incomingLinks[notePath] || /* c8 ignore next */ []) {
             const ease: number = noteEaseList.getEaseByPath(statObj.sourcePath);
@@ -73,7 +72,9 @@ export class OsrNoteGraph {
             }
         }
 
-        const outgoingLinks = this.vaultNoteLinkInfoFinder.getResolvedTargetLinksForNotePath(notePath) || /* c8 ignore next */ {};
+        const outgoingLinks =
+            this.vaultNoteLinkInfoFinder.getResolvedTargetLinksForNotePath(notePath) ||
+            /* c8 ignore next */ {};
         for (const outgoingLink in outgoingLinks) {
             const ease: number = noteEaseList.getEaseByPath(outgoingLink);
             const linkCount: number = outgoingLinks[outgoingLink];
@@ -85,11 +86,7 @@ export class OsrNoteGraph {
             }
         }
 
-        const linkContribution: number =
-            settings.maxLinkFactor *
-            Math.min(1.0, Math.log(totalLinkCount + 0.5) / Math.log(64));
-
-            return {linkTotal, linkPGTotal, totalLinkCount};
+        return { linkTotal, linkPGTotal, totalLinkCount };
     }
 
     generatePageRanks() {

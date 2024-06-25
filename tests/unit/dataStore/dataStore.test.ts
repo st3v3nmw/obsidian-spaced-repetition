@@ -6,4 +6,3 @@ test("getInstance() not initialised exception", () => {
     };
     expect(t).toThrow(Error);
 });
-

@@ -1,6 +1,12 @@
 import { Notice, Plugin, TAbstractFile, TFile } from "obsidian";
-import { SRSettingTab, SRSettings, DEFAULT_SETTINGS, upgradeSettings, SettingsUtil } from "src/settings";
-import {  REVIEW_QUEUE_VIEW_TYPE } from "src/gui/ReviewQueueListView";
+import {
+    SRSettingTab,
+    SRSettings,
+    DEFAULT_SETTINGS,
+    upgradeSettings,
+    SettingsUtil,
+} from "src/settings";
+import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/ReviewQueueListView";
 import { t } from "src/lang/helpers";
 import { appIcon } from "src/icons/appicon";
 import { TopicPath } from "./TopicPath";
@@ -36,8 +42,6 @@ import { ObsidianVaultNoteLinkInfoFinder } from "./algorithms/osr/ObsidianVaultN
 import { StatsModal } from "./gui/StatsModal";
 import { FlashcardModal } from "./gui/FlashcardModal";
 
-
-
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
     public data: PluginData;
@@ -46,7 +50,7 @@ export default class SRPlugin extends Plugin {
     private nextNoteReviewHandler: NextNoteReviewHandler;
 
     async onload(): Promise<void> {
-        // console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-06-25 v3");
+        console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-06-25 v3: 878A");
         await this.loadPluginData();
 
         this.initLogicClasses();
@@ -58,20 +62,28 @@ export default class SRPlugin extends Plugin {
         const questionPostponementList: QuestionPostponementList = new QuestionPostponementList(
             this,
             this.data.settings,
-            this.data.buryList
+            this.data.buryList,
         );
 
-        const osrNoteLinkInfoFinder: ObsidianVaultNoteLinkInfoFinder = new ObsidianVaultNoteLinkInfoFinder(this.app.metadataCache);
+        const osrNoteLinkInfoFinder: ObsidianVaultNoteLinkInfoFinder =
+            new ObsidianVaultNoteLinkInfoFinder(this.app.metadataCache);
 
         this.osrAppCore = new OsrAppCore(this.app);
-        this.osrAppCore.init(questionPostponementList, osrNoteLinkInfoFinder, this.data.settings,
-            this.onOsrVaultDataChanged.bind(this)
+        this.osrAppCore.init(
+            questionPostponementList,
+            osrNoteLinkInfoFinder,
+            this.data.settings,
+            this.onOsrVaultDataChanged.bind(this),
         );
     }
 
     private initGuiItems() {
-        this.nextNoteReviewHandler = new NextNoteReviewHandler(this.app, this.data.settings, this.app.workspace, 
-            this.osrAppCore.noteReviewQueue);
+        this.nextNoteReviewHandler = new NextNoteReviewHandler(
+            this.app,
+            this.data.settings,
+            this.app.workspace,
+            this.osrAppCore.noteReviewQueue,
+        );
         appIcon();
 
         this.statusBar = this.addStatusBarItem();
@@ -91,7 +103,7 @@ export default class SRPlugin extends Plugin {
                 this.openFlashcardModal(
                     this.osrAppCore.reviewableDeckTree,
                     this.osrAppCore.remainingDeckTree,
-                    FlashcardReviewMode.Review
+                    FlashcardReviewMode.Review,
                 );
             }
         });
@@ -122,7 +134,7 @@ export default class SRPlugin extends Plugin {
                             item.setTitle(
                                 t("REVIEW_DIFFICULTY_FILE_MENU", {
                                     difficulty: this.data.settings.flashcardEasyText,
-                                })
+                                }),
                             )
                                 .setIcon("SpacedRepIcon")
                                 .onClick(() => {
@@ -134,7 +146,7 @@ export default class SRPlugin extends Plugin {
                             item.setTitle(
                                 t("REVIEW_DIFFICULTY_FILE_MENU", {
                                     difficulty: this.data.settings.flashcardGoodText,
-                                })
+                                }),
                             )
                                 .setIcon("SpacedRepIcon")
                                 .onClick(() => {
@@ -146,7 +158,7 @@ export default class SRPlugin extends Plugin {
                             item.setTitle(
                                 t("REVIEW_DIFFICULTY_FILE_MENU", {
                                     difficulty: this.data.settings.flashcardHardText,
-                                })
+                                }),
                             )
                                 .setIcon("SpacedRepIcon")
                                 .onClick(() => {
@@ -154,7 +166,7 @@ export default class SRPlugin extends Plugin {
                                 });
                         });
                     }
-                })
+                }),
             );
         }
     }
@@ -219,7 +231,7 @@ export default class SRPlugin extends Plugin {
                     this.openFlashcardModal(
                         this.osrAppCore.reviewableDeckTree,
                         this.osrAppCore.remainingDeckTree,
-                        FlashcardReviewMode.Review
+                        FlashcardReviewMode.Review,
                     );
                 }
             },
@@ -230,7 +242,11 @@ export default class SRPlugin extends Plugin {
             name: t("CRAM_ALL_CARDS"),
             callback: async () => {
                 await this.sync();
-                this.openFlashcardModal(this.osrAppCore.reviewableDeckTree, this.osrAppCore.reviewableDeckTree, FlashcardReviewMode.Cram);
+                this.openFlashcardModal(
+                    this.osrAppCore.reviewableDeckTree,
+                    this.osrAppCore.reviewableDeckTree,
+                    FlashcardReviewMode.Cram,
+                );
             },
         });
 
@@ -308,7 +324,7 @@ export default class SRPlugin extends Plugin {
             this.data.settings,
             SrsAlgorithm.getInstance(),
             this.osrAppCore.questionPostponementList,
-            this.osrAppCore.dueDateFlashcardHistogram
+            this.osrAppCore.dueDateFlashcardHistogram,
         );
 
         reviewSequencer.setDeckTree(fullDeckTree, remainingDeckTree);
@@ -353,7 +369,10 @@ export default class SRPlugin extends Plugin {
         this.statusBar.setText(
             t("STATUS_BAR", {
                 dueNotesCount: this.osrAppCore.noteReviewQueue.dueNotesCount,
-                dueFlashcardsCount: this.osrAppCore.remainingDeckTree.getCardCount(CardListType.All, true),
+                dueFlashcardsCount: this.osrAppCore.remainingDeckTree.getCardCount(
+                    CardListType.All,
+                    true,
+                ),
             }),
         );
         this.osrSidebar.redraw();
@@ -388,7 +407,7 @@ export default class SRPlugin extends Plugin {
             return;
         }
 
-        // 
+        //
         await this.osrAppCore.saveNoteReviewResponse(noteSrTFile, response, this.data.settings);
 
         new Notice(t("RESPONSE_RECEIVED"));

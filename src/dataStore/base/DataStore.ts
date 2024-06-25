@@ -1,10 +1,12 @@
 import { RepItemScheduleInfo } from "src/algorithms/base/RepItemScheduleInfo";
 import { RepItemStorageInfo } from "./RepItemStorageInfo";
 import { Question } from "src/Question";
-import { ISRFile } from "src/SRFile";
 
 export interface IDataStore {
-    questionCreateSchedule(originalQuestionText: string, storageInfo: RepItemStorageInfo): RepItemScheduleInfo[];
+    questionCreateSchedule(
+        originalQuestionText: string,
+        storageInfo: RepItemStorageInfo,
+    ): RepItemScheduleInfo[];
     questionRemoveScheduleInfo(questionText: string): string;
     questionWrite(question: Question): Promise<void>;
     questionWriteSchedule(question: Question): Promise<void>;

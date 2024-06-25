@@ -28,7 +28,11 @@ export class DeckTreeStatsCalculator {
             const card: Card = iterator.currentCard;
             if (card.hasSchedule) {
                 const schedule: RepItemScheduleInfo = card.scheduleInfo;
-                result.update(schedule.delayedBeforeReviewDaysInt(), schedule.interval, schedule.latestEase);
+                result.update(
+                    schedule.delayedBeforeReviewDaysInt(),
+                    schedule.interval,
+                    schedule.latestEase,
+                );
             } else {
                 result.incrementNew();
             }

@@ -90,7 +90,7 @@ It can occur with different materials, such as:
 (also known as triboelectricity, triboelectric charging, [[triboelectrification]], or tribocharging)
 `;
         const links: string[] = unitTest_ParseForOutgoingLinks(text);
-        const expected: string[] = ["transfer between", "triboelectrification" ];
+        const expected: string[] = ["transfer between", "triboelectrification"];
         expect(links).toEqual(expected);
     });
 
@@ -99,7 +99,7 @@ It can occur with different materials, such as:
 The triboelectric effect describes electric charge [[triboelectrification]], or [[tribocharging]])
 `;
         const links: string[] = unitTest_ParseForOutgoingLinks(text);
-        const expected: string[] = ["triboelectrification", "tribocharging" ];
+        const expected: string[] = ["triboelectrification", "tribocharging"];
         expect(links).toEqual(expected);
     });
 });
@@ -121,26 +121,29 @@ describe("UnitTestLinkInfoFinder", () => {
         linkInfoFinder.init(osrCore.getFileMap());
 
         // One link from A to each of B, C, D
-        check_getResolvedLinks("A", new Map([
-            ["B", 1], 
-            ["C", 1], 
-            ["D", 1], 
-        ]));
+        check_getResolvedLinks(
+            "A",
+            new Map([
+                ["B", 1],
+                ["C", 1],
+                ["D", 1],
+            ]),
+        );
 
         // No links from B
-        check_getResolvedLinks("B", new Map([
-        ]));
+        check_getResolvedLinks("B", new Map([]));
 
         // One link from C to D
-        check_getResolvedLinks("C", new Map([
-            ["D", 1], 
-        ]));
+        check_getResolvedLinks("C", new Map([["D", 1]]));
 
-        check_getResolvedLinks("D", new Map([
-            ["A", 1], 
-            ["B", 2], 
-        ]));
-      });
+        check_getResolvedLinks(
+            "D",
+            new Map([
+                ["A", 1],
+                ["B", 2],
+            ]),
+        );
+    });
 });
 
 function createTagCacheObj(tag: string, line: number): any {

@@ -112,7 +112,10 @@ export class NoteQuestionParser {
 
             // And if the card has been reviewed, then scheduling info as well
             let cardScheduleInfoList: RepItemScheduleInfo[] =
-            DataStore.getInstance().questionCreateSchedule(question.questionText.original, null);
+                DataStore.getInstance().questionCreateSchedule(
+                    question.questionText.original,
+                    null,
+                );
 
             // we have some extra scheduling dates to delete
             const correctLength = cardFrontBackList.length;

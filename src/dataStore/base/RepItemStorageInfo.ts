@@ -1,4 +1,1 @@
-
-export class RepItemStorageInfo {
-
-}
+export class RepItemStorageInfo {}

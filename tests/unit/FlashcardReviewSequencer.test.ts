@@ -65,7 +65,7 @@ class TestContext {
             this.settings,
             SrsAlgorithm.getInstance(),
             this.questionPostponementList,
-            this.dueDateFlashcardHistogram
+            this.dueDateFlashcardHistogram,
         );
         setupStaticDateProvider_OriginDatePlusDays(daysAfterOrigin);
 
@@ -103,11 +103,8 @@ class TestContext {
         text: string,
         fakeFilePath?: string,
     ): TestContext {
-        const settingsClone: SRSettings = {...settings};
-        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(
-            iteratorOrder,
-            null,
-        );
+        const settingsClone: SRSettings = { ...settings };
+        let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, null);
         unitTestSetup_StandardDataStoreAlgorithm(settingsClone);
         let cardPostponementList: QuestionPostponementList = new QuestionPostponementList(
             null,
@@ -121,7 +118,7 @@ class TestContext {
             settingsClone,
             SrsAlgorithm.getInstance(),
             cardPostponementList,
-            dueDateFlashcardHistogram
+            dueDateFlashcardHistogram,
         );
         var file: UnitTestSRFile = new UnitTestSRFile(text, fakeFilePath);
 

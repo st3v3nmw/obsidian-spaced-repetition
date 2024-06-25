@@ -3,10 +3,14 @@ import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/RepItemScheduleInfo_
 import { TICKS_PER_DAY } from "src/constants";
 import { DEFAULT_SETTINGS } from "src/settings";
 
-
 describe("formatCardScheduleForHtmlComment", () => {
     test("With due date", () => {
-        const repItem: RepItemScheduleInfo_Osr = RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-02", 4, 270, null);
+        const repItem: RepItemScheduleInfo_Osr = RepItemScheduleInfo_Osr.fromDueDateStr(
+            "2023-09-02",
+            4,
+            270,
+            null,
+        );
         expect(repItem.formatCardScheduleForHtmlComment()).toEqual("!2023-09-02,4,270");
     });
 
@@ -16,10 +20,10 @@ describe("formatCardScheduleForHtmlComment", () => {
     });
 });
 
-
 test("getDummyScheduleForNewCard", () => {
-        const repItem: RepItemScheduleInfo_Osr = RepItemScheduleInfo_Osr.getDummyScheduleForNewCard(DEFAULT_SETTINGS);
-        expect(repItem.interval).toEqual(1);
-        expect(repItem.latestEase).toEqual(250);
-        expect(repItem.dueDate.valueOf).toEqual(moment("2000-01-01").valueOf);
+    const repItem: RepItemScheduleInfo_Osr =
+        RepItemScheduleInfo_Osr.getDummyScheduleForNewCard(DEFAULT_SETTINGS);
+    expect(repItem.interval).toEqual(1);
+    expect(repItem.latestEase).toEqual(250);
+    expect(repItem.dueDate.valueOf).toEqual(moment("2000-01-01").valueOf);
 });

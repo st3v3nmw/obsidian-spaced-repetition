@@ -1,4 +1,3 @@
-import { App, FuzzySuggestModal, TFile } from "obsidian";
 import { t } from "src/lang/helpers";
 import { ISRFile } from "./SRFile";
 
@@ -35,4 +34,3 @@ export class NoteReviewDeck {
         });
     }
 }
-

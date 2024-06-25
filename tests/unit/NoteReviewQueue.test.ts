@@ -1,6 +1,11 @@
 import { DEFAULT_SETTINGS } from "src/settings";
 import { UnitTestOsrCore } from "./helpers/UnitTestOsrCore";
-import { DateUtil, globalDateProvider, setupStaticDateProvider, setupStaticDateProvider_20230906 } from "src/util/DateProvider";
+import {
+    DateUtil,
+    globalDateProvider,
+    setupStaticDateProvider,
+    setupStaticDateProvider_20230906,
+} from "src/util/DateProvider";
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
 import { DueDateHistogram } from "src/DueDateHistogram";
 import { NoteReviewQueue } from "src/NoteReviewQueue";
@@ -27,7 +32,7 @@ describe("determineScheduleInfo", () => {
         await osrCore.loadTestVault("notes4");
         const histogram: DueDateHistogram = osrCore.dueDateNoteHistogram;
         expect(histogram.hasEntryForDays(DueDateHistogram.dueNowNDays)).toEqual(false);
-        });
+    });
 
     test("Note A.md due today", async () => {
         const osrCore: UnitTestOsrCore = new UnitTestOsrCore(DEFAULT_SETTINGS);
@@ -40,7 +45,6 @@ describe("determineScheduleInfo", () => {
         const histogram: DueDateHistogram = osrCore.dueDateNoteHistogram;
         checkHistogramDueCardCount(histogram, 1);
     });
-    
 });
 
 describe("dueNotesCount", () => {

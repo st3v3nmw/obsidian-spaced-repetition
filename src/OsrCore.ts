@@ -2,7 +2,7 @@ import { Deck, DeckTreeFilter } from "./Deck";
 import { NoteEaseList } from "./NoteEaseList";
 import { NoteReviewQueue } from "./NoteReviewQueue";
 import { QuestionPostponementList } from "./QuestionPostponementList";
-import { ISRFile, SrTFile } from "./SRFile";
+import { ISRFile } from "./SRFile";
 import { OsrNoteGraph } from "./algorithms/osr/OsrNoteGraph";
 import { Stats } from "./stats";
 import { SRSettings, SettingsUtil } from "./settings";
@@ -15,9 +15,8 @@ import { FlashcardReviewMode } from "./FlashcardReviewSequencer";
 import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 import { NoteFileLoader } from "./NoteFileLoader";
 import { ReviewResponse } from "./algorithms/base/RepetitionItem";
-import { NextNoteReviewHandler } from "./NextNoteReviewHandler";
 import { IOsrVaultNoteLinkInfoFinder } from "./algorithms/osr/ObsidianVaultNoteLinkInfoFinder";
-import { CardDueDateHistogram, DueDateHistogram, NoteDueDateHistogram } from "./DueDateHistogram";
+import { CardDueDateHistogram, NoteDueDateHistogram } from "./DueDateHistogram";
 
 export interface IOsrVaultEvents {
     dataChanged: () => void;
@@ -74,7 +73,12 @@ export class OsrCore {
     }
     /* c8 ignore stop */
 
-    init(questionPostponementList: QuestionPostponementList, osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder, settings: SRSettings, dataChangedHandler: () => void): void {
+    init(
+        questionPostponementList: QuestionPostponementList,
+        osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder,
+        settings: SRSettings,
+        dataChangedHandler: () => void,
+    ): void {
         this.settings = settings;
         this.osrNoteLinkInfoFinder = osrNoteLinkInfoFinder;
         this.dataChangedHandler = dataChangedHandler;
@@ -92,9 +96,10 @@ export class OsrCore {
         // reset flashcards stuff
         this.fullDeckTree = new Deck("root", null);
     }
-    
+
     protected async processFile(noteFile: ISRFile): Promise<void> {
-        const schedule: RepItemScheduleInfo = await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
+        const schedule: RepItemScheduleInfo =
+            await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
         let note: Note = null;
 
         // Update the graph of links between notes
@@ -120,14 +125,14 @@ export class OsrCore {
         if (matchedNoteTags.length == 0) {
             return;
         }
-        const noteSchedule: RepItemScheduleInfo = await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
+        const noteSchedule: RepItemScheduleInfo =
+            await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
         this._noteReviewQueue.addNoteToQueue(noteFile, noteSchedule, matchedNoteTags);
     }
 
     protected finaliseLoad(): void {
-
         this.osrNoteGraph.generatePageRanks();
-        
+
         // Reviewable cards are all except those with the "edit later" tag
         this._reviewableDeckTree = DeckTreeFilter.filterForReviewableCards(this.fullDeckTree);
 
@@ -142,24 +147,41 @@ export class OsrCore {
         this._cardStats = calc.calculate(this._reviewableDeckTree);
 
         // Generate the histogram for the due dates for (1) all the notes (2) all the cards
-        this._dueDateNoteHistogram.calculateFromReviewDecksAndSort(this.noteReviewQueue.reviewDecks, this.osrNoteGraph);
+        this._dueDateNoteHistogram.calculateFromReviewDecksAndSort(
+            this.noteReviewQueue.reviewDecks,
+            this.osrNoteGraph,
+        );
         this._dueDateFlashcardHistogram.calculateFromDeckTree(this._reviewableDeckTree);
 
         // Tell the interested party that the data has changed
         if (this.dataChangedHandler) this.dataChangedHandler();
     }
 
-    async saveNoteReviewResponse(noteFile: ISRFile, response: ReviewResponse, settings: SRSettings): Promise<void> {
-
+    async saveNoteReviewResponse(
+        noteFile: ISRFile,
+        response: ReviewResponse,
+        settings: SRSettings,
+    ): Promise<void> {
         // Get the current schedule for the note (null if new note)
-        const originalNoteSchedule: RepItemScheduleInfo = await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
+        const originalNoteSchedule: RepItemScheduleInfo =
+            await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
 
         // Calculate the new/updated schedule
         let noteSchedule: RepItemScheduleInfo;
         if (originalNoteSchedule == null) {
-            noteSchedule = SrsAlgorithm.getInstance().noteCalcNewSchedule(noteFile.path, this.osrNoteGraph, response, this._dueDateNoteHistogram);
+            noteSchedule = SrsAlgorithm.getInstance().noteCalcNewSchedule(
+                noteFile.path,
+                this.osrNoteGraph,
+                response,
+                this._dueDateNoteHistogram,
+            );
         } else {
-            noteSchedule = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(noteFile.path, originalNoteSchedule, response, this._dueDateNoteHistogram);
+            noteSchedule = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(
+                noteFile.path,
+                originalNoteSchedule,
+                response,
+                this._dueDateNoteHistogram,
+            );
         }
 
         // Store away the new schedule info
@@ -169,7 +191,10 @@ export class OsrCore {
         // (This could be optimized to make the small adjustments to the histogram, but simpler to implement
         // by recalculating from scratch)
         this._noteReviewQueue.updateScheduleInfo(noteFile, noteSchedule);
-        this._dueDateNoteHistogram.calculateFromReviewDecksAndSort(this.noteReviewQueue.reviewDecks, this.osrNoteGraph);
+        this._dueDateNoteHistogram.calculateFromReviewDecksAndSort(
+            this.noteReviewQueue.reviewDecks,
+            this.osrNoteGraph,
+        );
 
         // If configured in the settings, bury all cards within the note
         await this.buryAllCardsInNote(settings, noteFile);
@@ -204,5 +229,4 @@ export class OsrCore {
     private findTopicPath(note: ISRFile): TopicPath {
         return TopicPath.getTopicPathOfFile(note, this.settings);
     }
-
 }

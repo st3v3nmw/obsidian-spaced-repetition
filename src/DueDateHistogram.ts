@@ -1,13 +1,18 @@
 import { Card } from "./Card";
 import { Deck } from "./Deck";
-import { CardOrder, DeckOrder, DeckTreeIterator, IDeckTreeIterator, IIteratorOrder } from "./DeckTreeIterator";
+import {
+    CardOrder,
+    DeckOrder,
+    DeckTreeIterator,
+    IDeckTreeIterator,
+    IIteratorOrder,
+} from "./DeckTreeIterator";
 import { NoteReviewDeck, SchedNote } from "./NoteReviewDeck";
 import { TopicPath } from "./TopicPath";
 import { RepItemScheduleInfo } from "./algorithms/base/RepItemScheduleInfo";
 import { OsrNoteGraph } from "./algorithms/osr/OsrNoteGraph";
 import { TICKS_PER_DAY } from "./constants";
 import { globalDateProvider } from "./util/DateProvider";
-
 
 export class DueDateHistogram {
     // The key for dueDatesNotes is the number of days after today
@@ -16,10 +21,10 @@ export class DueDateHistogram {
 
     // Key - # of days in future
     // Value - Count of notes due
-    dueDatesMap: Map<number, number> = new Map<number, number>;
+    dueDatesMap: Map<number, number> = new Map<number, number>();
 
     constructor(rec: Record<number, number> = null) {
-        this.dueDatesMap = new Map<number, number>;
+        this.dueDatesMap = new Map<number, number>();
         if (rec != null) {
             Object.entries(rec).forEach(([key, value]) => {
                 this.dueDatesMap.set(Number(key), value);
@@ -30,7 +35,7 @@ export class DueDateHistogram {
     get dueNotesCount(): number {
         let result: number = 0;
         if (this.dueDatesMap.has(DueDateHistogram.dueNowNDays))
-            result = this.dueDatesMap.get(DueDateHistogram.dueNowNDays)
+            result = this.dueDatesMap.get(DueDateHistogram.dueNowNDays);
         return result;
     }
 
@@ -85,9 +90,11 @@ export class DueDateHistogram {
 }
 
 export class NoteDueDateHistogram extends DueDateHistogram {
-
-    calculateFromReviewDecksAndSort(reviewDecks: Map<string, NoteReviewDeck>, osrNoteGraph: OsrNoteGraph): void {
-        this.dueDatesMap = new Map<number, number>;
+    calculateFromReviewDecksAndSort(
+        reviewDecks: Map<string, NoteReviewDeck>,
+        osrNoteGraph: OsrNoteGraph,
+    ): void {
+        this.dueDatesMap = new Map<number, number>();
 
         const today: number = globalDateProvider.today.valueOf();
         reviewDecks.forEach((reviewDeck: NoteReviewDeck) => {
@@ -97,9 +104,7 @@ export class NoteDueDateHistogram extends DueDateHistogram {
                     reviewDeck.dueNotesCount++;
                 }
 
-                const nDays: number = Math.ceil(
-                    (scheduledNote.dueUnix - today) / TICKS_PER_DAY,
-                );
+                const nDays: number = Math.ceil((scheduledNote.dueUnix - today) / TICKS_PER_DAY);
                 this.increment(nDays);
             });
 
@@ -109,10 +114,9 @@ export class NoteDueDateHistogram extends DueDateHistogram {
 }
 
 export class CardDueDateHistogram extends DueDateHistogram {
-
     calculateFromDeckTree(deckTree: Deck): void {
-        this.dueDatesMap = new Map<number, number>;
-        
+        this.dueDatesMap = new Map<number, number>();
+
         // Order doesn't matter as long as we iterate over everything
         const iteratorOrder: IIteratorOrder = {
             deckOrder: DeckOrder.PrevDeckComplete_Sequential,

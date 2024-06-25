@@ -10,7 +10,7 @@ Really worth reading [[B]], [[C]] and [[D]]
 
 # Frontmatter Determination
 
-- Initially no frontmatter
-- OSR 1.10.0
-- this note reviewed as easy
-- Plugin determined interval 4, ease 270
+-   Initially no frontmatter
+-   OSR 1.10.0
+-   this note reviewed as easy
+-   Plugin determined interval 4, ease 270

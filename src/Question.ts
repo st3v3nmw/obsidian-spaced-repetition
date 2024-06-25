@@ -1,10 +1,5 @@
 import { Card } from "./Card";
-import {
-    OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX,
-    OBSIDIAN_TAG_AT_STARTOFLINE_REGEX,
-    SR_HTML_COMMENT_BEGIN,
-    SR_HTML_COMMENT_END,
-} from "./constants";
+import { OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX, OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "./constants";
 import { DataStore } from "./dataStore/base/DataStore";
 import { DataStoreAlgorithm } from "./dataStoreAlgorithm/DataStoreAlgorithm";
 import { Note } from "./Note";
@@ -223,7 +218,8 @@ export class Question {
         const hasSchedule: boolean = this.cards.some((card) => card.hasSchedule);
         if (hasSchedule) {
             result = result.trimEnd();
-            const scheduleHtml = DataStoreAlgorithm.getInstance().questionFormatScheduleAsHtmlComment(this);
+            const scheduleHtml =
+                DataStoreAlgorithm.getInstance().questionFormatScheduleAsHtmlComment(this);
             if (blockId) {
                 if (this.isCardCommentsOnSameLine(settings))
                     result += ` ${scheduleHtml} ${blockId}`;

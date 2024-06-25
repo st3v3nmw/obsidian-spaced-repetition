@@ -1,6 +1,5 @@
 import { App, FuzzySuggestModal } from "obsidian";
 
-
 export class ReviewDeckSelectionModal extends FuzzySuggestModal<string> {
     public deckKeys: string[] = [];
     public submitCallback: (deckKey: string) => void;

@@ -15,4 +15,3 @@ export class ObsidianVaultNoteLinkInfoFinder implements IOsrVaultNoteLinkInfoFin
         return this.metadataCache.resolvedLinks[path];
     }
 }
-

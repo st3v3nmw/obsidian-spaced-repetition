@@ -66,7 +66,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         settings: SRSettings,
         srsAlgorithm: ISrsAlgorithm,
         questionPostponementList: IQuestionPostponementList,
-        dueDateFlashcardHistogram: DueDateHistogram
+        dueDateFlashcardHistogram: DueDateHistogram,
     ) {
         this.reviewMode = reviewMode;
         this.cardSequencer = cardSequencer;
@@ -152,8 +152,8 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             // Nothing to do if a user resets a new card
             this.currentCard.scheduleInfo = this.determineCardSchedule(response, this.currentCard);
 
-			// Update the source file with the updated schedule
-			await DataStore.getInstance().questionWriteSchedule(this.currentQuestion);
+            // Update the source file with the updated schedule
+            await DataStore.getInstance().questionWriteSchedule(this.currentQuestion);
         }
 
         // Move/delete the card
@@ -201,14 +201,14 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
                 result = this.srsAlgorithm.cardCalcUpdatedSchedule(
                     response,
                     card.scheduleInfo,
-                    this.dueDateFlashcardHistogram
+                    this.dueDateFlashcardHistogram,
                 );
             } else {
                 const currentNote: Note = card.question.note;
                 result = this.srsAlgorithm.cardGetNewSchedule(
                     response,
                     currentNote.filePath,
-                    this.dueDateFlashcardHistogram
+                    this.dueDateFlashcardHistogram,
                 );
             }
         }

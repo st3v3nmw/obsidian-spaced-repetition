@@ -21,7 +21,11 @@ created: 2024-01-17
 A very interesting note
 `;
         let file: UnitTestSRFile = new UnitTestSRFile(noteText);
-        const scheduleInfo: RepItemScheduleInfo_Osr = RepItemScheduleInfo_Osr.fromDueDateStr("2023-10-06", 25, 263);
+        const scheduleInfo: RepItemScheduleInfo_Osr = RepItemScheduleInfo_Osr.fromDueDateStr(
+            "2023-10-06",
+            25,
+            263,
+        );
         await instance.noteSetSchedule(file, scheduleInfo);
 
         const expectedText: string = `---
@@ -34,7 +38,6 @@ A very interesting note
 `;
         expect(file.content).toEqual(expectedText);
     });
-
 });
 
 describe("formatCardSchedule", () => {
@@ -42,9 +45,13 @@ describe("formatCardSchedule", () => {
         const settings: SRSettings = { ...DEFAULT_SETTINGS };
         const instance: DataStoreInNote_AlgorithmOsr = new DataStoreInNote_AlgorithmOsr(settings);
 
-        const scheduleInfo: RepItemScheduleInfo_Osr = RepItemScheduleInfo_Osr.fromDueDateStr("2023-10-06", 25, 263);
+        const scheduleInfo: RepItemScheduleInfo_Osr = RepItemScheduleInfo_Osr.fromDueDateStr(
+            "2023-10-06",
+            25,
+            263,
+        );
         const card: Card = new Card({
-            scheduleInfo
+            scheduleInfo,
         });
         expect(instance.formatCardSchedule(card)).toEqual("!2023-10-06,25,263");
     });
@@ -53,11 +60,15 @@ describe("formatCardSchedule", () => {
         const settings: SRSettings = { ...DEFAULT_SETTINGS };
         const instance: DataStoreInNote_AlgorithmOsr = new DataStoreInNote_AlgorithmOsr(settings);
 
-        const scheduleInfo: RepItemScheduleInfo_Osr = new RepItemScheduleInfo_Osr(null, 25, 303, null);
+        const scheduleInfo: RepItemScheduleInfo_Osr = new RepItemScheduleInfo_Osr(
+            null,
+            25,
+            303,
+            null,
+        );
         const card: Card = new Card({
-            scheduleInfo
+            scheduleInfo,
         });
         expect(instance.formatCardSchedule(card)).toEqual("!2000-01-01,25,303");
     });
-
 });

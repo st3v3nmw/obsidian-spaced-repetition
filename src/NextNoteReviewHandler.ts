@@ -18,14 +18,19 @@ export class NextNoteReviewHandler {
     get noteReviewQueue(): NoteReviewQueue {
         return this._noteReviewQueue;
     }
-    
-    constructor(app: App, settings: SRSettings, workspace: Workspace, noteReviewQueue: NoteReviewQueue) {
+
+    constructor(
+        app: App,
+        settings: SRSettings,
+        workspace: Workspace,
+        noteReviewQueue: NoteReviewQueue,
+    ) {
         this.app = app;
         this.settings = settings;
         this.workspace = workspace;
         this._noteReviewQueue = noteReviewQueue;
     }
-   
+
     async autoReviewNextNote(): Promise<void> {
         if (this.settings.autoNextNote) {
             if (!this._lastSelectedReviewDeck) {
@@ -73,7 +78,7 @@ export class NextNoteReviewHandler {
             const index = this.settings.openRandomNote
                 ? Math.floor(Math.random() * deck.newNotes.length)
                 : 0;
-                await this.openNote(deckKey, deck.newNotes[index].tfile);
+            await this.openNote(deckKey, deck.newNotes[index].tfile);
             return;
         }
 

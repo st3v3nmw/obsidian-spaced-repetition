@@ -117,9 +117,12 @@ export class SettingsUtil {
 
     static isAnyTagANoteReviewTag(settings: SRSettings, tags: string[]): boolean {
         for (const tag of tags) {
-            if (settings.tagsToReview.some(
-                (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/"))) {
-                    return true;
+            if (
+                settings.tagsToReview.some(
+                    (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/"),
+                )
+            ) {
+                return true;
             }
         }
         return false;
@@ -160,13 +163,14 @@ export class SRSettingTab extends PluginSettingTab {
         super(app, plugin);
         this.plugin = plugin;
     }
-    
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     hide(): any {
-        console.log(`SRSettingTab: hide()`);
+        console.log("SRSettingTab: hide()");
     }
 
     display(): void {
-        console.log(`SRSettingTab: display()`);
+        console.log("SRSettingTab: display()");
         const { containerEl } = this;
 
         containerEl.empty();

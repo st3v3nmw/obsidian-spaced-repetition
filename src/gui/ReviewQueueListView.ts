@@ -4,19 +4,23 @@ import { NoteReviewDeck } from "src/NoteReviewDeck";
 import { t } from "src/lang/helpers";
 import { NoteReviewQueue } from "src/NoteReviewQueue";
 import { SRSettings } from "src/settings";
-import { SrTFile } from "src/SRFile";
 import { NextNoteReviewHandler } from "src/NextNoteReviewHandler";
 
 export const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
 
 export class ReviewQueueListView extends ItemView {
     private get noteReviewQueue(): NoteReviewQueue {
-        return this.nextNoteReviewHandler.noteReviewQueue
-    };
+        return this.nextNoteReviewHandler.noteReviewQueue;
+    }
     private settings: SRSettings;
     private nextNoteReviewHandler: NextNoteReviewHandler;
 
-    constructor(leaf: WorkspaceLeaf, app: App, nextNoteReviewHandler: NextNoteReviewHandler, settings: SRSettings) {
+    constructor(
+        leaf: WorkspaceLeaf,
+        app: App,
+        nextNoteReviewHandler: NextNoteReviewHandler,
+        settings: SRSettings,
+    ) {
         super(leaf);
 
         this.nextNoteReviewHandler = nextNoteReviewHandler;
@@ -48,15 +52,12 @@ export class ReviewQueueListView extends ItemView {
     }
 
     public redraw(): void {
-
         const activeFile: TFile | null = this.app.workspace.getActiveFile();
 
         const rootEl: HTMLElement = createDiv("nav-folder mod-root");
         const childrenEl: HTMLElement = rootEl.createDiv("nav-folder-children");
 
-        let deck: NoteReviewDeck;
-        for (let [ deckKey, deck ] of this.noteReviewQueue.reviewDecks) {
-
+        for (const [deckKey, deck] of this.noteReviewQueue.reviewDecks) {
             const deckCollapsed = !deck.activeFolders.has(deck.deckName);
 
             const deckFolderEl: HTMLElement = this.createRightPaneFolder(

@@ -87,10 +87,7 @@ A::B
 
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
         let delayDays = 3 - 6;
-        let scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr(
-                "2023-09-03",
-                1,
-                230);
+        let scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-03", 1, 230);
         scheduleInfo.delayedBeforeReviewTicks = delayDays * TICKS_PER_DAY;
         let card1 = {
             cardIdx: 0,
@@ -216,15 +213,12 @@ A::B ^d7cee0
 
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
         let delayDays = 3 - 6;
-        let scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr(
-                "2023-09-03",
-                1,
-                230);
+        let scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-03", 1, 230);
         scheduleInfo.delayedBeforeReviewTicks = delayDays * TICKS_PER_DAY;
 
         let card1 = {
             cardIdx: 0,
-            scheduleInfo
+            scheduleInfo,
         };
         let expected = [
             {
@@ -261,14 +255,11 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
 
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
         let delayDays = 3 - 6;
-        let scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr(
-            "2023-09-03",
-            1,
-            230);
+        let scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-03", 1, 230);
         scheduleInfo.delayedBeforeReviewTicks = delayDays * TICKS_PER_DAY;
         let card1 = {
             cardIdx: 0,
-            scheduleInfo
+            scheduleInfo,
         };
         let expected = [
             {
@@ -304,14 +295,11 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
 
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
         let delayDays = 3 - 6;
-        let scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr(
-            "2023-09-03",
-            1,
-            230);
+        let scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-03", 1, 230);
         scheduleInfo.delayedBeforeReviewTicks = delayDays * TICKS_PER_DAY;
         let card1 = {
             cardIdx: 0,
-            scheduleInfo
+            scheduleInfo,
         };
         let expected = [
             {

@@ -4,8 +4,6 @@ import { ReviewResponse } from "../base/RepetitionItem";
 import { DueDateHistogram } from "src/DueDateHistogram";
 import { TICKS_PER_DAY } from "src/constants";
 
-
-
 // Note that if dueDateHistogram is provided, then it is just used to assist with fuzzing.
 // (Unlike earlier versions, it is not updated based on the calculated schedule. The
 // caller needs to do that if needed.
@@ -16,7 +14,7 @@ export function osrSchedule(
     ease: number,
     delayedBeforeReview: number,
     settingsObj: SRSettings,
-    dueDateHistogram?: DueDateHistogram
+    dueDateHistogram?: DueDateHistogram,
 ): Record<string, number> {
     const delayedBeforeReviewDays = Math.max(0, Math.floor(delayedBeforeReview / TICKS_PER_DAY));
     let interval: number = originalInterval;

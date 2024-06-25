@@ -1,4 +1,4 @@
-import { App, TFile, Vault } from "obsidian";
+import { App, TFile } from "obsidian";
 import { SrTFile } from "./SRFile";
 import { OsrCore } from "./OsrCore";
 import { SettingsUtil } from "./settings";
@@ -15,7 +15,7 @@ export class OsrAppCore extends OsrCore {
         super();
         this.app = app;
     }
-    
+
     async loadVault(): Promise<void> {
         if (this._syncLock) {
             return;
@@ -30,7 +30,7 @@ export class OsrAppCore extends OsrCore {
                 if (SettingsUtil.isPathInNoteIgnoreFolder(this.settings, noteFile.path)) {
                     continue;
                 }
-    
+
                 const file: SrTFile = this.createSrTFile(noteFile);
                 await this.processFile(file);
             }
@@ -38,11 +38,10 @@ export class OsrAppCore extends OsrCore {
             this.finaliseLoad();
         } finally {
             this._syncLock = false;
-        }        
+        }
     }
-    
+
     createSrTFile(note: TFile): SrTFile {
         return new SrTFile(this.app.vault, this.app.metadataCache, note);
     }
-
 }

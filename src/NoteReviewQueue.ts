@@ -1,11 +1,6 @@
-import { App, Notice, Workspace } from "obsidian";
-import { DueDateHistogram } from "./DueDateHistogram";
-import { NoteReviewDeck, SchedNote } from "./NoteReviewDeck";
+import { NoteReviewDeck } from "./NoteReviewDeck";
 import { ISRFile } from "./SRFile";
 import { RepItemScheduleInfo } from "./algorithms/base/RepItemScheduleInfo";
-import { OsrNoteGraph } from "./algorithms/osr/OsrNoteGraph";
-import { globalDateProvider } from "./util/DateProvider";
-import { SRSettings } from "./settings";
 
 export class NoteReviewQueue {
     private _reviewDecks: Map<string, NoteReviewDeck>;
@@ -26,7 +21,11 @@ export class NoteReviewQueue {
         this._reviewDecks = new Map<string, NoteReviewDeck>();
     }
 
-    addNoteToQueue(noteFile: ISRFile, noteSchedule: RepItemScheduleInfo, matchedNoteTags: string[]): void {
+    addNoteToQueue(
+        noteFile: ISRFile,
+        noteSchedule: RepItemScheduleInfo,
+        matchedNoteTags: string[],
+    ): void {
         for (const matchedNoteTag of matchedNoteTags) {
             if (!this.reviewDecks.has(matchedNoteTag)) {
                 this.reviewDecks.set(matchedNoteTag, new NoteReviewDeck(matchedNoteTag));
@@ -39,11 +38,12 @@ export class NoteReviewQueue {
         } else {
             // schedule the note
             for (const matchedNoteTag of matchedNoteTags) {
-                this.reviewDecks.get(matchedNoteTag).scheduledNotes.push({ note: noteFile, dueUnix: noteSchedule.dueDateAsUnix });
+                this.reviewDecks
+                    .get(matchedNoteTag)
+                    .scheduledNotes.push({ note: noteFile, dueUnix: noteSchedule.dueDateAsUnix });
             }
         }
     }
-    
 
     updateScheduleInfo(note: ISRFile, scheduleInfo: RepItemScheduleInfo): void {
         this.reviewDecks.forEach((reviewDeck: NoteReviewDeck) => {
@@ -65,6 +65,5 @@ export class NoteReviewQueue {
                 reviewDeck.scheduledNotes.push({ note, dueUnix: scheduleInfo.dueDate.valueOf() });
             }
         });
-
     }
 }

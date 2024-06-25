@@ -19,9 +19,11 @@ test("No schedule info for question", () => {
 });
 
 test("Single schedule info for question (on separate line)", () => {
-    let actual: RepItemScheduleInfo[] =
-        DataStore.getInstance().questionCreateSchedule(`What symbol represents an electric field:: $\\large \\vec E$
-<!--SR:!2023-09-02,4,270-->`, null);
+    let actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+        `What symbol represents an electric field:: $\\large \\vec E$
+<!--SR:!2023-09-02,4,270-->`,
+        null,
+    );
 
     expect(actual).toEqual([
         RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-02", 4, 270, -4 * TICKS_PER_DAY),
@@ -29,9 +31,10 @@ test("Single schedule info for question (on separate line)", () => {
 });
 
 test("Single schedule info for question (on same line)", () => {
-    let actual: RepItemScheduleInfo[] =
-        DataStore.getInstance().questionCreateSchedule(
-            `What symbol represents an electric field:: $\\large \\vec E$<!--SR:!2023-09-02,4,270-->`, null);
+    let actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+        `What symbol represents an electric field:: $\\large \\vec E$<!--SR:!2023-09-02,4,270-->`,
+        null,
+    );
 
     expect(actual).toEqual([
         RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-02", 4, 270, -4 * TICKS_PER_DAY),
@@ -39,10 +42,11 @@ test("Single schedule info for question (on same line)", () => {
 });
 
 test("Multiple schedule info for question (on separate line)", () => {
-    let actual: RepItemScheduleInfo[] =
-        DataStore.getInstance().questionCreateSchedule(
-`This is a really very ==interesting== and ==fascinating== and ==great== test
-    <!--SR:!2023-09-03,1,230!2023-09-05,3,250!2023-09-06,4,270-->`, null);
+    let actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+        `This is a really very ==interesting== and ==fascinating== and ==great== test
+    <!--SR:!2023-09-03,1,230!2023-09-05,3,250!2023-09-06,4,270-->`,
+        null,
+    );
 
     expect(actual).toEqual([
         RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-03", 1, 230, -3 * TICKS_PER_DAY),

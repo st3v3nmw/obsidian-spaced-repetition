@@ -12,11 +12,18 @@ import { unitTest_CheckNoteFrontmatter } from "./helpers/UnitTestHelper";
 import { DueDateHistogram, NoteDueDateHistogram } from "src/DueDateHistogram";
 import { ISRFile } from "src/SRFile";
 
-function checkDeckTreeCounts(osrCore: UnitTestOsrCore, expectedReviewableCount: number, expectedRemainingCount: number): void {
-    expect(osrCore.reviewableDeckTree.getCardCount(CardListType.All, true)).toEqual(expectedReviewableCount);
-    expect(osrCore.remainingDeckTree.getCardCount(CardListType.All, true)).toEqual(expectedRemainingCount);
+function checkDeckTreeCounts(
+    osrCore: UnitTestOsrCore,
+    expectedReviewableCount: number,
+    expectedRemainingCount: number,
+): void {
+    expect(osrCore.reviewableDeckTree.getCardCount(CardListType.All, true)).toEqual(
+        expectedReviewableCount,
+    );
+    expect(osrCore.remainingDeckTree.getCardCount(CardListType.All, true)).toEqual(
+        expectedRemainingCount,
+    );
 }
-
 
 function checkNoteReviewDeck_Basic(actual: NoteReviewDeck, expected: any): void {
     expect(actual.deckName).toEqual(expected.deckName);
@@ -56,10 +63,10 @@ describe("Notes", () => {
             // Single deck "#review", with single new note "Computation Graph.md"
             const actual: NoteReviewDeck = osrCore.noteReviewQueue.reviewDecks.get("#review");
             checkNoteReviewDeck_Basic(actual, {
-                deckName: "#review", 
-                dueNotesCount: 0, 
-                newNotesLength: 1, 
-                scheduledNotesLength: 0
+                deckName: "#review",
+                dueNotesCount: 0,
+                newNotesLength: 1,
+                scheduledNotesLength: 0,
             });
             expect(actual.newNotes[0].path.endsWith("Computation Graph.md")).toBeTruthy();
         });
@@ -71,19 +78,19 @@ describe("Notes", () => {
             expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
             expect(osrCore.noteReviewQueue.reviewDecks.size).toEqual(1);
 
-            // Single deck "#review", with single scheduled note "Triboelectric Effect.md", 
+            // Single deck "#review", with single scheduled note "Triboelectric Effect.md",
             const actual: NoteReviewDeck = osrCore.noteReviewQueue.reviewDecks.get("#review");
             checkNoteReviewDeck_Basic(actual, {
-                deckName: "#review", 
-                dueNotesCount: 0, 
-                newNotesLength: 0, 
-                scheduledNotesLength: 1
+                deckName: "#review",
+                dueNotesCount: 0,
+                newNotesLength: 0,
+                scheduledNotesLength: 1,
             });
             checkScheduledNote(actual.scheduledNotes[0], {
-                filename: "Triboelectric Effect.md", 
-                dueDate: "2025-02-21"
+                filename: "Triboelectric Effect.md",
+                dueDate: "2025-02-21",
             });
-        });    
+        });
     });
 
     describe("Review New note (i.e. not previously reviewed); no questions present", () => {
@@ -124,7 +131,7 @@ describe("Notes", () => {
             // See: tests\vaults\readme.md
             await osrCore.loadTestVault("notes4");
 
-            // Review note B 
+            // Review note B
             const file = osrCore.getFileByNoteName("B");
             await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
 
@@ -150,7 +157,7 @@ describe("Notes", () => {
             });
             expect(osrCore.dueDateNoteHistogram).toEqual(expectedHistogram);
 
-            // Review note A 
+            // Review note A
             const file = osrCore.getFileByNoteName("A");
             await osrCore.saveNoteReviewResponse(file, ReviewResponse.Good, settings);
 
@@ -163,7 +170,6 @@ describe("Notes", () => {
                 11: 1,
             });
             expect(osrCore.dueDateNoteHistogram).toEqual(expectedHistogram);
-            
         });
 
         test("Review note with a backlink - Hard", async () => {
@@ -174,7 +180,7 @@ describe("Notes", () => {
             // See: tests/vaults/notes4/readme.md
             await osrCore.loadTestVault("notes4");
 
-            // Review note A 
+            // Review note A
             const file = osrCore.getFileByNoteName("A");
             await osrCore.saveNoteReviewResponse(file, ReviewResponse.Hard, settings);
 
@@ -222,7 +228,7 @@ describe("Notes", () => {
             // See: tests\vaults\readme.md
             await osrCore.loadTestVault("notes4");
 
-            // Review note B 
+            // Review note B
             const file = osrCore.getFileByNoteName("B");
             await osrCore.saveNoteReviewResponse(file, ReviewResponse.Easy, settings);
 
@@ -286,7 +292,7 @@ describe("Note Due Date Histogram", () => {
         });
         expect(osrCore.dueDateNoteHistogram).toEqual(expectedHistogram);
 
-        // Review note A 
+        // Review note A
         const file = osrCore.getFileByNoteName("A");
         await osrCore.saveNoteReviewResponse(file, ReviewResponse.Good, settings);
 
@@ -295,7 +301,6 @@ describe("Note Due Date Histogram", () => {
             11: 1,
         });
         expect(osrCore.dueDateNoteHistogram).toEqual(expectedHistogram);
-        
     });
 
     test("Review multiple notes", async () => {
@@ -323,9 +328,7 @@ describe("Note Due Date Histogram", () => {
             11: 1,
         });
         expect(osrCore.dueDateNoteHistogram).toEqual(expectedHistogram);
-        
     });
-
 });
 
 describe("Note review - bury all flashcards", () => {

@@ -18,7 +18,7 @@ export class UnitTestLinkInfoFinder implements IOsrVaultNoteLinkInfoFinder {
             this.linkPathMap.set(path.parse(filePath).name, filePath);
         });
 
-        // 
+        //
         this.outgoingLinks = new Map<string, Map<string, number>>();
         fileMap.forEach((file, sourceFilename) => {
             // Find all the (outgoing) links present in the file
@@ -38,7 +38,7 @@ export class UnitTestLinkInfoFinder implements IOsrVaultNoteLinkInfoFinder {
         if (!this.outgoingLinks.has(sourceFilename)) {
             this.outgoingLinks.set(sourceFilename, new Map<string, number>());
         }
-        const rec = this.outgoingLinks.get(sourceFilename)
+        const rec = this.outgoingLinks.get(sourceFilename);
         if (!rec.has(targetFilename)) {
             rec.set(targetFilename, 0);
         }
@@ -58,12 +58,11 @@ export class UnitTestLinkInfoFinder implements IOsrVaultNoteLinkInfoFinder {
     getResolvedTargetLinksForNotePath(sourcePath: string): Record<string, number> {
         let result: Record<string, number> = {};
         if (this.outgoingLinks.has(sourcePath)) {
-            const rec = this.outgoingLinks.get(sourcePath)
+            const rec = this.outgoingLinks.get(sourcePath);
             rec.forEach((n, filename) => {
                 result[filename] = n;
             });
         }
         return result;
     }
-
 }

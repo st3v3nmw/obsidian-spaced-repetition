@@ -1,4 +1,3 @@
-import { Moment } from "moment";
 import { RepItemScheduleInfo } from "src/algorithms/base/RepItemScheduleInfo";
 import { RepItemStorageInfo } from "src/dataStore/base/RepItemStorageInfo";
 
@@ -8,7 +7,10 @@ export enum ReviewResponse {
     Hard,
     Reset,
 }
-export enum RepetitionPhase { New, Review };
+export enum RepetitionPhase {
+    New,
+    Review,
+}
 
 export class RepetitionItem {
     repetitionPhase: RepetitionPhase;

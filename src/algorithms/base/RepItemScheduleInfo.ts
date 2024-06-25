@@ -12,7 +12,7 @@ export abstract class RepItemScheduleInfo {
     get dueDateAsUnix(): number {
         return this.dueDate.valueOf();
     }
-    
+
     isDue(): boolean {
         return this.dueDate && this.dueDate.isSameOrBefore(globalDateProvider.today);
     }
@@ -24,7 +24,6 @@ export abstract class RepItemScheduleInfo {
     delayedBeforeReviewDaysInt(): number {
         return Math.max(0, Math.floor(this.delayedBeforeReviewTicks / TICKS_PER_DAY));
     }
-
 
     abstract formatCardScheduleForHtmlComment(): string;
 }

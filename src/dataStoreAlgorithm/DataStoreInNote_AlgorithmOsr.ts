@@ -4,18 +4,24 @@ import { RepItemScheduleInfo } from "src/algorithms/base/RepItemScheduleInfo";
 import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/RepItemScheduleInfo_Osr";
 import { Moment } from "moment";
 import moment from "moment";
-import { ALLOWED_DATE_FORMATS, SCHEDULING_INFO_REGEX, SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END, YAML_FRONT_MATTER_REGEX } from "src/constants";
+import {
+    ALLOWED_DATE_FORMATS,
+    SCHEDULING_INFO_REGEX,
+    SR_HTML_COMMENT_BEGIN,
+    SR_HTML_COMMENT_END,
+    YAML_FRONT_MATTER_REGEX,
+} from "src/constants";
 import { formatDate_YYYY_MM_DD } from "src/util/utils";
 import { Question } from "src/Question";
 import { Card } from "src/Card";
 import { SRSettings } from "src/settings";
 
-// 
+//
 // Algorithm: The original OSR algorithm
 //      (RZ: Perhaps not the original algorithm, but the only one available in 2023/early 2024)
-// 
+//
 // Data Store: With data stored in the note's markdown file
-// 
+//
 export class DataStoreInNote_AlgorithmOsr implements IDataStoreAlgorithm {
     private settings: SRSettings;
 
@@ -27,7 +33,12 @@ export class DataStoreInNote_AlgorithmOsr implements IDataStoreAlgorithm {
         let result: RepItemScheduleInfo = null;
         const frontmatter: Map<string, string> = await note.getFrontmatter();
 
-        if (frontmatter && frontmatter.has("sr-due") && frontmatter.has("sr-interval") && frontmatter.has("sr-ease")) {
+        if (
+            frontmatter &&
+            frontmatter.has("sr-due") &&
+            frontmatter.has("sr-interval") &&
+            frontmatter.has("sr-ease")
+        ) {
             const dueDate: Moment = moment(frontmatter.get("sr-due"), ALLOWED_DATE_FORMATS);
             const interval: number = parseFloat(frontmatter.get("sr-interval"));
             const ease: number = parseFloat(frontmatter.get("sr-ease"));
@@ -85,12 +96,13 @@ export class DataStoreInNote_AlgorithmOsr implements IDataStoreAlgorithm {
         let result: string;
         if (card.hasSchedule) {
             const schedule = card.scheduleInfo as RepItemScheduleInfo_Osr;
-            const dateStr = schedule.dueDate ? formatDate_YYYY_MM_DD(schedule.dueDate) : RepItemScheduleInfo_Osr.dummyDueDateForNewCard;
+            const dateStr = schedule.dueDate
+                ? formatDate_YYYY_MM_DD(schedule.dueDate)
+                : RepItemScheduleInfo_Osr.dummyDueDateForNewCard;
             result = `!${dateStr},${schedule.interval},${schedule.latestEase}`;
         } else {
             result = `!${RepItemScheduleInfo_Osr.dummyDueDateForNewCard},${RepItemScheduleInfo_Osr.initialInterval},${this.settings.baseEase}`;
         }
         return result;
     }
-
 }

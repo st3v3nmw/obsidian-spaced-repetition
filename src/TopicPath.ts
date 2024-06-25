@@ -49,7 +49,9 @@ export class TopicPath {
                 result = new TopicPath(deckPath);
             }
         } else {
-            const tagList: TopicPath[] = this.getTopicPathsFromTagList(noteFile.getAllTagsFromCache());
+            const tagList: TopicPath[] = this.getTopicPathsFromTagList(
+                noteFile.getAllTagsFromCache(),
+            );
 
             outer: for (const tagToReview of this.getTopicPathsFromTagList(
                 settings.flashcardTags,
@@ -87,7 +89,7 @@ export class TopicPath {
         }
         return result;
     }
-    
+
     static isValidTag(tag: string): boolean {
         if (tag == null || tag.length == 0) return false;
         if (tag[0] != "#") return false;

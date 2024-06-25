@@ -7,21 +7,42 @@ const emptyHistogram = new DueDateHistogram();
 
 test("Test reviewing with default settings", () => {
     expect(
-        osrSchedule(ReviewResponse.Easy, 1, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, emptyHistogram),
+        osrSchedule(
+            ReviewResponse.Easy,
+            1,
+            DEFAULT_SETTINGS.baseEase,
+            0,
+            DEFAULT_SETTINGS,
+            emptyHistogram,
+        ),
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase + 20,
         interval: 4,
     });
 
     expect(
-        osrSchedule(ReviewResponse.Good, 1, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, emptyHistogram),
+        osrSchedule(
+            ReviewResponse.Good,
+            1,
+            DEFAULT_SETTINGS.baseEase,
+            0,
+            DEFAULT_SETTINGS,
+            emptyHistogram,
+        ),
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
         interval: 3,
     });
 
     expect(
-        osrSchedule(ReviewResponse.Hard, 1, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, emptyHistogram),
+        osrSchedule(
+            ReviewResponse.Hard,
+            1,
+            DEFAULT_SETTINGS.baseEase,
+            0,
+            DEFAULT_SETTINGS,
+            emptyHistogram,
+        ),
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase - 20,
         interval: 1,
@@ -31,21 +52,42 @@ test("Test reviewing with default settings", () => {
 test("Test reviewing with default settings & delay", () => {
     const delay = 2 * 24 * 3600 * 1000; // two day delay
     expect(
-        osrSchedule(ReviewResponse.Easy, 10, DEFAULT_SETTINGS.baseEase, delay, DEFAULT_SETTINGS, emptyHistogram),
+        osrSchedule(
+            ReviewResponse.Easy,
+            10,
+            DEFAULT_SETTINGS.baseEase,
+            delay,
+            DEFAULT_SETTINGS,
+            emptyHistogram,
+        ),
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase + 20,
         interval: 42,
     });
 
     expect(
-        osrSchedule(ReviewResponse.Good, 10, DEFAULT_SETTINGS.baseEase, delay, DEFAULT_SETTINGS, emptyHistogram),
+        osrSchedule(
+            ReviewResponse.Good,
+            10,
+            DEFAULT_SETTINGS.baseEase,
+            delay,
+            DEFAULT_SETTINGS,
+            emptyHistogram,
+        ),
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
         interval: 28,
     });
 
     expect(
-        osrSchedule(ReviewResponse.Hard, 10, DEFAULT_SETTINGS.baseEase, delay, DEFAULT_SETTINGS, emptyHistogram),
+        osrSchedule(
+            ReviewResponse.Hard,
+            10,
+            DEFAULT_SETTINGS.baseEase,
+            delay,
+            DEFAULT_SETTINGS,
+            emptyHistogram,
+        ),
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase - 20,
         interval: 5,
@@ -60,7 +102,14 @@ test("Test load balancing, small interval (load balancing disabled)", () => {
         3: 4,
     });
     expect(
-        osrSchedule(ReviewResponse.Good, 1, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates),
+        osrSchedule(
+            ReviewResponse.Good,
+            1,
+            DEFAULT_SETTINGS.baseEase,
+            0,
+            DEFAULT_SETTINGS,
+            dueDates,
+        ),
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
         interval: 3,
@@ -79,7 +128,14 @@ test("Test load balancing", () => {
         5: 2,
     });
     expect(
-        osrSchedule(ReviewResponse.Good, 2, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates),
+        osrSchedule(
+            ReviewResponse.Good,
+            2,
+            DEFAULT_SETTINGS.baseEase,
+            0,
+            DEFAULT_SETTINGS,
+            dueDates,
+        ),
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
         interval: 4,
@@ -90,7 +146,14 @@ test("Test load balancing", () => {
         25: 2,
     });
     expect(
-        osrSchedule(ReviewResponse.Good, 10, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates),
+        osrSchedule(
+            ReviewResponse.Good,
+            10,
+            DEFAULT_SETTINGS.baseEase,
+            0,
+            DEFAULT_SETTINGS,
+            dueDates,
+        ),
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
         interval: 24,
@@ -110,7 +173,14 @@ test("Test load balancing", () => {
         67: 10,
     });
     expect(
-        osrSchedule(ReviewResponse.Good, 25, DEFAULT_SETTINGS.baseEase, 0, DEFAULT_SETTINGS, dueDates),
+        osrSchedule(
+            ReviewResponse.Good,
+            25,
+            DEFAULT_SETTINGS.baseEase,
+            0,
+            DEFAULT_SETTINGS,
+            dueDates,
+        ),
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
         interval: 66,

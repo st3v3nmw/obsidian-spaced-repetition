@@ -17,10 +17,12 @@ export class UnitTestOsrCore extends OsrCore {
         super();
         this.buryList = [] as string[];
         this.infoFinder = new UnitTestLinkInfoFinder();
-        const questionPostponementList = new QuestionPostponementList(null, settings, this.buryList);
-        this.init(questionPostponementList, this.infoFinder, settings, () => {
-
-        });
+        const questionPostponementList = new QuestionPostponementList(
+            null,
+            settings,
+            this.buryList,
+        );
+        this.init(questionPostponementList, this.infoFinder, settings, () => {});
     }
 
     // Needed for unit testing: Setup fileMap and the link "info finder"
@@ -36,9 +38,8 @@ export class UnitTestOsrCore extends OsrCore {
         // Analyse the links between the notes before calling  processFile() finaliseLoad()
         this.infoFinder.init(this.fileMap);
     }
-    
-    async loadTestVault(vaultSubfolder: string): Promise<void> {
 
+    async loadTestVault(vaultSubfolder: string): Promise<void> {
         this.loadInit();
 
         const dir: string = path.join(__dirname, "..", "..", "vaults", vaultSubfolder);
@@ -46,7 +47,7 @@ export class UnitTestOsrCore extends OsrCore {
 
         // Pass 1
         this.initializeFileMap(dir, files);
-        
+
         // Pass 2: Process all files
         for (const filename of files) {
             const fullPath: string = path.join(dir, filename);

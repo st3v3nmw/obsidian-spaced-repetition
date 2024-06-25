@@ -13,20 +13,27 @@ export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
     // This is done by using this magic value for the date
     public static dummyDueDateForNewCard: string = "2000-01-01";
 
-    constructor(dueDate: Moment, interval: number, latestEase: number, delayedBeforeReviewTicks: number | null = null) {
+    constructor(
+        dueDate: Moment,
+        interval: number,
+        latestEase: number,
+        delayedBeforeReviewTicks: number | null = null,
+    ) {
         super();
         this.dueDate = dueDate;
         this.interval = Math.round(interval);
         this.latestEase = latestEase;
         this.delayedBeforeReviewTicks = delayedBeforeReviewTicks;
         if (dueDate && delayedBeforeReviewTicks == null) {
-            this.delayedBeforeReviewTicks = globalDateProvider.today.valueOf() - dueDate.valueOf()
+            this.delayedBeforeReviewTicks = globalDateProvider.today.valueOf() - dueDate.valueOf();
         }
     }
 
     formatCardScheduleForHtmlComment(): string {
         // We always want the correct schedule format, so we use the dummy due date if there is no schedule for a card
-        const dateStr: string = this.dueDate ? this.formatDueDate() : RepItemScheduleInfo_Osr.dummyDueDateForNewCard;
+        const dateStr: string = this.dueDate
+            ? this.formatDueDate()
+            : RepItemScheduleInfo_Osr.dummyDueDateForNewCard;
         return `!${dateStr},${this.interval},${this.latestEase}`;
     }
 
@@ -46,10 +53,9 @@ export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
         dueDateStr: string,
         interval: number,
         ease: number,
-        delayedBeforeReviewTicks: number | null = null
+        delayedBeforeReviewTicks: number | null = null,
     ) {
         const dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
         return new RepItemScheduleInfo_Osr(dueDate, interval, ease, delayedBeforeReviewTicks);
     }
-
 }

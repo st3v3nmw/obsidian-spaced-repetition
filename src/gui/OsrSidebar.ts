@@ -1,7 +1,6 @@
 import { App, Plugin, WorkspaceLeaf } from "obsidian";
 import { SRSettings } from "src/settings";
 import { REVIEW_QUEUE_VIEW_TYPE, ReviewQueueListView } from "./ReviewQueueListView";
-import { NoteReviewQueue } from "src/NoteReviewQueue";
 import { NextNoteReviewHandler } from "src/NextNoteReviewHandler";
 
 export class OsrSidebar {
@@ -9,12 +8,16 @@ export class OsrSidebar {
     private settings: SRSettings;
     private nextNoteReviewHandler: NextNoteReviewHandler;
     private reviewQueueListView: ReviewQueueListView;
-    
+
     private get app(): App {
         return this.plugin.app;
-    };
+    }
 
-    constructor(plugin: Plugin, settings: SRSettings, nextNoteReviewHandler: NextNoteReviewHandler) {
+    constructor(
+        plugin: Plugin,
+        settings: SRSettings,
+        nextNoteReviewHandler: NextNoteReviewHandler,
+    ) {
         this.plugin = plugin;
         this.settings = settings;
         this.nextNoteReviewHandler = nextNoteReviewHandler;
@@ -23,7 +26,7 @@ export class OsrSidebar {
     redraw(): void {
         if (this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE)) this.reviewQueueListView.redraw();
     }
-    
+
     private getActiveLeaf(type: string): WorkspaceLeaf | null {
         const leaves = this.app.workspace.getLeavesOfType(type);
         if (leaves.length == 0) {
@@ -34,13 +37,14 @@ export class OsrSidebar {
     }
 
     async init(): Promise<void> {
-
-        this.plugin.registerView(
-            REVIEW_QUEUE_VIEW_TYPE,
-            (leaf) => {
-                return this.reviewQueueListView = new ReviewQueueListView(leaf, this.app, this.nextNoteReviewHandler, this.settings); 
-            },
-        );
+        this.plugin.registerView(REVIEW_QUEUE_VIEW_TYPE, (leaf) => {
+            return (this.reviewQueueListView = new ReviewQueueListView(
+                leaf,
+                this.app,
+                this.nextNoteReviewHandler,
+                this.settings,
+            ));
+        });
 
         if (
             this.settings.enableNoteReviewPaneOnStartup &&
@@ -68,5 +72,4 @@ export class OsrSidebar {
             this.app.workspace.revealLeaf(reviewQueueLeaf);
         }
     }
-
 }
