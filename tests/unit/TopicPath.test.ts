@@ -1,7 +1,7 @@
-import { ISRFile } from "src/SRFile";
 import { TopicPath, TopicPathList } from "src/TopicPath";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
+import { ISRFile } from "src/SRFile";
 
 describe("Constructor exception handling", () => {
     test("Constructor rejects null path", () => {

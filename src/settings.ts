@@ -111,6 +111,34 @@ export class SettingsUtil {
         return SettingsUtil.isTagInList(settings.flashcardTags, tag);
     }
 
+    static isPathInNoteIgnoreFolder(settings: SRSettings, path: string): boolean {
+        return settings.noteFoldersToIgnore.some((folder) => path.startsWith(folder));
+    }
+
+    static isAnyTagANoteReviewTag(settings: SRSettings, tags: string[]): boolean {
+        for (const tag of tags) {
+            if (
+                settings.tagsToReview.some(
+                    (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/"),
+                )
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Given a list of tags, return the subset that is in settings.tagsToReview
+    static filterForNoteReviewTag(settings: SRSettings, tags: string[]): string[] {
+        const result: string[] = [];
+        for (const tagToReview of settings.tagsToReview) {
+            if (tags.some((tag) => tag === tagToReview || tag.startsWith(tagToReview + "/"))) {
+                result.push(tagToReview);
+            }
+        }
+        return result;
+    }
+
     private static isTagInList(tagList: string[], tag: string): boolean {
         for (const tagFromList of tagList) {
             if (tag === tagFromList || tag.startsWith(tagFromList + "/")) {
@@ -136,7 +164,13 @@ export class SRSettingTab extends PluginSettingTab {
         this.plugin = plugin;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    hide(): any {
+        console.log("SRSettingTab: hide()");
+    }
+
     display(): void {
+        console.log("SRSettingTab: display()");
         const { containerEl } = this;
 
         containerEl.empty();

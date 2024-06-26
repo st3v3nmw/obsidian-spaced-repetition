@@ -1,13 +1,14 @@
+import { RepItemScheduleInfo } from "./algorithms/base/RepItemScheduleInfo";
+import { DataStore } from "./dataStore/base/DataStore";
 import { TagCache } from "obsidian";
-import { Card } from "./Card";
-import { CardScheduleInfo, NoteCardScheduleParser } from "./CardSchedule";
-import { parseEx, ParsedQuestionInfo } from "./parser";
 import { Question, QuestionText } from "./Question";
+import { Card } from "./Card";
+import { parseEx, ParsedQuestionInfo } from "./parser";
 import { CardFrontBack, CardFrontBackUtil } from "./QuestionType";
 import { SRSettings, SettingsUtil } from "./settings";
 import { ISRFile, frontmatterTagPseudoLineNum } from "./SRFile";
 import { TopicPath, TopicPathList } from "./TopicPath";
-import { extractFrontmatter, splitTextIntoLineArray } from "./util/utils";
+import { splitNoteIntoFrontmatterAndContent, splitTextIntoLineArray } from "./util/utils";
 
 export class NoteQuestionParser {
     settings: SRSettings;
@@ -61,7 +62,7 @@ export class NoteQuestionParser {
 
             // The following analysis can require fair computation.
             // There is no point doing it if there aren't any topic paths
-            [this.frontmatterText, this.contentText] = extractFrontmatter(noteText);
+            [this.frontmatterText, this.contentText] = splitNoteIntoFrontmatterAndContent(noteText);
 
             // Create the question list
             this.questionList = this.doCreateQuestionList(
@@ -110,8 +111,11 @@ export class NoteQuestionParser {
             );
 
             // And if the card has been reviewed, then scheduling info as well
-            let cardScheduleInfoList: CardScheduleInfo[] =
-                NoteCardScheduleParser.createCardScheduleInfoList(question.questionText.original);
+            let cardScheduleInfoList: RepItemScheduleInfo[] =
+                DataStore.getInstance().questionCreateSchedule(
+                    question.questionText.original,
+                    null,
+                );
 
             // we have some extra scheduling dates to delete
             const correctLength = cardFrontBackList.length;
@@ -159,7 +163,7 @@ export class NoteQuestionParser {
 
     private createCardList(
         cardFrontBackList: CardFrontBack[],
-        cardScheduleInfoList: CardScheduleInfo[],
+        cardScheduleInfoList: RepItemScheduleInfo[],
     ): Card[] {
         const siblings: Card[] = [];
 
@@ -168,15 +172,15 @@ export class NoteQuestionParser {
             const { front, back } = cardFrontBackList[i];
 
             const hasScheduleInfo: boolean = i < cardScheduleInfoList.length;
-            const schedule: CardScheduleInfo = cardScheduleInfoList[i];
+            const schedule: RepItemScheduleInfo = cardScheduleInfoList[i];
 
             const cardObj: Card = new Card({
                 front,
                 back,
                 cardIdx: i,
             });
-            cardObj.scheduleInfo =
-                hasScheduleInfo && !schedule.isDummyScheduleForNewCard() ? schedule : null;
+
+            cardObj.scheduleInfo = hasScheduleInfo ? schedule : null;
 
             siblings.push(cardObj);
         }

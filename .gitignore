@@ -24,6 +24,7 @@ build
 # testing
 coverage
 tests/e2e/vault/
+tests/vaults/*/.obsidian
 
 # mkdocs
 site/

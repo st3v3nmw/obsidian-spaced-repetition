@@ -5,11 +5,14 @@ import { Question } from "src/Question";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
+import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
+import { NoteEaseList } from "src/NoteEaseList";
 
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 
 beforeAll(() => {
     setupStaticDateProvider_20230906();
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 describe("Multiple questions in the text", () => {

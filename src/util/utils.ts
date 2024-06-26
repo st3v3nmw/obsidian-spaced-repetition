@@ -108,7 +108,7 @@ export function stringTrimStart(str: string): [string, string] {
 // 2. The lines are blanked out rather than deleted so that line numbers are not affected
 // e.g. for calls to getQuestionContext(cardLine: number)
 //
-export function extractFrontmatter(str: string): [string, string] {
+export function splitNoteIntoFrontmatterAndContent(str: string): [string, string] {
     let frontmatter: string = "";
     let content: string = "";
     let frontmatterEndLineNum: number = null;
@@ -156,6 +156,10 @@ export function findLineIndexOfSearchStringIgnoringWs(
         }
     }
     return result;
+}
+
+export function isSupportedFileType(path: string): boolean {
+    return path.split(".").pop().toLowerCase() === "md";
 }
 
 /* 
