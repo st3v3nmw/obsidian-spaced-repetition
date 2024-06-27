@@ -9,21 +9,21 @@ export default {
     DUE_CARDS: "Anstehende Karten",
     NEW_CARDS: "Neue Karten",
     TOTAL_CARDS: "Alle Karten",
-    BACK: "Back",
-    SKIP: "Skip",
-    EDIT_CARD: "Edit Card",
+    BACK: "Zurück",
+    SKIP: "Überspringen",
+    EDIT_CARD: "Karte bearbeiten",
     RESET_CARD_PROGRESS: "Kartenfortschritt zurücksetzten",
     HARD: "Schwer",
     GOOD: "Gut",
     EASY: "Einfach",
     SHOW_ANSWER: "Zeige Antwort",
     CARD_PROGRESS_RESET: "Kartenfortschritt wurde zurückgesetzt.",
-    SAVE: "Save",
-    CANCEL: "Cancel",
-    NO_INPUT: "No input provided.",
-    CURRENT_EASE_HELP_TEXT: "Current Ease: ",
-    CURRENT_INTERVAL_HELP_TEXT: "Current Interval: ",
-    CARD_GENERATED_FROM: "Generated from: ${notePath}",
+    SAVE: "Speichern",
+    CANCEL: "Abbrechen",
+    NO_INPUT: "Keine Eingabe erhalten.",
+    CURRENT_EASE_HELP_TEXT: "Aktuelle Schwierigkeit: ",
+    CURRENT_INTERVAL_HELP_TEXT: "Aktueller Intervall: ",
+    CARD_GENERATED_FROM: "Erstellt von: ${notePath}",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Notiz zur Wiederholung öffnen",
@@ -31,14 +31,14 @@ export default {
     REVIEW_DIFFICULTY_FILE_MENU: "Notiz abschliessen als: ${difficulty}",
     REVIEW_NOTE_DIFFICULTY_CMD: "Notiz abschliessen als: ${difficulty}",
     REVIEW_ALL_CARDS: "Alle Lernkarten wiederholen",
-    CRAM_ALL_CARDS: "Select a deck to cram",
+    CRAM_ALL_CARDS: "Wähle ein Stapel zum pauken",
     REVIEW_CARDS_IN_NOTE: "Lernkarten in dieser Notiz wiederholen",
     CRAM_CARDS_IN_NOTE: "Lernkarten in dieser Notiz pauken.",
     VIEW_STATS: "Statistiken anzeigen",
-    OPEN_REVIEW_QUEUE_VIEW: "Open Notes Review Queue in sidebar",
+    OPEN_REVIEW_QUEUE_VIEW: "Öffne Überprüfungswarteschlage in der Seitenleiste",
     STATUS_BAR:
         "Wiederholung: ${dueNotesCount} Notiz(en), ${dueFlashcardsCount} Karte(n) anstehend",
-    SYNC_TIME_TAKEN: "Sync dauerte ${t}ms",
+    SYNC_TIME_TAKEN: "Synchronisierung dauerte ${t}ms",
     NOTE_IN_IGNORED_FOLDER:
         "Notiz befindet sich in einem ausgeschlossenen Ordner (siehe Einstellungen).",
     PLEASE_TAG_NOTE:
@@ -51,9 +51,9 @@ export default {
     DAYS_STR_IVL: "${interval} Tag(e)",
     MONTHS_STR_IVL: "${interval} Monat(e)",
     YEARS_STR_IVL: "${interval} Jahr(e)",
-    DAYS_STR_IVL_MOBILE: "${interval}d",
+    DAYS_STR_IVL_MOBILE: "${interval}t",
     MONTHS_STR_IVL_MOBILE: "${interval}m",
-    YEARS_STR_IVL_MOBILE: "${interval}y",
+    YEARS_STR_IVL_MOBILE: "${interval}j",
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition Plugin - Einstellungen",
@@ -62,12 +62,12 @@ export default {
     FOLDERS_TO_IGNORE_DESC:
         "Mehrere Ordner mit Zeilenumbrüchen getrennt angeben. Bsp. OrdnerA[Zeilenumbruch]OrdnerB/Unterordner",
     FLASHCARDS: "Lernkarten",
-    FLASHCARD_EASY_LABEL: "Easy Button Text",
-    FLASHCARD_GOOD_LABEL: "Good Button Text",
-    FLASHCARD_HARD_LABEL: "Hard Button Text",
-    FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
-    FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
-    FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
+    FLASHCARD_EASY_LABEL: "Einfach Knopf Text",
+    FLASHCARD_GOOD_LABEL: "Gut Knopf Text",
+    FLASHCARD_HARD_LABEL: "Schwer Knopf Text",
+    FLASHCARD_GOOD_DESC: 'Passe die Beschriftung für "Gut" Knopf an',
+    FLASHCARD_EASY_DESC: 'Passe die Beschriftung für "Einfach" Knopf an',
+    FLASHCARD_HARD_DESC: 'Passe die Beschriftung für "Schwer" Knopf an',
     FLASHCARD_TAGS: "Lernkarten Tags",
     FLASHCARD_TAGS_DESC:
         "Mehrere Tags mit Leerzeichen oder Zeilenumbrüchen getrennt angeben. Bsp. #karte #stapel2 #stapel3.",
@@ -88,19 +88,24 @@ export default {
     RESET_DEFAULT: "Standardeinstellung wiederherstellen",
     CARD_MODAL_WIDTH_PERCENT: "Breite einer Lernkarte in Prozent",
     RANDOMIZE_CARD_ORDER: "Während der Wiederhoung die Reihenfolge zufällig mischen?",
-    REVIEW_CARD_ORDER_WITHIN_DECK: "Order cards in a deck are displayed during review",
-    REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL: "Sequentially within a deck (All new cards first)",
-    REVIEW_CARD_ORDER_DUE_FIRST_SEQUENTIAL: "Sequentially within a deck (All due cards first)",
-    REVIEW_CARD_ORDER_NEW_FIRST_RANDOM: "Randomly within a deck (All new cards first)",
-    REVIEW_CARD_ORDER_DUE_FIRST_RANDOM: "Randomly within a deck (All due cards first)",
-    REVIEW_CARD_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
-    REVIEW_DECK_ORDER: "Order decks are displayed during review",
+    REVIEW_CARD_ORDER_WITHIN_DECK:
+        "Reihenfolge der Karten innerhalb eines Stapels während der Wiederholung",
+    REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL:
+        "Sequentielle Reihenfolge innerhalb eines Stapels (Alle neuen Karten zuerst)",
+    REVIEW_CARD_ORDER_DUE_FIRST_SEQUENTIAL:
+        "Sequentielle Reihenfolge innerhalb eines Stapels (Alle fälligen Karten zuerst)",
+    REVIEW_CARD_ORDER_NEW_FIRST_RANDOM:
+        "Zufällige Reihenfolge innerhalb eines Stapels (Alle neuen Karten zuerst)",
+    REVIEW_CARD_ORDER_DUE_FIRST_RANDOM:
+        "Zufällige Reihenfolge innerhalb eines Stapels (Alle fälligen Karten zuerst)",
+    REVIEW_CARD_ORDER_RANDOM_DECK_AND_CARD: "Zufällige Karte von zufälligem Stapel",
+    REVIEW_DECK_ORDER: "Reihenfolge der Stapel während der Wiederholung",
     REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL:
-        "Sequentially (once all cards in previous deck reviewed)",
+        "Sequentielle Reihenfolge (sobald alle Karten im vorherigen Stapel wiederholt wurden)",
     REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM:
-        "Randomly (once all cards in previous deck reviewed)",
-    REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
-    DISABLE_CLOZE_CARDS: "Lückentextkarten (cloze deletions) deaktivieren?",
+        "Zufällige Reihenfolge (sobald alle Karten im vorherigen Stapel wiederholt wurden)",
+    REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Zufällige Karte von zufälligem Stapel",
+    DISABLE_CLOZE_CARDS: "Lückentextkarten deaktivieren?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==Hervorgehobenen== Text in Lückentextkarten umwandeln?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "**Fettgedruckten** Text in Lückentextkarten umwandeln?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES:
@@ -112,7 +117,7 @@ export default {
     MULTILINE_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige Lernkarten",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige beidseitige Lernkarten",
     NOTES: "Notizen",
-    REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
+    REVIEW_PANE_ON_STARTUP: "Öffne Überprüfungswarteschlage beim start",
     TAGS_TO_REVIEW: "Zu wiederholende Tags",
     TAGS_TO_REVIEW_DESC:
         "Mehrere Tags können mit Leerzeichen oder Zeilenumbrüchen getrennt angegeben werden. Bsp. #karte #tag1 #tag2.",
@@ -129,15 +134,16 @@ export default {
     MIN_ONE_DAY: "Anzahl der Tage muss mindestens 1 sein.",
     VALID_NUMBER_WARNING: "Bitte eine gültige Zahl eingeben.",
     UI_PREFERENCES: "Einstellungen der Benutzeroberfläche",
-    INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Deckbäume sollten anfänglich erweitert angezeigt werden",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE:
+        "Stapelverzeichnis soll beim öffnen erweitert angezeigt werden",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
-        "Deaktivieren Sie dies, um verschachtelte Decks in derselben Karte zu reduzieren. Nützlich, wenn Sie Karten haben, die zu vielen Decks in derselben Datei gehören.",
+        "Deaktivieren Sie dies, um verschachtelte Stapel in derselben Karte zu reduzieren. Nützlich, wenn Sie Karten haben, die zu vielen Stapeln in derselben Datei gehören.",
     ALGORITHM: "Algorithmus",
     CHECK_ALGORITHM_WIKI:
         'Weiterführende Informationen: <a href="${algo_url}">Implementierung des Algorithmus</a> (english).',
-    BASE_EASE: "Basis der Einfachheit",
+    BASE_EASE: "Basis der Schwierigkeit",
     BASE_EASE_DESC: "Minimum ist 130. Empfohlen wird ca. 250.",
-    BASE_EASE_MIN_WARNING: "Basis der Einfachheit muss mindestens 130 sein.",
+    BASE_EASE_MIN_WARNING: "Basis der Schwierigkeit muss mindestens 130 sein.",
     LAPSE_INTERVAL_CHANGE:
         "Anpassungsfaktor des Intervalls wenn eine Notiz / Karte 'Schwer' abgeschlossen wird",
     LAPSE_INTERVAL_CHANGE_DESC: "neuesIntervall = altesIntervall * anpassungsfaktor / 100.",
@@ -145,14 +151,14 @@ export default {
     EASY_BONUS_DESC:
         "Der Einfachheit-Bonus gibt an um welchen Faktor (in Prozent) das Intervall länger sein soll, wenn eine Notiz / Karte 'Einfach' statt 'Gut' abgeschlossen wird. Minimum ist 100%.",
     EASY_BONUS_MIN_WARNING: "Der Einfachheit-Bonus muss mindestens 100 sein.",
-    MAX_INTERVAL: "Maximum interval in days",
+    MAX_INTERVAL: "Maximale Intervall in Tagen",
     MAX_INTERVAL_DESC:
         "Das maximale Intervall (in Tagen) für Wiederholungen. Standard sind 100 Jahre.",
     MAX_INTERVAL_MIN_WARNING: "Das maximale Interall muss mindestens ein Tag sein.",
     MAX_LINK_CONTRIB: "Maximaler Einfluss von Links",
     MAX_LINK_CONTRIB_DESC:
         "Maximaler Einfluss der Einfachheiten verlinkter Notizen zur gewichteten initialen Einfachheit einer neuen Lernkarte.",
-    LOGGING: "Logging",
+    LOGGING: "Protokollierung",
     DISPLAY_DEBUG_INFO: "Informationen zum Debugging in der Entwicklerkonsole anzeigen?",
 
     // sidebar.ts
@@ -165,10 +171,10 @@ export default {
 
     // stats-modal.tsx
     STATS_TITLE: "Statistiken",
-    MONTH: "Month",
-    QUARTER: "Quarter",
-    YEAR: "Year",
-    LIFETIME: "Lifetime",
+    MONTH: "Monat",
+    QUARTER: "Quartal",
+    YEAR: "Jahr",
+    LIFETIME: "Lebenslang",
     FORECAST: "Prognose",
     FORECAST_DESC: "Anzahl der künftig anstehenden Karten",
     SCHEDULED: "Anstehend",
@@ -179,8 +185,8 @@ export default {
     INTERVALS_DESC: "Intervalle bis Wiederholungen anstehen",
     COUNT: "Anzahl",
     INTERVALS_SUMMARY: "Durchschnittliches Intervall: ${avg}, Längstes Intervall: ${longest}",
-    EASES: "Einfachheit",
-    EASES_SUMMARY: "Durchschnittliche Einfachheit: ${avgEase}",
+    EASES: "Schwierigkeit",
+    EASES_SUMMARY: "Durchschnittliche Schwierigkeit: ${avgEase}",
     CARD_TYPES: "Kategorisierung",
     CARD_TYPES_DESC: "Verlegte Karten eingeschlossen",
     CARD_TYPE_NEW: "Neu",
