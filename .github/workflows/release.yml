@@ -5,6 +5,9 @@ on:
         tags:
             - "*"
 
+on:
+    workflow_dispatch:
+
 env:
     PLUGIN_NAME: obsidian-spaced-repetition
     COREPACK_ENABLE_STRICT: 0
