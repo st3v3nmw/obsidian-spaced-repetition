@@ -96,6 +96,15 @@ export function stringTrimStart(str: string): [string, string] {
     return [ws, trimmed];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function convertToStringOrEmpty(v: any): string {
+    let result: string = "";
+    if (v != null && v != undefined) {
+        result = v + "";
+    }
+    return result;
+}
+
 //
 // This returns [frontmatter, content]
 //

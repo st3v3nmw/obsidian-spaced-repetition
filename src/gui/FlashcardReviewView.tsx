@@ -136,7 +136,11 @@ export class FlashcardReviewView {
             this.plugin,
             this._currentNote.filePath,
         );
-        await wrapper.renderMarkdownWrapper(this._currentCard.front, this.content);
+        await wrapper.renderMarkdownWrapper(
+            this._currentCard.front,
+            this.content,
+            this._currentQuestion.questionText.textDirection,
+        );
 
         // Setup response buttons
         this._resetResponseButtons();
@@ -290,7 +294,11 @@ export class FlashcardReviewView {
             this.plugin,
             this._currentNote.filePath,
         );
-        wrapper.renderMarkdownWrapper(this._currentCard.back, this.content);
+        wrapper.renderMarkdownWrapper(
+            this._currentCard.back,
+            this.content,
+            this._currentQuestion.questionText.textDirection,
+        );
 
         // Show response buttons
         this.answerButton.addClass("sr-is-hidden");
