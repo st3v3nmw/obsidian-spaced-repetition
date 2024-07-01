@@ -2,6 +2,8 @@ name: Release
 
 on:
     workflow_dispatch:
+        tags:
+            - "*"
 
 env:
     PLUGIN_NAME: obsidian-spaced-repetition
