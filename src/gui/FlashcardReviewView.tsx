@@ -164,7 +164,7 @@ export class FlashcardReviewView {
         const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
             this.app,
             this.plugin,
-            this._currentNote.filePath
+            this._currentNote.filePath,
         );
         await wrapper.renderMarkdownWrapper(this._currentCard.front, this.content);
     }
@@ -341,7 +341,7 @@ export class FlashcardReviewView {
         const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
             this.app,
             this.plugin,
-            this._currentNote.filePath
+            this._currentNote.filePath,
         );
         wrapper.renderMarkdownWrapper(this._currentCard.back, this.content);
     }

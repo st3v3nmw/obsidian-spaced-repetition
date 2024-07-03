@@ -217,15 +217,15 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         const cardFrontBackList: CardFrontBack[] = CardFrontBackUtil.expand(
             question.questionType,
             question.questionText.actualQuestion,
-            this.settings
-        )
+            this.settings,
+        );
 
         await this.currentQuestion.writeQuestion(this.settings);
-        
+
         question.cards.forEach((card, i) => {
             const { front, back } = cardFrontBackList[i];
             card.front = front;
             card.back = back;
-        })
+        });
     }
 }
