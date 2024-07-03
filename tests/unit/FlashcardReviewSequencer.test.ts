@@ -753,7 +753,7 @@ ${indent}- bar?::baz
     });
 });
 
-describe("updateCurrentQuestionText", () => {
+describe("updateCurrentQuestionTextAndCards", () => {
     let space: string = " ";
 
     describe("Checking update to file", () => {
@@ -1161,7 +1161,7 @@ async function checkUpdateCurrentQuestionText(
     await c.setSequencerDeckTreeFromOriginalText();
     expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
 
-    await c.reviewSequencer.updateCurrentQuestionText(updatedQ);
+    await c.reviewSequencer.updateCurrentQuestionTextAndCards(updatedQ);
 
     // originalText should remain the same except for the specific substring change from originalStr => updatedStr
     if (!c.originalText.includes(originalStr)) throw `Text not found: ${originalStr}`;

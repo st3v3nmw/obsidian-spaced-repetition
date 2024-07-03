@@ -14,6 +14,7 @@ import {
 import { FlashcardEditModal } from "./EditModal";
 import { DeckListView } from "./DeckListView";
 import { FlashcardReviewView } from "./FlashcardReviewView";
+import { CardFrontBack, CardFrontBackUtil } from "src/QuestionType";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -121,7 +122,8 @@ export class FlashcardModal extends Modal {
         const editModal = FlashcardEditModal.Prompt(this.app, textPrompt);
         editModal
             .then(async (modifiedCardText) => {
-                this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
+                await this.reviewSequencer.updateCurrentQuestionTextAndCards(modifiedCardText);
+                this.flashcardView.rerenderCardContents()
             })
             .catch((reason) => console.log(reason));
     }
