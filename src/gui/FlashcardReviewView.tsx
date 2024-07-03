@@ -131,12 +131,7 @@ export class FlashcardReviewView {
 
         // Setup card content
         this.content.empty();
-        const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
-            this.app,
-            this.plugin,
-            this._currentNote.filePath,
-        );
-        await wrapper.renderMarkdownWrapper(this._currentCard.front, this.content);
+        await this._renderMarkdownFront();
 
         // Setup response buttons
         this._resetResponseButtons();
@@ -148,6 +143,30 @@ export class FlashcardReviewView {
         this.view.removeClass("sr-is-hidden");
         this.backButton.removeClass("sr-is-hidden");
         document.addEventListener("keydown", this._keydownHandler);
+    }
+
+    /**
+     * If the card is already being shown, re-render just the Markdown
+     * contents if needed
+     */
+    async rerenderCardContents() {
+        this.content.empty();
+        this._renderMarkdownFront();
+        if (this.mode == FlashcardModalMode.Back) {
+            this._renderMarkdownBackAndDivider();
+        }
+    }
+
+    /**
+     * Set up the Markdown rendering for the card's front side
+     */
+    private async _renderMarkdownFront() {
+        const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
+            this.app,
+            this.plugin,
+            this._currentNote.filePath,
+        );
+        await wrapper.renderMarkdownWrapper(this._currentCard.front, this.content);
     }
 
     /**
@@ -276,21 +295,7 @@ export class FlashcardReviewView {
 
         this.resetButton.disabled = false;
 
-        // Show answer text
-        if (this._currentQuestion.questionType !== CardType.Cloze) {
-            const hr: HTMLElement = document.createElement("hr");
-            hr.addClass("sr-card-divide");
-            this.content.appendChild(hr);
-        } else {
-            this.content.empty();
-        }
-
-        const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
-            this.app,
-            this.plugin,
-            this._currentNote.filePath,
-        );
-        wrapper.renderMarkdownWrapper(this._currentCard.back, this.content);
+        this._renderMarkdownBackAndDivider();
 
         // Show response buttons
         this.answerButton.addClass("sr-is-hidden");
@@ -319,6 +324,26 @@ export class FlashcardReviewView {
                 ReviewResponse.Easy,
             );
         }
+    }
+
+    /**
+     * Setup Markdown rendering for the card's back side and the divider
+     */
+    private _renderMarkdownBackAndDivider() {
+        if (this._currentQuestion.questionType !== CardType.Cloze) {
+            const hr: HTMLElement = document.createElement("hr");
+            hr.addClass("sr-card-divide");
+            this.content.appendChild(hr);
+        } else {
+            this.content.empty();
+        }
+
+        const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
+            this.app,
+            this.plugin,
+            this._currentNote.filePath,
+        );
+        wrapper.renderMarkdownWrapper(this._currentCard.back, this.content);
     }
 
     private async _processReview(response: ReviewResponse): Promise<void> {

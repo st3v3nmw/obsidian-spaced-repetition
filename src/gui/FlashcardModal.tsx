@@ -1,4 +1,4 @@
-import { Modal, App } from "obsidian";
+import { Modal, App, Notice } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
@@ -8,12 +8,15 @@ import { SRSettings } from "src/settings";
 import { Deck } from "../Deck";
 import { Question } from "../Question";
 import {
+    CardFrontBackMissingError,
+    CardLengthMismatchError,
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/FlashcardReviewSequencer";
 import { FlashcardEditModal } from "./EditModal";
 import { DeckListView } from "./DeckListView";
 import { FlashcardReviewView } from "./FlashcardReviewView";
+import { t } from "src/lang/helpers";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -121,8 +124,16 @@ export class FlashcardModal extends Modal {
         const editModal = FlashcardEditModal.Prompt(this.app, textPrompt);
         editModal
             .then(async (modifiedCardText) => {
-                this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
+                await this.reviewSequencer.updateCurrentQuestionTextAndCards(modifiedCardText);
+                this.flashcardView.rerenderCardContents();
             })
-            .catch((reason) => console.log(reason));
+            .catch((reason) => {
+                if (reason instanceof CardLengthMismatchError) {
+                    new Notice(t("CARD_LENGTH_MISMATCH_NOTICE"));
+                } else if (reason instanceof CardFrontBackMissingError) {
+                    new Notice(t("CARD_FRONT_BACK_MISSING_NOTICE"));
+                }
+                console.log(reason);
+            });
     }
 }
