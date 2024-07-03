@@ -16,6 +16,7 @@ import {
 import { FlashcardEditModal } from "./EditModal";
 import { DeckListView } from "./DeckListView";
 import { FlashcardReviewView } from "./FlashcardReviewView";
+import { t } from "src/lang/helpers";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -128,11 +129,9 @@ export class FlashcardModal extends Modal {
             })
             .catch((reason) => {
                 if (reason instanceof CardLengthMismatchError) {
-                    new Notice(
-                        "Unable to update flashcard. The number of cards after the edit does not match the original number of cards.",
-                    );
+                    new Notice(t("CARD_LENGTH_MISMATCH_NOTICE"));
                 } else if (reason instanceof CardFrontBackMissingError) {
-                    new Notice("Unable to update flashcard. Missing front or back side of card.");
+                    new Notice(t("CARD_FRONT_BACK_MISSING_NOTICE"));
                 }
                 console.log(reason);
             });
