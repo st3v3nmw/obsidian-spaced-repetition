@@ -24,6 +24,9 @@ export default {
     CURRENT_EASE_HELP_TEXT: "Aktuelle Schwierigkeit: ",
     CURRENT_INTERVAL_HELP_TEXT: "Aktueller Intervall: ",
     CARD_GENERATED_FROM: "Erstellt von: ${notePath}",
+    CARD_LENGTH_MISMATCH_NOTICE:
+        "Unable to update flashcard. The number of cards after the edit does not match the original number of cards.",
+    CARD_FRONT_BACK_MISSING_NOTICE: "Unable to update flashcard. The front or back is missing.",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Notiz zur Wiederholung öffnen",

@@ -21,6 +21,9 @@ export default {
     CURRENT_EASE_HELP_TEXT: "目前掌握程度：",
     CURRENT_INTERVAL_HELP_TEXT: "目前间隔：",
     CARD_GENERATED_FROM: "生成自：${notePath}",
+    CARD_LENGTH_MISMATCH_NOTICE:
+        "Unable to update flashcard. The number of cards after the edit does not match the original number of cards.",
+    CARD_FRONT_BACK_MISSING_NOTICE: "Unable to update flashcard. The front or back is missing.",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "打开一个笔记开始复习",
