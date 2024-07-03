@@ -772,8 +772,8 @@ describe("updateCurrentQuestionTextAndCards", () => {
 <!--SR:!2023-09-02,4,270-->`;
                 let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
 <!--SR:!2023-09-02,4,270-->`;
-                let updatedFront = `A much more in depth question`
-                let updatedBack = `A much more detailed answer`
+                let updatedFront = `A much more in depth question`;
+                let updatedBack = `A much more detailed answer`;
 
                 await checkUpdateCurrentQuestionTextAndCard(
                     text,
@@ -798,8 +798,8 @@ describe("updateCurrentQuestionTextAndCards", () => {
                 let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
                 let expectedUpdatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
 <!--SR:!2023-09-02,4,270-->`;
-                let updatedFront = `A much more in depth question`
-                let updatedBack = `A much more detailed answer`
+                let updatedFront = `A much more in depth question`;
+                let updatedBack = `A much more detailed answer`;
 
                 await checkUpdateCurrentQuestionTextAndCard(
                     text,
@@ -810,7 +810,6 @@ describe("updateCurrentQuestionTextAndCards", () => {
                     updatedBack,
                     DEFAULT_SETTINGS,
                 );
-
             });
         });
 
@@ -830,8 +829,8 @@ describe("updateCurrentQuestionTextAndCards", () => {
                 let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
                 let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
 
-                let updatedFront = `A much more in depth question`
-                let updatedBack = `A much more detailed answer`
+                let updatedFront = `A much more in depth question`;
+                let updatedBack = `A much more detailed answer`;
 
                 await checkUpdateCurrentQuestionTextAndCard(
                     text1,
@@ -842,7 +841,6 @@ describe("updateCurrentQuestionTextAndCards", () => {
                     updatedBack,
                     settings,
                 );
-
             });
 
             test("Question has schedule on following line (but placed on same line due to settings)", async () => {
@@ -859,9 +857,8 @@ describe("updateCurrentQuestionTextAndCards", () => {
 <!--SR:!2023-09-02,4,270-->`;
                 let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
 
-                let updatedFront = "A much more in depth question"
-                let updatedBack = "A much more detailed answer"
-
+                let updatedFront = "A much more in depth question";
+                let updatedBack = "A much more detailed answer";
 
                 await checkUpdateCurrentQuestionTextAndCard(
                     text,
@@ -872,7 +869,6 @@ describe("updateCurrentQuestionTextAndCards", () => {
                     updatedBack,
                     settings,
                 );
-
             });
         });
 
@@ -904,9 +900,9 @@ extra answer line 2
 <!--SR:!2023-09-02,4,270-->`;
 
                 let updatedFront = `Multiline question
-Question starting immediately after tag`
+Question starting immediately after tag`;
                 let updatedBack = `A2 (answer now includes more detail)
-extra answer line 2`
+extra answer line 2`;
 
                 await checkUpdateCurrentQuestionTextAndCard(
                     text,
@@ -917,7 +913,6 @@ extra answer line 2`
                     updatedBack,
                     DEFAULT_SETTINGS,
                 );
-
             });
 
             test("Question starts on same line as tag (after two spaces); Existing schedule present", async () => {
@@ -947,9 +942,9 @@ extra answer line 2
 <!--SR:!2023-09-02,4,270-->`;
 
                 let updatedFront = `Multiline question
-Question starting immediately after tag`
+Question starting immediately after tag`;
                 let updatedBack = `A2 (answer now includes more detail)
-extra answer line 2`
+extra answer line 2`;
 
                 await checkUpdateCurrentQuestionTextAndCard(
                     text,
@@ -960,7 +955,6 @@ extra answer line 2`
                     updatedBack,
                     DEFAULT_SETTINGS,
                 );
-
             });
 
             test("Question starts line after tag; Existing schedule present", async () => {
@@ -992,9 +986,9 @@ extra answer line 2
 <!--SR:!2023-09-02,4,270-->`;
 
                 let updatedFront = `Multiline question
-Question starting line after tag`
+Question starting line after tag`;
                 let updatedBack = `A2 (answer now includes more detail)
-extra answer line 2`
+extra answer line 2`;
 
                 await checkUpdateCurrentQuestionTextAndCard(
                     text,
@@ -1005,7 +999,6 @@ extra answer line 2`
                     updatedBack,
                     DEFAULT_SETTINGS,
                 );
-
             });
 
             test("Question starts line after tag (no white space after tag); New card", async () => {
@@ -1033,7 +1026,7 @@ ${updatedQuestionText}`;
                 let updatedFront = `Multiline question
 Question starting immediately after tag`;
                 let updatedBack = `A2 (answer now includes more detail)
-extra answer line 2`
+extra answer line 2`;
 
                 await checkUpdateCurrentQuestionTextAndCard(
                     fileText,
@@ -1069,9 +1062,9 @@ extra answer line 2`;
 ${updatedQuestionText}`;
 
                 let updatedFront = `Multiline question
-Question starting immediately after tag`
+Question starting immediately after tag`;
                 let updatedBack = `A2 (answer now includes more detail)
-extra answer line 2`
+extra answer line 2`;
 
                 await checkUpdateCurrentQuestionTextAndCard(
                     fileText,
@@ -1177,8 +1170,8 @@ describe("Sequences", () => {
         let updatedQ: string = "A much more in depth question::A much more detailed answer";
         let originalStr: string = `#flashcards Q2::A2`;
         let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer`;
-        let updatedFront = 'A much more in depth question'
-        let updatedBack = 'A much more detailed answer'
+        let updatedFront = "A much more in depth question";
+        let updatedBack = "A much more detailed answer";
 
         let c: TestContext = await checkUpdateCurrentQuestionTextAndCard(
             text1,
