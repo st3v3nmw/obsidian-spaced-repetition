@@ -772,11 +772,16 @@ describe("updateCurrentQuestionTextAndCards", () => {
 <!--SR:!2023-09-02,4,270-->`;
                 let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
 <!--SR:!2023-09-02,4,270-->`;
-                await checkUpdateCurrentQuestionText(
+                let updatedFront = `A much more in depth question`
+                let updatedBack = `A much more detailed answer`
+
+                await checkUpdateCurrentQuestionTextAndCard(
                     text,
                     updatedQ,
                     originalStr,
                     updatedStr,
+                    updatedFront,
+                    updatedBack,
                     DEFAULT_SETTINGS,
                 );
             });
@@ -793,13 +798,19 @@ describe("updateCurrentQuestionTextAndCards", () => {
                 let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
                 let expectedUpdatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
 <!--SR:!2023-09-02,4,270-->`;
-                await checkUpdateCurrentQuestionText(
+                let updatedFront = `A much more in depth question`
+                let updatedBack = `A much more detailed answer`
+
+                await checkUpdateCurrentQuestionTextAndCard(
                     text,
                     updatedQ,
                     originalStr,
                     expectedUpdatedStr,
+                    updatedFront,
+                    updatedBack,
                     DEFAULT_SETTINGS,
                 );
+
             });
         });
 
@@ -818,13 +829,20 @@ describe("updateCurrentQuestionTextAndCards", () => {
                 let updatedQ: string = "A much more in depth question::A much more detailed answer";
                 let originalStr: string = `#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->`;
                 let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
-                await checkUpdateCurrentQuestionText(
+
+                let updatedFront = `A much more in depth question`
+                let updatedBack = `A much more detailed answer`
+
+                await checkUpdateCurrentQuestionTextAndCard(
                     text1,
                     updatedQ,
                     originalStr,
                     updatedStr,
+                    updatedFront,
+                    updatedBack,
                     settings,
                 );
+
             });
 
             test("Question has schedule on following line (but placed on same line due to settings)", async () => {
@@ -840,13 +858,21 @@ describe("updateCurrentQuestionTextAndCards", () => {
                 let originalStr: string = `#flashcards Q2::A2
 <!--SR:!2023-09-02,4,270-->`;
                 let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->`;
-                await checkUpdateCurrentQuestionText(
+
+                let updatedFront = "A much more in depth question"
+                let updatedBack = "A much more detailed answer"
+
+
+                await checkUpdateCurrentQuestionTextAndCard(
                     text,
                     updatedQ,
                     originalStr,
                     updatedStr,
+                    updatedFront,
+                    updatedBack,
                     settings,
                 );
+
             });
         });
 
@@ -877,13 +903,21 @@ A2 (answer now includes more detail)
 extra answer line 2
 <!--SR:!2023-09-02,4,270-->`;
 
-                await checkUpdateCurrentQuestionText(
+                let updatedFront = `Multiline question
+Question starting immediately after tag`
+                let updatedBack = `A2 (answer now includes more detail)
+extra answer line 2`
+
+                await checkUpdateCurrentQuestionTextAndCard(
                     text,
                     updatedQ,
                     originalStr,
                     expectedUpdatedStr,
+                    updatedFront,
+                    updatedBack,
                     DEFAULT_SETTINGS,
                 );
+
             });
 
             test("Question starts on same line as tag (after two spaces); Existing schedule present", async () => {
@@ -912,13 +946,21 @@ A2 (answer now includes more detail)
 extra answer line 2
 <!--SR:!2023-09-02,4,270-->`;
 
-                await checkUpdateCurrentQuestionText(
+                let updatedFront = `Multiline question
+Question starting immediately after tag`
+                let updatedBack = `A2 (answer now includes more detail)
+extra answer line 2`
+
+                await checkUpdateCurrentQuestionTextAndCard(
                     text,
                     updatedQ,
                     originalStr,
                     expectedUpdatedStr,
+                    updatedFront,
+                    updatedBack,
                     DEFAULT_SETTINGS,
                 );
+
             });
 
             test("Question starts line after tag; Existing schedule present", async () => {
@@ -949,13 +991,21 @@ A2 (answer now includes more detail)
 extra answer line 2
 <!--SR:!2023-09-02,4,270-->`;
 
-                await checkUpdateCurrentQuestionText(
+                let updatedFront = `Multiline question
+Question starting line after tag`
+                let updatedBack = `A2 (answer now includes more detail)
+extra answer line 2`
+
+                await checkUpdateCurrentQuestionTextAndCard(
                     text,
                     updatedQ,
                     originalStr,
                     expectedUpdatedStr,
+                    updatedFront,
+                    updatedBack,
                     DEFAULT_SETTINGS,
                 );
+
             });
 
             test("Question starts line after tag (no white space after tag); New card", async () => {
@@ -980,11 +1030,18 @@ extra answer line 2`;
                 let expectedUpdatedStr: string = `#flashcards
 ${updatedQuestionText}`;
 
-                await checkUpdateCurrentQuestionText(
+                let updatedFront = `Multiline question
+Question starting immediately after tag`;
+                let updatedBack = `A2 (answer now includes more detail)
+extra answer line 2`
+
+                await checkUpdateCurrentQuestionTextAndCard(
                     fileText,
                     updatedQuestionText,
                     originalQuestionStr,
                     expectedUpdatedStr,
+                    updatedFront,
+                    updatedBack,
                     DEFAULT_SETTINGS,
                 );
             });
@@ -1011,11 +1068,18 @@ extra answer line 2`;
                 let expectedUpdatedStr: string = `#flashcards
 ${updatedQuestionText}`;
 
-                await checkUpdateCurrentQuestionText(
+                let updatedFront = `Multiline question
+Question starting immediately after tag`
+                let updatedBack = `A2 (answer now includes more detail)
+extra answer line 2`
+
+                await checkUpdateCurrentQuestionTextAndCard(
                     fileText,
                     updatedQuestionText,
                     originalQuestionStr,
                     expectedUpdatedStr,
+                    updatedFront,
+                    updatedBack,
                     DEFAULT_SETTINGS,
                 );
             });
@@ -1113,12 +1177,16 @@ describe("Sequences", () => {
         let updatedQ: string = "A much more in depth question::A much more detailed answer";
         let originalStr: string = `#flashcards Q2::A2`;
         let updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer`;
+        let updatedFront = 'A much more in depth question'
+        let updatedBack = 'A much more detailed answer'
 
-        let c: TestContext = await checkUpdateCurrentQuestionText(
+        let c: TestContext = await checkUpdateCurrentQuestionTextAndCard(
             text1,
             updatedQ,
             originalStr,
             updatedStr,
+            updatedFront,
+            updatedBack,
             DEFAULT_SETTINGS,
         );
 
@@ -1145,11 +1213,13 @@ function skipAndCheckNoRemainingCards(c: TestContext) {
     expect(c.reviewSequencer.hasCurrentCard).toEqual(false);
 }
 
-async function checkUpdateCurrentQuestionText(
+async function checkUpdateCurrentQuestionTextAndCard(
     noteText: string,
     updatedQ: string,
     originalStr: string,
     updatedStr: string,
+    updatedFront: string,
+    updatedBack: string,
     settings: SRSettings,
 ): Promise<TestContext> {
     let c: TestContext = TestContext.Create(
@@ -1167,5 +1237,9 @@ async function checkUpdateCurrentQuestionText(
     if (!c.originalText.includes(originalStr)) throw `Text not found: ${originalStr}`;
     let expectedFileText: string = c.originalText.replace(originalStr, updatedStr);
     expect(await c.file.read()).toEqual(expectedFileText);
+
+    expect(c.reviewSequencer.currentCard.front).toStrictEqual(updatedFront);
+    expect(c.reviewSequencer.currentCard.back).toStrictEqual(updatedBack);
+
     return c;
 }
