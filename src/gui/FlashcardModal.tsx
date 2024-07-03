@@ -1,4 +1,4 @@
-import { Modal, App } from "obsidian";
+import { Modal, App, Notice } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
@@ -8,13 +8,14 @@ import { SRSettings } from "src/settings";
 import { Deck } from "../Deck";
 import { Question } from "../Question";
 import {
+    CardFrontBackMissingError,
+    CardLengthMismatchError,
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/FlashcardReviewSequencer";
 import { FlashcardEditModal } from "./EditModal";
 import { DeckListView } from "./DeckListView";
 import { FlashcardReviewView } from "./FlashcardReviewView";
-import { CardFrontBack, CardFrontBackUtil } from "src/QuestionType";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -125,6 +126,15 @@ export class FlashcardModal extends Modal {
                 await this.reviewSequencer.updateCurrentQuestionTextAndCards(modifiedCardText);
                 this.flashcardView.rerenderCardContents();
             })
-            .catch((reason) => console.log(reason));
+            .catch((reason) => {
+                if (reason instanceof CardLengthMismatchError) {
+                    new Notice(
+                        "Unable to update flashcard. The number of cards after the edit does not match the original number of cards.",
+                    );
+                } else if (reason instanceof CardFrontBackMissingError) {
+                    new Notice("Unable to update flashcard. Missing front or back side of card.");
+                }
+                console.log(reason);
+            });
     }
 }

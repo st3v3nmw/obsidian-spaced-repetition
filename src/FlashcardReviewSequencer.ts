@@ -211,15 +211,29 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     async updateCurrentQuestionTextAndCards(text: string): Promise<void> {
         const question = this.currentQuestion;
         const q: QuestionText = question.questionText;
-        q.actualQuestion = text;
 
         // Update front/back properties of all cards which question is linked to
         const cardFrontBackList: CardFrontBack[] = CardFrontBackUtil.expand(
             question.questionType,
-            question.questionText.actualQuestion,
+            text,
             this.settings,
         );
 
+        // Prevent the edit if the number of cards linked to the question
+        // would be changed on edit
+        if (cardFrontBackList.length != question.cards.length) {
+            throw new CardLengthMismatchError(
+                "Mismatch between number of cards generated and current number of cards",
+            );
+        }
+
+        cardFrontBackList.forEach(({ front, back }) => {
+            if (front.length == 0 || back.length == 0) {
+                throw new CardFrontBackMissingError("Card's front or back has length of 0.");
+            }
+        });
+
+        q.actualQuestion = text;
         await this.currentQuestion.writeQuestion(this.settings);
 
         question.cards.forEach((card, i) => {
@@ -227,5 +241,19 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             card.front = front;
             card.back = back;
         });
+    }
+}
+
+export class CardLengthMismatchError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "CardLengthMismatchError";
+    }
+}
+
+export class CardFrontBackMissingError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "CardFrontBackMissingError";
     }
 }
