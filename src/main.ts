@@ -92,7 +92,7 @@ export default class SRPlugin extends Plugin {
     public cardStats: Stats;
 
     async onload(): Promise<void> {
-        console.log("onload: Branch: master v1.13-beta.4");
+        console.log("onload: Branch: master v1.13-beta.5");
         await this.loadPluginData();
         this.easeByPath = new NoteEaseList(this.data.settings);
         this.questionPostponementList = new QuestionPostponementList(
