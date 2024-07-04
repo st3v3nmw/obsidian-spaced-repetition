@@ -52,7 +52,7 @@ export default class SRPlugin extends Plugin {
     private nextNoteReviewHandler: NextNoteReviewHandler;
 
     async onload(): Promise<void> {
-        console.log("onload: Branch: master v1.13-beta.6");
+        console.log("onload: Branch: master v1.13-beta.7");
         await this.loadPluginData();
 
         this.initLogicClasses();
