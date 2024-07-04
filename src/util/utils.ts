@@ -1,6 +1,6 @@
 import moment from "moment";
 import { Moment } from "moment";
-import { PREFERRED_DATE_FORMAT, YAML_FRONT_MATTER_REGEX } from "src/constants";
+import { PREFERRED_DATE_FORMAT } from "src/constants";
 
 type Hex = number;
 
@@ -105,45 +105,43 @@ export function convertToStringOrEmpty(v: any): string {
     return result;
 }
 
-//
-// This returns [frontmatter, content]
-//
-// The returned content has the same number of lines as the supplied str string, but with the
-// frontmatter lines (if present) blanked out.
-//
-// 1. We don't want the parser to see the frontmatter, as it would deem it to be part of a multi-line question
-// if one started on the line immediately after the "---" closing marker.
-//
-// 2. The lines are blanked out rather than deleted so that line numbers are not affected
-// e.g. for calls to getQuestionContext(cardLine: number)
-//
+/**
+ * The returned content has the same number of lines as the supplied string, but with the frontmatter lines (if present) blanked out.
+ *
+ * 1. We don't want the parser to see the frontmatter, as it would deem it to be part of a multi-line question if one started on the line immediately after the "---" closing marker.
+ *
+ * 2. The lines are blanked out rather than deleted so that line numbers are not affected e.g. for calls to getQuestionContext(cardLine: number)
+ *
+ * @param str The file content as string
+ * @returns [frontmatter, content]
+ */
 export function splitNoteIntoFrontmatterAndContent(str: string): [string, string] {
-    let frontmatter: string = "";
-    let content: string = "";
-    let frontmatterEndLineNum: number = null;
-    if (YAML_FRONT_MATTER_REGEX.test) {
-        const lines: string[] = splitTextIntoLineArray(str);
-
-        // The end "---" marker must be on the third line (index 2) or later
-        for (let i = 2; i < lines.length; i++) {
-            if (lines[i] == "---") {
-                frontmatterEndLineNum = i;
-                break;
-            }
+    const lines = splitTextIntoLineArray(str);
+    let lineIndex = 0;
+    let hasFrontmatter = false;
+    do {
+        // Starts file with '---'
+        if (lineIndex === 0 && lines[lineIndex] === "---") {
+            hasFrontmatter = true;
         }
-
-        if (frontmatterEndLineNum) {
-            const frontmatterStartLineNum: number = 0;
-            const frontmatterLines: string[] = [];
-            for (let i = frontmatterStartLineNum; i <= frontmatterEndLineNum; i++) {
-                frontmatterLines.push(lines[i]);
-                lines[i] = "";
-            }
-            frontmatter = frontmatterLines.join("\n");
-            content = lines.join("\n");
+        // Line is end of front matter
+        else if (hasFrontmatter && lines[lineIndex] === "---") {
+            hasFrontmatter = false;
+            lineIndex++;
         }
+        if (hasFrontmatter) {
+            lineIndex++;
+        }
+    } while (hasFrontmatter && lineIndex < lines.length);
+    // No end of Frontmatter found
+    if (hasFrontmatter) {
+        lineIndex = 0;
     }
-    if (frontmatter.length == 0) content = str;
+
+    const frontmatter: string = lines.slice(0, lineIndex).join("\n");
+    const emptyLines: string[] = lineIndex > 0 ? Array(lineIndex).join(".").split(".") : [];
+    const content: string = emptyLines.concat(lines.slice(lineIndex)).join("\n");
+
     return [frontmatter, content];
 }
 

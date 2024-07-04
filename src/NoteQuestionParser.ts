@@ -18,7 +18,7 @@ export class NoteQuestionParser {
     noteText: string;
     frontmatterText: string;
 
-    // This is the note text, but with the frontmatter blanked out (see extractFrontmatter for reasoning)
+    // This is the note text, but with the frontmatter blanked out (see splitNoteIntoFrontmatterAndContent for reasoning)
     contentText: string;
     noteLines: string[];
 
@@ -139,7 +139,7 @@ export class NoteQuestionParser {
     }
 
     private parseQuestions(): ParsedQuestionInfo[] {
-        // We pass contentText which has the frontmatter blanked out; see extractFrontmatter for reasoning
+        // We pass contentText which has the frontmatter blanked out; see splitNoteIntoFrontmatterAndContent for reasoning
         const settings: SRSettings = this.settings;
         const result: ParsedQuestionInfo[] = parseEx(
             this.contentText,

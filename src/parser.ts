@@ -23,7 +23,7 @@ export class ParsedQuestionInfo {
 /**
  * Returns flashcards found in `text`
  *
- * It is best that the text does not contain frontmatter, see extractFrontmatter for reasoning
+ * It is best that the text does not contain frontmatter, see splitNoteIntoFrontmatterAndContent for reasoning
  *
  * Multi-line question with blank lines user workaround:
  *      As of 3/04/2024 there is no support for including blank lines within multi-line questions
