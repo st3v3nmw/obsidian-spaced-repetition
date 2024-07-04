@@ -57,10 +57,9 @@ export class SrTFile implements ISRFile {
         const result: Map<string, string> = new Map<string, string>();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         for (const [key, value] of Object.entries(frontmatter) as [string, any][]) {
-            let v: string;
-            if (typeof value === "string") v = value;
-            else if (Array.isArray(value) && value.length > 0) v = value[0];
-            result.set(key, v);
+            const v = (Array.isArray(value) && value.length > 0) ? value[0]: value;
+            const vStr: string = v + "";
+            result.set(key, vStr);
         }
         return result;
     }

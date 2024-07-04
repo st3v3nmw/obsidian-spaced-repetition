@@ -50,7 +50,7 @@ export default class SRPlugin extends Plugin {
     private nextNoteReviewHandler: NextNoteReviewHandler;
 
     async onload(): Promise<void> {
-        console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-06-25 v3: 878A");
+        console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-07-04");
         await this.loadPluginData();
 
         this.initLogicClasses();
