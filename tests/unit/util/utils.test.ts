@@ -1,7 +1,7 @@
 import { YAML_FRONT_MATTER_REGEX } from "src/constants";
 import {
     convertToStringOrEmpty,
-    extractFrontmatter,
+    splitNoteIntoFrontmatterAndContent,
     findLineIndexOfSearchStringIgnoringWs,
     literalStringReplace,
 } from "src/util/utils";
@@ -119,19 +119,19 @@ describe("YAML_FRONT_MATTER_REGEX", () => {
     });
 });
 
-describe("extractFrontmatter", () => {
+describe("splitNoteIntoFrontmatterAndContent", () => {
     test("No frontmatter", () => {
         let text: string = `Hello
 Goodbye`;
         let frontmatter: string;
         let content: string;
-        [frontmatter, content] = extractFrontmatter(text);
+        [frontmatter, content] = splitNoteIntoFrontmatterAndContent(text);
         expect(frontmatter).toEqual("");
         expect(content).toEqual(text);
 
         text = `---
 Goodbye`;
-        [frontmatter, content] = extractFrontmatter(text);
+        [frontmatter, content] = splitNoteIntoFrontmatterAndContent(text);
         expect(frontmatter).toEqual("");
         expect(content).toEqual(text);
     });
@@ -147,7 +147,7 @@ tags:
 ---`;
         const text: string = frontmatter;
         let content: string;
-        [frontmatter, content] = extractFrontmatter(text);
+        [frontmatter, content] = splitNoteIntoFrontmatterAndContent(text);
         expect(frontmatter).toEqual(text);
         const frontmatterBlankedOut: string = `
 
@@ -186,7 +186,7 @@ This single {{question}} turns into {{3 separate}} {{cards}}
         const text: string = `${frontmatter}
 ${content}`;
 
-        const [f, c] = extractFrontmatter(text);
+        const [f, c] = splitNoteIntoFrontmatterAndContent(text);
         expect(f).toEqual(frontmatter);
         const frontmatterBlankedOut: string = `
 

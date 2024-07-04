@@ -1,6 +1,6 @@
 import { TagCache } from "obsidian";
 import { frontmatterTagPseudoLineNum } from "src/SRFile";
-import { extractFrontmatter, splitTextIntoLineArray } from "src/util/utils";
+import { splitNoteIntoFrontmatterAndContent, splitTextIntoLineArray } from "src/util/utils";
 
 export function unitTest_CreateTagCache(tag: string, lineNum: number): TagCache {
     return {
@@ -13,10 +13,11 @@ export function unitTest_CreateTagCache(tag: string, lineNum: number): TagCache 
 }
 
 export function unitTest_GetAllTagsFromTextEx(text: string): TagCache[] {
-    const [frontmatter, content] = extractFrontmatter(text);
+    const [frontmatter, content] = splitNoteIntoFrontmatterAndContent(text);
     const result = [] as TagCache[];
     let lines: string[];
 
+    const map: Map<string, string[]> = unitTest_BasicFrontmatterParserEx(text);
     if (frontmatter) {
         const dataPrefix: string = "  - ";
         lines = splitTextIntoLineArray(frontmatter);
@@ -55,4 +56,88 @@ export function unitTest_GetAllTagsFromTextEx(text: string): TagCache[] {
         }
     }
     return result;
+}
+
+export function unitTest_GetAllTagsFromText(text: string): string[] {
+    const tagRegex = /#[^\s#]+/gi;
+    const result: RegExpMatchArray = text.match(tagRegex);
+    if (!result) return [];
+    return result;
+}
+
+export function unitTest_BasicFrontmatterParser(text: string): Map<string, string> {
+    const result = new Map<string, string>();
+    const map: Map<string, string[]> = unitTest_BasicFrontmatterParserEx(text);
+    map.forEach((value, key) => {
+        result.set(key, value.pop());
+    });
+    return result;
+}
+
+export function unitTest_BasicFrontmatterParserEx(text: string): Map<string, string[]> {
+    const [frontmatter, _] = splitNoteIntoFrontmatterAndContent(text);
+    const result = new Map<string, string[]>();
+
+    if (!frontmatter) return result;
+
+    const keyRegex = /^([A-Za-z0-9_-]+):(.*)$/;
+    const dataRegex = /^(\s+)-\s+(.+)$/;
+    const lines: string[] = splitTextIntoLineArray(frontmatter);
+    let keyName: string = null;
+    let valueList: string[] = [] as string[];
+
+    for (let i = 0; i < lines.length; i++) {
+        const line: string = lines[i];
+
+        // Is there a key, and optional value?
+        const keyMatch: RegExpMatchArray = line.match(keyRegex);
+        if (keyMatch) {
+            if (keyName) {
+                result.set(keyName, valueList);
+            }
+            keyName = keyMatch[1];
+            valueList = [] as string[];
+            const value = keyMatch[2].trim();
+            if (value) {
+                valueList.push(value);
+            }
+        } else {
+            // Just a value, related to the last key
+            const dataMatch: RegExpMatchArray = line.match(dataRegex);
+            if (keyName && dataMatch) {
+                const value = dataMatch[1].trim();
+                if (value) {
+                    valueList.push(value);
+                }
+            }
+        }
+    }
+    if (keyName) {
+        result.set(keyName, valueList);
+    }
+    return result;
+}
+
+export function unitTest_ParseForOutgoingLinks(text: string): string[] {
+    const linkRegex = /\[\[([\w\s]+)\]\]+/gi;
+    const matches = text.matchAll(linkRegex);
+    const result: string[] = [] as string[];
+    for (const m of matches) {
+        result.push(m[1]);
+    }
+    return result;
+}
+
+export function unitTest_CheckNoteFrontmatter(
+    text: string,
+    expectedDueDate: string,
+    expectedInterval: number,
+    expectedEase: number,
+): void {
+    const frontmatter: Map<string, string> = unitTest_BasicFrontmatterParser(text);
+
+    expect(frontmatter).toBeTruthy();
+    expect(frontmatter.get("sr-due")).toEqual(expectedDueDate);
+    expect(frontmatter.get("sr-interval")).toEqual(expectedInterval + "");
+    expect(frontmatter.get("sr-ease")).toEqual(expectedEase + "");
 }

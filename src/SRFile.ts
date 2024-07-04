@@ -14,6 +14,8 @@ import { parseObsidianFrontmatterTag } from "./util/utils";
 export interface ISRFile {
     get path(): string;
     get basename(): string;
+    get tfile(): TFile;
+    getFrontmatter(): Promise<Map<string, string>>;
     getAllTagsFromCache(): string[];
     getAllTagsFromText(): TagCache[];
     getQuestionContext(cardLine: number): string[];
@@ -44,6 +46,25 @@ export class SrTFile implements ISRFile {
 
     get basename(): string {
         return this.file.basename;
+    }
+
+    get tfile(): TFile {
+        return this.file;
+    }
+
+    async getFrontmatter(): Promise<Map<string, string>> {
+        const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
+
+        const frontmatter: FrontMatterCache = fileCachedData.frontmatter || {};
+        const result: Map<string, string> = new Map<string, string>();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        for (const [key, value] of Object.entries(frontmatter) as [string, any][]) {
+            let v: string;
+            if (typeof value === "string") v = value;
+            else if (Array.isArray(value) && value.length > 0) v = value[0];
+            result.set(key, v);
+        }
+        return result;
     }
 
     getAllTagsFromCache(): string[] {

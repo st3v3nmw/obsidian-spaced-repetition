@@ -15,8 +15,7 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-              with:
-                  node-version: "20"
+
             - name: Use Node.js
               uses: actions/setup-node@v4
               with:
@@ -42,7 +41,7 @@ jobs:
 
             - name: Create Release
               id: create-release
-              uses: actions/create-release@v1.1.4
+              uses: actions/create-release@v1
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   VERSION: ${{ github.ref }}
