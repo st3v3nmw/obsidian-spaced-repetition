@@ -35,6 +35,7 @@ export class ParsedQuestionInfo {
  * @param singlelineReversedCardSeparator - Separator for inline reversed cards
  * @param multilineCardSeparator - Separator for multiline basic cards
  * @param multilineReversedCardSeparator - Separator for multiline basic card
+ * @param multilineCardEndMarker - Marker indicating the end of a multi-line card
  * @returns An array of [CardType, card text, line number] tuples
  */
 export function parseEx(
@@ -43,6 +44,7 @@ export function parseEx(
     singlelineReversedCardSeparator: string,
     multilineCardSeparator: string,
     multilineReversedCardSeparator: string,
+    multilineCardEndMarker: string,
     convertHighlightsToClozes: boolean,
     convertBoldTextToClozes: boolean,
     convertCurlyBracketsToClozes: boolean,
@@ -51,48 +53,49 @@ export function parseEx(
     const cards: ParsedQuestionInfo[] = [];
     let cardType: CardType | null = null;
     let firstLineNo = 0;
-    let lastLineNo = 0;
-
+    
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
     for (let i = 0; i < lines.length; i++) {
         const currentLine = lines[i];
-        if (currentLine.length === 0) {
-            if (cardType) {
-                lastLineNo = i - 1;
-                cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
-                cardType = null;
-            }
 
-            cardText = "";
-            continue;
-        } else if (currentLine.startsWith("<!--") && !currentLine.startsWith("<!--SR:")) {
-            while (i + 1 < lines.length && !currentLine.includes("-->")) i++;
+        if (currentLine.startsWith("<!--") && !currentLine.startsWith("<!--SR:")) {
+            while (i + 1 < lines.length && !lines[i + 1].includes("-->")) i++;
             i++;
+            continue;
+        }
+
+        if (
+            cardType &&
+            currentLine.trim() === multilineCardEndMarker
+        ) {
+            const lastLineNo = i;
+            cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
+            cardType = null;
+            cardText = "";
             continue;
         }
 
         if (cardText.length > 0) {
             cardText += "\n";
-        } else if (cardText.length === 0) {
-            // This could be the first line of a multi line question
+        } else {
             firstLineNo = i;
         }
-        cardText += currentLine.trimEnd();
+        cardText += currentLine;
 
         if (
             currentLine.includes(singlelineReversedCardSeparator) ||
             currentLine.includes(singlelineCardSeparator)
         ) {
-            cardType = lines[i].includes(singlelineReversedCardSeparator)
+            cardType = currentLine.includes(singlelineReversedCardSeparator)
                 ? CardType.SingleLineReversed
                 : CardType.SingleLineBasic;
-            cardText = lines[i];
+            cardText = currentLine;
             firstLineNo = i;
             if (i + 1 < lines.length && lines[i + 1].startsWith("<!--SR:")) {
                 cardText += "\n" + lines[i + 1];
                 i++;
             }
-            lastLineNo = i;
+            const lastLineNo = i;
             cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
             cardType = null;
             cardText = "";
@@ -124,7 +127,7 @@ export function parseEx(
     }
 
     if (cardType && cardText) {
-        lastLineNo = lines.length - 1;
+        const lastLineNo = lines.length - 1;
         cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
     }
 

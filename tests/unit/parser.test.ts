@@ -1,11 +1,12 @@
 import { parseEx, ParsedQuestionInfo } from "src/parser";
 import { CardType } from "src/Question";
 
-const defaultArgs: [string, string, string, string, boolean, boolean, boolean] = [
+const defaultArgs: [string, string, string, string, string, boolean, boolean, boolean] = [
     "::",
     ":::",
     "?",
     "??",
+    "",
     true,
     true,
     true,
@@ -22,6 +23,7 @@ function parse(
     singlelineReversedCardSeparator: string,
     multilineCardSeparator: string,
     multilineReversedCardSeparator: string,
+    multilineCardEndMarker: string,
     convertHighlightsToClozes: boolean,
     convertBoldTextToClozes: boolean,
     convertCurlyBracketsToClozes: boolean,
@@ -32,6 +34,7 @@ function parse(
         singlelineReversedCardSeparator,
         multilineCardSeparator,
         multilineReversedCardSeparator,
+		multilineCardEndMarker,
         convertHighlightsToClozes,
         convertBoldTextToClozes,
         convertCurlyBracketsToClozes,
@@ -162,7 +165,7 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum ==p\ndolor won==", ...defaultArgs)).toEqual([]);
     expect(parse("lorem ipsum ==dolor won=", ...defaultArgs)).toEqual([]);
     // ==highlights== turned off
-    expect(parse("cloze ==deletion== test", "::", ":::", "?", "??", false, true, false)).toEqual(
+    expect(parse("cloze ==deletion== test", "::", ":::", "?", "??", "", false, true, false)).toEqual(
         [],
     );
 
@@ -193,7 +196,7 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum **p\ndolor won**", ...defaultArgs)).toEqual([]);
     expect(parse("lorem ipsum **dolor won*", ...defaultArgs)).toEqual([]);
     // **bolded** turned off
-    expect(parse("cloze **deletion** test", "::", ":::", "?", "??", true, false, false)).toEqual(
+    expect(parse("cloze **deletion** test", "::", ":::", "?", "??", "", true, false, false)).toEqual(
         [],
     );
 

@@ -137,6 +137,7 @@ export class NoteQuestionParser {
             settings.singleLineReversedCardSeparator,
             settings.multilineCardSeparator,
             settings.multilineReversedCardSeparator,
+            settings.multilineCardEndMarker,
             settings.convertHighlightsToClozes,
             settings.convertBoldTextToClozes,
             settings.convertCurlyBracketsToClozes,
