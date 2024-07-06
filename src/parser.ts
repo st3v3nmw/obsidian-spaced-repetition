@@ -53,28 +53,44 @@ export function parseEx(
     const cards: ParsedQuestionInfo[] = [];
     let cardType: CardType | null = null;
     let firstLineNo = 0;
-    
+    let annotation = "";
+    let lastLineNo;
+
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
     for (let i = 0; i < lines.length; i++) {
         const currentLine = lines[i];
 
+        // Ignore non-SR comments
         if (currentLine.startsWith("<!--") && !currentLine.startsWith("<!--SR:")) {
             while (i + 1 < lines.length && !lines[i + 1].includes("-->")) i++;
             i++;
             continue;
         }
 
-        if (
-            cardType &&
-            currentLine.trim() === multilineCardEndMarker
-        ) {
-            const lastLineNo = i;
+        // Capture SR annotations
+        if (currentLine.startsWith("<!--SR:!")) {
+            annotation = currentLine;
+            lastLineNo = i;
+            continue;
+        }
+
+        // Check for end marker for multi-line cards
+        if ( cardType && currentLine.trim() === multilineCardEndMarker ) {
+			if (annotation) {
+				cardText += "\n" + annotation;
+                annotation = "";
+            }
             cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
             cardType = null;
             cardText = "";
             continue;
         }
 
+        if(currentLine.length > 0) {
+			lastLineNo = i;
+        }
+
+        // Concatenate lines for the current card
         if (cardText.length > 0) {
             cardText += "\n";
         } else {
@@ -82,6 +98,7 @@ export function parseEx(
         }
         cardText += currentLine;
 
+        // Handle single-line cards
         if (
             currentLine.includes(singlelineReversedCardSeparator) ||
             currentLine.includes(singlelineCardSeparator)
@@ -99,6 +116,12 @@ export function parseEx(
             cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
             cardType = null;
             cardText = "";
+        } else if (cardType === null && currentLine.trim() === multilineCardSeparator) {
+            cardType = CardType.MultiLineBasic;
+            // Explicitly don't change firstLineNo, as per above comment
+        } else if (cardType === null && currentLine.trim() === multilineReversedCardSeparator) {
+            cardType = CardType.MultiLineReversed;
+            // Explicitly don't change firstLineNo, as per above comment
         } else if (
             cardType === null &&
             ((convertHighlightsToClozes && /==.*?==/gm.test(currentLine)) ||
@@ -109,12 +132,6 @@ export function parseEx(
 
             // Explicitly don't change firstLineNo, as we might not see the cloze markers on the first line
             // of a multi line cloze question. I.e. firstLineNo may be less than i;
-        } else if (currentLine.trim() === multilineCardSeparator) {
-            cardType = CardType.MultiLineBasic;
-            // Explicitly don't change firstLineNo, as per above comment
-        } else if (currentLine.trim() === multilineReversedCardSeparator) {
-            cardType = CardType.MultiLineReversed;
-            // Explicitly don't change firstLineNo, as per above comment
         } else if (currentLine.startsWith("```") || currentLine.startsWith("~~~")) {
             const codeBlockClose = currentLine.match(/`+|~+/)[0];
             while (i + 1 < lines.length && !lines[i + 1].startsWith(codeBlockClose)) {
@@ -126,10 +143,14 @@ export function parseEx(
         }
     }
 
+    // Handle the last card if any
     if (cardType && cardText) {
         const lastLineNo = lines.length - 1;
+        if (annotation) {
+            cardText += "\n" + annotation;
+        }
         cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
     }
-
+    console.log(cards);
     return cards;
 }
