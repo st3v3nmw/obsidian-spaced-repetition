@@ -53,8 +53,8 @@ export function parseEx(
     const cards: ParsedQuestionInfo[] = [];
     let cardType: CardType | null = null;
     let firstLineNo = 0;
+    let lastLineNo = 0;
     let annotation = "";
-    let lastLineNo;
 
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
     for (let i = 0; i < lines.length; i++) {
@@ -80,7 +80,7 @@ export function parseEx(
 				cardText += "\n" + annotation;
                 annotation = "";
             }
-            cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
+			cards.push(new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo-1));
             cardType = null;
             cardText = "";
             continue;
@@ -149,8 +149,7 @@ export function parseEx(
         if (annotation) {
             cardText += "\n" + annotation;
         }
-        cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
+        cards.push(new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo));
     }
-    console.log(cards);
     return cards;
 }
