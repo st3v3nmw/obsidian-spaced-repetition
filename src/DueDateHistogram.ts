@@ -98,11 +98,7 @@ export class NoteDueDateHistogram extends DueDateHistogram {
 
         const today: number = globalDateProvider.today.valueOf();
         reviewDecks.forEach((reviewDeck: NoteReviewDeck) => {
-            reviewDeck.dueNotesCount = 0;
             reviewDeck.scheduledNotes.forEach((scheduledNote: SchedNote) => {
-                if (scheduledNote.dueUnix <= today) {
-                    reviewDeck.dueNotesCount++;
-                }
 
                 const nDays: number = Math.ceil((scheduledNote.dueUnix - today) / TICKS_PER_DAY);
                 this.increment(nDays);

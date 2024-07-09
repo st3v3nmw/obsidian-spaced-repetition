@@ -34,9 +34,10 @@ export class NextNoteReviewHandler {
     async autoReviewNextNote(): Promise<void> {
         if (this.settings.autoNextNote) {
             if (!this._lastSelectedReviewDeck) {
-                const reviewDeckKeys: string[] = Object.keys(this._noteReviewQueue.reviewDecks);
+                const reviewDeckKeys: string[] = this._noteReviewQueue.reviewDeckNameList;
                 if (reviewDeckKeys.length > 0) this._lastSelectedReviewDeck = reviewDeckKeys[0];
                 else {
+                    // 2024-07-05 existing functionality: Code doesn't look at other decks
                     new Notice(t("ALL_CAUGHT_UP"));
                     return;
                 }
@@ -46,9 +47,10 @@ export class NextNoteReviewHandler {
     }
 
     async reviewNextNoteModal(): Promise<void> {
-        const reviewDeckNames: string[] = Object.keys(this._noteReviewQueue.reviewDecks);
+        const reviewDeckNames: string[] = this._noteReviewQueue.reviewDeckNameList;
 
         if (reviewDeckNames.length === 1) {
+            // There is only one deck, so no need to ask the user to make a selection
             this.reviewNextNote(reviewDeckNames[0]);
         } else {
             const deckSelectionModal = new ReviewDeckSelectionModal(this.app, reviewDeckNames);
@@ -58,31 +60,21 @@ export class NextNoteReviewHandler {
     }
 
     async reviewNextNote(deckKey: string): Promise<void> {
-        if (!Object.prototype.hasOwnProperty.call(this._noteReviewQueue.reviewDecks, deckKey)) {
+        if (!this._noteReviewQueue.reviewDeckNameList.contains(deckKey)) {
             new Notice(t("NO_DECK_EXISTS", { deckName: deckKey }));
             return;
         }
 
         this._lastSelectedReviewDeck = deckKey;
         const deck = this._noteReviewQueue.reviewDecks.get(deckKey);
+        const notefile =  deck.determineNextNote(this.settings.openRandomNote);
 
-        if (deck.dueNotesCount > 0) {
-            const index = this.settings.openRandomNote
-                ? Math.floor(Math.random() * deck.dueNotesCount)
-                : 0;
-            await this.openNote(deckKey, deck.scheduledNotes[index].note.tfile);
-            return;
+        if (notefile) {
+            await this.openNote(deckKey, notefile.tfile);
+        } else {
+            new Notice(t("ALL_CAUGHT_UP"));
         }
 
-        if (deck.newNotes.length > 0) {
-            const index = this.settings.openRandomNote
-                ? Math.floor(Math.random() * deck.newNotes.length)
-                : 0;
-            await this.openNote(deckKey, deck.newNotes[index].tfile);
-            return;
-        }
-
-        new Notice(t("ALL_CAUGHT_UP"));
     }
 
     async openNote(deckName: string, file: TFile): Promise<void> {
