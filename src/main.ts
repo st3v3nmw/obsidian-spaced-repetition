@@ -425,6 +425,10 @@ export default class SRPlugin extends Plugin {
         await this.osrAppCore.saveNoteReviewResponse(noteSrTFile, response, this.data.settings);
 
         new Notice(t("RESPONSE_RECEIVED"));
+
+        if (this.data.settings.autoNextNote) {
+            this.nextNoteReviewHandler.autoReviewNextNote();
+        }
     }
 
     createSrTFile(note: TFile): SrTFile {

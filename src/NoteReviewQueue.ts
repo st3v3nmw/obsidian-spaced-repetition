@@ -1,24 +1,33 @@
-import { NoteReviewDeck } from "./NoteReviewDeck";
+import { NoteReviewDeck, SchedNote } from "./NoteReviewDeck";
 import { ISRFile } from "./SRFile";
 import { RepItemScheduleInfo } from "./algorithms/base/RepItemScheduleInfo";
 
 export class NoteReviewQueue {
     private _reviewDecks: Map<string, NoteReviewDeck>;
+    private _dueNotesCount: number;
 
     get reviewDecks(): Map<string, NoteReviewDeck> {
         return this._reviewDecks;
     }
 
     get dueNotesCount(): number {
-        let result: number = 0;
-        this._reviewDecks.forEach((reviewDeck: NoteReviewDeck) => {
-            result += reviewDeck.dueNotesCount;
-        });
-        return result;
+        return this._dueNotesCount;
+    }
+
+    get reviewDeckNameList(): string[] {
+        return  [ ... this._reviewDecks.keys() ];
     }
 
     init(): void {
         this._reviewDecks = new Map<string, NoteReviewDeck>();
+    }
+
+    public calcDueNotesCount(todayUnix: number): void {
+        this._dueNotesCount = 0;
+        this._reviewDecks.forEach((reviewDeck: NoteReviewDeck) => {
+            reviewDeck.calcDueNotesCount(todayUnix);
+            this._dueNotesCount += reviewDeck.dueNotesCount;
+        });
     }
 
     addNoteToQueue(
@@ -40,7 +49,7 @@ export class NoteReviewQueue {
             for (const matchedNoteTag of matchedNoteTags) {
                 this.reviewDecks
                     .get(matchedNoteTag)
-                    .scheduledNotes.push({ note: noteFile, dueUnix: noteSchedule.dueDateAsUnix });
+                    .scheduledNotes.push(new SchedNote(noteFile, noteSchedule.dueDateAsUnix));
             }
         }
     }
@@ -62,7 +71,7 @@ export class NoteReviewQueue {
                     reviewDeck.newNotes.findIndex((newNote: ISRFile) => newNote.path === note.path),
                     1,
                 );
-                reviewDeck.scheduledNotes.push({ note, dueUnix: scheduleInfo.dueDate.valueOf() });
+                reviewDeck.scheduledNotes.push(new SchedNote(note, scheduleInfo.dueDate.valueOf()));
             }
         });
     }

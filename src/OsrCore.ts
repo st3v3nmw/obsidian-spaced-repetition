@@ -18,6 +18,7 @@ import { ReviewResponse } from "./algorithms/base/RepetitionItem";
 import { IOsrVaultNoteLinkInfoFinder } from "./algorithms/osr/ObsidianVaultNoteLinkInfoFinder";
 import { CardDueDateHistogram, NoteDueDateHistogram } from "./DueDateHistogram";
 import { TextDirection } from "./util/TextDirection";
+import { globalDateProvider } from "./util/DateProvider";
 
 export interface IOsrVaultEvents {
     dataChanged: () => void;
@@ -148,10 +149,7 @@ export class OsrCore {
         this._cardStats = calc.calculate(this._reviewableDeckTree);
 
         // Generate the histogram for the due dates for (1) all the notes (2) all the cards
-        this._dueDateNoteHistogram.calculateFromReviewDecksAndSort(
-            this.noteReviewQueue.reviewDecks,
-            this.osrNoteGraph,
-        );
+        this.calculateDerivedInfo();
         this._dueDateFlashcardHistogram.calculateFromDeckTree(this._reviewableDeckTree);
 
         // Tell the interested party that the data has changed
@@ -192,16 +190,22 @@ export class OsrCore {
         // (This could be optimized to make the small adjustments to the histogram, but simpler to implement
         // by recalculating from scratch)
         this._noteReviewQueue.updateScheduleInfo(noteFile, noteSchedule);
-        this._dueDateNoteHistogram.calculateFromReviewDecksAndSort(
-            this.noteReviewQueue.reviewDecks,
-            this.osrNoteGraph,
-        );
+        this.calculateDerivedInfo();
 
         // If configured in the settings, bury all cards within the note
         await this.buryAllCardsInNote(settings, noteFile);
 
         // Tell the interested party that the data has changed
         if (this.dataChangedHandler) this.dataChangedHandler();
+    }
+
+    private calculateDerivedInfo(): void {
+        const todayUnix: number = globalDateProvider.today.valueOf();
+        this.noteReviewQueue.calcDueNotesCount(todayUnix);
+        this._dueDateNoteHistogram.calculateFromReviewDecksAndSort(
+            this.noteReviewQueue.reviewDecks,
+            this.osrNoteGraph,
+        );
     }
 
     private async buryAllCardsInNote(settings: SRSettings, noteFile: ISRFile): Promise<void> {
