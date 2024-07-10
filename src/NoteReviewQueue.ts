@@ -22,11 +22,10 @@ export class NoteReviewQueue {
         this._reviewDecks = new Map<string, NoteReviewDeck>();
     }
 
-    public calcDueNotesCount(todayUnix: number): void {
+    public calcDueNotesCount(): void {
         this._dueNotesCount = 0;
         this._reviewDecks.forEach((reviewDeck: NoteReviewDeck) => {
-            reviewDeck.calcDueNotesCount(todayUnix);
-            this._dueNotesCount += reviewDeck.dueNotesCount;
+            this._dueNotesCount += reviewDeck.dueNotes().length;
         });
     }
 

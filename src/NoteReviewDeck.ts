@@ -2,6 +2,7 @@ import { t } from "src/lang/helpers";
 import { ISRFile } from "./SRFile";
 import { SRSettings } from "./settings";
 import { globalRandomNumberProvider } from "./util/RandomNumberProvider";
+import { globalDateProvider } from "./util/DateProvider";
 
 export class SchedNote {
     note: ISRFile;
@@ -23,7 +24,6 @@ export class NoteReviewDeck {
 
     private _newNotes: ISRFile[] = [];
     private _scheduledNotes: SchedNote[] = [];
-    private _dueNotesCount = 0;
 
     // This stores the collapsed/expanded state of each folder (folder names being things like
     // "TODAY", "NEW" or formatted dates).
@@ -41,8 +41,9 @@ export class NoteReviewDeck {
         return this._scheduledNotes;
     }
 
-    get dueNotesCount(): number {
-        return this._dueNotesCount;
+    dueNotes(): SchedNote[] {
+        const todayUnix: number = globalDateProvider.today.valueOf();
+        return this.scheduledNotes.filter((note) => note.isDue(todayUnix));
     }
 
     get activeFolders(): Set<string> {
@@ -52,15 +53,6 @@ export class NoteReviewDeck {
     constructor(name: string) {
         this._deckName = name;
         this._activeFolders = new Set([this._deckName, t("TODAY")]);
-    }
-
-    public calcDueNotesCount(todayUnix: number): void {
-        this._dueNotesCount = 0;
-        this.scheduledNotes.forEach((scheduledNote: SchedNote) => {
-            if (scheduledNote.isDue(todayUnix)) {
-                this._dueNotesCount++;
-            }
-        });
     }
 
     public sortNotesByDateAndImportance(pageranks: Record<string, number>): void {
@@ -80,13 +72,13 @@ export class NoteReviewDeck {
     }
 
     determineNextNote(openRandomNote: boolean): ISRFile {
-
-        // Review due notes before new ones
-        if (this.dueNotesCount > 0) {
+        const dueNotes = this.dueNotes();
+        if (dueNotes.length > 0) {
+            // Review due notes before new ones
             const index = openRandomNote
-                ? globalRandomNumberProvider.getInteger(0, this.dueNotesCount - 1)
+                ? globalRandomNumberProvider.getInteger(0, this.dueNotes.length - 1)
                 : 0;
-            return this.scheduledNotes[index].note;
+            return dueNotes[index].note;
         }
 
         if (this.newNotes.length > 0) {
