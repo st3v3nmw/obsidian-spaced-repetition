@@ -27,7 +27,7 @@ function checkDeckTreeCounts(
 
 function checkNoteReviewDeck_Basic(actual: NoteReviewDeck, expected: any): void {
     expect(actual.deckName).toEqual(expected.deckName);
-    expect(actual.dueNotesCount).toEqual(expected.dueNotesCount);
+    expect(actual.dueNotes().length).toEqual(expected.dueNotesCount);
     expect(actual.newNotes.length).toEqual(expected.newNotesLength);
     expect(actual.scheduledNotes.length).toEqual(expected.scheduledNotesLength);
 }

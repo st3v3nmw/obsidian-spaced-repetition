@@ -200,8 +200,7 @@ export class OsrCore {
     }
 
     private calculateDerivedInfo(): void {
-        const todayUnix: number = globalDateProvider.today.valueOf();
-        this.noteReviewQueue.calcDueNotesCount(todayUnix);
+        this.noteReviewQueue.calcDueNotesCount();
         this._dueDateNoteHistogram.calculateFromReviewDecksAndSort(
             this.noteReviewQueue.reviewDecks,
             this.osrNoteGraph,
