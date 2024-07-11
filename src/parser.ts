@@ -77,10 +77,10 @@ export function parseEx(
         // Check for end marker for multi-line cards
         if ( cardType && currentLine.trim() === multilineCardEndMarker ) {
 			if (annotation) {
-				cardText += "\n" + annotation;
+				cardText = cardText.trimEnd() + "\n" + annotation;
                 annotation = "";
             }
-			cards.push(new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo-1));
+            cards.push(new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo-1));
             cardType = null;
             cardText = "";
             continue;
@@ -113,7 +113,7 @@ export function parseEx(
                 i++;
             }
             const lastLineNo = i;
-            cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
+            cards.push(new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo));
             cardType = null;
             cardText = "";
         } else if (cardType === null && currentLine.trim() === multilineCardSeparator) {
