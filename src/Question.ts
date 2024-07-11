@@ -261,7 +261,6 @@ export class Question {
         //      2. the question text
         //      3. the schedule HTML comment (if present)
         const replacementText = this.formatForNote(settings);
-
         let newText = MultiLineTextFinder.findAndReplace(noteText, originalText, replacementText);
         if (newText) {
             this.questionText = QuestionText.create(replacementText, settings);
