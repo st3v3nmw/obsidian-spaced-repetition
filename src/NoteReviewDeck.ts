@@ -1,6 +1,5 @@
 import { t } from "src/lang/helpers";
 import { ISRFile } from "./SRFile";
-import { SRSettings } from "./settings";
 import { globalRandomNumberProvider } from "./util/RandomNumberProvider";
 
 export class SchedNote {
@@ -80,7 +79,6 @@ export class NoteReviewDeck {
     }
 
     determineNextNote(openRandomNote: boolean): ISRFile {
-
         // Review due notes before new ones
         if (this.dueNotesCount > 0) {
             const index = openRandomNote

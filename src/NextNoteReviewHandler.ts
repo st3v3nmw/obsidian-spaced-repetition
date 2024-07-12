@@ -67,14 +67,13 @@ export class NextNoteReviewHandler {
 
         this._lastSelectedReviewDeck = deckKey;
         const deck = this._noteReviewQueue.reviewDecks.get(deckKey);
-        const notefile =  deck.determineNextNote(this.settings.openRandomNote);
+        const notefile = deck.determineNextNote(this.settings.openRandomNote);
 
         if (notefile) {
             await this.openNote(deckKey, notefile.tfile);
         } else {
             new Notice(t("ALL_CAUGHT_UP"));
         }
-
     }
 
     async openNote(deckName: string, file: TFile): Promise<void> {
