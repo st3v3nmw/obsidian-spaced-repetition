@@ -32,3 +32,8 @@ venv/
 
 # env
 env.sh
+
+# This file should belong to the repo. However, it was not in there.
+# Because it is automatically generated, to avoid being asked to add it to the repo
+# all the times, I added to the ignore list.
+package-lock.json
