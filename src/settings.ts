@@ -1,6 +1,7 @@
 import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
 import type SRPlugin from "src/main";
 import { t } from "src/lang/helpers";
+import { isEqualOrSubPath } from "./util/utils";
 
 export interface SRSettings {
     // flashcards
@@ -112,7 +113,7 @@ export class SettingsUtil {
     }
 
     static isPathInNoteIgnoreFolder(settings: SRSettings, path: string): boolean {
-        return settings.noteFoldersToIgnore.some((folder) => path.startsWith(folder));
+        return settings.noteFoldersToIgnore.some((folder) => isEqualOrSubPath(path, folder));
     }
 
     static isAnyTagANoteReviewTag(settings: SRSettings, tags: string[]): boolean {
