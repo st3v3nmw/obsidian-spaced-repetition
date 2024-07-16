@@ -22,6 +22,7 @@ import { textInterval } from "src/algorithms/osr/NoteScheduling";
 import { t } from "src/lang/helpers";
 import { Stats } from "../stats";
 import { CardListType } from "src/Deck";
+import { OsrCore } from "src/OsrCore";
 
 Chart.register(
     BarElement,
@@ -37,12 +38,12 @@ Chart.register(
 );
 
 export class StatsModal extends Modal {
-    private plugin: SRPlugin;
+    private osrCore: OsrCore;
 
-    constructor(app: App, plugin: SRPlugin) {
+    constructor(app: App, osrCore: OsrCore) {
         super(app);
 
-        this.plugin = plugin;
+        this.osrCore = osrCore;
 
         this.titleEl.setText(`${t("STATS_TITLE")} `);
         this.titleEl.addClass("sr-centered");
@@ -70,7 +71,7 @@ export class StatsModal extends Modal {
         contentEl.style.textAlign = "center";
 
         // Add forecast
-        const cardStats: Stats = this.plugin.cardStats;
+        const cardStats: Stats = this.osrCore.cardStats;
         let maxN: number = cardStats.delayedDays.getMaxValue();
         for (let dueOffset = 0; dueOffset <= maxN; dueOffset++) {
             cardStats.delayedDays.clearCountIfMissing(dueOffset);
@@ -170,7 +171,7 @@ export class StatsModal extends Modal {
         );
 
         // Add card types
-        const totalCardsCount: number = this.plugin.deckTree.getDistinctCardCount(
+        const totalCardsCount: number = this.osrCore.reviewableDeckTree.getDistinctCardCount(
             CardListType.All,
             true,
         );

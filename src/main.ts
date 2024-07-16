@@ -50,7 +50,7 @@ export default class SRPlugin extends Plugin {
     private nextNoteReviewHandler: NextNoteReviewHandler;
 
     async onload(): Promise<void> {
-        console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-07-04");
+        console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-07-16");
         await this.loadPluginData();
 
         this.initLogicClasses();
@@ -278,7 +278,7 @@ export default class SRPlugin extends Plugin {
             callback: async () => {
                 if (!this.osrAppCore.syncLock) {
                     await this.sync();
-                    new StatsModal(this.app, this).open();
+                    new StatsModal(this.app, this.osrAppCore).open();
                 }
             },
         });
