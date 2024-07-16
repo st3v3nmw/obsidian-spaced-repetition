@@ -142,6 +142,8 @@ export class FlashcardReviewView {
             this.content,
             this._currentQuestion.questionText.textDirection,
         );
+        // Set scroll position back to top
+        this.content.scrollTop = 0;
 
         // Setup response buttons
         this._resetResponseButtons();
