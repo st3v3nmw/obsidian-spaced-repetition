@@ -15,7 +15,7 @@ export class NoteReviewQueue {
     }
 
     get reviewDeckNameList(): string[] {
-        return  [ ... this._reviewDecks.keys() ];
+        return [...this._reviewDecks.keys()];
     }
 
     init(): void {
