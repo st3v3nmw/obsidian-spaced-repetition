@@ -18,7 +18,6 @@ import { ReviewResponse } from "./algorithms/base/RepetitionItem";
 import { IOsrVaultNoteLinkInfoFinder } from "./algorithms/osr/ObsidianVaultNoteLinkInfoFinder";
 import { CardDueDateHistogram, NoteDueDateHistogram } from "./DueDateHistogram";
 import { TextDirection } from "./util/TextDirection";
-import { globalDateProvider } from "./util/DateProvider";
 
 export interface IOsrVaultEvents {
     dataChanged: () => void;

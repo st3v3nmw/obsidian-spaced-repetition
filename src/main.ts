@@ -1,4 +1,4 @@
-import { FrontMatterCache, Notice, Plugin, TAbstractFile, TFile } from "obsidian";
+import { Notice, Plugin, TAbstractFile, TFile } from "obsidian";
 import {
     SRSettingTab,
     SRSettings,

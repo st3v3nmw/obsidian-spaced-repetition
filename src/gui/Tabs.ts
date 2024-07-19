@@ -17,7 +17,7 @@
  * Contact the author (Jarkko Linnanvirta): https://github.com/Taitava/
  */
 
-import {setIcon} from "obsidian";
+import { setIcon } from "obsidian";
 
 export interface Tab {
     title: string;
@@ -26,17 +26,17 @@ export interface Tab {
 }
 
 export interface TabStructure {
-    header: HTMLElement,
-    active_tab_id: string,
+    header: HTMLElement;
+    active_tab_id: string;
     buttons: {
-        [key: string]: HTMLElement,
-    }
+        [key: string]: HTMLElement;
+    };
     contentContainers: {
-        [key: string]: HTMLElement,
-    },
+        [key: string]: HTMLElement;
+    };
     contentGeneratorPromises: {
-        [key: string]: Promise<void>,
-    }
+        [key: string]: Promise<void>;
+    };
 }
 
 export interface Tabs {
@@ -44,15 +44,19 @@ export interface Tabs {
 }
 
 interface TabContentContainers {
-    [key: string]: HTMLElement,
+    [key: string]: HTMLElement;
 }
 
 interface TabButtons {
-    [key: string]: HTMLElement,
+    [key: string]: HTMLElement;
 }
 
-export function createTabs(container_element: HTMLElement, tabs: Tabs, activateTabId: string): TabStructure {
-    const tab_header = container_element.createEl("div", {attr: {class: "sr-tab-header"}});
+export function createTabs(
+    container_element: HTMLElement,
+    tabs: Tabs,
+    activateTabId: string,
+): TabStructure {
+    const tab_header = container_element.createEl("div", { attr: { class: "sr-tab-header" } });
     const tab_content_containers: TabContentContainers = {};
     const tab_buttons: TabButtons = {};
     const tab_structure: TabStructure = {
@@ -85,7 +89,9 @@ export function createTabs(container_element: HTMLElement, tabs: Tabs, activateT
             }
             const container_element = tab_header.parentElement;
             if (null === container_element) {
-                throw new Error("Container element is missing. Did not get a parent from tab header.");
+                throw new Error(
+                    "Container element is missing. Did not get a parent from tab header.",
+                );
             }
             const tab_contents = container_element.findAll("div.sr-tab-content"); // Do not get all tab contents that exist, because there might be multiple tab systems open at the same time.
             const is_main_settings_modal = container_element.hasClass("vertical-tab-content");
@@ -117,14 +123,19 @@ export function createTabs(container_element: HTMLElement, tabs: Tabs, activateT
 
             // Activate the clicked tab
             tab_button.addClass("sr-tab-active");
-            const activateTabAttribute: Attr | null = tab_button.attributes.getNamedItem("activateTab");
+            const activateTabAttribute: Attr | null =
+                tab_button.attributes.getNamedItem("activateTab");
             if (null === activateTabAttribute) {
                 throw new Error("Tab button has no 'activateTab' HTML attribute! Murr!");
             }
             const activate_tab_id = activateTabAttribute.value;
             const tab_content: HTMLElement | null = document.getElementById(activate_tab_id);
             if (null === tab_content) {
-                throw new Error("No tab content was found with activate_tab_id '"+activate_tab_id+"'! Hmph!");
+                throw new Error(
+                    "No tab content was found with activate_tab_id '" +
+                        activate_tab_id +
+                        "'! Hmph!",
+                );
             }
             tab_content.addClass("sr-tab-active");
 
@@ -144,17 +155,20 @@ export function createTabs(container_element: HTMLElement, tabs: Tabs, activateT
             // Do nothing else (I don't know if this is needed or not)
             event.preventDefault();
         };
-        if (tab.icon)
-            setIcon(button, tab.icon);
+        if (tab.icon) setIcon(button, tab.icon);
 
         button.insertAdjacentText("beforeend", " " + tab.title);
         tab_buttons[tab_id] = button;
 
         // Create content container
-        tab_content_containers[tab_id] = container_element.createEl("div", {attr: {class: "sr-tab-content", id: "sr-tab-" + tab_id}});
+        tab_content_containers[tab_id] = container_element.createEl("div", {
+            attr: { class: "sr-tab-content", id: "sr-tab-" + tab_id },
+        });
 
         // Generate content
-        tab_structure.contentGeneratorPromises[tab_id] = tab.content_generator(tab_content_containers[tab_id]);
+        tab_structure.contentGeneratorPromises[tab_id] = tab.content_generator(
+            tab_content_containers[tab_id],
+        );
 
         // Memorize the first tab's button
         if (undefined === first_button) {
@@ -168,4 +182,3 @@ export function createTabs(container_element: HTMLElement, tabs: Tabs, activateT
     // Return the TabStructure
     return tab_structure;
 }
-
