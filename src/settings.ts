@@ -152,32 +152,38 @@ export class SRSettingTab extends PluginSettingTab {
                 "main-flashcards": {
                     title: t("FLASHCARDS"),
                     icon: null, // "SpacedRepIcon",
-                    content_generator: (container_element: HTMLElement) => this.tabFlashcards(container_element),
+                    content_generator: (container_element: HTMLElement) =>
+                        this.tabFlashcards(container_element),
                 },
                 "main-notes": {
                     title: t("NOTES"),
                     icon: null, // "note-glyph",
-                    content_generator: (container_element: HTMLElement) => this.tabNotes(container_element),
+                    content_generator: (container_element: HTMLElement) =>
+                        this.tabNotes(container_element),
                 },
                 "main-algorithm": {
                     title: "Algorithm",
                     icon: null, // "dot-network",
-                    content_generator: (container_element: HTMLElement) => this.tabAlgorithm(container_element),
+                    content_generator: (container_element: HTMLElement) =>
+                        this.tabAlgorithm(container_element),
                 },
                 "main-ui-preferences": {
                     title: t("UI_PREFERENCES"),
                     icon: null, // "presentation",
-                    content_generator: (container_element: HTMLElement) => this.tabUiPreferences(container_element),
+                    content_generator: (container_element: HTMLElement) =>
+                        this.tabUiPreferences(container_element),
                 },
                 "main-developer": {
                     title: "Developer",
                     icon: null, // "code-glyph",
-                    content_generator: (container_element: HTMLElement) => this.tabDeveloper(container_element),
+                    content_generator: (container_element: HTMLElement) =>
+                        this.tabDeveloper(container_element),
                 },
                 "main-help": {
                     title: "Help",
                     icon: null, // "help",
-                    content_generator: (container_element: HTMLElement) => this.tabHelp(container_element),
+                    content_generator: (container_element: HTMLElement) =>
+                        this.tabHelp(container_element),
                 },
             },
             this.last_position.tab_name,
@@ -192,23 +198,21 @@ export class SRSettingTab extends PluginSettingTab {
     }
 
     private async tabFlashcards(containerEl: HTMLElement): Promise<void> {
-        console.log(`tabFlashcards`);
-
-        containerEl.createEl("h3", { text: `Tags & Folders` });
+        containerEl.createEl("h3", { text: t("GROUP_TAGS_FOLDERS") });
         {
             new Setting(containerEl)
-            .setName(t("FLASHCARD_TAGS"))
-            .setDesc(t("FLASHCARD_TAGS_DESC"))
-            .addTextArea((text) =>
-                text
-                    .setValue(this.plugin.data.settings.flashcardTags.join(" "))
-                    .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            this.plugin.data.settings.flashcardTags = value.split(/\s+/);
-                            await this.plugin.savePluginData();
-                        });
-                    }),
-            );
+                .setName(t("FLASHCARD_TAGS"))
+                .setDesc(t("FLASHCARD_TAGS_DESC"))
+                .addTextArea((text) =>
+                    text
+                        .setValue(this.plugin.data.settings.flashcardTags.join(" "))
+                        .onChange((value) => {
+                            applySettingsUpdate(async () => {
+                                this.plugin.data.settings.flashcardTags = value.split(/\s+/);
+                                await this.plugin.savePluginData();
+                            });
+                        }),
+                );
 
             new Setting(containerEl)
                 .setName(t("CONVERT_FOLDERS_TO_DECKS"))
@@ -220,11 +224,11 @@ export class SRSettingTab extends PluginSettingTab {
                             this.plugin.data.settings.convertFoldersToDecks = value;
                             await this.plugin.savePluginData();
                         }),
-            );
+                );
             this.createSetting_FoldersToIgnore(containerEl);
         }
-        
-        containerEl.createEl("h3", { text: `Flashcard Review` });
+
+        containerEl.createEl("h3", { text: t("GROUP_FLASHCARD_REVIEW") });
         {
             new Setting(containerEl)
                 .setName(t("BURY_SIBLINGS_TILL_NEXT_DAY"))
@@ -266,18 +270,18 @@ export class SRSettingTab extends PluginSettingTab {
                     .addOptions(
                         deckOrderEnabled
                             ? {
-                                PrevDeckComplete_Sequential: t(
-                                    "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
-                                ),
-                                PrevDeckComplete_Random: t(
-                                    "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
-                                ),
-                            }
+                                  PrevDeckComplete_Sequential: t(
+                                      "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
+                                  ),
+                                  PrevDeckComplete_Random: t(
+                                      "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
+                                  ),
+                              }
                             : {
-                                EveryCardRandomDeckAndCard: t(
-                                    "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
-                                ),
-                            },
+                                  EveryCardRandomDeckAndCard: t(
+                                      "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
+                                  ),
+                              },
                     )
                     .setValue(
                         deckOrderEnabled
@@ -292,16 +296,18 @@ export class SRSettingTab extends PluginSettingTab {
             );
         }
 
-        containerEl.createEl("h3", { text: `Flashcard Separators` });
+        containerEl.createEl("h3", { text: t("GROUP_FLASHCARD_SEPARATORS") });
         {
-            new Setting(containerEl).setName(t("CONVERT_HIGHLIGHTS_TO_CLOZES")).addToggle((toggle) =>
-                toggle
-                    .setValue(this.plugin.data.settings.convertHighlightsToClozes)
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.convertHighlightsToClozes = value;
-                        await this.plugin.savePluginData();
-                    }),
-            );
+            new Setting(containerEl)
+                .setName(t("CONVERT_HIGHLIGHTS_TO_CLOZES"))
+                .addToggle((toggle) =>
+                    toggle
+                        .setValue(this.plugin.data.settings.convertHighlightsToClozes)
+                        .onChange(async (value) => {
+                            this.plugin.data.settings.convertHighlightsToClozes = value;
+                            await this.plugin.savePluginData();
+                        }),
+                );
 
             new Setting(containerEl).setName(t("CONVERT_BOLD_TEXT_TO_CLOZES")).addToggle((toggle) =>
                 toggle
@@ -424,7 +430,7 @@ export class SRSettingTab extends PluginSettingTab {
                 });
         }
 
-        containerEl.createEl("h3", { text: `Storage of Scheduling Data` });
+        containerEl.createEl("h3", { text: t("GROUP_DATA_STORAGE") });
         {
             new Setting(containerEl)
                 .setName(t("INLINE_SCHEDULING_COMMENTS"))
@@ -441,7 +447,6 @@ export class SRSettingTab extends PluginSettingTab {
     }
 
     private async tabNotes(containerEl: HTMLElement): Promise<void> {
-console.log(`tabNotes`);
         containerEl.createEl("br");
         new Setting(containerEl).setName(t("REVIEW_PANE_ON_STARTUP")).addToggle((toggle) =>
             toggle
@@ -557,8 +562,7 @@ console.log(`tabNotes`);
     }
 
     private async tabUiPreferences(containerEl: HTMLElement): Promise<void> {
-
-        containerEl.createEl("h3", { text: `Flashcards` });
+        containerEl.createEl("h3", { text: t("FLASHCARDS") });
         new Setting(containerEl)
             .setName(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE"))
             .setDesc(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC"))
@@ -571,70 +575,70 @@ console.log(`tabNotes`);
                     }),
             );
 
-            new Setting(containerEl)
-                .setName(t("SHOW_CARD_CONTEXT"))
-                .setDesc(t("SHOW_CARD_CONTEXT_DESC"))
-                .addToggle((toggle) =>
-                    toggle
-                        .setValue(this.plugin.data.settings.showContextInCards)
-                        .onChange(async (value) => {
-                            this.plugin.data.settings.showContextInCards = value;
-                            await this.plugin.savePluginData();
-                        }),
-                );
+        new Setting(containerEl)
+            .setName(t("SHOW_CARD_CONTEXT"))
+            .setDesc(t("SHOW_CARD_CONTEXT_DESC"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.showContextInCards)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.showContextInCards = value;
+                        await this.plugin.savePluginData();
+                    }),
+            );
 
-            new Setting(containerEl)
-                .setName(t("CARD_MODAL_HEIGHT_PERCENT"))
-                .setDesc(t("CARD_MODAL_SIZE_PERCENT_DESC"))
-                .addSlider((slider) =>
-                    slider
-                        .setLimits(10, 100, 5)
-                        .setValue(this.plugin.data.settings.flashcardHeightPercentage)
-                        .setDynamicTooltip()
-                        .onChange(async (value) => {
-                            this.plugin.data.settings.flashcardHeightPercentage = value;
-                            await this.plugin.savePluginData();
-                        }),
-                )
-                .addExtraButton((button) => {
-                    button
-                        .setIcon("reset")
-                        .setTooltip(t("RESET_DEFAULT"))
-                        .onClick(async () => {
-                            this.plugin.data.settings.flashcardHeightPercentage =
-                                DEFAULT_SETTINGS.flashcardHeightPercentage;
-                            await this.plugin.savePluginData();
-                            this.display();
-                        });
-                });
+        new Setting(containerEl)
+            .setName(t("CARD_MODAL_HEIGHT_PERCENT"))
+            .setDesc(t("CARD_MODAL_SIZE_PERCENT_DESC"))
+            .addSlider((slider) =>
+                slider
+                    .setLimits(10, 100, 5)
+                    .setValue(this.plugin.data.settings.flashcardHeightPercentage)
+                    .setDynamicTooltip()
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.flashcardHeightPercentage = value;
+                        await this.plugin.savePluginData();
+                    }),
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.flashcardHeightPercentage =
+                            DEFAULT_SETTINGS.flashcardHeightPercentage;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
-            new Setting(containerEl)
-                .setName(t("CARD_MODAL_WIDTH_PERCENT"))
-                .setDesc(t("CARD_MODAL_SIZE_PERCENT_DESC"))
-                .addSlider((slider) =>
-                    slider
-                        .setLimits(10, 100, 5)
-                        .setValue(this.plugin.data.settings.flashcardWidthPercentage)
-                        .setDynamicTooltip()
-                        .onChange(async (value) => {
-                            this.plugin.data.settings.flashcardWidthPercentage = value;
-                            await this.plugin.savePluginData();
-                        }),
-                )
-                .addExtraButton((button) => {
-                    button
-                        .setIcon("reset")
-                        .setTooltip(t("RESET_DEFAULT"))
-                        .onClick(async () => {
-                            this.plugin.data.settings.flashcardWidthPercentage =
-                                DEFAULT_SETTINGS.flashcardWidthPercentage;
-                            await this.plugin.savePluginData();
-                            this.display();
-                        });
-                });
+        new Setting(containerEl)
+            .setName(t("CARD_MODAL_WIDTH_PERCENT"))
+            .setDesc(t("CARD_MODAL_SIZE_PERCENT_DESC"))
+            .addSlider((slider) =>
+                slider
+                    .setLimits(10, 100, 5)
+                    .setValue(this.plugin.data.settings.flashcardWidthPercentage)
+                    .setDynamicTooltip()
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.flashcardWidthPercentage = value;
+                        await this.plugin.savePluginData();
+                    }),
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.flashcardWidthPercentage =
+                            DEFAULT_SETTINGS.flashcardWidthPercentage;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
 
-        containerEl.createEl("h3", { text: `Flashcards & Notes` });
-            new Setting(containerEl)
+        containerEl.createEl("h3", { text: t("GROUP_FLASHCARDS_NOTES") });
+        new Setting(containerEl)
             .setName(t("FLASHCARD_EASY_LABEL"))
             .setDesc(t("FLASHCARD_EASY_DESC"))
             .addText((text) =>
@@ -705,10 +709,12 @@ console.log(`tabNotes`);
     }
 
     private async tabAlgorithm(containerEl: HTMLElement): Promise<void> {
-
-        containerEl.createEl("p").insertAdjacentHTML("beforeend", t("CHECK_ALGORITHM_WIKI", {
-            algo_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/",
-        }));
+        containerEl.createEl("p").insertAdjacentHTML(
+            "beforeend",
+            t("CHECK_ALGORITHM_WIKI", {
+                algo_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/",
+            }),
+        );
 
         new Setting(containerEl)
             .setName(t("BASE_EASE"))
@@ -869,7 +875,6 @@ console.log(`tabNotes`);
     }
 
     private async tabDeveloper(containerEl: HTMLElement): Promise<void> {
-
         containerEl.createEl("h3", { text: `${t("LOGGING")}` });
         new Setting(containerEl).setName(t("DISPLAY_DEBUG_INFO")).addToggle((toggle) =>
             toggle.setValue(this.plugin.data.settings.showDebugMessages).onChange(async (value) => {
@@ -877,34 +882,53 @@ console.log(`tabNotes`);
                 await this.plugin.savePluginData();
             }),
         );
-        containerEl.createEl("h3", { text: `Contributing` });
-        containerEl.createEl("p").insertAdjacentHTML("beforeend", t("GITHUB_SOURCE_CODE", {
-            github_project_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition",
-        }));
-        containerEl.createEl("p").insertAdjacentHTML("beforeend", t("CODE_CONTRIBUTION_INFO", {
-            code_contribution_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/contributing/#code",
-        }));
-        containerEl.createEl("p").insertAdjacentHTML("beforeend", t("TRANSLATION_CONTRIBUTION_INFO", {
-            translation_contribution_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/contributing/#translating",
-        }));
-
+        containerEl.createEl("h3", { text: t("GROUP_CONTRIBUTING") });
+        containerEl.createEl("p").insertAdjacentHTML(
+            "beforeend",
+            t("GITHUB_SOURCE_CODE", {
+                github_project_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition",
+            }),
+        );
+        containerEl.createEl("p").insertAdjacentHTML(
+            "beforeend",
+            t("CODE_CONTRIBUTION_INFO", {
+                code_contribution_url:
+                    "https://www.stephenmwangi.com/obsidian-spaced-repetition/contributing/#code",
+            }),
+        );
+        containerEl.createEl("p").insertAdjacentHTML(
+            "beforeend",
+            t("TRANSLATION_CONTRIBUTION_INFO", {
+                translation_contribution_url:
+                    "https://www.stephenmwangi.com/obsidian-spaced-repetition/contributing/#translating",
+            }),
+        );
     }
 
     private async tabHelp(containerEl: HTMLElement): Promise<void> {
-
         // Documentation link & GitHub links
-        containerEl.createEl("p").insertAdjacentHTML("beforeend", t("CHECK_WIKI", {
-            wiki_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/",
-        }));
+        containerEl.createEl("p").insertAdjacentHTML(
+            "beforeend",
+            t("CHECK_WIKI", {
+                wiki_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/",
+            }),
+        );
 
-        containerEl.createEl("p").insertAdjacentHTML("beforeend", t("GITHUB_DISCUSSIONS", {
-            discussions_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/",
-        }));
+        containerEl.createEl("p").insertAdjacentHTML(
+            "beforeend",
+            t("GITHUB_DISCUSSIONS", {
+                discussions_url:
+                    "https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/",
+            }),
+        );
 
-        containerEl.createEl("p").insertAdjacentHTML("beforeend", t("GITHUB_ISSUES", {
-            issues_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/",
-        }));
-/* 
+        containerEl.createEl("p").insertAdjacentHTML(
+            "beforeend",
+            t("GITHUB_ISSUES", {
+                issues_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/",
+            }),
+        );
+        /* 
         // Documentation link & GitHub links
         containerEl.createEl("hr").insertAdjacentHTML("beforeend");
 
@@ -929,21 +953,21 @@ console.log(`tabNotes`);
         // Go to last position now
         this.tab_structure.buttons[last_position.tab_name].click();
         // window.setTimeout(() => { // Need to delay the scrolling a bit. Without this, something else would override scrolling and scroll back to 0.
-            container_element.scrollTo({
-                top: this.last_position.scroll_position,
-                behavior: "auto",
-            });
+        container_element.scrollTo({
+            top: this.last_position.scroll_position,
+            behavior: "auto",
+        });
         // }, 0); // 'timeout' can be 0 ms, no need to wait any longer.
         // I guess there's no need for setTimeout() anymore, as rememberLastPosition() is now called after waiting for asynchronous tab content generating is finished.
         // TODO: Remove the commented code after a while.
 
         // Listen to changes
-        container_element.addEventListener("scroll", (event) => {
+        container_element.addEventListener("scroll", (_) => {
             this.last_position.scroll_position = container_element.scrollTop;
         });
         for (const tab_name in this.tab_structure.buttons) {
             const button = this.tab_structure.buttons[tab_name];
-            button.onClickEvent((event: MouseEvent) => {
+            button.onClickEvent((_: MouseEvent) => {
                 last_position.tab_name = tab_name;
             });
         }
