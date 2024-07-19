@@ -52,11 +52,18 @@ export default {
     YEARS_STR_IVL_MOBILE: "${interval}a",
 
     // settings.ts
-    SETTINGS_HEADER: "Plugin Spaced Repetition - Configuração",
+    SETTINGS_HEADER: "Spaced Repetition - Configuração",
     CHECK_WIKI: 'Para mais informações, cheque a <a href="${wiki_url}">wiki</a>.',
+    GITHUB_DISCUSSIONS: 'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
+    GITHUB_ISSUES: 'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report.',
+    GITHUB_SOURCE_CODE: 'Project source code available on <a href="${github_project_url}">GitHub</a>',
+    CODE_CONTRIBUTION_INFO: 'Information on <a href="${code_contribution_url}">code contributions</a>',
+    TRANSLATION_CONTRIBUTION_INFO: 'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+    PROJECT_CONTRIBUTIONS: 'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Pastas para ignorar",
     FOLDERS_TO_IGNORE_DESC:
-        "Insira o caminho das pastas separado por quebras de linha ex: Templates Meta/Scripts",
+        `Insira o caminho das pastas separado por quebras de linha ex: Templates Meta/Scripts.
+Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARDS: "Flashcards",
     FLASHCARD_EASY_LABEL: "Texto do Botão de Fácil",
     FLASHCARD_GOOD_LABEL: "Texto do Botão de OK",

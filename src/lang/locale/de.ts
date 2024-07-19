@@ -56,11 +56,18 @@ export default {
     YEARS_STR_IVL_MOBILE: "${interval}j",
 
     // settings.ts
-    SETTINGS_HEADER: "Spaced Repetition Plugin - Einstellungen",
+    SETTINGS_HEADER: "Spaced Repetition - Einstellungen",
     CHECK_WIKI: 'Weitere Informationen gibt es im <a href="${wiki_url}">Wiki</a> (english).',
+    GITHUB_DISCUSSIONS: 'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
+    GITHUB_ISSUES: 'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report.',
+    GITHUB_SOURCE_CODE: 'Project source code available on <a href="${github_project_url}">GitHub</a>',
+    CODE_CONTRIBUTION_INFO: 'Information on <a href="${code_contribution_url}">code contributions</a>',
+    TRANSLATION_CONTRIBUTION_INFO: 'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+    PROJECT_CONTRIBUTIONS: 'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Ausgeschlossene Ordner",
     FOLDERS_TO_IGNORE_DESC:
-        "Mehrere Ordner mit Zeilenumbrüchen getrennt angeben. Bsp. OrdnerA[Zeilenumbruch]OrdnerB/Unterordner",
+        `Mehrere Ordner mit Zeilenumbrüchen getrennt angeben. Bsp. OrdnerA[Zeilenumbruch]OrdnerB/Unterordner.
+Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARDS: "Lernkarten",
     FLASHCARD_EASY_LABEL: "Einfach Knopf Text",
     FLASHCARD_GOOD_LABEL: "Gut Knopf Text",

@@ -50,7 +50,7 @@ export default {
     YEARS_STR_IVL_MOBILE: "${interval}y",
 
     // settings.ts
-    SETTINGS_HEADER: "Spaced Repetition Plugin - Settings",
+    SETTINGS_HEADER: "Spaced Repetition - Settings",
     CHECK_WIKI: 'For more information, check the <a href="${wiki_url}">wiki</a>.',
     GITHUB_DISCUSSIONS: 'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
     GITHUB_ISSUES: 'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report.',
