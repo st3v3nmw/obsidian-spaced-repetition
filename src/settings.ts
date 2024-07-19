@@ -143,7 +143,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
-        const header = containerEl.createEl("h1", { text: `${t("SETTINGS_HEADER")}` });
+        const header = containerEl.createEl("h4", { text: `${t("SETTINGS_HEADER")}` });
         header.addClass("sr-centered");
 
         this.tab_structure = createTabs(
@@ -910,7 +910,7 @@ console.log(`tabNotes`);
 
         // Copyright notice
         const copyright_paragraph = containerEl.createEl("p");
-        copyright_paragraph.addClass("SC-small-font");
+        copyright_paragraph.addClass("sr-small-font");
         copyright_paragraph.insertAdjacentHTML("beforeend", `
             <em>Shell commands</em> plugin Copyright &copy; 2021 - 2023 Jarkko Linnanvirta. This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. See more information in the license: <a href="${GitHub.license}">GNU GPL-3.0</a>.
         `);     */
