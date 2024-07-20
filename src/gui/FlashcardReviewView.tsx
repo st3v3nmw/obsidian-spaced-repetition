@@ -193,6 +193,8 @@ export class FlashcardReviewView {
             this._currentNote.filePath,
         );
         await wrapper.renderMarkdownWrapper(this._currentCard.front, this.content);
+        // Set scroll position back to top
+        this.content.scrollTop = 0;
 
         // Setup response buttons
         this._resetResponseButtons();
