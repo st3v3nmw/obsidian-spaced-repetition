@@ -94,9 +94,14 @@ inline_rev
     }
 
 multiline_card
-  = arg1:multiline_before question_mark arg2:multiline_after separator_line {
-  	  return createParsedQuestionInfo(CardType.MultiLineBasic,text().slice(0,-(separator.length+2)),location().start.line-1,location().end.line-2);
-    }
+  = multiline separator_line {
+  	return createParsedQuestionInfo(CardType.MultiLineBasic,text().slice(0,-(separator.length+2)),location().start.line-1,location().end.line-2);
+  }
+    
+multiline
+  = arg1:multiline_before question_mark arg2:multiline_after {
+  	return createParsedQuestionInfo(CardType.MultiLineBasic,text().slice(0,-(separator.length+2)),location().start.line-1,location().end.line-2);
+  }
 
 multiline_before
   = e:(!question_mark nonempty_text_line)+ {
