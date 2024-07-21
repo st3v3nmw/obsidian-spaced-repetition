@@ -107,6 +107,7 @@ export default {
     INLINE_REVERSED_CARDS_SEPARATOR: "インラインの表裏反転フラッシュカードに使用するセパレーター",
     MULTILINE_CARDS_SEPARATOR: "複数行のフラッシュカードに使用するセパレーター",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "複数行の表裏反転フラッシュカードに使用するセパレーター",
+    MULTILINE_CARDS_END_MARKER: "クローズと複数行フラッシュカードの終わりを示す文字",
     NOTES: "ノート",
     REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "レビューに使用するタグ",

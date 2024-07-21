@@ -116,6 +116,7 @@ export default {
     INLINE_REVERSED_CARDS_SEPARATOR: "Trennzeichen für einzeilige beidseitige Lernkarten",
     MULTILINE_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige Lernkarten",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige beidseitige Lernkarten",
+    MULTILINE_CARDS_END_MARKER: "Zeichen, die das Ende von Lückentexten und mehrzeiligen Flashcards kennzeichnen",
     NOTES: "Notizen",
     REVIEW_PANE_ON_STARTUP: "Öffne Überprüfungswarteschlage beim start",
     TAGS_TO_REVIEW: "Zu wiederholende Tags",

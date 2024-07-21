@@ -108,6 +108,7 @@ export default {
     MULTILINE_CARDS_SEPARATOR: "Separator dla kart zamaskowanych wieloliniowych",
     MULTILINE_REVERSED_CARDS_SEPARATOR:
         "Separator dla kart zamaskowanych odwróconych wieloliniowych",
+    MULTILINE_CARDS_END_MARKER: "Caracteres que denotam o fim de clozes e flashcards multilineares",
     NOTES: "Notatki",
     REVIEW_PANE_ON_STARTUP: "Włączyć panel przeglądu notatek przy starcie",
     TAGS_TO_REVIEW: "Tagi do przeglądu",

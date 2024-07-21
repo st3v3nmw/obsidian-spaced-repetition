@@ -107,6 +107,7 @@ export default {
     INLINE_REVERSED_CARDS_SEPARATOR: "Separador para flashcards inline reversos",
     MULTILINE_CARDS_SEPARATOR: "Separador para flashcards de múltiplas linhas",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Separador para flashcards de múltiplas linhas reversos",
+    MULTILINE_CARDS_END_MARKER: "Caracteres que denotam o fim de clozes e flashcards multilinha",
     NOTES: "Notas",
     REVIEW_PANE_ON_STARTUP: "Habilitar painel de revisão de notas na inicialização",
     TAGS_TO_REVIEW: "Etiquetas para revisar",
