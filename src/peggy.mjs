@@ -178,7 +178,6 @@ function peg$parse(input, options) {
   var peg$c0 = "::";
   var peg$c1 = ":::";
   var peg$c2 = "?";
-  var peg$c3 = "---";
 
   var peg$r0 = /^[^\n\r]/;
   var peg$r1 = /^[\n\r]/;
@@ -189,10 +188,9 @@ function peg$parse(input, options) {
   var peg$e1 = peg$classExpectation(["\n", "\r"], true, false);
   var peg$e2 = peg$literalExpectation(":::", false);
   var peg$e3 = peg$literalExpectation("?", false);
-  var peg$e4 = peg$literalExpectation("---", false);
-  var peg$e5 = peg$classExpectation(["\n", "\r"], false, false);
-  var peg$e6 = peg$classExpectation([" ", "\f", "\t", "\v", " ", "\xA0", "\u1680", ["\u2000", "\u200A"], "\u2028", "\u2029", "\u202F", "\u205F", "\u3000", "\uFEFF"], true, false);
-  var peg$e7 = peg$classExpectation([" ", "\f", "\t", "\v", " ", "\xA0", "\u1680", ["\u2000", "\u200A"], "\u2028", "\u2029", "\u202F", "\u205F", "\u3000", "\uFEFF"], false, false);
+  var peg$e4 = peg$classExpectation(["\n", "\r"], false, false);
+  var peg$e5 = peg$classExpectation([" ", "\f", "\t", "\v", " ", "\xA0", "\u1680", ["\u2000", "\u200A"], "\u2028", "\u2029", "\u202F", "\u205F", "\u3000", "\uFEFF"], true, false);
+  var peg$e6 = peg$classExpectation([" ", "\f", "\t", "\v", " ", "\xA0", "\u1680", ["\u2000", "\u200A"], "\u2028", "\u2029", "\u202F", "\u205F", "\u3000", "\uFEFF"], false, false);
 
   var peg$f0 = function(blocks) { return filterBlocks(blocks); };
   var peg$f1 = function(left, right) {
@@ -202,7 +200,7 @@ function peg$parse(input, options) {
       return createParsedQuestionInfo(CardType.SingleLineReversed,text(),location().start.line-1,location().end.line-1);
     };
   var peg$f3 = function(arg1, arg2) {
-  	  return createParsedQuestionInfo(CardType.MultiLineBasic,text().slice(0,-("---".length+2)),location().start.line-1,location().end.line-2);
+  	  return createParsedQuestionInfo(CardType.MultiLineBasic,text().slice(0,-(separator.length+2)),location().start.line-1,location().end.line-2);
     };
   var peg$f4 = function(e) {
   	  return text();
@@ -849,22 +847,11 @@ function peg$parse(input, options) {
     var s0, s1, s2;
 
     s0 = peg$currPos;
-    if (input.substr(peg$currPos, 3) === peg$c3) {
-      s1 = peg$c3;
-      peg$currPos += 3;
-    } else {
-      s1 = peg$FAILED;
-      if (peg$silentFails === 0) { peg$fail(peg$e4); }
-    }
-    if (s1 !== peg$FAILED) {
-      s2 = peg$parsenewline();
-      if (s2 !== peg$FAILED) {
-        s1 = [s1, s2];
-        s0 = s1;
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
-      }
+    s1 = '';
+    s2 = peg$parsenewline();
+    if (s2 !== peg$FAILED) {
+      s1 = [s1, s2];
+      s0 = s1;
     } else {
       peg$currPos = s0;
       s0 = peg$FAILED;
@@ -1082,7 +1069,7 @@ function peg$parse(input, options) {
       peg$currPos++;
     } else {
       s0 = peg$FAILED;
-      if (peg$silentFails === 0) { peg$fail(peg$e5); }
+      if (peg$silentFails === 0) { peg$fail(peg$e4); }
     }
 
     return s0;
@@ -1099,7 +1086,7 @@ function peg$parse(input, options) {
       peg$currPos++;
     } else {
       s3 = peg$FAILED;
-      if (peg$silentFails === 0) { peg$fail(peg$e5); }
+      if (peg$silentFails === 0) { peg$fail(peg$e4); }
     }
     if (s3 !== peg$FAILED) {
       s2 = [s2, s3];
@@ -1142,7 +1129,7 @@ function peg$parse(input, options) {
       peg$currPos++;
     } else {
       s0 = peg$FAILED;
-      if (peg$silentFails === 0) { peg$fail(peg$e6); }
+      if (peg$silentFails === 0) { peg$fail(peg$e5); }
     }
 
     return s0;
@@ -1157,7 +1144,7 @@ function peg$parse(input, options) {
       peg$currPos++;
     } else {
       s1 = peg$FAILED;
-      if (peg$silentFails === 0) { peg$fail(peg$e7); }
+      if (peg$silentFails === 0) { peg$fail(peg$e6); }
     }
     while (s1 !== peg$FAILED) {
       s0.push(s1);
@@ -1166,7 +1153,7 @@ function peg$parse(input, options) {
         peg$currPos++;
       } else {
         s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$e7); }
+        if (peg$silentFails === 0) { peg$fail(peg$e6); }
       }
     }
 
@@ -1192,6 +1179,8 @@ function peg$parse(input, options) {
   const CardType = options.CardType ? options.CardType : CardTypeFallBack;
   CardType.Ignore=null;
   const createParsedQuestionInfo = options.createParsedQuestionInfo ? options.createParsedQuestionInfo : createParsedQuestionInfoFallBack;
+
+  const separator = "---";
 
   function parseOperatorLine(parts, t) {
     return {

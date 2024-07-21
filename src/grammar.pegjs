@@ -18,6 +18,8 @@
   CardType.Ignore=null;
   const createParsedQuestionInfo = options.createParsedQuestionInfo ? options.createParsedQuestionInfo : createParsedQuestionInfoFallBack;
 
+  const separator = "---";
+
   function parseOperatorLine(parts, t) {
     return {
       type: t,
@@ -87,7 +89,7 @@ inline_rev
 
 multiline
   = arg1:multiline_before question_mark arg2:multiline_after separator_line {
-  	  return createParsedQuestionInfo(CardType.MultiLineBasic,text().slice(0,-("---".length+2)),location().start.line-1,location().end.line-2);
+  	  return createParsedQuestionInfo(CardType.MultiLineBasic,text().slice(0,-(separator.length+2)),location().start.line-1,location().end.line-2);
     }
 
 multiline_before
@@ -121,7 +123,8 @@ question_mark
   = "?" newline
 
 separator_line
-  = "---" newline
+  = "" newline
+  // separator
 
 text_line_nonterminated
   = text:[^\n\r]+ {
