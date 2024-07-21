@@ -18,7 +18,7 @@
   CardType.Ignore=null;
   const createParsedQuestionInfo = options.createParsedQuestionInfo ? options.createParsedQuestionInfo : createParsedQuestionInfoFallBack;
 
-  const separator = "---";
+  const separator = ""; // "---";
 
   function parseOperatorLine(parts, t) {
     return {
@@ -75,13 +75,14 @@ main
   = blocks:block* { return filterBlocks(blocks); }
 
 block
-  = inline_rev_card / inline_card / multiline_card / loose_line
+  = inline_rev_card / inline_card / multiline_rev_card / multiline_card / loose_line
 
 inline_card
   = e:inline newline? { return e; }
 
 inline
   = left:(!"::" [^\n\r])+ "::" right:not_newline (newline annotation)? {
+  	console.log(text(),">>");
       return createParsedQuestionInfo(CardType.SingleLineBasic,text(),location().start.line-1,location().end.line-1);
     }
 
@@ -94,21 +95,42 @@ inline_rev
     }
 
 multiline_card
-  = multiline separator_line {
-  	return createParsedQuestionInfo(CardType.MultiLineBasic,text().slice(0,-(separator.length+2)),location().start.line-1,location().end.line-2);
+  = d:multiline separator_line {
+  	return d;
   }
     
 multiline
   = arg1:multiline_before question_mark arg2:multiline_after {
-  	return createParsedQuestionInfo(CardType.MultiLineBasic,text().slice(0,-(separator.length+2)),location().start.line-1,location().end.line-2);
+  	return createParsedQuestionInfo(CardType.MultiLineBasic,(arg1+"?\n"+arg2.trim()),location().start.line-1,location().end.line-2);
   }
-
+  
 multiline_before
   = e:(!question_mark nonempty_text_line)+ {
   	  return text();
     }
 
 multiline_after
+  = e:(!separator_line text_line)+ {
+      return text();
+    } 
+
+multiline_rev_card
+  = d:multiline_rev separator_line {
+  	return d;
+  }
+    
+multiline_rev
+  = arg1:multiline_rev_before double_question_mark arg2:multiline_rev_after {
+  	return createParsedQuestionInfo(CardType.MultiLineReversed,(arg1+"??\n"+arg2.trim()),location().start.line-1,location().end.line-2);
+  }
+
+
+multiline_rev_before
+  = e:(!double_question_mark nonempty_text_line)+ {
+  	  return text();
+    }
+
+multiline_rev_after
   = e:(!separator_line text_line)+ {
       return text();
     }
@@ -131,7 +153,10 @@ multiline_after
 */
 
 question_mark
-  = "?" newline
+  = "?" _ newline
+
+double_question_mark
+  = "??" _ newline
 
 separator_line
   = "" newline
@@ -158,7 +183,7 @@ loose_line
     }
     
 annotation
-  = "<!--SR:!" + text:(!"-->" .+) {
+  = "<!--SR:!" (!"-->" .)+ "-->" {
       return createParsedQuestionInfo(CardType.Ignore,"",0,0);
     }
     
