@@ -73,7 +73,7 @@ main
   = blocks:block* { return filterBlocks(blocks); }
 
 block
-  = inline_rev_card / inline_card / multiline_rev_card / multiline_card / loose_line
+  = inline_rev_card / inline_card / multiline_rev_card / multiline_card / close_card / loose_line
 
 inline_card
   = e:inline newline? { return e; }
@@ -150,6 +150,47 @@ multiline_after
     }
 */
 
+close_card
+  = close {
+  console.log(text() + ">>>");
+    return createParsedQuestionInfo(CardType.Cloze,text().trim(),location().start.line-1,location().end.line-1);
+  }
+
+close
+//finish here
+  = multiline_before_close? f:close_line text_line1 e:(multiline_after_close)? e1:(newline annotation)? { console.log(f); console.log("++++");
+  }
+
+close_line
+  = ((!close_text [^\n\r])* close_text) text_line_nonterminated?
+  
+multiline_before_close
+  = (!close_line nonempty_text_line)+
+
+multiline_after_close
+  = (!newline text_line1)+
+
+close_text
+  = close_equal / close_star / close_bracket
+
+close_equal
+  = close_mark_equal (!close_mark_equal [^\n\r])+  close_mark_equal
+
+close_mark_equal
+  = "=="
+  
+close_star
+  = close_mark_star (!close_mark_star [^\n\r])+  close_mark_star
+
+close_mark_star
+  = "**"
+
+close_bracket
+  = close_mark_bracket (!close_mark_bracket [^\n\r])+  close_mark_bracket
+
+close_mark_bracket
+  = "**"
+
 question_mark
   = "?" _ newline
 
@@ -174,6 +215,11 @@ text_line
   = text:[^\n\r]* newline {
   	  return parseTextLine(text);
     }
+
+text_line1
+  = newline text:[^\n\r]* {
+  	  return parseTextLine(text);
+    }
     
 loose_line
   = text:([^\n\r]* newline / [^\n\r]+) {
@@ -181,7 +227,7 @@ loose_line
     }
     
 annotation
-  = "<!--SR:!" (!"-->" .)+ "-->" {
+  = "<!--SR:" (!"-->" .)+ "-->" {
       return createParsedQuestionInfo(CardType.Ignore,"",0,0);
     }
     
