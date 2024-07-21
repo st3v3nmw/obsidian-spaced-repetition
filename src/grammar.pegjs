@@ -75,19 +75,25 @@ main
   = blocks:block* { return filterBlocks(blocks); }
 
 block
-  = inline_rev / inline / multiline / loose_line
+  = inline_rev_card / inline_card / multiline_card / loose_line
+
+inline_card
+  = e:inline newline? { return e; }
 
 inline
-  = left:(!"::" [^\n\r])+ "::" right:not_newline newline? {
+  = left:(!"::" [^\n\r])+ "::" right:not_newline (newline annotation)? {
       return createParsedQuestionInfo(CardType.SingleLineBasic,text(),location().start.line-1,location().end.line-1);
     }
 
+inline_rev_card
+  = e:inline_rev newline? { return e; }
+
 inline_rev
-  = left:(!":::" [^\n\r])+ ":::" right:not_newline newline? {
+  = left:(!":::" [^\n\r])+ ":::" right:not_newline (newline annotation)? {
       return createParsedQuestionInfo(CardType.SingleLineReversed,text(),location().start.line-1,location().end.line-1);
     }
 
-multiline
+multiline_card
   = arg1:multiline_before question_mark arg2:multiline_after separator_line {
   	  return createParsedQuestionInfo(CardType.MultiLineBasic,text().slice(0,-(separator.length+2)),location().start.line-1,location().end.line-2);
     }
@@ -143,6 +149,11 @@ text_line
     
 loose_line
   = text:([^\n\r]* newline / [^\n\r]+) {
+      return createParsedQuestionInfo(CardType.Ignore,"",0,0);
+    }
+    
+annotation
+  = "<!--SR:!" + text:(!"-->" .+) {
       return createParsedQuestionInfo(CardType.Ignore,"",0,0);
     }
     
