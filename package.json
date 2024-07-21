@@ -21,6 +21,8 @@
     "author": "Stephen Mwangi",
     "license": "MIT",
     "devDependencies": {
+        "@babel/core": "^7.24.9",
+        "@babel/preset-env": "^7.24.8",
         "@types/jest": "^29.5.12",
         "@types/node": "^20.11.24",
         "@types/vhtml": "^2.2.9",
@@ -31,6 +33,7 @@
         "@wdio/mocha-framework": "^8.32.3",
         "@wdio/spec-reporter": "^8.32.2",
         "auto-changelog": "^2.4.0",
+        "babel-jest": "^29.7.0",
         "builtin-modules": "^3.3.0",
         "chai": "^4.4.1",
         "esbuild": "~0.19.12",

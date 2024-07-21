@@ -1,14 +1,22 @@
 /** @type {import('@ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
     verbose: true,
-    preset: "ts-jest",
-    testEnvironment: "jsdom",
-    setupFilesAfterEnv: ["jest-expect-message"],
+    preset: 'ts-jest/presets/default-esm',
+    testEnvironment: 'jsdom',
+    setupFilesAfterEnv: ['jest-expect-message'],
     moduleNameMapper: {
-        "src/(.*)": "<rootDir>/src/$1",
+        'src/(.*)': '<rootDir>/src/$1',
     },
-    moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node", "d.ts"],
-    roots: ["<rootDir>/src/", "<rootDir>/tests/unit/"],
+    moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx', 'json', 'node', 'mjs'],
+    transform: {
+        '^.+\\.(t|j)sx?$': ['ts-jest', { useESM: true }],
+        '^.+\\.mjs$': 'babel-jest' // Ensure babel-jest is configured to handle .mjs files
+    },
+    transformIgnorePatterns: [
+        '/node_modules/',
+    ],
+    extensionsToTreatAsEsm: ['.ts'], // Removed '.mjs' since it's automatically treated as ESM
+    roots: ['<rootDir>/src/', '<rootDir>/tests/unit/'],
     collectCoverageFrom: [
         "src/**/lang/*.ts",
         "src/NoteEaseList.ts",
