@@ -18,8 +18,6 @@
   CardType.Ignore=null;
   const createParsedQuestionInfo = options.createParsedQuestionInfo ? options.createParsedQuestionInfo : createParsedQuestionInfoFallBack;
 
-  const separator = ""; // "---";
-
   function parseOperatorLine(parts, t) {
     return {
       type: t,
@@ -159,7 +157,7 @@ double_question_mark
   = "??" _ newline
 
 separator_line
-  = "" newline
+  = "---" newline
   // separator
 
 text_line_nonterminated
