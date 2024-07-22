@@ -41,6 +41,7 @@ import { NoteEaseCalculator } from "./NoteEaseCalculator";
 import { DeckTreeStatsCalculator } from "./DeckTreeStatsCalculator";
 import { NoteEaseList } from "./NoteEaseList";
 import { QuestionPostponementList } from "./QuestionPostponementList";
+import { isEqualOrSubPath } from "./util/utils";
 
 interface PluginData {
     settings: SRSettings;
@@ -379,7 +380,7 @@ export default class SRPlugin extends Plugin {
         for (const noteFile of notes) {
             if (
                 this.data.settings.noteFoldersToIgnore.some((folder) =>
-                    noteFile.path.startsWith(folder),
+                    isEqualOrSubPath(noteFile.path, folder),
                 )
             ) {
                 continue;
@@ -567,7 +568,11 @@ export default class SRPlugin extends Plugin {
             fileCachedData.frontmatter || {};
 
         const tags = getAllTags(fileCachedData) || [];
-        if (this.data.settings.noteFoldersToIgnore.some((folder) => note.path.startsWith(folder))) {
+        if (
+            this.data.settings.noteFoldersToIgnore.some((folder) =>
+                isEqualOrSubPath(note.path, folder),
+            )
+        ) {
             new Notice(t("NOTE_IN_IGNORED_FOLDER"));
             return;
         }
@@ -756,11 +761,13 @@ export default class SRPlugin extends Plugin {
         this.lastSelectedReviewDeck = deckKey;
         const deck = this.reviewDecks[deckKey];
 
-        if (deck.dueNotesCount > 0) {
+        const nowUnix = Date.now();
+        const dueNotes = deck.scheduledNotes.filter((note) => note.dueUnix <= nowUnix);
+        if (dueNotes.length > 0) {
             const index = this.data.settings.openRandomNote
-                ? Math.floor(Math.random() * deck.dueNotesCount)
+                ? Math.floor(Math.random() * dueNotes.length)
                 : 0;
-            await this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
+            await this.app.workspace.getLeaf().openFile(dueNotes[index].note);
             return;
         }
 
