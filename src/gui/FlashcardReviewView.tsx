@@ -393,7 +393,6 @@ export class FlashcardReviewView {
     }
 
     private _setTitle(deck: Deck) {
-        const isRandomMode = this.settings.flashcardCardOrder === "EveryCardRandomDeckAndCard";
         let text = deck.deckName;
 
         const deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
