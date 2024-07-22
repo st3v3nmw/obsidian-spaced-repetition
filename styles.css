@@ -1,8 +1,40 @@
-.is-mobile #sr-modal {
-    --top-space: calc(var(--safe-area-inset-top) + var(--header-height) + var(--size-4-2));
-    width: 100vw !important;
-    height: calc(100vh - var(--top-space)) !important;
-    margin-top: var(--top-space);
+@media only screen and (orientation: landscape) {
+    .is-mobile .sr-flashcard {
+        flex-direction: row;
+    }
+
+    .is-mobile .sr-header {
+        flex-direction: column;
+        flex: 0 1 0;
+    }
+
+    .is-mobile .sr-content {
+        flex: 1 0 0;
+    }
+
+    .is-mobile .sr-response {
+        flex-direction: column;
+        flex: 0 1 0;
+    }
+
+    .is-mobile .sr-controls {
+        flex-direction: column;
+    }
+
+    .is-mobile .sr-title {
+        display: none;
+    }
+
+    .is-mobile .sr-response-button {
+        writing-mode: vertical-lr;
+    }
+}
+
+#sr-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 #sr-modal .modal-title {
