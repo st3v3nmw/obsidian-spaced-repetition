@@ -61,6 +61,11 @@ export function parseEx(
 	// Use this function when you call the parse method
 	try {
 		cards = parse(text + "\n\n\n",  {
+			singlelineCardSeparator,
+			singlelineReversedCardSeparator,
+			multilineCardSeparator,
+			multilineReversedCardSeparator,
+			multilineCardEndMarker,
 			convertHighlightsToClozes,
 			convertBoldTextToClozes,
 			convertCurlyBracketsToClozes,

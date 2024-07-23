@@ -17,10 +17,99 @@
   CardType.Ignore=null;
   const createParsedQuestionInfo = options.createParsedQuestionInfo ? options.createParsedQuestionInfo : createParsedQuestionInfoFallBack;
 
-  const convertHighlightsToClozes = (typeof options.convertHighlightsToClozes !== undefined) ? options.convertHighlightsToClozes : true;
-  const convertBoldTextToClozes = (typeof options.convertBoldTextToClozes !== undefined) ? options.convertBoldTextToClozes : true;
-  const convertCurlyBracketsToClozes = (typeof options.convertCurlyBracketsToClozes !== undefined) ? options.convertCurlyBracketsToClozes : true;
+  const convertHighlightsToClozes = options.hasOwnProperty("convertHighlightsToClozes") ? options.convertHighlightsToClozes : true;
+  const convertBoldTextToClozes = options.hasOwnProperty("convertBoldTextToClozes") ? options.convertBoldTextToClozes : true;
+  const convertCurlyBracketsToClozes = options.hasOwnProperty("convertCurlyBracketsToClozes") ? options.convertCurlyBracketsToClozes : true;
 
+  const singlelineCardSeparator = options.hasOwnProperty("singlelineCardSeparator") ? options.singlelineCardSeparator : "::";
+  const singlelineReversedCardSeparator = options.hasOwnProperty("singlelineReversedCardSeparator") ? options.singlelineReversedCardSeparator : ":::";
+  const multilineCardSeparator = options.hasOwnProperty("multilineCardSeparator") ? options.multilineCardSeparator : "?";
+  const multilineReversedCardSeparator = options.hasOwnProperty("multilineReversedCardSeparator") ? options.multilineReversedCardSeparator : "??";
+  const multilineCardEndMarker = options.hasOwnProperty("multilineCardEndMarker") ? options.multilineCardEndMarker : "";
+
+  // BEGIN HACK
+
+  // The following functions allows parsing the keywords defined by the user. The backbone
+  // of the functions defined below has been obtained by nearly copyin and pasting from the
+  // automatically generated `peggy.mjs` file.
+
+  function my$generate_end_card_mark(str) {
+	const len = str.length;
+  	const e = peg$literalExpectation(str, false);
+    return () => {
+	    var s0;
+
+	    if (input.substr(peg$currPos, len) === str) {
+	      s0 = str;
+	      peg$currPos += len;
+	    } else {
+	      s0 = peg$FAILED;
+	      if (peg$silentFails === 0) { peg$fail(e); }
+	    }
+
+	    return s0;
+	  }
+  }
+  peg$parseend_card_mark = my$generate_end_card_mark(multilineCardEndMarker);
+
+  function my$generate_question_mark_parser(str) {
+  	const len = str.length;
+  	const e = peg$literalExpectation(str, false);
+    return () => {
+	    var s0, s1, s2, s3;
+
+	    s0 = peg$currPos;
+	    if (input.substr(peg$currPos, len) === str) {
+	      s1 = str;
+	      peg$currPos += len;
+	    } else {
+	      s1 = peg$FAILED;
+	      if (peg$silentFails === 0) { peg$fail(e); }
+	    }
+	    if (s1 !== peg$FAILED) {
+	      s2 = peg$parse_();
+	      s3 = peg$parsenewline();
+	      if (s3 !== peg$FAILED) {
+	        s1 = [s1, s2, s3];
+	        s0 = s1;
+	      } else {
+	        peg$currPos = s0;
+	        s0 = peg$FAILED;
+	      }
+	    } else {
+	      peg$currPos = s0;
+	      s0 = peg$FAILED;
+	    }
+
+	    return s0;
+    }
+  }
+  peg$parsequestion_mark = my$generate_question_mark_parser(multilineCardSeparator);
+  peg$parsedouble_question_mark = my$generate_question_mark_parser(multilineReversedCardSeparator);
+
+  function my$generate_inline_mark_parser(str) {
+  	const len = str.length;
+  	const e = peg$literalExpectation(str, false);
+  	return () => {
+	    var s0;
+
+	    if (input.substr(peg$currPos, len) === str) {
+	      s0 = str;
+	      peg$currPos += len;
+	    } else {
+	      s0 = peg$FAILED;
+	      if (peg$silentFails === 0) { peg$fail(e); }
+	    }
+
+	    return s0;
+	}
+  }
+  peg$parseinline_mark = my$generate_inline_mark_parser(singlelineCardSeparator);
+  peg$parseinline_rev_mark = my$generate_inline_mark_parser(singlelineReversedCardSeparator);
+
+  // END HACK
+
+  
   function parseOperatorLine(parts, t) {
     return {
       type: t,
@@ -53,7 +142,7 @@ inline_card
   = e:inline newline? { return e; }
 
 inline
-  = left:(!"::" [^\n\r])+ "::" right:not_newline (newline annotation)? {
+  = left:(!inline_mark [^\n\r])+ inline_mark right:not_newline (newline annotation)? {
       return createParsedQuestionInfo(CardType.SingleLineBasic,text(),location().start.line-1,location().end.line-1);
     }
 
@@ -61,7 +150,7 @@ inline_rev_card
   = e:inline_rev newline? { return e; }
 
 inline_rev
-  = left:(!":::" [^\n\r])+ ":::" right:not_newline (newline annotation)? {
+  = left:(!inline_rev_mark [^\n\r])+ inline_rev_mark right:not_newline (newline annotation)? {
       return createParsedQuestionInfo(CardType.SingleLineReversed,text(),location().start.line-1,location().end.line-1);
     }
 
@@ -72,7 +161,7 @@ multiline_card
     
 multiline
   = arg1:multiline_before question_mark arg2:multiline_after {
-  	return createParsedQuestionInfo(CardType.MultiLineBasic,(arg1+"?\n"+arg2.trim()),location().start.line-1,location().end.line-2);
+  	return createParsedQuestionInfo(CardType.MultiLineBasic,(arg1+multilineCardSeparator+"\n"+arg2.trim()),location().start.line-1,location().end.line-2);
   }
   
 multiline_before
@@ -100,7 +189,7 @@ multiline_rev_card
     
 multiline_rev
   = arg1:multiline_rev_before double_question_mark arg2:multiline_rev_after {
-  	return createParsedQuestionInfo(CardType.MultiLineReversed,(arg1+"??\n"+arg2.trim()),location().start.line-1,location().end.line-2);
+  	return createParsedQuestionInfo(CardType.MultiLineReversed,(arg1+multilineReversedCardSeparator+"\n"+arg2.trim()),location().start.line-1,location().end.line-2);
   }
 
 multiline_rev_before
@@ -152,16 +241,24 @@ close_mark_bracket_open
 close_mark_bracket_close
   = "}}"
 
+inline_mark
+  = "SINGLELINECARDSEPARATOR"
+
+inline_rev_mark
+  = "SINGLELINEREVERSEDCARDSEPARATOR"
+
 question_mark
-  = "?" _ newline
+  = "MULTILINECARDSEPARATOR" _ newline
 
 double_question_mark
-  = "??" _ newline
+  = "MULTILINEREVERSEDCARDSEPARATOR" _ newline
+
+end_card_mark
+  = "MULTILINECARDENDMARKER"
 
 separator_line
-  = "" newline
-  // separator
-
+  = end_card_mark newline
+  
 text_line_nonterminated
   = t:$[^\n\r]+ {
       return t;
