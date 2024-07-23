@@ -34,8 +34,7 @@ export class RenderMarkdownWrapper {
             el = containerEl.createDiv();
             el.setAttribute("dir", "rtl");
         } else el = containerEl;
-
-        MarkdownRenderer.renderMarkdown(markdownString, el, this.notePath, this.plugin);
+        MarkdownRenderer.render(this.app, markdownString, el, this.notePath, this.plugin);
 
         el.findAll(".internal-embed").forEach((el) => {
             const link = this.parseLink(el.getAttribute("src"));

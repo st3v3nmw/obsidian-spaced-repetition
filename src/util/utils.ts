@@ -1,5 +1,6 @@
 import moment from "moment";
 import { Moment } from "moment";
+import { normalize, sep } from "path";
 import { PREFERRED_DATE_FORMAT, YAML_FRONT_MATTER_REGEX } from "src/constants";
 
 type Hex = number;
@@ -117,33 +118,76 @@ export function convertToStringOrEmpty(v: any): string {
 // 2. The lines are blanked out rather than deleted so that line numbers are not affected
 // e.g. for calls to getQuestionContext(cardLine: number)
 //
-export function extractFrontmatter(str: string): [string, string] {
-    let frontmatter: string = "";
-    let content: string = "";
-    let frontmatterEndLineNum: number = null;
-    if (YAML_FRONT_MATTER_REGEX.test) {
-        const lines: string[] = splitTextIntoLineArray(str);
 
-        // The end "---" marker must be on the third line (index 2) or later
-        for (let i = 2; i < lines.length; i++) {
-            if (lines[i] == "---") {
-                frontmatterEndLineNum = i;
-                break;
-            }
-        }
-
-        if (frontmatterEndLineNum) {
-            const frontmatterStartLineNum: number = 0;
-            const frontmatterLines: string[] = [];
-            for (let i = frontmatterStartLineNum; i <= frontmatterEndLineNum; i++) {
-                frontmatterLines.push(lines[i]);
-                lines[i] = "";
-            }
-            frontmatter = frontmatterLines.join("\n");
-            content = lines.join("\n");
+/**
+ * Checks a path is equal or a subpath of the other rootPath
+ *
+ * @param toCheck The path to check it is equal or a subpath of path.
+ * @param rootPath The ref path to check the other is equal to or a subpath of this.
+ * @tutorial
+ * rootPath = "root/sub/sub2"
+ * if toCheck = "notRoot/..." -> false
+ * if toCheck = "root" -> true
+ * if toCheck = "root/sub" -> true
+ * if toCheck = "root/s" -> false
+ */
+export function isEqualOrSubPath(toCheck: string, rootPath: string): boolean {
+    const rootPathSections = normalize(rootPath.toLowerCase())
+        .replaceAll(/(\\|\/)/g, sep)
+        .split(sep)
+        .filter((p) => p !== "");
+    const pathSections = normalize(toCheck.toLowerCase())
+        .replaceAll(/(\\|\/)/g, sep)
+        .split(sep)
+        .filter((p) => p !== "");
+    if (pathSections.length < rootPathSections.length) {
+        return false;
+    }
+    for (let i = 0; i < rootPathSections.length; i++) {
+        if (rootPathSections[i] !== pathSections[i]) {
+            return false;
         }
     }
-    if (frontmatter.length == 0) content = str;
+    return true;
+}
+
+/**
+ * The returned content has the same number of lines as the supplied string, but with the frontmatter lines (if present) blanked out.
+ *
+ * 1. We don't want the parser to see the frontmatter, as it would deem it to be part of a multi-line question if one started on the line immediately after the "---" closing marker.
+ *
+ * 2. The lines are blanked out rather than deleted so that line numbers are not affected e.g. for calls to getQuestionContext(cardLine: number)
+ *
+ * @param str The file content as string
+ * @returns [frontmatter, content]
+ */
+export function extractFrontmatter(str: string): [string, string] {
+    const lines = splitTextIntoLineArray(str);
+    let lineIndex = 0;
+    let hasFrontmatter = false;
+    do {
+        // Starts file with '---'
+        if (lineIndex === 0 && lines[lineIndex] === "---") {
+            hasFrontmatter = true;
+        }
+        // Line is end of front matter
+        else if (hasFrontmatter && lines[lineIndex] === "---") {
+            hasFrontmatter = false;
+            lineIndex++;
+        }
+        if (hasFrontmatter) {
+            lineIndex++;
+        }
+    } while (hasFrontmatter && lineIndex < lines.length);
+    // No end of Frontmatter found
+    if (hasFrontmatter) {
+        lineIndex = 0;
+    }
+
+    const frontmatter: string = lines.slice(0, lineIndex).join("\n");
+    const emptyLines: string[] = lineIndex > 0 ? Array(lineIndex).join(".").split(".") : [];
+    const content: string = emptyLines.concat(lines.slice(lineIndex)).join("\n");
+
     return [frontmatter, content];
 }
 
