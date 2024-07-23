@@ -93,8 +93,8 @@ inline_rev
     }
 
 multiline_card
-  = d:multiline separator_line {
-  	return d;
+  = c:multiline separator_line {
+  	return c;
   }
     
 multiline
@@ -103,14 +103,16 @@ multiline
   }
   
 multiline_before
-  = e:(!question_mark nonempty_text_line)+ {
-  	  return text();
-    }
+  = $(!question_mark nonempty_text_line)+
 
 multiline_after
-  = e:(!separator_line text_line)+ {
-      return text();
-    } 
+  = $(!separator_line (supercode_block / code_block / text_line))+
+
+supercode_block
+  = "````" text_line (!"````" text_line)* "````" _ newline?
+  
+code_block
+  = "```" _ newline (!"```" text_line)* "```" _ newline?
 
 multiline_rev_card
   = d:multiline_rev separator_line {
@@ -143,7 +145,7 @@ multiline_before
   = e:((!empty_line !question_mark .)+ newline)+ {
       return e.map((d) => d[0].map((f)=> f[2]).join('')+d[1]).join('');
     }
-
+`
 multiline_after
   = e:(!separator_line .)+ {
   	  return e.map((d) => d[1]).join('');
@@ -152,13 +154,13 @@ multiline_after
 
 close_card
   = close {
-  console.log(text() + ">>>");
+  // console.log(text() + ">>>");
     return createParsedQuestionInfo(CardType.Cloze,text().trim(),location().start.line-1,location().end.line-1);
   }
 
 close
-//finish here
-  = multiline_before_close? f:close_line text_line1 e:(multiline_after_close)? e1:(newline annotation)? { console.log(f); console.log("++++");
+  = multiline_before_close? f:close_line e:(multiline_after_close)? e1:(newline annotation)? { 
+    // console.log("HERE"); console.log(e);
   }
 
 close_line
@@ -168,7 +170,7 @@ multiline_before_close
   = (!close_line nonempty_text_line)+
 
 multiline_after_close
-  = (!newline text_line1)+
+  = e:(!(newline separator_line) text_line1)+
 
 close_text
   = close_equal / close_star / close_bracket
@@ -198,7 +200,7 @@ double_question_mark
   = "??" _ newline
 
 separator_line
-  = "---" newline
+  = "" newline
   // separator
 
 text_line_nonterminated
@@ -217,8 +219,9 @@ text_line
     }
 
 text_line1
-  = newline text:[^\n\r]* {
-  	  return parseTextLine(text);
+  = newline t:[^\n\r]* {
+  	  console.log(text());
+  	  return parseTextLine(t);
     }
     
 loose_line
