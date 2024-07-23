@@ -3044,7 +3044,7 @@ function peg$parse(input, options) {
   const multilineCardSeparator = options.hasOwnProperty("multilineCardSeparator") ? options.multilineCardSeparator : "?";
   const multilineReversedCardSeparator = options.hasOwnProperty("multilineReversedCardSeparator") ? options.multilineReversedCardSeparator : "??";
   const multilineCardEndMarker = options.hasOwnProperty("multilineCardEndMarker") ? options.multilineCardEndMarker : "";
-
+  console.log("SSSS",multilineCardEndMarker);
   // BEGIN HACK
 
   // The following functions allows parsing the keywords defined by the user. The backbone
