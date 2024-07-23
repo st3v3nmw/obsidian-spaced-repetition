@@ -1,5 +1,5 @@
 {
-
+let count =0;
   // The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
   const CardTypeFallBack = {
     SingleLineBasic: 0,
@@ -30,29 +30,6 @@
     };
   }
 
-  function parseMultiLine(arg1, arg2) {
-    return {
-      type: CardType.MultiLineBasic,
-      before: arg1,
-      after: arg2,
-      location: {
-        start: location().start.offset,
-        end: location().end.offset
-      }
-    };
-  }
-
-  function parseTextLine(text) {
-    return {
-      type: 'text',
-      value: text.join(''),
-      location: {
-        start: location().start.offset,
-        end: location().end.offset
-      }
-    };
-  }
-
   function filterBlocks(b) {
   	return b.filter( (d) => d.cardType === CardType.Ignore ? false : true )
   }
@@ -62,14 +39,18 @@ main
   = blocks:block* { return filterBlocks(blocks); }
 
 block
-  = inline_rev_card / inline_card / multiline_rev_card / multiline_card / close_card / loose_line
+  = html_comment / inline_rev_card / inline_card / multiline_rev_card / multiline_card / close_card / loose_line
+
+html_comment
+  = $("<!--" (!"-->" (html_comment / .))* "-->" newline?) {
+    return createParsedQuestionInfo(CardType.Ignore,"",0,0);
+  }
 
 inline_card
   = e:inline newline? { return e; }
 
 inline
   = left:(!"::" [^\n\r])+ "::" right:not_newline (newline annotation)? {
-  	console.log(text(),">>");
       return createParsedQuestionInfo(CardType.SingleLineBasic,text(),location().start.line-1,location().end.line-1);
     }
 
@@ -95,13 +76,19 @@ multiline_before
   = $(!question_mark nonempty_text_line)+
 
 multiline_after
-  = $(!separator_line (supercode_block / code_block / text_line))+
+  = $(!separator_line (tilde_code / backprime_code / text_line))+
 
-supercode_block
-  = "````" text_line (!"````" text_line)* "````" _ newline?
+tilde_code
+  = $(left:$tilde_marker text_line t:$(!(middle:$tilde_marker  &{ return left.length===middle.length;}) (tilde_code / text_line))* (right:$tilde_marker &{ return left.length===right.length; }) newline)  
   
-code_block
-  = "```" _ newline (!"```" text_line)* "```" _ newline?
+tilde_marker
+  = "~~~" "~"*
+
+backprime_code
+  = $(left:$backprime_marker text_line t:$(!(middle:$backprime_marker  &{ return left.length===middle.length;}) (backprime_code / text_line))* (right:$backprime_marker &{ return left.length===right.length; }) newline)  
+  
+backprime_marker
+  = "```" "`"*
 
 multiline_rev_card
   = d:multiline_rev separator_line {
@@ -113,44 +100,21 @@ multiline_rev
   	return createParsedQuestionInfo(CardType.MultiLineReversed,(arg1+"??\n"+arg2.trim()),location().start.line-1,location().end.line-2);
   }
 
-
 multiline_rev_before
   = e:(!double_question_mark nonempty_text_line)+ {
   	  return text();
     }
 
 multiline_rev_after
-  = e:(!separator_line text_line)+ {
-      return text();
-    }
-
-/*
-multiline
-  = arg1:multiline_before question_mark arg2:multiline_after separator_line {
-      return parseMultiLine(arg1, arg2);
-    }
-
-multiline_before
-  = e:((!empty_line !question_mark .)+ newline)+ {
-      return e.map((d) => d[0].map((f)=> f[2]).join('')+d[1]).join('');
-    }
-`
-multiline_after
-  = e:(!separator_line .)+ {
-  	  return e.map((d) => d[1]).join('');
-    }
-*/
-
+  = $(!separator_line text_line)+
+  
 close_card
-  = close {
-  // console.log(text() + ">>>");
-    return createParsedQuestionInfo(CardType.Cloze,text().trim(),location().start.line-1,location().end.line-1);
+  = t:$close {
+    return createParsedQuestionInfo(CardType.Cloze,t.trim(),location().start.line-1,location().end.line-1);
   }
 
 close
-  = multiline_before_close? f:close_line e:(multiline_after_close)? e1:(newline annotation)? { 
-    // console.log("HERE"); console.log(e);
-  }
+  = $(multiline_before_close? f:close_line e:(multiline_after_close)? e1:(newline annotation)?)
 
 close_line
   = ((!close_text [^\n\r])* close_text) text_line_nonterminated?
@@ -208,10 +172,7 @@ text_line
     }
 
 text_line1
-  = newline t:$[^\n\r]* {
-  	  console.log(text());
-  	  return t;
-    }
+  = newline @$[^\n\r]*
     
 loose_line
   = (([^\n\r]* newline) / [^\n\r]+) {
@@ -219,9 +180,7 @@ loose_line
     }
     
 annotation
-  = "<!--SR:" (!"-->" .)+ "-->" {
-      return createParsedQuestionInfo(CardType.Ignore,"",0,0);
-    }
+  = "<!--SR:" (!"-->" .)+ "-->"
     
 not_newline
   = [^\n\r]*
