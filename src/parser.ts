@@ -61,6 +61,9 @@ export function parseEx(
 	// Use this function when you call the parse method
 	try {
 		cards = parse(text + "\n\n\n",  {
+			convertHighlightsToClozes,
+			convertBoldTextToClozes,
+			convertCurlyBracketsToClozes,
 			CardType,
 			createParsedQuestionInfo: (cardType: CardType, text: string, firstLineNum: number, lastLineNum: number) => {
 				return new ParsedQuestionInfo(cardType, text, firstLineNum, lastLineNum);

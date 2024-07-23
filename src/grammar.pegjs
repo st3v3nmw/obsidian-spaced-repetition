@@ -1,5 +1,4 @@
 {
-let count =0;
   // The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
   const CardTypeFallBack = {
     SingleLineBasic: 0,
@@ -17,6 +16,10 @@ let count =0;
   const CardType = options.CardType ? options.CardType : CardTypeFallBack;
   CardType.Ignore=null;
   const createParsedQuestionInfo = options.createParsedQuestionInfo ? options.createParsedQuestionInfo : createParsedQuestionInfoFallBack;
+
+  const convertHighlightsToClozes = (typeof options.convertHighlightsToClozes !== undefined) ? options.convertHighlightsToClozes : true;
+  const convertBoldTextToClozes = (typeof options.convertBoldTextToClozes !== undefined) ? options.convertBoldTextToClozes : true;
+  const convertCurlyBracketsToClozes = (typeof options.convertCurlyBracketsToClozes !== undefined) ? options.convertCurlyBracketsToClozes : true;
 
   function parseOperatorLine(parts, t) {
     return {
@@ -132,19 +135,22 @@ close_equal
   = close_mark_equal (!close_mark_equal [^\n\r])+  close_mark_equal
 
 close_mark_equal
-  = "=="
+  = "==" &{return convertHighlightsToClozes;}
   
 close_star
   = close_mark_star (!close_mark_star [^\n\r])+  close_mark_star
 
 close_mark_star
-  = "**"
+  = "**" &{return convertBoldTextToClozes;}
 
 close_bracket
-  = close_mark_bracket (!close_mark_bracket [^\n\r])+  close_mark_bracket
+  = close_mark_bracket_open (!close_mark_bracket_close [^\n\r])+  close_mark_bracket_close
 
-close_mark_bracket
-  = "**"
+close_mark_bracket_open
+  = "{{" &{return convertCurlyBracketsToClozes;}
+
+close_mark_bracket_close
+  = "}}"
 
 question_mark
   = "?" _ newline
