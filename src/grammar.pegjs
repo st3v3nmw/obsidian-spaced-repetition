@@ -53,17 +53,6 @@
     };
   }
 
-  function parseEmptyLine(exp) {
-    return {
-      type: 'text',
-      value: exp[0].concat([exp[1]]).join(''),
-      location: {
-        start: location().start.offset,
-        end: location().end.offset
-      }
-    };
-  }
-
   function filterBlocks(b) {
   	return b.filter( (d) => d.cardType === CardType.Ignore ? false : true )
   }
@@ -204,28 +193,28 @@ separator_line
   // separator
 
 text_line_nonterminated
-  = text:[^\n\r]+ {
-      return parseTextLine(text);
+  = t:$[^\n\r]+ {
+      return t;
     }
 
 nonempty_text_line
-  = text:[^\n\r]+ newline {
-  	  return parseTextLine(text);
+  = t:$[^\n\r]+ newline {
+  	  return t;
     }
 
 text_line
-  = text:[^\n\r]* newline {
-  	  return parseTextLine(text);
+  = t:$[^\n\r]* newline {
+  	  return t;
     }
 
 text_line1
-  = newline t:[^\n\r]* {
+  = newline t:$[^\n\r]* {
   	  console.log(text());
-  	  return parseTextLine(t);
+  	  return t;
     }
     
 loose_line
-  = text:([^\n\r]* newline / [^\n\r]+) {
+  = (([^\n\r]* newline) / [^\n\r]+) {
       return createParsedQuestionInfo(CardType.Ignore,"",0,0);
     }
     
@@ -241,9 +230,7 @@ newline
   = [\n\r]
 
 empty_line
-  = exp:(_ [\n\r]) {
-      return parseEmptyLine(exp);
-    }
+  = $(_ [\n\r])
 
 empty_lines
   = emptylines:empty_line+
