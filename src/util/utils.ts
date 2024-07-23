@@ -1,7 +1,7 @@
 import moment from "moment";
 import { Moment } from "moment";
 import { normalize, sep } from "path";
-import { PREFERRED_DATE_FORMAT, YAML_FRONT_MATTER_REGEX } from "src/constants";
+import { PREFERRED_DATE_FORMAT } from "src/constants";
 
 type Hex = number;
 
