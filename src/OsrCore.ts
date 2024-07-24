@@ -18,12 +18,14 @@ import { ReviewResponse } from "./algorithms/base/RepetitionItem";
 import { IOsrVaultNoteLinkInfoFinder } from "./algorithms/osr/ObsidianVaultNoteLinkInfoFinder";
 import { CardDueDateHistogram, NoteDueDateHistogram } from "./DueDateHistogram";
 import { globalDateProvider } from "./util/DateProvider";
+import { TextDirection } from "./util/TextDirection";
 
 export interface IOsrVaultEvents {
     dataChanged: () => void;
 }
 
 export class OsrCore {
+    public defaultTextDirection: TextDirection;
     protected settings: SRSettings;
     private dataChangedHandler: () => void;
     protected osrNoteGraph: OsrNoteGraph;
@@ -222,7 +224,7 @@ export class OsrCore {
 
     async loadNote(noteFile: ISRFile, topicPath: TopicPath): Promise<Note> {
         const loader: NoteFileLoader = new NoteFileLoader(this.settings);
-        const note: Note = await loader.load(noteFile, topicPath);
+        const note: Note = await loader.load(noteFile, this.defaultTextDirection, topicPath);
         if (note.hasChanged) {
             await note.writeNoteFile(this.settings);
         }

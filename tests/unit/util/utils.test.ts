@@ -1,8 +1,10 @@
 import { YAML_FRONT_MATTER_REGEX } from "src/constants";
 import {
-    splitNoteIntoFrontmatterAndContent,
+    convertToStringOrEmpty,
     findLineIndexOfSearchStringIgnoringWs,
+    isEqualOrSubPath,
     literalStringReplace,
+    splitNoteIntoFrontmatterAndContent,
 } from "src/util/utils";
 
 describe("literalStringReplace", () => {
@@ -75,6 +77,28 @@ $$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$
 
         const actual: string = literalStringReplace(originalStr, searchStr, replacementStr);
         expect(actual).toEqual(expectedStr);
+    });
+});
+
+describe("convertToStringOrEmpty", () => {
+    test("undefined returns empty string", () => {
+        expect(convertToStringOrEmpty(undefined)).toEqual("");
+    });
+
+    test("null returns empty string", () => {
+        expect(convertToStringOrEmpty(null)).toEqual("");
+    });
+
+    test("empty string returns empty string", () => {
+        expect(convertToStringOrEmpty("")).toEqual("");
+    });
+
+    test("string returned unchanged", () => {
+        expect(convertToStringOrEmpty("Hello")).toEqual("Hello");
+    });
+
+    test("number is converted to string", () => {
+        expect(convertToStringOrEmpty(5)).toEqual("5");
     });
 });
 
@@ -177,6 +201,176 @@ ${content}`;
 ${content}`;
         expect(c).toEqual(expectedContent);
     });
+
+    test("With frontmatter and content (Horizontal line)", () => {
+        const frontmatter: string = `---
+sr-due: 2024-01-17
+sr-interval: 16
+sr-ease: 278
+tags:
+  - flashcards/aws
+  - flashcards/datascience
+---`;
+        const frontmatterBlankedOut: string = `
+
+
+
+
+
+
+`;
+        const content: string = `#flashcards/science/chemistry
+
+
+---
+# Questions
+---
+
+
+Chemistry Question from file underelephant 4A::goodby
+
+<!--SR:!2023-11-02,17,290-->
+
+Chemistry Question from file underdog 4B::goodby
+
+<!--SR:!2023-12-18,57,310-->
+
+---
+
+Chemistry Question from file underdog 4C::goodby
+
+<!--SR:!2023-10-25,3,210-->
+
+This single {{question}} turns into {{3 separate}} {{cards}}
+
+<!--SR:!2023-10-20,1,241!2023-10-25,3,254!2023-10-23,1,221-->
+
+---`;
+
+        const text: string = `${frontmatter}
+${content}`;
+        const expectedContent: string = `${frontmatterBlankedOut}
+${content}`;
+
+        const [f, c] = splitNoteIntoFrontmatterAndContent(text);
+        expect(f).toEqual(frontmatter);
+        expect(c).toEqual(expectedContent);
+    });
+
+    test("With frontmatter and content (Horizontal line newLine)", () => {
+        const frontmatter: string = `---
+sr-due: 2024-01-17
+sr-interval: 16
+sr-ease: 278
+tags:
+  - flashcards/aws
+  - flashcards/datascience
+---`;
+        const frontmatterBlankedOut: string = `
+
+
+
+
+
+
+`;
+        const content: string = `#flashcards/science/chemistry
+
+
+---
+# Questions
+---
+
+
+Chemistry Question from file underelephant 4A::goodby
+
+<!--SR:!2023-11-02,17,290-->
+
+Chemistry Question from file underdog 4B::goodby
+
+<!--SR:!2023-12-18,57,310-->
+
+---
+
+Chemistry Question from file underdog 4C::goodby
+
+<!--SR:!2023-10-25,3,210-->
+
+This single {{question}} turns into {{3 separate}} {{cards}}
+
+<!--SR:!2023-10-20,1,241!2023-10-25,3,254!2023-10-23,1,221-->
+
+---
+`;
+
+        const text: string = `${frontmatter}
+${content}`;
+        const expectedContent: string = `${frontmatterBlankedOut}
+${content}`;
+
+        const [f, c] = splitNoteIntoFrontmatterAndContent(text);
+        expect(f).toEqual(frontmatter);
+        expect(c).toEqual(expectedContent);
+    });
+
+    test("With frontmatter and content (Horizontal line codeblock)", () => {
+        const frontmatter: string = `---
+sr-due: 2024-01-17
+sr-interval: 16
+sr-ease: 278
+tags:
+  - flashcards/aws
+  - flashcards/datascience
+---`;
+        const frontmatterBlankedOut: string = `
+
+
+
+
+
+
+`;
+        const content: string = [
+            "```",
+            "---",
+            "```",
+            "#flashcards/science/chemistry",
+            "# Questions",
+            "  ",
+            "",
+            "Chemistry Question from file underelephant 4A::goodby",
+            "",
+            "<!--SR:!2023-11-02,17,290-->",
+            "",
+            "Chemistry Question from file underdog 4B::goodby",
+            "",
+            "<!--SR:!2023-12-18,57,310-->",
+            "```",
+            "---",
+            "```",
+            "",
+            "Chemistry Question from file underdog 4C::goodby",
+            "",
+            "<!--SR:!2023-10-25,3,210-->",
+            "",
+            "This single {{question}} turns into {{3 separate}} {{cards}}",
+            "",
+            "<!--SR:!2023-10-20,1,241!2023-10-25,3,254!2023-10-23,1,221-->",
+            "",
+            "```",
+            "---",
+            "```",
+        ].join("\n");
+
+        const text: string = `${frontmatter}
+${content}`;
+        const expectedContent: string = `${frontmatterBlankedOut}
+${content}`;
+
+        const [f, c] = splitNoteIntoFrontmatterAndContent(text);
+        expect(f).toEqual(frontmatter);
+        expect(c).toEqual(expectedContent);
+    });
 });
 
 describe("findLineIndexOfSearchStringIgnoringWs", () => {
@@ -241,5 +435,115 @@ describe("findLineIndexOfSearchStringIgnoringWs", () => {
         ];
 
         expect(findLineIndexOfSearchStringIgnoringWs(lines, "??")).toEqual(2);
+    });
+});
+
+describe("isEqualOrSubPath", () => {
+    const winSep = "\\";
+    const linSep = "/";
+    const root = "root";
+    const sub_1 = "plugins";
+    const sub_2 = "obsidian-spaced-repetition";
+    const sub_3 = "data";
+    const noMatch = "notRoot";
+    const caseMatch = "Root";
+
+    describe("Windows", () => {
+        const sep = winSep;
+        const rootPath = root + sep + sub_1;
+
+        test("Upper and lower case letters", () => {
+            expect(isEqualOrSubPath(caseMatch, root)).toBe(true);
+            expect(isEqualOrSubPath(caseMatch.toUpperCase(), root)).toBe(true);
+        });
+
+        test("Seperator auto correction", () => {
+            expect(isEqualOrSubPath(root + winSep + sub_1, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + winSep + sub_1 + winSep, rootPath)).toBe(true);
+
+            expect(isEqualOrSubPath(root + linSep + sub_1, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + linSep + sub_1 + linSep, rootPath)).toBe(true);
+        });
+
+        test("Differnent path", () => {
+            expect(isEqualOrSubPath(noMatch, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(noMatch + sep, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(noMatch + sep + sub_1, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(noMatch + sep + sub_1 + sep + sub_2, rootPath)).toBe(false);
+        });
+
+        test("Partially Match path", () => {
+            expect(isEqualOrSubPath("roo", rootPath)).toBe(false);
+            expect(isEqualOrSubPath("roo" + sep, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep + "plug", rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep + "plug" + sep, rootPath)).toBe(false);
+        });
+
+        test("Same path", () => {
+            expect(isEqualOrSubPath(rootPath, rootPath)).toBe(true);
+        });
+
+        test("Subpath", () => {
+            expect(isEqualOrSubPath(root, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep + sub_1, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(rootPath, rootPath + sep)).toBe(true);
+            expect(isEqualOrSubPath(rootPath + sep, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2 + sep, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2 + sep + sub_3, rootPath)).toBe(
+                true,
+            );
+        });
+    });
+    describe("Linux", () => {
+        const sep = linSep;
+        const rootPath = root + sep + sub_1;
+
+        test("Upper and lower case letters", () => {
+            expect(isEqualOrSubPath(caseMatch, root)).toBe(true);
+            expect(isEqualOrSubPath(caseMatch.toUpperCase(), root)).toBe(true);
+        });
+
+        test("Seperator auto correction", () => {
+            expect(isEqualOrSubPath(root + winSep + sub_1, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + winSep + sub_1 + winSep, rootPath)).toBe(true);
+
+            expect(isEqualOrSubPath(root + linSep + sub_1, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + linSep + sub_1 + linSep, rootPath)).toBe(true);
+        });
+
+        test("Differnent path", () => {
+            expect(isEqualOrSubPath(noMatch, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(noMatch + sep, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(noMatch + sep + sub_1, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(noMatch + sep + sub_1 + sep + sub_2, rootPath)).toBe(false);
+        });
+
+        test("Partially Match path", () => {
+            expect(isEqualOrSubPath("roo", rootPath)).toBe(false);
+            expect(isEqualOrSubPath("roo" + sep, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep + "plug", rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep + "plug" + sep, rootPath)).toBe(false);
+        });
+
+        test("Same path", () => {
+            expect(isEqualOrSubPath(rootPath, rootPath)).toBe(true);
+        });
+
+        test("Subpath", () => {
+            expect(isEqualOrSubPath(root, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep, rootPath)).toBe(false);
+            expect(isEqualOrSubPath(root + sep + sub_1, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(rootPath, rootPath + sep)).toBe(true);
+            expect(isEqualOrSubPath(rootPath + sep, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2 + sep, rootPath)).toBe(true);
+            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2 + sep + sub_3, rootPath)).toBe(
+                true,
+            );
+        });
     });
 });

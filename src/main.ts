@@ -27,6 +27,8 @@ import { Note } from "./Note";
 import { NoteFileLoader } from "./NoteFileLoader";
 import { ISRFile, SrTFile as SrTFile } from "./SRFile";
 import { QuestionPostponementList } from "./QuestionPostponementList";
+import { TextDirection } from "./util/TextDirection";
+import { convertToStringOrEmpty } from "./util/utils";
 import { ReviewResponse } from "./algorithms/base/RepetitionItem";
 import { SrsAlgorithm } from "./algorithms/base/SrsAlgorithm";
 import { DataStore } from "./dataStore/base/DataStore";
@@ -50,7 +52,7 @@ export default class SRPlugin extends Plugin {
     private nextNoteReviewHandler: NextNoteReviewHandler;
 
     async onload(): Promise<void> {
-        console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-07-16");
+        console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-07-24");
         await this.loadPluginData();
 
         this.initLogicClasses();
@@ -350,6 +352,7 @@ export default class SRPlugin extends Plugin {
         }
 
         const now = window.moment(Date.now());
+        this.osrAppCore.defaultTextDirection = this.getObsidianRtlSetting();
 
         await this.osrAppCore.loadVault();
 
@@ -386,11 +389,22 @@ export default class SRPlugin extends Plugin {
             this.data.settings,
         );
 
-        const note: Note = await loader.load(this.createSrTFile(noteFile), folderTopicPath);
+        const note: Note = await loader.load(
+            this.createSrTFile(noteFile),
+            this.getObsidianRtlSetting(),
+            folderTopicPath,
+        );
         if (note.hasChanged) {
             note.writeNoteFile(this.data.settings);
         }
         return note;
+    }
+
+    private getObsidianRtlSetting(): TextDirection {
+        // Get the direction with Obsidian's own setting
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const v: any = (this.app.vault as any).getConfig("rightToLeft");
+        return convertToStringOrEmpty(v) == "true" ? TextDirection.Rtl : TextDirection.Ltr;
     }
 
     async saveNoteReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {

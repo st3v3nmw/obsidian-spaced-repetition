@@ -1,11 +1,11 @@
 import * as fs from "fs";
 import {
     unitTest_BasicFrontmatterParser,
-    unitTest_BasicFrontmatterParserEx,
     unitTest_GetAllTagsFromTextEx,
 } from "./UnitTestHelper";
 import { TFile, TagCache } from "obsidian";
 import { ISRFile } from "src/SRFile";
+import { TextDirection } from "src/util/TextDirection";
 
 export class UnitTestSRFile implements ISRFile {
     content: string;
@@ -43,6 +43,10 @@ export class UnitTestSRFile implements ISRFile {
     // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     getQuestionContext(cardLine: number): string[] {
         return [];
+    }
+
+    getTextDirection(): TextDirection {
+        return TextDirection.Unspecified;
     }
 
     async read(): Promise<string> {

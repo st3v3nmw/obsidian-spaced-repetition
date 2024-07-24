@@ -4,6 +4,7 @@ import { Note } from "src/Note";
 import { Question } from "src/Question";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
+import { TextDirection } from "src/util/TextDirection";
 import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
 import { NoteEaseList } from "src/NoteEaseList";
@@ -24,7 +25,7 @@ Q3::A3
 `;
         let file: UnitTestSRFile = new UnitTestSRFile(noteText);
         let folderTopicPath = TopicPath.emptyPath;
-        let note: Note = await parser.parse(file, folderTopicPath);
+        let note: Note = await parser.parse(file, TextDirection.Ltr, folderTopicPath);
         let questionList = note.questionList;
         expect(questionList.length).toEqual(3);
     });

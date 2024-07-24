@@ -1,6 +1,7 @@
 import moment from "moment";
 import { Moment } from "moment";
-import { PREFERRED_DATE_FORMAT, YAML_FRONT_MATTER_REGEX } from "src/constants";
+import { normalize, sep } from "path";
+import { PREFERRED_DATE_FORMAT } from "src/constants";
 
 type Hex = number;
 
@@ -96,6 +97,47 @@ export function stringTrimStart(str: string): [string, string] {
     return [ws, trimmed];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function convertToStringOrEmpty(v: any): string {
+    let result: string = "";
+    if (v != null && v != undefined) {
+        result = v + "";
+    }
+    return result;
+}
+
+/**
+ * Checks a path is equal or a subpath of the other rootPath
+ *
+ * @param toCheck The path to check it is equal or a subpath of path.
+ * @param rootPath The ref path to check the other is equal to or a subpath of this.
+ * @tutorial
+ * rootPath = "root/sub/sub2"
+ * if toCheck = "notRoot/..." -> false
+ * if toCheck = "root" -> true
+ * if toCheck = "root/sub" -> true
+ * if toCheck = "root/s" -> false
+ */
+export function isEqualOrSubPath(toCheck: string, rootPath: string): boolean {
+    const rootPathSections = normalize(rootPath.toLowerCase())
+        .replaceAll(/(\\|\/)/g, sep)
+        .split(sep)
+        .filter((p) => p !== "");
+    const pathSections = normalize(toCheck.toLowerCase())
+        .replaceAll(/(\\|\/)/g, sep)
+        .split(sep)
+        .filter((p) => p !== "");
+    if (pathSections.length < rootPathSections.length) {
+        return false;
+    }
+    for (let i = 0; i < rootPathSections.length; i++) {
+        if (rootPathSections[i] !== pathSections[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 //
 // This returns [frontmatter, content]
 //
@@ -109,32 +151,32 @@ export function stringTrimStart(str: string): [string, string] {
 // e.g. for calls to getQuestionContext(cardLine: number)
 //
 export function splitNoteIntoFrontmatterAndContent(str: string): [string, string] {
-    let frontmatter: string = "";
-    let content: string = "";
-    let frontmatterEndLineNum: number = null;
-    if (YAML_FRONT_MATTER_REGEX.test) {
-        const lines: string[] = splitTextIntoLineArray(str);
-
-        // The end "---" marker must be on the third line (index 2) or later
-        for (let i = 2; i < lines.length; i++) {
-            if (lines[i] == "---") {
-                frontmatterEndLineNum = i;
-                break;
-            }
+    const lines = splitTextIntoLineArray(str);
+    let lineIndex = 0;
+    let hasFrontmatter = false;
+    do {
+        // Starts file with '---'
+        if (lineIndex === 0 && lines[lineIndex] === "---") {
+            hasFrontmatter = true;
         }
-
-        if (frontmatterEndLineNum) {
-            const frontmatterStartLineNum: number = 0;
-            const frontmatterLines: string[] = [];
-            for (let i = frontmatterStartLineNum; i <= frontmatterEndLineNum; i++) {
-                frontmatterLines.push(lines[i]);
-                lines[i] = "";
-            }
-            frontmatter = frontmatterLines.join("\n");
-            content = lines.join("\n");
+        // Line is end of front matter
+        else if (hasFrontmatter && lines[lineIndex] === "---") {
+            hasFrontmatter = false;
+            lineIndex++;
         }
+        if (hasFrontmatter) {
+            lineIndex++;
+        }
+    } while (hasFrontmatter && lineIndex < lines.length);
+    // No end of Frontmatter found
+    if (hasFrontmatter) {
+        lineIndex = 0;
     }
-    if (frontmatter.length == 0) content = str;
+
+    const frontmatter: string = lines.slice(0, lineIndex).join("\n");
+    const emptyLines: string[] = lineIndex > 0 ? Array(lineIndex).join(".").split(".") : [];
+    const content: string = emptyLines.concat(lines.slice(lineIndex)).join("\n");
+
     return [frontmatter, content];
 }
 

@@ -54,8 +54,8 @@ export class ReviewQueueListView extends ItemView {
     public redraw(): void {
         const activeFile: TFile | null = this.app.workspace.getActiveFile();
 
-        const rootEl: HTMLElement = createDiv("nav-folder mod-root");
-        const childrenEl: HTMLElement = rootEl.createDiv("nav-folder-children");
+        const rootEl: HTMLElement = createDiv();
+        const childrenEl: HTMLElement = rootEl;
 
         for (const [deckKey, deck] of this.noteReviewQueue.reviewDecks) {
             const deckCollapsed = !deck.activeFolders.has(deck.deckName);
@@ -66,7 +66,7 @@ export class ReviewQueueListView extends ItemView {
                 deckCollapsed,
                 false,
                 deck,
-            ).getElementsByClassName("nav-folder-children")[0] as HTMLElement;
+            ).getElementsByClassName("tree-item-children")[0] as HTMLElement;
 
             if (deck.newNotes.length > 0) {
                 const newNotesFolderEl: HTMLElement = this.createRightPaneFolder(
@@ -161,11 +161,11 @@ export class ReviewQueueListView extends ItemView {
         hidden: boolean,
         deck: NoteReviewDeck,
     ): HTMLElement {
-        const folderEl: HTMLDivElement = parentEl.createDiv("nav-folder");
-        const folderTitleEl: HTMLDivElement = folderEl.createDiv("nav-folder-title");
-        const childrenEl: HTMLDivElement = folderEl.createDiv("nav-folder-children");
+        const folderEl: HTMLDivElement = parentEl.createDiv("tree-item");
+        const folderTitleEl: HTMLDivElement = folderEl.createDiv("tree-item-self");
+        const childrenEl: HTMLDivElement = folderEl.createDiv("tree-item-children");
         const collapseIconEl: HTMLDivElement = folderTitleEl.createDiv(
-            "nav-folder-collapse-indicator collapse-icon",
+            "tree-item-collapse-indicator collapse-icon",
         );
 
         collapseIconEl.innerHTML = COLLAPSE_ICON;
@@ -173,7 +173,7 @@ export class ReviewQueueListView extends ItemView {
             (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "rotate(-90deg)";
         }
 
-        folderTitleEl.createDiv("nav-folder-title-content").setText(folderTitle);
+        folderTitleEl.createDiv("tree-item-content").setText(folderTitle);
 
         if (hidden) {
             folderEl.style.display = "none";
@@ -205,18 +205,18 @@ export class ReviewQueueListView extends ItemView {
         deck: NoteReviewDeck,
     ): void {
         const navFileEl: HTMLElement = folderEl
-            .getElementsByClassName("nav-folder-children")[0]
-            .createDiv("nav-file");
+            .getElementsByClassName("tree-item-children")[0]
+            .createDiv("tree-item");
         if (hidden) {
             navFileEl.style.display = "none";
         }
 
-        const navFileTitle: HTMLElement = navFileEl.createDiv("nav-file-title");
+        const navFileTitle: HTMLElement = navFileEl.createDiv("tree-item-self");
         if (fileElActive) {
             navFileTitle.addClass("is-active");
         }
 
-        navFileTitle.createDiv("nav-file-title-content").setText(file.basename);
+        navFileTitle.createDiv("tree-item-content").setText(file.basename);
         navFileTitle.addEventListener(
             "click",
             async (event: MouseEvent) => {
@@ -244,7 +244,7 @@ export class ReviewQueueListView extends ItemView {
     }
 
     private changeFolderIconToExpanded(folderEl: HTMLElement): void {
-        const collapseIconEl = folderEl.find("div.nav-folder-collapse-indicator");
+        const collapseIconEl = folderEl.find("div.tree-item-collapse-indicator");
         (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "";
     }
 }

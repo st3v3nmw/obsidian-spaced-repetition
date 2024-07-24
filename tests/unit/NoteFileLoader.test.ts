@@ -2,6 +2,7 @@ import { Note } from "src/Note";
 import { NoteFileLoader } from "src/NoteFileLoader";
 import { TopicPath } from "src/TopicPath";
 import { DEFAULT_SETTINGS } from "src/settings";
+import { TextDirection } from "src/util/TextDirection";
 import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
 import { NoteEaseList } from "src/NoteEaseList";
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
@@ -22,7 +23,7 @@ Q3:::A3
 <!--SR:!2023-09-02,4,270-->
 `;
         let file: UnitTestSRFile = new UnitTestSRFile(noteText);
-        let note: Note = await noteFileLoader.load(file, TopicPath.emptyPath);
+        let note: Note = await noteFileLoader.load(file, TextDirection.Ltr, TopicPath.emptyPath);
         expect(note.hasChanged).toEqual(false);
     });
 
@@ -35,7 +36,7 @@ Q3:::A3
 <!--SR:!2023-09-02,4,270-->
 `;
         let file: UnitTestSRFile = new UnitTestSRFile(noteText);
-        let note: Note = await noteFileLoader.load(file, TopicPath.emptyPath);
+        let note: Note = await noteFileLoader.load(file, TextDirection.Ltr, TopicPath.emptyPath);
         expect(note.hasChanged).toEqual(true);
     });
 });
