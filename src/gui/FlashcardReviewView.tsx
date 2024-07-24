@@ -136,7 +136,13 @@ export class FlashcardReviewView {
             this.plugin,
             this._currentNote.filePath,
         );
-        await wrapper.renderMarkdownWrapper(this._currentCard.front, this.content);
+        await wrapper.renderMarkdownWrapper(
+            this._currentCard.front,
+            this.content,
+            this._currentQuestion.questionText.textDirection,
+        );
+        // Set scroll position back to top
+        this.content.scrollTop = 0;
 
         // Setup response buttons
         this._resetResponseButtons();
@@ -290,7 +296,11 @@ export class FlashcardReviewView {
             this.plugin,
             this._currentNote.filePath,
         );
-        wrapper.renderMarkdownWrapper(this._currentCard.back, this.content);
+        wrapper.renderMarkdownWrapper(
+            this._currentCard.back,
+            this.content,
+            this._currentQuestion.questionText.textDirection,
+        );
 
         // Show response buttons
         this.answerButton.addClass("sr-is-hidden");
@@ -339,9 +349,17 @@ export class FlashcardReviewView {
     private _formatQuestionContextText(questionContext: string[]): string {
         const separator: string = " > ";
         let result = this._currentNote.file.basename;
-        if (questionContext.length > 0) {
-            result += separator + questionContext.join(separator);
-        }
+        questionContext.forEach((context) => {
+            // Check for links trim [[ ]]
+            if (context.startsWith("[[") && context.endsWith("]]")) {
+                context = context.replace("[[", "").replace("]]", "");
+                // Use replacement text if any
+                if (context.contains("|")) {
+                    context = context.split("|")[1];
+                }
+            }
+            result += separator + context;
+        });
         return result + separator + "...";
     }
 
