@@ -16,7 +16,6 @@ import {
     ArcElement,
 } from "chart.js";
 
-import type SRPlugin from "src/main";
 import { getKeysPreserveType, getTypedObjectEntries } from "src/util/utils";
 import { textInterval } from "src/algorithms/osr/NoteScheduling";
 import { t } from "src/lang/helpers";

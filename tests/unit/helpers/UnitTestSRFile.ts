@@ -1,8 +1,5 @@
 import * as fs from "fs";
-import {
-    unitTest_BasicFrontmatterParser,
-    unitTest_GetAllTagsFromTextEx,
-} from "./UnitTestHelper";
+import { unitTest_BasicFrontmatterParser, unitTest_GetAllTagsFromTextEx } from "./UnitTestHelper";
 import { TFile, TagCache } from "obsidian";
 import { ISRFile } from "src/SRFile";
 import { TextDirection } from "src/util/TextDirection";
