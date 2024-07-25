@@ -25,14 +25,24 @@ theme:
               name: Switch to light mode
     features:
         - navigation.top
+        - navigation.expand
         - toc.follow
 
 nav:
     - Index: index.md
-    - Flashcards: flashcards.md
+    - Flashcards:
+        - Flashcards Overview: flashcards/flashcards.md
+        - Question & Answer Cards: flashcards/qanda-cards.md
+        - Cloze Cards:
+            - Basic Cloze Cards: flashcards/cloze-cards/basic-cloze-cards.md
+        - Organizing into Decks: flashcards/decks.md
+        - Reviewing & Cramming: flashcards/reviewing.md
+        - Statistics: flashcards/statistics.md
+        - Flashcard Settings: flashcards/flashcard-settings.md
     - Notes: notes.md
     - Contributing: contributing.md
     - Algorithms: algorithms.md
+    - Spaced Repetition Guides: resources.md
     - Changelog: changelog.md
     - License: license.md
 
@@ -60,6 +70,10 @@ markdown_extensions:
     - pymdownx.emoji:
           emoji_index: !!python/name:materialx.emoji.twemoji
           emoji_generator: !!python/name:materialx.emoji.to_svg
+    - md_in_html
+
+extra_css:
+  - stylesheets/extra.css
 
 remote_branch: gh-pages
 remote_name: origin

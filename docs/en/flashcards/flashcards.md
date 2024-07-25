@@ -1,4 +1,25 @@
-# Flashcards
+# Flashcard Introduction
+
+Flashcards are defined within standard Obsidian markdown files.
+
+A markdown file containing flashcards must identify the [deck](decks.md) (or decks) into which the flashcards are placed. 
+However, the file does not need to be tagged as a Note for it to have flashcards defined.
+
+Two types of flashcards are supported – Question & Answer, as well as Cloze.
+
+- [Question & Answer](qanda-cards.md) flashcards are ones where the flashcard text contains both the question text and answer text.
+- [Cloze](basic-cloze-cards.md) flashcards are ones where the flashcard text identifies parts of the text (e.g. a word or phrase) that is hidden 
+when the front of the card is shown. The hidden text is known as a `cloze deletion`.
+
+## Flashcard Text, Flashcards and Cards
+The `flashcard text` is text that defines the type and content of a card (or a set of related, `sibling` cards).
+!!! note
+    For simplicity `flashcard text` is sometimes written just as `flashcard`
+
+For example, the flashcard text for [Single-line Basic](qanda-cards.md#single-line-basic) flashcard defines the front and back of a single card.
+Alternatively, one [Single-line Bidirectional](qanda-cards.md#single-line-bidirectional) flashcard defines two cards.
+Whilst a cloze flashcard defines multiple cards, the number of cards based on the number of cloze deletions.
+
 
 ## Creating
 

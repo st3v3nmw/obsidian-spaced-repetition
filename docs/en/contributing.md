@@ -10,6 +10,21 @@ First off, thanks for wanting to contribute to the Spaced Repetition plugin!
 
 ## Translating
 
+The plugin has been translated into the following languages by the Obsidian community 😄.
+
+- Arabic / العربية
+- Chinese (Simplified) / 简体中文
+- Chinese (Traditional) / 繁體中文
+- Czech / čeština
+- German / Deutsch
+- Italian / Italiano
+- Korean / 한국어
+- Japanese / 日本語
+- Polish / Polski
+- Portuguese (Brazil) / Português do Brasil
+- Spanish / Español
+- Russian / русский
+
 ### Steps
 
 To help translate the plugin to your language:
