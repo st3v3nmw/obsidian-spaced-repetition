@@ -16,12 +16,20 @@ By default, the cloze delimiter is `==`, and a simple cloze card would be:
 The first female prime minister of Australia was ==Julia Gillard==
 ```
 
-!!! note "Front of card"
-    The first female prime minister of Australia was [...]
+!!! note "Displayed when reviewed"
+    <div class="grid" markdown>
 
-And
-!!! note "Back of card"
-    The first female prime minister of Australia was Julia Gillard
+    !!! tip "Card Front"
+
+        The first female prime minister of Australia was [...]
+
+    !!! tip "Card Back"
+
+        The first female prime minister of Australia was Julia Gillard
+
+    </div>
+
+    
 
 ### Multiple Cloze Deletions
 If the card text identifies multiple parts as cloze deletions, then multiple cards will be shown for review, each one occluding one deletion, while leaving the other deletions visible.
@@ -31,15 +39,25 @@ For instance, the following note:
 The first female ==prime minister== of Australia was ==Julia Gillard==
 ```
 
-!!! note "Front of card 1"
-    The first female [...] of Australia was Julia Gillard
+!!! note ""
+    <div class="grid" markdown>
 
-!!! note "Front of card 2"
-    The first female prime minister of Australia was [...]
+    !!! tip "Card 1 Front"
 
-!!! note "Back of both cards"
+        The first female [...] of Australia was Julia Gillard
+
+    !!! tip "Card 2 Front"
+
+        The first female prime minister of Australia was [...]
+
+    </div>
+
+!!! tip "Card Back (same for both cards)"
+
     The first female prime minister of Australia was Julia Gillard
 
+These two cards are considered sibling cards. See [sibling cards](flashcards.md#sibling-cards) regarding the 
+[Bury sibling cards until the next day](../plugin-settings.md#flashcard-review) scheduling option.
 
 ## Cloze Delimiter
 

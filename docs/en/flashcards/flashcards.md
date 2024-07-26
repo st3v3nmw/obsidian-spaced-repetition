@@ -48,7 +48,7 @@ If there are multiple cards defined by a single flashcard, those cards are known
 
 A special scheduling option is available for the review of sibling cards.
 
-If the [Bury sibling cards until the next day?]( ../plugin-settings.md#flashcard-review)) setting is turned on, 
+If the [Bury sibling cards until the next day]( ../plugin-settings.md#flashcard-review)) setting is turned on, 
 only one sibling card is available for review on a single day.
 
 ## RTL Support
