@@ -50,17 +50,10 @@ Kenya::Nairobi
 Canada::Ottawa
 ```
 
-The flashcard for `Kenya::Nairobi` will have `Trivia > Capitals > Africa` as the context/title whereas the flashcard for `Canada::Ottawa` will have `Trivia > Capitals > North America` as the context/title.
+Flashcard | Context/Title
+- | -
+`Kenya::Nairobi` | `Trivia > Capitals > Africa`
+`Canada::Ottawa` | `Trivia > Capitals > North America`
 
-## Deleting cards
-
-To delete a card, simply delete the scheduling information & the card text.
-
-## Ignoring cards
-
-You can wrap flashcards in HTML comments e.g. `<!--Card text <!--SR:2021-08-20,13,290--> -->` to prevent it from showing up in your review queues. You can always remove the wrapping comment later.
-
-## Cramming
-
-Currently, the only supported method is "cramming" all cards in a note using the Cram flashcards in this note command. Will work on a per-deck across-all-notes method.
-
+!!! note
+    Context is only shown if enabled in [UI Preferences](../plugin-settings.md#ui-preferences)

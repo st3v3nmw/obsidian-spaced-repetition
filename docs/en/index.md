@@ -7,7 +7,6 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
 
 <div class="grid" markdown>
 
-
 !!! tip "Getting started"
 
     :material-circle-medium: View the [quick demo](index.md#quick-demo) below<br/>

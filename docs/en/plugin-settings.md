@@ -18,3 +18,7 @@
 
 ![flashcard-settings-scheduling-data](https://github.com/user-attachments/assets/200bb976-c631-4d73-82a5-12ba7e140339)
 
+## UI Preferences
+
+![settings-ui-preferences](https://github.com/user-attachments/assets/c0740fa0-02b5-4db9-9d81-94f0ae29ab6c)
+

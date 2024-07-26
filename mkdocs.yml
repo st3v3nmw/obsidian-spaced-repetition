@@ -33,18 +33,20 @@ nav:
     - Flashcards:
         - Flashcards Overview: flashcards/flashcards.md
         - Question & Answer Cards: flashcards/qanda-cards.md
-        - Cloze Cards:
-            - Basic Cloze Cards: flashcards/cloze-cards/basic-cloze-cards.md
+        - Cloze Cards: flashcards/cloze-cards/basic-cloze-cards.md
         - Organizing into Decks: flashcards/decks.md
         - Reviewing & Cramming: flashcards/reviewing.md
         - Statistics: flashcards/statistics.md
-        - Flashcard Settings: flashcards/flashcard-settings.md
     - Notes: notes.md
-    - Contributing: contributing.md
-    - Algorithms: algorithms.md
-    - Spaced Repetition Guides: resources.md
-    - Changelog: changelog.md
-    - License: license.md
+    - Settings & Commands:
+        - Settings: plugin-settings.md
+        - Commands: plugin-commands.md
+    - Repetition Algorithms: algorithms.md
+    - Additional:
+        - Spaced Repetition Guides: resources.md
+        - Contributing: contributing.md
+        - Changelog: changelog.md
+        - License: license.md
 
 plugins:
     - search
