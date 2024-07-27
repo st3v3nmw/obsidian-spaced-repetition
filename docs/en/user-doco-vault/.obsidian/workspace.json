@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "User Guide/Context.md",
+                "file": "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "User Guide/Context.md",
+                "file": "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "User Guide/Context.md",
+                "file": "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "User Guide/Context.md"
+                "file": "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md"
               }
             }
           },
@@ -156,10 +156,11 @@
       "obsidian-spaced-repetition:Review flashcards": false
     }
   },
-  "active": "abd0bfd3259ee283",
+  "active": "2cb81aad0c9cc3a2",
   "lastOpenFiles": [
-    "Math/Ellipse/Ellipse Equation.md",
     "User Guide/Context.md",
+    "Computing/AWS/DynamoDB/101. [HOL] Searching DynamoDB - Query API.md",
+    "Math/Ellipse/Ellipse Equation.md",
     "User Guide",
     "Computing/AWS/DynamoDB/files/Pasted image 20240508132354.png",
     "Computing/AWS/DynamoDB/files/Pasted image 20240508134406.png",
@@ -190,7 +191,6 @@
     "Computing/AWS/DynamoDB/104. DynamoDB Optimistic Locking and Conditional Updates.md",
     "Computing/AWS/DynamoDB/103. [HOL] Create LSI and GSI.md",
     "Computing/AWS/DynamoDB/102. DynamoDB LSI and GSI.md",
-    "Computing/AWS/DynamoDB/101. [HOL] Searching DynamoDB - Query API.md",
     "Computing/AWS/DynamoDB/100. [HOL] Searching DynamoDB - Scan API.md",
     "Computing/AWS/DynamoDB",
     "Computing/AWS/Section 8 - DynamoDB/files",

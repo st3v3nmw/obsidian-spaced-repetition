@@ -9,19 +9,26 @@ Two types of flashcards are supported:
 
 <div class="grid" markdown>
 
-!!! tip "Question & Answer"
+!!! note "Question & Answer"
 
     [Question & Answer](qanda-cards.md) flashcards are ones where the flashcard text contains both the question text and answer text.
+    
+    ---
+    ![flashcard-qanda-example](https://github.com/user-attachments/assets/95f5ae9a-3093-400e-9ef4-a0ec829eabf7)
 
-!!! tip "Cloze"
+!!! note "Cloze"
 
     [Cloze](basic-cloze-cards.md) flashcards are ones where the flashcard text identifies parts of the text (e.g. a word or phrase) that is hidden 
     when the front of the card is shown. <br/>
     The hidden text is known as a `cloze deletion`.
+    ---
+    ![flashcard-cloze-example](https://github.com/user-attachments/assets/47f7403b-a34f-4458-a078-417fa1ea75c6)
 </div>
 
 !!! tip
     For guidelines on how to write and structure flashcards, see [Spaced Repetition Guides]( ../resources.md#flashcards)
+
+---
 
 ## Flashcard Text, Flashcards and Cards
 
@@ -51,6 +58,9 @@ A special scheduling option is available for the review of sibling cards.
 If the [Bury sibling cards until the next day]( ../plugin-settings.md#flashcard-review)) setting is turned on, 
 only one sibling card is available for review on a single day.
 
+---
+
+
 ## RTL Support
 
 There are two ways that the plugin can be used with RTL languages, such as Arabic, Hebrew, Persian (Farsi).
@@ -68,6 +78,8 @@ direction: rtl
 This is the same way text direction is specified to the `RTL Support` plugin.
 
 Note that there is no current support for cards with different text directions within the same note.
+
+---
 
 ## Card Maintenance
 
