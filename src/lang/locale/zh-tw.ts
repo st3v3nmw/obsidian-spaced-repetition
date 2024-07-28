@@ -90,6 +90,8 @@ export default {
     CONVERT_HIGHLIGHTS_TO_CLOZES: "將 ==高亮== 轉換為填空克漏字？",
     CONVERT_BOLD_TEXT_TO_CLOZES: "將 **粗體** 轉換為填空克漏字？",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "將 {{大括號}} 轉換為填空克漏字？",
+    CLOZE_PATTERNS: "填空克漏字模式",
+    CLOZE_PATTERNS_DESC: "輸入以換行符分隔的填空克漏字模式",
     INLINE_CARDS_SEPARATOR: "單行卡片的分隔字元",
     FIX_SEPARATORS_MANUALLY_WARNING: "注意：更改此選項後你將需要自行更改已存在卡片的分隔字元。",
     INLINE_REVERSED_CARDS_SEPARATOR: "單行反轉卡片的分隔字元",

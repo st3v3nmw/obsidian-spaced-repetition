@@ -54,9 +54,9 @@ test("CardType.Cloze", () => {
 
     const settings2: SRSettings = DEFAULT_SETTINGS;
     settings2.clozePatterns = [
+        "{{[123;;]answer[;;hint]}}",
         "==[123;;]answer[;;hint]==",
         "**[123;;]answer[;;hint]**",
-        "{{[123;;]answer[;;hint]}}"
     ];
 
     expect(
@@ -86,15 +86,23 @@ test("CardType.Cloze", () => {
     ).toEqual([
         new CardFrontBack(
             "This is a really very " + clozeFormatter.asking() + " and fascinating and great test",
-            "This is a really very " + clozeFormatter.showingAnswer("interesting") + " and fascinating and great test",
+            "This is a really very " +
+                clozeFormatter.showingAnswer("interesting") +
+                " and fascinating and great test",
         ),
         new CardFrontBack(
             "This is a really very interesting and " + clozeFormatter.asking() + " and great test",
-            "This is a really very interesting and " + clozeFormatter.showingAnswer("fascinating") + " and great test",
+            "This is a really very interesting and " +
+                clozeFormatter.showingAnswer("fascinating") +
+                " and great test",
         ),
         new CardFrontBack(
-            "This is a really very interesting and fascinating and " + clozeFormatter.asking() + " test",
-            "This is a really very interesting and fascinating and " + clozeFormatter.showingAnswer("great") + " test",
+            "This is a really very interesting and fascinating and " +
+                clozeFormatter.asking() +
+                " test",
+            "This is a really very interesting and fascinating and " +
+                clozeFormatter.showingAnswer("great") +
+                " test",
         ),
     ]);
 });

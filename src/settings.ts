@@ -360,7 +360,7 @@ export class SRSettingTab extends PluginSettingTab {
                 .onChange(async (value) => {
                     const boldPattern = "**[123;;]answer[;;hint]**";
                     const clozePatternSet = new Set(this.plugin.data.settings.clozePatterns);
-                    
+
                     if (value) {
                         clozePatternSet.add(boldPattern);
                     } else {
@@ -401,7 +401,9 @@ export class SRSettingTab extends PluginSettingTab {
             .setDesc(t("CLOZE_PATTERNS_DESC"))
             .addTextArea((text) =>
                 text
-                    .setPlaceholder("Example:\n==[123;;]answer[;;hint]==\n**[123;;]answer[;;hint]**\n{{[123;;]answer[;;hint]}}")
+                    .setPlaceholder(
+                        "Example:\n==[123;;]answer[;;hint]==\n**[123;;]answer[;;hint]**\n{{[123;;]answer[;;hint]}}",
+                    )
                     .setValue(this.plugin.data.settings.clozePatterns.join("\n"))
                     .onChange((value) => {
                         applySettingsUpdate(async () => {
@@ -409,11 +411,12 @@ export class SRSettingTab extends PluginSettingTab {
                             const boldPattern = "**[123;;]answer[;;hint]**";
                             const curlyBracketsPattern = "{{[123;;]answer[;;hint]}}";
 
-                            const clozePatternSet = new Set( value
-                                .split(/\n+/)
-                                .map((v) => v.trim())
-                                .filter((v) => v)
-                                );
+                            const clozePatternSet = new Set(
+                                value
+                                    .split(/\n+/)
+                                    .map((v) => v.trim())
+                                    .filter((v) => v),
+                            );
 
                             if (clozePatternSet.has(hightlightPattern)) {
                                 this.plugin.data.settings.convertHighlightsToClozes = true;

@@ -6,11 +6,7 @@ const defaultArgs: [string, string, string, string, string[]] = [
     ":::",
     "?",
     "??",
-    [
-        "==[123;;]answer[;;hint]==",
-        "**[123;;]answer[;;hint]**",
-        "{{[123;;]answer[;;hint]}}"
-    ]
+    ["==[123;;]answer[;;hint]==", "**[123;;]answer[;;hint]**", "{{[123;;]answer[;;hint]}}"],
 ];
 
 /**
@@ -160,9 +156,9 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum ==p\ndolor won==", ...defaultArgs)).toEqual([]);
     expect(parse("lorem ipsum ==dolor won=", ...defaultArgs)).toEqual([]);
     // ==highlights== turned off
-    expect(parse("cloze ==deletion== test", "::", ":::", "?", "??", ["**[123;;]answer[;;hint]**"])).toEqual(
-        [],
-    );
+    expect(
+        parse("cloze ==deletion== test", "::", ":::", "?", "??", ["**[123;;]answer[;;hint]**"]),
+    ).toEqual([]);
 
     // **bolded**
     expect(parse("cloze **deletion** test", ...defaultArgs)).toEqual([
@@ -191,9 +187,9 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum **p\ndolor won**", ...defaultArgs)).toEqual([]);
     expect(parse("lorem ipsum **dolor won*", ...defaultArgs)).toEqual([]);
     // **bolded** turned off
-    expect(parse("cloze **deletion** test", "::", ":::", "?", "??", ["==[123;;]answer[;;hint]=="])).toEqual(
-        [],
-    );
+    expect(
+        parse("cloze **deletion** test", "::", ":::", "?", "??", ["==[123;;]answer[;;hint]=="]),
+    ).toEqual([]);
 
     // both
     expect(parse("cloze **deletion** test ==another deletion==!", ...defaultArgs)).toEqual([

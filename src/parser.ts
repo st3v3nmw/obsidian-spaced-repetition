@@ -96,9 +96,7 @@ export function parseEx(
             cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
             cardType = null;
             cardText = "";
-        } else if (
-            cardType === null && clozecrafter.isClozeNote(currentLine)
-        ) {
+        } else if (cardType === null && clozecrafter.isClozeNote(currentLine)) {
             cardType = CardType.Cloze;
 
             // Explicitly don't change firstLineNo, as we might not see the cloze markers on the first line
