@@ -7,6 +7,7 @@ import { CardFrontBack, CardFrontBackUtil } from "./QuestionType";
 import { SRSettings, SettingsUtil } from "./settings";
 import { ISRFile, frontmatterTagPseudoLineNum } from "./SRFile";
 import { TopicPath, TopicPathList } from "./TopicPath";
+import { TextDirection } from "./util/TextDirection";
 import { extractFrontmatter, splitTextIntoLineArray } from "./util/utils";
 
 export class NoteQuestionParser {
@@ -40,6 +41,7 @@ export class NoteQuestionParser {
 
     async createQuestionList(
         noteFile: ISRFile,
+        defaultTextDirection: TextDirection,
         folderTopicPath: TopicPath,
         onlyKeepQuestionsWithTopicPath: boolean,
     ): Promise<Question[]> {
@@ -64,8 +66,11 @@ export class NoteQuestionParser {
             [this.frontmatterText, this.contentText] = extractFrontmatter(noteText);
 
             // Create the question list
+            let textDirection: TextDirection = noteFile.getTextDirection();
+            if (textDirection == TextDirection.Unspecified) textDirection = defaultTextDirection;
             this.questionList = this.doCreateQuestionList(
                 noteText,
+                textDirection,
                 folderTopicPath,
                 this.tagCacheList,
             );
@@ -89,6 +94,7 @@ export class NoteQuestionParser {
 
     private doCreateQuestionList(
         noteText: string,
+        textDirection: TextDirection,
         folderTopicPath: TopicPath,
         tagCacheList: TagCache[],
     ): Question[] {
@@ -100,7 +106,7 @@ export class NoteQuestionParser {
         const result: Question[] = [];
         const parsedQuestionInfoList: ParsedQuestionInfo[] = this.parseQuestions();
         for (const parsedQuestionInfo of parsedQuestionInfoList) {
-            const question: Question = this.createQuestionObject(parsedQuestionInfo);
+            const question: Question = this.createQuestionObject(parsedQuestionInfo, textDirection);
 
             // Each rawCardText can turn into multiple CardFrontBack's (e.g. CardType.Cloze, CardType.SingleLineReversed)
             const cardFrontBackList: CardFrontBack[] = CardFrontBackUtil.expand(
@@ -142,7 +148,10 @@ export class NoteQuestionParser {
         return result;
     }
 
-    private createQuestionObject(parsedQuestionInfo: ParsedQuestionInfo): Question {
+    private createQuestionObject(
+        parsedQuestionInfo: ParsedQuestionInfo,
+        textDirection: TextDirection,
+    ): Question {
         const questionContext: string[] = this.noteFile.getQuestionContext(
             parsedQuestionInfo.firstLineNum,
         );
@@ -150,6 +159,7 @@ export class NoteQuestionParser {
             this.settings,
             parsedQuestionInfo,
             null, // We haven't worked out the TopicPathList yet
+            textDirection,
             questionContext,
         );
         return result;
