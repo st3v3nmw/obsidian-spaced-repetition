@@ -11,7 +11,7 @@ A key part of spaced repetition learning is being shown the front of cards to te
 
 !!! tip "Cramming"
 
-    You are shown every single card in the selected deck, even those that have recently been reviewed.
+    You are shown every single card in the selected deck/note, even those that have recently been reviewed.
 
 </div>
 
@@ -21,12 +21,24 @@ A key part of spaced repetition learning is being shown the front of cards to te
 
 Although you may want to review or cram all cards across all decks, you often may wish to do so on only a subset of decks.
 
-![flashcard-decks-1](https://github.com/user-attachments/assets/e17d6384-73fd-4e8f-bbda-a0fcf4972ebd)
+![review-deck](https://github.com/user-attachments/assets/07c9f436-6b2a-43b5-b6f6-339bcd1cadfa)
 
 !!! note "All subdecks included"
 
     For example, clicking on the `course` deck will also include all cards within the `aws`
     and `developer-associate` decks.
+
+### Operation
+
+
+# | Name | Description
+- | - | -
+1 | Edit | Edit the flashcard text
+2 | Reset | Reset the review schedule information - the review interval is set to 1 day, and the ease is set to the default value
+3 | Info | Shows the scheduling information for the card
+4 | Skip | Skip the current card without reviewing
+
+![review-operation](https://github.com/user-attachments/assets/d8f438dc-f1f0-43c4-a752-a5eeb64346e4)
 
 ### Context
 
@@ -50,19 +62,26 @@ Kenya::Nairobi
 
 Canada::Ottawa
 ```
+!!! tip "Context displayed"
+    ![reviewing-context](https://github.com/user-attachments/assets/2ccfc23a-a106-4133-91ec-8bd0efd0e372)
 
-Flashcard | Context/Title
-- | -
-`Kenya::Nairobi` | `Trivia > Capitals > Africa`
-`Canada::Ottawa` | `Trivia > Capitals > North America`
 
-This would be displayed as:
 
-![reviewing-context](https://github.com/user-attachments/assets/3ca63e07-94b5-450a-972e-a1ffaddff00d)
 
 !!! note
     Context is only shown if enabled in [UI Preferences](../plugin-settings.md#ui-preferences)
 
+### Keyboard shortcuts
+
+To review faster, use the following keyboard shortcuts:
+
+-   `Space/Enter` => Show answer
+-   `0` => Reset card's progress (Sorta like `Again` in Anki)
+-   `1` => Review as `Hard`
+-   `2` => Review as `Good`
+-   `3` => Review as `Easy`
+
+---
 
 ## Reviewing
 
@@ -82,15 +101,15 @@ Note that you can skip a card by simply pressing `S` (case doesn't matter).
     go to [settings](../plugin-settings.md#ui-preferences) and set the _Flashcard Height Percentage_ and _Flashcard Width Percentage_
     to 100% to maximize it.
 
-### Faster Review
-
-To review faster, use the following keyboard shortcuts:
-
--   `Space/Enter` => Show answer
--   `0` => Reset card's progress (Sorta like `Again` in Anki)
--   `1` => Review as `Hard`
--   `2` or `Space` => Review as `Good`
--   `3` => Review as `Easy`
-
+---
 
 ## Cramming
+
+You are shown every single card, even those that have recently been reviewed. 
+By using the appropriate [command](../plugin-commands.md) have the choice of cramming cards:
+
+Cards | Command
+- | -
+Within a single note | `Spaced Repetition: Cram flashcards in this note`
+Within a deck (including all subdecks) |  `Spaced Repetition: Select a deck to cram note`
+

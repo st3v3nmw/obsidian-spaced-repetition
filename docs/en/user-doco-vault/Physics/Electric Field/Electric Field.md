@@ -15,7 +15,7 @@ The electric field is present around a charge regardless of whether or not there
 # Questions
 
 What symbol represents an electric field:: $\large  \vec  E$
-<!--SR:!2024-08-02,129,270-->
+<!--SR:!2024-07-29,1,250-->
 
 At a particular distance from charge $\large Q_1$ there is an electric field strength of $\large  \vec E_1$. How is the field strength $\large  \vec E_1$ altered by the placement of another charge $\large Q_2$ at that same position
 

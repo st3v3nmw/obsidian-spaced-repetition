@@ -71,6 +71,9 @@ Please note that:
 1. Only the strings(templates) on the right of the key should be translated.
 2. Text inside `${}` isn't translated. This is used to replace variables in code. For instance, if interval = 4, it becomes `4 days` in English & `Siku 4` in Swahili. Quite nifty if you ask me.
 
+---
+
+
 ## Code
 
 1. Make your changes.
@@ -106,6 +109,9 @@ Please note that:
     - Format the code in case any warnings are raised: `pnpm format`
 8. Open the pull request.
 
+---
+
+
 ## Documentation
 
 The documentation consists of Markdown files which [MkDocs](https://www.mkdocs.org/) converts to static web pages.
@@ -140,6 +146,9 @@ For larger diffs, it's important that you check how your docs look like as expla
 2. Add the code from (1) to the MkDocs configuration (`mkdocs.yml` - `plugins.i18n.languages`).
 3. Copy the files from the English (`en`) folder into the new folder.
 4. Translate then open a pull request.
+
+---
+
 
 ## Maintenance
 

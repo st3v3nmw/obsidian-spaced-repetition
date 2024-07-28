@@ -68,9 +68,14 @@ Question6 (in deckA)::Answer6
 
 Here `Question6` will be part of `deckA` and not `deckB` as `deckB` is specific to `Question4` only.
 
+---
+
+
 ## Using Folder Structure
 
-The plugin will automatically search for folders that contain flashcards & use their paths to create decks & sub-decks i.e. `Folder/sub-folder/sub-sub-folder` ⇔ `Deck/sub-deck/sub-sub-deck`.
+The plugin will automatically search for folders that contain flashcards & use their paths to create decks & sub-decks
 
-This is an alternative to the tagging option and can be enabled in settings.
+e.g. `Folder/sub-folder/sub-sub-folder` ⇔ `Deck/sub-deck/sub-sub-deck`.
+
+This is an alternative to the tagging option and can be enabled in [settings](../plugin-settings.md#tags--folders).
 
