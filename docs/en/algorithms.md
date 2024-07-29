@@ -40,6 +40,9 @@ Algorithm | Status
                 > "[...] Anki also applies a small amount of random “fuzz” to prevent cards that were introduced at the same time and given the same ratings from sticking together and always coming up for review on the same day."
 -   The scheduling information is stored in the YAML front matter
 
+---
+
+
 ## FSRS
 
 The algorithm is detailed at:
@@ -47,6 +50,9 @@ The algorithm is detailed at:
 
 Incorporation of the FSRS algorithm into this plugin has not yet occurred. For progress see:
 [ [FEAT] sm-2 is outdated, can you please replace it with the fsrs algorithm? #748 ](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/748)
+
+---
+
 
 ## User Specified Intervals
 

@@ -1,4 +1,10 @@
-#course/aws/developer-associate 
+---
+sr-due: 2024-07-01
+sr-interval: 3
+sr-ease: 269
+---
+
+#course/aws/developer-associate  #review
 
 In this lesson, I'm going to cover what are called [[Local Secondary Index (LSI)|Local Secondary Indexes]] and [[Global Secondary Index (GSI)|Global Secondary Indexes]], LSIs and GSIs. 
 

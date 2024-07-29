@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Physics/Electric Field/Electric Field.md",
+                "file": "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md",
                 "mode": "source",
                 "source": false
               }
@@ -69,7 +69,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 237.5
   },
   "right": {
     "id": "3c58afc610addbb0",
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Physics/Electric Field/Electric Field.md",
+                "file": "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Physics/Electric Field/Electric Field.md",
+                "file": "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,12 +125,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Physics/Electric Field/Electric Field.md"
+                "file": "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md"
               }
             }
           },
           {
-            "id": "3881a4106cb4a48d",
+            "id": "ab5847646efdb1fc",
             "type": "leaf",
             "state": {
               "type": "review-queue-list-view",
@@ -142,8 +142,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -153,13 +152,22 @@
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
-      "obsidian-spaced-repetition:Review flashcards": false
+      "obsidian-spaced-repetition:Review flashcards": false,
+      "obsidian-spaced-repetition-rz:Review flashcards": false
     }
   },
   "active": "2cb81aad0c9cc3a2",
   "lastOpenFiles": [
-    "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md",
+    "Computing/AWS/DynamoDB/93. Amazon DynamoDB.md",
+    "Computing/AWS/DynamoDB/DynamoDB LSI and GSI.md",
+    "Physics/Electric Field/Electric Field Strength and Charge Equation.md",
+    "Computing/AWS/DynamoDB/102. DynamoDB LSI and GSI.md",
+    "Physics/Electric Field/Electric Field Strength and Force Equation.md",
+    "Computing/AWS/DynamoDB/104. DynamoDB Optimistic Locking and Conditional Updates.md",
     "User Guide/Context.md",
+    "Math/Ellipse/Ellipse.md",
+    "Physics/Electric Field/Electric Field.md",
+    "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md",
     "Computing/AWS/DynamoDB/101. [HOL] Searching DynamoDB - Query API.md",
     "Math/Ellipse/Ellipse Equation.md",
     "User Guide",
@@ -180,7 +188,6 @@
     "Computing/AWS/DynamoDB/96. DynamoDB Consistency Models and Transactions.md",
     "Computing/AWS/DynamoDB/97. DynamoDB Capacity Units (RCU-WCU).md",
     "Computing/AWS/DynamoDB/95. [HOL] Practice Creating DynamoDB Tables.md",
-    "Computing/AWS/DynamoDB/93. Amazon DynamoDB.md",
     "Computing/AWS/DynamoDB/92. Introduction.md",
     "Computing/AWS/DynamoDB/110. Exam Cram - Amazon DynamoDB.md",
     "Computing/AWS/DynamoDB/109. [HOL] Enable Global Table.md",
@@ -188,16 +195,9 @@
     "Computing/AWS/DynamoDB/107. Amazon DynamoDB Accelerator (DAX).md",
     "Computing/AWS/DynamoDB/106. Amazon DynamoDB Streams.md",
     "Computing/AWS/DynamoDB/105. [HOL] Adding a Time to Live (TTL) to Items.md",
-    "Computing/AWS/DynamoDB/104. DynamoDB Optimistic Locking and Conditional Updates.md",
     "Computing/AWS/DynamoDB/103. [HOL] Create LSI and GSI.md",
-    "Computing/AWS/DynamoDB/102. DynamoDB LSI and GSI.md",
-    "Computing/AWS/DynamoDB/100. [HOL] Searching DynamoDB - Scan API.md",
     "Computing/AWS/DynamoDB",
     "Computing/AWS/Section 8 - DynamoDB/files",
-    "Computing/AWS/Section 8 - DynamoDB/Quiz 5 - Amazon DynamoDB.md",
-    "Computing/AWS/Section 8 - DynamoDB/99. DynamoDB Scan and Query API.md",
-    "Computing/AWS/Section 8 - DynamoDB/98. DynamoDB Performance and Throttling.md",
-    "Computing/AWS/Section 8 - DynamoDB/97. DynamoDB Capacity Units (RCU-WCU).md",
     "Computing/AWS/Section 8 - DynamoDB",
     "Computing/AWS",
     "Computing/New folder",

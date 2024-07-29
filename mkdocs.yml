@@ -41,7 +41,9 @@ nav:
     - Settings & Commands:
         - Settings: plugin-settings.md
         - Commands: plugin-commands.md
-    - Repetition Algorithms: algorithms.md
+    - Algorithms & Data Storage:
+        - Repetition Algorithms: algorithms.md
+        - Data Storage: data-storage.md
     - Additional:
         - Spaced Repetition Guides: resources.md
         - Contributing: contributing.md

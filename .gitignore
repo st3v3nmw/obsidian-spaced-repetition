@@ -29,8 +29,10 @@ tests/e2e/vault/
 site/
 venv/
 .venv/
+docs/en/media/~*
+docs/en/user-doco-vault/.obsidian/plugins/obsidian-spaced-repetition-beta
 
 # env
 env.sh
-docs/en/media/~$age-annotation.docx
-docs/en/media/~WRL1691.tmp
+
+

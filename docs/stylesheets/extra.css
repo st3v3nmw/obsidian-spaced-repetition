@@ -1,3 +1,9 @@
 .youtube {
     color: #EE0F0F;
 }
+
+hr {
+    border: none !important;
+    height: 4px;
+    background-color: #333;  
+}
