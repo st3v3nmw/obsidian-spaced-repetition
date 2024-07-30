@@ -1,0 +1,11 @@
+{
+    "id": "obsidian-spaced-repetition-rz",
+    "name": "Spaced Repetition-rz",
+    "version": "1.10.4.1",
+    "minAppVersion": "0.15.4",
+    "description": "Fight the forgetting curve by reviewing flashcards & entire notes.",
+    "author": "Stephen Mwangi",
+    "authorUrl": "https://github.com/st3v3nmw",
+    "isDesktopOnly": false,
+    "fundingUrl": "https://ko-fi.com/M4M44DEN6"
+}

@@ -1,0 +1,370 @@
+@media only screen and (orientation: landscape) {
+    .is-mobile .sr-flashcard {
+        flex-direction: row;
+    }
+
+    .is-mobile .sr-header {
+        flex-direction: column;
+        flex: 0 1 0;
+    }
+
+    .is-mobile .sr-content {
+        flex: 1 0 0;
+    }
+
+    .is-mobile .sr-response {
+        flex-direction: column;
+        flex: 0 1 0;
+    }
+
+    .is-mobile .sr-controls {
+        flex-direction: column;
+    }
+
+    .is-mobile .sr-title {
+        display: none;
+    }
+
+    .is-mobile .sr-response-button {
+        writing-mode: vertical-lr;
+    }
+}
+
+#sr-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#sr-modal .modal-title {
+    display: none;
+}
+
+#sr-modal .modal-close-button {
+    z-index: 21;
+}
+
+body:not(.native-scrollbars) #sr-modal .modal-close-button {
+    top: 12px;
+}
+
+.sr-modal-content {
+    position: relative;
+    overflow: hidden;
+}
+
+.sr-is-hidden {
+    display: none !important;
+}
+
+.sr-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.sr-deck-list,
+.sr-flashcard,
+.sr-edit-view {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.sr-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    border-bottom: 1px solid var(--hr-color);
+}
+
+.sr-title {
+    font-size: var(--font-ui-large);
+    font-weight: var(--font-semibold);
+    text-align: center;
+    line-height: var(--line-height-tight);
+}
+
+.sr-content {
+    overflow-y: auto;
+}
+
+.sr-button {
+    box-shadow: none !important;
+    cursor: pointer;
+}
+
+.sr-back-button {
+    z-index: 21;
+    cursor: var(--cursor);
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 26px;
+    line-height: 22px;
+    height: 26px;
+    width: 26px;
+    padding: 0 var(--size-2-2);
+    border-radius: var(--radius-s);
+    color: var(--text-muted);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sr-back-button:hover,
+.sr-button:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.sr-response {
+    display: flex;
+    width: 100%;
+    margin-top: var(--size-4-4);
+    gap: var(--size-4-4);
+}
+
+.sr-response-button {
+    height: 48px;
+    flex-grow: 1;
+    margin: auto;
+    line-height: 48px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 4px;
+    user-select: text;
+}
+
+.sr-bg-blue,
+.sr-bg-green,
+.sr-bg-red {
+    color: #ffffff !important;
+}
+
+.sr-bg-green {
+    background-color: #4caf50 !important;
+}
+
+.sr-bg-blue {
+    background-color: #2094f3 !important;
+}
+
+.sr-bg-red {
+    background-color: #ff7043 !important;
+}
+
+.sr-deck-list .sr-tree-item-row:hover .sr-bg-green,
+.sr-response-button.sr-bg-green:hover {
+    background-color: hsl(122, 39%, 44%) !important;
+}
+
+.sr-deck-list .sr-tree-item-row:hover .sr-bg-blue,
+.sr-response-button.sr-bg-blue:hover {
+    background-color: hsl(207, 90%, 49%) !important;
+}
+
+.sr-deck-list .sr-tree-item-row:hover .sr-bg-red,
+.sr-response-button.sr-bg-red:hover {
+    background-color: hsl(14, 100%, 58%) !important;
+}
+
+/* -> DeckListView */
+
+.sr-deck-list .sr-header {
+    gap: 8px;
+    padding-bottom: 14px;
+    margin-bottom: 24px;
+}
+
+.sr-deck-list .sr-header-stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.sr-deck-list .sr-header-stats-count {
+    display: flex;
+    color: #ffffff;
+    padding: 4px;
+    gap: 4px;
+}
+
+.sr-deck-list .sr-header-stats-count > *:first-child {
+    min-width: 10ch;
+}
+
+.sr-deck-list .sr-header-stats-count > *:last-child {
+    min-width: 3ch;
+    text-align: right;
+}
+
+.sr-deck-list .sr-tree-item-row {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-bottom: 0;
+}
+
+.sr-deck-list .sr-tree-stats-container {
+    display: flex;
+    gap: 4px;
+}
+
+.sr-deck-list .sr-tree-stats-count {
+    min-width: 3ch;
+    padding: 4px;
+    box-sizing: content-box;
+    text-align: center;
+    color: #ffffff !important;
+}
+
+/* -> FlashcardReviewView */
+
+.sr-flashcard .sr-header {
+    position: relative;
+    gap: 8px;
+    padding-bottom: 8px;
+}
+
+.sr-flashcard .sr-button:disabled {
+    cursor: not-allowed;
+}
+
+.sr-flashcard .sr-back-button {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 21;
+}
+
+.sr-flashcard .sr-controls {
+    display: flex;
+    gap: var(--size-4-4);
+}
+
+.sr-flashcard .sr-context {
+    font-style: italic;
+    color: var(--text-faint);
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    margin-left: 8px;
+}
+
+.sr-flashcard .sr-content {
+    font-size: var(--font-text-size);
+    overflow-y: auto;
+    user-select: text;
+    padding-inline: 8px;
+    width: 100%;
+    flex-grow: 1;
+}
+
+.sr-flashcard .sr-card-divide {
+    backdrop-filter: invert(40%);
+    border-top-style: dashed;
+}
+
+/* -> EditModal */
+
+.sr-edit-modal {
+    height: 80%;
+}
+
+.sr-edit-view {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--size-4-4);
+}
+
+.sr-edit-view .sr-input {
+    flex-grow: 1;
+    width: 100%;
+    resize: none;
+}
+
+.sr-edit-view .sr-response {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    width: 100%;
+    margin-top: 0;
+}
+
+.sr-edit-view .sr-response-button {
+    width: 100%;
+}
+
+.sr-edit-view .sr-response-button.sr-spacer {
+    opacity: 0;
+    cursor: default;
+}
+
+/*  -> Statistics */
+
+#sr-chart-period {
+    appearance: menulist;
+    border-right: 8px solid transparent;
+}
+
+/*
+ * Tab elements
+ * This CSS is copied from https://github.com/Taitava/obsidian-shellcommands
+ * Jarkko Linnanvirta https://github.com/Taitava comments below...
+ *  - Renamed classes
+ *
+ * This CSS is copied 2021-10-21 from https://www.w3schools.com/howto/howto_js_tabs.asp
+ * Modifications:
+ *  - Renamed classes
+ *  - Added tab icons.
+ *  - Changed colors.
+ *  - Changed/removed borders.
+ *  - Removed button transition.
+ *  - Changed button border-radiuses
+ *  - Added margin-right rule to .sr-tab-header-button .
+ */
+
+/* Style the tab */
+.sr-tab-header {
+    border-bottom: 6px solid var(--background-modifier-border);
+}
+
+/* Style the buttons that are used to open the tab content */
+button.sr-tab-header-button {
+    background-color: unset;
+    border: none;
+    box-shadow: none; /* Remove a "border" that came via Obsidian 0.16.0. */
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    margin-right: 6px; /* Reduced margin. Obsidian's default margin-right for button is 12px (0 for other margins). */
+    border-radius: 10px 10px 0 0; /* 0 0 = No border-radius at bottom */
+}
+
+/* Create an active/current tablink class */
+button.sr-tab-header-button.sr-tab-active,
+button.sr-tab-header-button:hover {
+    background-color: var(--background-modifier-border);
+}
+
+.sr-tab-header-button svg {
+    vertical-align: middle; /* Not middle but close enough. */
+}
+
+/* Style the tab content */
+.sr-tab-content {
+    display: none;
+    padding: 6px 12px;
+}
+
+.sr-tab-content.sr-tab-active {
+    display: block;
+}
