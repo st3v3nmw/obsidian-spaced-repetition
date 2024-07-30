@@ -5,7 +5,11 @@
 
 ## Getting started
 
-Tag any notes that you'd like to review as `#review`. This default tag can be changed in the settings. (You can also use multiple tags)
+Tag any notes that you'd like to review as `#review`. This default tag can be changed in the [settings](plugin-settings.md#note-settings). (You can also use multiple tags)
+
+## Note Review Queue
+
+
 
 ## New Notes
 
@@ -47,23 +51,3 @@ Alternatively, one can use the `Open a note for review` command.
 ## Review Queue
 
 -   Daily review entries are sorted by importance (PageRank)
-
-## Incremental Writing
-
-This was introduced [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/15) by `@aviskase`.
-
-Here are the YouTube videos:
-
--   English: [Obsidian: inbox review with spaced repetition](https://youtu.be/zG5r7QIY_TM)
--   Russian / русский: [Yuliya Bagriy - Разгребатель инбокса заметок как у Andy Matuschak в Obsidian](https://www.youtube.com/watch?v=CF6SSHB74cs)
-
-### Brief summary
-
-Andy Matuschak uses [spaced repetition system for working on writing inbox](https://notes.andymatuschak.org/z7iCjRziX6V6unNWL81yc2dJicpRw2Cpp9MfQ).
-
-In short, there are four possible actions (where `x < y`):
-
--   skip note (increase interval for `x`) == mark as `good`
--   work on it, mark as fruitful work (decrease interval) == mark as `hard`
--   work on it, mark as unfruitful work (increase interval for `y`) == mark as `easy`
--   convert to evergreen note (stop using the space-repetition prompts)

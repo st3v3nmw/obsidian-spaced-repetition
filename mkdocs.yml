@@ -33,7 +33,7 @@ nav:
     - Flashcards:
         - Flashcards Overview: flashcards/flashcards.md
         - Question & Answer Cards: flashcards/qanda-cards.md
-        - Cloze Cards: flashcards/cloze-cards/basic-cloze-cards.md
+        - Cloze Cards: flashcards/basic-cloze-cards.md
         - Organizing into Decks: flashcards/decks.md
         - Reviewing & Cramming: flashcards/reviewing.md
         - Statistics: flashcards/statistics.md
@@ -72,8 +72,8 @@ markdown_extensions:
     - attr_list
     - footnotes
     - pymdownx.emoji:
-          emoji_index: !!python/name:materialx.emoji.twemoji
-          emoji_generator: !!python/name:materialx.emoji.to_svg
+          emoji_index: !!python/name:material.extensions.emoji.twemoji
+          emoji_generator: !!python/name:material.extensions.emoji.to_svg
     - md_in_html
 
 extra_css:

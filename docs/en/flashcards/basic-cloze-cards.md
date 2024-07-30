@@ -1,6 +1,6 @@
 # Basic Cloze Cards
 
-With [Single & Multiline Cards](../flashcard-syntax.md) the text of both the front and back of each card is specified.
+With [Single & Multiline Cards](../flashcards/qanda-cards.md) the text of both the front and back of each card is specified.
 
 With `cloze` cards a single text is specified, together with an identification of which parts of the text should be obscured.
 

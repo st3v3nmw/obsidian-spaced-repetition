@@ -3,7 +3,7 @@
 Flashcards are defined within standard Obsidian markdown files.
 
 A markdown file containing flashcards must identify the [deck](decks.md) (or decks) into which the flashcards are placed. 
-However, the file does not need to be tagged as a [note](notes.md) for it to have flashcards defined.
+However, the file does not need to be tagged as a [note](../notes.md) for it to have flashcards defined.
 
 Two types of flashcards are supported:
 

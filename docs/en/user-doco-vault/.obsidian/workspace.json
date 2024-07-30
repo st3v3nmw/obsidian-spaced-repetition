@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md",
+                "file": "User Guide/Context.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md",
+                "file": "User Guide/Context.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md",
+                "file": "User Guide/Context.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md"
+                "file": "User Guide/Context.md"
               }
             }
           },
@@ -152,14 +152,15 @@
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
-      "obsidian-spaced-repetition:Review flashcards": false,
       "obsidian-spaced-repetition-rz:Review flashcards": false
     }
   },
   "active": "2cb81aad0c9cc3a2",
   "lastOpenFiles": [
-    "Computing/AWS/DynamoDB/93. Amazon DynamoDB.md",
     "Computing/AWS/DynamoDB/DynamoDB LSI and GSI.md",
+    "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md",
+    "Computing/AWS/DynamoDB/Amazon DynamoDB.md",
+    "Computing/AWS/DynamoDB/93. Amazon DynamoDB.md",
     "Physics/Electric Field/Electric Field Strength and Charge Equation.md",
     "Computing/AWS/DynamoDB/102. DynamoDB LSI and GSI.md",
     "Physics/Electric Field/Electric Field Strength and Force Equation.md",
@@ -167,7 +168,6 @@
     "User Guide/Context.md",
     "Math/Ellipse/Ellipse.md",
     "Physics/Electric Field/Electric Field.md",
-    "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md",
     "Computing/AWS/DynamoDB/101. [HOL] Searching DynamoDB - Query API.md",
     "Math/Ellipse/Ellipse Equation.md",
     "User Guide",
@@ -195,7 +195,6 @@
     "Computing/AWS/DynamoDB/107. Amazon DynamoDB Accelerator (DAX).md",
     "Computing/AWS/DynamoDB/106. Amazon DynamoDB Streams.md",
     "Computing/AWS/DynamoDB/105. [HOL] Adding a Time to Live (TTL) to Items.md",
-    "Computing/AWS/DynamoDB/103. [HOL] Create LSI and GSI.md",
     "Computing/AWS/DynamoDB",
     "Computing/AWS/Section 8 - DynamoDB/files",
     "Computing/AWS/Section 8 - DynamoDB",

@@ -15,8 +15,10 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
 
 !!! tip "Features"
 
-    :material-circle-medium: [Flashcards](flashcards.md)<br/>
-    :material-circle-medium: [Notes](notes.md)
+    :material-circle-medium: [Flashcards](flashcards/flashcards.md) &nbsp; &nbsp; :material-circle-medium: [Notes](notes.md)
+    <hr class="thin">
+    :material-circle-medium: [Repetition Algorithms](algorithms.md) &nbsp; &nbsp; :material-circle-medium: [Data Storage](data-storage.md)
+
 
 !!! tip "Help & Support"
 
@@ -29,13 +31,33 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
 </div>
 
 
+---
 
 
 ## Quick Demo
 
+
+![user-interface-overview](https://github.com/user-attachments/assets/977bab30-cc5e-4b5c-849e-3881d82b3f8e)
+
+
+!!! note ""
+
+    1. Display the [Note Review Queue](notes.md#note-review-queue) <br/>
+    2. Note review queue<br/>
+    3. Display the Obsidian command dialog to access the plugin [commands](plugin-commands.md)<br/>
+    4. Select a flashcard [deck](flashcards/reviewing.md#deck-selection) to [review](flashcards/reviewing.md#reviewing) <br/>
+    5. Identify that flashcards within this note are in the `#flashcards/science/physics` [deck](flashcards/decks.md#using-obsidian-tags)<br/>
+    6. A [single line question](flashcards/qanda-cards.md#single-line-basic) (identified by the `::` separating the question and answer)<br/>
+    7. The plugin stores scheduling info within this [HTML comment](data-storage.md#individual-markdown-files) <br/>
+    8. The number of notes and flashcards currently due for review. Click to SOMETHING.
+
+
 <video controls>
   <source src="https://user-images.githubusercontent.com/43380836/115256965-5d455f00-a138-11eb-988f-27ba29f328a0.mp4" type="video/mp4">
 </video>
+
+---
+
 
 ## Installation
 
@@ -44,8 +66,9 @@ You can easily install the plugin from Obsidian's community plugin section in th
 ### Manual Installation
 
 !!! note "Advanced"
-  Create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your vault. Add the `main.js`, `manifest.json`, and the `styles.css` files from the [latest release](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases) to the folder.
+    Create an `obsidian-spaced-repetition` folder under `.obsidian/plugins` in your vault. Add the `main.js`, `manifest.json`, and the `styles.css` files from the [latest release](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases) to the folder.
 
+---
 
 ## Support
 
