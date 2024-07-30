@@ -67,7 +67,7 @@ info 1:::info 2
 
     </div>
 
-These two cards are considered sibling cards. See [sibling cards](flashcards.md#sibling-cards) regarding the 
+These two cards are considered sibling cards. See [sibling cards](flashcards-overview.md#sibling-cards) regarding the 
 [Bury sibling cards until the next day](../plugin-settings.md#flashcard-review) scheduling option.
 
 ---
@@ -159,7 +159,7 @@ These can also span over multiple lines as long as both sides "touch" the `??`:
 
     </div>
 
-These two cards are considered sibling cards. See [sibling cards](flashcards.md#sibling-cards) regarding the 
+These two cards are considered sibling cards. See [sibling cards](flashcards-overview.md#sibling-cards) regarding the 
 [Bury sibling cards until the next day]( ../plugin-settings.md#flashcard-review) scheduling option.
 
 

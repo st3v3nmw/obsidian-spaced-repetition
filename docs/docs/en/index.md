@@ -15,7 +15,7 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
 
 !!! tip "Features"
 
-    :material-circle-medium: [Flashcards](flashcards/flashcards.md) &nbsp; &nbsp; :material-circle-medium: [Notes](notes.md)
+    :material-circle-medium: [Flashcards](flashcards/flashcards-overview.md) &nbsp; &nbsp; :material-circle-medium: [Notes](notes.md)
     <hr class="thin">
     :material-circle-medium: [Repetition Algorithms](algorithms.md) &nbsp; &nbsp; :material-circle-medium: [Data Storage](data-storage.md)
 

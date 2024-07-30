@@ -32,7 +32,7 @@ theme:
 nav:
     - Index: index.md
     - Flashcards:
-        - Flashcards Overview: flashcards/flashcards.md
+        - Flashcards Overview:  flashcards/flashcards-overview.md
         - Question & Answer Cards: flashcards/qanda-cards.md
         - Cloze Cards: flashcards/basic-cloze-cards.md
         - Organizing into Decks: flashcards/decks.md
