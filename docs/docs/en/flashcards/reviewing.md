@@ -69,7 +69,7 @@ Canada::Ottawa
 
 
 !!! note
-    Context is only shown if enabled in [UI Preferences](../plugin-settings.md#ui-preferences)
+    Context is only shown if enabled in [UI Preferences](../user-options.md#ui-preferences)
 
 ### Keyboard shortcuts
 
@@ -98,7 +98,7 @@ Note that you can skip a card by simply pressing `S` (case doesn't matter).
 !!! tip
 
     If you're experiencing issues with the size of the modal on mobile devices,
-    go to [settings](../plugin-settings.md#ui-preferences) and set the _Flashcard Height Percentage_ and _Flashcard Width Percentage_
+    go to [settings](../user-options.md#ui-preferences) and set the _Flashcard Height Percentage_ and _Flashcard Width Percentage_
     to 100% to maximize it.
 
 ---

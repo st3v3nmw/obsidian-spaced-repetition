@@ -5,7 +5,7 @@
 
 ## Getting started
 
-Tag any notes that you'd like to review as `#review`. This default tag can be changed in the [settings](plugin-settings.md#note-settings). (You can also use multiple tags)
+Tag any notes that you'd like to review as `#review`. This default tag can be changed in the [settings](user-options.md#note-settings). (You can also use multiple tags)
 
 ## Note Review Queue
 

@@ -18,7 +18,7 @@ When the card is reviewed, an HTML comment will be added after the card's text, 
 
 By default, the comment is stored on the line following the card text.
 Alternatively, it can be stored on the same line by enabling the 
-[Save scheduling comment on the same line as the flashcard's last line?](plugin-settings.md#storage-of-scheduling-data) option.
+[Save scheduling comment on the same line as the flashcard's last line?](user-options.md#storage-of-scheduling-data) option.
 
 Scheduling information for the note is kept at the beginning of the file, in YAML format within the frontmatter section.
 For example:
@@ -44,7 +44,7 @@ Implementation of this has not yet occurred. For progress see:
 
 ## User Options
 
-All user [options](plugin-settings.md) are stored in `data.json` in the plugin folder.
+All user [options](user-options.md) are stored in `data.json` in the plugin folder.
 
 ---
 
@@ -54,7 +54,7 @@ All user [options](plugin-settings.md) are stored in `data.json` in the plugin f
 
 This records a list of cards reviewed today that have sibling cards that shouldn't be reviewed until tomorrow.
 
-Cards are only added to this list if the [Bury sibling cards until the next day](plugin-settings.md#flashcard-review) setting is turned on.
+Cards are only added to this list if the [Bury sibling cards until the next day](user-options.md#flashcard-review) setting is turned on.
 
 This information is also kept in the `data.json` file.
 

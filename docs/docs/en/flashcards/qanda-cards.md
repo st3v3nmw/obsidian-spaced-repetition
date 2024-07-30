@@ -11,7 +11,7 @@
 
 ## Single-line Basic
 
-The prompt and the answer are separated by `::` (this can be configured in [settings]( ../plugin-settings.md#flashcard-separators)).
+The prompt and the answer are separated by `::` (this can be configured in [settings]( ../user-options.md#flashcard-separators)).
 
 ```markdown
 the question goes on this side::answer goes here!
@@ -34,7 +34,7 @@ the question goes on this side::answer goes here!
 
 Two cards are created from the single flashcard text.
 
-The two parts are separated by `:::` (this can be configured in [settings]( ../plugin-settings.md#flashcard-separators)).
+The two parts are separated by `:::` (this can be configured in [settings]( ../user-options.md#flashcard-separators)).
 
 For example:
 
@@ -68,13 +68,13 @@ info 1:::info 2
     </div>
 
 These two cards are considered sibling cards. See [sibling cards](flashcards-overview.md#sibling-cards) regarding the 
-[Bury sibling cards until the next day](../plugin-settings.md#flashcard-review) scheduling option.
+[Bury sibling cards until the next day](../user-options.md#flashcard-review) scheduling option.
 
 ---
 
 ## Multi-line Basic
 
-The front and the back of the card are separated by `?` (this can be configured in [settings]( ../plugin-settings.md#flashcard-separators)).
+The front and the back of the card are separated by `?` (this can be configured in [settings]( ../user-options.md#flashcard-separators)).
 
 ```markdown
 As per the definition
@@ -113,7 +113,7 @@ These can also span over multiple lines as long as both sides "touch" the `?`:
 
 Two cards are created from the single flashcard text.
 
-The two parts are separated by `??` (this can be configured in [settings]( ../plugin-settings.md#flashcard-separators)).
+The two parts are separated by `??` (this can be configured in [settings]( ../user-options.md#flashcard-separators)).
 
 For example:
 
@@ -160,7 +160,7 @@ These can also span over multiple lines as long as both sides "touch" the `??`:
     </div>
 
 These two cards are considered sibling cards. See [sibling cards](flashcards-overview.md#sibling-cards) regarding the 
-[Bury sibling cards until the next day]( ../plugin-settings.md#flashcard-review) scheduling option.
+[Bury sibling cards until the next day]( ../user-options.md#flashcard-review) scheduling option.
 
 
 

@@ -1,4 +1,4 @@
-# Plugin Settings
+# User Options
 
 ## Flashcard Settings
 

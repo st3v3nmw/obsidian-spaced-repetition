@@ -57,7 +57,7 @@ The first female ==prime minister== of Australia was ==Julia Gillard==
     The first female prime minister of Australia was Julia Gillard
 
 These two cards are considered sibling cards. See [sibling cards](flashcards-overview.md#sibling-cards) regarding the 
-[Bury sibling cards until the next day](../plugin-settings.md#flashcard-review) scheduling option.
+[Bury sibling cards until the next day](../user-options.md#flashcard-review) scheduling option.
 
 ## Cloze Delimiter
 

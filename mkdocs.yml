@@ -39,8 +39,8 @@ nav:
         - Reviewing & Cramming: flashcards/reviewing.md
         - Statistics: flashcards/statistics.md
     - Notes: notes.md
-    - Settings & Commands:
-        - Settings: plugin-settings.md
+    - User Options & Commands:
+        - User Options: user-options.md
         - Commands: plugin-commands.md
     - Algorithms & Data Storage:
         - Repetition Algorithms: algorithms.md
