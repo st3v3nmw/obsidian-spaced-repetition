@@ -13,7 +13,7 @@
  So let's look at an example table. On the left hand side here, we have a partition key. Now, in this case this is using a post ID, so maybe it's something like a forum. And there's a unique ID for each entry in the forum. And then on the right we have the attributes. And those are the information associated with each of these entries in the table. 
 
 
- You can also have something called a composite key. That is a partition key plus a ==sort key== in combination. 
+ You can also have something called a composite key. That is a partition key plus a {{sort key}} in combination. 
 
 
  So an example is a user posting to a forum. The partition key would be the user ID and the sort key would be the timestamp of the post. The two together mean that you can have multiple items in the table with the same partition key but they're going to have a different sort key and that creates uniqueness. Two items may have the same partition key but they must have a different sort key. 

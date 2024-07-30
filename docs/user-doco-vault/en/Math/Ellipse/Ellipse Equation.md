@@ -1,3 +1,11 @@
+---
+sr-due: 2024-08-31
+sr-interval: 3
+sr-ease: 266
+---
+
+#review
+
 
 The general equation of an ellipse is used to algebraically represent an ellipse in the coordinate plane. The equation of an ellipse can be given as,
 

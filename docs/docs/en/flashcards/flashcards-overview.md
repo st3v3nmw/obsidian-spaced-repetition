@@ -13,16 +13,16 @@ Two types of flashcards are supported:
 
     [Question & Answer](qanda-cards.md) flashcards are ones where the flashcard text contains both the question text and answer text.
     
-    ---
-    ![flashcard-qanda-example](https://github.com/user-attachments/assets/95f5ae9a-3093-400e-9ef4-a0ec829eabf7)
+    <hr class="thin">
+    ![flashcard-qanda-example](https://github.com/user-attachments/assets/65639d80-b249-4b16-ae40-c2af011c6aab)
 
 !!! note "Cloze"
 
     [Cloze](basic-cloze-cards.md) flashcards are ones where the flashcard text identifies parts of the text (e.g. a word or phrase) that is hidden 
     when the front of the card is shown. <br/>
     The hidden text is known as a `cloze deletion`.
-    ---
-    ![flashcard-cloze-example](https://github.com/user-attachments/assets/47f7403b-a34f-4458-a078-417fa1ea75c6)
+    <hr class="thin">
+    ![flashcard-cloze-example](https://github.com/user-attachments/assets/9fb12f2e-9b81-45d9-9097-7f1e3d97ae5a)
 </div>
 
 !!! tip
@@ -53,9 +53,7 @@ Flashcard Type | Cards Defined
 
 If there are multiple cards defined by a single flashcard, those cards are known as `sibling` cards.
 
-A special scheduling option is available for the review of sibling cards.
-
-If the [Bury sibling cards until the next day]( ../user-options.md#flashcard-review)) setting is turned on, 
+A special scheduling option is available for the review of sibling cards. If the [Bury sibling cards until the next day]( ../user-options.md#flashcard-review) setting is turned on, 
 only one sibling card is available for review on a single day.
 
 ---

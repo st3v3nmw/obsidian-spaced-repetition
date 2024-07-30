@@ -19,11 +19,11 @@ The first female prime minister of Australia was ==Julia Gillard==
 !!! note "Displayed when reviewed"
     <div class="grid" markdown>
 
-    !!! tip "Card Front"
+    !!! tip "Initial View"
 
         The first female prime minister of Australia was [...]
 
-    !!! tip "Card Back"
+    !!! tip "After `Show Answer` Clicked"
 
         The first female prime minister of Australia was Julia Gillard
 
@@ -42,17 +42,17 @@ The first female ==prime minister== of Australia was ==Julia Gillard==
 !!! note ""
     <div class="grid" markdown>
 
-    !!! tip "Card 1 Front"
+    !!! tip "Card 1 Initial View"
 
         The first female [...] of Australia was Julia Gillard
 
-    !!! tip "Card 2 Front"
+    !!! tip "Card 2 Initial View"
 
         The first female prime minister of Australia was [...]
 
     </div>
 
-!!! tip "Card Back (same for both cards)"
+!!! tip "After `Show Answer` Clicked (same for both cards)"
 
     The first female prime minister of Australia was Julia Gillard
 
@@ -61,9 +61,10 @@ These two cards are considered sibling cards. See [sibling cards](flashcards-ove
 
 ## Cloze Delimiter
 
-The cloze delimiter can be modified in settings, e.g. to `**`, or curly braces `{{text in curly braces}}`.
+The cloze delimiter can be modified in [settings](../user-options.md#flashcard-review), e.g. to `**`, or curly braces `{{text in curly braces}}`.
 
 
+<!-- 
 ## Cloze Hints
 
 Hints can be included for any of the cloze deletions, using the `^[text of hint]` syntax. For example:
@@ -100,8 +101,10 @@ and this also ==in group 1==[^1]
 
 !!! warning
     When using deletion groups, every cloze deletion must include the group number
+ -->
 
 ## Anki style
 
-!!! warning "Fix documentation"
+!!! warning
     Anki style `{{c1:This text}} would {{c2:generate}} {{c1:2 cards}}` cloze deletions are not currently supported. This feature is being tracked [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/93/).
+

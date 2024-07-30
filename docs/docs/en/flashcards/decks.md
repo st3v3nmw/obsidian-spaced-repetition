@@ -1,9 +1,7 @@
 # Organizing into Decks
 
-![Screenshot from 2021-06-05 19-28-24](https://user-images.githubusercontent.com/43380836/120922211-78603400-c6d0-11eb-9d09-bdd5df1c9112.png)
+![flashcard-decks-1](https://github.com/user-attachments/assets/a207b0f6-b064-443c-9c55-540681b10891)
 
-!!! note
-    The green and blue counts on the right of each deck name represent due and new cards respectively.
 
 ## Using Obsidian Tags
 

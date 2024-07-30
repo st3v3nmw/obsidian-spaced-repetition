@@ -1,6 +1,6 @@
 #course/aws/developer-associate 
 
-Hi guys. In this lesson, I'm going to cover [[106. Amazon DynamoDB Streams|DynamoDB streams]]. So what is streams? Well, let's have a look at an example. So we have an application here, a DynamoDB table and then DynamoDB streams. Our application is writing items to the table. Maybe it's inserting, updating, or deleting an item. So we can see that as the first operation here. 
+Hi guys. In this lesson, I'm going to cover [[Amazon DynamoDB Streams|DynamoDB streams]]. So what is streams? Well, let's have a look at an example. So we have an application here, a DynamoDB table and then DynamoDB streams. Our application is writing items to the table. Maybe it's inserting, updating, or deleting an item. So we can see that as the first operation here. 
 
 A record is written to the DynamoDB stream. So after a change is made to the DynamoDB table, all changes are then projected into the DynamoDB stream. We might then have a lambda function being triggered and it will do something like process the information in the stream and write something to CloudWatch Logs. So just an example of using a stream. 
 

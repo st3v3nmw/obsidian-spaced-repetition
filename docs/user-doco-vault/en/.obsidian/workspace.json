@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "User Guide/Context.md",
+                "file": "Math/Ellipse/Ellipse Equation.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "User Guide/Context.md",
+                "file": "Math/Ellipse/Ellipse Equation.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "User Guide/Context.md",
+                "file": "Math/Ellipse/Ellipse Equation.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "User Guide/Context.md"
+                "file": "Math/Ellipse/Ellipse Equation.md"
               }
             }
           },
@@ -142,7 +142,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 392.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -155,21 +155,30 @@
       "obsidian-spaced-repetition-rz:Review flashcards": false
     }
   },
-  "active": "2cb81aad0c9cc3a2",
+  "active": "ab5847646efdb1fc",
   "lastOpenFiles": [
-    "Computing/AWS/DynamoDB/DynamoDB LSI and GSI.md",
-    "Computing/AWS/DynamoDB/94. DynamoDB Partitions and Primary Keys.md",
     "Computing/AWS/DynamoDB/Amazon DynamoDB.md",
+    "Math/Ellipse/Ellipse Equation.md",
+    "Math/Singular Matrix.md",
+    "Physics/Electric Field/Electric Field Simulation.md",
+    "Computing/AWS/DynamoDB/DynamoDB LSI and GSI.md",
+    "Computing/AWS/DynamoDB/DynamoDB Capacity Units (RCU-WCU).md",
+    "Computing/AWS/DynamoDB/Amazon DynamoDB Streams.md",
+    "Computing/AWS/DynamoDB/Amazon DynamoDB Global Tables.md",
+    "Computing/AWS/DynamoDB/Amazon DynamoDB Accelerator (DAX).md",
+    "Computing/AWS/DynamoDB/DynamoDB Optimistic Locking and Conditional Updates.md",
+    "Computing/AWS/DynamoDB/DynamoDB Scan and Query API.md",
+    "Computing/AWS/DynamoDB/DynamoDB Performance and Throttling.md",
+    "Computing/AWS/DynamoDB/DynamoDB Consistency Models and Transactions.md",
+    "Computing/AWS/DynamoDB/DynamoDB Partitions and Primary Keys.md",
+    "User Guide/Context.md",
     "Computing/AWS/DynamoDB/93. Amazon DynamoDB.md",
     "Physics/Electric Field/Electric Field Strength and Charge Equation.md",
     "Computing/AWS/DynamoDB/102. DynamoDB LSI and GSI.md",
     "Physics/Electric Field/Electric Field Strength and Force Equation.md",
-    "Computing/AWS/DynamoDB/104. DynamoDB Optimistic Locking and Conditional Updates.md",
-    "User Guide/Context.md",
     "Math/Ellipse/Ellipse.md",
     "Physics/Electric Field/Electric Field.md",
     "Computing/AWS/DynamoDB/101. [HOL] Searching DynamoDB - Query API.md",
-    "Math/Ellipse/Ellipse Equation.md",
     "User Guide",
     "Computing/AWS/DynamoDB/files/Pasted image 20240508132354.png",
     "Computing/AWS/DynamoDB/files/Pasted image 20240508134406.png",
@@ -182,19 +191,10 @@
     "Computing/AWS/DynamoDB/files/Pasted image 20240504223518.png",
     "Computing/AWS/DynamoDB/files/Pasted image 20240506145524.png",
     "Computing/AWS/DynamoDB/Quiz 5 - Amazon DynamoDB.md",
-    "Computing/AWS/DynamoDB/98. DynamoDB Performance and Throttling.md",
     "Computing/AWS/DynamoDB/files",
-    "Computing/AWS/DynamoDB/99. DynamoDB Scan and Query API.md",
-    "Computing/AWS/DynamoDB/96. DynamoDB Consistency Models and Transactions.md",
-    "Computing/AWS/DynamoDB/97. DynamoDB Capacity Units (RCU-WCU).md",
     "Computing/AWS/DynamoDB/95. [HOL] Practice Creating DynamoDB Tables.md",
     "Computing/AWS/DynamoDB/92. Introduction.md",
     "Computing/AWS/DynamoDB/110. Exam Cram - Amazon DynamoDB.md",
-    "Computing/AWS/DynamoDB/109. [HOL] Enable Global Table.md",
-    "Computing/AWS/DynamoDB/108. Amazon DynamoDB Global Tables.md",
-    "Computing/AWS/DynamoDB/107. Amazon DynamoDB Accelerator (DAX).md",
-    "Computing/AWS/DynamoDB/106. Amazon DynamoDB Streams.md",
-    "Computing/AWS/DynamoDB/105. [HOL] Adding a Time to Live (TTL) to Items.md",
     "Computing/AWS/DynamoDB",
     "Computing/AWS/Section 8 - DynamoDB/files",
     "Computing/AWS/Section 8 - DynamoDB",

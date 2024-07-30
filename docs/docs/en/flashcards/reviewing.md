@@ -21,7 +21,7 @@ A key part of spaced repetition learning is being shown the front of cards to te
 
 Although you may want to review or cram all cards across all decks, you often may wish to do so on only a subset of decks.
 
-![review-deck](https://github.com/user-attachments/assets/07c9f436-6b2a-43b5-b6f6-339bcd1cadfa)
+![flashcard-decks-1](https://github.com/user-attachments/assets/a207b0f6-b064-443c-9c55-540681b10891)
 
 !!! note "All subdecks included"
 
@@ -31,15 +31,16 @@ Although you may want to review or cram all cards across all decks, you often ma
 ### Operation
 
 
-# | Name | Description
-- | - | -
-1 | Edit | Edit the flashcard text
-2 | Reset | Reset the review schedule information - the review interval is set to 1 day, and the ease is set to the default value
-3 | Info | Shows the scheduling information for the card
-4 | Skip | Skip the current card without reviewing
-
 ![review-operation](https://github.com/user-attachments/assets/d8f438dc-f1f0-43c4-a752-a5eeb64346e4)
 
+!!! note ""
+    # | Name | Description
+    - | - | -
+    1 | Edit | Edit the flashcard text
+    2 | Reset | Reset the review schedule information - the review interval is set to 1 day, and the ease is set to the default value
+    3 | Info | Shows the scheduling information for the card
+    4 | Skip | Skip the current card without reviewing
+    
 ### Context
 
 If the parent note has heading(s), the flashcard will have a title containing the context.

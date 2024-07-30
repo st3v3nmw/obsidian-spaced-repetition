@@ -18,6 +18,7 @@ the question goes on this side::answer goes here!
 ```
 
 !!! note "Displayed when reviewed"
+
     <div class="grid" markdown>
 
     !!! tip "Card Front"
@@ -45,11 +46,11 @@ info 1:::info 2
 !!! note "Card 1"
     <div class="grid" markdown>
 
-    !!! tip "Card 1 Front"
+    !!! tip "Front"
 
         info 1
 
-    !!! tip "Card 1 Back"
+    !!! tip "Back"
 
         info 2
 
@@ -57,11 +58,11 @@ info 1:::info 2
 
 !!! note "Card 2"
     <div class="grid" markdown>
-    !!! tip "Card 2 Front"
+    !!! tip "Front"
 
         info 2
 
-    !!! tip "Card 2 Back"
+    !!! tip "Back"
 
         info 1
 
@@ -131,13 +132,13 @@ These can also span over multiple lines as long as both sides "touch" the `??`:
 !!! note "Card 1"
     <div class="grid" markdown>
 
-    !!! tip "Card 1 Front"
+    !!! tip "Front"
 
         info 1A <br/>
         info 1B <br/>
         info 1C
 
-    !!! tip "Card 1 Back"
+    !!! tip "Back"
 
         info 2A <br/>
         info 2B
@@ -146,12 +147,12 @@ These can also span over multiple lines as long as both sides "touch" the `??`:
 
 !!! note "Card 2"
     <div class="grid" markdown>
-    !!! tip "Card 2 Front"
+    !!! tip "Front"
 
         info 2A <br/>
         info 2B
 
-    !!! tip "Card 2 Back"
+    !!! tip "Back"
 
         info 1A <br/>
         info 1B <br/>

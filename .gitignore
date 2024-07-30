@@ -29,8 +29,8 @@ tests/e2e/vault/
 site/
 venv/
 .venv/
-docs/en/media/~*
-docs/en/user-doco-vault/.obsidian/plugins/obsidian-spaced-repetition-beta
+docs/docs/en/media/~*
+docs/docs/en/user-doco-vault/.obsidian/plugins/obsidian-spaced-repetition-beta
 
 # env
 env.sh

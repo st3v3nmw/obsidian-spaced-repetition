@@ -10,7 +10,7 @@
     "convertFoldersToDecks": false,
     "cardCommentOnSameLine": true,
     "burySiblingCards": true,
-    "showContextInCards": false,
+    "showContextInCards": true,
     "flashcardHeightPercentage": 80,
     "flashcardWidthPercentage": 40,
     "randomizeCardOrder": null,

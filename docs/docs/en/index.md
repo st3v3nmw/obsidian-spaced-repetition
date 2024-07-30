@@ -46,11 +46,11 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
     1. Display the [Note Review Queue](notes.md#note-review-queue) <br/>
     2. Note review queue<br/>
     3. Display the Obsidian command dialog to access the plugin [commands](plugin-commands.md)<br/>
-    4. Select a flashcard [deck](flashcards/reviewing.md#deck-selection) to [review](flashcards/reviewing.md#reviewing) <br/>
+    4. `Flashcard Review Icon` Select a flashcard [deck](flashcards/reviewing.md#deck-selection) to [review](flashcards/reviewing.md#reviewing) <br/>
     5. Identify that flashcards within this note are in the `#flashcards/science/physics` [deck](flashcards/decks.md#using-obsidian-tags)<br/>
     6. A [single line question](flashcards/qanda-cards.md#single-line-basic) (identified by the `::` separating the question and answer)<br/>
     7. The plugin stores scheduling info within this [HTML comment](data-storage.md#individual-markdown-files) <br/>
-    8. The number of notes and flashcards currently due for review. Click to SOMETHING.
+    8. `Spaced Repetition Status Area` The number of notes and flashcards currently due for review. Click to SOMETHING.
 
 
 <video controls>
