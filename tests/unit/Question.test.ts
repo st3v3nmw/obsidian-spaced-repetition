@@ -1,6 +1,7 @@
 import { TopicPath } from "src/TopicPath";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { Question, QuestionText } from "src/Question";
+import { TextDirection } from "src/util/TextDirection";
 
 let settings_cardCommentOnSameLine: SRSettings = { ...DEFAULT_SETTINGS };
 settings_cardCommentOnSameLine.cardCommentOnSameLine = true;
@@ -13,7 +14,7 @@ describe("Question", () => {
                 "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```";
 
             let question: Question = new Question({
-                questionText: new QuestionText(text, null, text, null),
+                questionText: new QuestionText(text, null, text, TextDirection.Ltr, null),
             });
 
             expect(question.getHtmlCommentSeparator(DEFAULT_SETTINGS)).toEqual("\n");
@@ -24,7 +25,7 @@ describe("Question", () => {
             let text: string = "Q1::A1";
 
             let question: Question = new Question({
-                questionText: new QuestionText(text, null, text, null),
+                questionText: new QuestionText(text, null, text, TextDirection.Ltr, null),
             });
 
             expect(question.getHtmlCommentSeparator(DEFAULT_SETTINGS)).toEqual("\n");

@@ -48,7 +48,9 @@ export class FlashcardModal extends Modal {
 
         // Setup base containers
         this.modalEl.style.height = this.settings.flashcardHeightPercentage + "%";
+        this.modalEl.style.maxHeight = this.settings.flashcardHeightPercentage + "%";
         this.modalEl.style.width = this.settings.flashcardWidthPercentage + "%";
+        this.modalEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
         this.modalEl.setAttribute("id", "sr-modal");
 
         this.contentEl.addClass("sr-modal-content");
@@ -118,7 +120,11 @@ export class FlashcardModal extends Modal {
         // Just the question/answer text; without any preceding topic tag
         const textPrompt = currentQ.questionText.actualQuestion;
 
-        const editModal = FlashcardEditModal.Prompt(this.app, textPrompt);
+        const editModal = FlashcardEditModal.Prompt(
+            this.app,
+            textPrompt,
+            currentQ.questionText.textDirection,
+        );
         editModal
             .then(async (modifiedCardText) => {
                 this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);

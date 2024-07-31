@@ -42,6 +42,7 @@ plugins:
           docs_structure: folder
           languages:
               en: English
+              zh: 简体中文
           default_language: en
 
 markdown_extensions:
