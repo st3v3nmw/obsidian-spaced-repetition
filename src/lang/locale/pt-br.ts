@@ -101,6 +101,8 @@ export default {
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Converter ==marca-texto== em omissões?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "Converter **texto em negrito** em omissões?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Converter {{chaves}} em omissões?",
+    CLOZE_PATTERNS: "Padrões de Omissão",
+    CLOZE_PATTERNS_DESC: "Entre os padrões de omissão separados por quebras de linha",
     INLINE_CARDS_SEPARATOR: "Separador para flashcards inline",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Note que depois de mudar isso você vai ter que manualmente mudar quaisquer flashcards que você tenha.",

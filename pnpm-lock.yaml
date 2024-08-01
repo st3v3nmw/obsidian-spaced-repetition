@@ -8,6 +8,9 @@ dependencies:
   chart.js:
     specifier: ^4.4.2
     version: 4.4.2
+  clozecraft:
+    specifier: ^0.4.0
+    version: 0.4.0
   pagerank.js:
     specifier: ^1.0.2
     version: 1.0.2
@@ -2206,6 +2209,10 @@ packages:
     engines: {node: '>=0.8'}
     requiresBuild: true
     dev: true
+
+  /clozecraft@0.4.0:
+    resolution: {integrity: sha512-VeXEZV6/Ar0sLbru53lpn9bNf6dpBtQtywUJ0K76WOCrI9a61jSgEo/aspwUuKdpR7kAtAhAlsYDDEaZj87wqQ==}
+    dev: false
 
   /co@4.6.0:
     resolution: {integrity: sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==}
