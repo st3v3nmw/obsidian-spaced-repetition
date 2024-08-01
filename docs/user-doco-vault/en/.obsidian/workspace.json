@@ -130,7 +130,7 @@
             }
           },
           {
-            "id": "ab5847646efdb1fc",
+            "id": "ac76ac38fa879cc6",
             "type": "leaf",
             "state": {
               "type": "review-queue-list-view",
@@ -155,7 +155,7 @@
       "obsidian-spaced-repetition-rz:Review flashcards": false
     }
   },
-  "active": "ab5847646efdb1fc",
+  "active": "ac76ac38fa879cc6",
   "lastOpenFiles": [
     "Computing/AWS/DynamoDB/Amazon DynamoDB.md",
     "Math/Ellipse/Ellipse Equation.md",
