@@ -105,7 +105,7 @@ export class CardScheduleCalculator {
         const interval = CardScheduleInfo.initialInterval;
         const ease = this.settings.baseEase;
         const dueDate = globalDateProvider.today.add(interval, "d");
-        const delayBeforeReview = 0;
+        const delayBeforeReview = 0;        
         return CardScheduleInfo.fromDueDateMoment(dueDate, interval, ease, delayBeforeReview);
     }
 
