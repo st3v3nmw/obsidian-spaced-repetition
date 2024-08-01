@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+         <loc>https://www.stephenmwangi.com/obsidian-spaced-repetition/changelog/</loc>
+         <lastmod>2024-08-01</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://www.stephenmwangi.com/obsidian-spaced-repetition/en/changelog/"/>
+         <xhtml:link rel="alternate" hreflang="zh" href="https://www.stephenmwangi.com/obsidian-spaced-repetition/zh/changelog/"/>
+         
+    </url>
+    <url>
+         <loc>https://www.stephenmwangi.com/obsidian-spaced-repetition/license/</loc>
+         <lastmod>2024-08-01</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://www.stephenmwangi.com/obsidian-spaced-repetition/en/license/"/>
+         <xhtml:link rel="alternate" hreflang="zh" href="https://www.stephenmwangi.com/obsidian-spaced-repetition/zh/license/"/>
+         
+    </url>
+    <url>
+         <loc>https://www.stephenmwangi.com/obsidian-spaced-repetition/</loc>
+         <lastmod>2024-08-01</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://www.stephenmwangi.com/obsidian-spaced-repetition/en/"/>
+         <xhtml:link rel="alternate" hreflang="zh" href="https://www.stephenmwangi.com/obsidian-spaced-repetition/zh/"/>
+         
+    </url>
+    <url>
+         <loc>https://www.stephenmwangi.com/obsidian-spaced-repetition/algorithms/</loc>
+         <lastmod>2024-08-01</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://www.stephenmwangi.com/obsidian-spaced-repetition/en/algorithms/"/>
+         <xhtml:link rel="alternate" hreflang="zh" href="https://www.stephenmwangi.com/obsidian-spaced-repetition/zh/algorithms/"/>
+         
+    </url>
+    <url>
+         <loc>https://www.stephenmwangi.com/obsidian-spaced-repetition/contributing/</loc>
+         <lastmod>2024-08-01</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://www.stephenmwangi.com/obsidian-spaced-repetition/en/contributing/"/>
+         <xhtml:link rel="alternate" hreflang="zh" href="https://www.stephenmwangi.com/obsidian-spaced-repetition/zh/contributing/"/>
+         
+    </url>
+    <url>
+         <loc>https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/</loc>
+         <lastmod>2024-08-01</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://www.stephenmwangi.com/obsidian-spaced-repetition/en/flashcards/"/>
+         <xhtml:link rel="alternate" hreflang="zh" href="https://www.stephenmwangi.com/obsidian-spaced-repetition/zh/flashcards/"/>
+         
+    </url>
+    <url>
+         <loc>https://www.stephenmwangi.com/obsidian-spaced-repetition/notes/</loc>
+         <lastmod>2024-08-01</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://www.stephenmwangi.com/obsidian-spaced-repetition/en/notes/"/>
+         <xhtml:link rel="alternate" hreflang="zh" href="https://www.stephenmwangi.com/obsidian-spaced-repetition/zh/notes/"/>
+         
+    </url>
+</urlset>
