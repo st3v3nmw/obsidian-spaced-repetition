@@ -27,7 +27,9 @@ export class FlashcardReviewView {
     public view: HTMLDivElement;
 
     public header: HTMLDivElement;
+    public titleWrapper: HTMLDivElement;
     public title: HTMLDivElement;
+    public subTitle: HTMLDivElement;
     public backButton: HTMLDivElement;
 
     public controls: HTMLDivElement;
@@ -45,6 +47,7 @@ export class FlashcardReviewView {
     public easyButton: HTMLButtonElement;
     public answerButton: HTMLButtonElement;
 
+    private chosenDeck: Deck | null;
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
@@ -72,6 +75,7 @@ export class FlashcardReviewView {
         this.editClickHandler = editClickHandler;
         this.modalContentEl = contentEl;
         this.modalEl = modalEl;
+        this.chosenDeck = null;
 
         // Build ui
         this.init();
@@ -81,16 +85,22 @@ export class FlashcardReviewView {
      * Initializes all static elements in the FlashcardView
      */
     init() {
+        this._createBackButton();
+
         this.view = this.modalContentEl.createDiv();
         this.view.addClasses(["sr-flashcard", "sr-is-hidden"]);
 
         this.header = this.view.createDiv();
         this.header.addClass("sr-header");
 
-        this._createBackButton();
+        this.titleWrapper = this.header.createDiv();
+        this.titleWrapper.addClass("sr-title-wrapper");
 
-        this.title = this.header.createDiv();
+        this.title = this.titleWrapper.createDiv();
         this.title.addClass("sr-title");
+
+        this.subTitle = this.titleWrapper.createDiv();
+        this.subTitle.addClasses(["sr-sub-title", "sr-is-hidden"]);
 
         this.controls = this.header.createDiv();
         this.controls.addClass("sr-controls");
@@ -112,14 +122,60 @@ export class FlashcardReviewView {
     }
 
     /**
-     * Shows the FlashcardView & rerenders all dynamic elements
+     * Shows the FlashcardView if it is hidden
      */
-    async show() {
+    async show(chosenDeck: Deck) {
+        if (!this.view.hasClass("sr-is-hidden")) {
+            return;
+        }
+        this.chosenDeck = chosenDeck;
+
+        await this._drawContent();
+
+        // Prevents the following code, from running if this show is just a redraw and not an unhide
+        this.view.removeClass("sr-is-hidden");
+        this.backButton.removeClass("sr-is-hidden");
+        document.addEventListener("keydown", this._keydownHandler);
+    }
+
+    /**
+     * Refreshes all dynamic elements
+     */
+    async refresh() {
+        await this._drawContent();
+    }
+
+    /**
+     * Hides the FlashcardView if it is visible
+     */
+    hide() {
+        // Prevents the following code, from running if this was executed multiple times after one another
+        if (this.view.hasClass("sr-is-hidden")) {
+            return;
+        }
+
+        document.removeEventListener("keydown", this._keydownHandler);
+        this.view.addClass("sr-is-hidden");
+        this.backButton.addClass("sr-is-hidden");
+    }
+
+    /**
+     * Closes the FlashcardView
+     */
+    close() {
+        this.hide();
+        document.removeEventListener("keydown", this._keydownHandler);
+    }
+
+    // #region -> Functions & helpers
+
+    private async _drawContent() {
         this.mode = FlashcardModalMode.Front;
-        const deck: Deck = this.reviewSequencer.currentDeck;
+        const currentDeck: Deck = this.reviewSequencer.currentDeck;
 
         // Setup title
-        this._setTitle(deck);
+        this._setTitle(this.chosenDeck);
+        this._setSubTitle(this.chosenDeck, currentDeck);
         this.resetButton.disabled = true;
 
         // Setup context
@@ -146,38 +202,7 @@ export class FlashcardReviewView {
 
         // Setup response buttons
         this._resetResponseButtons();
-
-        // Prevents the following code, from running if this show is just a redraw and not an unhide
-        if (!this.view.hasClass("sr-is-hidden")) {
-            return;
-        }
-        this.view.removeClass("sr-is-hidden");
-        this.backButton.removeClass("sr-is-hidden");
-        document.addEventListener("keydown", this._keydownHandler);
     }
-
-    /**
-     * Hides the FlashcardView
-     */
-    hide() {
-        // Prevents the following code, from running if this was executed multiple times after one another
-        if (this.view.hasClass("sr-is-hidden")) {
-            return;
-        }
-        this.view.addClass("sr-is-hidden");
-        this.backButton.addClass("sr-is-hidden");
-        document.removeEventListener("keydown", this._keydownHandler);
-    }
-
-    /**
-     * Closes the FlashcardView
-     */
-    close() {
-        document.removeEventListener("keydown", this._keydownHandler);
-        this.hide();
-    }
-
-    // -> Functions & helpers
 
     private _keydownHandler = (e: KeyboardEvent) => {
         // Prevents any input, if the edit modal is open
@@ -342,7 +367,7 @@ export class FlashcardReviewView {
     }
 
     private async _handleSkipCard(): Promise<void> {
-        if (this._currentCard != null) await this.show();
+        if (this._currentCard != null) await this.refresh();
         else this.backClickHandler();
     }
 
@@ -371,13 +396,46 @@ export class FlashcardReviewView {
         setIcon(this.backButton, "arrow-left");
         this.backButton.setAttribute("aria-label", t("BACK"));
         this.backButton.addEventListener("click", () => {
-            /* this.plugin.data.historyDeck = ""; */
             this.backClickHandler();
         });
     }
 
     private _setTitle(deck: Deck) {
-        this.title.setText(`${deck.deckName}: ${deck.getCardCount(CardListType.All, true)}`);
+        let text = deck.deckName;
+
+        const deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
+        const cardsInQueue = deckStats.dueCount + deckStats.newCount;
+        text += `: ${cardsInQueue}`;
+
+        this.title.setText(text);
+    }
+
+    private _setSubTitle(chosenDeck: Deck, currentDeck: Deck) {
+        if (chosenDeck.subdecks.length === 0) {
+            if (!this.subTitle.hasClass("sr-is-hidden")) {
+                this.subTitle.addClass("sr-is-hidden");
+            }
+            return;
+        }
+
+        if (this.subTitle.hasClass("sr-is-hidden")) {
+            this.subTitle.removeClass("sr-is-hidden");
+        }
+
+        let text = `${currentDeck.deckName}`;
+
+        const isRandomMode = this.settings.flashcardCardOrder === "EveryCardRandomDeckAndCard";
+        if (!isRandomMode) {
+            const subDecksWithCardsInQueue = chosenDeck.subdecks.filter((subDeck) => {
+                const deckStats = this.reviewSequencer.getDeckStats(subDeck.getTopicPath());
+                return deckStats.dueCount + deckStats.newCount > 0;
+            });
+
+            text = `${t("DECKS")}: ${subDecksWithCardsInQueue.length} | ${text}`;
+            text += `: ${currentDeck.getCardCount(CardListType.All, false)}`;
+        }
+
+        this.subTitle.setText(text);
     }
 
     // -> Controls
