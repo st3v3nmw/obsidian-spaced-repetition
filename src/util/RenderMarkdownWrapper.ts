@@ -6,6 +6,7 @@ import {
     NON_LETTER_SYMBOLS_REGEX,
 } from "../constants";
 import SRPlugin from "../main";
+import { TextDirection } from "./TextDirection";
 
 export class RenderMarkdownWrapper {
     private app: App;
@@ -23,13 +24,19 @@ export class RenderMarkdownWrapper {
     async renderMarkdownWrapper(
         markdownString: string,
         containerEl: HTMLElement,
+        textDirection: TextDirection,
         recursiveDepth = 0,
     ): Promise<void> {
         if (recursiveDepth > 4) return;
 
-        MarkdownRenderer.render(this.app, markdownString, containerEl, this.notePath, this.plugin);
+        let el: HTMLElement;
+        if (textDirection == TextDirection.Rtl) {
+            el = containerEl.createDiv();
+            el.setAttribute("dir", "rtl");
+        } else el = containerEl;
+        MarkdownRenderer.render(this.app, markdownString, el, this.notePath, this.plugin);
 
-        containerEl.findAll(".internal-embed").forEach((el) => {
+        el.findAll(".internal-embed").forEach((el) => {
             const link = this.parseLink(el.getAttribute("src"));
 
             // file does not exist, display dead link
@@ -145,6 +152,9 @@ export class RenderMarkdownWrapper {
             blockText = text;
         }
 
-        this.renderMarkdownWrapper(blockText, el, recursiveDepth + 1);
+        // We are operating here within the parent container.
+        // It already has the rtl div if necessary.
+        // We don't need another rtl div, so we can set direction to Unspecified
+        this.renderMarkdownWrapper(blockText, el, TextDirection.Unspecified, recursiveDepth + 1);
     }
 }

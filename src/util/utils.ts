@@ -1,7 +1,7 @@
 import moment from "moment";
 import { Moment } from "moment";
 import { normalize, sep } from "path";
-import { PREFERRED_DATE_FORMAT, YAML_FRONT_MATTER_REGEX } from "src/constants";
+import { PREFERRED_DATE_FORMAT } from "src/constants";
 
 type Hex = number;
 
@@ -96,6 +96,28 @@ export function stringTrimStart(str: string): [string, string] {
     const ws: string = str.substring(0, wsCount);
     return [ws, trimmed];
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function convertToStringOrEmpty(v: any): string {
+    let result: string = "";
+    if (v != null && v != undefined) {
+        result = v + "";
+    }
+    return result;
+}
+
+//
+// This returns [frontmatter, content]
+//
+// The returned content has the same number of lines as the supplied str string, but with the
+// frontmatter lines (if present) blanked out.
+//
+// 1. We don't want the parser to see the frontmatter, as it would deem it to be part of a multi-line question
+// if one started on the line immediately after the "---" closing marker.
+//
+// 2. The lines are blanked out rather than deleted so that line numbers are not affected
+// e.g. for calls to getQuestionContext(cardLine: number)
+//
 
 /**
  * Checks a path is equal or a subpath of the other rootPath
