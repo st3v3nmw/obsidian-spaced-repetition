@@ -162,6 +162,9 @@ Note that this setting is common to both Flashcards and Notes.`,
         "링크된 노트의 초기 ease에 대한 가중치가 적용된 ease의 최대 기여도입니다.",
     LOGGING: "로깅",
     DISPLAY_DEBUG_INFO: "디버깅 정보를 개발자 콘솔에 표시하시겠습니까?",
+    SETTINGS_DEVELOPER_NONE: "None",
+    SETTINGS_DEVELOPER_CONSOLE: "Console",
+    SETTINGS_DEVELOPER_FILE: "File", 
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "리뷰할 노트 대기열",

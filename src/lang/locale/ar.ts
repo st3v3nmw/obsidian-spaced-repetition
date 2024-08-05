@@ -157,6 +157,9 @@ Note that this setting is common to both Flashcards and Notes. : أدخل مسا
     MAX_LINK_CONTRIB_DESC: "أقصى مساهمة للسهولة المرجحة للملاحظات المرتبطة بالسهولة الأولية.",
     LOGGING: "تسجيل",
     DISPLAY_DEBUG_INFO: "عرض معلومات التصحيح على وحدة تحكم المطور؟",
+    SETTINGS_DEVELOPER_NONE: "None",
+    SETTINGS_DEVELOPER_CONSOLE: "Console",
+    SETTINGS_DEVELOPER_FILE: "File", 
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "ملاحظات قائمة المراجعة",

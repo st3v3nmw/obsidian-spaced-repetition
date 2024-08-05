@@ -166,6 +166,9 @@ Note that this setting is common to both Flashcards and Notes.`,
         "Contribución máxima de la facilidad ponderada de las notas vinculadas a la facilidad inicial.",
     LOGGING: "Registro",
     DISPLAY_DEBUG_INFO: "¿Mostrar información de depuración en la consola de desarrollador?",
+    SETTINGS_DEVELOPER_NONE: "None",
+    SETTINGS_DEVELOPER_CONSOLE: "Console",
+    SETTINGS_DEVELOPER_FILE: "File", 
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Cola de notas a revisar",

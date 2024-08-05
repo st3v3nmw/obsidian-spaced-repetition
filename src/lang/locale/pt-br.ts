@@ -168,6 +168,9 @@ Note that this setting is common to both Flashcards and Notes.`,
         "Contribuição máxima da facilidade ponderada das notas linkadas à facilidade inicial.",
     LOGGING: "Logging",
     DISPLAY_DEBUG_INFO: "Mostrar informação de debugging no console de desenvolvimento?",
+    SETTINGS_DEVELOPER_NONE: "None",
+    SETTINGS_DEVELOPER_CONSOLE: "Console",
+    SETTINGS_DEVELOPER_FILE: "File", 
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Fila de Notas para Revisar",

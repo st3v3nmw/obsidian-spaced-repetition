@@ -165,6 +165,9 @@ Note that this setting is common to both Flashcards and Notes.`,
         "最初の易しさに対して、リンクされたノートの重み付けされた易しさが寄与する最大値を指定してください。",
     LOGGING: "ログ管理",
     DISPLAY_DEBUG_INFO: "デベロッパーコンソールにてデバッグ情報を表示しますか？",
+    SETTINGS_DEVELOPER_NONE: "None",
+    SETTINGS_DEVELOPER_CONSOLE: "Console",
+    SETTINGS_DEVELOPER_FILE: "File", 
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "ノートレビューのキュー",
