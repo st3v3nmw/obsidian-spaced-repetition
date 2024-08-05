@@ -160,6 +160,9 @@ Note that this setting is common to both Flashcards and Notes.`,
         "Maximum contribution of the weighted ease of linked notes to the initial ease.",
     LOGGING: "Logging",
     DISPLAY_DEBUG_INFO: "Display debugging information on the developer console?",
+    SETTINGS_DEVELOPER_NONE: "None",
+    SETTINGS_DEVELOPER_CONSOLE: "Console",
+    SETTINGS_DEVELOPER_FILE: "File", 
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Notes Review Queue",

@@ -43,6 +43,9 @@ import { StatsModal } from "./gui/StatsModal";
 import { FlashcardModal } from "./gui/FlashcardModal";
 import { TextDirection } from "./util/TextDirection";
 import { convertToStringOrEmpty } from "./util/utils";
+import { logger } from "./util/logger";
+
+export const versionString: string = "Branch: master v1.13-beta.8"
 
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
@@ -52,15 +55,15 @@ export default class SRPlugin extends Plugin {
     private nextNoteReviewHandler: NextNoteReviewHandler;
 
     async onload(): Promise<void> {
-        console.log("onload: Branch: master v1.13-beta.8");
+        console.log(`onload: ${versionString}`);
         await this.loadPluginData();
 
-        this.initLogicClasses();
+        await this.initLogicClasses();
 
         this.initGuiItems();
     }
 
-    private initLogicClasses() {
+    private async initLogicClasses(): Promise<void> {
         const questionPostponementList: QuestionPostponementList = new QuestionPostponementList(
             this,
             this.data.settings,
@@ -70,6 +73,9 @@ export default class SRPlugin extends Plugin {
         const osrNoteLinkInfoFinder: ObsidianVaultNoteLinkInfoFinder =
             new ObsidianVaultNoteLinkInfoFinder(this.app.metadataCache);
 
+        logger.setVault(this.app.vault);
+        await logger.setDestination(this.data.settings);
+
         this.osrAppCore = new OsrAppCore(this.app);
         this.osrAppCore.init(
             questionPostponementList,
@@ -77,6 +83,7 @@ export default class SRPlugin extends Plugin {
             this.data.settings,
             this.onOsrVaultDataChanged.bind(this),
         );
+
     }
 
     private initGuiItems() {
@@ -358,8 +365,8 @@ export default class SRPlugin extends Plugin {
 
         if (this.data.settings.showDebugMessages) {
             // TODO: console.log(`SR: ${t("EASES")}`, this.easeByPath.dict);
-            console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
-            console.log(
+            logger.log(`SR: ${t("DECKS")}, ${this.osrAppCore.reviewableDeckTree}`);
+            logger.log(
                 "SR: " +
                     t("SYNC_TIME_TAKEN", {
                         t: Date.now() - now.valueOf(),

@@ -3,6 +3,7 @@ import type SRPlugin from "src/main";
 import { t } from "src/lang/helpers";
 import { isEqualOrSubPath } from "./util/utils";
 import { TabStructure, createTabs } from "./gui/Tabs";
+import { logger } from "./util/logger";
 
 export interface SRSettings {
     // flashcards
@@ -45,6 +46,8 @@ export interface SRSettings {
     maxLinkFactor: number;
     // logging
     showDebugMessages: boolean;
+    debugLoggerDestination: string;
+    debugLoggerFilename: string;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
@@ -87,8 +90,11 @@ export const DEFAULT_SETTINGS: SRSettings = {
     easyBonus: 1.3,
     maximumInterval: 36525,
     maxLinkFactor: 1.0,
+
     // logging
-    showDebugMessages: false,
+    showDebugMessages: false, 
+    debugLoggerDestination: "None", 
+    debugLoggerFilename: logger.defaultFilenameTemplate()
 };
 
 export function upgradeSettings(settings: SRSettings) {
@@ -106,9 +112,23 @@ export function upgradeSettings(settings: SRSettings) {
         // After the upgrade, we don't need the old attribute any more
         settings.randomizeCardOrder = null;
     }
+    upgradeSettingsLoggerDestination();
+
+    function upgradeSettingsLoggerDestination() {
+        if (settings.debugLoggerDestination == null) {
+            console.log(`upgradeSettingsLoggerDestination: Upgrading settings: ${settings.showDebugMessages}`);
+            settings.debugLoggerDestination = settings.showDebugMessages ? "Console" : "None";
+            settings.debugLoggerFilename = logger.defaultFilenameTemplate();
+        }
+    }
 }
 
 export class SettingsUtil {
+    static setDebugLoggerDestination(settings: SRSettings, value: string) {
+        settings.debugLoggerDestination = value;
+        settings.showDebugMessages = (value != "None")
+    }
+
     static isFlashcardTag(settings: SRSettings, tag: string): boolean {
         return SettingsUtil.isTagInList(settings.flashcardTags, tag);
     }
@@ -912,13 +932,23 @@ export class SRSettingTab extends PluginSettingTab {
     }
 
     private async tabDeveloper(containerEl: HTMLElement): Promise<void> {
-        containerEl.createEl("h3", { text: `${t("LOGGING")}` });
-        new Setting(containerEl).setName(t("DISPLAY_DEBUG_INFO")).addToggle((toggle) =>
-            toggle.setValue(this.plugin.data.settings.showDebugMessages).onChange(async (value) => {
-                this.plugin.data.settings.showDebugMessages = value;
-                await this.plugin.savePluginData();
-            }),
+        new Setting(containerEl)
+        .setName(t("DISPLAY_DEBUG_INFO"))
+        .addDropdown((dropdown) =>
+            dropdown
+                .addOptions({
+                    None: t("SETTINGS_DEVELOPER_NONE"),
+                    Console: t("SETTINGS_DEVELOPER_CONSOLE"),
+                    File: t("SETTINGS_DEVELOPER_FILE"),
+                })
+                .setValue(this.plugin.data.settings.debugLoggerDestination)
+                .onChange(async (value) => {
+                    SettingsUtil.setDebugLoggerDestination(this.plugin.data.settings, value);
+                    await logger.setDestination(this.plugin.data.settings);
+                    await this.plugin.savePluginData();
+                }),
         );
+
         containerEl.createEl("h3", { text: t("GROUP_CONTRIBUTING") });
         containerEl.createEl("p").insertAdjacentHTML(
             "beforeend",
