@@ -159,7 +159,7 @@ Note that this setting is common to both Flashcards and Notes. : أدخل مسا
     DISPLAY_DEBUG_INFO: "عرض معلومات التصحيح على وحدة تحكم المطور؟",
     SETTINGS_DEVELOPER_NONE: "None",
     SETTINGS_DEVELOPER_CONSOLE: "Console",
-    SETTINGS_DEVELOPER_FILE: "File", 
+    SETTINGS_DEVELOPER_FILE: "File",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "ملاحظات قائمة المراجعة",

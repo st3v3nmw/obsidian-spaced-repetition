@@ -92,9 +92,9 @@ export const DEFAULT_SETTINGS: SRSettings = {
     maxLinkFactor: 1.0,
 
     // logging
-    showDebugMessages: false, 
-    debugLoggerDestination: "None", 
-    debugLoggerFilename: logger.defaultFilenameTemplate()
+    showDebugMessages: false,
+    debugLoggerDestination: "None",
+    debugLoggerFilename: logger.defaultFilenameTemplate(),
 };
 
 export function upgradeSettings(settings: SRSettings) {
@@ -116,7 +116,9 @@ export function upgradeSettings(settings: SRSettings) {
 
     function upgradeSettingsLoggerDestination() {
         if (settings.debugLoggerDestination == null) {
-            console.log(`upgradeSettingsLoggerDestination: Upgrading settings: ${settings.showDebugMessages}`);
+            console.log(
+                `upgradeSettingsLoggerDestination: Upgrading settings: ${settings.showDebugMessages}`,
+            );
             settings.debugLoggerDestination = settings.showDebugMessages ? "Console" : "None";
             settings.debugLoggerFilename = logger.defaultFilenameTemplate();
         }
@@ -126,7 +128,7 @@ export function upgradeSettings(settings: SRSettings) {
 export class SettingsUtil {
     static setDebugLoggerDestination(settings: SRSettings, value: string) {
         settings.debugLoggerDestination = value;
-        settings.showDebugMessages = (value != "None")
+        settings.showDebugMessages = value != "None";
     }
 
     static isFlashcardTag(settings: SRSettings, tag: string): boolean {
@@ -932,9 +934,7 @@ export class SRSettingTab extends PluginSettingTab {
     }
 
     private async tabDeveloper(containerEl: HTMLElement): Promise<void> {
-        new Setting(containerEl)
-        .setName(t("DISPLAY_DEBUG_INFO"))
-        .addDropdown((dropdown) =>
+        new Setting(containerEl).setName(t("DISPLAY_DEBUG_INFO")).addDropdown((dropdown) =>
             dropdown
                 .addOptions({
                     None: t("SETTINGS_DEVELOPER_NONE"),

@@ -5,7 +5,9 @@ import * as path from "path";
 import { versionString } from "src/main";
 
 export enum LoggerDestination {
-    None, Console, File
+    None,
+    Console,
+    File,
 }
 
 export class logger {
@@ -41,17 +43,15 @@ export class logger {
         const output: string = `[${dateStr}]: ${str}\r\n`;
         const filename: string = normalizePath(logger._filename) + ".md";
 
-        try
-        {
+        try {
             if (await logger._vault.adapter.exists(filename)) {
                 await this._vault.adapter.append(filename, output);
             } else {
                 const dir: string = path.dirname(filename);
                 await logger._vault.createFolder(dir);
                 await logger._vault.create(filename, output);
-            } 
-        }
-        catch (e) {
+            }
+        } catch (e) {
             console.log(`logToFile: ${output}`, e);
         }
     }
@@ -63,6 +63,6 @@ export class logger {
     }
 
     static defaultFilenameTemplate(): string {
-        return `temp/logs/osr_{DATE}`;
+        return "temp/logs/osr_{DATE}";
     }
 }

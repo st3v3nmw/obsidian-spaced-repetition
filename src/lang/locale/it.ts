@@ -171,7 +171,7 @@ Note that this setting is common to both Flashcards and Notes.`,
     DISPLAY_DEBUG_INFO: "Visualizza informazione di debug sulla console per sviluppatori?",
     SETTINGS_DEVELOPER_NONE: "None",
     SETTINGS_DEVELOPER_CONSOLE: "Console",
-    SETTINGS_DEVELOPER_FILE: "File", 
+    SETTINGS_DEVELOPER_FILE: "File",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Coda di note da rivedere",
