@@ -3,7 +3,7 @@ import { globalDateProvider } from "./DateProvider";
 import { SRSettings } from "src/settings";
 import * as path from "path";
 import { versionString } from "src/main";
-import { pathDir as pathDirName } from "./utils";
+import { pathDirName } from "./utils";
 
 export enum LoggerDestination {
     None,

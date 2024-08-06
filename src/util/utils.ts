@@ -202,7 +202,7 @@ export function isSupportedFileType(path: string): boolean {
     return path.split(".").pop().toLowerCase() === "md";
 }
 
-export function pathDir(filename: string): string {
+export function pathDirName(filename: string): string {
     const pos: number = Math.max(filename.lastIndexOf("/"), filename.lastIndexOf("\\"));
     return (pos > 0) ? filename.substring(0, pos) : filename;
 }
