@@ -18,12 +18,22 @@ export class logger {
     static setVault(vault: Vault): void {
         logger._vault = vault;
     }
-
+ 
     static async setDestination(settings: SRSettings): Promise<void> {
         logger._dest = logger.convertStrToLoggerDestination(settings.debugLoggerDestination);
         const dateStr: string = globalDateProvider.now.format("YYYYMMDD");
         logger._filename = settings.debugLoggerFilename.replace("{DATE}", dateStr);
-        await logger.log(`Obsidian: SpacedRepetition: ${versionString}`);
+        await logger.log(`\r\n---\r\n## Obsidian: SpacedRepetition: ${versionString}\r\n`);
+    }
+
+    static error(str: string, e: Error) {
+        if (e && e.stack == null) {
+            // 
+            if (e.message) str += `: ${e.message}`;
+            if (e.name) str += `: ${e.name}`;
+        }
+        logger.log(`ERROR: ${str}`);
+        if (e?.stack) logger.log(`STACK: ${e.stack}`);
     }
 
     static async log(str: string): Promise<void> {
@@ -48,7 +58,9 @@ export class logger {
                 await this._vault.adapter.append(filename, output);
             } else {
                 const dir: string = path.dirname(filename);
-                await logger._vault.createFolder(dir);
+                if (!await logger._vault.adapter.exists(dir)) {
+                    await logger._vault.createFolder(dir);
+                }
                 await logger._vault.create(filename, output);
             }
         } catch (e) {

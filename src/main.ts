@@ -61,6 +61,10 @@ export default class SRPlugin extends Plugin {
         await this.initLogicClasses();
 
         this.initGuiItems();
+
+        window.onunhandledrejection = (event) => {
+            logger.log(`Unhandled promise rejection: ${event.reason}`);
+        };
     }
 
     private async initLogicClasses(): Promise<void> {
@@ -353,6 +357,15 @@ export default class SRPlugin extends Plugin {
     }
 
     async sync(): Promise<void> {
+        try {
+            await this.doSync();
+        }
+        catch (e) {
+            logger.error("sync()", e);
+        }
+    }
+
+    async doSync(): Promise<void> {
         if (this.osrAppCore.syncLock) {
             return;
         }
