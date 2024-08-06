@@ -3,6 +3,7 @@ import { globalDateProvider } from "./DateProvider";
 import { SRSettings } from "src/settings";
 import * as path from "path";
 import { versionString } from "src/main";
+import { pathDir as pathDirName } from "./utils";
 
 export enum LoggerDestination {
     None,
@@ -57,7 +58,7 @@ export class logger {
             if (await logger._vault.adapter.exists(filename)) {
                 await this._vault.adapter.append(filename, output);
             } else {
-                const dir: string = path.dirname(filename);
+                const dir: string = pathDirName(filename);
                 if (!await logger._vault.adapter.exists(dir)) {
                     await logger._vault.createFolder(dir);
                 }

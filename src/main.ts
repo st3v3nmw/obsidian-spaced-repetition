@@ -377,7 +377,7 @@ export default class SRPlugin extends Plugin {
 
         if (this.data.settings.showDebugMessages) {
             // TODO: console.log(`SR: ${t("EASES")}`, this.easeByPath.dict);
-            logger.log(`SR: ${t("DECKS")}, ${this.osrAppCore.reviewableDeckTree}`);
+            // logger.log(`SR: ${t("DECKS")}, ${this.osrAppCore.reviewableDeckTree}`);
             logger.log(
                 "SR: " +
                     t("SYNC_TIME_TAKEN", {
