@@ -152,5 +152,3 @@ Example using `v1.9.2`:
 6. Locally, switch back to `master` and pull the changes: `git switch master && git pull`
 7. Create a git tag with the version: `git tag 1.9.2`
 8. Push the tag: `git push --tags`. <br> You're all set! [This GitHub action](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/.github/workflows/release.yml) should pick it up, create a release, publish it, and update the live documentation.
-
-[^1]: Check the Obsidian Tasks project which has [excellent contribution guidelines](https://github.com/obsidian-tasks-group/obsidian-tasks/blob/main/CONTRIBUTING.md).
