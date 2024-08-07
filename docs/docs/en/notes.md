@@ -27,7 +27,13 @@ The note will appear under `New` in the `Note Review Queue` in the right pane.
     4. The notes scheduled for review on August 1 <br/>
     5. The notes scheduled for review on August 31 <br/>
 
+### Displaying the Note Review Queue
 
+By default, the Note Review Queue is displayed when the plugin starts. This can be changed with
+the `Enable note review pane on startup` [setting](user-options.md#note-settings).
+
+The Note Review Queue can also be shown by using the `Open Notes Review Queue in sidebar` 
+[command](plugin-commands.md).
 
 ## Reviewing
 
