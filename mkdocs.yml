@@ -41,9 +41,11 @@ plugins:
     - i18n:
           docs_structure: folder
           languages:
-              en: English
-              zh: 简体中文
-          default_language: en
+              - locale: en
+                name: English
+                default: true
+              - locale: zh
+                name: 简体中文
 
 markdown_extensions:
     - toc:
@@ -58,7 +60,7 @@ markdown_extensions:
     - attr_list
     - footnotes
     - pymdownx.emoji:
-          emoji_index: !!python/name:materialx.emoji.twemoji
+          emoji_index: !!python/name:material.extensions.emoji.twemoji
           emoji_generator: !!python/name:materialx.emoji.to_svg
 
 remote_branch: gh-pages

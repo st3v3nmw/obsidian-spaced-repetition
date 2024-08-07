@@ -314,3 +314,57 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     appearance: menulist;
     border-right: 8px solid transparent;
 }
+
+/*
+ * Tab elements
+ * This CSS is copied from https://github.com/Taitava/obsidian-shellcommands
+ * Jarkko Linnanvirta https://github.com/Taitava comments below...
+ *  - Renamed classes
+ *
+ * This CSS is copied 2021-10-21 from https://www.w3schools.com/howto/howto_js_tabs.asp
+ * Modifications:
+ *  - Renamed classes
+ *  - Added tab icons.
+ *  - Changed colors.
+ *  - Changed/removed borders.
+ *  - Removed button transition.
+ *  - Changed button border-radiuses
+ *  - Added margin-right rule to .sr-tab-header-button .
+ */
+
+/* Style the tab */
+.sr-tab-header {
+    border-bottom: 6px solid var(--background-modifier-border);
+}
+
+/* Style the buttons that are used to open the tab content */
+button.sr-tab-header-button {
+    background-color: unset;
+    border: none;
+    box-shadow: none; /* Remove a "border" that came via Obsidian 0.16.0. */
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    margin-right: 6px; /* Reduced margin. Obsidian's default margin-right for button is 12px (0 for other margins). */
+    border-radius: 10px 10px 0 0; /* 0 0 = No border-radius at bottom */
+}
+
+/* Create an active/current tablink class */
+button.sr-tab-header-button.sr-tab-active,
+button.sr-tab-header-button:hover {
+    background-color: var(--background-modifier-border);
+}
+
+.sr-tab-header-button svg {
+    vertical-align: middle; /* Not middle but close enough. */
+}
+
+/* Style the tab content */
+.sr-tab-content {
+    display: none;
+    padding: 6px 12px;
+}
+
+.sr-tab-content.sr-tab-active {
+    display: block;
+}
