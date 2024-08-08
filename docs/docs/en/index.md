@@ -50,7 +50,7 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
     5. Identify that flashcards within this note are in the `#flashcards/science/physics` [deck](flashcards/decks.md#using-obsidian-tags)<br/>
     6. A [single line question](flashcards/qanda-cards.md#single-line-basic) (identified by the `::` separating the question and answer)<br/>
     7. The plugin stores scheduling info within this [HTML comment](data-storage.md#individual-markdown-files) <br/>
-    8. `Spaced Repetition Status Area` The number of notes and flashcards currently due for review. Click to SOMETHING.
+    8. `Spaced Repetition Status Area` The number of notes and flashcards currently due for review. Click to [open a note for review](notes.md#selecting-a-note-for-review).
 
 
 <video controls>

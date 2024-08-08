@@ -58,8 +58,10 @@ You can create custom hotkeys for the review result in `Settings -> HotKeys`.
 
 ### Selecting a Note for Review
 
+There are a few ways to open a note for review:
+
 - Open a note via the standard Obsidian features
-- Doubled click on a note title from the Note Review Queue
+- Double click on a note title from the Note Review Queue
 - Click on the `Spaced Repetition Status Area` in the status bar at the bottom of the screen
 - Select the command [Open a note to review review](plugin-commands.md)
 
