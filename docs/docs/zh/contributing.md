@@ -77,7 +77,7 @@ Please note that:
 5. If your "business logic" is properly decoupled from Obsidian APIs, write some unit tests.
     - This project uses [jest](https://jestjs.io/), tests are stored in `tests/`.
     - `pnpm test`
-6. Add your change to the `[Unreleased]` section of the changelog (`docs/changelog.md`).
+6. Add your change to the `[Unreleased]` section of the changelog (`docs/docs/changelog.md`).
     - The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), TL;DR:
         - `Added` for new features.
         - `Changed` for changes in existing functionality.
