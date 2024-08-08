@@ -7,6 +7,8 @@ site_description: >-
 repo_name: st3v3nmw/obsidian-spaced-repetition
 repo_url: https://github.com/st3v3nmw/obsidian-spaced-repetition/
 edit_uri: ""
+docs_dir: docs/docs
+# use_directory_urls: false
 
 theme:
     name: material
@@ -25,16 +27,30 @@ theme:
               name: Switch to light mode
     features:
         - navigation.top
+        - navigation.expand
         - toc.follow
 
 nav:
     - Index: index.md
-    - Flashcards: flashcards.md
+    - Flashcards:
+          - Flashcards Overview: flashcards/flashcards-overview.md
+          - Question & Answer Cards: flashcards/qanda-cards.md
+          - Cloze Cards: flashcards/basic-cloze-cards.md
+          - Organizing into Decks: flashcards/decks.md
+          - Reviewing & Cramming: flashcards/reviewing.md
+          - Statistics: flashcards/statistics.md
     - Notes: notes.md
-    - Contributing: contributing.md
-    - Algorithms: algorithms.md
-    - Changelog: changelog.md
-    - License: license.md
+    - User Options & Commands:
+          - User Options: user-options.md
+          - Commands: plugin-commands.md
+    - Algorithms & Data Storage:
+          - Repetition Algorithms: algorithms.md
+          - Data Storage: data-storage.md
+    - Additional:
+          - Spaced Repetition Guides: resources.md
+          - Contributing: contributing.md
+          - Changelog: changelog.md
+          - License: license.md
 
 plugins:
     - search
@@ -61,7 +77,11 @@ markdown_extensions:
     - footnotes
     - pymdownx.emoji:
           emoji_index: !!python/name:material.extensions.emoji.twemoji
-          emoji_generator: !!python/name:materialx.emoji.to_svg
+          emoji_generator: !!python/name:material.extensions.emoji.to_svg
+    - md_in_html
+
+extra_css:
+    - stylesheets/extra.css
 
 remote_branch: gh-pages
 remote_name: origin
