@@ -118,12 +118,14 @@ test("Test load balancing, small interval (load balancing disabled)", () => {
     });
     dueDates.decrement(originalInterval);
     dueDates.increment(newInterval);
-    expect(dueDates).toEqual(new DueDateHistogram({
-        0: 1,
-        1: 0, // One less than before
-        2: 1,
-        3: 5, // One more than before
-    }));
+    expect(dueDates).toEqual(
+        new DueDateHistogram({
+            0: 1,
+            1: 0, // One less than before
+            2: 1,
+            3: 5, // One more than before
+        }),
+    );
 });
 
 test("Test load balancing", () => {
