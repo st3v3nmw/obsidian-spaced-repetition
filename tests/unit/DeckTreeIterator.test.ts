@@ -13,6 +13,8 @@ import {
     setupNextRandomNumber,
     setupStaticRandomNumberProvider,
 } from "src/util/RandomNumberProvider";
+import { NoteEaseList } from "src/NoteEaseList";
+import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
 
 let order_DueFirst_Sequential: IIteratorOrder = {
     cardOrder: CardOrder.DueFirstSequential,
@@ -24,6 +26,7 @@ var iterator: DeckTreeIterator;
 beforeAll(() => {
     setupStaticDateProvider_20230906();
     setupStaticRandomNumberProvider();
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 describe("setDeck", () => {

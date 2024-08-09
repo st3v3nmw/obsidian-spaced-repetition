@@ -106,19 +106,6 @@ export function convertToStringOrEmpty(v: any): string {
     return result;
 }
 
-//
-// This returns [frontmatter, content]
-//
-// The returned content has the same number of lines as the supplied str string, but with the
-// frontmatter lines (if present) blanked out.
-//
-// 1. We don't want the parser to see the frontmatter, as it would deem it to be part of a multi-line question
-// if one started on the line immediately after the "---" closing marker.
-//
-// 2. The lines are blanked out rather than deleted so that line numbers are not affected
-// e.g. for calls to getQuestionContext(cardLine: number)
-//
-
 /**
  * Checks a path is equal or a subpath of the other rootPath
  *
@@ -151,17 +138,19 @@ export function isEqualOrSubPath(toCheck: string, rootPath: string): boolean {
     return true;
 }
 
-/**
- * The returned content has the same number of lines as the supplied string, but with the frontmatter lines (if present) blanked out.
- *
- * 1. We don't want the parser to see the frontmatter, as it would deem it to be part of a multi-line question if one started on the line immediately after the "---" closing marker.
- *
- * 2. The lines are blanked out rather than deleted so that line numbers are not affected e.g. for calls to getQuestionContext(cardLine: number)
- *
- * @param str The file content as string
- * @returns [frontmatter, content]
- */
-export function extractFrontmatter(str: string): [string, string] {
+//
+// This returns [frontmatter, content]
+//
+// The returned content has the same number of lines as the supplied str string, but with the
+// frontmatter lines (if present) blanked out.
+//
+// 1. We don't want the parser to see the frontmatter, as it would deem it to be part of a multi-line question
+// if one started on the line immediately after the "---" closing marker.
+//
+// 2. The lines are blanked out rather than deleted so that line numbers are not affected
+// e.g. for calls to getQuestionContext(cardLine: number)
+//
+export function splitNoteIntoFrontmatterAndContent(str: string): [string, string] {
     const lines = splitTextIntoLineArray(str);
     let lineIndex = 0;
     let hasFrontmatter = false;
@@ -209,6 +198,10 @@ export function findLineIndexOfSearchStringIgnoringWs(
         }
     }
     return result;
+}
+
+export function isSupportedFileType(path: string): boolean {
+    return path.split(".").pop().toLowerCase() === "md";
 }
 
 /* 

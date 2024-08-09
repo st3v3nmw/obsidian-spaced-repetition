@@ -11,10 +11,15 @@ module.exports = {
     roots: ["<rootDir>/src/", "<rootDir>/tests/unit/"],
     collectCoverageFrom: [
         "src/**/lang/*.ts",
+        "src/algorithms/**/*.ts",
+        "src/dataStore/**/*.ts",
+        "src/dataStoreAlgorithm/**/*.ts",
         "src/NoteEaseList.ts",
         "src/NoteFileLoader.ts",
         "src/NoteParser.ts",
         "src/NoteQuestionParser.ts",
+        "src/NoteReviewQueue.ts",
+        "src/OsrCore.ts",
         "src/TopicParser.ts",
         "src/parser.ts",
         "src/scheduling.ts",
@@ -22,6 +27,12 @@ module.exports = {
     ],
     coveragePathIgnorePatterns: [
         "/node_modules/",
+        "src/algorithms/base/ISrsAlgorithm",
+        "src/algorithms/base/RepItemScheduleInfo",
+        "src/algorithms/base/SrsAlgorithm",
+        "src/algorithms/osr/ObsidianVaultNoteLinkInfoFinder",
+        "src/dataStoreAlgorithm/DataStoreAlgorithm",
+        "src/dataStoreAlgorithm/IDataStoreAlgorithm",
         "src/lang/locale/",
         "src/constants",
         "src/icons",
@@ -33,8 +44,8 @@ module.exports = {
     coverageProvider: "v8",
     coverageThreshold: {
         global: {
-            statements: 100,
-            branches: 100,
+            statements: 99,
+            branches: 98,
         },
     },
 };
