@@ -61,8 +61,8 @@ export class DueDateHistogram {
 
     decrement(days: number): void {
         let value: number = 0;
-        if (this.dueDatesMap.has(days)) {
-            value = this.dueDatesMap.get(days);
+        if (this.dueDatesMap.has(days)) value = this.dueDatesMap.get(days);
+        if (value > 0) {
             this.dueDatesMap.set(days, value - 1);
         }
     }

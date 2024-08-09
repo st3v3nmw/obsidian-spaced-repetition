@@ -95,9 +95,11 @@ test("Test reviewing with default settings & delay", () => {
 });
 
 test("Test load balancing, small interval (load balancing disabled)", () => {
+    const originalInterval: number = 1;
+    const newInterval: number = 3;
     const dueDates = new DueDateHistogram({
         0: 1,
-        1: 1,
+        1: 1, // key = originalInterval
         2: 1,
         3: 4,
     });
@@ -112,14 +114,16 @@ test("Test load balancing, small interval (load balancing disabled)", () => {
         ),
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
-        interval: 3,
+        interval: newInterval,
     });
-    /* expect(dueDates).toEqual(new DueDateHistogram({
+    dueDates.decrement(originalInterval);
+    dueDates.increment(newInterval);
+    expect(dueDates).toEqual(new DueDateHistogram({
         0: 1,
-        1: 1,
+        1: 0, // One less than before
         2: 1,
-        3: 5,
-    })); */
+        3: 5, // One more than before
+    }));
 });
 
 test("Test load balancing", () => {
