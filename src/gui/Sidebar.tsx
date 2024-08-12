@@ -175,6 +175,12 @@ export class ReviewQueueListView extends ItemView {
         folderTitleEl.onClickEvent(() => {
             this.changeFolderFolding(folderEl, !folderEl.hasClass("is-collapsed"));
             childrenEl.style.display = !folderEl.hasClass("is-collapsed") ? "block" : "none";
+
+            if (!folderEl.hasClass("is-collapsed")) {
+                deck.activeFolders.delete(folderTitle);
+            } else {
+                deck.activeFolders.add(folderTitle);
+            }
         });
 
         return folderEl;
