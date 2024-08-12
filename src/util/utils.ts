@@ -76,7 +76,12 @@ export function cyrb53(str: string, seed = 0): string {
 }
 
 /**
- * @deprecated use parseDateToTicks() instead
+ * Converts the date to timestamp
+ *
+ * @param year The Year
+ * @param month The month 1-12
+ * @param day The Day 1-31
+ * @returns Retruns the Ticks of the date since 1970-01-01
  */
 export function ticksFromDate(year: number, month: number, day: number): number {
     return moment({ year, month, day }).utc().valueOf();
@@ -92,32 +97,6 @@ export function ticksFromDate(year: number, month: number, day: number): number 
  */
 export function formatDate_YYYY_MM_DD(ticks: Moment): string {
     return ticks.format(PREFERRED_DATE_FORMAT);
-}
-
-/**
- * Retruns the Ticks of the date since 1970-01-01
- *
- * @param year The Year
- * @param month The month 1-12
- * @param day The Day 1-31
- * @param utc Universal time code
- * @returns The ticks
- */
-export function parseDateToTicks(
-    year: number,
-    month: number,
-    day: number,
-    utc: boolean = false,
-): number {
-    let timestamp: number;
-    if (utc) {
-        timestamp = Date.UTC(year, month - 1, day, 0, 0, 0, 0);
-    } else {
-        const _date = new Date(year, month - 1, day);
-        timestamp = _date.getTime();
-    }
-
-    return timestamp;
 }
 
 /**
