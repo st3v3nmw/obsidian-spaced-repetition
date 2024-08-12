@@ -10,7 +10,6 @@ import {
     getKeysPreserveType,
     getTypedObjectEntries,
     formatDate,
-    parseDateToTicks,
     parseObsidianFrontmatterTag,
     splitTextIntoLineArray,
     stringTrimStart,
@@ -242,25 +241,6 @@ describe("cyrb53", () => {
         const seed = 555;
         const expectedHash = "1484280e499f6c";
         expect(cyrb53(input, seed)).toBe(expectedHash);
-    });
-});
-
-describe("Parse date to ticks", () => {
-    test("Test with normal year UTC", () => {
-        // January 1, 2023
-        expect(parseDateToTicks(2023, 1, 1, true)).toBe(1672531200000);
-    });
-    test("Test with a leap year UTC", () => {
-        // February 29, 2020 (leap year)
-        expect(parseDateToTicks(2020, 2, 29, true)).toBe(1582934400000);
-    });
-    test("Test with normal year", () => {
-        // January 1, 2023
-        expect(parseDateToTicks(2023, 1, 1, false)).toBe(new Date(2023, 0, 1).getTime());
-    });
-    test("Test with a leap year", () => {
-        // February 29, 2020 (leap year)
-        expect(parseDateToTicks(2020, 2, 29, false)).toBe(new Date(2020, 1, 29).getTime());
     });
 });
 
