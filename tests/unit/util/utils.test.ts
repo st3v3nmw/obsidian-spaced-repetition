@@ -14,6 +14,7 @@ import {
     parseObsidianFrontmatterTag,
     splitTextIntoLineArray,
     stringTrimStart,
+    ticksFromDate,
 } from "src/util/utils";
 
 describe("getTypedObjectEntries", () => {
@@ -263,13 +264,32 @@ describe("cyrb53", () => {
 });
 
 describe("Parse date to ticks", () => {
-    test("Test with normal year", () => {
+    test("Test with normal year UTC", () => {
         // January 1, 2023
         expect(parseDateToTicks(2023, 1, 1, true)).toBe(1672531200000);
     });
-    test("Test with a leap year", () => {
+    test("Test with a leap year UTC", () => {
         // February 29, 2020 (leap year)
         expect(parseDateToTicks(2020, 2, 29, true)).toBe(1582934400000);
+    });
+    test("Test with normal year", () => {
+        // January 1, 2023
+        expect(parseDateToTicks(2023, 1, 1, false)).toBe(new Date(2023, 0, 1).getTime());
+    });
+    test("Test with a leap year", () => {
+        // February 29, 2020 (leap year)
+        expect(parseDateToTicks(2020, 2, 29, false)).toBe(new Date(2020, 1, 29).getTime());
+    });
+});
+
+describe("Ticks from date", () => {
+    test("2024 05 26", () => {
+        const year = 2024;
+        const month = 5;
+        const day = 26;
+        const ticks = 1719352800000;
+
+        expect(ticksFromDate(year, month, day)).toBe(ticks);
     });
 });
 
