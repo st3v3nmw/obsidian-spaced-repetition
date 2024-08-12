@@ -51,10 +51,28 @@ export default {
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition - Ustawienia",
+    GROUP_TAGS_FOLDERS: "Tags & Folders",
+    GROUP_FLASHCARD_REVIEW: "Flashcard Review",
+    GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
+    GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
+    GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: 'Aby uzyskać więcej informacji, sprawdź <a href="${wiki_url}">wiki</a>.',
+    GITHUB_DISCUSSIONS:
+        'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
+    GITHUB_ISSUES:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report.',
+    GITHUB_SOURCE_CODE:
+        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+    CODE_CONTRIBUTION_INFO:
+        'Information on <a href="${code_contribution_url}">code contributions</a>',
+    TRANSLATION_CONTRIBUTION_INFO:
+        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+    PROJECT_CONTRIBUTIONS:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Foldery do zignorowania",
-    FOLDERS_TO_IGNORE_DESC:
-        "Wprowadź ścieżki folderów oddzielone nowymi liniami, np. Szablony Meta/Scripts",
+    FOLDERS_TO_IGNORE_DESC: `Wprowadź ścieżki folderów oddzielone nowymi liniami, np. Szablony Meta/Scripts.
+Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARDS: "Fiszki",
     FLASHCARD_EASY_LABEL: "Tekst przycisku Łatwe",
     FLASHCARD_GOOD_LABEL: "Tekst przycisku Średnio trudne",

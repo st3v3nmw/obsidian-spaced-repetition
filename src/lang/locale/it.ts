@@ -52,10 +52,28 @@ export default {
 
     // settings.ts
     SETTINGS_HEADER: "Plugin per ripetizione spaziata - Impostazioni",
+    GROUP_TAGS_FOLDERS: "Tags & Folders",
+    GROUP_FLASHCARD_REVIEW: "Flashcard Review",
+    GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
+    GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
+    GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: 'Per maggiori informazioni, rivolgersi alla <a href="${wiki_url}">wiki</a>.',
+    GITHUB_DISCUSSIONS:
+        'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
+    GITHUB_ISSUES:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report.',
+    GITHUB_SOURCE_CODE:
+        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+    CODE_CONTRIBUTION_INFO:
+        'Information on <a href="${code_contribution_url}">code contributions</a>',
+    TRANSLATION_CONTRIBUTION_INFO:
+        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+    PROJECT_CONTRIBUTIONS:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Cartelle da ignorare",
-    FOLDERS_TO_IGNORE_DESC:
-        "Inserisci i percorsi delle cartelle separati da a capo, per esempio, Templates Meta/Scripts",
+    FOLDERS_TO_IGNORE_DESC: `Inserisci i percorsi delle cartelle separati da a capo, per esempio, Templates Meta/Scripts.
+Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARDS: "Schede",
     FLASHCARD_EASY_LABEL: "Testo del bottone facile",
     FLASHCARD_GOOD_LABEL: "Testo del bottone buono",
