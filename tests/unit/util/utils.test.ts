@@ -249,7 +249,7 @@ describe("Ticks from date", () => {
         const year = 2024;
         const month = 5;
         const day = 26;
-        const ticks = 1719360000000 
+        const ticks = 1719360000000;
 
         expect(ticksFromDate(year, month, day)).toBe(ticks);
     });
