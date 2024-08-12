@@ -8,6 +8,7 @@ export interface SRSettings {
     flashcardEasyText: string;
     flashcardGoodText: string;
     flashcardHardText: string;
+    reviewButtonDelay: number;
     flashcardTags: string[];
     convertFoldersToDecks: boolean;
     cardCommentOnSameLine: boolean;
@@ -51,6 +52,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardEasyText: t("EASY"),
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),
+    reviewButtonDelay: 0,
     flashcardTags: ["#flashcards"],
     convertFoldersToDecks: false,
     cardCommentOnSameLine: false,
@@ -706,6 +708,31 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
+
+        new Setting(containerEl)
+            .setName(t("REVIEW_BUTTON_DELAY"))
+            .setDesc(t("REVIEW_BUTTON_DELAY_DESC"))
+            .addSlider((slider) =>
+                slider
+                    .setLimits(0, 5000, 100)
+                    .setValue(this.plugin.data.settings.reviewButtonDelay)
+                    .setDynamicTooltip()
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.reviewButtonDelay = value;
+                        await this.plugin.savePluginData();
+                    }),
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.reviewButtonDelay =
+                            DEFAULT_SETTINGS.reviewButtonDelay;
+                        await this.plugin.savePluginData();
+                        this.display();
+                    });
+            });
     }
 
     private async tabAlgorithm(containerEl: HTMLElement): Promise<void> {
@@ -929,15 +956,15 @@ export class SRSettingTab extends PluginSettingTab {
             }),
         );
         /* 
-        // Documentation link & GitHub links
-        containerEl.createEl("hr").insertAdjacentHTML("beforeend");
+		// Documentation link & GitHub links
+		containerEl.createEl("hr").insertAdjacentHTML("beforeend");
 
-        // Copyright notice
-        const copyright_paragraph = containerEl.createEl("p");
-        copyright_paragraph.addClass("sr-small-font");
-        copyright_paragraph.insertAdjacentHTML("beforeend", `
-            <em>Shell commands</em> plugin Copyright &copy; 2021 - 2023 Jarkko Linnanvirta. This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. See more information in the license: <a href="${GitHub.license}">GNU GPL-3.0</a>.
-        `);     */
+		// Copyright notice
+		const copyright_paragraph = containerEl.createEl("p");
+		copyright_paragraph.addClass("sr-small-font");
+		copyright_paragraph.insertAdjacentHTML("beforeend", `
+			<em>Shell commands</em> plugin Copyright &copy; 2021 - 2023 Jarkko Linnanvirta. This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. See more information in the license: <a href="${GitHub.license}">GNU GPL-3.0</a>.
+		`);     */
     }
 
     private last_position: {

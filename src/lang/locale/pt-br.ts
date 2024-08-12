@@ -82,6 +82,9 @@ Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARD_EASY_DESC: 'Customize o rótulo para o botão de "Fácil"',
     FLASHCARD_GOOD_DESC: 'Customize o rótulo para o botão de "OK"',
     FLASHCARD_HARD_DESC: 'Customize o rótulo para o botão de "Difícil"',
+    REVIEW_BUTTON_DELAY: "Button press delay",
+    REVIEW_BUTTON_DELAY_DESC:
+        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before there could be pressed again.",
     FLASHCARD_TAGS: "Etiquetas dos Flashcards",
     FLASHCARD_TAGS_DESC:
         "Insira etiquetas separadas por espaços ou quebras de linha ex: #flashcards #baralho2 #baralho3.",

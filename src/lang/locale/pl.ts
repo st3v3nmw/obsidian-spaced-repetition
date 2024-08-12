@@ -80,6 +80,9 @@ Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARD_EASY_DESC: 'Dostosuj etykietę dla przycisku "Łatwe"',
     FLASHCARD_GOOD_DESC: 'Dostosuj etykietę dla przycisku "Średnio trudne"',
     FLASHCARD_HARD_DESC: 'Dostosuj etykietę dla przycisku "Trudne"',
+    REVIEW_BUTTON_DELAY: "Button press delay",
+    REVIEW_BUTTON_DELAY_DESC:
+        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before there could be pressed again.",
     FLASHCARD_TAGS: "Tagi fiszek",
     FLASHCARD_TAGS_DESC:
         "Wprowadź tagi oddzielone spacją lub nowymi liniami, np. #fiszki #talia2 #talia3.",

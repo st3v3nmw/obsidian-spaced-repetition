@@ -80,6 +80,9 @@ Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
     FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
     FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
+    REVIEW_BUTTON_DELAY: "Button press delay",
+    REVIEW_BUTTON_DELAY_DESC:
+        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before there could be pressed again.",
     FLASHCARD_TAGS: "Flashcard tags",
     FLASHCARD_TAGS_DESC:
         "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.",

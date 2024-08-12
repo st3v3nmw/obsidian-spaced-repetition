@@ -16,6 +16,7 @@ import { Note } from "src/Note";
 import { RenderMarkdownWrapper } from "src/util/RenderMarkdownWrapper";
 import { CardScheduleInfo } from "src/CardSchedule";
 import { FlashcardModalMode } from "./FlashcardModal";
+import { now } from "moment";
 
 export class FlashcardReviewView {
     public app: App;
@@ -44,6 +45,7 @@ export class FlashcardReviewView {
     public goodButton: HTMLButtonElement;
     public easyButton: HTMLButtonElement;
     public answerButton: HTMLButtonElement;
+    public lastPressed: number;
 
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
@@ -278,6 +280,15 @@ export class FlashcardReviewView {
     }
 
     private _showAnswer(): void {
+        const timeNow = now();
+        if (
+            this.lastPressed &&
+            timeNow - this.lastPressed < this.plugin.data.settings.reviewButtonDelay
+        ) {
+            return;
+        }
+        this.lastPressed = timeNow;
+
         this.mode = FlashcardModalMode.Back;
 
         this.resetButton.disabled = false;
@@ -332,6 +343,15 @@ export class FlashcardReviewView {
     }
 
     private async _processReview(response: ReviewResponse): Promise<void> {
+        const timeNow = now();
+        if (
+            this.lastPressed &&
+            timeNow - this.lastPressed < this.plugin.data.settings.reviewButtonDelay
+        ) {
+            return;
+        }
+        this.lastPressed = timeNow;
+
         await this.reviewSequencer.processReview(response);
         await this._handleSkipCard();
     }

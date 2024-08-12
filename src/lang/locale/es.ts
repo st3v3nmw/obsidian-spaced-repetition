@@ -80,6 +80,9 @@ Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARD_EASY_DESC: "Personalize la etiqueta para el botón: Fácil",
     FLASHCARD_GOOD_DESC: "Personalize la etiqueta para el botón: Bien",
     FLASHCARD_HARD_DESC: "Personalize la etiqueta para el botón: Difícil",
+    REVIEW_BUTTON_DELAY: "Button press delay",
+    REVIEW_BUTTON_DELAY_DESC:
+        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before there could be pressed again.",
     FLASHCARD_TAGS: "Etiquetas de las Tarjetas de Memorización",
     FLASHCARD_TAGS_DESC:
         "Escriba las etiquetas separadas por espacios o saltos de línea, por ejemplo, #memorizar #mazo2 #mazo3",

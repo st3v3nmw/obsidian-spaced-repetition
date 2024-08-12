@@ -81,6 +81,9 @@ Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARD_EASY_DESC: 'Personalizza il testo per il pulsante "Facile"',
     FLASHCARD_GOOD_DESC: 'Personalizza il testo per il pulsante "Buono"',
     FLASHCARD_HARD_DESC: 'Personalizza il testo per il pulsante "Difficile"',
+    REVIEW_BUTTON_DELAY: "Button press delay",
+    REVIEW_BUTTON_DELAY_DESC:
+        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before there could be pressed again.",
     FLASHCARD_TAGS: "Etichette delle schede",
     FLASHCARD_TAGS_DESC:
         "Inserire etichette separate da spazi o a capi, per esempio #flashcards #deck2 #deck3.",
