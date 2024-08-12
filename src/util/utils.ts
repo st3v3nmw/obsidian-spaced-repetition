@@ -84,7 +84,7 @@ export function cyrb53(str: string, seed = 0): string {
  * @returns Retruns the Ticks of the date since 1970-01-01
  */
 export function ticksFromDate(year: number, month: number, day: number): number {
-    return moment({ year, month, day }).utc().valueOf();
+    return moment.utc({ year, month, day }).valueOf();
 }
 
 /**
