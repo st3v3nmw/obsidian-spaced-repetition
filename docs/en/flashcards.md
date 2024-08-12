@@ -154,6 +154,24 @@ The plugin will automatically search for folders that contain flashcards & use t
 
 This is an alternative to the tagging option and can be enabled in settings.
 
+## RTL Support
+
+There are two ways that the plugin can be used with RTL languages, such as Arabic, Hebrew, Persian (Farsi).
+
+If all cards are in a RTL language, then simply enable the global Obsidian option `Editor → Right-to-left (RTL)`.
+
+If all cards within a single note have the same LTR/RTL direction, then frontmatter can be used to specify the text direction. For example:
+
+```
+---
+direction: rtl
+---
+```
+
+This is the same way text direction is specified to the `RTL Support` plugin.
+
+Note that there is no current support for cards with different text directions within the same note.
+
 ## Reviewing
 
 Once done creating cards, click on the flashcards button on the left ribbon to start reviewing the flashcards. After a card is reviewed, a HTML comment is added containing the next review day, the interval, and the card's ease.
