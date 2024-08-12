@@ -496,6 +496,14 @@ describe("isEqualOrSubPath", () => {
                 true,
             );
         });
+
+        test("Multiple separators", () => {
+            expect(isEqualOrSubPath(root + sep + sep, root)).toBe(true);
+            expect(isEqualOrSubPath(root, root + sep + sep)).toBe(true);
+            expect(isEqualOrSubPath(root, root + sep + sep + sub_1)).toBe(false);
+            expect(isEqualOrSubPath(root + sep + sep + sub_1, root)).toBe(true);
+            expect(isEqualOrSubPath(root + winSep + linSep + sub_1, root)).toBe(true);
+        });
     });
     describe("Linux", () => {
         const sep = linSep;
@@ -545,5 +553,20 @@ describe("isEqualOrSubPath", () => {
                 true,
             );
         });
+
+        test("Multiple separators", () => {
+            expect(isEqualOrSubPath(root + sep + sep, root)).toBe(true);
+            expect(isEqualOrSubPath(root, root + sep + sep)).toBe(true);
+            expect(isEqualOrSubPath(root, root + sep + sep + sub_1)).toBe(false);
+            expect(isEqualOrSubPath(root + sep + sep + sub_1, root)).toBe(true);
+            expect(isEqualOrSubPath(root + winSep + linSep + sub_1, root)).toBe(true);
+        });
+    });
+    test("Examples", () => {
+        expect(isEqualOrSubPath("/user/docs/letter.txt", "/user/docs")).toBe(true);
+        expect(isEqualOrSubPath("/user/docs", "/user/docs")).toBe(true);
+        expect(isEqualOrSubPath("/user/docs/letter.txt", "/user/projects")).toBe(false);
+        expect(isEqualOrSubPath("/User/Docs", "/user/docs")).toBe(true);
+        expect(isEqualOrSubPath("C:\\user\\docs", "C:/user/docs")).toBe(true);
     });
 });
