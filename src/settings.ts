@@ -2,6 +2,7 @@ import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
 import type SRPlugin from "src/main";
 import { t } from "src/lang/helpers";
 import { TabStructure, createTabs } from "./gui/Tabs";
+import { generateParser } from "./generateParser";
 
 export interface SRSettings {
     // flashcards
@@ -25,6 +26,7 @@ export interface SRSettings {
     singleLineReversedCardSeparator: string;
     multilineCardSeparator: string;
     multilineReversedCardSeparator: string;
+    multilineCardEndMarker: string;
     editLaterTag: string;
     // notes
     enableNoteReviewPaneOnStartup: boolean;
@@ -69,6 +71,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     singleLineReversedCardSeparator: ":::",
     multilineCardSeparator: "?",
     multilineReversedCardSeparator: "??",
+    multilineCardEndMarker: "",
     editLaterTag: "#edit-later",
     // notes
     enableNoteReviewPaneOnStartup: true,
@@ -424,6 +427,31 @@ export class SRSettingTab extends PluginSettingTab {
                         .onClick(async () => {
                             this.plugin.data.settings.multilineReversedCardSeparator =
                                 DEFAULT_SETTINGS.multilineReversedCardSeparator;
+                            await this.plugin.savePluginData();
+                            this.display();
+                        });
+                });
+
+            new Setting(containerEl)
+                .setName(t("MULTILINE_CARDS_END_MARKER"))
+                .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
+                .addText((text) =>
+                    text
+                        .setValue(this.plugin.data.settings.multilineCardEndMarker)
+                        .onChange((value) => {
+                            applySettingsUpdate(async () => {
+                                this.plugin.data.settings.multilineCardEndMarker = value;
+                                await this.plugin.savePluginData();
+                            });
+                        }),
+                )
+                .addExtraButton((button) => {
+                    button
+                        .setIcon("reset")
+                        .setTooltip(t("RESET_DEFAULT"))
+                        .onClick(async () => {
+                            this.plugin.data.settings.multilineCardEndMarker =
+                                DEFAULT_SETTINGS.multilineCardEndMarker;
                             await this.plugin.savePluginData();
                             this.display();
                         });

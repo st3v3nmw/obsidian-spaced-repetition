@@ -139,13 +139,7 @@ export class NoteQuestionParser {
         const settings: SRSettings = this.settings;
         const result: ParsedQuestionInfo[] = parseEx(
             this.contentText,
-            settings.singleLineCardSeparator,
-            settings.singleLineReversedCardSeparator,
-            settings.multilineCardSeparator,
-            settings.multilineReversedCardSeparator,
-            settings.convertHighlightsToClozes,
-            settings.convertBoldTextToClozes,
-            settings.convertCurlyBracketsToClozes,
+            settings
         );
         return result;
     }
