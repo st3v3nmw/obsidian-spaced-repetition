@@ -48,11 +48,12 @@ export class ParsedQuestionInfo {
 export function parseEx(
 	text: string,
 	settings: SRSettings,
+    force_parser_generation = false
 ): ParsedQuestionInfo[] {
 	// let cardText = "";
 	let cards: ParsedQuestionInfo[] = [];
 
-    if(parser === null) {
+    if(force_parser_generation || parser === null) {
         generateParser(settings);
     }
 	

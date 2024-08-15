@@ -44,6 +44,7 @@ import { QuestionPostponementList } from "./QuestionPostponementList";
 import { TextDirection } from "./util/TextDirection";
 import { convertToStringOrEmpty } from "./util/utils";
 import { isEqualOrSubPath } from "./util/utils";
+import { generateParser } from "./generateParser";
 
 interface PluginData {
     settings: SRSettings;
@@ -91,6 +92,8 @@ export default class SRPlugin extends Plugin {
     public deckTree: Deck = new Deck("root", null);
     private remainingDeckTree: Deck;
     public cardStats: Stats;
+
+    private debouncedGenerateParserTimeout: number | null = null;
 
     async onload(): Promise<void> {
         await this.loadPluginData();
@@ -809,6 +812,18 @@ export default class SRPlugin extends Plugin {
 
     async savePluginData(): Promise<void> {
         await this.saveData(this.data);
+    }
+
+    async debouncedGenerateParser(timeout_ms = 250) {
+        
+        if (this.debouncedGenerateParserTimeout) {
+            clearTimeout(this.debouncedGenerateParserTimeout);
+        }
+        
+        this.debouncedGenerateParserTimeout = window.setTimeout(async () => {
+            generateParser(this.data.settings);
+            this.debouncedGenerateParserTimeout = null;
+        }, timeout_ms);
     }
 
     private getActiveLeaf(type: string): WorkspaceLeaf | null {

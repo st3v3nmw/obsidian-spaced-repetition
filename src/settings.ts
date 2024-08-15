@@ -308,6 +308,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .setValue(this.plugin.data.settings.convertHighlightsToClozes)
                         .onChange(async (value) => {
                             this.plugin.data.settings.convertHighlightsToClozes = value;
+                            this.plugin.debouncedGenerateParser();
                             await this.plugin.savePluginData();
                         }),
                 );
@@ -317,6 +318,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .setValue(this.plugin.data.settings.convertBoldTextToClozes)
                     .onChange(async (value) => {
                         this.plugin.data.settings.convertBoldTextToClozes = value;
+                        this.plugin.debouncedGenerateParser();
                         await this.plugin.savePluginData();
                     }),
             );
@@ -328,6 +330,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .setValue(this.plugin.data.settings.convertCurlyBracketsToClozes)
                         .onChange(async (value) => {
                             this.plugin.data.settings.convertCurlyBracketsToClozes = value;
+                            this.plugin.debouncedGenerateParser();
                             await this.plugin.savePluginData();
                         }),
                 );
@@ -341,6 +344,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onChange((value) => {
                             applySettingsUpdate(async () => {
                                 this.plugin.data.settings.singleLineCardSeparator = value;
+                                this.plugin.debouncedGenerateParser();
                                 await this.plugin.savePluginData();
                             });
                         }),
@@ -352,6 +356,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onClick(async () => {
                             this.plugin.data.settings.singleLineCardSeparator =
                                 DEFAULT_SETTINGS.singleLineCardSeparator;
+                            this.plugin.debouncedGenerateParser();
                             await this.plugin.savePluginData();
                             this.display();
                         });
@@ -366,6 +371,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onChange((value) => {
                             applySettingsUpdate(async () => {
                                 this.plugin.data.settings.singleLineReversedCardSeparator = value;
+                                this.plugin.debouncedGenerateParser();
                                 await this.plugin.savePluginData();
                             });
                         }),
@@ -377,6 +383,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onClick(async () => {
                             this.plugin.data.settings.singleLineReversedCardSeparator =
                                 DEFAULT_SETTINGS.singleLineReversedCardSeparator;
+                            this.plugin.debouncedGenerateParser();
                             await this.plugin.savePluginData();
                             this.display();
                         });
@@ -391,6 +398,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onChange((value) => {
                             applySettingsUpdate(async () => {
                                 this.plugin.data.settings.multilineCardSeparator = value;
+                                this.plugin.debouncedGenerateParser();
                                 await this.plugin.savePluginData();
                             });
                         }),
@@ -402,6 +410,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onClick(async () => {
                             this.plugin.data.settings.multilineCardSeparator =
                                 DEFAULT_SETTINGS.multilineCardSeparator;
+                            this.plugin.debouncedGenerateParser();
                             await this.plugin.savePluginData();
                             this.display();
                         });
@@ -416,6 +425,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onChange((value) => {
                             applySettingsUpdate(async () => {
                                 this.plugin.data.settings.multilineReversedCardSeparator = value;
+                                this.plugin.debouncedGenerateParser();
                                 await this.plugin.savePluginData();
                             });
                         }),
@@ -427,6 +437,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onClick(async () => {
                             this.plugin.data.settings.multilineReversedCardSeparator =
                                 DEFAULT_SETTINGS.multilineReversedCardSeparator;
+                            this.plugin.debouncedGenerateParser();
                             await this.plugin.savePluginData();
                             this.display();
                         });
@@ -441,6 +452,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onChange((value) => {
                             applySettingsUpdate(async () => {
                                 this.plugin.data.settings.multilineCardEndMarker = value;
+                                this.plugin.debouncedGenerateParser();
                                 await this.plugin.savePluginData();
                             });
                         }),
@@ -452,6 +464,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onClick(async () => {
                             this.plugin.data.settings.multilineCardEndMarker =
                                 DEFAULT_SETTINGS.multilineCardEndMarker;
+                            this.plugin.debouncedGenerateParser();
                             await this.plugin.savePluginData();
                             this.display();
                         });
