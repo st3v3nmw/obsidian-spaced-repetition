@@ -162,6 +162,8 @@ Note that this setting is common to both Flashcards and Notes.`,
         "Maximální příspěvek vážené složitosti prolinkovaných poznámek použitý pro určení počáteční složitosti.",
     LOGGING: "Zaznamenávám",
     DISPLAY_DEBUG_INFO: "Zobrazit informace pro ladění na vývojářské konzoli?",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Fronta poznámek k revizi",

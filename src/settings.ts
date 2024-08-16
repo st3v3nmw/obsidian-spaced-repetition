@@ -2,6 +2,7 @@ import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
 import type SRPlugin from "src/main";
 import { t } from "src/lang/helpers";
 import { TabStructure, createTabs } from "./gui/Tabs";
+import { setDebugParser } from "./parser";
 
 export interface SRSettings {
     // flashcards
@@ -45,6 +46,7 @@ export interface SRSettings {
     maxLinkFactor: number;
     // logging
     showDebugMessages: boolean;
+    showPaserDebugMessages: boolean;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
@@ -90,6 +92,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     maxLinkFactor: 1.0,
     // logging
     showDebugMessages: false,
+    showPaserDebugMessages: false,
 };
 
 export function upgradeSettings(settings: SRSettings) {
@@ -921,6 +924,15 @@ export class SRSettingTab extends PluginSettingTab {
                 this.plugin.data.settings.showDebugMessages = value;
                 await this.plugin.savePluginData();
             }),
+        );
+        new Setting(containerEl).setName(t("DISPLAY_PARSER_DEBUG_INFO")).addToggle((toggle) =>
+            toggle
+                .setValue(this.plugin.data.settings.showPaserDebugMessages)
+                .onChange(async (value) => {
+                    this.plugin.data.settings.showPaserDebugMessages = value;
+                    setDebugParser(this.plugin.data.settings.showPaserDebugMessages);
+                    await this.plugin.savePluginData();
+                }),
         );
         containerEl.createEl("h3", { text: t("GROUP_CONTRIBUTING") });
         containerEl.createEl("p").insertAdjacentHTML(

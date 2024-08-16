@@ -42,8 +42,8 @@ export function copyParserOptions(src: ParserOptions): ParserOptions {
     };
 }
 
-export function toggleDebugParser() {
-    debugParser = !debugParser;
+export function setDebugParser(value: boolean) {
+    debugParser = value;
 }
 
 export class ParsedQuestionInfo {

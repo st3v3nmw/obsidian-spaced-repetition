@@ -1,4 +1,4 @@
-import { parseEx, ParsedQuestionInfo } from "src/parser";
+import { parseEx, ParsedQuestionInfo, setDebugParser } from "src/parser";
 import { CardType } from "src/Question";
 import { ParserOptions } from "src/parser";
 
@@ -23,8 +23,8 @@ function parse(
     options: ParserOptions,
 ): [CardType, string, number, number][] {
     // for testing purposes, generate parser each time, overwriting the default one
-    
-    const list: ParsedQuestionInfo[] = parseEx(text,options);
+
+    const list: ParsedQuestionInfo[] = parseEx(text, options);
     const result: [CardType, string, number, number][] = [];
     for (const item of list) {
         result.push([item.cardType, item.text, item.firstLineNum, item.lastLineNum]);
@@ -112,13 +112,13 @@ test("Test parsing of multi line reversed cards", () => {
     ]);
     expect(parse("#Title\n\nLine0\nQ1\n??\nA1\nAnswerExtra\n\nQ2\n??\nA2", parserOptions)).toEqual(
         [
-            [
-                CardType.MultiLineReversed,
-                "Line0\nQ1\n??\nA1\nAnswerExtra",
-                /* Line0 */ 2,
-                /* AnswerExtra */ 6,
-            ],
-            [CardType.MultiLineReversed, "Q2\n??\nA2", 8, 10],
+        [
+            CardType.MultiLineReversed,
+            "Line0\nQ1\n??\nA1\nAnswerExtra",
+            /* Line0 */ 2,
+            /* AnswerExtra */ 6,
+        ],
+        [CardType.MultiLineReversed, "Q2\n??\nA2", 8, 10],
         ],
     );
 });
@@ -163,7 +163,7 @@ test("Test parsing of cloze cards", () => {
         })).toEqual(
         [],
     );
-    
+
     // **bolded**
     expect(parse("cloze **deletion** test", parserOptions)).toEqual([
         [CardType.Cloze, "cloze **deletion** test", 0, 0],
@@ -322,20 +322,46 @@ test("Test not parsing cards in HTML comments", () => {
 });
 
 test("Unexpected Error case", () => {
-	// replace console error log with an empty mock function
-	const errorSpy = jest.spyOn(global.console, "error").mockImplementation(() => {});
+    // replace console error log with an empty mock function
+    const errorSpy = jest.spyOn(global.console, "error").mockImplementation(() => {});
 
-	expect(parseEx("", null)).toStrictEqual([]);
+    expect(parseEx("", null)).toStrictEqual([]);
 
-	expect(errorSpy).toHaveBeenCalled();
-	expect(errorSpy.mock.calls[0][0]).toMatch(/^Unexpected error:.*/);
+    expect(errorSpy).toHaveBeenCalled();
+    expect(errorSpy.mock.calls[0][0]).toMatch(/^Unexpected error:.*/);
 
-	// clear the mock
-	errorSpy.mockClear();
+    // clear the mock
+    errorSpy.mockClear();
 
-	expect(parseEx("", parserOptions)).toStrictEqual([]);
-	expect(errorSpy).toHaveBeenCalledTimes(0);
+    expect(parseEx("", parserOptions)).toStrictEqual([]);
+    expect(errorSpy).toHaveBeenCalledTimes(0);
 
-	// restore original console error log
-	errorSpy.mockRestore();
+    // restore original console error log
+    errorSpy.mockRestore();
+});
+
+describe("Parser debug messages", () => {
+    test("Messages disabled", () => {
+        // replace console error log with an empty mock function
+        const logSpy = jest.spyOn(global.console, "log").mockImplementation(() => {});
+        setDebugParser(false);
+
+        parseEx("", parserOptions);
+        expect(logSpy).toHaveBeenCalledTimes(0);
+
+        // restore original console error log
+        logSpy.mockRestore();
+    });
+
+    test("Messages enabled", () => {
+        // replace console error log with an empty mock function
+        const logSpy = jest.spyOn(global.console, "log").mockImplementation(() => {});
+        setDebugParser(true);
+
+        parseEx("", parserOptions);
+        expect(logSpy).toHaveBeenCalled();
+
+        // restore original console error log
+        logSpy.mockRestore();
+    });
 });

@@ -148,6 +148,8 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB_DESC: "鏈接筆記的加權掌握程度對原始掌握程度的最大貢獻。",
     LOGGING: "記錄中",
     DISPLAY_DEBUG_INFO: "在開發者控制台中顯示除錯資訊？",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "筆記復習序列",

@@ -149,6 +149,8 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB_DESC: "链接笔记的加权掌握程度对原始掌握程度的最大贡献。",
     LOGGING: "记录中",
     DISPLAY_DEBUG_INFO: "在开发者控制台中显示调试信息？",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "笔记复习序列",
