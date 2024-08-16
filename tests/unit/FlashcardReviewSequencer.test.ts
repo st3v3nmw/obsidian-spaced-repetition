@@ -1192,6 +1192,8 @@ async function checkUpdateCurrentQuestionText(
         settings,
         noteText,
     );
+    settings.showDebugMessages = true;
+
     await c.setSequencerDeckTreeFromOriginalText();
     expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
 
@@ -1205,5 +1207,7 @@ async function checkUpdateCurrentQuestionText(
     console.log("Updated string:<<<"+updatedStr+">>>");
     console.log("<<<"+expectedFileText+">>>");
     expect(await c.file.read()).toEqual(expectedFileText);
+
+    settings.showDebugMessages = false;
     return c;
 }

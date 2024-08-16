@@ -45,7 +45,7 @@ import { TextDirection } from "./util/TextDirection";
 import { convertToStringOrEmpty } from "./util/utils";
 import { isEqualOrSubPath } from "./util/utils";
 import { generateParser } from "./generateParser";
-import { setDefaultParser } from "./parser";
+import { provideSettings, setDefaultParser } from "./parser";
 
 interface PluginData {
     settings: SRSettings;

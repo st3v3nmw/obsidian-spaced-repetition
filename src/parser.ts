@@ -57,10 +57,13 @@ export function parseEx(
         // if parser is not provided explicitly, use the parser configured
         // with the plugin settings provided by the user
         if(defaultParser === null) {
+            if(defaultSettings === null) throw Error("Something went wrong. The variable 'defaultSettings' was not initialized yet.");
             defaultParser = generateParser(defaultSettings);
         }
         parser = defaultParser;    
     }
+
+    console.log(text);
 
     // Use this function when you call the parse method
 	try {

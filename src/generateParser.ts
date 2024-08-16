@@ -2,11 +2,8 @@
 
 import { SRSettings } from "./settings";
 import { generate, Parser } from "peggy";
-import { setDefaultParser } from "./parser";
 
 export function generateParser(settings: SRSettings): Parser {
-
-    if(settings === null) throw Error("Something went wrong. The variable 'settings' was not initialized yet.");
 
     const close_rules_list: string[] = [];
 

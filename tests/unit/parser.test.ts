@@ -163,7 +163,7 @@ test("Test parsing of cloze cards", () => {
             convertHighlightsToClozes: false,
             convertBoldTextToClozes: true,
             convertCurlyBracketsToClozes: false,
-        },true)).toEqual(
+        })).toEqual(
         [],
     );
     
@@ -203,7 +203,7 @@ test("Test parsing of cloze cards", () => {
             convertHighlightsToClozes: true,
             convertBoldTextToClozes: false,
             convertCurlyBracketsToClozes: false,
-        },true)).toEqual(
+        })).toEqual(
         [],
     );
 
