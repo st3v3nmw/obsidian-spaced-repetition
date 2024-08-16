@@ -2,7 +2,6 @@ import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
 import type SRPlugin from "src/main";
 import { t } from "src/lang/helpers";
 import { TabStructure, createTabs } from "./gui/Tabs";
-import { generateParser } from "./generateParser";
 
 export interface SRSettings {
     // flashcards

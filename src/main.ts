@@ -45,7 +45,6 @@ import { TextDirection } from "./util/TextDirection";
 import { convertToStringOrEmpty } from "./util/utils";
 import { isEqualOrSubPath } from "./util/utils";
 import { generateParser } from "./generateParser";
-import { provideSettings, setDefaultParser } from "./parser";
 
 interface PluginData {
     settings: SRSettings;
@@ -105,8 +104,6 @@ export default class SRPlugin extends Plugin {
             this.data.buryList,
         );
 
-        provideSettings(this.data.settings);
-        
         appIcon();
 
         this.statusBar = this.addStatusBarItem();
@@ -824,7 +821,17 @@ export default class SRPlugin extends Plugin {
         }
         
         this.debouncedGenerateParserTimeout = window.setTimeout(async () => {
-            setDefaultParser(generateParser(this.data.settings));
+            const parserOptions = {
+                singleLineCardSeparator:this.data.settings.singleLineCardSeparator,
+                singleLineReversedCardSeparator:this.data.settings.singleLineReversedCardSeparator,
+                multilineCardSeparator:this.data.settings.multilineCardSeparator,
+                multilineReversedCardSeparator:this.data.settings.multilineReversedCardSeparator,
+                multilineCardEndMarker:this.data.settings.multilineCardEndMarker,
+                convertHighlightsToClozes:this.data.settings.convertHighlightsToClozes,
+                convertBoldTextToClozes:this.data.settings.convertBoldTextToClozes,
+                convertCurlyBracketsToClozes:this.data.settings.convertCurlyBracketsToClozes,
+            };
+            generateParser(parserOptions);
             this.debouncedGenerateParserTimeout = null;
         }, timeout_ms);
     }

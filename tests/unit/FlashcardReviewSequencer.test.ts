@@ -26,7 +26,6 @@ import moment from "moment";
 import { INoteEaseList, NoteEaseList } from "src/NoteEaseList";
 import { QuestionPostponementList, IQuestionPostponementList } from "src/QuestionPostponementList";
 import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
-import { provideSettings } from "src/parser";
 
 let order_DueFirst_Sequential: IIteratorOrder = {
     cardOrder: CardOrder.DueFirstSequential,
@@ -102,8 +101,7 @@ class TestContext {
         text: string,
         fakeFilePath?: string,
     ): TestContext {
-        provideSettings(settings);
-
+        
         let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, null);
         let noteEaseList = new NoteEaseList(settings);
         let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(

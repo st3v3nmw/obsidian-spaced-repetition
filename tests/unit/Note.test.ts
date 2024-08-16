@@ -6,9 +6,7 @@ import { DEFAULT_SETTINGS } from "src/settings";
 import { NoteFileLoader } from "src/NoteFileLoader";
 import { TextDirection } from "src/util/TextDirection";
 import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
-import { provideSettings } from "src/parser";
 
-provideSettings(DEFAULT_SETTINGS);
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 var noteFileLoader: NoteFileLoader = new NoteFileLoader(DEFAULT_SETTINGS);
 

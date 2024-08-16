@@ -1,16 +1,43 @@
 import { CardType } from "./Question";
 
 import { Parser } from "peggy";
-import { SRSettings } from "./settings";
 import { generateParser } from "./generateParser";
 
-let defaultParser: Parser | null = null;
+export interface ParserOptions {
+    singleLineCardSeparator: string,
+    singleLineReversedCardSeparator: string,
+    multilineCardSeparator: string,
+    multilineReversedCardSeparator: string,
+    multilineCardEndMarker: string,
+    convertHighlightsToClozes: boolean,
+    convertBoldTextToClozes: boolean,
+    convertCurlyBracketsToClozes: boolean,
+}
 
-let defaultSettings: SRSettings | null = null;
+export function areParserOptionsEqual(options1: ParserOptions, options2: ParserOptions): boolean {
+    return (
+        options1.singleLineCardSeparator === options2.singleLineCardSeparator &&
+        options1.singleLineReversedCardSeparator === options2.singleLineReversedCardSeparator &&
+        options1.multilineCardSeparator === options2.multilineCardSeparator &&
+        options1.multilineReversedCardSeparator === options2.multilineReversedCardSeparator &&
+        options1.multilineCardEndMarker === options2.multilineCardEndMarker &&
+        options1.convertHighlightsToClozes === options2.convertHighlightsToClozes &&
+        options1.convertBoldTextToClozes === options2.convertBoldTextToClozes &&
+        options1.convertCurlyBracketsToClozes === options2.convertCurlyBracketsToClozes
+    );
+}
 
-export function provideSettings(providedSettings: SRSettings): void {
-    // we provides the plugin settings as a reference which is stored in the module
-    defaultSettings = providedSettings;
+export function copyParserOptions(src: ParserOptions): ParserOptions {
+    return {
+        singleLineCardSeparator:src.singleLineCardSeparator,
+        singleLineReversedCardSeparator:src.singleLineReversedCardSeparator,
+        multilineCardSeparator:src.multilineCardSeparator,
+        multilineReversedCardSeparator:src.multilineReversedCardSeparator,
+        multilineCardEndMarker:src.multilineCardEndMarker,
+        convertHighlightsToClozes:src.convertHighlightsToClozes,
+        convertBoldTextToClozes:src.convertBoldTextToClozes,
+        convertCurlyBracketsToClozes:src.convertCurlyBracketsToClozes,
+    };
 }
 
 export class ParsedQuestionInfo {
@@ -33,10 +60,6 @@ export class ParsedQuestionInfo {
 	}
 }
 
-export function setDefaultParser(parser: Parser): void {
-    defaultParser = parser;
-}
-
 /**
  * Returns flashcards found in `text`
  *
@@ -48,23 +71,14 @@ export function setDefaultParser(parser: Parser): void {
  */
 export function parseEx(
 	text: string,
-	parser?: Parser,
+    options: ParserOptions,
 ): ParsedQuestionInfo[] {
 
     // console.log("<<<" + text + ">>>");
 
-	// let cardText = "";
 	let cards: ParsedQuestionInfo[] = [];
 
-    if(parser === undefined) {
-        // if parser is not provided explicitly, use the parser configured
-        // with the plugin settings provided by the user
-        if(defaultParser === null) {
-            if(defaultSettings === null) throw Error("Something went wrong. The variable 'defaultSettings' was not initialized yet.");
-            defaultParser = generateParser(defaultSettings);
-        }
-        parser = defaultParser;    
-    }
+    const parser: Parser = generateParser(options);
 
     // Use this function when you call the parse method
 	try {

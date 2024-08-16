@@ -1,15 +1,25 @@
 // generateParser.ts
 
-import { SRSettings } from "./settings";
 import { generate, Parser } from "peggy";
+import { areParserOptionsEqual, copyParserOptions, ParserOptions } from "./parser";
 
-export function generateParser(settings: SRSettings): Parser {
+let parser: Parser | null = null;
+let oldOptions: ParserOptions;
+
+export function generateParser(options: ParserOptions): Parser {
+
+    // if the parser existed already and the user provided the same options, we simply reuse the already generated parser
+    if(parser && areParserOptionsEqual(options,oldOptions)) {
+        return parser;
+    }
+
+    oldOptions = copyParserOptions(options);
 
     const close_rules_list: string[] = [];
 
-    if(settings.convertHighlightsToClozes) close_rules_list.push("close_equal");
-    if(settings.convertBoldTextToClozes) close_rules_list.push("close_star");
-    if(settings.convertCurlyBracketsToClozes) close_rules_list.push("close_bracket");
+    if(options.convertHighlightsToClozes) close_rules_list.push("close_equal");
+    if(options.convertBoldTextToClozes) close_rules_list.push("close_star");
+    if(options.convertCurlyBracketsToClozes) close_rules_list.push("close_bracket");
     
     const close_rules = close_rules_list.join(" / ");
 
@@ -78,7 +88,7 @@ multiline_card
 
 multiline
   = arg1:multiline_before multiline_mark arg2:multiline_after {
-    return createParsedQuestionInfo(CardType.MultiLineBasic,(arg1+"${settings.multilineCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
+    return createParsedQuestionInfo(CardType.MultiLineBasic,(arg1+"${options.multilineCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
   }
   
 multiline_before
@@ -104,7 +114,7 @@ multiline_rev_card
     
 multiline_rev
   = arg1:multiline_rev_before multiline_rev_mark arg2:multiline_rev_after {
-    return createParsedQuestionInfo(CardType.MultiLineReversed,(arg1+"${settings.multilineReversedCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
+    return createParsedQuestionInfo(CardType.MultiLineReversed,(arg1+"${options.multilineReversedCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
   }
 
 multiline_rev_before
@@ -152,19 +162,19 @@ close_mark_bracket_close
   = "}}"
 
 inline_mark
-  = "${settings.singleLineCardSeparator}"
+  = "${options.singleLineCardSeparator}"
 
 inline_rev_mark
-  = "${settings.singleLineReversedCardSeparator}"
+  = "${options.singleLineReversedCardSeparator}"
 
 multiline_mark
-  = "${settings.multilineCardSeparator}" _* newline
+  = "${options.multilineCardSeparator}" _* newline
 
 multiline_rev_mark
-  = "${settings.multilineReversedCardSeparator}" _* newline
+  = "${options.multilineReversedCardSeparator}" _* newline
 
 end_card_mark
-  = "${settings.multilineCardEndMarker}"
+  = "${options.multilineCardEndMarker}"
 
 separator_line
   = end_card_mark newline
@@ -207,13 +217,10 @@ emptyspace
 _ = ([ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff])
 `;
 
-    if (settings.showDebugMessages) {
-        console.log(grammar);
-    }
     // console.log(grammar);
     
     // const t0 = Date.now();
-    const parser = generate(grammar);
+    parser = generate(grammar);
     // const t1 = Date.now();
     // console.log("To generate the parser, it took " + (t1 - t0) + " milliseconds.")
 
