@@ -49,13 +49,22 @@ html_comment
     return createParsedQuestionInfo(CardType.Ignore,"",0,0);
   }
 
+tag
+  = $("#" + name:([a-zA-Z/\\-_] { return 1; } / [0-9]{ return 0;})+ &{
+    // check if it is a valid Obsidian tag
+    return name.includes(1);
+  })
+
+tag_line
+  = tag:tag _* nl:newline { return tag + nl; }
+
 inline_card
   = e:inline newline? { return e; }
 
 inline
   = left:(!inline_mark [^\\n\\r])+ inline_mark right:not_newline (newline annotation)? {
-      return createParsedQuestionInfo(CardType.SingleLineBasic,text(),location().start.line-1,location().end.line-1);
-    }
+    return createParsedQuestionInfo(CardType.SingleLineBasic,text(),location().start.line-1,location().end.line-1);
+  }
 
 inline_rev_card
   = e:inline_rev newline? { return e; }
@@ -69,14 +78,14 @@ multiline_card
   = c:multiline separator_line {
     return c;
   }
-    
+
 multiline
-  = arg1:multiline_before question_mark arg2:multiline_after {
-    return createParsedQuestionInfo(CardType.MultiLineBasic,(arg1+"${settings.multilineCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
+  = tag:tag_line? arg1:multiline_before multiline_mark arg2:multiline_after {
+    return createParsedQuestionInfo(CardType.MultiLineBasic,((tag ?? "") + arg1+"${settings.multilineCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
   }
   
 multiline_before
-  = $(!question_mark nonempty_text_line)+
+  = $(!multiline_mark nonempty_text_line)+
 
 multiline_after
   = $(!separator_line (tilde_code / backprime_code / text_line))+
@@ -92,32 +101,25 @@ backprime_code
   
 backprime_marker
   = "\`\`\`" "\`"*
-
+  
 multiline_rev_card
-  = d:multiline_rev separator_line {
-    return d;
-  }
+  = @multiline_rev separator_line
     
 multiline_rev
-  = arg1:multiline_rev_before double_question_mark arg2:multiline_rev_after {
-    return createParsedQuestionInfo(CardType.MultiLineReversed,(arg1+"${settings.multilineReversedCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
+  = tag:tag_line? arg1:multiline_rev_before multiline_rev_mark arg2:multiline_rev_after {
+    return createParsedQuestionInfo(CardType.MultiLineReversed,((tag ?? "") + arg1+"${settings.multilineReversedCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
   }
 
 multiline_rev_before
-  = e:(!double_question_mark nonempty_text_line)+ {
-      return text();
-    }
+  = $(!multiline_rev_mark nonempty_text_line)+
 
 multiline_rev_after
   = $(!separator_line text_line)+
   
 close_card
-  = t:$close {
-    return createParsedQuestionInfo(CardType.Cloze,t.trim(),location().start.line-1,location().end.line-1);
+  = $(multiline_before_close? f:close_line e:(multiline_after_close)? e1:(newline annotation)?) {
+    return createParsedQuestionInfo(CardType.Cloze,text().trim(),location().start.line-1,location().end.line-1);
   }
-
-close
-  = $(multiline_before_close? f:close_line e:(multiline_after_close)? e1:(newline annotation)?)
 
 close_line
   = ((!close_text [^\\n\\r])* close_text) text_line_nonterminated?
@@ -158,11 +160,11 @@ inline_mark
 inline_rev_mark
   = "${settings.singleLineReversedCardSeparator}"
 
-question_mark
-  = "${settings.multilineCardSeparator}" _ newline
+multiline_mark
+  = "${settings.multilineCardSeparator}" _* newline
 
-double_question_mark
-  = "${settings.multilineReversedCardSeparator}" _ newline
+multiline_rev_mark
+  = "${settings.multilineReversedCardSeparator}" _* newline
 
 end_card_mark
   = "${settings.multilineCardEndMarker}"
@@ -171,56 +173,50 @@ separator_line
   = end_card_mark newline
   
 text_line_nonterminated
-  = t:$[^\\n\\r]+ {
-      return t;
-    }
+  = $[^\\n\\r]+
 
 nonempty_text_line
-  = t:$[^\\n\\r]+ newline {
-      return t;
-    }
+  = @$[^\\n\\r]+ newline
 
 text_line
-  = t:$[^\\n\\r]* newline {
-      return t;
-    }
+  = @$[^\\n\\r]* newline
 
 text_line1
   = newline @$[^\\n\\r]*
     
 loose_line
-  = (([^\\n\\r]* newline) / [^\\n\\r]+) {
+  = $(([^\\n\\r]* newline) / [^\\n\\r]+) {
       return createParsedQuestionInfo(CardType.Ignore,"",0,0);
     }
     
 annotation
-  = "<!--SR:" (!"-->" .)+ "-->"
+  = $("<!--SR:" (!"-->" .)+ "-->")
     
 not_newline
-  = [^\\n\\r]*
+  = $[^\\n\\r]*
 
 newline
-  = [\\n\\r]
+  = $[\\n\\r]
 
 empty_line
-  = $(_ [\\n\\r])
+  = $(_* [\\n\\r])
 
 empty_lines
-  = emptylines:empty_line+
+  = $empty_line+
 
 nonemptyspace
   = [^ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]
 
 emptyspace
-  = _
+  = _*
 
-_ = ([ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff])*
+_ = ([ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff])
 `;
 
     if (settings.showDebugMessages) {
-        // console.log(grammar);
+        console.log(grammar);
     }
-
+    
     // const t0 = Date.now();
     const parser = generate(grammar);
     // const t1 = Date.now();

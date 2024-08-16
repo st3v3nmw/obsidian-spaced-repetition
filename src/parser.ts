@@ -63,8 +63,6 @@ export function parseEx(
         parser = defaultParser;    
     }
 
-    // console.log(this.)
-
     // Use this function when you call the parse method
 	try {
 		cards = parser.parse(text + "\n\n\n",  {

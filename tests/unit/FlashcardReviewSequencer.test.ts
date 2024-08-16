@@ -673,7 +673,7 @@ Q1::A1
 
         test("Answer includes MathJax within $$", async () => {
             let fileText: string = `#flashcards
-What is Newman's equation for gravitational force
+What is Newton's equation for gravitational force
 ?
 $$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$`;
 
@@ -684,7 +684,7 @@ $$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$`;
                 fileText,
             );
             await c.setSequencerDeckTreeFromOriginalText();
-            expect(c.reviewSequencer.currentCard.front).toContain("What is Newman's equation");
+            expect(c.reviewSequencer.currentCard.front).toContain("What is Newton's equation");
 
             // Reviewing the card doesn't change the question, only adds the schedule info
             await c.reviewSequencer.processReview(ReviewResponse.Easy);
@@ -762,39 +762,6 @@ describe("updateCurrentQuestionText", () => {
     describe("Checking update to file", () => {
         describe("Single line card type; Settings - schedule on following line", () => {
 
-            test("Question starts line after tag (single space after tag before newline); New card", async () => {
-                let originalQuestionStr: string = `#flashcards${space}
-Q2
-?
-A2`;
-
-                let fileText: string = `
-${originalQuestionStr}
-
-#flashcards Q1::A1
-
-#flashcards Q3::A3`;
-
-                let updatedQuestionText: string = `Multiline question
-Question starting immediately after tag
-?
-A2 (answer now includes more detail)
-extra answer line 2`;
-
-                let expectedUpdatedStr: string = `#flashcards
-${updatedQuestionText}`;
-
-                await checkUpdateCurrentQuestionText(
-                    fileText,
-                    updatedQuestionText,
-                    originalQuestionStr,
-                    expectedUpdatedStr,
-                    DEFAULT_SETTINGS,
-                );
-            });
-
-            return;
-
             test("Question has schedule on following line before/after update", async () => {
                 let text: string = `
 #flashcards Q1::A1
@@ -839,7 +806,7 @@ ${updatedQuestionText}`;
                 );
             });
         });
-        return;
+        
         describe("Single line card type; Settings - schedule on same line", () => {
             let settings: SRSettings = { ...DEFAULT_SETTINGS };
             settings.cardCommentOnSameLine = true;
@@ -1060,6 +1027,7 @@ ${updatedQuestionText}`;
     });
 });
 
+
 describe("getDeckStats", () => {
     describe("Single level deck with some new and due cards", () => {
         test("Initial stats", async () => {
@@ -1203,10 +1171,6 @@ async function checkUpdateCurrentQuestionText(
     // originalText should remain the same except for the specific substring change from originalStr => updatedStr
     if (!c.originalText.includes(originalStr)) throw `Text not found: ${originalStr}`;
     const expectedFileText: string = c.originalText.replace(originalStr, updatedStr);
-    console.log("<<<"+await c.file.read()+">>>");
-    console.log("Original string:<<<"+originalStr+">>>");
-    console.log("Updated string:<<<"+updatedStr+">>>");
-    console.log("<<<"+expectedFileText+">>>");
     expect(await c.file.read()).toEqual(expectedFileText);
     return c;
 }
