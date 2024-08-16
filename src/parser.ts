@@ -63,7 +63,7 @@ export function parseEx(
         parser = defaultParser;    
     }
 
-    console.log(text);
+    // console.log(this.)
 
     // Use this function when you call the parse method
 	try {

@@ -26,6 +26,7 @@ import moment from "moment";
 import { INoteEaseList, NoteEaseList } from "src/NoteEaseList";
 import { QuestionPostponementList, IQuestionPostponementList } from "src/QuestionPostponementList";
 import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
+import { provideSettings } from "src/parser";
 
 let order_DueFirst_Sequential: IIteratorOrder = {
     cardOrder: CardOrder.DueFirstSequential,
@@ -101,6 +102,8 @@ class TestContext {
         text: string,
         fakeFilePath?: string,
     ): TestContext {
+        provideSettings(settings);
+
         let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, null);
         let noteEaseList = new NoteEaseList(settings);
         let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(
@@ -1192,8 +1195,6 @@ async function checkUpdateCurrentQuestionText(
         settings,
         noteText,
     );
-    settings.showDebugMessages = true;
-
     await c.setSequencerDeckTreeFromOriginalText();
     expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
 
@@ -1207,7 +1208,5 @@ async function checkUpdateCurrentQuestionText(
     console.log("Updated string:<<<"+updatedStr+">>>");
     console.log("<<<"+expectedFileText+">>>");
     expect(await c.file.read()).toEqual(expectedFileText);
-
-    settings.showDebugMessages = false;
     return c;
 }
