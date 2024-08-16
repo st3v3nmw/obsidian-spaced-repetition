@@ -10,6 +10,21 @@ First off, thanks for wanting to contribute to the Spaced Repetition plugin!
 
 ## Translating
 
+The plugin has been translated into the following languages by the Obsidian community 😄.
+
+- Arabic / العربية
+- Chinese (Simplified) / 简体中文
+- Chinese (Traditional) / 繁體中文
+- Czech / čeština
+- German / Deutsch
+- Italian / Italiano
+- Korean / 한국어
+- Japanese / 日本語
+- Polish / Polski
+- Portuguese (Brazil) / Português do Brasil
+- Spanish / Español
+- Russian / русский
+
 ### Steps
 
 To help translate the plugin to your language:
@@ -56,6 +71,9 @@ Please note that:
 1. Only the strings(templates) on the right of the key should be translated.
 2. Text inside `${}` isn't translated. This is used to replace variables in code. For instance, if interval = 4, it becomes `4 days` in English & `Siku 4` in Swahili. Quite nifty if you ask me.
 
+---
+
+
 ## Code
 
 1. Make your changes.
@@ -77,7 +95,7 @@ Please note that:
 5. If your "business logic" is properly decoupled from Obsidian APIs, write some unit tests.
     - This project uses [jest](https://jestjs.io/), tests are stored in `tests/`.
     - `pnpm test`
-6. Add your change to the `[Unreleased]` section of the changelog (`docs/changelog.md`).
+6. Add your change to the `[Unreleased]` section of the changelog (`docs/docs/changelog.md`).
     - The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), TL;DR:
         - `Added` for new features.
         - `Changed` for changes in existing functionality.
@@ -90,6 +108,9 @@ Please note that:
 7. Before pushing your changes, run the linter: `pnpm lint`
     - Format the code in case any warnings are raised: `pnpm format`
 8. Open the pull request.
+
+---
+
 
 ## Documentation
 
@@ -125,6 +146,9 @@ For larger diffs, it's important that you check how your docs look like as expla
 2. Add the code from (1) to the MkDocs configuration (`mkdocs.yml` - `plugins.i18n.languages`).
 3. Copy the files from the English (`en`) folder into the new folder.
 4. Translate then open a pull request.
+
+---
+
 
 ## Maintenance
 
