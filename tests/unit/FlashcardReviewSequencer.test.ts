@@ -101,7 +101,6 @@ class TestContext {
         text: string,
         fakeFilePath?: string,
     ): TestContext {
-        
         let cardSequencer: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, null);
         let noteEaseList = new NoteEaseList(settings);
         let cardScheduleCalculator: CardScheduleCalculator = new CardScheduleCalculator(
@@ -759,7 +758,6 @@ describe("updateCurrentQuestionText", () => {
 
     describe("Checking update to file", () => {
         describe("Single line card type; Settings - schedule on following line", () => {
-
             test("Question has schedule on following line before/after update", async () => {
                 let text: string = `
 #flashcards Q1::A1
@@ -804,7 +802,7 @@ describe("updateCurrentQuestionText", () => {
                 );
             });
         });
-        
+
         describe("Single line card type; Settings - schedule on same line", () => {
             let settings: SRSettings = { ...DEFAULT_SETTINGS };
             settings.cardCommentOnSameLine = true;
@@ -991,13 +989,13 @@ ${updatedQuestionText}`;
                 );
             });
 
-
             // DISABLED TEST. IT SEEMS UNNECESSARY TO TRIM THE END OF LINES
             /*test("Question starts line after tag (single space after tag before newline); New card", async () => {
+            test("Question starts line after tag (single space after tag before newline); New card", async () => {
                 let originalQuestionStr: string = `#flashcards${space}
 Q2
 ?
-A2 helloooooo`;
+A2`;
 
                 let fileText: string = `
 ${originalQuestionStr}
@@ -1022,11 +1020,10 @@ ${updatedQuestionText}`;
                     expectedUpdatedStr,
                     DEFAULT_SETTINGS,
                 );
-            });
-        });*/
+            });*/
+        });
     });
 });
-
 
 describe("getDeckStats", () => {
     describe("Single level deck with some new and due cards", () => {

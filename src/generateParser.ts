@@ -8,10 +8,13 @@ let oldOptions: ParserOptions;
 
 export function generateParser(options: ParserOptions): Parser {
 
-    // if the parser existed already and the user provided the same options, we simply reuse the already generated parser
     if(parser && areParserOptionsEqual(options,oldOptions)) {
+        // If the parser existed already and the user provided the same options,
+        // we simply reuse the already generated parser
         return parser;
     }
+
+    /* GENERATE A NEW PARSER */
 
     oldOptions = copyParserOptions(options);
 
