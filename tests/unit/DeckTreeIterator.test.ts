@@ -13,6 +13,7 @@ import {
     setupNextRandomNumber,
     setupStaticRandomNumberProvider,
 } from "src/util/RandomNumberProvider";
+import { provideSettings } from "src/parser";
 
 let order_DueFirst_Sequential: IIteratorOrder = {
     cardOrder: CardOrder.DueFirstSequential,
@@ -20,6 +21,8 @@ let order_DueFirst_Sequential: IIteratorOrder = {
 };
 
 var iterator: DeckTreeIterator;
+
+provideSettings(DEFAULT_SETTINGS);
 
 beforeAll(() => {
     setupStaticDateProvider_20230906();

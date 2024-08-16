@@ -7,6 +7,7 @@ import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 import { TextDirection } from "src/util/TextDirection";
 import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
 
+provideSettings(DEFAULT_SETTINGS);
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 
 beforeAll(() => {

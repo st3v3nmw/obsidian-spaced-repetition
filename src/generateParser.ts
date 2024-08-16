@@ -26,7 +26,7 @@ export function generateParser(settings: SRSettings): Parser {
   
   // The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
   const createParsedQuestionInfoFallBack = (cardType, text, firstLineNum, lastLineNum) => {
-    return {cardType, text, firstLineNum, lastLineNum};
+    return {cardType, text: text.replace(/\\s*$/gm, ''), firstLineNum, lastLineNum};
   };
 
   const CardType = options.CardType ? options.CardType : CardTypeFallBack;
@@ -55,14 +55,11 @@ tag
     return name.includes(1);
   })
 
-tag_line
-  = tag:tag _* nl:newline { return tag + nl; }
-
 inline_card
   = e:inline newline? { return e; }
 
 inline
-  = left:(!inline_mark [^\\n\\r])+ inline_mark right:not_newline (newline annotation)? {
+  = left:(!inline_mark [^\\n])+ inline_mark right:not_newline (newline annotation)? {
     return createParsedQuestionInfo(CardType.SingleLineBasic,text(),location().start.line-1,location().end.line-1);
   }
 
@@ -70,7 +67,7 @@ inline_rev_card
   = e:inline_rev newline? { return e; }
 
 inline_rev
-  = left:(!inline_rev_mark [^\\n\\r])+ inline_rev_mark right:not_newline (newline annotation)? {
+  = left:(!inline_rev_mark [^\\n])+ inline_rev_mark right:not_newline (newline annotation)? {
       return createParsedQuestionInfo(CardType.SingleLineReversed,text(),location().start.line-1,location().end.line-1);
     }
 
@@ -80,8 +77,8 @@ multiline_card
   }
 
 multiline
-  = tag:tag_line? arg1:multiline_before multiline_mark arg2:multiline_after {
-    return createParsedQuestionInfo(CardType.MultiLineBasic,((tag ?? "") + arg1+"${settings.multilineCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
+  = arg1:multiline_before multiline_mark arg2:multiline_after {
+    return createParsedQuestionInfo(CardType.MultiLineBasic,(arg1+"${settings.multilineCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
   }
   
 multiline_before
@@ -106,8 +103,8 @@ multiline_rev_card
   = @multiline_rev separator_line
     
 multiline_rev
-  = tag:tag_line? arg1:multiline_rev_before multiline_rev_mark arg2:multiline_rev_after {
-    return createParsedQuestionInfo(CardType.MultiLineReversed,((tag ?? "") + arg1+"${settings.multilineReversedCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
+  = arg1:multiline_rev_before multiline_rev_mark arg2:multiline_rev_after {
+    return createParsedQuestionInfo(CardType.MultiLineReversed,(arg1+"${settings.multilineReversedCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
   }
 
 multiline_rev_before
@@ -122,7 +119,7 @@ close_card
   }
 
 close_line
-  = ((!close_text [^\\n\\r])* close_text) text_line_nonterminated?
+  = ((!close_text [^\\n])* close_text) text_line_nonterminated?
   
 multiline_before_close
   = (!close_line nonempty_text_line)+
@@ -134,19 +131,19 @@ close_text
   = ${close_rules}
 
 close_equal
-  = close_mark_equal (!close_mark_equal [^\\n\\r])+  close_mark_equal
+  = close_mark_equal (!close_mark_equal [^\\n])+  close_mark_equal
 
 close_mark_equal
   = "=="
   
 close_star
-  = close_mark_star (!close_mark_star [^\\n\\r])+  close_mark_star
+  = close_mark_star (!close_mark_star [^\\n])+  close_mark_star
 
 close_mark_star
   = "**"
 
 close_bracket
-  = close_mark_bracket_open (!close_mark_bracket_close [^\\n\\r])+  close_mark_bracket_close
+  = close_mark_bracket_open (!close_mark_bracket_close [^\\n])+  close_mark_bracket_close
 
 close_mark_bracket_open
   = "{{"
@@ -173,36 +170,33 @@ separator_line
   = end_card_mark newline
   
 text_line_nonterminated
-  = $[^\\n\\r]+
+  = $[^\\n]+
 
 nonempty_text_line
-  = @$[^\\n\\r]+ newline
+  = t:$[^\\n]+ nl:newline { return t.trimEnd() + nl; }
 
 text_line
-  = @$[^\\n\\r]* newline
+  = @$[^\\n]* newline
 
 text_line1
-  = newline @$[^\\n\\r]*
+  = newline @$[^\\n]*
     
 loose_line
-  = $(([^\\n\\r]* newline) / [^\\n\\r]+) {
+  = $(([^\\n]* newline) / [^\\n]+) {
       return createParsedQuestionInfo(CardType.Ignore,"",0,0);
     }
-    
+
 annotation
   = $("<!--SR:" (!"-->" .)+ "-->")
     
 not_newline
-  = $[^\\n\\r]*
+  = $[^\\n]*
 
 newline
-  = $[\\n\\r]
+  = $[\\n]
 
 empty_line
-  = $(_* [\\n\\r])
-
-empty_lines
-  = $empty_line+
+  = $(_* [\\n])
 
 nonemptyspace
   = [^ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]
@@ -216,6 +210,7 @@ _ = ([ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f
     if (settings.showDebugMessages) {
         console.log(grammar);
     }
+    // console.log(grammar);
     
     // const t0 = Date.now();
     const parser = generate(grammar);

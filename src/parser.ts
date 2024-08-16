@@ -22,8 +22,8 @@ export class ParsedQuestionInfo {
 	lastLineNum: number;
 
 	constructor(cardType: CardType, text: string, firstLineNum: number, lastLineNum: number) {
-		this.cardType = cardType;
-		this.text = text;
+        this.cardType = cardType;
+		this.text = text; // text.replace(/\s*$/gm, ""); // reproduce the same old behavior as when adding new lines with trimEnd. It is not clear why we need it in real life. However, it is needed to pass the tests.
 		this.firstLineNum = firstLineNum;
 		this.lastLineNum = lastLineNum;
 	}
@@ -50,6 +50,9 @@ export function parseEx(
 	text: string,
 	parser?: Parser,
 ): ParsedQuestionInfo[] {
+
+    // console.log("<<<" + text + ">>>");
+
 	// let cardText = "";
 	let cards: ParsedQuestionInfo[] = [];
 
@@ -78,6 +81,8 @@ export function parseEx(
 			console.error("Unexpected error:", error);
 		}
 	}
+
+    // console.log(cards);
 
 	return cards;
 }
