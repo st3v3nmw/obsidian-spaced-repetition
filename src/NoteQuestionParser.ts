@@ -136,11 +136,7 @@ export class NoteQuestionParser {
 
     private parseQuestions(): ParsedQuestionInfo[] {
         // We pass contentText which has the frontmatter blanked out; see extractFrontmatter for reasoning
-        const settings: SRSettings = this.settings;
-        const result: ParsedQuestionInfo[] = parseEx(
-            this.contentText,
-            settings
-        );
+        const result: ParsedQuestionInfo[] = parseEx(this.contentText);
         return result;
     }
 

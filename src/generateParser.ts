@@ -1,10 +1,12 @@
 // generateParser.ts
 
 import { SRSettings } from "./settings";
-import { generate } from "peggy";
-import { setParser } from "./parser";
+import { generate, Parser } from "peggy";
+import { setDefaultParser } from "./parser";
 
-export function generateParser(settings: SRSettings): void {
+export function generateParser(settings: SRSettings): Parser {
+
+    if(settings === null) throw Error("Something went wrong. The variable 'settings' was not initialized yet.");
 
     const close_rules_list: string[] = [];
 
@@ -219,11 +221,13 @@ _ = ([ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f
 `;
 
     if (settings.showDebugMessages) {
-        console.log(grammar);
+        // console.log(grammar);
     }
 
     // const t0 = Date.now();
-    setParser(generate(grammar));
+    const parser = generate(grammar);
     // const t1 = Date.now();
     // console.log("To generate the parser, it took " + (t1 - t0) + " milliseconds.")
+
+    return parser;
 }

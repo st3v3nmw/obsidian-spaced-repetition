@@ -45,6 +45,7 @@ import { TextDirection } from "./util/TextDirection";
 import { convertToStringOrEmpty } from "./util/utils";
 import { isEqualOrSubPath } from "./util/utils";
 import { generateParser } from "./generateParser";
+import { setDefaultParser } from "./parser";
 
 interface PluginData {
     settings: SRSettings;
@@ -104,6 +105,8 @@ export default class SRPlugin extends Plugin {
             this.data.buryList,
         );
 
+        provideSettings(this.data.settings);
+        
         appIcon();
 
         this.statusBar = this.addStatusBarItem();
@@ -821,7 +824,7 @@ export default class SRPlugin extends Plugin {
         }
         
         this.debouncedGenerateParserTimeout = window.setTimeout(async () => {
-            generateParser(this.data.settings);
+            setDefaultParser(generateParser(this.data.settings));
             this.debouncedGenerateParserTimeout = null;
         }, timeout_ms);
     }

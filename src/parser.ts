@@ -4,11 +4,13 @@ import { Parser } from "peggy";
 import { SRSettings } from "./settings";
 import { generateParser } from "./generateParser";
 
-let parser: Parser | null = null;
+let defaultParser: Parser | null = null;
 
-export function setParser(p: Parser): void {
-    parser = p;
-    // console.log(parser);
+let defaultSettings: SRSettings | null = null;
+
+export function provideSettings(providedSettings: SRSettings): void {
+    // we provides the plugin settings as a reference which is stored in the module
+    defaultSettings = providedSettings;
 }
 
 export class ParsedQuestionInfo {
@@ -31,15 +33,14 @@ export class ParsedQuestionInfo {
 	}
 }
 
+export function setDefaultParser(parser: Parser): void {
+    defaultParser = parser;
+}
+
 /**
  * Returns flashcards found in `text`
  *
  * It is best that the text does not contain frontmatter, see extractFrontmatter for reasoning
- *
- * Multi-line question with blank lines user workaround:
- *      As of 3/04/2024 there is no support for including blank lines within multi-line questions
- *      As a workaround, one user uses a zero width Unicode character - U+200B
- *      https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/915#issuecomment-2031003092
  *
  * @param text - The text to extract flashcards from
  * @param settings - Plugin's settings
@@ -47,16 +48,20 @@ export class ParsedQuestionInfo {
  */
 export function parseEx(
 	text: string,
-	settings: SRSettings,
-    force_parser_generation = false
+	parser?: Parser,
 ): ParsedQuestionInfo[] {
 	// let cardText = "";
 	let cards: ParsedQuestionInfo[] = [];
 
-    if(force_parser_generation || parser === null) {
-        generateParser(settings);
+    if(parser === undefined) {
+        // if parser is not provided explicitly, use the parser configured
+        // with the plugin settings provided by the user
+        if(defaultParser === null) {
+            defaultParser = generateParser(defaultSettings);
+        }
+        parser = defaultParser;    
     }
-	
+
     // Use this function when you call the parse method
 	try {
 		cards = parser.parse(text + "\n\n\n",  {
