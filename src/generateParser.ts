@@ -1,14 +1,14 @@
 // generateParser.ts
 
 import { generate, Parser } from "peggy";
-import { areParserOptionsEqual, copyParserOptions, ParserOptions } from "./parser";
+import { areParserOptionsEqual, copyParserOptions, debugParser, ParserOptions } from "./parser";
 
 let parser: Parser | null = null;
 let oldOptions: ParserOptions;
 
 export function generateParser(options: ParserOptions): Parser {
 
-    if(parser && areParserOptionsEqual(options,oldOptions)) {
+    if(parser && areParserOptionsEqual(options,oldOptions) && !debugParser) {
         // If the parser existed already and the user provided the same options,
         // we simply reuse the already generated parser
         return parser;
@@ -171,16 +171,16 @@ inline_rev_mark
   = "${options.singleLineReversedCardSeparator}"
 
 multiline_mark
-  = "${options.multilineCardSeparator}" _* newline
+  = _* "${options.multilineCardSeparator}" _* newline
 
 multiline_rev_mark
-  = "${options.multilineReversedCardSeparator}" _* newline
+  = _* "${options.multilineReversedCardSeparator}" _* newline
 
 end_card_mark
   = "${options.multilineCardEndMarker}"
 
 separator_line
-  = end_card_mark newline
+  = end_card_mark _* newline
   
 text_line_nonterminated
   = $[^\\n]+
@@ -220,7 +220,9 @@ emptyspace
 _ = ([ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff])
 `;
 
-    // console.log(grammar);
+    if(debugParser) {
+        console.log(grammar);
+    }
     
     // const t0 = Date.now();
     parser = generate(grammar);

@@ -467,7 +467,6 @@ Multiline answer2
  
 `;
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
-
         let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
             noteFile,
             TextDirection.Ltr,
@@ -806,6 +805,7 @@ tags:
   - flashcards
   - data-structure
 ---
+some content
 ?
 In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!
     `;
@@ -819,7 +819,7 @@ In computer-science, a *heap* is a tree-based data-structure, that satisfies the
                 topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
                 cards: [
                     new Card({
-                        front: "",
+                        front: "some content",
                         back: "In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!",
                     }),
                 ],

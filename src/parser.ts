@@ -3,6 +3,8 @@ import { CardType } from "./Question";
 import { Parser } from "peggy";
 import { generateParser } from "./generateParser";
 
+export let debugParser = false;
+
 export interface ParserOptions {
     singleLineCardSeparator: string,
     singleLineReversedCardSeparator: string,
@@ -40,6 +42,10 @@ export function copyParserOptions(src: ParserOptions): ParserOptions {
     };
 }
 
+export function toggleDebugParser() {
+    debugParser = !debugParser;
+}
+
 export class ParsedQuestionInfo {
 	cardType: CardType;
 	text: string;
@@ -74,7 +80,9 @@ export function parseEx(
     options: ParserOptions,
 ): ParsedQuestionInfo[] {
 
-    // console.log("<<<" + text + ">>>");
+    if(debugParser) {
+      console.log("Text to parse:\n<<<" + text + ">>>");  
+    }
 
 	let cards: ParsedQuestionInfo[] = [];
 
@@ -96,7 +104,10 @@ export function parseEx(
 		}
 	}
 
-    // console.log(cards);
+    if(debugParser) {
+        console.log("Parsed card:");
+        console.log(cards);
+    }
 
 	return cards;
 }
