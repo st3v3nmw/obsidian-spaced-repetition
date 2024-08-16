@@ -85,11 +85,12 @@ export function parseEx(
     }
 
 	let cards: ParsedQuestionInfo[] = [];
-
-    const parser: Parser = generateParser(options);
-
-    // Use this function when you call the parse method
 	try {
+		if(!options) throw Error("No parser options provided.");
+
+		const parser: Parser = generateParser(options);
+
+		// Use this function when you call the parse method
 		cards = parser.parse(text + "\n\n\n",  {
 			CardType,
 			createParsedQuestionInfo: (cardType: CardType, text: string, firstLineNum: number, lastLineNum: number) => {
@@ -97,11 +98,7 @@ export function parseEx(
 			}
 		});
 	} catch (error) {
-		if (error instanceof SyntaxError) {
-			console.error("Syntax error:", error);
-		} else {
-			console.error("Unexpected error:", error);
-		}
+		console.error("Unexpected error:", error);
 	}
 
     if(debugParser) {

@@ -320,3 +320,22 @@ test("Test not parsing cards in HTML comments", () => {
     expect(parse("<!--cloze ==deletion== test-->", parserOptions)).toEqual([]);
     expect(parse("<!--cloze **deletion** test-->", parserOptions)).toEqual([]);
 });
+
+test("Unexpected Error case", () => {
+	// replace console error log with an empty mock function
+	const errorSpy = jest.spyOn(global.console, "error").mockImplementation(() => {});
+
+	expect(parseEx("", null)).toStrictEqual([]);
+
+	expect(errorSpy).toHaveBeenCalled();
+	expect(errorSpy.mock.calls[0][0]).toMatch(/^Unexpected error:.*/);
+
+	// clear the mock
+	errorSpy.mockClear();
+
+	expect(parseEx("", parserOptions)).toStrictEqual([]);
+	expect(errorSpy).toHaveBeenCalledTimes(0);
+
+	// restore original console error log
+	errorSpy.mockRestore();
+});
