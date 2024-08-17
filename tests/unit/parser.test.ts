@@ -152,9 +152,9 @@ test("Test parsing of multi line reversed cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "---",
-            convertHighlightsToClozes: false,
+            convertHighlightsToClozes: true,
             convertBoldTextToClozes: true,
-            convertCurlyBracketsToClozes: false,
+            convertCurlyBracketsToClozes: true,
         })).toEqual([
         [CardType.MultiLineReversed, "Question\n??\nAnswer line 1\nAnswer line 2", 0, 4],
     ]);
@@ -164,9 +164,9 @@ test("Test parsing of multi line reversed cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "---",
-            convertHighlightsToClozes: false,
+            convertHighlightsToClozes: true,
             convertBoldTextToClozes: true,
-            convertCurlyBracketsToClozes: false,
+            convertCurlyBracketsToClozes: true,
         })).toEqual([
         [CardType.MultiLineBasic, "Question 1\n?\nAnswer line 1\nAnswer line 2", 0, 4],
         [CardType.MultiLineReversed, "Question 2\n??\nAnswer line 1\nAnswer line 2", 6, 9]
@@ -257,6 +257,20 @@ test("Test parsing of cloze cards", () => {
     // both
     expect(parse("cloze **deletion** test ==another deletion==!", parserOptions)).toEqual([
         [CardType.Cloze, "cloze **deletion** test ==another deletion==!", 0, 0],
+    ]);
+
+    expect(parse("Test 1\nTest 2\nThis is a close with ===secret=== text.\nWith this extra lines\n\nAnd more here.\nAnd even more.\n\n---\n\nTest 3\nTest 4\nThis is a close with ===super secret=== text.\nWith this extra lines\n\nAnd more here.\nAnd even more.\n\n---\n\nHere is some more text.", {
+            singleLineCardSeparator: "::",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            convertHighlightsToClozes: true,
+            convertBoldTextToClozes: false,
+            convertCurlyBracketsToClozes: false,
+        })).toEqual([
+        [CardType.Cloze, "Test 1\nTest 2\nThis is a close with ===secret=== text.\nWith this extra lines\n\nAnd more here.\nAnd even more.", 0, 7],
+        [CardType.Cloze, "Test 3\nTest 4\nThis is a close with ===super secret=== text.\nWith this extra lines\n\nAnd more here.\nAnd even more.", 10, 17]
     ]);
 });
 
