@@ -8,26 +8,52 @@ let oldOptions: ParserOptions;
 
 export function generateParser(options: ParserOptions): Parser {
 
-    if(parser && areParserOptionsEqual(options,oldOptions) && !debugParser) {
-        // If the parser existed already and the user provided the same options,
-        // we simply reuse the already generated parser
-        return parser;
+    let grammar: string | null = null;
+
+    // If the parser did not already exist or if the parser options changed since last the last
+    // parser was generated, we generate a new parser. Otherwise, we skip the block to save
+    // some execution time.
+    if(parser === null || !areParserOptionsEqual(options,oldOptions)) {
+
+        /* GENERATE A NEW PARSER */
+
+        oldOptions = copyParserOptions(options);
+
+        grammar = generateGrammar(options);
+
+        if(debugParser) {
+            const t0 = Date.now();
+            parser = generate(grammar);
+            const t1 = Date.now();    
+            console.log("New parser generated in " + (t1 - t0) + " milliseconds.");
+        } else {
+            parser = generate(grammar);
+        }
+    } else {
+        if(debugParser) console.log("Parser already existed. No need to generate a new parser.");
     }
 
-    /* GENERATE A NEW PARSER */
+    if(debugParser) {
+        if(grammar === null) {
+            grammar = generateGrammar(options);
+        }
+        console.log("The parsers grammar is provided below. You can test it with https://peggyjs.org/online.html.");
+        console.log({info: "Copy the grammar by right-clicking on the property grammar and copying it as a string. Then, paste it in https://peggyjs.org/online.html.", grammar: grammar});
+    }
 
-    oldOptions = copyParserOptions(options);
+    return parser;
+}
 
+function generateGrammar(options: ParserOptions): string {
     const close_rules_list: string[] = [];
 
-    if(options.convertHighlightsToClozes) close_rules_list.push("close_equal");
-    if(options.convertBoldTextToClozes) close_rules_list.push("close_star");
-    if(options.convertCurlyBracketsToClozes) close_rules_list.push("close_bracket");
-    
-    const close_rules = close_rules_list.join(" / ");
+        if(options.convertHighlightsToClozes) close_rules_list.push("close_equal");
+        if(options.convertBoldTextToClozes) close_rules_list.push("close_star");
+        if(options.convertCurlyBracketsToClozes) close_rules_list.push("close_bracket");
+        
+        const close_rules = close_rules_list.join(" / ");
 
-    const grammar = `
-{
+        return `{
   // The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
   const CardTypeFallBack = {
     SingleLineBasic: 0,
@@ -219,15 +245,4 @@ emptyspace
 
 _ = ([ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff])
 `;
-
-    if(debugParser) {
-        console.log(grammar);
-    }
-    
-    // const t0 = Date.now();
-    parser = generate(grammar);
-    // const t1 = Date.now();
-    // console.log("To generate the parser, it took " + (t1 - t0) + " milliseconds.")
-
-    return parser;
 }

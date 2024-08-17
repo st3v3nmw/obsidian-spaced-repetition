@@ -91,6 +91,12 @@ export function parseEx(
 		const parser: Parser = generateParser(options);
 
 		// Use this function when you call the parse method
+        //
+        // The few extra lines empty lines appended to the end of the text "\n\n\n"
+        // is a trick to avoid unnecessarily complex grammar rules for the parer,
+        // which differen between the case when the last line ends with "\n" or not.
+        //
+        // Prusamably a single "\n" would be sufficient, but a few more do not bother.
 		cards = parser.parse(text + "\n\n\n",  {
 			CardType,
 			createParsedQuestionInfo: (cardType: CardType, text: string, firstLineNum: number, lastLineNum: number) => {
@@ -102,7 +108,7 @@ export function parseEx(
 	}
 
     if(debugParser) {
-        console.log("Parsed card:");
+        console.log("Parsed cards:");
         console.log(cards);
     }
 
