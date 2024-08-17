@@ -166,7 +166,7 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB_DESC:
         "Maksymalny wkład ważonej łatwości połączonych notatek do początkowej łatwości.",
     LOGGING: "Logowanie",
-    DISPLAY_DEBUG_INFO: "Wyświetl informacje debugowania w konsoli deweloperskiej?", // sidebar.ts
+    DISPLAY_DEBUG_INFO: "Wyświetl informacje debugowania w konsoli deweloperskiej", // sidebar.ts
     DISPLAY_PARSER_DEBUG_INFO:
         "Display debugging information for the parser on the developer console",
 

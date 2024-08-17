@@ -167,7 +167,7 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB_DESC:
         "Contribución máxima de la facilidad ponderada de las notas vinculadas a la facilidad inicial.",
     LOGGING: "Registro",
-    DISPLAY_DEBUG_INFO: "¿Mostrar información de depuración en la consola de desarrollador?",
+    DISPLAY_DEBUG_INFO: "¿Mostrar información de depuración en la consola de desarrollador",
     DISPLAY_PARSER_DEBUG_INFO:
         "Display debugging information for the parser on the developer console",
 

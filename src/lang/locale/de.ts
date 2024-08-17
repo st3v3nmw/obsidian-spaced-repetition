@@ -179,7 +179,7 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB_DESC:
         "Maximaler Einfluss der Einfachheiten verlinkter Notizen zur gewichteten initialen Einfachheit einer neuen Lernkarte.",
     LOGGING: "Protokollierung",
-    DISPLAY_DEBUG_INFO: "Informationen zum Debugging in der Entwicklerkonsole anzeigen?",
+    DISPLAY_DEBUG_INFO: "Informationen zum Debugging in der Entwicklerkonsole anzeigen",
     DISPLAY_PARSER_DEBUG_INFO:
         "Informationen zum parser Debugging in der Entwicklerkonsole anzeigen",
 

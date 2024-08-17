@@ -170,9 +170,9 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB_DESC:
         "Contributo massimo della difficoltà pasata delle note collegate alla difficoltà iniziale.",
     LOGGING: "Registrando",
-    DISPLAY_DEBUG_INFO: "Visualizza informazione di debug sulla console per sviluppatori?",
+    DISPLAY_DEBUG_INFO: "Visualizza informazione di debug sulla console per sviluppatori",
     DISPLAY_PARSER_DEBUG_INFO:
-        "Display debugging information for the parser on the developer console",
+        "Visualizza informazione di debug riguardanti il parser sulla console per sviluppatori",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Coda di note da rivedere",

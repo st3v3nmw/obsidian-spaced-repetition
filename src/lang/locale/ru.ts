@@ -175,7 +175,7 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB_DESC:
         'Максимальный вклад среднего значения "Лёгкости" связанных заметок в начальную "Лёгкость".',
     LOGGING: "Журналирование",
-    DISPLAY_DEBUG_INFO: "Отображать отладочную информацию в консоли разработчика?",
+    DISPLAY_DEBUG_INFO: "Отображать отладочную информацию в консоли разработчика",
     DISPLAY_PARSER_DEBUG_INFO:
         "Display debugging information for the parser on the developer console",
 
