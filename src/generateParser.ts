@@ -153,7 +153,7 @@ multiline_rev_after
   = $(!separator_line text_line)+
   
 close_card
-  = $(multiline_before_close? f:close_line e:(multiline_after_close)? e1:(newline annotation)?) {
+  = $(multiline_before_close? close_line (multiline_after_close)? (newline annotation)?) {
     return createParsedQuestionInfo(CardType.Cloze,text().trim(),location().start.line-1,location().end.line-1);
   }
 
@@ -217,6 +217,7 @@ nonempty_text_line
 text_line
   = @$[^\\n]* newline
 
+// very likely, it is possible to homogeneize/modify the rules to use only either 'text_line1' or 'text_line'
 text_line1
   = newline @$[^\\n]*
     
