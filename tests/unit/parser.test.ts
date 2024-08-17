@@ -98,6 +98,31 @@ test("Test parsing of multi line basic cards", () => {
     expect(parse("#flashcards/tag-on-previous-line\nQuestion\n?\nAnswer", parserOptions)).toEqual([
         [CardType.MultiLineBasic, "#flashcards/tag-on-previous-line\nQuestion\n?\nAnswer", 0, 3],
     ]);
+    expect(parse("Question\n?\nAnswer line 1\nAnswer line 2\n\n---", {
+            singleLineCardSeparator: "::",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            convertHighlightsToClozes: false,
+            convertBoldTextToClozes: true,
+            convertCurlyBracketsToClozes: false,
+        })).toEqual([
+        [CardType.MultiLineBasic, "Question\n?\nAnswer line 1\nAnswer line 2", 0, 4],
+    ]);
+    expect(parse("Question 1\n?\nAnswer line 1\nAnswer line 2\n\n---\nQuestion 2\n?\nAnswer line 1\nAnswer line 2\n---\n", {
+            singleLineCardSeparator: "::",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            convertHighlightsToClozes: false,
+            convertBoldTextToClozes: true,
+            convertCurlyBracketsToClozes: false,
+        })).toEqual([
+        [CardType.MultiLineBasic, "Question 1\n?\nAnswer line 1\nAnswer line 2", 0, 4],
+        [CardType.MultiLineBasic, "Question 2\n?\nAnswer line 1\nAnswer line 2", 6, 9]
+    ]);
 });
 
 test("Test parsing of multi line reversed cards", () => {
@@ -121,6 +146,31 @@ test("Test parsing of multi line reversed cards", () => {
         [CardType.MultiLineReversed, "Q2\n??\nA2", 8, 10],
         ],
     );
+    expect(parse("Question\n??\nAnswer line 1\nAnswer line 2\n\n---", {
+            singleLineCardSeparator: "::",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            convertHighlightsToClozes: false,
+            convertBoldTextToClozes: true,
+            convertCurlyBracketsToClozes: false,
+        })).toEqual([
+        [CardType.MultiLineReversed, "Question\n??\nAnswer line 1\nAnswer line 2", 0, 4],
+    ]);
+    expect(parse("Question 1\n?\nAnswer line 1\nAnswer line 2\n\n---\nQuestion 2\n??\nAnswer line 1\nAnswer line 2\n---\n", {
+            singleLineCardSeparator: "::",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            convertHighlightsToClozes: false,
+            convertBoldTextToClozes: true,
+            convertCurlyBracketsToClozes: false,
+        })).toEqual([
+        [CardType.MultiLineBasic, "Question 1\n?\nAnswer line 1\nAnswer line 2", 0, 4],
+        [CardType.MultiLineReversed, "Question 2\n??\nAnswer line 1\nAnswer line 2", 6, 9]
+    ]);
 });
 
 test("Test parsing of cloze cards", () => {
