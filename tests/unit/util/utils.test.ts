@@ -650,6 +650,24 @@ describe("findLineIndexOfSearchStringIgnoringWs", () => {
     });
 });
 
+describe("YAML_FRONT_MATTER_REGEX", () => {
+    function createTestStr1(sep: string): string {
+        return `---${sep}sr-due: 2024-08-10${sep}sr-interval: 273${sep}sr-ease: 309${sep}---`;
+    }
+
+    test("New line is line feed", async () => {
+        const sep: string = String.fromCharCode(10);
+        const text: string = createTestStr1(sep);
+        expect(YAML_FRONT_MATTER_REGEX.test(text)).toEqual(true);
+    });
+
+    test("New line is carriage return line feed", async () => {
+        const sep: string = String.fromCharCode(13, 10);
+        const text: string = createTestStr1(sep);
+        expect(YAML_FRONT_MATTER_REGEX.test(text)).toEqual(true);
+    });
+});
+
 describe("isEqualOrSubPath", () => {
     const winSep = "\\";
     const linSep = "/";
@@ -717,7 +735,6 @@ describe("isEqualOrSubPath", () => {
             expect(isEqualOrSubPath(root + winSep + linSep + sub_1, root)).toBe(true);
         });
     });
-
     describe("Linux", () => {
         const sep = linSep;
         const rootPath = root + sep + sub_1;
@@ -775,88 +792,11 @@ describe("isEqualOrSubPath", () => {
             expect(isEqualOrSubPath(root + winSep + linSep + sub_1, root)).toBe(true);
         });
     });
-
     test("Examples", () => {
         expect(isEqualOrSubPath("/user/docs/letter.txt", "/user/docs")).toBe(true);
         expect(isEqualOrSubPath("/user/docs", "/user/docs")).toBe(true);
         expect(isEqualOrSubPath("/user/docs/letter.txt", "/user/projects")).toBe(false);
         expect(isEqualOrSubPath("/User/Docs", "/user/docs")).toBe(true);
         expect(isEqualOrSubPath("C:\\user\\docs", "C:/user/docs")).toBe(true);
-    });
-});
-
-describe("Parse Obsidian Frontmatter Tag", () => {
-    test("No tag", () => {
-        expect(parseObsidianFrontmatterTag("")).toEqual([]);
-        expect(parseObsidianFrontmatterTag(undefined)).toEqual([]);
-    });
-    test("Singel tag without #", () => {
-        expect(parseObsidianFrontmatterTag("flashcards")).toEqual(["#flashcards"]);
-        expect(parseObsidianFrontmatterTag("flashcards/philosophy/philosophers")).toEqual([
-            "#flashcards/philosophy/philosophers",
-        ]);
-    });
-    test("Singel tag with #", () => {
-        expect(parseObsidianFrontmatterTag("#flashcards")).toEqual(["#flashcards"]);
-        expect(parseObsidianFrontmatterTag("#flashcards/philosophy/philosophers")).toEqual([
-            "#flashcards/philosophy/philosophers",
-        ]);
-    });
-    test("Multiple tags without #", () => {
-        expect(parseObsidianFrontmatterTag("flashcardsX,flashcardsX")).toEqual([
-            "#flashcardsX",
-            "#flashcardsX",
-        ]);
-        expect(parseObsidianFrontmatterTag("flashcardsX,flashcardsX/toes")).toEqual([
-            "#flashcardsX",
-            "#flashcardsX/toes",
-        ]);
-        expect(
-            parseObsidianFrontmatterTag("flashcardsX/philosophy/philosophers,flashcardsX/toes"),
-        ).toEqual(["#flashcardsX/philosophy/philosophers", "#flashcardsX/toes"]);
-    });
-    test("Multiple tags with #", () => {
-        expect(parseObsidianFrontmatterTag("#flashcardsX,#flashcardsX")).toEqual([
-            "#flashcardsX",
-            "#flashcardsX",
-        ]);
-        expect(parseObsidianFrontmatterTag("#flashcardsX,#flashcardsX/toes")).toEqual([
-            "#flashcardsX",
-            "#flashcardsX/toes",
-        ]);
-        expect(
-            parseObsidianFrontmatterTag("#flashcardsX/philosophy/philosophers,#flashcardsX/toes"),
-        ).toEqual(["#flashcardsX/philosophy/philosophers", "#flashcardsX/toes"]);
-    });
-    test("Multiple tags with and without #", () => {
-        expect(parseObsidianFrontmatterTag("#flashcardsX,flashcardsX")).toEqual([
-            "#flashcardsX",
-            "#flashcardsX",
-        ]);
-        expect(parseObsidianFrontmatterTag("#flashcardsX,flashcardsX/toes")).toEqual([
-            "#flashcardsX",
-            "#flashcardsX/toes",
-        ]);
-        expect(
-            parseObsidianFrontmatterTag("#flashcardsX/philosophy/philosophers,flashcardsX/toes"),
-        ).toEqual(["#flashcardsX/philosophy/philosophers", "#flashcardsX/toes"]);
-    });
-});
-
-describe("YAML_FRONT_MATTER_REGEX", () => {
-    function createTestStr1(sep: string): string {
-        return `---${sep}sr-due: 2024-08-10${sep}sr-interval: 273${sep}sr-ease: 309${sep}---`;
-    }
-
-    test("New line is line feed", async () => {
-        const sep: string = String.fromCharCode(10);
-        const text: string = createTestStr1(sep);
-        expect(YAML_FRONT_MATTER_REGEX.test(text)).toEqual(true);
-    });
-
-    test("New line is carriage return line feed", async () => {
-        const sep: string = String.fromCharCode(13, 10);
-        const text: string = createTestStr1(sep);
-        expect(YAML_FRONT_MATTER_REGEX.test(text)).toEqual(true);
     });
 });

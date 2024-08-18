@@ -1,6 +1,6 @@
+import moment, { Moment } from "moment";
 import { sep } from "path";
 import { PREFERRED_DATE_FORMAT } from "src/constants";
-import moment, { Moment } from "moment";
 
 type Hex = number;
 
