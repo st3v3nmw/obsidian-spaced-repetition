@@ -96,7 +96,7 @@ Please note that:
 The documentation consists of Markdown files which [MkDocs](https://www.mkdocs.org/) converts to static web pages.
 Specifically, this project uses [MkDocs Material](https://squidfunk.github.io/mkdocs-material/getting-started/).
 
-These files reside in `docs/` in the respective language's folder. For instance, English docs are located in `docs/en/`.
+These files reside in `docs/docs/` in the respective language's folder. For instance, English docs are located in `docs/docs/en/`.
 
 The docs are served on [https://www.stephenmwangi.com/obsidian-spaced-repetition/](https://www.stephenmwangi.com/obsidian-spaced-repetition/).
 
@@ -121,7 +121,7 @@ For larger diffs, it's important that you check how your docs look like as expla
 
 ### Translating Documentation
 
-1. Create a folder for your language in `docs/` if it doesn't exist. Use the language codes provided [here](https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/#site-language).
+1. Create a folder for your language in `docs/docs/` if it doesn't exist. Use the language codes provided [here](https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/#site-language).
 2. Add the code from (1) to the MkDocs configuration (`mkdocs.yml` - `plugins.i18n.languages`).
 3. Copy the files from the English (`en`) folder into the new folder.
 4. Translate then open a pull request.

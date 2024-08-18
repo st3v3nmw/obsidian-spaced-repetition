@@ -9,7 +9,7 @@
         "format": "npx prettier --write .",
         "lint": "npx prettier --check . && npx eslint src/",
         "test": "jest",
-        "changelog": "auto-changelog --template=compact --package && npx prettier --write docs/changelog.md",
+        "changelog": "auto-changelog --template=compact --package && npx prettier --write docs/docs/changelog.md",
         "e2e": "make setup_e2e && wdio run ./wdio.conf.js"
     },
     "keywords": [
