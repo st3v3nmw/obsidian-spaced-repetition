@@ -80,9 +80,9 @@ Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
     FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
     FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
-    REVIEW_BUTTON_DELAY: "Button press delay",
+    REVIEW_BUTTON_DELAY: "Button press delay (ms)",
     REVIEW_BUTTON_DELAY_DESC:
-        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before there could be pressed again.",
+        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before they could be pressed again.",
     FLASHCARD_TAGS: "Tag pro kartičky",
     FLASHCARD_TAGS_DESC:
         "Zadete tagy oodělené mezerou nebo odřádkováním například. #kartičky #balíčke2 #balíček3.",

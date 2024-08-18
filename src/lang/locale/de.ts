@@ -86,7 +86,7 @@ Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARD_GOOD_DESC: 'Passe die Beschriftung für "Gut" Knopf an',
     FLASHCARD_EASY_DESC: 'Passe die Beschriftung für "Einfach" Knopf an',
     FLASHCARD_HARD_DESC: 'Passe die Beschriftung für "Schwer" Knopf an',
-    REVIEW_BUTTON_DELAY: "Druckknopfverzögerung",
+    REVIEW_BUTTON_DELAY: "Druckknopfverzögerung (ms)",
     REVIEW_BUTTON_DELAY_DESC:
         "Fügt den Überprüfungsschaltflächen („Einfach“, „Gut“, „Schwer“, „Antwort anzeigen“) eine Verzögerung hinzu, bevor sie erneut gedrückt werden können.",
     FLASHCARD_TAGS: "Lernkarten Tags",
