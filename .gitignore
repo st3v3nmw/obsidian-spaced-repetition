@@ -30,6 +30,10 @@ tests/vaults/*/.obsidian
 site/
 venv/
 .venv/
+docs/docs/en/media/~*
+.obsidian/plugins/obsidian-spaced-repetition-beta/*
 
 # env
 env.sh
+
+
