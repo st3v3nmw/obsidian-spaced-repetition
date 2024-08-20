@@ -20,6 +20,20 @@ export class ParsedQuestionInfo {
     }
 }
 
+
+function removeSpaces(input: string): string {
+    const lines = input.split('\n');
+
+    const processedLines = lines.map(line => {
+        if (/^\s+```/.test(line)) {
+            return line.trimStart();
+        } else {
+            return line;
+        }
+    });
+
+    return processedLines.join('\n');
+}
 /**
  * Returns flashcards found in `text`
  *
@@ -53,6 +67,7 @@ export function parseEx(
     let firstLineNo = 0;
     let lastLineNo = 0;
 
+    text = removeSpaces(text)
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
     for (let i = 0; i < lines.length; i++) {
         const currentLine = lines[i];
@@ -77,7 +92,7 @@ export function parseEx(
             // This could be the first line of a multi line question
             firstLineNo = i;
         }
-        cardText += currentLine.trimEnd();
+        cardText += currentLine;  //.trimEnd();
 
         if (
             currentLine.includes(singlelineReversedCardSeparator) ||

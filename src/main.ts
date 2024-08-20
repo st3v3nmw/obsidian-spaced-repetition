@@ -546,7 +546,7 @@ export default class SRPlugin extends Plugin {
             }),
         );
 
-        if (this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE)) this.reviewQueueView.redraw();
+        if (this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE) && this.reviewQueueView) this.reviewQueueView.redraw();
     }
 
     async loadNote(noteFile: TFile): Promise<Note> {
