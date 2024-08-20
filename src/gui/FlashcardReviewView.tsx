@@ -189,10 +189,12 @@ export class FlashcardReviewView {
 
         switch (e.code) {
             case "KeyS":
+            case "ArrowUp":
                 this._skipCurrentCard();
                 consumeKeyEvent();
                 break;
             case "Space":
+            case "ArrowDown":
                 if (this.mode === FlashcardModalMode.Front) {
                     this._showAnswer();
                     consumeKeyEvent();
@@ -203,6 +205,7 @@ export class FlashcardReviewView {
                 break;
             case "Enter":
             case "NumpadEnter":
+            case "ArrowDown":
                 if (this.mode !== FlashcardModalMode.Front) {
                     break;
                 }
@@ -211,6 +214,7 @@ export class FlashcardReviewView {
                 break;
             case "Numpad1":
             case "Digit1":
+            case "ArrowLeft":
                 if (this.mode !== FlashcardModalMode.Back) {
                     break;
                 }
@@ -219,6 +223,7 @@ export class FlashcardReviewView {
                 break;
             case "Numpad2":
             case "Digit2":
+            case "ArrowDown":
                 if (this.mode !== FlashcardModalMode.Back) {
                     break;
                 }
@@ -227,6 +232,7 @@ export class FlashcardReviewView {
                 break;
             case "Numpad3":
             case "Digit3":
+            case "ArrowRight":
                 if (this.mode !== FlashcardModalMode.Back) {
                     break;
                 }
