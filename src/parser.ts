@@ -70,9 +70,14 @@ export class ParsedQuestionInfo {
  * Returns flashcards found in `text`
  *
  * It is best that the text does not contain frontmatter, see extractFrontmatter for reasoning
+ * 
+ * EXCEPTIONS: The underlying peggy parser can throw an exception if the input it receives does
+ * not conform to the grammar it was built with. However, the grammar used in generating this
+ * parser, see generateParser(), intentionally matches all input text and therefore
+ * this function should not throw an exception.
  *
  * @param text - The text to extract flashcards from
- * @param settings - Plugin's settings
+ * @param options - Plugin's settings
  * @returns An array of [CardType, card text, line number] tuples
  */
 export function parseEx(
