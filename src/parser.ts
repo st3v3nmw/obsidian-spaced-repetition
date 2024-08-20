@@ -92,7 +92,7 @@ export function parseEx(
             // This could be the first line of a multi line question
             firstLineNo = i;
         }
-        cardText += currentLine.trimEnd();
+        cardText += currentLine;  //.trimEnd();
 
         if (
             currentLine.includes(singlelineReversedCardSeparator) ||
