@@ -114,6 +114,7 @@ Note that this setting is common to both Flashcards and Notes.`,
     INLINE_REVERSED_CARDS_SEPARATOR: "单行翻转卡片的分隔符",
     MULTILINE_CARDS_SEPARATOR: "多行卡片的分隔符",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "多行翻转卡片的分隔符",
+    MULTILINE_CARDS_END_MARKER: "表示填空和多行闪卡结束的字符",
     NOTES: "笔记",
     REVIEW_PANE_ON_STARTUP: "启动时开启笔记复习窗格",
     TAGS_TO_REVIEW: "复习标签",
@@ -147,7 +148,9 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB: "最大链接收益",
     MAX_LINK_CONTRIB_DESC: "链接笔记的加权掌握程度对原始掌握程度的最大贡献。",
     LOGGING: "记录中",
-    DISPLAY_DEBUG_INFO: "在开发者控制台中显示调试信息？",
+    DISPLAY_DEBUG_INFO: "在开发者控制台中显示调试信息",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "笔记复习序列",

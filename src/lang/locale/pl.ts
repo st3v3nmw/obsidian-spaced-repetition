@@ -126,6 +126,7 @@ Note that this setting is common to both Flashcards and Notes.`,
     MULTILINE_CARDS_SEPARATOR: "Separator dla kart zamaskowanych wieloliniowych",
     MULTILINE_REVERSED_CARDS_SEPARATOR:
         "Separator dla kart zamaskowanych odwróconych wieloliniowych",
+    MULTILINE_CARDS_END_MARKER: "Caracteres que denotam o fim de clozes e flashcards multilineares",
     NOTES: "Notatki",
     REVIEW_PANE_ON_STARTUP: "Włączyć panel przeglądu notatek przy starcie",
     TAGS_TO_REVIEW: "Tagi do przeglądu",
@@ -165,7 +166,9 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB_DESC:
         "Maksymalny wkład ważonej łatwości połączonych notatek do początkowej łatwości.",
     LOGGING: "Logowanie",
-    DISPLAY_DEBUG_INFO: "Wyświetl informacje debugowania w konsoli deweloperskiej?", // sidebar.ts
+    DISPLAY_DEBUG_INFO: "Wyświetl informacje debugowania w konsoli deweloperskiej", // sidebar.ts
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     //sidebar.ts
     NOTES_REVIEW_QUEUE: "Kolejka przeglądu notatek",
