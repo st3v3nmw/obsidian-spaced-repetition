@@ -210,16 +210,16 @@ inline_rev_mark
   = "${options.singleLineReversedCardSeparator}"
 
 multiline_mark
-  = optional_whitespace "${options.multilineCardSeparator}" optional_whitespace newline
+  = optional_whitespaces "${options.multilineCardSeparator}" optional_whitespaces newline
 
 multiline_rev_mark
-  = optional_whitespace "${options.multilineReversedCardSeparator}" optional_whitespace newline
+  = optional_whitespaces "${options.multilineReversedCardSeparator}" optional_whitespaces newline
 
 end_card_mark
   = "${options.multilineCardEndMarker}"
 
 separator_line
-  = end_card_mark optional_whitespace newline
+  = end_card_mark optional_whitespaces newline
   
 text_line_nonterminated
   = $nonempty_text_till_newline
@@ -260,7 +260,7 @@ empty_line
 nonemptyspace
   = [^ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]
 
-optional_whitespace
+optional_whitespaces
   = whitespace_char*
 
 whitespace_char = ([ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff])
