@@ -798,16 +798,19 @@ In computer-science, a *heap* is a tree-based data-structure, that satisfies the
         ).toMatchObject(expected);
     });
 
-    test("Multi-line without question (i.e. question is blank)", async () => {
+    test("Multi-line without question is ignored", async () => {
         let noteText: string = `---
 created: 2024-03-11 10:41
 tags:
   - flashcards
   - data-structure
 ---
-some content
 ?
-In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!
+A1
+
+Q2
+?
+A2
     `;
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
@@ -817,10 +820,12 @@ In computer-science, a *heap* is a tree-based data-structure, that satisfies the
                 questionType: CardType.MultiLineBasic,
                 // Explicitly checking that #data-structure is not included
                 topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
+
+                // No card A1; only card Q2/A2
                 cards: [
                     new Card({
-                        front: "some content",
-                        back: "In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!",
+                        front: "Q2",
+                        back: "A2",
                     }),
                 ],
             },

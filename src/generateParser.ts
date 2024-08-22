@@ -80,6 +80,8 @@ function generateGrammar(options: ParserOptions): string {
 main
   = blocks:block* { return filterBlocks(blocks); }
 
+/* The input text to the parser contains arbitrary text, not just card definitions. 
+  Hence we fallback to matching on loose_line. The result from loose_line is filtered out by filterBlocks() */  
 block
   = html_comment / inline_rev_card / inline_card / multiline_rev_card / multiline_card / close_card / loose_line
 
@@ -88,9 +90,10 @@ html_comment
     return createParsedQuestionInfo(CardType.Ignore,"",0,0);
   }
 
+/* Obsidian tag definition: https://help.obsidian.md/Editing+and+formatting/Tags#Tag+format */
 tag
   = $("#" + name:([a-zA-Z/\\-_] { return 1; } / [0-9]{ return 0;})+ &{
-    // check if it is a valid Obsidian tag
+    // check if it is a valid Obsidian tag - (Tags must contain at least one non-numerical character)
     return name.includes(1);
   })
 
@@ -98,7 +101,7 @@ inline_card
   = e:inline newline? { return e; }
 
 inline
-  = left:(!inline_mark [^\\n])+ inline_mark right:not_newline (newline annotation)? {
+  = left:(!inline_mark non_newline)+ inline_mark right:text_till_newline (newline annotation)? {
     return createParsedQuestionInfo(CardType.SingleLineBasic,text(),location().start.line-1,location().end.line-1);
   }
 
@@ -106,7 +109,7 @@ inline_rev_card
   = e:inline_rev newline? { return e; }
 
 inline_rev
-  = left:(!inline_rev_mark [^\\n])+ inline_rev_mark right:not_newline (newline annotation)? {
+  = left:(!inline_rev_mark non_newline)+ inline_rev_mark right:text_till_newline (newline annotation)? {
       return createParsedQuestionInfo(CardType.SingleLineReversed,text(),location().start.line-1,location().end.line-1);
     }
 
@@ -127,13 +130,23 @@ multiline_after
   = $(!separator_line (tilde_code / backprime_code / text_line))+
 
 tilde_code
-  = $(left:$tilde_marker text_line t:$(!(middle:$tilde_marker  &{ return left.length===middle.length;}) (tilde_code / text_line))* (right:$tilde_marker &{ return left.length===right.length; }) newline)  
+  = $(
+    left:$tilde_marker text_line 
+    t:$(!(middle:$tilde_marker  &{ return left.length===middle.length;}) (tilde_code / text_line))* 
+    (right:$tilde_marker &{ return left.length===right.length; }) 
+    newline
+  )  
   
 tilde_marker
   = "~~~" "~"*
 
 backprime_code
-  = $(left:$backprime_marker text_line t:$(!(middle:$backprime_marker  &{ return left.length===middle.length;}) (backprime_code / text_line))* (right:$backprime_marker &{ return left.length===right.length; }) newline)  
+  = $(
+    left:$backprime_marker text_line 
+    t:$(!(middle:$backprime_marker  &{ return left.length===middle.length;}) (backprime_code / text_line))* 
+    (right:$backprime_marker &{ return left.length===right.length; }) 
+    newline
+  )  
   
 backprime_marker
   = "\`\`\`" "\`"*
@@ -158,7 +171,7 @@ close_card
   }
 
 close_line
-  = ((!close_text [^\\n])* close_text) text_line_nonterminated?
+  = ((!close_text non_newline)* close_text) text_line_nonterminated?
   
 multiline_before_close
   = (!close_line nonempty_text_line)+
@@ -170,19 +183,19 @@ close_text
   = ${close_rules}
 
 close_equal
-  = close_mark_equal (!close_mark_equal [^\\n])+  close_mark_equal
+  = close_mark_equal (!close_mark_equal non_newline)+  close_mark_equal
 
 close_mark_equal
   = "=="
   
 close_star
-  = close_mark_star (!close_mark_star [^\\n])+  close_mark_star
+  = close_mark_star (!close_mark_star non_newline)+  close_mark_star
 
 close_mark_star
   = "**"
 
 close_bracket
-  = close_mark_bracket_open (!close_mark_bracket_close [^\\n])+  close_mark_bracket_close
+  = close_mark_bracket_open (!close_mark_bracket_close non_newline)+  close_mark_bracket_close
 
 close_mark_bracket_open
   = "{{"
@@ -197,53 +210,59 @@ inline_rev_mark
   = "${options.singleLineReversedCardSeparator}"
 
 multiline_mark
-  = _* "${options.multilineCardSeparator}" _* newline
+  = optional_whitespace "${options.multilineCardSeparator}" optional_whitespace newline
 
 multiline_rev_mark
-  = _* "${options.multilineReversedCardSeparator}" _* newline
+  = optional_whitespace "${options.multilineReversedCardSeparator}" optional_whitespace newline
 
 end_card_mark
   = "${options.multilineCardEndMarker}"
 
 separator_line
-  = end_card_mark _* newline
+  = end_card_mark optional_whitespace newline
   
 text_line_nonterminated
-  = $[^\\n]+
+  = $nonempty_text_till_newline
 
 nonempty_text_line
-  = t:$[^\\n]+ nl:newline { return t.trimEnd() + nl; }
+  = t:$nonempty_text_till_newline nl:newline { return t.trimEnd() + nl; }
 
 text_line
-  = @$[^\\n]* newline
+  = @$text_till_newline newline
 
 // very likely, it is possible to homogeneize/modify the rules to use only either 'text_line1' or 'text_line'
 text_line1
-  = newline @$[^\\n]*
+  = newline @$text_till_newline
     
 loose_line
-  = $(([^\\n]* newline) / [^\\n]+) {
+  = $((text_till_newline newline) / nonempty_text_till_newline) {
       return createParsedQuestionInfo(CardType.Ignore,"",0,0);
     }
 
 annotation
   = $("<!--SR:" (!"-->" .)+ "-->")
     
-not_newline
-  = $[^\\n]*
+nonempty_text_till_newline
+  = $non_newline+
+
+text_till_newline
+  = $non_newline*
+
+non_newline
+  = [^\\n]
 
 newline
   = $[\\n]
 
 empty_line
-  = $(_* [\\n])
+  = $(whitespace_char* [\\n])
 
 nonemptyspace
   = [^ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]
 
-emptyspace
-  = _*
+optional_whitespace
+  = whitespace_char*
 
-_ = ([ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff])
+whitespace_char = ([ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff])
 `;
 }

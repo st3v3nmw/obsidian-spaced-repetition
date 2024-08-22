@@ -988,39 +988,6 @@ ${updatedQuestionText}`;
                     DEFAULT_SETTINGS,
                 );
             });
-
-            // DISABLED TEST. IT SEEMS UNNECESSARY TO TRIM THE END OF LINES
-            /*test("Question starts line after tag (single space after tag before newline); New card", async () => {
-            test("Question starts line after tag (single space after tag before newline); New card", async () => {
-                let originalQuestionStr: string = `#flashcards${space}
-Q2
-?
-A2`;
-
-                let fileText: string = `
-${originalQuestionStr}
-
-#flashcards Q1::A1
-
-#flashcards Q3::A3`;
-
-                let updatedQuestionText: string = `Multiline question
-Question starting immediately after tag
-?
-A2 (answer now includes more detail)
-extra answer line 2`;
-
-                let expectedUpdatedStr: string = `#flashcards
-${updatedQuestionText}`;
-
-                await checkUpdateCurrentQuestionText(
-                    fileText,
-                    updatedQuestionText,
-                    originalQuestionStr,
-                    expectedUpdatedStr,
-                    DEFAULT_SETTINGS,
-                );
-            });*/
         });
     });
 });
