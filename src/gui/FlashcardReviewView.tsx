@@ -211,7 +211,6 @@ export class FlashcardReviewView {
                 break;
             case "Enter":
             case "NumpadEnter":
-            case "ArrowDown":
                 if (this.mode !== FlashcardModalMode.Front) {
                     break;
                 }
@@ -229,7 +228,6 @@ export class FlashcardReviewView {
                 break;
             case "Numpad2":
             case "Digit2":
-            case "ArrowDown":
                 if (this.mode !== FlashcardModalMode.Back) {
                     break;
                 }

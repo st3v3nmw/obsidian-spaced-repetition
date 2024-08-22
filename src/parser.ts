@@ -22,7 +22,7 @@ export class ParsedQuestionInfo {
 
 
 function removeSpaces(input: string): string {
-    const lines = input.split('\n');
+    const lines = input.split("\n");
 
     const processedLines = lines.map(line => {
         if (/^\s+```/.test(line)) {
@@ -32,7 +32,7 @@ function removeSpaces(input: string): string {
         }
     });
 
-    return processedLines.join('\n');
+    return processedLines.join("\n");
 }
 /**
  * Returns flashcards found in `text`
@@ -67,7 +67,7 @@ export function parseEx(
     let firstLineNo = 0;
     let lastLineNo = 0;
 
-    text = removeSpaces(text)
+    text = removeSpaces(text);
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
     for (let i = 0; i < lines.length; i++) {
         const currentLine = lines[i];
