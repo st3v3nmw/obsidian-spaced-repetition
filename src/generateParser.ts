@@ -65,7 +65,7 @@ function generateGrammar(options: ParserOptions): string {
   
   // The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
   const createParsedQuestionInfoFallBack = (cardType, text, firstLineNum, lastLineNum) => {
-    return {cardType, text: text.replace(/\\s*$/gm, ''), firstLineNum, lastLineNum};
+    return {cardType, text, firstLineNum, lastLineNum};
   };
 
   const CardType = options.CardType ? options.CardType : CardTypeFallBack;
@@ -120,7 +120,7 @@ multiline_card
 
 multiline
   = arg1:multiline_before multiline_mark arg2:multiline_after {
-    return createParsedQuestionInfo(CardType.MultiLineBasic,(arg1+"${options.multilineCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
+    return createParsedQuestionInfo(CardType.MultiLineBasic,(arg1+"${options.multilineCardSeparator}\\n"+arg2),location().start.line-1,location().end.line-2);
   }
   
 multiline_before
@@ -156,7 +156,7 @@ multiline_rev_card
     
 multiline_rev
   = arg1:multiline_rev_before multiline_rev_mark arg2:multiline_rev_after {
-    return createParsedQuestionInfo(CardType.MultiLineReversed,(arg1+"${options.multilineReversedCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
+    return createParsedQuestionInfo(CardType.MultiLineReversed,(arg1+"${options.multilineReversedCardSeparator}\\n"+arg2),location().start.line-1,location().end.line-2);
   }
 
 multiline_rev_before
@@ -167,7 +167,7 @@ multiline_rev_after
   
 close_card
   = $(multiline_before_close? close_line (multiline_after_close)? (newline annotation)?) {
-    return createParsedQuestionInfo(CardType.Cloze,text().trim(),location().start.line-1,location().end.line-1);
+    return createParsedQuestionInfo(CardType.Cloze,text(),location().start.line-1,location().end.line-1);
   }
 
 close_line
@@ -225,7 +225,7 @@ text_line_nonterminated
   = $nonempty_text_till_newline
 
 nonempty_text_line
-  = t:$nonempty_text_till_newline nl:newline { return t.trimEnd() + nl; }
+  = t:$nonempty_text_till_newline nl:newline { return t + nl; }
 
 text_line
   = @$text_till_newline newline
