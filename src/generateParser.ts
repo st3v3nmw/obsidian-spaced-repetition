@@ -120,7 +120,7 @@ multiline_card
 
 multiline
   = arg1:multiline_before multiline_mark arg2:multiline_after {
-    return createParsedQuestionInfo(CardType.MultiLineBasic,(arg1+"${options.multilineCardSeparator}\\n"+arg2),location().start.line-1,location().end.line-2);
+    return createParsedQuestionInfo(CardType.MultiLineBasic,(arg1+"${options.multilineCardSeparator}\\n"+arg2.trimEnd()),location().start.line-1,location().end.line-2);
   }
   
 multiline_before
@@ -156,7 +156,7 @@ multiline_rev_card
     
 multiline_rev
   = arg1:multiline_rev_before multiline_rev_mark arg2:multiline_rev_after {
-    return createParsedQuestionInfo(CardType.MultiLineReversed,(arg1+"${options.multilineReversedCardSeparator}\\n"+arg2),location().start.line-1,location().end.line-2);
+    return createParsedQuestionInfo(CardType.MultiLineReversed,(arg1+"${options.multilineReversedCardSeparator}\\n"+arg2.trimEnd()),location().start.line-1,location().end.line-2);
   }
 
 multiline_rev_before
@@ -225,7 +225,7 @@ text_line_nonterminated
   = $nonempty_text_till_newline
 
 nonempty_text_line
-  = t:$nonempty_text_till_newline nl:newline { return t + nl; }
+  = nonempty_text_till_newline newline
 
 text_line
   = @$text_till_newline newline
