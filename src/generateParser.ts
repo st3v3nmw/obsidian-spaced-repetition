@@ -167,7 +167,7 @@ multiline_rev_after
   
 close_card
   = $(multiline_before_close? close_line (multiline_after_close)? (newline annotation)?) {
-    return createParsedQuestionInfo(CardType.Cloze,text(),location().start.line-1,location().end.line-1);
+    return createParsedQuestionInfo(CardType.Cloze,text().trimEnd(),location().start.line-1,location().end.line-1);
   }
 
 close_line
