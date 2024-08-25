@@ -1,6 +1,6 @@
 import moment from "moment";
 import { Moment } from "moment";
-import { normalize, sep } from "path";
+import { sep } from "path";
 import { PREFERRED_DATE_FORMAT } from "src/constants";
 
 type Hex = number;
@@ -120,24 +120,42 @@ export function convertToStringOrEmpty(v: any): string {
 //
 
 /**
- * Checks a path is equal or a subpath of the other rootPath
+ * Determines if a given path (`toCheck`) is either equal to or a sub-path of a specified root path (`rootPath`).
+ * The function compares the paths in a case-insensitive manner and normalizes the directory separators for consistency across different platforms.
  *
- * @param toCheck The path to check it is equal or a subpath of path.
- * @param rootPath The ref path to check the other is equal to or a subpath of this.
- * @tutorial
- * rootPath = "root/sub/sub2"
- * if toCheck = "notRoot/..." -> false
- * if toCheck = "root" -> true
- * if toCheck = "root/sub" -> true
- * if toCheck = "root/s" -> false
+ * @param {string} toCheck - The path that needs to be checked against the root path.
+ * @param {string} rootPath - The root path to check against. The function determines if `toCheck` is equal to or a sub-path of this path.
+ * @returns {boolean} - Returns `true` if `toCheck` is either equal to or a sub-path of `rootPath`. Otherwise, returns `false`.
+ *
+ * @example
+ * // Example 1: Sub-path scenario
+ * isEqualOrSubPath('/user/docs/letter.txt', '/user/docs'); // returns true
+ *
+ * @example
+ * // Example 2: Equal paths scenario
+ * isEqualOrSubPath('/user/docs', '/user/docs'); // returns true
+ *
+ * @example
+ * // Example 3: Non-matching path scenario
+ * isEqualOrSubPath('/user/docs/letter.txt', '/user/projects'); // returns false
+ *
+ * @example
+ * // Example 4: Case-insensitive matching
+ * isEqualOrSubPath('/User/Docs', '/user/docs'); // returns true
+ *
+ * @example
+ * // Example 5: Handles different path separators
+ * isEqualOrSubPath('C:\\user\\docs', 'C:/user/docs'); // returns true
  */
 export function isEqualOrSubPath(toCheck: string, rootPath: string): boolean {
-    const rootPathSections = normalize(rootPath.toLowerCase())
-        .replaceAll(/(\\|\/)/g, sep)
+    const rootPathSections = rootPath
+        .toLowerCase()
+        .replaceAll(/(\\|\/)+/g, sep)
         .split(sep)
         .filter((p) => p !== "");
-    const pathSections = normalize(toCheck.toLowerCase())
-        .replaceAll(/(\\|\/)/g, sep)
+    const pathSections = toCheck
+        .toLowerCase()
+        .replaceAll(/(\\|\/)+/g, sep)
         .split(sep)
         .filter((p) => p !== "");
     if (pathSections.length < rootPathSections.length) {

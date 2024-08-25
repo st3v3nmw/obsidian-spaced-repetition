@@ -123,6 +123,19 @@ test("Test parsing of multi line basic cards", () => {
         [CardType.MultiLineBasic, "Question 1\n?\nAnswer line 1\nAnswer line 2", 0, 4],
         [CardType.MultiLineBasic, "Question 2\n?\nAnswer line 1\nAnswer line 2", 6, 9]
     ]);
+    expect(parse("Question 1\n?\nAnswer line 1\nAnswer line 2\n\n---\nQuestion with empty line after question mark\n?\n\nAnswer line 1\nAnswer line 2\n---\n", {
+            singleLineCardSeparator: "::",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            convertHighlightsToClozes: false,
+            convertBoldTextToClozes: true,
+            convertCurlyBracketsToClozes: false,
+        })).toEqual([
+        [CardType.MultiLineBasic, "Question 1\n?\nAnswer line 1\nAnswer line 2", 0, 4],
+        [CardType.MultiLineBasic, "Question with empty line after question mark\n?\n\nAnswer line 1\nAnswer line 2", 6, 10]
+    ]);
 });
 
 test("Test parsing of multi line reversed cards", () => {

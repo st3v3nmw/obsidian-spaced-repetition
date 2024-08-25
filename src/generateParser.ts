@@ -65,7 +65,7 @@ function generateGrammar(options: ParserOptions): string {
   
   // The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
   const createParsedQuestionInfoFallBack = (cardType, text, firstLineNum, lastLineNum) => {
-    return {cardType, text: text.replace(/\\s*$/gm, ''), firstLineNum, lastLineNum};
+    return {cardType, text, firstLineNum, lastLineNum};
   };
 
   const CardType = options.CardType ? options.CardType : CardTypeFallBack;
@@ -120,7 +120,7 @@ multiline_card
 
 multiline
   = arg1:multiline_before multiline_mark arg2:multiline_after {
-    return createParsedQuestionInfo(CardType.MultiLineBasic,(arg1+"${options.multilineCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
+    return createParsedQuestionInfo(CardType.MultiLineBasic,(arg1+"${options.multilineCardSeparator}\\n"+arg2.trimEnd()),location().start.line-1,location().end.line-2);
   }
   
 multiline_before
@@ -156,7 +156,7 @@ multiline_rev_card
     
 multiline_rev
   = arg1:multiline_rev_before multiline_rev_mark arg2:multiline_rev_after {
-    return createParsedQuestionInfo(CardType.MultiLineReversed,(arg1+"${options.multilineReversedCardSeparator}"+"\\n"+arg2.trim()),location().start.line-1,location().end.line-2);
+    return createParsedQuestionInfo(CardType.MultiLineReversed,(arg1+"${options.multilineReversedCardSeparator}\\n"+arg2.trimEnd()),location().start.line-1,location().end.line-2);
   }
 
 multiline_rev_before
@@ -167,7 +167,7 @@ multiline_rev_after
   
 close_card
   = $(multiline_before_close? close_line (multiline_after_close)? (newline annotation)?) {
-    return createParsedQuestionInfo(CardType.Cloze,text().trim(),location().start.line-1,location().end.line-1);
+    return createParsedQuestionInfo(CardType.Cloze,text().trimEnd(),location().start.line-1,location().end.line-1);
   }
 
 close_line
@@ -210,22 +210,22 @@ inline_rev_mark
   = "${options.singleLineReversedCardSeparator}"
 
 multiline_mark
-  = optional_whitespace "${options.multilineCardSeparator}" optional_whitespace newline
+  = optional_whitespaces "${options.multilineCardSeparator}" optional_whitespaces newline
 
 multiline_rev_mark
-  = optional_whitespace "${options.multilineReversedCardSeparator}" optional_whitespace newline
+  = optional_whitespaces "${options.multilineReversedCardSeparator}" optional_whitespaces newline
 
 end_card_mark
   = "${options.multilineCardEndMarker}"
 
 separator_line
-  = end_card_mark optional_whitespace newline
+  = end_card_mark optional_whitespaces newline
   
 text_line_nonterminated
   = $nonempty_text_till_newline
 
 nonempty_text_line
-  = t:$nonempty_text_till_newline nl:newline { return t.trimEnd() + nl; }
+  = nonempty_text_till_newline newline
 
 text_line
   = @$text_till_newline newline
@@ -260,7 +260,7 @@ empty_line
 nonemptyspace
   = [^ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]
 
-optional_whitespace
+optional_whitespaces
   = whitespace_char*
 
 whitespace_char = ([ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff])
