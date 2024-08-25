@@ -18,10 +18,7 @@ const parserOptions: ParserOptions = {
  * Created when the actual parser changed from returning [CardType, string, number, number] to ParsedQuestionInfo.
  * It's purpose is to minimise changes to all the test cases here during the parser()->parserEx() change.
  */
-function parse(
-    text: string,
-    options: ParserOptions,
-): [CardType, string, number, number][] {
+function parse(text: string, options: ParserOptions): [CardType, string, number, number][] {
     // for testing purposes, generate parser each time, overwriting the default one
 
     const list: ParsedQuestionInfo[] = parseEx(text, options);
@@ -98,7 +95,8 @@ test("Test parsing of multi line basic cards", () => {
     expect(parse("#flashcards/tag-on-previous-line\nQuestion\n?\nAnswer", parserOptions)).toEqual([
         [CardType.MultiLineBasic, "#flashcards/tag-on-previous-line\nQuestion\n?\nAnswer", 0, 3],
     ]);
-    expect(parse("Question\n?\nAnswer line 1\nAnswer line 2\n\n---", {
+    expect(
+        parse("Question\n?\nAnswer line 1\nAnswer line 2\n\n---", {
             singleLineCardSeparator: "::",
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
@@ -107,34 +105,48 @@ test("Test parsing of multi line basic cards", () => {
             convertHighlightsToClozes: false,
             convertBoldTextToClozes: true,
             convertCurlyBracketsToClozes: false,
-        })).toEqual([
-        [CardType.MultiLineBasic, "Question\n?\nAnswer line 1\nAnswer line 2", 0, 4],
-    ]);
-    expect(parse("Question 1\n?\nAnswer line 1\nAnswer line 2\n\n---\nQuestion 2\n?\nAnswer line 1\nAnswer line 2\n---\n", {
-            singleLineCardSeparator: "::",
-            singleLineReversedCardSeparator: ":::",
-            multilineCardSeparator: "?",
-            multilineReversedCardSeparator: "??",
-            multilineCardEndMarker: "---",
-            convertHighlightsToClozes: false,
-            convertBoldTextToClozes: true,
-            convertCurlyBracketsToClozes: false,
-        })).toEqual([
+        }),
+    ).toEqual([[CardType.MultiLineBasic, "Question\n?\nAnswer line 1\nAnswer line 2", 0, 4]]);
+    expect(
+        parse(
+            "Question 1\n?\nAnswer line 1\nAnswer line 2\n\n---\nQuestion 2\n?\nAnswer line 1\nAnswer line 2\n---\n",
+            {
+                singleLineCardSeparator: "::",
+                singleLineReversedCardSeparator: ":::",
+                multilineCardSeparator: "?",
+                multilineReversedCardSeparator: "??",
+                multilineCardEndMarker: "---",
+                convertHighlightsToClozes: false,
+                convertBoldTextToClozes: true,
+                convertCurlyBracketsToClozes: false,
+            },
+        ),
+    ).toEqual([
         [CardType.MultiLineBasic, "Question 1\n?\nAnswer line 1\nAnswer line 2", 0, 4],
-        [CardType.MultiLineBasic, "Question 2\n?\nAnswer line 1\nAnswer line 2", 6, 9]
+        [CardType.MultiLineBasic, "Question 2\n?\nAnswer line 1\nAnswer line 2", 6, 9],
     ]);
-    expect(parse("Question 1\n?\nAnswer line 1\nAnswer line 2\n\n---\nQuestion with empty line after question mark\n?\n\nAnswer line 1\nAnswer line 2\n---\n", {
-            singleLineCardSeparator: "::",
-            singleLineReversedCardSeparator: ":::",
-            multilineCardSeparator: "?",
-            multilineReversedCardSeparator: "??",
-            multilineCardEndMarker: "---",
-            convertHighlightsToClozes: false,
-            convertBoldTextToClozes: true,
-            convertCurlyBracketsToClozes: false,
-        })).toEqual([
+    expect(
+        parse(
+            "Question 1\n?\nAnswer line 1\nAnswer line 2\n\n---\nQuestion with empty line after question mark\n?\n\nAnswer line 1\nAnswer line 2\n---\n",
+            {
+                singleLineCardSeparator: "::",
+                singleLineReversedCardSeparator: ":::",
+                multilineCardSeparator: "?",
+                multilineReversedCardSeparator: "??",
+                multilineCardEndMarker: "---",
+                convertHighlightsToClozes: false,
+                convertBoldTextToClozes: true,
+                convertCurlyBracketsToClozes: false,
+            },
+        ),
+    ).toEqual([
         [CardType.MultiLineBasic, "Question 1\n?\nAnswer line 1\nAnswer line 2", 0, 4],
-        [CardType.MultiLineBasic, "Question with empty line after question mark\n?\n\nAnswer line 1\nAnswer line 2", 6, 10]
+        [
+            CardType.MultiLineBasic,
+            "Question with empty line after question mark\n?\n\nAnswer line 1\nAnswer line 2",
+            6,
+            10,
+        ],
     ]);
 });
 
@@ -148,8 +160,7 @@ test("Test parsing of multi line reversed cards", () => {
     expect(parse("Question\n??\nAnswer line 1\nAnswer line 2", parserOptions)).toEqual([
         [CardType.MultiLineReversed, "Question\n??\nAnswer line 1\nAnswer line 2", 0, 3],
     ]);
-    expect(parse("#Title\n\nLine0\nQ1\n??\nA1\nAnswerExtra\n\nQ2\n??\nA2", parserOptions)).toEqual(
-        [
+    expect(parse("#Title\n\nLine0\nQ1\n??\nA1\nAnswerExtra\n\nQ2\n??\nA2", parserOptions)).toEqual([
         [
             CardType.MultiLineReversed,
             "Line0\nQ1\n??\nA1\nAnswerExtra",
@@ -157,21 +168,9 @@ test("Test parsing of multi line reversed cards", () => {
             /* AnswerExtra */ 6,
         ],
         [CardType.MultiLineReversed, "Q2\n??\nA2", 8, 10],
-        ],
-    );
-    expect(parse("Question\n??\nAnswer line 1\nAnswer line 2\n\n---", {
-            singleLineCardSeparator: "::",
-            singleLineReversedCardSeparator: ":::",
-            multilineCardSeparator: "?",
-            multilineReversedCardSeparator: "??",
-            multilineCardEndMarker: "---",
-            convertHighlightsToClozes: true,
-            convertBoldTextToClozes: true,
-            convertCurlyBracketsToClozes: true,
-        })).toEqual([
-        [CardType.MultiLineReversed, "Question\n??\nAnswer line 1\nAnswer line 2", 0, 4],
     ]);
-    expect(parse("Question 1\n?\nAnswer line 1\nAnswer line 2\n\n---\nQuestion 2\n??\nAnswer line 1\nAnswer line 2\n---\n", {
+    expect(
+        parse("Question\n??\nAnswer line 1\nAnswer line 2\n\n---", {
             singleLineCardSeparator: "::",
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
@@ -180,9 +179,25 @@ test("Test parsing of multi line reversed cards", () => {
             convertHighlightsToClozes: true,
             convertBoldTextToClozes: true,
             convertCurlyBracketsToClozes: true,
-        })).toEqual([
+        }),
+    ).toEqual([[CardType.MultiLineReversed, "Question\n??\nAnswer line 1\nAnswer line 2", 0, 4]]);
+    expect(
+        parse(
+            "Question 1\n?\nAnswer line 1\nAnswer line 2\n\n---\nQuestion 2\n??\nAnswer line 1\nAnswer line 2\n---\n",
+            {
+                singleLineCardSeparator: "::",
+                singleLineReversedCardSeparator: ":::",
+                multilineCardSeparator: "?",
+                multilineReversedCardSeparator: "??",
+                multilineCardEndMarker: "---",
+                convertHighlightsToClozes: true,
+                convertBoldTextToClozes: true,
+                convertCurlyBracketsToClozes: true,
+            },
+        ),
+    ).toEqual([
         [CardType.MultiLineBasic, "Question 1\n?\nAnswer line 1\nAnswer line 2", 0, 4],
-        [CardType.MultiLineReversed, "Question 2\n??\nAnswer line 1\nAnswer line 2", 6, 9]
+        [CardType.MultiLineReversed, "Question 2\n??\nAnswer line 1\nAnswer line 2", 6, 9],
     ]);
 });
 
@@ -214,7 +229,8 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum ==p\ndolor won==", parserOptions)).toEqual([]);
     expect(parse("lorem ipsum ==dolor won=", parserOptions)).toEqual([]);
     // ==highlights== turned off
-    expect(parse("cloze ==deletion== test",{
+    expect(
+        parse("cloze ==deletion== test", {
             singleLineCardSeparator: "::",
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
@@ -223,9 +239,8 @@ test("Test parsing of cloze cards", () => {
             convertHighlightsToClozes: false,
             convertBoldTextToClozes: true,
             convertCurlyBracketsToClozes: false,
-        })).toEqual(
-        [],
-    );
+        }),
+    ).toEqual([]);
 
     // **bolded**
     expect(parse("cloze **deletion** test", parserOptions)).toEqual([
@@ -254,7 +269,8 @@ test("Test parsing of cloze cards", () => {
     expect(parse("lorem ipsum **p\ndolor won**", parserOptions)).toEqual([]);
     expect(parse("lorem ipsum **dolor won*", parserOptions)).toEqual([]);
     // **bolded** turned off
-    expect(parse("cloze **deletion** test", {
+    expect(
+        parse("cloze **deletion** test", {
             singleLineCardSeparator: "::",
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
@@ -263,27 +279,41 @@ test("Test parsing of cloze cards", () => {
             convertHighlightsToClozes: true,
             convertBoldTextToClozes: false,
             convertCurlyBracketsToClozes: false,
-        })).toEqual(
-        [],
-    );
+        }),
+    ).toEqual([]);
 
     // both
     expect(parse("cloze **deletion** test ==another deletion==!", parserOptions)).toEqual([
         [CardType.Cloze, "cloze **deletion** test ==another deletion==!", 0, 0],
     ]);
 
-    expect(parse("Test 1\nTest 2\nThis is a close with ===secret=== text.\nWith this extra lines\n\nAnd more here.\nAnd even more.\n\n---\n\nTest 3\nTest 4\nThis is a close with ===super secret=== text.\nWith this extra lines\n\nAnd more here.\nAnd even more.\n\n---\n\nHere is some more text.", {
-            singleLineCardSeparator: "::",
-            singleLineReversedCardSeparator: ":::",
-            multilineCardSeparator: "?",
-            multilineReversedCardSeparator: "??",
-            multilineCardEndMarker: "---",
-            convertHighlightsToClozes: true,
-            convertBoldTextToClozes: false,
-            convertCurlyBracketsToClozes: false,
-        })).toEqual([
-        [CardType.Cloze, "Test 1\nTest 2\nThis is a close with ===secret=== text.\nWith this extra lines\n\nAnd more here.\nAnd even more.", 0, 7],
-        [CardType.Cloze, "Test 3\nTest 4\nThis is a close with ===super secret=== text.\nWith this extra lines\n\nAnd more here.\nAnd even more.", 10, 17]
+    expect(
+        parse(
+            "Test 1\nTest 2\nThis is a close with ===secret=== text.\nWith this extra lines\n\nAnd more here.\nAnd even more.\n\n---\n\nTest 3\nTest 4\nThis is a close with ===super secret=== text.\nWith this extra lines\n\nAnd more here.\nAnd even more.\n\n---\n\nHere is some more text.",
+            {
+                singleLineCardSeparator: "::",
+                singleLineReversedCardSeparator: ":::",
+                multilineCardSeparator: "?",
+                multilineReversedCardSeparator: "??",
+                multilineCardEndMarker: "---",
+                convertHighlightsToClozes: true,
+                convertBoldTextToClozes: false,
+                convertCurlyBracketsToClozes: false,
+            },
+        ),
+    ).toEqual([
+        [
+            CardType.Cloze,
+            "Test 1\nTest 2\nThis is a close with ===secret=== text.\nWith this extra lines\n\nAnd more here.\nAnd even more.",
+            0,
+            7,
+        ],
+        [
+            CardType.Cloze,
+            "Test 3\nTest 4\nThis is a close with ===super secret=== text.\nWith this extra lines\n\nAnd more here.\nAnd even more.",
+            10,
+            17,
+        ],
     ]);
 });
 
