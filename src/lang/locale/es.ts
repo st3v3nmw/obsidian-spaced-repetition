@@ -124,6 +124,8 @@ Note that this setting is common to both Flashcards and Notes.`,
     MULTILINE_CARDS_SEPARATOR: "Separador para tarjetas de memorización multilínea",
     MULTILINE_REVERSED_CARDS_SEPARATOR:
         "Separador para tarjetas de memorización multilínea invertidas",
+    MULTILINE_CARDS_END_MARKER:
+        "Caracteres que denotan el fin de los clozes y tarjetas didácticas de varias líneas",
     NOTES: "Notes",
     REVIEW_PANE_ON_STARTUP: "Activar panel de revisión de notas al arrancar",
     TAGS_TO_REVIEW: "Etiquetas a revisar",
@@ -165,7 +167,9 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB_DESC:
         "Contribución máxima de la facilidad ponderada de las notas vinculadas a la facilidad inicial.",
     LOGGING: "Registro",
-    DISPLAY_DEBUG_INFO: "¿Mostrar información de depuración en la consola de desarrollador?",
+    DISPLAY_DEBUG_INFO: "¿Mostrar información de depuración en la consola de desarrollador",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Cola de notas a revisar",
