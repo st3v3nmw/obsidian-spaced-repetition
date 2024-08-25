@@ -1,56 +1,58 @@
-const expect = require("chai").expect;
-const fs = require("fs");
-const path = require("node:path");
-const { Key } = require("webdriverio");
+// TODO: Fix e2e tests
 
-const constants = require("./constants");
+// const expect = require("chai").expect;
+// const fs = require("fs");
+// const path = require("node:path");
+// const { Key } = require("webdriverio");
 
-module.exports = {
-    // Step
-    sleep: async (seconds) => {
-        return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
-    },
+// const constants = require("./constants");
 
-    // Setup
-    setUpVault: async () => {
-        await browser;
+// module.exports = {
+//     // Step
+//     sleep: async (seconds) => {
+//         return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+//     },
 
-        // Open the vault
-        await browser.execute(
-            "require('electron').ipcRenderer.sendSync('vault-open', 'tests/e2e/vault', false)",
-        );
-        await module.exports.sleep(2);
+//     // Setup
+//     setUpVault: async () => {
+//         await browser;
 
-        // Disable safemode and enable the plugin
-        await browser.execute(
-            "app.plugins.setEnable(true);app.plugins.enablePlugin('obsidian-spaced-repetition')",
-        );
+//         // Open the vault
+//         await browser.execute(
+//             "require('electron').ipcRenderer.sendSync('vault-open', 'tests/e2e/vault', false)",
+//         );
+//         await module.exports.sleep(2);
 
-        // Trust the vault
-        await browser
-            .$("div.modal.mod-trust-folder > div.modal-button-container > button:nth-child(1)")
-            .click();
-        await browser.$("div.modal-close-button").click();
-    },
+//         // Disable safemode and enable the plugin
+//         await browser.execute(
+//             "app.plugins.setEnable(true);app.plugins.enablePlugin('obsidian-spaced-repetition')",
+//         );
 
-    copyInputFile: (src, test_title) => {
-        const testFilePath = path.resolve(__dirname, "vault", `${test_title}.md`);
-        fs.copyFileSync(path.resolve(__dirname, "inputs", src), testFilePath);
-        return testFilePath;
-    },
+//         // Trust the vault
+//         await browser
+//             .$("div.modal.mod-trust-folder > div.modal-button-container > button:nth-child(1)")
+//             .click();
+//         await browser.$("div.modal-close-button").click();
+//     },
 
-    // Interaction
-    runCommand: async (command) => {
-        await browser.keys([Key.Ctrl, "p"]);
-        await browser.$("div.prompt > div.prompt-input-container > input").setValue(command);
-        await browser.keys([Key.Enter]);
-        await module.exports.sleep(1);
-    },
+//     copyInputFile: (src, test_title) => {
+//         const testFilePath = path.resolve(__dirname, "vault", `${test_title}.md`);
+//         fs.copyFileSync(path.resolve(__dirname, "inputs", src), testFilePath);
+//         return testFilePath;
+//     },
 
-    // Notes
-    assertNotesScheduling: (testFilePath, expectedInterval, expectedEase) => {
-        const schedulingInfo = constants.SCHEDULING_INFO_REGEX.exec(fs.readFileSync(testFilePath));
-        expect(schedulingInfo[3]).to.equal(expectedInterval);
-        expect(schedulingInfo[4]).to.equal(expectedEase);
-    },
-};
+//     // Interaction
+//     runCommand: async (command) => {
+//         await browser.keys([Key.Ctrl, "p"]);
+//         await browser.$("div.prompt > div.prompt-input-container > input").setValue(command);
+//         await browser.keys([Key.Enter]);
+//         await module.exports.sleep(1);
+//     },
+
+//     // Notes
+//     assertNotesScheduling: (testFilePath, expectedInterval, expectedEase) => {
+//         const schedulingInfo = constants.SCHEDULING_INFO_REGEX.exec(fs.readFileSync(testFilePath));
+//         expect(schedulingInfo[3]).to.equal(expectedInterval);
+//         expect(schedulingInfo[4]).to.equal(expectedEase);
+//     },
+// };

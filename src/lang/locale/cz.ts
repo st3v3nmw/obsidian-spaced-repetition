@@ -73,6 +73,7 @@ export default {
     FOLDERS_TO_IGNORE: "Ignorované složky",
     FOLDERS_TO_IGNORE_DESC: `Zadejte cesty ke složkám oddělené odřádkováním napříkad. Šablony Meta/Scripts.
 Note that this setting is common to both Flashcards and Notes.`,
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Kartičky",
     FLASHCARD_EASY_LABEL: "Easy Button Text",
     FLASHCARD_GOOD_LABEL: "Good Button Text",
@@ -139,6 +140,11 @@ Note that this setting is common to both Flashcards and Notes.`,
     MIN_ONE_DAY: "Počet dní musí být minimálně 1.",
     VALID_NUMBER_WARNING: "Prosím zadejte validní číslo.",
     UI_PREFERENCES: "Předvolby uživatelského rozhraní",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE:
         "Stromy balíčky by měly být zpočátku zobrazeny jako rozbalené",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:

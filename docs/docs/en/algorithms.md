@@ -2,11 +2,11 @@
 
 A learning algorithm is a formula that determines when a note or flashcard should next be reviewed.
 
-Algorithm | Status
-- | -
-[SM-2-OSR](#sm-2-osr) | Implemented
-[FSRS](#fsrs) | Planned
-[User Defined Intervals](#user-specified-intervals) | Planned
+| Algorithm                                           | Status      |
+| --------------------------------------------------- | ----------- |
+| [SM-2-OSR](#sm-2-osr)                               | Implemented |
+| [FSRS](#fsrs)                                       | Planned     |
+| [User Defined Intervals](#user-specified-intervals) | Planned     |
 
 ## SM-2-OSR
 
@@ -14,7 +14,7 @@ Algorithm | Status
 -   It supports ternary reviews i.e. a concept is either hard, good, or easy at the time of review.
 -   initial ease is weighted (using max_link_factor) depending on the average ease of linked notes, note importance, and the base ease.
 -   Anki also applies a small amount of random “fuzz” to prevent cards that were introduced at the same time and given the same ratings from sticking together and always coming up for review on the same day."
--    The algorithm is essentially the same for both notes and flashcards - apart from the PageRanks
+-   The algorithm is essentially the same for both notes and flashcards - apart from the PageRanks
 
 ### Algorithm Details
 
@@ -23,8 +23,7 @@ Algorithm | Status
     Note that this hasn't been updated in a while,
     please see the [code](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/src/scheduling.ts).
 
--   `if link_count > 0: initial_ease = (1 - link_contribution) * base_ease + link_contribution * average_ease`
-        -   `link_contribution = max_link_factor * min(1.0, log(link_count + 0.5) / log(64))` (cater for uncertainty)
+-   `if link_count > 0: initial_ease = (1 - link_contribution) * base_ease + link_contribution * average_ease` - `link_contribution = max_link_factor * min(1.0, log(link_count + 0.5) / log(64))` (cater for uncertainty)
     -   The importance of the different concepts/notes is determined using the PageRank algorithm (not all notes are created equal xD)
         -   On most occasions, the most fundamental concepts/notes have higher importance
 -   If the user reviews a concept/note as:
@@ -42,7 +41,6 @@ Algorithm | Status
 
 ---
 
-
 ## FSRS
 
 The algorithm is detailed at:
@@ -52,7 +50,6 @@ Incorporation of the FSRS algorithm into this plugin has not yet occurred. For p
 [ [FEAT] sm-2 is outdated, can you please replace it with the fsrs algorithm? #748 ](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/748)
 
 ---
-
 
 ## User Specified Intervals
 

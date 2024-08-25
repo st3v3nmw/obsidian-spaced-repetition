@@ -9,34 +9,38 @@ module.exports = {
     },
     moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node", "d.ts"],
     roots: ["<rootDir>/src/", "<rootDir>/tests/unit/"],
-    collectCoverageFrom: ["./src/**"],
+    collectCoverageFrom: ["src/**"],
     coveragePathIgnorePatterns: [
-        "/node_modules/",
-        "src/algorithms/base/ISrsAlgorithm",
-        "src/algorithms/base/RepItemScheduleInfo",
-        "src/algorithms/base/SrsAlgorithm",
-        "src/algorithms/osr/ObsidianVaultNoteLinkInfoFinder",
-        "src/dataStoreAlgorithm/DataStoreAlgorithm",
-        "src/dataStoreAlgorithm/IDataStoreAlgorithm",
-        "src/lang/locale/",
-        "src/constants",
-        "src/icons",
-        "src/gui",
-        "src/ReviewDeck.ts",
-        "src/SRFile.ts",
-        "src/declarations.d.ts",
+        // node modules & build output
+        "build/",
+        "node_modules/",
+
+        // GUI & Obsidian coupled code
+        "src/app-core.ts",
+        "src/file.ts",
+        "src/gui/",
+        "src/icons/",
         "src/main.ts",
+        "src/next-note-review-handler.ts",
+        "src/plugin-data.ts",
         "src/settings.ts",
-        "src/util/RenderMarkdownWrapper.ts",
-        "src/util/TimeTestUtil.ts",
+        "src/utils/render-markdown-wrapper.ts",
+
+        // debugging utils
+        "src/utils/time-test-util.ts",
+
+        // don't include in results
+        "src/declarations.d.ts",
+        "src/lang/locale/",
     ],
     coverageDirectory: "coverage",
     collectCoverage: true,
     coverageProvider: "v8",
     coverageThreshold: {
         global: {
-            statements: 90,
-            branches: 90,
+            // TODO: Bring coverage back up to 98%+
+            statements: 92,
+            branches: 92,
         },
     },
 };

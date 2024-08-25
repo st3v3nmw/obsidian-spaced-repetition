@@ -3,6 +3,7 @@
 A key part of spaced repetition learning is being shown the front of cards to test whether or not you recall the information on the back. There are two similar functions that perform this – [reviewing](#reviewing) & [cramming](#cramming).
 
 <div class="grid" markdown>
+
 !!! tip "Reviewing"
 
     For the selected deck, you are only shown<br/>
@@ -30,21 +31,17 @@ Although you may want to review or cram all cards across all decks, you often ma
 
 ### Operation
 
-
 ![review-operation](https://github.com/user-attachments/assets/d8f438dc-f1f0-43c4-a752-a5eeb64346e4)
 
-!!! note ""
-    # | Name | Description
-    - | - | -
-    1 | Edit | Edit the flashcard text
-    2 | Reset | Reset the review schedule information - the review interval is set to 1 day, and the ease is set to the default value
-    3 | Info | Shows the scheduling information for the card
-    4 | Skip | Skip the current card without reviewing
+!!! note "" # | Name | Description - | - | -
+1 | Edit | Edit the flashcard text
+2 | Reset | Reset the review schedule information - the review interval is set to 1 day, and the ease is set to the default value
+3 | Info | Shows the scheduling information for the card
+4 | Skip | Skip the current card without reviewing
 
 ### Context
 
 If the parent note has heading(s), the flashcard will have a title containing the context.
-
 
 Taking the following note:
 
@@ -63,14 +60,12 @@ Kenya::Nairobi
 
 Canada::Ottawa
 ```
+
 !!! tip "Context displayed"
-    ![reviewing-context](https://github.com/user-attachments/assets/2ccfc23a-a106-4133-91ec-8bd0efd0e372)
-
-
-
+![reviewing-context](https://github.com/user-attachments/assets/2ccfc23a-a106-4133-91ec-8bd0efd0e372)
 
 !!! note
-    Context is only shown if enabled in [UI Preferences](../user-options.md#ui-preferences)
+Context is only shown if enabled in [UI Preferences](../user-options.md#ui-preferences)
 
 ### Keyboard shortcuts
 
@@ -109,7 +104,7 @@ Note that you can skip a card by simply pressing `S` (case doesn't matter).
 You are shown every single card, even those that have recently been reviewed.
 By using the appropriate [command](../plugin-commands.md) have the choice of cramming cards:
 
-Cards | Command
-- | -
-Within a single note | `Spaced Repetition: Cram flashcards in this note`
-Within a deck (including all subdecks) |  `Spaced Repetition: Select a deck to cram note`
+| Cards                                  | Command                                           |
+| -------------------------------------- | ------------------------------------------------- |
+| Within a single note                   | `Spaced Repetition: Cram flashcards in this note` |
+| Within a deck (including all subdecks) | `Spaced Repetition: Select a deck to cram note`   |

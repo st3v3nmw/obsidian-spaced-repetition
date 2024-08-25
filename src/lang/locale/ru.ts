@@ -82,6 +82,7 @@ export default {
     FOLDERS_TO_IGNORE: "Игнорируемые папки",
     FOLDERS_TO_IGNORE_DESC: `Укажите пути папок, каждый на своей строке, например: Templates Meta/Scripts.
 Note that this setting is common to both Flashcards and Notes.`,
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Карточки",
     FLASHCARD_EASY_LABEL: 'Текст кнопки "Легко"',
     FLASHCARD_GOOD_LABEL: 'Текст кнопки "Нормально"',
@@ -150,6 +151,11 @@ Note that this setting is common to both Flashcards and Notes.`,
     MIN_ONE_DAY: "Количество дней не меньше 1.",
     VALID_NUMBER_WARNING: "Пожалуйста, введите подходящее число.",
     UI_PREFERENCES: "Пользовательский интерфейс - Настройки",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE:
         "Деревья колод должны изначально отображаться как развернутые",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:

@@ -1,10 +1,7 @@
 build
 coverage
 node_modules
-.yarn
-.pnp.cjs
-.pnp.loader.mjs
 pnpm-lock.yaml
 tests/e2e/vault/
-tests/vaults
-docs
+tests/vaults/
+docs/user-doco-vault/

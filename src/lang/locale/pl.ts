@@ -73,6 +73,7 @@ export default {
     FOLDERS_TO_IGNORE: "Foldery do zignorowania",
     FOLDERS_TO_IGNORE_DESC: `Wprowadź ścieżki folderów oddzielone nowymi liniami, np. Szablony Meta/Scripts.
 Note that this setting is common to both Flashcards and Notes.`,
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Fiszki",
     FLASHCARD_EASY_LABEL: "Tekst przycisku Łatwe",
     FLASHCARD_GOOD_LABEL: "Tekst przycisku Średnio trudne",
@@ -144,6 +145,11 @@ Note that this setting is common to both Flashcards and Notes.`,
     MIN_ONE_DAY: "Liczba dni musi wynosić co najmniej 1.",
     VALID_NUMBER_WARNING: "Podaj prawidłową liczbę.",
     UI_PREFERENCES: "Preferencje interfejsu użytkownika",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Podtalie powinny być początkowo wyświetlane rozszerzone",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "Wyłącz to, aby zwinąć zagnieżdżone talie w tej samej karcie. Przydatne, jeśli karty należą do wielu talii w tym samym pliku.",
