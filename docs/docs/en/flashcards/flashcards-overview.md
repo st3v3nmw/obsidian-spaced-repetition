@@ -56,6 +56,18 @@ If there are multiple cards defined by a single flashcard, those cards are known
 A special scheduling option is available for the review of sibling cards. If the [Bury sibling cards until the next day]( ../user-options.md#flashcard-review) setting is turned on, 
 only one sibling card is available for review on a single day.
 
+### Including Blank Lines within Multiline and Cloze Flashcards
+
+By default, [Multi-line Basic](qanda-cards.md#multi-line-basic), [Multi-line Bidirectional](qanda-cards.md#multi-line-bidirectional) 
+and [Cloze](basic-cloze-cards.md) type flashcards recognize a blank line as the end of the flashcard text.
+This means that blank lines can not be included within the text.
+
+If blank lines need to be included (e.g. on a card containing a markdown table), the
+`Characters denoting the end of clozes and multiline flashcards` [setting](../user-options.md#flashcard-separators)
+needs to be changed.
+
+For example, it could be changed to `+++`.
+
 ---
 
 
