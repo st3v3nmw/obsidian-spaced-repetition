@@ -104,7 +104,8 @@ the answer
 
 
 These can also span over multiple lines as long as both sides "touch" the `?`.
-To include blank lines, see the section below.
+
+See [Cards with Blank Lines](cards-with-blank-lines.md) if blank lines need to be included.
 
 
 

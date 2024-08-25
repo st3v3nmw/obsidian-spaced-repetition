@@ -58,15 +58,10 @@ only one sibling card is available for review on a single day.
 
 ### Including Blank Lines within Multiline and Cloze Flashcards
 
-By default, [Multi-line Basic](qanda-cards.md#multi-line-basic), [Multi-line Bidirectional](qanda-cards.md#multi-line-bidirectional) 
-and [Cloze](basic-cloze-cards.md) type flashcards recognize a blank line as the end of the flashcard text.
+By default, the end of a multiline flashcard is denoted by a blank line at the end of the flashcard text.
 This means that blank lines can not be included within the text.
 
-If blank lines need to be included (e.g. on a card containing a markdown table), the
-`Characters denoting the end of clozes and multiline flashcards` [setting](../user-options.md#flashcard-separators)
-needs to be changed.
-
-For example, it could be changed to `+++`.
+See [Cards with Blank Lines](cards-with-blank-lines.md) if blank lines need to be included.
 
 ---
 
