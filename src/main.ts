@@ -43,6 +43,8 @@ import { OsrSidebar } from "./gui/OsrSidebar";
 import { ObsidianVaultNoteLinkInfoFinder } from "./algorithms/osr/ObsidianVaultNoteLinkInfoFinder";
 import { StatsModal } from "./gui/StatsModal";
 import { FlashcardModal } from "./gui/FlashcardModal";
+import { setDebugParser } from "./parser";
+import { generateParser } from "./generateParser";
 
 export default class SRPlugin extends Plugin {
     private statusBar: HTMLElement;
@@ -50,6 +52,8 @@ export default class SRPlugin extends Plugin {
     private osrAppCore: OsrAppCore;
     private osrSidebar: OsrSidebar;
     private nextNoteReviewHandler: NextNoteReviewHandler;
+
+    private debouncedGenerateParserTimeout: number | null = null;
 
     async onload(): Promise<void> {
         console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-07-24");
@@ -440,6 +444,7 @@ export default class SRPlugin extends Plugin {
         if (loadedData?.settings) upgradeSettings(loadedData.settings);
         this.data = Object.assign({}, DEFAULT_DATA, loadedData);
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
+        setDebugParser(this.data.settings.showPaserDebugMessages);
 
         this.setupDataStoreAndAlgorithmInstances(this.data.settings);
     }
@@ -453,5 +458,26 @@ export default class SRPlugin extends Plugin {
 
     async savePluginData(): Promise<void> {
         await this.saveData(this.data);
+    }
+
+    async debouncedGenerateParser(timeout_ms = 250) {
+        if (this.debouncedGenerateParserTimeout) {
+            clearTimeout(this.debouncedGenerateParserTimeout);
+        }
+
+        this.debouncedGenerateParserTimeout = window.setTimeout(async () => {
+            const parserOptions = {
+                singleLineCardSeparator: this.data.settings.singleLineCardSeparator,
+                singleLineReversedCardSeparator: this.data.settings.singleLineReversedCardSeparator,
+                multilineCardSeparator: this.data.settings.multilineCardSeparator,
+                multilineReversedCardSeparator: this.data.settings.multilineReversedCardSeparator,
+                multilineCardEndMarker: this.data.settings.multilineCardEndMarker,
+                convertHighlightsToClozes: this.data.settings.convertHighlightsToClozes,
+                convertBoldTextToClozes: this.data.settings.convertBoldTextToClozes,
+                convertCurlyBracketsToClozes: this.data.settings.convertCurlyBracketsToClozes,
+            };
+            generateParser(parserOptions);
+            this.debouncedGenerateParserTimeout = null;
+        }, timeout_ms);
     }
 }

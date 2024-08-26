@@ -127,6 +127,8 @@ Note that this setting is common to both Flashcards and Notes.`,
     INLINE_REVERSED_CARDS_SEPARATOR: "Separatore per schede all'incontrario sulla stessa riga",
     MULTILINE_CARDS_SEPARATOR: "Separatore per schede su più righe",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Separatore per schede all'incontrario su più righe",
+    MULTILINE_CARDS_END_MARKER:
+        "Caratteri che denotano la fine di carte con spazi da riempiere e carte multilinea",
     NOTES: "Note",
     REVIEW_PANE_ON_STARTUP: "Abilita il pannello di revisione note all'avvio",
     TAGS_TO_REVIEW: "Etichette da rivedere",
@@ -168,7 +170,9 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB_DESC:
         "Contributo massimo della difficoltà pasata delle note collegate alla difficoltà iniziale.",
     LOGGING: "Registrando",
-    DISPLAY_DEBUG_INFO: "Visualizza informazione di debug sulla console per sviluppatori?",
+    DISPLAY_DEBUG_INFO: "Visualizza informazione di debug sulla console per sviluppatori",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Visualizza informazione di debug riguardanti il parser sulla console per sviluppatori",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Coda di note da rivedere",

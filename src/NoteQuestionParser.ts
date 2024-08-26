@@ -3,7 +3,7 @@ import { DataStore } from "./dataStore/base/DataStore";
 import { TagCache } from "obsidian";
 import { Question, QuestionText } from "./Question";
 import { Card } from "./Card";
-import { parseEx, ParsedQuestionInfo } from "./parser";
+import { parseEx, ParsedQuestionInfo, ParserOptions } from "./parser";
 import { CardFrontBack, CardFrontBackUtil } from "./QuestionType";
 import { SRSettings, SettingsUtil } from "./settings";
 import { ISRFile, frontmatterTagPseudoLineNum } from "./SRFile";
@@ -140,17 +140,18 @@ export class NoteQuestionParser {
 
     private parseQuestions(): ParsedQuestionInfo[] {
         // We pass contentText which has the frontmatter blanked out; see extractFrontmatter for reasoning
-        const settings: SRSettings = this.settings;
-        const result: ParsedQuestionInfo[] = parseEx(
-            this.contentText,
-            settings.singleLineCardSeparator,
-            settings.singleLineReversedCardSeparator,
-            settings.multilineCardSeparator,
-            settings.multilineReversedCardSeparator,
-            settings.convertHighlightsToClozes,
-            settings.convertBoldTextToClozes,
-            settings.convertCurlyBracketsToClozes,
-        );
+        const parserOptions: ParserOptions = {
+            singleLineCardSeparator:this.settings.singleLineCardSeparator,
+            singleLineReversedCardSeparator: this.settings.singleLineReversedCardSeparator,
+            multilineCardSeparator: this.settings.multilineCardSeparator,
+            multilineReversedCardSeparator: this.settings.multilineReversedCardSeparator,
+            multilineCardEndMarker: this.settings.multilineCardEndMarker,
+            convertHighlightsToClozes: this.settings.convertHighlightsToClozes,
+            convertBoldTextToClozes: this.settings.convertBoldTextToClozes,
+            convertCurlyBracketsToClozes: this.settings.convertCurlyBracketsToClozes,
+        };
+
+        const result: ParsedQuestionInfo[] = parseEx(this.contentText, parserOptions);
         return result;
     }
 

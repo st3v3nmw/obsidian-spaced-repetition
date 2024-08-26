@@ -56,6 +56,13 @@ If there are multiple cards defined by a single flashcard, those cards are known
 A special scheduling option is available for the review of sibling cards. If the [Bury sibling cards until the next day]( ../user-options.md#flashcard-review) setting is turned on, 
 only one sibling card is available for review on a single day.
 
+### Including Blank Lines within Multiline and Cloze Flashcards
+
+By default, the end of a multiline flashcard is denoted by a blank line at the end of the flashcard text.
+This means that blank lines can not be included within the text.
+
+See [Cards with Blank Lines](cards-with-blank-lines.md) if blank lines need to be included.
+
 ---
 
 
