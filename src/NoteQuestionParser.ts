@@ -141,7 +141,7 @@ export class NoteQuestionParser {
     private parseQuestions(): ParsedQuestionInfo[] {
         // We pass contentText which has the frontmatter blanked out; see extractFrontmatter for reasoning
         const parserOptions: ParserOptions = {
-            singleLineCardSeparator:this.settings.singleLineCardSeparator,
+            singleLineCardSeparator: this.settings.singleLineCardSeparator,
             singleLineReversedCardSeparator: this.settings.singleLineReversedCardSeparator,
             multilineCardSeparator: this.settings.multilineCardSeparator,
             multilineReversedCardSeparator: this.settings.multilineReversedCardSeparator,
