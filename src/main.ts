@@ -391,6 +391,18 @@ export default class SRPlugin extends Plugin {
             ) {
                 continue;
             }
+            const fileCachedData = this.app.metadataCache.getFileCache(noteFile) || {};
+
+            const frontmatter: FrontMatterCache | Record<string, unknown> =
+                fileCachedData.frontmatter || {};
+            const tags = getAllTags(fileCachedData) || [];
+            if (
+                this.data.settings.tagsToIgnore.some((igntag) =>
+                    tags.some((notetag) => notetag.startsWith(igntag)),
+                )
+            ) {
+                continue;
+            }
 
             if (this.incomingLinks[noteFile.path] === undefined) {
                 this.incomingLinks[noteFile.path] = [];
@@ -424,11 +436,6 @@ export default class SRPlugin extends Plugin {
                     this.easeByPath.setEaseForPath(note.filePath, flashcardsInNoteAvgEase);
                 }
             }
-            const fileCachedData = this.app.metadataCache.getFileCache(noteFile) || {};
-
-            const frontmatter: FrontMatterCache | Record<string, unknown> =
-                fileCachedData.frontmatter || {};
-            const tags = getAllTags(fileCachedData) || [];
 
             let shouldIgnore = true;
             const matchedNoteTags = [];
@@ -594,7 +601,14 @@ export default class SRPlugin extends Plugin {
             new Notice(t("NOTE_IN_IGNORED_FOLDER"));
             return;
         }
-
+        if (
+            this.data.settings.tagsToIgnore.some((igntag) =>
+                tags.some((notetag) => notetag.startsWith(igntag)),
+            )
+        ) {
+            new Notice(t("NOTE_IN_IGNORED_TAGS"));
+            return;
+        }
         let shouldIgnore = true;
         for (const tag of tags) {
             if (

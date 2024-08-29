@@ -3,6 +3,7 @@ import type SRPlugin from "src/main";
 import { t } from "src/lang/helpers";
 import { TabStructure, createTabs } from "./gui/Tabs";
 import { setDebugParser } from "./parser";
+import { addignoreSetting } from "./settings/ignoreSetting";
 
 export interface SRSettings {
     // flashcards
@@ -32,6 +33,7 @@ export interface SRSettings {
     enableNoteReviewPaneOnStartup: boolean;
     tagsToReview: string[];
     noteFoldersToIgnore: string[];
+    tagsToIgnore: string[];
     openRandomNote: boolean;
     autoNextNote: boolean;
     disableFileMenuReviewOptions: boolean;
@@ -78,6 +80,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     enableNoteReviewPaneOnStartup: true,
     tagsToReview: ["#review"],
     noteFoldersToIgnore: [],
+    tagsToIgnore: [],
     openRandomNote: false,
     autoNextNote: false,
     disableFileMenuReviewOptions: false,
@@ -129,7 +132,7 @@ export class SettingsUtil {
 
 // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
 let applyDebounceTimer = 0;
-function applySettingsUpdate(callback: () => void): void {
+export function applySettingsUpdate(callback: () => void): void {
     clearTimeout(applyDebounceTimer);
     applyDebounceTimer = window.setTimeout(callback, 512);
 }
@@ -231,6 +234,7 @@ export class SRSettingTab extends PluginSettingTab {
                         }),
                 );
             this.createSetting_FoldersToIgnore(containerEl);
+            addignoreSetting(containerEl.createDiv(), this.plugin);
         }
 
         containerEl.createEl("h3", { text: t("GROUP_FLASHCARD_REVIEW") });
@@ -515,6 +519,7 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         this.createSetting_FoldersToIgnore(containerEl);
+        addignoreSetting(containerEl.createDiv(), this.plugin);
 
         new Setting(containerEl)
             .setName(t("OPEN_RANDOM_NOTE"))

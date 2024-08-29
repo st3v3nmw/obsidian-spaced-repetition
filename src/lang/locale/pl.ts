@@ -36,6 +36,7 @@ export default {
     STATUS_BAR: "Przeglądaj: ${dueNotesCount} notatek, ${dueFlashcardsCount} fiszek z terminem",
     SYNC_TIME_TAKEN: "Synchronizacja zajęła ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "Notatka jest zapisana w folderze zignorowanym (sprawdź ustawienia).",
+    NOTE_IN_IGNORED_TAGS: "Note is saved with ignored tag (check settings).",
     PLEASE_TAG_NOTE: "Proszę odpowiednio otagować notatkę do przeglądu (w ustawieniach).",
     RESPONSE_RECEIVED: "Otrzymano odpowiedź.",
     NO_DECK_EXISTS: "Nie istnieje talia o nazwie ${deckName}",
@@ -72,6 +73,9 @@ export default {
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Foldery do zignorowania",
     FOLDERS_TO_IGNORE_DESC: `Wprowadź ścieżki folderów oddzielone nowymi liniami, np. Szablony Meta/Scripts.
+Note that this setting is common to both Flashcards and Notes.`,
+    TAGS_TO_IGNORE: "Tags to ignore",
+    TAGS_TO_IGNORE_DESC: `Enter tags separated by newlines i.e. #excalidraw.
 Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARDS: "Fiszki",
     FLASHCARD_EASY_LABEL: "Tekst przycisku Łatwe",

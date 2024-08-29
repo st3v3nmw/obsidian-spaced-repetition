@@ -36,6 +36,7 @@ export default {
     STATUS_BAR: "Revisar: ${dueNotesCount} nota(s), ${dueFlashcardsCount} tarjetas vencidas",
     SYNC_TIME_TAKEN: "La sincronización tomó ${t} milisegundos",
     NOTE_IN_IGNORED_FOLDER: "La nota está guardada en un directorio ignorado (revisa los ajustes).",
+    NOTE_IN_IGNORED_TAGS: "Note is saved with ignored tag (check settings).",
     PLEASE_TAG_NOTE: "Por favor etiquete apropiadamente la nota para revisión (en los ajustes).",
     RESPONSE_RECEIVED: "Respuesta Recibida",
     NO_DECK_EXISTS: "No existen mazos para: ${deckName}",
@@ -72,6 +73,9 @@ export default {
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Directorios a ignorar",
     FOLDERS_TO_IGNORE_DESC: `Escriba las rutas de los directorios separadas por saltos de línea, por ejemplo, Plantillas Extra/Guiones.
+Note that this setting is common to both Flashcards and Notes.`,
+    TAGS_TO_IGNORE: "Tags to ignore",
+    TAGS_TO_IGNORE_DESC: `Enter tags separated by newlines i.e. #excalidraw.
 Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARDS: "Tarjetas de Memorización",
     FLASHCARD_EASY_LABEL: "Texto del botón: Fácil",

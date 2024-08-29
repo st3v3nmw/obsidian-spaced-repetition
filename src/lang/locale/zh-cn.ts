@@ -32,10 +32,11 @@ export default {
     REVIEW_CARDS_IN_NOTE: "复习此笔记中的卡片",
     CRAM_CARDS_IN_NOTE: "集中复习此笔记中的卡片",
     VIEW_STATS: "查看数据",
-    OPEN_REVIEW_QUEUE_VIEW: "Open Notes Review Queue in sidebar",
+    OPEN_REVIEW_QUEUE_VIEW: "打开侧边栏的笔记复习队列",
     STATUS_BAR: "复习: ${dueNotesCount} 笔记, ${dueFlashcardsCount} 卡片已到期",
     SYNC_TIME_TAKEN: "同步时间 ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "笔记保存在已被忽略的路径中（检查设置选项）。",
+    NOTE_IN_IGNORED_TAGS: "保存的笔记带有已被忽略的标签（检查设置选项）。",
     PLEASE_TAG_NOTE: "请将需要复习的笔记中加入正确的标签（检查设置选项）。",
     RESPONSE_RECEIVED: "反馈已收到",
     NO_DECK_EXISTS: "没有 ${deckName} 卡组",
@@ -73,6 +74,9 @@ export default {
     FOLDERS_TO_IGNORE: "忽略此文件夹",
     FOLDERS_TO_IGNORE_DESC: `输入文件夹路径，用新建行分隔，例如：Templates Meta/Scripts.
 Note that this setting is common to both Flashcards and Notes.`,
+    TAGS_TO_IGNORE: "忽略此标签",
+    TAGS_TO_IGNORE_DESC: `输入标签，用新建行分隔，例如： #excalidraw.
+    注意卡片与笔记共用该项设置。`,
     FLASHCARDS: "卡片",
     FLASHCARD_EASY_LABEL: "“简单”按钮文本",
     FLASHCARD_GOOD_LABEL: "“记得”按钮文本",

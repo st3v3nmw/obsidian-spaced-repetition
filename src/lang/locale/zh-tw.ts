@@ -32,10 +32,11 @@ export default {
     REVIEW_ALL_CARDS: "復習所有筆記中的卡片",
     CRAM_CARDS_IN_NOTE: "不計難易度復習此筆記中的卡片",
     VIEW_STATS: "檢視數據",
-    OPEN_REVIEW_QUEUE_VIEW: "Open Notes Review Queue in sidebar",
+    OPEN_REVIEW_QUEUE_VIEW: "打開側邊欄的筆記復習序列",
     STATUS_BAR: "復習: ${dueNotesCount} 筆記, ${dueFlashcardsCount} 卡片已到期",
     SYNC_TIME_TAKEN: "同步時間 ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "筆記儲存在已被忽略的路徑中（檢查設定選項）。",
+    NOTE_IN_IGNORED_TAGS: "儲存的筆記带有已被忽略的標籤（檢查設定選項）。",
     PLEASE_TAG_NOTE: "請將需要復習的筆記中加入正確的標籤（檢查設定選項）。",
     RESPONSE_RECEIVED: "回饋已收到",
     NO_DECK_EXISTS: "沒有 ${deckName} 牌組",
@@ -73,6 +74,9 @@ export default {
     FOLDERS_TO_IGNORE: "忽略此資料夾",
     FOLDERS_TO_IGNORE_DESC: `輸入資料夾路徑（用換行字元分隔），例如：Templates Meta/Scripts.
 Note that this setting is common to both Flashcards and Notes.`,
+    TAGS_TO_IGNORE: "忽略此標籤",
+    TAGS_TO_IGNORE_DESC: `輸入標籤，用換行字元分隔，例如： #excalidraw .
+注意闪卡與筆記共用該項設置。`,
     FLASHCARDS: "卡片",
     FLASHCARD_EASY_LABEL: "簡單按鈕文字",
     FLASHCARD_GOOD_LABEL: "記得按鈕文字",

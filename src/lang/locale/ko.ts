@@ -36,6 +36,7 @@ export default {
     STATUS_BAR: "--리뷰: ${dueNotesCount} 노트, ${dueFlashcardsCount} 카드 남았습니다.",
     SYNC_TIME_TAKEN: "동기화에 ${t}밀리초 걸렸습니다",
     NOTE_IN_IGNORED_FOLDER: "노트가 무시된 폴더 아래에 저장되어 있습니다. (설정을 확인해주세요)",
+    NOTE_IN_IGNORED_TAGS: "Note is saved with ignored tag (check settings).",
     PLEASE_TAG_NOTE: "리뷰를 하기위해 노트에 적절히 태그해주세요. (설정을 확인해주세요)",
     RESPONSE_RECEIVED: "요청이 완료되었습니다",
     NO_DECK_EXISTS: "${deckName}이라는 이름의 덱이 존재하지 않습니다.",
@@ -72,6 +73,9 @@ export default {
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "무시할 폴더들",
     FOLDERS_TO_IGNORE_DESC: `폴더 경로를 빈 줄로 구분해서 입력해주세요. 'Templates Meta/Scripts' 와 같이 입력하는 것은 유효하지 않습니다.
+Note that this setting is common to both Flashcards and Notes.`,
+    TAGS_TO_IGNORE: "Tags to ignore",
+    TAGS_TO_IGNORE_DESC: `Enter tags separated by newlines i.e. #excalidraw.
 Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARDS: "플래시카드",
     FLASHCARD_EASY_LABEL: "Easy Button Text",

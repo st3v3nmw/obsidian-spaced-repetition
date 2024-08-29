@@ -36,6 +36,7 @@ export default {
     STATUS_BAR: "Review: ${dueNotesCount} note(s), ${dueFlashcardsCount} card(s) due",
     SYNC_TIME_TAKEN: "Sync took ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "Note is saved under ignored folder (check settings).",
+    NOTE_IN_IGNORED_TAGS: "Note is saved with ignored tag (check settings).",
     PLEASE_TAG_NOTE: "Please tag the note appropriately for reviewing (in settings).",
     RESPONSE_RECEIVED: "Response received.",
     NO_DECK_EXISTS: "No deck exists for ${deckName}",
@@ -72,6 +73,9 @@ export default {
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Folders to ignore",
     FOLDERS_TO_IGNORE_DESC: `Enter folder paths separated by newlines e.g. Templates Meta/Scripts.
+Note that this setting is common to both Flashcards and Notes.`,
+    TAGS_TO_IGNORE: "Tags to ignore",
+    TAGS_TO_IGNORE_DESC: `Enter tags separated by newlines i.e. #excalidraw.
 Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARDS: "Flashcards",
     FLASHCARD_EASY_LABEL: "Easy Button Text",

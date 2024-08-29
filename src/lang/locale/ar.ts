@@ -36,6 +36,7 @@ export default {
     STATUS_BAR: "البطاقات المستحقة ${dueFlashcardsCount},ملاحظات ${dueNotesCount}:مراجعة",
     SYNC_TIME_TAKEN: "${t}ms استغراق المزامنة",
     NOTE_IN_IGNORED_FOLDER: ".الملاحظة يتم حفظها ضمن المجلد الذي تم تجاهله (تحقق من الإعدادات)",
+    NOTE_IN_IGNORED_TAGS: "Note is saved with ignored tag (check settings).",
     PLEASE_TAG_NOTE: ".يرجى وضع وسم على الملاحظة بشكل مناسب للمراجعة (في الإعدادات)",
     RESPONSE_RECEIVED: ".استُلمت الاستجابة",
     NO_DECK_EXISTS: "${deckName} لا يوجد رُزمَة",
@@ -73,6 +74,9 @@ export default {
     FOLDERS_TO_IGNORE: "مجلدات لتجاهلها",
     FOLDERS_TO_IGNORE_DESC: `Templates Meta/Scripts.
 Note that this setting is common to both Flashcards and Notes. : أدخل مسارات المجلد مفصولة بواسطة سطور جديدة,مثال`,
+    TAGS_TO_IGNORE: "Tags to ignore",
+    TAGS_TO_IGNORE_DESC: `Enter tags separated by newlines i.e. #excalidraw.
+Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARDS: "البطاقات",
     FLASHCARD_EASY_LABEL: "نص الزر سهل",
     FLASHCARD_GOOD_LABEL: "نص الزر جيد",

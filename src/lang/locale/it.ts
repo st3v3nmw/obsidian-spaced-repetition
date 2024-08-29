@@ -36,6 +36,7 @@ export default {
     STATUS_BAR: "Da rivedere: ${dueNotesCount} scheda/e, ${dueFlashcardsCount} schede in ritardo",
     SYNC_TIME_TAKEN: "Sincronizzato in ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "La nota è salvata in una cartella ignorata (rivedi le impostazioni).",
+    NOTE_IN_IGNORED_TAGS: "Note is saved with ignored tag (check settings).",
     PLEASE_TAG_NOTE:
         "Per favore etichetta la nota appropriatamente per la revisione (nelle impostazioni).",
     RESPONSE_RECEIVED: "Risposta ricevuta.",
@@ -73,6 +74,9 @@ export default {
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Cartelle da ignorare",
     FOLDERS_TO_IGNORE_DESC: `Inserisci i percorsi delle cartelle separati da a capo, per esempio, Templates Meta/Scripts.
+Note that this setting is common to both Flashcards and Notes.`,
+    TAGS_TO_IGNORE: "Tags to ignore",
+    TAGS_TO_IGNORE_DESC: `Enter tags separated by newlines i.e. #excalidraw.
 Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARDS: "Schede",
     FLASHCARD_EASY_LABEL: "Testo del bottone facile",

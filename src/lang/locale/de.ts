@@ -41,6 +41,7 @@ export default {
     SYNC_TIME_TAKEN: "Synchronisierung dauerte ${t}ms",
     NOTE_IN_IGNORED_FOLDER:
         "Notiz befindet sich in einem ausgeschlossenen Ordner (siehe Einstellungen).",
+    NOTE_IN_IGNORED_TAGS: "Note is saved with ignored tag (check settings).",
     PLEASE_TAG_NOTE:
         "Bitte die Notiz für Wiederholungen entsprechend taggen (siehe Einstellungen).",
     RESPONSE_RECEIVED: "Antwort erhalten.",
@@ -78,6 +79,9 @@ export default {
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Ausgeschlossene Ordner",
     FOLDERS_TO_IGNORE_DESC: `Mehrere Ordner mit Zeilenumbrüchen getrennt angeben. Bsp. OrdnerA[Zeilenumbruch]OrdnerB/Unterordner.
+Note that this setting is common to both Flashcards and Notes.`,
+    TAGS_TO_IGNORE: "Tags to ignore",
+    TAGS_TO_IGNORE_DESC: `Enter tags separated by newlines i.e. #excalidraw.
 Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARDS: "Lernkarten",
     FLASHCARD_EASY_LABEL: "Einfach Knopf Text",

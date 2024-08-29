@@ -36,6 +36,7 @@ export default {
     STATUS_BAR: "Revize: ${dueNotesCount} poznámek, ${dueFlashcardsCount} kartiček po termínu",
     SYNC_TIME_TAKEN: "Synchronizace trvala ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "Poznámka je uložena v ignorované složce (zkontrolujte nastavení).",
+    NOTE_IN_IGNORED_TAGS: "Note is saved with ignored tag (check settings).",
     PLEASE_TAG_NOTE: "Prosím označne poznámku odpovídajícím tagem pro revizi (v nastavení).",
     RESPONSE_RECEIVED: "Odpověď přijata.",
     NO_DECK_EXISTS: "Neexistuje žádný balíček pro ${deckName}",
@@ -72,6 +73,9 @@ export default {
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Ignorované složky",
     FOLDERS_TO_IGNORE_DESC: `Zadejte cesty ke složkám oddělené odřádkováním napříkad. Šablony Meta/Scripts.
+Note that this setting is common to both Flashcards and Notes.`,
+    TAGS_TO_IGNORE: "Tags to ignore",
+    TAGS_TO_IGNORE_DESC: `Enter tags separated by newlines i.e. #excalidraw.
 Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARDS: "Kartičky",
     FLASHCARD_EASY_LABEL: "Easy Button Text",

@@ -45,6 +45,7 @@ export default {
     STATUS_BAR: "Повторить: ${dueNotesCount} заметок, ${dueFlashcardsCount} карточек",
     SYNC_TIME_TAKEN: "Синхронизация заняла ${t}мс",
     NOTE_IN_IGNORED_FOLDER: "Заметка сохранена в игнорируемую папку (см. настройки).",
+    NOTE_IN_IGNORED_TAGS: "Note is saved with ignored tag (check settings).",
     PLEASE_TAG_NOTE: "Для изучения, пожалуйста, правильно пометьте заметку тегом (см. настройки).",
     RESPONSE_RECEIVED: "Ответ получен.",
     NO_DECK_EXISTS: "Не существует уровня ${deckName}",
@@ -81,6 +82,9 @@ export default {
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Игнорируемые папки",
     FOLDERS_TO_IGNORE_DESC: `Укажите пути папок, каждый на своей строке, например: Templates Meta/Scripts.
+Note that this setting is common to both Flashcards and Notes.`,
+    TAGS_TO_IGNORE: "Tags to ignore",
+    TAGS_TO_IGNORE_DESC: `Enter tags separated by newlines i.e. #excalidraw.
 Note that this setting is common to both Flashcards and Notes.`,
     FLASHCARDS: "Карточки",
     FLASHCARD_EASY_LABEL: 'Текст кнопки "Легко"',
