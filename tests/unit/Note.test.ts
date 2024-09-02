@@ -6,9 +6,15 @@ import { DEFAULT_SETTINGS } from "src/settings";
 import { NoteFileLoader } from "src/NoteFileLoader";
 import { TextDirection } from "src/util/TextDirection";
 import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
+import { NoteEaseList } from "src/NoteEaseList";
+import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
 
 let parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 var noteFileLoader: NoteFileLoader = new NoteFileLoader(DEFAULT_SETTINGS);
+
+beforeAll(() => {
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+});
 
 describe("appendCardsToDeck", () => {
     test("Multiple questions, single card per question", async () => {

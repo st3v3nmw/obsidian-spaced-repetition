@@ -1,13 +1,16 @@
 import { Card } from "./Card";
 import { CardListType, Deck } from "./Deck";
 import { Question, QuestionText } from "./Question";
-import { ReviewResponse } from "./scheduling";
 import { SRSettings } from "./settings";
 import { TopicPath } from "./TopicPath";
-import { CardScheduleInfo, ICardScheduleCalculator } from "./CardSchedule";
 import { Note } from "./Note";
 import { IDeckTreeIterator } from "./DeckTreeIterator";
 import { IQuestionPostponementList } from "./QuestionPostponementList";
+import { ISrsAlgorithm } from "./algorithms/base/ISrsAlgorithm";
+import { ReviewResponse } from "./algorithms/base/RepetitionItem";
+import { RepItemScheduleInfo } from "./algorithms/base/RepItemScheduleInfo";
+import { DataStore } from "./dataStore/base/DataStore";
+import { DueDateHistogram } from "./DueDateHistogram";
 
 export interface IFlashcardReviewSequencer {
     get hasCurrentCard(): boolean;
@@ -21,7 +24,7 @@ export interface IFlashcardReviewSequencer {
     setCurrentDeck(topicPath: TopicPath): void;
     getDeckStats(topicPath: TopicPath): DeckStats;
     skipCurrentCard(): void;
-    determineCardSchedule(response: ReviewResponse, card: Card): CardScheduleInfo;
+    determineCardSchedule(response: ReviewResponse, card: Card): RepItemScheduleInfo;
     processReview(response: ReviewResponse): Promise<void>;
     updateCurrentQuestionText(text: string): Promise<void>;
 }
@@ -53,21 +56,24 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     private reviewMode: FlashcardReviewMode;
     private cardSequencer: IDeckTreeIterator;
     private settings: SRSettings;
-    private cardScheduleCalculator: ICardScheduleCalculator;
+    private srsAlgorithm: ISrsAlgorithm;
     private questionPostponementList: IQuestionPostponementList;
+    private dueDateFlashcardHistogram: DueDateHistogram;
 
     constructor(
         reviewMode: FlashcardReviewMode,
         cardSequencer: IDeckTreeIterator,
         settings: SRSettings,
-        cardScheduleCalculator: ICardScheduleCalculator,
+        srsAlgorithm: ISrsAlgorithm,
         questionPostponementList: IQuestionPostponementList,
+        dueDateFlashcardHistogram: DueDateHistogram,
     ) {
         this.reviewMode = reviewMode;
         this.cardSequencer = cardSequencer;
         this.settings = settings;
-        this.cardScheduleCalculator = cardScheduleCalculator;
+        this.srsAlgorithm = srsAlgorithm;
         this.questionPostponementList = questionPostponementList;
+        this.dueDateFlashcardHistogram = dueDateFlashcardHistogram;
     }
 
     get hasCurrentCard(): boolean {
@@ -147,7 +153,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             this.currentCard.scheduleInfo = this.determineCardSchedule(response, this.currentCard);
 
             // Update the source file with the updated schedule
-            await this.currentQuestion.writeQuestion(this.settings);
+            await DataStore.getInstance().questionWriteSchedule(this.currentQuestion);
         }
 
         // Move/delete the card
@@ -183,24 +189,26 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         }
     }
 
-    determineCardSchedule(response: ReviewResponse, card: Card): CardScheduleInfo {
-        let result: CardScheduleInfo;
+    determineCardSchedule(response: ReviewResponse, card: Card): RepItemScheduleInfo {
+        let result: RepItemScheduleInfo;
 
         if (response == ReviewResponse.Reset) {
             // Resetting the card schedule
-            result = this.cardScheduleCalculator.getResetCardSchedule();
+            result = this.srsAlgorithm.cardGetResetSchedule();
         } else {
             // scheduled card
             if (card.hasSchedule) {
-                result = this.cardScheduleCalculator.calcUpdatedSchedule(
+                result = this.srsAlgorithm.cardCalcUpdatedSchedule(
                     response,
                     card.scheduleInfo,
+                    this.dueDateFlashcardHistogram,
                 );
             } else {
                 const currentNote: Note = card.question.note;
-                result = this.cardScheduleCalculator.getNewCardSchedule(
+                result = this.srsAlgorithm.cardGetNewSchedule(
                     response,
                     currentNote.filePath,
+                    this.dueDateFlashcardHistogram,
                 );
             }
         }
@@ -212,6 +220,6 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
         q.actualQuestion = text;
 
-        await this.currentQuestion.writeQuestion(this.settings);
+        await DataStore.getInstance().questionWrite(this.currentQuestion);
     }
 }
