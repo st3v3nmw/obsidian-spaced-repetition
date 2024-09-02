@@ -1,4 +1,4 @@
-import { EventRef, Menu, Notice, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
+import { Menu, Notice, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 import {
     SRSettingTab,
     SRSettings,
@@ -96,7 +96,7 @@ export default class SRPlugin extends Plugin {
         appIcon();
 
         this.showStatusBar(this.data.settings.showStatusBar);
-        
+
         this.showRibbonIcon(this.data.settings.showRibbonIcon);
 
         this.showFileMenuItems(!this.data.settings.disableFileMenuReviewOptions);
@@ -116,7 +116,7 @@ export default class SRPlugin extends Plugin {
         });
     }
 
-    showFileMenuItems(status:boolean) {
+    showFileMenuItems(status: boolean) {
 
         if(this.fileMenuHandler===undefined) { // define the handler if it was not defined yet
             this.fileMenuHandler = (menu, fileish: TAbstractFile) => {

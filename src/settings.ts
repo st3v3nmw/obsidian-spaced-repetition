@@ -177,11 +177,19 @@ export class SRSettingTab extends PluginSettingTab {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     hide(): any {
+<<<<<<< HEAD
         // console.log("SRSettingTab: hide()");
     }
 
     display(): void {
         // console.log("SRSettingTab: display()");
+=======
+        console.log("SRSettingTab: hide()");
+    }
+
+    display(): void {
+        console.log("SRSettingTab: display()");
+>>>>>>> 38bca5f (feat: refactor code to support diff methods of storing the scheduling info, and diff SR algorithms (#1006))
         const { containerEl } = this;
 
         containerEl.empty();

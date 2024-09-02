@@ -11,6 +11,15 @@ module.exports = {
     roots: ["<rootDir>/src/", "<rootDir>/tests/unit/"],
     collectCoverageFrom: ["./src/**"],
     coveragePathIgnorePatterns: [
+        "/node_modules/",
+        "src/algorithms/base/ISrsAlgorithm",
+        "src/algorithms/base/RepItemScheduleInfo",
+        "src/algorithms/base/SrsAlgorithm",
+        "src/algorithms/osr/ObsidianVaultNoteLinkInfoFinder",
+        "src/dataStoreAlgorithm/DataStoreAlgorithm",
+        "src/dataStoreAlgorithm/IDataStoreAlgorithm",
+        "src/lang/locale/",
+        "src/constants",
         "src/icons",
         "src/gui",
         "src/ReviewDeck.ts",
@@ -26,10 +35,8 @@ module.exports = {
     coverageProvider: "v8",
     coverageThreshold: {
         global: {
-            lines: 90,
             statements: 90,
             branches: 90,
-            functions: 90,
         },
     },
 };

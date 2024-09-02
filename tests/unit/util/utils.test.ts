@@ -4,7 +4,6 @@ import {
     findLineIndexOfSearchStringIgnoringWs,
     isEqualOrSubPath,
     literalStringReplace,
-    splitNoteIntoFrontmatterAndContent,
     cyrb53,
     escapeRegexString,
     getKeysPreserveType,
@@ -14,6 +13,7 @@ import {
     splitTextIntoLineArray,
     stringTrimStart,
     ticksFromDate,
+    splitNoteIntoFrontmatterAndContent,
 } from "src/util/utils";
 
 describe("getTypedObjectEntries", () => {
