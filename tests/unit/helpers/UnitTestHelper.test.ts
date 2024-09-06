@@ -1,5 +1,15 @@
 import { TagCache } from "obsidian";
-import { unitTest_GetAllTagsFromTextEx } from "./UnitTestHelper";
+import { unitTest_GetAllTagsFromTextEx, unitTest_ParseForOutgoingLinks } from "./UnitTestHelper";
+import { UnitTestOsrCore } from "./UnitTestOsrCore";
+import { DEFAULT_SETTINGS } from "src/settings";
+import { UnitTestLinkInfoFinder } from "./UnitTestLinkInfoFinder";
+import { unitTestSetup_StandardDataStoreAlgorithm } from "./UnitTestSetup";
+
+let linkInfoFinder: UnitTestLinkInfoFinder;
+
+beforeAll(() => {
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+});
 
 describe("unitTest_GetAllTagsFromTextEx", () => {
     describe("Without frontmatter", () => {
@@ -51,6 +61,88 @@ This single {{question}} turns into {{3 separate}} {{cards}}
             ];
             expect(actual).toEqual(expected);
         });
+    });
+});
+
+describe("unitTest_ParseForOutgoingLinks", () => {
+    test("No outgoing links", () => {
+        const text: string = `
+The triboelectric effect describes electric charge transfer between two objects when they contact or slide against each other. 
+
+It can occur with different materials, such as:
+- the sole of a shoe on a carpet
+- balloon rubbing against sweater
+
+(also known as triboelectricity, triboelectric charging, triboelectrification, or tribocharging)
+`;
+        const links: string[] = unitTest_ParseForOutgoingLinks(text);
+        expect(links.length).toEqual(0);
+    });
+
+    test("Multiple outgoing links on different lines", () => {
+        const text: string = `
+The triboelectric effect describes electric charge [[transfer between]] two objects when they contact or slide against each other. 
+
+It can occur with different materials, such as:
+- the sole of a shoe on a carpet
+- balloon rubbing against sweater
+
+(also known as triboelectricity, triboelectric charging, [[triboelectrification]], or tribocharging)
+`;
+        const links: string[] = unitTest_ParseForOutgoingLinks(text);
+        const expected: string[] = ["transfer between", "triboelectrification"];
+        expect(links).toEqual(expected);
+    });
+
+    test("Multiple outgoing links on the one line", () => {
+        const text: string = `
+The triboelectric effect describes electric charge [[triboelectrification]], or [[tribocharging]])
+`;
+        const links: string[] = unitTest_ParseForOutgoingLinks(text);
+        const expected: string[] = ["triboelectrification", "tribocharging"];
+        expect(links).toEqual(expected);
+    });
+});
+
+function check_getResolvedLinks(linkName: string, expected: Map<string, number>): void {
+    let e: Record<string, number> = {};
+    expected.forEach((n, linkName) => {
+        const filename: string = linkInfoFinder.getFilenameForLink(linkName);
+        e[filename] = n;
+    });
+    expect(linkInfoFinder.getResolvedTargetLinksForNoteLink(linkName)).toEqual(e);
+}
+
+describe("UnitTestLinkInfoFinder", () => {
+    test("No outgoing links", async () => {
+        const osrCore: UnitTestOsrCore = new UnitTestOsrCore(DEFAULT_SETTINGS);
+        await osrCore.loadTestVault("notes3");
+        linkInfoFinder = new UnitTestLinkInfoFinder();
+        linkInfoFinder.init(osrCore.getFileMap());
+
+        // One link from A to each of B, C, D
+        check_getResolvedLinks(
+            "A",
+            new Map([
+                ["B", 1],
+                ["C", 1],
+                ["D", 1],
+            ]),
+        );
+
+        // No links from B
+        check_getResolvedLinks("B", new Map([]));
+
+        // One link from C to D
+        check_getResolvedLinks("C", new Map([["D", 1]]));
+
+        check_getResolvedLinks(
+            "D",
+            new Map([
+                ["A", 1],
+                ["B", 2],
+            ]),
+        );
     });
 });
 

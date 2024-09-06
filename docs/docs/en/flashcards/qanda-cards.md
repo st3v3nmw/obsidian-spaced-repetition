@@ -103,7 +103,9 @@ the answer
     </div>
 
 
-These can also span over multiple lines as long as both sides "touch" the `?`:
+These can also span over multiple lines as long as both sides "touch" the `?`.
+
+See [Cards with Blank Lines](cards-with-blank-lines.md) if blank lines need to be included.
 
 
 
@@ -128,6 +130,7 @@ info 2B
 ```
 
 These can also span over multiple lines as long as both sides "touch" the `??`:
+To include blank lines, see the section below.
 
 !!! note "Card 1"
     <div class="grid" markdown>
@@ -162,6 +165,3 @@ These can also span over multiple lines as long as both sides "touch" the `??`:
 
 These two cards are considered sibling cards. See [sibling cards](flashcards-overview.md#sibling-cards) regarding the 
 [Bury sibling cards until the next day]( ../user-options.md#flashcard-review) scheduling option.
-
-
-

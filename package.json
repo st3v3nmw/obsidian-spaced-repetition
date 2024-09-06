@@ -48,7 +48,8 @@
     },
     "dependencies": {
         "chart.js": "^4.4.2",
-        "pagerank.js": "^1.0.2"
+        "pagerank.js": "^1.0.2",
+        "peggy": "^4.0.3"
     },
     "packageManager": "^pnpm@8.15.4"
 }

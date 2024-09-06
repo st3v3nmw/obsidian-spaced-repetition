@@ -1,5 +1,4 @@
 import { NoteQuestionParser } from "src/NoteQuestionParser";
-import { CardScheduleInfo } from "src/CardSchedule";
 import { TICKS_PER_DAY } from "src/constants";
 import { CardType, Question } from "src/Question";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
@@ -9,6 +8,10 @@ import { ISRFile, frontmatterTagPseudoLineNum } from "src/SRFile";
 import { setupStaticDateProvider_20230906 } from "src/util/DateProvider";
 import { TextDirection } from "src/util/TextDirection";
 import { UnitTestSRFile } from "./helpers/UnitTestSRFile";
+import { RepItemScheduleInfo } from "src/algorithms/base/RepItemScheduleInfo";
+import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/RepItemScheduleInfo_Osr";
+import { NoteEaseList } from "src/NoteEaseList";
+import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/UnitTestSetup";
 import { Card } from "src/Card";
 
 let parserWithDefaultSettings: NoteQuestionParser = createTest_NoteQuestionParser(DEFAULT_SETTINGS);
@@ -20,6 +23,7 @@ let parser_ConvertFoldersToDecks: NoteQuestionParser = createTest_NoteQuestionPa
 
 beforeAll(() => {
     setupStaticDateProvider_20230906();
+    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 describe("No flashcard questions", () => {
@@ -64,7 +68,7 @@ A::B
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
         let card1 = {
             cardIdx: 0,
-            scheduleInfo: null as CardScheduleInfo,
+            scheduleInfo: null as RepItemScheduleInfo,
         };
         let expected = [
             {
@@ -99,14 +103,11 @@ A::B
 
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
         let delayDays = 3 - 6;
+        let scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-03", 1, 230);
+        scheduleInfo.delayedBeforeReviewTicks = delayDays * TICKS_PER_DAY;
         let card1 = {
             cardIdx: 0,
-            scheduleInfo: CardScheduleInfo.fromDueDateStr(
-                "2023-09-03",
-                1,
-                230,
-                delayDays * TICKS_PER_DAY,
-            ),
+            scheduleInfo,
         };
         let expected = [
             {
@@ -206,7 +207,7 @@ A::B ^d7cee0
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
         let card1 = {
             cardIdx: 0,
-            scheduleInfo: null as CardScheduleInfo,
+            scheduleInfo: null as RepItemScheduleInfo_Osr,
         };
         let expected = [
             {
@@ -248,14 +249,12 @@ A::B ^d7cee0
 
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
         let delayDays = 3 - 6;
+        let scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-03", 1, 230);
+        scheduleInfo.delayedBeforeReviewTicks = delayDays * TICKS_PER_DAY;
+
         let card1 = {
             cardIdx: 0,
-            scheduleInfo: CardScheduleInfo.fromDueDateStr(
-                "2023-09-03",
-                1,
-                230,
-                delayDays * TICKS_PER_DAY,
-            ),
+            scheduleInfo,
         };
         let expected = [
             {
@@ -297,14 +296,11 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
 
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
         let delayDays = 3 - 6;
+        let scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-03", 1, 230);
+        scheduleInfo.delayedBeforeReviewTicks = delayDays * TICKS_PER_DAY;
         let card1 = {
             cardIdx: 0,
-            scheduleInfo: CardScheduleInfo.fromDueDateStr(
-                "2023-09-03",
-                1,
-                230,
-                delayDays * TICKS_PER_DAY,
-            ),
+            scheduleInfo,
         };
         let expected = [
             {
@@ -345,14 +341,11 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
 
         let folderTopicPath: TopicPath = TopicPath.emptyPath;
         let delayDays = 3 - 6;
+        let scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-03", 1, 230);
+        scheduleInfo.delayedBeforeReviewTicks = delayDays * TICKS_PER_DAY;
         let card1 = {
             cardIdx: 0,
-            scheduleInfo: CardScheduleInfo.fromDueDateStr(
-                "2023-09-03",
-                1,
-                230,
-                delayDays * TICKS_PER_DAY,
-            ),
+            scheduleInfo,
         };
         let expected = [
             {
@@ -467,7 +460,6 @@ Multiline answer2
  
 `;
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
-
         let questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
             noteFile,
             TextDirection.Ltr,
@@ -799,7 +791,7 @@ In computer-science, a *heap* is a tree-based data-structure, that satisfies the
         ).toMatchObject(expected);
     });
 
-    test("Multi-line without question (i.e. question is blank)", async () => {
+    test("Multi-line without question is ignored", async () => {
         let noteText: string = `---
 created: 2024-03-11 10:41
 tags:
@@ -807,7 +799,11 @@ tags:
   - data-structure
 ---
 ?
-In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!
+A1
+
+Q2
+?
+A2
     `;
         let noteFile: ISRFile = new UnitTestSRFile(noteText);
 
@@ -817,10 +813,12 @@ In computer-science, a *heap* is a tree-based data-structure, that satisfies the
                 questionType: CardType.MultiLineBasic,
                 // Explicitly checking that #data-structure is not included
                 topicPathList: TopicPathList.fromPsv("#flashcards", frontmatterTagPseudoLineNum),
+
+                // No card A1; only card Q2/A2
                 cards: [
                     new Card({
-                        front: "",
-                        back: "In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!",
+                        front: "Q2",
+                        back: "A2",
                     }),
                 ],
             },
@@ -888,7 +886,7 @@ function checkQuestion1(question: Question) {
         isDue: false,
         front: "Q1",
         back: "A1",
-        scheduleInfo: null as CardScheduleInfo,
+        scheduleInfo: null as RepItemScheduleInfo_Osr,
     };
     let expected = {
         questionType: CardType.SingleLineBasic,
@@ -912,7 +910,7 @@ function checkQuestion2(question: Question) {
         isDue: false,
         front: "Q2",
         back: "A2",
-        scheduleInfo: null as CardScheduleInfo,
+        scheduleInfo: null as RepItemScheduleInfo_Osr,
     };
     let expected = {
         questionType: CardType.SingleLineBasic,

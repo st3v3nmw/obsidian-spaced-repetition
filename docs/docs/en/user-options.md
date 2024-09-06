@@ -12,7 +12,7 @@
 
 ### Flashcard Separators
 
-![flashcard-settings-separators](https://github.com/user-attachments/assets/bc5706de-80d7-445d-9e9c-5c9fe6d9522a)
+![flashcard-settings-separators](https://github.com/user-attachments/assets/744aea85-fdb3-4508-b532-7a551253f97d)
 
 ### Storage of Scheduling Data
 

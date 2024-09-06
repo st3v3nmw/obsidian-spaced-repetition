@@ -122,6 +122,7 @@ Note that this setting is common to both Flashcards and Notes.`,
     INLINE_REVERSED_CARDS_SEPARATOR: "Oddělovač pro otočené inline kartičky",
     MULTILINE_CARDS_SEPARATOR: "Oddělovač pro víceřádkové kartičky",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Oddělovač pro víceřádkove otočené kartičky",
+    MULTILINE_CARDS_END_MARKER: "Znaky označující konec clozes a víceřádkových flash karet",
     NOTES: "Poznámky",
     REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "Tag pro revizi",
@@ -160,7 +161,9 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB_DESC:
         "Maximální příspěvek vážené složitosti prolinkovaných poznámek použitý pro určení počáteční složitosti.",
     LOGGING: "Zaznamenávám",
-    DISPLAY_DEBUG_INFO: "Zobrazit informace pro ladění na vývojářské konzoli?",
+    DISPLAY_DEBUG_INFO: "Zobrazit informace pro ladění na vývojářské konzoli",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Fronta poznámek k revizi",
