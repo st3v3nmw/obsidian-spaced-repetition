@@ -1,1 +1,1 @@
-docs/en/contributing.md
+docs/docs/en/contributing.md
