@@ -6,4 +6,5 @@ node_modules
 .pnp.loader.mjs
 pnpm-lock.yaml
 tests/e2e/vault/
+tests/vaults
 docs
