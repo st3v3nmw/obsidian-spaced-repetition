@@ -46,8 +46,10 @@ export class RenderMarkdownWrapper {
                 if (link.target.extension !== "md") {
                     this.embedMediaFile(el, link.target);
                 } else {
-                    el.innerText = "";
-                    this.renderTransclude(el, link, recursiveDepth);
+                    // We get here if there is a transclusion link, such as "![[Test Embed]]"
+                    // In version 1.12.4 and earlier we used the deprecated Obsidian MarkdownRenderer.renderMarkdown() and we
+                    // needed to have our own method "renderTransclude()" that loaded the referenced file and rendered it.
+                    // In version 1.12.5, we started using MarkdownRenderer.render() instead, which does this automatically.
                 }
             }
         });
@@ -114,47 +116,5 @@ export class RenderMarkdownWrapper {
         } else {
             el.innerText = target.path;
         }
-    }
-
-    private async renderTransclude(
-        el: HTMLElement,
-        link: {
-            text: string;
-            file: string;
-            heading: string;
-            blockId: string;
-            target: TFile;
-        },
-        recursiveDepth: number,
-    ) {
-        const cache = this.app.metadataCache.getCache(link.target.path);
-        const text = await this.app.vault.cachedRead(link.target);
-        let blockText;
-        if (link.heading) {
-            const clean = (s: string) => s.replace(NON_LETTER_SYMBOLS_REGEX, "");
-            const headingIndex = cache.headings?.findIndex(
-                (h) => clean(h.heading) === clean(link.heading),
-            );
-            const heading = cache.headings[headingIndex];
-
-            const startAt = heading.position.start.offset;
-            const endAt =
-                cache.headings.slice(headingIndex + 1).find((h) => h.level <= heading.level)
-                    ?.position?.start?.offset || text.length;
-
-            blockText = text.substring(startAt, endAt);
-        } else if (link.blockId) {
-            const block = cache.blocks[link.blockId];
-            const startAt = block.position.start.offset;
-            const endAt = block.position.end.offset;
-            blockText = text.substring(startAt, endAt);
-        } else {
-            blockText = text;
-        }
-
-        // We are operating here within the parent container.
-        // It already has the rtl div if necessary.
-        // We don't need another rtl div, so we can set direction to Unspecified
-        this.renderMarkdownWrapper(blockText, el, TextDirection.Unspecified, recursiveDepth + 1);
     }
 }
