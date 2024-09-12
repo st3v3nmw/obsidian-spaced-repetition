@@ -73,6 +73,7 @@ export default {
     FOLDERS_TO_IGNORE: "Folders to ignore",
     FOLDERS_TO_IGNORE_DESC: `Enter folder paths separated by newlines e.g. Templates Meta/Scripts.
 Note that this setting is common to both Flashcards and Notes.`,
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Flashcards",
     FLASHCARD_EASY_LABEL: "Easy Button Text",
     FLASHCARD_GOOD_LABEL: "Good Button Text",
@@ -130,14 +131,18 @@ Note that this setting is common to both Flashcards and Notes.`,
     OPEN_RANDOM_NOTE: "Open a random note for review",
     OPEN_RANDOM_NOTE_DESC: "When you turn this off, notes are ordered by importance (PageRank).",
     AUTO_NEXT_NOTE: "Open next note automatically after a review",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Disable review options in the file menu i.e. Review: Easy Good Hard",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this.",
     MAX_N_DAYS_REVIEW_QUEUE: "Maximum number of days to display on right panel",
     MIN_ONE_DAY: "The number of days must be at least 1.",
     VALID_NUMBER_WARNING: "Please provide a valid number.",
     UI_PREFERENCES: "UI Preferences",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC: "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
+    DISABLE_FILE_MENU_REVIEW_OPTIONS:
+        "Disable review options in the file menu i.e. Review: Easy Good Hard",
+    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this.",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Deck trees should be initially displayed as expanded",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "Turn this off to collapse nested decks in the same card. Useful if you have cards which belong to many decks in the same file.",

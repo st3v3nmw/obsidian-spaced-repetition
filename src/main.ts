@@ -47,13 +47,15 @@ import { setDebugParser } from "./parser";
 import { generateParser } from "./generateParser";
 
 export default class SRPlugin extends Plugin {
-    private statusBar: HTMLElement;
     public data: PluginData;
     private osrAppCore: OsrAppCore;
     private osrSidebar: OsrSidebar;
     private nextNoteReviewHandler: NextNoteReviewHandler;
 
     private debouncedGenerateParserTimeout: number | null = null;
+
+    private ribbonIcon: HTMLElement | null = null;
+    private statusBar: HTMLElement | null = null;
 
     async onload(): Promise<void> {
         console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-07-24");
@@ -92,27 +94,9 @@ export default class SRPlugin extends Plugin {
         );
         appIcon();
 
-        this.statusBar = this.addStatusBarItem();
-        this.statusBar.classList.add("mod-clickable");
-        this.statusBar.setAttribute("aria-label", t("OPEN_NOTE_FOR_REVIEW"));
-        this.statusBar.setAttribute("aria-label-position", "top");
-        this.statusBar.addEventListener("click", async () => {
-            if (!this.osrAppCore.syncLock) {
-                await this.sync();
-                this.nextNoteReviewHandler.reviewNextNoteModal();
-            }
-        });
-
-        this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
-            if (!this.osrAppCore.syncLock) {
-                await this.sync();
-                this.openFlashcardModal(
-                    this.osrAppCore.reviewableDeckTree,
-                    this.osrAppCore.remainingDeckTree,
-                    FlashcardReviewMode.Review,
-                );
-            }
-        });
+        this.showStatusBar(this.data.settings.showStatusBar);
+        
+        this.showRibbonIcon(this.data.settings.showRibbonIcon);
 
         this.addFileMenuItems();
 
@@ -479,5 +463,45 @@ export default class SRPlugin extends Plugin {
             generateParser(parserOptions);
             this.debouncedGenerateParserTimeout = null;
         }, timeout_ms);
+    }
+
+    showRibbonIcon(status:boolean) {
+        if(!this.ribbonIcon) { // if it does not exit, we create it
+            this.ribbonIcon = this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
+                if (!this.osrAppCore.syncLock) {
+                    await this.sync();
+                    this.openFlashcardModal(
+                        this.osrAppCore.reviewableDeckTree,
+                        this.osrAppCore.remainingDeckTree,
+                        FlashcardReviewMode.Review,
+                    );
+                }
+            });
+        }
+        if(status) {
+            this.ribbonIcon.style.display = "";
+        } else {
+            this.ribbonIcon.style.display = "none";
+        }
+    }
+
+    showStatusBar(status:boolean) {
+        if(!this.statusBar) { // if it does not exit, we create it
+            this.statusBar = this.addStatusBarItem();
+            this.statusBar.classList.add("mod-clickable");
+            this.statusBar.setAttribute("aria-label", t("OPEN_NOTE_FOR_REVIEW"));
+            this.statusBar.setAttribute("aria-label-position", "top");
+            this.statusBar.addEventListener("click", async () => {
+                if (!this.osrAppCore.syncLock) {
+                    await this.sync();
+                    this.nextNoteReviewHandler.reviewNextNoteModal();
+                }
+            });
+        }
+        if(status) {
+            this.statusBar.style.display = "";
+        } else {
+            this.statusBar.style.display = "none";
+        }
     }
 }

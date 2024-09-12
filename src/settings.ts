@@ -37,6 +37,8 @@ export interface SRSettings {
     disableFileMenuReviewOptions: boolean;
     maxNDaysNotesReviewQueue: number;
     // UI preferences
+    showRibbonIcon: boolean;
+    showStatusBar: boolean;
     initiallyExpandAllSubdecksInTree: boolean;
     // algorithm
     baseEase: number;
@@ -83,6 +85,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     disableFileMenuReviewOptions: false,
     maxNDaysNotesReviewQueue: 365,
     // UI settings
+    showRibbonIcon: true,
+    showStatusBar: true,
     initiallyExpandAllSubdecksInTree: false,
     // algorithm
     baseEase: 250,
@@ -570,18 +574,6 @@ export class SRSettingTab extends PluginSettingTab {
         );
 
         new Setting(containerEl)
-            .setName(t("DISABLE_FILE_MENU_REVIEW_OPTIONS"))
-            .setDesc(t("DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
-            .addToggle((toggle) =>
-                toggle
-                    .setValue(this.plugin.data.settings.disableFileMenuReviewOptions)
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.disableFileMenuReviewOptions = value;
-                        await this.plugin.savePluginData();
-                    }),
-            );
-
-        new Setting(containerEl)
             .setName(t("MAX_N_DAYS_REVIEW_QUEUE"))
             .addText((text) =>
                 text
@@ -639,6 +631,46 @@ export class SRSettingTab extends PluginSettingTab {
     }
 
     private async tabUiPreferences(containerEl: HTMLElement): Promise<void> {
+
+        containerEl.createEl("h3", { text: t("OBSIDIAN_INTEGRATION") });
+        new Setting(containerEl)
+            .setName(t("SHOW_RIBBON_ICON"))
+            .setDesc(t("SHOW_RIBBON_ICON_DESC"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.showRibbonIcon)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.showRibbonIcon = value;
+                        await this.plugin.savePluginData();
+                        this.plugin.showRibbonIcon(value);
+                    }),
+            );
+
+        new Setting(containerEl)
+            .setName(t("SHOW_STATUS_BAR"))
+            .setDesc(t("SHOW_STATUS_BAR_DESC"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.showStatusBar)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.showStatusBar = value;
+                        await this.plugin.savePluginData();
+                        this.plugin.showStatusBar(value);
+                    }),
+            );
+
+        new Setting(containerEl)
+            .setName(t("DISABLE_FILE_MENU_REVIEW_OPTIONS"))
+            .setDesc(t("DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.disableFileMenuReviewOptions)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.disableFileMenuReviewOptions = value;
+                        await this.plugin.savePluginData();
+                    }),
+            );
+
         containerEl.createEl("h3", { text: t("FLASHCARDS") });
         new Setting(containerEl)
             .setName(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE"))
