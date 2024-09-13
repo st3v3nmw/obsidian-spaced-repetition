@@ -660,14 +660,15 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
-            .setName(t("DISABLE_FILE_MENU_REVIEW_OPTIONS"))
-            .setDesc(t("DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
+            .setName(t("ENABLE_FILE_MENU_REVIEW_OPTIONS"))
+            .setDesc(t("ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
             .addToggle((toggle) =>
                 toggle
-                    .setValue(this.plugin.data.settings.disableFileMenuReviewOptions)
+                    .setValue(!this.plugin.data.settings.disableFileMenuReviewOptions)
                     .onChange(async (value) => {
-                        this.plugin.data.settings.disableFileMenuReviewOptions = value;
+                        this.plugin.data.settings.disableFileMenuReviewOptions = !value;
                         await this.plugin.savePluginData();
+                        this.plugin.showFileMenuItems(value);
                     }),
             );
 

@@ -1,4 +1,4 @@
-import { Notice, Plugin, TAbstractFile, TFile } from "obsidian";
+import { EventRef, Menu, Notice, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 import {
     SRSettingTab,
     SRSettings,
@@ -56,6 +56,7 @@ export default class SRPlugin extends Plugin {
 
     private ribbonIcon: HTMLElement | null = null;
     private statusBar: HTMLElement | null = null;
+    private fileMenuHandler:((menu:Menu,file:TAbstractFile, source:string, leaf?:WorkspaceLeaf)=>void);
 
     async onload(): Promise<void> {
         console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-07-24");
@@ -98,7 +99,7 @@ export default class SRPlugin extends Plugin {
         
         this.showRibbonIcon(this.data.settings.showRibbonIcon);
 
-        this.addFileMenuItems();
+        this.showFileMenuItems(!this.data.settings.disableFileMenuReviewOptions);
 
         this.addPluginCommands();
 
@@ -115,49 +116,54 @@ export default class SRPlugin extends Plugin {
         });
     }
 
-    private addFileMenuItems() {
-        if (!this.data.settings.disableFileMenuReviewOptions) {
-            this.registerEvent(
-                this.app.workspace.on("file-menu", (menu, fileish: TAbstractFile) => {
-                    if (fileish instanceof TFile && fileish.extension === "md") {
-                        menu.addItem((item) => {
-                            item.setTitle(
-                                t("REVIEW_DIFFICULTY_FILE_MENU", {
-                                    difficulty: this.data.settings.flashcardEasyText,
-                                }),
-                            )
-                                .setIcon("SpacedRepIcon")
-                                .onClick(() => {
-                                    this.saveNoteReviewResponse(fileish, ReviewResponse.Easy);
-                                });
-                        });
+    showFileMenuItems(status:boolean) {
 
-                        menu.addItem((item) => {
-                            item.setTitle(
-                                t("REVIEW_DIFFICULTY_FILE_MENU", {
-                                    difficulty: this.data.settings.flashcardGoodText,
-                                }),
-                            )
-                                .setIcon("SpacedRepIcon")
-                                .onClick(() => {
-                                    this.saveNoteReviewResponse(fileish, ReviewResponse.Good);
-                                });
-                        });
+        if(this.fileMenuHandler===undefined) { // define the handler if it was not defined yet
+            this.fileMenuHandler = (menu, fileish: TAbstractFile) => {
+                if (fileish instanceof TFile && fileish.extension === "md") {
+                    menu.addItem((item) => {
+                        item.setTitle(
+                            t("REVIEW_DIFFICULTY_FILE_MENU", {
+                                difficulty: this.data.settings.flashcardEasyText,
+                            }),
+                        )
+                            .setIcon("SpacedRepIcon")
+                            .onClick(() => {
+                                this.saveNoteReviewResponse(fileish, ReviewResponse.Easy);
+                            });
+                    });
 
-                        menu.addItem((item) => {
-                            item.setTitle(
-                                t("REVIEW_DIFFICULTY_FILE_MENU", {
-                                    difficulty: this.data.settings.flashcardHardText,
-                                }),
-                            )
-                                .setIcon("SpacedRepIcon")
-                                .onClick(() => {
-                                    this.saveNoteReviewResponse(fileish, ReviewResponse.Hard);
-                                });
-                        });
-                    }
-                }),
-            );
+                    menu.addItem((item) => {
+                        item.setTitle(
+                            t("REVIEW_DIFFICULTY_FILE_MENU", {
+                                difficulty: this.data.settings.flashcardGoodText,
+                            }),
+                        )
+                            .setIcon("SpacedRepIcon")
+                            .onClick(() => {
+                                this.saveNoteReviewResponse(fileish, ReviewResponse.Good);
+                            });
+                    });
+
+                    menu.addItem((item) => {
+                        item.setTitle(
+                            t("REVIEW_DIFFICULTY_FILE_MENU", {
+                                difficulty: this.data.settings.flashcardHardText,
+                            }),
+                        )
+                            .setIcon("SpacedRepIcon")
+                            .onClick(() => {
+                                this.saveNoteReviewResponse(fileish, ReviewResponse.Hard);
+                            });
+                    });
+                }
+            };
+        }
+
+        if(status){
+            this.registerEvent(this.app.workspace.on("file-menu", this.fileMenuHandler));
+        } else {
+            this.app.workspace.off("file-menu", this.fileMenuHandler);
         }
     }
 
