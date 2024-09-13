@@ -122,9 +122,9 @@ Note that this setting is common to both Flashcards and Notes.`,
     OPEN_RANDOM_NOTE: "复习随机笔记",
     OPEN_RANDOM_NOTE_DESC: "关闭此选项，笔记将以重要度(PageRank)排序。",
     AUTO_NEXT_NOTE: "复习后自动打开下一个笔记",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS: "关闭文件选单中的复习选项 例如：复习：简单 记得 较难",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "关闭此选项后你可以使用快捷键开始复习。重新启动Obsidian使本选项生效。",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS: "请在文件菜单中启用复习选项（例如：复习：简单、良好、困难",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "如果您在文件菜单中禁用复习选项，您可以使用插件命令来复习笔记，如果您定义了相关快捷键，也可以使用它们。",
     MAX_N_DAYS_REVIEW_QUEUE: "右边栏中显示的最大天数",
     MIN_ONE_DAY: "天数最小值为1",
     VALID_NUMBER_WARNING: "请输入有效的数字。",

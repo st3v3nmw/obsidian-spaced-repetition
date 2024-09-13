@@ -139,10 +139,10 @@ Note that this setting is common to both Flashcards and Notes.`,
     SHOW_STATUS_BAR_DESC: "Turn this off to hide the flashcard's review status in Obsidian's status bar",
     SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
     SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Disable review options in the file menu i.e. Review: Easy Good Hard",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this.",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "Enable the review options in the file menu (e.g. Review: Easy, Good, Hard)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "If you disable the review options in the file menu, you can review your notes using the plugin commands and, if you defined them, the associated command hotkeys.",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Deck trees should be initially displayed as expanded",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "Turn this off to collapse nested decks in the same card. Useful if you have cards which belong to many decks in the same file.",

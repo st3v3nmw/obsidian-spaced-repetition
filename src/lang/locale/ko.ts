@@ -132,10 +132,10 @@ Note that this setting is common to both Flashcards and Notes.`,
     OPEN_RANDOM_NOTE: "리뷰를 위해 랜덤 노트를 엽니다.",
     OPEN_RANDOM_NOTE_DESC: "이 옵션이 꺼져있으면, 노트는 중요도(페이지 랭크)에 따라 정렬됩니다.",
     AUTO_NEXT_NOTE: "리뷰 후에 다음 노트를 자동으로 엽니다.",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "파일 메뉴에서의 리뷰 옵션을 비활성화 합니다. 예) 리뷰: Easy Good Hard",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "이 옵션을 비활성화 한 후, 명령 단축키를 이용해 리뷰하실 수 있습니다. 이 옵션을 변경한 후에 옵시디언을 새로고침 하십시오.",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "파일 메뉴에서 검토 옵션을 활성화하세요 (예: 검토: 쉬움, 좋음, 어려움)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "파일 메뉴에서 검토 옵션을 비활성화하면 플러그인 명령을 사용해 노트를 검토할 수 있으며, 정의된 경우에는 관련된 단축키도 사용할 수 있습니다.",
     MAX_N_DAYS_REVIEW_QUEUE: "오른쪽 패널에 표시할 최대 일수",
     MIN_ONE_DAY: "적어도 1이상이어야 합니다.",
     VALID_NUMBER_WARNING: "유효한 숫자를 입력해주세요.",

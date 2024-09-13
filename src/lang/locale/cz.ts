@@ -10,7 +10,7 @@ export default {
     SKIP: "Skip",
     EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "Vynulovat pokrok kartičky",
-    HARD: "Težké",
+    HARD: "Těžké",
     GOOD: "Dobré",
     EASY: "Jednoduché",
     SHOW_ANSWER: "Ukázat odpověď",
@@ -131,10 +131,10 @@ Note that this setting is common to both Flashcards and Notes.`,
     OPEN_RANDOM_NOTE: "Otevřít náhodnou poznámku pro revizi",
     OPEN_RANDOM_NOTE_DESC: "Pokud toto vypnete, poznámky budou řazeny dle důležitosti (PageRank).",
     AUTO_NEXT_NOTE: "Otevřít automaticky další poznámku po dokončení revize",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Vypnout volby revize v menu souboru například 'Revize: Jednoduché'",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "Po vypnutí můžete používat klávesové zkratky. Restartujte Obsidian po změně nastavení.",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "Povolte možnosti revize v nabídce souboru (např. Revize: Jednoduché, Dobré, Těžké)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "Pokud v nabídce souboru zakážete možnosti revize, můžete své poznámky revidovat pomocí příkazů pluginu a, pokud jste je definovali, pomocí přiřazených klávesových zkratek.",
     MAX_N_DAYS_REVIEW_QUEUE: "Maximální počet dní zobrazených v pravém panelu",
     MIN_ONE_DAY: "Počet dní musí být minimálně 1.",
     VALID_NUMBER_WARNING: "Prosím zadejte validní číslo.",
