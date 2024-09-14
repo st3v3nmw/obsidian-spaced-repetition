@@ -177,11 +177,11 @@ export class SRSettingTab extends PluginSettingTab {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     hide(): any {
-        console.log("SRSettingTab: hide()");
+        // console.log("SRSettingTab: hide()");
     }
 
     display(): void {
-        console.log("SRSettingTab: display()");
+        // console.log("SRSettingTab: display()");
         const { containerEl } = this;
 
         containerEl.empty();
