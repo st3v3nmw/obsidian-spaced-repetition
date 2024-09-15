@@ -40,7 +40,7 @@ Although you may want to review or cram all cards across all decks, you often ma
     2 | Reset | Reset the review schedule information - the review interval is set to 1 day, and the ease is set to the default value
     3 | Info | Shows the scheduling information for the card
     4 | Skip | Skip the current card without reviewing
-    
+
 ### Context
 
 If the parent note has heading(s), the flashcard will have a title containing the context.
@@ -106,11 +106,10 @@ Note that you can skip a card by simply pressing `S` (case doesn't matter).
 
 ## Cramming
 
-You are shown every single card, even those that have recently been reviewed. 
+You are shown every single card, even those that have recently been reviewed.
 By using the appropriate [command](../plugin-commands.md) have the choice of cramming cards:
 
 Cards | Command
 - | -
 Within a single note | `Spaced Repetition: Cram flashcards in this note`
 Within a deck (including all subdecks) |  `Spaced Repetition: Select a deck to cram note`
-

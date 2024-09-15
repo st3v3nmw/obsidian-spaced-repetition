@@ -17,7 +17,7 @@ When the card is reviewed, an HTML comment will be added after the card's text, 
 ```
 
 By default, the comment is stored on the line following the card text.
-Alternatively, it can be stored on the same line by enabling the 
+Alternatively, it can be stored on the same line by enabling the
 [Save scheduling comment on the same line as the flashcard's last line?](user-options.md#storage-of-scheduling-data) option.
 
 Scheduling information for the note is kept at the beginning of the file, in YAML format within the frontmatter section.

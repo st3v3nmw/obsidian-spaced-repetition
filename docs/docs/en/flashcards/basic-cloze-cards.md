@@ -29,7 +29,7 @@ The first female prime minister of Australia was ==Julia Gillard==
 
     </div>
 
-    
+
 
 ### Multiple Cloze Deletions
 If the card text identifies multiple parts as cloze deletions, then multiple cards will be shown for review, each one occluding one deletion, while leaving the other deletions visible.
@@ -56,7 +56,7 @@ The first female ==prime minister== of Australia was ==Julia Gillard==
 
     The first female prime minister of Australia was Julia Gillard
 
-These two cards are considered sibling cards. See [sibling cards](flashcards-overview.md#sibling-cards) regarding the 
+These two cards are considered sibling cards. See [sibling cards](flashcards-overview.md#sibling-cards) regarding the
 [Bury sibling cards until the next day](../user-options.md#flashcard-review) scheduling option.
 
 ## Cloze Delimiter
@@ -64,7 +64,7 @@ These two cards are considered sibling cards. See [sibling cards](flashcards-ove
 The cloze delimiter can be modified in [settings](../user-options.md#flashcard-review), e.g. to `**`, or curly braces `{{text in curly braces}}`.
 
 
-<!-- 
+<!--
 ## Cloze Hints
 
 Hints can be included for any of the cloze deletions, using the `^[text of hint]` syntax. For example:
@@ -88,7 +88,7 @@ In the above examples, each card shown for review has one cloze deletion shown a
 
 For example:
 ```
-This is ==in group 1==[^1], this ==in group 2==[^2] 
+This is ==in group 1==[^1], this ==in group 2==[^2]
 and this also ==in group 1==[^1]
 ```
 
@@ -107,4 +107,3 @@ and this also ==in group 1==[^1]
 
 !!! warning
     Anki style `{{c1:This text}} would {{c2:generate}} {{c1:2 cards}}` cloze deletions are not currently supported. This feature is being tracked [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/93/).
-

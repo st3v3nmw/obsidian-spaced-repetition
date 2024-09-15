@@ -8,7 +8,6 @@ repo_name: st3v3nmw/obsidian-spaced-repetition
 repo_url: https://github.com/st3v3nmw/obsidian-spaced-repetition/
 edit_uri: ""
 docs_dir: docs/docs
-# use_directory_urls: false
 
 theme:
     name: material
