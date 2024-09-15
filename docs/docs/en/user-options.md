@@ -29,4 +29,3 @@
 ## UI Preferences
 
 ![settings-ui-preferences](https://github.com/user-attachments/assets/c0740fa0-02b5-4db9-9d81-94f0ae29ab6c)
-
