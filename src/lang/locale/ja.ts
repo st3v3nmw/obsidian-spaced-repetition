@@ -135,10 +135,10 @@ Note that this setting is common to both Flashcards and Notes.`,
     OPEN_RANDOM_NOTE_DESC:
         "このオプションが無効化されている状態では、ノートは重要度(ページランク)による順番で表示されます。",
     AUTO_NEXT_NOTE: "レビュー後に次のノートを自動的に開く",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "ファイルメニューでのレビューオプションを無効化(｢レビュー: Easy｣等の項目を非表示にする)",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "無効化した後、コマンドホットキーを使ってレビューすることが可能になります。このオプションを変更した場合にはObsidianをリロードしてください。",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "ファイルメニューでレビューオプションを有効にしてください（例: Easy, Good, Hard）",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "ファイルメニューでレビューオプションを無効にした場合、プラグインコマンドや、設定している場合は対応するホットキーを使用してメモをレビューできます。",
     MAX_N_DAYS_REVIEW_QUEUE: "右パネルに表示する最大の日数",
     MIN_ONE_DAY: "日数には1以上の数字を指定してください。",
     VALID_NUMBER_WARNING: "有効な数字を入力してください。",

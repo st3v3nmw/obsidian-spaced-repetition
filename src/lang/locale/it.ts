@@ -138,10 +138,10 @@ Note that this setting is common to both Flashcards and Notes.`,
     OPEN_RANDOM_NOTE_DESC:
         "Quando lo disabiliti, le note saranno ordinate per importanza (PageRank).",
     AUTO_NEXT_NOTE: "Apri la prossima nota automaticamente dopo la revisione",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Disabilita le opzioni di revisioni nel menù di file, per esempio Revisione: Facile Buono Difficile",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "Dopo avermi disattivato, puoi iniziare una revisione con le combinazioni di testi per il comando. Riavvia Obsidian dopo avermi cambiato.",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "Abilita le opzioni di revisione nel menu File (es.: Rivisita: Facile, Buono, Difficile)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "Se disabiliti le opzioni di revisione nel menu File, puoi rivedere le tue note utilizzando i comandi del plugin e, se li hai definiti, le scorciatoie da tastiera associate.",
     MAX_N_DAYS_REVIEW_QUEUE: "Numero di giorni massimi da visualizzare nel pannello di destra",
     MIN_ONE_DAY: "Il numero di giorni deve essere almeno 1.",
     VALID_NUMBER_WARNING: "Per favore, mettere un numero valido.",

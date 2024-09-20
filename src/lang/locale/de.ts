@@ -28,8 +28,8 @@ export default {
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Notiz zur Wiederholung öffnen",
     REVIEW_CARDS: "Lernkarten wiederholen",
-    REVIEW_DIFFICULTY_FILE_MENU: "Notiz abschliessen als: ${difficulty}",
-    REVIEW_NOTE_DIFFICULTY_CMD: "Notiz abschliessen als: ${difficulty}",
+    REVIEW_DIFFICULTY_FILE_MENU: "Notizen wiederholen als: ${difficulty}",
+    REVIEW_NOTE_DIFFICULTY_CMD: "Notizen wiederholen als: ${difficulty}",
     REVIEW_ALL_CARDS: "Alle Lernkarten wiederholen",
     CRAM_ALL_CARDS: "Wähle ein Stapel zum pauken",
     REVIEW_CARDS_IN_NOTE: "Lernkarten in dieser Notiz wiederholen",
@@ -145,10 +145,10 @@ Note that this setting is common to both Flashcards and Notes.`,
     OPEN_RANDOM_NOTE_DESC:
         "Wenn dies deaktiviert wird, dann werden die Notizen nach Wichtigkeit wiederholt (PageRank).",
     AUTO_NEXT_NOTE: "Nach einer Wiederholung automatisch die nächste Karte öffnen",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Optionen zur Wiederholung im Menü einer Datei deaktivieren. Bsp. Wiederholen: Einfach Gut Schwer",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "Nach dem Deaktivieren können die Tastenkürzel zur Wiederholung verwendet werden. Obsidian muss nach einer Änderung neu geladen weren.",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "Aktiviere die Überprüfungsoptionen im Dateimenü (z. B. Notizen wiederholen als: Einfach, Gut, Schwer)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "Wenn du die Überprüfungsoptionen im Dateimenü deaktivierst, kannst du deine Notizen mit den Plugin-Befehlen und, falls definiert, den zugehörigen Tastenkombinationen überprüfen.",
     MAX_N_DAYS_REVIEW_QUEUE:
         "Maximale Anzahl anstehender Notizen, die im rechten Fensterbereich angezeigt werden",
     MIN_ONE_DAY: "Anzahl der Tage muss mindestens 1 sein.",

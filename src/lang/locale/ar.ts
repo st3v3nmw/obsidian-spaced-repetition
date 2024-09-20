@@ -127,10 +127,10 @@ Note that this setting is common to both Flashcards and Notes. : أدخل مسا
     OPEN_RANDOM_NOTE: "افتح ملاحظة عشوائية للمراجعة",
     OPEN_RANDOM_NOTE_DESC: "(Pagerank) عند تعطيل هذا الخيار ،الملاحظات سيتم ترتيبُها حسب الأهمية",
     AUTO_NEXT_NOTE: "افتح الملاحظة التالية تلقائيًا بعد المراجعة",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "تعطيل خيارات المراجعة في قائمة الملفات ، أي المراجعة:السهل الصعب الجيد",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "عند تغيير هذا الخيار Obsidian أعد تشغيل , command hotkeys. بعد التعطيل ، يمكنك المراجعة باستخدام",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "فعّل خيارات المراجعة في قائمة الملف (مثال: مراجعة: سهل، جيد، صعب)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "إذا قمت بتعطيل خيارات المراجعة في قائمة الملف، يمكنك مراجعة ملاحظاتك باستخدام أوامر الإضافة وإذا كنت قد حددتها، باستخدام مفاتيح الاختصار المرتبطة.",
     MAX_N_DAYS_REVIEW_QUEUE: "الحد الأقصى لعدد الأيام التي يجب عرضها على اللوحة اليمنى",
     MIN_ONE_DAY: "يجب أن يكون عدد الأيام 1 على الأقل",
     VALID_NUMBER_WARNING: "يرجى تقديم رقم صالح",
