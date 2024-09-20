@@ -136,10 +136,10 @@ Note that this setting is common to both Flashcards and Notes.`,
     OPEN_RANDOM_NOTE_DESC:
         "Po wyłączeniu tej opcji notatki są uporządkowane według istotności (PageRank).",
     AUTO_NEXT_NOTE: "Automatycznie otwierać następną notatkę po przeglądzie",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Wyłączyć opcje przeglądu w menu pliku, tj. Przegląd: Łatwe Dobrze Trudne",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "Po wyłączeniu możesz przeglądać za pomocą skrótów klawiszowych. Po zmianie tej opcji konieczne jest ponowne załadowanie Obsidian.",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "Wyłączyć opcje przeglądu w menu pliku, tj. Przeglądaj: Łatwe Dobrze Trudne",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "Jeśli wyłączysz opcje przeglądu w menu Plik, możesz przeglądać swoje notatki za pomocą poleceń wtyczki i, jeśli je zdefiniowałeś, przypisanych skrótów klawiszowych.",
     MAX_N_DAYS_REVIEW_QUEUE: "Maksymalna liczba dni do wyświetlenia w panelu prawym",
     MIN_ONE_DAY: "Liczba dni musi wynosić co najmniej 1.",
     VALID_NUMBER_WARNING: "Podaj prawidłową liczbę.",

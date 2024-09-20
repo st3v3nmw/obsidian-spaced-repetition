@@ -72,11 +72,10 @@ function generateGrammar(options: ParserOptions): string {
   };
 
   const CardType = options.CardType ? options.CardType : CardTypeFallBack;
-  CardType.Ignore=null;
   const createParsedQuestionInfo = options.createParsedQuestionInfo ? options.createParsedQuestionInfo : createParsedQuestionInfoFallBack;
 
   function filterBlocks(b) {
-    return b.filter( (d) => d.cardType === CardType.Ignore ? false : true )
+    return b.filter( (d) => d !== null )
   }
 }
 
@@ -86,11 +85,11 @@ main
 /* The input text to the parser contains arbitrary text, not just card definitions. 
   Hence we fallback to matching on loose_line. The result from loose_line is filtered out by filterBlocks() */  
 block
-  = html_comment / inline_rev_card / inline_card / multiline_rev_card / multiline_card / close_card / loose_line
+  = html_comment / tilde_code / backprime_code / inline_rev_card / inline_card / multiline_rev_card / multiline_card / close_card / loose_line
 
 html_comment
   = $("<!--" (!"-->" (html_comment / .))* "-->" newline?) {
-    return createParsedQuestionInfo(CardType.Ignore,"",0,0);
+    return null;
   }
 
 /* Obsidian tag definition: https://help.obsidian.md/Editing+and+formatting/Tags#Tag+format */
@@ -104,7 +103,7 @@ inline_card
   = e:inline newline? { return e; }
 
 inline
-  = left:(!inline_mark non_newline)+ inline_mark right:text_till_newline (newline annotation)? {
+  = $(left:(!inline_mark (inline_code / non_newline))+ inline_mark right:text_till_newline (newline annotation)?) {
     return createParsedQuestionInfo(CardType.SingleLineBasic,text(),location().start.line-1,location().end.line-1);
   }
 
@@ -112,7 +111,7 @@ inline_rev_card
   = e:inline_rev newline? { return e; }
 
 inline_rev
-  = left:(!inline_rev_mark non_newline)+ inline_rev_mark right:text_till_newline (newline annotation)? {
+  = left:(!inline_rev_mark (inline_code / non_newline))+ inline_rev_mark right:text_till_newline (newline annotation)? {
       return createParsedQuestionInfo(CardType.SingleLineReversed,text(),location().start.line-1,location().end.line-1);
     }
 
@@ -132,24 +131,27 @@ multiline_before
 multiline_after
   = $(!separator_line (tilde_code / backprime_code / text_line))+
 
+inline_code
+  = $("\`" (!"\`" .)* "\`")
+
 tilde_code
   = $(
-    left:$tilde_marker text_line 
-    t:$(!(middle:$tilde_marker  &{ return left.length===middle.length;}) (tilde_code / text_line))* 
+    " "* left:$tilde_marker text_line
+    (!(middle:$tilde_marker &{ return left.length===middle.length;}) (tilde_code / text_line))*
     (right:$tilde_marker &{ return left.length===right.length; }) 
     newline
-  )  
+  ) { return null; }
   
 tilde_marker
   = "~~~" "~"*
 
 backprime_code
   = $(
-    left:$backprime_marker text_line 
-    t:$(!(middle:$backprime_marker  &{ return left.length===middle.length;}) (backprime_code / text_line))* 
+    " "* left:$backprime_marker text_line
+    (!(middle:$backprime_marker  &{ return left.length===middle.length;}) (backprime_code / text_line))*
     (right:$backprime_marker &{ return left.length===right.length; }) 
     newline
-  )  
+  ) { return null; }
   
 backprime_marker
   = "\`\`\`" "\`"*
@@ -239,14 +241,14 @@ text_line1
     
 loose_line
   = $((text_till_newline newline) / nonempty_text_till_newline) {
-      return createParsedQuestionInfo(CardType.Ignore,"",0,0);
+      return null;
     }
 
 annotation
   = $("<!--SR:" (!"-->" .)+ "-->")
     
 nonempty_text_till_newline
-  = $non_newline+
+  = $(inline_code / non_newline)+
 
 text_till_newline
   = $non_newline*
