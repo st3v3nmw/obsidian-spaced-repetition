@@ -10,9 +10,9 @@ export default {
     SKIP: "Sauter",
     EDIT_CARD: "Modifier la carte",
     RESET_CARD_PROGRESS: "Remettre à zéro le niveau de cette carte",
-    difficile: "Difficile",
+    HARD: "Difficile",
     GOOD: "Correct",
-    facile: "Facile",
+    EASY: "Facile",
     SHOW_ANSWER: "Montrer la réponse",
     CARD_PROGRESS_RESET: "Le niveau de la carte a été remis à zéro.",
     SAVE: "Sauvegarder",
@@ -74,13 +74,14 @@ export default {
     FOLDERS_TO_IGNORE: "Dossiers à ignorer",
     FOLDERS_TO_IGNORE_DESC: `Entrez les chemins des dossiers. Un chemin par ligne, ex. Templates Meta/Scripts.
 Ce réglage est le même pour les flashcards et les notes.`,
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Flashcards",
-    FLASHCARD_facile_LABEL: "Bouton Facile",
+    FLASHCARD_EASY_LABEL: "Bouton Facile",
     FLASHCARD_GOOD_LABEL: "Bouton Correct",
-    FLASHCARD_difficile_LABEL: "Bouton Difficile",
-    FLASHCARD_facile_DESC: "Changez le texte du bouton Facile",
+    FLASHCARD_HARD_LABEL: "Bouton Difficile",
+    FLASHCARD_EASY_DESC: "Changez le texte du bouton Facile",
     FLASHCARD_GOOD_DESC: "Changez le texte du bouton Correct",
-    FLASHCARD_difficile_DESC: "Changez le texte du bouton Difficile",
+    FLASHCARD_HARD_DESC: "Changez le texte du bouton Difficile",
     FLASHCARD_TAGS: "Tags des flashcards",
     FLASHCARD_TAGS_DESC:
         "Entrez les tags séparés par un espace ou une ligne i.e. #flashcards #paquet2 #paquet3.",
@@ -134,14 +135,19 @@ Ce réglage est le même pour les flashcards et les notes.`,
     OPEN_RANDOM_NOTE_DESC:
         "Si vous désactivez cette option, les notes sont triées par importance (PageRank).",
     AUTO_NEXT_NOTE: "Ouvrir la prochaine note automatiquement après un apprentissage",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Désactiver les options d'apprentissage dans le menu du fichier ex. Apprentissage : Facile Correct Difficile",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "Après avoir désactivé, vous pouvez utiliser les raccourcis clavier pour apprendre. Redémarrez d'abord Obsidian.",
     MAX_N_DAYS_REVIEW_QUEUE: "Jours maximum affichés dans la barre de droite",
     MIN_ONE_DAY: "Le nombre de jours doit être au moins 1.",
     VALID_NUMBER_WARNING: "Entrez un nombre valide.",
     UI_PREFERENCES: "Préférences UI",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "Enable the review options in the file menu (e.g. Review: Easy, Good, Hard)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "If you disable the review options in the file menu, you can review your notes using the plugin commands and, if you defined them, the associated command hotkeys.",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE:
         "Les dossiers de paquets devraient initialement tous être ouverts",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
@@ -155,10 +161,10 @@ Ce réglage est le même pour les flashcards et les notes.`,
     LAPSE_INTERVAL_CHANGE:
         "Changement d'intervalle quand vous indiquez qu'une flashcard/note a été difficile",
     LAPSE_INTERVAL_CHANGE_DESC: "nouvelIntervalle = ancienIntervalle * changementIntervalle / 100.",
-    facile_BONUS: "Bonus Facile",
-    facile_BONUS_DESC:
+    EASY_BONUS: "Bonus Facile",
+    EASY_BONUS_DESC:
         "Le bonus Facile vous permet d'augmenter l'intervalle entre une réponse Correct et une réponse Facile sur une flashcard/note (minimum = 100%).",
-    facile_BONUS_MIN_WARNING: "Le bonus Facile doit être au moins 100.",
+    EASY_BONUS_MIN_WARNING: "Le bonus Facile doit être au moins 100.",
     MAX_INTERVAL: "Intervalle maximum (en jours)",
     MAX_INTERVAL_DESC:
         "Vous permet de mettre une limite maximale sur l'intervalle (par défaut, 100 ans).",

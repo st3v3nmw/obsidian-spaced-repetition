@@ -14,7 +14,7 @@ test("Check that localization entries are consistent across all files", () => {
             const extra_keys = locale_keys.filter((x) => !expected_keys.includes(x));
             expect(
                 extra_keys.length,
-                `The ${language_code} locale includes the following deprecated translations: ${extra_keys}.`,
+                `The ${language_code} locale includes the following translations that are no longer in use: ${extra_keys}.`,
             ).toBe(0);
         }
     });
