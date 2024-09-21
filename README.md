@@ -8,7 +8,7 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
 -   Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/3/) for upcoming features & fixes.
 -   Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug report.
 -   Visit the [discussions](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/) section for Q&A help, feedback, and general discussion.
--   The plugin has been translated into _Arabic, Chinese, Czech, German, Italian, Korean, Japanese, Polish, Portuguese, Spanish, Russian, and Turkish_ by the Obsidian community 😄.
+-   The plugin has been translated into _Arabic, Chinese, Czech, French, German, Italian, Korean, Japanese, Polish, Portuguese, Spanish, Russian, and Turkish_ by the Obsidian community 😄.
     -   To help translate this plugin to your language, check the [translation guide here](https://www.stephenmwangi.com/obsidian-spaced-repetition/contributing/#translating_1).
 
 ## Features
