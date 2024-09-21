@@ -121,8 +121,8 @@ export default class SRPlugin extends Plugin {
     }
 
     showFileMenuItems(status: boolean) {
+        // define the handler if it was not defined yet
         if (this.fileMenuHandler === undefined) {
-            // define the handler if it was not defined yet
             this.fileMenuHandler = (menu, fileish: TAbstractFile) => {
                 if (fileish instanceof TFile && fileish.extension === "md") {
                     menu.addItem((item) => {
@@ -475,8 +475,8 @@ export default class SRPlugin extends Plugin {
     }
 
     showRibbonIcon(status: boolean) {
+        // if it does not exit, we create it
         if (!this.ribbonIcon) {
-            // if it does not exit, we create it
             this.ribbonIcon = this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
                 if (!this.osrAppCore.syncLock) {
                     await this.sync();
@@ -496,8 +496,8 @@ export default class SRPlugin extends Plugin {
     }
 
     showStatusBar(status: boolean) {
+        // if it does not exit, we create it
         if (!this.statusBar) {
-            // if it does not exit, we create it
             this.statusBar = this.addStatusBarItem();
             this.statusBar.classList.add("mod-clickable");
             this.statusBar.setAttribute("aria-label", t("OPEN_NOTE_FOR_REVIEW"));
@@ -509,6 +509,7 @@ export default class SRPlugin extends Plugin {
                 }
             });
         }
+
         if (status) {
             this.statusBar.style.display = "";
         } else {

@@ -25,8 +25,9 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
     :material-circle-medium: Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug-report.
 
 !!! tip "Contributing"
-:material-circle-medium: The plugin has been translated into over [10 languages](contributing.md#translating) by the Obsidian community 😄. To help translate this plugin to your language, check the [translation guide here](contributing.md#translating).<br/>
-:material-circle-medium: Software developers can contribute [feature enhancements and bug fixes](contributing.md#code)
+
+    :material-circle-medium: The plugin has been translated into over [10 languages](contributing.md#translating) by the Obsidian community 😄. To help translate this plugin to your language, check the [translation guide here](contributing.md#translating).<br/>
+    :material-circle-medium: Software developers can contribute [feature enhancements and bug fixes](contributing.md#code)
 
 </div>
 
