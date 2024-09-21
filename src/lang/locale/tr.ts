@@ -73,6 +73,7 @@ export default {
     FOLDERS_TO_IGNORE: "Yoksayılan Klasörler",
     FOLDERS_TO_IGNORE_DESC: `Klasör yollarını yeni satırlarla ayırarak girin, örneğin: Templates Meta/Scripts.
     Bu ayarın hem Flash Kartlar hem de Notlar için geçerli olduğunu unutmayın.`,
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Flash Kartlar",
     FLASHCARD_EASY_LABEL: "Kolay Butonu Metni",
     FLASHCARD_GOOD_LABEL: "Orta Butonu Metni",
@@ -132,14 +133,19 @@ export default {
     OPEN_RANDOM_NOTE: "Gözden geçirmek için rastgele bir not aç",
     OPEN_RANDOM_NOTE_DESC: "Bunu kapattığınızda, notlar önem sırasına göre sıralanır (PageRank).",
     AUTO_NEXT_NOTE: "Bir incelemeden sonra otomatik olarak bir sonraki notu aç",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Dosya menüsünde inceleme seçeneklerini devre dışı bırak örn. İnceleme: Kolay Orta Zor",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "Devre dışı bıraktıktan sonra komut kısayollarını kullanarak inceleme yapabilirsiniz. Bu değişiklikten sonra Obsidian’ı yeniden başlatın.",
     MAX_N_DAYS_REVIEW_QUEUE: "Sağ panelde gösterilecek maksimum gün sayısı",
     MIN_ONE_DAY: "Gün sayısı en az 1 olmalıdır.",
     VALID_NUMBER_WARNING: "Lütfen geçerli bir sayı girin.",
     UI_PREFERENCES: "Kullanıcı Arayüzü Tercihleri",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "Enable the review options in the file menu (e.g. Review: Easy, Good, Hard)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "If you disable the review options in the file menu, you can review your notes using the plugin commands and, if you defined them, the associated command hotkeys.",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE:
         "Deste ağaçları başlangıçta genişletilmiş olarak gösterilmeli mi",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:

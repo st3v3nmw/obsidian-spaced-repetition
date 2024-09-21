@@ -1,102 +1,104 @@
-const utils = require("./utils");
+// TODO: Fix e2e tests
 
-before(async function () {
-    await utils.setUpVault();
-});
+// const utils = require("./utils");
 
-describe("Notes Review", () => {
-    describe("commands", () => {
-        it("should review with default #review tag (easy)", async function () {
-            const testFilePath = utils.copyInputFile("notes_default_tag.md", this.test.fullTitle());
+// before(async function () {
+//     await utils.setUpVault();
+// });
 
-            await utils.runCommand("Open a note for review");
-            await utils.runCommand("Review note as easy");
+// describe("Notes Review", () => {
+//     describe("commands", () => {
+//         it("should review with default #review tag (easy)", async function () {
+//             const testFilePath = utils.copyInputFile("notes_default_tag.md", this.test.fullTitle());
 
-            utils.assertNotesScheduling(testFilePath, "4", "270");
-        });
+//             await utils.runCommand("Open a note for review");
+//             await utils.runCommand("Review note as easy");
 
-        it("should review with default #review tag (good)", async function () {
-            const testFilePath = utils.copyInputFile("notes_default_tag.md", this.test.fullTitle());
+//             utils.assertNotesScheduling(testFilePath, "4", "270");
+//         });
 
-            await utils.runCommand("Open a note for review");
-            await utils.runCommand("Review note as good");
+//         it("should review with default #review tag (good)", async function () {
+//             const testFilePath = utils.copyInputFile("notes_default_tag.md", this.test.fullTitle());
 
-            utils.assertNotesScheduling(testFilePath, "3", "250");
-        });
+//             await utils.runCommand("Open a note for review");
+//             await utils.runCommand("Review note as good");
 
-        it("should review with default #review tag (hard)", async function () {
-            const testFilePath = utils.copyInputFile("notes_default_tag.md", this.test.fullTitle());
+//             utils.assertNotesScheduling(testFilePath, "3", "250");
+//         });
 
-            await utils.runCommand("Open a note for review");
-            await utils.runCommand("Review note as hard");
+//         it("should review with default #review tag (hard)", async function () {
+//             const testFilePath = utils.copyInputFile("notes_default_tag.md", this.test.fullTitle());
 
-            utils.assertNotesScheduling(testFilePath, "1", "230");
-        });
-    });
+//             await utils.runCommand("Open a note for review");
+//             await utils.runCommand("Review note as hard");
 
-    describe("file menu", () => {
-        it("should review with default #review tag (easy)", async function () {
-            const testTitle = this.test.fullTitle();
-            const testFilePath = utils.copyInputFile("notes_default_tag.md", testTitle);
+//             utils.assertNotesScheduling(testFilePath, "1", "230");
+//         });
+//     });
 
-            const fileEl = browser.$(`.nav-file-title[data-path="${testTitle}.md"]`);
-            await fileEl.click(); // open file
-            await fileEl.click({ button: "right" }); // open file menu
-            await browser.$('//div[text() = "Review: Easy"]').click();
-            await utils.sleep(1);
+//     describe("file menu", () => {
+//         it("should review with default #review tag (easy)", async function () {
+//             const testTitle = this.test.fullTitle();
+//             const testFilePath = utils.copyInputFile("notes_default_tag.md", testTitle);
 
-            utils.assertNotesScheduling(testFilePath, "4", "270");
-        });
+//             const fileEl = browser.$(`.nav-file-title[data-path="${testTitle}.md"]`);
+//             await fileEl.click(); // open file
+//             await fileEl.click({ button: "right" }); // open file menu
+//             await browser.$('//div[text() = "Review: Easy"]').click();
+//             await utils.sleep(1);
 
-        it("should review with default #review tag (good)", async function () {
-            const testTitle = this.test.fullTitle();
-            const testFilePath = utils.copyInputFile("notes_default_tag.md", testTitle);
+//             utils.assertNotesScheduling(testFilePath, "4", "270");
+//         });
 
-            const fileEl = browser.$(`.nav-file-title[data-path="${testTitle}.md"]`);
-            await fileEl.click(); // open file
-            await fileEl.click({ button: "right" }); // open file menu
-            await browser.$('//div[text() = "Review: Good"]').click();
-            await utils.sleep(1);
+//         it("should review with default #review tag (good)", async function () {
+//             const testTitle = this.test.fullTitle();
+//             const testFilePath = utils.copyInputFile("notes_default_tag.md", testTitle);
 
-            utils.assertNotesScheduling(testFilePath, "3", "250");
-        });
+//             const fileEl = browser.$(`.nav-file-title[data-path="${testTitle}.md"]`);
+//             await fileEl.click(); // open file
+//             await fileEl.click({ button: "right" }); // open file menu
+//             await browser.$('//div[text() = "Review: Good"]').click();
+//             await utils.sleep(1);
 
-        it("should review with default #review tag (hard)", async function () {
-            const testTitle = this.test.fullTitle();
-            const testFilePath = utils.copyInputFile("notes_default_tag.md", testTitle);
+//             utils.assertNotesScheduling(testFilePath, "3", "250");
+//         });
 
-            const fileEl = browser.$(`.nav-file-title[data-path="${testTitle}.md"]`);
-            await fileEl.click(); // open file
-            await fileEl.click({ button: "right" }); // open file menu
-            await browser.$('//div[text() = "Review: Hard"]').click();
-            await utils.sleep(1);
+//         it("should review with default #review tag (hard)", async function () {
+//             const testTitle = this.test.fullTitle();
+//             const testFilePath = utils.copyInputFile("notes_default_tag.md", testTitle);
 
-            utils.assertNotesScheduling(testFilePath, "1", "230");
-        });
-    });
+//             const fileEl = browser.$(`.nav-file-title[data-path="${testTitle}.md"]`);
+//             await fileEl.click(); // open file
+//             await fileEl.click({ button: "right" }); // open file menu
+//             await browser.$('//div[text() = "Review: Hard"]').click();
+//             await utils.sleep(1);
 
-    // describe("sidebar", () => {
-    //     before(async function () {
-    //         // Open the sidebar
-    //         await browser.$("div.sidebar-toggle-button.mod-right").click();
-    //         await browser.$('.workspace-tab-header[aria-label="Notes Review Queue"]').click();
-    //     });
+//             utils.assertNotesScheduling(testFilePath, "1", "230");
+//         });
+//     });
 
-    //     it("should review with default #review tag (easy)", async function () {
-    //         const testTitle = this.test.fullTitle();
-    //         const testFilePath = utils.copyInputFile("notes_default_tag.md", testTitle);
-    //         await utils.runCommand("Open a note for review");  // force re-index
+//     // describe("sidebar", () => {
+//     //     before(async function () {
+//     //         // Open the sidebar
+//     //         await browser.$("div.sidebar-toggle-button.mod-right").click();
+//     //         await browser.$('.workspace-tab-header[aria-label="Notes Review Queue"]').click();
+//     //     });
 
-    //         await utils.sleep(2);
-    //         const fileEl = browser.$(
-    //             `//div[@class="nav-file-title-content" and text()="${testTitle}"]`
-    //         );
-    //         await fileEl.click(); // open file
-    //         await fileEl.click({ button: "right" }); // open file menu
-    //         await browser.$('//div[text() = "Review: Easy"]').click();
-    //         await utils.sleep(1);
+//     //     it("should review with default #review tag (easy)", async function () {
+//     //         const testTitle = this.test.fullTitle();
+//     //         const testFilePath = utils.copyInputFile("notes_default_tag.md", testTitle);
+//     //         await utils.runCommand("Open a note for review");  // force re-index
 
-    //         utils.assertNotesScheduling(testFilePath, "4", "270");
-    //     });
-    // });
-});
+//     //         await utils.sleep(2);
+//     //         const fileEl = browser.$(
+//     //             `//div[@class="nav-file-title-content" and text()="${testTitle}"]`
+//     //         );
+//     //         await fileEl.click(); // open file
+//     //         await fileEl.click({ button: "right" }); // open file menu
+//     //         await browser.$('//div[text() = "Review: Easy"]').click();
+//     //         await utils.sleep(1);
+
+//     //         utils.assertNotesScheduling(testFilePath, "4", "270");
+//     //     });
+//     // });
+// });

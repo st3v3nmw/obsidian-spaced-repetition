@@ -15,6 +15,7 @@
 ---
 
 ## Notes
+
 -   Notes should be atomic i.e. focus on a single concept.
 -   Notes should be highly linked.
 -   Reviews should start only after properly understanding a concept.
@@ -22,11 +23,11 @@
 
 ### Incremental Writing
 
-
 -   English: [Obsidian: inbox review with spaced repetition by @aviskase :fontawesome-brands-youtube:{ .youtube } ](https://youtu.be/zG5r7QIY_TM)
 -   Russian / русский: [Разгребатель инбокса заметок как у Andy Matuschak в Obsidian by @YuliyaBagriy_ru :fontawesome-brands-youtube:{ .youtube } ](https://youtu.be/CF6SSHB74cs)
 
 !!! bug "Improvement Needed"
+
     Extract anything important from the reference and include here instead
 
 This was introduced [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/15) by `@aviskase`.
@@ -36,6 +37,7 @@ This was introduced [here](https://github.com/st3v3nmw/obsidian-spaced-repetitio
 Andy Matuschak uses [spaced repetition system for working on writing inbox](https://notes.andymatuschak.org/z7iCjRziX6V6unNWL81yc2dJicpRw2Cpp9MfQ).
 
 !!! bug "Improvement Needed"
+
     What does this mean?
 
 In short, there are four possible actions (where `x < y`):

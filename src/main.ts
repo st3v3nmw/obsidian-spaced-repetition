@@ -1,50 +1,50 @@
-import { EventRef, Menu, Notice, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
-import {
-    SRSettingTab,
-    SRSettings,
-    DEFAULT_SETTINGS,
-    upgradeSettings,
-    SettingsUtil,
-} from "src/settings";
-import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/ReviewQueueListView";
-import { t } from "src/lang/helpers";
-import { appIcon } from "src/icons/appicon";
-import { TopicPath } from "./TopicPath";
-import { CardListType, Deck, DeckTreeFilter } from "./Deck";
-import {
-    FlashcardReviewMode,
-    FlashcardReviewSequencer as FlashcardReviewSequencer,
-    IFlashcardReviewSequencer as IFlashcardReviewSequencer,
-} from "./FlashcardReviewSequencer";
+import { Menu, Notice, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
+
+import { ReviewResponse } from "src/algorithms/base/repetition-item";
+import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
+import { ObsidianVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
+import { SrsAlgorithm_Osr } from "src/algorithms/osr/srs-algorithm-osr";
+import { OsrAppCore } from "src/app-core";
+import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
+import { DataStoreInNote_AlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
+import { DataStore } from "src/data-stores/base/data-store";
+import { StoreInNote } from "src/data-stores/store-in-note/note";
+import { CardListType, Deck, DeckTreeFilter } from "src/deck";
 import {
     CardOrder,
+    DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
-    DeckOrder,
-} from "./DeckTreeIterator";
-import { Note } from "./Note";
-import { NoteFileLoader } from "./NoteFileLoader";
-import { ISRFile, SrTFile as SrTFile } from "./SRFile";
-import { QuestionPostponementList } from "./QuestionPostponementList";
-import { TextDirection } from "./util/TextDirection";
-import { convertToStringOrEmpty } from "./util/utils";
-import { ReviewResponse } from "./algorithms/base/RepetitionItem";
-import { SrsAlgorithm } from "./algorithms/base/SrsAlgorithm";
-import { DataStore } from "./dataStore/base/DataStore";
-import { DataStoreAlgorithm } from "./dataStoreAlgorithm/DataStoreAlgorithm";
-import { DataStoreInNote_AlgorithmOsr } from "./dataStoreAlgorithm/DataStoreInNote_AlgorithmOsr";
-import { DataStore_StoreInNote } from "./dataStore/storeInNote/DataStore_StoreInNote";
-import { SrsAlgorithm_Osr } from "./algorithms/osr/SrsAlgorithm_Osr";
-import { OsrAppCore } from "./OsrAppCore";
-import { DEFAULT_DATA, PluginData } from "./PluginData";
-import { NextNoteReviewHandler } from "./NextNoteReviewHandler";
-import { OsrSidebar } from "./gui/OsrSidebar";
-import { ObsidianVaultNoteLinkInfoFinder } from "./algorithms/osr/ObsidianVaultNoteLinkInfoFinder";
-import { StatsModal } from "./gui/StatsModal";
-import { FlashcardModal } from "./gui/FlashcardModal";
-import { setDebugParser } from "./parser";
-import { generateParser } from "./generateParser";
+} from "src/deck-tree-iterator";
+import {
+    FlashcardReviewMode,
+    FlashcardReviewSequencer,
+    IFlashcardReviewSequencer,
+} from "src/flashcard-review-sequencer";
+import { FlashcardModal } from "src/gui/flashcard-modal";
+import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/review-queue-list-view";
+import { OsrSidebar } from "src/gui/sidebar";
+import { StatsModal } from "src/gui/stats-modal";
+import { appIcon } from "src/icons/app-icon";
+import { t } from "src/lang/helpers";
+import { NextNoteReviewHandler } from "src/next-note-review-handler";
+import { Note } from "src/note";
+import { NoteFileLoader } from "src/note-file-loader";
+import { generateParser, setDebugParser } from "src/parser";
+import { DEFAULT_DATA, PluginData } from "src/plugin-data";
+import { QuestionPostponementList } from "src/question-postponement-list";
+import {
+    DEFAULT_SETTINGS,
+    SettingsUtil,
+    SRSettings,
+    SRSettingTab,
+    upgradeSettings,
+} from "src/settings";
+import { ISRFile, SrTFile as SrTFile } from "src/sr-file";
+import { TopicPath } from "src/topic-path";
+import { TextDirection } from "src/utils/text-direction";
+import { convertToStringOrEmpty } from "src/utils/utils";
 
 export default class SRPlugin extends Plugin {
     public data: PluginData;
@@ -56,10 +56,14 @@ export default class SRPlugin extends Plugin {
 
     private ribbonIcon: HTMLElement | null = null;
     private statusBar: HTMLElement | null = null;
-    private fileMenuHandler:((menu:Menu,file:TAbstractFile, source:string, leaf?:WorkspaceLeaf)=>void);
+    private fileMenuHandler: (
+        menu: Menu,
+        file: TAbstractFile,
+        source: string,
+        leaf?: WorkspaceLeaf,
+    ) => void;
 
     async onload(): Promise<void> {
-        console.log("onload: Branch: feat-878-support-multiple-sched, Date: 2024-07-24");
         await this.loadPluginData();
 
         this.initLogicClasses();
@@ -96,7 +100,7 @@ export default class SRPlugin extends Plugin {
         appIcon();
 
         this.showStatusBar(this.data.settings.showStatusBar);
-        
+
         this.showRibbonIcon(this.data.settings.showRibbonIcon);
 
         this.showFileMenuItems(!this.data.settings.disableFileMenuReviewOptions);
@@ -116,9 +120,9 @@ export default class SRPlugin extends Plugin {
         });
     }
 
-    showFileMenuItems(status:boolean) {
-
-        if(this.fileMenuHandler===undefined) { // define the handler if it was not defined yet
+    showFileMenuItems(status: boolean) {
+        // define the handler if it was not defined yet
+        if (this.fileMenuHandler === undefined) {
             this.fileMenuHandler = (menu, fileish: TAbstractFile) => {
                 if (fileish instanceof TFile && fileish.extension === "md") {
                     menu.addItem((item) => {
@@ -160,7 +164,7 @@ export default class SRPlugin extends Plugin {
             };
         }
 
-        if(status){
+        if (status) {
             this.registerEvent(this.app.workspace.on("file-menu", this.fileMenuHandler));
         } else {
             this.app.workspace.off("file-menu", this.fileMenuHandler);
@@ -351,7 +355,6 @@ export default class SRPlugin extends Plugin {
         await this.osrAppCore.loadVault();
 
         if (this.data.settings.showDebugMessages) {
-            // TODO: console.log(`SR: ${t("EASES")}`, this.easeByPath.dict);
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
@@ -441,7 +444,7 @@ export default class SRPlugin extends Plugin {
 
     setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
         // For now we can hardcoded as we only support the one data store and one algorithm
-        DataStore.instance = new DataStore_StoreInNote(settings);
+        DataStore.instance = new StoreInNote(settings);
         SrsAlgorithm.instance = new SrsAlgorithm_Osr(settings);
         DataStoreAlgorithm.instance = new DataStoreInNote_AlgorithmOsr(settings);
     }
@@ -471,8 +474,9 @@ export default class SRPlugin extends Plugin {
         }, timeout_ms);
     }
 
-    showRibbonIcon(status:boolean) {
-        if(!this.ribbonIcon) { // if it does not exit, we create it
+    showRibbonIcon(status: boolean) {
+        // if it does not exit, we create it
+        if (!this.ribbonIcon) {
             this.ribbonIcon = this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
                 if (!this.osrAppCore.syncLock) {
                     await this.sync();
@@ -484,15 +488,16 @@ export default class SRPlugin extends Plugin {
                 }
             });
         }
-        if(status) {
+        if (status) {
             this.ribbonIcon.style.display = "";
         } else {
             this.ribbonIcon.style.display = "none";
         }
     }
 
-    showStatusBar(status:boolean) {
-        if(!this.statusBar) { // if it does not exit, we create it
+    showStatusBar(status: boolean) {
+        // if it does not exit, we create it
+        if (!this.statusBar) {
             this.statusBar = this.addStatusBarItem();
             this.statusBar.classList.add("mod-clickable");
             this.statusBar.setAttribute("aria-label", t("OPEN_NOTE_FOR_REVIEW"));
@@ -504,7 +509,8 @@ export default class SRPlugin extends Plugin {
                 }
             });
         }
-        if(status) {
+
+        if (status) {
             this.statusBar.style.display = "";
         } else {
             this.statusBar.style.display = "none";

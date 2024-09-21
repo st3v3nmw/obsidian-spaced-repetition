@@ -11,12 +11,15 @@ The front of the card is displayed as the text with (one or more) `cloze deletio
 A part of the card text is identified as a cloze deletion by surrounding it with the `cloze delimiter`.
 
 ### Single Cloze Deletion
+
 By default, the cloze delimiter is `==`, and a simple cloze card would be:
+
 ```
 The first female prime minister of Australia was ==Julia Gillard==
 ```
 
 !!! note "Displayed when reviewed"
+
     <div class="grid" markdown>
 
     !!! tip "Initial View"
@@ -29,17 +32,18 @@ The first female prime minister of Australia was ==Julia Gillard==
 
     </div>
 
-
-
 ### Multiple Cloze Deletions
+
 If the card text identifies multiple parts as cloze deletions, then multiple cards will be shown for review, each one occluding one deletion, while leaving the other deletions visible.
 
 For instance, the following note:
+
 ```
 The first female ==prime minister== of Australia was ==Julia Gillard==
 ```
 
 !!! note ""
+
     <div class="grid" markdown>
 
     !!! tip "Card 1 Initial View"
@@ -62,7 +66,6 @@ These two cards are considered sibling cards. See [sibling cards](flashcards-ove
 ## Cloze Delimiter
 
 The cloze delimiter can be modified in [settings](../user-options.md#flashcard-review), e.g. to `**`, or curly braces `{{text in curly braces}}`.
-
 
 <!--
 ## Cloze Hints
@@ -106,4 +109,5 @@ and this also ==in group 1==[^1]
 ## Anki style
 
 !!! warning
+
     Anki style `{{c1:This text}} would {{c2:generate}} {{c1:2 cards}}` cloze deletions are not currently supported. This feature is being tracked [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/93/).

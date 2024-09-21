@@ -12,18 +12,19 @@ First off, thanks for wanting to contribute to the Spaced Repetition plugin!
 
 The plugin has been translated into the following languages by the Obsidian community 😄.
 
-- Arabic / العربية
-- Chinese (Simplified) / 简体中文
-- Chinese (Traditional) / 繁體中文
-- Czech / čeština
-- German / Deutsch
-- Italian / Italiano
-- Korean / 한국어
-- Japanese / 日本語
-- Polish / Polski
-- Portuguese (Brazil) / Português do Brasil
-- Spanish / Español
-- Russian / русский
+-   Arabic / العربية
+-   Chinese (Simplified) / 简体中文
+-   Chinese (Traditional) / 繁體中文
+-   Czech / čeština
+-   German / Deutsch
+-   Italian / Italiano
+-   Korean / 한국어
+-   Japanese / 日本語
+-   Polish / Polski
+-   Portuguese (Brazil) / Português do Brasil
+-   Spanish / Español
+-   Russian / русский
+-   Turkish / Türkçe
 
 ### Steps
 
@@ -73,7 +74,6 @@ Please note that:
 
 ---
 
-
 ## Code
 
 1. Make your changes.
@@ -111,7 +111,6 @@ Please note that:
 
 ---
 
-
 ## Documentation
 
 The documentation consists of Markdown files which [MkDocs](https://www.mkdocs.org/) converts to static web pages.
@@ -148,7 +147,6 @@ For larger diffs, it's important that you check how your docs look like as expla
 4. Translate then open a pull request.
 
 ---
-
 
 ## Maintenance
 

@@ -73,6 +73,7 @@ export default {
     FOLDERS_TO_IGNORE: "忽略此文件夹",
     FOLDERS_TO_IGNORE_DESC: `输入文件夹路径，用新建行分隔，例如：Templates Meta/Scripts.
 Note that this setting is common to both Flashcards and Notes.`,
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "卡片",
     FLASHCARD_EASY_LABEL: "“简单”按钮文本",
     FLASHCARD_GOOD_LABEL: "“记得”按钮文本",
@@ -129,6 +130,11 @@ Note that this setting is common to both Flashcards and Notes.`,
     MIN_ONE_DAY: "天数最小值为1",
     VALID_NUMBER_WARNING: "请输入有效的数字。",
     UI_PREFERENCES: "用户界面首选项",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "甲板树最初应显示为展开",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "关闭此选项可折叠同一张卡片中的嵌套牌组。如果您的卡片属于同一文件中的许多套牌，则很有用。",
