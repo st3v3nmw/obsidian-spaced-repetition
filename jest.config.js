@@ -17,7 +17,7 @@ module.exports = {
 
         // GUI & Obsidian coupled code
         "src/app-core.ts",
-        "src/file.ts",
+        "src/sr-file.ts",
         "src/gui/",
         "src/icons/",
         "src/main.ts",

@@ -21,7 +21,7 @@
     "author": "Stephen Mwangi",
     "license": "MIT",
     "devDependencies": {
-        "@eslint/js": "^9.10.0",
+        "@eslint/js": "^9.11.0",
         "@types/eslint__js": "^8.42.3",
         "@types/jest": "^29.5.13",
         "@types/node": "^22.5.5",
@@ -36,7 +36,7 @@
         "builtin-modules": "^4.0.0",
         "chai": "^5.1.1",
         "esbuild": "^0.23.1",
-        "eslint": "^9.10.0",
+        "eslint": "^9.11.0",
         "eslint-plugin-simple-import-sort": "^12.1.1",
         "eslint-plugin-unicorn": "^55.0.0",
         "jest": "^29.7.0",
