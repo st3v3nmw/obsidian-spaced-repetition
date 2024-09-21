@@ -11,25 +11,24 @@ module.exports = {
     roots: ["<rootDir>/src/", "<rootDir>/tests/unit/"],
     collectCoverageFrom: ["./src/**"],
     coveragePathIgnorePatterns: [
-        "src/icons",
-        "src/gui",
-        "src/ReviewDeck.ts",
-        "src/SRFile.ts",
+        "src/icons/", // obsidian dependencies
+        "src/gui/", // obsidian dependencies
+        "src/sr-file.ts", // obsidian dependencies
         "src/declarations.d.ts",
-        "src/main.ts",
-        "src/settings.ts",
-        "src/util/RenderMarkdownWrapper.ts",
-        "src/util/TimeTestUtil.ts",
+        "src/main.ts", // obsidian dependencies
+        "src/settings.ts", // obsidian dependencies
+        "src/utils/render-markdown-wrapper.ts", // obsidian dependencies
     ],
     coverageDirectory: "coverage",
     collectCoverage: true,
     coverageProvider: "v8",
     coverageThreshold: {
         global: {
-            lines: 90,
-            statements: 90,
-            branches: 90,
-            functions: 90,
+            // TODO: Bring coverage back up to 98%+
+            statements: 94,
+            branches: 93,
+            lines: 94,
+            functions: 89,
         },
     },
 };

@@ -73,6 +73,7 @@ export default {
     FOLDERS_TO_IGNORE: "무시할 폴더들",
     FOLDERS_TO_IGNORE_DESC: `폴더 경로를 빈 줄로 구분해서 입력해주세요. 'Templates Meta/Scripts' 와 같이 입력하는 것은 유효하지 않습니다.
 Note that this setting is common to both Flashcards and Notes.`,
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "플래시카드",
     FLASHCARD_EASY_LABEL: "Easy Button Text",
     FLASHCARD_GOOD_LABEL: "Good Button Text",
@@ -123,6 +124,7 @@ Note that this setting is common to both Flashcards and Notes.`,
     INLINE_REVERSED_CARDS_SEPARATOR: "인라인 반전 플래시카드 구분자",
     MULTILINE_CARDS_SEPARATOR: "여러 줄 플래시카드 구분자",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "여러 줄 반전 플래시카드 구분자",
+    MULTILINE_CARDS_END_MARKER: "클로즈와 다중 행 플래시카드의 끝을 나타내는 문자",
     NOTES: "노트",
     REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "리뷰에 사용할 태그",
@@ -131,14 +133,19 @@ Note that this setting is common to both Flashcards and Notes.`,
     OPEN_RANDOM_NOTE: "리뷰를 위해 랜덤 노트를 엽니다.",
     OPEN_RANDOM_NOTE_DESC: "이 옵션이 꺼져있으면, 노트는 중요도(페이지 랭크)에 따라 정렬됩니다.",
     AUTO_NEXT_NOTE: "리뷰 후에 다음 노트를 자동으로 엽니다.",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "파일 메뉴에서의 리뷰 옵션을 비활성화 합니다. 예) 리뷰: Easy Good Hard",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "이 옵션을 비활성화 한 후, 명령 단축키를 이용해 리뷰하실 수 있습니다. 이 옵션을 변경한 후에 옵시디언을 새로고침 하십시오.",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "파일 메뉴에서 검토 옵션을 활성화하세요 (예: 검토: 쉬움, 좋음, 어려움)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "파일 메뉴에서 검토 옵션을 비활성화하면 플러그인 명령을 사용해 노트를 검토할 수 있으며, 정의된 경우에는 관련된 단축키도 사용할 수 있습니다.",
     MAX_N_DAYS_REVIEW_QUEUE: "오른쪽 패널에 표시할 최대 일수",
     MIN_ONE_DAY: "적어도 1이상이어야 합니다.",
     VALID_NUMBER_WARNING: "유효한 숫자를 입력해주세요.",
     UI_PREFERENCES: "사용자 인터페이스 기본 설정",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "덱 트리는 처음에 확장된 것으로 표시되어야 합니다.",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "같은 카드에 중첩된 덱을 접으려면 이 옵션을 끄십시오. 같은 파일에 여러 덱에 속한 카드가 있는 경우 유용합니다.",
@@ -161,7 +168,9 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB_DESC:
         "링크된 노트의 초기 ease에 대한 가중치가 적용된 ease의 최대 기여도입니다.",
     LOGGING: "로깅",
-    DISPLAY_DEBUG_INFO: "디버깅 정보를 개발자 콘솔에 표시하시겠습니까?",
+    DISPLAY_DEBUG_INFO: "디버깅 정보를 개발자 콘솔에 표시하시겠습니까",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "리뷰할 노트 대기열",

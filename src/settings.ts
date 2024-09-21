@@ -1,7 +1,9 @@
-import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
-import type SRPlugin from "src/main";
+import { App, Notice, Platform, PluginSettingTab, Setting } from "obsidian";
+
+import { createTabs, TabStructure } from "src/gui/tabs";
 import { t } from "src/lang/helpers";
-import { TabStructure, createTabs } from "./gui/Tabs";
+import type SRPlugin from "src/main";
+import { setDebugParser } from "src/parser";
 
 export interface SRSettings {
     // flashcards
@@ -25,6 +27,7 @@ export interface SRSettings {
     singleLineReversedCardSeparator: string;
     multilineCardSeparator: string;
     multilineReversedCardSeparator: string;
+    multilineCardEndMarker: string;
     editLaterTag: string;
     // notes
     enableNoteReviewPaneOnStartup: boolean;
@@ -35,6 +38,8 @@ export interface SRSettings {
     disableFileMenuReviewOptions: boolean;
     maxNDaysNotesReviewQueue: number;
     // UI preferences
+    showRibbonIcon: boolean;
+    showStatusBar: boolean;
     initiallyExpandAllSubdecksInTree: boolean;
     // algorithm
     baseEase: number;
@@ -44,6 +49,7 @@ export interface SRSettings {
     maxLinkFactor: number;
     // logging
     showDebugMessages: boolean;
+    showPaserDebugMessages: boolean;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
@@ -69,6 +75,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     singleLineReversedCardSeparator: ":::",
     multilineCardSeparator: "?",
     multilineReversedCardSeparator: "??",
+    multilineCardEndMarker: "",
     editLaterTag: "#edit-later",
     // notes
     enableNoteReviewPaneOnStartup: true,
@@ -79,6 +86,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     disableFileMenuReviewOptions: false,
     maxNDaysNotesReviewQueue: 365,
     // UI settings
+    showRibbonIcon: true,
+    showStatusBar: true,
     initiallyExpandAllSubdecksInTree: false,
     // algorithm
     baseEase: 250,
@@ -88,6 +97,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     maxLinkFactor: 1.0,
     // logging
     showDebugMessages: false,
+    showPaserDebugMessages: false,
 };
 
 export function upgradeSettings(settings: SRSettings) {
@@ -110,6 +120,34 @@ export function upgradeSettings(settings: SRSettings) {
 export class SettingsUtil {
     static isFlashcardTag(settings: SRSettings, tag: string): boolean {
         return SettingsUtil.isTagInList(settings.flashcardTags, tag);
+    }
+
+    static isPathInNoteIgnoreFolder(settings: SRSettings, path: string): boolean {
+        return settings.noteFoldersToIgnore.some((folder) => path.startsWith(folder));
+    }
+
+    static isAnyTagANoteReviewTag(settings: SRSettings, tags: string[]): boolean {
+        for (const tag of tags) {
+            if (
+                settings.tagsToReview.some(
+                    (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/"),
+                )
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Given a list of tags, return the subset that is in settings.tagsToReview
+    static filterForNoteReviewTag(settings: SRSettings, tags: string[]): string[] {
+        const result: string[] = [];
+        for (const tagToReview of settings.tagsToReview) {
+            if (tags.some((tag) => tag === tagToReview || tag.startsWith(tagToReview + "/"))) {
+                result.push(tagToReview);
+            }
+        }
+        return result;
     }
 
     private static isTagInList(tagList: string[], tag: string): boolean {
@@ -143,7 +181,9 @@ export class SRSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
-        const header = containerEl.createEl("h4", { text: `${t("SETTINGS_HEADER")}` });
+        const header = containerEl.createEl("h4", {
+            text: `${t("SETTINGS_HEADER")}`,
+        });
         header.addClass("sr-centered");
 
         this.tab_structure = createTabs(
@@ -305,6 +345,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .setValue(this.plugin.data.settings.convertHighlightsToClozes)
                         .onChange(async (value) => {
                             this.plugin.data.settings.convertHighlightsToClozes = value;
+                            this.plugin.debouncedGenerateParser();
                             await this.plugin.savePluginData();
                         }),
                 );
@@ -314,6 +355,7 @@ export class SRSettingTab extends PluginSettingTab {
                     .setValue(this.plugin.data.settings.convertBoldTextToClozes)
                     .onChange(async (value) => {
                         this.plugin.data.settings.convertBoldTextToClozes = value;
+                        this.plugin.debouncedGenerateParser();
                         await this.plugin.savePluginData();
                     }),
             );
@@ -325,6 +367,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .setValue(this.plugin.data.settings.convertCurlyBracketsToClozes)
                         .onChange(async (value) => {
                             this.plugin.data.settings.convertCurlyBracketsToClozes = value;
+                            this.plugin.debouncedGenerateParser();
                             await this.plugin.savePluginData();
                         }),
                 );
@@ -338,6 +381,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onChange((value) => {
                             applySettingsUpdate(async () => {
                                 this.plugin.data.settings.singleLineCardSeparator = value;
+                                this.plugin.debouncedGenerateParser();
                                 await this.plugin.savePluginData();
                             });
                         }),
@@ -349,6 +393,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onClick(async () => {
                             this.plugin.data.settings.singleLineCardSeparator =
                                 DEFAULT_SETTINGS.singleLineCardSeparator;
+                            this.plugin.debouncedGenerateParser();
                             await this.plugin.savePluginData();
                             this.display();
                         });
@@ -363,6 +408,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onChange((value) => {
                             applySettingsUpdate(async () => {
                                 this.plugin.data.settings.singleLineReversedCardSeparator = value;
+                                this.plugin.debouncedGenerateParser();
                                 await this.plugin.savePluginData();
                             });
                         }),
@@ -374,6 +420,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onClick(async () => {
                             this.plugin.data.settings.singleLineReversedCardSeparator =
                                 DEFAULT_SETTINGS.singleLineReversedCardSeparator;
+                            this.plugin.debouncedGenerateParser();
                             await this.plugin.savePluginData();
                             this.display();
                         });
@@ -388,6 +435,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onChange((value) => {
                             applySettingsUpdate(async () => {
                                 this.plugin.data.settings.multilineCardSeparator = value;
+                                this.plugin.debouncedGenerateParser();
                                 await this.plugin.savePluginData();
                             });
                         }),
@@ -399,6 +447,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onClick(async () => {
                             this.plugin.data.settings.multilineCardSeparator =
                                 DEFAULT_SETTINGS.multilineCardSeparator;
+                            this.plugin.debouncedGenerateParser();
                             await this.plugin.savePluginData();
                             this.display();
                         });
@@ -413,6 +462,7 @@ export class SRSettingTab extends PluginSettingTab {
                         .onChange((value) => {
                             applySettingsUpdate(async () => {
                                 this.plugin.data.settings.multilineReversedCardSeparator = value;
+                                this.plugin.debouncedGenerateParser();
                                 await this.plugin.savePluginData();
                             });
                         }),
@@ -424,6 +474,34 @@ export class SRSettingTab extends PluginSettingTab {
                         .onClick(async () => {
                             this.plugin.data.settings.multilineReversedCardSeparator =
                                 DEFAULT_SETTINGS.multilineReversedCardSeparator;
+                            this.plugin.debouncedGenerateParser();
+                            await this.plugin.savePluginData();
+                            this.display();
+                        });
+                });
+
+            new Setting(containerEl)
+                .setName(t("MULTILINE_CARDS_END_MARKER"))
+                .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
+                .addText((text) =>
+                    text
+                        .setValue(this.plugin.data.settings.multilineCardEndMarker)
+                        .onChange((value) => {
+                            applySettingsUpdate(async () => {
+                                this.plugin.data.settings.multilineCardEndMarker = value;
+                                this.plugin.debouncedGenerateParser();
+                                await this.plugin.savePluginData();
+                            });
+                        }),
+                )
+                .addExtraButton((button) => {
+                    button
+                        .setIcon("reset")
+                        .setTooltip(t("RESET_DEFAULT"))
+                        .onClick(async () => {
+                            this.plugin.data.settings.multilineCardEndMarker =
+                                DEFAULT_SETTINGS.multilineCardEndMarker;
+                            this.plugin.debouncedGenerateParser();
                             await this.plugin.savePluginData();
                             this.display();
                         });
@@ -493,18 +571,6 @@ export class SRSettingTab extends PluginSettingTab {
         );
 
         new Setting(containerEl)
-            .setName(t("DISABLE_FILE_MENU_REVIEW_OPTIONS"))
-            .setDesc(t("DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
-            .addToggle((toggle) =>
-                toggle
-                    .setValue(this.plugin.data.settings.disableFileMenuReviewOptions)
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.disableFileMenuReviewOptions = value;
-                        await this.plugin.savePluginData();
-                    }),
-            );
-
-        new Setting(containerEl)
             .setName(t("MAX_N_DAYS_REVIEW_QUEUE"))
             .addText((text) =>
                 text
@@ -553,8 +619,7 @@ export class SRSettingTab extends PluginSettingTab {
                         applySettingsUpdate(async () => {
                             this.plugin.data.settings.noteFoldersToIgnore = value
                                 .split(/\n+/)
-                                .map((v) => v.trim())
-                                .filter((v) => v);
+                                .map((v) => v.trim());
                             await this.plugin.savePluginData();
                         });
                     }),
@@ -562,6 +627,44 @@ export class SRSettingTab extends PluginSettingTab {
     }
 
     private async tabUiPreferences(containerEl: HTMLElement): Promise<void> {
+        containerEl.createEl("h3", { text: t("OBSIDIAN_INTEGRATION") });
+        new Setting(containerEl)
+            .setName(t("SHOW_RIBBON_ICON"))
+            .setDesc(t("SHOW_RIBBON_ICON_DESC"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.showRibbonIcon)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.showRibbonIcon = value;
+                        await this.plugin.savePluginData();
+                        this.plugin.showRibbonIcon(value);
+                    }),
+            );
+
+        new Setting(containerEl)
+            .setName(t("SHOW_STATUS_BAR"))
+            .setDesc(t("SHOW_STATUS_BAR_DESC"))
+            .addToggle((toggle) =>
+                toggle.setValue(this.plugin.data.settings.showStatusBar).onChange(async (value) => {
+                    this.plugin.data.settings.showStatusBar = value;
+                    await this.plugin.savePluginData();
+                    this.plugin.showStatusBar(value);
+                }),
+            );
+
+        new Setting(containerEl)
+            .setName(t("ENABLE_FILE_MENU_REVIEW_OPTIONS"))
+            .setDesc(t("ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(!this.plugin.data.settings.disableFileMenuReviewOptions)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.disableFileMenuReviewOptions = !value;
+                        await this.plugin.savePluginData();
+                        this.plugin.showFileMenuItems(value);
+                    }),
+            );
+
         containerEl.createEl("h3", { text: t("FLASHCARDS") });
         new Setting(containerEl)
             .setName(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE"))
@@ -882,6 +985,15 @@ export class SRSettingTab extends PluginSettingTab {
                 await this.plugin.savePluginData();
             }),
         );
+        new Setting(containerEl).setName(t("DISPLAY_PARSER_DEBUG_INFO")).addToggle((toggle) =>
+            toggle
+                .setValue(this.plugin.data.settings.showPaserDebugMessages)
+                .onChange(async (value) => {
+                    this.plugin.data.settings.showPaserDebugMessages = value;
+                    setDebugParser(this.plugin.data.settings.showPaserDebugMessages);
+                    await this.plugin.savePluginData();
+                }),
+        );
         containerEl.createEl("h3", { text: t("GROUP_CONTRIBUTING") });
         containerEl.createEl("p").insertAdjacentHTML(
             "beforeend",
@@ -928,7 +1040,7 @@ export class SRSettingTab extends PluginSettingTab {
                 issues_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/",
             }),
         );
-        /* 
+        /*
         // Documentation link & GitHub links
         containerEl.createEl("hr").insertAdjacentHTML("beforeend");
 
