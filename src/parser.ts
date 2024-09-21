@@ -74,13 +74,18 @@ export function generateParser(options: ParserOptions): Parser {
 }
 
 function generateGrammar(options: ParserOptions): string {
-    const close_rules_list: string[] = [];
+    const cloze_rules_list: string[] = [];
 
-    if (options.convertHighlightsToClozes) close_rules_list.push("close_equal");
-    if (options.convertBoldTextToClozes) close_rules_list.push("close_star");
-    if (options.convertCurlyBracketsToClozes) close_rules_list.push("close_bracket");
+    if (options.convertHighlightsToClozes) cloze_rules_list.push("cloze_equal");
+    if (options.convertBoldTextToClozes) cloze_rules_list.push("cloze_star");
+    if (options.convertCurlyBracketsToClozes) cloze_rules_list.push("cloze_bracket");
 
-    const close_rules = close_rules_list.join(" / ");
+    let cloze_rules: string;
+    if (cloze_rules_list.length > 0) {
+        cloze_rules = cloze_rules_list.join(" / ");
+    } else {
+        cloze_rules = "tombstone";
+    }
 
     return `{
 // The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
@@ -111,7 +116,7 @@ main
 /* The input text to the parser contains arbitrary text, not just card definitions.
 Hence we fallback to matching on loose_line. The result from loose_line is filtered out by filterBlocks() */
 block
-= html_comment / tilde_code / backprime_code / inline_rev_card / inline_card / multiline_rev_card / multiline_card / close_card / loose_line
+= html_comment / tilde_code / backprime_code / inline_code / inline_rev_card / inline_card / multiline_rev_card / multiline_card / cloze_card / loose_line
 
 html_comment
 = $("<!--" (!"-->" (html_comment / .))* "-->" newline?) {
@@ -129,7 +134,7 @@ inline_card
 = e:inline newline? { return e; }
 
 inline
-= $(left:(!inline_mark (inline_code / non_newline))+ inline_mark right:text_till_newline (newline annotation)?) {
+= $(left:(!inline_mark !inline_code non_newline)+ inline_mark right:text_till_newline (newline annotation)?) {
   return createParsedQuestionInfo(CardType.SingleLineBasic,text(),location().start.line-1,location().end.line-1);
 }
 
@@ -137,9 +142,9 @@ inline_rev_card
 = e:inline_rev newline? { return e; }
 
 inline_rev
-= left:(!inline_rev_mark (inline_code / non_newline))+ inline_rev_mark right:text_till_newline (newline annotation)? {
+= left:(!inline_rev_mark !inline_code non_newline)+ inline_rev_mark right:text_till_newline (newline annotation)? {
     return createParsedQuestionInfo(CardType.SingleLineReversed,text(),location().start.line-1,location().end.line-1);
-  }
+}
 
 multiline_card
 = c:multiline separator_line {
@@ -158,7 +163,7 @@ multiline_after
 = $(!separator_line (tilde_code / backprime_code / text_line))+
 
 inline_code
-= $("\`" (!"\`" .)* "\`")
+= $("\`" (!"\`" .)* "\`") { return null; }
 
 tilde_code
 = $(
@@ -196,42 +201,42 @@ multiline_rev_before
 multiline_rev_after
 = $(!separator_line text_line)+
 
-close_card
-= $(multiline_before_close? close_line (multiline_after_close)? (newline annotation)?) {
+cloze_card
+= $(multiline_before_cloze? cloze_line (multiline_after_cloze)? (newline annotation)?) {
   return createParsedQuestionInfo(CardType.Cloze,text().trimEnd(),location().start.line-1,location().end.line-1);
 }
 
-close_line
-= ((!close_text non_newline)* close_text) text_line_nonterminated?
+cloze_line
+= ((!cloze_text !inline_code non_newline)* cloze_text) text_line_nonterminated?
 
-multiline_before_close
-= (!close_line nonempty_text_line)+
+multiline_before_cloze
+= (!cloze_line nonempty_text_line)+
 
-multiline_after_close
+multiline_after_cloze
 = e:(!(newline separator_line) text_line1)+
 
-close_text
-= ${close_rules}
+cloze_text
+= ${cloze_rules}
 
-close_equal
-= close_mark_equal (!close_mark_equal non_newline)+  close_mark_equal
+cloze_equal
+= cloze_mark_equal (!cloze_mark_equal non_newline)+  cloze_mark_equal
 
-close_mark_equal
+cloze_mark_equal
 = "=="
 
-close_star
-= close_mark_star (!close_mark_star non_newline)+  close_mark_star
+cloze_star
+= cloze_mark_star (!cloze_mark_star non_newline)+  cloze_mark_star
 
-close_mark_star
+cloze_mark_star
 = "**"
 
-close_bracket
-= close_mark_bracket_open (!close_mark_bracket_close non_newline)+  close_mark_bracket_close
+cloze_bracket
+= cloze_mark_bracket_open (!cloze_mark_bracket_close non_newline)+  cloze_mark_bracket_close
 
-close_mark_bracket_open
+cloze_mark_bracket_open
 = "{{"
 
-close_mark_bracket_close
+cloze_mark_bracket_close
 = "}}"
 
 inline_mark
@@ -295,6 +300,9 @@ optional_whitespaces
 = whitespace_char*
 
 whitespace_char = ([ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff])
+
+tombstone
+= "\0"
 `;
 }
 
@@ -343,7 +351,7 @@ export function parseEx(text: string, options: ParserOptions): ParsedQuestionInf
 
     let cards: ParsedQuestionInfo[] = [];
     try {
-        if (!options) throw Error("No parser options provided.");
+        if (!options) throw new Error("No parser options provided.");
 
         const parser: Parser = generateParser(options);
 
@@ -370,8 +378,7 @@ export function parseEx(text: string, options: ParserOptions): ParsedQuestionInf
     }
 
     if (debugParser) {
-        console.log("Parsed cards:");
-        console.log(cards);
+        console.log("Parsed cards:\n", cards);
     }
 
     return cards;

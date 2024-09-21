@@ -17,7 +17,7 @@ export class DataStore {
 
     public static getInstance(): IDataStore {
         if (!DataStore.instance) {
-            throw Error("there is no DataStore instance.");
+            throw new Error("there is no DataStore instance.");
         }
         return DataStore.instance;
     }
