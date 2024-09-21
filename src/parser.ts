@@ -75,32 +75,80 @@ export function generateParser(options: ParserOptions): Parser {
 }
 
 function generateGrammar(options: ParserOptions): string {
-    const cloze_rules_list: string[] = [];
+    // Contains the grammar for cloze cards
+    let clozes_grammar = ""
 
+    // An array contianing the types of cards enabled by the user
+    let card_rules_list: string[] = ['html_comment', 'tilde_code', 'backprime_code'];
+
+    // Include reversed inline flashcards rule only if the user provided a non-empty marker for reversed inline flashcards
+    if(options.singleLineCardSeparator.trim()!=="") card_rules_list.push('inline_rev_card');
+
+    // Include inline flashcards rule only if the user provided a non-empty marker for inline flashcards
+    if(options.singleLineCardSeparator.trim()!=="") card_rules_list.push('inline_card');
+
+    // Include reversed multiline flashcards rule only if the user provided a non-empty marker for reversed multiline flashcards
+    if(options.multilineReversedCardSeparator.trim()!=="") card_rules_list.push('multiline_rev_card');
+
+    // Include multiline flashcards rule only if the user provided a non-empty marker for multiline flashcards
+    if(options.multilineCardSeparator.trim()!=="") card_rules_list.push('multiline_card');
+
+    const cloze_rules_list: string[] = [];
     if (options.convertHighlightsToClozes) cloze_rules_list.push("cloze_equal");
     if (options.convertBoldTextToClozes) cloze_rules_list.push("cloze_star");
     if (options.convertCurlyBracketsToClozes) cloze_rules_list.push("cloze_bracket");
+        
+    // Include cloze cards only if the user enabled at least one type of cloze cards
+    if(cloze_rules_list.length>0) {
+        card_rules_list.push('cloze_card');
+        const cloze_rules = cloze_rules_list.join(" / ");
+        clozes_grammar = `
+cloze_card
+= $(multiline_before_cloze? cloze_line (multiline_after_cloze)? (newline annotation)?) {
+  return createParsedQuestionInfo(CardType.Cloze,text().trimEnd(),location().start.line-1,location().end.line-1);
+}
 
-    // If the user disabled all cloze option, then the rule for cloze_card is disabled by setting it to ""
-    const cloze_card_rule = (() => {
-        if(cloze_rules_list.length > 0) {
-            return '/ cloze_card';
-        } else {
-            // If the user has disabled all clozes, we provide the string pattern "", which represents an empty
-            // string. In fact, it does not matter what string pattern we provide, because this rule will never be
-            // reached if the user has disabled clozes. If we do not provide a literal or other rule for
-            // `cloze_text`, peggyjs will complain with a syntax error because the rule must be fully defined with
-            // something. Unfortunately, we cannot simply remove the `cloze_text` rule with an `if` statement,
-            // because this rule is needed by `cloze_line`, and so on and so forth. So the only alternative would
-            // be to use lots of `if' statements to remove all cloze-related rules when they are disabled by the
-            // user. This makes the code longer and adds unnecessary complexity/logic, so we prefer the current
-            // solution.
-            cloze_rules_list.push('""');
-            return "";  
-        } 
-    })();
+cloze_line
+= ((!cloze_text (inline_code / non_newline))* cloze_text) text_line_nonterminated?
 
-    const cloze_rules = cloze_rules_list.join(" / ");
+multiline_before_cloze
+= (!cloze_line nonempty_text_line)+
+
+multiline_after_cloze
+= e:(!(newline separator_line) text_line1)+
+
+cloze_text
+= ${cloze_rules}
+
+cloze_equal
+= cloze_mark_equal (!cloze_mark_equal non_newline)+  cloze_mark_equal
+
+cloze_mark_equal
+= "=="
+
+cloze_star
+= cloze_mark_star (!cloze_mark_star non_newline)+  cloze_mark_star
+
+cloze_mark_star
+= "**"
+
+cloze_bracket
+= cloze_mark_bracket_open (!cloze_mark_bracket_close non_newline)+  cloze_mark_bracket_close
+
+cloze_mark_bracket_open
+= "{{"
+
+cloze_mark_bracket_close
+= "}}"
+` ;
+    }
+
+    // Important: we need to include `loose_line` rule to detect any other loose line.
+    // Otherwise, we get a syntax error because the parser is likely not able to reach the end
+    // of the file, as it may encounter loose lines, which it would not know how to handle.
+    card_rules_list.push('loose_line');
+
+    const card_rules = card_rules_list.join(" / ");
 
     return `{
     // The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
@@ -131,7 +179,7 @@ main
 /* The input text to the parser contains arbitrary text, not just card definitions.
 Hence we fallback to matching on loose_line. The result from loose_line is filtered out by filterBlocks() */
 block
-= html_comment / tilde_code / backprime_code / inline_rev_card / inline_card / multiline_rev_card / multiline_card ${cloze_card_rule} / loose_line
+= ${card_rules}
 
 html_comment
 = $("<!--" (!"-->" (html_comment / .))* "-->" newline?) {
@@ -216,43 +264,7 @@ multiline_rev_before
 multiline_rev_after
 = $(!separator_line text_line)+
 
-cloze_card
-= $(multiline_before_cloze? cloze_line (multiline_after_cloze)? (newline annotation)?) {
-  return createParsedQuestionInfo(CardType.Cloze,text().trimEnd(),location().start.line-1,location().end.line-1);
-}
-
-cloze_line
-= ((!cloze_text (inline_code / non_newline))* cloze_text) text_line_nonterminated?
-
-multiline_before_cloze
-= (!cloze_line nonempty_text_line)+
-
-multiline_after_cloze
-= e:(!(newline separator_line) text_line1)+
-
-cloze_text
-= ${cloze_rules}
-
-cloze_equal
-= cloze_mark_equal (!cloze_mark_equal non_newline)+  cloze_mark_equal
-
-cloze_mark_equal
-= "=="
-
-cloze_star
-= cloze_mark_star (!cloze_mark_star non_newline)+  cloze_mark_star
-
-cloze_mark_star
-= "**"
-
-cloze_bracket
-= cloze_mark_bracket_open (!cloze_mark_bracket_close non_newline)+  cloze_mark_bracket_close
-
-cloze_mark_bracket_open
-= "{{"
-
-cloze_mark_bracket_close
-= "}}"
+${clozes_grammar}
 
 inline_mark
 = "${options.singleLineCardSeparator}"
