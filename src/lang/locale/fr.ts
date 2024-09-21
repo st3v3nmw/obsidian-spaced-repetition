@@ -32,7 +32,8 @@ export default {
     REVIEW_CARDS_IN_NOTE: "Apprendre les flashcards dans cette note",
     CRAM_CARDS_IN_NOTE: "Réviser les flashcards dans cette note",
     VIEW_STATS: "Voir les statistiques",
-    OPEN_REVIEW_QUEUE_VIEW: "Ouvrir la file d'attente des notes à apprendre dans la barre verticale",
+    OPEN_REVIEW_QUEUE_VIEW:
+        "Ouvrir la file d'attente des notes à apprendre dans la barre verticale",
     STATUS_BAR: "Apprentissage : ${dueNotesCount} note(s), ${dueFlashcardsCount} carte(s) dues",
     SYNC_TIME_TAKEN: "Synchronisé en ${t}ms",
     NOTE_IN_IGNORED_FOLDER: "La note est dans un dossier ignoré (voir paramètres).",
@@ -77,14 +78,15 @@ Ce réglage est le même pour les flashcards et les notes.`,
     FLASHCARD_facile_LABEL: "Bouton Facile",
     FLASHCARD_GOOD_LABEL: "Bouton Correct",
     FLASHCARD_difficile_LABEL: "Bouton Difficile",
-    FLASHCARD_facile_DESC: 'Changez le texte du bouton Facile',
-    FLASHCARD_GOOD_DESC: 'Changez le texte du bouton Correct',
-    FLASHCARD_difficile_DESC: 'Changez le texte du bouton Difficile',
+    FLASHCARD_facile_DESC: "Changez le texte du bouton Facile",
+    FLASHCARD_GOOD_DESC: "Changez le texte du bouton Correct",
+    FLASHCARD_difficile_DESC: "Changez le texte du bouton Difficile",
     FLASHCARD_TAGS: "Tags des flashcards",
     FLASHCARD_TAGS_DESC:
         "Entrez les tags séparés par un espace ou une ligne i.e. #flashcards #paquet2 #paquet3.",
     CONVERT_FOLDERS_TO_DECKS: "Convertir les dossiers en paquets et sous-paquets ?",
-    CONVERT_FOLDERS_TO_DECKS_DESC: "Ceci est une alternative aux tags de flashcards présentés ci-dessus.",
+    CONVERT_FOLDERS_TO_DECKS_DESC:
+        "Ceci est une alternative aux tags de flashcards présentés ci-dessus.",
     INLINE_SCHEDULING_COMMENTS:
         "Sauvegarder le commentaire de planification dans la dernière ligne de la flashcard ?",
     INLINE_SCHEDULING_COMMENTS_DESC:
@@ -95,8 +97,7 @@ Ce réglage est le même pour les flashcards et les notes.`,
     SHOW_CARD_CONTEXT: "Montrer le contexte dans les cartes ?",
     SHOW_CARD_CONTEXT_DESC: "ex. Titre de la note > Titre 1 > Sous-titre > ... > Sous-titre",
     CARD_MODAL_HEIGHT_PERCENT: "Pourcentage de hauteur de la flashcard",
-    CARD_MODAL_SIZE_PERCENT_DESC:
-        "Devrait être 100% sur mobile ou en cas de grandes images",
+    CARD_MODAL_SIZE_PERCENT_DESC: "Devrait être 100% sur mobile ou en cas de grandes images",
     RESET_DEFAULT: "Réinitialiser les paramètres",
     CARD_MODAL_WIDTH_PERCENT: "Pourcentage de largeur de la flashcard",
     RANDOMIZE_CARD_ORDER: "Apprendre les cartes dans un ordre aléatoire ?",
@@ -122,13 +123,16 @@ Ce réglage est le même pour les flashcards et les notes.`,
     INLINE_REVERSED_CARDS_SEPARATOR: "Séparateur pour flashcards inversées en une ligne",
     MULTILINE_CARDS_SEPARATOR: "Séparateur pour flashcards en plusieurs lignes",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Séparateur pour flashcards inversées en plusieurs lignes",
-    MULTILINE_CARDS_END_MARKER: "Caractères de fin de textes à trous ou de flashcards en plusieurs lignes",
+    MULTILINE_CARDS_END_MARKER:
+        "Caractères de fin de textes à trous ou de flashcards en plusieurs lignes",
     NOTES: "Notes",
     REVIEW_PANE_ON_STARTUP: "Montrer le module d'apprentissage des notes au démarrage",
     TAGS_TO_REVIEW: "Tags à apprendre",
-    TAGS_TO_REVIEW_DESC: "Entrez les tags séparés par un espace ou une ligne i.e. #review #tag2 #tag3.",
+    TAGS_TO_REVIEW_DESC:
+        "Entrez les tags séparés par un espace ou une ligne i.e. #review #tag2 #tag3.",
     OPEN_RANDOM_NOTE: "Ouvrir une note à apprendre au hasard",
-    OPEN_RANDOM_NOTE_DESC: "Si vous désactivez cette option, les notes sont triées par importance (PageRank).",
+    OPEN_RANDOM_NOTE_DESC:
+        "Si vous désactivez cette option, les notes sont triées par importance (PageRank).",
     AUTO_NEXT_NOTE: "Ouvrir la prochaine note automatiquement après un apprentissage",
     DISABLE_FILE_MENU_REVIEW_OPTIONS:
         "Désactiver les options d'apprentissage dans le menu du fichier ex. Apprentissage : Facile Correct Difficile",
@@ -138,23 +142,26 @@ Ce réglage est le même pour les flashcards et les notes.`,
     MIN_ONE_DAY: "Le nombre de jours doit être au moins 1.",
     VALID_NUMBER_WARNING: "Entrez un nombre valide.",
     UI_PREFERENCES: "Préférences UI",
-    INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Les dossiers de paquets devraient initialement tous être ouverts",
+    INITIALLY_EXPAND_SUBDECKS_IN_TREE:
+        "Les dossiers de paquets devraient initialement tous être ouverts",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "Désactivez pour réduire les paquets dans la même carte. Ce réglage est utile si vous avez des cartes qui appartiennent à beaucoup de paquets à la fois.",
     ALGORITHM: "Algorithme",
     CHECK_ALGORITHM_WIKI:
-        'Pour en savoir plus, lisez l\'<a href="${algo_url}">implémentation de l\'algorithme</a>.',
+        "Pour en savoir plus, lisez l'<a href=\"${algo_url}\">implémentation de l'algorithme</a>.",
     BASE_EASE: "Facilité de base",
     BASE_EASE_DESC: "minimum = 130, recommandé = vers 250.",
     BASE_EASE_MIN_WARNING: "La facilité de base doit être supérieure à 130.",
-    LAPSE_INTERVAL_CHANGE: "Changement d'intervalle quand vous indiquez qu'une flashcard/note a été difficile",
+    LAPSE_INTERVAL_CHANGE:
+        "Changement d'intervalle quand vous indiquez qu'une flashcard/note a été difficile",
     LAPSE_INTERVAL_CHANGE_DESC: "nouvelIntervalle = ancienIntervalle * changementIntervalle / 100.",
     facile_BONUS: "Bonus Facile",
     facile_BONUS_DESC:
         "Le bonus Facile vous permet d'augmenter l'intervalle entre une réponse Correct et une réponse Facile sur une flashcard/note (minimum = 100%).",
     facile_BONUS_MIN_WARNING: "Le bonus Facile doit être au moins 100.",
     MAX_INTERVAL: "Intervalle maximum (en jours)",
-    MAX_INTERVAL_DESC: "Vous permet de mettre une limite maximale sur l'intervalle (par défaut, 100 ans).",
+    MAX_INTERVAL_DESC:
+        "Vous permet de mettre une limite maximale sur l'intervalle (par défaut, 100 ans).",
     MAX_INTERVAL_MIN_WARNING: "L'intervalle maximum doit être au moins 1 jour.",
     MAX_LINK_CONTRIB: "Contribution maximum des liens",
     MAX_LINK_CONTRIB_DESC:
