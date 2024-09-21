@@ -1,20 +1,20 @@
-import { Card } from "src/Card";
-import { CardScheduleInfo } from "src/CardSchedule";
+import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { Card } from "src/card";
 import { TICKS_PER_DAY } from "src/constants";
 
 describe("Card", () => {
     test("format Schedule", () => {
         expect(
             new Card({
-                front: "What year was the Taliban Emirate founded?",
-                back: "1996 #flashcards",
+                front: "What year did Aegon's Conquest start?",
+                back: "2BC #flashcards",
             }).formatSchedule(),
         ).toBe("New");
         expect(
             new Card({
-                front: "What year was the Taliban Emirate founded?",
-                back: "1996 #flashcards",
-                scheduleInfo: CardScheduleInfo.fromDueDateStr(
+                front: "What year did Aegon's Conquest start?",
+                back: "2BC #flashcards",
+                scheduleInfo: RepItemScheduleInfo_Osr.fromDueDateStr(
                     "2023-09-03",
                     1,
                     230,
