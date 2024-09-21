@@ -1,19 +1,19 @@
 # Notes
 
 !!! tip
+
     For guidelines on how to write and structure notes, see [Spaced Repetition Guides](resources.md#notes)
 
 ## Getting started
-
 
 Tag any markdown files for review with the `note review` tag, which by default is `#review`.
 
 The note will appear under `New` in the `Note Review Queue` in the right pane.
 
 !!! note
+
     When you tag a note with `#review` the note doesn't immediately appear in the review queue.
-    You will need to first click on the `Flashcard Review Icon` or the `Spaced Repetition Status Area`
-    for the queue to update
+    You will need to first click on the `Flashcard Review Icon` or the `Spaced Repetition Status Area` for the queue to update
 
 ## Note Review Queue
 
@@ -60,10 +60,10 @@ You can create custom hotkeys for the review result in `Settings -> HotKeys`.
 
 There are a few ways to open a note for review:
 
-- Open a note via the standard Obsidian features
-- Double click on a note title from the Note Review Queue
-- Click on the `Spaced Repetition Status Area` in the status bar at the bottom of the screen
-- Select the command [Open a note to review review](plugin-commands.md)
+-   Open a note via the standard Obsidian features
+-   Double click on a note title from the Note Review Queue
+-   Click on the `Spaced Repetition Status Area` in the status bar at the bottom of the screen
+-   Select the command [Open a note to review review](plugin-commands.md)
 
 There are also the following relevant options:
 

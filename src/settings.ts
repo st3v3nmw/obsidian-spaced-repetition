@@ -1,8 +1,9 @@
-import { Notice, PluginSettingTab, Setting, App, Platform } from "obsidian";
-import type SRPlugin from "src/main";
+import { App, Notice, Platform, PluginSettingTab, Setting } from "obsidian";
+
+import { createTabs, TabStructure } from "src/gui/tabs";
 import { t } from "src/lang/helpers";
-import { TabStructure, createTabs } from "./gui/Tabs";
-import { setDebugParser } from "./parser";
+import type SRPlugin from "src/main";
+import { setDebugParser } from "src/parser";
 
 export interface SRSettings {
     // flashcards
@@ -175,18 +176,14 @@ export class SRSettingTab extends PluginSettingTab {
         this.plugin = plugin;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    hide(): any {
-        // console.log("SRSettingTab: hide()");
-    }
-
     display(): void {
-        // console.log("SRSettingTab: display()");
         const { containerEl } = this;
 
         containerEl.empty();
 
-        const header = containerEl.createEl("h4", { text: `${t("SETTINGS_HEADER")}` });
+        const header = containerEl.createEl("h4", {
+            text: `${t("SETTINGS_HEADER")}`,
+        });
         header.addClass("sr-centered");
 
         this.tab_structure = createTabs(
@@ -622,8 +619,7 @@ export class SRSettingTab extends PluginSettingTab {
                         applySettingsUpdate(async () => {
                             this.plugin.data.settings.noteFoldersToIgnore = value
                                 .split(/\n+/)
-                                .map((v) => v.trim())
-                                .filter((v) => v);
+                                .map((v) => v.trim());
                             await this.plugin.savePluginData();
                         });
                     }),
@@ -631,7 +627,6 @@ export class SRSettingTab extends PluginSettingTab {
     }
 
     private async tabUiPreferences(containerEl: HTMLElement): Promise<void> {
-
         containerEl.createEl("h3", { text: t("OBSIDIAN_INTEGRATION") });
         new Setting(containerEl)
             .setName(t("SHOW_RIBBON_ICON"))
@@ -650,13 +645,11 @@ export class SRSettingTab extends PluginSettingTab {
             .setName(t("SHOW_STATUS_BAR"))
             .setDesc(t("SHOW_STATUS_BAR_DESC"))
             .addToggle((toggle) =>
-                toggle
-                    .setValue(this.plugin.data.settings.showStatusBar)
-                    .onChange(async (value) => {
-                        this.plugin.data.settings.showStatusBar = value;
-                        await this.plugin.savePluginData();
-                        this.plugin.showStatusBar(value);
-                    }),
+                toggle.setValue(this.plugin.data.settings.showStatusBar).onChange(async (value) => {
+                    this.plugin.data.settings.showStatusBar = value;
+                    await this.plugin.savePluginData();
+                    this.plugin.showStatusBar(value);
+                }),
             );
 
         new Setting(containerEl)
@@ -1047,7 +1040,7 @@ export class SRSettingTab extends PluginSettingTab {
                 issues_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/",
             }),
         );
-        /* 
+        /*
         // Documentation link & GitHub links
         containerEl.createEl("hr").insertAdjacentHTML("beforeend");
 

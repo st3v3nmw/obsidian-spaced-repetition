@@ -1,6 +1,6 @@
 // Deutsch
 
-// Obsidian specific names (folder, note, tag, etc.) are consistent with the german translation:
+// Obsidian specific names (folder, note, tag, etc.) are consistent with the German translation:
 // https://github.com/obsidianmd/obsidian-translations/blob/master/de.json
 
 export default {
@@ -79,6 +79,7 @@ export default {
     FOLDERS_TO_IGNORE: "Ausgeschlossene Ordner",
     FOLDERS_TO_IGNORE_DESC: `Mehrere Ordner mit Zeilenumbrüchen getrennt angeben. Bsp. OrdnerA[Zeilenumbruch]OrdnerB/Unterordner.
 Note that this setting is common to both Flashcards and Notes.`,
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Lernkarten",
     FLASHCARD_EASY_LABEL: "Einfach Knopf Text",
     FLASHCARD_GOOD_LABEL: "Gut Knopf Text",
@@ -154,6 +155,11 @@ Note that this setting is common to both Flashcards and Notes.`,
     MIN_ONE_DAY: "Anzahl der Tage muss mindestens 1 sein.",
     VALID_NUMBER_WARNING: "Bitte eine gültige Zahl eingeben.",
     UI_PREFERENCES: "Einstellungen der Benutzeroberfläche",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE:
         "Stapelverzeichnis soll beim öffnen erweitert angezeigt werden",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:

@@ -2,7 +2,6 @@
 
 ![flashcard-decks-1](https://github.com/user-attachments/assets/a207b0f6-b064-443c-9c55-540681b10891)
 
-
 ## Using Obsidian Tags
 
 1. Specify flashcard tags in settings (`#flashcards` is the default).
@@ -67,7 +66,6 @@ Question6 (in deckA)::Answer6
 Here `Question6` will be part of `deckA` and not `deckB` as `deckB` is specific to `Question4` only.
 
 ---
-
 
 ## Using Folder Structure
 

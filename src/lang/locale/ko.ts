@@ -73,6 +73,7 @@ export default {
     FOLDERS_TO_IGNORE: "무시할 폴더들",
     FOLDERS_TO_IGNORE_DESC: `폴더 경로를 빈 줄로 구분해서 입력해주세요. 'Templates Meta/Scripts' 와 같이 입력하는 것은 유효하지 않습니다.
 Note that this setting is common to both Flashcards and Notes.`,
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "플래시카드",
     FLASHCARD_EASY_LABEL: "Easy Button Text",
     FLASHCARD_GOOD_LABEL: "Good Button Text",
@@ -140,6 +141,11 @@ Note that this setting is common to both Flashcards and Notes.`,
     MIN_ONE_DAY: "적어도 1이상이어야 합니다.",
     VALID_NUMBER_WARNING: "유효한 숫자를 입력해주세요.",
     UI_PREFERENCES: "사용자 인터페이스 기본 설정",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "덱 트리는 처음에 확장된 것으로 표시되어야 합니다.",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "같은 카드에 중첩된 덱을 접으려면 이 옵션을 끄십시오. 같은 파일에 여러 덱에 속한 카드가 있는 경우 유용합니다.",

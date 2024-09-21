@@ -1,38 +1,40 @@
 // https://github.com/mgmeyers/obsidian-kanban/blob/93014c2512507fde9eafd241e8d4368a8dfdf853/src/lang/helpers.ts
 
 import { moment } from "obsidian";
-import af from "./locale/af";
-import ar from "./locale/ar";
-import cz from "./locale/cz";
-import bn from "./locale/bn";
-import da from "./locale/da";
-import de from "./locale/de";
-import en from "./locale/en";
-import enGB from "./locale/en-gb";
-import es from "./locale/es";
-import fr from "./locale/fr";
-import hi from "./locale/hi";
-import id from "./locale/id";
-import it from "./locale/it";
-import ja from "./locale/ja";
-import ko from "./locale/ko";
-import mr from "./locale/mr";
-import nl from "./locale/nl";
-import no from "./locale/no";
-import pl from "./locale/pl";
-import pt from "./locale/pt";
-import ptBR from "./locale/pt-br";
-import ro from "./locale/ro";
-import ru from "./locale/ru";
-import ta from "./locale/ta";
-import te from "./locale/te";
-import th from "./locale/th";
-import tr from "./locale/tr";
-import uk from "./locale/uk";
-import ur from "./locale/ur";
-import vi from "./locale/vi";
-import zhCN from "./locale/zh-cn";
-import zhTW from "./locale/zh-tw";
+
+import af from "src/lang/locale/af";
+import ar from "src/lang/locale/ar";
+import bn from "src/lang/locale/bn";
+import cz from "src/lang/locale/cz";
+import da from "src/lang/locale/da";
+import de from "src/lang/locale/de";
+import en from "src/lang/locale/en";
+import enGB from "src/lang/locale/en-gb";
+import es from "src/lang/locale/es";
+import fr from "src/lang/locale/fr";
+import hi from "src/lang/locale/hi";
+import id from "src/lang/locale/id";
+import it from "src/lang/locale/it";
+import ja from "src/lang/locale/ja";
+import ko from "src/lang/locale/ko";
+import mr from "src/lang/locale/mr";
+import nl from "src/lang/locale/nl";
+import no from "src/lang/locale/no";
+import pl from "src/lang/locale/pl";
+import pt from "src/lang/locale/pt";
+import ptBR from "src/lang/locale/pt-br";
+import ro from "src/lang/locale/ro";
+import ru from "src/lang/locale/ru";
+import sw from "src/lang/locale/sw";
+import ta from "src/lang/locale/ta";
+import te from "src/lang/locale/te";
+import th from "src/lang/locale/th";
+import tr from "src/lang/locale/tr";
+import uk from "src/lang/locale/uk";
+import ur from "src/lang/locale/ur";
+import vi from "src/lang/locale/vi";
+import zhCN from "src/lang/locale/zh-cn";
+import zhTW from "src/lang/locale/zh-tw";
 
 export const localeMap: { [k: string]: Partial<typeof en> } = {
     af,
@@ -58,6 +60,7 @@ export const localeMap: { [k: string]: Partial<typeof en> } = {
     "pt-br": ptBR,
     ro,
     ru,
+    sw,
     ta,
     te,
     th,

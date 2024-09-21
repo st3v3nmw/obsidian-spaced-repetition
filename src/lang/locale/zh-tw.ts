@@ -73,6 +73,7 @@ export default {
     FOLDERS_TO_IGNORE: "忽略此資料夾",
     FOLDERS_TO_IGNORE_DESC: `輸入資料夾路徑（用換行字元分隔），例如：Templates Meta/Scripts.
 Note that this setting is common to both Flashcards and Notes.`,
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "卡片",
     FLASHCARD_EASY_LABEL: "簡單按鈕文字",
     FLASHCARD_GOOD_LABEL: "記得按鈕文字",
@@ -123,11 +124,17 @@ Note that this setting is common to both Flashcards and Notes.`,
     OPEN_RANDOM_NOTE_DESC: "關閉此選項，筆記將以重要度(PageRank)排序。",
     AUTO_NEXT_NOTE: "復習後自動打開下一個筆記",
     ENABLE_FILE_MENU_REVIEW_OPTIONS: "請在檔案選單中啟用檢視選項（例如：檢視：簡單、記得、較難）",
-    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC: "如果您在檔案選單中停用檢視選項，您可以使用插件指令檢視筆記，如果有設定，也可以使用相關的快捷鍵。",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "如果您在檔案選單中停用檢視選項，您可以使用插件指令檢視筆記，如果有設定，也可以使用相關的快捷鍵。",
     MAX_N_DAYS_REVIEW_QUEUE: "右邊面板顯示的最大天數",
     MIN_ONE_DAY: "天數最小值為1",
     VALID_NUMBER_WARNING: "請輸入有效的數字。",
     UI_PREFERENCES: "用戶介面首選項",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "牌組樹最初應顯示為展開",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "關閉此選項可摺疊同一張卡片中的巢狀牌組。如果您的卡片屬於同一檔案中的許多套牌，則很有用。",
