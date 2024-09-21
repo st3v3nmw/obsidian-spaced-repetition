@@ -33,6 +33,20 @@ function areParserOptionsEqual(options1: ParserOptions, options2: ParserOptions)
 export function generateParser(options: ParserOptions): Parser {
     let grammar: string | null = null;
 
+    // Debug the grammar before generating the parser `generate(grammar)` from the grammar.
+    if (debugParser) {
+        if (grammar === null) {
+            grammar = generateGrammar(options);
+        }
+        console.log(
+            "The parsers grammar is provided below. You can test it with https://peggyjs.org/online.html.",
+        );
+        console.log({
+            info: "Copy the grammar by right-clicking on the property grammar and copying it as a string. Then, paste it in https://peggyjs.org/online.html.",
+            grammar: grammar,
+        });
+    }
+
     // If the parser did not already exist or if the parser options changed since last the last
     // parser was generated, we generate a new parser. Otherwise, we skip the block to save
     // some execution time.
@@ -53,21 +67,8 @@ export function generateParser(options: ParserOptions): Parser {
         }
     } else {
         if (debugParser) {
-            console.log("Parser already existed. No need to generate a new parser.");
+            console.log("Parser already exists. No need to generate a new parser.");
         }
-    }
-
-    if (debugParser) {
-        if (grammar === null) {
-            grammar = generateGrammar(options);
-        }
-        console.log(
-            "The parsers grammar is provided below. You can test it with https://peggyjs.org/online.html.",
-        );
-        console.log({
-            info: "Copy the grammar by right-clicking on the property grammar and copying it as a string. Then, paste it in https://peggyjs.org/online.html.",
-            grammar: grammar,
-        });
     }
 
     return parser;
@@ -80,34 +81,48 @@ function generateGrammar(options: ParserOptions): string {
     if (options.convertBoldTextToClozes) cloze_rules_list.push("cloze_star");
     if (options.convertCurlyBracketsToClozes) cloze_rules_list.push("cloze_bracket");
 
-    let cloze_rules: string;
-    if (cloze_rules_list.length > 0) {
-        cloze_rules = cloze_rules_list.join(" / ");
-    } else {
-        cloze_rules = "tombstone";
-    }
+    // If the user disabled all cloze option, then the rule for cloze_card is disabled by setting it to ""
+    const cloze_card_rule = (() => {
+        if(cloze_rules_list.length > 0) {
+            return '/ cloze_card';
+        } else {
+            // If the user has disabled all clozes, we provide the string pattern "", which represents an empty
+            // string. In fact, it does not matter what string pattern we provide, because this rule will never be
+            // reached if the user has disabled clozes. If we do not provide a literal or other rule for
+            // `cloze_text`, peggyjs will complain with a syntax error because the rule must be fully defined with
+            // something. Unfortunately, we cannot simply remove the `cloze_text` rule with an `if` statement,
+            // because this rule is needed by `cloze_line`, and so on and so forth. So the only alternative would
+            // be to use lots of `if' statements to remove all cloze-related rules when they are disabled by the
+            // user. This makes the code longer and adds unnecessary complexity/logic, so we prefer the current
+            // solution.
+            cloze_rules_list.push('""');
+            return "";  
+        } 
+    })();
+
+    const cloze_rules = cloze_rules_list.join(" / ");
 
     return `{
-// The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
-const CardTypeFallBack = {
-  SingleLineBasic: 0,
-  SingleLineReversed: 1,
-  MultiLineBasic: 2,
-  MultiLineReversed: 3,
-  Cloze: 4,
-};
+    // The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
+    const CardTypeFallBack = {
+      SingleLineBasic: 0,
+      SingleLineReversed: 1,
+      MultiLineBasic: 2,
+      MultiLineReversed: 3,
+      Cloze: 4,
+    };
 
-// The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
-const createParsedQuestionInfoFallBack = (cardType, text, firstLineNum, lastLineNum) => {
-  return {cardType, text, firstLineNum, lastLineNum};
-};
+    // The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
+    const createParsedQuestionInfoFallBack = (cardType, text, firstLineNum, lastLineNum) => {
+      return {cardType, text, firstLineNum, lastLineNum};
+    };
 
-const CardType = options.CardType ? options.CardType : CardTypeFallBack;
-const createParsedQuestionInfo = options.createParsedQuestionInfo ? options.createParsedQuestionInfo : createParsedQuestionInfoFallBack;
+    const CardType = options.CardType ? options.CardType : CardTypeFallBack;
+    const createParsedQuestionInfo = options.createParsedQuestionInfo ? options.createParsedQuestionInfo : createParsedQuestionInfoFallBack;
 
-function filterBlocks(b) {
-  return b.filter( (d) => d !== null )
-}
+    function filterBlocks(b) {
+      return b.filter( (d) => d !== null )
+    }
 }
 
 main
@@ -116,7 +131,7 @@ main
 /* The input text to the parser contains arbitrary text, not just card definitions.
 Hence we fallback to matching on loose_line. The result from loose_line is filtered out by filterBlocks() */
 block
-= html_comment / tilde_code / backprime_code / inline_code / inline_rev_card / inline_card / multiline_rev_card / multiline_card / cloze_card / loose_line
+= html_comment / tilde_code / backprime_code / inline_rev_card / inline_card / multiline_rev_card / multiline_card ${cloze_card_rule} / loose_line
 
 html_comment
 = $("<!--" (!"-->" (html_comment / .))* "-->" newline?) {
@@ -134,7 +149,7 @@ inline_card
 = e:inline newline? { return e; }
 
 inline
-= $(left:(!inline_mark !inline_code non_newline)+ inline_mark right:text_till_newline (newline annotation)?) {
+= $(left:(!inline_mark (inline_code / non_newline))+ inline_mark right:text_till_newline (newline annotation)?) {
   return createParsedQuestionInfo(CardType.SingleLineBasic,text(),location().start.line-1,location().end.line-1);
 }
 
@@ -142,7 +157,7 @@ inline_rev_card
 = e:inline_rev newline? { return e; }
 
 inline_rev
-= left:(!inline_rev_mark !inline_code non_newline)+ inline_rev_mark right:text_till_newline (newline annotation)? {
+= left:(!inline_rev_mark (inline_code / non_newline))+ inline_rev_mark right:text_till_newline (newline annotation)? {
     return createParsedQuestionInfo(CardType.SingleLineReversed,text(),location().start.line-1,location().end.line-1);
 }
 
@@ -163,7 +178,7 @@ multiline_after
 = $(!separator_line (tilde_code / backprime_code / text_line))+
 
 inline_code
-= $("\`" (!"\`" .)* "\`") { return null; }
+= $("\`" (!"\`" .)* "\`")
 
 tilde_code
 = $(
@@ -207,7 +222,7 @@ cloze_card
 }
 
 cloze_line
-= ((!cloze_text !inline_code non_newline)* cloze_text) text_line_nonterminated?
+= ((!cloze_text (inline_code / non_newline))* cloze_text) text_line_nonterminated?
 
 multiline_before_cloze
 = (!cloze_line nonempty_text_line)+
@@ -300,9 +315,6 @@ optional_whitespaces
 = whitespace_char*
 
 whitespace_char = ([ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff])
-
-tombstone
-= "\0"
 `;
 }
 
