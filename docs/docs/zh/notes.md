@@ -13,21 +13,21 @@
 
 新笔记将展示在右栏的 `新` （复习序列）中，如图：
 
-<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/new_notes.png" />
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/docs/media/en/new_notes.png" />
 
 ## 复习
 
 打开笔记即可复习。在菜单中选择 `复习: 简单`，`复习: 记得` 或 `复习: 较难`。 选择 `简单`，`记得` 还是 `较难` 取决于你对复习材料的理解程度。
 
-<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/more_options.png" />
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/docs/media/en/more_options.png" />
 
 在文件上右击可以调出相同选项：
 
-<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/file_context_menu.png" />
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/docs/media/en/file_context_menu.png" />
 
 笔记将被添加到复习队列中：
 
-<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/scheduled.png" />
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/docs/media/en/scheduled.png" />
 
 ### 快速复习
 

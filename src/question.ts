@@ -9,9 +9,7 @@ import { Note } from "src/note";
 import { ParsedQuestionInfo } from "src/parser";
 import { SRSettings } from "src/settings";
 import { TopicPath, TopicPathList, TopicPathWithWs } from "src/topic-path";
-import { MultiLineTextFinder } from "src/utils/multiline-text-finder";
-import { TextDirection } from "src/utils/text-direction";
-import { cyrb53, stringTrimStart } from "src/utils/utils";
+import { cyrb53, MultiLineTextFinder, stringTrimStart, TextDirection } from "src/utils/strings";
 
 export enum CardType {
     SingleLineBasic,

@@ -1,92 +1,14 @@
-import { YAML_FRONT_MATTER_REGEX } from "src/constants";
 import {
     convertToStringOrEmpty,
     cyrb53,
     escapeRegexString,
     findLineIndexOfSearchStringIgnoringWs,
-    formatDate,
-    getKeysPreserveType,
-    getTypedObjectEntries,
-    isEqualOrSubPath,
     literalStringReplace,
-    pathMatchesPattern,
+    MultiLineTextFinder,
     splitNoteIntoFrontmatterAndContent,
     splitTextIntoLineArray,
     stringTrimStart,
-    ticksFromDate,
-} from "src/utils/utils";
-
-describe("getTypedObjectEntries", () => {
-    test("should handle basic object", () => {
-        expect(getTypedObjectEntries({ name: "Alice", age: 30, isStudent: false })).toEqual([
-            ["name", "Alice"],
-            ["age", 30],
-            ["isStudent", false],
-        ]);
-    });
-
-    test("should handle empty object", () => {
-        expect(getTypedObjectEntries({})).toEqual([]);
-    });
-
-    test("should handle object with different value types", () => {
-        expect(
-            getTypedObjectEntries({
-                a: 1,
-                b: "string",
-                c: true,
-                d: null,
-                e: undefined,
-            }),
-        ).toEqual([
-            ["a", 1],
-            ["b", "string"],
-            ["c", true],
-            ["d", null],
-            ["e", undefined],
-        ]);
-    });
-
-    test("should handle object with nested objects", () => {
-        expect(getTypedObjectEntries({ obj: { nestedKey: "nestedValue" } })).toEqual([
-            ["obj", { nestedKey: "nestedValue" }],
-        ]);
-    });
-
-    test("should handle object with array values", () => {
-        expect(getTypedObjectEntries({ arr: [1, 2, 3] })).toEqual([["arr", [1, 2, 3]]]);
-    });
-
-    test("should handle object with function values", () => {
-        const output = getTypedObjectEntries({ func: () => "result" });
-        expect(output.length).toBe(1);
-        expect(output[0][0]).toBe("func");
-        expect(typeof output[0][1]).toBe("function");
-        expect(output[0][1]()).toBe("result");
-    });
-});
-
-describe("getKeysPreserveType", () => {
-    test("should return keys of a basic object", () => {
-        expect(getKeysPreserveType({ name: "Alice", age: 30, isStudent: false })).toEqual([
-            "name",
-            "age",
-            "isStudent",
-        ]);
-    });
-
-    test("should return an empty array for an empty object", () => {
-        expect(getKeysPreserveType({})).toEqual([]);
-    });
-
-    test("should return keys of an object with different value types", () => {
-        expect(getKeysPreserveType({ a: 1, b: "string", c: true })).toEqual(["a", "b", "c"]);
-    });
-
-    test("should return keys of an object with a function value", () => {
-        expect(getKeysPreserveType({ func: () => "result" })).toEqual(["func"]);
-    });
-});
+} from "src/utils/strings";
 
 describe("escapeRegexString", () => {
     test("should escape special regex characters", () => {
@@ -187,28 +109,6 @@ $$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$
     });
 });
 
-describe("convertToStringOrEmpty", () => {
-    test("undefined returns empty string", () => {
-        expect(convertToStringOrEmpty(undefined)).toEqual("");
-    });
-
-    test("null returns empty string", () => {
-        expect(convertToStringOrEmpty(null)).toEqual("");
-    });
-
-    test("empty string returns empty string", () => {
-        expect(convertToStringOrEmpty("")).toEqual("");
-    });
-
-    test("string returned unchanged", () => {
-        expect(convertToStringOrEmpty("Hello")).toEqual("Hello");
-    });
-
-    test("number is converted to string", () => {
-        expect(convertToStringOrEmpty(5)).toEqual("5");
-    });
-});
-
 describe("cyrb53", () => {
     test("should generate hash for a simple string without seed", () => {
         const input = "hello";
@@ -250,26 +150,25 @@ describe("cyrb53", () => {
     });
 });
 
-describe("Ticks from date", () => {
-    test("2024 05 26", () => {
-        const year = 2024;
-        const month = 5;
-        const day = 26;
-        const ticks = 1719360000000;
-
-        expect(ticksFromDate(year, month, day)).toBe(ticks);
-    });
-});
-
-describe("Format date", () => {
-    test("Different input overloads", () => {
-        expect(formatDate(new Date(2023, 0, 1))).toBe("2023-01-01");
-        expect(formatDate(2023, 1, 1)).toBe("2023-01-01");
-        expect(formatDate(1672531200000)).toBe("2023-01-01");
+describe("convertToStringOrEmpty", () => {
+    test("undefined returns empty string", () => {
+        expect(convertToStringOrEmpty(undefined)).toEqual("");
     });
 
-    test("handles a leap year date", () => {
-        expect(formatDate(2020, 2, 29)).toBe("2020-02-29");
+    test("null returns empty string", () => {
+        expect(convertToStringOrEmpty(null)).toEqual("");
+    });
+
+    test("empty string returns empty string", () => {
+        expect(convertToStringOrEmpty("")).toEqual("");
+    });
+
+    test("string returned unchanged", () => {
+        expect(convertToStringOrEmpty("Hello")).toEqual("Hello");
+    });
+
+    test("number is converted to string", () => {
+        expect(convertToStringOrEmpty(5)).toEqual("5");
     });
 });
 
@@ -663,190 +562,180 @@ describe("findLineIndexOfSearchStringIgnoringWs", () => {
     });
 });
 
-describe("YAML_FRONT_MATTER_REGEX", () => {
-    function createTestStr1(sep: string): string {
-        return `---${sep}sr-due: 2024-08-10${sep}sr-interval: 273${sep}sr-ease: 309${sep}---`;
-    }
+const space: string = " ";
+const text10: string = `Some Stuff 0 More Stuff
+Some Stuff 1 More Stuff
+Some Stuff 2 More Stuff
+Some Stuff 3 More Stuff
+Some Stuff 4 More Stuff
+Some Stuff 5 More Stuff
+Some Stuff 6 More Stuff
+Some Stuff 7 More Stuff
+Some Stuff 8 More Stuff
+Some Stuff 9 More Stuff`;
+const text20: string = `Some Stuff 0 More Stuff
+Some Stuff 1 More Stuff
+Some Stuff 2 More Stuff
+Some Stuff 3 More Stuff
+Some Stuff 4 More Stuff
+Some Stuff 5 More Stuff
+Some Stuff 6 More Stuff
+Some Stuff 7 More Stuff
+Some Stuff 8 More Stuff
+Some Stuff 9 More Stuff
+Some Stuff 10 More Stuff
+Some Stuff 11 More Stuff
+Some Stuff 12 More Stuff
+Some Stuff 13 More Stuff
+Some Stuff 14 More Stuff
+Some Stuff 15 More Stuff
+   Some Stuff 16 More Stuff
+Some Stuff 17 More Stuff${space}${space}
+Some Stuff 18 More Stuff
+Some Stuff 19 More Stuff
+Some Stuff 20 More Stuff
+`;
 
-    test("New line is line feed", async () => {
-        const sep: string = String.fromCharCode(10);
-        const text: string = createTestStr1(sep);
-        expect(YAML_FRONT_MATTER_REGEX.test(text)).toEqual(true);
-    });
+describe("find", () => {
+    describe("Single line search string - Match found", () => {
+        test("Search string present as complete line within text (identical)", () => {
+            const searchStr: string = "Some Stuff 14 More Stuff";
 
-    test("New line is carriage return line feed", async () => {
-        const sep: string = String.fromCharCode(13, 10);
-        const text: string = createTestStr1(sep);
-        expect(YAML_FRONT_MATTER_REGEX.test(text)).toEqual(true);
-    });
-});
-
-describe("isEqualOrSubPath", () => {
-    const winSep = "\\";
-    const linSep = "/";
-    const root = "root";
-    const sub_1 = "plugins";
-    const sub_2 = "obsidian-spaced-repetition";
-    const sub_3 = "data";
-    const noMatch = "notRoot";
-    const caseMatch = "Root";
-
-    describe("Windows", () => {
-        const sep = winSep;
-        const rootPath = root + sep + sub_1;
-
-        test("Upper and lower case letters", () => {
-            expect(isEqualOrSubPath(caseMatch, root)).toBe(true);
-            expect(isEqualOrSubPath(caseMatch.toUpperCase(), root)).toBe(true);
+            checkFindResult(text20, searchStr, 14);
         });
 
-        test("Seperator auto correction", () => {
-            expect(isEqualOrSubPath(root + winSep + sub_1, rootPath)).toBe(true);
-            expect(isEqualOrSubPath(root + winSep + sub_1 + winSep, rootPath)).toBe(true);
+        test("Search string present as complete line within text (search has pre/post additional spaces)", () => {
+            let searchStr: string = "   Some Stuff 14 More Stuff";
+            checkFindResult(text20, searchStr, 14);
 
-            expect(isEqualOrSubPath(root + linSep + sub_1, rootPath)).toBe(true);
-            expect(isEqualOrSubPath(root + linSep + sub_1 + linSep, rootPath)).toBe(true);
+            searchStr = "Some Stuff 14 More Stuff   ";
+            checkFindResult(text20, searchStr, 14);
+
+            searchStr = "   Some Stuff 14 More Stuff   ";
+            checkFindResult(text20, searchStr, 14);
         });
 
-        test("Differnent path", () => {
-            expect(isEqualOrSubPath(noMatch, rootPath)).toBe(false);
-            expect(isEqualOrSubPath(noMatch + sep, rootPath)).toBe(false);
-            expect(isEqualOrSubPath(noMatch + sep + sub_1, rootPath)).toBe(false);
-            expect(isEqualOrSubPath(noMatch + sep + sub_1 + sep + sub_2, rootPath)).toBe(false);
-        });
+        test("Search string present as complete line within text (source text has pre/post additional spaces)", () => {
+            let searchStr: string = "Some Stuff 16 More Stuff";
+            checkFindResult(text20, searchStr, 16);
 
-        test("Partially Match path", () => {
-            expect(isEqualOrSubPath("roo", rootPath)).toBe(false);
-            expect(isEqualOrSubPath("roo" + sep, rootPath)).toBe(false);
-            expect(isEqualOrSubPath(root + sep + "plug", rootPath)).toBe(false);
-            expect(isEqualOrSubPath(root + sep + "plug" + sep, rootPath)).toBe(false);
-        });
-
-        test("Same path", () => {
-            expect(isEqualOrSubPath(rootPath, rootPath)).toBe(true);
-        });
-
-        test("Subpath", () => {
-            expect(isEqualOrSubPath(root, rootPath)).toBe(false);
-            expect(isEqualOrSubPath(root + sep, rootPath)).toBe(false);
-            expect(isEqualOrSubPath(root + sep + sub_1, rootPath)).toBe(true);
-            expect(isEqualOrSubPath(rootPath, rootPath + sep)).toBe(true);
-            expect(isEqualOrSubPath(rootPath + sep, rootPath)).toBe(true);
-            expect(isEqualOrSubPath(root + sep + sub_1 + sep, rootPath)).toBe(true);
-            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2, rootPath)).toBe(true);
-            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2 + sep, rootPath)).toBe(true);
-            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2 + sep + sub_3, rootPath)).toBe(
-                true,
-            );
-        });
-
-        test("Multiple separators", () => {
-            expect(isEqualOrSubPath(root + sep + sep, root)).toBe(true);
-            expect(isEqualOrSubPath(root, root + sep + sep)).toBe(true);
-            expect(isEqualOrSubPath(root, root + sep + sep + sub_1)).toBe(false);
-            expect(isEqualOrSubPath(root + sep + sep + sub_1, root)).toBe(true);
-            expect(isEqualOrSubPath(root + winSep + linSep + sub_1, root)).toBe(true);
+            searchStr = "Some Stuff 17 More Stuff";
+            checkFindResult(text20, searchStr, 17);
         });
     });
 
-    describe("Linux", () => {
-        const sep = linSep;
-        const rootPath = root + sep + sub_1;
+    describe("Multi line search string - Match found", () => {
+        test("Search string present from line 1", () => {
+            const searchStr: string = `Some Stuff 1 More Stuff
+    Some Stuff 2 More Stuff
+    Some Stuff 3 More Stuff`;
 
-        test("Upper and lower case letters", () => {
-            expect(isEqualOrSubPath(caseMatch, root)).toBe(true);
-            expect(isEqualOrSubPath(caseMatch.toUpperCase(), root)).toBe(true);
+            checkFindResult(text20, searchStr, 1);
         });
 
-        test("Seperator auto correction", () => {
-            expect(isEqualOrSubPath(root + winSep + sub_1, rootPath)).toBe(true);
-            expect(isEqualOrSubPath(root + winSep + sub_1 + winSep, rootPath)).toBe(true);
-
-            expect(isEqualOrSubPath(root + linSep + sub_1, rootPath)).toBe(true);
-            expect(isEqualOrSubPath(root + linSep + sub_1 + linSep, rootPath)).toBe(true);
+        test("Search string present mid file", () => {
+            const searchStr: string = `Some Stuff 9 More Stuff
+    Some Stuff 10 More Stuff
+    Some Stuff 11 More Stuff`;
+            checkFindResult(text20, searchStr, 9);
         });
 
-        test("Different path", () => {
-            expect(isEqualOrSubPath(noMatch, rootPath)).toBe(false);
-            expect(isEqualOrSubPath(noMatch + sep, rootPath)).toBe(false);
-            expect(isEqualOrSubPath(noMatch + sep + sub_1, rootPath)).toBe(false);
-            expect(isEqualOrSubPath(noMatch + sep + sub_1 + sep + sub_2, rootPath)).toBe(false);
-        });
-
-        test("Partially Match path", () => {
-            expect(isEqualOrSubPath("roo", rootPath)).toBe(false);
-            expect(isEqualOrSubPath("roo" + sep, rootPath)).toBe(false);
-            expect(isEqualOrSubPath(root + sep + "plug", rootPath)).toBe(false);
-            expect(isEqualOrSubPath(root + sep + "plug" + sep, rootPath)).toBe(false);
-        });
-
-        test("Same path", () => {
-            expect(isEqualOrSubPath(rootPath, rootPath)).toBe(true);
-        });
-
-        test("Subpath", () => {
-            expect(isEqualOrSubPath(root, rootPath)).toBe(false);
-            expect(isEqualOrSubPath(root + sep, rootPath)).toBe(false);
-            expect(isEqualOrSubPath(root + sep + sub_1, rootPath)).toBe(true);
-            expect(isEqualOrSubPath(rootPath, rootPath + sep)).toBe(true);
-            expect(isEqualOrSubPath(rootPath + sep, rootPath)).toBe(true);
-            expect(isEqualOrSubPath(root + sep + sub_1 + sep, rootPath)).toBe(true);
-            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2, rootPath)).toBe(true);
-            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2 + sep, rootPath)).toBe(true);
-            expect(isEqualOrSubPath(root + sep + sub_1 + sep + sub_2 + sep + sub_3, rootPath)).toBe(
-                true,
-            );
-        });
-
-        test("Multiple separators", () => {
-            expect(isEqualOrSubPath(root + sep + sep, root)).toBe(true);
-            expect(isEqualOrSubPath(root, root + sep + sep)).toBe(true);
-            expect(isEqualOrSubPath(root, root + sep + sep + sub_1)).toBe(false);
-            expect(isEqualOrSubPath(root + sep + sep + sub_1, root)).toBe(true);
-            expect(isEqualOrSubPath(root + winSep + linSep + sub_1, root)).toBe(true);
+        test("Search string present at end of file", () => {
+            const searchStr: string = `Some Stuff 19 More Stuff
+    Some Stuff 20 More Stuff`;
+            checkFindResult(text20, searchStr, 19);
         });
     });
 
-    test("Examples", () => {
-        expect(isEqualOrSubPath("/user/docs/letter.txt", "/user/docs")).toBe(true);
-        expect(isEqualOrSubPath("/user/docs", "/user/docs")).toBe(true);
-        expect(isEqualOrSubPath("/user/docs/letter.txt", "/user/projects")).toBe(false);
-        expect(isEqualOrSubPath("/User/Docs", "/user/docs")).toBe(true);
-        expect(isEqualOrSubPath("C:\\user\\docs", "C:/user/docs")).toBe(true);
+    describe("Single line search string - No match found", () => {
+        test("Search string is a match but only to part of the line", () => {
+            const searchStr: string = "Stuff 14 More Stuff";
+
+            checkFindResult(text20, searchStr, null);
+        });
+    });
+
+    describe("Multi line search string - No match found", () => {
+        test("Search string doesn't match any source line", () => {
+            const searchStr: string = `Nothing here that matches
+    Or hear `;
+            checkFindResult(text20, searchStr, null);
+        });
+
+        test("Some, but not all of the search string lines matches the source", () => {
+            const searchStr: string = `Some Stuff 9 More Stuff
+    Some Stuff 10 More Stuff
+    Some Stuff 11 More Stuff - this line doesn't match`;
+            checkFindResult(text20, searchStr, null);
+        });
     });
 });
 
-describe("pathMatchesPattern", () => {
-    test("Paths that match", () => {
-        expect(pathMatchesPattern("Computing/AWS/DynamoDB/Streams.md", "Computing/AWS")).toBe(true);
-        expect(pathMatchesPattern("Computing/AWS/DynamoDB/Streams.md", "Computing/AWS/")).toBe(
-            true,
-        );
-        expect(
-            pathMatchesPattern("Computing/GCP/DynamoDB/Streams.md", "Computing/*/DynamoDB/*"),
-        ).toBe(true);
-        expect(pathMatchesPattern("Computing/AWS/DynamoDB/Streams.md", "Computing/**")).toBe(true);
-        expect(
-            pathMatchesPattern("Computing/AWS/DynamoDB/Streams.md", "Computing/AWS/DynamoDB/*"),
-        ).toBe(true);
+describe("findAndReplace", () => {
+    test("Multi line search string present as exact match", () => {
+        const searchStr: string = `Some Stuff 4 More Stuff
+Some Stuff 5 More Stuff
+Some Stuff 6 More Stuff`;
 
-        expect(pathMatchesPattern("Computing/AWS/foo.excalidraw.md", "**/*.excalidraw.md")).toBe(
-            true,
-        );
-        expect(
-            pathMatchesPattern(
-                "Computing/Drawing 2024-09-22 15.12.39.excalidraw.md",
-                "*/*.excalidraw.md",
-            ),
-        ).toBe(true);
+        const replacementStr: string = "Replacement line";
+
+        const expectedResult: string = `Some Stuff 0 More Stuff
+Some Stuff 1 More Stuff
+Some Stuff 2 More Stuff
+Some Stuff 3 More Stuff
+Replacement line
+Some Stuff 7 More Stuff
+Some Stuff 8 More Stuff
+Some Stuff 9 More Stuff`;
+        checkFindAndReplaceResult(text10, searchStr, replacementStr, expectedResult);
     });
 
-    test("Paths that don't match", () => {
-        expect(pathMatchesPattern("Math/Singular Matrix.md", "Computing/AWS")).toBe(false);
-        expect(pathMatchesPattern("AWS/DynamoDB/Streams.md", "Computing/*/DynamoDB/")).toBe(false);
+    test("Multi line search string has pre/post spaces", () => {
+        const searchStr: string = `Some Stuff 4 More Stuff
+${space}Some Stuff 5 More Stuff
+Some Stuff 6 More Stuff${space}${space}`;
 
-        expect(pathMatchesPattern("Computing/AWS/DynamoDB/Streams.md", "**/*.excalidraw.md")).toBe(
-            false,
-        );
+        const replacementStr: string = `Replacement line 1
+Replacement line 2`;
+
+        const expectedResult: string = `Some Stuff 0 More Stuff
+Some Stuff 1 More Stuff
+Some Stuff 2 More Stuff
+Some Stuff 3 More Stuff
+Replacement line 1
+Replacement line 2
+Some Stuff 7 More Stuff
+Some Stuff 8 More Stuff
+Some Stuff 9 More Stuff`;
+        checkFindAndReplaceResult(text10, searchStr, replacementStr, expectedResult);
+    });
+
+    test("No match found", () => {
+        const searchStr: string = `Some Stuff 4 More Stuff
+Some Stuff 5 More Stuff
+Some Stuff 7 More Stuff`;
+
+        const replacementStr: string = `Replacement line 1
+Replacement line 2`;
+
+        const expectedResult: string = null;
+        checkFindAndReplaceResult(text10, searchStr, replacementStr, expectedResult);
     });
 });
+
+function checkFindAndReplaceResult(
+    text: string,
+    searchStr: string,
+    replacementStr: string,
+    expectedResult: string,
+) {
+    const result: string = MultiLineTextFinder.findAndReplace(text, searchStr, replacementStr);
+    expect(result).toEqual(expectedResult);
+}
+
+function checkFindResult(text: string, searchStr: string, expectedResult: number) {
+    const textArray = splitTextIntoLineArray(text);
+    const searchArray = splitTextIntoLineArray(searchStr);
+    const result: number = MultiLineTextFinder.find(textArray, searchArray);
+    expect(result).toEqual(expectedResult);
+}

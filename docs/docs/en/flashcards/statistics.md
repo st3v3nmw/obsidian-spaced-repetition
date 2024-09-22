@@ -6,7 +6,7 @@ The statistics section can be accessed using the `View Statistics` command.
 
 Stats on the number of cards due in the future.
 
-<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/stats_forecast.png" />
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/docs/media/en/stats_forecast.png" />
 
 ### Intervals
 

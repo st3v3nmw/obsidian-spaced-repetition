@@ -12,7 +12,7 @@ import {
 } from "src/deck-tree-iterator";
 import { NoteReviewDeck, SchedNote } from "src/note-review-deck";
 import { TopicPath } from "src/topic-path";
-import { globalDateProvider } from "src/utils/date-provider";
+import { globalDateProvider } from "src/utils/dates";
 
 export class DueDateHistogram {
     // The key for dueDatesNotes is the number of days after today

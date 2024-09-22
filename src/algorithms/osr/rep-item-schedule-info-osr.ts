@@ -2,7 +2,7 @@ import { Moment } from "moment";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { SRSettings } from "src/settings";
-import { DateUtil, globalDateProvider } from "src/utils/date-provider";
+import { DateUtil, globalDateProvider } from "src/utils/dates";
 
 export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
     // A question can have multiple cards. The schedule info for all sibling cards are formatted together

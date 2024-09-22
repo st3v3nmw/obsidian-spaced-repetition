@@ -15,7 +15,7 @@ import type SRPlugin from "src/main";
 import { Note } from "src/note";
 import { CardType, Question } from "src/question";
 import { SRSettings } from "src/settings";
-import { RenderMarkdownWrapper } from "src/utils/render-markdown-wrapper";
+import { RenderMarkdownWrapper } from "src/utils/renderers";
 
 export class FlashcardReviewView {
     public app: App;

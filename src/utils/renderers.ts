@@ -2,7 +2,7 @@ import { App, MarkdownRenderer, TFile } from "obsidian";
 
 import { AUDIO_FORMATS, IMAGE_FORMATS, VIDEO_FORMATS } from "src/constants";
 import SRPlugin from "src/main";
-import { TextDirection } from "src/utils/text-direction";
+import { TextDirection } from "src/utils/strings";
 
 export class RenderMarkdownWrapper {
     private app: App;

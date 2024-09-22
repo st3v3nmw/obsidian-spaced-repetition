@@ -7,8 +7,8 @@ import { CardType, Question } from "src/question";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { frontmatterTagPseudoLineNum, ISRFile } from "src/sr-file";
 import { TopicPath, TopicPathList } from "src/topic-path";
-import { setupStaticDateProvider_20230906 } from "src/utils/date-provider";
-import { TextDirection } from "src/utils/text-direction";
+import { setupStaticDateProvider_20230906 } from "src/utils/dates";
+import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/unit-test-setup";

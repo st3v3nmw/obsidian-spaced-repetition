@@ -2,7 +2,7 @@ import { Note } from "src/note";
 import { NoteFileLoader } from "src/note-file-loader";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { TopicPath } from "src/topic-path";
-import { TextDirection } from "src/utils/text-direction";
+import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/unit-test-setup";

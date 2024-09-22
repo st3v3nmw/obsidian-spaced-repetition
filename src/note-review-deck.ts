@@ -1,6 +1,6 @@
 import { t } from "src/lang/helpers";
 import { ISRFile } from "src/sr-file";
-import { globalRandomNumberProvider } from "src/utils/random-number-provider";
+import { globalRandomNumberProvider } from "src/utils/numbers";
 
 export class SchedNote {
     note: ISRFile;

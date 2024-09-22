@@ -30,6 +30,7 @@ site/
 venv/
 .venv/
 docs/docs/en/media/~*
+docs/vaults/*/.obsidian
 .obsidian/plugins/obsidian-spaced-repetition-beta/*
 
 # env

@@ -17,8 +17,8 @@ import { SettingsUtil, SRSettings } from "src/settings";
 import { ISRFile } from "src/sr-file";
 import { Stats } from "src/stats";
 import { TopicPath } from "src/topic-path";
-import { globalDateProvider } from "src/utils/date-provider";
-import { TextDirection } from "src/utils/text-direction";
+import { globalDateProvider } from "src/utils/dates";
+import { TextDirection } from "src/utils/strings";
 
 export interface IOsrVaultEvents {
     dataChanged: () => void;

@@ -5,7 +5,7 @@ import { NoteParser } from "src/note-parser";
 import { NoteQuestionParser } from "src/note-question-parser";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { TopicPath } from "src/topic-path";
-import { TextDirection } from "src/utils/text-direction";
+import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
 
