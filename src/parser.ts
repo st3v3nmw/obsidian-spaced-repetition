@@ -76,31 +76,32 @@ export function generateParser(options: ParserOptions): Parser {
 
 function generateGrammar(options: ParserOptions): string {
     // Contains the grammar for cloze cards
-    let clozes_grammar = ""
+    let clozes_grammar = "";
 
     // An array contianing the types of cards enabled by the user
-    let card_rules_list: string[] = ['html_comment', 'tilde_code', 'backprime_code'];
+    const card_rules_list: string[] = ["html_comment", "tilde_code", "backprime_code"];
 
     // Include reversed inline flashcards rule only if the user provided a non-empty marker for reversed inline flashcards
-    if(options.singleLineCardSeparator.trim()!=="") card_rules_list.push('inline_rev_card');
+    if (options.singleLineCardSeparator.trim() !== "") card_rules_list.push("inline_rev_card");
 
     // Include inline flashcards rule only if the user provided a non-empty marker for inline flashcards
-    if(options.singleLineCardSeparator.trim()!=="") card_rules_list.push('inline_card');
+    if (options.singleLineCardSeparator.trim() !== "") card_rules_list.push("inline_card");
 
     // Include reversed multiline flashcards rule only if the user provided a non-empty marker for reversed multiline flashcards
-    if(options.multilineReversedCardSeparator.trim()!=="") card_rules_list.push('multiline_rev_card');
+    if (options.multilineReversedCardSeparator.trim() !== "")
+        card_rules_list.push("multiline_rev_card");
 
     // Include multiline flashcards rule only if the user provided a non-empty marker for multiline flashcards
-    if(options.multilineCardSeparator.trim()!=="") card_rules_list.push('multiline_card');
+    if (options.multilineCardSeparator.trim() !== "") card_rules_list.push("multiline_card");
 
     const cloze_rules_list: string[] = [];
     if (options.convertHighlightsToClozes) cloze_rules_list.push("cloze_equal");
     if (options.convertBoldTextToClozes) cloze_rules_list.push("cloze_star");
     if (options.convertCurlyBracketsToClozes) cloze_rules_list.push("cloze_bracket");
-        
+
     // Include cloze cards only if the user enabled at least one type of cloze cards
-    if(cloze_rules_list.length>0) {
-        card_rules_list.push('cloze_card');
+    if (cloze_rules_list.length > 0) {
+        card_rules_list.push("cloze_card");
         const cloze_rules = cloze_rules_list.join(" / ");
         clozes_grammar = `
 cloze_card
@@ -140,13 +141,13 @@ cloze_mark_bracket_open
 
 cloze_mark_bracket_close
 = "}}"
-` ;
+`;
     }
 
     // Important: we need to include `loose_line` rule to detect any other loose line.
     // Otherwise, we get a syntax error because the parser is likely not able to reach the end
     // of the file, as it may encounter loose lines, which it would not know how to handle.
-    card_rules_list.push('loose_line');
+    card_rules_list.push("loose_line");
 
     const card_rules = card_rules_list.join(" / ");
 

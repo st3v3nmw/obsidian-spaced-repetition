@@ -464,7 +464,22 @@ test("Test parsing of a mix of card types", () => {
 });
 
 test("Test parsing cards with codeblocks", () => {
-    // no blank lines
+    // `inline`
+    expect(
+        parse(
+            "my inline question containing `some inline code` in it::and this is answer possibly containing `inline` code.",
+            parserOptions,
+        ),
+    ).toEqual([
+        [
+            CardType.SingleLineBasic,
+            "my inline question containing `some inline code` in it::and this is answer possibly containing `inline` code.",
+            0,
+            0,
+        ],
+    ]);
+
+    // ```block```, no blank lines
     expect(
         parse(
             "How do you ... Python?\n?\n" +
@@ -481,7 +496,7 @@ test("Test parsing cards with codeblocks", () => {
         ],
     ]);
 
-    // with blank lines
+    // ```block```, with blank lines
     expect(
         parse(
             "How do you ... Python?\n?\n" +
@@ -498,7 +513,7 @@ test("Test parsing cards with codeblocks", () => {
         ],
     ]);
 
-    // general Markdown syntax
+    // nested markdown
     expect(
         parse(
             "Nested Markdown?\n?\n" +
