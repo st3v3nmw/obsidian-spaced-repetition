@@ -75,6 +75,20 @@ test("Test parsing of single line basic cards", () => {
             convertCurlyBracketsToClozes: false,
         }),
     ).toEqual([[CardType.SingleLineBasic, "Question=Answer", 0, 0]]);
+
+    // empty string or whitespace character provided
+    expect(
+        parse("Question::Answer", {
+            singleLineCardSeparator: "",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            convertHighlightsToClozes: false,
+            convertBoldTextToClozes: false,
+            convertCurlyBracketsToClozes: false,
+        }),
+    ).toEqual([]);
 });
 
 test("Test parsing of single line reversed cards", () => {
@@ -103,6 +117,20 @@ test("Test parsing of single line reversed cards", () => {
             convertCurlyBracketsToClozes: false,
         }),
     ).toEqual([[CardType.SingleLineReversed, "Question&&&Answer", 0, 0]]);
+
+    // empty string or whitespace character provided
+    expect(
+        parse("Question:::Answer", {
+            singleLineCardSeparator: ">",
+            singleLineReversedCardSeparator: "  ",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            convertHighlightsToClozes: false,
+            convertBoldTextToClozes: false,
+            convertCurlyBracketsToClozes: false,
+        }),
+    ).toEqual([]);
 });
 
 test("Test parsing of multi line basic cards", () => {
@@ -199,6 +227,20 @@ test("Test parsing of multi line basic cards", () => {
             convertCurlyBracketsToClozes: false,
         }),
     ).toEqual([[CardType.MultiLineBasic, "Question\n@@\nAnswer", 0, 2]]);
+
+    // empty string or whitespace character provided
+    expect(
+        parse("Question\n?\nAnswer", {
+            singleLineCardSeparator: "::",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: "\n",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            convertHighlightsToClozes: false,
+            convertBoldTextToClozes: false,
+            convertCurlyBracketsToClozes: false,
+        }),
+    ).toEqual([]);
 });
 
 test("Test parsing of multi line reversed cards", () => {
@@ -260,6 +302,20 @@ test("Test parsing of multi line reversed cards", () => {
             convertCurlyBracketsToClozes: false,
         }),
     ).toEqual([[CardType.MultiLineReversed, "Question\n@@@\nAnswer", 0, 2]]);
+
+    // empty string or whitespace character provided
+    expect(
+        parse("Question\n??\nAnswer", {
+            singleLineCardSeparator: "::",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "\t",
+            multilineCardEndMarker: "---",
+            convertHighlightsToClozes: false,
+            convertBoldTextToClozes: false,
+            convertCurlyBracketsToClozes: false,
+        }),
+    ).toEqual([]);
 });
 
 test("Test parsing of cloze cards", () => {
