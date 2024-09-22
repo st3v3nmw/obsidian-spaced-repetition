@@ -72,8 +72,8 @@ export default {
     PROJECT_CONTRIBUTIONS:
         'Créez un ticket <a href="${issues_url}">sur GitHub</a> si vous trouvez un bug ou voulez demander une fonctionnalité',
     FOLDERS_TO_IGNORE: "Dossiers à ignorer",
-    FOLDERS_TO_IGNORE_DESC: `Entrez les chemins des dossiers. Un chemin par ligne, ex. Templates Meta/Scripts.
-Ce réglage est le même pour les flashcards et les notes.`,
+    FOLDERS_TO_IGNORE_DESC:
+        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
     OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Flashcards",
     FLASHCARD_EASY_LABEL: "Bouton Facile",

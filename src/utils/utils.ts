@@ -1,3 +1,4 @@
+import { minimatch } from "minimatch";
 import moment, { Moment } from "moment";
 import { sep } from "path";
 
@@ -387,4 +388,12 @@ export function parseObsidianFrontmatterTag(tagStr: string): string[] {
         }
     }
     return result;
+}
+
+// This checks if the given path matches the given pattern
+// We match based on:
+//  1. The `path` starts with `pattern`
+//  2. The `path` matches the glob `pattern`
+export function pathMatchesPattern(path: string, pattern: string) {
+    return path.startsWith(pattern) || minimatch(path, pattern);
 }

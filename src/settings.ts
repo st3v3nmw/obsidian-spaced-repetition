@@ -4,6 +4,7 @@ import { createTabs, TabStructure } from "src/gui/tabs";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { setDebugParser } from "src/parser";
+import { pathMatchesPattern } from "src/utils/utils";
 
 export interface SRSettings {
     // flashcards
@@ -123,7 +124,7 @@ export class SettingsUtil {
     }
 
     static isPathInNoteIgnoreFolder(settings: SRSettings, path: string): boolean {
-        return settings.noteFoldersToIgnore.some((folder) => path.startsWith(folder));
+        return settings.noteFoldersToIgnore.some((folder) => pathMatchesPattern(path, folder));
     }
 
     static isAnyTagANoteReviewTag(settings: SRSettings, tags: string[]): boolean {
@@ -619,7 +620,8 @@ export class SRSettingTab extends PluginSettingTab {
                         applySettingsUpdate(async () => {
                             this.plugin.data.settings.noteFoldersToIgnore = value
                                 .split(/\n+/)
-                                .map((v) => v.trim());
+                                .map((v) => v.trim())
+                                .filter((v) => v);
                             await this.plugin.savePluginData();
                         });
                     }),
