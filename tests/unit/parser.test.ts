@@ -233,7 +233,7 @@ test("Test parsing of multi line basic cards", () => {
         parse("Question\n?\nAnswer", {
             singleLineCardSeparator: "::",
             singleLineReversedCardSeparator: ":::",
-            multilineCardSeparator: "\n",
+            multilineCardSeparator: "",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "---",
             convertHighlightsToClozes: false,
