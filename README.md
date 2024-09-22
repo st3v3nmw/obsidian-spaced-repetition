@@ -31,8 +31,24 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
     -   Possible use case: [Incremental writing](https://www.stephenmwangi.com/obsidian-spaced-repetition/notes/#incremental-writing)
 -   [Statistics](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#statistics)
 
+## Coming Soon
+
+1. FSRS
+
+-   [ ] Store scheduling info in a dedicated file
+-   [ ] Migrate from one storage system to another
+-   [ ] Implement FSRS
+-   [ ] Update documentation
+
+2. Better Cloze formats
+
+-   [ ] Custom cloze markers
+-   [ ] Cloze hints
+-   [ ] Anki-like clozes
+-   [ ] Update documentation
+
 ## Usage
 
-Check the [docs](https://www.stephenmwangi.com/obsidian-spaced-repetition/) for more details.
+Check the [documentation](https://www.stephenmwangi.com/obsidian-spaced-repetition/) for more details.
 
 <a href='https://ko-fi.com/M4M44DEN6' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi3.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
