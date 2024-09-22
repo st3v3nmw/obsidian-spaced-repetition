@@ -9,6 +9,7 @@ import {
     getTypedObjectEntries,
     isEqualOrSubPath,
     literalStringReplace,
+    pathMatchesPattern,
     splitNoteIntoFrontmatterAndContent,
     splitTextIntoLineArray,
     stringTrimStart,
@@ -296,39 +297,48 @@ describe("stringTrimStart", () => {
         expect(stringTrimStart("")).toEqual(["", ""]);
         expect(stringTrimStart(undefined)).toEqual(["", ""]);
     });
+
     test("No white spaces", () => {
         expect(stringTrimStart("any text here")).toEqual(["", "any text here"]);
     });
+
     test("Only white spaces", () => {
         expect(stringTrimStart(" ")).toEqual([" ", ""]);
         expect(stringTrimStart("   ")).toEqual(["   ", ""]);
     });
+
     test("Leading white spaces", () => {
         expect(stringTrimStart(" any text here")).toEqual([" ", "any text here"]);
         expect(stringTrimStart("  any text here")).toEqual(["  ", "any text here"]);
     });
+
     test("Trailing white spaces", () => {
         expect(stringTrimStart("any text here ")).toEqual(["", "any text here "]);
         expect(stringTrimStart("any text here  ")).toEqual(["", "any text here  "]);
     });
+
     test("Leading tabs", () => {
         expect(stringTrimStart("\tany text here")).toEqual(["\t", "any text here"]);
         expect(stringTrimStart("\t\tany text here")).toEqual(["\t\t", "any text here"]);
     });
+
     test("Trailing tabs", () => {
         expect(stringTrimStart("any text here\t")).toEqual(["", "any text here\t"]);
         expect(stringTrimStart("any text here\t\t")).toEqual(["", "any text here\t\t"]);
     });
+
     test("Mixed leading whitespace (spaces and tabs)", () => {
         expect(stringTrimStart(" \tany text here")).toEqual([" \t", "any text here"]);
         expect(stringTrimStart("\t any text here")).toEqual(["\t ", "any text here"]);
         expect(stringTrimStart(" \t any text here")).toEqual([" \t ", "any text here"]);
     });
+
     test("Mixed trailing whitespace (spaces and tabs)", () => {
         expect(stringTrimStart("any text here \t")).toEqual(["", "any text here \t"]);
         expect(stringTrimStart("any text here\t ")).toEqual(["", "any text here\t "]);
         expect(stringTrimStart("any text here \t ")).toEqual(["", "any text here \t "]);
     });
+
     test("Newlines and leading spaces", () => {
         expect(stringTrimStart("\nany text here")).toEqual(["\n", "any text here"]);
         expect(stringTrimStart("\n any text here")).toEqual(["\n ", "any text here"]);
@@ -738,6 +748,7 @@ describe("isEqualOrSubPath", () => {
             expect(isEqualOrSubPath(root + winSep + linSep + sub_1, root)).toBe(true);
         });
     });
+
     describe("Linux", () => {
         const sep = linSep;
         const rootPath = root + sep + sub_1;
@@ -755,7 +766,7 @@ describe("isEqualOrSubPath", () => {
             expect(isEqualOrSubPath(root + linSep + sub_1 + linSep, rootPath)).toBe(true);
         });
 
-        test("Differnent path", () => {
+        test("Different path", () => {
             expect(isEqualOrSubPath(noMatch, rootPath)).toBe(false);
             expect(isEqualOrSubPath(noMatch + sep, rootPath)).toBe(false);
             expect(isEqualOrSubPath(noMatch + sep + sub_1, rootPath)).toBe(false);
@@ -795,11 +806,47 @@ describe("isEqualOrSubPath", () => {
             expect(isEqualOrSubPath(root + winSep + linSep + sub_1, root)).toBe(true);
         });
     });
+
     test("Examples", () => {
         expect(isEqualOrSubPath("/user/docs/letter.txt", "/user/docs")).toBe(true);
         expect(isEqualOrSubPath("/user/docs", "/user/docs")).toBe(true);
         expect(isEqualOrSubPath("/user/docs/letter.txt", "/user/projects")).toBe(false);
         expect(isEqualOrSubPath("/User/Docs", "/user/docs")).toBe(true);
         expect(isEqualOrSubPath("C:\\user\\docs", "C:/user/docs")).toBe(true);
+    });
+});
+
+describe("pathMatchesPattern", () => {
+    test("Paths that match", () => {
+        expect(pathMatchesPattern("Computing/AWS/DynamoDB/Streams.md", "Computing/AWS")).toBe(true);
+        expect(pathMatchesPattern("Computing/AWS/DynamoDB/Streams.md", "Computing/AWS/")).toBe(
+            true,
+        );
+        expect(
+            pathMatchesPattern("Computing/GCP/DynamoDB/Streams.md", "Computing/*/DynamoDB/*"),
+        ).toBe(true);
+        expect(pathMatchesPattern("Computing/AWS/DynamoDB/Streams.md", "Computing/**")).toBe(true);
+        expect(
+            pathMatchesPattern("Computing/AWS/DynamoDB/Streams.md", "Computing/AWS/DynamoDB/*"),
+        ).toBe(true);
+
+        expect(pathMatchesPattern("Computing/AWS/foo.excalidraw.md", "**/*.excalidraw.md")).toBe(
+            true,
+        );
+        expect(
+            pathMatchesPattern(
+                "Computing/Drawing 2024-09-22 15.12.39.excalidraw.md",
+                "*/*.excalidraw.md",
+            ),
+        ).toBe(true);
+    });
+
+    test("Paths that don't match", () => {
+        expect(pathMatchesPattern("Math/Singular Matrix.md", "Computing/AWS")).toBe(false);
+        expect(pathMatchesPattern("AWS/DynamoDB/Streams.md", "Computing/*/DynamoDB/")).toBe(false);
+
+        expect(pathMatchesPattern("Computing/AWS/DynamoDB/Streams.md", "**/*.excalidraw.md")).toBe(
+            false,
+        );
     });
 });
