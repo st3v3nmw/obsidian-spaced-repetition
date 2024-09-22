@@ -71,8 +71,8 @@ export default {
     PROJECT_CONTRIBUTIONS:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Directorios a ignorar",
-    FOLDERS_TO_IGNORE_DESC: `Escriba las rutas de los directorios separadas por saltos de línea, por ejemplo, Plantillas Extra/Guiones.
-Note that this setting is common to both Flashcards and Notes.`,
+    FOLDERS_TO_IGNORE_DESC:
+        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
     OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Tarjetas de Memorización",
     FLASHCARD_EASY_LABEL: "Texto del botón: Fácil",

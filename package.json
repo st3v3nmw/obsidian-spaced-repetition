@@ -47,6 +47,7 @@
     },
     "dependencies": {
         "chart.js": "^4.4.4",
+        "minimatch": "^10.0.1",
         "pagerank.js": "^1.0.2",
         "peggy": "^4.0.3"
     },

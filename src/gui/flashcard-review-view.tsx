@@ -360,7 +360,7 @@ export class FlashcardReviewView {
             }
             result += separator + context;
         });
-        return result + separator + "...";
+        return result;
     }
 
     // -> Header

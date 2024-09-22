@@ -71,8 +71,8 @@ export default {
     PROJECT_CONTRIBUTIONS:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Foldery do zignorowania",
-    FOLDERS_TO_IGNORE_DESC: `Wprowadź ścieżki folderów oddzielone nowymi liniami, np. Szablony Meta/Scripts.
-Note that this setting is common to both Flashcards and Notes.`,
+    FOLDERS_TO_IGNORE_DESC:
+        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
     OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Fiszki",
     FLASHCARD_EASY_LABEL: "Tekst przycisku Łatwe",
