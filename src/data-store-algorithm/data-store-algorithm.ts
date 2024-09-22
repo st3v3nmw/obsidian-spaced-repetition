@@ -5,7 +5,7 @@ export class DataStoreAlgorithm {
 
     public static getInstance(): IDataStoreAlgorithm {
         if (!DataStoreAlgorithm.instance) {
-            throw Error("there is no DataStoreAlgorithm instance.");
+            throw new Error("there is no DataStoreAlgorithm instance.");
         }
         return DataStoreAlgorithm.instance;
     }

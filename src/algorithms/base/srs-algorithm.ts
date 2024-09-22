@@ -5,7 +5,7 @@ export class SrsAlgorithm {
 
     public static getInstance(): ISrsAlgorithm {
         if (!SrsAlgorithm.instance) {
-            throw Error("there is no SrsAlgorithm instance.");
+            throw new Error("there is no SrsAlgorithm instance.");
         }
         return SrsAlgorithm.instance;
     }
