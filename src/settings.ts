@@ -4,7 +4,7 @@ import { createTabs, TabStructure } from "src/gui/tabs";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { setDebugParser } from "src/parser";
-import { pathMatchesPattern } from "src/utils/utils";
+import { pathMatchesPattern } from "src/utils/fs";
 
 export interface SRSettings {
     // flashcards

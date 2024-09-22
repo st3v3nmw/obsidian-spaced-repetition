@@ -44,7 +44,7 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
     3. Display the Obsidian command dialog to access the plugin [commands](plugin-commands.md)<br/>
     4. `Flashcard Review Icon` Select a flashcard [deck](flashcards/reviewing.md#deck-selection) to [review](flashcards/reviewing.md#reviewing) <br/>
     5. Identify that flashcards within this note are in the `#flashcards/science/physics` [deck](flashcards/decks.md#using-obsidian-tags)<br/>
-    6. A [single line question](flashcards/qanda-cards.md#single-line-basic) (identified by the `::` separating the question and answer)<br/>
+    6. A [single line question](flashcards/q-and-a-cards.md#single-line-basic) (identified by the `::` separating the question and answer)<br/>
     7. The plugin stores scheduling info within this [HTML comment](data-storage.md#individual-markdown-files) <br/>
     8. `Spaced Repetition Status Area` The number of notes and flashcards currently due for review. Click to [open a note for review](notes.md#selecting-a-note-for-review).
 
@@ -69,5 +69,3 @@ You can easily install the plugin from Obsidian's community plugin section in th
 ## Support
 
 <a href='https://ko-fi.com/M4M44DEN6' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi3.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
-
-<a href="https://jb.gg/OpenSourceSupport" target="_blank"><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" height='128' style='border:0px;height:128px;' alt="JetBrains Logo (Main) logo."></a>

@@ -1,6 +1,6 @@
 import { CardType } from "src/question";
 import { SRSettings } from "src/settings";
-import { findLineIndexOfSearchStringIgnoringWs } from "src/utils/utils";
+import { findLineIndexOfSearchStringIgnoringWs } from "src/utils/strings";
 
 export class CardFrontBack {
     front: string;

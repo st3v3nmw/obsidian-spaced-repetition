@@ -10,7 +10,7 @@ In this lesson, I'm going to cover what are called [[Local Secondary Index (LSI)
 
 # Local Secondary Indexes
 
-So firstly let's look at the LSIs]]. These provide an alternative sort key to use for scans and queries. 
+So firstly let's look at the LSIs. These provide an alternative sort key to use for scans and queries. 
 
 You can create up to five LSIs per table. And they must be created at the creation time for your DynamoDB table. You cannot add, remove, or modify them later on. 
 

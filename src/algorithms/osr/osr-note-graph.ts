@@ -2,7 +2,7 @@ import * as graph from "pagerank.js";
 
 import { IOsrVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
 import { INoteEaseList } from "src/note-ease-list";
-import { isSupportedFileType } from "src/utils/utils";
+import { isSupportedFileType } from "src/utils/fs";
 
 export interface LinkStat {
     sourcePath: string;

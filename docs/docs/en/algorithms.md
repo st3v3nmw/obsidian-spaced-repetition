@@ -21,7 +21,7 @@ A learning algorithm is a formula that determines when a note or flashcard shoul
 !!! warning
 
     Note that this hasn't been updated in a while,
-    please see the [code](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/src/scheduling.ts).
+    please see the [code](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/src/algorithms/osr/srs-algorithm-osr.ts).
 
 -   `if link_count > 0: initial_ease = (1 - link_contribution) * base_ease + link_contribution * average_ease` - `link_contribution = max_link_factor * min(1.0, log(link_count + 0.5) / log(64))` (cater for uncertainty)
     -   The importance of the different concepts/notes is determined using the PageRank algorithm (not all notes are created equal xD)

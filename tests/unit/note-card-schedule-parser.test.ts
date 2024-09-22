@@ -3,7 +3,7 @@ import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/rep-item-schedule-in
 import { TICKS_PER_DAY } from "src/constants";
 import { DataStore } from "src/data-stores/base/data-store";
 import { DEFAULT_SETTINGS } from "src/settings";
-import { setupStaticDateProvider_20230906 } from "src/utils/date-provider";
+import { setupStaticDateProvider_20230906 } from "src/utils/dates";
 
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 

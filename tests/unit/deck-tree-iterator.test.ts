@@ -2,11 +2,8 @@ import { CardListType, Deck } from "src/deck";
 import { CardOrder, DeckOrder, DeckTreeIterator } from "src/deck-tree-iterator";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { TopicPath } from "src/topic-path";
-import { setupStaticDateProvider_20230906 } from "src/utils/date-provider";
-import {
-    setupNextRandomNumber,
-    setupStaticRandomNumberProvider,
-} from "src/utils/random-number-provider";
+import { setupStaticDateProvider_20230906 } from "src/utils/dates";
+import { setupNextRandomNumber, setupStaticRandomNumberProvider } from "src/utils/numbers";
 
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 import { SampleItemDecks } from "./sample-items";

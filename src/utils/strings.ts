@@ -1,39 +1,10 @@
-import { minimatch } from "minimatch";
-import moment, { Moment } from "moment";
-import { sep } from "path";
-
-import { PREFERRED_DATE_FORMAT } from "src/constants";
-
-type Hex = number;
-
-// https://stackoverflow.com/a/69019874
-type ObjectType = Record<PropertyKey, unknown>;
-type PickByValue<OBJ_T, VALUE_T> = // https://stackoverflow.com/a/55153000
-    Pick<
-        OBJ_T,
-        {
-            [K in keyof OBJ_T]: OBJ_T[K] extends VALUE_T ? K : never;
-        }[keyof OBJ_T]
-    >;
-type ObjectEntries<OBJ_T> = // https://stackoverflow.com/a/60142095
-    {
-        [K in keyof OBJ_T]: [keyof PickByValue<OBJ_T, OBJ_T[K]>, OBJ_T[K]];
-    }[keyof OBJ_T][];
-export function getTypedObjectEntries<OBJ_T extends ObjectType>(obj: OBJ_T): ObjectEntries<OBJ_T> {
-    return Object.entries(obj) as ObjectEntries<OBJ_T>;
+export enum TextDirection {
+    Unspecified,
+    Ltr,
+    Rtl,
 }
 
-/**
- * Returns an array of the keys of an object with type `(keyof T)[]`
- * instead of `string[]`
- * Please see https://stackoverflow.com/a/59459000 for more details
- *
- * @param obj - An object
- * @returns An array of the keys of `obj` with type `(keyof T)[]`
- */
-export const getKeysPreserveType = Object.keys as <T extends Record<string, unknown>>(
-    obj: T,
-) => Array<keyof T>;
+type Hex = number;
 
 /**
  * Escapes the input string so that it can be converted to a regex
@@ -84,92 +55,12 @@ export function cyrb53(str: string, seed = 0): string {
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
 }
 
-/**
- * Converts the date to timestamp
- *
- * @param year The Year
- * @param month The month 1-12
- * @param day The Day 1-31
- * @returns Retruns the Ticks of the date since 1970-01-01
- */
-export function ticksFromDate(year: number, month: number, day: number): number {
-    return moment.utc({ year, month, day }).valueOf();
-}
-
-/**
- * 👇️ format as "YYYY-MM-DD"
- * https://bobbyhadz.com/blog/typescript-date-format
- *
- * @param ticks
- * @returns
- * @deprecated use formatDate() instead
- */
-export function formatDate_YYYY_MM_DD(ticks: Moment): string {
-    return ticks.format(PREFERRED_DATE_FORMAT);
-}
-
-/**
- * Converts the ticks to a date formatted string.
- * Allowed format
- * YYYY = Year
- * MM = Month
- * DD = Day
- *
- * @param year The Year
- * @param month The month 1-12
- * @param day The Day 1-31
- * @param format Format string
- * @returns The date as string
- */
-export function formatDate(year: number, month: number, day: number, format?: string): string;
-
-/**
- * Converts the ticks to a date formatted string.
- * Allowed format
- * YYYY = Year
- * MM = Month
- * DD = Day
- *
- * @param date A date object
- * @param format Format string
- * @returns The date as string
- */
-export function formatDate(date: Date, format?: string): string;
-
-/**
- * Converts the ticks to a date formatted string.
- * Allowed format
- * YYYY = Year
- * MM = Month
- * DD = Day
- *
- * @param ticks The ticks in milliseconds
- * @param format Format string
- * @returns The date as string
- */
-export function formatDate(ticks: number, format?: string): string;
-
-export function formatDate(
-    arg1: unknown,
-    arg2?: unknown,
-    arg3?: unknown,
-    format: string = PREFERRED_DATE_FORMAT,
-): string {
-    let _date: Date;
-    if (typeof arg1 === "number" && typeof arg2 === "number" && typeof arg3 === "number") {
-        _date = new Date(arg1, arg2 - 1, arg3);
-    } else if (typeof arg1 === "number") {
-        _date = new Date(arg1);
-    } else if (typeof arg1 === typeof new Date()) {
-        _date = arg1 as Date;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function convertToStringOrEmpty(v: any): string {
+    let result: string = "";
+    if (v != null && v != undefined) {
+        result = v + "";
     }
-
-    let result: string = format;
-
-    result = result.replaceAll(/YYYY/g, _date.getFullYear().toString().padStart(4, "0"));
-    result = result.replaceAll(/MM/g, (_date.getMonth() + 1).toString().padStart(2, "0"));
-    result = result.replaceAll(/DD/g, _date.getDate().toString().padStart(2, "0"));
-
     return result;
 }
 
@@ -200,66 +91,6 @@ export function stringTrimStart(str: string): [string, string] {
     return [ws, trimmed];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function convertToStringOrEmpty(v: any): string {
-    let result: string = "";
-    if (v != null && v != undefined) {
-        result = v + "";
-    }
-    return result;
-}
-
-/**
- * Determines if a given path (`toCheck`) is either equal to or a sub-path of a specified root path (`rootPath`).
- * The function compares the paths in a case-insensitive manner and normalizes the directory separators for consistency across different platforms.
- *
- * @param {string} toCheck - The path that needs to be checked against the root path.
- * @param {string} rootPath - The root path to check against. The function determines if `toCheck` is equal to or a sub-path of this path.
- * @returns {boolean} - Returns `true` if `toCheck` is either equal to or a sub-path of `rootPath`. Otherwise, returns `false`.
- *
- * @example
- * // Example 1: Sub-path scenario
- * isEqualOrSubPath('/user/docs/letter.txt', '/user/docs'); // returns true
- *
- * @example
- * // Example 2: Equal paths scenario
- * isEqualOrSubPath('/user/docs', '/user/docs'); // returns true
- *
- * @example
- * // Example 3: Non-matching path scenario
- * isEqualOrSubPath('/user/docs/letter.txt', '/user/projects'); // returns false
- *
- * @example
- * // Example 4: Case-insensitive matching
- * isEqualOrSubPath('/User/Docs', '/user/docs'); // returns true
- *
- * @example
- * // Example 5: Handles different path separators
- * isEqualOrSubPath('C:\\user\\docs', 'C:/user/docs'); // returns true
- */
-export function isEqualOrSubPath(toCheck: string, rootPath: string): boolean {
-    const rootPathSections = rootPath
-        .toLowerCase()
-        .replaceAll(/(\\|\/)+/g, sep)
-        .split(sep)
-        .filter((p) => p !== "");
-    const pathSections = toCheck
-        .toLowerCase()
-        .replaceAll(/(\\|\/)+/g, sep)
-        .split(sep)
-        .filter((p) => p !== "");
-    if (pathSections.length < rootPathSections.length) {
-        return false;
-    }
-    for (let i = 0; i < rootPathSections.length; i++) {
-        if (rootPathSections[i] !== pathSections[i]) {
-            return false;
-        }
-    }
-    return true;
-}
-
-//
 // This returns [frontmatter, content]
 //
 // The returned content has the same number of lines as the supplied str string, but with the
@@ -301,7 +132,6 @@ export function splitNoteIntoFrontmatterAndContent(str: string): [string, string
     return [frontmatter, content];
 }
 
-//
 // Returns the index of the line that consists of the search string.
 //
 // A line is considered a match if it is identical to the search string, (ignoring leading and
@@ -319,10 +149,6 @@ export function findLineIndexOfSearchStringIgnoringWs(
         }
     }
     return result;
-}
-
-export function isSupportedFileType(path: string): boolean {
-    return path.split(".").pop().toLowerCase() === "md";
 }
 
 /*
@@ -390,10 +216,49 @@ export function parseObsidianFrontmatterTag(tagStr: string): string[] {
     return result;
 }
 
-// This checks if the given path matches the given pattern
-// We match based on:
-//  1. The `path` starts with `pattern`
-//  2. The `path` matches the glob `pattern`
-export function pathMatchesPattern(path: string, pattern: string) {
-    return path.startsWith(pattern) || minimatch(path, pattern);
+export class MultiLineTextFinder {
+    static findAndReplace(
+        sourceText: string,
+        searchText: string,
+        replacementText: string,
+    ): string | null {
+        let result: string = null;
+        if (sourceText.includes(searchText)) {
+            result = literalStringReplace(sourceText, searchText, replacementText);
+        } else {
+            const sourceTextArray = splitTextIntoLineArray(sourceText);
+            const searchTextArray = splitTextIntoLineArray(searchText);
+            const lineNo: number | null = MultiLineTextFinder.find(
+                sourceTextArray,
+                searchTextArray,
+            );
+            if (lineNo !== null) {
+                const replacementTextArray = splitTextIntoLineArray(replacementText);
+                const linesToRemove: number = searchTextArray.length;
+                sourceTextArray.splice(lineNo, linesToRemove, ...replacementTextArray);
+                result = sourceTextArray.join("\n");
+            }
+        }
+        return result;
+    }
+
+    static find(sourceText: string[], searchText: string[]): number | null {
+        let result: number = null;
+        let searchIdx: number = 0;
+        const maxSearchIdx: number = searchText.length - 1;
+        for (let sourceIdx = 0; sourceIdx < sourceText.length; sourceIdx++) {
+            const sourceLine: string = sourceText[sourceIdx].trim();
+            const searchLine: string = searchText[searchIdx].trim();
+            if (searchLine == sourceLine) {
+                if (searchIdx == maxSearchIdx) {
+                    result = sourceIdx - searchIdx;
+                    break;
+                }
+                searchIdx++;
+            } else {
+                searchIdx = 0;
+            }
+        }
+        return result;
+    }
 }

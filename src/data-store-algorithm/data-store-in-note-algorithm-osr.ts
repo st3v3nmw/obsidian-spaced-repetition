@@ -15,7 +15,7 @@ import { IDataStoreAlgorithm } from "src/data-store-algorithm/idata-store-algori
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
 import { ISRFile } from "src/sr-file";
-import { formatDate_YYYY_MM_DD } from "src/utils/utils";
+import { formatDate_YYYY_MM_DD } from "src/utils/dates";
 
 //
 // Algorithm: The original OSR algorithm

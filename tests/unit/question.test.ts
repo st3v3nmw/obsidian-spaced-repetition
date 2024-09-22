@@ -1,6 +1,6 @@
 import { Question, QuestionText } from "src/question";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
-import { TextDirection } from "src/utils/text-direction";
+import { TextDirection } from "src/utils/strings";
 
 const settings_cardCommentOnSameLine: SRSettings = { ...DEFAULT_SETTINGS };
 settings_cardCommentOnSameLine.cardCommentOnSameLine = true;

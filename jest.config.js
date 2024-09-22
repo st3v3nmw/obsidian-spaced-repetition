@@ -24,10 +24,10 @@ module.exports = {
         "src/next-note-review-handler.ts",
         "src/plugin-data.ts",
         "src/settings.ts",
-        "src/utils/render-markdown-wrapper.ts",
+        "src/utils/renderers.ts",
 
         // debugging utils
-        "src/utils/time-test-util.ts",
+        "src/utils/debug.ts",
 
         // don't include in results
         "src/declarations.d.ts",

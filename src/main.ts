@@ -43,8 +43,7 @@ import {
 } from "src/settings";
 import { ISRFile, SrTFile as SrTFile } from "src/sr-file";
 import { TopicPath } from "src/topic-path";
-import { TextDirection } from "src/utils/text-direction";
-import { convertToStringOrEmpty } from "src/utils/utils";
+import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
 
 export default class SRPlugin extends Plugin {
     public data: PluginData;

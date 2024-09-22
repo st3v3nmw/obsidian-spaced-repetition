@@ -1,6 +1,6 @@
 import { DueDateHistogram } from "src/due-date-histogram";
 import { DEFAULT_SETTINGS } from "src/settings";
-import { setupStaticDateProvider, setupStaticDateProvider_20230906 } from "src/utils/date-provider";
+import { setupStaticDateProvider, setupStaticDateProvider_20230906 } from "src/utils/dates";
 
 import { UnitTestOsrCore } from "./helpers/unit-test-core";
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/unit-test-setup";

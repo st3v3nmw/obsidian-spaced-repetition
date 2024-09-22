@@ -21,7 +21,7 @@ import { OsrCore } from "src/core";
 import { CardListType } from "src/deck";
 import { t } from "src/lang/helpers";
 import { Stats } from "src/stats";
-import { getKeysPreserveType, getTypedObjectEntries } from "src/utils/utils";
+import { getKeysPreserveType, getTypedObjectEntries } from "src/utils/types";
 
 Chart.register(
     BarElement,
