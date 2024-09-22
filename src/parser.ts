@@ -33,6 +33,20 @@ function areParserOptionsEqual(options1: ParserOptions, options2: ParserOptions)
 export function generateParser(options: ParserOptions): Parser {
     let grammar: string | null = null;
 
+    // Debug the grammar before generating the parser `generate(grammar)` from the grammar.
+    if (debugParser) {
+        if (grammar === null) {
+            grammar = generateGrammar(options);
+        }
+        console.log(
+            "The parsers grammar is provided below. You can test it with https://peggyjs.org/online.html.",
+        );
+        console.log({
+            info: "Copy the grammar by right-clicking on the property grammar and copying it as a string. Then, paste it in https://peggyjs.org/online.html.",
+            grammar: grammar,
+        });
+    }
+
     // If the parser did not already exist or if the parser options changed since last the last
     // parser was generated, we generate a new parser. Otherwise, we skip the block to save
     // some execution time.
@@ -53,56 +67,111 @@ export function generateParser(options: ParserOptions): Parser {
         }
     } else {
         if (debugParser) {
-            console.log("Parser already existed. No need to generate a new parser.");
+            console.log("Parser already exists. No need to generate a new parser.");
         }
-    }
-
-    if (debugParser) {
-        if (grammar === null) {
-            grammar = generateGrammar(options);
-        }
-        console.log(
-            "The parsers grammar is provided below. You can test it with https://peggyjs.org/online.html.",
-        );
-        console.log({
-            info: "Copy the grammar by right-clicking on the property grammar and copying it as a string. Then, paste it in https://peggyjs.org/online.html.",
-            grammar: grammar,
-        });
     }
 
     return parser;
 }
 
 function generateGrammar(options: ParserOptions): string {
-    const close_rules_list: string[] = [];
+    // Contains the grammar for cloze cards
+    let clozes_grammar = "";
 
-    if (options.convertHighlightsToClozes) close_rules_list.push("close_equal");
-    if (options.convertBoldTextToClozes) close_rules_list.push("close_star");
-    if (options.convertCurlyBracketsToClozes) close_rules_list.push("close_bracket");
+    // An array contianing the types of cards enabled by the user
+    const card_rules_list: string[] = ["html_comment", "tilde_code", "backprime_code"];
 
-    const close_rules = close_rules_list.join(" / ");
+    // Include reversed inline flashcards rule only if the user provided a non-empty marker for reversed inline flashcards
+    if (options.singleLineCardSeparator.trim() !== "") card_rules_list.push("inline_rev_card");
+
+    // Include inline flashcards rule only if the user provided a non-empty marker for inline flashcards
+    if (options.singleLineCardSeparator.trim() !== "") card_rules_list.push("inline_card");
+
+    // Include reversed multiline flashcards rule only if the user provided a non-empty marker for reversed multiline flashcards
+    if (options.multilineReversedCardSeparator.trim() !== "")
+        card_rules_list.push("multiline_rev_card");
+
+    // Include multiline flashcards rule only if the user provided a non-empty marker for multiline flashcards
+    if (options.multilineCardSeparator.trim() !== "") card_rules_list.push("multiline_card");
+
+    const cloze_rules_list: string[] = [];
+    if (options.convertHighlightsToClozes) cloze_rules_list.push("cloze_equal");
+    if (options.convertBoldTextToClozes) cloze_rules_list.push("cloze_star");
+    if (options.convertCurlyBracketsToClozes) cloze_rules_list.push("cloze_bracket");
+
+    // Include cloze cards only if the user enabled at least one type of cloze cards
+    if (cloze_rules_list.length > 0) {
+        card_rules_list.push("cloze_card");
+        const cloze_rules = cloze_rules_list.join(" / ");
+        clozes_grammar = `
+cloze_card
+= $(multiline_before_cloze? cloze_line (multiline_after_cloze)? (newline annotation)?) {
+  return createParsedQuestionInfo(CardType.Cloze,text().trimEnd(),location().start.line-1,location().end.line-1);
+}
+
+cloze_line
+= ((!cloze_text (inline_code / non_newline))* cloze_text) text_line_nonterminated?
+
+multiline_before_cloze
+= (!cloze_line nonempty_text_line)+
+
+multiline_after_cloze
+= e:(!(newline separator_line) text_line1)+
+
+cloze_text
+= ${cloze_rules}
+
+cloze_equal
+= cloze_mark_equal (!cloze_mark_equal non_newline)+  cloze_mark_equal
+
+cloze_mark_equal
+= "=="
+
+cloze_star
+= cloze_mark_star (!cloze_mark_star non_newline)+  cloze_mark_star
+
+cloze_mark_star
+= "**"
+
+cloze_bracket
+= cloze_mark_bracket_open (!cloze_mark_bracket_close non_newline)+  cloze_mark_bracket_close
+
+cloze_mark_bracket_open
+= "{{"
+
+cloze_mark_bracket_close
+= "}}"
+`;
+    }
+
+    // Important: we need to include `loose_line` rule to detect any other loose line.
+    // Otherwise, we get a syntax error because the parser is likely not able to reach the end
+    // of the file, as it may encounter loose lines, which it would not know how to handle.
+    card_rules_list.push("loose_line");
+
+    const card_rules = card_rules_list.join(" / ");
 
     return `{
-// The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
-const CardTypeFallBack = {
-  SingleLineBasic: 0,
-  SingleLineReversed: 1,
-  MultiLineBasic: 2,
-  MultiLineReversed: 3,
-  Cloze: 4,
-};
+    // The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
+    const CardTypeFallBack = {
+      SingleLineBasic: 0,
+      SingleLineReversed: 1,
+      MultiLineBasic: 2,
+      MultiLineReversed: 3,
+      Cloze: 4,
+    };
 
-// The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
-const createParsedQuestionInfoFallBack = (cardType, text, firstLineNum, lastLineNum) => {
-  return {cardType, text, firstLineNum, lastLineNum};
-};
+    // The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
+    const createParsedQuestionInfoFallBack = (cardType, text, firstLineNum, lastLineNum) => {
+      return {cardType, text, firstLineNum, lastLineNum};
+    };
 
-const CardType = options.CardType ? options.CardType : CardTypeFallBack;
-const createParsedQuestionInfo = options.createParsedQuestionInfo ? options.createParsedQuestionInfo : createParsedQuestionInfoFallBack;
+    const CardType = options.CardType ? options.CardType : CardTypeFallBack;
+    const createParsedQuestionInfo = options.createParsedQuestionInfo ? options.createParsedQuestionInfo : createParsedQuestionInfoFallBack;
 
-function filterBlocks(b) {
-  return b.filter( (d) => d !== null )
-}
+    function filterBlocks(b) {
+      return b.filter( (d) => d !== null )
+    }
 }
 
 main
@@ -111,7 +180,7 @@ main
 /* The input text to the parser contains arbitrary text, not just card definitions.
 Hence we fallback to matching on loose_line. The result from loose_line is filtered out by filterBlocks() */
 block
-= html_comment / tilde_code / backprime_code / inline_rev_card / inline_card / multiline_rev_card / multiline_card / close_card / loose_line
+= ${card_rules}
 
 html_comment
 = $("<!--" (!"-->" (html_comment / .))* "-->" newline?) {
@@ -139,7 +208,7 @@ inline_rev_card
 inline_rev
 = left:(!inline_rev_mark (inline_code / non_newline))+ inline_rev_mark right:text_till_newline (newline annotation)? {
     return createParsedQuestionInfo(CardType.SingleLineReversed,text(),location().start.line-1,location().end.line-1);
-  }
+}
 
 multiline_card
 = c:multiline separator_line {
@@ -196,43 +265,7 @@ multiline_rev_before
 multiline_rev_after
 = $(!separator_line text_line)+
 
-close_card
-= $(multiline_before_close? close_line (multiline_after_close)? (newline annotation)?) {
-  return createParsedQuestionInfo(CardType.Cloze,text().trimEnd(),location().start.line-1,location().end.line-1);
-}
-
-close_line
-= ((!close_text non_newline)* close_text) text_line_nonterminated?
-
-multiline_before_close
-= (!close_line nonempty_text_line)+
-
-multiline_after_close
-= e:(!(newline separator_line) text_line1)+
-
-close_text
-= ${close_rules}
-
-close_equal
-= close_mark_equal (!close_mark_equal non_newline)+  close_mark_equal
-
-close_mark_equal
-= "=="
-
-close_star
-= close_mark_star (!close_mark_star non_newline)+  close_mark_star
-
-close_mark_star
-= "**"
-
-close_bracket
-= close_mark_bracket_open (!close_mark_bracket_close non_newline)+  close_mark_bracket_close
-
-close_mark_bracket_open
-= "{{"
-
-close_mark_bracket_close
-= "}}"
+${clozes_grammar}
 
 inline_mark
 = "${options.singleLineCardSeparator}"
@@ -343,7 +376,7 @@ export function parseEx(text: string, options: ParserOptions): ParsedQuestionInf
 
     let cards: ParsedQuestionInfo[] = [];
     try {
-        if (!options) throw Error("No parser options provided.");
+        if (!options) throw new Error("No parser options provided.");
 
         const parser: Parser = generateParser(options);
 
@@ -370,8 +403,7 @@ export function parseEx(text: string, options: ParserOptions): ParsedQuestionInf
     }
 
     if (debugParser) {
-        console.log("Parsed cards:");
-        console.log(cards);
+        console.log("Parsed cards:\n", cards);
     }
 
     return cards;
