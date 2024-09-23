@@ -4,7 +4,7 @@ import { NoteFileLoader } from "src/note-file-loader";
 import { NoteParser } from "src/note-parser";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { TopicPath } from "src/topic-path";
-import { TextDirection } from "src/utils/text-direction";
+import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/unit-test-setup";

@@ -9,8 +9,11 @@ import { CardFrontBack, CardFrontBackUtil } from "src/question-type";
 import { SettingsUtil, SRSettings } from "src/settings";
 import { frontmatterTagPseudoLineNum, ISRFile } from "src/sr-file";
 import { TopicPath, TopicPathList } from "src/topic-path";
-import { TextDirection } from "src/utils/text-direction";
-import { splitNoteIntoFrontmatterAndContent, splitTextIntoLineArray } from "src/utils/utils";
+import {
+    splitNoteIntoFrontmatterAndContent,
+    splitTextIntoLineArray,
+    TextDirection,
+} from "src/utils/strings";
 
 export class NoteQuestionParser {
     settings: SRSettings;

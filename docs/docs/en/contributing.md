@@ -16,6 +16,7 @@ The plugin has been translated into the following languages by the Obsidian comm
 -   Chinese (Simplified) / 简体中文
 -   Chinese (Traditional) / 繁體中文
 -   Czech / čeština
+-   French / français
 -   German / Deutsch
 -   Italian / Italiano
 -   Korean / 한국어
@@ -172,5 +173,5 @@ Example using `v1.9.2`:
 
 5. Open and merge the PR into `master`.
 6. Locally, switch back to `master` and pull the changes: `git switch master && git pull`
-7. Create a git tag with the version: `git tag 1.9.2`
+7. Create a git tag with the version: `git tag -a 1.9.2 -m "1.9.2"`
 8. Push the tag: `git push --tags`. <br> You're all set! [This GitHub action](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/.github/workflows/release.yml) should pick it up, create a release, publish it, and update the live documentation.

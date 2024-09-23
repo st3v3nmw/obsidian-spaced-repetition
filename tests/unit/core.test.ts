@@ -6,8 +6,7 @@ import { NoteDueDateHistogram } from "src/due-date-histogram";
 import { NoteReviewDeck, SchedNote } from "src/note-review-deck";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { ISRFile } from "src/sr-file";
-import { setupStaticDateProvider_20230906 } from "src/utils/date-provider";
-import { formatDate_YYYY_MM_DD } from "src/utils/utils";
+import { formatDate_YYYY_MM_DD, setupStaticDateProvider_20230906 } from "src/utils/dates";
 
 import { UnitTestOsrCore } from "./helpers/unit-test-core";
 import { unitTest_CheckNoteFrontmatter } from "./helpers/unit-test-helper";

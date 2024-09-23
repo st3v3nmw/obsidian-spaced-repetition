@@ -2,7 +2,7 @@ import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/rep-item-schedule-in
 import { Card } from "src/card";
 import { DataStoreInNote_AlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
-import { setupStaticDateProvider_20230906 } from "src/utils/date-provider";
+import { setupStaticDateProvider_20230906 } from "src/utils/dates";
 
 import { UnitTestSRFile } from "../helpers/unit-test-file";
 

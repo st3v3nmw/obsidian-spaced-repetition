@@ -1,8 +1,7 @@
 import { Moment } from "moment";
 
 import { TICKS_PER_DAY } from "src/constants";
-import { globalDateProvider } from "src/utils/date-provider";
-import { formatDate_YYYY_MM_DD } from "src/utils/utils";
+import { formatDate_YYYY_MM_DD, globalDateProvider } from "src/utils/dates";
 
 export abstract class RepItemScheduleInfo {
     dueDate: Moment;

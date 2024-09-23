@@ -1,4 +1,4 @@
-These vaults serve are used by the unit test cases.
+These vaults are used by the unit test cases.
 
 # Test Vaults
 

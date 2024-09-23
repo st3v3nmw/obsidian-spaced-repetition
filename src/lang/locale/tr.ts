@@ -71,8 +71,8 @@ export default {
     PROJECT_CONTRIBUTIONS:
         'Bir özellik isteğiniz ya da hata bildiriminiz varsa <a href="${issues_url}">buradan</a> bildirin.',
     FOLDERS_TO_IGNORE: "Yoksayılan Klasörler",
-    FOLDERS_TO_IGNORE_DESC: `Klasör yollarını yeni satırlarla ayırarak girin, örneğin: Templates Meta/Scripts.
-    Bu ayarın hem Flash Kartlar hem de Notlar için geçerli olduğunu unutmayın.`,
+    FOLDERS_TO_IGNORE_DESC:
+        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
     OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Flash Kartlar",
     FLASHCARD_EASY_LABEL: "Kolay Butonu Metni",

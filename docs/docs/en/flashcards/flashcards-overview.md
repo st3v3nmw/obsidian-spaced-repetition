@@ -11,7 +11,7 @@ Two types of flashcards are supported:
 
 !!! note "Question & Answer"
 
-    [Question & Answer](qanda-cards.md) flashcards are ones where the flashcard text contains both the question text and answer text.
+    [Question & Answer](q-and-a-cards.md) flashcards are ones where the flashcard text contains both the question text and answer text.
 
     <hr class="thin">
     ![flashcard-qanda-example](https://github.com/user-attachments/assets/65639d80-b249-4b16-ae40-c2af011c6aab)
@@ -45,13 +45,13 @@ The `flashcard text` is text that defines the type and content of a card (or a s
 For some flashcard types, the flashcard text defines a single card. For other flashcard types, multiple
 cards are defined.
 
-| Flashcard Type                                                        | Cards Defined                                                                                 |
-| --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| [Single-line Basic](qanda-cards.md#single-line-basic)                 | flashcard defines the front and back of a single card.                                        |
-| [Single-line Bidirectional](qanda-cards.md#single-line-bidirectional) | flashcard defines two cards.                                                                  |
-| [Multi-line Basic](qanda-cards.md#multi-line-basic)                   | flashcard defines the front and back of a single card.                                        |
-| [Multi-line Bidirectional](qanda-cards.md#multi-line-bidirectional)   | flashcard defines two cards.                                                                  |
-| [Cloze](basic-cloze-cards.md)                                         | flashcard defines multiple cards, the number of cards based on the number of cloze deletions. |
+| Flashcard Type                                                          | Cards Defined                                                                                 |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| [Single-line Basic](q-and-a-cards.md#single-line-basic)                 | flashcard defines the front and back of a single card.                                        |
+| [Single-line Bidirectional](q-and-a-cards.md#single-line-bidirectional) | flashcard defines two cards.                                                                  |
+| [Multi-line Basic](q-and-a-cards.md#multi-line-basic)                   | flashcard defines the front and back of a single card.                                        |
+| [Multi-line Bidirectional](q-and-a-cards.md#multi-line-bidirectional)   | flashcard defines two cards.                                                                  |
+| [Cloze](basic-cloze-cards.md)                                           | flashcard defines multiple cards, the number of cards based on the number of cloze deletions. |
 
 ### Sibling Cards
 

@@ -11,7 +11,7 @@ import { Note } from "src/note";
 import { INoteEaseList, NoteEaseList } from "src/note-ease-list";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
-import { globalDateProvider } from "src/utils/date-provider";
+import { globalDateProvider } from "src/utils/dates";
 
 export class SrsAlgorithm_Osr implements ISrsAlgorithm {
     private settings: SRSettings;

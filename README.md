@@ -8,7 +8,7 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
 -   Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/3/) for upcoming features & fixes.
 -   Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug report.
 -   Visit the [discussions](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/) section for Q&A help, feedback, and general discussion.
--   The plugin has been translated into _Arabic, Chinese, Czech, German, Italian, Korean, Japanese, Polish, Portuguese, Spanish, Russian, and Turkish_ by the Obsidian community 😄.
+-   The plugin has been translated into _Arabic, Chinese, Czech, French, German, Italian, Korean, Japanese, Polish, Portuguese, Spanish, Russian, and Turkish_ by the Obsidian community 😄.
     -   To help translate this plugin to your language, check the [translation guide here](https://www.stephenmwangi.com/obsidian-spaced-repetition/contributing/#translating_1).
 
 ## Features
@@ -35,8 +35,4 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
 
 Check the [docs](https://www.stephenmwangi.com/obsidian-spaced-repetition/) for more details.
 
-## Supported By
-
 <a href='https://ko-fi.com/M4M44DEN6' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi3.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
-
-<a href="https://jb.gg/OpenSourceSupport" target="_blank"><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" height='128' style='border:0px;height:128px;' alt="JetBrains Logo (Main) logo."></a>

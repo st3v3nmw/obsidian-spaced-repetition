@@ -1,4 +1,4 @@
-import { ValueCountDict } from "src/utils/number-count-dict";
+import { ValueCountDict } from "src/utils/numbers";
 
 export class Stats {
     eases: ValueCountDict = new ValueCountDict();

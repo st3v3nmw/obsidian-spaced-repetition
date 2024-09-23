@@ -8,8 +8,7 @@ import {
     Vault,
 } from "obsidian";
 
-import { TextDirection } from "src/utils/text-direction";
-import { parseObsidianFrontmatterTag } from "src/utils/utils";
+import { parseObsidianFrontmatterTag, TextDirection } from "src/utils/strings";
 
 // NOTE: Line numbers are zero based
 export interface ISRFile {

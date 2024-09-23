@@ -23,7 +23,7 @@ import { TopicPath } from "src/topic-path";
 import {
     setupStaticDateProvider_20230906,
     setupStaticDateProvider_OriginDatePlusDays,
-} from "src/utils/date-provider";
+} from "src/utils/dates";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
 import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/unit-test-setup";

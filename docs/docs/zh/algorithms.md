@@ -5,7 +5,7 @@
 !!! 警告
 
     该条目长时间未更新,
-    请注意阅读 [源代码](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/src/scheduling.ts).
+    请注意阅读 [源代码](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/src/algorithms/osr/srs-algorithm-osr.ts).
 
 (除 PageRanks 之外，卡片复习采用相同规划算法)
 

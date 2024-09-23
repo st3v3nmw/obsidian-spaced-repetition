@@ -225,7 +225,7 @@ Canada::Ottawa
 
 计算将要到期的卡片数量。
 
-<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/assets/stats_forecast.png" />
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/docs/media/en/stats_forecast.png" />
 
 ### 复习间隔
 

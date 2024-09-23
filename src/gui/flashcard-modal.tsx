@@ -79,9 +79,9 @@ export class FlashcardModal extends Modal {
     }
 
     onClose(): void {
+        this.mode = FlashcardModalMode.Closed;
         this.deckView.close();
         this.flashcardView.close();
-        this.mode = FlashcardModalMode.Closed;
     }
 
     private _showDecksList(): void {
@@ -93,9 +93,9 @@ export class FlashcardModal extends Modal {
         this.deckView.hide();
     }
 
-    private _showFlashcard(): void {
+    private _showFlashcard(deck: Deck): void {
         this._hideDecksList();
-        this.flashcardView.show();
+        this.flashcardView.show(deck);
     }
 
     private _hideFlashcard(): void {
@@ -105,7 +105,7 @@ export class FlashcardModal extends Modal {
     private _startReviewOfDeck(deck: Deck) {
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         if (this.reviewSequencer.hasCurrentCard) {
-            this._showFlashcard();
+            this._showFlashcard(deck);
         } else {
             this._showDecksList();
         }

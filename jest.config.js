@@ -11,13 +11,27 @@ module.exports = {
     roots: ["<rootDir>/src/", "<rootDir>/tests/unit/"],
     collectCoverageFrom: ["./src/**"],
     coveragePathIgnorePatterns: [
-        "src/icons/", // obsidian dependencies
-        "src/gui/", // obsidian dependencies
-        "src/sr-file.ts", // obsidian dependencies
+        // node modules & build output
+        "build/",
+        "node_modules/",
+
+        // GUI & Obsidian coupled code
+        "src/app-core.ts",
+        "src/sr-file.ts",
+        "src/gui/",
+        "src/icons/",
+        "src/main.ts",
+        "src/next-note-review-handler.ts",
+        "src/plugin-data.ts",
+        "src/settings.ts",
+        "src/utils/renderers.ts",
+
+        // debugging utils
+        "src/utils/debug.ts",
+
+        // don't include in results
         "src/declarations.d.ts",
-        "src/main.ts", // obsidian dependencies
-        "src/settings.ts", // obsidian dependencies
-        "src/utils/render-markdown-wrapper.ts", // obsidian dependencies
+        "src/lang/locale/",
     ],
     coverageDirectory: "coverage",
     collectCoverage: true,
@@ -26,7 +40,7 @@ module.exports = {
         global: {
             // TODO: Bring coverage back up to 98%+
             statements: 93,
-            branches: 88,
+            branches: 89,
             lines: 93,
             functions: 89,
         },

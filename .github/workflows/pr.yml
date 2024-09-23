@@ -1,29 +1,21 @@
-name: Lint and Test
+name: Lint PR
 
 on:
-    pull_request:
-        branches: [master]
+    pull_request_target:
+        types:
+            - opened
+            - edited
+            - synchronize
+            - reopened
 
-env:
-    COREPACK_ENABLE_STRICT: 0
+permissions:
+    pull-requests: read
 
 jobs:
-    lint_and_test:
+    lint_pr:
         runs-on: ubuntu-latest
 
         steps:
-            - name: Setup Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "20"
-
-            - uses: actions/checkout@v3
-
-            - name: Install Dependencies
-              run: npm install -g pnpm && pnpm install
-
-            - name: Lint
-              run: pnpm lint
-
-            - name: Test
-              run: pnpm test
+            - uses: amannn/action-semantic-pull-request@v5
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

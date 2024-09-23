@@ -2,7 +2,7 @@ import * as fs from "fs";
 import { TagCache, TFile } from "obsidian";
 
 import { ISRFile } from "src/sr-file";
-import { TextDirection } from "src/utils/text-direction";
+import { TextDirection } from "src/utils/strings";
 
 import { unitTest_BasicFrontmatterParser, unitTest_GetAllTagsFromTextEx } from "./unit-test-helper";
 
