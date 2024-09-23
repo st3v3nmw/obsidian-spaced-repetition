@@ -7,11 +7,12 @@ site_description: >-
 repo_name: st3v3nmw/obsidian-spaced-repetition
 repo_url: https://github.com/st3v3nmw/obsidian-spaced-repetition/
 edit_uri: ""
+docs_dir: docs/docs
 
 theme:
     name: material
-    logo: assets/favicon.ico
-    favicon: assets/favicon.ico
+    logo: favicon.ico
+    favicon: favicon.ico
     icon:
         repo: fontawesome/brands/github
     palette:
@@ -25,25 +26,42 @@ theme:
               name: Switch to light mode
     features:
         - navigation.top
+        - navigation.expand
         - toc.follow
 
 nav:
     - Index: index.md
-    - Flashcards: flashcards.md
+    - Flashcards:
+          - Flashcards Overview: flashcards/flashcards-overview.md
+          - Question & Answer Cards: flashcards/q-and-a-cards.md
+          - Cloze Cards: flashcards/basic-cloze-cards.md
+          - Cards with Blank Lines: flashcards/cards-with-blank-lines.md
+          - Organizing into Decks: flashcards/decks.md
+          - Reviewing & Cramming: flashcards/reviewing.md
+          - Statistics: flashcards/statistics.md
     - Notes: notes.md
-    - Contributing: contributing.md
-    - Algorithms: algorithms.md
-    - Changelog: changelog.md
-    - License: license.md
+    - User Options & Commands:
+          - User Options: user-options.md
+          - Commands: plugin-commands.md
+    - Algorithms & Data Storage:
+          - Repetition Algorithms: algorithms.md
+          - Data Storage: data-storage.md
+    - Additional:
+          - Spaced Repetition Guides: resources.md
+          - Contributing: contributing.md
+          - Changelog: changelog.md
+          - License: license.md
 
 plugins:
     - search
     - i18n:
           docs_structure: folder
           languages:
-              en: English
-              zh: 简体中文
-          default_language: en
+              - locale: en
+                name: English
+                default: true
+              - locale: zh
+                name: 简体中文
 
 markdown_extensions:
     - toc:
@@ -58,8 +76,12 @@ markdown_extensions:
     - attr_list
     - footnotes
     - pymdownx.emoji:
-          emoji_index: !!python/name:materialx.emoji.twemoji
-          emoji_generator: !!python/name:materialx.emoji.to_svg
+          emoji_index: !!python/name:material.extensions.emoji.twemoji
+          emoji_generator: !!python/name:material.extensions.emoji.to_svg
+    - md_in_html
+
+extra_css:
+    - extra.css
 
 remote_branch: gh-pages
 remote_name: origin

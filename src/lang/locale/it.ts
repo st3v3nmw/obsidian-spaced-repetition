@@ -52,10 +52,29 @@ export default {
 
     // settings.ts
     SETTINGS_HEADER: "Plugin per ripetizione spaziata - Impostazioni",
+    GROUP_TAGS_FOLDERS: "Tags & Folders",
+    GROUP_FLASHCARD_REVIEW: "Flashcard Review",
+    GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
+    GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
+    GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: 'Per maggiori informazioni, rivolgersi alla <a href="${wiki_url}">wiki</a>.',
+    GITHUB_DISCUSSIONS:
+        'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
+    GITHUB_ISSUES:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report.',
+    GITHUB_SOURCE_CODE:
+        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+    CODE_CONTRIBUTION_INFO:
+        'Information on <a href="${code_contribution_url}">code contributions</a>',
+    TRANSLATION_CONTRIBUTION_INFO:
+        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+    PROJECT_CONTRIBUTIONS:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Cartelle da ignorare",
     FOLDERS_TO_IGNORE_DESC:
-        "Inserisci i percorsi delle cartelle separati da a capo, per esempio, Templates Meta/Scripts",
+        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Schede",
     FLASHCARD_EASY_LABEL: "Testo del bottone facile",
     FLASHCARD_GOOD_LABEL: "Testo del bottone buono",
@@ -109,6 +128,8 @@ export default {
     INLINE_REVERSED_CARDS_SEPARATOR: "Separatore per schede all'incontrario sulla stessa riga",
     MULTILINE_CARDS_SEPARATOR: "Separatore per schede su più righe",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Separatore per schede all'incontrario su più righe",
+    MULTILINE_CARDS_END_MARKER:
+        "Caratteri che denotano la fine di carte con spazi da riempiere e carte multilinea",
     NOTES: "Note",
     REVIEW_PANE_ON_STARTUP: "Abilita il pannello di revisione note all'avvio",
     TAGS_TO_REVIEW: "Etichette da rivedere",
@@ -118,14 +139,19 @@ export default {
     OPEN_RANDOM_NOTE_DESC:
         "Quando lo disabiliti, le note saranno ordinate per importanza (PageRank).",
     AUTO_NEXT_NOTE: "Apri la prossima nota automaticamente dopo la revisione",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Disabilita le opzioni di revisioni nel menù di file, per esempio Revisione: Facile Buono Difficile",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "Dopo avermi disattivato, puoi iniziare una revisione con le combinazioni di testi per il comando. Riavvia Obsidian dopo avermi cambiato.",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "Abilita le opzioni di revisione nel menu File (es.: Rivisita: Facile, Buono, Difficile)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "Se disabiliti le opzioni di revisione nel menu File, puoi rivedere le tue note utilizzando i comandi del plugin e, se li hai definiti, le scorciatoie da tastiera associate.",
     MAX_N_DAYS_REVIEW_QUEUE: "Numero di giorni massimi da visualizzare nel pannello di destra",
     MIN_ONE_DAY: "Il numero di giorni deve essere almeno 1.",
     VALID_NUMBER_WARNING: "Per favore, mettere un numero valido.",
     UI_PREFERENCES: "Preferenze di interfaccia",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE:
         "Alberti di mazzi dovrebbero essere inizialmente visualizzate come espansi",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
@@ -150,7 +176,9 @@ export default {
     MAX_LINK_CONTRIB_DESC:
         "Contributo massimo della difficoltà pasata delle note collegate alla difficoltà iniziale.",
     LOGGING: "Registrando",
-    DISPLAY_DEBUG_INFO: "Visualizza informazione di debug sulla console per sviluppatori?",
+    DISPLAY_DEBUG_INFO: "Visualizza informazione di debug sulla console per sviluppatori",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Visualizza informazione di debug riguardanti il parser sulla console per sviluppatori",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Coda di note da rivedere",

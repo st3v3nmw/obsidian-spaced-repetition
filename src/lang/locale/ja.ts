@@ -51,11 +51,30 @@ export default {
     YEARS_STR_IVL_MOBILE: "${interval}y",
 
     // settings.ts
-    SETTINGS_HEADER: "Spaced Repetition Plugin - 設定",
+    SETTINGS_HEADER: "Spaced Repetition - 設定",
+    GROUP_TAGS_FOLDERS: "Tags & Folders",
+    GROUP_FLASHCARD_REVIEW: "Flashcard Review",
+    GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
+    GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
+    GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: '詳細については<a href="${wiki_url}">wiki</a>を確認してください。',
+    GITHUB_DISCUSSIONS:
+        'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
+    GITHUB_ISSUES:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report.',
+    GITHUB_SOURCE_CODE:
+        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+    CODE_CONTRIBUTION_INFO:
+        'Information on <a href="${code_contribution_url}">code contributions</a>',
+    TRANSLATION_CONTRIBUTION_INFO:
+        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+    PROJECT_CONTRIBUTIONS:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "無視するフォルダ",
     FOLDERS_TO_IGNORE_DESC:
-        'フォルダパスを改行で区切って入力してください。"Templates Meta/Scripts" のようなスペースによる区切りでの書き方は無効です。',
+        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "フラッシュカード",
     FLASHCARD_EASY_LABEL: "Easy Button Text",
     FLASHCARD_GOOD_LABEL: "Good Button Text",
@@ -107,6 +126,7 @@ export default {
     INLINE_REVERSED_CARDS_SEPARATOR: "インラインの表裏反転フラッシュカードに使用するセパレーター",
     MULTILINE_CARDS_SEPARATOR: "複数行のフラッシュカードに使用するセパレーター",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "複数行の表裏反転フラッシュカードに使用するセパレーター",
+    MULTILINE_CARDS_END_MARKER: "クローズと複数行フラッシュカードの終わりを示す文字",
     NOTES: "ノート",
     REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "レビューに使用するタグ",
@@ -116,14 +136,19 @@ export default {
     OPEN_RANDOM_NOTE_DESC:
         "このオプションが無効化されている状態では、ノートは重要度(ページランク)による順番で表示されます。",
     AUTO_NEXT_NOTE: "レビュー後に次のノートを自動的に開く",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "ファイルメニューでのレビューオプションを無効化(｢レビュー: Easy｣等の項目を非表示にする)",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "無効化した後、コマンドホットキーを使ってレビューすることが可能になります。このオプションを変更した場合にはObsidianをリロードしてください。",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "ファイルメニューでレビューオプションを有効にしてください（例: Easy, Good, Hard）",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "ファイルメニューでレビューオプションを無効にした場合、プラグインコマンドや、設定している場合は対応するホットキーを使用してメモをレビューできます。",
     MAX_N_DAYS_REVIEW_QUEUE: "右パネルに表示する最大の日数",
     MIN_ONE_DAY: "日数には1以上の数字を指定してください。",
     VALID_NUMBER_WARNING: "有効な数字を入力してください。",
     UI_PREFERENCES: "ユーザー インターフェイスの設定",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "デッキ ツリーは最初は展開して表示する必要があります",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "これをオフにすると、同じカード内のネストされたデッキが折りたたまれます。同じファイルに多くのデッキに属するカードがある場合に便利です。",
@@ -146,7 +171,9 @@ export default {
     MAX_LINK_CONTRIB_DESC:
         "最初の易しさに対して、リンクされたノートの重み付けされた易しさが寄与する最大値を指定してください。",
     LOGGING: "ログ管理",
-    DISPLAY_DEBUG_INFO: "デベロッパーコンソールにてデバッグ情報を表示しますか？",
+    DISPLAY_DEBUG_INFO: "デベロッパーコンソールにてデバッグ情報を表示しますか",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "ノートレビューのキュー",

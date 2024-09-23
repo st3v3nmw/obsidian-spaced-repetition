@@ -52,11 +52,30 @@ export default {
     YEARS_STR_IVL_MOBILE: "${interval}a",
 
     // settings.ts
-    SETTINGS_HEADER: "Plugin Spaced Repetition - Configuração",
+    SETTINGS_HEADER: "Spaced Repetition - Configuração",
+    GROUP_TAGS_FOLDERS: "Tags & Folders",
+    GROUP_FLASHCARD_REVIEW: "Flashcard Review",
+    GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
+    GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
+    GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: 'Para mais informações, cheque a <a href="${wiki_url}">wiki</a>.',
+    GITHUB_DISCUSSIONS:
+        'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
+    GITHUB_ISSUES:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report.',
+    GITHUB_SOURCE_CODE:
+        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+    CODE_CONTRIBUTION_INFO:
+        'Information on <a href="${code_contribution_url}">code contributions</a>',
+    TRANSLATION_CONTRIBUTION_INFO:
+        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+    PROJECT_CONTRIBUTIONS:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Pastas para ignorar",
     FOLDERS_TO_IGNORE_DESC:
-        "Insira o caminho das pastas separado por quebras de linha ex: Templates Meta/Scripts",
+        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Flashcards",
     FLASHCARD_EASY_LABEL: "Texto do Botão de Fácil",
     FLASHCARD_GOOD_LABEL: "Texto do Botão de OK",
@@ -107,6 +126,7 @@ export default {
     INLINE_REVERSED_CARDS_SEPARATOR: "Separador para flashcards inline reversos",
     MULTILINE_CARDS_SEPARATOR: "Separador para flashcards de múltiplas linhas",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Separador para flashcards de múltiplas linhas reversos",
+    MULTILINE_CARDS_END_MARKER: "Caracteres que denotam o fim de clozes e flashcards multilinha",
     NOTES: "Notas",
     REVIEW_PANE_ON_STARTUP: "Habilitar painel de revisão de notas na inicialização",
     TAGS_TO_REVIEW: "Etiquetas para revisar",
@@ -116,14 +136,19 @@ export default {
     OPEN_RANDOM_NOTE_DESC:
         "Quando você desabilitar isso, as notas vão ser ordenadas por importância (PageRank).",
     AUTO_NEXT_NOTE: "Abrir a próxima nota automaticamente depois de uma revisão",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Desabilitar opções de revisão no menu de arquivos ex: Revisão: Fácil OK Difícil",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "Depois de desabilitar, você pode revisar usando os atalhos de comando. Reinicie Obsidian depois de mudar isso.",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "Ative as opções de revisão no menu Arquivo (ex.: Revisão: Fácil, OK, Difícil)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "Se você desativar as opções de revisão no menu Arquivo, poderá revisar suas anotações usando os comandos do plugin e, se os tiver definido, as teclas de atalho associadas.",
     MAX_N_DAYS_REVIEW_QUEUE: "Número máximo de dias para exibir no painel direito",
     MIN_ONE_DAY: "O número de dias deve ser pelo menos 1.",
     VALID_NUMBER_WARNING: "Por favor Insira um número válido.",
     UI_PREFERENCES: "Preferências de UI",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE:
         "Árvores de baralhos devem inicialmente ser exibidas como expandidas",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
@@ -149,7 +174,9 @@ export default {
     MAX_LINK_CONTRIB_DESC:
         "Contribuição máxima da facilidade ponderada das notas linkadas à facilidade inicial.",
     LOGGING: "Logging",
-    DISPLAY_DEBUG_INFO: "Mostrar informação de debugging no console de desenvolvimento?",
+    DISPLAY_DEBUG_INFO: "Mostrar informação de debugging no console de desenvolvimento",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Fila de Notas para Revisar",

@@ -23,12 +23,15 @@ build
 
 # testing
 coverage
-tests/e2e/vault/
+tests/vaults/*/.obsidian
 
 # mkdocs
 site/
 venv/
 .venv/
+docs/docs/en/media/~*
+docs/vaults/*/.obsidian
+.obsidian/plugins/obsidian-spaced-repetition-beta/*
 
 # env
 env.sh

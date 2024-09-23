@@ -1,6 +1,6 @@
 // Deutsch
 
-// Obsidian specific names (folder, note, tag, etc.) are consistent with the german translation:
+// Obsidian specific names (folder, note, tag, etc.) are consistent with the German translation:
 // https://github.com/obsidianmd/obsidian-translations/blob/master/de.json
 
 export default {
@@ -28,8 +28,8 @@ export default {
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Notiz zur Wiederholung öffnen",
     REVIEW_CARDS: "Lernkarten wiederholen",
-    REVIEW_DIFFICULTY_FILE_MENU: "Notiz abschliessen als: ${difficulty}",
-    REVIEW_NOTE_DIFFICULTY_CMD: "Notiz abschliessen als: ${difficulty}",
+    REVIEW_DIFFICULTY_FILE_MENU: "Notizen wiederholen als: ${difficulty}",
+    REVIEW_NOTE_DIFFICULTY_CMD: "Notizen wiederholen als: ${difficulty}",
     REVIEW_ALL_CARDS: "Alle Lernkarten wiederholen",
     CRAM_ALL_CARDS: "Wähle ein Stapel zum pauken",
     REVIEW_CARDS_IN_NOTE: "Lernkarten in dieser Notiz wiederholen",
@@ -56,11 +56,30 @@ export default {
     YEARS_STR_IVL_MOBILE: "${interval}j",
 
     // settings.ts
-    SETTINGS_HEADER: "Spaced Repetition Plugin - Einstellungen",
+    SETTINGS_HEADER: "Spaced Repetition - Einstellungen",
+    GROUP_TAGS_FOLDERS: "Tags & Folders",
+    GROUP_FLASHCARD_REVIEW: "Flashcard Review",
+    GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
+    GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
+    GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: 'Weitere Informationen gibt es im <a href="${wiki_url}">Wiki</a> (english).',
+    GITHUB_DISCUSSIONS:
+        'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
+    GITHUB_ISSUES:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report.',
+    GITHUB_SOURCE_CODE:
+        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+    CODE_CONTRIBUTION_INFO:
+        'Information on <a href="${code_contribution_url}">code contributions</a>',
+    TRANSLATION_CONTRIBUTION_INFO:
+        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+    PROJECT_CONTRIBUTIONS:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Ausgeschlossene Ordner",
     FOLDERS_TO_IGNORE_DESC:
-        "Mehrere Ordner mit Zeilenumbrüchen getrennt angeben. Bsp. OrdnerA[Zeilenumbruch]OrdnerB/Unterordner",
+        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Lernkarten",
     FLASHCARD_EASY_LABEL: "Einfach Knopf Text",
     FLASHCARD_GOOD_LABEL: "Gut Knopf Text",
@@ -116,6 +135,8 @@ export default {
     INLINE_REVERSED_CARDS_SEPARATOR: "Trennzeichen für einzeilige beidseitige Lernkarten",
     MULTILINE_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige Lernkarten",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige beidseitige Lernkarten",
+    MULTILINE_CARDS_END_MARKER:
+        "Zeichen, die das Ende von Lückentexten und mehrzeiligen Flashcards kennzeichnen",
     NOTES: "Notizen",
     REVIEW_PANE_ON_STARTUP: "Öffne Überprüfungswarteschlage beim start",
     TAGS_TO_REVIEW: "Zu wiederholende Tags",
@@ -125,15 +146,20 @@ export default {
     OPEN_RANDOM_NOTE_DESC:
         "Wenn dies deaktiviert wird, dann werden die Notizen nach Wichtigkeit wiederholt (PageRank).",
     AUTO_NEXT_NOTE: "Nach einer Wiederholung automatisch die nächste Karte öffnen",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Optionen zur Wiederholung im Menü einer Datei deaktivieren. Bsp. Wiederholen: Einfach Gut Schwer",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "Nach dem Deaktivieren können die Tastenkürzel zur Wiederholung verwendet werden. Obsidian muss nach einer Änderung neu geladen weren.",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "Aktiviere die Überprüfungsoptionen im Dateimenü (z. B. Notizen wiederholen als: Einfach, Gut, Schwer)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "Wenn du die Überprüfungsoptionen im Dateimenü deaktivierst, kannst du deine Notizen mit den Plugin-Befehlen und, falls definiert, den zugehörigen Tastenkombinationen überprüfen.",
     MAX_N_DAYS_REVIEW_QUEUE:
         "Maximale Anzahl anstehender Notizen, die im rechten Fensterbereich angezeigt werden",
     MIN_ONE_DAY: "Anzahl der Tage muss mindestens 1 sein.",
     VALID_NUMBER_WARNING: "Bitte eine gültige Zahl eingeben.",
     UI_PREFERENCES: "Einstellungen der Benutzeroberfläche",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE:
         "Stapelverzeichnis soll beim öffnen erweitert angezeigt werden",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
@@ -159,7 +185,9 @@ export default {
     MAX_LINK_CONTRIB_DESC:
         "Maximaler Einfluss der Einfachheiten verlinkter Notizen zur gewichteten initialen Einfachheit einer neuen Lernkarte.",
     LOGGING: "Protokollierung",
-    DISPLAY_DEBUG_INFO: "Informationen zum Debugging in der Entwicklerkonsole anzeigen?",
+    DISPLAY_DEBUG_INFO: "Informationen zum Debugging in der Entwicklerkonsole anzeigen",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Informationen zum parser Debugging in der Entwicklerkonsole anzeigen",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Anstehende Notizen zur Wiederholung",

@@ -51,10 +51,29 @@ export default {
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition - Ustawienia",
+    GROUP_TAGS_FOLDERS: "Tags & Folders",
+    GROUP_FLASHCARD_REVIEW: "Flashcard Review",
+    GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
+    GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
+    GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: 'Aby uzyskać więcej informacji, sprawdź <a href="${wiki_url}">wiki</a>.',
+    GITHUB_DISCUSSIONS:
+        'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
+    GITHUB_ISSUES:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report.',
+    GITHUB_SOURCE_CODE:
+        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+    CODE_CONTRIBUTION_INFO:
+        'Information on <a href="${code_contribution_url}">code contributions</a>',
+    TRANSLATION_CONTRIBUTION_INFO:
+        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+    PROJECT_CONTRIBUTIONS:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Foldery do zignorowania",
     FOLDERS_TO_IGNORE_DESC:
-        "Wprowadź ścieżki folderów oddzielone nowymi liniami, np. Szablony Meta/Scripts",
+        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Fiszki",
     FLASHCARD_EASY_LABEL: "Tekst przycisku Łatwe",
     FLASHCARD_GOOD_LABEL: "Tekst przycisku Średnio trudne",
@@ -108,6 +127,7 @@ export default {
     MULTILINE_CARDS_SEPARATOR: "Separator dla kart zamaskowanych wieloliniowych",
     MULTILINE_REVERSED_CARDS_SEPARATOR:
         "Separator dla kart zamaskowanych odwróconych wieloliniowych",
+    MULTILINE_CARDS_END_MARKER: "Caracteres que denotam o fim de clozes e flashcards multilineares",
     NOTES: "Notatki",
     REVIEW_PANE_ON_STARTUP: "Włączyć panel przeglądu notatek przy starcie",
     TAGS_TO_REVIEW: "Tagi do przeglądu",
@@ -117,14 +137,19 @@ export default {
     OPEN_RANDOM_NOTE_DESC:
         "Po wyłączeniu tej opcji notatki są uporządkowane według istotności (PageRank).",
     AUTO_NEXT_NOTE: "Automatycznie otwierać następną notatkę po przeglądzie",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Wyłączyć opcje przeglądu w menu pliku, tj. Przegląd: Łatwe Dobrze Trudne",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "Po wyłączeniu możesz przeglądać za pomocą skrótów klawiszowych. Po zmianie tej opcji konieczne jest ponowne załadowanie Obsidian.",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "Wyłączyć opcje przeglądu w menu pliku, tj. Przeglądaj: Łatwe Dobrze Trudne",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "Jeśli wyłączysz opcje przeglądu w menu Plik, możesz przeglądać swoje notatki za pomocą poleceń wtyczki i, jeśli je zdefiniowałeś, przypisanych skrótów klawiszowych.",
     MAX_N_DAYS_REVIEW_QUEUE: "Maksymalna liczba dni do wyświetlenia w panelu prawym",
     MIN_ONE_DAY: "Liczba dni musi wynosić co najmniej 1.",
     VALID_NUMBER_WARNING: "Podaj prawidłową liczbę.",
     UI_PREFERENCES: "Preferencje interfejsu użytkownika",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Podtalie powinny być początkowo wyświetlane rozszerzone",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "Wyłącz to, aby zwinąć zagnieżdżone talie w tej samej karcie. Przydatne, jeśli karty należą do wielu talii w tym samym pliku.",
@@ -147,7 +172,9 @@ export default {
     MAX_LINK_CONTRIB_DESC:
         "Maksymalny wkład ważonej łatwości połączonych notatek do początkowej łatwości.",
     LOGGING: "Logowanie",
-    DISPLAY_DEBUG_INFO: "Wyświetl informacje debugowania w konsoli deweloperskiej?", // sidebar.ts
+    DISPLAY_DEBUG_INFO: "Wyświetl informacje debugowania w konsoli deweloperskiej", // sidebar.ts
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     //sidebar.ts
     NOTES_REVIEW_QUEUE: "Kolejka przeglądu notatek",

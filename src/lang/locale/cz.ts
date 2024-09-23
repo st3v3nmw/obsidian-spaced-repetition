@@ -10,7 +10,7 @@ export default {
     SKIP: "Skip",
     EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "Vynulovat pokrok kartičky",
-    HARD: "Težké",
+    HARD: "Těžké",
     GOOD: "Dobré",
     EASY: "Jednoduché",
     SHOW_ANSWER: "Ukázat odpověď",
@@ -50,11 +50,30 @@ export default {
     YEARS_STR_IVL_MOBILE: "${interval}r",
 
     // settings.ts
-    SETTINGS_HEADER: "Spaced Repetition Plugin - Nastavení",
+    SETTINGS_HEADER: "Spaced Repetition - Nastavení",
+    GROUP_TAGS_FOLDERS: "Tags & Folders",
+    GROUP_FLASHCARD_REVIEW: "Flashcard Review",
+    GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
+    GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
+    GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: 'Pro více informací jděte na <a href="${wiki_url}">wiki</a>.',
+    GITHUB_DISCUSSIONS:
+        'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
+    GITHUB_ISSUES:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report.',
+    GITHUB_SOURCE_CODE:
+        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+    CODE_CONTRIBUTION_INFO:
+        'Information on <a href="${code_contribution_url}">code contributions</a>',
+    TRANSLATION_CONTRIBUTION_INFO:
+        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+    PROJECT_CONTRIBUTIONS:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Ignorované složky",
     FOLDERS_TO_IGNORE_DESC:
-        "Zadejte cesty ke složkám oddělené odřádkováním napříkad. Šablony Meta/Scripts",
+        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Kartičky",
     FLASHCARD_EASY_LABEL: "Easy Button Text",
     FLASHCARD_GOOD_LABEL: "Good Button Text",
@@ -104,6 +123,7 @@ export default {
     INLINE_REVERSED_CARDS_SEPARATOR: "Oddělovač pro otočené inline kartičky",
     MULTILINE_CARDS_SEPARATOR: "Oddělovač pro víceřádkové kartičky",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Oddělovač pro víceřádkove otočené kartičky",
+    MULTILINE_CARDS_END_MARKER: "Znaky označující konec clozes a víceřádkových flash karet",
     NOTES: "Poznámky",
     REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "Tag pro revizi",
@@ -112,14 +132,19 @@ export default {
     OPEN_RANDOM_NOTE: "Otevřít náhodnou poznámku pro revizi",
     OPEN_RANDOM_NOTE_DESC: "Pokud toto vypnete, poznámky budou řazeny dle důležitosti (PageRank).",
     AUTO_NEXT_NOTE: "Otevřít automaticky další poznámku po dokončení revize",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Vypnout volby revize v menu souboru například 'Revize: Jednoduché'",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "Po vypnutí můžete používat klávesové zkratky. Restartujte Obsidian po změně nastavení.",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "Povolte možnosti revize v nabídce souboru (např. Revize: Jednoduché, Dobré, Těžké)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "Pokud v nabídce souboru zakážete možnosti revize, můžete své poznámky revidovat pomocí příkazů pluginu a, pokud jste je definovali, pomocí přiřazených klávesových zkratek.",
     MAX_N_DAYS_REVIEW_QUEUE: "Maximální počet dní zobrazených v pravém panelu",
     MIN_ONE_DAY: "Počet dní musí být minimálně 1.",
     VALID_NUMBER_WARNING: "Prosím zadejte validní číslo.",
     UI_PREFERENCES: "Předvolby uživatelského rozhraní",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE:
         "Stromy balíčky by měly být zpočátku zobrazeny jako rozbalené",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
@@ -142,7 +167,9 @@ export default {
     MAX_LINK_CONTRIB_DESC:
         "Maximální příspěvek vážené složitosti prolinkovaných poznámek použitý pro určení počáteční složitosti.",
     LOGGING: "Zaznamenávám",
-    DISPLAY_DEBUG_INFO: "Zobrazit informace pro ladění na vývojářské konzoli?",
+    DISPLAY_DEBUG_INFO: "Zobrazit informace pro ladění na vývojářské konzoli",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Fronta poznámek k revizi",

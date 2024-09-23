@@ -51,9 +51,29 @@ export default {
 
     // settings.ts
     SETTINGS_HEADER: "间隔重复插件 - 设置",
+    GROUP_TAGS_FOLDERS: "Tags & Folders",
+    GROUP_FLASHCARD_REVIEW: "Flashcard Review",
+    GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
+    GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
+    GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: '了解更多, 请点击<a href="${wiki_url}">wiki</a>.',
+    GITHUB_DISCUSSIONS:
+        'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
+    GITHUB_ISSUES:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report.',
+    GITHUB_SOURCE_CODE:
+        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+    CODE_CONTRIBUTION_INFO:
+        'Information on <a href="${code_contribution_url}">code contributions</a>',
+    TRANSLATION_CONTRIBUTION_INFO:
+        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+    PROJECT_CONTRIBUTIONS:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "忽略此文件夹",
-    FOLDERS_TO_IGNORE_DESC: "输入文件夹路径，用新建行分隔，例如：Templates Meta/Scripts",
+    FOLDERS_TO_IGNORE_DESC:
+        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "卡片",
     FLASHCARD_EASY_LABEL: "“简单”按钮文本",
     FLASHCARD_GOOD_LABEL: "“记得”按钮文本",
@@ -95,6 +115,7 @@ export default {
     INLINE_REVERSED_CARDS_SEPARATOR: "单行翻转卡片的分隔符",
     MULTILINE_CARDS_SEPARATOR: "多行卡片的分隔符",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "多行翻转卡片的分隔符",
+    MULTILINE_CARDS_END_MARKER: "表示填空和多行闪卡结束的字符",
     NOTES: "笔记",
     REVIEW_PANE_ON_STARTUP: "启动时开启笔记复习窗格",
     TAGS_TO_REVIEW: "复习标签",
@@ -102,13 +123,18 @@ export default {
     OPEN_RANDOM_NOTE: "复习随机笔记",
     OPEN_RANDOM_NOTE_DESC: "关闭此选项，笔记将以重要度(PageRank)排序。",
     AUTO_NEXT_NOTE: "复习后自动打开下一个笔记",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS: "关闭文件选单中的复习选项 例如：复习：简单 记得 较难",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "关闭此选项后你可以使用快捷键开始复习。重新启动Obsidian使本选项生效。",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS: "请在文件菜单中启用复习选项（例如：复习：简单、良好、困难",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "如果您在文件菜单中禁用复习选项，您可以使用插件命令来复习笔记，如果您定义了相关快捷键，也可以使用它们。",
     MAX_N_DAYS_REVIEW_QUEUE: "右边栏中显示的最大天数",
     MIN_ONE_DAY: "天数最小值为1",
     VALID_NUMBER_WARNING: "请输入有效的数字。",
     UI_PREFERENCES: "用户界面首选项",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "甲板树最初应显示为展开",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "关闭此选项可折叠同一张卡片中的嵌套牌组。如果您的卡片属于同一文件中的许多套牌，则很有用。",
@@ -128,7 +154,9 @@ export default {
     MAX_LINK_CONTRIB: "最大链接收益",
     MAX_LINK_CONTRIB_DESC: "链接笔记的加权掌握程度对原始掌握程度的最大贡献。",
     LOGGING: "记录中",
-    DISPLAY_DEBUG_INFO: "在开发者控制台中显示调试信息？",
+    DISPLAY_DEBUG_INFO: "在开发者控制台中显示调试信息",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "笔记复习序列",

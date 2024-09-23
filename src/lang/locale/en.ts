@@ -50,10 +50,30 @@ export default {
     YEARS_STR_IVL_MOBILE: "${interval}y",
 
     // settings.ts
-    SETTINGS_HEADER: "Spaced Repetition Plugin - Settings",
+    SETTINGS_HEADER: "Spaced Repetition - Settings",
+    GROUP_TAGS_FOLDERS: "Tags & Folders",
+    GROUP_FLASHCARD_REVIEW: "Flashcard Review",
+    GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
+    GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
+    GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: 'For more information, check the <a href="${wiki_url}">wiki</a>.',
+    GITHUB_DISCUSSIONS:
+        'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
+    GITHUB_ISSUES:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report.',
+    GITHUB_SOURCE_CODE:
+        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+    CODE_CONTRIBUTION_INFO:
+        'Information on <a href="${code_contribution_url}">code contributions</a>',
+    TRANSLATION_CONTRIBUTION_INFO:
+        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+    PROJECT_CONTRIBUTIONS:
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "Folders to ignore",
-    FOLDERS_TO_IGNORE_DESC: "Enter folder paths separated by newlines i.e. Templates Meta/Scripts",
+    FOLDERS_TO_IGNORE_DESC:
+        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Flashcards",
     FLASHCARD_EASY_LABEL: "Easy Button Text",
     FLASHCARD_GOOD_LABEL: "Good Button Text",
@@ -103,6 +123,7 @@ export default {
     INLINE_REVERSED_CARDS_SEPARATOR: "Separator for inline reversed flashcards",
     MULTILINE_CARDS_SEPARATOR: "Separator for multiline flashcards",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Separator for multiline reversed flashcards",
+    MULTILINE_CARDS_END_MARKER: "Characters denoting the end of clozes and multiline flashcards",
     NOTES: "Notes",
     REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "Tags to review",
@@ -110,14 +131,19 @@ export default {
     OPEN_RANDOM_NOTE: "Open a random note for review",
     OPEN_RANDOM_NOTE_DESC: "When you turn this off, notes are ordered by importance (PageRank).",
     AUTO_NEXT_NOTE: "Open next note automatically after a review",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Disable review options in the file menu i.e. Review: Easy Good Hard",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "After disabling, you can review using the command hotkeys. Reload Obsidian after changing this.",
     MAX_N_DAYS_REVIEW_QUEUE: "Maximum number of days to display on right panel",
     MIN_ONE_DAY: "The number of days must be at least 1.",
     VALID_NUMBER_WARNING: "Please provide a valid number.",
     UI_PREFERENCES: "UI Preferences",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "Enable the review options in the file menu (e.g. Review: Easy, Good, Hard)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "If you disable the review options in the file menu, you can review your notes using the plugin commands and, if you defined them, the associated command hotkeys.",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Deck trees should be initially displayed as expanded",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "Turn this off to collapse nested decks in the same card. Useful if you have cards which belong to many decks in the same file.",
@@ -140,7 +166,9 @@ export default {
     MAX_LINK_CONTRIB_DESC:
         "Maximum contribution of the weighted ease of linked notes to the initial ease.",
     LOGGING: "Logging",
-    DISPLAY_DEBUG_INFO: "Display debugging information on the developer console?",
+    DISPLAY_DEBUG_INFO: "Display debugging information on the developer console",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Notes Review Queue",
