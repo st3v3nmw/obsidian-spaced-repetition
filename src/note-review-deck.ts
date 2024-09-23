@@ -1,5 +1,6 @@
 import { t } from "src/lang/helpers";
 import { ISRFile } from "src/sr-file";
+import { globalDateProvider } from "src/utils/dates";
 import { globalRandomNumberProvider } from "src/utils/numbers";
 
 export class SchedNote {
@@ -81,10 +82,12 @@ export class NoteReviewDeck {
     determineNextNote(openRandomNote: boolean): ISRFile {
         // Review due notes before new ones
         if (this.dueNotesCount > 0) {
+            const todayUnix: number = globalDateProvider.today.valueOf();
+            const dueNotes = this.scheduledNotes.filter((note) => note.isDue(todayUnix));
             const index = openRandomNote
-                ? globalRandomNumberProvider.getInteger(0, this.dueNotesCount - 1)
+                ? globalRandomNumberProvider.getInteger(0, dueNotes.length - 1)
                 : 0;
-            return this.scheduledNotes[index].note;
+            return dueNotes[index].note;
         }
 
         if (this.newNotes.length > 0) {
