@@ -90,6 +90,13 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     line-height: var(--line-height-tight);
 }
 
+.sr-sub-title {
+    font-size: var(--font-ui-medium);
+    text-align: center;
+    line-height: var(--line-height-tight);
+    color: var(--text-muted);
+}
+
 .sr-content {
     overflow-y: auto;
 }
@@ -230,15 +237,16 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     padding-bottom: 8px;
 }
 
-.sr-flashcard .sr-button:disabled {
-    cursor: not-allowed;
+.sr-flashcard .sr-title-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
 }
 
-.sr-flashcard .sr-back-button {
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 21;
+.sr-flashcard .sr-button:disabled {
+    cursor: not-allowed;
 }
 
 .sr-flashcard .sr-controls {
