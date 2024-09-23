@@ -1,3 +1,6 @@
+/* eslint-disable no-undef */
+/* eslint-disable getter-return */
+
 module.exports = {
     moment: {
         locale: jest.fn(() => "en"),

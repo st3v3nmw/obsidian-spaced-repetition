@@ -71,8 +71,9 @@ export default {
     PROJECT_CONTRIBUTIONS:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
     FOLDERS_TO_IGNORE: "مجلدات لتجاهلها",
-    FOLDERS_TO_IGNORE_DESC: `Templates Meta/Scripts.
-Note that this setting is common to both Flashcards and Notes. : أدخل مسارات المجلد مفصولة بواسطة سطور جديدة,مثال`,
+    FOLDERS_TO_IGNORE_DESC:
+        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "البطاقات",
     FLASHCARD_EASY_LABEL: "نص الزر سهل",
     FLASHCARD_GOOD_LABEL: "نص الزر جيد",
@@ -122,6 +123,7 @@ Note that this setting is common to both Flashcards and Notes. : أدخل مسا
     INLINE_REVERSED_CARDS_SEPARATOR: "فاصل من أجل البطاقات العكسية المضمنة",
     MULTILINE_CARDS_SEPARATOR: "فاصل من أجل البطاقات المتعددة",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "فاصل من أجل البطاقات العكسية المتعددة",
+    MULTILINE_CARDS_END_MARKER: "الأحرف التي تدل على نهاية الكلوزات وبطاقات التعلم المتعددة الأسطر",
     NOTES: "ملاحظات",
     REVIEW_PANE_ON_STARTUP: "تمكين جزء مراجعة الملاحظات عند بدء التشغيل",
     TAGS_TO_REVIEW: "وسوم للمراجعة",
@@ -129,14 +131,19 @@ Note that this setting is common to both Flashcards and Notes. : أدخل مسا
     OPEN_RANDOM_NOTE: "افتح ملاحظة عشوائية للمراجعة",
     OPEN_RANDOM_NOTE_DESC: "(Pagerank) عند تعطيل هذا الخيار ،الملاحظات سيتم ترتيبُها حسب الأهمية",
     AUTO_NEXT_NOTE: "افتح الملاحظة التالية تلقائيًا بعد المراجعة",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS:
-        "تعطيل خيارات المراجعة في قائمة الملفات ، أي المراجعة:السهل الصعب الجيد",
-    DISABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "عند تغيير هذا الخيار Obsidian أعد تشغيل , command hotkeys. بعد التعطيل ، يمكنك المراجعة باستخدام",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS:
+        "فعّل خيارات المراجعة في قائمة الملف (مثال: مراجعة: سهل، جيد، صعب)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
+        "إذا قمت بتعطيل خيارات المراجعة في قائمة الملف، يمكنك مراجعة ملاحظاتك باستخدام أوامر الإضافة وإذا كنت قد حددتها، باستخدام مفاتيح الاختصار المرتبطة.",
     MAX_N_DAYS_REVIEW_QUEUE: "الحد الأقصى لعدد الأيام التي يجب عرضها على اللوحة اليمنى",
     MIN_ONE_DAY: "يجب أن يكون عدد الأيام 1 على الأقل",
     VALID_NUMBER_WARNING: "يرجى تقديم رقم صالح",
     UI_PREFERENCES: "تفضيلات واجهة المستخدم",
+    SHOW_STATUS_BAR: "Show status bar",
+    SHOW_STATUS_BAR_DESC:
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE:
         "يجب أن يكون العرض الشجري للرُزم موسع بحيث تطهر الملفات الفرعية كلها",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
@@ -159,7 +166,9 @@ Note that this setting is common to both Flashcards and Notes. : أدخل مسا
     MAX_LINK_CONTRIB: "أقصى مساهمة ارتباط",
     MAX_LINK_CONTRIB_DESC: "أقصى مساهمة للسهولة المرجحة للملاحظات المرتبطة بالسهولة الأولية.",
     LOGGING: "تسجيل",
-    DISPLAY_DEBUG_INFO: "عرض معلومات التصحيح على وحدة تحكم المطور؟",
+    DISPLAY_DEBUG_INFO: "عرض معلومات التصحيح على وحدة تحكم المطور",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Display debugging information for the parser on the developer console",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "ملاحظات قائمة المراجعة",

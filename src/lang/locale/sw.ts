@@ -1,3 +1,3 @@
-// Swahili
+// Kiswahili
 
 export default {};

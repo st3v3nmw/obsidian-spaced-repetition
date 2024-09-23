@@ -9,32 +9,38 @@ module.exports = {
     },
     moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node", "d.ts"],
     roots: ["<rootDir>/src/", "<rootDir>/tests/unit/"],
-    collectCoverageFrom: [
-        "src/**/lang/*.ts",
-        "src/NoteEaseList.ts",
-        "src/NoteFileLoader.ts",
-        "src/NoteParser.ts",
-        "src/NoteQuestionParser.ts",
-        "src/TopicParser.ts",
-        "src/parser.ts",
-        "src/scheduling.ts",
-        "utils.ts",
-    ],
+    collectCoverageFrom: ["src/**"],
     coveragePathIgnorePatterns: [
-        "/node_modules/",
-        "src/lang/locale/",
-        "src/constants",
-        "src/icons",
+        // node modules & build output
+        "build/",
+        "node_modules/",
+
+        // GUI & Obsidian coupled code
+        "src/app-core.ts",
+        "src/sr-file.ts",
+        "src/gui/",
+        "src/icons/",
+        "src/main.ts",
+        "src/next-note-review-handler.ts",
+        "src/plugin-data.ts",
+        "src/settings.ts",
+        "src/utils/renderers.ts",
+
+        // debugging utils
+        "src/utils/debug.ts",
+
+        // don't include in results
         "src/declarations.d.ts",
-        "build",
+        "src/lang/locale/",
     ],
     coverageDirectory: "coverage",
     collectCoverage: true,
     coverageProvider: "v8",
     coverageThreshold: {
         global: {
-            statements: 100,
-            branches: 100,
+            // TODO: Bring coverage back up to 98%+
+            statements: 93,
+            branches: 89,
         },
     },
 };
