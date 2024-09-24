@@ -81,9 +81,9 @@ export class NoteReviewDeck {
 
     determineNextNote(openRandomNote: boolean): ISRFile {
         // Review due notes before new ones
-        if (this.dueNotesCount > 0) {
-            const todayUnix: number = globalDateProvider.today.valueOf();
-            const dueNotes = this.scheduledNotes.filter((note) => note.isDue(todayUnix));
+        const todayUnix: number = globalDateProvider.today.valueOf();
+        const dueNotes = this.scheduledNotes.filter((note) => note.isDue(todayUnix));
+        if (dueNotes.length > 0) {
             const index = openRandomNote
                 ? globalRandomNumberProvider.getInteger(0, dueNotes.length - 1)
                 : 0;
