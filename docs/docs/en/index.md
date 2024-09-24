@@ -22,7 +22,7 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
 !!! tip "Help & Support"
 
     :material-circle-medium: Visit the [discussions](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/) section for Q&A help, feedback, and general discussion.<br/>
-    :material-circle-medium: Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug-report.
+    :material-circle-medium: Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug report.
 
 !!! tip "Contributing"
 

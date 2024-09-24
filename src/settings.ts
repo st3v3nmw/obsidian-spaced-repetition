@@ -30,6 +30,7 @@ export interface SRSettings {
     multilineReversedCardSeparator: string;
     multilineCardEndMarker: string;
     editLaterTag: string;
+
     // notes
     enableNoteReviewPaneOnStartup: boolean;
     tagsToReview: string[];
@@ -38,16 +39,19 @@ export interface SRSettings {
     autoNextNote: boolean;
     disableFileMenuReviewOptions: boolean;
     maxNDaysNotesReviewQueue: number;
+
     // UI preferences
     showRibbonIcon: boolean;
     showStatusBar: boolean;
     initiallyExpandAllSubdecksInTree: boolean;
+
     // algorithm
     baseEase: number;
     lapsesIntervalChange: number;
     easyBonus: number;
     maximumInterval: number;
     maxLinkFactor: number;
+
     // logging
     showDebugMessages: boolean;
     showPaserDebugMessages: boolean;
@@ -68,7 +72,6 @@ export const DEFAULT_SETTINGS: SRSettings = {
     randomizeCardOrder: null,
     flashcardCardOrder: "DueFirstRandom",
     flashcardDeckOrder: "PrevDeckComplete_Sequential",
-
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
     convertCurlyBracketsToClozes: false,
@@ -78,24 +81,28 @@ export const DEFAULT_SETTINGS: SRSettings = {
     multilineReversedCardSeparator: "??",
     multilineCardEndMarker: "",
     editLaterTag: "#edit-later",
+
     // notes
     enableNoteReviewPaneOnStartup: true,
     tagsToReview: ["#review"],
-    noteFoldersToIgnore: [],
+    noteFoldersToIgnore: ["**/*.excalidraw.md"],
     openRandomNote: false,
     autoNextNote: false,
     disableFileMenuReviewOptions: false,
     maxNDaysNotesReviewQueue: 365,
+
     // UI settings
     showRibbonIcon: true,
     showStatusBar: true,
     initiallyExpandAllSubdecksInTree: false,
+
     // algorithm
     baseEase: 250,
     lapsesIntervalChange: 0.5,
     easyBonus: 1.3,
     maximumInterval: 36525,
     maxLinkFactor: 1.0,
+
     // logging
     showDebugMessages: false,
     showPaserDebugMessages: false,

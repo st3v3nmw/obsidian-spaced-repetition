@@ -73,7 +73,7 @@ export default {
         'Créez un ticket <a href="${issues_url}">sur GitHub</a> si vous trouvez un bug ou voulez demander une fonctionnalité',
     FOLDERS_TO_IGNORE: "Dossiers à ignorer",
     FOLDERS_TO_IGNORE_DESC:
-        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
+        "Enter folder paths or glob patterns on separate lines e.g. Templates/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
     OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Flashcards",
     FLASHCARD_EASY_LABEL: "Bouton Facile",

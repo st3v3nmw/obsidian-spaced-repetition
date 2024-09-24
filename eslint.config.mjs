@@ -37,12 +37,6 @@ export default tseslint.config(
         },
     },
     {
-        files: ["tests/**"],
-        rules: {
-            "@typescript-eslint/no-require-imports": "off",
-        },
-    },
-    {
         files: ["src/**"],
         rules: {
             "no-restricted-imports": [
@@ -56,6 +50,12 @@ export default tseslint.config(
                     ],
                 },
             ],
+        },
+    },
+    {
+        files: ["tests/**"],
+        rules: {
+            "@typescript-eslint/no-require-imports": "off",
         },
     },
 );

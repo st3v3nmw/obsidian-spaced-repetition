@@ -61,7 +61,7 @@ export default {
     GITHUB_DISCUSSIONS:
         'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
     GITHUB_ISSUES:
-        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report.',
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report.',
     GITHUB_SOURCE_CODE:
         'Project source code available on <a href="${github_project_url}">GitHub</a>',
     CODE_CONTRIBUTION_INFO:
@@ -69,10 +69,10 @@ export default {
     TRANSLATION_CONTRIBUTION_INFO:
         'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
     PROJECT_CONTRIBUTIONS:
-        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug-report',
+        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report',
     FOLDERS_TO_IGNORE: "忽略此資料夾",
     FOLDERS_TO_IGNORE_DESC:
-        "Enter folder paths or glob patterns on separate lines e.g. Templates Meta/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
+        "Enter folder paths or glob patterns on separate lines e.g. Templates/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
     OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "卡片",
     FLASHCARD_EASY_LABEL: "簡單按鈕文字",
