@@ -51,7 +51,7 @@ export default {
     YEARS_STR_IVL_MOBILE: "${interval}y",
 
     // settings.ts
-    SETTINGS_HEADER: "Plugin per ripetizione spaziata - Impostazioni",
+    SETTINGS_HEADER: "Plugin per ripetizione spaziata",
     GROUP_TAGS_FOLDERS: "Tags & Folders",
     GROUP_FLASHCARD_REVIEW: "Flashcard Review",
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",

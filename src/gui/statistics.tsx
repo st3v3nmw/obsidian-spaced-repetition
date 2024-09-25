@@ -12,7 +12,6 @@ import {
     Title,
     Tooltip,
 } from "chart.js";
-import { App, Modal, Platform } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
@@ -36,17 +35,24 @@ Chart.register(
     ArcElement,
 );
 
-export class StatsModal extends Modal {
+export class StatisticsView {
+    private containerEl: HTMLElement;
     private osrCore: OsrCore;
 
-    constructor(app: App, osrCore: OsrCore) {
-        super(app);
+    private forecastChart: Chart;
+    private intervalsChart: Chart;
+    private easesChart: Chart;
+    private cardTypesChart: Chart;
 
+    constructor(containerEl: HTMLElement, osrCore: OsrCore) {
+        this.containerEl = containerEl;
         this.osrCore = osrCore;
+    }
 
-        this.titleEl.setText(`${t("STATS_TITLE")} `);
-        this.titleEl.addClass("sr-centered");
-        this.titleEl.innerHTML += (
+    render(): void {
+        this.containerEl.style.textAlign = "center";
+
+        this.containerEl.innerHTML += (
             <select id="sr-chart-period">
                 <option value="month" selected>
                     {t("MONTH")}
@@ -56,18 +62,6 @@ export class StatsModal extends Modal {
                 <option value="lifetime">{t("LIFETIME")}</option>
             </select>
         );
-
-        this.modalEl.style.height = "100%";
-        this.modalEl.style.width = "100%";
-
-        if (Platform.isMobile) {
-            this.contentEl.style.display = "block";
-        }
-    }
-
-    onOpen(): void {
-        const { contentEl } = this;
-        contentEl.style.textAlign = "center";
 
         // Add forecast
         const cardStats: Stats = this.osrCore.cardStats;
@@ -88,7 +82,7 @@ export class StatsModal extends Modal {
         const scheduledCount: number = cardStats.youngCount + cardStats.matureCount;
         maxN = Math.max(maxN, 1);
 
-        contentEl.innerHTML += (
+        this.containerEl.innerHTML += (
             <div>
                 <canvas id="forecastChart"></canvas>
                 <span id="forecastChartSummary"></span>
@@ -108,7 +102,7 @@ export class StatsModal extends Modal {
             </div>
         );
 
-        createStatsChart(
+        this.forecastChart = createStatsChart(
             "bar",
             "forecastChart",
             t("FORECAST"),
@@ -135,7 +129,7 @@ export class StatsModal extends Modal {
             ),
             longest_interval: string = textInterval(cardStats.intervals.getMaxValue(), false);
 
-        createStatsChart(
+        this.intervalsChart = createStatsChart(
             "bar",
             "intervalsChart",
             t("INTERVALS"),
@@ -159,7 +153,7 @@ export class StatsModal extends Modal {
         const average_ease: number =
             Math.round(cardStats.eases.getTotalOfValueMultiplyCount() / scheduledCount) || 0;
 
-        createStatsChart(
+        this.easesChart = createStatsChart(
             "bar",
             "easesChart",
             t("EASES"),
@@ -177,15 +171,13 @@ export class StatsModal extends Modal {
             CardListType.All,
             true,
         );
-        createStatsChart(
+        this.cardTypesChart = createStatsChart(
             "pie",
             "cardTypesChart",
             t("CARD_TYPES"),
             t("CARD_TYPES_DESC"),
             [
-                `${t("CARD_TYPE_NEW")} - ${Math.round(
-                    (cardStats.newCount / totalCardsCount) * 100,
-                )}%`,
+                `${t("CARD_TYPE_NEW")} - ${Math.round((cardStats.newCount / totalCardsCount) * 100)}%`,
                 `${t("CARD_TYPE_YOUNG")} - ${Math.round(
                     (cardStats.youngCount / totalCardsCount) * 100,
                 )}%`,
@@ -198,9 +190,11 @@ export class StatsModal extends Modal {
         );
     }
 
-    onClose(): void {
-        const { contentEl } = this;
-        contentEl.empty();
+    destroy(): void {
+        this.forecastChart.destroy();
+        this.intervalsChart.destroy();
+        this.easesChart.destroy();
+        this.cardTypesChart.destroy();
     }
 }
 
@@ -215,7 +209,7 @@ function createStatsChart(
     seriesTitle = "",
     xAxisTitle = "",
     yAxisTitle = "",
-) {
+): Chart {
     const style = getComputedStyle(document.body);
     const textColor = style.getPropertyValue("--text-normal");
 
@@ -314,4 +308,6 @@ function createStatsChart(
     }
 
     document.getElementById(`${canvasId}Summary`).innerText = summary;
+
+    return statsChart;
 }
