@@ -201,11 +201,12 @@ export class ReviewQueueListView extends ItemView {
         hidden: boolean,
         deck: NoteReviewDeck,
     ): void {
-        const navFileEl: HTMLElement = folderEl
-            .getElementsByClassName("tree-item-children nav-folder-children")[0]
-            .createDiv("nav-file");
+        const childrenEl: HTMLElement = folderEl.getElementsByClassName(
+            "tree-item-children nav-folder-children",
+        )[0] as HTMLElement;
+        const navFileEl: HTMLElement = childrenEl.createDiv("nav-file");
         if (hidden) {
-            navFileEl.style.display = "none";
+            childrenEl.style.display = "none";
         }
 
         const navFileTitle: HTMLElement = navFileEl.createDiv("tree-item-self nav-file-title");
