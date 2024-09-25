@@ -52,5 +52,9 @@
         "peggy": "^4.0.3",
         "short-uuid": "^5.2.0"
     },
-    "packageManager": "^pnpm@9.10.0"
+    "packageManager": "pnpm@^9.10.0",
+    "engines": {
+        "pnpm": ">=9.10.0"
+    },
+    "engineStrict": true
 }
