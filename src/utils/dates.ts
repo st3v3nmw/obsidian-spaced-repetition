@@ -3,7 +3,7 @@ import moment, { Moment } from "moment";
 import { ALLOWED_DATE_FORMATS, PREFERRED_DATE_FORMAT } from "src/constants";
 
 /**
- * 👇️ format as "YYYY-MM-DD"
+ * Format as "YYYY-MM-DD"
  * https://bobbyhadz.com/blog/typescript-date-format
  *
  * @param ticks

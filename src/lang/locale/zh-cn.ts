@@ -50,7 +50,7 @@ export default {
     YEARS_STR_IVL_MOBILE: "${interval}年",
 
     // settings.ts
-    SETTINGS_HEADER: "间隔重复插件 - 设置",
+    SETTINGS_HEADER: "间隔重复插件",
     GROUP_TAGS_FOLDERS: "Tags & Folders",
     GROUP_FLASHCARD_REVIEW: "Flashcard Review",
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",

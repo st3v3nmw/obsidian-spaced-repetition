@@ -1,3 +1,5 @@
+import { App, TFile } from "obsidian";
+
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
@@ -14,7 +16,7 @@ import { NoteFileLoader } from "src/note-file-loader";
 import { NoteReviewQueue } from "src/note-review-queue";
 import { QuestionPostponementList } from "src/question-postponement-list";
 import { SettingsUtil, SRSettings } from "src/settings";
-import { ISRFile } from "src/sr-file";
+import { ISRFile, SrTFile } from "src/sr-file";
 import { Stats } from "src/stats";
 import { TopicPath } from "src/topic-path";
 import { globalDateProvider } from "src/utils/dates";
@@ -57,7 +59,6 @@ export class OsrCore {
         return this._questionPostponementList;
     }
 
-    /* c8 ignore start */
     get dueDateFlashcardHistogram(): CardDueDateHistogram {
         return this._dueDateFlashcardHistogram;
     }
@@ -73,7 +74,6 @@ export class OsrCore {
     get cardStats(): Stats {
         return this._cardStats;
     }
-    /* c8 ignore stop */
 
     init(
         questionPostponementList: QuestionPostponementList,
@@ -233,5 +233,48 @@ export class OsrCore {
 
     private findTopicPath(note: ISRFile): TopicPath {
         return TopicPath.getTopicPathOfFile(note, this.settings);
+    }
+}
+
+export class OsrAppCore extends OsrCore {
+    private app: App;
+    private _syncLock = false;
+
+    get syncLock(): boolean {
+        return this._syncLock;
+    }
+
+    constructor(app: App) {
+        super();
+        this.app = app;
+    }
+
+    async loadVault(): Promise<void> {
+        if (this._syncLock) {
+            return;
+        }
+        this._syncLock = true;
+
+        try {
+            this.loadInit();
+
+            const notes: TFile[] = this.app.vault.getMarkdownFiles();
+            for (const noteFile of notes) {
+                if (SettingsUtil.isPathInNoteIgnoreFolder(this.settings, noteFile.path)) {
+                    continue;
+                }
+
+                const file: SrTFile = this.createSrTFile(noteFile);
+                await this.processFile(file);
+            }
+
+            this.finaliseLoad();
+        } finally {
+            this._syncLock = false;
+        }
+    }
+
+    createSrTFile(note: TFile): SrTFile {
+        return new SrTFile(this.app.vault, this.app.metadataCache, note);
     }
 }

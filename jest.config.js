@@ -16,14 +16,13 @@ module.exports = {
         "node_modules/",
 
         // GUI & Obsidian coupled code
-        "src/app-core.ts",
+        "src/core.ts",
         "src/sr-file.ts",
         "src/gui/",
         "src/icons/",
         "src/main.ts",
         "src/next-note-review-handler.ts",
         "src/plugin-data.ts",
-        "src/settings.ts",
         "src/utils/renderers.ts",
 
         // debugging utils

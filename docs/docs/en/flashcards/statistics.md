@@ -1,6 +1,6 @@
 ## Statistics
 
-The statistics section can be accessed using the `View Statistics` command.
+The statistics section can be accessed in the `Statistics` section in the plugin's settings.
 
 ### Forecast
 

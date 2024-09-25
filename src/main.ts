@@ -4,7 +4,7 @@ import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { ObsidianVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
 import { SrsAlgorithm_Osr } from "src/algorithms/osr/srs-algorithm-osr";
-import { OsrAppCore } from "src/app-core";
+import { OsrAppCore } from "src/core";
 import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
 import { DataStoreInNote_AlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
 import { DataStore } from "src/data-stores/base/data-store";
@@ -24,8 +24,8 @@ import {
 } from "src/flashcard-review-sequencer";
 import { FlashcardModal } from "src/gui/flashcard-modal";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/review-queue-list-view";
+import { SRSettingTab } from "src/gui/settings";
 import { OsrSidebar } from "src/gui/sidebar";
-import { StatsModal } from "src/gui/stats-modal";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/next-note-review-handler";
@@ -34,20 +34,14 @@ import { NoteFileLoader } from "src/note-file-loader";
 import { generateParser, setDebugParser } from "src/parser";
 import { DEFAULT_DATA, PluginData } from "src/plugin-data";
 import { QuestionPostponementList } from "src/question-postponement-list";
-import {
-    DEFAULT_SETTINGS,
-    SettingsUtil,
-    SRSettings,
-    SRSettingTab,
-    upgradeSettings,
-} from "src/settings";
+import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
 import { ISRFile, SrTFile as SrTFile } from "src/sr-file";
 import { TopicPath } from "src/topic-path";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
 
 export default class SRPlugin extends Plugin {
     public data: PluginData;
-    private osrAppCore: OsrAppCore;
+    public osrAppCore: OsrAppCore;
     private osrSidebar: OsrSidebar;
     private nextNoteReviewHandler: NextNoteReviewHandler;
 
@@ -267,17 +261,6 @@ export default class SRPlugin extends Plugin {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
                 if (openFile && openFile.extension === "md") {
                     this.openFlashcardModalForSingleNote(openFile, FlashcardReviewMode.Cram);
-                }
-            },
-        });
-
-        this.addCommand({
-            id: "srs-view-stats",
-            name: t("VIEW_STATS"),
-            callback: async () => {
-                if (!this.osrAppCore.syncLock) {
-                    await this.sync();
-                    new StatsModal(this.app, this.osrAppCore).open();
                 }
             },
         });

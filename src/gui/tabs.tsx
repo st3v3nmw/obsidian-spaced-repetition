@@ -23,7 +23,7 @@ import h from "vhtml";
 export interface Tab {
     title: string;
     icon: string;
-    content_generator: (container_element: HTMLElement) => Promise<void>;
+    content_generator: (containerElement: HTMLElement) => Promise<void>;
 }
 
 export interface TabStructure {
@@ -53,11 +53,11 @@ interface TabButtons {
 }
 
 export function createTabs(
-    container_element: HTMLElement,
+    containerElement: HTMLElement,
     tabs: Tabs,
     activateTabId: string,
 ): TabStructure {
-    const tab_header = container_element.createEl("div", {
+    const tab_header = containerElement.createEl("div", {
         attr: { class: "sr-tab-header" },
     });
     const tab_content_containers: TabContentContainers = {};
@@ -65,7 +65,7 @@ export function createTabs(
     const tab_structure: TabStructure = {
         header: tab_header,
         // Indicate that the first tab is active.
-        // This does not affect what tab is active in practise, it just reports the active tab.
+        // This does not affect what tab is active in practice, it just reports the active tab.
         active_tab_id: Object.keys(tabs)[0] as string,
         buttons: tab_buttons,
         contentContainers: tab_content_containers,
@@ -94,8 +94,8 @@ export function createTabs(
             if (null === tab_header) {
                 throw new Error("Tab header is missing. Did not get a parent from tab button.");
             }
-            const container_element = tab_header.parentElement;
-            if (null === container_element) {
+            const containerElement = tab_header.parentElement;
+            if (null === containerElement) {
                 throw new Error(
                     "Container element is missing. Did not get a parent from tab header.",
                 );
@@ -103,8 +103,8 @@ export function createTabs(
 
             // Do not get all tab contents that exist,
             //  because there might be multiple tab systems open at the same time.
-            const tab_contents = container_element.findAll("div.sr-tab-content");
-            const is_main_settings_modal = container_element.hasClass("vertical-tab-content");
+            const tab_contents = containerElement.findAll("div.sr-tab-content");
+            const is_main_settings_modal = containerElement.hasClass("vertical-tab-content");
             for (const index in tab_contents) {
                 const tab_content = tab_contents[index];
 
@@ -176,7 +176,7 @@ export function createTabs(
         tab_buttons[tab_id] = button;
 
         // Create content container
-        tab_content_containers[tab_id] = container_element.createEl("div", {
+        tab_content_containers[tab_id] = containerElement.createEl("div", {
             attr: { class: "sr-tab-content", id: "sr-tab-" + tab_id },
         });
 

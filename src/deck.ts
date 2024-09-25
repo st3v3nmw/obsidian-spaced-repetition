@@ -10,12 +10,10 @@ export enum CardListType {
     All,
 }
 
-//
 // The same card can be added to multiple decks e.g.
 //      #flashcards/language/words
 //      #flashcards/trivia
 // To simplify certain functions (e.g. getDistinctCardCount), we explicitly use the same card object (and not a copy)
-//
 export class Deck {
     public deckName: string;
     public newFlashcards: Card[];
@@ -80,10 +78,8 @@ export class Deck {
         return result;
     }
 
-    //
     // Returns a count of the number of this question's cards are present in this deck.
     // (The returned value would be <= question.cards.length)
-    //
     public getQuestionCardCount(question: Question): number {
         let result: number = 0;
         result += this.getQuestionCardCountForCardListType(question, this.newFlashcards);
@@ -194,10 +190,8 @@ export class Deck {
         cardList.push(cardObj);
     }
 
-    //
     // The question lists all the topics in which this card is included.
     // The topics are relative to the base deck, and this method must be called on that deck
-    //
     deleteQuestionFromAllDecks(question: Question, exceptionIfMissing: boolean): void {
         for (const card of question.cards) {
             this.deleteCardFromAllDecks(card, exceptionIfMissing);
@@ -210,10 +204,8 @@ export class Deck {
         }
     }
 
-    //
     // The card's question lists all the topics in which this card is included.
     // The topics are relative to the base deck, and this method must be called on that deck
-    //
     deleteCardFromAllDecks(card: Card, exceptionIfMissing: boolean): void {
         for (const topicPath of card.question.topicPathList.list) {
             const deck: Deck = this.getDeck(topicPath);

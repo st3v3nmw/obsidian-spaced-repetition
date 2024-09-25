@@ -19,7 +19,6 @@ export enum CardType {
     Cloze,
 }
 
-//
 // QuestionText comprises the following components:
 //      1. QuestionTopicPath (optional, and if present there may be whitespace before)
 //
@@ -73,7 +72,6 @@ export enum CardType {
 //
 //  Question text with block identifier:
 //      Q2::A2 ^d7cee0
-//
 export class QuestionText {
     // Complete text including all components, as read from file
     original: string;
