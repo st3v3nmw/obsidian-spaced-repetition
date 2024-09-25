@@ -82,8 +82,7 @@ export default {
     FLASHCARD_GOOD_DESC: "Personalize la etiqueta para el botón: Bien",
     FLASHCARD_HARD_DESC: "Personalize la etiqueta para el botón: Difícil",
     REVIEW_BUTTON_DELAY: "Button press delay (ms)",
-    REVIEW_BUTTON_DELAY_DESC:
-        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before they could be pressed again.",
+    REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "Etiquetas de las Tarjetas de Memorización",
     FLASHCARD_TAGS_DESC:
         "Escriba las etiquetas separadas por espacios o saltos de línea, por ejemplo, #memorizar #mazo2 #mazo3",

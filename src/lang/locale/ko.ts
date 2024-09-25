@@ -82,8 +82,7 @@ export default {
     FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
     FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
     REVIEW_BUTTON_DELAY: "Button press delay (ms)",
-    REVIEW_BUTTON_DELAY_DESC:
-        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before they could be pressed again.",
+    REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "플래시카드 태그",
     FLASHCARD_TAGS_DESC:
         "태그를 공백 또는 빈 줄로 구분해서 입력해주세요. 예) '#flashcards #deck2 #deck3'",

@@ -83,8 +83,7 @@ export default {
     FLASHCARD_GOOD_DESC: "Changez le texte du bouton Correct",
     FLASHCARD_HARD_DESC: "Changez le texte du bouton Difficile",
     REVIEW_BUTTON_DELAY: "Button press delay (ms)",
-    REVIEW_BUTTON_DELAY_DESC:
-        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before they could be pressed again.",
+    REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "Tags des flashcards",
     FLASHCARD_TAGS_DESC:
         "Entrez les tags séparés par un espace ou une ligne i.e. #flashcards #paquet2 #paquet3.",

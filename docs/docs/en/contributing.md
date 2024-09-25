@@ -78,7 +78,7 @@ Please note that:
 ## Code
 
 1. Make your changes.
-2. Run `pnpm dev` to test the changes inside Obsidian.
+2. Run `pnpm dev` to watch for changes & rebuild the plugin automatically.
 3. You could create symbolic links between the build files and the Obsidian vault, example:
 
     ```bash
@@ -96,19 +96,9 @@ Please note that:
 5. If your "business logic" is properly decoupled from Obsidian APIs, write some unit tests.
     - This project uses [jest](https://jestjs.io/), tests are stored in `tests/`.
     - `pnpm test`
-6. Add your change to the `[Unreleased]` section of the changelog (`docs/docs/changelog.md`).
-    - The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), TL;DR:
-        - `Added` for new features.
-        - `Changed` for changes in existing functionality.
-        - `Deprecated` for soon-to-be removed features.
-        - `Removed` for now removed features.
-        - `Fixed` for any bug fixes.
-        - `Security` in case of vulnerabilities.
-    - You can also append a link to your GitHub profile, example:
-        - `Make flashcard text selectable [@st3v3nmw](https://github.com/st3v3nmw)`
-7. Before pushing your changes, run the linter: `pnpm lint`
+6. Before pushing your changes, run the linter: `pnpm lint`
     - Format the code in case any warnings are raised: `pnpm format`
-8. Open the pull request.
+7. Open the pull request.
 
 ---
 
@@ -167,7 +157,7 @@ Example using `v1.9.2`:
 
     ```bash
     git add .
-    git commit -m "Bump version to v1.9.2"
+    git commit -m "chore: bump version to v1.9.2"
     git push --set-upstream origin release-v1.9.2
     ```
 

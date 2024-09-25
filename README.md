@@ -31,7 +31,7 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
     -   Possible use case: [Incremental writing](https://www.stephenmwangi.com/obsidian-spaced-repetition/notes/#incremental-writing)
 -   [Statistics](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#statistics)
 
-## Coming Soon
+### Coming Soon
 
 1. FSRS
 
