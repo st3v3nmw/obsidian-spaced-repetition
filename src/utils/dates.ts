@@ -10,7 +10,7 @@ import { ALLOWED_DATE_FORMATS, PREFERRED_DATE_FORMAT } from "src/constants";
  * @returns
  * @deprecated use formatDate() instead
  */
-export function formatDate_YYYY_MM_DD(ticks: Moment): string {
+export function formatDateYYYYMMDD(ticks: Moment): string {
     return ticks.format(PREFERRED_DATE_FORMAT);
 }
 
@@ -132,11 +132,11 @@ function getOriginDateAsMoment(): Moment {
     return DateUtil.dateStrToMoment(originDate);
 }
 
-export function setupStaticDateProvider_OriginDatePlusDays(days: number) {
+export function setupStaticDateProviderOriginDatePlusDays(days: number) {
     const simulatedDate: Moment = getOriginDateAsMoment().add(days, "d");
     globalDateProvider = new StaticDateProvider(simulatedDate);
 }
 
-export function setupStaticDateProvider_20230906() {
+export function setupStaticDateProvider20230906() {
     setupStaticDateProvider(originDate);
 }

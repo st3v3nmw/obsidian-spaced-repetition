@@ -1,7 +1,7 @@
 import { Deck } from "src/deck";
+import { ISRFile } from "src/file";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
-import { ISRFile } from "src/sr-file";
 
 export class Note {
     file: ISRFile;

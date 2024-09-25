@@ -3,7 +3,7 @@ import path from "path";
 import { IOsrVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
 
 import { UnitTestSRFile } from "./unit-test-file";
-import { unitTest_ParseForOutgoingLinks } from "./unit-test-helper";
+import { unitTestParseForOutgoingLinks } from "./unit-test-helper";
 
 export class UnitTestLinkInfoFinder implements IOsrVaultNoteLinkInfoFinder {
     private linkPathMap: Map<string, string>;
@@ -24,7 +24,7 @@ export class UnitTestLinkInfoFinder implements IOsrVaultNoteLinkInfoFinder {
         this.outgoingLinks = new Map<string, Map<string, number>>();
         fileMap.forEach((file, sourceFilename) => {
             // Find all the (outgoing) links present in the file
-            const outgoingLinks2: string[] = unitTest_ParseForOutgoingLinks(file.content);
+            const outgoingLinks2: string[] = unitTestParseForOutgoingLinks(file.content);
 
             for (const targetLink of outgoingLinks2) {
                 const targetFilename: string = this.linkPathMap.get(targetLink);

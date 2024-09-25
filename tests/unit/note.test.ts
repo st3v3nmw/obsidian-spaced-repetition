@@ -7,13 +7,13 @@ import { TopicPath } from "src/topic-path";
 import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
-import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
+import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 
 const parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 const noteFileLoader: NoteFileLoader = new NoteFileLoader(DEFAULT_SETTINGS);
 
 beforeAll(() => {
-    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 describe("appendCardsToDeck", () => {

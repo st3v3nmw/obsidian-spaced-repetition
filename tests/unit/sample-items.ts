@@ -9,18 +9,18 @@ import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
 
-export function createTest_NoteQuestionParser(settings: SRSettings): NoteQuestionParser {
+export function createTestNoteQuestionParser(settings: SRSettings): NoteQuestionParser {
     const questionParser: NoteQuestionParser = new NoteQuestionParser(settings);
     return questionParser;
 }
-export function createTest_NoteParser(): NoteParser {
+export function createTestNoteParser(): NoteParser {
     const result = new NoteParser(DEFAULT_SETTINGS);
     return result;
 }
-export const test_RefDate_20230906: Date = new Date(2023, 8, 6);
+export const testRefDate20230906: Date = new Date(2023, 8, 6);
 
 export class SampleItemDecks {
-    static async createSingleLevelTree_NewCards(): Promise<Deck> {
+    static async createSingleLevelTreeNewCards(): Promise<Deck> {
         const text: string = `
 Q1::A1
 Q2::A2
@@ -68,7 +68,7 @@ Q3::A3`;
         folderTopicPath: TopicPath = TopicPath.emptyPath,
     ): Promise<Deck> {
         const deck: Deck = new Deck("Root", null);
-        const noteParser: NoteParser = createTest_NoteParser();
+        const noteParser: NoteParser = createTestNoteParser();
         const note: Note = await noteParser.parse(file, TextDirection.Ltr, folderTopicPath);
         note.appendCardsToDeck(deck);
         return deck;

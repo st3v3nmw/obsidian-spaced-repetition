@@ -1,5 +1,5 @@
+import { ISRFile } from "src/file";
 import { t } from "src/lang/helpers";
-import { ISRFile } from "src/sr-file";
 import { globalDateProvider } from "src/utils/dates";
 import { globalRandomNumberProvider } from "src/utils/numbers";
 

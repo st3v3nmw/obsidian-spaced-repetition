@@ -23,12 +23,12 @@ import h from "vhtml";
 export interface Tab {
     title: string;
     icon: string;
-    content_generator: (containerElement: HTMLElement) => Promise<void>;
+    contentGenerator: (containerElement: HTMLElement) => Promise<void>;
 }
 
 export interface TabStructure {
     header: HTMLElement;
-    active_tab_id: string;
+    activeTabId: string;
     buttons: {
         [key: string]: HTMLElement;
     };
@@ -57,44 +57,44 @@ export function createTabs(
     tabs: Tabs,
     activateTabId: string,
 ): TabStructure {
-    const tab_header = containerElement.createEl("div", {
+    const tabHeader = containerElement.createEl("div", {
         attr: { class: "sr-tab-header" },
     });
-    const tab_content_containers: TabContentContainers = {};
-    const tab_buttons: TabButtons = {};
-    const tab_structure: TabStructure = {
-        header: tab_header,
+    const tabContentContainers: TabContentContainers = {};
+    const tabButtons: TabButtons = {};
+    const tabStructure: TabStructure = {
+        header: tabHeader,
         // Indicate that the first tab is active.
         // This does not affect what tab is active in practice, it just reports the active tab.
-        active_tab_id: Object.keys(tabs)[0] as string,
-        buttons: tab_buttons,
-        contentContainers: tab_content_containers,
+        activeTabId: Object.keys(tabs)[0] as string,
+        buttons: tabButtons,
+        contentContainers: tabContentContainers,
         contentGeneratorPromises: {},
     };
-    let first_button: HTMLElement | undefined;
-    for (const tab_id in tabs) {
-        const tab = tabs[tab_id];
+    let firstButton: HTMLElement | undefined;
+    for (const tabId in tabs) {
+        const tab = tabs[tabId];
 
         // Create button
-        const button = tab_header.createEl("button", {
+        const button = tabHeader.createEl("button", {
             attr: {
                 class: "sr-tab-header-button",
-                activateTab: "sr-tab-" + tab_id,
+                activateTab: "sr-tab-" + tabId,
             },
         });
         button.onclick = function (event: MouseEvent) {
             // Use 'this' instead of event.target because this way we'll always get a button element,
             //  not an element inside the  button (i.e. an icon).
-            const tab_button = this as HTMLElement;
+            const tabButton = this as HTMLElement;
 
             // Hide all tab contents and get the max dimensions
-            let max_width = 0;
-            let max_height = 0;
-            const tab_header = tab_button.parentElement;
-            if (null === tab_header) {
+            let maxWidth = 0;
+            let maxHeight = 0;
+            const tabHeader = tabButton.parentElement;
+            if (null === tabHeader) {
                 throw new Error("Tab header is missing. Did not get a parent from tab button.");
             }
-            const containerElement = tab_header.parentElement;
+            const containerElement = tabHeader.parentElement;
             if (null === containerElement) {
                 throw new Error(
                     "Container element is missing. Did not get a parent from tab header.",
@@ -103,68 +103,66 @@ export function createTabs(
 
             // Do not get all tab contents that exist,
             //  because there might be multiple tab systems open at the same time.
-            const tab_contents = containerElement.findAll("div.sr-tab-content");
-            const is_main_settings_modal = containerElement.hasClass("vertical-tab-content");
-            for (const index in tab_contents) {
-                const tab_content = tab_contents[index];
+            const tabContents = containerElement.findAll("div.sr-tab-content");
+            const isMainSettingsModal = containerElement.hasClass("vertical-tab-content");
+            for (const index in tabContents) {
+                const tabContent = tabContents[index];
 
                 // Get the maximum tab dimensions so that all tabs can have the same dimensions.
                 // But don't do it if this is the main settings modal
-                if (!is_main_settings_modal) {
+                if (!isMainSettingsModal) {
                     // Need to make the tab visible temporarily in order to get the dimensions.
-                    tab_content.addClass("sr-tab-active");
-                    if (tab_content.offsetHeight > max_height) {
-                        max_height = tab_content.offsetHeight;
+                    tabContent.addClass("sr-tab-active");
+                    if (tabContent.offsetHeight > maxHeight) {
+                        maxHeight = tabContent.offsetHeight;
                     }
-                    if (tab_content.offsetWidth > max_width) {
-                        max_width = tab_content.offsetWidth;
+                    if (tabContent.offsetWidth > maxWidth) {
+                        maxWidth = tabContent.offsetWidth;
                     }
                 }
 
                 // Finally hide the tab
-                tab_content.removeClass("sr-tab-active");
+                tabContent.removeClass("sr-tab-active");
             }
 
             // Remove active status from all buttons
             // Do not get all tab buttons that exist,
             //  because there might be multiple tab systems open at the same time.
-            const adjacent_tab_buttons = tab_header.findAll(".sr-tab-header-button");
-            for (const index in adjacent_tab_buttons) {
-                const tab_button = adjacent_tab_buttons[index];
-                tab_button.removeClass("sr-tab-active");
+            const adjacentTabButtons = tabHeader.findAll(".sr-tab-header-button");
+            for (const index in adjacentTabButtons) {
+                const tabButton = adjacentTabButtons[index];
+                tabButton.removeClass("sr-tab-active");
             }
 
             // Activate the clicked tab
-            tab_button.addClass("sr-tab-active");
+            tabButton.addClass("sr-tab-active");
             const activateTabAttribute: Attr | null =
-                tab_button.attributes.getNamedItem("activateTab");
+                tabButton.attributes.getNamedItem("activateTab");
             if (null === activateTabAttribute) {
                 throw new Error("Tab button has no 'activateTab' HTML attribute! Murr!");
             }
-            const activate_tab_id = activateTabAttribute.value;
-            const tab_content: HTMLElement | null = document.getElementById(activate_tab_id);
-            if (null === tab_content) {
+            const activateTabId = activateTabAttribute.value;
+            const tabContent: HTMLElement | null = document.getElementById(activateTabId);
+            if (null === tabContent) {
                 throw new Error(
-                    "No tab content was found with activate_tab_id '" +
-                        activate_tab_id +
-                        "'! Hmph!",
+                    "No tab content was found with activate_tab_id '" + activateTabId + "'! Hmph!",
                 );
             }
-            tab_content.addClass("sr-tab-active");
+            tabContent.addClass("sr-tab-active");
 
             // Mark the clicked tab as active in TabStructure (just to report which tab is currently active)
             // Remove "sr-tab" prefix.
-            tab_structure.active_tab_id = activate_tab_id.replace(/^sr-tab-/, "");
+            tabStructure.activeTabId = activateTabId.replace(/^sr-tab-/, "");
 
             // Focus an element (if a focusable element is present)
             // ? = If not found, do nothing.
-            tab_content.find(".sr-focus-element-on-tab-opening")?.focus();
+            tabContent.find(".sr-focus-element-on-tab-opening")?.focus();
 
             // Apply the max dimensions to this tab
             // But don't do it if this is the main settings modal
-            if (!is_main_settings_modal) {
-                tab_content.style.width = max_width + "px";
-                tab_content.style.height = max_height + "px";
+            if (!isMainSettingsModal) {
+                tabContent.style.width = maxWidth + "px";
+                tabContent.style.height = maxHeight + "px";
             }
 
             // Do nothing else (I don't know if this is needed or not)
@@ -173,27 +171,27 @@ export function createTabs(
         if (tab.icon) setIcon(button, tab.icon);
 
         button.insertAdjacentHTML("beforeend", <span style="padding-left: 5px;">{tab.title}</span>);
-        tab_buttons[tab_id] = button;
+        tabButtons[tabId] = button;
 
         // Create content container
-        tab_content_containers[tab_id] = containerElement.createEl("div", {
-            attr: { class: "sr-tab-content", id: "sr-tab-" + tab_id },
+        tabContentContainers[tabId] = containerElement.createEl("div", {
+            attr: { class: "sr-tab-content", id: "sr-tab-" + tabId },
         });
 
         // Generate content
-        tab_structure.contentGeneratorPromises[tab_id] = tab.content_generator(
-            tab_content_containers[tab_id],
+        tabStructure.contentGeneratorPromises[tabId] = tab.contentGenerator(
+            tabContentContainers[tabId],
         );
 
         // Memorize the first tab's button
-        if (undefined === first_button) {
-            first_button = button;
+        if (undefined === firstButton) {
+            firstButton = button;
         }
     }
 
     // Open a tab.
-    tab_buttons[activateTabId].click();
+    tabButtons[activateTabId].click();
 
     // Return the TabStructure
-    return tab_structure;
+    return tabStructure;
 }

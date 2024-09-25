@@ -3,11 +3,11 @@ import { TagCache } from "obsidian";
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { Card } from "src/card";
 import { DataStore } from "src/data-stores/base/data-store";
+import { frontmatterTagPseudoLineNum, ISRFile } from "src/file";
 import { ParsedQuestionInfo, parseEx, ParserOptions } from "src/parser";
 import { Question, QuestionText } from "src/question";
 import { CardFrontBack, CardFrontBackUtil } from "src/question-type";
 import { SettingsUtil, SRSettings } from "src/settings";
-import { frontmatterTagPseudoLineNum, ISRFile } from "src/sr-file";
 import { TopicPath, TopicPathList } from "src/topic-path";
 import {
     splitNoteIntoFrontmatterAndContent,
@@ -321,19 +321,17 @@ export class NoteQuestionParser {
         return new TopicPathList(list, lineNum);
     }
 
-    private createTopicPathList_FromSingleTag(tagCache: TagCache): TopicPathList {
+    private createTopicPathListFromSingleTag(tagCache: TagCache): TopicPathList {
         const list: TopicPath[] = [TopicPath.getTopicPathFromTag(tagCache.tag)];
         return new TopicPathList(list, tagCache.position.start.line);
     }
 
-    //
     // A question can be associated with multiple topics (hence returning TopicPathList and not just TopicPath).
     //
     // If the question has an associated question specific TopicPath, then that is returned.
     //
     // Else the first TopicPathList prior to the question (in the order present in the file) is returned.
     // That could be either the tags within the note's frontmatter, or tags on lines within the note's content.
-    //
     private determineQuestionTopicPathList(question: Question): TopicPathList {
         let result: TopicPathList;
         if (this.settings.convertFoldersToDecks) {
@@ -363,7 +361,7 @@ export class NoteQuestionParser {
                 // if nothing matched, then use the first one
                 // This could occur if the only topic tags present are question specific
                 if (!result && this.flashcardTagList.length > 0) {
-                    result = this.createTopicPathList_FromSingleTag(this.flashcardTagList[0]);
+                    result = this.createTopicPathListFromSingleTag(this.flashcardTagList[0]);
                 }
             }
         }

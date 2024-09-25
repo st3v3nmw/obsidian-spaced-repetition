@@ -16,7 +16,7 @@ function applySettingsUpdate(callback: () => void): void {
 
 export class SRSettingTab extends PluginSettingTab {
     private plugin: SRPlugin;
-    private tab_structure: TabStructure;
+    private tabStructure: TabStructure;
     private statistics: StatisticsView;
 
     constructor(app: App, plugin: SRPlugin) {
@@ -34,37 +34,41 @@ export class SRSettingTab extends PluginSettingTab {
         });
         header.addClass("sr-centered");
 
-        this.tab_structure = createTabs(
+        this.tabStructure = createTabs(
             containerEl,
             {
                 "main-flashcards": {
                     title: t("FLASHCARDS"),
                     icon: "SpacedRepIcon",
-                    content_generator: (containerElement: HTMLElement) =>
+                    contentGenerator: (containerElement: HTMLElement) =>
                         this.tabFlashcards(containerElement),
                 },
                 "main-notes": {
                     title: t("NOTES"),
                     icon: "book-text",
-                    content_generator: (containerElement: HTMLElement) =>
+                    contentGenerator: (containerElement: HTMLElement) =>
                         this.tabNotes(containerElement),
                 },
                 "main-algorithm": {
                     title: t("SCHEDULING"),
                     icon: "calendar",
-                    content_generator: (containerElement: HTMLElement) =>
+                    contentGenerator: (containerElement: HTMLElement) =>
                         this.tabScheduling(containerElement),
                 },
                 "main-ui-preferences": {
                     title: t("UI"),
                     icon: "presentation",
-                    content_generator: (containerElement: HTMLElement) =>
+                    contentGenerator: (containerElement: HTMLElement) =>
                         this.tabUiPreferences(containerElement),
                 },
                 "main-statistics": {
                     title: t("STATS_TITLE"),
                     icon: "bar-chart-3",
-                    content_generator: async (containerElement: HTMLElement): Promise<void> => {
+                    contentGenerator: async (containerElement: HTMLElement): Promise<void> => {
+                        if (this.plugin.osrAppCore.cardStats == null) {
+                            await this.plugin.sync();
+                        }
+
                         this.statistics = new StatisticsView(
                             containerElement,
                             this.plugin.osrAppCore,
@@ -75,17 +79,17 @@ export class SRSettingTab extends PluginSettingTab {
                 "main-help": {
                     title: t("HELP"),
                     icon: "badge-help",
-                    content_generator: (containerElement: HTMLElement) =>
+                    contentGenerator: (containerElement: HTMLElement) =>
                         this.tabHelp(containerElement),
                 },
             },
-            this.last_position.tab_name,
+            this.lastPosition.tabName,
         );
 
         // KEEP THIS AFTER CREATING ALL ELEMENTS:
         // Scroll to the position when the settings modal was last open,
         //  but do it after content generating has finished.
-        this.tab_structure.contentGeneratorPromises[this.tab_structure.active_tab_id].then(() => {
+        this.tabStructure.contentGeneratorPromises[this.tabStructure.activeTabId].then(() => {
             this.rememberLastPosition(containerEl);
         });
     }
@@ -123,7 +127,7 @@ export class SRSettingTab extends PluginSettingTab {
                     }),
             );
 
-        this.createSetting_FoldersToIgnore(containerEl);
+        this.createSettingFoldersToIgnore(containerEl);
 
         containerEl.createEl("h3", { text: t("GROUP_FLASHCARD_REVIEW") });
         new Setting(containerEl)
@@ -166,9 +170,11 @@ export class SRSettingTab extends PluginSettingTab {
                 .addOptions(
                     deckOrderEnabled
                         ? {
+                              // eslint-disable-next-line camelcase
                               PrevDeckComplete_Sequential: t(
                                   "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
                               ),
+                              // eslint-disable-next-line camelcase
                               PrevDeckComplete_Random: t(
                                   "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
                               ),
@@ -376,7 +382,7 @@ export class SRSettingTab extends PluginSettingTab {
                     }),
             );
 
-        this.createSetting_FoldersToIgnore(containerEl);
+        this.createSettingFoldersToIgnore(containerEl);
 
         containerEl.createEl("h3", { text: t("NOTES_REVIEW_QUEUE") });
         new Setting(containerEl).setName(t("AUTO_NEXT_NOTE")).addToggle((toggle) =>
@@ -445,7 +451,7 @@ export class SRSettingTab extends PluginSettingTab {
             });
     }
 
-    private async createSetting_FoldersToIgnore(containerEl: HTMLElement): Promise<void> {
+    private async createSettingFoldersToIgnore(containerEl: HTMLElement): Promise<void> {
         new Setting(containerEl)
             .setName(t("FOLDERS_TO_IGNORE"))
             .setDesc(t("FOLDERS_TO_IGNORE_DESC"))
@@ -681,7 +687,7 @@ export class SRSettingTab extends PluginSettingTab {
         algoSettingEl.descEl.insertAdjacentHTML(
             "beforeend",
             t("CHECK_ALGORITHM_WIKI", {
-                algo_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
+                algoUrl: "https://www.stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
             }),
         );
         algoSettingEl.addDropdown((dropdown) =>
@@ -887,14 +893,14 @@ export class SRSettingTab extends PluginSettingTab {
         containerEl.createEl("p").insertAdjacentHTML(
             "beforeend",
             t("CHECK_WIKI", {
-                wiki_url: "https://www.stephenmwangi.com/obsidian-spaced-repetition/",
+                wikiUrl: "https://www.stephenmwangi.com/obsidian-spaced-repetition/",
             }),
         );
 
         containerEl.createEl("p").insertAdjacentHTML(
             "beforeend",
             t("GITHUB_DISCUSSIONS", {
-                discussions_url:
+                discussionsUrl:
                     "https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/",
             }),
         );
@@ -902,7 +908,7 @@ export class SRSettingTab extends PluginSettingTab {
         containerEl.createEl("p").insertAdjacentHTML(
             "beforeend",
             t("GITHUB_ISSUES", {
-                issues_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/",
+                issuesUrl: "https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/",
             }),
         );
 
@@ -930,14 +936,14 @@ export class SRSettingTab extends PluginSettingTab {
         containerEl.createEl("p").insertAdjacentHTML(
             "beforeend",
             t("GITHUB_SOURCE_CODE", {
-                github_project_url: "https://github.com/st3v3nmw/obsidian-spaced-repetition",
+                githubProjectUrl: "https://github.com/st3v3nmw/obsidian-spaced-repetition",
             }),
         );
 
         containerEl.createEl("p").insertAdjacentHTML(
             "beforeend",
             t("CODE_CONTRIBUTION_INFO", {
-                code_contribution_url:
+                codeContributionUrl:
                     "https://www.stephenmwangi.com/obsidian-spaced-repetition/contributing/#code",
             }),
         );
@@ -945,39 +951,39 @@ export class SRSettingTab extends PluginSettingTab {
         containerEl.createEl("p").insertAdjacentHTML(
             "beforeend",
             t("TRANSLATION_CONTRIBUTION_INFO", {
-                translation_contribution_url:
+                translationContributionUrl:
                     "https://www.stephenmwangi.com/obsidian-spaced-repetition/contributing/#translating",
             }),
         );
     }
 
-    private last_position: {
-        scroll_position: number;
-        tab_name: string;
+    private lastPosition: {
+        scrollPosition: number;
+        tabName: string;
     } = {
-        scroll_position: 0,
-        tab_name: "main-flashcards",
+        scrollPosition: 0,
+        tabName: "main-flashcards",
     };
     private rememberLastPosition(containerElement: HTMLElement) {
-        const last_position = this.last_position;
+        const lastPosition = this.lastPosition;
 
         // Go to last position now
-        this.tab_structure.buttons[last_position.tab_name].click();
+        this.tabStructure.buttons[lastPosition.tabName].click();
         // Need to delay the scrolling a bit.
         // Without this, something else would override scrolling and scroll back to 0.
         containerElement.scrollTo({
-            top: this.last_position.scroll_position,
+            top: this.lastPosition.scrollPosition,
             behavior: "auto",
         });
 
         // Listen to changes
         containerElement.addEventListener("scroll", (_) => {
-            this.last_position.scroll_position = containerElement.scrollTop;
+            this.lastPosition.scrollPosition = containerElement.scrollTop;
         });
-        for (const tab_name in this.tab_structure.buttons) {
-            const button = this.tab_structure.buttons[tab_name];
+        for (const tabName in this.tabStructure.buttons) {
+            const button = this.tabStructure.buttons[tabName];
             button.onClickEvent((_: MouseEvent) => {
-                last_position.tab_name = tab_name;
+                lastPosition.tabName = tabName;
             });
         }
     }

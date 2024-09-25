@@ -28,7 +28,7 @@ export interface IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[];
 }
 
-class QuestionType_SingleLineBasic implements IQuestionTypeHandler {
+class QuestionTypeSingleLineBasic implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
         const idx: number = questionText.indexOf(settings.singleLineCardSeparator);
         const item: CardFrontBack = new CardFrontBack(
@@ -40,7 +40,7 @@ class QuestionType_SingleLineBasic implements IQuestionTypeHandler {
     }
 }
 
-class QuestionType_SingleLineReversed implements IQuestionTypeHandler {
+class QuestionTypeSingleLineReversed implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
         const idx: number = questionText.indexOf(settings.singleLineReversedCardSeparator);
         const side1: string = questionText.substring(0, idx),
@@ -55,7 +55,7 @@ class QuestionType_SingleLineReversed implements IQuestionTypeHandler {
     }
 }
 
-class QuestionType_MultiLineBasic implements IQuestionTypeHandler {
+class QuestionTypeMultiLineBasic implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
         // We don't need to worry about "\r\n", as multi line questions processed by parse() concatenates lines explicitly with "\n"
         const questionLines = questionText.split("\n");
@@ -71,7 +71,7 @@ class QuestionType_MultiLineBasic implements IQuestionTypeHandler {
     }
 }
 
-class QuestionType_MultiLineReversed implements IQuestionTypeHandler {
+class QuestionTypeMultiLineReversed implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
         // We don't need to worry about "\r\n", as multi line questions processed by parse() concatenates lines explicitly with "\n"
         const questionLines = questionText.split("\n");
@@ -90,7 +90,7 @@ class QuestionType_MultiLineReversed implements IQuestionTypeHandler {
     }
 }
 
-class QuestionType_Cloze implements IQuestionTypeHandler {
+class QuestionTypeCloze implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
         const siblings: RegExpMatchArray[] = [];
         if (settings.convertHighlightsToClozes) {
@@ -120,16 +120,16 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
                 deletionEnd: number = deletionStart + m[0].length;
             front =
                 questionText.substring(0, deletionStart) +
-                QuestionType_ClozeUtil.renderClozeFront() +
+                QuestionTypeClozeUtil.renderClozeFront() +
                 questionText.substring(deletionEnd);
-            front = QuestionType_ClozeUtil.removeClozeTokens(front, settings);
+            front = QuestionTypeClozeUtil.removeClozeTokens(front, settings);
             back =
                 questionText.substring(0, deletionStart) +
-                QuestionType_ClozeUtil.renderClozeBack(
+                QuestionTypeClozeUtil.renderClozeBack(
                     questionText.substring(deletionStart, deletionEnd),
                 ) +
                 questionText.substring(deletionEnd);
-            back = QuestionType_ClozeUtil.removeClozeTokens(back, settings);
+            back = QuestionTypeClozeUtil.removeClozeTokens(back, settings);
             result.push(new CardFrontBack(front, back));
         }
 
@@ -137,7 +137,7 @@ class QuestionType_Cloze implements IQuestionTypeHandler {
     }
 }
 
-export class QuestionType_ClozeUtil {
+export class QuestionTypeClozeUtil {
     static renderClozeFront(): string {
         return "<span style='color:#2196f3'>[...]</span>";
     }
@@ -162,19 +162,19 @@ export class QuestionTypeFactory {
         let handler: IQuestionTypeHandler;
         switch (questionType) {
             case CardType.SingleLineBasic:
-                handler = new QuestionType_SingleLineBasic();
+                handler = new QuestionTypeSingleLineBasic();
                 break;
             case CardType.SingleLineReversed:
-                handler = new QuestionType_SingleLineReversed();
+                handler = new QuestionTypeSingleLineReversed();
                 break;
             case CardType.MultiLineBasic:
-                handler = new QuestionType_MultiLineBasic();
+                handler = new QuestionTypeMultiLineBasic();
                 break;
             case CardType.MultiLineReversed:
-                handler = new QuestionType_MultiLineReversed();
+                handler = new QuestionTypeMultiLineReversed();
                 break;
             case CardType.Cloze:
-                handler = new QuestionType_Cloze();
+                handler = new QuestionTypeCloze();
                 break;
         }
         return handler;

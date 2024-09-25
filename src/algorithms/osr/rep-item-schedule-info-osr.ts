@@ -4,7 +4,7 @@ import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info"
 import { SRSettings } from "src/settings";
 import { DateUtil, globalDateProvider } from "src/utils/dates";
 
-export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
+export class RepItemScheduleInfoOsr extends RepItemScheduleInfo {
     // A question can have multiple cards. The schedule info for all sibling cards are formatted together
     // in a single <!--SR: --> comment, such as:
     // <!--SR:!2023-09-02,4,270!2023-09-02,5,270!2023-09-02,6,270!2023-09-02,7,270-->
@@ -34,7 +34,7 @@ export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
         // We always want the correct schedule format, so we use the dummy due date if there is no schedule for a card
         const dateStr: string = this.dueDate
             ? this.formatDueDate()
-            : RepItemScheduleInfo_Osr.dummyDueDateForNewCard;
+            : RepItemScheduleInfoOsr.dummyDueDateForNewCard;
         return `!${dateStr},${this.interval},${this.latestEase}`;
     }
 
@@ -42,10 +42,10 @@ export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
         return 1.0;
     }
 
-    static getDummyScheduleForNewCard(settings: SRSettings): RepItemScheduleInfo_Osr {
-        return RepItemScheduleInfo_Osr.fromDueDateStr(
-            RepItemScheduleInfo_Osr.dummyDueDateForNewCard,
-            RepItemScheduleInfo_Osr.initialInterval,
+    static getDummyScheduleForNewCard(settings: SRSettings): RepItemScheduleInfoOsr {
+        return RepItemScheduleInfoOsr.fromDueDateStr(
+            RepItemScheduleInfoOsr.dummyDueDateForNewCard,
+            RepItemScheduleInfoOsr.initialInterval,
             settings.baseEase,
         );
     }
@@ -57,6 +57,6 @@ export class RepItemScheduleInfo_Osr extends RepItemScheduleInfo {
         delayedBeforeReviewTicks: number | null = null,
     ) {
         const dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
-        return new RepItemScheduleInfo_Osr(dueDate, interval, ease, delayedBeforeReviewTicks);
+        return new RepItemScheduleInfoOsr(dueDate, interval, ease, delayedBeforeReviewTicks);
     }
 }

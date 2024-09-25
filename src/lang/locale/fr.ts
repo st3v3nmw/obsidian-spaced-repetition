@@ -59,19 +59,17 @@ export default {
     GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
     GROUP_CONTRIBUTING: "Contribuer",
-    CHECK_WIKI: 'Pour plus d\'informations, visitez le <a href="${wiki_url}">wiki</a>.',
+    CHECK_WIKI: 'Pour plus d\'informations, visitez le <a href="${wikiUrl}">wiki</a>.',
     GITHUB_DISCUSSIONS:
-        'Visitez les <a href="${discussions_url}">discussions</a> pour des questions-réponses, des retours ou une discussion généraliste.',
+        'Visitez les <a href="${discussionsUrl}">discussions</a> pour des questions-réponses, des retours ou une discussion généraliste.',
     GITHUB_ISSUES:
-        'Créez un ticket <a href="${issues_url}">sur GitHub</a> si vous trouvez un bug ou voulez demander une fonctionnalité.',
+        'Créez un ticket <a href="${issuesUrl}">sur GitHub</a> si vous trouvez un bug ou voulez demander une fonctionnalité.',
     GITHUB_SOURCE_CODE:
-        'Code source du projet disponible sur <a href="${github_project_url}">GitHub</a>',
+        'Code source du projet disponible sur <a href="${githubProjectUrl}">GitHub</a>',
     CODE_CONTRIBUTION_INFO:
-        'Information sur les <a href="${code_contribution_url}">contributions au code</a>',
+        'Information sur les <a href="${codeContributionUrl}">contributions au code</a>',
     TRANSLATION_CONTRIBUTION_INFO:
-        'Informations sur la <a href="${translation_contribution_url}">traduction du plugin</a> dans votre langue',
-    PROJECT_CONTRIBUTIONS:
-        'Créez un ticket <a href="${issues_url}">sur GitHub</a> si vous trouvez un bug ou voulez demander une fonctionnalité',
+        'Informations sur la <a href="${translationContributionUrl}">traduction du plugin</a> dans votre langue',
     FOLDERS_TO_IGNORE: "Dossiers à ignorer",
     FOLDERS_TO_IGNORE_DESC:
         "Enter folder paths or glob patterns on separate lines e.g. Templates/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
@@ -157,7 +155,7 @@ export default {
         "Désactivez pour réduire les paquets dans la même carte. Ce réglage est utile si vous avez des cartes qui appartiennent à beaucoup de paquets à la fois.",
     ALGORITHM: "Algorithme",
     CHECK_ALGORITHM_WIKI:
-        "Pour en savoir plus, lisez l'<a href=\"${algo_url}\">implémentation de l'algorithme</a>.",
+        "Pour en savoir plus, lisez l'<a href=\"${algoUrl}\">implémentation de l'algorithme</a>.",
     SM2_OSR_VARIANT: "OSR's variant of SM-2",
     BASE_EASE: "Facilité de base",
     BASE_EASE_DESC: "minimum = 130, recommandé = vers 250.",

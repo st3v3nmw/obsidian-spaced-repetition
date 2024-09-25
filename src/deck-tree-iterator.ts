@@ -185,7 +185,6 @@ class SingleDeckIterator {
     }
 }
 
-//
 // Note that this iterator is destructive over the deck tree supplied to setBaseDeck()
 // The caller is required to first make a clone if this behavior is unwanted.
 //
@@ -198,7 +197,6 @@ class SingleDeckIterator {
 //
 //      1. Whilst iterating, any multi-deck card is only returned once.
 //      2. All copies are removed from the deck tree supplied to setBaseDeck()
-//
 export class DeckTreeIterator implements IDeckTreeIterator {
     private iteratorOrder: IIteratorOrder;
 
@@ -280,7 +278,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         }
 
         if (this.iteratorOrder.cardOrder == CardOrder.EveryCardRandomDeckAndCard) {
-            result = this.nextCard_EveryCardRandomDeck();
+            result = this.nextCardEveryCardRandomDeck();
         } else {
             // If we are just starting, then depending on settings we want to either start from the first deck,
             // or a random deck
@@ -325,12 +323,13 @@ export class DeckTreeIterator implements IDeckTreeIterator {
                 break;
             }
         }
+
         if (this.deckIdx < this.deckArray.length) {
             this.singleDeckIterator.setDeck(this.deckArray[this.deckIdx]);
         }
     }
 
-    private nextCard_EveryCardRandomDeck(): boolean {
+    private nextCardEveryCardRandomDeck(): boolean {
         // Make the chance of picking a specific deck proportional to the number of cards within
         const weights: Record<number, number> = {};
         for (let i = 0; i < this.deckArray.length; i++) {

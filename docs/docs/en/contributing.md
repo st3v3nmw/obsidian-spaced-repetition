@@ -48,7 +48,7 @@ export default {
     SHOW_ANSWER: "Show Answer",
     DAYS_STR_IVL: "${interval} days",
     CHECK_ALGORITHM_WIKI:
-        'For more information, check the <a href="${algo_url}">algorithm implementation</a>.',
+        'For more information, check the <a href="${algoUrl}">algorithm implementation</a>.',
 };
 ```
 
@@ -62,7 +62,7 @@ export default {
     SHOW_ANSWER: "Onyesha Jibu",
     DAYS_STR_IVL: "Siku ${interval}",
     CHECK_ALGORITHM_WIKI:
-        'Kwa habari zaidi, angalia <a href="${algo_url}">utekelezaji wa algorithm</a>.',
+        'Kwa habari zaidi, angalia <a href="${algoUrl}">utekelezaji wa algorithm</a>.',
 };
 ```
 

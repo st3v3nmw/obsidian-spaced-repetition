@@ -1,13 +1,13 @@
 import { DueDateHistogram } from "src/due-date-histogram";
 import { DEFAULT_SETTINGS } from "src/settings";
-import { setupStaticDateProvider, setupStaticDateProvider_20230906 } from "src/utils/dates";
+import { setupStaticDateProvider, setupStaticDateProvider20230906 } from "src/utils/dates";
 
 import { UnitTestOsrCore } from "./helpers/unit-test-core";
-import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
+import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 
 beforeAll(() => {
-    setupStaticDateProvider_20230906();
-    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    setupStaticDateProvider20230906();
+    unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 function checkHistogramValue(histogram: DueDateHistogram, nDays: number, expectedValue: number) {

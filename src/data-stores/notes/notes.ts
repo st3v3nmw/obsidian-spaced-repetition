@@ -2,14 +2,14 @@ import { Moment } from "moment";
 import { App } from "obsidian";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR } from "src/constants";
 import { IDataStore } from "src/data-stores/base/data-store";
 import { RepItemStorageInfo } from "src/data-stores/base/rep-item-storage-info";
 import { NoteEaseList } from "src/note-ease-list";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
-import { DateUtil, formatDate_YYYY_MM_DD, globalDateProvider } from "src/utils/dates";
+import { DateUtil, formatDateYYYYMMDD, globalDateProvider } from "src/utils/dates";
 
 export class StoreInNotes implements IDataStore {
     private settings: SRSettings;
@@ -40,14 +40,14 @@ export class StoreInNotes implements IDataStore {
             let info: RepItemScheduleInfo;
             if (
                 dueDate == null ||
-                formatDate_YYYY_MM_DD(dueDate) == RepItemScheduleInfo_Osr.dummyDueDateForNewCard
+                formatDateYYYYMMDD(dueDate) == RepItemScheduleInfoOsr.dummyDueDateForNewCard
             ) {
                 info = null;
             } else {
                 const delayBeforeReviewTicks: number =
                     dueDate.valueOf() - globalDateProvider.today.valueOf();
 
-                info = new RepItemScheduleInfo_Osr(dueDate, interval, ease, delayBeforeReviewTicks);
+                info = new RepItemScheduleInfoOsr(dueDate, interval, ease, delayBeforeReviewTicks);
             }
             result.push(info);
         }

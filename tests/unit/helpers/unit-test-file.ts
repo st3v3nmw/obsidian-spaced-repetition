@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import { TagCache, TFile } from "obsidian";
 
-import { ISRFile } from "src/sr-file";
+import { ISRFile } from "src/file";
 import { TextDirection } from "src/utils/strings";
 
-import { unitTest_BasicFrontmatterParser, unitTest_GetAllTagsFromTextEx } from "./unit-test-helper";
+import { unitTestBasicFrontmatterParser, unitTestGetAllTagsFromTextEx } from "./unit-test-helper";
 
 export class UnitTestSRFile implements ISRFile {
     content: string;
@@ -28,15 +28,15 @@ export class UnitTestSRFile implements ISRFile {
     }
 
     async getFrontmatter(): Promise<Map<string, string>> {
-        return unitTest_BasicFrontmatterParser(await this.read());
+        return unitTestBasicFrontmatterParser(await this.read());
     }
 
     getAllTagsFromCache(): string[] {
-        return unitTest_GetAllTagsFromTextEx(this.content).map((item) => item.tag);
+        return unitTestGetAllTagsFromTextEx(this.content).map((item) => item.tag);
     }
 
     getAllTagsFromText(): TagCache[] {
-        return unitTest_GetAllTagsFromTextEx(this.content);
+        return unitTestGetAllTagsFromTextEx(this.content);
     }
 
     getQuestionContext(_: number): string[] {

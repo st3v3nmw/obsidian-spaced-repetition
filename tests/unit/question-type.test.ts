@@ -1,5 +1,5 @@
 import { CardType } from "src/question";
-import { CardFrontBack, CardFrontBackUtil, QuestionType_ClozeUtil } from "src/question-type";
+import { CardFrontBack, CardFrontBackUtil, QuestionTypeClozeUtil } from "src/question-type";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 
 test("CardType.SingleLineBasic", () => {
@@ -37,7 +37,7 @@ test("CardType.MultiLineReversed", () => {
 });
 
 test("CardType.Cloze", () => {
-    const frontHtml = QuestionType_ClozeUtil.renderClozeFront();
+    const frontHtml = QuestionTypeClozeUtil.renderClozeFront();
 
     expect(
         CardFrontBackUtil.expand(
@@ -48,7 +48,7 @@ test("CardType.Cloze", () => {
     ).toEqual([
         new CardFrontBack(
             "This is a very " + frontHtml + " test",
-            "This is a very " + QuestionType_ClozeUtil.renderClozeBack("interesting") + " test",
+            "This is a very " + QuestionTypeClozeUtil.renderClozeBack("interesting") + " test",
         ),
     ]);
 
@@ -62,7 +62,7 @@ test("CardType.Cloze", () => {
     ).toEqual([
         new CardFrontBack(
             "This is a very " + frontHtml + " test",
-            "This is a very " + QuestionType_ClozeUtil.renderClozeBack("interesting") + " test",
+            "This is a very " + QuestionTypeClozeUtil.renderClozeBack("interesting") + " test",
         ),
     ]);
 
@@ -71,7 +71,7 @@ test("CardType.Cloze", () => {
     ).toEqual([
         new CardFrontBack(
             "This is a very " + frontHtml + " test",
-            "This is a very " + QuestionType_ClozeUtil.renderClozeBack("interesting") + " test",
+            "This is a very " + QuestionTypeClozeUtil.renderClozeBack("interesting") + " test",
         ),
     ]);
 

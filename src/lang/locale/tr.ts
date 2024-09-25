@@ -58,19 +58,17 @@ export default {
     GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flash Kartlar ve Notlar",
     GROUP_CONTRIBUTING: "Katkıda Bulunma",
-    CHECK_WIKI: 'Daha fazla bilgi için <a href="${wiki_url}">wiki</a> sayfasına göz atın.',
+    CHECK_WIKI: 'Daha fazla bilgi için <a href="${wikiUrl}">wiki</a> sayfasına göz atın.',
     GITHUB_DISCUSSIONS:
-        'Soru-cevap, geri bildirim ve genel tartışmalar için <a href="${discussions_url}">tartışmalar</a> bölümüne göz atın.',
+        'Soru-cevap, geri bildirim ve genel tartışmalar için <a href="${discussionsUrl}">tartışmalar</a> bölümüne göz atın.',
     GITHUB_ISSUES:
-        'Bir özellik isteğiniz ya da hata bildiriminiz varsa <a href="${issues_url}">buradan</a> bildirin.',
+        'Bir özellik isteğiniz ya da hata bildiriminiz varsa <a href="${issuesUrl}">buradan</a> bildirin.',
     GITHUB_SOURCE_CODE:
-        'Proje kaynak koduna <a href="${github_project_url}">GitHub</a> üzerinden ulaşabilirsiniz.',
+        'Proje kaynak koduna <a href="${githubProjectUrl}">GitHub</a> üzerinden ulaşabilirsiniz.',
     CODE_CONTRIBUTION_INFO:
-        '<a href="${code_contribution_url}">Kod katkıları</a> hakkında bilgi alın.',
+        '<a href="${codeContributionUrl}">Kod katkıları</a> hakkında bilgi alın.',
     TRANSLATION_CONTRIBUTION_INFO:
-        'Eklentiyi kendi dilinize çevirmek hakkında bilgi için <a href="${translation_contribution_url}">çeviri katkıları</a> sayfasını ziyaret edin.',
-    PROJECT_CONTRIBUTIONS:
-        'Bir özellik isteğiniz ya da hata bildiriminiz varsa <a href="${issues_url}">buradan</a> bildirin.',
+        'Eklentiyi kendi dilinize çevirmek hakkında bilgi için <a href="${translationContributionUrl}">çeviri katkıları</a> sayfasını ziyaret edin.',
     FOLDERS_TO_IGNORE: "Yoksayılan Klasörler",
     FOLDERS_TO_IGNORE_DESC:
         "Enter folder paths or glob patterns on separate lines e.g. Templates/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
@@ -155,7 +153,7 @@ export default {
         "Bunu kapatın, aynı dosyada birçok desteye ait kartlarınız varsa iç içe desteleri daraltmak için kullanışlıdır.",
     ALGORITHM: "Algoritma",
     CHECK_ALGORITHM_WIKI:
-        'Daha fazla bilgi için <a href="${algo_url}">algoritma uygulamasına</a> göz atın.',
+        'Daha fazla bilgi için <a href="${algoUrl}">algoritma uygulamasına</a> göz atın.',
     SM2_OSR_VARIANT: "OSR's variant of SM-2",
     BASE_EASE: "Temel kolaylık",
     BASE_EASE_DESC: "minimum = 130, tercihen yaklaşık 250.",

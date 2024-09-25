@@ -58,19 +58,17 @@ export default {
     GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
     GROUP_CONTRIBUTING: "Contributing",
-    CHECK_WIKI: '瞭解更多, 請點選<a href="${wiki_url}">wiki</a>.',
+    CHECK_WIKI: '瞭解更多, 請點選<a href="${wikiUrl}">wiki</a>.',
     GITHUB_DISCUSSIONS:
-        'Visit the <a href="${discussions_url}">discussions</a> section for Q&A help, feedback, and general discussion.',
+        'Visit the <a href="${discussionsUrl}">discussions</a> section for Q&A help, feedback, and general discussion.',
     GITHUB_ISSUES:
-        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report.',
+        'Raise an issue <a href="${issuesUrl}">here</a> if you have a feature request or a bug report.',
     GITHUB_SOURCE_CODE:
-        'The project\'s source code is available on <a href="${github_project_url}">GitHub</a>.',
+        'The project\'s source code is available on <a href="${githubProjectUrl}">GitHub</a>.',
     CODE_CONTRIBUTION_INFO:
-        '<a href="${code_contribution_url}">Here\'s</a> how to contribute code to the plugin.',
+        '<a href="${codeContributionUrl}">Here\'s</a> how to contribute code to the plugin.',
     TRANSLATION_CONTRIBUTION_INFO:
-        '<a href="${translation_contribution_url}">Here\'s</a> how to translate the plugin to another language.',
-    PROJECT_CONTRIBUTIONS:
-        'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report',
+        '<a href="${translationContributionUrl}">Here\'s</a> how to translate the plugin to another language.',
     FOLDERS_TO_IGNORE: "忽略此資料夾",
     FOLDERS_TO_IGNORE_DESC:
         "Enter folder paths or glob patterns on separate lines e.g. Templates/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
@@ -142,7 +140,7 @@ export default {
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "關閉此選項可摺疊同一張卡片中的巢狀牌組。如果您的卡片屬於同一檔案中的許多套牌，則很有用。",
     ALGORITHM: "演算法",
-    CHECK_ALGORITHM_WIKI: '瞭解更多, 請點選<a href="${algo_url}">算法實現</a>.',
+    CHECK_ALGORITHM_WIKI: '瞭解更多, 請點選<a href="${algoUrl}">算法實現</a>.',
     SM2_OSR_VARIANT: "OSR's variant of SM-2",
     BASE_EASE: "基礎掌握程度",
     BASE_EASE_DESC: "最小值130，推薦值約250.",

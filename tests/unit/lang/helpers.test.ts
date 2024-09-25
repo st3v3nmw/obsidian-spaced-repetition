@@ -1,20 +1,20 @@
 test("Check that localization entries are consistent across all files", () => {
     jest.isolateModules(() => {
         const { localeMap } = require("src/lang/helpers");
-        const expected_keys: string[] = Object.keys(localeMap["en"]);
-        for (const [language_code, locale] of Object.entries(localeMap) as [string, string[]][]) {
-            const locale_keys = Object.keys(locale);
-            if (locale_keys.length == 0 || language_code == "en") continue;
+        const expectedKeys: string[] = Object.keys(localeMap["en"]);
+        for (const [languageCode, locale] of Object.entries(localeMap) as [string, string[]][]) {
+            const localeKeys = Object.keys(locale);
+            if (localeKeys.length == 0 || languageCode == "en") continue;
 
-            const unmapped_keys = expected_keys.filter((x) => !locale_keys.includes(x));
+            const unmappedKeys = expectedKeys.filter((x) => !localeKeys.includes(x));
             expect(
-                unmapped_keys.length,
-                `The ${language_code} locale does not include translations for: ${unmapped_keys}.`,
+                unmappedKeys.length,
+                `The ${languageCode} locale does not include translations for: ${unmappedKeys}.`,
             ).toBe(0);
-            const extra_keys = locale_keys.filter((x) => !expected_keys.includes(x));
+            const extraKeys = localeKeys.filter((x) => !expectedKeys.includes(x));
             expect(
-                extra_keys.length,
-                `The ${language_code} locale includes the following translations that are no longer in use: ${extra_keys}.`,
+                extraKeys.length,
+                `The ${languageCode} locale includes the following translations that are no longer in use: ${extraKeys}.`,
             ).toBe(0);
         }
     });

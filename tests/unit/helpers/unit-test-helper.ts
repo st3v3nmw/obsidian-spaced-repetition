@@ -1,9 +1,9 @@
 import { TagCache } from "obsidian";
 
-import { frontmatterTagPseudoLineNum } from "src/sr-file";
+import { frontmatterTagPseudoLineNum } from "src/file";
 import { splitNoteIntoFrontmatterAndContent, splitTextIntoLineArray } from "src/utils/strings";
 
-export function unitTest_CreateTagCacheObj(tag: string, line: number): TagCache {
+export function unitTestCreateTagCacheObj(tag: string, line: number): TagCache {
     return {
         tag: tag,
         position: {
@@ -13,7 +13,7 @@ export function unitTest_CreateTagCacheObj(tag: string, line: number): TagCache 
     };
 }
 
-export function unitTest_GetAllTagsFromTextEx(text: string): TagCache[] {
+export function unitTestGetAllTagsFromTextEx(text: string): TagCache[] {
     const [frontmatter, _] = splitNoteIntoFrontmatterAndContent(text);
     const result = [] as TagCache[];
     let lines: string[];
@@ -28,7 +28,7 @@ export function unitTest_GetAllTagsFromTextEx(text: string): TagCache[] {
                 if (line.startsWith(dataPrefix)) {
                     const tagStr: string = line.substring(dataPrefix.length);
                     result.push(
-                        unitTest_CreateTagCacheObj("#" + tagStr, frontmatterTagPseudoLineNum),
+                        unitTestCreateTagCacheObj("#" + tagStr, frontmatterTagPseudoLineNum),
                     );
                 } else {
                     break;
@@ -61,23 +61,23 @@ export function unitTest_GetAllTagsFromTextEx(text: string): TagCache[] {
     return result;
 }
 
-export function unitTest_GetAllTagsFromText(text: string): string[] {
+export function unitTestGetAllTagsFromText(text: string): string[] {
     const tagRegex = /#[^\s#]+/gi;
     const result: RegExpMatchArray = text.match(tagRegex);
     if (!result) return [];
     return result;
 }
 
-export function unitTest_BasicFrontmatterParser(text: string): Map<string, string> {
+export function unitTestBasicFrontmatterParser(text: string): Map<string, string> {
     const result = new Map<string, string>();
-    const map: Map<string, string[]> = unitTest_BasicFrontmatterParserEx(text);
+    const map: Map<string, string[]> = unitTestBasicFrontmatterParserEx(text);
     map.forEach((value, key) => {
         result.set(key, value.pop());
     });
     return result;
 }
 
-export function unitTest_BasicFrontmatterParserEx(text: string): Map<string, string[]> {
+export function unitTestBasicFrontmatterParserEx(text: string): Map<string, string[]> {
     const [frontmatter, _] = splitNoteIntoFrontmatterAndContent(text);
     const result = new Map<string, string[]>();
 
@@ -121,7 +121,7 @@ export function unitTest_BasicFrontmatterParserEx(text: string): Map<string, str
     return result;
 }
 
-export function unitTest_ParseForOutgoingLinks(text: string): string[] {
+export function unitTestParseForOutgoingLinks(text: string): string[] {
     const linkRegex = /\[\[([\w\s]+)\]\]+/gi;
     const matches = text.matchAll(linkRegex);
     const result: string[] = [] as string[];
@@ -131,13 +131,13 @@ export function unitTest_ParseForOutgoingLinks(text: string): string[] {
     return result;
 }
 
-export function unitTest_CheckNoteFrontmatter(
+export function unitTestCheckNoteFrontmatter(
     text: string,
     expectedDueDate: string,
     expectedInterval: number,
     expectedEase: number,
 ): void {
-    const frontmatter: Map<string, string> = unitTest_BasicFrontmatterParser(text);
+    const frontmatter: Map<string, string> = unitTestBasicFrontmatterParser(text);
 
     expect(frontmatter).toBeTruthy();
     expect(frontmatter.get("sr-due")).toEqual(expectedDueDate);

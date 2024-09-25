@@ -1,4 +1,4 @@
-import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { Card } from "src/card";
 import { TICKS_PER_DAY } from "src/constants";
 
@@ -14,7 +14,7 @@ describe("Card", () => {
             new Card({
                 front: "What year did Aegon's Conquest start?",
                 back: "2BC #flashcards",
-                scheduleInfo: RepItemScheduleInfo_Osr.fromDueDateStr(
+                scheduleInfo: RepItemScheduleInfoOsr.fromDueDateStr(
                     "2023-09-03",
                     1,
                     230,

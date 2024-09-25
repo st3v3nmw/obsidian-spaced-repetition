@@ -2,17 +2,17 @@ import { Note } from "src/note";
 import { NoteParser } from "src/note-parser";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { TopicPath } from "src/topic-path";
-import { setupStaticDateProvider_20230906 } from "src/utils/dates";
+import { setupStaticDateProvider20230906 } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
-import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
+import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 
 const parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 
 beforeAll(() => {
-    setupStaticDateProvider_20230906();
-    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    setupStaticDateProvider20230906();
+    unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 describe("Multiple questions in the text", () => {
