@@ -55,6 +55,7 @@ export default {
     GROUP_FLASHCARD_REVIEW: "Flashcard Review",
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
     GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
     GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: '瞭解更多, 請點選<a href="${wiki_url}">wiki</a>.',
@@ -63,11 +64,11 @@ export default {
     GITHUB_ISSUES:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report.',
     GITHUB_SOURCE_CODE:
-        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+        'The project\'s source code is available on <a href="${github_project_url}">GitHub</a>.',
     CODE_CONTRIBUTION_INFO:
-        'Information on <a href="${code_contribution_url}">code contributions</a>',
+        '<a href="${code_contribution_url}">Here\'s</a> how to contribute code to the plugin.',
     TRANSLATION_CONTRIBUTION_INFO:
-        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+        '<a href="${translation_contribution_url}">Here\'s</a> how to translate the plugin to another language.',
     PROJECT_CONTRIBUTIONS:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report',
     FOLDERS_TO_IGNORE: "忽略此資料夾",
@@ -81,7 +82,7 @@ export default {
     FLASHCARD_EASY_DESC: "自訂「簡單」按鈕的標籤",
     FLASHCARD_GOOD_DESC: "自訂「記得」按鈕的標籤",
     FLASHCARD_HARD_DESC: "自訂「較難」按鈕的標籤",
-    REVIEW_BUTTON_DELAY: "Button press delay (ms)",
+    REVIEW_BUTTON_DELAY: "Button Press Delay (ms)",
     REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "卡片標籤",
     FLASHCARD_TAGS_DESC: "輸入標籤（用空白或換行字元分隔），例如：#flashcards #deck2 #deck3.",
@@ -131,7 +132,7 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "右邊面板顯示的最大天數",
     MIN_ONE_DAY: "天數最小值為1",
     VALID_NUMBER_WARNING: "請輸入有效的數字。",
-    UI_PREFERENCES: "用戶介面首選項",
+    UI: "User Interface",
     SHOW_STATUS_BAR: "Show status bar",
     SHOW_STATUS_BAR_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
@@ -142,6 +143,7 @@ export default {
         "關閉此選項可摺疊同一張卡片中的巢狀牌組。如果您的卡片屬於同一檔案中的許多套牌，則很有用。",
     ALGORITHM: "演算法",
     CHECK_ALGORITHM_WIKI: '瞭解更多, 請點選<a href="${algo_url}">算法實現</a>.',
+    SM2_OSR_VARIANT: "OSR's variant of SM-2",
     BASE_EASE: "基礎掌握程度",
     BASE_EASE_DESC: "最小值130，推薦值約250.",
     BASE_EASE_MIN_WARNING: "基礎掌握程度的最小值為130。",
@@ -156,9 +158,12 @@ export default {
     MAX_LINK_CONTRIB: "最大鏈接貢獻",
     MAX_LINK_CONTRIB_DESC: "鏈接筆記的加權掌握程度對原始掌握程度的最大貢獻。",
     LOGGING: "記錄中",
-    DISPLAY_DEBUG_INFO: "在開發者控制台中顯示除錯資訊",
-    DISPLAY_PARSER_DEBUG_INFO:
-        "Display debugging information for the parser on the developer console",
+    DISPLAY_SCHEDULING_DEBUG_INFO: "在開發者控制台中顯示除錯資訊",
+    DISPLAY_PARSER_DEBUG_INFO: "Show the parser's debugging information on the developer console",
+    SCHEDULING: "Scheduling",
+    EXPERIMENTAL: "Experimental",
+    HELP: "Help",
+    STORE_IN_NOTES: "In the notes",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "筆記復習序列",

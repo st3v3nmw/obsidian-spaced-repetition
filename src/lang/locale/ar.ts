@@ -55,6 +55,7 @@ export default {
     GROUP_FLASHCARD_REVIEW: "Flashcard Review",
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
     GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
     GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: '.<a href="${wiki_url}">wiki</a> لمزيد من المعلومات ، تحقق من',
@@ -63,11 +64,11 @@ export default {
     GITHUB_ISSUES:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report.',
     GITHUB_SOURCE_CODE:
-        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+        'The project\'s source code is available on <a href="${github_project_url}">GitHub</a>.',
     CODE_CONTRIBUTION_INFO:
-        'Information on <a href="${code_contribution_url}">code contributions</a>',
+        '<a href="${code_contribution_url}">Here\'s</a> how to contribute code to the plugin.',
     TRANSLATION_CONTRIBUTION_INFO:
-        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+        '<a href="${translation_contribution_url}">Here\'s</a> how to translate the plugin to another language.',
     PROJECT_CONTRIBUTIONS:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report',
     FOLDERS_TO_IGNORE: "مجلدات لتجاهلها",
@@ -81,7 +82,7 @@ export default {
     FLASHCARD_EASY_DESC: '"تخصيص التسمية للزر "سهل',
     FLASHCARD_GOOD_DESC: '"تخصيص التسمية للزر "جيد',
     FLASHCARD_HARD_DESC: '"تخصيص التسمية للزر "صعب',
-    REVIEW_BUTTON_DELAY: "Button press delay (ms)",
+    REVIEW_BUTTON_DELAY: "Button Press Delay (ms)",
     REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "وُسوم البطاقات",
     FLASHCARD_TAGS_DESC: "#2أدخل الوُسوم مفصولة بمسافات أو أسطر جديدة ، أي بطاقات# رزمة3# رزمة",
@@ -137,7 +138,7 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "الحد الأقصى لعدد الأيام التي يجب عرضها على اللوحة اليمنى",
     MIN_ONE_DAY: "يجب أن يكون عدد الأيام 1 على الأقل",
     VALID_NUMBER_WARNING: "يرجى تقديم رقم صالح",
-    UI_PREFERENCES: "تفضيلات واجهة المستخدم",
+    UI: "User Interface",
     SHOW_STATUS_BAR: "Show status bar",
     SHOW_STATUS_BAR_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
@@ -148,8 +149,8 @@ export default {
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         " عطل هذا الخيار لطي الرُزم المتداخلة في نفس البطاقة , مفيد إذا كان لديك بطاقات تنتمي إلى العديد من الرُزم في نفس الملف",
     ALGORITHM: "خوارزمية",
-    CHECK_ALGORITHM_WIKI:
-        '<a href="${algo_url}">algorithm implementation</a> :لمزيد من المعلومات تحقق من',
+    CHECK_ALGORITHM_WIKI: '<a href="${algo_url}">algorithm details</a> :لمزيد من المعلومات تحقق من',
+    SM2_OSR_VARIANT: "OSR's variant of SM-2",
     BASE_EASE: "سهولة القاعدة",
     BASE_EASE_DESC: "الحد الأدنى = 130 ، ويفضل حوالي 250.",
     BASE_EASE_MIN_WARNING: "يجب أن تكون سهولة القاعدة 130 على الأقل.",
@@ -165,9 +166,12 @@ export default {
     MAX_LINK_CONTRIB: "أقصى مساهمة ارتباط",
     MAX_LINK_CONTRIB_DESC: "أقصى مساهمة للسهولة المرجحة للملاحظات المرتبطة بالسهولة الأولية.",
     LOGGING: "تسجيل",
-    DISPLAY_DEBUG_INFO: "عرض معلومات التصحيح على وحدة تحكم المطور",
-    DISPLAY_PARSER_DEBUG_INFO:
-        "Display debugging information for the parser on the developer console",
+    DISPLAY_SCHEDULING_DEBUG_INFO: "عرض معلومات التصحيح على وحدة تحكم المطور",
+    DISPLAY_PARSER_DEBUG_INFO: "Show the parser's debugging information on the developer console",
+    SCHEDULING: "Scheduling",
+    EXPERIMENTAL: "Experimental",
+    HELP: "Help",
+    STORE_IN_NOTES: "In the notes",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "ملاحظات قائمة المراجعة",

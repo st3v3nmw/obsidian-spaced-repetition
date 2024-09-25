@@ -55,6 +55,7 @@ export default {
     GROUP_FLASHCARD_REVIEW: "Flash Kartları Gözden Geçirme",
     GROUP_FLASHCARD_SEPARATORS: "Flash Kart Ayırıcıları",
     GROUP_DATA_STORAGE: "Planlama Verilerinin Saklanması",
+    GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flash Kartlar ve Notlar",
     GROUP_CONTRIBUTING: "Katkıda Bulunma",
     CHECK_WIKI: 'Daha fazla bilgi için <a href="${wiki_url}">wiki</a> sayfasına göz atın.',
@@ -81,7 +82,7 @@ export default {
     FLASHCARD_EASY_DESC: '"Kolay" butonunun metnini özelleştirin',
     FLASHCARD_GOOD_DESC: '"Orta" butonunun metnini özelleştirin',
     FLASHCARD_HARD_DESC: '"Zor" butonunun metnini özelleştirin',
-    REVIEW_BUTTON_DELAY: "Button press delay (ms)",
+    REVIEW_BUTTON_DELAY: "Button Press Delay (ms)",
     REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "Flash Kart Etiketleri",
     FLASHCARD_TAGS_DESC:
@@ -138,7 +139,7 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "Sağ panelde gösterilecek maksimum gün sayısı",
     MIN_ONE_DAY: "Gün sayısı en az 1 olmalıdır.",
     VALID_NUMBER_WARNING: "Lütfen geçerli bir sayı girin.",
-    UI_PREFERENCES: "Kullanıcı Arayüzü Tercihleri",
+    UI: "User Interface",
     SHOW_STATUS_BAR: "Show status bar",
     SHOW_STATUS_BAR_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
@@ -155,6 +156,7 @@ export default {
     ALGORITHM: "Algoritma",
     CHECK_ALGORITHM_WIKI:
         'Daha fazla bilgi için <a href="${algo_url}">algoritma uygulamasına</a> göz atın.',
+    SM2_OSR_VARIANT: "OSR's variant of SM-2",
     BASE_EASE: "Temel kolaylık",
     BASE_EASE_DESC: "minimum = 130, tercihen yaklaşık 250.",
     BASE_EASE_MIN_WARNING: "Temel kolaylık en az 130 olmalıdır.",
@@ -171,9 +173,13 @@ export default {
     MAX_LINK_CONTRIB_DESC:
         "Bağlantılı notların ağırlıklı kolaylık değerinin başlangıç kolaylığına maksimum katkısı.",
     LOGGING: "Kayıt tutma",
-    DISPLAY_DEBUG_INFO: "Geliştirici konsolunda hata ayıklama bilgilerini göster",
+    DISPLAY_SCHEDULING_DEBUG_INFO: "Geliştirici konsolunda hata ayıklama bilgilerini göster",
     DISPLAY_PARSER_DEBUG_INFO:
         "Ayrıştırıcı için hata ayıklama bilgilerini geliştirici konsolunda göster",
+    SCHEDULING: "Scheduling",
+    EXPERIMENTAL: "Experimental",
+    HELP: "Help",
+    STORE_IN_NOTES: "In the notes",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Not İnceleme Sırası",

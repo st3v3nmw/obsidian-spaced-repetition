@@ -56,6 +56,7 @@ export default {
     GROUP_FLASHCARD_REVIEW: "Flashcard Review",
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
     GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
     GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: '詳細については<a href="${wiki_url}">wiki</a>を確認してください。',
@@ -64,11 +65,11 @@ export default {
     GITHUB_ISSUES:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report.',
     GITHUB_SOURCE_CODE:
-        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+        'The project\'s source code is available on <a href="${github_project_url}">GitHub</a>.',
     CODE_CONTRIBUTION_INFO:
-        'Information on <a href="${code_contribution_url}">code contributions</a>',
+        '<a href="${code_contribution_url}">Here\'s</a> how to contribute code to the plugin.',
     TRANSLATION_CONTRIBUTION_INFO:
-        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+        '<a href="${translation_contribution_url}">Here\'s</a> how to translate the plugin to another language.',
     PROJECT_CONTRIBUTIONS:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report',
     FOLDERS_TO_IGNORE: "無視するフォルダ",
@@ -82,7 +83,7 @@ export default {
     FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
     FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
     FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
-    REVIEW_BUTTON_DELAY: "Button press delay (ms)",
+    REVIEW_BUTTON_DELAY: "Button Press Delay (ms)",
     REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "フラッシュカードに使用するタグ",
     FLASHCARD_TAGS_DESC:
@@ -145,7 +146,7 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "右パネルに表示する最大の日数",
     MIN_ONE_DAY: "日数には1以上の数字を指定してください。",
     VALID_NUMBER_WARNING: "有効な数字を入力してください。",
-    UI_PREFERENCES: "ユーザー インターフェイスの設定",
+    UI: "User Interface",
     SHOW_STATUS_BAR: "Show status bar",
     SHOW_STATUS_BAR_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
@@ -157,6 +158,7 @@ export default {
     ALGORITHM: "アルゴリズム",
     CHECK_ALGORITHM_WIKI:
         '詳細については<a href="${algo_url}">アルゴリズムの実装</a>を確認してください。',
+    SM2_OSR_VARIANT: "OSR's variant of SM-2",
     BASE_EASE: "ベースの易しさ",
     BASE_EASE_DESC: "最小値は130ですが、 適正値はおおよそ250です。",
     BASE_EASE_MIN_WARNING: "ベースの易しさには130以上の数字を指定してください。",
@@ -173,9 +175,12 @@ export default {
     MAX_LINK_CONTRIB_DESC:
         "最初の易しさに対して、リンクされたノートの重み付けされた易しさが寄与する最大値を指定してください。",
     LOGGING: "ログ管理",
-    DISPLAY_DEBUG_INFO: "デベロッパーコンソールにてデバッグ情報を表示しますか",
-    DISPLAY_PARSER_DEBUG_INFO:
-        "Display debugging information for the parser on the developer console",
+    DISPLAY_SCHEDULING_DEBUG_INFO: "デベロッパーコンソールにてデバッグ情報を表示しますか",
+    DISPLAY_PARSER_DEBUG_INFO: "Show the parser's debugging information on the developer console",
+    SCHEDULING: "Scheduling",
+    EXPERIMENTAL: "Experimental",
+    HELP: "Help",
+    STORE_IN_NOTES: "In the notes",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "ノートレビューのキュー",

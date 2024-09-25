@@ -4,6 +4,10 @@ import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { DueDateHistogram } from "src/due-date-histogram";
 import { Note } from "src/note";
 
+export enum Algorithm {
+    SM_2_OSR = "SM-2-OSR",
+}
+
 export interface ISrsAlgorithm {
     noteOnLoadedNote(path: string, note: Note, noteEase: number): void;
     noteCalcNewSchedule(

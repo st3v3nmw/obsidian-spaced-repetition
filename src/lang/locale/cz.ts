@@ -55,6 +55,7 @@ export default {
     GROUP_FLASHCARD_REVIEW: "Flashcard Review",
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
     GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
     GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: 'Pro více informací jděte na <a href="${wiki_url}">wiki</a>.',
@@ -63,11 +64,11 @@ export default {
     GITHUB_ISSUES:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report.',
     GITHUB_SOURCE_CODE:
-        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+        'The project\'s source code is available on <a href="${github_project_url}">GitHub</a>.',
     CODE_CONTRIBUTION_INFO:
-        'Information on <a href="${code_contribution_url}">code contributions</a>',
+        '<a href="${code_contribution_url}">Here\'s</a> how to contribute code to the plugin.',
     TRANSLATION_CONTRIBUTION_INFO:
-        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+        '<a href="${translation_contribution_url}">Here\'s</a> how to translate the plugin to another language.',
     PROJECT_CONTRIBUTIONS:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report',
     FOLDERS_TO_IGNORE: "Ignorované složky",
@@ -81,7 +82,7 @@ export default {
     FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
     FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
     FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
-    REVIEW_BUTTON_DELAY: "Button press delay (ms)",
+    REVIEW_BUTTON_DELAY: "Button Press Delay (ms)",
     REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "Tag pro kartičky",
     FLASHCARD_TAGS_DESC:
@@ -141,7 +142,7 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "Maximální počet dní zobrazených v pravém panelu",
     MIN_ONE_DAY: "Počet dní musí být minimálně 1.",
     VALID_NUMBER_WARNING: "Prosím zadejte validní číslo.",
-    UI_PREFERENCES: "Předvolby uživatelského rozhraní",
+    UI: "Předvolby uživatelského rozhraní",
     SHOW_STATUS_BAR: "Show status bar",
     SHOW_STATUS_BAR_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
@@ -153,6 +154,7 @@ export default {
         "Vypněte toto, chcete-li sbalit vnořené balíčky na stejné kartě. To je užitečné, pokud máte kartičky, které patří k mnoha balíčkům ve stejném souboru.",
     ALGORITHM: "Algoritmus",
     CHECK_ALGORITHM_WIKI: 'Pro více informací jděte na <a href="${algo_url}">popis algoritmu</a>.',
+    SM2_OSR_VARIANT: "OSR's variant of SM-2",
     BASE_EASE: "Základní složitost",
     BASE_EASE_DESC: "minimum = 130, nejlépe přibližně 250.",
     BASE_EASE_MIN_WARNING: "Základní složitost musí být minimálně 130.",
@@ -169,9 +171,12 @@ export default {
     MAX_LINK_CONTRIB_DESC:
         "Maximální příspěvek vážené složitosti prolinkovaných poznámek použitý pro určení počáteční složitosti.",
     LOGGING: "Zaznamenávám",
-    DISPLAY_DEBUG_INFO: "Zobrazit informace pro ladění na vývojářské konzoli",
-    DISPLAY_PARSER_DEBUG_INFO:
-        "Display debugging information for the parser on the developer console",
+    DISPLAY_SCHEDULING_DEBUG_INFO: "Zobrazit informace pro ladění na vývojářské konzoli",
+    DISPLAY_PARSER_DEBUG_INFO: "Show the parser's debugging information on the developer console",
+    SCHEDULING: "Scheduling",
+    EXPERIMENTAL: "Experimental",
+    HELP: "Help",
+    STORE_IN_NOTES: "In the notes",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Fronta poznámek k revizi",
