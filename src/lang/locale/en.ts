@@ -82,8 +82,7 @@ export default {
     FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
     FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
     REVIEW_BUTTON_DELAY: "Button press delay (ms)",
-    REVIEW_BUTTON_DELAY_DESC:
-        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before they could be pressed again.",
+    REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "Flashcard tags",
     FLASHCARD_TAGS_DESC:
         "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.",

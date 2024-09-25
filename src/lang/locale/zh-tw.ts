@@ -82,8 +82,7 @@ export default {
     FLASHCARD_GOOD_DESC: "自訂「記得」按鈕的標籤",
     FLASHCARD_HARD_DESC: "自訂「較難」按鈕的標籤",
     REVIEW_BUTTON_DELAY: "Button press delay (ms)",
-    REVIEW_BUTTON_DELAY_DESC:
-        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before they could be pressed again.",
+    REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "卡片標籤",
     FLASHCARD_TAGS_DESC: "輸入標籤（用空白或換行字元分隔），例如：#flashcards #deck2 #deck3.",
     CONVERT_FOLDERS_TO_DECKS: "是否將資料夾內容轉換為牌組和子牌組？",
