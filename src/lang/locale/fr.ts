@@ -56,6 +56,7 @@ export default {
     GROUP_FLASHCARD_REVIEW: "Apprentissage des flashcards",
     GROUP_FLASHCARD_SEPARATORS: "Séparateurs de flashcards",
     GROUP_DATA_STORAGE: "Stockage des informations de planification",
+    GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
     GROUP_CONTRIBUTING: "Contribuer",
     CHECK_WIKI: 'Pour plus d\'informations, visitez le <a href="${wiki_url}">wiki</a>.',
@@ -82,7 +83,7 @@ export default {
     FLASHCARD_EASY_DESC: "Changez le texte du bouton Facile",
     FLASHCARD_GOOD_DESC: "Changez le texte du bouton Correct",
     FLASHCARD_HARD_DESC: "Changez le texte du bouton Difficile",
-    REVIEW_BUTTON_DELAY: "Button press delay (ms)",
+    REVIEW_BUTTON_DELAY: "Button Press Delay (ms)",
     REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "Tags des flashcards",
     FLASHCARD_TAGS_DESC:
@@ -140,7 +141,7 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "Jours maximum affichés dans la barre de droite",
     MIN_ONE_DAY: "Le nombre de jours doit être au moins 1.",
     VALID_NUMBER_WARNING: "Entrez un nombre valide.",
-    UI_PREFERENCES: "Préférences UI",
+    UI: "User Interface",
     SHOW_STATUS_BAR: "Show status bar",
     SHOW_STATUS_BAR_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
@@ -157,6 +158,7 @@ export default {
     ALGORITHM: "Algorithme",
     CHECK_ALGORITHM_WIKI:
         "Pour en savoir plus, lisez l'<a href=\"${algo_url}\">implémentation de l'algorithme</a>.",
+    SM2_OSR_VARIANT: "OSR's variant of SM-2",
     BASE_EASE: "Facilité de base",
     BASE_EASE_DESC: "minimum = 130, recommandé = vers 250.",
     BASE_EASE_MIN_WARNING: "La facilité de base doit être supérieure à 130.",
@@ -175,9 +177,14 @@ export default {
     MAX_LINK_CONTRIB_DESC:
         "Contribution maximum de la facilité pondérée des notes liées à la facilité initiale.",
     LOGGING: "Logging",
-    DISPLAY_DEBUG_INFO: "Afficher les informations de débogage dans la console de développement",
+    DISPLAY_SCHEDULING_DEBUG_INFO:
+        "Afficher les informations de débogage dans la console de développement",
     DISPLAY_PARSER_DEBUG_INFO:
         "Afficher les informations de débogage pour le parser dans la console de développement",
+    SCHEDULING: "Scheduling",
+    EXPERIMENTAL: "Experimental",
+    HELP: "Help",
+    STORE_IN_NOTES: "In the notes",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Cartes à apprendre",

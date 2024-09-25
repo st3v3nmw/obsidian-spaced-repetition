@@ -8,7 +8,7 @@ import { OsrAppCore } from "src/app-core";
 import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
 import { DataStoreInNote_AlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
 import { DataStore } from "src/data-stores/base/data-store";
-import { StoreInNote } from "src/data-stores/store-in-note/note";
+import { StoreInNotes } from "src/data-stores/notes/notes";
 import { CardListType, Deck, DeckTreeFilter } from "src/deck";
 import {
     CardOrder,
@@ -353,7 +353,7 @@ export default class SRPlugin extends Plugin {
 
         await this.osrAppCore.loadVault();
 
-        if (this.data.settings.showDebugMessages) {
+        if (this.data.settings.showSchedulingDebugMessages) {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
@@ -436,14 +436,14 @@ export default class SRPlugin extends Plugin {
         if (loadedData?.settings) upgradeSettings(loadedData.settings);
         this.data = Object.assign({}, DEFAULT_DATA, loadedData);
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
-        setDebugParser(this.data.settings.showPaserDebugMessages);
+        setDebugParser(this.data.settings.showParserDebugMessages);
 
         this.setupDataStoreAndAlgorithmInstances(this.data.settings);
     }
 
     setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
-        // For now we can hardcoded as we only support the one data store and one algorithm
-        DataStore.instance = new StoreInNote(settings);
+        // For now we can hardcode as we only support the one data store and one algorithm
+        DataStore.instance = new StoreInNotes(settings);
         SrsAlgorithm.instance = new SrsAlgorithm_Osr(settings);
         DataStoreAlgorithm.instance = new DataStoreInNote_AlgorithmOsr(settings);
     }

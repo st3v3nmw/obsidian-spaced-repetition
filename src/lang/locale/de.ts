@@ -61,6 +61,7 @@ export default {
     GROUP_FLASHCARD_REVIEW: "Flashcard Review",
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
     GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
     GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: 'Weitere Informationen gibt es im <a href="${wiki_url}">Wiki</a> (english).',
@@ -69,11 +70,11 @@ export default {
     GITHUB_ISSUES:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report.',
     GITHUB_SOURCE_CODE:
-        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+        'The project\'s source code is available on <a href="${github_project_url}">GitHub</a>.',
     CODE_CONTRIBUTION_INFO:
-        'Information on <a href="${code_contribution_url}">code contributions</a>',
+        '<a href="${code_contribution_url}">Here\'s</a> how to contribute code to the plugin.',
     TRANSLATION_CONTRIBUTION_INFO:
-        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+        '<a href="${translation_contribution_url}">Here\'s</a> how to translate the plugin to another language.',
     PROJECT_CONTRIBUTIONS:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report',
     FOLDERS_TO_IGNORE: "Ausgeschlossene Ordner",
@@ -157,7 +158,7 @@ export default {
         "Maximale Anzahl anstehender Notizen, die im rechten Fensterbereich angezeigt werden",
     MIN_ONE_DAY: "Anzahl der Tage muss mindestens 1 sein.",
     VALID_NUMBER_WARNING: "Bitte eine gültige Zahl eingeben.",
-    UI_PREFERENCES: "Einstellungen der Benutzeroberfläche",
+    UI: "User Interface",
     SHOW_STATUS_BAR: "Show status bar",
     SHOW_STATUS_BAR_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
@@ -170,6 +171,7 @@ export default {
     ALGORITHM: "Algorithmus",
     CHECK_ALGORITHM_WIKI:
         'Weiterführende Informationen: <a href="${algo_url}">Implementierung des Algorithmus</a> (english).',
+    SM2_OSR_VARIANT: "OSR's variant of SM-2",
     BASE_EASE: "Basis der Schwierigkeit",
     BASE_EASE_DESC: "Minimum ist 130. Empfohlen wird ca. 250.",
     BASE_EASE_MIN_WARNING: "Basis der Schwierigkeit muss mindestens 130 sein.",
@@ -188,9 +190,13 @@ export default {
     MAX_LINK_CONTRIB_DESC:
         "Maximaler Einfluss der Einfachheiten verlinkter Notizen zur gewichteten initialen Einfachheit einer neuen Lernkarte.",
     LOGGING: "Protokollierung",
-    DISPLAY_DEBUG_INFO: "Informationen zum Debugging in der Entwicklerkonsole anzeigen",
+    DISPLAY_SCHEDULING_DEBUG_INFO: "Informationen zum Debugging in der Entwicklerkonsole anzeigen",
     DISPLAY_PARSER_DEBUG_INFO:
         "Informationen zum parser Debugging in der Entwicklerkonsole anzeigen",
+    SCHEDULING: "Scheduling",
+    EXPERIMENTAL: "Experimental",
+    HELP: "Help",
+    STORE_IN_NOTES: "In the notes",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Anstehende Notizen zur Wiederholung",

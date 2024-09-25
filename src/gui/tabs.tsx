@@ -16,8 +16,9 @@
  *
  * Contact the author (Jarkko Linnanvirta): https://github.com/Taitava/
  */
-
 import { setIcon } from "obsidian";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import h from "vhtml";
 
 export interface Tab {
     title: string;
@@ -63,7 +64,9 @@ export function createTabs(
     const tab_buttons: TabButtons = {};
     const tab_structure: TabStructure = {
         header: tab_header,
-        active_tab_id: Object.keys(tabs)[0] as string, // Indicate that the first tab is active. This does not affect what tab is active in practise, it just reports the active tab.
+        // Indicate that the first tab is active.
+        // This does not affect what tab is active in practise, it just reports the active tab.
+        active_tab_id: Object.keys(tabs)[0] as string,
         buttons: tab_buttons,
         contentContainers: tab_content_containers,
         contentGeneratorPromises: {},
@@ -80,7 +83,9 @@ export function createTabs(
             },
         });
         button.onclick = function (event: MouseEvent) {
-            const tab_button = this as HTMLElement; // Use 'this' instead of event.target because this way we'll always get a button element, not an element inside the  button (i.e. an icon).
+            // Use 'this' instead of event.target because this way we'll always get a button element,
+            //  not an element inside the  button (i.e. an icon).
+            const tab_button = this as HTMLElement;
 
             // Hide all tab contents and get the max dimensions
             let max_width = 0;
@@ -95,7 +100,10 @@ export function createTabs(
                     "Container element is missing. Did not get a parent from tab header.",
                 );
             }
-            const tab_contents = container_element.findAll("div.sr-tab-content"); // Do not get all tab contents that exist, because there might be multiple tab systems open at the same time.
+
+            // Do not get all tab contents that exist,
+            //  because there might be multiple tab systems open at the same time.
+            const tab_contents = container_element.findAll("div.sr-tab-content");
             const is_main_settings_modal = container_element.hasClass("vertical-tab-content");
             for (const index in tab_contents) {
                 const tab_content = tab_contents[index];
@@ -103,7 +111,8 @@ export function createTabs(
                 // Get the maximum tab dimensions so that all tabs can have the same dimensions.
                 // But don't do it if this is the main settings modal
                 if (!is_main_settings_modal) {
-                    tab_content.addClass("sr-tab-active"); // Need to make the tab visible temporarily in order to get the dimensions.
+                    // Need to make the tab visible temporarily in order to get the dimensions.
+                    tab_content.addClass("sr-tab-active");
                     if (tab_content.offsetHeight > max_height) {
                         max_height = tab_content.offsetHeight;
                     }
@@ -117,7 +126,9 @@ export function createTabs(
             }
 
             // Remove active status from all buttons
-            const adjacent_tab_buttons = tab_header.findAll(".sr-tab-header-button"); // Do not get all tab buttons that exist, because there might be multiple tab systems open at the same time.
+            // Do not get all tab buttons that exist,
+            //  because there might be multiple tab systems open at the same time.
+            const adjacent_tab_buttons = tab_header.findAll(".sr-tab-header-button");
             for (const index in adjacent_tab_buttons) {
                 const tab_button = adjacent_tab_buttons[index];
                 tab_button.removeClass("sr-tab-active");
@@ -142,10 +153,12 @@ export function createTabs(
             tab_content.addClass("sr-tab-active");
 
             // Mark the clicked tab as active in TabStructure (just to report which tab is currently active)
-            tab_structure.active_tab_id = activate_tab_id.replace(/^sr-tab-/, ""); // Remove "sr-tab" prefix.
+            // Remove "sr-tab" prefix.
+            tab_structure.active_tab_id = activate_tab_id.replace(/^sr-tab-/, "");
 
             // Focus an element (if a focusable element is present)
-            tab_content.find(".sr-focus-element-on-tab-opening")?.focus(); // ? = If not found, do nothing.
+            // ? = If not found, do nothing.
+            tab_content.find(".sr-focus-element-on-tab-opening")?.focus();
 
             // Apply the max dimensions to this tab
             // But don't do it if this is the main settings modal
@@ -159,7 +172,7 @@ export function createTabs(
         };
         if (tab.icon) setIcon(button, tab.icon);
 
-        button.insertAdjacentText("beforeend", " " + tab.title);
+        button.insertAdjacentHTML("beforeend", <span style="padding-left: 5px;">{tab.title}</span>);
         tab_buttons[tab_id] = button;
 
         // Create content container

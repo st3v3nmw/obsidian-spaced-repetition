@@ -11,7 +11,7 @@ import { Question } from "src/question";
 import { SRSettings } from "src/settings";
 import { DateUtil, formatDate_YYYY_MM_DD, globalDateProvider } from "src/utils/dates";
 
-export class StoreInNote implements IDataStore {
+export class StoreInNotes implements IDataStore {
     private settings: SRSettings;
     app: App;
     easeByPath: NoteEaseList;

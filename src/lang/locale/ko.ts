@@ -55,6 +55,7 @@ export default {
     GROUP_FLASHCARD_REVIEW: "Flashcard Review",
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
     GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
     GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: '더 많은 정보를 원하시면, <a href="${wiki_url}">wiki</a>를 확인해주세요.',
@@ -63,11 +64,11 @@ export default {
     GITHUB_ISSUES:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report.',
     GITHUB_SOURCE_CODE:
-        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+        'The project\'s source code is available on <a href="${github_project_url}">GitHub</a>.',
     CODE_CONTRIBUTION_INFO:
-        'Information on <a href="${code_contribution_url}">code contributions</a>',
+        '<a href="${code_contribution_url}">Here\'s</a> how to contribute code to the plugin.',
     TRANSLATION_CONTRIBUTION_INFO:
-        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+        '<a href="${translation_contribution_url}">Here\'s</a> how to translate the plugin to another language.',
     PROJECT_CONTRIBUTIONS:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report',
     FOLDERS_TO_IGNORE: "무시할 폴더들",
@@ -81,7 +82,7 @@ export default {
     FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
     FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
     FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
-    REVIEW_BUTTON_DELAY: "Button press delay (ms)",
+    REVIEW_BUTTON_DELAY: "Button Press Delay (ms)",
     REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "플래시카드 태그",
     FLASHCARD_TAGS_DESC:
@@ -142,7 +143,7 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "오른쪽 패널에 표시할 최대 일수",
     MIN_ONE_DAY: "적어도 1이상이어야 합니다.",
     VALID_NUMBER_WARNING: "유효한 숫자를 입력해주세요.",
-    UI_PREFERENCES: "사용자 인터페이스 기본 설정",
+    UI: "User Interface",
     SHOW_STATUS_BAR: "Show status bar",
     SHOW_STATUS_BAR_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
@@ -153,7 +154,8 @@ export default {
         "같은 카드에 중첩된 덱을 접으려면 이 옵션을 끄십시오. 같은 파일에 여러 덱에 속한 카드가 있는 경우 유용합니다.",
     ALGORITHM: "알고리즘",
     CHECK_ALGORITHM_WIKI:
-        '더 많은 정보를 원하시면, <a href="${algo_url}">algorithm implementation</a>을 확인해주세요.',
+        '더 많은 정보를 원하시면, <a href="${algo_url}">algorithm details</a>을 확인해주세요.',
+    SM2_OSR_VARIANT: "OSR's variant of SM-2",
     BASE_EASE: "기본 ease",
     BASE_EASE_DESC: "최솟값 = 130, 적정치는 대략 250입니다.",
     BASE_EASE_MIN_WARNING: "기본 ease는 적어도 130 이어야 합니다.",
@@ -170,9 +172,12 @@ export default {
     MAX_LINK_CONTRIB_DESC:
         "링크된 노트의 초기 ease에 대한 가중치가 적용된 ease의 최대 기여도입니다.",
     LOGGING: "로깅",
-    DISPLAY_DEBUG_INFO: "디버깅 정보를 개발자 콘솔에 표시하시겠습니까",
-    DISPLAY_PARSER_DEBUG_INFO:
-        "Display debugging information for the parser on the developer console",
+    DISPLAY_SCHEDULING_DEBUG_INFO: "디버깅 정보를 개발자 콘솔에 표시하시겠습니까",
+    DISPLAY_PARSER_DEBUG_INFO: "Show the parser's debugging information on the developer console",
+    SCHEDULING: "Scheduling",
+    EXPERIMENTAL: "Experimental",
+    HELP: "Help",
+    STORE_IN_NOTES: "In the notes",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "리뷰할 노트 대기열",

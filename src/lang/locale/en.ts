@@ -55,6 +55,7 @@ export default {
     GROUP_FLASHCARD_REVIEW: "Flashcard Review",
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
     GROUP_DATA_STORAGE: "Storage of Scheduling Data",
+    GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
     GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: 'For more information, check the <a href="${wiki_url}">wiki</a>.',
@@ -63,11 +64,11 @@ export default {
     GITHUB_ISSUES:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report.',
     GITHUB_SOURCE_CODE:
-        'Project source code available on <a href="${github_project_url}">GitHub</a>',
+        'The project\'s source code is available on <a href="${github_project_url}">GitHub</a>.',
     CODE_CONTRIBUTION_INFO:
-        'Information on <a href="${code_contribution_url}">code contributions</a>',
+        '<a href="${code_contribution_url}">Here\'s</a> how to contribute code to the plugin.',
     TRANSLATION_CONTRIBUTION_INFO:
-        'Information on <a href="${translation_contribution_url}">translating the plugin</a> to your language',
+        '<a href="${translation_contribution_url}">Here\'s</a> how to translate the plugin to another language.',
     PROJECT_CONTRIBUTIONS:
         'Raise an issue <a href="${issues_url}">here</a> if you have a feature request or a bug report',
     FOLDERS_TO_IGNORE: "Folders to ignore",
@@ -81,7 +82,7 @@ export default {
     FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
     FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
     FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
-    REVIEW_BUTTON_DELAY: "Button press delay (ms)",
+    REVIEW_BUTTON_DELAY: "Button Press Delay (ms)",
     REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "Flashcard tags",
     FLASHCARD_TAGS_DESC:
@@ -133,10 +134,10 @@ export default {
     OPEN_RANDOM_NOTE: "Open a random note for review",
     OPEN_RANDOM_NOTE_DESC: "When you turn this off, notes are ordered by importance (PageRank).",
     AUTO_NEXT_NOTE: "Open next note automatically after a review",
-    MAX_N_DAYS_REVIEW_QUEUE: "Maximum number of days to display on right panel",
+    MAX_N_DAYS_REVIEW_QUEUE: "Maximum number of days to display on note review panel",
     MIN_ONE_DAY: "The number of days must be at least 1.",
     VALID_NUMBER_WARNING: "Please provide a valid number.",
-    UI_PREFERENCES: "UI Preferences",
+    UI: "User Interface",
     SHOW_STATUS_BAR: "Show status bar",
     SHOW_STATUS_BAR_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
@@ -151,7 +152,8 @@ export default {
         "Turn this off to collapse nested decks in the same card. Useful if you have cards which belong to many decks in the same file.",
     ALGORITHM: "Algorithm",
     CHECK_ALGORITHM_WIKI:
-        'For more information, check the <a href="${algo_url}">algorithm implementation</a>.',
+        'For more information, check the <a href="${algo_url}">algorithm details</a>.',
+    SM2_OSR_VARIANT: "OSR's variant of SM-2",
     BASE_EASE: "Base ease",
     BASE_EASE_DESC: "minimum = 130, preferrably approximately 250.",
     BASE_EASE_MIN_WARNING: "The base ease must be at least 130.",
@@ -168,9 +170,13 @@ export default {
     MAX_LINK_CONTRIB_DESC:
         "Maximum contribution of the weighted ease of linked notes to the initial ease.",
     LOGGING: "Logging",
-    DISPLAY_DEBUG_INFO: "Display debugging information on the developer console",
-    DISPLAY_PARSER_DEBUG_INFO:
-        "Display debugging information for the parser on the developer console",
+    DISPLAY_SCHEDULING_DEBUG_INFO:
+        "Show the scheduler's debugging information on the developer console",
+    DISPLAY_PARSER_DEBUG_INFO: "Show the parser's debugging information on the developer console",
+    SCHEDULING: "Scheduling",
+    EXPERIMENTAL: "Experimental",
+    HELP: "Help",
+    STORE_IN_NOTES: "In the notes",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Notes Review Queue",
