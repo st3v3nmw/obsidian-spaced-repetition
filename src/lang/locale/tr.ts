@@ -81,6 +81,9 @@ export default {
     FLASHCARD_EASY_DESC: '"Kolay" butonunun metnini özelleştirin',
     FLASHCARD_GOOD_DESC: '"Orta" butonunun metnini özelleştirin',
     FLASHCARD_HARD_DESC: '"Zor" butonunun metnini özelleştirin',
+    REVIEW_BUTTON_DELAY: "Button press delay (ms)",
+    REVIEW_BUTTON_DELAY_DESC:
+        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before they could be pressed again.",
     FLASHCARD_TAGS: "Flash Kart Etiketleri",
     FLASHCARD_TAGS_DESC:
         "Etiketleri boşluklar veya yeni satırlarla ayırarak girin, örneğin: #flashcards #deck2 #deck3.",

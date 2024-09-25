@@ -82,6 +82,9 @@ export default {
     FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
     FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
     FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
+    REVIEW_BUTTON_DELAY: "Button press delay (ms)",
+    REVIEW_BUTTON_DELAY_DESC:
+        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before they could be pressed again.",
     FLASHCARD_TAGS: "フラッシュカードに使用するタグ",
     FLASHCARD_TAGS_DESC:
         'タグをスペースまたは改行で区切って入力してください。例: "#flashcards #deck2 #deck3"',

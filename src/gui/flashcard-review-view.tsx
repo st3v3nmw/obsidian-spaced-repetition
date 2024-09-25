@@ -1,3 +1,4 @@
+import { now } from "moment";
 import { App, Notice, Platform, setIcon } from "obsidian";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
@@ -46,6 +47,7 @@ export class FlashcardReviewView {
     public goodButton: HTMLButtonElement;
     public easyButton: HTMLButtonElement;
     public answerButton: HTMLButtonElement;
+    public lastPressed: number;
 
     private chosenDeck: Deck | null;
     private reviewSequencer: IFlashcardReviewSequencer;
@@ -303,6 +305,15 @@ export class FlashcardReviewView {
     }
 
     private _showAnswer(): void {
+        const timeNow = now();
+        if (
+            this.lastPressed &&
+            timeNow - this.lastPressed < this.plugin.data.settings.reviewButtonDelay
+        ) {
+            return;
+        }
+        this.lastPressed = timeNow;
+
         this.mode = FlashcardModalMode.Back;
 
         this.resetButton.disabled = false;
@@ -357,6 +368,15 @@ export class FlashcardReviewView {
     }
 
     private async _processReview(response: ReviewResponse): Promise<void> {
+        const timeNow = now();
+        if (
+            this.lastPressed &&
+            timeNow - this.lastPressed < this.plugin.data.settings.reviewButtonDelay
+        ) {
+            return;
+        }
+        this.lastPressed = timeNow;
+
         await this.reviewSequencer.processReview(response);
         await this._handleSkipCard();
     }

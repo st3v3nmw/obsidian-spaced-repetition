@@ -81,6 +81,9 @@ export default {
     FLASHCARD_EASY_DESC: '"تخصيص التسمية للزر "سهل',
     FLASHCARD_GOOD_DESC: '"تخصيص التسمية للزر "جيد',
     FLASHCARD_HARD_DESC: '"تخصيص التسمية للزر "صعب',
+    REVIEW_BUTTON_DELAY: "Button press delay (ms)",
+    REVIEW_BUTTON_DELAY_DESC:
+        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before they could be pressed again.",
     FLASHCARD_TAGS: "وُسوم البطاقات",
     FLASHCARD_TAGS_DESC: "#2أدخل الوُسوم مفصولة بمسافات أو أسطر جديدة ، أي بطاقات# رزمة3# رزمة",
     CONVERT_FOLDERS_TO_DECKS: "تحويل المجلدات إلى ملفات أصلية و ملفات الفرعية؟",

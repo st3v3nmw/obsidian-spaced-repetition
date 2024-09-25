@@ -90,6 +90,9 @@ export default {
     FLASHCARD_EASY_DESC: 'Настроить ярлык для кнопки "Легко"',
     FLASHCARD_GOOD_DESC: 'Настроить ярлык для кнопки "Нормально"',
     FLASHCARD_HARD_DESC: 'Настроить ярлык для кнопки "Сложно"',
+    REVIEW_BUTTON_DELAY: "Button press delay (ms)",
+    REVIEW_BUTTON_DELAY_DESC:
+        "Add a delay to the review buttons('Easy', 'Good', 'Hard', 'Show answer') before they could be pressed again.",
     FLASHCARD_TAGS: "Теги карточек",
     FLASHCARD_TAGS_DESC:
         "Укажите теги разделенные Enter-ом или пробелом, например: #flashcards #deck2 #deck3.",
