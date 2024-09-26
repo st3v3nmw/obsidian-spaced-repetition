@@ -2,16 +2,16 @@ import { CardListType, Deck } from "src/deck";
 import { CardOrder, DeckOrder, DeckTreeIterator } from "src/deck-tree-iterator";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { TopicPath } from "src/topic-path";
-import { setupStaticDateProvider_20230906 } from "src/utils/dates";
+import { setupStaticDateProvider20230906 } from "src/utils/dates";
 import { setupNextRandomNumber, setupStaticRandomNumberProvider } from "src/utils/numbers";
 
-import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
+import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 import { SampleItemDecks } from "./sample-items";
 
 beforeAll(() => {
-    setupStaticDateProvider_20230906();
+    setupStaticDateProvider20230906();
     setupStaticRandomNumberProvider();
-    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 describe("setDeck", () => {

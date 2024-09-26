@@ -1,30 +1,30 @@
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { Card } from "src/card";
 import { TICKS_PER_DAY } from "src/constants";
+import { frontmatterTagPseudoLineNum, ISRFile } from "src/file";
 import { NoteQuestionParser } from "src/note-question-parser";
 import { CardType, Question } from "src/question";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
-import { frontmatterTagPseudoLineNum, ISRFile } from "src/sr-file";
 import { TopicPath, TopicPathList } from "src/topic-path";
-import { setupStaticDateProvider_20230906 } from "src/utils/dates";
+import { setupStaticDateProvider20230906 } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
-import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
-import { createTest_NoteQuestionParser } from "./sample-items";
+import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
+import { createTestNoteQuestionParser } from "./sample-items";
 
 const parserWithDefaultSettings: NoteQuestionParser =
-    createTest_NoteQuestionParser(DEFAULT_SETTINGS);
-const settings_ConvertFoldersToDecks: SRSettings = { ...DEFAULT_SETTINGS };
-settings_ConvertFoldersToDecks.convertFoldersToDecks = true;
-const parser_ConvertFoldersToDecks: NoteQuestionParser = createTest_NoteQuestionParser(
-    settings_ConvertFoldersToDecks,
+    createTestNoteQuestionParser(DEFAULT_SETTINGS);
+const settingsConvertFoldersToDecks: SRSettings = { ...DEFAULT_SETTINGS };
+settingsConvertFoldersToDecks.convertFoldersToDecks = true;
+const parserConvertFoldersToDecks: NoteQuestionParser = createTestNoteQuestionParser(
+    settingsConvertFoldersToDecks,
 );
 
 beforeAll(() => {
-    setupStaticDateProvider_20230906();
-    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    setupStaticDateProvider20230906();
+    unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 describe("No flashcard questions", () => {
@@ -104,7 +104,7 @@ A::B
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const delayDays = 3 - 6;
-        const scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-03", 1, 230);
+        const scheduleInfo = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-03", 1, 230);
         scheduleInfo.delayedBeforeReviewTicks = delayDays * TICKS_PER_DAY;
         const card1 = {
             cardIdx: 0,
@@ -208,7 +208,7 @@ A::B ^d7cee0
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const card1 = {
             cardIdx: 0,
-            scheduleInfo: null as RepItemScheduleInfo_Osr,
+            scheduleInfo: null as RepItemScheduleInfoOsr,
         };
         const expected = [
             {
@@ -250,7 +250,7 @@ A::B ^d7cee0
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const delayDays = 3 - 6;
-        const scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-03", 1, 230);
+        const scheduleInfo = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-03", 1, 230);
         scheduleInfo.delayedBeforeReviewTicks = delayDays * TICKS_PER_DAY;
 
         const card1 = {
@@ -297,7 +297,7 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const delayDays = 3 - 6;
-        const scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-03", 1, 230);
+        const scheduleInfo = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-03", 1, 230);
         scheduleInfo.delayedBeforeReviewTicks = delayDays * TICKS_PER_DAY;
         const card1 = {
             cardIdx: 0,
@@ -342,7 +342,7 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const delayDays = 3 - 6;
-        const scheduleInfo = RepItemScheduleInfo_Osr.fromDueDateStr("2023-09-03", 1, 230);
+        const scheduleInfo = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-03", 1, 230);
         scheduleInfo.delayedBeforeReviewTicks = delayDays * TICKS_PER_DAY;
         const card1 = {
             cardIdx: 0,
@@ -387,7 +387,7 @@ Q2::A2
 `;
         const noteFile: ISRFile = new UnitTestSRFile(noteText);
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
-        const questionList: Question[] = await parser_ConvertFoldersToDecks.createQuestionList(
+        const questionList: Question[] = await parserConvertFoldersToDecks.createQuestionList(
             noteFile,
             TextDirection.Ltr,
             folderTopicPath,
@@ -405,7 +405,7 @@ Q3::A3
         const noteFile: ISRFile = new UnitTestSRFile(noteText);
 
         const folderTopicPath: TopicPath = new TopicPath(["flashcards", "science"]);
-        const questionList: Question[] = await parser_ConvertFoldersToDecks.createQuestionList(
+        const questionList: Question[] = await parserConvertFoldersToDecks.createQuestionList(
             noteFile,
             TextDirection.Ltr,
             folderTopicPath,
@@ -497,7 +497,7 @@ describe("Handling tags within note", () => {
     describe("Settings mode: Convert folder path to tag", () => {
         const settings: SRSettings = { ...DEFAULT_SETTINGS };
         settings.convertFoldersToDecks = true;
-        const parser2: NoteQuestionParser = createTest_NoteQuestionParser(settings);
+        const parser2: NoteQuestionParser = createTestNoteQuestionParser(settings);
 
         test("Folder path applies to all questions within note", async () => {
             const noteText: string = `

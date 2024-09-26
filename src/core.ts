@@ -9,6 +9,7 @@ import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorith
 import { Deck, DeckTreeFilter } from "src/deck";
 import { DeckTreeStatsCalculator } from "src/deck-tree-stats-calculator";
 import { CardDueDateHistogram, NoteDueDateHistogram } from "src/due-date-histogram";
+import { ISRFile, SrTFile } from "src/file";
 import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
 import { Note } from "src/note";
 import { NoteEaseList } from "src/note-ease-list";
@@ -16,7 +17,6 @@ import { NoteFileLoader } from "src/note-file-loader";
 import { NoteReviewQueue } from "src/note-review-queue";
 import { QuestionPostponementList } from "src/question-postponement-list";
 import { SettingsUtil, SRSettings } from "src/settings";
-import { ISRFile, SrTFile } from "src/sr-file";
 import { Stats } from "src/stats";
 import { TopicPath } from "src/topic-path";
 import { globalDateProvider } from "src/utils/dates";

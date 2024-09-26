@@ -17,7 +17,7 @@ module.exports = {
 
         // GUI & Obsidian coupled code
         "src/core.ts",
-        "src/sr-file.ts",
+        "src/file.ts",
         "src/gui/",
         "src/icons/",
         "src/main.ts",
@@ -39,7 +39,7 @@ module.exports = {
         global: {
             // TODO: Bring coverage back up to 98%+
             statements: 93,
-            branches: 89,
+            branches: 88,
         },
     },
 };

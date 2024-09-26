@@ -2,7 +2,7 @@ import { Moment } from "moment";
 import moment from "moment";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { Card } from "src/card";
 import {
     ALLOWED_DATE_FORMATS,
@@ -12,18 +12,16 @@ import {
     YAML_FRONT_MATTER_REGEX,
 } from "src/constants";
 import { IDataStoreAlgorithm } from "src/data-store-algorithm/idata-store-algorithm";
+import { ISRFile } from "src/file";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
-import { ISRFile } from "src/sr-file";
-import { formatDate_YYYY_MM_DD } from "src/utils/dates";
+import { formatDateYYYYMMDD } from "src/utils/dates";
 
-//
 // Algorithm: The original OSR algorithm
 //      (RZ: Perhaps not the original algorithm, but the only one available in 2023/early 2024)
 //
 // Data Store: With data stored in the note's markdown file
-//
-export class DataStoreInNote_AlgorithmOsr implements IDataStoreAlgorithm {
+export class DataStoreInNoteAlgorithmOsr implements IDataStoreAlgorithm {
     private settings: SRSettings;
 
     constructor(settings: SRSettings) {
@@ -43,7 +41,7 @@ export class DataStoreInNote_AlgorithmOsr implements IDataStoreAlgorithm {
             const dueDate: Moment = moment(frontmatter.get("sr-due"), ALLOWED_DATE_FORMATS);
             const interval: number = parseFloat(frontmatter.get("sr-interval"));
             const ease: number = parseFloat(frontmatter.get("sr-ease"));
-            result = new RepItemScheduleInfo_Osr(dueDate, interval, ease);
+            result = new RepItemScheduleInfoOsr(dueDate, interval, ease);
         }
         return result;
     }
@@ -51,8 +49,8 @@ export class DataStoreInNote_AlgorithmOsr implements IDataStoreAlgorithm {
     async noteSetSchedule(note: ISRFile, repItemScheduleInfo: RepItemScheduleInfo): Promise<void> {
         let fileText: string = await note.read();
 
-        const schedInfo: RepItemScheduleInfo_Osr = repItemScheduleInfo as RepItemScheduleInfo_Osr;
-        const dueString: string = formatDate_YYYY_MM_DD(schedInfo.dueDate);
+        const schedInfo: RepItemScheduleInfoOsr = repItemScheduleInfo as RepItemScheduleInfoOsr;
+        const dueString: string = formatDateYYYYMMDD(schedInfo.dueDate);
         const interval: number = schedInfo.interval;
         const ease: number = schedInfo.latestEase;
 
@@ -96,13 +94,13 @@ export class DataStoreInNote_AlgorithmOsr implements IDataStoreAlgorithm {
     formatCardSchedule(card: Card) {
         let result: string;
         if (card.hasSchedule) {
-            const schedule = card.scheduleInfo as RepItemScheduleInfo_Osr;
+            const schedule = card.scheduleInfo as RepItemScheduleInfoOsr;
             const dateStr = schedule.dueDate
-                ? formatDate_YYYY_MM_DD(schedule.dueDate)
-                : RepItemScheduleInfo_Osr.dummyDueDateForNewCard;
+                ? formatDateYYYYMMDD(schedule.dueDate)
+                : RepItemScheduleInfoOsr.dummyDueDateForNewCard;
             result = `!${dateStr},${schedule.interval},${schedule.latestEase}`;
         } else {
-            result = `!${RepItemScheduleInfo_Osr.dummyDueDateForNewCard},${RepItemScheduleInfo_Osr.initialInterval},${this.settings.baseEase}`;
+            result = `!${RepItemScheduleInfoOsr.dummyDueDateForNewCard},${RepItemScheduleInfoOsr.initialInterval},${this.settings.baseEase}`;
         }
         return result;
     }

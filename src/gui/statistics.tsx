@@ -121,13 +121,13 @@ export class StatisticsView {
         }
 
         // Add intervals
-        const average_interval: string = textInterval(
+        const averageInterval: string = textInterval(
                 Math.round(
                     (cardStats.intervals.getTotalOfValueMultiplyCount() / scheduledCount) * 10,
                 ) / 10 || 0,
                 false,
             ),
-            longest_interval: string = textInterval(cardStats.intervals.getMaxValue(), false);
+            longestInterval: string = textInterval(cardStats.intervals.getMaxValue(), false);
 
         this.intervalsChart = createStatsChart(
             "bar",
@@ -137,8 +137,8 @@ export class StatisticsView {
             Object.keys(cardStats.intervals.dict),
             Object.values(cardStats.intervals.dict),
             t("INTERVALS_SUMMARY", {
-                avg: average_interval,
-                longest: longest_interval,
+                avg: averageInterval,
+                longest: longestInterval,
             }),
             t("COUNT"),
             t("DAYS"),
@@ -150,7 +150,7 @@ export class StatisticsView {
         for (let ease = Math.min(...eases); ease <= Math.max(...eases); ease++) {
             cardStats.eases.clearCountIfMissing(ease);
         }
-        const average_ease: number =
+        const averageEase: number =
             Math.round(cardStats.eases.getTotalOfValueMultiplyCount() / scheduledCount) || 0;
 
         this.easesChart = createStatsChart(
@@ -160,7 +160,7 @@ export class StatisticsView {
             "",
             Object.keys(cardStats.eases.dict),
             Object.values(cardStats.eases.dict),
-            t("EASES_SUMMARY", { avgEase: average_ease }),
+            t("EASES_SUMMARY", { avgEase: averageEase }),
             t("COUNT"),
             t("EASES"),
             t("NUMBER_OF_CARDS"),

@@ -135,16 +135,16 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     async processReview(response: ReviewResponse): Promise<void> {
         switch (this.reviewMode) {
             case FlashcardReviewMode.Review:
-                await this.processReview_ReviewMode(response);
+                await this.processReviewReviewMode(response);
                 break;
 
             case FlashcardReviewMode.Cram:
-                await this.processReview_CramMode(response);
+                await this.processReviewCramMode(response);
                 break;
         }
     }
 
-    async processReview_ReviewMode(response: ReviewResponse): Promise<void> {
+    async processReviewReviewMode(response: ReviewResponse): Promise<void> {
         if (response != ReviewResponse.Reset || this.currentCard.hasSchedule) {
             // We need to update the schedule if:
             //  (1) the user reviewed with easy/good/hard (either a new or due card),
@@ -181,7 +181,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         }
     }
 
-    async processReview_CramMode(response: ReviewResponse): Promise<void> {
+    async processReviewCramMode(response: ReviewResponse): Promise<void> {
         if (response == ReviewResponse.Easy) this.deleteCurrentCard();
         else {
             this.cardSequencer.moveCurrentCardToEndOfList();

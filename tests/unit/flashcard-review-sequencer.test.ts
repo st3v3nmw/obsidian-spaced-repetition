@@ -21,15 +21,15 @@ import { QuestionPostponementList } from "src/question-postponement-list";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { TopicPath } from "src/topic-path";
 import {
-    setupStaticDateProvider_20230906,
-    setupStaticDateProvider_OriginDatePlusDays,
+    setupStaticDateProvider20230906,
+    setupStaticDateProviderOriginDatePlusDays,
 } from "src/utils/dates";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
-import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
+import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 import { SampleItemDecks } from "./sample-items";
 
-const order_DueFirst_Sequential: IIteratorOrder = {
+const orderDueFirstSequential: IIteratorOrder = {
     cardOrder: CardOrder.DueFirstSequential,
     deckOrder: DeckOrder.PrevDeckComplete_Sequential,
 };
@@ -67,7 +67,7 @@ class TestContext {
             this.questionPostponementList,
             this.dueDateFlashcardHistogram,
         );
-        setupStaticDateProvider_OriginDatePlusDays(daysAfterOrigin);
+        setupStaticDateProviderOriginDatePlusDays(daysAfterOrigin);
 
         await this.setSequencerDeckTreeFromOriginalText();
     }
@@ -105,7 +105,7 @@ class TestContext {
     ): TestContext {
         const settingsClone: SRSettings = { ...settings };
         const cardSequencer: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, null);
-        unitTestSetup_StandardDataStoreAlgorithm(settingsClone);
+        unitTestSetupStandardDataStoreAlgorithm(settingsClone);
         const cardPostponementList: QuestionPostponementList = new QuestionPostponementList(
             null,
             settingsClone,
@@ -138,14 +138,14 @@ class TestContext {
 }
 
 interface Info1 {
-    cardQ2_PreReviewText: string;
-    cardQ2_PostReviewEase: number;
-    cardQ2_PostReviewInterval: number;
-    cardQ2_PostReviewDueDate: string;
-    cardQ2_PostReviewText: string;
+    cardQ2PreReviewText: string;
+    cardQ2PostReviewEase: number;
+    cardQ2PostReviewInterval: number;
+    cardQ2PostReviewDueDate: string;
+    cardQ2PostReviewText: string;
 }
 
-async function checkReviewResponse_ReviewMode(
+async function checkReviewResponseReviewMode(
     reviewResponse: ReviewResponse,
     info: Info1,
 ): Promise<void> {
@@ -156,7 +156,7 @@ async function checkReviewResponse_ReviewMode(
 
     const fakeFilePath: string = moment().millisecond().toString();
     const c: TestContext = TestContext.Create(
-        order_DueFirst_Sequential,
+        orderDueFirstSequential,
         FlashcardReviewMode.Review,
         DEFAULT_SETTINGS,
         text,
@@ -177,19 +177,19 @@ async function checkReviewResponse_ReviewMode(
     expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
 
     // Schedule for the reviewed card has been updated
-    expect(card.scheduleInfo.latestEase).toEqual(info.cardQ2_PostReviewEase);
-    expect(card.scheduleInfo.interval).toEqual(info.cardQ2_PostReviewInterval);
-    expect(card.scheduleInfo.dueDate.unix).toEqual(moment(info.cardQ2_PostReviewDueDate).unix);
+    expect(card.scheduleInfo.latestEase).toEqual(info.cardQ2PostReviewEase);
+    expect(card.scheduleInfo.interval).toEqual(info.cardQ2PostReviewInterval);
+    expect(card.scheduleInfo.dueDate.unix).toEqual(moment(info.cardQ2PostReviewDueDate).unix);
 
     // Note text has been updated
     const expectedText: string = c.originalText.replace(
-        info.cardQ2_PreReviewText,
-        info.cardQ2_PostReviewText,
+        info.cardQ2PreReviewText,
+        info.cardQ2PostReviewText,
     );
     expect(await c.file.read()).toEqual(expectedText);
 }
 
-async function checkReviewResponse_CramMode(reviewResponse: ReviewResponse): Promise<TestContext> {
+async function checkReviewResponseCramMode(reviewResponse: ReviewResponse): Promise<TestContext> {
     const text: string = `
 #flashcards Q1::A1 <!--SR:!2023-09-02,4,270-->
 #flashcards Q2::A2 <!--SR:!2023-09-02,3,270-->
@@ -198,7 +198,7 @@ async function checkReviewResponse_CramMode(reviewResponse: ReviewResponse): Pro
 
     const str: string = moment().millisecond().toString();
     const c: TestContext = TestContext.Create(
-        order_DueFirst_Sequential,
+        orderDueFirstSequential,
         FlashcardReviewMode.Cram,
         DEFAULT_SETTINGS,
         text,
@@ -245,12 +245,7 @@ async function setupSample1(
 #flashcards/science/physics Q5::A5 <!--SR:!2023-09-02,4,270-->
 #flashcards/math Q6::A6`;
 
-    const c: TestContext = TestContext.Create(
-        order_DueFirst_Sequential,
-        reviewMode,
-        settings,
-        text,
-    );
+    const c: TestContext = TestContext.Create(orderDueFirstSequential, reviewMode, settings, text);
     await c.setSequencerDeckTreeFromOriginalText();
     return c;
 }
@@ -282,13 +277,13 @@ function skipThenCheckCardFront(sequencer: IFlashcardReviewSequencer, expectedFr
 
 // Do this before each test, as some tests change the "current" date
 beforeEach(() => {
-    setupStaticDateProvider_20230906();
+    setupStaticDateProvider20230906();
 });
 
 describe("setDeckTree", () => {
     test("Empty deck", () => {
         const c: TestContext = TestContext.Create(
-            order_DueFirst_Sequential,
+            orderDueFirstSequential,
             FlashcardReviewMode.Review,
             DEFAULT_SETTINGS,
             "",
@@ -306,7 +301,7 @@ Q1::A1
 Q2::A2
 Q3::A3`;
         const c: TestContext = TestContext.Create(
-            order_DueFirst_Sequential,
+            orderDueFirstSequential,
             FlashcardReviewMode.Review,
             DEFAULT_SETTINGS,
             text,
@@ -365,7 +360,7 @@ describe("skipCurrentCard", () => {
 `;
 
         const c: TestContext = TestContext.Create(
-            order_DueFirst_Sequential,
+            orderDueFirstSequential,
             FlashcardReviewMode.Review,
             DEFAULT_SETTINGS,
             text,
@@ -421,7 +416,7 @@ describe("processReview", () => {
                     #flashcards Q3::A3 <!--SR:!2023-09-02,6,270-->`;
 
                 const c: TestContext = TestContext.Create(
-                    order_DueFirst_Sequential,
+                    orderDueFirstSequential,
                     FlashcardReviewMode.Review,
                     DEFAULT_SETTINGS,
                     text,
@@ -468,14 +463,14 @@ describe("processReview", () => {
         describe("ReviewResponse.Easy", () => {
             test("Card schedule is updated, next card becomes current", async () => {
                 const expected: Info1 = {
-                    cardQ2_PreReviewText: "Q2::A2 <!--SR:!2023-09-02,4,270-->",
-                    cardQ2_PostReviewEase: 290,
-                    cardQ2_PostReviewInterval: 15,
-                    cardQ2_PostReviewDueDate: "2023-09-21", // 15 days after the unit testing fixed date of 2023-09-06
-                    cardQ2_PostReviewText: `Q2::A2
+                    cardQ2PreReviewText: "Q2::A2 <!--SR:!2023-09-02,4,270-->",
+                    cardQ2PostReviewEase: 290,
+                    cardQ2PostReviewInterval: 15,
+                    cardQ2PostReviewDueDate: "2023-09-21", // 15 days after the unit testing fixed date of 2023-09-06
+                    cardQ2PostReviewText: `Q2::A2
 <!--SR:!2023-09-21,15,290-->`,
                 };
-                await checkReviewResponse_ReviewMode(ReviewResponse.Easy, expected);
+                await checkReviewResponseReviewMode(ReviewResponse.Easy, expected);
             });
         });
 
@@ -492,7 +487,7 @@ Q1::A1
     `;
 
                 const c: TestContext = TestContext.Create(
-                    order_DueFirst_Sequential,
+                    orderDueFirstSequential,
                     FlashcardReviewMode.Review,
                     settings,
                     text,
@@ -532,7 +527,7 @@ Q1::A1
     `;
 
                 const c: TestContext = TestContext.Create(
-                    order_DueFirst_Sequential,
+                    orderDueFirstSequential,
                     FlashcardReviewMode.Review,
                     settings,
                     text,
@@ -566,10 +561,11 @@ Q1::A1
     `;
 
                 // Simulate performing the review on 2023-09-06
-                // Check that the reviewed card, scheduled for following day; 2 buried cards have schedule dates with magic number indicating unreviewed card ("2000-01-01")
-                setupStaticDateProvider_OriginDatePlusDays(0);
+                // Check that the reviewed card, scheduled for following day;
+                // 2 buried cards have schedule dates with magic number indicating unreviewed card ("2000-01-01")
+                setupStaticDateProviderOriginDatePlusDays(0);
                 const c: TestContext = TestContext.Create(
-                    order_DueFirst_Sequential,
+                    orderDueFirstSequential,
                     FlashcardReviewMode.Review,
                     settings,
                     text,
@@ -629,9 +625,9 @@ Q1::A1
                 const text: string = "#flashcards Q1::A1";
 
                 // Create the test context
-                setupStaticDateProvider_OriginDatePlusDays(0);
+                setupStaticDateProviderOriginDatePlusDays(0);
                 const c: TestContext = TestContext.Create(
-                    order_DueFirst_Sequential,
+                    orderDueFirstSequential,
                     FlashcardReviewMode.Review,
                     settings,
                     text,
@@ -654,7 +650,7 @@ What is Newton's equation for gravitational force
 $$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$`;
 
             const c: TestContext = TestContext.Create(
-                order_DueFirst_Sequential,
+                orderDueFirstSequential,
                 FlashcardReviewMode.Review,
                 DEFAULT_SETTINGS,
                 fileText,
@@ -686,7 +682,7 @@ ${indent}- bar?::baz
 `;
 
             const c: TestContext = TestContext.Create(
-                order_DueFirst_Sequential,
+                orderDueFirstSequential,
                 FlashcardReviewMode.Review,
                 settings,
                 text,
@@ -706,7 +702,7 @@ ${indent}- bar?::baz
         describe("ReviewResponse.Easy", () => {
             test("Next card after reviewed card becomes current; reviewed easy card doesn't resurface", async () => {
                 // [Q1, Q2, Q3] review Q1, then current becomes Q2
-                const c: TestContext = await checkReviewResponse_CramMode(ReviewResponse.Easy);
+                const c: TestContext = await checkReviewResponseCramMode(ReviewResponse.Easy);
                 expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
                 skipThenCheckCardFront(c.reviewSequencer, "Q3");
                 skipThenCheckCardFront(c.reviewSequencer, "Q4");
@@ -719,7 +715,7 @@ ${indent}- bar?::baz
         describe("ReviewResponse.Hard", () => {
             test("Next card after reviewed card becomes current; reviewed hard card seen again", async () => {
                 // [Q1, Q2, Q3] review Q1, then current becomes Q2
-                const c: TestContext = await checkReviewResponse_CramMode(ReviewResponse.Hard);
+                const c: TestContext = await checkReviewResponseCramMode(ReviewResponse.Hard);
                 expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
                 skipThenCheckCardFront(c.reviewSequencer, "Q3");
                 skipThenCheckCardFront(c.reviewSequencer, "Q4");
@@ -987,7 +983,7 @@ Q3::A3
 Q4::A4 <!--SR:!2023-01-21,15,290-->
 `;
             const c: TestContext = TestContext.Create(
-                order_DueFirst_Sequential,
+                orderDueFirstSequential,
                 FlashcardReviewMode.Review,
                 DEFAULT_SETTINGS,
                 text,
@@ -1004,14 +1000,14 @@ Q3::A3
 Q4::A4 <!--SR:!2023-01-21,15,290-->
 `;
             const c: TestContext = TestContext.Create(
-                order_DueFirst_Sequential,
+                orderDueFirstSequential,
                 FlashcardReviewMode.Review,
                 DEFAULT_SETTINGS,
                 text,
             );
             await c.setSequencerDeckTreeFromOriginalText();
 
-            expect(c.reviewSequencer.currentCard.front).toEqual("Q4"); // This is the first card as we are using order_DueFirst_Sequential
+            expect(c.reviewSequencer.currentCard.front).toEqual("Q4"); // This is the first card as we are using orderDueFirstSequential
             expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(1, 3, 4));
             c.reviewSequencer.skipCurrentCard();
             // One less due card
@@ -1026,7 +1022,7 @@ Q3::A3
 Q4::A4 <!--SR:!2023-01-21,15,290-->
 `;
             const c: TestContext = TestContext.Create(
-                order_DueFirst_Sequential,
+                orderDueFirstSequential,
                 FlashcardReviewMode.Review,
                 DEFAULT_SETTINGS,
                 text,
@@ -1034,7 +1030,7 @@ Q4::A4 <!--SR:!2023-01-21,15,290-->
             await c.setSequencerDeckTreeFromOriginalText();
 
             await checkStats(c, "#flashcards", [
-                [new DeckStats(1, 3, 4), "Q4", ReviewResponse.Easy], // This is the first card as we are using order_DueFirst_Sequential
+                [new DeckStats(1, 3, 4), "Q4", ReviewResponse.Easy], // This is the first card as we are using orderDueFirstSequential
                 [new DeckStats(0, 3, 4), "Q1", ReviewResponse.Easy], // Iterated through all the due cards, now the new ones
                 [new DeckStats(0, 2, 4), "Q2", ReviewResponse.Easy],
             ]);
@@ -1108,7 +1104,7 @@ async function checkUpdateCurrentQuestionText(
     settings: SRSettings,
 ): Promise<TestContext> {
     const c: TestContext = TestContext.Create(
-        order_DueFirst_Sequential,
+        orderDueFirstSequential,
         FlashcardReviewMode.Review,
         settings,
         noteText,

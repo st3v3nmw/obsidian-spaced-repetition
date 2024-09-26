@@ -3,10 +3,10 @@ import { Menu, Notice, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsid
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { ObsidianVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
-import { SrsAlgorithm_Osr } from "src/algorithms/osr/srs-algorithm-osr";
+import { SrsAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
 import { OsrAppCore } from "src/core";
 import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
-import { DataStoreInNote_AlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
+import { DataStoreInNoteAlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
 import { DataStore } from "src/data-stores/base/data-store";
 import { StoreInNotes } from "src/data-stores/notes/notes";
 import { CardListType, Deck, DeckTreeFilter } from "src/deck";
@@ -17,6 +17,7 @@ import {
     IDeckTreeIterator,
     IIteratorOrder,
 } from "src/deck-tree-iterator";
+import { ISRFile, SrTFile } from "src/file";
 import {
     FlashcardReviewMode,
     FlashcardReviewSequencer,
@@ -35,7 +36,6 @@ import { generateParser, setDebugParser } from "src/parser";
 import { DEFAULT_DATA, PluginData } from "src/plugin-data";
 import { QuestionPostponementList } from "src/question-postponement-list";
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
-import { ISRFile, SrTFile as SrTFile } from "src/sr-file";
 import { TopicPath } from "src/topic-path";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
 
@@ -427,15 +427,15 @@ export default class SRPlugin extends Plugin {
     setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
         // For now we can hardcode as we only support the one data store and one algorithm
         DataStore.instance = new StoreInNotes(settings);
-        SrsAlgorithm.instance = new SrsAlgorithm_Osr(settings);
-        DataStoreAlgorithm.instance = new DataStoreInNote_AlgorithmOsr(settings);
+        SrsAlgorithm.instance = new SrsAlgorithmOsr(settings);
+        DataStoreAlgorithm.instance = new DataStoreInNoteAlgorithmOsr(settings);
     }
 
     async savePluginData(): Promise<void> {
         await this.saveData(this.data);
     }
 
-    async debouncedGenerateParser(timeout_ms = 250) {
+    async debouncedGenerateParser(timeoutMs = 250) {
         if (this.debouncedGenerateParserTimeout) {
             clearTimeout(this.debouncedGenerateParserTimeout);
         }
@@ -453,7 +453,7 @@ export default class SRPlugin extends Plugin {
             };
             generateParser(parserOptions);
             this.debouncedGenerateParserTimeout = null;
-        }, timeout_ms);
+        }, timeoutMs);
     }
 
     showRibbonIcon(status: boolean) {

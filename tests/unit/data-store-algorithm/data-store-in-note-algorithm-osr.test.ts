@@ -1,19 +1,19 @@
-import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { Card } from "src/card";
-import { DataStoreInNote_AlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
+import { DataStoreInNoteAlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
-import { setupStaticDateProvider_20230906 } from "src/utils/dates";
+import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
 import { UnitTestSRFile } from "../helpers/unit-test-file";
 
 beforeAll(() => {
-    setupStaticDateProvider_20230906();
+    setupStaticDateProvider20230906();
 });
 
 describe("noteSetSchedule", () => {
     test("File originally has frontmatter (but not OSR note scheduling frontmatter)", async () => {
         const settings: SRSettings = { ...DEFAULT_SETTINGS };
-        const instance: DataStoreInNote_AlgorithmOsr = new DataStoreInNote_AlgorithmOsr(settings);
+        const instance: DataStoreInNoteAlgorithmOsr = new DataStoreInNoteAlgorithmOsr(settings);
 
         const noteText: string = `---
 created: 2024-01-17
@@ -21,7 +21,7 @@ created: 2024-01-17
 A very interesting note
 `;
         const file: UnitTestSRFile = new UnitTestSRFile(noteText);
-        const scheduleInfo: RepItemScheduleInfo_Osr = RepItemScheduleInfo_Osr.fromDueDateStr(
+        const scheduleInfo: RepItemScheduleInfoOsr = RepItemScheduleInfoOsr.fromDueDateStr(
             "2023-10-06",
             25,
             263,
@@ -43,9 +43,9 @@ A very interesting note
 describe("formatCardSchedule", () => {
     test("Has schedule, with due date", async () => {
         const settings: SRSettings = { ...DEFAULT_SETTINGS };
-        const instance: DataStoreInNote_AlgorithmOsr = new DataStoreInNote_AlgorithmOsr(settings);
+        const instance: DataStoreInNoteAlgorithmOsr = new DataStoreInNoteAlgorithmOsr(settings);
 
-        const scheduleInfo: RepItemScheduleInfo_Osr = RepItemScheduleInfo_Osr.fromDueDateStr(
+        const scheduleInfo: RepItemScheduleInfoOsr = RepItemScheduleInfoOsr.fromDueDateStr(
             "2023-10-06",
             25,
             263,
@@ -58,9 +58,9 @@ describe("formatCardSchedule", () => {
 
     test("Has schedule, but no due date", async () => {
         const settings: SRSettings = { ...DEFAULT_SETTINGS };
-        const instance: DataStoreInNote_AlgorithmOsr = new DataStoreInNote_AlgorithmOsr(settings);
+        const instance: DataStoreInNoteAlgorithmOsr = new DataStoreInNoteAlgorithmOsr(settings);
 
-        const scheduleInfo: RepItemScheduleInfo_Osr = new RepItemScheduleInfo_Osr(
+        const scheduleInfo: RepItemScheduleInfoOsr = new RepItemScheduleInfoOsr(
             null,
             25,
             303,

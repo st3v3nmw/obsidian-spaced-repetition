@@ -174,16 +174,16 @@ export class Deck {
             // We explicitly are adding the same card object to each of the specified decks
             // This is required by getDistinctCardCount()
             for (const topicPath of topicPathList.list) {
-                this.appendCard_SingleTopic(topicPath, cardObj);
+                this.appendCardSingleTopic(topicPath, cardObj);
             }
         }
     }
 
     appendCardToRootDeck(cardObj: Card): void {
-        this.appendCard_SingleTopic(TopicPath.emptyPath, cardObj);
+        this.appendCardSingleTopic(TopicPath.emptyPath, cardObj);
     }
 
-    appendCard_SingleTopic(topicPath: TopicPath, cardObj: Card): void {
+    appendCardSingleTopic(topicPath: TopicPath, cardObj: Card): void {
         const deck: Deck = this.getOrCreateDeck(topicPath);
         const cardList: Card[] = deck.getCardListForCardType(cardObj.cardListType);
 

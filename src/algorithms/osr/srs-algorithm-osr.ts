@@ -5,7 +5,7 @@ import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info"
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { osrSchedule } from "src/algorithms/osr/note-scheduling";
 import { NoteLinkStat, OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
-import { RepItemScheduleInfo_Osr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { DueDateHistogram } from "src/due-date-histogram";
 import { Note } from "src/note";
 import { INoteEaseList, NoteEaseList } from "src/note-ease-list";
@@ -13,7 +13,7 @@ import { Question } from "src/question";
 import { SRSettings } from "src/settings";
 import { globalDateProvider } from "src/utils/dates";
 
-export class SrsAlgorithm_Osr implements ISrsAlgorithm {
+export class SrsAlgorithmOsr implements ISrsAlgorithm {
     private settings: SRSettings;
     private noteEaseList: INoteEaseList;
 
@@ -47,18 +47,17 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
                 : linkContribution * this.settings.baseEase);
 
         // add note's average flashcard ease if available
-        /* c8 ignore next 3 */
         if (this.noteEaseList.hasEaseForPath(notePath)) {
             ease = (ease + this.noteEaseList.getEaseByPath(notePath)) / 2;
         }
 
         // Don't know the due date until we know the calculated interval
         const dueDate: Moment = null;
-        const interval: number = SrsAlgorithm_Osr.initialInterval;
+        const interval: number = SrsAlgorithmOsr.initialInterval;
         ease = Math.round(ease);
-        const temp: RepItemScheduleInfo_Osr = new RepItemScheduleInfo_Osr(dueDate, interval, ease);
+        const temp: RepItemScheduleInfoOsr = new RepItemScheduleInfoOsr(dueDate, interval, ease);
 
-        const result: RepItemScheduleInfo_Osr = this.calcSchedule(
+        const result: RepItemScheduleInfoOsr = this.calcSchedule(
             temp,
             response,
             dueDateNoteHistogram,
@@ -72,7 +71,7 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
     noteOnLoadedNote(path: string, note: Note, noteEase: number): void {
         let flashcardsInNoteAvgEase: number = null;
         if (note) {
-            flashcardsInNoteAvgEase = SrsAlgorithm_Osr.calculateFlashcardAvgEase(
+            flashcardsInNoteAvgEase = SrsAlgorithmOsr.calculateFlashcardAvgEase(
                 note.questionList,
                 this.settings,
             );
@@ -122,8 +121,8 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
         response: ReviewResponse,
         dueDateNoteHistogram: DueDateHistogram,
     ): RepItemScheduleInfo {
-        const noteScheduleOsr: RepItemScheduleInfo_Osr = noteSchedule as RepItemScheduleInfo_Osr;
-        const temp: RepItemScheduleInfo_Osr = this.calcSchedule(
+        const noteScheduleOsr: RepItemScheduleInfoOsr = noteSchedule as RepItemScheduleInfoOsr;
+        const temp: RepItemScheduleInfoOsr = this.calcSchedule(
             noteScheduleOsr,
             response,
             dueDateNoteHistogram,
@@ -133,14 +132,14 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
 
         const dueDate: Moment = moment(globalDateProvider.today.add(interval, "d"));
         this.noteEaseList.setEaseForPath(notePath, ease);
-        return new RepItemScheduleInfo_Osr(dueDate, interval, ease);
+        return new RepItemScheduleInfoOsr(dueDate, interval, ease);
     }
 
     private calcSchedule(
-        schedule: RepItemScheduleInfo_Osr,
+        schedule: RepItemScheduleInfoOsr,
         response: ReviewResponse,
         dueDateHistogram: DueDateHistogram,
-    ): RepItemScheduleInfo_Osr {
+    ): RepItemScheduleInfoOsr {
         const temp: Record<string, number> = osrSchedule(
             response,
             schedule.interval,
@@ -150,14 +149,14 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
             dueDateHistogram,
         );
 
-        return new RepItemScheduleInfo_Osr(globalDateProvider.today, temp.interval, temp.ease);
+        return new RepItemScheduleInfoOsr(globalDateProvider.today, temp.interval, temp.ease);
     }
 
     cardGetResetSchedule(): RepItemScheduleInfo {
-        const interval = SrsAlgorithm_Osr.initialInterval;
+        const interval = SrsAlgorithmOsr.initialInterval;
         const ease = this.settings.baseEase;
         const dueDate = globalDateProvider.today.add(interval, "d");
-        return new RepItemScheduleInfo_Osr(dueDate, interval, ease);
+        return new RepItemScheduleInfoOsr(dueDate, interval, ease);
     }
 
     cardGetNewSchedule(
@@ -165,17 +164,16 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
         notePath: string,
         dueDateFlashcardHistogram: DueDateHistogram,
     ): RepItemScheduleInfo {
-        let initial_ease: number = this.settings.baseEase;
-        /* c8 ignore next 3 */
+        let initialEase: number = this.settings.baseEase;
         if (this.noteEaseList.hasEaseForPath(notePath)) {
-            initial_ease = Math.round(this.noteEaseList.getEaseByPath(notePath));
+            initialEase = Math.round(this.noteEaseList.getEaseByPath(notePath));
         }
         const delayBeforeReview = 0;
 
         const schedObj: Record<string, number> = osrSchedule(
             response,
-            SrsAlgorithm_Osr.initialInterval,
-            initial_ease,
+            SrsAlgorithmOsr.initialInterval,
+            initialEase,
             delayBeforeReview,
             this.settings,
             dueDateFlashcardHistogram,
@@ -184,7 +182,7 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
         const interval = schedObj.interval;
         const ease = schedObj.ease;
         const dueDate = globalDateProvider.today.add(interval, "d");
-        return new RepItemScheduleInfo_Osr(dueDate, interval, ease, delayBeforeReview);
+        return new RepItemScheduleInfoOsr(dueDate, interval, ease, delayBeforeReview);
     }
 
     cardCalcUpdatedSchedule(
@@ -192,7 +190,7 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
         cardSchedule: RepItemScheduleInfo,
         dueDateFlashcardHistogram: DueDateHistogram,
     ): RepItemScheduleInfo {
-        const cardScheduleOsr: RepItemScheduleInfo_Osr = cardSchedule as RepItemScheduleInfo_Osr;
+        const cardScheduleOsr: RepItemScheduleInfoOsr = cardSchedule as RepItemScheduleInfoOsr;
         const schedObj: Record<string, number> = osrSchedule(
             response,
             cardScheduleOsr.interval,
@@ -205,6 +203,6 @@ export class SrsAlgorithm_Osr implements ISrsAlgorithm {
         const ease = schedObj.ease;
         const dueDate = globalDateProvider.today.add(interval, "d");
         const delayBeforeReview = 0;
-        return new RepItemScheduleInfo_Osr(dueDate, interval, ease, delayBeforeReview);
+        return new RepItemScheduleInfoOsr(dueDate, interval, ease, delayBeforeReview);
     }
 }

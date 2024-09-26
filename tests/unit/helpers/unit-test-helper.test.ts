@@ -4,17 +4,17 @@ import { DEFAULT_SETTINGS } from "src/settings";
 
 import { UnitTestOsrCore } from "./unit-test-core";
 import {
-    unitTest_CreateTagCacheObj,
-    unitTest_GetAllTagsFromTextEx,
-    unitTest_ParseForOutgoingLinks,
+    unitTestCreateTagCacheObj,
+    unitTestGetAllTagsFromTextEx,
+    unitTestParseForOutgoingLinks,
 } from "./unit-test-helper";
 import { UnitTestLinkInfoFinder } from "./unit-test-link-info-finder";
-import { unitTestSetup_StandardDataStoreAlgorithm } from "./unit-test-setup";
+import { unitTestSetupStandardDataStoreAlgorithm } from "./unit-test-setup";
 
 let linkInfoFinder: UnitTestLinkInfoFinder;
 
 beforeAll(() => {
-    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 describe("unitTest_GetAllTagsFromTextEx", () => {
@@ -42,11 +42,11 @@ This single {{question}} turns into {{3 separate}} {{cards}}
 #flashcards/science/misc
 
     `;
-            const actual: TagCache[] = unitTest_GetAllTagsFromTextEx(text);
+            const actual: TagCache[] = unitTestGetAllTagsFromTextEx(text);
             const expected: TagCache[] = [
-                unitTest_CreateTagCacheObj("#review", 2),
-                unitTest_CreateTagCacheObj("#flashcards/science/chemistry", 5),
-                unitTest_CreateTagCacheObj("#flashcards/science/misc", 18),
+                unitTestCreateTagCacheObj("#review", 2),
+                unitTestCreateTagCacheObj("#flashcards/science/chemistry", 5),
+                unitTestCreateTagCacheObj("#flashcards/science/misc", 18),
             ];
             expect(actual).toEqual(expected);
         });
@@ -60,10 +60,10 @@ This single {{question}} turns into {{3 separate}} {{cards}}
 
 
     `;
-            const actual: TagCache[] = unitTest_GetAllTagsFromTextEx(text);
+            const actual: TagCache[] = unitTestGetAllTagsFromTextEx(text);
             const expected: TagCache[] = [
-                unitTest_CreateTagCacheObj("#flashcards/science/chemistry", 2),
-                unitTest_CreateTagCacheObj("#flashcards/science/misc", 2),
+                unitTestCreateTagCacheObj("#flashcards/science/chemistry", 2),
+                unitTestCreateTagCacheObj("#flashcards/science/misc", 2),
             ];
             expect(actual).toEqual(expected);
         });
@@ -81,7 +81,7 @@ It can occur with different materials, such as:
 
 (also known as triboelectricity, triboelectric charging, triboelectrification, or tribocharging)
 `;
-        const links: string[] = unitTest_ParseForOutgoingLinks(text);
+        const links: string[] = unitTestParseForOutgoingLinks(text);
         expect(links.length).toEqual(0);
     });
 
@@ -95,7 +95,7 @@ It can occur with different materials, such as:
 
 (also known as triboelectricity, triboelectric charging, [[triboelectrification]], or tribocharging)
 `;
-        const links: string[] = unitTest_ParseForOutgoingLinks(text);
+        const links: string[] = unitTestParseForOutgoingLinks(text);
         const expected: string[] = ["transfer between", "triboelectrification"];
         expect(links).toEqual(expected);
     });
@@ -104,13 +104,13 @@ It can occur with different materials, such as:
         const text: string = `
 The triboelectric effect describes electric charge [[triboelectrification]], or [[tribocharging]])
 `;
-        const links: string[] = unitTest_ParseForOutgoingLinks(text);
+        const links: string[] = unitTestParseForOutgoingLinks(text);
         const expected: string[] = ["triboelectrification", "tribocharging"];
         expect(links).toEqual(expected);
     });
 });
 
-function check_getResolvedLinks(linkName: string, expected: Map<string, number>): void {
+function checkGetResolvedLinks(linkName: string, expected: Map<string, number>): void {
     const e: Record<string, number> = {};
     expected.forEach((n, linkName) => {
         const filename: string = linkInfoFinder.getFilenameForLink(linkName);
@@ -127,7 +127,7 @@ describe("UnitTestLinkInfoFinder", () => {
         linkInfoFinder.init(osrCore.getFileMap());
 
         // One link from A to each of B, C, D
-        check_getResolvedLinks(
+        checkGetResolvedLinks(
             "A",
             new Map([
                 ["B", 1],
@@ -137,12 +137,12 @@ describe("UnitTestLinkInfoFinder", () => {
         );
 
         // No links from B
-        check_getResolvedLinks("B", new Map([]));
+        checkGetResolvedLinks("B", new Map([]));
 
         // One link from C to D
-        check_getResolvedLinks("C", new Map([["D", 1]]));
+        checkGetResolvedLinks("C", new Map([["D", 1]]));
 
-        check_getResolvedLinks(
+        checkGetResolvedLinks(
             "D",
             new Map([
                 ["A", 1],

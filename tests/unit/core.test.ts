@@ -3,14 +3,14 @@ import moment from "moment";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { CardListType } from "src/deck";
 import { NoteDueDateHistogram } from "src/due-date-histogram";
+import { ISRFile } from "src/file";
 import { NoteReviewDeck, SchedNote } from "src/note-review-deck";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
-import { ISRFile } from "src/sr-file";
-import { formatDate_YYYY_MM_DD, setupStaticDateProvider_20230906 } from "src/utils/dates";
+import { formatDateYYYYMMDD, setupStaticDateProvider20230906 } from "src/utils/dates";
 
 import { UnitTestOsrCore } from "./helpers/unit-test-core";
-import { unitTest_CheckNoteFrontmatter } from "./helpers/unit-test-helper";
-import { unitTestSetup_StandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
+import { unitTestCheckNoteFrontmatter } from "./helpers/unit-test-helper";
+import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 
 function checkDeckTreeCounts(
     osrCore: UnitTestOsrCore,
@@ -25,7 +25,7 @@ function checkDeckTreeCounts(
     );
 }
 
-function checkNoteReviewDeck_Basic(
+function checkNoteReviewDeckBasic(
     actual: NoteReviewDeck,
     expected: {
         deckName: string;
@@ -45,12 +45,12 @@ function checkScheduledNote(
     expected: { filename: string; dueDate: string },
 ): void {
     expect(actual.note.path.endsWith(expected.filename)).toBeTruthy();
-    expect(formatDate_YYYY_MM_DD(moment(actual.dueUnix))).toEqual(expected.dueDate);
+    expect(formatDateYYYYMMDD(moment(actual.dueUnix))).toEqual(expected.dueDate);
 }
 
 beforeAll(() => {
-    setupStaticDateProvider_20230906();
-    unitTestSetup_StandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    setupStaticDateProvider20230906();
+    unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
 test("No questions in the text; no files tagged as notes", async () => {
@@ -73,7 +73,7 @@ describe("Notes", () => {
 
             // Single deck "#review", with single new note "Computation Graph.md"
             const actual: NoteReviewDeck = osrCore.noteReviewQueue.reviewDecks.get("#review");
-            checkNoteReviewDeck_Basic(actual, {
+            checkNoteReviewDeckBasic(actual, {
                 deckName: "#review",
                 dueNotesCount: 0,
                 newNotesLength: 1,
@@ -91,7 +91,7 @@ describe("Notes", () => {
 
             // Single deck "#review", with single scheduled note "Triboelectric Effect.md",
             const actual: NoteReviewDeck = osrCore.noteReviewQueue.reviewDecks.get("#review");
-            checkNoteReviewDeck_Basic(actual, {
+            checkNoteReviewDeckBasic(actual, {
                 deckName: "#review",
                 dueNotesCount: 0,
                 newNotesLength: 0,
@@ -116,7 +116,7 @@ describe("Notes", () => {
 
             // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
             const expectedDueDate: string = "2023-09-10";
-            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
+            unitTestCheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
         });
 
         // The notes that have links to [[A]] themselves haven't been reviewed,
@@ -132,7 +132,7 @@ describe("Notes", () => {
 
             // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
             const expectedDueDate: string = "2023-09-10";
-            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
+            unitTestCheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
         });
 
         test("Review note with a backlink (one source file already reviewed)", async () => {
@@ -148,7 +148,7 @@ describe("Notes", () => {
 
             // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
             const expectedDueDate: string = "2023-09-10";
-            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 272);
+            unitTestCheckNoteFrontmatter(file.content, expectedDueDate, 4, 272);
         });
     });
 
@@ -174,7 +174,7 @@ describe("Notes", () => {
 
             // Check note frontmatter - 11 days after the simulated test date of 2023-09-06
             const expectedDueDate: string = "2023-09-17";
-            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 11, 270);
+            unitTestCheckNoteFrontmatter(file.content, expectedDueDate, 11, 270);
 
             expect(osrCore.dueDateNoteHistogram.dueNotesCount).toEqual(0);
             expectedHistogram = new NoteDueDateHistogram({
@@ -197,7 +197,7 @@ describe("Notes", () => {
 
             // Check note frontmatter - 2 days after the simulated test date of 2023-09-06
             const expectedDueDate: string = "2023-09-08";
-            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 2, 250);
+            unitTestCheckNoteFrontmatter(file.content, expectedDueDate, 2, 250);
         });
     });
 
@@ -213,7 +213,7 @@ describe("Notes", () => {
 
             // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
             const expectedDueDate: string = "2023-09-10";
-            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
+            unitTestCheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
         });
 
         // The notes that have links to [[A]] themselves haven't been reviewed,
@@ -229,7 +229,7 @@ describe("Notes", () => {
 
             // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
             const expectedDueDate: string = "2023-09-10";
-            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
+            unitTestCheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
         });
 
         test("Review note with a backlink (one source file already reviewed)", async () => {
@@ -245,7 +245,7 @@ describe("Notes", () => {
 
             // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
             const expectedDueDate: string = "2023-09-10";
-            unitTest_CheckNoteFrontmatter(file.content, expectedDueDate, 4, 272);
+            unitTestCheckNoteFrontmatter(file.content, expectedDueDate, 4, 272);
         });
     });
 

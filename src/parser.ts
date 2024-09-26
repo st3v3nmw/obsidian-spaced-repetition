@@ -76,34 +76,34 @@ export function generateParser(options: ParserOptions): Parser {
 
 function generateGrammar(options: ParserOptions): string {
     // Contains the grammar for cloze cards
-    let clozes_grammar = "";
+    let clozesGrammar = "";
 
     // An array contianing the types of cards enabled by the user
-    const card_rules_list: string[] = ["html_comment", "tilde_code", "backprime_code"];
+    const cardRulesList: string[] = ["html_comment", "tilde_code", "backprime_code"];
 
     // Include reversed inline flashcards rule only if the user provided a non-empty marker for reversed inline flashcards
-    if (options.singleLineCardSeparator.trim() !== "") card_rules_list.push("inline_rev_card");
+    if (options.singleLineCardSeparator.trim() !== "") cardRulesList.push("inline_rev_card");
 
     // Include inline flashcards rule only if the user provided a non-empty marker for inline flashcards
-    if (options.singleLineCardSeparator.trim() !== "") card_rules_list.push("inline_card");
+    if (options.singleLineCardSeparator.trim() !== "") cardRulesList.push("inline_card");
 
     // Include reversed multiline flashcards rule only if the user provided a non-empty marker for reversed multiline flashcards
     if (options.multilineReversedCardSeparator.trim() !== "")
-        card_rules_list.push("multiline_rev_card");
+        cardRulesList.push("multiline_rev_card");
 
     // Include multiline flashcards rule only if the user provided a non-empty marker for multiline flashcards
-    if (options.multilineCardSeparator.trim() !== "") card_rules_list.push("multiline_card");
+    if (options.multilineCardSeparator.trim() !== "") cardRulesList.push("multiline_card");
 
-    const cloze_rules_list: string[] = [];
-    if (options.convertHighlightsToClozes) cloze_rules_list.push("cloze_equal");
-    if (options.convertBoldTextToClozes) cloze_rules_list.push("cloze_star");
-    if (options.convertCurlyBracketsToClozes) cloze_rules_list.push("cloze_bracket");
+    const clozeRulesList: string[] = [];
+    if (options.convertHighlightsToClozes) clozeRulesList.push("cloze_equal");
+    if (options.convertBoldTextToClozes) clozeRulesList.push("cloze_star");
+    if (options.convertCurlyBracketsToClozes) clozeRulesList.push("cloze_bracket");
 
     // Include cloze cards only if the user enabled at least one type of cloze cards
-    if (cloze_rules_list.length > 0) {
-        card_rules_list.push("cloze_card");
-        const cloze_rules = cloze_rules_list.join(" / ");
-        clozes_grammar = `
+    if (clozeRulesList.length > 0) {
+        cardRulesList.push("cloze_card");
+        const clozeRules = clozeRulesList.join(" / ");
+        clozesGrammar = `
 cloze_card
 = $(multiline_before_cloze? cloze_line (multiline_after_cloze)? (newline annotation)?) {
   return createParsedQuestionInfo(CardType.Cloze,text().trimEnd(),location().start.line-1,location().end.line-1);
@@ -119,7 +119,7 @@ multiline_after_cloze
 = e:(!(newline separator_line) text_line1)+
 
 cloze_text
-= ${cloze_rules}
+= ${clozeRules}
 
 cloze_equal
 = cloze_mark_equal (!cloze_mark_equal non_newline)+  cloze_mark_equal
@@ -147,9 +147,9 @@ cloze_mark_bracket_close
     // Important: we need to include `loose_line` rule to detect any other loose line.
     // Otherwise, we get a syntax error because the parser is likely not able to reach the end
     // of the file, as it may encounter loose lines, which it would not know how to handle.
-    card_rules_list.push("loose_line");
+    cardRulesList.push("loose_line");
 
-    const card_rules = card_rules_list.join(" / ");
+    const cardRules = cardRulesList.join(" / ");
 
     return `{
     // The fallback case is important if we want to test the rules with https://peggyjs.org/online.html
@@ -180,7 +180,7 @@ main
 /* The input text to the parser contains arbitrary text, not just card definitions.
 Hence we fallback to matching on loose_line. The result from loose_line is filtered out by filterBlocks() */
 block
-= ${card_rules}
+= ${cardRules}
 
 html_comment
 = $("<!--" (!"-->" (html_comment / .))* "-->" newline?) {
@@ -265,7 +265,7 @@ multiline_rev_before
 multiline_rev_after
 = $(!separator_line text_line)+
 
-${clozes_grammar}
+${clozesGrammar}
 
 inline_mark
 = "${options.singleLineCardSeparator}"

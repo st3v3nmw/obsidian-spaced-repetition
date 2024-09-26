@@ -1,7 +1,7 @@
 import { Moment } from "moment";
 
 import { TICKS_PER_DAY } from "src/constants";
-import { formatDate_YYYY_MM_DD, globalDateProvider } from "src/utils/dates";
+import { formatDateYYYYMMDD, globalDateProvider } from "src/utils/dates";
 
 export abstract class RepItemScheduleInfo {
     dueDate: Moment;
@@ -18,7 +18,7 @@ export abstract class RepItemScheduleInfo {
     }
 
     formatDueDate(): string {
-        return formatDate_YYYY_MM_DD(this.dueDate);
+        return formatDateYYYYMMDD(this.dueDate);
     }
 
     delayedBeforeReviewDaysInt(): number {

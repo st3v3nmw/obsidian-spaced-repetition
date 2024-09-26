@@ -1,6 +1,6 @@
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
+import { ISRFile } from "src/file";
 import { NoteReviewDeck, SchedNote } from "src/note-review-deck";
-import { ISRFile } from "src/sr-file";
 
 export class NoteReviewQueue {
     private _reviewDecks: Map<string, NoteReviewDeck>;
