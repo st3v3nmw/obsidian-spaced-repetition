@@ -31,8 +31,8 @@ For example:
 
     ---
     sr-due: 2024-07-01
-    sr-interval: 3
     sr-ease: 269
+    sr-interval: 3
     ---
 
 ### Single Scheduling File
