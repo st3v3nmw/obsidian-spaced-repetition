@@ -35,7 +35,7 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
 
 1. FSRS
 
--   [ ] Store scheduling info in a dedicated file
+-   [ ] Store scheduling info in a dedicated file (`.yaml`)
 -   [ ] Migrate from one storage system to another
 -   [ ] Implement FSRS
 -   [ ] Update documentation
