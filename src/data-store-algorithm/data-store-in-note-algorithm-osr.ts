@@ -1,12 +1,13 @@
-import { Moment } from "moment";
-import moment from "moment";
+import moment, { Moment } from "moment";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { Card } from "src/card";
 import {
     ALLOWED_DATE_FORMATS,
-    SCHEDULING_INFO_REGEX,
+    SCHEDULING_INFO_DUE_REGEX,
+    SCHEDULING_INFO_EASE_REGEX,
+    SCHEDULING_INFO_INTERVAL_REGEX,
     SR_HTML_COMMENT_BEGIN,
     SR_HTML_COMMENT_END,
     YAML_FRONT_MATTER_REGEX,
@@ -35,12 +36,12 @@ export class DataStoreInNoteAlgorithmOsr implements IDataStoreAlgorithm {
         if (
             frontmatter &&
             frontmatter.has("sr-due") &&
-            frontmatter.has("sr-interval") &&
-            frontmatter.has("sr-ease")
+            frontmatter.has("sr-ease") &&
+            frontmatter.has("sr-interval")
         ) {
             const dueDate: Moment = moment(frontmatter.get("sr-due"), ALLOWED_DATE_FORMATS);
-            const interval: number = parseFloat(frontmatter.get("sr-interval"));
             const ease: number = parseFloat(frontmatter.get("sr-ease"));
+            const interval: number = parseFloat(frontmatter.get("sr-interval"));
             result = new RepItemScheduleInfoOsr(dueDate, interval, ease);
         }
         return result;
@@ -51,17 +52,30 @@ export class DataStoreInNoteAlgorithmOsr implements IDataStoreAlgorithm {
 
         const schedInfo: RepItemScheduleInfoOsr = repItemScheduleInfo as RepItemScheduleInfoOsr;
         const dueString: string = formatDateYYYYMMDD(schedInfo.dueDate);
-        const interval: number = schedInfo.interval;
         const ease: number = schedInfo.latestEase;
+        const interval: number = schedInfo.interval;
 
         // check if scheduling info exists
-        if (SCHEDULING_INFO_REGEX.test(fileText)) {
-            const schedulingInfo = SCHEDULING_INFO_REGEX.exec(fileText);
+        const hasSchedulingDueString = SCHEDULING_INFO_DUE_REGEX.test(fileText);
+        const hasSchedulingEase = SCHEDULING_INFO_EASE_REGEX.test(fileText);
+        const hasSchedulingInterval = SCHEDULING_INFO_INTERVAL_REGEX.test(fileText);
+        if (hasSchedulingDueString && hasSchedulingEase && hasSchedulingInterval) {
+            const schedulingDueString = SCHEDULING_INFO_DUE_REGEX.exec(fileText);
             fileText = fileText.replace(
-                SCHEDULING_INFO_REGEX,
-                `---\n${schedulingInfo[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
-                    `${schedulingInfo[5]}---`,
+                SCHEDULING_INFO_DUE_REGEX,
+                `${schedulingDueString[1]}${dueString}${schedulingDueString[3]}`,
+            );
+
+            const schedulingEase = SCHEDULING_INFO_EASE_REGEX.exec(fileText);
+            fileText = fileText.replace(
+                SCHEDULING_INFO_EASE_REGEX,
+                `${schedulingEase[1]}${ease}${schedulingEase[3]}`,
+            );
+
+            const schedulingInterval = SCHEDULING_INFO_INTERVAL_REGEX.exec(fileText);
+            fileText = fileText.replace(
+                SCHEDULING_INFO_INTERVAL_REGEX,
+                `${schedulingInterval[1]}${interval}${schedulingInterval[3]}`,
             );
         } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
             // new note with existing YAML front matter
@@ -69,12 +83,12 @@ export class DataStoreInNoteAlgorithmOsr implements IDataStoreAlgorithm {
             fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
                 `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n---`,
+                    `sr-ease: ${ease}\nsr-interval: ${interval}\n---`,
             );
         } else {
             fileText =
-                `---\nsr-due: ${dueString}\nsr-interval: ${interval}\n` +
-                `sr-ease: ${ease}\n---\n\n${fileText}`;
+                `---\nsr-due: ${dueString}\nsr-ease: ${ease}\n` +
+                `sr-interval: ${interval}\n---\n\n${fileText}`;
         }
 
         await note.write(fileText);

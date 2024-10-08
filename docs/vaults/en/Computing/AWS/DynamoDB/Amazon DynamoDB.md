@@ -1,7 +1,7 @@
 ---
 sr-due: 2024-08-03
-sr-interval: 4
 sr-ease: 270
+sr-interval: 4
 ---
 
   #review

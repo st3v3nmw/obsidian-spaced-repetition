@@ -8,7 +8,7 @@
         "dev": "node esbuild.config.mjs",
         "format": "pnpm prettier --write . && pnpm eslint src/ tests/ --fix",
         "lint": "pnpm prettier --check . && pnpm eslint src/ tests/",
-        "test": "pnpm jest",
+        "test": "TZ=UTC pnpm jest",
         "changelog": "pnpm auto-changelog --template=compact --package && pnpm prettier --write docs/docs/changelog.md"
     },
     "keywords": [
