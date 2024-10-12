@@ -195,7 +195,7 @@ export class FlashcardReviewView {
             this._currentNote.filePath,
         );
         await wrapper.renderMarkdownWrapper(
-            this._currentCard.front,
+            this._currentCard.front.trimStart(),
             this.content,
             this._currentQuestion.questionText.textDirection,
         );
