@@ -14,13 +14,13 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
 ## Features
 
 -   Flashcards
-    -   [Decks](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#decks) (Using Obsidian's hierarchical tags or folder structure)
-    -   [Single-line style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#single-line-basic-remnote-style) (`Question::Answer`)
-    -   [Single-line reversed style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#single-line-reversed) (`Question:::Answer`)
-    -   [Multi-line style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#multi-line-basic) (Separated by `?`)
-    -   [Multi-line reversed style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#multi-line-reversed) (Separated by `??`)
-    -   [Cloze cards](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#cloze-cards) (`==highlight==` your cloze deletions!, `**bolded text**`, or `{{text in curly braces}}`)
-    -   [Card context - automatic titles based on headings](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#context) (i.e. `Note title > Heading 1 > Subheading`)
+    -   [Decks](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/decks/) (Using Obsidian's hierarchical tags or folder structure)
+    -   [Single-line style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#single-line-basic) (`Question::Answer`)
+    -   [Single-line reversed style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#single-line-bidirectional) (`Question:::Answer`)
+    -   [Multi-line style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#multi-line-basic) (Separated by `?`)
+    -   [Multi-line reversed style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#multi-line-bidirectional) (Separated by `??`)
+    -   [Cloze cards](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/cloze-cards/) (`==highlight==` your cloze deletions!, `**bolded text**`, `{{text in curly braces}}`, or custom cloze patterns)
+    -   [Card context - automatic titles based on headings](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/reviewing/#context) (i.e. `Note title > Heading 1 > Subheading`)
     -   Rich text support in flashcards (inherited from Obsidian)
         -   Images, Audio, & Video
         -   LaTeX
@@ -28,8 +28,7 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
         -   Footnotes
 -   Notes
     -   [Reviewing entire notes](https://www.stephenmwangi.com/obsidian-spaced-repetition/notes/)
-    -   Possible use case: [Incremental writing](https://www.stephenmwangi.com/obsidian-spaced-repetition/notes/#incremental-writing)
--   [Statistics](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/#statistics)
+-   [Statistics](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/statistics/)
 
 ### Coming Soon
 
