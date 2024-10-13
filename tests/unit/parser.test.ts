@@ -485,7 +485,7 @@ test("Test parsing of cloze cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "",
-            clozePatterns: ["==answer==[^[hint]][[^123]]"],
+            clozePatterns: ["==answer==[^\\[hint\\]][\\[^123\\]]"],
         }),
     ).toEqual([
         [CardType.Cloze, "Brazilians speak ==Portuguese==", 0, 0],
@@ -500,7 +500,7 @@ test("Test parsing of cloze cards", () => {
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
                 multilineCardEndMarker: "",
-                clozePatterns: ["==answer==[^[hint]][[^123]]"],
+                clozePatterns: ["==answer==[^\\[hint\\]][\\[^123\\]]"],
             },
         ),
     ).toEqual([
@@ -516,7 +516,7 @@ test("Test parsing of cloze cards", () => {
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
                 multilineCardEndMarker: "",
-                clozePatterns: ["==answer==[^[hint]][[^123]]"],
+                clozePatterns: ["==answer==[^\\[hint\\]][\\[^123\\]]"],
             },
         ),
     ).toEqual([

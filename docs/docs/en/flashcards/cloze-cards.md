@@ -140,10 +140,10 @@ Brackets `[]` delineate where the sequence number and hint will be placed, along
 
 Here are some examples of custom patterns:
 
-| Explanation                                                                                                                                    | Pattern in the Settings           | Simplified Cloze Usage                                                                                  | Numbered Cloze Usage                                                                                            | Generalized Cloze Overlapping Usage                                                                             |
-| ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Anki-Like Pattern                                                                                                                              | `{{[123::]answer[::hint]}}`       | `Brazilians speak {{Portuguese}}`<br><br>Or, with hint:<br>`Brazilians speak {{Portuguese::language}}`  | `Brazilians speak {{1::Portuguese}}`<br><br>Or, with hint:<br>`Brazilians speak {{1::Portuguese::language}}`    | `Brazilians speak {{a::Portuguese}}`<br><br>Or, with hint:<br>`Brazilians speak {{a::Portuguese::language}}`    |
-| Highlighted pattern with hint and sequencer in footnotes. Note that you can use brackets as part of your pattern, but you need to escape them. | `==answer==[^\[hint\]][\[^123\]]` | `Brazilians speak ==Portuguese==`<br><br>Or, with hint:<br>`Brazilians speak ==Portuguese==^[language]` | `Brazilians speak ==Portuguese==[^1]`<br><br>Or, with hint:<br>`Brazilians speak ==Portuguese==^[language][^1]` | `Brazilians speak ==Portuguese==[^a]`<br><br>Or, with hint:<br>`Brazilians speak ==Portuguese==^[language][^a]` |
+| Explanation                                                                                                                                                   | Pattern in the Settings               | Simplified Cloze Usage                                                                                  | Numbered Cloze Usage                                                                                            | Generalized Cloze Overlapping Usage                                                                             |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Anki-Like Pattern                                                                                                                                             | `{{[123::]answer[::hint]}}`           | `Brazilians speak {{Portuguese}}`<br><br>Or, with hint:<br>`Brazilians speak {{Portuguese::language}}`  | `Brazilians speak {{1::Portuguese}}`<br><br>Or, with hint:<br>`Brazilians speak {{1::Portuguese::language}}`    | `Brazilians speak {{a::Portuguese}}`<br><br>Or, with hint:<br>`Brazilians speak {{a::Portuguese::language}}`    |
+| Highlighted pattern with hint and sequencer in footnotes. <br/><br/> **Note that you can use brackets as part of your pattern, but you need to escape them.** | `==answer==[^\\[hint\\]][\\[^123\\]]` | `Brazilians speak ==Portuguese==`<br><br>Or, with hint:<br>`Brazilians speak ==Portuguese==^[language]` | `Brazilians speak ==Portuguese==[^1]`<br><br>Or, with hint:<br>`Brazilians speak ==Portuguese==^[language][^1]` | `Brazilians speak ==Portuguese==[^a]`<br><br>Or, with hint:<br>`Brazilians speak ==Portuguese==^[language][^a]` |
 
 !!! warning
 
@@ -154,7 +154,7 @@ In your settings, you can add multiple patterns at once, separating them with a 
 
 ```
 {{[123::]answer[::hint]}}
-==answer==[^\[hint\]][\[^123\]]
+==answer==[^\\[hint\\]][\\[^123\\]]
 ```
 
 Then, you can use them in your notes:
