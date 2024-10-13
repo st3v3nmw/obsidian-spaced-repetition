@@ -1,7 +1,7 @@
 # Including Blank Lines in Flashcards
 
 By default, [Multi-line Basic](q-and-a-cards.md#multi-line-basic), [Multi-line Bidirectional](q-and-a-cards.md#multi-line-bidirectional)
-and [Cloze](basic-cloze-cards.md) type flashcards recognize a blank line as the end of the flashcard text.
+and [Cloze](cloze-cards.md) type flashcards recognize a blank line as the end of the flashcard text.
 This means that blank lines can not be included within the text.
 
 If blank lines need to be included (e.g. on a card containing a markdown table), the

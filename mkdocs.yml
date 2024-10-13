@@ -34,7 +34,7 @@ nav:
     - Flashcards:
           - Flashcards Overview: flashcards/flashcards-overview.md
           - Question & Answer Cards: flashcards/q-and-a-cards.md
-          - Cloze Cards: flashcards/basic-cloze-cards.md
+          - Cloze Cards: flashcards/cloze-cards.md
           - Cards with Blank Lines: flashcards/cards-with-blank-lines.md
           - Organizing into Decks: flashcards/decks.md
           - Reviewing & Cramming: flashcards/reviewing.md

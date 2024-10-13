@@ -40,13 +40,6 @@ Fight the forgetting curve & note aging by reviewing flashcards & notes using sp
 -   [ ] Implement FSRS
 -   [ ] Update documentation
 
-2. Better Cloze formats
-
--   [ ] Custom cloze markers
--   [ ] Cloze hints
--   [ ] Anki-like clozes
--   [ ] Update documentation
-
 ## Usage
 
 Check the [documentation](https://www.stephenmwangi.com/obsidian-spaced-repetition/) for more details.

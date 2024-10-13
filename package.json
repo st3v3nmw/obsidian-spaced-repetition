@@ -52,7 +52,7 @@
         "pagerank.js": "^1.0.2",
         "short-uuid": "^5.2.0"
     },
-    "packageManager": "pnpm@^9.10.0",
+    "packageManager": "pnpm@9.10.0",
     "engines": {
         "pnpm": ">=9.10.0"
     },
