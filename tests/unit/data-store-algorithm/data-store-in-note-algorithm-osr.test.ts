@@ -31,8 +31,8 @@ A very interesting note
         const expectedText: string = `---
 created: 2024-01-17
 sr-due: 2023-10-06
-sr-interval: 25
 sr-ease: 263
+sr-interval: 25
 ---
 A very interesting note
 `;
