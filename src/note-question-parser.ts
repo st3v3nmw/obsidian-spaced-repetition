@@ -4,7 +4,7 @@ import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info"
 import { Card } from "src/card";
 import { DataStore } from "src/data-stores/base/data-store";
 import { frontmatterTagPseudoLineNum, ISRFile } from "src/file";
-import { ParsedQuestionInfo, parseEx, ParserOptions } from "src/parser";
+import { parse, ParsedQuestionInfo, ParserOptions } from "src/parser";
 import { Question, QuestionText } from "src/question";
 import { CardFrontBack, CardFrontBackUtil } from "src/question-type";
 import { SettingsUtil, SRSettings } from "src/settings";
@@ -143,20 +143,18 @@ export class NoteQuestionParser {
     }
 
     private parseQuestions(): ParsedQuestionInfo[] {
-        // We pass contentText which has the frontmatter blanked out; see extractFrontmatter for reasoning
+        const settings = this.settings;
         const parserOptions: ParserOptions = {
-            singleLineCardSeparator: this.settings.singleLineCardSeparator,
-            singleLineReversedCardSeparator: this.settings.singleLineReversedCardSeparator,
-            multilineCardSeparator: this.settings.multilineCardSeparator,
-            multilineReversedCardSeparator: this.settings.multilineReversedCardSeparator,
-            multilineCardEndMarker: this.settings.multilineCardEndMarker,
-            convertHighlightsToClozes: this.settings.convertHighlightsToClozes,
-            convertBoldTextToClozes: this.settings.convertBoldTextToClozes,
-            convertCurlyBracketsToClozes: this.settings.convertCurlyBracketsToClozes,
+            singleLineCardSeparator: settings.singleLineCardSeparator,
+            singleLineReversedCardSeparator: settings.singleLineReversedCardSeparator,
+            multilineCardSeparator: settings.multilineCardSeparator,
+            multilineReversedCardSeparator: settings.multilineReversedCardSeparator,
+            multilineCardEndMarker: settings.multilineCardEndMarker,
+            clozePatterns: settings.clozePatterns,
         };
 
-        const result: ParsedQuestionInfo[] = parseEx(this.contentText, parserOptions);
-        return result;
+        // We pass contentText which has the frontmatter blanked out; see extractFrontmatter for reasoning
+        return parse(this.contentText, parserOptions);
     }
 
     private createQuestionObject(

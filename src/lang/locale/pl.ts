@@ -121,6 +121,8 @@ export default {
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Konwertować ==podświetlenia== na karty zamaskowane?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "Konwertować pogrubiony tekst na karty zamaskowane?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Konwertować {{klamry}} na karty zamaskowane?",
+    CLOZE_PATTERNS: "Wzory kart zamaskowanych",
+    CLOZE_PATTERNS_DESC: "Wprowadź wzory kart zamaskowanych oddzielone nowymi liniami",
     INLINE_CARDS_SEPARATOR: "Separator dla kart zamaskowanych w linii",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Pamiętaj, że po zmianie tego musisz ręcznie edytować wszystkie karty zamaskowane, które już masz.",

@@ -253,14 +253,14 @@ describe("Notes", () => {
         test("There is schedule info for 3 cards, but only 2 cards in the question", async () => {
             const settings: SRSettings = { ...DEFAULT_SETTINGS };
             settings.cardCommentOnSameLine = true;
-            settings.convertCurlyBracketsToClozes = true;
+            settings.clozePatterns = ["{{[123;;]answer[;;hint]}}"];
             const osrCore: UnitTestOsrCore = new UnitTestOsrCore(settings);
             await osrCore.loadTestVault("notes6");
 
             /*
-A {{question}} with multiple parts {{Navevo part}}
-<!--SR:!2024-05-22,1,230!2024-05-25,4,270!2033-03-03,3,333-->
-The final schedule info "!2033-03-03,3,333" has been deleted
+                A {{question}} with multiple parts {{Navevo part}}
+                <!--SR:!2024-05-22,1,230!2024-05-25,4,270!2033-03-03,3,333-->
+                The final schedule info "!2033-03-03,3,333" has been deleted
              */
             const file = osrCore.getFileByNoteName("A");
             expect(file.content).toContain("<!--SR:!2024-05-22,1,230!2024-05-25,4,270-->");

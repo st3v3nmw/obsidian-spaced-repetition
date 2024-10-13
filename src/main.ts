@@ -32,7 +32,7 @@ import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/next-note-review-handler";
 import { Note } from "src/note";
 import { NoteFileLoader } from "src/note-file-loader";
-import { generateParser, setDebugParser } from "src/parser";
+import { setDebugParser } from "src/parser";
 import { DEFAULT_DATA, PluginData } from "src/plugin-data";
 import { QuestionPostponementList } from "src/question-postponement-list";
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
@@ -44,8 +44,6 @@ export default class SRPlugin extends Plugin {
     public osrAppCore: OsrAppCore;
     private osrSidebar: OsrSidebar;
     private nextNoteReviewHandler: NextNoteReviewHandler;
-
-    private debouncedGenerateParserTimeout: number | null = null;
 
     private ribbonIcon: HTMLElement | null = null;
     private statusBar: HTMLElement | null = null;
@@ -435,29 +433,8 @@ export default class SRPlugin extends Plugin {
         await this.saveData(this.data);
     }
 
-    async debouncedGenerateParser(timeoutMs = 250) {
-        if (this.debouncedGenerateParserTimeout) {
-            clearTimeout(this.debouncedGenerateParserTimeout);
-        }
-
-        this.debouncedGenerateParserTimeout = window.setTimeout(async () => {
-            const parserOptions = {
-                singleLineCardSeparator: this.data.settings.singleLineCardSeparator,
-                singleLineReversedCardSeparator: this.data.settings.singleLineReversedCardSeparator,
-                multilineCardSeparator: this.data.settings.multilineCardSeparator,
-                multilineReversedCardSeparator: this.data.settings.multilineReversedCardSeparator,
-                multilineCardEndMarker: this.data.settings.multilineCardEndMarker,
-                convertHighlightsToClozes: this.data.settings.convertHighlightsToClozes,
-                convertBoldTextToClozes: this.data.settings.convertBoldTextToClozes,
-                convertCurlyBracketsToClozes: this.data.settings.convertCurlyBracketsToClozes,
-            };
-            generateParser(parserOptions);
-            this.debouncedGenerateParserTimeout = null;
-        }, timeoutMs);
-    }
-
     showRibbonIcon(status: boolean) {
-        // if it does not exit, we create it
+        // if it does not exist, we create it
         if (!this.ribbonIcon) {
             this.ribbonIcon = this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
                 if (!this.osrAppCore.syncLock) {
@@ -478,7 +455,7 @@ export default class SRPlugin extends Plugin {
     }
 
     showStatusBar(status: boolean) {
-        // if it does not exit, we create it
+        // if it does not exist, we create it
         if (!this.statusBar) {
             this.statusBar = this.addStatusBarItem();
             this.statusBar.classList.add("mod-clickable");
