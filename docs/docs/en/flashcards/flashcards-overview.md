@@ -18,7 +18,7 @@ Two types of flashcards are supported:
 
 !!! note "Cloze"
 
-    [Cloze](basic-cloze-cards.md) flashcards are ones where the flashcard text identifies parts of the text (e.g. a word or phrase) that is hidden
+    [Cloze](cloze-cards.md) flashcards are ones where the flashcard text identifies parts of the text (e.g. a word or phrase) that is hidden
     when the front of the card is shown. <br/>
     The hidden text is known as a `cloze deletion`.
     <hr class="thin">
@@ -51,7 +51,7 @@ cards are defined.
 | [Single-line Bidirectional](q-and-a-cards.md#single-line-bidirectional) | flashcard defines two cards.                                                                  |
 | [Multi-line Basic](q-and-a-cards.md#multi-line-basic)                   | flashcard defines the front and back of a single card.                                        |
 | [Multi-line Bidirectional](q-and-a-cards.md#multi-line-bidirectional)   | flashcard defines two cards.                                                                  |
-| [Cloze](basic-cloze-cards.md)                                           | flashcard defines multiple cards, the number of cards based on the number of cloze deletions. |
+| [Cloze](cloze-cards.md)                                                 | flashcard defines multiple cards, the number of cards based on the number of cloze deletions. |
 
 ### Sibling Cards
 
