@@ -118,6 +118,8 @@ export default {
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==Vurgulanan== metni gizli kartlara dönüştür?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "**Kalın metni** gizli kartlara dönüştür?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "{{Kıvırcık parantezleri}} gizli kartlara dönüştür?",
+    CLOZE_PATTERNS: "Cloze Patterns",
+    CLOZE_PATTERNS_DESC: "Enter cloze patterns separated by newlines",
     INLINE_CARDS_SEPARATOR: "Satır içi flash kartlar için ayırıcı",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Bunu değiştirdikten sonra mevcut flash kartlarınızı manuel olarak düzenlemeniz gerektiğini unutmayın.",

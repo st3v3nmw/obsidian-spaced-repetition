@@ -1,5 +1,5 @@
 import { CardType } from "src/question";
-import { CardFrontBack, CardFrontBackUtil, QuestionTypeClozeUtil } from "src/question-type";
+import { CardFrontBack, CardFrontBackUtil, QuestionTypeClozeFormatter } from "src/question-type";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 
 test("CardType.SingleLineBasic", () => {
@@ -37,7 +37,7 @@ test("CardType.MultiLineReversed", () => {
 });
 
 test("CardType.Cloze", () => {
-    const frontHtml = QuestionTypeClozeUtil.renderClozeFront();
+    const clozeFormatter = new QuestionTypeClozeFormatter();
 
     expect(
         CardFrontBackUtil.expand(
@@ -47,22 +47,24 @@ test("CardType.Cloze", () => {
         ),
     ).toEqual([
         new CardFrontBack(
-            "This is a very " + frontHtml + " test",
-            "This is a very " + QuestionTypeClozeUtil.renderClozeBack("interesting") + " test",
+            "This is a very " + clozeFormatter.asking() + " test",
+            "This is a very " + clozeFormatter.showingAnswer("interesting") + " test",
         ),
     ]);
 
     const settings2: SRSettings = DEFAULT_SETTINGS;
-    settings2.convertBoldTextToClozes = true;
-    settings2.convertHighlightsToClozes = true;
-    settings2.convertCurlyBracketsToClozes = true;
+    settings2.clozePatterns = [
+        "==[123;;]answer[;;hint]==",
+        "**[123;;]answer[;;hint]**",
+        "{{[123;;]answer[;;hint]}}",
+    ];
 
     expect(
         CardFrontBackUtil.expand(CardType.Cloze, "This is a very **interesting** test", settings2),
     ).toEqual([
         new CardFrontBack(
-            "This is a very " + frontHtml + " test",
-            "This is a very " + QuestionTypeClozeUtil.renderClozeBack("interesting") + " test",
+            "This is a very " + clozeFormatter.asking() + " test",
+            "This is a very " + clozeFormatter.showingAnswer("interesting") + " test",
         ),
     ]);
 
@@ -70,8 +72,8 @@ test("CardType.Cloze", () => {
         CardFrontBackUtil.expand(CardType.Cloze, "This is a very {{interesting}} test", settings2),
     ).toEqual([
         new CardFrontBack(
-            "This is a very " + frontHtml + " test",
-            "This is a very " + QuestionTypeClozeUtil.renderClozeBack("interesting") + " test",
+            "This is a very " + clozeFormatter.asking() + " test",
+            "This is a very " + clozeFormatter.showingAnswer("interesting") + " test",
         ),
     ]);
 
@@ -83,16 +85,16 @@ test("CardType.Cloze", () => {
         ),
     ).toEqual([
         new CardFrontBack(
-            "This is a really very <span style='color:#2196f3'>[...]</span> and fascinating and great test",
-            "This is a really very <span style='color:#2196f3'>interesting</span> and fascinating and great test",
-        ),
-        new CardFrontBack(
             "This is a really very interesting and <span style='color:#2196f3'>[...]</span> and great test",
             "This is a really very interesting and <span style='color:#2196f3'>fascinating</span> and great test",
         ),
         new CardFrontBack(
             "This is a really very interesting and fascinating and <span style='color:#2196f3'>[...]</span> test",
             "This is a really very interesting and fascinating and <span style='color:#2196f3'>great</span> test",
+        ),
+        new CardFrontBack(
+            "This is a really very <span style='color:#2196f3'>[...]</span> and fascinating and great test",
+            "This is a really very <span style='color:#2196f3'>interesting</span> and fascinating and great test",
         ),
     ]);
 });

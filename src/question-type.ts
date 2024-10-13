@@ -1,3 +1,5 @@
+import { ClozeCrafter, IClozeFormatter } from "clozecraft";
+
 import { CardType } from "src/question";
 import { SRSettings } from "src/settings";
 import { findLineIndexOfSearchStringIgnoringWs } from "src/utils/strings";
@@ -92,44 +94,15 @@ class QuestionTypeMultiLineReversed implements IQuestionTypeHandler {
 
 class QuestionTypeCloze implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
-        const siblings: RegExpMatchArray[] = [];
-        if (settings.convertHighlightsToClozes) {
-            siblings.push(...questionText.matchAll(/==(.*?)==/gm));
-        }
-        if (settings.convertBoldTextToClozes) {
-            siblings.push(...questionText.matchAll(/\*\*(.*?)\*\*/gm));
-        }
-        if (settings.convertCurlyBracketsToClozes) {
-            siblings.push(...questionText.matchAll(/{{(.*?)}}/gm));
-        }
-        siblings.sort((a, b) => {
-            if (a.index < b.index) {
-                return -1;
-            }
-            if (a.index > b.index) {
-                return 1;
-            }
-            // What is unit test to cover following statement; otherwise jest please ignore
-            return 0;
-        });
+        const clozecrafter = new ClozeCrafter(settings.clozePatterns);
+        const clozeNote = clozecrafter.createClozeNote(questionText);
+        const clozeFormatter = new QuestionTypeClozeFormatter();
 
         let front: string, back: string;
         const result: CardFrontBack[] = [];
-        for (const m of siblings) {
-            const deletionStart: number = m.index,
-                deletionEnd: number = deletionStart + m[0].length;
-            front =
-                questionText.substring(0, deletionStart) +
-                QuestionTypeClozeUtil.renderClozeFront() +
-                questionText.substring(deletionEnd);
-            front = QuestionTypeClozeUtil.removeClozeTokens(front, settings);
-            back =
-                questionText.substring(0, deletionStart) +
-                QuestionTypeClozeUtil.renderClozeBack(
-                    questionText.substring(deletionStart, deletionEnd),
-                ) +
-                questionText.substring(deletionEnd);
-            back = QuestionTypeClozeUtil.removeClozeTokens(back, settings);
+        for (let i = 0; i < clozeNote.numCards; i++) {
+            front = clozeNote.getCardFront(i, clozeFormatter);
+            back = clozeNote.getCardBack(i, clozeFormatter);
             result.push(new CardFrontBack(front, back));
         }
 
@@ -137,23 +110,17 @@ class QuestionTypeCloze implements IQuestionTypeHandler {
     }
 }
 
-export class QuestionTypeClozeUtil {
-    static renderClozeFront(): string {
-        return "<span style='color:#2196f3'>[...]</span>";
+export class QuestionTypeClozeFormatter implements IClozeFormatter {
+    asking(answer?: string, hint?: string): string {
+        return `<span style='color:#2196f3'>${!hint ? "[...]" : `[${hint}]`}</span>`;
     }
 
-    static renderClozeBack(str: string): string {
-        return "<span style='color:#2196f3'>" + str + "</span>";
+    showingAnswer(answer: string, _hint?: string): string {
+        return `<span style='color:#2196f3'>${answer}</span>`;
     }
 
-    static removeClozeTokens(text: string, settings: SRSettings): string {
-        let result: string = text;
-        if (settings.convertHighlightsToClozes) result = result.replace(/==/gm, "");
-        if (settings.convertBoldTextToClozes) result = result.replace(/\*\*/gm, "");
-        if (settings.convertCurlyBracketsToClozes) {
-            result = result.replace(/{{/gm, "").replace(/}}/gm, "");
-        }
-        return result;
+    hiding(answer?: string, hint?: string): string {
+        return `<span style='color:var(--code-comment)'>${!hint ? "[...]" : `[${hint}]`}</span>`;
     }
 }
 
