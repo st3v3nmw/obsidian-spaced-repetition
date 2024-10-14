@@ -115,7 +115,7 @@ export default {
         "Randomly (once all cards in previous deck reviewed)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
     DISABLE_CLOZE_CARDS: "Disable cloze cards?",
-    CONVERT_HIGHLIGHTS_TO_CLOZES: "Convert ==hightlights== to clozes?",
+    CONVERT_HIGHLIGHTS_TO_CLOZES: "Convert ==highlights== to clozes?",
     CONVERT_BOLD_TEXT_TO_CLOZES: "Convert **bolded text** to clozes?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Convert {{curly brackets}} to clozes?",
     CLOZE_PATTERNS: "Cloze Patterns",

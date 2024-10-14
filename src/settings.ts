@@ -134,25 +134,17 @@ export function upgradeSettings(settings: SRSettings) {
         settings.randomizeCardOrder = null;
     }
 
-    if (
-        settings.convertHighlightsToClozes &&
-        !settings.clozePatterns.contains("==[123;;]answer[;;hint]==")
-    ) {
-        settings.clozePatterns.push("==[123;;]answer[;;hint]==");
-    }
+    if (settings.clozePatterns == null) {
+        settings.clozePatterns = [];
 
-    if (
-        settings.convertBoldTextToClozes &&
-        !settings.clozePatterns.contains("**[123;;]answer[;;hint]**")
-    ) {
-        settings.clozePatterns.push("**[123;;]answer[;;hint]**");
-    }
+        if (settings.convertHighlightsToClozes)
+            settings.clozePatterns.push("==[123;;]answer[;;hint]==");
 
-    if (
-        settings.convertCurlyBracketsToClozes &&
-        !settings.clozePatterns.contains("{{[123;;]answer[;;hint]}}")
-    ) {
-        settings.clozePatterns.push("{{[123;;]answer[;;hint]}}");
+        if (settings.convertBoldTextToClozes)
+            settings.clozePatterns.push("**[123;;]answer[;;hint]**");
+
+        if (settings.convertCurlyBracketsToClozes)
+            settings.clozePatterns.push("{{[123;;]answer[;;hint]}}");
     }
 }
 
