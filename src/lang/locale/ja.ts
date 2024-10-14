@@ -122,7 +122,8 @@ export default {
     CONVERT_BOLD_TEXT_TO_CLOZES: "**ボールド体**を穴埋めとして使用しますか？",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "{{中括弧}}を穴埋めとして使用しますか？",
     CLOZE_PATTERNS: "穴埋めパターン",
-    CLOZE_PATTERNS_DESC: "改行で区切って穴埋めパターンを入力してください。",
+    CLOZE_PATTERNS_DESC:
+        '改行で区切って穴埋めパターンを入力してください。 Check the <a href="${docsUrl}">wiki</a> for guidance.',
     INLINE_CARDS_SEPARATOR: "インラインフラッシュカードに使用するセパレーター",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "このオプションを変更する場合には、作成済みのフラッシュカードを手動で編集し直す必要があることに注意してください。",

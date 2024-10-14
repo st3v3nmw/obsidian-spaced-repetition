@@ -112,7 +112,8 @@ export default {
     CONVERT_BOLD_TEXT_TO_CLOZES: "将 **粗体** 转换为完形填空？",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "将 {{大括号}} 转换为完形填空？",
     CLOZE_PATTERNS: "完形填空模式",
-    CLOZE_PATTERNS_DESC: "输入以换行符分隔的完形填空模式",
+    CLOZE_PATTERNS_DESC:
+        '输入以换行符分隔的完形填空模式. Check the <a href="${docsUrl}">wiki</a> for guidance.',
     INLINE_CARDS_SEPARATOR: "单行卡片的分隔符",
     FIX_SEPARATORS_MANUALLY_WARNING: "注意：更改此选项后你将需要自行更改已存在卡片的分隔符。",
     INLINE_REVERSED_CARDS_SEPARATOR: "单行翻转卡片的分隔符",

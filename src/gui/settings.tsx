@@ -262,51 +262,56 @@ export class SRSettingTab extends PluginSettingTab {
                     }),
             );
 
-        new Setting(containerEl)
-            .setName(t("CLOZE_PATTERNS"))
-            .setDesc(t("CLOZE_PATTERNS_DESC"))
-            .addTextArea((text) =>
-                text
-                    .setPlaceholder(
-                        "Example:\n==[123;;]answer[;;hint]==\n**[123;;]answer[;;hint]**\n{{[123;;]answer[;;hint]}}",
-                    )
-                    .setValue(this.plugin.data.settings.clozePatterns.join("\n"))
-                    .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            const hightlightPattern = "==[123;;]answer[;;hint]==";
-                            const boldPattern = "**[123;;]answer[;;hint]**";
-                            const curlyBracketsPattern = "{{[123;;]answer[;;hint]}}";
+        const clozePatternsEl = new Setting(containerEl).setName(t("CLOZE_PATTERNS"));
+        clozePatternsEl.descEl.insertAdjacentHTML(
+            "beforeend",
+            t("CLOZE_PATTERNS_DESC", {
+                docsUrl:
+                    "https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/cloze-cards/#cloze-types",
+            }),
+        );
+        clozePatternsEl.addTextArea((text) =>
+            text
+                .setPlaceholder(
+                    "Example:\n==[123;;]answer[;;hint]==\n**[123;;]answer[;;hint]**\n{{[123;;]answer[;;hint]}}",
+                )
+                .setValue(this.plugin.data.settings.clozePatterns.join("\n"))
+                .onChange((value) => {
+                    applySettingsUpdate(async () => {
+                        const hightlightPattern = "==[123;;]answer[;;hint]==";
+                        const boldPattern = "**[123;;]answer[;;hint]**";
+                        const curlyBracketsPattern = "{{[123;;]answer[;;hint]}}";
 
-                            const clozePatternSet = new Set(
-                                value
-                                    .split(/\n+/)
-                                    .map((v) => v.trim())
-                                    .filter((v) => v),
-                            );
+                        const clozePatternSet = new Set(
+                            value
+                                .split(/\n+/)
+                                .map((v) => v.trim())
+                                .filter((v) => v),
+                        );
 
-                            if (clozePatternSet.has(hightlightPattern)) {
-                                this.plugin.data.settings.convertHighlightsToClozes = true;
-                            } else {
-                                this.plugin.data.settings.convertHighlightsToClozes = false;
-                            }
+                        if (clozePatternSet.has(hightlightPattern)) {
+                            this.plugin.data.settings.convertHighlightsToClozes = true;
+                        } else {
+                            this.plugin.data.settings.convertHighlightsToClozes = false;
+                        }
 
-                            if (clozePatternSet.has(boldPattern)) {
-                                this.plugin.data.settings.convertBoldTextToClozes = true;
-                            } else {
-                                this.plugin.data.settings.convertBoldTextToClozes = false;
-                            }
+                        if (clozePatternSet.has(boldPattern)) {
+                            this.plugin.data.settings.convertBoldTextToClozes = true;
+                        } else {
+                            this.plugin.data.settings.convertBoldTextToClozes = false;
+                        }
 
-                            if (clozePatternSet.has(curlyBracketsPattern)) {
-                                this.plugin.data.settings.convertCurlyBracketsToClozes = true;
-                            } else {
-                                this.plugin.data.settings.convertCurlyBracketsToClozes = false;
-                            }
+                        if (clozePatternSet.has(curlyBracketsPattern)) {
+                            this.plugin.data.settings.convertCurlyBracketsToClozes = true;
+                        } else {
+                            this.plugin.data.settings.convertCurlyBracketsToClozes = false;
+                        }
 
-                            this.plugin.data.settings.clozePatterns = [...clozePatternSet];
-                            await this.plugin.savePluginData();
-                        });
-                    }),
-            );
+                        this.plugin.data.settings.clozePatterns = [...clozePatternSet];
+                        await this.plugin.savePluginData();
+                    });
+                }),
+        );
 
         new Setting(containerEl)
             .setName(t("INLINE_CARDS_SEPARATOR"))

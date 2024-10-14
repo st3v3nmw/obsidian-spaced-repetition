@@ -116,7 +116,8 @@ export default {
     CONVERT_BOLD_TEXT_TO_CLOZES: "Convert **bolded text** to clozes?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Convert {{curly brackets}} to clozes?",
     CLOZE_PATTERNS: "Cloze Patterns",
-    CLOZE_PATTERNS_DESC: "Enter cloze patterns separated by newlines",
+    CLOZE_PATTERNS_DESC:
+        'Enter cloze patterns separated by newlines. Check the <a href="${docsUrl}">wiki</a> for guidance.',
     INLINE_CARDS_SEPARATOR: "فاصل من أجل البطاقات المضمنة",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "ضع في حسابك أنه بعد تغيير هذا ، يجب عليك تعديل أي بطاقات لديك بالفعل يدويًا",

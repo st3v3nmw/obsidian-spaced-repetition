@@ -120,7 +120,8 @@ export default {
     CONVERT_BOLD_TEXT_TO_CLOZES: "Convertir **gras** en trous ?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Convertir {{crochets}} en trous ?",
     CLOZE_PATTERNS: "Cloze Patterns",
-    CLOZE_PATTERNS_DESC: "Enter cloze patterns separated by newlines",
+    CLOZE_PATTERNS_DESC:
+        'Enter cloze patterns separated by newlines. Check the <a href="${docsUrl}">wiki</a> for guidance.',
     INLINE_CARDS_SEPARATOR: "Séparateur pour flashcards en une ligne",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Après avoir changé ce réglage, vous devrez manuellement mettre à jour toutes vos flashcards.",

@@ -119,7 +119,8 @@ export default {
     CONVERT_BOLD_TEXT_TO_CLOZES: "**Kalın metni** gizli kartlara dönüştür?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "{{Kıvırcık parantezleri}} gizli kartlara dönüştür?",
     CLOZE_PATTERNS: "Cloze Patterns",
-    CLOZE_PATTERNS_DESC: "Enter cloze patterns separated by newlines",
+    CLOZE_PATTERNS_DESC:
+        'Enter cloze patterns separated by newlines. Check the <a href="${docsUrl}">wiki</a> for guidance.',
     INLINE_CARDS_SEPARATOR: "Satır içi flash kartlar için ayırıcı",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Bunu değiştirdikten sonra mevcut flash kartlarınızı manuel olarak düzenlemeniz gerektiğini unutmayın.",
