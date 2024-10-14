@@ -140,15 +140,20 @@ Brackets `[]` delineate where the sequence number and hint will be placed, along
 
 Here are some examples of custom patterns:
 
-| Explanation                                                                                                                                                   | Pattern in the Settings               | Simplified Cloze Usage                                                                                  | Numbered Cloze Usage                                                                                            | Generalized Cloze Overlapping Usage                                                                             |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Anki-Like Pattern                                                                                                                                             | `{{[123::]answer[::hint]}}`           | `Brazilians speak {{Portuguese}}`<br><br>Or, with hint:<br>`Brazilians speak {{Portuguese::language}}`  | `Brazilians speak {{1::Portuguese}}`<br><br>Or, with hint:<br>`Brazilians speak {{1::Portuguese::language}}`    | `Brazilians speak {{a::Portuguese}}`<br><br>Or, with hint:<br>`Brazilians speak {{a::Portuguese::language}}`    |
-| Highlighted pattern with hint and sequencer in footnotes. <br/><br/> **Note that you can use brackets as part of your pattern, but you need to escape them.** | `==answer==[^\\[hint\\]][\\[^123\\]]` | `Brazilians speak ==Portuguese==`<br><br>Or, with hint:<br>`Brazilians speak ==Portuguese==^[language]` | `Brazilians speak ==Portuguese==[^1]`<br><br>Or, with hint:<br>`Brazilians speak ==Portuguese==^[language][^1]` | `Brazilians speak ==Portuguese==[^a]`<br><br>Or, with hint:<br>`Brazilians speak ==Portuguese==^[language][^a]` |
+| Explanation                                               | Pattern in the Settings               | Simplified Cloze Usage                                                                                  | Numbered Cloze Usage                                                                                            | Generalized Cloze Overlapping Usage                                                                             |
+| --------------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Anki-Like Pattern                                         | `{{[123::]answer[::hint]}}`           | `Brazilians speak {{Portuguese}}`<br><br>Or, with hint:<br>`Brazilians speak {{Portuguese::language}}`  | `Brazilians speak {{1::Portuguese}}`<br><br>Or, with hint:<br>`Brazilians speak {{1::Portuguese::language}}`    | `Brazilians speak {{a::Portuguese}}`<br><br>Or, with hint:<br>`Brazilians speak {{a::Portuguese::language}}`    |
+| Highlighted pattern with hint and sequencer in footnotes. | `==answer==[^\\[hint\\]][\\[^123\\]]` | `Brazilians speak ==Portuguese==`<br><br>Or, with hint:<br>`Brazilians speak ==Portuguese==^[language]` | `Brazilians speak ==Portuguese==[^1]`<br><br>Or, with hint:<br>`Brazilians speak ==Portuguese==^[language][^1]` | `Brazilians speak ==Portuguese==[^a]`<br><br>Or, with hint:<br>`Brazilians speak ==Portuguese==^[language][^a]` |
 
 !!! warning
 
-    Make sure that your custom cloze patterns do not conflict with other flashcard separators.
+    Make sure that your custom cloze patterns do not conflict with other flashcard separators.<br/>
     For instance, the Anki-Like pattern `{{[123::]answer[::hint]}}` conflicts with the default single line flashcard separator `::`.
+
+!!! warning
+
+    You can use brackets as part of your pattern, but you need to [escape](https://en.wikipedia.org/wiki/Escape_character) them with `\\`.<br/>
+    For instance, in the pattern `==answer==[^\\[hint\\]][\\[^123\\]]`, the brackets _inside_ the outer brackets are escaped (`^\\[hint\\]` & `\\[^123\\]`).
 
 In your settings, you can add multiple patterns at once, separating them with a new line:
 

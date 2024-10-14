@@ -32,7 +32,7 @@
 
 This was introduced [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/15) by `@aviskase`.
 
-### Brief summary
+#### Brief summary
 
 Andy Matuschak uses [spaced repetition system for working on writing inbox](https://notes.andymatuschak.org/z7iCjRziX6V6unNWL81yc2dJicpRw2Cpp9MfQ).
 
