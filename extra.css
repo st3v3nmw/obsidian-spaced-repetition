@@ -1,0 +1,14 @@
+.youtube {
+    color: #ee0f0f;
+}
+
+hr {
+    border: none !important;
+    height: 4px;
+    background-color: #333;
+}
+
+.thin {
+    border: none !important;
+    height: 1px;
+}
