@@ -120,7 +120,8 @@ export default {
     CONVERT_BOLD_TEXT_TO_CLOZES: "**bolded text** 를 빈 칸 채우기로 전환하시겠습니까?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "{{curly brackets}} 를 빈 칸 채우기로 전환하시겠습니까?",
     CLOZE_PATTERNS: "빈 칸 채우기 패턴",
-    CLOZE_PATTERNS_DESC: "빈 칸 채우기 패턴을 입력해주세요. 줄바꿈으로 구분합니다.",
+    CLOZE_PATTERNS_DESC:
+        '빈 칸 채우기 패턴을 입력해주세요. 줄바꿈으로 구분합니다. Check the <a href="${docsUrl}">wiki</a> for guidance.',
     INLINE_CARDS_SEPARATOR: "인라인 플래시카드 구분자",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "주의: 이 옵션을 수정한 후에는 이미 작성된 플래시카드를 수동으로 수정해야 함을 주의하십시오.",

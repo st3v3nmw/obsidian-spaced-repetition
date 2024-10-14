@@ -132,7 +132,8 @@ export default {
     CONVERT_CURLY_BRACKETS_TO_CLOZES:
         "{{Geschweifte Klammern}} Text in Lückentextkarten umwandeln?",
     CLOZE_PATTERNS: "Lückentextmuster",
-    CLOZE_PATTERNS_DESC: "Geben Sie Lückentextmuster durch Zeilenumbrüche getrennt ein",
+    CLOZE_PATTERNS_DESC:
+        'Geben Sie Lückentextmuster durch Zeilenumbrüche getrennt ein. Check the <a href="${docsUrl}">wiki</a> for guidance.',
     INLINE_CARDS_SEPARATOR: "Trennzeichen für einzeilige Lernkarten",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Wenn diese Einstellung geändert wird, dann müssen die entsprechenden Lernkarten manuell angepasst werden.",

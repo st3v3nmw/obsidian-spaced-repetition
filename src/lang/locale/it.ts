@@ -124,7 +124,8 @@ export default {
     CONVERT_BOLD_TEXT_TO_CLOZES: "Convertire **testo in grassetto** in spazi da riempire",
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Convertire {{parentesi graffe}} in spazi da riempire?",
     CLOZE_PATTERNS: "Modelli di spazi da riempire",
-    CLOZE_PATTERNS_DESC: "Inserisci i modelli di spazi da riempire separati da a capo",
+    CLOZE_PATTERNS_DESC:
+        'Inserisci i modelli di spazi da riempire separati da a capo. Check the <a href="${docsUrl}">wiki</a> for guidance.',
     INLINE_CARDS_SEPARATOR: "Separatore per schede sulla stessa riga",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Si avvisa che dopo aver cambiato questo dovrai manualmente modificare le schede che hai già.",

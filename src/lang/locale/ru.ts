@@ -130,7 +130,8 @@ export default {
     CONVERT_CURLY_BRACKETS_TO_CLOZES:
         "Конвертировать {{фигурные скобки}} в пропуски (пример: [...])?",
     CLOZE_PATTERNS: "Шаблоны пропусков",
-    CLOZE_PATTERNS_DESC: "Введите шаблоны пропусков, разделенные переводами строк",
+    CLOZE_PATTERNS_DESC:
+        'Введите шаблоны пропусков, разделенные переводами строк. Check the <a href="${docsUrl}">wiki</a> for guidance.',
     INLINE_CARDS_SEPARATOR: "Разделитель для внутристрочных карточек",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Внимание! После изменения этого вам придётся вручную редактировать уже существующие карточки",
