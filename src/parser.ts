@@ -112,12 +112,12 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
             continue;
         }
 
-        // Have we reached a card end marker?
+        // Have we reached the end of a card?
         const isEmptyLine = currentTrimmed.length == 0;
         const hasMultilineCardEndMarker =
             options.multilineCardEndMarker && currentTrimmed == options.multilineCardEndMarker;
         if (
-            // We've possibly reached the end of a card
+            // We've probably reached the end of a card
             (isEmptyLine && !options.multilineCardEndMarker) ||
             // Empty line & we're not picking up any card
             (isEmptyLine && cardText.length == 0) ||
