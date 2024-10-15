@@ -1,8 +1,8 @@
-# Flashcard-Based and Note-Based Spaced Repetition Plugin
+# Obsidian Spaced Repetition Plugin
 
-<img src="https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/total" /> <img src="https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/latest/total?style=flat-square" /> <img src="https://img.shields.io/github/manifest-json/v/st3v3nmw/obsidian-spaced-repetition?style=flat-square" />
+<img src="https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/total" /> <img src="https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/latest/total?style=flat-square" /> <img src="https://img.shields.io/github/manifest-json/v/st3v3nmw/obsidian-spaced-repetition?style=flat-square" /> <img alt="Codecov" src="https://img.shields.io/codecov/c/gh/st3v3nmw/obsidian-spaced-repetition">
 
-Fight the forgetting curve & note aging by reviewing flashcards & notes using spaced repetition on Obsidian.md
+Fight the forgetting curve by reviewing flashcards & notes using spaced repetition.
 
 -   Check the documentation [here](https://www.stephenmwangi.com/obsidian-spaced-repetition/).
 -   Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/3/) for upcoming features & fixes.

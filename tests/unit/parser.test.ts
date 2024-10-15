@@ -636,14 +636,14 @@ test("Test parsing cards with codeblocks", () => {
     expect(
         parseT(
             "How do you ... Python?\n?\n" +
-                "```\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
+                "```python\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
             parserOptions,
         ),
     ).toEqual([
         [
             CardType.MultiLineBasic,
             "How do you ... Python?\n?\n" +
-                "```\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
+                "```python\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
             0,
             9,
         ],
