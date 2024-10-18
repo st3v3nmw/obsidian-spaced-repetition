@@ -99,6 +99,9 @@ export default {
     SHOW_CARD_CONTEXT: "Mostrare contesto nelle schede?",
     SHOW_CARD_CONTEXT_DESC:
         "per esempio, Titolo > Intestazione 1 > Sottotitolo 1 > ... > Sottotitolo",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Show next review time in the review buttons",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
+        "Useful to know how far in the future your cards are being pushed.",
     CARD_MODAL_HEIGHT_PERCENT: "Percentuale altezza schede",
     CARD_MODAL_SIZE_PERCENT_DESC:
         "Dovrebbe essere 100% se sei su telefono o se hai immagini molto grandi",
@@ -173,6 +176,10 @@ export default {
     EASY_BONUS_DESC:
         "Il bonus facilità ti permette di impostare le differenze negli intervalli tra il rispondere Buono e Facile su una scheda o nota (minimo 100%).",
     EASY_BONUS_MIN_WARNING: "Il bonus facilità deve essere di almeno 100.",
+    LOAD_BALANCE: "Enable load balancer",
+    LOAD_BALANCE_DESC: `Slightly tweaks the interval so that the number of reviews per day is more consistent.
+        It's like Anki's fuzz but instead of being random, it picks the day with the least amount of reviews.
+        It's turned off for small intervals.`,
     MAX_INTERVAL: "Intervallo massimo in giorni",
     MAX_INTERVAL_DESC:
         "Ti permette di mettere un limite massimo all'intervallo (default 100 anni).",

@@ -92,6 +92,9 @@ export default {
     BURY_SIBLINGS_TILL_NEXT_DAY_DESC: "反轉卡片由同一卡片文字產生，例如：填空克漏字",
     SHOW_CARD_CONTEXT: "在卡片中顯示上下文？",
     SHOW_CARD_CONTEXT_DESC: "例如：標題 > 副標題 > 小標題 > ... > 小標題",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Show next review time in the review buttons",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
+        "Useful to know how far in the future your cards are being pushed.",
     CARD_MODAL_HEIGHT_PERCENT: "卡片高度百分比",
     CARD_MODAL_SIZE_PERCENT_DESC: "在移動端或需要較大圖片時應設定為100%",
     RESET_DEFAULT: "重置為預設值",
@@ -153,6 +156,10 @@ export default {
     EASY_BONUS: "簡單獎勵",
     EASY_BONUS_DESC: "簡單獎勵設定「記得」和「簡單」卡片或筆記的復習間隔差距（最小值100%）。",
     EASY_BONUS_MIN_WARNING: "簡單獎勵至少為100。",
+    LOAD_BALANCE: "Enable load balancer",
+    LOAD_BALANCE_DESC: `Slightly tweaks the interval so that the number of reviews per day is more consistent.
+        It's like Anki's fuzz but instead of being random, it picks the day with the least amount of reviews.
+        It's turned off for small intervals.`,
     MAX_INTERVAL: "最大間隔（天）",
     MAX_INTERVAL_DESC: "設定復習的最大間隔時間（預設值100年）。",
     MAX_INTERVAL_MIN_WARNING: "最大間隔至少為1天",

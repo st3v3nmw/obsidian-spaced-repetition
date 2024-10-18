@@ -97,6 +97,9 @@ export default {
         "Los hermanos son tarjetas generadas del mismo texto de la tarjeta, por ejemplo, deletreos de huecos (cloze deletions en inglés)",
     SHOW_CARD_CONTEXT: "¿Mostrar contexto en las tarjetas?",
     SHOW_CARD_CONTEXT_DESC: "Por Ejemplo: Título > Cabecera > Sub-Cabecera > ... > Sub-Cabecera",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Show next review time in the review buttons",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
+        "Useful to know how far in the future your cards are being pushed.",
     CARD_MODAL_HEIGHT_PERCENT: "Porcentaje de la altura de las tarjetas de memoria",
     CARD_MODAL_SIZE_PERCENT_DESC: "Debería ser establecido en 100% si tienes imágenes grandes",
     RESET_DEFAULT: "Reiniciar a la configuración por defecto",
@@ -170,6 +173,10 @@ export default {
     EASY_BONUS_DESC:
         "La bonificación para Fácil te permite establecer la diferencia entre intervalos al responder Bien y Fácil en las tarjetas o notas (mínimo = 100%).",
     EASY_BONUS_MIN_WARNING: "El bono de facilidad debe ser al menos 100.",
+    LOAD_BALANCE: "Enable load balancer",
+    LOAD_BALANCE_DESC: `Slightly tweaks the interval so that the number of reviews per day is more consistent.
+        It's like Anki's fuzz but instead of being random, it picks the day with the least amount of reviews.
+        It's turned off for small intervals.`,
     MAX_INTERVAL: "Intervalo máximo en días",
     MAX_INTERVAL_DESC:
         "Te permite establecer un límite mayor en el intervalo (por defecto es de 100 años).",

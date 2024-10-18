@@ -99,6 +99,9 @@ export default {
     SHOW_CARD_CONTEXT: "カードにコンテキストを表示しますか？",
     SHOW_CARD_CONTEXT_DESC:
         "｢タイトル > 見出し 1 > 副見出し > ... > 副見出し｣の表示を行うかどうかを決めます。",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Show next review time in the review buttons",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
+        "Useful to know how far in the future your cards are being pushed.",
     CARD_MODAL_HEIGHT_PERCENT: "フラッシュカードの縦サイズのパーセンテージ",
     CARD_MODAL_SIZE_PERCENT_DESC:
         "モバイル版、または非常に大きなサイズの画像がある場合には100%にする必要があります。",
@@ -169,6 +172,10 @@ export default {
     EASY_BONUS_DESC:
         "Easyボーナスによってフラッシュカード/ノートにおける間隔の差分を設定できます(最小値 = 100%)。",
     EASY_BONUS_MIN_WARNING: "Easyボーナスには100以上の数字を指定してください。",
+    LOAD_BALANCE: "Enable load balancer",
+    LOAD_BALANCE_DESC: `Slightly tweaks the interval so that the number of reviews per day is more consistent.
+        It's like Anki's fuzz but instead of being random, it picks the day with the least amount of reviews.
+        It's turned off for small intervals.`,
     MAX_INTERVAL: "Maximum interval in days",
     MAX_INTERVAL_DESC: "間隔に上限値を設定することができます(デフォルト値 = 100年)。",
     MAX_INTERVAL_MIN_WARNING: "間隔の最大値には1以上の数字を指定してください。",
