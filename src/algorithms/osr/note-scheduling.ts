@@ -13,7 +13,7 @@ export function osrSchedule(
     originalInterval: number,
     ease: number,
     delayedBeforeReview: number,
-    settingsObj: SRSettings,
+    settings: SRSettings,
     dueDateHistogram?: DueDateHistogram,
 ): Record<string, number> {
     const delayedBeforeReviewDays = Math.max(0, Math.floor(delayedBeforeReview / TICKS_PER_DAY));
@@ -22,19 +22,19 @@ export function osrSchedule(
     if (response === ReviewResponse.Easy) {
         ease += 20;
         interval = ((interval + delayedBeforeReviewDays) * ease) / 100;
-        interval *= settingsObj.easyBonus;
+        interval *= settings.easyBonus;
     } else if (response === ReviewResponse.Good) {
         interval = ((interval + delayedBeforeReviewDays / 2) * ease) / 100;
     } else if (response === ReviewResponse.Hard) {
         ease = Math.max(130, ease - 20);
         interval = Math.max(
             1,
-            (interval + delayedBeforeReviewDays / 4) * settingsObj.lapsesIntervalChange,
+            (interval + delayedBeforeReviewDays / 4) * settings.lapsesIntervalChange,
         );
     }
 
     // replaces random fuzz with load balancing over the fuzz interval
-    if (dueDateHistogram !== undefined) {
+    if (settings.loadBalance && dueDateHistogram !== undefined) {
         interval = Math.round(interval);
         // disable fuzzing for small intervals
         if (interval > 4) {
@@ -48,7 +48,7 @@ export function osrSchedule(
         }
     }
 
-    interval = Math.min(interval, settingsObj.maximumInterval);
+    interval = Math.min(interval, settings.maximumInterval);
     interval = Math.round(interval * 10) / 10;
 
     return { interval, ease };

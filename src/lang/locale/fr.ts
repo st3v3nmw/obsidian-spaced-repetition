@@ -98,6 +98,9 @@ export default {
         "Les cartes sœurs sont les cartes générées depuis le même texte, par exemple pour les textes à trous",
     SHOW_CARD_CONTEXT: "Montrer le contexte dans les cartes ?",
     SHOW_CARD_CONTEXT_DESC: "ex. Titre de la note > Titre 1 > Sous-titre > ... > Sous-titre",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Show next review time in the review buttons",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
+        "Useful to know how far in the future your cards are being pushed.",
     CARD_MODAL_HEIGHT_PERCENT: "Pourcentage de hauteur de la flashcard",
     CARD_MODAL_SIZE_PERCENT_DESC: "Devrait être 100% sur mobile ou en cas de grandes images",
     RESET_DEFAULT: "Réinitialiser les paramètres",
@@ -170,6 +173,10 @@ export default {
     EASY_BONUS_DESC:
         "Le bonus Facile vous permet d'augmenter l'intervalle entre une réponse Correct et une réponse Facile sur une flashcard/note (minimum = 100%).",
     EASY_BONUS_MIN_WARNING: "Le bonus Facile doit être au moins 100.",
+    LOAD_BALANCE: "Enable load balancer",
+    LOAD_BALANCE_DESC: `Slightly tweaks the interval so that the number of reviews per day is more consistent.
+        It's like Anki's fuzz but instead of being random, it picks the day with the least amount of reviews.
+        It's turned off for small intervals.`,
     MAX_INTERVAL: "Intervalle maximum (en jours)",
     MAX_INTERVAL_DESC:
         "Vous permet de mettre une limite maximale sur l'intervalle (par défaut, 100 ans).",

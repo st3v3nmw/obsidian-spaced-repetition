@@ -99,6 +99,9 @@ export default {
         "Cartas irmãs são geradas pelo texto da mesma carta ex: omissão de palavras",
     SHOW_CARD_CONTEXT: "Mostrar contexto nas cartas?",
     SHOW_CARD_CONTEXT_DESC: "ex: Título > Cabeçalho 1 > Subcabeçalho > ... > Subcabeçalho",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Show next review time in the review buttons",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
+        "Useful to know how far in the future your cards are being pushed.",
     CARD_MODAL_HEIGHT_PERCENT: "Porcentagem da Altura do Flashcard",
     CARD_MODAL_SIZE_PERCENT_DESC:
         "Deveria estar configurado em 100% em dispositivos móveis ou se você tem imagens muito grandes",
@@ -171,6 +174,10 @@ export default {
     EASY_BONUS_DESC:
         "O bônus de fácil te permite mudar a diferência entre intervalos de responder OK e Fácil em um(a) flashcard/nota (mínimo = 100%).",
     EASY_BONUS_MIN_WARNING: "O bônus de fácil deve ser pelo menos 100.",
+    LOAD_BALANCE: "Enable load balancer",
+    LOAD_BALANCE_DESC: `Slightly tweaks the interval so that the number of reviews per day is more consistent.
+        It's like Anki's fuzz but instead of being random, it picks the day with the least amount of reviews.
+        It's turned off for small intervals.`,
     MAX_INTERVAL: "Intervalo máximo em dias",
     MAX_INTERVAL_DESC:
         "Te permite colocar um limite máximo no intervalo (pré-definição = 100 anos).",

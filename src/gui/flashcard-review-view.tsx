@@ -586,10 +586,14 @@ export class FlashcardReviewView {
         );
         const interval: number = schedule.interval;
 
-        if (Platform.isMobile) {
-            button.setText(textInterval(interval, true));
+        if (this.settings.showIntervalInReviewButtons) {
+            if (Platform.isMobile) {
+                button.setText(textInterval(interval, true));
+            } else {
+                button.setText(`${buttonName} - ${textInterval(interval, false)}`);
+            }
         } else {
-            button.setText(`${buttonName} - ${textInterval(interval, false)}`);
+            button.setText(buttonName);
         }
     }
 }

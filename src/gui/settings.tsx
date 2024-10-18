@@ -616,6 +616,18 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
+            .setName(t("SHOW_INTERVAL_IN_REVIEW_BUTTONS"))
+            .setDesc(t("SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.showIntervalInReviewButtons)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.showIntervalInReviewButtons = value;
+                        await this.plugin.savePluginData();
+                    }),
+            );
+
+        new Setting(containerEl)
             .setName(t("CARD_MODAL_HEIGHT_PERCENT"))
             .setDesc(t("CARD_MODAL_SIZE_PERCENT_DESC"))
             .addSlider((slider) =>
@@ -885,6 +897,16 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
+
+        new Setting(containerEl)
+            .setName(t("LOAD_BALANCE"))
+            .setDesc(t("LOAD_BALANCE_DESC"))
+            .addToggle((toggle) =>
+                toggle.setValue(this.plugin.data.settings.loadBalance).onChange(async (value) => {
+                    this.plugin.data.settings.loadBalance = value;
+                    await this.plugin.savePluginData();
+                }),
+            );
 
         new Setting(containerEl)
             .setName(t("MAX_INTERVAL"))

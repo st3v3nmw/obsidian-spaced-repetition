@@ -104,6 +104,9 @@ export default {
         "Родственные карточки - те, которые образованы из одного текста, пример: карточки с пропусками ([...])",
     SHOW_CARD_CONTEXT: "Показывать контекст (уровень) в карточках (во время повторения)?",
     SHOW_CARD_CONTEXT_DESC: "пример: Title > Heading 1 > Subheading > ... > Subheading",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Show next review time in the review buttons",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
+        "Useful to know how far in the future your cards are being pushed.",
     CARD_MODAL_HEIGHT_PERCENT: "Высота карточки в процентах",
     CARD_MODAL_SIZE_PERCENT_DESC:
         "Если пользуетесь мобильным телефоном, выставьте 100%. Иначе у вас будут огромные изображения",
@@ -178,6 +181,10 @@ export default {
     EASY_BONUS_DESC:
         "Бонус за Легко позволяет вам установить разницу в промежутках между ответами Хорошо и Легко на карточке/заметке (мин. = 100%).",
     EASY_BONUS_MIN_WARNING: 'Бонус за "Легко" должен быть не меньше 100.',
+    LOAD_BALANCE: "Enable load balancer",
+    LOAD_BALANCE_DESC: `Slightly tweaks the interval so that the number of reviews per day is more consistent.
+        It's like Anki's fuzz but instead of being random, it picks the day with the least amount of reviews.
+        It's turned off for small intervals.`,
     MAX_INTERVAL: "Максимальный интервал повторения в днях",
     MAX_INTERVAL_DESC:
         "Позволяет вам устанавливать верхнюю границу на интервал повторения (по умолчанию = 100 лет).",

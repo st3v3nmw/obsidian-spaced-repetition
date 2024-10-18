@@ -96,6 +96,9 @@ export default {
         "Rodzeństwo to karty wygenerowane z tego samego tekstu karty, np. usunięcia zamaskowane",
     SHOW_CARD_CONTEXT: "Czy pokazywać kontekst na kartach?",
     SHOW_CARD_CONTEXT_DESC: "np. Tytuł > Nagłówek 1 > Podnagłówek > ... > Podnagłówek",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Show next review time in the review buttons",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
+        "Useful to know how far in the future your cards are being pushed.",
     CARD_MODAL_HEIGHT_PERCENT: "Procentowa wysokość fiszki",
     CARD_MODAL_SIZE_PERCENT_DESC:
         "Powinno być ustawione na 100% na urządzeniach mobilnych lub gdy masz bardzo duże obrazy",
@@ -170,6 +173,10 @@ export default {
     EASY_BONUS_DESC:
         "Bonus za łatwe pozwala ustawić różnicę w interwałach między odpowiedziami Średnio trudne i Łatwe na fiszce/notatce (minimum = 100%).",
     EASY_BONUS_MIN_WARNING: "Bonus za łatwe musi wynosić co najmniej 100.",
+    LOAD_BALANCE: "Enable load balancer",
+    LOAD_BALANCE_DESC: `Slightly tweaks the interval so that the number of reviews per day is more consistent.
+        It's like Anki's fuzz but instead of being random, it picks the day with the least amount of reviews.
+        It's turned off for small intervals.`,
     MAX_INTERVAL: "Maksymalny interwał w dniach",
     MAX_INTERVAL_DESC: "Pozwala na ustawienie górnego limitu interwału (domyślnie = 100 lat).",
     MAX_INTERVAL_MIN_WARNING: "Maksymalny interwał musi wynosić co najmniej 1 dzień.",

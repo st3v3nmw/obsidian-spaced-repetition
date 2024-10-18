@@ -96,6 +96,9 @@ export default {
         "Kardeş kartlar, aynı kart metninden üretilen kartlardır (örneğin gizlemeler).",
     SHOW_CARD_CONTEXT: "Kartlarda bağlamı göster?",
     SHOW_CARD_CONTEXT_DESC: "Örneğin: Başlık > Başlık 1 > Alt Başlık > ... > Alt Başlık",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Show next review time in the review buttons",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
+        "Useful to know how far in the future your cards are being pushed.",
     CARD_MODAL_HEIGHT_PERCENT: "Flash Kart Yükseklik Yüzdesi",
     CARD_MODAL_SIZE_PERCENT_DESC:
         "Mobilde veya çok büyük resimleriniz varsa %100 olarak ayarlayın.",
@@ -167,6 +170,10 @@ export default {
     EASY_BONUS_DESC:
         "Kolaylık bonusu, bir flash kartı/notu İyi ve Kolay yanıtladığınızda aralıklardaki farkı ayarlamanıza olanak tanır (minimum = %100).",
     EASY_BONUS_MIN_WARNING: "Kolaylık bonusu en az %100 olmalıdır.",
+    LOAD_BALANCE: "Enable load balancer",
+    LOAD_BALANCE_DESC: `Slightly tweaks the interval so that the number of reviews per day is more consistent.
+        It's like Anki's fuzz but instead of being random, it picks the day with the least amount of reviews.
+        It's turned off for small intervals.`,
     MAX_INTERVAL: "Maksimum aralık (gün)",
     MAX_INTERVAL_DESC: "Aralığa bir üst sınır koymanıza olanak tanır (varsayılan = 100 yıl).",
     MAX_INTERVAL_MIN_WARNING: "Maksimum aralık en az 1 gün olmalıdır.",

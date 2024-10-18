@@ -3,10 +3,9 @@ coverage:
     round: down
     precision: 2
     status:
-        project: off
+        project: true
         patch:
             default:
                 target: 100
                 threshold: 0.0
                 only_pulls: true
-        changes: off

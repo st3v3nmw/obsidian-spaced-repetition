@@ -7,16 +7,9 @@ import { pathMatchesPattern } from "src/utils/fs";
 
 export interface SRSettings {
     // flashcards
-    flashcardEasyText: string;
-    flashcardGoodText: string;
-    flashcardHardText: string;
-    reviewButtonDelay: number;
     flashcardTags: string[];
     convertFoldersToDecks: boolean;
     burySiblingCards: boolean;
-    showContextInCards: boolean;
-    flashcardHeightPercentage: number;
-    flashcardWidthPercentage: number;
     randomizeCardOrder: boolean;
     flashcardCardOrder: string;
     flashcardDeckOrder: string;
@@ -44,12 +37,21 @@ export interface SRSettings {
     showRibbonIcon: boolean;
     showStatusBar: boolean;
     initiallyExpandAllSubdecksInTree: boolean;
+    showContextInCards: boolean;
+    showIntervalInReviewButtons: boolean;
+    flashcardHeightPercentage: number;
+    flashcardWidthPercentage: number;
+    flashcardEasyText: string;
+    flashcardGoodText: string;
+    flashcardHardText: string;
+    reviewButtonDelay: number;
 
     // algorithm
     algorithm: string;
     baseEase: number;
     lapsesIntervalChange: number;
     easyBonus: number;
+    loadBalance: boolean;
     maximumInterval: number;
     maxLinkFactor: number;
 
@@ -64,16 +66,9 @@ export interface SRSettings {
 
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
-    flashcardEasyText: t("EASY"),
-    flashcardGoodText: t("GOOD"),
-    flashcardHardText: t("HARD"),
-    reviewButtonDelay: 0,
     flashcardTags: ["#flashcards"],
     convertFoldersToDecks: false,
     burySiblingCards: false,
-    showContextInCards: true,
-    flashcardHeightPercentage: Platform.isMobile ? 100 : 80,
-    flashcardWidthPercentage: Platform.isMobile ? 100 : 40,
     randomizeCardOrder: null,
     flashcardCardOrder: "DueFirstRandom",
     flashcardDeckOrder: "PrevDeckComplete_Sequential",
@@ -101,12 +96,21 @@ export const DEFAULT_SETTINGS: SRSettings = {
     showRibbonIcon: true,
     showStatusBar: true,
     initiallyExpandAllSubdecksInTree: false,
+    showContextInCards: true,
+    showIntervalInReviewButtons: true,
+    flashcardHeightPercentage: Platform.isMobile ? 100 : 80,
+    flashcardWidthPercentage: Platform.isMobile ? 100 : 40,
+    flashcardEasyText: t("EASY"),
+    flashcardGoodText: t("GOOD"),
+    flashcardHardText: t("HARD"),
+    reviewButtonDelay: 0,
 
     // algorithm
     algorithm: Algorithm.SM_2_OSR,
     baseEase: 250,
     lapsesIntervalChange: 0.5,
     easyBonus: 1.3,
+    loadBalance: true,
     maximumInterval: 36525,
     maxLinkFactor: 1.0,
 
