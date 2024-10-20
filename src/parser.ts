@@ -120,7 +120,7 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
             // We've probably reached the end of a card
             (isEmptyLine && !options.multilineCardEndMarker) ||
             // Empty line & we're not picking up any card
-            (isEmptyLine && cardText.length == 0) ||
+            (isEmptyLine && cardType == null) ||
             // We've reached the end of a multi line card &
             //  we're using custom end markers
             hasMultilineCardEndMarker
