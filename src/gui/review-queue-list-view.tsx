@@ -1,4 +1,4 @@
-import { App, ItemView, Menu, TFile, WorkspaceLeaf } from "obsidian";
+import { ItemView, Menu, TFile, WorkspaceLeaf } from "obsidian";
 
 import { COLLAPSE_ICON, TICKS_PER_DAY } from "src/constants";
 import { t } from "src/lang/helpers";
@@ -18,7 +18,6 @@ export class ReviewQueueListView extends ItemView {
 
     constructor(
         leaf: WorkspaceLeaf,
-        app: App,
         nextNoteReviewHandler: NextNoteReviewHandler,
         settings: SRSettings,
     ) {
@@ -26,8 +25,11 @@ export class ReviewQueueListView extends ItemView {
 
         this.nextNoteReviewHandler = nextNoteReviewHandler;
         this.settings = settings;
-        this.registerEvent(this.app.workspace.on("file-open", () => this.redraw()));
-        this.registerEvent(this.app.vault.on("rename", () => this.redraw()));
+
+        if (this.settings.enableNoteReviewPaneOnStartup) {
+            this.registerEvent(this.app.workspace.on("file-open", () => this.redraw()));
+            this.registerEvent(this.app.vault.on("rename", () => this.redraw()));
+        }
     }
 
     public getViewType(): string {
@@ -53,6 +55,8 @@ export class ReviewQueueListView extends ItemView {
     }
 
     public redraw(): void {
+        if (!this.noteReviewQueue.reviewDecks) return;
+
         const activeFile: TFile | null = this.app.workspace.getActiveFile();
 
         const rootEl: HTMLElement = createDiv("tree-item nav-folder mod-root");

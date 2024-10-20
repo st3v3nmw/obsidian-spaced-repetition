@@ -1,4 +1,4 @@
-import { App, Notice, TFile, Workspace } from "obsidian";
+import { App, Notice, TFile } from "obsidian";
 
 import { ReviewDeckSelectionModal } from "src/gui/review-deck-selection-modal";
 import { t } from "src/lang/helpers";
@@ -8,7 +8,6 @@ import { SRSettings } from "src/settings";
 export class NextNoteReviewHandler {
     private app: App;
     private settings: SRSettings;
-    private workspace: Workspace;
     private _noteReviewQueue: NoteReviewQueue;
     private _lastSelectedReviewDeck: string;
 
@@ -20,15 +19,9 @@ export class NextNoteReviewHandler {
         return this._noteReviewQueue;
     }
 
-    constructor(
-        app: App,
-        settings: SRSettings,
-        workspace: Workspace,
-        noteReviewQueue: NoteReviewQueue,
-    ) {
+    constructor(app: App, settings: SRSettings, noteReviewQueue: NoteReviewQueue) {
         this.app = app;
         this.settings = settings;
-        this.workspace = workspace;
         this._noteReviewQueue = noteReviewQueue;
     }
 

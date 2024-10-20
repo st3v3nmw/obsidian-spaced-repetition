@@ -143,10 +143,7 @@ export class StatisticsView {
             t("INTERVALS_DESC"),
             Object.keys(cardStats.intervals.dict),
             Object.values(cardStats.intervals.dict),
-            t("INTERVALS_SUMMARY", {
-                avg: averageInterval,
-                longest: longestInterval,
-            }),
+            t("INTERVALS_SUMMARY", { avg: averageInterval, longest: longestInterval }),
             t("COUNT"),
             t("DAYS"),
             t("NUMBER_OF_CARDS"),

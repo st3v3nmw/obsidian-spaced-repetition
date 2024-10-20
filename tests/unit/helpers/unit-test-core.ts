@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { OsrCore } from "src/core";
+import { NoteReviewQueue } from "src/note-review-queue";
 import { QuestionPostponementList } from "src/question-postponement-list";
 import { SRSettings } from "src/settings";
 
@@ -24,7 +25,13 @@ export class UnitTestOsrCore extends OsrCore {
             settings,
             this.buryList,
         );
-        this.init(questionPostponementList, this.infoFinder, settings, () => {});
+        this.init(
+            questionPostponementList,
+            this.infoFinder,
+            settings,
+            () => {},
+            new NoteReviewQueue(),
+        );
     }
 
     // Needed for unit testing: Setup fileMap and the link "info finder"
