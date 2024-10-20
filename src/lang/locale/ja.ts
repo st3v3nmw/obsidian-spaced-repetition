@@ -135,6 +135,7 @@ export default {
     MULTILINE_REVERSED_CARDS_SEPARATOR: "複数行の表裏反転フラッシュカードに使用するセパレーター",
     MULTILINE_CARDS_END_MARKER: "クローズと複数行フラッシュカードの終わりを示す文字",
     NOTES: "ノート",
+    NOTE: "Note",
     REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "レビューに使用するタグ",
     TAGS_TO_REVIEW_DESC:
@@ -216,10 +217,14 @@ export default {
     INTERVALS_SUMMARY: "間隔の平均値: ${avg}, 最長の間隔: ${longest}",
     EASES: "易しさ",
     EASES_SUMMARY: "易しさの平均値: ${avgEase}",
+    EASE: "Ease",
     CARD_TYPES: "カードタイプ",
     CARD_TYPES_DESC: "延期のカードがある場合にはこれに含まれます",
     CARD_TYPE_NEW: "新規",
     CARD_TYPE_YOUNG: "復習(初期)",
     CARD_TYPE_MATURE: "復習(後期)",
     CARD_TYPES_SUMMARY: "カードの合計: ${totalCardsCount}枚",
+    SEARCH: "Search",
+    PREVIOUS: "Previous",
+    NEXT: "Next",
 };

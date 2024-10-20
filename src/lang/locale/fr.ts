@@ -134,6 +134,7 @@ export default {
     MULTILINE_CARDS_END_MARKER:
         "Caractères de fin de textes à trous ou de flashcards en plusieurs lignes",
     NOTES: "Notes",
+    NOTE: "Note",
     REVIEW_PANE_ON_STARTUP: "Montrer le module d'apprentissage des notes au démarrage",
     TAGS_TO_REVIEW: "Tags à apprendre",
     TAGS_TO_REVIEW_DESC:
@@ -220,10 +221,14 @@ export default {
     INTERVALS_SUMMARY: "Intervalle moyen : ${avg}. Intervalle maximum: ${longest}",
     EASES: "Facilité",
     EASES_SUMMARY: "Facilité moyenne : ${avgEase}",
+    EASE: "Ease",
     CARD_TYPES: "Types de cartes",
     CARD_TYPES_DESC: "Ceci inclut les cartes enterrées, s'il y en a",
     CARD_TYPE_NEW: "Nouvelles",
     CARD_TYPE_YOUNG: "En cours d'apprentissage",
     CARD_TYPE_MATURE: "Matures",
     CARD_TYPES_SUMMARY: "Total de cartes : ${totalCardsCount}",
+    SEARCH: "Search",
+    PREVIOUS: "Previous",
+    NEXT: "Next",
 };

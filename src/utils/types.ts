@@ -26,3 +26,12 @@ export function getTypedObjectEntries<OBJ_T extends ObjectType>(obj: OBJ_T): Obj
 export const getKeysPreserveType = Object.keys as <T extends Record<string, unknown>>(
     obj: T,
 ) => Array<keyof T>;
+
+export function mapRecord<T, U, V extends string | number | symbol>(
+    record: Record<string, T>,
+    transform: (key: string, value: T) => [V, U],
+): Record<V, U> {
+    return Object.fromEntries(
+        Object.entries(record).map(([key, value]) => transform(key, value)),
+    ) as Record<V, U>;
+}

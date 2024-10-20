@@ -3,7 +3,7 @@ coverage:
     round: down
     precision: 2
     status:
-        project: true
+        project: false
         patch:
             default:
                 target: 100

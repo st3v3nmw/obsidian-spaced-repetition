@@ -52,6 +52,7 @@
     "dependencies": {
         "chart.js": "^4.4.4",
         "clozecraft": "^0.4.0",
+        "gridjs": "^6.2.0",
         "minimatch": "^10.0.1",
         "pagerank.js": "^1.0.2",
         "short-uuid": "^5.2.0"

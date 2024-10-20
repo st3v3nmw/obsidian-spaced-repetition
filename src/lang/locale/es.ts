@@ -135,6 +135,7 @@ export default {
     MULTILINE_CARDS_END_MARKER:
         "Caracteres que denotan el fin de los clozes y tarjetas didácticas de varias líneas",
     NOTES: "Notes",
+    NOTE: "Note",
     REVIEW_PANE_ON_STARTUP: "Activar panel de revisión de notas al arrancar",
     TAGS_TO_REVIEW: "Etiquetas a revisar",
     TAGS_TO_REVIEW_DESC:
@@ -219,10 +220,14 @@ export default {
     INTERVALS_SUMMARY: "Intervalo de carga: ${avg}, Intervalo mayor: ${longest}",
     EASES: "Facilidad",
     EASES_SUMMARY: "Carga de Facilidad: ${avgEase}",
+    EASE: "Ease",
     CARD_TYPES: "Tipos de tarjetas",
     CARD_TYPES_DESC: "Esto incluye también a las tarjetas enterradas, si las hay",
     CARD_TYPE_NEW: "Nueva",
     CARD_TYPE_YOUNG: "Joven",
     CARD_TYPE_MATURE: "Madura",
     CARD_TYPES_SUMMARY: "Tarjetas Totales: ${totalCardsCount}",
+    SEARCH: "Search",
+    PREVIOUS: "Previous",
+    NEXT: "Next",
 };

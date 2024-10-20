@@ -138,6 +138,7 @@ export default {
     MULTILINE_CARDS_END_MARKER:
         "Caratteri che denotano la fine di carte con spazi da riempiere e carte multilinea",
     NOTES: "Note",
+    NOTE: "Note",
     REVIEW_PANE_ON_STARTUP: "Abilita il pannello di revisione note all'avvio",
     TAGS_TO_REVIEW: "Etichette da rivedere",
     TAGS_TO_REVIEW_DESC:
@@ -223,10 +224,14 @@ export default {
     INTERVALS_SUMMARY: "Intervallo medio: ${avg}, Intervallo massimo: ${longest}",
     EASES: "Difficoltà",
     EASES_SUMMARY: "Difficoltà media: ${avgEase}",
+    EASE: "Ease",
     CARD_TYPES: "Tipi di schede",
     CARD_TYPES_DESC: "Include eventuali schede sepolte",
     CARD_TYPE_NEW: "Nuove",
     CARD_TYPE_YOUNG: "Giovani",
     CARD_TYPE_MATURE: "Mature",
     CARD_TYPES_SUMMARY: "Schede tottali: ${totalCardsCount}",
+    SEARCH: "Search",
+    PREVIOUS: "Previous",
+    NEXT: "Next",
 };

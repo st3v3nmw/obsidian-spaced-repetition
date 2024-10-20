@@ -3,6 +3,7 @@ import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { DueDateHistogram } from "src/due-date-histogram";
 import { Note } from "src/note";
+import { INoteEaseList } from "src/note-ease-list";
 
 export enum Algorithm {
     SM_2_OSR = "SM-2-OSR",
@@ -22,6 +23,7 @@ export interface ISrsAlgorithm {
         response: ReviewResponse,
         dueDateNoteHistogram: DueDateHistogram,
     ): RepItemScheduleInfo;
+    noteStats(): INoteEaseList;
 
     cardGetResetSchedule(): RepItemScheduleInfo;
     cardGetNewSchedule(

@@ -143,6 +143,7 @@ export default {
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Разделитель для обратных многострочных карточек",
     MULTILINE_CARDS_END_MARKER: "Символы, обозначающие конец клозов и многострочных карточек",
     NOTES: "Заметки",
+    NOTE: "Note",
     REVIEW_PANE_ON_STARTUP: "Включить панель изучения карточек при запуске программы",
     TAGS_TO_REVIEW: "Теги для изучения",
     TAGS_TO_REVIEW_DESC:
@@ -226,10 +227,14 @@ export default {
     INTERVALS_SUMMARY: "Средний промежуток: ${avg}, Самый длинный промежуток: ${longest}",
     EASES: "Прогресс изучения",
     EASES_SUMMARY: "Среднее значение прогресса: ${avgEase}",
+    EASE: "Ease",
     CARD_TYPES: "Типы карточек",
     CARD_TYPES_DESC: "Включая спрятанные карточки, если такие существуют.",
     CARD_TYPE_NEW: "Новых",
     CARD_TYPE_YOUNG: "Повторяемых",
     CARD_TYPE_MATURE: "Изученных",
     CARD_TYPES_SUMMARY: "Всего карточек: ${totalCardsCount}",
+    SEARCH: "Search",
+    PREVIOUS: "Previous",
+    NEXT: "Next",
 };

@@ -63,7 +63,6 @@ export class WeightedRandomNumber {
         return new WeightedRandomNumber(globalRandomNumberProvider);
     }
 
-    //
     // weights is a dictionary:
     //      first number - a key that can be returned
     //      second number - the "bucket size" - this is a weight that influences the probability of the
