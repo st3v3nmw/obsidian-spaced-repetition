@@ -135,6 +135,7 @@ export default {
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Separador para flashcards de múltiplas linhas reversos",
     MULTILINE_CARDS_END_MARKER: "Caracteres que denotam o fim de clozes e flashcards multilinha",
     NOTES: "Notas",
+    NOTE: "Note",
     REVIEW_PANE_ON_STARTUP: "Habilitar painel de revisão de notas na inicialização",
     TAGS_TO_REVIEW: "Etiquetas para revisar",
     TAGS_TO_REVIEW_DESC:
@@ -219,10 +220,14 @@ export default {
     INTERVALS_SUMMARY: "Intervalo em média: ${avg}, Maior intervalo: ${longest}",
     EASES: "Facilidades",
     EASES_SUMMARY: "Facilidade em média: ${avgEase}",
+    EASE: "Ease",
     CARD_TYPES: "Tipos de Cartas",
     CARD_TYPES_DESC: "Isso também inclui cartas enterradas, caso existam",
     CARD_TYPE_NEW: "Novo",
     CARD_TYPE_YOUNG: "Jovem",
     CARD_TYPE_MATURE: "Amadurecido",
     CARD_TYPES_SUMMARY: "Total de cartas: ${totalCardsCount}",
+    SEARCH: "Search",
+    PREVIOUS: "Previous",
+    NEXT: "Next",
 };

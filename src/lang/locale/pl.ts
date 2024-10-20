@@ -136,6 +136,7 @@ export default {
         "Separator dla kart zamaskowanych odwróconych wieloliniowych",
     MULTILINE_CARDS_END_MARKER: "Caracteres que denotam o fim de clozes e flashcards multilineares",
     NOTES: "Notatki",
+    NOTE: "Note",
     REVIEW_PANE_ON_STARTUP: "Włączyć panel przeglądu notatek przy starcie",
     TAGS_TO_REVIEW: "Tagi do przeglądu",
     TAGS_TO_REVIEW_DESC:
@@ -217,10 +218,14 @@ export default {
     INTERVALS_SUMMARY: "Średni interwał: ${avg}, Najdłuższy interwał: ${longest}",
     EASES: "Łatwości",
     EASES_SUMMARY: "Średnia łatwość: ${avgEase}",
+    EASE: "Ease",
     CARD_TYPES: "Typy kart",
     CARD_TYPES_DESC: "Obejmuje także ukryte karty, jeśli takie są",
     CARD_TYPE_NEW: "Nowe",
     CARD_TYPE_YOUNG: "Młode",
     CARD_TYPE_MATURE: "Stare",
     CARD_TYPES_SUMMARY: "Łączna liczba kart: ${totalCardsCount}",
+    SEARCH: "Search",
+    PREVIOUS: "Previous",
+    NEXT: "Next",
 };

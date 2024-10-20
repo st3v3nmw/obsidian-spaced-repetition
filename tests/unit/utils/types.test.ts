@@ -1,4 +1,6 @@
-import { getKeysPreserveType, getTypedObjectEntries } from "src/utils/types";
+import path from "path";
+
+import { getKeysPreserveType, getTypedObjectEntries, mapRecord } from "src/utils/types";
 
 describe("getTypedObjectEntries", () => {
     test("should handle basic object", () => {
@@ -70,4 +72,13 @@ describe("getKeysPreserveType", () => {
     test("should return keys of an object with a function value", () => {
         expect(getKeysPreserveType({ func: () => "result" })).toEqual(["func"]);
     });
+});
+
+describe("mapRecord should transform the keys & values", () => {
+    expect(
+        mapRecord({ "a/b/topic.md": 254.556 }, (key: string, value: number): [string, number] => [
+            path.parse(key).name,
+            Math.round(value),
+        ]),
+    ).toEqual({ topic: 255 });
 });

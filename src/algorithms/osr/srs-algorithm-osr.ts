@@ -205,4 +205,8 @@ export class SrsAlgorithmOsr implements ISrsAlgorithm {
         const delayBeforeReview = 0;
         return new RepItemScheduleInfoOsr(dueDate, interval, ease, delayBeforeReview);
     }
+
+    noteStats() {
+        return this.noteEaseList;
+    }
 }

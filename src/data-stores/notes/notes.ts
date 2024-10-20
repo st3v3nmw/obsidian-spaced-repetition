@@ -6,7 +6,6 @@ import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-inf
 import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR } from "src/constants";
 import { IDataStore } from "src/data-stores/base/data-store";
 import { RepItemStorageInfo } from "src/data-stores/base/rep-item-storage-info";
-import { NoteEaseList } from "src/note-ease-list";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
 import { DateUtil, formatDateYYYYMMDD, globalDateProvider } from "src/utils/dates";
@@ -14,7 +13,6 @@ import { DateUtil, formatDateYYYYMMDD, globalDateProvider } from "src/utils/date
 export class StoreInNotes implements IDataStore {
     private settings: SRSettings;
     app: App;
-    easeByPath: NoteEaseList;
 
     constructor(settings: SRSettings) {
         this.settings = settings;

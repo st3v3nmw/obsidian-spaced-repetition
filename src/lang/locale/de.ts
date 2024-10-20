@@ -146,6 +146,7 @@ export default {
     MULTILINE_CARDS_END_MARKER:
         "Zeichen, die das Ende von Lückentexten und mehrzeiligen Flashcards kennzeichnen",
     NOTES: "Notizen",
+    NOTE: "Note",
     REVIEW_PANE_ON_STARTUP: "Öffne Überprüfungswarteschlage beim start",
     TAGS_TO_REVIEW: "Zu wiederholende Tags",
     TAGS_TO_REVIEW_DESC:
@@ -232,10 +233,14 @@ export default {
     INTERVALS_SUMMARY: "Durchschnittliches Intervall: ${avg}, Längstes Intervall: ${longest}",
     EASES: "Schwierigkeit",
     EASES_SUMMARY: "Durchschnittliche Schwierigkeit: ${avgEase}",
+    EASE: "Ease",
     CARD_TYPES: "Kategorisierung",
     CARD_TYPES_DESC: "Verlegte Karten eingeschlossen",
     CARD_TYPE_NEW: "Neu",
     CARD_TYPE_YOUNG: "Jung",
     CARD_TYPE_MATURE: "Ausgereift",
     CARD_TYPES_SUMMARY: "Insgesamt ${totalCardsCount} Karten",
+    SEARCH: "Search",
+    PREVIOUS: "Previous",
+    NEXT: "Next",
 };

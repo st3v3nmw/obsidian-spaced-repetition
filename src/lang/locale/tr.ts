@@ -133,6 +133,7 @@ export default {
     MULTILINE_CARDS_END_MARKER:
         "Gizli kartlar ve çok satırlı flash kartların sonunu belirten karakterler",
     NOTES: "Notlar",
+    NOTE: "Note",
     REVIEW_PANE_ON_STARTUP: "Başlangıçta not inceleme panelini etkinleştir",
     TAGS_TO_REVIEW: "Gözden geçirilecek etiketler",
     TAGS_TO_REVIEW_DESC:
@@ -215,10 +216,14 @@ export default {
     INTERVALS_SUMMARY: "Ortalama aralık: ${avg}, En uzun aralık: ${longest}",
     EASES: "Kolaylıklar",
     EASES_SUMMARY: "Ortalama kolaylık: ${avgEase}",
+    EASE: "Ease",
     CARD_TYPES: "Kart Türleri",
     CARD_TYPES_DESC: "Bu, gömülü kartları da içerir (varsa)",
     CARD_TYPE_NEW: "Yeni",
     CARD_TYPE_YOUNG: "Genç",
     CARD_TYPE_MATURE: "Olgun",
     CARD_TYPES_SUMMARY: "Toplam kart: ${totalCardsCount}",
+    SEARCH: "Search",
+    PREVIOUS: "Previous",
+    NEXT: "Next",
 };

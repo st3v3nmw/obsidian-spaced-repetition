@@ -1,6 +1,8 @@
 import { SRSettings } from "src/settings";
 
 export interface INoteEaseList {
+    dict: Record<string, number>;
+
     hasEaseForPath(path: string): boolean;
     getEaseByPath(path: string): number | null;
     setEaseForPath(path: string, ease: number): void;

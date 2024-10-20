@@ -133,6 +133,7 @@ export default {
     MULTILINE_REVERSED_CARDS_SEPARATOR: "여러 줄 반전 플래시카드 구분자",
     MULTILINE_CARDS_END_MARKER: "클로즈와 다중 행 플래시카드의 끝을 나타내는 문자",
     NOTES: "노트",
+    NOTE: "Note",
     REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "리뷰에 사용할 태그",
     TAGS_TO_REVIEW_DESC:
@@ -213,10 +214,14 @@ export default {
     INTERVALS_SUMMARY: "평균 간격: ${avg}, 가장 긴 간격: ${longest}",
     EASES: "Eases",
     EASES_SUMMARY: "Average ease: ${avgEase}",
+    EASE: "Ease",
     CARD_TYPES: "카드 타입",
     CARD_TYPES_DESC: "여기에는 묻어둔 카드도 포함됩니다.",
     CARD_TYPE_NEW: "New",
     CARD_TYPE_YOUNG: "Young",
     CARD_TYPE_MATURE: "Mature",
     CARD_TYPES_SUMMARY: "전체 카드 수: ${totalCardsCount}",
+    SEARCH: "Search",
+    PREVIOUS: "Previous",
+    NEXT: "Next",
 };

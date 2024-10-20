@@ -12,15 +12,18 @@ import {
     Title,
     Tooltip,
 } from "chart.js";
+import { Grid } from "gridjs";
+import path from "path";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
+import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { textInterval } from "src/algorithms/osr/note-scheduling";
 import { OsrCore } from "src/core";
 import { CardListType } from "src/deck";
 import { t } from "src/lang/helpers";
 import { Stats } from "src/stats";
-import { getKeysPreserveType, getTypedObjectEntries } from "src/utils/types";
+import { getKeysPreserveType, getTypedObjectEntries, mapRecord } from "src/utils/types";
 
 Chart.register(
     BarElement,
@@ -99,6 +102,10 @@ export class StatisticsView {
                 <canvas id="cardTypesChart"></canvas>
                 <br />
                 <span id="cardTypesChartSummary"></span>
+                <br />
+                <br />
+                <h1>Notes</h1>
+                <div id="noteStats"></div>
             </div>
         );
 
@@ -188,6 +195,44 @@ export class StatisticsView {
             [cardStats.newCount, cardStats.youngCount, cardStats.matureCount],
             t("CARD_TYPES_SUMMARY", { totalCardsCount }),
         );
+
+        const noteEases = mapRecord(
+            SrsAlgorithm.getInstance().noteStats().dict,
+            (key: string, value: number): [string, number] => [
+                path.parse(key).name,
+                Math.round(value),
+            ],
+        );
+
+        const grid = new Grid({
+            columns: [
+                {
+                    name: t("NOTE"),
+                },
+                {
+                    name: t("EASE"),
+                    sort: true,
+                    width: "200px",
+                },
+            ],
+            search: true,
+            autoWidth: false,
+            data: Object.entries(noteEases).sort((a, b) => b[1] - a[1]),
+            pagination: {
+                limit: 10,
+                summary: false,
+            },
+            language: {
+                search: {
+                    placeholder: t("SEARCH"),
+                },
+                pagination: {
+                    previous: t("PREVIOUS"),
+                    next: t("NEXT"),
+                },
+            },
+        });
+        grid.render(document.getElementById("noteStats"));
     }
 
     destroy(): void {

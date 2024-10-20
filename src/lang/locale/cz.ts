@@ -132,6 +132,7 @@ export default {
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Oddělovač pro víceřádkove otočené kartičky",
     MULTILINE_CARDS_END_MARKER: "Znaky označující konec clozes a víceřádkových flash karet",
     NOTES: "Poznámky",
+    NOTE: "Note",
     REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "Tag pro revizi",
     TAGS_TO_REVIEW_DESC:
@@ -212,10 +213,14 @@ export default {
     INTERVALS_SUMMARY: "Průměrný interval: ${avg}, Nejdelší interval: ${longest}",
     EASES: "Složitost",
     EASES_SUMMARY: "Průměrná složitost: ${avgEase}",
+    EASE: "Ease",
     CARD_TYPES: "Typy kartiček",
     CARD_TYPES_DESC: "Obsahuje i odložené kartičky (pokud existují)",
     CARD_TYPE_NEW: "Nová",
     CARD_TYPE_YOUNG: "Mladá",
     CARD_TYPE_MATURE: "Dospělá",
     CARD_TYPES_SUMMARY: "Kartiček celkem: ${totalCardsCount}",
+    SEARCH: "Search",
+    PREVIOUS: "Previous",
+    NEXT: "Next",
 };
