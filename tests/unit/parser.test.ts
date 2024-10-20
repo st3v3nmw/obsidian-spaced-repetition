@@ -298,6 +298,40 @@ test("Test parsing of multi line reversed cards", () => {
             clozePatterns: [],
         }),
     ).toEqual([[CardType.MultiLineReversed, "Question\n@@@\nAnswer", 0, 2]]);
+    expect(
+        parseT(
+            `line 1
+
+
+line 2
+
+Question 1?
+??
+Answer to question 1
+????
+line 3
+
+line 4
+
+Question 2?
+??
+Answer to question 2
+????
+Line 5
+`,
+            {
+                singleLineCardSeparator: ":::",
+                singleLineReversedCardSeparator: "::::",
+                multilineCardSeparator: "??",
+                multilineReversedCardSeparator: "???",
+                multilineCardEndMarker: "????",
+                clozePatterns: [],
+            },
+        ),
+    ).toEqual([
+        [CardType.MultiLineBasic, "Question 1?\n??\nAnswer to question 1", 5, 7],
+        [CardType.MultiLineBasic, "Question 2?\n??\nAnswer to question 2", 13, 15],
+    ]);
 
     // empty string or whitespace character provided
     expect(
