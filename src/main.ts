@@ -32,6 +32,7 @@ import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/next-note-review-handler";
 import { Note } from "src/note";
 import { NoteFileLoader } from "src/note-file-loader";
+import { NoteReviewQueue } from "src/note-review-queue";
 import { setDebugParser } from "src/parser";
 import { DEFAULT_DATA, PluginData } from "src/plugin-data";
 import { QuestionPostponementList } from "src/question-postponement-list";
@@ -57,12 +58,24 @@ export default class SRPlugin extends Plugin {
     async onload(): Promise<void> {
         await this.loadPluginData();
 
-        this.initLogicClasses();
+        const noteReviewQueue = new NoteReviewQueue();
+        this.nextNoteReviewHandler = new NextNoteReviewHandler(
+            this.app,
+            this.data.settings,
+            noteReviewQueue,
+        );
 
-        this.initGuiItems();
-    }
+        this.osrSidebar = new OsrSidebar(this, this.data.settings, this.nextNoteReviewHandler);
+        this.osrSidebar.init();
+        this.app.workspace.onLayoutReady(async () => {
+            await this.osrSidebar.activateReviewQueueViewPanel();
+            setTimeout(async () => {
+                if (!this.osrAppCore.syncLock) {
+                    await this.sync();
+                }
+            }, 2000);
+        });
 
-    private initLogicClasses() {
         const questionPostponementList: QuestionPostponementList = new QuestionPostponementList(
             this,
             this.data.settings,
@@ -78,16 +91,9 @@ export default class SRPlugin extends Plugin {
             osrNoteLinkInfoFinder,
             this.data.settings,
             this.onOsrVaultDataChanged.bind(this),
+            noteReviewQueue,
         );
-    }
 
-    private initGuiItems() {
-        this.nextNoteReviewHandler = new NextNoteReviewHandler(
-            this.app,
-            this.data.settings,
-            this.app.workspace,
-            this.osrAppCore.noteReviewQueue,
-        );
         appIcon();
 
         this.showStatusBar(this.data.settings.showStatusBar);
@@ -99,16 +105,6 @@ export default class SRPlugin extends Plugin {
         this.addPluginCommands();
 
         this.addSettingTab(new SRSettingTab(this.app, this));
-
-        this.osrSidebar = new OsrSidebar(this, this.data.settings, this.nextNoteReviewHandler);
-        this.app.workspace.onLayoutReady(async () => {
-            await this.osrSidebar.init();
-            setTimeout(async () => {
-                if (!this.osrAppCore.syncLock) {
-                    await this.sync();
-                }
-            }, 2000);
-        });
     }
 
     showFileMenuItems(status: boolean) {
@@ -355,7 +351,8 @@ export default class SRPlugin extends Plugin {
                 ),
             }),
         );
-        this.osrSidebar.redraw();
+
+        if (this.data.settings.enableNoteReviewPaneOnStartup) this.osrSidebar.redraw();
     }
 
     async loadNote(noteFile: TFile): Promise<Note> {

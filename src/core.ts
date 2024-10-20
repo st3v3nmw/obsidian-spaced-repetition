@@ -74,11 +74,12 @@ export class OsrCore {
         osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder,
         settings: SRSettings,
         dataChangedHandler: () => void,
+        noteReviewQueue: NoteReviewQueue,
     ): void {
         this.settings = settings;
         this.osrNoteLinkInfoFinder = osrNoteLinkInfoFinder;
         this.dataChangedHandler = dataChangedHandler;
-        this._noteReviewQueue = new NoteReviewQueue();
+        this._noteReviewQueue = noteReviewQueue;
         this._questionPostponementList = questionPostponementList;
         this._dueDateFlashcardHistogram = new CardDueDateHistogram();
         this._dueDateNoteHistogram = new NoteDueDateHistogram();
