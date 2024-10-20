@@ -62,18 +62,9 @@ function hasInlineMarker(text: string, marker: string): boolean {
     // No marker provided
     if (marker.length == 0) return false;
 
-    // Make sure it's an "exact" match
-    // For instance:
-    //  hasInlineMarker("a:::b", "::") -> false
-    //  hasInlineMarker("a::b", "::") -> true
+    // Check if the marker is in the text
     const markerIdx = text.indexOf(marker);
     if (markerIdx === -1) return false;
-
-    const prevChar = markerIdx > 0 ? text[markerIdx - 1] : null;
-    const nextChar =
-        markerIdx + marker.length < text.length ? text[markerIdx + marker.length] : null;
-    const markerMatchesExactly = prevChar !== marker[0] && nextChar !== marker[0];
-    if (!markerMatchesExactly) return false;
 
     // Check if it's inside an inline code block
     return !markerInsideCodeBlock(text, marker, markerIdx);
@@ -92,6 +83,13 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
     if (debugParser) {
         console.log("Text to parse:\n<<<" + text + ">>>");
     }
+
+    // Sort inline separators by length, longest first
+    const inlineSeparators = [
+        { separator: options.singleLineCardSeparator, type: CardType.SingleLineBasic },
+        { separator: options.singleLineReversedCardSeparator, type: CardType.SingleLineReversed },
+    ];
+    inlineSeparators.sort((a, b) => b.separator.length - a.separator.length);
 
     const cards: ParsedQuestionInfo[] = [];
     let cardText = "";
@@ -146,18 +144,14 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
         cardText += currentLine.trimEnd();
 
         // Pick up inline cards
-        const hasSingleLineCardSeparator: boolean = hasInlineMarker(
-            currentLine,
-            options.singleLineCardSeparator,
-        );
-        if (
-            hasSingleLineCardSeparator ||
-            // Has single line reversed card separator
-            hasInlineMarker(currentLine, options.singleLineReversedCardSeparator)
-        ) {
-            cardType = hasSingleLineCardSeparator
-                ? CardType.SingleLineBasic
-                : CardType.SingleLineReversed;
+        for (const { separator, type } of inlineSeparators) {
+            if (hasInlineMarker(currentLine, separator)) {
+                cardType = type;
+                break;
+            }
+        }
+
+        if (cardType == CardType.SingleLineBasic || cardType == CardType.SingleLineReversed) {
             cardText = currentLine;
             firstLineNo = i;
 
