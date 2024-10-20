@@ -43,8 +43,7 @@ export function osrSchedule(
             else if (interval < 30) fuzz = Math.max(2, Math.floor(interval * 0.15));
             else fuzz = Math.max(4, Math.floor(interval * 0.05));
 
-            const fuzzedInterval = dueDateHistogram.findLeastUsedIntervalOverRange(interval, fuzz);
-            interval = fuzzedInterval;
+            interval = dueDateHistogram.findLeastUsedIntervalOverRange(interval, fuzz);
         }
     }
 

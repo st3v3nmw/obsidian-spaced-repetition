@@ -2,6 +2,7 @@ import { ISrsAlgorithm } from "src/algorithms/base/isrs-algorithm";
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { Card } from "src/card";
+import { TICKS_PER_DAY } from "src/constants";
 import { DataStore } from "src/data-stores/base/data-store";
 import { CardListType, Deck } from "src/deck";
 import { IDeckTreeIterator } from "src/deck-tree-iterator";
@@ -11,6 +12,7 @@ import { Question, QuestionText } from "src/question";
 import { IQuestionPostponementList } from "src/question-postponement-list";
 import { SRSettings } from "src/settings";
 import { TopicPath } from "src/topic-path";
+import { globalDateProvider } from "src/utils/dates";
 
 export interface IFlashcardReviewSequencer {
     get hasCurrentCard(): boolean;
@@ -146,6 +148,8 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
     async processReviewReviewMode(response: ReviewResponse): Promise<void> {
         if (response != ReviewResponse.Reset || this.currentCard.hasSchedule) {
+            const oldSchedule = this.currentCard.scheduleInfo;
+
             // We need to update the schedule if:
             //  (1) the user reviewed with easy/good/hard (either a new or due card),
             //  (2) or reset a due card
@@ -154,6 +158,16 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
             // Update the source file with the updated schedule
             await DataStore.getInstance().questionWriteSchedule(this.currentQuestion);
+
+            if (oldSchedule) {
+                const today: number = globalDateProvider.today.valueOf();
+                const nDays: number = Math.ceil(
+                    (oldSchedule.dueDateAsUnix - today) / TICKS_PER_DAY,
+                );
+
+                this.dueDateFlashcardHistogram.decrement(nDays);
+            }
+            this.dueDateFlashcardHistogram.increment(this.currentCard.scheduleInfo.interval);
         }
 
         // Move/delete the card
