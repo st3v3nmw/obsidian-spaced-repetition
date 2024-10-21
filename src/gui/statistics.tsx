@@ -46,6 +46,7 @@ export class StatisticsView {
     private intervalsChart: Chart;
     private easesChart: Chart;
     private cardTypesChart: Chart;
+    private noteStatsGrid: Grid;
 
     constructor(containerEl: HTMLElement, osrCore: OsrCore) {
         this.containerEl = containerEl;
@@ -201,7 +202,7 @@ export class StatisticsView {
             ],
         );
 
-        const grid = new Grid({
+        this.noteStatsGrid = new Grid({
             columns: [
                 {
                     name: t("NOTE"),
@@ -229,7 +230,7 @@ export class StatisticsView {
                 },
             },
         });
-        grid.render(document.getElementById("noteStats"));
+        this.noteStatsGrid.render(document.getElementById("noteStats"));
     }
 
     destroy(): void {
@@ -237,6 +238,7 @@ export class StatisticsView {
         this.intervalsChart.destroy();
         this.easesChart.destroy();
         this.cardTypesChart.destroy();
+        this.noteStatsGrid.destroy();
     }
 }
 
