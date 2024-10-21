@@ -19,7 +19,7 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
     -   [Single-line reversed style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#single-line-bidirectional) (`Question:::Answer`)
     -   [Multi-line style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#multi-line-basic) (Separated by `?`)
     -   [Multi-line reversed style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#multi-line-bidirectional) (Separated by `??`)
-    -   [Cloze cards](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/cloze-cards/) (`==highlight==` your cloze deletions!, `**bolded text**`, `{{text in curly braces}}`, or custom cloze patterns)
+    -   [Cloze cards](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/cloze-cards/) (`==highlight==` your cloze deletions!, `**bolded text**`, `{{text in curly braces}}`, or use custom cloze patterns)
     -   [Card context - automatic titles based on headings](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/reviewing/#context) (i.e. `Note title > Heading 1 > Subheading`)
     -   Rich text support in flashcards (inherited from Obsidian)
         -   Images, Audio, & Video
