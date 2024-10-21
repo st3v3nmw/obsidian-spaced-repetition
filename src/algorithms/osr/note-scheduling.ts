@@ -37,11 +37,14 @@ export function osrSchedule(
     if (settings.loadBalance && dueDateHistogram !== undefined) {
         interval = Math.round(interval);
         // disable fuzzing for small intervals
-        if (interval > 4) {
-            let fuzz = 0;
-            if (interval < 7) fuzz = 1;
-            else if (interval < 30) fuzz = Math.max(2, Math.floor(interval * 0.15));
-            else fuzz = Math.max(4, Math.floor(interval * 0.05));
+        if (interval > 7) {
+            let fuzz: number;
+            // 3 day window: day - 1 <= x <= day + 1
+            if (interval <= 21) fuzz = 1;
+            // up to a week window: day - 3 <= x <= day + 3
+            else if (interval <= 180) fuzz = Math.min(3, Math.floor(interval * 0.05));
+            // up to a 2 weeks window: day - 7 <= x <= day + 7
+            else fuzz = Math.min(7, Math.floor(interval * 0.025));
 
             interval = dueDateHistogram.findLeastUsedIntervalOverRange(interval, fuzz);
         }

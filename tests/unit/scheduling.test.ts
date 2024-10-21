@@ -129,7 +129,7 @@ test("Test load balancing, small interval (load balancing disabled)", () => {
 });
 
 test("Test load balancing", () => {
-    // interval < 7
+    // interval <= 7
     let dueDates = new DueDateHistogram({
         5: 2,
     });
@@ -144,12 +144,33 @@ test("Test load balancing", () => {
         ),
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
-        interval: 4,
+        interval: 5,
     });
 
-    // 7 <= interval < 30
+    // 7 < interval <= 21
     dueDates = new DueDateHistogram({
-        25: 2,
+        17: 4,
+        18: 5,
+        19: 3,
+    });
+    expect(
+        osrSchedule(
+            ReviewResponse.Good,
+            7,
+            DEFAULT_SETTINGS.baseEase,
+            0,
+            DEFAULT_SETTINGS,
+            dueDates,
+        ),
+    ).toEqual({
+        ease: DEFAULT_SETTINGS.baseEase,
+        interval: 19,
+    });
+
+    // 21 < interval <= 180
+    dueDates = new DueDateHistogram({
+        23: 5,
+        26: 1,
     });
     expect(
         osrSchedule(
@@ -162,10 +183,9 @@ test("Test load balancing", () => {
         ),
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
-        interval: 24,
+        interval: 25,
     });
 
-    // interval >= 30
     dueDates = new DueDateHistogram({
         2: 5,
         59: 8,
@@ -190,6 +210,32 @@ test("Test load balancing", () => {
     ).toEqual({
         ease: DEFAULT_SETTINGS.baseEase,
         interval: 66,
+    });
+
+    // interval > 180
+    dueDates = new DueDateHistogram({
+        1245: 7,
+        1246: 4,
+        1247: 2,
+        1248: 9,
+        1249: 5,
+        1250: 4,
+        1251: 1,
+        1252: 1,
+        1254: 1,
+    });
+    expect(
+        osrSchedule(
+            ReviewResponse.Good,
+            500,
+            DEFAULT_SETTINGS.baseEase,
+            0,
+            DEFAULT_SETTINGS,
+            dueDates,
+        ),
+    ).toEqual({
+        ease: DEFAULT_SETTINGS.baseEase,
+        interval: 1253,
     });
 });
 
