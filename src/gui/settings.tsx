@@ -197,17 +197,24 @@ export class SRSettingTab extends PluginSettingTab {
         );
 
         containerEl.createEl("h3", { text: t("GROUP_FLASHCARD_SEPARATORS") });
-        new Setting(containerEl).setName(t("CONVERT_HIGHLIGHTS_TO_CLOZES")).addToggle((toggle) =>
+        const convertHighlightsToClozesEl = new Setting(containerEl).setName(
+            t("CONVERT_HIGHLIGHTS_TO_CLOZES"),
+        );
+        convertHighlightsToClozesEl.descEl.insertAdjacentHTML(
+            "beforeend",
+            t("CONVERT_HIGHLIGHTS_TO_CLOZES_DESC", { defaultPattern: "==[123;;]answer[;;hint]==" }),
+        );
+        convertHighlightsToClozesEl.addToggle((toggle) =>
             toggle
                 .setValue(this.plugin.data.settings.convertHighlightsToClozes)
                 .onChange(async (value) => {
-                    const hightlightPattern = "==[123;;]answer[;;hint]==";
+                    const defaultHightlightPattern = "==[123;;]answer[;;hint]==";
                     const clozePatternSet = new Set(this.plugin.data.settings.clozePatterns);
 
                     if (value) {
-                        clozePatternSet.add(hightlightPattern);
+                        clozePatternSet.add(defaultHightlightPattern);
                     } else {
-                        clozePatternSet.delete(hightlightPattern);
+                        clozePatternSet.delete(defaultHightlightPattern);
                     }
 
                     this.plugin.data.settings.clozePatterns = [...clozePatternSet];
@@ -218,17 +225,24 @@ export class SRSettingTab extends PluginSettingTab {
                 }),
         );
 
-        new Setting(containerEl).setName(t("CONVERT_BOLD_TEXT_TO_CLOZES")).addToggle((toggle) =>
+        const convertBoldTextToClozesEl = new Setting(containerEl).setName(
+            t("CONVERT_BOLD_TEXT_TO_CLOZES"),
+        );
+        convertBoldTextToClozesEl.descEl.insertAdjacentHTML(
+            "beforeend",
+            t("CONVERT_BOLD_TEXT_TO_CLOZES_DESC", { defaultPattern: "**[123;;]answer[;;hint]**" }),
+        );
+        convertBoldTextToClozesEl.addToggle((toggle) =>
             toggle
                 .setValue(this.plugin.data.settings.convertBoldTextToClozes)
                 .onChange(async (value) => {
-                    const boldPattern = "**[123;;]answer[;;hint]**";
+                    const defaultBoldPattern = "**[123;;]answer[;;hint]**";
                     const clozePatternSet = new Set(this.plugin.data.settings.clozePatterns);
 
                     if (value) {
-                        clozePatternSet.add(boldPattern);
+                        clozePatternSet.add(defaultBoldPattern);
                     } else {
-                        clozePatternSet.delete(boldPattern);
+                        clozePatternSet.delete(defaultBoldPattern);
                     }
 
                     this.plugin.data.settings.clozePatterns = [...clozePatternSet];
@@ -239,28 +253,35 @@ export class SRSettingTab extends PluginSettingTab {
                 }),
         );
 
-        new Setting(containerEl)
-            .setName(t("CONVERT_CURLY_BRACKETS_TO_CLOZES"))
-            .addToggle((toggle) =>
-                toggle
-                    .setValue(this.plugin.data.settings.convertCurlyBracketsToClozes)
-                    .onChange(async (value) => {
-                        const curlyBracketsPattern = "{{[123;;]answer[;;hint]}}";
-                        const clozePatternSet = new Set(this.plugin.data.settings.clozePatterns);
+        const convertCurlyBracketsToClozesEl = new Setting(containerEl).setName(
+            t("CONVERT_CURLY_BRACKETS_TO_CLOZES"),
+        );
+        convertCurlyBracketsToClozesEl.descEl.insertAdjacentHTML(
+            "beforeend",
+            t("CONVERT_CURLY_BRACKETS_TO_CLOZES_DESC", {
+                defaultPattern: "{{[123;;]answer[;;hint]}}",
+            }),
+        );
+        convertCurlyBracketsToClozesEl.addToggle((toggle) =>
+            toggle
+                .setValue(this.plugin.data.settings.convertCurlyBracketsToClozes)
+                .onChange(async (value) => {
+                    const defaultCurlyBracketsPattern = "{{[123;;]answer[;;hint]}}";
+                    const clozePatternSet = new Set(this.plugin.data.settings.clozePatterns);
 
-                        if (value) {
-                            clozePatternSet.add(curlyBracketsPattern);
-                        } else {
-                            clozePatternSet.delete(curlyBracketsPattern);
-                        }
+                    if (value) {
+                        clozePatternSet.add(defaultCurlyBracketsPattern);
+                    } else {
+                        clozePatternSet.delete(defaultCurlyBracketsPattern);
+                    }
 
-                        this.plugin.data.settings.clozePatterns = [...clozePatternSet];
-                        this.plugin.data.settings.convertCurlyBracketsToClozes = value;
-                        await this.plugin.savePluginData();
+                    this.plugin.data.settings.clozePatterns = [...clozePatternSet];
+                    this.plugin.data.settings.convertCurlyBracketsToClozes = value;
+                    await this.plugin.savePluginData();
 
-                        this.display();
-                    }),
-            );
+                    this.display();
+                }),
+        );
 
         const clozePatternsEl = new Setting(containerEl).setName(t("CLOZE_PATTERNS"));
         clozePatternsEl.descEl.insertAdjacentHTML(
@@ -278,9 +299,9 @@ export class SRSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.data.settings.clozePatterns.join("\n"))
                 .onChange((value) => {
                     applySettingsUpdate(async () => {
-                        const hightlightPattern = "==[123;;]answer[;;hint]==";
-                        const boldPattern = "**[123;;]answer[;;hint]**";
-                        const curlyBracketsPattern = "{{[123;;]answer[;;hint]}}";
+                        const defaultHightlightPattern = "==[123;;]answer[;;hint]==";
+                        const defaultBoldPattern = "**[123;;]answer[;;hint]**";
+                        const defaultCurlyBracketsPattern = "{{[123;;]answer[;;hint]}}";
 
                         const clozePatternSet = new Set(
                             value
@@ -289,19 +310,19 @@ export class SRSettingTab extends PluginSettingTab {
                                 .filter((v) => v),
                         );
 
-                        if (clozePatternSet.has(hightlightPattern)) {
+                        if (clozePatternSet.has(defaultHightlightPattern)) {
                             this.plugin.data.settings.convertHighlightsToClozes = true;
                         } else {
                             this.plugin.data.settings.convertHighlightsToClozes = false;
                         }
 
-                        if (clozePatternSet.has(boldPattern)) {
+                        if (clozePatternSet.has(defaultBoldPattern)) {
                             this.plugin.data.settings.convertBoldTextToClozes = true;
                         } else {
                             this.plugin.data.settings.convertBoldTextToClozes = false;
                         }
 
-                        if (clozePatternSet.has(curlyBracketsPattern)) {
+                        if (clozePatternSet.has(defaultCurlyBracketsPattern)) {
                             this.plugin.data.settings.convertCurlyBracketsToClozes = true;
                         } else {
                             this.plugin.data.settings.convertCurlyBracketsToClozes = false;

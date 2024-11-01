@@ -119,8 +119,14 @@ export default {
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Rastgele desteden rastgele kart",
     DISABLE_CLOZE_CARDS: "Gizli kartları devre dışı bırak?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==Vurgulanan== metni gizli kartlara dönüştür?",
+    CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
+        '"Cloze Patterns"den <code>${defaultPattern</code> öğesini ekleyin/kaldırın',
     CONVERT_BOLD_TEXT_TO_CLOZES: "**Kalın metni** gizli kartlara dönüştür?",
+    CONVERT_BOLD_TEXT_TO_CLOZES_DESC:
+        '"Cloze Patterns"den <code>${defaultPattern</code> öğesini ekleyin/kaldırın',
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "{{Kıvırcık parantezleri}} gizli kartlara dönüştür?",
+    CONVERT_CURLY_BRACKETS_TO_CLOZES_DESC:
+        '"Cloze Patterns"den <code>${defaultPattern</code> öğesini ekleyin/kaldırın',
     CLOZE_PATTERNS: "Cloze Patterns",
     CLOZE_PATTERNS_DESC:
         'Enter cloze patterns separated by newlines. Check the <a href="${docsUrl}">wiki</a> for guidance.',

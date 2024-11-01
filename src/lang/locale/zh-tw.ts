@@ -112,8 +112,14 @@ export default {
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "牌組及卡片都亂序",
     DISABLE_CLOZE_CARDS: "停用填空克漏字卡片？",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "將 ==高亮== 轉換為填空克漏字？",
+    CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
+        '在 "填空克漏字模式" 中加入/移除 <code>${defaultPattern}</code>',
     CONVERT_BOLD_TEXT_TO_CLOZES: "將 **粗體** 轉換為填空克漏字？",
+    CONVERT_BOLD_TEXT_TO_CLOZES_DESC:
+        '在 "填空克漏字模式" 中加入/移除 <code>${defaultPattern}</code>',
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "將 {{大括號}} 轉換為填空克漏字？",
+    CONVERT_CURLY_BRACKETS_TO_CLOZES_DESC:
+        '在 "填空克漏字模式" 中加入/移除 <code>${defaultPattern}</code>',
     CLOZE_PATTERNS: "填空克漏字模式",
     CLOZE_PATTERNS_DESC:
         '輸入以換行符分隔的填空克漏字模式. Check the <a href="${docsUrl}">wiki</a> for guidance.',

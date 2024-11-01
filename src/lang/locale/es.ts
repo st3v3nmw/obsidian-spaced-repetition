@@ -119,8 +119,14 @@ export default {
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
     DISABLE_CLOZE_CARDS: "¿Deshabilitar deletreo de huecos en las tarjetas?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "¿Convertir ==resaltados== a deletreo de huecos?",
+    CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
+        'Añadir/eliminar el <code>${defaultPattern}</code> de tus "Patrones de Deletreo de Huecos"',
     CONVERT_BOLD_TEXT_TO_CLOZES: "¿Convertir **texto en negrita** a deletreo de huecos?",
+    CONVERT_BOLD_TEXT_TO_CLOZES_DESC:
+        'Añadir/eliminar el <code>${defaultPattern}</code> de tus "Patrones de Deletreo de Huecos"',
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "¿Convertir {{llaves rizadas}} a deletreo de huecos?",
+    CONVERT_CURLY_BRACKETS_TO_CLOZES_DESC:
+        'Añadir/eliminar el <code>${defaultPattern}</code> de tus "Patrones de Deletreo de Huecos"',
     CLOZE_PATTERNS: "Patrones de deletreo de huecos",
     CLOZE_PATTERNS_DESC:
         'Escriba los patrones de deletreo de huecos separados por saltos de línea. . Check the <a href="${docsUrl}">wiki</a> for guidance.',
