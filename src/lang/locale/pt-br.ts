@@ -122,8 +122,14 @@ export default {
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
     DISABLE_CLOZE_CARDS: "Desabilitar cartas que usam omissão de palavras?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Converter ==marca-texto== em omissões?",
+    CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
+        'Adiciona/remove o <code>${defaultPattern}</code> dos seus "Padrões de Omissão"',
     CONVERT_BOLD_TEXT_TO_CLOZES: "Converter **texto em negrito** em omissões?",
+    CONVERT_BOLD_TEXT_TO_CLOZES_DESC:
+        'Adiciona/remove o <code>${defaultPattern}</code> dos seus "Padrões de Omissão"',
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Converter {{chaves}} em omissões?",
+    CONVERT_CURLY_BRACKETS_TO_CLOZES_DESC:
+        'Adiciona/remove o <code>${defaultPattern}</code> dos seus "Padrões de Omissão"',
     CLOZE_PATTERNS: "Padrões de Omissão",
     CLOZE_PATTERNS_DESC:
         'Entre os padrões de omissão separados por quebras de linha. Check the <a href="${docsUrl}">wiki</a> for guidance.',

@@ -120,8 +120,14 @@ export default {
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Carte au hasard dans un paquet au hasard",
     DISABLE_CLOZE_CARDS: "Désactiver les textes à trous ?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Convertir ==soulignages== en trous ?",
+    CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
+        'Ajouter/supprimer le <code>${defaultPattern}</code> de vos "Cloze Patterns"',
     CONVERT_BOLD_TEXT_TO_CLOZES: "Convertir **gras** en trous ?",
+    CONVERT_BOLD_TEXT_TO_CLOZES_DESC:
+        'Ajouter/supprimer le <code>${defaultPattern}</code> de vos "Cloze Patterns"',
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Convertir {{crochets}} en trous ?",
+    CONVERT_CURLY_BRACKETS_TO_CLOZES_DESC:
+        'Ajouter/supprimer le <code>${defaultPattern}</code> de vos "Cloze Patterns"',
     CLOZE_PATTERNS: "Cloze Patterns",
     CLOZE_PATTERNS_DESC:
         'Enter cloze patterns separated by newlines. Check the <a href="${docsUrl}">wiki</a> for guidance.',

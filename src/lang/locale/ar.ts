@@ -116,8 +116,14 @@ export default {
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
     DISABLE_CLOZE_CARDS: "؟cloze تعطيل بطاقات",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Convert ==highlights== to clozes",
+    CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
+        'Add/remove the <code>${defaultPattern}</code> from your "Cloze Patterns"',
     CONVERT_BOLD_TEXT_TO_CLOZES: "Convert **bolded text** to clozes",
+    CONVERT_BOLD_TEXT_TO_CLOZES_DESC:
+        'Add/remove the <code>${defaultPattern}</code> from your "Cloze Patterns"',
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Convert {{curly brackets}} to clozes",
+    CONVERT_CURLY_BRACKETS_TO_CLOZES_DESC:
+        'Add/remove the <code>${defaultPattern}</code> from your "Cloze Patterns"',
     CLOZE_PATTERNS: "Cloze Patterns",
     CLOZE_PATTERNS_DESC:
         'Enter cloze patterns separated by newlines. Check the <a href="${docsUrl}">wiki</a> for guidance.',

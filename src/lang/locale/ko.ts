@@ -120,8 +120,14 @@ export default {
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
     DISABLE_CLOZE_CARDS: "빈 칸 채우기 카드를 비활성화하시겠습니까?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==highlights== 를 빈 칸 채우기로 전환하시겠습니까?",
+    CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
+        '"빈 칸 채우기 패턴" 에서 <code>${defaultPattern}</code> 를 추가/제거하시겠습니까?',
     CONVERT_BOLD_TEXT_TO_CLOZES: "**bolded text** 를 빈 칸 채우기로 전환하시겠습니까?",
+    CONVERT_BOLD_TEXT_TO_CLOZES_DESC:
+        '"빈 칸 채우기 패턴" 에서 <code>${defaultPattern}</code> 를 추가/제거하시겠습니까?',
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "{{curly brackets}} 를 빈 칸 채우기로 전환하시겠습니까?",
+    CONVERT_CURLY_BRACKETS_TO_CLOZES_DESC:
+        '"빈 칸 채우기 패턴" 에서 <code>${defaultPattern}</code> 를 추가/제거하시겠습니까?',
     CLOZE_PATTERNS: "빈 칸 채우기 패턴",
     CLOZE_PATTERNS_DESC:
         '빈 칸 채우기 패턴을 입력해주세요. 줄바꿈으로 구분합니다. Check the <a href="${docsUrl}">wiki</a> for guidance.',

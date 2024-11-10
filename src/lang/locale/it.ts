@@ -124,8 +124,14 @@ export default {
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Scheda a caso da mazzo a caso",
     DISABLE_CLOZE_CARDS: "Disabilita schede con spazi da riempire?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Convertire ==testo evidenziato== in spazi da riempire?",
+    CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
+        'Aggiungi/rimuovi <code>${defaultPattern}</code> dai tuoi "Modelli per spazi da riempire"',
     CONVERT_BOLD_TEXT_TO_CLOZES: "Convertire **testo in grassetto** in spazi da riempire",
+    CONVERT_BOLD_TEXT_TO_CLOZES_DESC:
+        'Aggiungi/rimuovi <code>${defaultPattern}</code> dai tuoi "Modelli per spazi da riempire"',
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Convertire {{parentesi graffe}} in spazi da riempire?",
+    CONVERT_CURLY_BRACKETS_TO_CLOZES_DESC:
+        'Aggiungi/rimuovi <code>${defaultPattern}</code> dai tuoi "Modelli per spazi da riempire"',
     CLOZE_PATTERNS: "Modelli di spazi da riempire",
     CLOZE_PATTERNS_DESC:
         'Inserisci i modelli di spazi da riempire separati da a capo. Check the <a href="${docsUrl}">wiki</a> for guidance.',

@@ -119,8 +119,14 @@ export default {
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
     DISABLE_CLOZE_CARDS: "Vypnout cloze kartičky?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Převést ==zvýraznění== na clozes?",
+    CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
+        'Přidat/odstranit <code>${defaultPattern}</code> z vašich "Cloze vzorů"',
     CONVERT_BOLD_TEXT_TO_CLOZES: "Převést **tučný text** na clozes?",
+    CONVERT_BOLD_TEXT_TO_CLOZES_DESC:
+        'Přidat/odstranit <code>${defaultPattern}</code> z vašich "Cloze vzorů"',
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "Převést {{složené závorky}} na clozes?",
+    CONVERT_CURLY_BRACKETS_TO_CLOZES_DESC:
+        'Přidat/odstranit <code>${defaultPattern}</code> z vašich "Cloze vzorů"',
     CLOZE_PATTERNS: "Cloze vzory",
     CLOZE_PATTERNS_DESC:
         'Zadejte cloze vzory oddělené odřádkováním. Check the <a href="${docsUrl}">wiki</a> for guidance.',

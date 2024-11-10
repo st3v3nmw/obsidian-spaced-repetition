@@ -112,8 +112,14 @@ export default {
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "卡片组及卡片都乱序",
     DISABLE_CLOZE_CARDS: "不进行完形填空？",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "将 ==高亮== 转换为完形填空？",
+    CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
+        '添加/删除 "完形填空模式" 中的 <code>${defaultPattern}</code>',
     CONVERT_BOLD_TEXT_TO_CLOZES: "将 **粗体** 转换为完形填空？",
+    CONVERT_BOLD_TEXT_TO_CLOZES_DESC:
+        '添加/删除 "完形填空模式" 中的 <code>${defaultPattern}</code>',
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "将 {{大括号}} 转换为完形填空？",
+    CONVERT_CURLY_BRACKETS_TO_CLOZES_DESC:
+        '添加/删除 "完形填空模式" 中的 <code>${defaultPattern}</code>',
     CLOZE_PATTERNS: "完形填空模式",
     CLOZE_PATTERNS_DESC:
         '输入以换行符分隔的完形填空模式. Check the <a href="${docsUrl}">wiki</a> for guidance.',
