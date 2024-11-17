@@ -60,34 +60,39 @@ export class TabbedSRItemView extends ItemView {
     }
 
     async onOpen() {
-        const loadedData = await this.loadReviewSequencer();
-        this.reviewSequencer = loadedData.reviewSequencer;
-        this.reviewMode = loadedData.mode;
+        try {
+            const loadedData = await this.loadReviewSequencer();
 
-        if (this.deckView === undefined) {
-            // Init static elements in views
-            this.deckView = new DeckListView(
-                this.plugin,
-                this.settings,
-                this.reviewSequencer,
-                this.viewContentEl,
-                this._startReviewOfDeck.bind(this),
-            );
+            this.reviewSequencer = loadedData.reviewSequencer;
+            this.reviewMode = loadedData.mode;
 
-            this.flashcardView = new FlashcardReviewView(
-                this.app,
-                this.plugin,
-                this.settings,
-                this.reviewSequencer,
-                this.reviewMode,
-                this.viewContentEl,
-                this.viewContainerEl,
-                this._showDecksList.bind(this),
-                this._doEditQuestionText.bind(this),
-            );
+            if (this.deckView === undefined) {
+                // Init static elements in views
+                this.deckView = new DeckListView(
+                    this.plugin,
+                    this.settings,
+                    this.reviewSequencer,
+                    this.viewContentEl,
+                    this._startReviewOfDeck.bind(this),
+                );
+
+                this.flashcardView = new FlashcardReviewView(
+                    this.app,
+                    this.plugin,
+                    this.settings,
+                    this.reviewSequencer,
+                    this.reviewMode,
+                    this.viewContentEl,
+                    this.viewContainerEl,
+                    this._showDecksList.bind(this),
+                    this._doEditQuestionText.bind(this),
+                );
+            }
+
+            this._showDecksList();
+        } catch (e) {
+            this.unload();
         }
-
-        this._showDecksList();
     }
 
     async onClose() {

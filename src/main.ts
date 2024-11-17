@@ -100,7 +100,6 @@ export default class SRPlugin extends Plugin {
     async onload(): Promise<void> {
         // Closes all still open views when the plugin is loaded, because it causes bugs / empty windows otherwise
         this.app.workspace.onLayoutReady(async () => {
-            console.log(this.app.workspace.getLeavesOfType(TABBED_SR_ITEM_VIEW));
             this.detachAllTabbedLeaves();
         });
 
