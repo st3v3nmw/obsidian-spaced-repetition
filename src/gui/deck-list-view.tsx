@@ -7,7 +7,7 @@ import {
     DeckStats,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import { FlashcardModalMode } from "src/gui/flashcard-modal";
+import { FlashcardMode } from "src/gui/flashcard-modal";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
@@ -15,8 +15,8 @@ import { TopicPath } from "src/topic-path";
 
 export class DeckListView {
     public plugin: SRPlugin;
-    public mode: FlashcardModalMode;
-    public modalContentEl: HTMLElement;
+    public mode: FlashcardMode;
+    public contentEl: HTMLElement;
 
     public view: HTMLDivElement;
     public header: HTMLDivElement;
@@ -39,7 +39,7 @@ export class DeckListView {
         this.plugin = plugin;
         this.settings = settings;
         this.reviewSequencer = reviewSequencer;
-        this.modalContentEl = contentEl;
+        this.contentEl = contentEl;
         this.startReviewOfDeck = startReviewOfDeck;
 
         // Build ui
@@ -50,7 +50,7 @@ export class DeckListView {
      * Initializes all static elements in the DeckListView
      */
     init(): void {
-        this.view = this.modalContentEl.createDiv();
+        this.view = this.contentEl.createDiv();
         this.view.addClasses(["sr-deck-list", "sr-is-hidden"]);
 
         this.header = this.view.createDiv();
@@ -72,7 +72,7 @@ export class DeckListView {
      * Shows the DeckListView & rerenders dynamic elements
      */
     show(): void {
-        this.mode = FlashcardModalMode.DecksList;
+        this.mode = FlashcardMode.DecksList;
 
         // Redraw in case the stats have changed
         this._createHeaderStats();

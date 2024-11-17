@@ -12,7 +12,7 @@ import type SRPlugin from "src/main";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
 
-export enum FlashcardModalMode {
+export enum FlashcardMode {
     DecksList,
     Front,
     Back,
@@ -21,7 +21,7 @@ export enum FlashcardModalMode {
 
 export class FlashcardModal extends Modal {
     public plugin: SRPlugin;
-    public mode: FlashcardModalMode;
+    public mode: FlashcardMode;
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
@@ -79,7 +79,7 @@ export class FlashcardModal extends Modal {
     }
 
     onClose(): void {
-        this.mode = FlashcardModalMode.Closed;
+        this.mode = FlashcardMode.Closed;
         this.deckView.close();
         this.flashcardView.close();
     }
