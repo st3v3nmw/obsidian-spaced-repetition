@@ -2,11 +2,11 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
 import SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
-import { DeckListView } from "../deck-list-view";
-import { FlashcardReviewView } from "../flashcard-review-view";
+import { DeckListView } from "./deck-list-view";
+import { FlashcardReviewView } from "./flashcard-review-view";
 import { Question } from "src/question";
 import { Deck } from "src/deck";
-import { FlashcardEditModal } from "../edit-modal";
+import { FlashcardEditModal } from "./edit-modal";
 
 export const TABBED_SR_ITEM_VIEW = "tabbed-spaced-repetition-item-view";
 
@@ -15,6 +15,7 @@ export class TabbedSRItemView extends ItemView {
         reviewSequencer: IFlashcardReviewSequencer;
         mode: FlashcardReviewMode;
     }>;
+    viewContainerEl: HTMLElement;
     viewContentEl: HTMLElement;
 
     public plugin: SRPlugin;
@@ -39,10 +40,11 @@ export class TabbedSRItemView extends ItemView {
 
         const viewContent = this.containerEl.getElementsByClassName("view-content");
         if (viewContent.length > 0) {
-            this.viewContentEl = viewContent[0] as HTMLElement;
-            this.viewContentEl.addClass("sr-tab-view-content");
+            this.viewContainerEl = viewContent[0] as HTMLElement;
+            this.viewContainerEl.addClass("sr-tab-view");
+            this.viewContentEl = this.viewContainerEl.createDiv("sr-tab-view-content");
+            this.viewContainerEl.appendChild(this.viewContentEl);
         }
-        this.containerEl.addClass("sr-tab-view");
     }
 
     getViewType() {
@@ -79,7 +81,7 @@ export class TabbedSRItemView extends ItemView {
                 this.reviewSequencer,
                 this.reviewMode,
                 this.viewContentEl,
-                this.containerEl,
+                this.viewContainerEl,
                 this._showDecksList.bind(this),
                 this._doEditQuestionText.bind(this),
             );
@@ -89,8 +91,8 @@ export class TabbedSRItemView extends ItemView {
     }
 
     async onClose() {
-        this.deckView.close();
-        this.flashcardView.close();
+        if (this.deckView) this.deckView.close();
+        if (this.flashcardView) this.flashcardView.close();
     }
 
     private _showDecksList(): void {

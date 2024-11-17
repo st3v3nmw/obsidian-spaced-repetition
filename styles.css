@@ -49,7 +49,17 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     top: 12px;
 }
 
-.sr-modal-content {
+.sr-tab-view {
+    display: flex;
+    flex-direction: column;
+}
+
+.sr-tab-view-content {
+    flex-grow: 1;
+}
+
+.sr-modal-content,
+.sr-tab-view {
     position: relative;
     overflow: hidden;
 }

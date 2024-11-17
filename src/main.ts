@@ -1,13 +1,4 @@
-import {
-    Menu,
-    Notice,
-    PaneType,
-    Plugin,
-    TAbstractFile,
-    TFile,
-    ViewCreator,
-    WorkspaceLeaf,
-} from "obsidian";
+import { Menu, Notice, PaneType, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
@@ -48,11 +39,9 @@ import { QuestionPostponementList } from "src/question-postponement-list";
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
 import { TopicPath } from "src/topic-path";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
-import {
-    TABBED_SR_ITEM_VIEW,
-    TabbedSRItemView,
-} from "./gui/tabbed-spaced-repetition-view/TabbedSRItemView";
+
 import { TabbedViewType } from "./utils/types";
+import { TABBED_SR_ITEM_VIEW, TabbedSRItemView } from "src/gui/tabbed-space-repetition-view";
 
 export default class SRPlugin extends Plugin {
     public data: PluginData;
@@ -72,7 +61,7 @@ export default class SRPlugin extends Plugin {
                     // This allows us to load the data from inside the view when the open function is called
 
                     if (this.chosenSingleNoteForTabbedView !== undefined) {
-                        const singleNoteDeckData = await this.prepareDecksForSingleNoteReview(
+                        const singleNoteDeckData = await this.getPrepareDecksForSingleNoteReview(
                             this.chosenSingleNoteForTabbedView,
                             this.chosenReviewModeForTabbedView,
                         );
@@ -109,6 +98,12 @@ export default class SRPlugin extends Plugin {
     ) => void;
 
     async onload(): Promise<void> {
+        // Closes all still open views when the plugin is loaded, because it causes bugs / empty windows otherwise
+        this.app.workspace.onLayoutReady(async () => {
+            console.log(this.app.workspace.getLeavesOfType(TABBED_SR_ITEM_VIEW));
+            this.detachAllTabbedLeaves();
+        });
+
         await this.loadPluginData();
 
         const noteReviewQueue = new NoteReviewQueue();
@@ -268,18 +263,20 @@ export default class SRPlugin extends Plugin {
             id: "srs-review-flashcards",
             name: t("REVIEW_ALL_CARDS"),
             callback: async () => {
-                if (!this.osrAppCore.syncLock) {
-                    await this.sync();
-                    if (this.data.settings.openViewInNewTab) {
-                        this.chosenReviewModeForTabbedView = FlashcardReviewMode.Review;
-                        this.openTabbedSRView();
-                    } else {
-                        this.openFlashcardModal(
-                            this.osrAppCore.reviewableDeckTree,
-                            this.osrAppCore.remainingDeckTree,
-                            FlashcardReviewMode.Review,
-                        );
-                    }
+                if (this.osrAppCore.syncLock) {
+                    return;
+                }
+                await this.sync();
+
+                if (this.data.settings.openViewInNewTab) {
+                    this.chosenReviewModeForTabbedView = FlashcardReviewMode.Review;
+                    this.openTabbedSRView();
+                } else {
+                    this.openFlashcardModal(
+                        this.osrAppCore.reviewableDeckTree,
+                        this.osrAppCore.remainingDeckTree,
+                        FlashcardReviewMode.Review,
+                    );
                 }
             },
         });
@@ -307,14 +304,16 @@ export default class SRPlugin extends Plugin {
             name: t("REVIEW_CARDS_IN_NOTE"),
             callback: async () => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
-                if (openFile && openFile.extension === "md") {
-                    if (this.data.settings.openViewInNewTab) {
-                        this.chosenReviewModeForTabbedView = FlashcardReviewMode.Review;
-                        this.chosenSingleNoteForTabbedView = openFile;
-                        this.openTabbedSRView();
-                    } else {
-                        this.openFlashcardModalForSingleNote(openFile, FlashcardReviewMode.Review);
-                    }
+                if (!openFile || openFile.extension !== "md") {
+                    return;
+                }
+
+                if (this.data.settings.openViewInNewTab) {
+                    this.chosenReviewModeForTabbedView = FlashcardReviewMode.Review;
+                    this.chosenSingleNoteForTabbedView = openFile;
+                    this.openTabbedSRView();
+                } else {
+                    this.openFlashcardModalForSingleNote(openFile, FlashcardReviewMode.Review);
                 }
             },
         });
@@ -324,14 +323,16 @@ export default class SRPlugin extends Plugin {
             name: t("CRAM_CARDS_IN_NOTE"),
             callback: async () => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
-                if (openFile && openFile.extension === "md") {
-                    if (this.data.settings.openViewInNewTab) {
-                        this.chosenReviewModeForTabbedView = FlashcardReviewMode.Cram;
-                        this.chosenSingleNoteForTabbedView = openFile;
-                        this.openTabbedSRView();
-                    } else {
-                        this.openFlashcardModalForSingleNote(openFile, FlashcardReviewMode.Cram);
-                    }
+                if (!openFile || openFile.extension !== "md") {
+                    return;
+                }
+
+                if (this.data.settings.openViewInNewTab) {
+                    this.chosenReviewModeForTabbedView = FlashcardReviewMode.Cram;
+                    this.chosenSingleNoteForTabbedView = openFile;
+                    this.openTabbedSRView();
+                } else {
+                    this.openFlashcardModalForSingleNote(openFile, FlashcardReviewMode.Cram);
                 }
             },
         });
@@ -371,7 +372,7 @@ export default class SRPlugin extends Plugin {
         return { reviewSequencer, mode: reviewMode };
     }
 
-    private async prepareDecksForSingleNoteReview(
+    private async getPrepareDecksForSingleNoteReview(
         file: TFile,
         mode: FlashcardReviewMode,
     ): Promise<{ deckTree: Deck; remainingDeckTree: Deck; mode: FlashcardReviewMode }> {
@@ -402,7 +403,7 @@ export default class SRPlugin extends Plugin {
 
     private detachAllTabbedLeaves() {
         this.forEachTabbedViewType((viewType) => {
-            this.app.workspace.getLeavesOfType(viewType.type).forEach((leaf) => leaf.detach());
+            this.app.workspace.detachLeavesOfType(viewType.type);
         });
     }
 
@@ -437,14 +438,16 @@ export default class SRPlugin extends Plugin {
         noteFile: TFile,
         reviewMode: FlashcardReviewMode,
     ): Promise<void> {
-        const singleNoteDeckData = await this.prepareDecksForSingleNoteReview(noteFile, reviewMode);
+        const singleNoteDeckData = await this.getPrepareDecksForSingleNoteReview(
+            noteFile,
+            reviewMode,
+        );
         this.openFlashcardModal(
             singleNoteDeckData.deckTree,
             singleNoteDeckData.remainingDeckTree,
             reviewMode,
         );
     }
-
     private openFlashcardModal(
         fullDeckTree: Deck,
         remainingDeckTree: Deck,
