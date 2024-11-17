@@ -40,7 +40,7 @@ import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src
 import { TopicPath } from "src/topic-path";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
 
-import { TabbedViewType } from "./utils/types";
+import { TabbedViewType } from "src/utils/types";
 import { TABBED_SR_ITEM_VIEW, TabbedSRItemView } from "src/gui/tabbed-space-repetition-view";
 
 export default class SRPlugin extends Plugin {
