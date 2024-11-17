@@ -1,3 +1,5 @@
+import { ViewCreator } from "obsidian";
+
 // https://stackoverflow.com/a/69019874
 type ObjectType = Record<PropertyKey, unknown>;
 type PickByValue<OBJ_T, VALUE_T> = // https://stackoverflow.com/a/55153000
@@ -35,3 +37,5 @@ export function mapRecord<T, U, V extends string | number | symbol>(
         Object.entries(record).map(([key, value]) => transform(key, value)),
     ) as Record<V, U>;
 }
+
+export type TabbedViewType = { type: string; viewCreator: ViewCreator };
