@@ -27,6 +27,7 @@ import { FlashcardModal } from "src/gui/flashcard-modal";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/review-queue-list-view";
 import { SRSettingTab } from "src/gui/settings";
 import { OsrSidebar } from "src/gui/sidebar";
+import { TABBED_SR_ITEM_VIEW, TabbedSRItemView } from "src/gui/tabbed-space-repetition-view";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/next-note-review-handler";
@@ -41,7 +42,6 @@ import { TopicPath } from "src/topic-path";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
 
 import { TabbedViewType } from "src/utils/types";
-import { TABBED_SR_ITEM_VIEW, TabbedSRItemView } from "src/gui/tabbed-space-repetition-view";
 
 export default class SRPlugin extends Plugin {
     public data: PluginData;
@@ -493,9 +493,9 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                    t("SYNC_TIME_TAKEN", {
-                        t: Date.now() - now.valueOf(),
-                    }),
+                t("SYNC_TIME_TAKEN", {
+                    t: Date.now() - now.valueOf(),
+                }),
             );
         }
     }

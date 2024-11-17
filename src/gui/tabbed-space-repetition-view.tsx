@@ -1,12 +1,12 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
-import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
-import SRPlugin from "src/main";
-import { SRSettings } from "src/settings";
-import { DeckListView } from "src/gui/deck-list-view";
-import { FlashcardReviewView } from "src/gui/flashcard-review-view";
-import { Question } from "src/question";
 import { Deck } from "src/deck";
+import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
+import { DeckListView } from "src/gui/deck-list-view";
 import { FlashcardEditModal } from "src/gui/edit-modal";
+import { FlashcardReviewView } from "src/gui/flashcard-review-view";
+import SRPlugin from "src/main";
+import { Question } from "src/question";
+import { SRSettings } from "src/settings";
 
 export const TABBED_SR_ITEM_VIEW = "tabbed-spaced-repetition-item-view";
 
