@@ -493,9 +493,9 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                t("SYNC_TIME_TAKEN", {
-                    t: Date.now() - now.valueOf(),
-                }),
+                    t("SYNC_TIME_TAKEN", {
+                        t: Date.now() - now.valueOf(),
+                    }),
             );
         }
     }
