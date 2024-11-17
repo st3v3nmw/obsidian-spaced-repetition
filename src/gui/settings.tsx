@@ -575,6 +575,18 @@ export class SRSettingTab extends PluginSettingTab {
     private async tabUiPreferences(containerEl: HTMLElement): Promise<void> {
         containerEl.createEl("h3", { text: t("OBSIDIAN_INTEGRATION") });
         new Setting(containerEl)
+            .setName(t("OPEN_IN_TAB"))
+            .setDesc(t("OPEN_IN_TAB_DESC"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.openViewInNewTab)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.openViewInNewTab = value;
+                        await this.plugin.savePluginData();
+                    }),
+            );
+
+        new Setting(containerEl)
             .setName(t("SHOW_RIBBON_ICON"))
             .setDesc(t("SHOW_RIBBON_ICON_DESC"))
             .addToggle((toggle) =>
