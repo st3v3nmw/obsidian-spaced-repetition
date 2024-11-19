@@ -1,4 +1,4 @@
-import { Menu, Notice, PaneType, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
+import { Menu, Notice, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
@@ -27,7 +27,6 @@ import { FlashcardModal } from "src/gui/sr-modal";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/review-queue-list-view";
 import { SRSettingTab } from "src/gui/settings";
 import { OsrSidebar } from "src/gui/sidebar";
-import { SRTabView } from "src/gui/sr-tab-view";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/next-note-review-handler";
@@ -40,16 +39,14 @@ import { QuestionPostponementList } from "src/question-postponement-list";
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
 import { TopicPath } from "src/topic-path";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
-import { TabViewType as TabViewType } from "src/utils/types";
-import { SR_TAB_VIEW } from "./constants";
 import TabViewManager from "./tab-view-manager/tab-view-manager";
 
 export default class SRPlugin extends Plugin {
     public data: PluginData;
     public osrAppCore: OsrAppCore;
+    public tabViewManager: TabViewManager;
     private osrSidebar: OsrSidebar;
     private nextNoteReviewHandler: NextNoteReviewHandler;
-    private tabViewManager: TabViewManager;
 
     private ribbonIcon: HTMLElement | null = null;
     private statusBar: HTMLElement | null = null;

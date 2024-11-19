@@ -581,6 +581,9 @@ export class SRSettingTab extends PluginSettingTab {
                 toggle
                     .setValue(this.plugin.data.settings.openViewInNewTab)
                     .onChange(async (value) => {
+                        if (!value) {
+                            this.plugin.tabViewManager.closeAllTabViews();
+                        }
                         this.plugin.data.settings.openViewInNewTab = value;
                         await this.plugin.savePluginData();
                     }),
