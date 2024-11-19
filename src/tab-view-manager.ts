@@ -2,7 +2,7 @@ import { PaneType, TFile, WorkspaceLeaf } from "obsidian";
 import { SR_TAB_VIEW } from "src/constants";
 import { OsrAppCore } from "src/core";
 import { Deck } from "src/deck";
-import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
+import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
 import { SRTabView } from "src/gui/sr-tab-view";
 import SRPlugin from "src/main";
 import { TabViewType } from "src/utils/types";

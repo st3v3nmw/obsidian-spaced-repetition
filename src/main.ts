@@ -39,7 +39,7 @@ import { QuestionPostponementList } from "src/question-postponement-list";
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
 import { TopicPath } from "src/topic-path";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
-import TabViewManager from "./tab-view-manager/tab-view-manager";
+import TabViewManager from "src/tab-view-manager";
 
 export default class SRPlugin extends Plugin {
     public data: PluginData;
