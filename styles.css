@@ -56,6 +56,7 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
 
 .sr-tab-view-content {
     flex-grow: 1;
+    margin: auto;
 }
 
 .sr-modal-content,
