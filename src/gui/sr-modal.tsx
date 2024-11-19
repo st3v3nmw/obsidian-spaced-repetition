@@ -5,15 +5,15 @@ import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import { DeckListView } from "src/gui/deck-list-view";
+import { DeckUI } from "src/gui/deck-ui";
 import { FlashcardEditModal } from "src/gui/edit-modal";
-import { FlashcardReviewView } from "src/gui/flashcard-review-view";
+import { CardUI } from "src/gui/card-ui";
 import type SRPlugin from "src/main";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
 
 export enum FlashcardMode {
-    DecksList,
+    Deck,
     Front,
     Back,
     Closed,
@@ -25,8 +25,8 @@ export class FlashcardModal extends Modal {
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
-    private deckView: DeckListView;
-    private flashcardView: FlashcardReviewView;
+    private deckView: DeckUI;
+    private flashcardView: CardUI;
 
     constructor(
         app: App,
@@ -53,7 +53,7 @@ export class FlashcardModal extends Modal {
         this.contentEl.addClass("sr-modal-content");
 
         // Init static elements in views
-        this.deckView = new DeckListView(
+        this.deckView = new DeckUI(
             this.plugin,
             this.settings,
             this.reviewSequencer,
@@ -61,7 +61,7 @@ export class FlashcardModal extends Modal {
             this._startReviewOfDeck.bind(this),
         );
 
-        this.flashcardView = new FlashcardReviewView(
+        this.flashcardView = new CardUI(
             this.app,
             this.plugin,
             this.settings,

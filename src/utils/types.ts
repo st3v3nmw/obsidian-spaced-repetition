@@ -38,4 +38,4 @@ export function mapRecord<T, U, V extends string | number | symbol>(
     ) as Record<V, U>;
 }
 
-export type TabbedViewType = { type: string; viewCreator: ViewCreator };
+export type TabViewType = { type: string; viewCreator: ViewCreator };

@@ -7,13 +7,13 @@ import {
     DeckStats,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import { FlashcardMode } from "src/gui/flashcard-modal";
+import { FlashcardMode } from "src/gui/sr-modal";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
 import { TopicPath } from "src/topic-path";
 
-export class DeckListView {
+export class DeckUI {
     public plugin: SRPlugin;
     public mode: FlashcardMode;
     public contentEl: HTMLElement;
@@ -72,7 +72,7 @@ export class DeckListView {
      * Shows the DeckListView & rerenders dynamic elements
      */
     show(): void {
-        this.mode = FlashcardMode.DecksList;
+        this.mode = FlashcardMode.Deck;
 
         // Redraw in case the stats have changed
         this._createHeaderStats();

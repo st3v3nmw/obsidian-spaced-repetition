@@ -23,11 +23,11 @@ import {
     FlashcardReviewSequencer,
     IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import { FlashcardModal } from "src/gui/flashcard-modal";
+import { FlashcardModal } from "src/gui/sr-modal";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/review-queue-list-view";
 import { SRSettingTab } from "src/gui/settings";
 import { OsrSidebar } from "src/gui/sidebar";
-import { TABBED_SR_ITEM_VIEW, TabbedSRItemView } from "src/gui/tabbed-space-repetition-view";
+import { SRTabView } from "src/gui/sr-tab-view";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/next-note-review-handler";
@@ -40,53 +40,16 @@ import { QuestionPostponementList } from "src/question-postponement-list";
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
 import { TopicPath } from "src/topic-path";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
-
-import { TabbedViewType } from "src/utils/types";
+import { TabViewType as TabViewType } from "src/utils/types";
+import { SR_TAB_VIEW } from "./constants";
+import TabViewManager from "./tab-view-manager/tab-view-manager";
 
 export default class SRPlugin extends Plugin {
     public data: PluginData;
     public osrAppCore: OsrAppCore;
     private osrSidebar: OsrSidebar;
     private nextNoteReviewHandler: NextNoteReviewHandler;
-
-    private chosenReviewModeForTabbedView: FlashcardReviewMode;
-    private chosenSingleNoteForTabbedView: TFile;
-
-    private tabbedViewTypes: TabbedViewType[] = [
-        {
-            type: TABBED_SR_ITEM_VIEW,
-            viewCreator: (leaf) =>
-                new TabbedSRItemView(leaf, this, async () => {
-                    // Tabbed views cant get params on open call, so we have to do it here
-                    // This allows us to load the data from inside the view when the open function is called
-
-                    if (this.chosenSingleNoteForTabbedView !== undefined) {
-                        const singleNoteDeckData = await this.getPrepareDecksForSingleNoteReview(
-                            this.chosenSingleNoteForTabbedView,
-                            this.chosenReviewModeForTabbedView,
-                        );
-
-                        return this.getPreparedReviewSequencer(
-                            singleNoteDeckData.deckTree,
-                            singleNoteDeckData.remainingDeckTree,
-                            singleNoteDeckData.mode,
-                        );
-                    }
-
-                    const fullDeckTree: Deck = this.osrAppCore.reviewableDeckTree;
-                    const remainingDeckTree: Deck =
-                        this.chosenReviewModeForTabbedView === FlashcardReviewMode.Cram
-                            ? this.osrAppCore.reviewableDeckTree
-                            : this.osrAppCore.remainingDeckTree;
-
-                    return this.getPreparedReviewSequencer(
-                        fullDeckTree,
-                        remainingDeckTree,
-                        this.chosenReviewModeForTabbedView,
-                    );
-                }),
-        },
-    ];
+    private tabViewManager: TabViewManager;
 
     private ribbonIcon: HTMLElement | null = null;
     private statusBar: HTMLElement | null = null;
@@ -98,9 +61,10 @@ export default class SRPlugin extends Plugin {
     ) => void;
 
     async onload(): Promise<void> {
-        // Closes all still open views when the plugin is loaded, because it causes bugs / empty windows otherwise
+        // Closes all still open tab views when the plugin is loaded, because it causes bugs / empty windows otherwise
+        this.tabViewManager = new TabViewManager(this);
         this.app.workspace.onLayoutReady(async () => {
-            this.detachAllTabbedLeaves();
+            this.tabViewManager.closeAllTabViews();
         });
 
         await this.loadPluginData();
@@ -142,8 +106,6 @@ export default class SRPlugin extends Plugin {
         );
 
         appIcon();
-
-        this.registerTabbedViews();
 
         this.showStatusBar(this.data.settings.showStatusBar);
 
@@ -268,8 +230,7 @@ export default class SRPlugin extends Plugin {
                 await this.sync();
 
                 if (this.data.settings.openViewInNewTab) {
-                    this.chosenReviewModeForTabbedView = FlashcardReviewMode.Review;
-                    this.openTabbedSRView();
+                    this.tabViewManager.openSRTabView(this.osrAppCore, FlashcardReviewMode.Review);
                 } else {
                     this.openFlashcardModal(
                         this.osrAppCore.reviewableDeckTree,
@@ -286,8 +247,7 @@ export default class SRPlugin extends Plugin {
             callback: async () => {
                 await this.sync();
                 if (this.data.settings.openViewInNewTab) {
-                    this.chosenReviewModeForTabbedView = FlashcardReviewMode.Cram;
-                    this.openTabbedSRView();
+                    this.tabViewManager.openSRTabView(this.osrAppCore, FlashcardReviewMode.Cram);
                 } else {
                     this.openFlashcardModal(
                         this.osrAppCore.reviewableDeckTree,
@@ -308,9 +268,11 @@ export default class SRPlugin extends Plugin {
                 }
 
                 if (this.data.settings.openViewInNewTab) {
-                    this.chosenReviewModeForTabbedView = FlashcardReviewMode.Review;
-                    this.chosenSingleNoteForTabbedView = openFile;
-                    this.openTabbedSRView();
+                    this.tabViewManager.openSRTabView(
+                        this.osrAppCore,
+                        FlashcardReviewMode.Review,
+                        openFile,
+                    );
                 } else {
                     this.openFlashcardModalForSingleNote(openFile, FlashcardReviewMode.Review);
                 }
@@ -327,9 +289,11 @@ export default class SRPlugin extends Plugin {
                 }
 
                 if (this.data.settings.openViewInNewTab) {
-                    this.chosenReviewModeForTabbedView = FlashcardReviewMode.Cram;
-                    this.chosenSingleNoteForTabbedView = openFile;
-                    this.openTabbedSRView();
+                    this.tabViewManager.openSRTabView(
+                        this.osrAppCore,
+                        FlashcardReviewMode.Cram,
+                        openFile,
+                    );
                 } else {
                     this.openFlashcardModalForSingleNote(openFile, FlashcardReviewMode.Cram);
                 }
@@ -347,10 +311,10 @@ export default class SRPlugin extends Plugin {
 
     onunload(): void {
         this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).forEach((leaf) => leaf.detach());
-        this.detachAllTabbedLeaves();
+        this.tabViewManager.closeAllTabViews();
     }
 
-    private getPreparedReviewSequencer(
+    public getPreparedReviewSequencer(
         fullDeckTree: Deck,
         remainingDeckTree: Deck,
         reviewMode: FlashcardReviewMode,
@@ -367,11 +331,10 @@ export default class SRPlugin extends Plugin {
         );
 
         reviewSequencer.setDeckTree(fullDeckTree, remainingDeckTree);
-        this.chosenReviewModeForTabbedView = undefined;
         return { reviewSequencer, mode: reviewMode };
     }
 
-    private async getPrepareDecksForSingleNoteReview(
+    public async getPreparedDecksForSingleNoteReview(
         file: TFile,
         mode: FlashcardReviewMode,
     ): Promise<{ deckTree: Deck; remainingDeckTree: Deck; mode: FlashcardReviewMode }> {
@@ -385,59 +348,14 @@ export default class SRPlugin extends Plugin {
             mode,
         );
 
-        this.chosenSingleNoteForTabbedView = undefined;
-
         return { deckTree, remainingDeckTree, mode };
-    }
-
-    private forEachTabbedViewType(callback: (type: TabbedViewType) => void) {
-        this.tabbedViewTypes.forEach((type) => callback(type));
-    }
-
-    private registerTabbedViews() {
-        this.forEachTabbedViewType((viewType) =>
-            this.registerView(viewType.type, viewType.viewCreator),
-        );
-    }
-
-    private detachAllTabbedLeaves() {
-        this.forEachTabbedViewType((viewType) => {
-            this.app.workspace.detachLeavesOfType(viewType.type);
-        });
-    }
-
-    private async openTabbedSRView() {
-        await this.openTabbedView(TABBED_SR_ITEM_VIEW, true);
-    }
-
-    private async openTabbedView(type: string, newLeaf?: PaneType | boolean) {
-        const { workspace } = this.app;
-
-        let leaf: WorkspaceLeaf | null = null;
-        const leaves = workspace.getLeavesOfType(type);
-
-        if (leaves.length > 0) {
-            // A leaf with our view already exists, use that
-            leaf = leaves[0];
-        } else {
-            // Our view could not be found in the workspace, create a new leaf as a tab
-            leaf = workspace.getLeaf(newLeaf);
-            if (leaf !== null) {
-                await leaf.setViewState({ type: type, active: true });
-            }
-        }
-
-        // "Reveal" the leaf in case it is in a collapsed sidebar
-        if (leaf !== null) {
-            workspace.revealLeaf(leaf);
-        }
     }
 
     private async openFlashcardModalForSingleNote(
         noteFile: TFile,
         reviewMode: FlashcardReviewMode,
     ): Promise<void> {
-        const singleNoteDeckData = await this.getPrepareDecksForSingleNoteReview(
+        const singleNoteDeckData = await this.getPreparedDecksForSingleNoteReview(
             noteFile,
             reviewMode,
         );

@@ -1,34 +1,49 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { Deck } from "src/deck";
 import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
-import { DeckListView } from "src/gui/deck-list-view";
+import { DeckUI } from "src/gui/deck-ui";
 import { FlashcardEditModal } from "src/gui/edit-modal";
-import { FlashcardReviewView } from "src/gui/flashcard-review-view";
+import { CardUI } from "src/gui/card-ui";
 import SRPlugin from "src/main";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
+import { SR_TAB_VIEW } from "src/constants";
 
-export const TABBED_SR_ITEM_VIEW = "tabbed-spaced-repetition-item-view";
-
-export class TabbedSRItemView extends ItemView {
-    loadReviewSequencer: () => Promise<{
+/**
+ * Represents a tab view for spaced repetition plugin.
+ *
+ * This class extends the ItemView and is used to display the deck and flashcard uis.
+ *
+ * @property {SRPlugin} plugin - The main plugin instance.
+ * @property {SRPlugin} leaf - The leaf instance for the view.
+ * @property {() => Promise<{reviewSequencer: IFlashcardReviewSequencer;mode: FlashcardReviewMode;}>} loadReviewSequencerData - Callback for loading the reviewSequencer an the selected review mode.
+ *
+ * @method getViewType - Returns the view type identifier.
+ * @method getIcon - Returns the icon identifier for the view.
+ * @method getDisplayText - Returns the display text for the view.
+ * @method onOpen - Initializes the view and loads necessary data when opened.
+ * @method onClose - Cleans up resources when the view is closed.
+ */
+export class SRTabView extends ItemView {
+    loadReviewSequencerData: () => Promise<{
         reviewSequencer: IFlashcardReviewSequencer;
         mode: FlashcardReviewMode;
     }>;
-    viewContainerEl: HTMLElement;
-    viewContentEl: HTMLElement;
 
-    public plugin: SRPlugin;
-    public reviewMode: FlashcardReviewMode;
+    private plugin: SRPlugin;
+    private reviewMode: FlashcardReviewMode;
+    private viewContainerEl: HTMLElement;
+    private viewContentEl: HTMLElement;
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
-    private deckView: DeckListView;
-    private flashcardView: FlashcardReviewView;
+    private deckView: DeckUI;
+    private flashcardView: CardUI;
+    private openErrorCount: number = 0; // Counter for catching the first inevitable error but the letting the other through
 
     constructor(
         leaf: WorkspaceLeaf,
         plugin: SRPlugin,
-        loadReviewSequencer: () => Promise<{
+        loadReviewSequencerData: () => Promise<{
             reviewSequencer: IFlashcardReviewSequencer;
             mode: FlashcardReviewMode;
         }>,
@@ -36,7 +51,7 @@ export class TabbedSRItemView extends ItemView {
         super(leaf);
         this.plugin = plugin;
         this.settings = plugin.data.settings;
-        this.loadReviewSequencer = loadReviewSequencer;
+        this.loadReviewSequencerData = loadReviewSequencerData;
 
         const viewContent = this.containerEl.getElementsByClassName("view-content");
         if (viewContent.length > 0) {
@@ -47,36 +62,58 @@ export class TabbedSRItemView extends ItemView {
         }
     }
 
+    /**
+     * Returns the view type identifier for the SRTabView.
+     *
+     * @returns {string} The view type identifier.
+     */
     getViewType() {
-        return TABBED_SR_ITEM_VIEW;
+        return SR_TAB_VIEW;
     }
 
+    /**
+     * Retrieves the icon identifier for the SRTabView.
+     *
+     * @returns {string} The tab icon identifier.
+     */
     getIcon() {
         return "SpacedRepIcon";
     }
 
+    /**
+     * Returns the display text for the SRTabView.
+     *
+     * @returns {string} The display text for the SRTabView.
+     */
     getDisplayText() {
         return "Spaced Repetition";
     }
 
+    /**
+     * Initializes the SRTabView when opened by loading the review sequencer data
+     * and setting up the deck and flashcard views if they are not already initialized.
+     * Catches and logs errors that occur during the initial loading process.
+     */
     async onOpen() {
         try {
-            const loadedData = await this.loadReviewSequencer();
+            const loadedData = await this.loadReviewSequencerData();
 
             this.reviewSequencer = loadedData.reviewSequencer;
             this.reviewMode = loadedData.mode;
 
             if (this.deckView === undefined) {
                 // Init static elements in views
-                this.deckView = new DeckListView(
+                this.deckView = new DeckUI(
                     this.plugin,
                     this.settings,
                     this.reviewSequencer,
                     this.viewContentEl,
                     this._startReviewOfDeck.bind(this),
                 );
+            }
 
-                this.flashcardView = new FlashcardReviewView(
+            if (this.flashcardView === undefined) {
+                this.flashcardView = new CardUI(
                     this.app,
                     this.plugin,
                     this.settings,
@@ -90,11 +127,26 @@ export class TabbedSRItemView extends ItemView {
             }
 
             this._showDecksList();
-        } catch {
-            this.unload();
+        } catch (e) {
+            /*
+             * There will be an error, when opening obsidian, because if a tab is still open from the last session,
+             * then it will be loaded before any plugin was loaded, so there is no possibility of cleaning it up fast enough.
+             * This will cause an error, where the sr data structure wasn't initialized just yet.
+             * Sadly there is no way to load the data before the plugin is loaded or close the tab on closing the window.
+             * So we have to live with this error and just catch it the first time around.
+             * Lets any other errors through that might occur.
+             */
+            if (this.openErrorCount > 0) {
+                console.error(e);
+            }
+            this.openErrorCount++;
         }
     }
 
+    /**
+     * Closes the SRTabView by shutting down any active deck or flashcard views.
+     * Ensures that resources associated with these views are properly released.
+     */
     async onClose() {
         if (this.deckView) this.deckView.close();
         if (this.flashcardView) this.flashcardView.close();

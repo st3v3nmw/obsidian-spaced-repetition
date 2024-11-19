@@ -10,7 +10,7 @@ import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import { FlashcardMode } from "src/gui/flashcard-modal";
+import { FlashcardMode } from "src/gui/sr-modal";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { Note } from "src/note";
@@ -18,7 +18,7 @@ import { CardType, Question } from "src/question";
 import { SRSettings } from "src/settings";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
 
-export class FlashcardReviewView {
+export class CardUI {
     public app: App;
     public plugin: SRPlugin;
     public contentEl: HTMLElement;
