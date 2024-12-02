@@ -1,4 +1,5 @@
 import { PaneType, TFile, WorkspaceLeaf } from "obsidian";
+
 import { SR_TAB_VIEW } from "src/constants";
 import { OsrAppCore } from "src/core";
 import { Deck } from "src/deck";
@@ -67,7 +68,7 @@ export default class TabViewManager {
         this.plugin = plugin;
         this.shouldOpenSingeNoteTabView = false;
 
-        this._registerAllTabViews();
+        this.registerAllTabViews();
     }
 
     /**
@@ -93,7 +94,7 @@ export default class TabViewManager {
         this.shouldOpenSingeNoteTabView = singleNote !== undefined;
         if (singleNote) this.chosenSingleNoteForTabbedView = singleNote;
 
-        await this._openTabView(SR_TAB_VIEW, true);
+        await this.openTabView(SR_TAB_VIEW, true);
     }
 
     /**
@@ -103,22 +104,22 @@ export default class TabViewManager {
      * their corresponding leaves from the workspace, effectively closing them.
      */
     public closeAllTabViews() {
-        this._forEachTabViewType((viewType) => {
+        this.forEachTabViewType((viewType) => {
             this.plugin.app.workspace.detachLeavesOfType(viewType.type);
         });
     }
 
-    private _forEachTabViewType(callback: (type: TabViewType) => void) {
+    public forEachTabViewType(callback: (type: TabViewType) => void) {
         this.tabViewTypes.forEach((type) => callback(type));
     }
 
-    private _registerAllTabViews() {
-        this._forEachTabViewType((viewType) =>
+    public registerAllTabViews() {
+        this.forEachTabViewType((viewType) =>
             this.plugin.registerView(viewType.type, viewType.viewCreator),
         );
     }
 
-    private async _openTabView(type: string, newLeaf?: PaneType | boolean) {
+    public async openTabView(type: string, newLeaf?: PaneType | boolean) {
         const { workspace } = this.plugin.app;
 
         let leaf: WorkspaceLeaf | null = null;

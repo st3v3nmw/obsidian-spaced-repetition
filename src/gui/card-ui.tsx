@@ -207,8 +207,12 @@ export class CardUI {
     }
 
     private _keydownHandler = (e: KeyboardEvent) => {
-        // Prevents any input, if the edit modal is open
-        if (document.activeElement.nodeName === "TEXTAREA" || this.mode === FlashcardMode.Closed) {
+        // Prevents any input, if the edit modal is open or if the view is not in focus
+        if (
+            document.activeElement.nodeName === "TEXTAREA" ||
+            this.mode === FlashcardMode.Closed ||
+            !this.plugin.getSRInFocusState()
+        ) {
             return;
         }
 

@@ -23,10 +23,12 @@ import {
     FlashcardReviewSequencer,
     IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import { FlashcardModal } from "src/gui/sr-modal";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/review-queue-list-view";
 import { SRSettingTab } from "src/gui/settings";
 import { OsrSidebar } from "src/gui/sidebar";
+import { FlashcardModal } from "src/gui/sr-modal";
+import { SRTabView } from "src/gui/sr-tab-view";
+import TabViewManager from "src/gui/tab-view-manager";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/next-note-review-handler";
@@ -39,8 +41,6 @@ import { QuestionPostponementList } from "src/question-postponement-list";
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
 import { TopicPath } from "src/topic-path";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
-import TabViewManager from "src/tab-view-manager";
-import { SRTabView } from "./gui/sr-tab-view";
 
 export default class SRPlugin extends Plugin {
     public data: PluginData;
@@ -353,23 +353,25 @@ export default class SRPlugin extends Plugin {
     }
 
     public registerSRFocusListener() {
-        this.registerEvent(this.app.workspace.on("active-leaf-change", this.handleFocusChange));
+        this.registerEvent(
+            this.app.workspace.on("active-leaf-change", this.handleFocusChange.bind(this)),
+        );
     }
 
     public removeSRFocusListener() {
         this.setSRViewInFocus(false);
-        this.app.workspace.off("active-leaf-change", this.handleFocusChange);
+        this.app.workspace.off("active-leaf-change", this.handleFocusChange.bind(this));
     }
 
     public handleFocusChange(leaf: WorkspaceLeaf | null) {
-        this.setSRViewInFocus(leaf?.view instanceof SRTabView);
+        this.setSRViewInFocus(leaf !== null && leaf.view instanceof SRTabView);
     }
 
     public setSRViewInFocus(value: boolean) {
         this.isSRInFocus = value;
     }
 
-    public getSRFocusState(): boolean {
+    public getSRInFocusState(): boolean {
         return this.isSRInFocus;
     }
 
@@ -435,9 +437,9 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                t("SYNC_TIME_TAKEN", {
-                    t: Date.now() - now.valueOf(),
-                }),
+                    t("SYNC_TIME_TAKEN", {
+                        t: Date.now() - now.valueOf(),
+                    }),
             );
         }
     }

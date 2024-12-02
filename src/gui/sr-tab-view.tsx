@@ -1,13 +1,14 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
+
+import { SR_TAB_VIEW } from "src/constants";
 import { Deck } from "src/deck";
 import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
+import { CardUI } from "src/gui/card-ui";
 import { DeckUI } from "src/gui/deck-ui";
 import { FlashcardEditModal } from "src/gui/edit-modal";
-import { CardUI } from "src/gui/card-ui";
 import SRPlugin from "src/main";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
-import { SR_TAB_VIEW } from "src/constants";
 
 /**
  * Represents a tab view for spaced repetition plugin.
