@@ -40,6 +40,7 @@ import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src
 import { TopicPath } from "src/topic-path";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
 import TabViewManager from "src/tab-view-manager";
+import { SRTabView } from "./gui/sr-tab-view";
 
 export default class SRPlugin extends Plugin {
     public data: PluginData;
@@ -50,6 +51,7 @@ export default class SRPlugin extends Plugin {
 
     private ribbonIcon: HTMLElement | null = null;
     private statusBar: HTMLElement | null = null;
+    private isSRInFocus: boolean = false;
     private fileMenuHandler: (
         menu: Menu,
         file: TAbstractFile,
@@ -113,6 +115,8 @@ export default class SRPlugin extends Plugin {
         this.addPluginCommands();
 
         this.addSettingTab(new SRSettingTab(this.app, this));
+
+        this.registerSRFocusListener();
     }
 
     showFileMenuItems(status: boolean) {
@@ -348,6 +352,27 @@ export default class SRPlugin extends Plugin {
         return { deckTree, remainingDeckTree, mode };
     }
 
+    public registerSRFocusListener() {
+        this.registerEvent(this.app.workspace.on("active-leaf-change", this.handleFocusChange));
+    }
+
+    public removeSRFocusListener() {
+        this.setSRViewInFocus(false);
+        this.app.workspace.off("active-leaf-change", this.handleFocusChange);
+    }
+
+    public handleFocusChange(leaf: WorkspaceLeaf | null) {
+        this.setSRViewInFocus(leaf?.view instanceof SRTabView);
+    }
+
+    public setSRViewInFocus(value: boolean) {
+        this.isSRInFocus = value;
+    }
+
+    public getSRFocusState(): boolean {
+        return this.isSRInFocus;
+    }
+
     private async openFlashcardModalForSingleNote(
         noteFile: TFile,
         reviewMode: FlashcardReviewMode,
@@ -372,6 +397,8 @@ export default class SRPlugin extends Plugin {
             remainingDeckTree,
             reviewMode,
         );
+
+        this.setSRViewInFocus(true);
         new FlashcardModal(
             this.app,
             this,
@@ -408,9 +435,9 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                    t("SYNC_TIME_TAKEN", {
-                        t: Date.now() - now.valueOf(),
-                    }),
+                t("SYNC_TIME_TAKEN", {
+                    t: Date.now() - now.valueOf(),
+                }),
             );
         }
     }

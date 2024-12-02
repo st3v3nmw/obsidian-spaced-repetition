@@ -79,6 +79,7 @@ export class FlashcardModal extends Modal {
     }
 
     onClose(): void {
+        this.plugin.setSRViewInFocus(false);
         this.mode = FlashcardMode.Closed;
         this.deckView.close();
         this.flashcardView.close();
