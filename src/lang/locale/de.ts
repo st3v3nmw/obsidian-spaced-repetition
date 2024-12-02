@@ -170,6 +170,8 @@ export default {
     MIN_ONE_DAY: "Anzahl der Tage muss mindestens 1 sein.",
     VALID_NUMBER_WARNING: "Bitte eine gültige Zahl eingeben.",
     UI: "User Interface",
+    OPEN_IN_TAB: "Öffne im neuen Tab",
+    OPEN_IN_TAB_DESC: "Schalte dies aus, um die Notizen in einem Modalfenster zu öffnen",
     SHOW_STATUS_BAR: "Show status bar",
     SHOW_STATUS_BAR_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",

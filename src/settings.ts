@@ -45,6 +45,7 @@ export interface SRSettings {
     flashcardGoodText: string;
     flashcardHardText: string;
     reviewButtonDelay: number;
+    openViewInNewTab: boolean;
 
     // algorithm
     algorithm: string;
@@ -104,6 +105,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),
     reviewButtonDelay: 0,
+    openViewInNewTab: false,
 
     // algorithm
     algorithm: Algorithm.SM_2_OSR,

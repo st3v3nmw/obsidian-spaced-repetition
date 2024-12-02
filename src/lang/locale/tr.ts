@@ -151,6 +151,8 @@ export default {
     MIN_ONE_DAY: "Gün sayısı en az 1 olmalıdır.",
     VALID_NUMBER_WARNING: "Lütfen geçerli bir sayı girin.",
     UI: "User Interface",
+    OPEN_IN_TAB: "Open in new tab",
+    OPEN_IN_TAB_DESC: "Turn this off to open the plugin in a modal window",
     SHOW_STATUS_BAR: "Show status bar",
     SHOW_STATUS_BAR_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",

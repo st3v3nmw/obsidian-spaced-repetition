@@ -158,6 +158,8 @@ export default {
     MIN_ONE_DAY: "El número de días debe ser al menos uno.",
     VALID_NUMBER_WARNING: "Por favor especifique un número válido.",
     UI: "User Interface",
+    OPEN_IN_TAB: "Open in new tab",
+    OPEN_IN_TAB_DESC: "Turn this off to open the plugin in a modal window",
     SHOW_STATUS_BAR: "Show status bar",
     SHOW_STATUS_BAR_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
