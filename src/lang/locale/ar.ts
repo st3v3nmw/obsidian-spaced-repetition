@@ -150,6 +150,8 @@ export default {
     MIN_ONE_DAY: "يجب أن يكون عدد الأيام 1 على الأقل",
     VALID_NUMBER_WARNING: "يرجى تقديم رقم صالح",
     UI: "User Interface",
+    OPEN_IN_TAB: "Open in new tab",
+    OPEN_IN_TAB_DESC: "Turn this off to open the plugin in a modal window",
     SHOW_STATUS_BAR: "Show status bar",
     SHOW_STATUS_BAR_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
