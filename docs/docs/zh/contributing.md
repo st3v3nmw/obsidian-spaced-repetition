@@ -77,6 +77,8 @@ Please note that:
 
 ## Code
 
+### General changes
+
 1. Make your changes.
 2. Run `pnpm dev` to watch for changes & rebuild the plugin automatically.
 3. You could create symbolic links between the build files and the Obsidian vault, example:
@@ -99,6 +101,25 @@ Please note that:
 6. Before pushing your changes, run the linter: `pnpm lint`
     - Format the code in case any warnings are raised: `pnpm format`
 7. Open the pull request.
+
+### UI changes
+
+-   All UI changes should be made in the `src/gui/` folder.
+
+-   Put your changes under the right section (see "MARK:" or "#region" comments in the code).
+
+-   Document your functions & classes with JSDoc.
+
+-   Test your changes in all arrangements that the ui can be in:
+    1. Desktop
+    2. Mobile portrait mode
+    3. Small sized mobile device
+    4. Mobile landscape mode
+    5. Tablet landscape mode
+    6. Tablet portrait mode
+    7. All the above, but with tab view option enabled
+    8. All the above, but with tab view option disabled
+    9. All the above, but with tab view option disabled and different flashcard height/width percentages
 
 ---
 
