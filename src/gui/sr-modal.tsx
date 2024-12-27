@@ -1,4 +1,4 @@
-import { App, Modal } from "obsidian";
+import { App, Modal, setIcon } from "obsidian";
 
 import { Deck } from "src/deck";
 import {
@@ -8,6 +8,7 @@ import {
 import { CardUI } from "src/gui/card-ui";
 import { DeckUI } from "src/gui/deck-ui";
 import { FlashcardEditModal } from "src/gui/edit-modal";
+import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
@@ -27,6 +28,7 @@ export class FlashcardModal extends Modal {
     private reviewMode: FlashcardReviewMode;
     private deckView: DeckUI;
     private flashcardView: CardUI;
+    public backButton: HTMLDivElement;
 
     constructor(
         app: App,
@@ -49,6 +51,13 @@ export class FlashcardModal extends Modal {
         this.modalEl.style.width = this.settings.flashcardWidthPercentage + "%";
         this.modalEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
         this.modalEl.setAttribute("id", "sr-modal");
+
+        if (
+            this.settings.flashcardHeightPercentage >= 100 ||
+            this.settings.flashcardWidthPercentage >= 100
+        ) {
+            this.modalEl.style.borderRadius = "0";
+        }
 
         this.contentEl.addClass("sr-modal-content");
 
@@ -75,6 +84,7 @@ export class FlashcardModal extends Modal {
     }
 
     onOpen(): void {
+        this._createBackButton();
         this._showDecksList();
     }
 
@@ -107,6 +117,7 @@ export class FlashcardModal extends Modal {
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         if (this.reviewSequencer.hasCurrentCard) {
             this._showFlashcard(deck);
+            this.backButton.removeClass("sr-is-hidden");
         } else {
             this._showDecksList();
         }
@@ -128,5 +139,16 @@ export class FlashcardModal extends Modal {
                 this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
             })
             .catch((reason) => console.log(reason));
+    }
+
+    private _createBackButton() {
+        this.backButton = this.modalEl.createDiv();
+        this.backButton.addClasses(["sr-back-button", "sr-is-hidden"]);
+        setIcon(this.backButton, "arrow-left");
+        this.backButton.setAttribute("aria-label", t("BACK"));
+        this.backButton.addEventListener("click", () => {
+            this.backButton.addClass("sr-is-hidden");
+            this._showDecksList();
+        });
     }
 }

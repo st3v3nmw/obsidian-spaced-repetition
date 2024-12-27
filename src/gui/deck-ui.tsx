@@ -22,6 +22,7 @@ export class DeckUI {
     public header: HTMLDivElement;
     public title: HTMLDivElement;
     public stats: HTMLDivElement;
+    public headerDivider: HTMLHRElement;
     public content: HTMLDivElement;
 
     private reviewSequencer: IFlashcardReviewSequencer;
@@ -63,6 +64,8 @@ export class DeckUI {
         this.stats = this.header.createDiv();
         this.stats.addClass("sr-header-stats-container");
         this._createHeaderStats();
+
+        this.headerDivider = this.view.createEl("hr");
 
         this.content = this.view.createDiv();
         this.content.addClass("sr-content");

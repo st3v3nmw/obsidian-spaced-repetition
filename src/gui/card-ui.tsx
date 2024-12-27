@@ -28,19 +28,28 @@ export class CardUI {
     public view: HTMLDivElement;
 
     public header: HTMLDivElement;
-    public titleWrapper: HTMLDivElement;
-    public title: HTMLDivElement;
-    public subTitle: HTMLDivElement;
-    public backButton: HTMLDivElement;
+    public chosenDeckLabel: HTMLDivElement;
+    public chosenDeckText: HTMLDivElement;
+    public chosenDeckSubDeckNumText: HTMLDivElement;
+    public chosenDeckCardNumIcon: HTMLDivElement;
+    public chosenDeckDeckNumIcon: HTMLDivElement;
+
+    public deckDivider: HTMLDivElement;
+
+    public currentDeckLabel: HTMLDivElement;
+    public currentDeckText: HTMLDivElement;
+    public currentDeckCardNumIcon: HTMLDivElement;
 
     public controls: HTMLDivElement;
     public editButton: HTMLButtonElement;
     public resetButton: HTMLButtonElement;
     public infoButton: HTMLButtonElement;
     public skipButton: HTMLButtonElement;
+    public headerDivider: HTMLHRElement;
 
     public content: HTMLDivElement;
     public context: HTMLElement;
+    public contextLandscape: HTMLElement;
 
     public response: HTMLDivElement;
     public hardButton: HTMLButtonElement;
@@ -53,7 +62,7 @@ export class CardUI {
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
-    private backClickHandler: () => void;
+    private backToDeck: () => void;
     private editClickHandler: () => void;
 
     constructor(
@@ -64,7 +73,7 @@ export class CardUI {
         reviewMode: FlashcardReviewMode,
         contentEl: HTMLElement,
         parentEl: HTMLElement,
-        backClickHandler: () => void,
+        backToDeck: () => void,
         editClickHandler: () => void,
     ) {
         // Init properties
@@ -73,7 +82,7 @@ export class CardUI {
         this.settings = settings;
         this.reviewSequencer = reviewSequencer;
         this.reviewMode = reviewMode;
-        this.backClickHandler = backClickHandler;
+        this.backToDeck = backToDeck;
         this.editClickHandler = editClickHandler;
         this.contentEl = contentEl;
         this.parentEl = parentEl;
@@ -87,27 +96,44 @@ export class CardUI {
      * Initializes all static elements in the FlashcardView
      */
     init() {
-        this._createBackButton();
-
         this.view = this.contentEl.createDiv();
         this.view.addClasses(["sr-flashcard", "sr-is-hidden"]);
 
         this.header = this.view.createDiv();
         this.header.addClass("sr-header");
 
-        this.titleWrapper = this.header.createDiv();
-        this.titleWrapper.addClass("sr-title-wrapper");
+        this.chosenDeckLabel = this.header.createDiv();
+        this.chosenDeckLabel.addClass("sr-chosen-deck-label");
+        this.chosenDeckText = this.chosenDeckLabel.createDiv();
 
-        this.title = this.titleWrapper.createDiv();
-        this.title.addClass("sr-title");
+        this.chosenDeckCardNumIcon = this.chosenDeckLabel.createDiv();
+        setIcon(this.chosenDeckCardNumIcon, "credit-card");
 
-        this.subTitle = this.titleWrapper.createDiv();
-        this.subTitle.addClasses(["sr-sub-title", "sr-is-hidden"]);
+        this.chosenDeckSubDeckNumText = this.chosenDeckLabel.createDiv();
+        this.chosenDeckSubDeckNumText.addClass("sr-chosen-deck-deck-num");
 
-        this.controls = this.header.createDiv();
+        this.chosenDeckDeckNumIcon = this.chosenDeckLabel.createDiv();
+        setIcon(this.chosenDeckDeckNumIcon, "layers");
+
+        this.deckDivider = this.header.createDiv();
+        this.deckDivider.addClass("sr-deck-divider");
+        this.deckDivider.addClass("sr-is-hidden");
+        this.deckDivider.setText(">>");
+
+        this.currentDeckLabel = this.header.createDiv();
+        this.currentDeckLabel.addClass("sr-is-hidden");
+        this.currentDeckLabel.addClass("sr-current-deck-label");
+
+        this.currentDeckText = this.currentDeckLabel.createDiv();
+        this.currentDeckCardNumIcon = this.currentDeckLabel.createDiv();
+        setIcon(this.currentDeckCardNumIcon, "credit-card");
+
+        this.controls = this.view.createDiv();
         this.controls.addClass("sr-controls");
 
         this._createCardControls();
+
+        this.headerDivider = this.view.createEl("hr");
 
         if (this.settings.showContextInCards) {
             this.context = this.view.createDiv();
@@ -136,7 +162,7 @@ export class CardUI {
 
         // Prevents the following code, from running if this show is just a redraw and not an unhide
         this.view.removeClass("sr-is-hidden");
-        this.backButton.removeClass("sr-is-hidden");
+        // this.backButton.removeClass("sr-is-hidden");
         document.addEventListener("keydown", this._keydownHandler);
     }
 
@@ -158,7 +184,7 @@ export class CardUI {
 
         document.removeEventListener("keydown", this._keydownHandler);
         this.view.addClass("sr-is-hidden");
-        this.backButton.addClass("sr-is-hidden");
+        // this.backButton.addClass("sr-is-hidden");
     }
 
     /**
@@ -176,8 +202,8 @@ export class CardUI {
         const currentDeck: Deck = this.reviewSequencer.currentDeck;
 
         // Setup title
-        this._setTitle(this.chosenDeck);
-        this._setSubTitle(this.chosenDeck, currentDeck);
+        this._setChosenDeckLabel(this.chosenDeck);
+        this._setCurrentDeckLabel(this.chosenDeck, currentDeck);
         this.resetButton.disabled = true;
 
         // Setup context
@@ -322,7 +348,6 @@ export class CardUI {
         // Show answer text
         if (this._currentQuestion.questionType !== CardType.Cloze) {
             const hr: HTMLElement = document.createElement("hr");
-            hr.addClass("sr-card-divide");
             this.content.appendChild(hr);
         } else {
             this.content.empty();
@@ -389,7 +414,7 @@ export class CardUI {
 
     private async _handleSkipCard(): Promise<void> {
         if (this._currentCard != null) await this.refresh();
-        else this.backClickHandler();
+        else this.backToDeck();
     }
 
     private _formatQuestionContextText(questionContext: string[]): string {
@@ -409,57 +434,54 @@ export class CardUI {
         return result;
     }
 
-    // -> Header
+    // #region -> Header
 
-    private _createBackButton() {
-        this.backButton = this.parentEl.createDiv();
-        this.backButton.addClasses(["sr-back-button", "sr-is-hidden"]);
-        setIcon(this.backButton, "arrow-left");
-        this.backButton.setAttribute("aria-label", t("BACK"));
-        this.backButton.addEventListener("click", () => {
-            this.backClickHandler();
-        });
-    }
-
-    private _setTitle(deck: Deck) {
+    private _setChosenDeckLabel(deck: Deck) {
         let text = deck.deckName;
 
         const deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
         const cardsInQueue = deckStats.dueCount + deckStats.newCount;
-        text += `: ${cardsInQueue}`;
+        text += ` -  ${cardsInQueue} x `;
 
-        this.title.setText(text);
+        const subDecksWithCardsInQueue = deck.subdecks.filter((subDeck) => {
+            const deckStats = this.reviewSequencer.getDeckStats(subDeck.getTopicPath());
+            return deckStats.dueCount + deckStats.newCount > 0;
+        });
+
+        this.chosenDeckText.setText(text);
+        this.chosenDeckSubDeckNumText.setText(subDecksWithCardsInQueue.length + " x ");
     }
 
-    private _setSubTitle(chosenDeck: Deck, currentDeck: Deck) {
+    private _setCurrentDeckLabel(chosenDeck: Deck, currentDeck: Deck) {
         if (chosenDeck.subdecks.length === 0) {
-            if (!this.subTitle.hasClass("sr-is-hidden")) {
-                this.subTitle.addClass("sr-is-hidden");
+            if (!this.deckDivider.hasClass("sr-is-hidden")) {
+                this.deckDivider.addClass("sr-is-hidden");
+            }
+            if (!this.currentDeckLabel.hasClass("sr-is-hidden")) {
+                this.currentDeckLabel.addClass("sr-is-hidden");
             }
             return;
         }
 
-        if (this.subTitle.hasClass("sr-is-hidden")) {
-            this.subTitle.removeClass("sr-is-hidden");
+        if (this.deckDivider.hasClass("sr-is-hidden")) {
+            this.deckDivider.removeClass("sr-is-hidden");
         }
 
-        let text = `${currentDeck.deckName}`;
+        if (this.currentDeckLabel.hasClass("sr-is-hidden")) {
+            this.currentDeckLabel.removeClass("sr-is-hidden");
+        }
+
+        let text = `${currentDeck.deckName} - `;
 
         const isRandomMode = this.settings.flashcardCardOrder === "EveryCardRandomDeckAndCard";
         if (!isRandomMode) {
-            const subDecksWithCardsInQueue = chosenDeck.subdecks.filter((subDeck) => {
-                const deckStats = this.reviewSequencer.getDeckStats(subDeck.getTopicPath());
-                return deckStats.dueCount + deckStats.newCount > 0;
-            });
-
-            text = `${t("DECKS")}: ${subDecksWithCardsInQueue.length} | ${text}`;
-            text += `: ${currentDeck.getCardCount(CardListType.All, false)}`;
+            text = `${currentDeck.deckName} - ${currentDeck.getCardCount(CardListType.All, false)} x `;
         }
 
-        this.subTitle.setText(text);
+        this.currentDeckText.setText(text);
     }
 
-    // -> Controls
+    // #region -> Controls
 
     private _createCardControls() {
         this._createEditButton();
@@ -508,7 +530,7 @@ export class CardUI {
         });
     }
 
-    // -> Response
+    // #region -> Response
 
     private _createResponseButtons() {
         this._createShowAnswerButton();
