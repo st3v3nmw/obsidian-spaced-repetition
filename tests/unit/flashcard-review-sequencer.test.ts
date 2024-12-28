@@ -974,6 +974,25 @@ ${updatedQuestionText}`;
 });
 
 describe("getDeckStats", () => {
+    describe("Multi level deck with some new and due cards", () => {
+        test("Initial multi level stats", async () => {
+            const text: string = `#flashcards/sub-deck
+Q1::A1
+Q2::A2
+Q3::A3
+Q4::A4 <!--SR:!2023-01-21,15,290-->
+`;
+            const c: TestContext = TestContext.Create(
+                orderDueFirstSequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                text,
+            );
+            await c.setSequencerDeckTreeFromOriginalText();
+            expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(4, 1, 3, 4, 0, 0, 0, 1, 1));
+        });
+    });
+
     describe("Single level deck with some new and due cards", () => {
         test("Initial stats", async () => {
             const text: string = `#flashcards
