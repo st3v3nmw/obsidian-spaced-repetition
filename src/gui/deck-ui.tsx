@@ -33,14 +33,14 @@ export class DeckUI {
         plugin: SRPlugin,
         settings: SRSettings,
         reviewSequencer: IFlashcardReviewSequencer,
-        contentEl: HTMLElement,
+        view: HTMLDivElement,
         startReviewOfDeck: (deck: Deck) => void,
     ) {
         // Init properties
         this.plugin = plugin;
         this.settings = settings;
         this.reviewSequencer = reviewSequencer;
-        this.contentEl = contentEl;
+        this.view = view;
         this.startReviewOfDeck = startReviewOfDeck;
 
         // Build ui
@@ -51,7 +51,6 @@ export class DeckUI {
      * Initializes all static elements in the DeckListView
      */
     init(): void {
-        this.view = this.contentEl.createDiv();
         this.view.addClasses(["sr-deck-list", "sr-is-hidden"]);
 
         this.header = this.view.createDiv();

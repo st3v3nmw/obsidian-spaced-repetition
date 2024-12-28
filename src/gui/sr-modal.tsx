@@ -66,7 +66,7 @@ export class FlashcardModal extends Modal {
             this.plugin,
             this.settings,
             this.reviewSequencer,
-            this.contentEl,
+            this.contentEl.createDiv(),
             this._startReviewOfDeck.bind(this),
         );
 
@@ -76,8 +76,7 @@ export class FlashcardModal extends Modal {
             this.settings,
             this.reviewSequencer,
             this.reviewMode,
-            this.contentEl,
-            this.modalEl,
+            this.contentEl.createDiv(),
             this._showDecksList.bind(this),
             this._doEditQuestionText.bind(this),
         );

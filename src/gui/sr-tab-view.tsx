@@ -118,7 +118,7 @@ export class SRTabView extends ItemView {
                     this.plugin,
                     this.settings,
                     this.reviewSequencer,
-                    this.viewContentEl,
+                    this.viewContentEl.createDiv(),
                     this._startReviewOfDeck.bind(this),
                 );
             }
@@ -130,8 +130,7 @@ export class SRTabView extends ItemView {
                     this.settings,
                     this.reviewSequencer,
                     this.reviewMode,
-                    this.viewContentEl,
-                    this.viewContainerEl,
+                    this.viewContentEl.createDiv(),
                     this._showDecksList.bind(this),
                     this._doEditQuestionText.bind(this),
                 );

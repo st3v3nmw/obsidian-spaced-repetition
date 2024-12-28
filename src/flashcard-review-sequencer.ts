@@ -25,21 +25,68 @@ export interface IFlashcardReviewSequencer {
     setDeckTree(originalDeckTree: Deck, remainingDeckTree: Deck): void;
     setCurrentDeck(topicPath: TopicPath): void;
     getDeckStats(topicPath: TopicPath): DeckStats;
+    getSubDecksWithCardsInQueue(deck: Deck): Deck[];
     skipCurrentCard(): void;
     determineCardSchedule(response: ReviewResponse, card: Card): RepItemScheduleInfo;
     processReview(response: ReviewResponse): Promise<void>;
     updateCurrentQuestionText(text: string): Promise<void>;
 }
 
+/**
+ * Represents statistics for a deck and its subdecks.
+ *
+ * @property {number} totalCount - Total number of cards in this deck and all subdecks.
+ * @property {number} dueCount - Number of due cards in this deck and all subdecks.
+ * @property {number} newCount - Number of new cards in this deck and all subdecks.
+ * @property {number} cardsInQueueCount - Number of cards in the queue of this deck and all subdecks.
+ * @property {number} dueCardsInQueueOfThisDeckCount - Number of due cards just in this deck.
+ * @property {number} newCardsInQueueOfThisDeckCount - Number of new cards just in this deck.
+ * @property {number} cardsInQueueOfThisDeckCount - Total number of cards in queue just in this deck.
+ * @property {number} subDecksInQueueOfThisDeckCount - Number of subdecks in the queue just in this deck.
+ * @property {number} decksInQueueOfThisDeckCount - Total number of decks in the queue including this deck and its subdecks.
+ *
+ * @constructor
+ * @param {number} totalCount - Initializes the total count of cards.
+ * @param {number} dueCount - Initializes the due count of cards.
+ * @param {number} newCount - Initializes the new count of cards.
+ * @param {number} cardsInQueueCount - Initializes the count of cards in the queue.
+ * @param {number} dueCardsInQueueOfThisDeckCount - Initializes the count of due cards just in this deck.
+ * @param {number} newCardsInQueueOfThisDeckCount - Initializes the count of new cards just in this deck.
+ * @param {number} cardsInQueueOfThisDeckCount - Initializes the count of all cards in the queue just in this deck.
+ * @param {number} subDecksInQueueOfThisDeckCount - Initializes the count of subdecks in the queue just in this deck.
+ * @param {number} decksInQueueOfThisDeckCount - Initializes the count of all decks in the queue including this deck and its subdecks.
+ */
 export class DeckStats {
+    totalCount: number;
     dueCount: number;
     newCount: number;
-    totalCount: number;
+    cardsInQueueCount: number;
+    dueCardsInQueueOfThisDeckCount: number;
+    newCardsInQueueOfThisDeckCount: number;
+    cardsInQueueOfThisDeckCount: number;
+    subDecksInQueueOfThisDeckCount: number;
+    decksInQueueOfThisDeckCount: number;
 
-    constructor(dueCount: number, newCount: number, totalCount: number) {
+    constructor(
+        totalCount: number,
+        dueCount: number,
+        newCount: number,
+        cardsInQueueCount: number,
+        dueCardsInQueueOfThisDeckCount: number,
+        newCardsInQueueOfThisDeckCount: number,
+        cardsInQueueOfThisDeckCount: number,
+        subDecksInQueueOfThisDeckCount: number,
+        decksInQueueOfThisDeckCount: number,
+    ) {
         this.dueCount = dueCount;
         this.newCount = newCount;
         this.totalCount = totalCount;
+        this.cardsInQueueCount = cardsInQueueCount;
+        this.dueCardsInQueueOfThisDeckCount = dueCardsInQueueOfThisDeckCount;
+        this.newCardsInQueueOfThisDeckCount = newCardsInQueueOfThisDeckCount;
+        this.cardsInQueueOfThisDeckCount = cardsInQueueOfThisDeckCount;
+        this.subDecksInQueueOfThisDeckCount = subDecksInQueueOfThisDeckCount;
+        this.decksInQueueOfThisDeckCount = decksInQueueOfThisDeckCount;
     }
 }
 
@@ -123,7 +170,53 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         const remainingDeck: Deck = this.remainingDeckTree.getDeck(topicPath);
         const newCount: number = remainingDeck.getDistinctCardCount(CardListType.NewCard, true);
         const dueCount: number = remainingDeck.getDistinctCardCount(CardListType.DueCard, true);
-        return new DeckStats(dueCount, newCount, totalCount);
+
+        // Sry for the long variable names, but I needed all these distinct counts in the UI
+        const newCardsInQueueOfThisDeckCount = remainingDeck.getDistinctCardCount(
+            CardListType.NewCard,
+            false,
+        );
+        const dueCardsInQueueOfThisDeckCount = remainingDeck.getDistinctCardCount(
+            CardListType.DueCard,
+            false,
+        );
+        const cardsInQueueOfThisDeckCount =
+            newCardsInQueueOfThisDeckCount + dueCardsInQueueOfThisDeckCount;
+
+        const subDecksInQueueOfThisDeckCount =
+            this.getSubDecksWithCardsInQueue(remainingDeck).length;
+        const decksInQueueOfThisDeckCount =
+            cardsInQueueOfThisDeckCount > 0
+                ? subDecksInQueueOfThisDeckCount + 1
+                : subDecksInQueueOfThisDeckCount;
+
+        return new DeckStats(
+            totalCount,
+            dueCount,
+            newCount,
+            dueCount + newCount,
+            dueCardsInQueueOfThisDeckCount,
+            newCardsInQueueOfThisDeckCount,
+            cardsInQueueOfThisDeckCount,
+            subDecksInQueueOfThisDeckCount,
+            decksInQueueOfThisDeckCount,
+        );
+    }
+
+    getSubDecksWithCardsInQueue(deck: Deck): Deck[] {
+        let subDecksWithCardsInQueue: Deck[] = [];
+
+        deck.subdecks.forEach((subDeck) => {
+            subDecksWithCardsInQueue = subDecksWithCardsInQueue.concat(
+                this.getSubDecksWithCardsInQueue(subDeck),
+            );
+
+            const newCount: number = subDeck.getDistinctCardCount(CardListType.NewCard, false);
+            const dueCount: number = subDeck.getDistinctCardCount(CardListType.DueCard, false);
+            if (newCount + dueCount > 0) subDecksWithCardsInQueue.push(subDeck);
+        });
+
+        return subDecksWithCardsInQueue;
     }
 
     skipCurrentCard(): void {

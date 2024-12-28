@@ -79,11 +79,6 @@
         margin-bottom: 8px;
     }
 
-    .is-mobile:not(.is-tablet) .sr-flashcard .sr-chosen-deck-label > *,
-    .is-mobile:not(.is-tablet) .sr-flashcard .sr-current-deck-label > * {
-        font-size: medium;
-    }
-
     .is-mobile:not(.is-tablet) .sr-flashcard .sr-controls {
         width: unset !important;
         flex-direction: column;
@@ -94,30 +89,68 @@
         padding-left: 8px;
     }
 
-    .is-mobile:not(.is-tablet) .sr-tab-view .sr-flashcard > hr {
+    .is-mobile:not(.is-tablet) .sr-flashcard .sr-chosen-deck-info > *,
+    .is-mobile:not(.is-tablet) .sr-flashcard .sr-current-deck-info > * {
+        font-size: medium;
+    }
+
+    .is-mobile:not(.is-tablet) .sr-tab-view .sr-flashcard .sr-info-bar {
         margin: 0 0 0 calc(var(--side-button-clearance));
     }
 
-    /* .is-mobile:not(.is-tablet) .sr-flashcard > hr {
-        margin: 0 var(--side-button-clearance);
-    } */
-
-    .is-mobile:not(.is-tablet) .sr-flashcard .sr-context {
-        margin: 0 0 0 calc(var(--side-button-clearance));
+    .is-mobile:not(.is-tablet) #sr-modal .sr-flashcard .sr-info-bar {
+        margin: 0 calc(var(--side-button-clearance));
     }
 
     .is-mobile:not(.is-tablet) .sr-flashcard .sr-content {
         margin: 0 0 0 calc(var(--side-button-clearance));
     }
 
+    .is-mobile:not(.is-tablet) .sr-flashcard .sr-content hr {
+        margin: 2px 0;
+    }
+
     .is-mobile:not(.is-tablet) .sr-response-button {
         height: 48px !important;
     }
+}
 
-    .is-mobile:not(.is-tablet) .sr-tab-view .sr-flashcard .sr-header {
-        margin: 0 0 0 var(--side-button-clearance);
+@media only screen and (orientation: landscape) and (max-height: 430px) {
+    .is-mobile:not(.is-tablet) .sr-button {
+        height: 35px;
+        width: 35px;
+    }
+
+    .is-mobile:not(.is-tablet) .sr-response {
+        margin: 0 0 0 calc(var(--side-button-clearance));
+    }
+
+    .is-mobile:not(.is-tablet) .sr-response-button {
+        height: 32px !important;
+    }
+
+    .is-mobile:not(.is-tablet) .sr-flashcard .sr-content p {
+        margin-block-start: 0.5rem;
+        margin-block-end: 0.5rem;
     }
 }
+
+@media only screen and (orientation: landscape) and (max-height: 400px) {
+    .is-mobile:not(.is-tablet) .sr-tab-view .sr-flashcard .sr-info-bar {
+        --side-button-clearance: calc(var(--side-button-width) * 4) !important;
+    }
+
+    .is-mobile:not(.is-tablet) .sr-tab-view .sr-back-button {
+        left: calc(var(--side-button-width) * 3) !important;
+        top: 0px !important;
+    }
+
+    .is-mobile:not(.is-tablet) .sr-flashcard {
+        gap: 4px;
+    }
+}
+
+/* MARK: Mobile portrait mode */
 
 @media only screen and (orientation: portrait) {
     .is-mobile:not(.is-tablet) .sr-flashcard,
@@ -131,26 +164,12 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 500px) {
-    .is-mobile .sr-deck-divider {
-        display: none;
-    }
-
-    .is-mobile .sr-flashcard .sr-header {
-        flex-direction: column !important;
-        gap: 0px !important;
-    }
-
     .is-mobile .sr-tab-view {
         padding: 0 8px;
     }
 }
 
 @media only screen and (orientation: portrait) and (max-width: 340px) {
-    .is-mobile .sr-flashcard .sr-header .sr-chosen-deck-label > *,
-    .is-mobile .sr-flashcard .sr-current-deck-label > * {
-        font-size: medium;
-    }
-
     .is-mobile .sr-response-button {
         height: 32px !important;
     }
@@ -162,38 +181,6 @@
 
     .is-mobile .sr-tab-view {
         padding: 0 4px;
-    }
-}
-
-@media only screen and (orientation: landscape) and (max-height: 430px) {
-    .is-mobile:not(.is-tablet) .sr-response {
-        margin: 0 0 0 calc(var(--side-button-clearance));
-    }
-
-    .is-mobile:not(.is-tablet) .sr-response-button {
-        height: 32px !important;
-    }
-
-    .is-mobile:not(.is-tablet) .sr-button {
-        height: 35px;
-        width: 35px;
-    }
-}
-
-@media only screen and (orientation: landscape) and (max-height: 400px) {
-    .is-mobile:not(.is-tablet) .sr-tab-view .sr-flashcard .sr-header,
-    .is-mobile:not(.is-tablet) .sr-tab-view .sr-flashcard > hr {
-        --side-button-clearance: calc(var(--side-button-width) * 4) !important;
-    }
-
-    .is-mobile:not(.is-tablet) .sr-tab-view .sr-back-button {
-        left: calc(var(--side-button-width) * 3) !important;
-        top: 0px !important;
-    }
-
-    .is-mobile:not(.is-tablet) .sr-tab-view .sr-flashcard > hr {
-        margin: 0 0 0
-            calc(var(--side-button-clearance) - var(--side-button-width) - var(--side-button-width));
     }
 }
 
@@ -288,26 +275,11 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     margin: 0;
 }
 
-#sr-modal .sr-flashcard .sr-header {
-    margin: 0 var(--side-button-clearance);
-}
-
-.sr-tab-view .sr-flashcard .sr-header {
-    margin: 0 var(--side-button-clearance);
-}
-
 .sr-title {
     font-size: var(--font-ui-large);
     font-weight: var(--font-semibold);
     text-align: center;
     line-height: var(--line-height-tight);
-}
-
-.sr-sub-title {
-    font-size: var(--font-ui-medium);
-    text-align: center;
-    line-height: var(--line-height-tight);
-    color: var(--text-muted);
 }
 
 .sr-content {
@@ -369,47 +341,6 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
 
 /* MARK: FlashcardReviewView */
 
-/* TODO: Enable textwrap for card content */
-.sr-flashcard .sr-header {
-    position: relative;
-    gap: 16px;
-    flex-direction: row;
-}
-
-.sr-flashcard .sr-chosen-deck-label svg,
-.sr-flashcard .sr-current-deck-label svg {
-    --size: 16px;
-    height: var(--size);
-    width: var(--size);
-    margin-bottom: -3px;
-}
-
-.sr-flashcard .sr-chosen-deck-label,
-.sr-flashcard .sr-current-deck-label {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-}
-
-.sr-flashcard .sr-chosen-deck-deck-num {
-    padding-left: 4px;
-}
-
-.sr-flashcard .sr-chosen-deck-label > *,
-.sr-flashcard .sr-current-deck-label > * {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    font-size: large;
-}
-
-.sr-flashcard .sr-chosen-deck-label > * {
-    font-weight: 500;
-}
-
 .sr-flashcard .sr-button:disabled {
     cursor: not-allowed;
 }
@@ -422,8 +353,43 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     align-items: center;
 }
 
-.sr-flashcard > hr {
-    margin: 0;
+.sr-flashcard .sr-info-bar {
+    display: flex;
+    margin-top: 8px;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.sr-flashcard .sr-chosen-deck-info svg,
+.sr-flashcard .sr-current-deck-info svg {
+    --size: 16px;
+    height: var(--size);
+    width: var(--size);
+    margin-bottom: -3px;
+}
+
+.sr-flashcard .sr-chosen-deck-info,
+.sr-flashcard .sr-current-deck-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.sr-flashcard .sr-chosen-deck-info > *,
+.sr-flashcard .sr-current-deck-info > * {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-muted);
+    text-wrap: nowrap;
+}
+
+.sr-flashcard .sr-chosen-deck-info > * {
+    font-weight: 500;
 }
 
 .sr-flashcard .sr-context {
