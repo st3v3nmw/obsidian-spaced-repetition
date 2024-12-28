@@ -110,6 +110,14 @@ Please note that:
 
 -   Document your functions & classes with JSDoc.
 
+-   One can switch between mobile view and desktop view by entering the following command in developer console:
+
+    ```js
+    this.app.emulateMobile(false); // to switch to desktop view
+
+    this.app.emulateMobile(true); // to switch to mobile view
+    ```
+
 -   Test your changes in all arrangements that the ui can be in:
     1. Desktop
     2. Mobile portrait mode
