@@ -3,7 +3,7 @@
 export default {
     // flashcard-modal.tsx
     DECKS: "Desteler",
-    DUE_CARDS: "Güncel Kartlar",
+    DUE_CARDS: "Süresi Dolan Kartlar",
     NEW_CARDS: "Yeni Kartlar",
     TOTAL_CARDS: "Toplam Kartlar",
     BACK: "Geri",
@@ -129,7 +129,7 @@ export default {
         '"Gizleme Desenleri"den <code>${defaultPattern</code> öğesini ekleyin/kaldırın',
     CLOZE_PATTERNS: "Gizleme Desenleri",
     CLOZE_PATTERNS_DESC:
-        'Gizleme desenlerini satırlarla ayırarak girin. Rehberlik için <a href="${docsUrl}">wiki</a>\'yi kontrol edin.',
+        'Gizleme desenlerini satırlarla ayırarak girin. Rehberlik için <a href="${docsUrl}">wiki</a> kontrol edin.',
     INLINE_CARDS_SEPARATOR: "Satır içi flash kartlar için ayırıcı",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Bunu değiştirdikten sonra mevcut flash kartlarınızı manuel olarak düzenlemeniz gerektiğini unutmayın.",
