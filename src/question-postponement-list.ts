@@ -22,8 +22,7 @@ export class QuestionPostponementList implements IQuestionPostponementList {
     }
 
     async clearIfNewDay(data: PluginData): Promise<void> {
-        const now = window.moment(Date.now());
-        const todayDate: string = now.format("YYYY-MM-DD");
+        const todayDate = this._todayDate()
 
         // clear bury list if we've changed dates
         const isNewDay: boolean = todayDate !== data.buryDate;
@@ -50,6 +49,17 @@ export class QuestionPostponementList implements IQuestionPostponementList {
         // This is null only whilst unit testing is being performed
         if (this.plugin == null) return;
 
+        // set buryDate before writing so we can clear bury list on new day
+        const todayDate = this._todayDate()
+        this.plugin.data.buryDate = todayDate
+
         await this.plugin.savePluginData();
     }
+
+    _todayDate(): string {
+        const now = window.moment(Date.now());
+        const todayDate: string = now.format("YYYY-MM-DD");
+        return todayDate
+    }
+
 }
