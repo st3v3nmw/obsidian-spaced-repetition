@@ -353,10 +353,10 @@ export class CardUI {
 
         this.chosenDeckName.setText(`${chosenDeck.deckName}`);
         this.chosenDeckCardCounter.setText(
-            `${this.totalCardsInSession - chosenDeckStats.cardsInQueueCount} / ${this.totalCardsInSession}`,
+            `${this.totalCardsInSession - chosenDeckStats.cardsInQueueCount}/${this.totalCardsInSession}`,
         );
         this.chosenDeckSubDeckCounter.setText(
-            `${this.totalDecksInSession - chosenDeckStats.decksInQueueOfThisDeckCount} / ${this.totalDecksInSession}`,
+            `${this.totalDecksInSession - chosenDeckStats.decksInQueueOfThisDeckCount}/${this.totalDecksInSession}`,
         );
     }
 
@@ -385,7 +385,7 @@ export class CardUI {
         if (!isRandomMode) {
             const currentDeckStats = this.reviewSequencer.getDeckStats(currentDeck.getTopicPath());
             this.currentDeckCardCounter.setText(
-                `${this.currentDeckTotalCardsInQueue - currentDeckStats.cardsInQueueOfThisDeckCount} / ${this.currentDeckTotalCardsInQueue}`,
+                `${this.currentDeckTotalCardsInQueue - currentDeckStats.cardsInQueueOfThisDeckCount}/${this.currentDeckTotalCardsInQueue}`,
             );
         }
     }

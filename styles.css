@@ -356,7 +356,7 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
 .sr-flashcard .sr-info-bar {
     display: flex;
     margin-top: 8px;
-    gap: 8px;
+    gap: 1ch;
     flex-wrap: wrap;
 }
 
@@ -365,7 +365,7 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     --size: 16px;
     height: var(--size);
     width: var(--size);
-    margin-bottom: -3px;
+    margin-top: -3px;
 }
 
 .sr-flashcard .sr-chosen-deck-info,
@@ -374,7 +374,7 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 5px;
+    gap: 1ch;
     flex-wrap: wrap;
 }
 
@@ -390,6 +390,10 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
 
 .sr-flashcard .sr-chosen-deck-info > * {
     font-weight: 500;
+}
+
+.sr-flashcard .sr-deck-divider {
+    padding: 0 0.5ch;
 }
 
 .sr-flashcard .sr-context {
