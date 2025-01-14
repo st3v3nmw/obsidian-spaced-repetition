@@ -397,6 +397,7 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
 .sr-flashcard .sr-chosen-deck-subdeck-counter-icon svg,
 .sr-flashcard .sr-current-deck-card-counter-icon svg {
     --icon-size: 16px;
+    --icon-stroke: 2.5px;
 }
 
 .sr-flashcard .sr-context {
