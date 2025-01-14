@@ -29,8 +29,12 @@ export class CardUI {
 
     public chosenDeckInfo: HTMLDivElement;
     public chosenDeckName: HTMLDivElement;
+
+    public chosenDeckCardCounterWrapper: HTMLDivElement;
     public chosenDeckCardCounter: HTMLDivElement;
     public chosenDeckCardCounterIcon: HTMLDivElement;
+
+    public chosenDeckSubDeckCounterWrapper: HTMLDivElement;
     public chosenDeckSubDeckCounter: HTMLDivElement;
     public chosenDeckSubDeckCounterIcon: HTMLDivElement;
 
@@ -38,6 +42,7 @@ export class CardUI {
 
     public currentDeckInfo: HTMLDivElement;
     public currentDeckName: HTMLDivElement;
+    public currentDeckCardCounterWrapper: HTMLDivElement;
     public currentDeckCardCounter: HTMLDivElement;
     public currentDeckCardCounterIcon: HTMLDivElement;
 
@@ -117,29 +122,45 @@ export class CardUI {
         this.chosenDeckInfo = this.infoBar.createDiv();
         this.chosenDeckInfo.addClass("sr-chosen-deck-info");
         this.chosenDeckName = this.chosenDeckInfo.createDiv();
-        this.chosenDeckCardCounter = this.chosenDeckInfo.createDiv();
 
-        this.chosenDeckCardCounterIcon = this.chosenDeckInfo.createDiv();
+        this.chosenDeckCardCounterWrapper = this.chosenDeckInfo.createDiv();
+        this.chosenDeckCardCounterWrapper.addClass("sr-chosen-deck-card-counter-wrapper");
+
+        this.chosenDeckCardCounter = this.chosenDeckCardCounterWrapper.createDiv();
+        this.chosenDeckCardCounter.addClass("sr-chosen-deck-card-counter");
+
+        this.chosenDeckCardCounterIcon = this.chosenDeckCardCounterWrapper.createDiv();
+        this.chosenDeckCardCounterIcon.addClass("sr-chosen-deck-card-counter-icon");
         setIcon(this.chosenDeckCardCounterIcon, "credit-card");
 
-        this.chosenDeckSubDeckCounter = this.chosenDeckInfo.createDiv();
-        this.chosenDeckSubDeckCounter.addClass("sr-chosen-deck-deck-num");
+        this.chosenDeckSubDeckCounterWrapper = this.chosenDeckInfo.createDiv();
+        this.chosenDeckSubDeckCounterWrapper.addClass("sr-is-hidden");
+        this.chosenDeckSubDeckCounterWrapper.addClass("sr-chosen-deck-subdeck-counter-wrapper");
 
-        this.chosenDeckSubDeckCounterIcon = this.chosenDeckInfo.createDiv();
+        this.chosenDeckSubDeckCounter = this.chosenDeckSubDeckCounterWrapper.createDiv();
+        this.chosenDeckSubDeckCounter.addClass("sr-chosen-deck-subdeck-counter");
+
+        this.chosenDeckSubDeckCounterIcon = this.chosenDeckSubDeckCounterWrapper.createDiv();
+        this.chosenDeckSubDeckCounterIcon.addClass("sr-chosen-deck-subdeck-counter-icon");
         setIcon(this.chosenDeckSubDeckCounterIcon, "layers");
 
         this.deckInfoDivider = this.infoBar.createDiv();
+        this.deckInfoDivider.setText("|");
         this.deckInfoDivider.addClass("sr-deck-divider");
         this.deckInfoDivider.addClass("sr-is-hidden");
-        this.deckInfoDivider.setText("|");
 
         this.currentDeckInfo = this.infoBar.createDiv();
         this.currentDeckInfo.addClass("sr-is-hidden");
         this.currentDeckInfo.addClass("sr-current-deck-info");
 
         this.currentDeckName = this.currentDeckInfo.createDiv();
-        this.currentDeckCardCounter = this.currentDeckInfo.createDiv();
-        this.currentDeckCardCounterIcon = this.currentDeckInfo.createDiv();
+        this.currentDeckCardCounterWrapper = this.currentDeckInfo.createDiv();
+        this.currentDeckCardCounterWrapper.addClass("sr-current-deck-card-counter-wrapper");
+
+        this.currentDeckCardCounter = this.currentDeckCardCounterWrapper.createDiv();
+        this.currentDeckCardCounter.addClass("sr-current-deck-card-counter");
+        this.currentDeckCardCounterIcon = this.currentDeckCardCounterWrapper.createDiv();
+        this.currentDeckCardCounterIcon.addClass("sr-current-deck-card-counter-icon");
         setIcon(this.currentDeckCardCounterIcon, "credit-card");
 
         if (this.settings.showContextInCards) {
@@ -355,6 +376,18 @@ export class CardUI {
         this.chosenDeckCardCounter.setText(
             `${this.totalCardsInSession - chosenDeckStats.cardsInQueueCount}/${this.totalCardsInSession}`,
         );
+
+        if (chosenDeck.subdecks.length === 0) {
+            if (!this.chosenDeckSubDeckCounterWrapper.hasClass("sr-is-hidden")) {
+                this.chosenDeckSubDeckCounterWrapper.addClass("sr-is-hidden");
+            }
+            return;
+        }
+
+        if (this.chosenDeckSubDeckCounterWrapper.hasClass("sr-is-hidden")) {
+            this.chosenDeckSubDeckCounterWrapper.removeClass("sr-is-hidden");
+        }
+
         this.chosenDeckSubDeckCounter.setText(
             `${this.totalDecksInSession - chosenDeckStats.decksInQueueOfThisDeckCount}/${this.totalDecksInSession}`,
         );
@@ -365,6 +398,7 @@ export class CardUI {
             if (!this.deckInfoDivider.hasClass("sr-is-hidden")) {
                 this.deckInfoDivider.addClass("sr-is-hidden");
             }
+
             if (!this.currentDeckInfo.hasClass("sr-is-hidden")) {
                 this.currentDeckInfo.addClass("sr-is-hidden");
             }

@@ -355,45 +355,48 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
 
 .sr-flashcard .sr-info-bar {
     display: flex;
-    margin-top: 8px;
-    gap: 1ch;
     flex-wrap: wrap;
-}
-
-.sr-flashcard .sr-chosen-deck-info svg,
-.sr-flashcard .sr-current-deck-info svg {
-    --size: 16px;
-    height: var(--size);
-    width: var(--size);
-    margin-top: -3px;
+    gap: 1ch;
+    margin-top: 8px;
 }
 
 .sr-flashcard .sr-chosen-deck-info,
 .sr-flashcard .sr-current-deck-info {
     display: flex;
-    flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 1ch;
     flex-wrap: wrap;
+    gap: 0.8ch;
+}
+
+.sr-flashcard .sr-chosen-deck-info,
+.sr-flashcard .sr-current-deck-info,
+.sr-flashcard .sr-deck-divider {
+    color: var(--text-muted);
+    text-wrap: nowrap;
+    font-weight: bold;
 }
 
 .sr-flashcard .sr-chosen-deck-info > *,
 .sr-flashcard .sr-current-deck-info > * {
     display: flex;
-    flex-direction: row;
     justify-content: center;
     align-items: center;
-    color: var(--text-muted);
-    text-wrap: nowrap;
+    gap: 0.5ch;
 }
 
-.sr-flashcard .sr-chosen-deck-info > * {
-    font-weight: 500;
+.sr-flashcard .sr-chosen-deck-card-counter-icon,
+.sr-flashcard .sr-chosen-deck-subdeck-counter-icon,
+.sr-flashcard .sr-current-deck-card-counter-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.sr-flashcard .sr-deck-divider {
-    padding: 0 0.5ch;
+.sr-flashcard .sr-chosen-deck-card-counter-icon svg,
+.sr-flashcard .sr-chosen-deck-subdeck-counter-icon svg,
+.sr-flashcard .sr-current-deck-card-counter-icon svg {
+    --icon-size: 16px;
 }
 
 .sr-flashcard .sr-context {
