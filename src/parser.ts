@@ -80,6 +80,9 @@ function hasInlineMarker(text: string, marker: string): boolean {
  * @returns An array of parsed question information
  */
 export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[] {
+    // Remove comments that break flashcards appearing in the deck
+    text = text.replace(/<!--[\s\S]*?-->/g, '');
+
     if (debugParser) {
         console.log("Text to parse:\n<<<" + text + ">>>");
     }
