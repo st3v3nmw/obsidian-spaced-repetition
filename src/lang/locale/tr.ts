@@ -157,7 +157,8 @@ export default {
     SHOW_STATUS_BAR_DESC:
         "Obsidian'ın durum çubuğunda flashcard'ın inceleme durumunu gizlemek için bunu kapatın",
     SHOW_RIBBON_ICON: "Şerit çubuğunda simgeyi göster",
-    SHOW_RIBBON_ICON_DESC: "Eklenti simgesini Obsidian'ın şerit çubuğundan gizlemek için bunu kapatın",
+    SHOW_RIBBON_ICON_DESC:
+        "Eklenti simgesini Obsidian'ın şerit çubuğundan gizlemek için bunu kapatın",
     ENABLE_FILE_MENU_REVIEW_OPTIONS:
         "Dosya menüsünde inceleme seçeneklerini etkinleştirin (örn. İnceleme: Kolay, İyi, Zor)",
     ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:

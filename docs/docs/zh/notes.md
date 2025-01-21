@@ -1,9 +1,9 @@
 # 笔记
 
--   笔记应当具有原子性：说清楚**一个**概念；
--   笔记之间应当高度关联；
--   先理解，后复习；
--   善用 [费曼学习法](https://fs.blog/2021/02/feynman-learning-technique/)
+- 笔记应当具有原子性：说清楚**一个**概念；
+- 笔记之间应当高度关联；
+- 先理解，后复习；
+- 善用 [费曼学习法](https://fs.blog/2021/02/feynman-learning-technique/)
 
 ## 开始使用
 
@@ -37,8 +37,8 @@
 
 可供定制的选项包括：
 
--   随机打开笔记或按照优先级排序
--   在复习完成后是否自动打开下一个笔记
+- 随机打开笔记或按照优先级排序
+- 在复习完成后是否自动打开下一个笔记
 
 ## 复习计划
 
@@ -48,7 +48,7 @@
 
 ## 复习序列
 
--   每日复习条目将按照优先级排序 (PageRank)
+- 每日复习条目将按照优先级排序 (PageRank)
 
 ## 渐进式写作
 
@@ -56,8 +56,8 @@
 
 视频资源：
 
--   英文： [Obsidian: inbox review with spaced repetition](https://youtu.be/zG5r7QIY_TM)
--   俄文： [Yuliya Bagriy - Разгребатель инбокса заметок как у Andy Matuschak в Obsidian](https://www.youtube.com/watch?v=CF6SSHB74cs)
+- 英文： [Obsidian: inbox review with spaced repetition](https://youtu.be/zG5r7QIY_TM)
+- 俄文： [Yuliya Bagriy - Разгребатель инбокса заметок как у Andy Matuschak в Obsidian](https://www.youtube.com/watch?v=CF6SSHB74cs)
 
 ### 概要
 
@@ -65,7 +65,7 @@ Andy Matuschak 在 [写作素材库中引入间隔重复系统](https://notes.an
 
 简而言之，可以进行四种操作 (此处 `x < y`):
 
--   跳过笔记 (增加 `x` 天的复习间隔) == 标记为 `记得`
--   已阅，觉得有用 (降低复习间隔) == 标记为 `较难`
--   已阅，觉得没用 (增加 `y` 天的复习间隔) == 标记为 `简单`
--   转换为 evergreen 笔记 （中止使用间隔重复系统）
+- 跳过笔记 (增加 `x` 天的复习间隔) == 标记为 `记得`
+- 已阅，觉得有用 (降低复习间隔) == 标记为 `较难`
+- 已阅，觉得没用 (增加 `y` 天的复习间隔) == 标记为 `简单`
+- 转换为 evergreen 笔记 （中止使用间隔重复系统）
