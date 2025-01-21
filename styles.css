@@ -233,7 +233,7 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
 }
 
 .sr-deck-list .sr-tree-stats-count {
-    min-width: 3ch;
+    min-width: 4ch;
     padding: 4px;
     box-sizing: content-box;
     text-align: center;
