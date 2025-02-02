@@ -91,7 +91,7 @@ export default class SRPlugin extends Plugin {
             this.data.settings,
             this.data.buryList,
         );
-        await questionPostponementList.clearIfNewDay(this.data)
+        await questionPostponementList.clearIfNewDay();
 
         const osrNoteLinkInfoFinder: ObsidianVaultNoteLinkInfoFinder =
             new ObsidianVaultNoteLinkInfoFinder(this.app.metadataCache);
