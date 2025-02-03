@@ -3,7 +3,7 @@
 export default {
     // flashcard-modal.tsx
     DECKS: "Desteler",
-    DUE_CARDS: "Süresi Dolan Kartlar",
+    DUE_CARDS: "Güncel Kartlar",
     NEW_CARDS: "Yeni Kartlar",
     TOTAL_CARDS: "Toplam Kartlar",
     BACK: "Geri",
@@ -55,9 +55,9 @@ export default {
     GROUP_FLASHCARD_REVIEW: "Flash Kartları Gözden Geçirme",
     GROUP_FLASHCARD_SEPARATORS: "Flash Kart Ayırıcıları",
     GROUP_DATA_STORAGE: "Planlama Verilerinin Saklanması",
-    GROUP_DATA_STORAGE_DESC: "Planlama verilerinin nerede saklanacağını seçin",
+    GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flash Kartlar ve Notlar",
-    GROUP_CONTRIBUTING: "Katkıda Bulun",
+    GROUP_CONTRIBUTING: "Katkıda Bulunma",
     CHECK_WIKI: 'Daha fazla bilgi için <a href="${wikiUrl}">wiki</a> sayfasına göz atın.',
     GITHUB_DISCUSSIONS:
         'Soru-cevap, geri bildirim ve genel tartışmalar için <a href="${discussionsUrl}">tartışmalar</a> bölümüne göz atın.',
@@ -71,8 +71,8 @@ export default {
         'Eklentiyi kendi dilinize çevirmek hakkında bilgi için <a href="${translationContributionUrl}">çeviri katkıları</a> sayfasını ziyaret edin.',
     FOLDERS_TO_IGNORE: "Yoksayılan Klasörler",
     FOLDERS_TO_IGNORE_DESC:
-        "Klasör yollarını veya glob desenlerini ayrı satırlara girin, ör. Templates/Scripts or **/*.excalidraw.md. Bu ayar hem flash kartlarda hem de notlarda ortaktır..",
-    OBSIDIAN_INTEGRATION: "Obsidian Entegrasyonu",
+        "Enter folder paths or glob patterns on separate lines e.g. Templates/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
+    OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Flash Kartlar",
     FLASHCARD_EASY_LABEL: "Kolay Butonu Metni",
     FLASHCARD_GOOD_LABEL: "Orta Butonu Metni",
@@ -80,8 +80,8 @@ export default {
     FLASHCARD_EASY_DESC: '"Kolay" butonunun metnini özelleştirin',
     FLASHCARD_GOOD_DESC: '"Orta" butonunun metnini özelleştirin',
     FLASHCARD_HARD_DESC: '"Zor" butonunun metnini özelleştirin',
-    REVIEW_BUTTON_DELAY: "Düğmeye Basma Gecikmesi (ms)",
-    REVIEW_BUTTON_DELAY_DESC: "İnceleme düğmelerine tekrar basılmadan önce bir gecikme ekleyin.",
+    REVIEW_BUTTON_DELAY: "Button Press Delay (ms)",
+    REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "Flash Kart Etiketleri",
     FLASHCARD_TAGS_DESC:
         "Etiketleri boşluklar veya yeni satırlarla ayırarak girin, örneğin: #flashcards #deck2 #deck3.",
@@ -96,9 +96,9 @@ export default {
         "Kardeş kartlar, aynı kart metninden üretilen kartlardır (örneğin gizlemeler).",
     SHOW_CARD_CONTEXT: "Kartlarda bağlamı göster?",
     SHOW_CARD_CONTEXT_DESC: "Örneğin: Başlık > Başlık 1 > Alt Başlık > ... > Alt Başlık",
-    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "İnceleme düğmelerinde bir sonraki inceleme zamanını göster",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Show next review time in the review buttons",
     SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
-        "Kartlarınızın ne kadar ileri bir tarihe itildiğini bilmek faydalıdır.",
+        "Useful to know how far in the future your cards are being pushed.",
     CARD_MODAL_HEIGHT_PERCENT: "Flash Kart Yükseklik Yüzdesi",
     CARD_MODAL_SIZE_PERCENT_DESC:
         "Mobilde veya çok büyük resimleriniz varsa %100 olarak ayarlayın.",
@@ -120,16 +120,16 @@ export default {
     DISABLE_CLOZE_CARDS: "Gizli kartları devre dışı bırak?",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==Vurgulanan== metni gizli kartlara dönüştür?",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
-        '"Gizleme Desenleri"den <code>${defaultPattern</code> öğesini ekleyin/kaldırın',
+        '"Cloze Patterns"den <code>${defaultPattern</code> öğesini ekleyin/kaldırın',
     CONVERT_BOLD_TEXT_TO_CLOZES: "**Kalın metni** gizli kartlara dönüştür?",
     CONVERT_BOLD_TEXT_TO_CLOZES_DESC:
-        '"Gizleme Desenleri"den <code>${defaultPattern</code> öğesini ekleyin/kaldırın',
+        '"Cloze Patterns"den <code>${defaultPattern</code> öğesini ekleyin/kaldırın',
     CONVERT_CURLY_BRACKETS_TO_CLOZES: "{{Kıvırcık parantezleri}} gizli kartlara dönüştür?",
     CONVERT_CURLY_BRACKETS_TO_CLOZES_DESC:
-        '"Gizleme Desenleri"den <code>${defaultPattern</code> öğesini ekleyin/kaldırın',
-    CLOZE_PATTERNS: "Gizleme Desenleri",
+        '"Cloze Patterns"den <code>${defaultPattern</code> öğesini ekleyin/kaldırın',
+    CLOZE_PATTERNS: "Cloze Patterns",
     CLOZE_PATTERNS_DESC:
-        'Gizleme desenlerini satırlarla ayırarak girin. Rehberlik için <a href="${docsUrl}">wiki</a> kontrol edin.',
+        'Enter cloze patterns separated by newlines. Check the <a href="${docsUrl}">wiki</a> for guidance.',
     INLINE_CARDS_SEPARATOR: "Satır içi flash kartlar için ayırıcı",
     FIX_SEPARATORS_MANUALLY_WARNING:
         "Bunu değiştirdikten sonra mevcut flash kartlarınızı manuel olarak düzenlemeniz gerektiğini unutmayın.",
@@ -139,7 +139,7 @@ export default {
     MULTILINE_CARDS_END_MARKER:
         "Gizli kartlar ve çok satırlı flash kartların sonunu belirten karakterler",
     NOTES: "Notlar",
-    NOTE: "Not",
+    NOTE: "Note",
     REVIEW_PANE_ON_STARTUP: "Başlangıçta not inceleme panelini etkinleştir",
     TAGS_TO_REVIEW: "Gözden geçirilecek etiketler",
     TAGS_TO_REVIEW_DESC:
@@ -150,19 +150,18 @@ export default {
     MAX_N_DAYS_REVIEW_QUEUE: "Sağ panelde gösterilecek maksimum gün sayısı",
     MIN_ONE_DAY: "Gün sayısı en az 1 olmalıdır.",
     VALID_NUMBER_WARNING: "Lütfen geçerli bir sayı girin.",
-    UI: "Arayüz",
-    OPEN_IN_TAB: "Yeni sekmede aç",
-    OPEN_IN_TAB_DESC: "Eklentiyi modal pencerede açmak için bunu kapatın",
-    SHOW_STATUS_BAR: "Durum çubuğunu göster",
+    UI: "User Interface",
+    OPEN_IN_TAB: "Open in new tab",
+    OPEN_IN_TAB_DESC: "Turn this off to open the plugin in a modal window",
+    SHOW_STATUS_BAR: "Show status bar",
     SHOW_STATUS_BAR_DESC:
-        "Obsidian'ın durum çubuğunda flashcard'ın inceleme durumunu gizlemek için bunu kapatın",
-    SHOW_RIBBON_ICON: "Şerit çubuğunda simgeyi göster",
-    SHOW_RIBBON_ICON_DESC:
-        "Eklenti simgesini Obsidian'ın şerit çubuğundan gizlemek için bunu kapatın",
+        "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
+    SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     ENABLE_FILE_MENU_REVIEW_OPTIONS:
-        "Dosya menüsünde inceleme seçeneklerini etkinleştirin (örn. İnceleme: Kolay, İyi, Zor)",
+        "Enable the review options in the file menu (e.g. Review: Easy, Good, Hard)",
     ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
-        "Eğer dosya menüsündeki inceleme seçeneklerini devre dışı bırakırsanız, notlarınızı eklenti komutlarını ve tanımladıysanız ilgili kısayol tuşlarını kullanarak inceleyebilirsiniz.",
+        "If you disable the review options in the file menu, you can review your notes using the plugin commands and, if you defined them, the associated command hotkeys.",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE:
         "Deste ağaçları başlangıçta genişletilmiş olarak gösterilmeli mi",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
@@ -180,10 +179,10 @@ export default {
     EASY_BONUS_DESC:
         "Kolaylık bonusu, bir flash kartı/notu İyi ve Kolay yanıtladığınızda aralıklardaki farkı ayarlamanıza olanak tanır (minimum = %100).",
     EASY_BONUS_MIN_WARNING: "Kolaylık bonusu en az %100 olmalıdır.",
-    LOAD_BALANCE: "Yük dengeleyiciyi etkinleştir",
-    LOAD_BALANCE_DESC: `Günlük inceleme sayısının daha tutarlı olması için aralığı hafifçe ayarlar.
-        Anki'nin fuzz'ına benzer ancak rastgele olmak yerine en az incelemenin olduğu günü seçer.
-        Küçük aralıklar için kapalıdır.`,
+    LOAD_BALANCE: "Enable load balancer",
+    LOAD_BALANCE_DESC: `Slightly tweaks the interval so that the number of reviews per day is more consistent.
+        It's like Anki's fuzz but instead of being random, it picks the day with the least amount of reviews.
+        It's turned off for small intervals.`,
     MAX_INTERVAL: "Maksimum aralık (gün)",
     MAX_INTERVAL_DESC: "Aralığa bir üst sınır koymanıza olanak tanır (varsayılan = 100 yıl).",
     MAX_INTERVAL_MIN_WARNING: "Maksimum aralık en az 1 gün olmalıdır.",
@@ -195,9 +194,9 @@ export default {
     DISPLAY_PARSER_DEBUG_INFO:
         "Ayrıştırıcı için hata ayıklama bilgilerini geliştirici konsolunda göster",
     SCHEDULING: "Scheduling",
-    EXPERIMENTAL: "Deneysel",
-    HELP: "Yardım",
-    STORE_IN_NOTES: "Notlarda",
+    EXPERIMENTAL: "Experimental",
+    HELP: "Help",
+    STORE_IN_NOTES: "In the notes",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Not İnceleme Sırası",
@@ -216,23 +215,23 @@ export default {
     FORECAST: "Tahmin",
     FORECAST_DESC: "Gelecekte incelemeye alınacak kartların sayısı",
     SCHEDULED: "Planlanmış",
-    DAYS: "Gün",
+    DAYS: "Günler",
     NUMBER_OF_CARDS: "Kart Sayısı",
     REVIEWS_PER_DAY: "Ortalama: ${avg} inceleme/gün",
     INTERVALS: "Aralıklar",
     INTERVALS_DESC: "İncelemelerin tekrar gösterilme gecikmeleri",
     COUNT: "Sayı",
     INTERVALS_SUMMARY: "Ortalama aralık: ${avg}, En uzun aralık: ${longest}",
-    EASES: "Öğrenim Kolaylıkları",
+    EASES: "Kolaylıklar",
     EASES_SUMMARY: "Ortalama kolaylık: ${avgEase}",
-    EASE: "Öğrenim Kolaylığı",
+    EASE: "Ease",
     CARD_TYPES: "Kart Türleri",
     CARD_TYPES_DESC: "Bu, gömülü kartları da içerir (varsa)",
     CARD_TYPE_NEW: "Yeni",
     CARD_TYPE_YOUNG: "Genç",
     CARD_TYPE_MATURE: "Olgun",
     CARD_TYPES_SUMMARY: "Toplam kart: ${totalCardsCount}",
-    SEARCH: "Ara",
-    PREVIOUS: "Önceki",
-    NEXT: "Sonraki",
+    SEARCH: "Search",
+    PREVIOUS: "Previous",
+    NEXT: "Next",
 };
