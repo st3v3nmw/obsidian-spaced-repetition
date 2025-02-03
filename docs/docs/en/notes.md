@@ -60,15 +60,15 @@ You can create custom hotkeys for the review result in `Settings -> HotKeys`.
 
 There are a few ways to open a note for review:
 
--   Open a note via the standard Obsidian features
--   Double click on a note title from the Note Review Queue
--   Click on the `Spaced Repetition Status Area` in the status bar at the bottom of the screen
--   Select the command [Open a note to review review](plugin-commands.md)
+- Open a note via the standard Obsidian features
+- Double click on a note title from the Note Review Queue
+- Click on the `Spaced Repetition Status Area` in the status bar at the bottom of the screen
+- Select the command [Open a note to review review](plugin-commands.md)
 
 There are also the following relevant options:
 
--   [Open a random note for review](user-options.md)
--   [Open next note automatically after a review](user-options.md)
+- [Open a random note for review](user-options.md)
+- [Open next note automatically after a review](user-options.md)
 
 ## Multiple Note Review Decks
 
