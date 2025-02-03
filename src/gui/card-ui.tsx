@@ -25,10 +25,14 @@ export class CardUI {
 
     public view: HTMLDivElement;
 
-    public infoBar: HTMLDivElement;
+    public infoSection: HTMLDivElement;
+    public deckProgressInfo: HTMLDivElement;
 
     public chosenDeckInfo: HTMLDivElement;
     public chosenDeckName: HTMLDivElement;
+
+    public chosenDeckCounterWrapper: HTMLDivElement;
+    public chosenDeckCounterDivider: HTMLDivElement;
 
     public chosenDeckCardCounterWrapper: HTMLDivElement;
     public chosenDeckCardCounter: HTMLDivElement;
@@ -38,10 +42,13 @@ export class CardUI {
     public chosenDeckSubDeckCounter: HTMLDivElement;
     public chosenDeckSubDeckCounterIcon: HTMLDivElement;
 
-    public deckInfoDivider: HTMLDivElement;
-
     public currentDeckInfo: HTMLDivElement;
     public currentDeckName: HTMLDivElement;
+
+    public currentDeckCounterWrapper: HTMLDivElement;
+
+    public currentDeckCounterDivider: HTMLDivElement;
+
     public currentDeckCardCounterWrapper: HTMLDivElement;
     public currentDeckCardCounter: HTMLDivElement;
     public currentDeckCardCounterIcon: HTMLDivElement;
@@ -55,7 +62,6 @@ export class CardUI {
     public resetButton: HTMLButtonElement;
     public infoButton: HTMLButtonElement;
     public skipButton: HTMLButtonElement;
-    public controlsDivider: HTMLHRElement;
 
     public response: HTMLDivElement;
     public hardButton: HTMLButtonElement;
@@ -116,57 +122,7 @@ export class CardUI {
 
         this._createCardControls();
 
-        this.infoBar = this.view.createDiv();
-        this.infoBar.addClass("sr-info-bar");
-
-        this.chosenDeckInfo = this.infoBar.createDiv();
-        this.chosenDeckInfo.addClass("sr-chosen-deck-info");
-        this.chosenDeckName = this.chosenDeckInfo.createDiv();
-
-        this.chosenDeckCardCounterWrapper = this.chosenDeckInfo.createDiv();
-        this.chosenDeckCardCounterWrapper.addClass("sr-chosen-deck-card-counter-wrapper");
-
-        this.chosenDeckCardCounter = this.chosenDeckCardCounterWrapper.createDiv();
-        this.chosenDeckCardCounter.addClass("sr-chosen-deck-card-counter");
-
-        this.chosenDeckCardCounterIcon = this.chosenDeckCardCounterWrapper.createDiv();
-        this.chosenDeckCardCounterIcon.addClass("sr-chosen-deck-card-counter-icon");
-        setIcon(this.chosenDeckCardCounterIcon, "credit-card");
-
-        this.chosenDeckSubDeckCounterWrapper = this.chosenDeckInfo.createDiv();
-        this.chosenDeckSubDeckCounterWrapper.addClass("sr-is-hidden");
-        this.chosenDeckSubDeckCounterWrapper.addClass("sr-chosen-deck-subdeck-counter-wrapper");
-
-        this.chosenDeckSubDeckCounter = this.chosenDeckSubDeckCounterWrapper.createDiv();
-        this.chosenDeckSubDeckCounter.addClass("sr-chosen-deck-subdeck-counter");
-
-        this.chosenDeckSubDeckCounterIcon = this.chosenDeckSubDeckCounterWrapper.createDiv();
-        this.chosenDeckSubDeckCounterIcon.addClass("sr-chosen-deck-subdeck-counter-icon");
-        setIcon(this.chosenDeckSubDeckCounterIcon, "layers");
-
-        this.deckInfoDivider = this.infoBar.createDiv();
-        this.deckInfoDivider.setText("|");
-        this.deckInfoDivider.addClass("sr-deck-divider");
-        this.deckInfoDivider.addClass("sr-is-hidden");
-
-        this.currentDeckInfo = this.infoBar.createDiv();
-        this.currentDeckInfo.addClass("sr-is-hidden");
-        this.currentDeckInfo.addClass("sr-current-deck-info");
-
-        this.currentDeckName = this.currentDeckInfo.createDiv();
-        this.currentDeckCardCounterWrapper = this.currentDeckInfo.createDiv();
-        this.currentDeckCardCounterWrapper.addClass("sr-current-deck-card-counter-wrapper");
-
-        this.currentDeckCardCounter = this.currentDeckCardCounterWrapper.createDiv();
-        this.currentDeckCardCounter.addClass("sr-current-deck-card-counter");
-        this.currentDeckCardCounterIcon = this.currentDeckCardCounterWrapper.createDiv();
-        this.currentDeckCardCounterIcon.addClass("sr-current-deck-card-counter-icon");
-        setIcon(this.currentDeckCardCounterIcon, "credit-card");
-
-        if (this.settings.showContextInCards) {
-            this.cardContext = this.infoBar.createDiv();
-            this.cardContext.addClass("sr-context");
-        }
+        this._createInfoSection();
 
         this.content = this.view.createDiv();
         this.content.addClass("sr-content");
@@ -363,6 +319,73 @@ export class CardUI {
 
     // #region -> Deck Info
 
+    private _createInfoSection() {
+        this.infoSection = this.view.createDiv();
+        this.infoSection.addClass("sr-info-section");
+
+        this.deckProgressInfo = this.infoSection.createDiv();
+        this.deckProgressInfo.addClass("sr-deck-progress-info");
+
+        this.chosenDeckInfo = this.deckProgressInfo.createDiv();
+        this.chosenDeckInfo.addClass("sr-chosen-deck-info");
+        this.chosenDeckName = this.chosenDeckInfo.createDiv();
+        this.chosenDeckName.addClass("sr-chosen-deck-name");
+
+        this.chosenDeckCounterWrapper = this.chosenDeckInfo.createDiv();
+        this.chosenDeckCounterWrapper.addClass("sr-chosen-deck-counter-wrapper");
+
+        this.chosenDeckCounterDivider = this.chosenDeckCounterWrapper.createDiv();
+        this.chosenDeckCounterDivider.addClass("sr-chosen-deck-counter-divider");
+
+        this.chosenDeckCardCounterWrapper = this.chosenDeckCounterWrapper.createDiv();
+        this.chosenDeckCardCounterWrapper.addClass("sr-chosen-deck-card-counter-wrapper");
+
+        this.chosenDeckCardCounter = this.chosenDeckCardCounterWrapper.createDiv();
+        this.chosenDeckCardCounter.addClass("sr-chosen-deck-card-counter");
+
+        this.chosenDeckCardCounterIcon = this.chosenDeckCardCounterWrapper.createDiv();
+        this.chosenDeckCardCounterIcon.addClass("sr-chosen-deck-card-counter-icon");
+        setIcon(this.chosenDeckCardCounterIcon, "credit-card");
+
+        this.chosenDeckSubDeckCounterWrapper = this.chosenDeckCounterWrapper.createDiv();
+        this.chosenDeckSubDeckCounterWrapper.addClass("sr-is-hidden");
+        this.chosenDeckSubDeckCounterWrapper.addClass("sr-chosen-deck-subdeck-counter-wrapper");
+
+        this.chosenDeckSubDeckCounter = this.chosenDeckSubDeckCounterWrapper.createDiv();
+        this.chosenDeckSubDeckCounter.addClass("sr-chosen-deck-subdeck-counter");
+
+        this.chosenDeckSubDeckCounterIcon = this.chosenDeckSubDeckCounterWrapper.createDiv();
+        this.chosenDeckSubDeckCounterIcon.addClass("sr-chosen-deck-subdeck-counter-icon");
+        setIcon(this.chosenDeckSubDeckCounterIcon, "layers");
+
+        this.currentDeckInfo = this.deckProgressInfo.createDiv();
+        this.currentDeckInfo.addClass("sr-is-hidden");
+        this.currentDeckInfo.addClass("sr-current-deck-info");
+
+        this.currentDeckName = this.currentDeckInfo.createDiv();
+        this.currentDeckName.addClass("sr-current-deck-name");
+
+        this.currentDeckCounterWrapper = this.currentDeckInfo.createDiv();
+        this.currentDeckCounterWrapper.addClass("sr-current-deck-counter-wrapper");
+
+        this.currentDeckCounterDivider = this.currentDeckCounterWrapper.createDiv();
+        this.currentDeckCounterDivider.addClass("sr-current-deck-counter-divider");
+
+        this.currentDeckCardCounterWrapper = this.currentDeckCounterWrapper.createDiv();
+        this.currentDeckCardCounterWrapper.addClass("sr-current-deck-card-counter-wrapper");
+
+        this.currentDeckCardCounter = this.currentDeckCardCounterWrapper.createDiv();
+        this.currentDeckCardCounter.addClass("sr-current-deck-card-counter");
+        this.currentDeckCardCounterIcon = this.currentDeckCardCounterWrapper.createDiv();
+        this.currentDeckCardCounterIcon.addClass("sr-current-deck-card-counter-icon");
+        setIcon(this.currentDeckCardCounterIcon, "credit-card");
+
+        if (this.settings.showContextInCards) {
+            this.cardContext = this.infoSection.createDiv();
+            this.cardContext.addClass("sr-context");
+        }
+    }
+
     private _updateInfoBar(chosenDeck: Deck, currentDeck: Deck) {
         this._updateChosenDeckInfo(chosenDeck);
         this._updateCurrentDeckInfo(chosenDeck, currentDeck);
@@ -395,18 +418,10 @@ export class CardUI {
 
     private _updateCurrentDeckInfo(chosenDeck: Deck, currentDeck: Deck) {
         if (chosenDeck.subdecks.length === 0) {
-            if (!this.deckInfoDivider.hasClass("sr-is-hidden")) {
-                this.deckInfoDivider.addClass("sr-is-hidden");
-            }
-
             if (!this.currentDeckInfo.hasClass("sr-is-hidden")) {
                 this.currentDeckInfo.addClass("sr-is-hidden");
             }
             return;
-        }
-
-        if (this.deckInfoDivider.hasClass("sr-is-hidden")) {
-            this.deckInfoDivider.removeClass("sr-is-hidden");
         }
 
         if (this.currentDeckInfo.hasClass("sr-is-hidden")) {
@@ -430,7 +445,7 @@ export class CardUI {
             return;
         }
         this.cardContext.setText(
-            ` > ${this._formatQuestionContextText(this._currentQuestion.questionContext)}`,
+            ` ${this._formatQuestionContextText(this._currentQuestion.questionContext)}`,
         );
     }
 
