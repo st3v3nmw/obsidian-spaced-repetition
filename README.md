@@ -4,40 +4,40 @@
 
 Fight the forgetting curve by reviewing flashcards & notes using spaced repetition.
 
-- Check the documentation [here](https://www.stephenmwangi.com/obsidian-spaced-repetition/).
-- Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/3/) for upcoming features & fixes.
-- Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug report.
-- Visit the [discussions](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/) section for Q&A help, feedback, and general discussion.
-- The plugin has been translated into _Arabic, Chinese, Czech, French, German, Italian, Korean, Japanese, Polish, Portuguese, Spanish, Russian, Turkish and Ukrainian_ by the Obsidian community 😄.
-    - To help translate this plugin to your language, check the [translation guide here](https://www.stephenmwangi.com/obsidian-spaced-repetition/contributing/#translating_1).
+-   Check the documentation [here](https://www.stephenmwangi.com/obsidian-spaced-repetition/).
+-   Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/3/) for upcoming features & fixes.
+-   Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug report.
+-   Visit the [discussions](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/) section for Q&A help, feedback, and general discussion.
+-   The plugin has been translated into _Arabic, Chinese, Czech, French, German, Italian, Korean, Japanese, Polish, Portuguese, Spanish, Russian, Turkish and Ukrainian_ by the Obsidian community 😄.
+    -   To help translate this plugin to your language, check the [translation guide here](https://www.stephenmwangi.com/obsidian-spaced-repetition/contributing/#translating_1).
 
 ## Features
 
-- Flashcards
-    - [Decks](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/decks/) (Using Obsidian's hierarchical tags or folder structure)
-    - [Single-line style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#single-line-basic) (`Question::Answer`)
-    - [Single-line reversed style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#single-line-bidirectional) (`Question:::Answer`)
-    - [Multi-line style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#multi-line-basic) (Separated by `?`)
-    - [Multi-line reversed style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#multi-line-bidirectional) (Separated by `??`)
-    - [Cloze cards](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/cloze-cards/) (`==highlight==` your cloze deletions!, `**bolded text**`, `{{text in curly braces}}`, or use custom cloze patterns)
-    - [Card context - automatic titles based on headings](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/reviewing/#context) (i.e. `Note title > Heading 1 > Subheading`)
-    - Rich text support in flashcards (inherited from Obsidian)
-        - Images, Audio, & Video
-        - LaTeX
-        - Code syntax highlighting
-        - Footnotes
-- Notes
-    - [Reviewing entire notes](https://www.stephenmwangi.com/obsidian-spaced-repetition/notes/)
-- [Statistics](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/statistics/)
+-   Flashcards
+    -   [Decks](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/decks/) (Using Obsidian's hierarchical tags or folder structure)
+    -   [Single-line style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#single-line-basic) (`Question::Answer`)
+    -   [Single-line reversed style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#single-line-bidirectional) (`Question:::Answer`)
+    -   [Multi-line style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#multi-line-basic) (Separated by `?`)
+    -   [Multi-line reversed style](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#multi-line-bidirectional) (Separated by `??`)
+    -   [Cloze cards](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/cloze-cards/) (`==highlight==` your cloze deletions!, `**bolded text**`, `{{text in curly braces}}`, or use custom cloze patterns)
+    -   [Card context - automatic titles based on headings](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/reviewing/#context) (i.e. `Note title > Heading 1 > Subheading`)
+    -   Rich text support in flashcards (inherited from Obsidian)
+        -   Images, Audio, & Video
+        -   LaTeX
+        -   Code syntax highlighting
+        -   Footnotes
+-   Notes
+    -   [Reviewing entire notes](https://www.stephenmwangi.com/obsidian-spaced-repetition/notes/)
+-   [Statistics](https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/statistics/)
 
 ### Coming Soon
 
 1. FSRS
 
-- [ ] Store scheduling info in a dedicated file (`.yaml`)
-- [ ] Migrate from one storage system to another
-- [ ] Implement FSRS
-- [ ] Update documentation
+-   [ ] Store scheduling info in a dedicated file (`.yaml`)
+-   [ ] Migrate from one storage system to another
+-   [ ] Implement FSRS
+-   [ ] Update documentation
 
 ## Usage
 
