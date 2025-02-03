@@ -104,7 +104,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardEasyText: t("EASY"),
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),
-    reviewButtonDelay: 1000,
+    reviewButtonDelay: 0,
     openViewInNewTab: false,
 
     // algorithm

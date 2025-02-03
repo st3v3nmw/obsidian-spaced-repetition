@@ -111,9 +111,9 @@ This is a cloze. This is too, but without hint. And this one is asked together w
 
 The Cloze Overlapping Generalization allows you to dictate the behavior of each deletion individually. Each deletion has its own set of actions that indicate how it will behave on each card:
 
-- `a` for ask (hide the deletion answer in the front of the card while showing it in the back).
-- `h` for hide (hide the deletion answer both in the front and back of the card).
-- `s` for show (show the deletion answer both in the front and back of the card).
+-   `a` for ask (hide the deletion answer in the front of the card while showing it in the back).
+-   `h` for hide (hide the deletion answer both in the front and back of the card).
+-   `s` for show (show the deletion answer both in the front and back of the card).
 
 For instance, the following note:
 
