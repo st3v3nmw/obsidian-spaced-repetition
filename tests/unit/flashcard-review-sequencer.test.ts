@@ -974,6 +974,25 @@ ${updatedQuestionText}`;
 });
 
 describe("getDeckStats", () => {
+    describe("Multi level deck with some new and due cards", () => {
+        test("Initial multi level stats", async () => {
+            const text: string = `#flashcards/sub-deck
+Q1::A1
+Q2::A2
+Q3::A3
+Q4::A4 <!--SR:!2023-01-21,15,290-->
+`;
+            const c: TestContext = TestContext.Create(
+                orderDueFirstSequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                text,
+            );
+            await c.setSequencerDeckTreeFromOriginalText();
+            expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(4, 1, 3, 4, 0, 0, 0, 1, 1));
+        });
+    });
+
     describe("Single level deck with some new and due cards", () => {
         test("Initial stats", async () => {
             const text: string = `#flashcards
@@ -989,7 +1008,7 @@ Q4::A4 <!--SR:!2023-01-21,15,290-->
                 text,
             );
             await c.setSequencerDeckTreeFromOriginalText();
-            expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(1, 3, 4));
+            expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(4, 1, 3, 4, 1, 3, 4, 0, 1));
         });
 
         test("Reduction in due count after skipping card", async () => {
@@ -1008,10 +1027,10 @@ Q4::A4 <!--SR:!2023-01-21,15,290-->
             await c.setSequencerDeckTreeFromOriginalText();
 
             expect(c.reviewSequencer.currentCard.front).toEqual("Q4"); // This is the first card as we are using orderDueFirstSequential
-            expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(1, 3, 4));
+            expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(4, 1, 3, 4, 1, 3, 4, 0, 1));
             c.reviewSequencer.skipCurrentCard();
             // One less due card
-            expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(0, 3, 4));
+            expect(c.getDeckStats("#flashcards")).toEqual(new DeckStats(4, 0, 3, 3, 0, 3, 3, 0, 1));
         });
 
         test("Change in stats after reviewing each card", async () => {
@@ -1030,9 +1049,9 @@ Q4::A4 <!--SR:!2023-01-21,15,290-->
             await c.setSequencerDeckTreeFromOriginalText();
 
             await checkStats(c, "#flashcards", [
-                [new DeckStats(1, 3, 4), "Q4", ReviewResponse.Easy], // This is the first card as we are using orderDueFirstSequential
-                [new DeckStats(0, 3, 4), "Q1", ReviewResponse.Easy], // Iterated through all the due cards, now the new ones
-                [new DeckStats(0, 2, 4), "Q2", ReviewResponse.Easy],
+                [new DeckStats(4, 1, 3, 4, 1, 3, 4, 0, 1), "Q4", ReviewResponse.Easy], // This is the first card as we are using orderDueFirstSequential
+                [new DeckStats(4, 0, 3, 3, 0, 3, 3, 0, 1), "Q1", ReviewResponse.Easy], // Iterated through all the due cards, now the new ones
+                [new DeckStats(4, 0, 2, 2, 0, 2, 2, 0, 1), "Q2", ReviewResponse.Easy],
             ]);
         });
     });
