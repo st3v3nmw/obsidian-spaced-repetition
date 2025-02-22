@@ -538,11 +538,18 @@ export default class SRPlugin extends Plugin {
             this.ribbonIcon = this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
                 if (!this.osrAppCore.syncLock) {
                     await this.sync();
-                    this.openFlashcardModal(
-                        this.osrAppCore.reviewableDeckTree,
-                        this.osrAppCore.remainingDeckTree,
-                        FlashcardReviewMode.Review,
-                    );
+                    if (this.data.settings.openViewInNewTab) {
+                        this.tabViewManager.openSRTabView(
+                            this.osrAppCore,
+                            FlashcardReviewMode.Review,
+                        );
+                    } else {
+                        this.openFlashcardModal(
+                            this.osrAppCore.reviewableDeckTree,
+                            this.osrAppCore.remainingDeckTree,
+                            FlashcardReviewMode.Review,
+                        );
+                    }
                 }
             });
         }
