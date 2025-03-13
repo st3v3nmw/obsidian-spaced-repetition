@@ -30,7 +30,7 @@
 
     从参考材料中提取要点，并放在此处。
 
- 点击[这里](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/15)查看`@aviskase`的介绍。
+点击[这里](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/15)查看`@aviskase`的介绍。
 
 #### 概要
 
