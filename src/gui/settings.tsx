@@ -129,6 +129,8 @@ export class SRSettingTab extends PluginSettingTab {
 
         this.createSettingFoldersToIgnore(containerEl);
 
+        this.createSettingsTagsToIgnore(containerEl);
+
         containerEl.createEl("h3", { text: t("GROUP_FLASHCARD_REVIEW") });
         new Setting(containerEl)
             .setName(t("BURY_SIBLINGS_TILL_NEXT_DAY"))
@@ -549,6 +551,28 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
+    }
+
+    private async createSettingsTagsToIgnore(containerEl: HTMLElement): Promise<void> {
+        new Setting(containerEl)
+            .setName(t("TAGS_TO_EXCLUDE_FROM_DECKS"))
+            .setDesc(t("TAGS_TO_EXCLUDE_FROM_DECKS_DESC"))
+            .addTextArea((text) =>
+                text
+                    .setValue(
+                        this.plugin.data.settings.flashcardTagsToExclude
+                            ? this.plugin.data.settings.flashcardTagsToExclude.join(" ")
+                            : "",
+                    )
+                    .onChange((value) => {
+                        applySettingsUpdate(async () => {
+                            this.plugin.data.settings.flashcardTagsToExclude = value
+                                .split(/\s+/)
+                                .filter((t) => t.length > 0);
+                            await this.plugin.savePluginData();
+                        });
+                    }),
+            );
     }
 
     private async createSettingFoldersToIgnore(containerEl: HTMLElement): Promise<void> {
