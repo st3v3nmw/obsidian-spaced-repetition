@@ -4,8 +4,7 @@ import { Algorithm } from "src/algorithms/base/isrs-algorithm";
 import { DataStoreName } from "src/data-stores/base/data-store";
 import { t } from "src/lang/helpers";
 import { pathMatchesPattern } from "src/utils/fs";
-
-import { mapBadChars } from "./utils/strings";
+import { mapBadChars } from "src/utils/strings";
 
 export interface SRSettings {
     // flashcards
