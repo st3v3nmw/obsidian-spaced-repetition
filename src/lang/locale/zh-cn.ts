@@ -93,8 +93,7 @@ export default {
     SHOW_CARD_CONTEXT: "在卡片中显示上下文",
     SHOW_CARD_CONTEXT_DESC: "例如：标题 > 副标题 > 小标题 > ... > 小标题",
     SHOW_INTERVAL_IN_REVIEW_BUTTONS: "将下次复习时间显示在复习按钮",
-    SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
-        "了解你的卡片被推迟了多久对你很有用",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC: "了解你的卡片被推迟了多久对你很有用",
     CARD_MODAL_HEIGHT_PERCENT: "卡片高度百分比",
     CARD_MODAL_SIZE_PERCENT_DESC: "请在移动端使用并需要浏览较大图片时设为100%",
     RESET_DEFAULT: "重置为默认",
@@ -147,8 +146,7 @@ export default {
     OPEN_IN_TAB: "在新标签打开",
     OPEN_IN_TAB_DESC: "关闭此选项可在模式窗口中打开插件",
     SHOW_STATUS_BAR: "显示在状态栏",
-    SHOW_STATUS_BAR_DESC:
-        "将此关闭以隐藏 Obsidian 状态栏中的卡片复习状态。",
+    SHOW_STATUS_BAR_DESC: "将此关闭以隐藏 Obsidian 状态栏中的卡片复习状态。",
     SHOW_RIBBON_ICON: "在功能区中显示图标",
     SHOW_RIBBON_ICON_DESC: "关闭此选项可隐藏 Obsidian 功能区栏中的插件图标",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "默认在列表中展开嵌套子牌组",

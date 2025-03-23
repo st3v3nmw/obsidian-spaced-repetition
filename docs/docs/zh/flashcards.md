@@ -167,11 +167,11 @@ Question6 (in deckA)::Answer6
 
 你可以在快速复习中使用如下快捷键：
 
--   `Space/Enter` => 显示答案
--   `0` => 重置进度 (等价于 Anki 中的 `Again`)
--   `1` => 标记为 `Hard`
--   `2` 或 `Space` => 标记为 `Good`
--   `3` => 标记为 `Easy`
+- `Space/Enter` => 显示答案
+- `0` => 重置进度 (等价于 Anki 中的 `Again`)
+- `1` => 标记为 `Hard`
+- `2` 或 `Space` => 标记为 `Good`
+- `3` => 标记为 `Easy`
 
 ### 上下文
 
