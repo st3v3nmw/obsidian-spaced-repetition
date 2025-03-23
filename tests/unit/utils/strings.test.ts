@@ -3,12 +3,31 @@ import {
     cyrb53,
     escapeRegexString,
     findLineIndexOfSearchStringIgnoringWs,
+    getBadToGoodCharMap,
     literalStringReplace,
+    mapBadChars,
     MultiLineTextFinder,
     splitNoteIntoFrontmatterAndContent,
     splitTextIntoLineArray,
     stringTrimStart,
 } from "src/utils/strings";
+
+describe("mapBadChars", () => {
+    test("All LH should be different from RH", () => {
+        const m = getBadToGoodCharMap();
+        // Check that each mapping is to a different character
+        for (const [key, value] of Object.entries(m)) {
+            expect(key).not.toEqual(value);
+        }
+    });
+
+    test("Map replaces special characters with safe alternatives", () => {
+        const problem = "cрen-331";
+        const real = "cpen-331";
+        expect(problem).not.toEqual(real); // Check that the strings are different
+        expect(mapBadChars(problem)).toEqual(real);
+    });
+});
 
 describe("escapeRegexString", () => {
     test("should escape special regex characters", () => {

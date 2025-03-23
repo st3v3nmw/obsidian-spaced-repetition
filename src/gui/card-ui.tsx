@@ -53,7 +53,7 @@ export class CardUI {
     public currentDeckCardCounter: HTMLDivElement;
     public currentDeckCardCounterIcon: HTMLDivElement;
 
-    public cardContext: HTMLElement;
+    public cardContext: HTMLElement | undefined;
 
     public content: HTMLDivElement;
 
@@ -441,7 +441,7 @@ export class CardUI {
 
     private _updateCardContext() {
         if (!this.settings.showContextInCards) {
-            this.cardContext.setText("");
+            this.cardContext?.setText("");
             return;
         }
         this.cardContext.setText(

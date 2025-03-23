@@ -6,6 +6,27 @@ export enum TextDirection {
 
 type Hex = number;
 
+export function getBadToGoodCharMap(): Record<string, string> {
+    const badToGood: Record<string, string> = {};
+    badToGood["р"] = "p";
+    return badToGood;
+}
+
+/**
+ * Maps bad characters to good characters.
+ * We need this because when saving string in Obsidian some chars like "p" is converted to diffent p. See below
+ * If you try to save "cpen-331" in Obsidian we won't find that tag
+ */
+export function mapBadChars(tag: string): string {
+    const badToGood = getBadToGoodCharMap();
+    return [...tag]
+        .map((e) => {
+            const good = badToGood[e];
+            return good ? good : e;
+        })
+        .join("");
+}
+
 /**
  * Escapes the input string so that it can be converted to a regex
  * while making sure that symbols like `?` and `*` aren't interpreted
