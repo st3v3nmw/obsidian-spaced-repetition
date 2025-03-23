@@ -13,7 +13,7 @@ A learning algorithm is a formula that determines when a note or flashcard shoul
 -   The `SM-2-OSR` algorithm is a variant of [Anki's algorithm](https://faqs.ankiweb.net/what-spaced-repetition-algorithm.html) which is based on the [SM-2 algorithm](https://www.supermemo.com/en/archives1990-2015/english/ol/sm2).
 -   It supports ternary reviews i.e. a concept is either hard, good, or easy at the time of review.
 -   initial ease is weighted (using max_link_factor) depending on the average ease of linked notes, note importance, and the base ease.
--   Anki also applies a small amount of random “fuzz” to prevent cards that were introduced at the same time and given the same ratings from sticking together and always coming up for review on the same day."
+-   Anki also applies a small amount of random “fuzz” to prevent cards that were introduced at the same time and given the same ratings from sticking together and always coming up for review on the same day.
 -   The algorithm is essentially the same for both notes and flashcards - apart from the PageRanks
 
 ### Algorithm Details
