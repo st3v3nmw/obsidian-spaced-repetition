@@ -4,28 +4,28 @@
 
 ## 报告Bug & 功能请求
 
--   查看 [路线图](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/2/) 以了解即将推出的功能和修复。
--   如果您想请求新功能或报告Bug，请点击[这里](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/)。
--   前往[讨论区](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/)参与问答互助、意见反馈和常规讨论。
+- 查看 [路线图](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/2/) 以了解即将推出的功能和修复。
+- 如果您想请求新功能或报告Bug，请点击[这里](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/)。
+- 前往[讨论区](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/)参与问答互助、意见反馈和常规讨论。
 
 ## 翻译
 
 在 Obsidian 社区的帮助下，插件已支持如下语言。😄
 
--   Arabic / العربية
--   Chinese (Simplified) / 简体中文
--   Chinese (Traditional) / 繁體中文
--   Czech / čeština
--   French / français
--   German / Deutsch
--   Italian / Italiano
--   Korean / 한국어
--   Japanese / 日本語
--   Polish / Polski
--   Portuguese (Brazil) / Português do Brasil
--   Spanish / Español
--   Russian / русский
--   Turkish / Türkçe
+- Arabic / العربية
+- Chinese (Simplified) / 简体中文
+- Chinese (Traditional) / 繁體中文
+- Czech / čeština
+- French / français
+- German / Deutsch
+- Italian / Italiano
+- Korean / 한국어
+- Japanese / 日本語
+- Polish / Polski
+- Portuguese (Brazil) / Português do Brasil
+- Spanish / Español
+- Russian / русский
+- Turkish / Türkçe
 
 ### 步骤
 
@@ -104,13 +104,13 @@ export default {
 
 ### UI 修改
 
--   所有 UI 修改都应当在`src/gui/`目录内完成。
+- 所有 UI 修改都应当在`src/gui/`目录内完成。
 
--   将修改放在正确的区域 (参考代码中的 "MARK:" 或 "#region" 注释)。
+- 将修改放在正确的区域 (参考代码中的 "MARK:" 或 "#region" 注释)。
 
--   用 JSDoc 为你的函数和类编写文档。
+- 用 JSDoc 为你的函数和类编写文档。
 
--   您可以在开发者控制台中输入以下代码来切换桌面端和移动端视图。
+- 您可以在开发者控制台中输入以下代码来切换桌面端和移动端视图。
 
     ```js
     this.app.emulateMobile(false); // 切换至桌面端视图
@@ -118,7 +118,7 @@ export default {
     this.app.emulateMobile(true); // 切换至移动端视图
     ```
 
--   在以下所有布局中测试您的 UI 修改:
+- 在以下所有布局中测试您的 UI 修改:
     1. 桌面端
     2. 移动端竖屏模式
     3. 小尺寸移动设备

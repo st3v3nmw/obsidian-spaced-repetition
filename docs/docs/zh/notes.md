@@ -58,15 +58,15 @@
 
 您可以通过如下方式选择笔记以复习:
 
--   使用 Obsidian 标准功能打开笔记
--   在 笔记复习序列 中双击笔记
--   点击窗口右下角的 `Spaced Repetition 状态栏`
--   快捷指令 [打开一个笔记开始复习](plugin-commands.md)
+- 使用 Obsidian 标准功能打开笔记
+- 在 笔记复习序列 中双击笔记
+- 点击窗口右下角的 `Spaced Repetition 状态栏`
+- 快捷指令 [打开一个笔记开始复习](plugin-commands.md)
 
 相关选项还包括:
 
--   [随机打开一个笔记复习](user-options.md)
--   [复习后自动打开下一个笔记](user-options.md)
+- [随机打开一个笔记复习](user-options.md)
+- [复习后自动打开下一个笔记](user-options.md)
 
 ## 多个复习卡组
 
