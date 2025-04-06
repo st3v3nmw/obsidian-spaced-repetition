@@ -149,6 +149,9 @@ export default {
     TAGS_TO_REVIEW: "Etichette da rivedere",
     TAGS_TO_REVIEW_DESC:
         "Inserisci le etichette separate da spazi o a capi, tipo #review #tag2 #tag3.",
+    TAGS_TO_EXCLUDE_FROM_DECKS: "Tag da escludere dalla creazione del mazzo",
+    TAGS_TO_EXCLUDE_FROM_DECKS_DESC:
+        "Inserisci i tag separati da spazi. Le carte con questi tag saranno comunque incluse nella revisione ma non creeranno mazzi separati. Si tratta di sottocomponenti, quindi se hai #flashcard/test inserisci 'test'.",
     OPEN_RANDOM_NOTE: "Apri una nota a caso per revisione",
     OPEN_RANDOM_NOTE_DESC:
         "Quando lo disabiliti, le note saranno ordinate per importanza (PageRank).",

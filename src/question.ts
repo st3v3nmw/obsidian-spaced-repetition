@@ -184,7 +184,7 @@ export class QuestionText {
 export class Question {
     note: Note;
     parsedQuestionInfo: ParsedQuestionInfo;
-    topicPathList: TopicPathList;
+    topicPathList: TopicPathList | null;
     questionText: QuestionText;
     hasEditLaterTag: boolean;
     questionContext: string[];

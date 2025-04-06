@@ -142,9 +142,12 @@ export default {
     NOTES: "Notes",
     NOTE: "Note",
     REVIEW_PANE_ON_STARTUP: "Montrer le module d'apprentissage des notes au démarrage",
-    TAGS_TO_REVIEW: "Tags à apprendre",
+    TAGS_TO_REVIEW: "Tags à réviser",
     TAGS_TO_REVIEW_DESC:
-        "Entrez les tags séparés par un espace ou une ligne i.e. #review #tag2 #tag3.",
+        "Entrez des tags séparés par des espaces ou des sauts de ligne, par exemple : #review #tag2 #tag3.",
+    TAGS_TO_EXCLUDE_FROM_DECKS: "Tags à exclure de la création de paquets",
+    TAGS_TO_EXCLUDE_FROM_DECKS_DESC:
+        "Entrez des tags séparés par des espaces. Les cartes avec ces tags seront toujours incluses dans la révision mais ne créeront pas de paquets séparés. Il s'agit de sous-composants, donc si vous avez #flashcards/test, entrez 'test'.",
     OPEN_RANDOM_NOTE: "Ouvrir une note à apprendre au hasard",
     OPEN_RANDOM_NOTE_DESC:
         "Si vous désactivez cette option, les notes sont triées par importance (PageRank).",

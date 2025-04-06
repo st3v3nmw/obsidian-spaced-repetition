@@ -157,6 +157,9 @@ export default {
     TAGS_TO_REVIEW: "Zu wiederholende Tags",
     TAGS_TO_REVIEW_DESC:
         "Mehrere Tags können mit Leerzeichen oder Zeilenumbrüchen getrennt angegeben werden. Bsp. #karte #tag1 #tag2.",
+    TAGS_TO_EXCLUDE_FROM_DECKS: "Von der Stapelerstellung ausgeschlossene Tags",
+    TAGS_TO_EXCLUDE_FROM_DECKS_DESC:
+        "Geben Sie Tags durch Leerzeichen getrennt ein. Karten mit diesen Tags werden weiterhin in die Überprüfung einbezogen, erstellen aber keine separaten Stapel. Dies betrifft Unterkomponenten, wenn Sie also #flashcards/test haben, geben Sie 'test' ein.",
     OPEN_RANDOM_NOTE: "Zufällige Karten wiederholen",
     OPEN_RANDOM_NOTE_DESC:
         "Wenn dies deaktiviert wird, dann werden die Notizen nach Wichtigkeit wiederholt (PageRank).",

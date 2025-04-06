@@ -143,6 +143,9 @@ export default {
     TAGS_TO_REVIEW: "Tag pro revizi",
     TAGS_TO_REVIEW_DESC:
         "Zadejte tagy oddělené mezerami nebo odřádkováním například #review #tag2 #tag3.",
+    TAGS_TO_EXCLUDE_FROM_DECKS: "Tagy vyloučené z vytváření balíčků",
+    TAGS_TO_EXCLUDE_FROM_DECKS_DESC:
+        "Zadejte tagy oddělené mezerami. Karty s těmito tagy budou stále zahrnuty do revize, ale nevytvoří samostatné balíčky. Toto jsou dílčí komponenty, takže pokud máte #flashcards/test, zadejte 'test'.",
     OPEN_RANDOM_NOTE: "Otevřít náhodnou poznámku pro revizi",
     OPEN_RANDOM_NOTE_DESC: "Pokud toto vypnete, poznámky budou řazeny dle důležitosti (PageRank).",
     AUTO_NEXT_NOTE: "Otevřít automaticky další poznámku po dokončení revize",

@@ -144,6 +144,9 @@ export default {
     TAGS_TO_REVIEW: "리뷰에 사용할 태그",
     TAGS_TO_REVIEW_DESC:
         "태그를 공백 또는 빈 줄로 구분해서 입력해주세요. 예) '#review #tag2 #tag3'",
+    TAGS_TO_EXCLUDE_FROM_DECKS: "덱 생성에서 제외할 태그",
+    TAGS_TO_EXCLUDE_FROM_DECKS_DESC:
+        "태그를 공백으로 구분해서 입력해주세요. 이 태그가 있는 카드는 여전히 리뷰에 포함되지만 별도의 덱을 생성하지 않습니다. 이것은 하위 컴포넌트로, 예를 들어 #flashcards/test가 있다면 'test'를 입력하세요.",
     OPEN_RANDOM_NOTE: "리뷰를 위해 랜덤 노트를 엽니다.",
     OPEN_RANDOM_NOTE_DESC: "이 옵션이 꺼져있으면, 노트는 중요도(페이지 랭크)에 따라 정렬됩니다.",
     AUTO_NEXT_NOTE: "리뷰 후에 다음 노트를 자동으로 엽니다.",

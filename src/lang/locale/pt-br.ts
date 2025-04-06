@@ -146,6 +146,9 @@ export default {
     TAGS_TO_REVIEW: "Etiquetas para revisar",
     TAGS_TO_REVIEW_DESC:
         "Insira etiquetas separadas por espaços ou quebra de linhas ex: #revisar #etiqueta2 #etiqueta3.",
+    TAGS_TO_EXCLUDE_FROM_DECKS: "Etiquetas para excluir da criação de baralhos",
+    TAGS_TO_EXCLUDE_FROM_DECKS_DESC:
+        "Insira etiquetas separadas por espaços. Cartas com essas etiquetas ainda serão incluídas na revisão mas não criarão baralhos separados. Isto refere-se a subcomponentes, então se você tiver #flashcards/teste então insira 'teste'.",
     OPEN_RANDOM_NOTE: "Abrir uma nota aleatória para revisar",
     OPEN_RANDOM_NOTE_DESC:
         "Quando você desabilitar isso, as notas vão ser ordenadas por importância (PageRank).",

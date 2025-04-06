@@ -144,6 +144,9 @@ export default {
     TAGS_TO_REVIEW: "Gözden geçirilecek etiketler",
     TAGS_TO_REVIEW_DESC:
         "Etiketleri boşluklar veya yeni satırlarla ayırarak girin, örneğin: #review #tag2 #tag3.",
+    TAGS_TO_EXCLUDE_FROM_DECKS: "Deste oluşturmada hariç tutulacak etiketler",
+    TAGS_TO_EXCLUDE_FROM_DECKS_DESC:
+        "Etiketleri boşluklarla ayırarak girin. Bu etiketlere sahip kartlar yine de incelemeye dahil edilecek ancak ayrı desteler oluşturmayacaktır. Bu alt bileşenlerdir, örneğin #flashcards/test etiketiniz varsa, 'test' girişi yapın.",
     OPEN_RANDOM_NOTE: "Gözden geçirmek için rastgele bir not aç",
     OPEN_RANDOM_NOTE_DESC: "Bunu kapattığınızda, notlar önem sırasına göre sıralanır (PageRank).",
     AUTO_NEXT_NOTE: "Bir incelemeden sonra otomatik olarak bir sonraki notu aç",
