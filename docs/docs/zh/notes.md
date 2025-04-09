@@ -1,71 +1,81 @@
 # 笔记
 
--   笔记应当具有原子性：说清楚**一个**概念；
--   笔记之间应当高度关联；
--   先理解，后复习；
--   善用 [费曼学习法](https://fs.blog/2021/02/feynman-learning-technique/)
+!!! tip "提示"
+
+    关于如何编写和组织笔记的指南，请参见 [Spaced Repetition Guides](resources.md#notes)
 
 ## 开始使用
 
-为需要复习的笔记添加 `#review` 标签。你可以在插件设置中修改此默认标签（也可以使用多个标签）
+为需复习的 Markdown 笔记添加 `note review` 标签（默认值是`#review`）
 
-## 新笔记
+该笔记会出现在右侧边栏 `笔记复习序列` 的 `#review` 标签下。
 
-新笔记将展示在右栏的 `新` （复习序列）中，如图：
+!!! note "注意"
 
-<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/docs/media/en/new_notes.png" />
+    添加 `#review` 标签的笔记不会立即出现在笔记复习序列中。<br>
+    您需要点击 `复习卡片按钮` 或 `Spaced Repitition 状态栏` 以更新队列。
+
+## 笔记复习序列
+
+![笔记复习序列](https://github.com/user-attachments/assets/c0e1d09c-610f-4775-b532-ab78369b117a)
+
+!!! note "注意"
+
+    1. 笔记复习序列 <br/>
+    2. `#review`标签下的卡组预览 <br/>
+    3. 新笔记，即新增`#review`标签但尚未复习的笔记 <br/>
+    4. 计划于 8 月 1 日复习的笔记 <br/>
+    5. 计划于 8 月 31 日复习的笔记 <br/>
+
+### 显示笔记复习序列
+
+默认情况下，插件启动时会自动显示笔记复习序列（可在[设置](user-options.md#note-settings)中修改 `启动时开启复习笔记窗格`）
+
+您也可以运行 `Open Notes Review Queue in sidebar`
+[快捷指令](plugin-commands.md) 以显示复习序列。
 
 ## 复习
 
-打开笔记即可复习。在菜单中选择 `复习: 简单`，`复习: 记得` 或 `复习: 较难`。 选择 `简单`，`记得` 还是 `较难` 取决于你对复习材料的理解程度。
+打开笔记，阅读并复习。完成后，根据您对笔记的理解程度，在菜单（三点图标）中选择 “复习：简单”，“复习：记得” 或 “复习：较难”。
 
-<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/docs/media/en/more_options.png" />
+![三点菜单](https://github.com/user-attachments/assets/5f37ab88-30f9-477d-b39c-eb86ba15abdb)
 
-在文件上右击可以调出相同选项：
+也可在 笔记复习序列 中右键笔记调出相同选项。
 
-<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/docs/media/en/file_context_menu.png" />
+![笔记复习序列](https://github.com/user-attachments/assets/d4affa19-5126-45f8-bf3c-0079d2a8a597)
 
-笔记将被添加到复习队列中：
+随后，笔记会根据 [学习算法](algorithms.md) 自动安排复习计划，并更新状态:
 
-<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/docs/media/en/scheduled.png" />
+![笔记头部标签](https://github.com/user-attachments/assets/b9744f50-c897-46ad-ab34-1bbc55796b57)
 
-### 快速复习
+### 快捷键
 
-我们提供快速进入复习模式的命令。你可以在 `设置 -> 快捷键` 中定制快捷键。这可以使您直接开始复习。
+您可以通过 [快捷指令](plugin-commands.md) 选择 `记得`，`简单`和`较难`。
 
-### 复习设置
+虽然这不如上述方法便捷，但您可在`设置 -> 快捷键`中为其自定义快捷键。
 
-可供定制的选项包括：
+### 选择笔记以复习
 
--   随机打开笔记或按照优先级排序
--   在复习完成后是否自动打开下一个笔记
+您可以通过如下方式选择笔记以复习:
 
-## 复习计划
+- 使用 Obsidian 标准功能打开笔记
+- 在 笔记复习序列 中双击笔记
+- 点击窗口右下角的 `Spaced Repetition 状态栏`
+- 快捷指令 [打开一个笔记开始复习](plugin-commands.md)
 
-位于状态栏底部的 `复习: N 卡片已到期` 显示您今天需要复习的卡片数目（今日卡片 + 逾期卡片）。点击可打开一张卡片开始复习。
+相关选项还包括:
 
-您也可以使用 `打开一个笔记开始复习` 命令。
+- [随机打开一个笔记复习](user-options.md)
+- [复习后自动打开下一个笔记](user-options.md)
 
-## 复习序列
+## 多个复习卡组
 
--   每日复习条目将按照优先级排序 (PageRank)
+默认使用标签为 `#review` 的唯一卡组。
 
-## 渐进式写作
+您可在 [设置](user-options.md#note-settings) 中修改默认标签，并添加更多复习卡组。
 
-阅读 `@aviskase` 的 [介绍](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/15)
+## Spaced Repetition 状态栏
 
-视频资源：
+窗口右下角状态栏的 `复习：N 笔记` 显示今日需复习的笔记数量(今日笔记+逾期笔记)。
 
--   英文： [Obsidian: inbox review with spaced repetition](https://youtu.be/zG5r7QIY_TM)
--   俄文： [Yuliya Bagriy - Разгребатель инбокса заметок как у Andy Matuschak в Obsidian](https://www.youtube.com/watch?v=CF6SSHB74cs)
-
-### 概要
-
-Andy Matuschak 在 [写作素材库中引入间隔重复系统](https://notes.andymatuschak.org/z7iCjRziX6V6unNWL81yc2dJicpRw2Cpp9MfQ).
-
-简而言之，可以进行四种操作 (此处 `x < y`):
-
--   跳过笔记 (增加 `x` 天的复习间隔) == 标记为 `记得`
--   已阅，觉得有用 (降低复习间隔) == 标记为 `较难`
--   已阅，觉得没用 (增加 `y` 天的复习间隔) == 标记为 `简单`
--   转换为 evergreen 笔记 （中止使用间隔重复系统）
+点击 状态栏 可打开一个笔记开始复习。
