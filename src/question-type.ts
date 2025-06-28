@@ -2,7 +2,7 @@ import { ClozeCrafter, IClozeFormatter } from "clozecraft";
 
 import { CardType } from "src/question";
 import { SRSettings } from "src/settings";
-import { escapeRegexString, findLineIndexOfSearchStringIgnoringWs } from "src/utils/strings";
+import { findLineIndexOfSearchStringIgnoringWs } from "src/utils/strings";
 
 export class CardFrontBack {
     front: string;
@@ -105,25 +105,21 @@ class QuestionTypeCloze implements IQuestionTypeHandler {
             back = clozeNote.getCardBack(i, clozeFormatter);
             result.push(new CardFrontBack(front, back));
         }
-
         return result;
     }
 }
 
 class CalloutType implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
-        // We don't need to worry about "\r\n", as multi line questions processed by parse() concatenates lines explicitly with "\n"
         const questionLines = questionText.split("\n");
-        const marker = escapeRegexString(settings.calloutCardMarker);
-        // match any line that start with the `settings.calloutCardMarker`
-        // as well as any one directly following '+' or '-' if found
-        // => matches everything until question itself
-        const regex = new RegExp(`^${marker}[+-]?`, "i");
+        // assume the line is supposed to become a flashcard and thus has a valid `calloutCardMarker`
+        // then deleting everything in the `[]` brackets suffices to delete the marker
+        const regex = new RegExp("^>\\[.*?\\][+-]?", "i");
         // question is always in the first line
         const side1: string = questionLines[0].replace(regex, "").trim();
         const side2 = questionLines
             .slice(1)
-            // remove first leven of `calloutLineMarker`
+            // remove first level of `calloutLineMarker`
             .map((line) => line.replace(settings.calloutLineMarker, ""))
             .join("\n")
             .trim();
