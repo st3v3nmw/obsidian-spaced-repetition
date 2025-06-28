@@ -112,7 +112,6 @@ export class NoteQuestionParser {
         const parsedQuestionInfoList: ParsedQuestionInfo[] = this.parseQuestions();
         for (const parsedQuestionInfo of parsedQuestionInfoList) {
             const question: Question = this.createQuestionObject(parsedQuestionInfo, textDirection);
-            console.log("Question: \n\t" + question.questionText + "\n\t" + question.questionType);
 
             // Each rawCardText can turn into multiple CardFrontBack's (e.g. CardType.Cloze, CardType.SingleLineReversed)
             const cardFrontBackList: CardFrontBack[] = CardFrontBackUtil.expand(

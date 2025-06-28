@@ -127,7 +127,6 @@ class CalloutType implements IQuestionTypeHandler {
             .map((line) => line.replace(settings.calloutLineMarker, ""))
             .join("\n")
             .trim();
-        console.log("Callout Card converted: \n\tFront: " + side1 + "\n\tBack: " + side2);
 
         const result: CardFrontBack[] = [new CardFrontBack(side1, side2)];
         return result;
