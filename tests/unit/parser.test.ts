@@ -738,7 +738,20 @@ test("Test parsing of callout cards", () => {
     expect(
         parseT("#flashcards/tag-on-previous-line\n>[!Question] Question\n>Answer", parserOptions),
     ).toEqual([[CardType.Callout, ">[!Question] Question\n>Answer", 1, 2]]);
-    // custom symbols
+    // Mutli Symbols
+    expect(
+        parseT(">[!Definition] Question\n>Answer line 1\n>Answer line 2", parserOptions),
+    ).toEqual([[CardType.Callout, ">[!Question] Question\n>Answer line 1\n>Answer line 2", 0, 2]]);
+    expect(
+        parseT(
+            ">[!Definition] Question\n>Answer line 1\n>Answer line 2\n\n>[!Question] Question\n>Answer line 1\n>Answer line 2\n",
+            parserOptions,
+        ),
+    ).toEqual([
+        [CardType.Callout, ">[!Definition] Question\n>Answer line 1\n>Answer line 2", 0, 2],
+        [CardType.Callout, ">[!Question] Question\n>Answer line 1\n>Answer line 2", 2, 4],
+    ]);
+    // Custom symbols
     expect(
         parseT(">[!Custom] Question\n>Answer line 1\n>Answer line 2\n\n", {
             singleLineCardSeparator: "::",
@@ -753,7 +766,7 @@ test("Test parsing of callout cards", () => {
     ).toEqual([[CardType.Callout, ">[!Custom] Question\n>Answer line 1\n>Answer line 2", 0, 2]]);
     expect(
         parseT(
-            ">[!Multi] Question 1\n>Answer line 1\n>Answer line 2\n\n\n>[!Multi] Question 2\n>Answer line 1\n>Answer line 2\n\nirrelavant",
+            ">[!Card] Question 1\n>Answer line 1\n>Answer line 2\n\n\n>[!Multi] Question 2\n>Answer line 1\n>Answer line 2\n\nirrelavant",
             {
                 singleLineCardSeparator: "::",
                 singleLineReversedCardSeparator: ":::",
@@ -761,13 +774,13 @@ test("Test parsing of callout cards", () => {
                 multilineReversedCardSeparator: "??",
                 multilineCardEndMarker: "---",
                 calloutLineMarker: ">",
-                calloutCardMarker: [">[!Multi]"],
+                calloutCardMarker: [">[!Card]"],
                 clozePatterns: ["**[123;;]answer[;;hint]**"],
             },
         ),
     ).toEqual([
-        [CardType.Callout, ">[!Multi] Question 1\n>Answer line 1\n>Answer line 2", 0, 2],
-        [CardType.Callout, ">[!Multi] Question 2\n>Answer line 1\n>Answer line 2", 5, 7],
+        [CardType.Callout, ">[!Card] Question 1\n>Answer line 1\n>Answer line 2", 0, 2],
+        [CardType.Callout, ">[!Card] Question 2\n>Answer line 1\n>Answer line 2", 5, 7],
     ]);
     // empty string or whitespace character provided
     expect(

@@ -84,7 +84,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     multilineCardSeparator: "?",
     multilineReversedCardSeparator: "??",
     multilineCardEndMarker: "",
-    calloutCardMarker: [">[!Question]", ">[!Definition]"],
+    calloutCardMarker: [">[!Question]", ">[!Definition]", ">[!Card]"],
     calloutLineMarker: ">",
     editLaterTag: "#edit-later",
 
