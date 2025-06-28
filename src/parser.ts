@@ -28,6 +28,9 @@ export class ParsedQuestionInfo {
     lastLineNum: number;
 
     constructor(cardType: CardType, text: string, firstLineNum: number, lastLineNum: number) {
+        console.log(
+            "New Card(" + cardType + "):\n\t" + text + "\n\t" + firstLineNum + " -> " + lastLineNum,
+        );
         this.cardType = cardType;
         this.text = text;
         this.firstLineNum = firstLineNum;
@@ -119,11 +122,12 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
         if (
             // We've probably reached the end of a card
             (isEmptyLine && !options.multilineCardEndMarker) ||
-            // Empty line & we're not picking up any card
-            (isEmptyLine && cardType == null) ||
+            // Empty line AND (we're not picking up any card OR callout is done)
+            (isEmptyLine && (cardType == null || cardType == CardType.Callout)) ||
             // We've reached the end of a multi line card &
             //  we're using custom end markers
             hasMultilineCardEndMarker
+            // || (cardType == CardType.Callout && !currentTrimmed.startsWith(options.calloutLineMarker))
         ) {
             if (cardType) {
                 // Create a new card
@@ -194,8 +198,12 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
             cardType = CardType.Cloze;
         } else if (
             cardType === null &&
+            options.calloutCardMarker &&
             currentLine.trim().toLowerCase().startsWith(options.calloutCardMarker.toLowerCase())
         ) {
+            const split = cardText.split("\n");
+            cardText = split[split.length - 1];
+            firstLineNo += split.length - 1;
             cardType = CardType.Callout;
         }
     }

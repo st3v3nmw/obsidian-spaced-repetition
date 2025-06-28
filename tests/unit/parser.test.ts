@@ -673,6 +673,117 @@ test("Test parsing of cloze cards", () => {
     ).toEqual([]);
 });
 
+test("Test parsing of callout cards", () => {
+    // standard symbols
+    expect(parseT(">[!Question] Question\n>Answer", parserOptions)).toEqual([
+        [CardType.Callout, ">[!Question] Question\n>Answer", 0, 1],
+    ]);
+    expect(parseT(">[!Question] Question\n>\n>Answer", parserOptions)).toEqual([
+        [CardType.Callout, ">[!Question] Question\n>\n>Answer", 0, 2],
+    ]);
+    expect(parseT(">[!Question] Question\n>Answer 1\n>Answer2", parserOptions)).toEqual([
+        [CardType.Callout, ">[!Question] Question\n>Answer 1\n>Answer2", 0, 2],
+    ]);
+    expect(parseT(">[!Question] Question\n>Answer 1\n>Answer2\n\n\n\n", parserOptions)).toEqual([
+        [CardType.Callout, ">[!Question] Question\n>Answer 1\n>Answer2", 0, 2],
+    ]);
+    expect(
+        parseT(">[!Question] Question\n>Answer <!--SR:!2021-08-11,4,270-->", parserOptions),
+    ).toEqual([
+        [CardType.Callout, ">[!Question] Question\n>Answer <!--SR:!2021-08-11,4,270-->", 0, 1],
+    ]);
+    expect(
+        parseT(">[!Question] Question\n>\n>Answer <!--SR:!2021-08-11,4,270-->", parserOptions),
+    ).toEqual([
+        [CardType.Callout, ">[!Question] Question\n>\n>Answer <!--SR:!2021-08-11,4,270-->", 0, 2],
+    ]);
+    expect(
+        parseT(
+            ">[!Question] Question\n>Answer 1\n>Answer2 <!--SR:!2021-08-11,4,270-->",
+            parserOptions,
+        ),
+    ).toEqual([
+        [
+            CardType.Callout,
+            ">[!Question] Question\n>Answer 1\n>Answer2 <!--SR:!2021-08-11,4,270-->",
+            0,
+            2,
+        ],
+    ]);
+    expect(
+        parseT(
+            ">[!Question] Question\n>Answer 1\n>Answer2\n<!--SR:!2021-08-11,4,270-->",
+            parserOptions,
+        ),
+    ).toEqual([
+        [
+            CardType.Callout,
+            ">[!Question] Question\n>Answer 1\n>Answer2\n<!--SR:!2021-08-11,4,270-->",
+            0,
+            3,
+        ],
+    ]);
+    expect(parseT(">[!Question] Question\n>Answer line 1\n>Answer line 2", parserOptions)).toEqual([
+        [CardType.Callout, ">[!Question] Question\n>Answer line 1\n>Answer line 2", 0, 2],
+    ]);
+    expect(
+        parseT(
+            "#Title\n\nLine0\n>[!Question] Q1\n>A1\n>AnswerExtra\n\n>[!Question] Q2\n>A2",
+            parserOptions,
+        ),
+    ).toEqual([
+        [CardType.Callout, ">[!Question] Q1\n>A1\n>AnswerExtra", 3, 5],
+        [CardType.Callout, ">[!Question] Q2\n>A2", 7, 8],
+    ]);
+    expect(
+        parseT("#flashcards/tag-on-previous-line\n>[!Question] Question\n>Answer", parserOptions),
+    ).toEqual([[CardType.Callout, ">[!Question] Question\n>Answer", 1, 2]]);
+    // custom symbols
+    expect(
+        parseT(">[!Custom] Question\n>Answer line 1\n>Answer line 2\n\n", {
+            singleLineCardSeparator: "::",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: ">[!Custom]",
+            clozePatterns: ["**[123;;]answer[;;hint]**"],
+        }),
+    ).toEqual([[CardType.Callout, ">[!Custom] Question\n>Answer line 1\n>Answer line 2", 0, 2]]);
+    expect(
+        parseT(
+            ">[!Multi] Question 1\n>Answer line 1\n>Answer line 2\n\n\n>[!Multi] Question 2\n>Answer line 1\n>Answer line 2\n\nirrelavant",
+            {
+                singleLineCardSeparator: "::",
+                singleLineReversedCardSeparator: ":::",
+                multilineCardSeparator: "?",
+                multilineReversedCardSeparator: "??",
+                multilineCardEndMarker: "---",
+                calloutLineMarker: ">",
+                calloutCardMarker: ">[!Multi]",
+                clozePatterns: ["**[123;;]answer[;;hint]**"],
+            },
+        ),
+    ).toEqual([
+        [CardType.Callout, ">[!Multi] Question 1\n>Answer line 1\n>Answer line 2", 0, 2],
+        [CardType.Callout, ">[!Multi] Question 2\n>Answer line 1\n>Answer line 2", 5, 7],
+    ]);
+    // empty string or whitespace character provided
+    expect(
+        parseT(">[!Question] Question\n>Answer", {
+            singleLineCardSeparator: "::",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: "",
+            clozePatterns: [],
+        }),
+    ).toEqual([]);
+});
+
 test("Test parsing of a mix of card types", () => {
     expect(
         parseT(
