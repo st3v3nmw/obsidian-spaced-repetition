@@ -107,6 +107,15 @@ export default {
         "Deveria estar configurado em 100% em dispositivos móveis ou se você tem imagens muito grandes",
     RESET_DEFAULT: "Reiniciar para a pré-definição",
     CARD_MODAL_WIDTH_PERCENT: "Porcentagem de Largura do Flashcard",
+    SCROLL_TO_CLOZE_AUTO: "Auto-scroll to cloze",
+    SCROLL_TO_CLOZE_AUTO_DESC:
+        "Automatically scroll the hidden cloze deletion (e.g., [...]) into view when the card is shown.",
+    SCROLL_BEHAVIOR: "Scroll behavior",
+    SCROLL_BEHAVIOR_DESC:
+        "Choose how the card scrolls to the hidden cloze — instantly or smoothly with animation.",
+    SCROLL_BLOCK: "Scroll position",
+    SCROLL_BLOCK_DESC:
+        "Define where the hidden cloze will appear in the view after scrolling — top, center, bottom, or nearest visible.",
     RANDOMIZE_CARD_ORDER: "Aleatorizar a ordem das cartas durante a revisão?",
     REVIEW_CARD_ORDER_WITHIN_DECK: "Order cards in a deck are displayed during review",
     REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL: "Sequentially within a deck (All new cards first)",

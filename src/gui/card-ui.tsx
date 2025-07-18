@@ -183,6 +183,22 @@ export class CardUI {
 
     // #region -> Functions & helpers
 
+    // Scroll the asking/answer into view for long context.
+    private _scrollClozeIntoView(showAnswer: boolean): void {
+        if (!this.settings.scrollToCloze) {
+            return;
+        }
+        const el = this.content.querySelector(".cloze") as HTMLElement;
+        if (el) {
+            requestAnimationFrame(() => {
+                el.scrollIntoView({
+                    behavior: showAnswer ? "auto" : this.settings.scrollBehavior,
+                    block: this.settings.scrollBlock,
+                });
+            });
+        }
+    }
+
     private async _drawContent() {
         this.resetButton.disabled = true;
 
@@ -212,8 +228,7 @@ export class CardUI {
             this.content,
             this._currentQuestion.questionText.textDirection,
         );
-        // Set scroll position back to top
-        this.content.scrollTop = 0;
+        this._scrollClozeIntoView(false);
 
         // Update response buttons
         this._resetResponseButtons();
@@ -556,7 +571,7 @@ export class CardUI {
         }
     }
 
-    private _showAnswer(): void {
+    private async _showAnswer() {
         const timeNow = now();
         if (
             this.lastPressed &&
@@ -583,11 +598,12 @@ export class CardUI {
             this.plugin,
             this._currentNote.filePath,
         );
-        wrapper.renderMarkdownWrapper(
+        await wrapper.renderMarkdownWrapper(
             this._currentCard.back,
             this.content,
             this._currentQuestion.questionText.textDirection,
         );
+        this._scrollClozeIntoView(true);
 
         // Show response buttons
         this.answerButton.addClass("sr-is-hidden");
