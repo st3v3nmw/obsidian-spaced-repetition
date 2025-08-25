@@ -1,6 +1,7 @@
 import { Moment } from "moment";
 import moment from "moment";
 
+import { Algorithm } from "src/algorithms/base/isrs-algorithm";
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { Card } from "src/card";
@@ -32,15 +33,22 @@ export class DataStoreInNoteAlgorithmOsr implements IDataStoreAlgorithm {
         let result: RepItemScheduleInfo = null;
         const frontmatter: Map<string, string> = await note.getFrontmatter();
 
-        if (
-            frontmatter &&
-            frontmatter.has("sr-due") &&
-            frontmatter.has("sr-interval") &&
-            frontmatter.has("sr-ease")
-        ) {
+        if (frontmatter && frontmatter.has("sr-due")) {
             const dueDate: Moment = moment(frontmatter.get("sr-due"), ALLOWED_DATE_FORMATS);
-            const interval: number = parseFloat(frontmatter.get("sr-interval"));
-            const ease: number = parseFloat(frontmatter.get("sr-ease"));
+
+            // For Custom Intervals, interval might not be stored, so use a default value
+            // The actual interval will be determined by the algorithm when scheduling
+            let interval: number = 1; // Default interval
+            if (frontmatter.has("sr-interval")) {
+                interval = parseFloat(frontmatter.get("sr-interval"));
+            }
+
+            // For Custom Intervals, ease might not be stored, so use default value
+            let ease: number = 250; // Default ease
+            if (frontmatter.has("sr-ease")) {
+                ease = parseFloat(frontmatter.get("sr-ease"));
+            }
+
             result = new RepItemScheduleInfoOsr(dueDate, interval, ease);
         }
         return result;
@@ -54,13 +62,18 @@ export class DataStoreInNoteAlgorithmOsr implements IDataStoreAlgorithm {
         const interval: number = schedInfo.interval;
         const ease: number = schedInfo.latestEase;
 
+        // Determine what to include based on algorithm
+        const includeSM2Data = this.settings.algorithm === Algorithm.SM_2_OSR;
+        const intervalString = includeSM2Data ? `sr-interval: ${interval}\n` : "";
+        const easeString = includeSM2Data ? `sr-ease: ${ease}\n` : "";
+
         // check if scheduling info exists
         if (SCHEDULING_INFO_REGEX.test(fileText)) {
             const schedulingInfo = SCHEDULING_INFO_REGEX.exec(fileText);
             fileText = fileText.replace(
                 SCHEDULING_INFO_REGEX,
                 `---\n${schedulingInfo[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
+                    `${intervalString}${easeString}` +
                     `${schedulingInfo[5]}---`,
             );
         } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
@@ -69,12 +82,11 @@ export class DataStoreInNoteAlgorithmOsr implements IDataStoreAlgorithm {
             fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
                 `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n---`,
+                    `${intervalString}${easeString}---`,
             );
         } else {
             fileText =
-                `---\nsr-due: ${dueString}\nsr-interval: ${interval}\n` +
-                `sr-ease: ${ease}\n---\n\n${fileText}`;
+                `---\nsr-due: ${dueString}\n` + `${intervalString}${easeString}---\n\n${fileText}`;
         }
 
         await note.write(fileText);
