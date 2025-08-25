@@ -848,8 +848,6 @@ export class SRSettingTab extends PluginSettingTab {
 
         // Custom interval settings (only show when Custom Intervals algorithm is selected)
         if (this.plugin.data.settings.algorithm === "Custom-Intervals") {
-            containerEl.createEl("h3", { text: t("CUSTOM_INTERVALS") });
-
             new Setting(containerEl)
                 .setName(t("CUSTOM_INTERVAL_EASY"))
                 .setDesc(t("CUSTOM_INTERVAL_EASY_DESC"))
@@ -941,177 +939,187 @@ export class SRSettingTab extends PluginSettingTab {
                 });
         }
 
-        new Setting(containerEl)
-            .setName(t("BASE_EASE"))
-            .setDesc(t("BASE_EASE_DESC"))
-            .addText((text) =>
-                text.setValue(this.plugin.data.settings.baseEase.toString()).onChange((value) => {
-                    applySettingsUpdate(async () => {
-                        const numValue: number = Number.parseInt(value);
-                        if (!isNaN(numValue)) {
-                            if (numValue < 130) {
-                                new Notice(t("BASE_EASE_MIN_WARNING"));
-                                text.setValue(this.plugin.data.settings.baseEase.toString());
-                                return;
-                            }
+        // SM-2 OSR specific settings (only show when SM-2 OSR algorithm is selected)
+        if (this.plugin.data.settings.algorithm === "SM-2-OSR") {
+            new Setting(containerEl)
+                .setName(t("BASE_EASE"))
+                .setDesc(t("BASE_EASE_DESC"))
+                .addText((text) =>
+                    text
+                        .setValue(this.plugin.data.settings.baseEase.toString())
+                        .onChange((value) => {
+                            applySettingsUpdate(async () => {
+                                const numValue: number = Number.parseInt(value);
+                                if (!isNaN(numValue)) {
+                                    if (numValue < 130) {
+                                        new Notice(t("BASE_EASE_MIN_WARNING"));
+                                        text.setValue(
+                                            this.plugin.data.settings.baseEase.toString(),
+                                        );
+                                        return;
+                                    }
 
-                            this.plugin.data.settings.baseEase = numValue;
+                                    this.plugin.data.settings.baseEase = numValue;
+                                    await this.plugin.savePluginData();
+                                } else {
+                                    new Notice(t("VALID_NUMBER_WARNING"));
+                                }
+                            });
+                        }),
+                )
+                .addExtraButton((button) => {
+                    button
+                        .setIcon("reset")
+                        .setTooltip(t("RESET_DEFAULT"))
+                        .onClick(async () => {
+                            this.plugin.data.settings.baseEase = DEFAULT_SETTINGS.baseEase;
                             await this.plugin.savePluginData();
-                        } else {
-                            new Notice(t("VALID_NUMBER_WARNING"));
-                        }
-                    });
-                }),
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.plugin.data.settings.baseEase = DEFAULT_SETTINGS.baseEase;
-                        await this.plugin.savePluginData();
 
-                        this.display();
-                    });
-            });
-
-        new Setting(containerEl)
-            .setName(t("LAPSE_INTERVAL_CHANGE"))
-            .setDesc(t("LAPSE_INTERVAL_CHANGE_DESC"))
-            .addSlider((slider) =>
-                slider
-                    .setLimits(1, 99, 1)
-                    .setValue(this.plugin.data.settings.lapsesIntervalChange * 100)
-                    .setDynamicTooltip()
-                    .onChange(async (value: number) => {
-                        this.plugin.data.settings.lapsesIntervalChange = value / 100;
-                        await this.plugin.savePluginData();
-                    }),
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.plugin.data.settings.lapsesIntervalChange =
-                            DEFAULT_SETTINGS.lapsesIntervalChange;
-                        await this.plugin.savePluginData();
-
-                        this.display();
-                    });
-            });
-
-        new Setting(containerEl)
-            .setName(t("EASY_BONUS"))
-            .setDesc(t("EASY_BONUS_DESC"))
-            .addText((text) =>
-                text
-                    .setValue((this.plugin.data.settings.easyBonus * 100).toString())
-                    .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            const numValue: number = Number.parseInt(value) / 100;
-                            if (!isNaN(numValue)) {
-                                if (numValue < 1.0) {
-                                    new Notice(t("EASY_BONUS_MIN_WARNING"));
-                                    text.setValue(
-                                        (this.plugin.data.settings.easyBonus * 100).toString(),
-                                    );
-                                    return;
-                                }
-
-                                this.plugin.data.settings.easyBonus = numValue;
-                                await this.plugin.savePluginData();
-                            } else {
-                                new Notice(t("VALID_NUMBER_WARNING"));
-                            }
+                            this.display();
                         });
-                    }),
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.plugin.data.settings.easyBonus = DEFAULT_SETTINGS.easyBonus;
-                        await this.plugin.savePluginData();
+                });
 
-                        this.display();
-                    });
-            });
+            new Setting(containerEl)
+                .setName(t("LAPSE_INTERVAL_CHANGE"))
+                .setDesc(t("LAPSE_INTERVAL_CHANGE_DESC"))
+                .addSlider((slider) =>
+                    slider
+                        .setLimits(1, 99, 1)
+                        .setValue(this.plugin.data.settings.lapsesIntervalChange * 100)
+                        .setDynamicTooltip()
+                        .onChange(async (value: number) => {
+                            this.plugin.data.settings.lapsesIntervalChange = value / 100;
+                            await this.plugin.savePluginData();
+                        }),
+                )
+                .addExtraButton((button) => {
+                    button
+                        .setIcon("reset")
+                        .setTooltip(t("RESET_DEFAULT"))
+                        .onClick(async () => {
+                            this.plugin.data.settings.lapsesIntervalChange =
+                                DEFAULT_SETTINGS.lapsesIntervalChange;
+                            await this.plugin.savePluginData();
 
-        new Setting(containerEl)
-            .setName(t("LOAD_BALANCE"))
-            .setDesc(t("LOAD_BALANCE_DESC"))
-            .addToggle((toggle) =>
-                toggle.setValue(this.plugin.data.settings.loadBalance).onChange(async (value) => {
-                    this.plugin.data.settings.loadBalance = value;
-                    await this.plugin.savePluginData();
-                }),
-            );
-
-        new Setting(containerEl)
-            .setName(t("MAX_INTERVAL"))
-            .setDesc(t("MAX_INTERVAL_DESC"))
-            .addText((text) =>
-                text
-                    .setValue(this.plugin.data.settings.maximumInterval.toString())
-                    .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            const numValue: number = Number.parseInt(value);
-                            if (!isNaN(numValue)) {
-                                if (numValue < 1) {
-                                    new Notice(t("MAX_INTERVAL_MIN_WARNING"));
-                                    text.setValue(
-                                        this.plugin.data.settings.maximumInterval.toString(),
-                                    );
-                                    return;
-                                }
-
-                                this.plugin.data.settings.maximumInterval = numValue;
-                                await this.plugin.savePluginData();
-                            } else {
-                                new Notice(t("VALID_NUMBER_WARNING"));
-                            }
+                            this.display();
                         });
-                    }),
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.plugin.data.settings.maximumInterval =
-                            DEFAULT_SETTINGS.maximumInterval;
-                        await this.plugin.savePluginData();
+                });
 
-                        this.display();
-                    });
-            });
+            new Setting(containerEl)
+                .setName(t("EASY_BONUS"))
+                .setDesc(t("EASY_BONUS_DESC"))
+                .addText((text) =>
+                    text
+                        .setValue((this.plugin.data.settings.easyBonus * 100).toString())
+                        .onChange((value) => {
+                            applySettingsUpdate(async () => {
+                                const numValue: number = Number.parseInt(value) / 100;
+                                if (!isNaN(numValue)) {
+                                    if (numValue < 1.0) {
+                                        new Notice(t("EASY_BONUS_MIN_WARNING"));
+                                        text.setValue(
+                                            (this.plugin.data.settings.easyBonus * 100).toString(),
+                                        );
+                                        return;
+                                    }
 
-        new Setting(containerEl)
-            .setName(t("MAX_LINK_CONTRIB"))
-            .setDesc(t("MAX_LINK_CONTRIB_DESC"))
-            .addSlider((slider) =>
-                slider
-                    .setLimits(0, 100, 1)
-                    .setValue(this.plugin.data.settings.maxLinkFactor * 100)
-                    .setDynamicTooltip()
-                    .onChange(async (value: number) => {
-                        this.plugin.data.settings.maxLinkFactor = value / 100;
-                        await this.plugin.savePluginData();
-                    }),
-            )
-            .addExtraButton((button) => {
-                button
-                    .setIcon("reset")
-                    .setTooltip(t("RESET_DEFAULT"))
-                    .onClick(async () => {
-                        this.plugin.data.settings.maxLinkFactor = DEFAULT_SETTINGS.maxLinkFactor;
-                        await this.plugin.savePluginData();
+                                    this.plugin.data.settings.easyBonus = numValue;
+                                    await this.plugin.savePluginData();
+                                } else {
+                                    new Notice(t("VALID_NUMBER_WARNING"));
+                                }
+                            });
+                        }),
+                )
+                .addExtraButton((button) => {
+                    button
+                        .setIcon("reset")
+                        .setTooltip(t("RESET_DEFAULT"))
+                        .onClick(async () => {
+                            this.plugin.data.settings.easyBonus = DEFAULT_SETTINGS.easyBonus;
+                            await this.plugin.savePluginData();
 
-                        this.display();
-                    });
-            });
+                            this.display();
+                        });
+                });
+
+            new Setting(containerEl)
+                .setName(t("LOAD_BALANCE"))
+                .setDesc(t("LOAD_BALANCE_DESC"))
+                .addToggle((toggle) =>
+                    toggle
+                        .setValue(this.plugin.data.settings.loadBalance)
+                        .onChange(async (value) => {
+                            this.plugin.data.settings.loadBalance = value;
+                            await this.plugin.savePluginData();
+                        }),
+                );
+
+            new Setting(containerEl)
+                .setName(t("MAX_INTERVAL"))
+                .setDesc(t("MAX_INTERVAL_DESC"))
+                .addText((text) =>
+                    text
+                        .setValue(this.plugin.data.settings.maximumInterval.toString())
+                        .onChange((value) => {
+                            applySettingsUpdate(async () => {
+                                const numValue: number = Number.parseInt(value);
+                                if (!isNaN(numValue)) {
+                                    if (numValue < 1) {
+                                        new Notice(t("MAX_INTERVAL_MIN_WARNING"));
+                                        text.setValue(
+                                            this.plugin.data.settings.maximumInterval.toString(),
+                                        );
+                                        return;
+                                    }
+
+                                    this.plugin.data.settings.maximumInterval = numValue;
+                                    await this.plugin.savePluginData();
+                                } else {
+                                    new Notice(t("VALID_NUMBER_WARNING"));
+                                }
+                            });
+                        }),
+                )
+                .addExtraButton((button) => {
+                    button
+                        .setIcon("reset")
+                        .setTooltip(t("RESET_DEFAULT"))
+                        .onClick(async () => {
+                            this.plugin.data.settings.maximumInterval =
+                                DEFAULT_SETTINGS.maximumInterval;
+                            await this.plugin.savePluginData();
+
+                            this.display();
+                        });
+                });
+
+            new Setting(containerEl)
+                .setName(t("MAX_LINK_CONTRIB"))
+                .setDesc(t("MAX_LINK_CONTRIB_DESC"))
+                .addSlider((slider) =>
+                    slider
+                        .setLimits(0, 100, 1)
+                        .setValue(this.plugin.data.settings.maxLinkFactor * 100)
+                        .setDynamicTooltip()
+                        .onChange(async (value: number) => {
+                            this.plugin.data.settings.maxLinkFactor = value / 100;
+                            await this.plugin.savePluginData();
+                        }),
+                )
+                .addExtraButton((button) => {
+                    button
+                        .setIcon("reset")
+                        .setTooltip(t("RESET_DEFAULT"))
+                        .onClick(async () => {
+                            this.plugin.data.settings.maxLinkFactor =
+                                DEFAULT_SETTINGS.maxLinkFactor;
+                            await this.plugin.savePluginData();
+
+                            this.display();
+                        });
+                });
+        }
 
         containerEl.createEl("h3", { text: t("GROUP_DATA_STORAGE") });
         new Setting(containerEl)
