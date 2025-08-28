@@ -489,7 +489,7 @@ export class CardUI {
         this.answerButton.addClasses(["sr-response-button", "sr-show-answer-button", "sr-bg-blue"]);
         this.answerButton.setText(t("SHOW_ANSWER"));
         this.answerButton.addEventListener("click", () => {
-            this._showAnswer();
+            this.nswer();
         });
     }
 
@@ -615,6 +615,13 @@ export class CardUI {
                 this.easyButton,
                 this.settings.flashcardEasyText,
                 ReviewResponse.Easy,
+            );
+        }
+        if (!this.settings.showContextInCards) {
+            this.cardContext = this.infoSection.createDiv();
+            this.cardContext.addClass("sr-context");
+            this.cardContext.setText(
+                ` ${this._formatQuestionContextText(this._currentQuestion.questionContext)}`,
             );
         }
     }
