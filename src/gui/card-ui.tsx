@@ -489,7 +489,7 @@ export class CardUI {
         this.answerButton.addClasses(["sr-response-button", "sr-show-answer-button", "sr-bg-blue"]);
         this.answerButton.setText(t("SHOW_ANSWER"));
         this.answerButton.addEventListener("click", () => {
-            this.nswer();
+            this._showAnswer();
         });
     }
 
