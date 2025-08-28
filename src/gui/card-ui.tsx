@@ -440,6 +440,7 @@ export class CardUI {
     }
 
     private _updateCardContext() {
+        if (!this.cardContext) return;
         if (!this.settings.showContextInCards) {
             this.cardContext.setText("");
             return;
