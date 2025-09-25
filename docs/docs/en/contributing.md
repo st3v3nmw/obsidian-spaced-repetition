@@ -4,28 +4,28 @@ First off, thanks for wanting to contribute to the Spaced Repetition plugin!
 
 ## Bug Reports & Feature Requests
 
--   Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/2/) for upcoming features & fixes.
--   Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug report.
--   Visit the [discussions](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/) section for Q&A help, feedback, and general discussion.
+- Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/2/) for upcoming features & fixes.
+- Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug report.
+- Visit the [discussions](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/) section for Q&A help, feedback, and general discussion.
 
 ## Translating
 
 The plugin has been translated into the following languages by the Obsidian community 😄.
 
--   Arabic / العربية
--   Chinese (Simplified) / 简体中文
--   Chinese (Traditional) / 繁體中文
--   Czech / čeština
--   French / français
--   German / Deutsch
--   Italian / Italiano
--   Korean / 한국어
--   Japanese / 日本語
--   Polish / Polski
--   Portuguese (Brazil) / Português do Brasil
--   Spanish / Español
--   Russian / русский
--   Turkish / Türkçe
+- Arabic / العربية
+- Chinese (Simplified) / 简体中文
+- Chinese (Traditional) / 繁體中文
+- Czech / čeština
+- French / français
+- German / Deutsch
+- Italian / Italiano
+- Korean / 한국어
+- Japanese / 日本語
+- Polish / Polski
+- Portuguese (Brazil) / Português do Brasil
+- Spanish / Español
+- Russian / русский
+- Turkish / Türkçe
 
 ### Steps
 
@@ -104,13 +104,13 @@ Please note that:
 
 ### UI changes
 
--   All UI changes should be made in the `src/gui/` folder.
+- All UI changes should be made in the `src/gui/` folder.
 
--   Put your changes under the right section (see "MARK:" or "#region" comments in the code).
+- Put your changes under the right section (see "MARK:" or "#region" comments in the code).
 
--   Document your functions & classes with JSDoc.
+- Document your functions & classes with JSDoc.
 
--   One can switch between mobile view and desktop view by entering the following command in developer console:
+- One can switch between mobile view and desktop view by entering the following command in developer console:
 
     ```js
     this.app.emulateMobile(false); // to switch to desktop view
@@ -118,7 +118,7 @@ Please note that:
     this.app.emulateMobile(true); // to switch to mobile view
     ```
 
--   Test your changes in all arrangements that the ui can be in:
+- Test your changes in all arrangements that the ui can be in:
     1. Desktop
     2. Mobile portrait mode
     3. Small sized mobile device
