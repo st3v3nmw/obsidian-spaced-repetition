@@ -441,13 +441,17 @@ export class CardUI {
 
     private _updateCardContext() {
         if (!this.settings.showContextInCards) {
-            this.cardContext.setText("");
+          if (this.cardContext) {
+                this.cardContext.setText("");
+            }
             return;
         }
-        this.cardContext.setText(
-            ` ${this._formatQuestionContextText(this._currentQuestion.questionContext)}`,
-        );
-    }
+       if (this.cardContext) {
+            this.cardContext.setText(
+                ` 
+${this._formatQuestionContextText(this._currentQuestion.questionContext)}`,
+            );
+        }
 
     private _formatQuestionContextText(questionContext: string[]): string {
         const separator: string = " > ";
