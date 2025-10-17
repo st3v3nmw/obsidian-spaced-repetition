@@ -85,6 +85,15 @@ export class NoteQuestionParser {
                 this.analyseTagCacheList(tagCompleteList);
             for (const question of this.questionList) {
                 question.topicPathList = this.determineQuestionTopicPathList(question);
+                if (
+                    question.topicPathList?.list.some((e) =>
+                        e.path.some((tag) => {
+                            return SettingsUtil.isExcludedFlashcardTag(this.settings, tag);
+                        }),
+                    )
+                ) {
+                    question.topicPathList = null;
+                }
             }
 
             // Now only keep questions that have a topic list

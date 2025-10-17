@@ -133,6 +133,8 @@ export default {
     REVIEW_PANE_ON_STARTUP: "启动时开启笔记复习窗格",
     TAGS_TO_REVIEW: "复习标签",
     TAGS_TO_REVIEW_DESC: "输入标签，用空格或新建行分隔，例如：#review #tag2 #tag3.",
+    TAGS_TO_EXCLUDE_FROM_DECKS: "从卡组创建中排除的标签",
+    TAGS_TO_EXCLUDE_FROM_DECKS_DESC: "输入以空格分隔的标签。带有这些标签的卡片仍将包含在复习中，但不会创建单独的卡组。这是子组件，例如，如果你有 #flashcards/test，那么输入 'test'。",
     OPEN_RANDOM_NOTE: "复习随机笔记",
     OPEN_RANDOM_NOTE_DESC: "关闭此选项，笔记将以重要度(PageRank)排序。",
     AUTO_NEXT_NOTE: "复习后自动打开下一个笔记",

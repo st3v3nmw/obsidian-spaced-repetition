@@ -146,6 +146,9 @@ export default {
     TAGS_TO_REVIEW: "レビューに使用するタグ",
     TAGS_TO_REVIEW_DESC:
         'タグをスペースまたは改行で区切って入力してください。例: "#review #tag2 #tag3"',
+    TAGS_TO_EXCLUDE_FROM_DECKS: "デッキ作成から除外するタグ",
+    TAGS_TO_EXCLUDE_FROM_DECKS_DESC:
+        "スペースで区切られたタグを入力します。これらのタグを持つカードは復習に含まれますが、個別のデッキは作成されません。これはサブコンポーネントなので、#flashcards/testがある場合は「test」と入力します。",
     OPEN_RANDOM_NOTE: "ランダムにノートを開いてレビューする",
     OPEN_RANDOM_NOTE_DESC:
         "このオプションが無効化されている状態では、ノートは重要度(ページランク)による順番で表示されます。",

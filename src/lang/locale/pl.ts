@@ -147,6 +147,9 @@ export default {
     TAGS_TO_REVIEW: "Tagi do przeglądu",
     TAGS_TO_REVIEW_DESC:
         "Wprowadź tagi oddzielone spacją lub nowymi liniami, np. #przegląd #tag2 #tag3.",
+    TAGS_TO_EXCLUDE_FROM_DECKS: "Tagi do wykluczenia z tworzenia talii",
+    TAGS_TO_EXCLUDE_FROM_DECKS_DESC:
+        "Wprowadź tagi oddzielone spacjami. Karty z tymi tagami nadal będą uwzględniane w przeglądzie, ale nie utworzą oddzielnych talii. Dotyczy to podkomponentów, więc jeśli masz #fiszki/test, wprowadź 'test'.",
     OPEN_RANDOM_NOTE: "Otwórz losową notatkę do przeglądu",
     OPEN_RANDOM_NOTE_DESC:
         "Po wyłączeniu tej opcji notatki są uporządkowane według istotności (PageRank).",

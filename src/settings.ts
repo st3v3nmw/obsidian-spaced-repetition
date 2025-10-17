@@ -4,10 +4,12 @@ import { Algorithm } from "src/algorithms/base/isrs-algorithm";
 import { DataStoreName } from "src/data-stores/base/data-store";
 import { t } from "src/lang/helpers";
 import { pathMatchesPattern } from "src/utils/fs";
+import { mapBadChars } from "src/utils/strings";
 
 export interface SRSettings {
     // flashcards
     flashcardTags: string[];
+    flashcardTagsToExclude: string[];
     convertFoldersToDecks: boolean;
     burySiblingCards: boolean;
     randomizeCardOrder: boolean;
@@ -68,6 +70,7 @@ export interface SRSettings {
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
     flashcardTags: ["#flashcards"],
+    flashcardTagsToExclude: [],
     convertFoldersToDecks: false,
     burySiblingCards: false,
     randomizeCardOrder: null,
@@ -194,5 +197,12 @@ export class SettingsUtil {
             }
         }
         return false;
+    }
+
+    static isExcludedFlashcardTag(settings: SRSettings, tag: string): boolean {
+        const res = settings.flashcardTagsToExclude.some(
+            (tagToExclude) => mapBadChars(tag) === mapBadChars(tagToExclude),
+        );
+        return res;
     }
 }
