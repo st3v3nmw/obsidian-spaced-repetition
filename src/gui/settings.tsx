@@ -6,6 +6,9 @@ import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { setDebugParser } from "src/parser";
 import { DEFAULT_SETTINGS } from "src/settings";
+import { ConfirmationModal } from "./confirmation-modal";
+import { deleteSchedulingData } from "src/delete-scheduling-data";
+
 
 // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
 let applyDebounceTimer = 0;
@@ -1039,6 +1042,23 @@ export class SRSettingTab extends PluginSettingTab {
                         this.plugin.data.settings.cardCommentOnSameLine = value;
                         await this.plugin.savePluginData();
                     }),
+            );
+
+        containerEl.createEl("h3", { text: t("DELETE_SCHEDULING_DATA") });
+        new Setting(containerEl)
+            .setName(t("DELETE_SCHEDULING_DATA"))
+            .setDesc(t("DELETE_SCHEDULING_DATA_IN_NOTES_AND_FLASHCARDS"))
+            .addButton((button) =>
+                button
+                    .setButtonText(t("DELETE"))
+                    .setClass("mod-warning")
+                    .onClick(async () => {
+                        new ConfirmationModal(this.plugin.app, 
+                            t("DELETE_SCHEDULING_DATA"), 
+                            t("CONFIRM_SCHEDULING_DATA_DELETION"), 
+                            t("SCHEDULING_DATA_HAS_BEEN_DELETED"), 
+                            deleteSchedulingData).open();
+                }),
             );
     }
 
