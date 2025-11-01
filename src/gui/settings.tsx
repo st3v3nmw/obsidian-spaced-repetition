@@ -1,14 +1,13 @@
 import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 
+import { deleteSchedulingData } from "src/delete-scheduling-data";
+import { ConfirmationModal } from "src/gui/confirmation-modal";
 import { StatisticsView } from "src/gui/statistics";
 import { createTabs, TabStructure } from "src/gui/tabs";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { setDebugParser } from "src/parser";
 import { DEFAULT_SETTINGS } from "src/settings";
-import { ConfirmationModal } from "src/gui/confirmation-modal";
-import { deleteSchedulingData } from "src/delete-scheduling-data";
-
 
 // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
 let applyDebounceTimer = 0;
@@ -1053,12 +1052,14 @@ export class SRSettingTab extends PluginSettingTab {
                     .setButtonText(t("DELETE"))
                     .setClass("mod-warning")
                     .onClick(async () => {
-                        new ConfirmationModal(this.plugin.app, 
-                            t("DELETE_SCHEDULING_DATA"), 
-                            t("CONFIRM_SCHEDULING_DATA_DELETION"), 
-                            t("SCHEDULING_DATA_HAS_BEEN_DELETED"), 
-                            deleteSchedulingData).open();
-                }),
+                        new ConfirmationModal(
+                            this.plugin.app,
+                            t("DELETE_SCHEDULING_DATA"),
+                            t("CONFIRM_SCHEDULING_DATA_DELETION"),
+                            t("SCHEDULING_DATA_HAS_BEEN_DELETED"),
+                            deleteSchedulingData,
+                        ).open();
+                    }),
             );
     }
 

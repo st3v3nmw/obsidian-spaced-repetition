@@ -195,14 +195,16 @@ export default {
     HELP: "Help",
     STORE_IN_NOTES: "In the notes",
     DELETE_SCHEDULING_DATA: "Delete Scheduling Data",
-    DELETE_SCHEDULING_DATA_IN_NOTES_AND_FLASHCARDS: "Delete scheduling data from all notes and flashcards.",
+    DELETE_SCHEDULING_DATA_IN_NOTES_AND_FLASHCARDS:
+        "Delete scheduling data from all notes and flashcards.",
     DELETE: "Delete",
     CONFIRM_SCHEDULING_DATA_DELETION:
         "Are you sure you want to delete all scheduling data from your notes and flashcards? This action cannot be undone.",
     CONFIRM: "Confirm",
-    SCHEDULING_DATA_HAS_BEEN_DELETED: "Scheduling data has been deleted from all notes and flashcards.",
-    
-// sidebar.ts
+    SCHEDULING_DATA_HAS_BEEN_DELETED:
+        "Scheduling data has been deleted from all notes and flashcards.",
+
+    // sidebar.ts
     NOTES_REVIEW_QUEUE: "Notes Review Queue",
     CLOSE: "Close",
     NEW: "New",
