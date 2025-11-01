@@ -6,7 +6,7 @@ import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { setDebugParser } from "src/parser";
 import { DEFAULT_SETTINGS } from "src/settings";
-import { ConfirmationModal } from "./confirmation-modal";
+import { ConfirmationModal } from "src/gui/confirmation-modal";
 import { deleteSchedulingData } from "src/delete-scheduling-data";
 
 

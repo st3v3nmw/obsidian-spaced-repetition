@@ -1,5 +1,5 @@
 import { TFile, Vault } from "obsidian";
-import { SCHEDULING_EXTRACTOR, SCHEDULING_INFO_REGEX } from "./constants";
+import { SCHEDULING_EXTRACTOR, SCHEDULING_INFO_REGEX } from "src/constants";
 
 function modifyFile(vault: Vault, file: TFile): Promise<string> {
   return vault.process(file, (data) => {
