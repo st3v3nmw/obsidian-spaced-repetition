@@ -1,6 +1,6 @@
 import { TFile, Vault } from "obsidian";
 
-import { SCHEDULING_EXTRACTOR, SCHEDULING_INFO_REGEX } from "src/constants";
+import { SCHEDULING_EXTRACTOR, SCHEDULING_INFO_BLOCK, SCHEDULING_INFO_TEXT } from "src/constants";
 
 /**
  * Modifies a file to remove scheduling data.
@@ -10,7 +10,7 @@ import { SCHEDULING_EXTRACTOR, SCHEDULING_INFO_REGEX } from "src/constants";
  */
 function modifyFile(vault: Vault, file: TFile): Promise<string> {
     return vault.process(file, (data) => {
-        return data.replace(SCHEDULING_INFO_REGEX, "").replace(SCHEDULING_EXTRACTOR, "").trim();
+        return data.replace(SCHEDULING_INFO_BLOCK, "").replace(SCHEDULING_INFO_TEXT, "").replace(SCHEDULING_EXTRACTOR, "").trim();
     });
 }
 
