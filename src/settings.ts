@@ -13,6 +13,7 @@ export interface SRSettings {
     randomizeCardOrder: boolean;
     flashcardCardOrder: string;
     flashcardDeckOrder: string;
+    convertClozePatternsToInputs: boolean;
     convertHighlightsToClozes: boolean;
     convertBoldTextToClozes: boolean;
     convertCurlyBracketsToClozes: boolean;
@@ -73,6 +74,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     randomizeCardOrder: null,
     flashcardCardOrder: "DueFirstRandom",
     flashcardDeckOrder: "PrevDeckComplete_Sequential",
+    convertClozePatternsToInputs: false,
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
     convertCurlyBracketsToClozes: false,
