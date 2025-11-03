@@ -71,8 +71,8 @@ export class CardUI {
     public answerButton: HTMLButtonElement;
     public lastPressed: number;
 
-    public clozeInputs: NodeListOf<Element>;
-    public clozeAnswers: NodeListOf<Element>;
+    private clozeInputs: NodeListOf<Element>;
+    private clozeAnswers: NodeListOf<Element>;
 
     private chosenDeck: Deck | null;
     private totalCardsInSession: number = 0;
@@ -222,14 +222,8 @@ export class CardUI {
         // Update response buttons
         this._resetResponseButtons();
         
-        this.clozeInputs = document.querySelectorAll("#cloze-input");
-
-        this.clozeInputs.forEach((input) => {
-            input.addEventListener("change", (e) => {
-                e.target as HTMLInputElement;
-            });
-        });
-    
+        // Setup cloze input listeners
+        this._setupClozeInputListeners();
     }
 
     private get _currentCard(): Card {
@@ -569,6 +563,33 @@ export class CardUI {
         }
     }
 
+    private _setupClozeInputListeners(): void {
+        this.clozeInputs = document.querySelectorAll("#cloze-input");
+        
+        this.clozeInputs.forEach((input) => {
+            input.addEventListener("change", (e) => {
+                const input = e.target as HTMLInputElement;
+            });
+        });
+    }
+
+    private _evaluateClozeAnswers(): void {
+        this.clozeAnswers = document.querySelectorAll("#cloze-answer");
+
+        if (this.clozeAnswers.length === this.clozeInputs.length) {
+            for (let i = 0; i < this.clozeAnswers.length; i++) {
+                const clozeInput = this.clozeInputs[i] as HTMLInputElement;
+                const clozeAnswer = this.clozeAnswers[i] as HTMLElement;
+
+                const inputText = clozeInput.value.trim();
+                const answerText = clozeAnswer.innerText.trim();
+
+                const answerElement = inputText === answerText ? `<span style="color: green">${escapeHtml(inputText)}</span>` : `[<span style="color: red; text-decoration: line-through;">${escapeHtml(inputText)}</span><span style="color: green">${answerText}</span>]`;
+                clozeAnswer.innerHTML = answerElement;
+            }
+        }
+    }
+
     private _showAnswer(): void {
         const timeNow = now();
         if (
@@ -602,20 +623,8 @@ export class CardUI {
             this._currentQuestion.questionText.textDirection,
         );
 
-        this.clozeAnswers = document.querySelectorAll("#cloze-answer");
-
-        if (this.clozeAnswers.length === this.clozeInputs.length) {
-            for (let i = 0; i < this.clozeAnswers.length; i++) {
-                const clozeInput = this.clozeInputs[i] as HTMLInputElement;
-                const clozeAnswer = this.clozeAnswers[i] as HTMLElement;
-
-                const inputText = clozeInput.value.trim();
-                const answerText = clozeAnswer.innerText.trim();
-
-                const answerElement = inputText === answerText ? `<span style="color: green">${escapeHtml(inputText)}</span>` : `[<span style="color: red; text-decoration: line-through;">${escapeHtml(inputText)}</span><span style="color: green">${answerText}</span>]`;
-                clozeAnswer.innerHTML = answerElement;
-            }
-        }
+        // Evaluate cloze answers
+        this._evaluateClozeAnswers();
 
         // Show response buttons
         this.answerButton.addClass("sr-is-hidden");
