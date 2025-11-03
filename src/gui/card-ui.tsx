@@ -221,7 +221,7 @@ export class CardUI {
 
         // Update response buttons
         this._resetResponseButtons();
-        
+
         // Setup cloze input listeners
         this._setupClozeInputListeners();
     }
@@ -565,11 +565,10 @@ export class CardUI {
 
     private _setupClozeInputListeners(): void {
         this.clozeInputs = document.querySelectorAll("#cloze-input");
-        
+
         this.clozeInputs.forEach((input) => {
-            input.addEventListener("change", (e) => {
-                const input = e.target as HTMLInputElement;
-            });
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            input.addEventListener("change", (e) => {});
         });
     }
 
@@ -584,7 +583,10 @@ export class CardUI {
                 const inputText = clozeInput.value.trim();
                 const answerText = clozeAnswer.innerText.trim();
 
-                const answerElement = inputText === answerText ? `<span style="color: green">${escapeHtml(inputText)}</span>` : `[<span style="color: red; text-decoration: line-through;">${escapeHtml(inputText)}</span><span style="color: green">${answerText}</span>]`;
+                const answerElement =
+                    inputText === answerText
+                        ? `<span style="color: green">${escapeHtml(inputText)}</span>`
+                        : `[<span style="color: red; text-decoration: line-through;">${escapeHtml(inputText)}</span><span style="color: green">${answerText}</span>]`;
                 clozeAnswer.innerHTML = answerElement;
             }
         }
@@ -658,7 +660,7 @@ export class CardUI {
     private _keydownHandler = (e: KeyboardEvent) => {
         // Prevents any input, if the edit modal is open, input area is in focus, or if the view is not in focus
         if (
-            document.activeElement.nodeName === "TEXTAREA" || 
+            document.activeElement.nodeName === "TEXTAREA" ||
             document.activeElement.nodeName === "INPUT" ||
             this.mode === FlashcardMode.Closed ||
             !this.plugin.getSRInFocusState()

@@ -96,9 +96,11 @@ class QuestionTypeCloze implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
         const clozecrafter = new ClozeCrafter(settings.clozePatterns);
         const clozeNote = clozecrafter.createClozeNote(questionText);
-        
+
         // Determine which question formatter to use based on settings (Cloze patterns as inputs or not).
-        const clozeFormatter = settings.convertClozePatternsToInputs ? new QuestionTypeClozeInputFormatter() : new QuestionTypeClozeFormatter();
+        const clozeFormatter = settings.convertClozePatternsToInputs
+            ? new QuestionTypeClozeInputFormatter()
+            : new QuestionTypeClozeFormatter();
 
         let front: string, back: string;
         const result: CardFrontBack[] = [];
