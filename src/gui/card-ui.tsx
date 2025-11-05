@@ -564,7 +564,7 @@ export class CardUI {
     }
 
     private _setupClozeInputListeners(): void {
-        this.clozeInputs = document.querySelectorAll("#cloze-input");
+        this.clozeInputs = document.querySelectorAll(".cloze-input");
 
         this.clozeInputs.forEach((input) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -573,7 +573,7 @@ export class CardUI {
     }
 
     private _evaluateClozeAnswers(): void {
-        this.clozeAnswers = document.querySelectorAll("#cloze-answer");
+        this.clozeAnswers = document.querySelectorAll(".cloze-answer");
 
         if (this.clozeAnswers.length === this.clozeInputs.length) {
             for (let i = 0; i < this.clozeAnswers.length; i++) {

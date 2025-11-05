@@ -130,11 +130,11 @@ export class QuestionTypeClozeFormatter implements IClozeFormatter {
 
 export class QuestionTypeClozeInputFormatter implements IClozeFormatter {
     asking(answer?: string, hint?: string): string {
-        return `<span style='color:#2196f3'><input id="cloze-input" type="text" size="${!answer ? "0" : `${answer.length}`}" />${!hint ? "" : `[${hint}]`}</span>`;
+        return `<span style='color:#2196f3'><input class="cloze-input" type="text" size="${!answer ? 1 : answer.length}" />${!hint ? "" : `[${hint}]`}</span>`;
     }
 
     showingAnswer(answer: string, _hint?: string): string {
-        return `<span id="cloze-answer" style='color:#2196f3'>${answer}</span>`;
+        return `<span class="cloze-answer" style='color:#2196f3'>${answer}</span>`;
     }
 
     hiding(answer?: string, hint?: string): string {
