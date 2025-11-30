@@ -1,7 +1,9 @@
 import { Menu, Notice, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
+import { Algorithm } from "src/algorithms/base/isrs-algorithm";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
+import { SrsAlgorithmCustom } from "src/algorithms/custom/srs-algorithm-custom";
 import { ObsidianVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
 import { SrsAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
 import { OsrAppCore } from "src/core";
@@ -523,9 +525,20 @@ export default class SRPlugin extends Plugin {
     }
 
     setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
-        // For now we can hardcode as we only support the one data store and one algorithm
+        // Set up data store (only one supported for now)
         DataStore.instance = new StoreInNotes(settings);
-        SrsAlgorithm.instance = new SrsAlgorithmOsr(settings);
+
+        // Select algorithm based on settings
+        switch (settings.algorithm) {
+            case Algorithm.CUSTOM_INTERVALS:
+                SrsAlgorithm.instance = new SrsAlgorithmCustom(settings);
+                break;
+            case Algorithm.SM_2_OSR:
+            default:
+                SrsAlgorithm.instance = new SrsAlgorithmOsr(settings);
+                break;
+        }
+
         DataStoreAlgorithm.instance = new DataStoreInNoteAlgorithmOsr(settings);
     }
     async savePluginData(): Promise<void> {

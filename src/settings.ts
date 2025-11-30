@@ -56,6 +56,11 @@ export interface SRSettings {
     maximumInterval: number;
     maxLinkFactor: number;
 
+    // custom intervals (for notes and flashcards)
+    customIntervalEasy: number;
+    customIntervalGood: number;
+    customIntervalHard: number;
+
     // storage
     dataStore: string;
     cardCommentOnSameLine: boolean;
@@ -116,6 +121,11 @@ export const DEFAULT_SETTINGS: SRSettings = {
     maximumInterval: 36525,
     maxLinkFactor: 1.0,
 
+    // custom intervals (for notes and flashcards) - in days
+    customIntervalEasy: 4,
+    customIntervalGood: 2,
+    customIntervalHard: 1,
+
     // storage
     dataStore: DataStoreName.NOTES,
     cardCommentOnSameLine: false,
@@ -151,6 +161,17 @@ export function upgradeSettings(settings: SRSettings) {
 
         if (settings.convertCurlyBracketsToClozes)
             settings.clozePatterns.push("{{[123;;]answer[;;hint]}}");
+    }
+
+    // Add custom interval settings if they don't exist (for existing users)
+    if (settings.customIntervalEasy == null) {
+        settings.customIntervalEasy = DEFAULT_SETTINGS.customIntervalEasy;
+    }
+    if (settings.customIntervalGood == null) {
+        settings.customIntervalGood = DEFAULT_SETTINGS.customIntervalGood;
+    }
+    if (settings.customIntervalHard == null) {
+        settings.customIntervalHard = DEFAULT_SETTINGS.customIntervalHard;
     }
 }
 
