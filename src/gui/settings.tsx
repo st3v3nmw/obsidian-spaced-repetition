@@ -1,5 +1,7 @@
 import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 
+import { deleteSchedulingData } from "src/delete-scheduling-data";
+import { ConfirmationModal } from "src/gui/confirmation-modal";
 import { StatisticsView } from "src/gui/statistics";
 import { createTabs, TabStructure } from "src/gui/tabs";
 import { t } from "src/lang/helpers";
@@ -1038,6 +1040,25 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         this.plugin.data.settings.cardCommentOnSameLine = value;
                         await this.plugin.savePluginData();
+                    }),
+            );
+
+        containerEl.createEl("h3", { text: t("DELETE_SCHEDULING_DATA") });
+        new Setting(containerEl)
+            .setName(t("DELETE_SCHEDULING_DATA"))
+            .setDesc(t("DELETE_SCHEDULING_DATA_IN_NOTES_AND_FLASHCARDS"))
+            .addButton((button) =>
+                button
+                    .setButtonText(t("DELETE"))
+                    .setClass("mod-warning")
+                    .onClick(async () => {
+                        new ConfirmationModal(
+                            this.plugin.app,
+                            t("DELETE_SCHEDULING_DATA"),
+                            t("CONFIRM_SCHEDULING_DATA_DELETION"),
+                            t("SCHEDULING_DATA_HAS_BEEN_DELETED"),
+                            deleteSchedulingData,
+                        ).open();
                     }),
             );
     }
