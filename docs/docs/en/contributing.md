@@ -16,6 +16,7 @@ The plugin has been translated into the following languages by the Obsidian comm
 - Chinese (Simplified) / 简体中文
 - Chinese (Traditional) / 繁體中文
 - Czech / čeština
+- Dutch / Nederlands
 - French / français
 - German / Deutsch
 - Italian / Italiano

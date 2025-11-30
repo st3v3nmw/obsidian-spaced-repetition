@@ -33,9 +33,11 @@ export default {
     CRAM_CARDS_IN_NOTE: "Stamp flitskaarten in deze notitie",
     VIEW_STATS: "Bekijk statistieken",
     OPEN_REVIEW_QUEUE_VIEW: "Open notities beoordelingswachtrij in zijbalk",
-    STATUS_BAR: "Beoordeling: ${dueNotesCount} notitie(s), ${dueFlashcardsCount} kaart(en) te beoordelen",
+    STATUS_BAR:
+        "Beoordeling: ${dueNotesCount} notitie(s), ${dueFlashcardsCount} kaart(en) te beoordelen",
     SYNC_TIME_TAKEN: "Synchronisatie duurde ${t}ms",
-    NOTE_IN_IGNORED_FOLDER: "Notitie is opgeslagen in een genegeerde map (controleer instellingen).",
+    NOTE_IN_IGNORED_FOLDER:
+        "Notitie is opgeslagen in een genegeerde map (controleer instellingen).",
     PLEASE_TAG_NOTE: "Tag de notitie correct voor beoordeling (in instellingen).",
     RESPONSE_RECEIVED: "Reactie ontvangen.",
     NO_DECK_EXISTS: "Er bestaat geen stapel voor ${deckName}",
@@ -81,7 +83,8 @@ export default {
     FLASHCARD_GOOD_DESC: 'Pas het label aan voor de "Goed" knop',
     FLASHCARD_HARD_DESC: 'Pas het label aan voor de "Moeilijk" knop',
     REVIEW_BUTTON_DELAY: "Vertraging knopindrukken (ms)",
-    REVIEW_BUTTON_DELAY_DESC: "Voeg een vertraging toe aan de beoordelingsknoppen voordat ze opnieuw kunnen worden ingedrukt.",
+    REVIEW_BUTTON_DELAY_DESC:
+        "Voeg een vertraging toe aan de beoordelingsknoppen voordat ze opnieuw kunnen worden ingedrukt.",
     FLASHCARD_TAGS: "Flitskaarttags",
     FLASHCARD_TAGS_DESC:
         "Voer tags in, gescheiden door spaties of nieuwe regels, bijvoorbeeld #flitskaarten #stapel2 #stapel3.",
@@ -106,10 +109,13 @@ export default {
     CARD_MODAL_WIDTH_PERCENT: "Flitskaart breedtepercentage",
     RANDOMIZE_CARD_ORDER: "Flitskaartvolgorde willekeurig tijdens herziening?",
     REVIEW_CARD_ORDER_WITHIN_DECK: "Volgorde van kaarten in een stapel tijdens herziening",
-    REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL: "Opeenvolgend binnen een stapel (Alle nieuwe kaarten eerst)",
-    REVIEW_CARD_ORDER_DUE_FIRST_SEQUENTIAL: "Opeenvolgend binnen een stapel (Alle kaarten die aan de beurt zijn eerst)",
+    REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL:
+        "Opeenvolgend binnen een stapel (Alle nieuwe kaarten eerst)",
+    REVIEW_CARD_ORDER_DUE_FIRST_SEQUENTIAL:
+        "Opeenvolgend binnen een stapel (Alle kaarten die aan de beurt zijn eerst)",
     REVIEW_CARD_ORDER_NEW_FIRST_RANDOM: "Willekeurig binnen een stapel (Alle nieuwe kaarten eerst)",
-    REVIEW_CARD_ORDER_DUE_FIRST_RANDOM: "Willekeurig binnen een stapel (Alle kaarten die aan de beurt zijn eerst)",
+    REVIEW_CARD_ORDER_DUE_FIRST_RANDOM:
+        "Willekeurig binnen een stapel (Alle kaarten die aan de beurt zijn eerst)",
     REVIEW_CARD_ORDER_RANDOM_DECK_AND_CARD: "Willekeurige kaart uit willekeurige stapel",
     REVIEW_DECK_ORDER: "Volgorde waarin stapels worden weergegeven tijdens herziening",
     REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL:
@@ -136,16 +142,20 @@ export default {
     INLINE_REVERSED_CARDS_SEPARATOR: "Scheidingsteken voor inline omgekeerde flitskaarten",
     MULTILINE_CARDS_SEPARATOR: "Scheidingsteken voor meerregelige flitskaarten",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Scheidingsteken voor meerregelige omgekeerde flitskaarten",
-    MULTILINE_CARDS_END_MARKER: "Tekens die het einde van clozes en meerregelige flitskaarten aangeven",
+    MULTILINE_CARDS_END_MARKER:
+        "Tekens die het einde van clozes en meerregelige flitskaarten aangeven",
     NOTES: "Notities",
     NOTE: "Notitie",
     REVIEW_PANE_ON_STARTUP: "Notitiebeoordelingsvenster inschakelen bij opstarten",
     TAGS_TO_REVIEW: "Tags om te beoordelen",
-    TAGS_TO_REVIEW_DESC: "Voer tags in, gescheiden door spaties of nieuwe regels, bijv. #review #tag2 #tag3.",
+    TAGS_TO_REVIEW_DESC:
+        "Voer tags in, gescheiden door spaties of nieuwe regels, bijv. #review #tag2 #tag3.",
     OPEN_RANDOM_NOTE: "Open een willekeurige notitie voor beoordeling",
-    OPEN_RANDOM_NOTE_DESC: "Wanneer u dit uitschakelt, worden notities geordend op belangrijkheid (PageRank).",
+    OPEN_RANDOM_NOTE_DESC:
+        "Wanneer u dit uitschakelt, worden notities geordend op belangrijkheid (PageRank).",
     AUTO_NEXT_NOTE: "Open automatisch de volgende notitie na een beoordeling",
-    MAX_N_DAYS_REVIEW_QUEUE: "Maximum aantal dagen om weer te geven in het notitiebeoordelingspaneel",
+    MAX_N_DAYS_REVIEW_QUEUE:
+        "Maximum aantal dagen om weer te geven in het notitiebeoordelingspaneel",
     MIN_ONE_DAY: "Het aantal dagen moet minimaal 1 zijn.",
     VALID_NUMBER_WARNING: "Geef een geldig getal op.",
     UI: "Gebruikersinterface",
@@ -155,7 +165,8 @@ export default {
     SHOW_STATUS_BAR_DESC:
         "Schakel dit uit om de beoordelingsstatus van de flitskaart te verbergen in de statusbalk van Obsidian",
     SHOW_RIBBON_ICON: "Pictogram weergeven in de lintbalk",
-    SHOW_RIBBON_ICON_DESC: "Schakel dit uit om het pictogram van de plugin in de lintbalk van Obsidian te verbergen",
+    SHOW_RIBBON_ICON_DESC:
+        "Schakel dit uit om het pictogram van de plugin in de lintbalk van Obsidian te verbergen",
     ENABLE_FILE_MENU_REVIEW_OPTIONS:
         "Schakel de beoordelingsopties in het bestandsmenu in (bijv. Beoordelen: Gemakkelijk, Goed, Moeilijk)",
     ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
@@ -170,7 +181,8 @@ export default {
     BASE_EASE: "Basisgemak",
     BASE_EASE_DESC: "minimum = 130, bij voorkeur ongeveer 250.",
     BASE_EASE_MIN_WARNING: "Het basisgemak moet minimaal 130 zijn.",
-    LAPSE_INTERVAL_CHANGE: "Intervalwijziging wanneer u een flitskaart/notitie als moeilijk beoordeelt",
+    LAPSE_INTERVAL_CHANGE:
+        "Intervalwijziging wanneer u een flitskaart/notitie als moeilijk beoordeelt",
     LAPSE_INTERVAL_CHANGE_DESC: "nieuwInterval = oudInterval * intervalWijziging / 100.",
     EASY_BONUS: "Gemakkelijk Bonus",
     EASY_BONUS_DESC:
@@ -181,7 +193,8 @@ export default {
         Het is vergelijkbaar met Anki's fuzz, maar in plaats van willekeurig te zijn, kiest het de dag met het minste aantal beoordelingen.
         Het is uitgeschakeld voor kleine intervallen.`,
     MAX_INTERVAL: "Maximum interval in dagen",
-    MAX_INTERVAL_DESC: "Hiermee kunt u een bovengrens voor het interval instellen (standaard = 100 jaar).",
+    MAX_INTERVAL_DESC:
+        "Hiermee kunt u een bovengrens voor het interval instellen (standaard = 100 jaar).",
     MAX_INTERVAL_MIN_WARNING: "Het maximale interval moet minimaal 1 dag zijn.",
     MAX_LINK_CONTRIB: "Maximale linkbijdrage",
     MAX_LINK_CONTRIB_DESC:
@@ -189,7 +202,8 @@ export default {
     LOGGING: "Loggen",
     DISPLAY_SCHEDULING_DEBUG_INFO:
         "Toon de foutopsporingsinformatie van de planner op de ontwikkelaarsconsole",
-    DISPLAY_PARSER_DEBUG_INFO: "Toon de foutopsporingsinformatie van de parser op de ontwikkelaarsconsole",
+    DISPLAY_PARSER_DEBUG_INFO:
+        "Toon de foutopsporingsinformatie van de parser op de ontwikkelaarsconsole",
     SCHEDULING: "Plannen",
     EXPERIMENTAL: "Experimenteel",
     HELP: "Help",
