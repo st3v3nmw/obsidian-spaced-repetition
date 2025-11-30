@@ -197,6 +197,24 @@ export class SRSettingTab extends PluginSettingTab {
         );
 
         containerEl.createEl("h3", { text: t("GROUP_FLASHCARD_SEPARATORS") });
+        const convertClozePatternsToInputsEl = new Setting(containerEl).setName(
+            t("CONVERT_CLOZE_PATTERNS_TO_INPUTS"),
+        );
+        convertClozePatternsToInputsEl.descEl.insertAdjacentHTML(
+            "beforeend",
+            t("CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC"),
+        );
+        convertClozePatternsToInputsEl.addToggle((toggle) =>
+            toggle
+                .setValue(this.plugin.data.settings.convertClozePatternsToInputs)
+                .onChange(async (value) => {
+                    this.plugin.data.settings.convertClozePatternsToInputs = value;
+                    await this.plugin.savePluginData();
+
+                    this.display();
+                }),
+        );
+
         const convertHighlightsToClozesEl = new Setting(containerEl).setName(
             t("CONVERT_HIGHLIGHTS_TO_CLOZES"),
         );
