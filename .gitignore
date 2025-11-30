@@ -35,3 +35,7 @@ docs/vaults/*/.obsidian
 
 # env
 env.sh
+
+# AI Tooling
+.claude/
+.sourcerer/
