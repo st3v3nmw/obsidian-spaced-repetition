@@ -112,11 +112,11 @@ class QuestionTypeCloze implements IQuestionTypeHandler {
 
 export class QuestionTypeClozeFormatter implements IClozeFormatter {
     asking(answer?: string, hint?: string): string {
-        return `<span style='color:#2196f3'>${!hint ? "[...]" : `[${hint}]`}</span>`;
+        return `<span class='cloze' style='color:#2196f3'>${!hint ? "[...]" : `[${hint}]`}</span>`;
     }
 
     showingAnswer(answer: string, _hint?: string): string {
-        return `<span style='color:#2196f3'>${answer}</span>`;
+        return `<span class='cloze' style='color:#2196f3'>${answer}</span>`;
     }
 
     hiding(answer?: string, hint?: string): string {

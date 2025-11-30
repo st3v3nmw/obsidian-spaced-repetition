@@ -41,6 +41,9 @@ export interface SRSettings {
     showIntervalInReviewButtons: boolean;
     flashcardHeightPercentage: number;
     flashcardWidthPercentage: number;
+    scrollToCloze: boolean;
+    scrollBehavior: "auto" | "smooth";
+    scrollBlock: "start" | "center" | "end" | "nearest";
     flashcardEasyText: string;
     flashcardGoodText: string;
     flashcardHardText: string;
@@ -101,6 +104,9 @@ export const DEFAULT_SETTINGS: SRSettings = {
     showIntervalInReviewButtons: true,
     flashcardHeightPercentage: Platform.isMobile ? 100 : 80,
     flashcardWidthPercentage: Platform.isMobile ? 100 : 40,
+    scrollToCloze: true,
+    scrollBehavior: "auto",
+    scrollBlock: "center",
     flashcardEasyText: t("EASY"),
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),

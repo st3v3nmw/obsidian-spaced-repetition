@@ -112,6 +112,15 @@ export default {
         "Если пользуетесь мобильным телефоном, выставьте 100%. Иначе у вас будут огромные изображения",
     RESET_DEFAULT: "Настройки по-умолчанию",
     CARD_MODAL_WIDTH_PERCENT: "Ширина карточки в процентах",
+    SCROLL_TO_CLOZE_AUTO: "Auto-scroll to cloze",
+    SCROLL_TO_CLOZE_AUTO_DESC:
+        "Automatically scroll the hidden cloze deletion (e.g., [...]) into view when the card is shown.",
+    SCROLL_BEHAVIOR: "Scroll behavior",
+    SCROLL_BEHAVIOR_DESC:
+        "Choose how the card scrolls to the hidden cloze — instantly or smoothly with animation.",
+    SCROLL_BLOCK: "Scroll position",
+    SCROLL_BLOCK_DESC:
+        "Define where the hidden cloze will appear in the view after scrolling — top, center, bottom, or nearest visible.",
     RANDOMIZE_CARD_ORDER: "Случайный порядок карт во время изучения?",
     REVIEW_CARD_ORDER_WITHIN_DECK: "Порядок отображения карт колоды во время изучения",
     REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL:

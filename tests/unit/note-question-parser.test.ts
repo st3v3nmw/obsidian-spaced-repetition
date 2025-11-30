@@ -602,8 +602,8 @@ Stop trying ==to milk the crowd== for sympathy. // доить толпу
                     topicPathList: TopicPathList.fromPsv("#flashcards/English", 3), // #flashcards/English is on the 4th line, line number 3
                     cards: [
                         new Card({
-                            front: "Stop trying <span style='color:#2196f3'>[...]</span> for sympathy. // доить толпу",
-                            back: "Stop trying <span style='color:#2196f3'>to milk the crowd</span> for sympathy. // доить толпу",
+                            front: "Stop trying <span class='cloze' style='color:#2196f3'>[...]</span> for sympathy. // доить толпу",
+                            back: "Stop trying <span class='cloze' style='color:#2196f3'>to milk the crowd</span> for sympathy. // доить толпу",
                         }),
                     ],
                 },
