@@ -8,6 +8,8 @@ const parserOptions: ParserOptions = {
     multilineCardSeparator: "?",
     multilineReversedCardSeparator: "??",
     multilineCardEndMarker: "",
+    calloutLineMarker: ">",
+    calloutCardMarker: [">[!Question]", ">[!Definition]"],
     clozePatterns: [
         "==[123;;]answer[;;hint]==",
         "**[123;;]answer[;;hint]**",
@@ -60,6 +62,8 @@ test("Test parsing of single line basic cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: [],
         }),
     ).toEqual([[CardType.SingleLineBasic, "Question&&Answer", 0, 0]]);
@@ -70,6 +74,8 @@ test("Test parsing of single line basic cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: [],
         }),
     ).toEqual([[CardType.SingleLineBasic, "Question=Answer", 0, 0]]);
@@ -82,6 +88,8 @@ test("Test parsing of single line basic cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: [],
         }),
     ).toEqual([]);
@@ -108,6 +116,8 @@ test("Test parsing of single line reversed cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: [],
         }),
     ).toEqual([[CardType.SingleLineReversed, "Question&&&Answer", 0, 0]]);
@@ -118,6 +128,8 @@ test("Test parsing of single line reversed cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: [],
         }),
     ).toEqual([[CardType.SingleLineReversed, "Question::Answer", 0, 0]]);
@@ -128,6 +140,8 @@ test("Test parsing of single line reversed cards", () => {
             multilineCardSeparator: ";>",
             multilineReversedCardSeparator: "<;>",
             multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: [],
         }),
     ).toEqual([
@@ -143,6 +157,8 @@ test("Test parsing of single line reversed cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: [],
         }),
     ).toEqual([]);
@@ -182,6 +198,8 @@ test("Test parsing of multi line basic cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: ["**[123;;]answer[;;hint]**"],
         }),
     ).toEqual([[CardType.MultiLineBasic, "Question\n?\nAnswer line 1\nAnswer line 2", 0, 4]]);
@@ -194,6 +212,8 @@ test("Test parsing of multi line basic cards", () => {
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
                 multilineCardEndMarker: "---",
+                calloutLineMarker: ">",
+                calloutCardMarker: [">[!Question]", ">[!Definition]"],
                 clozePatterns: ["**[123;;]answer[;;hint]**"],
             },
         ),
@@ -210,6 +230,8 @@ test("Test parsing of multi line basic cards", () => {
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
                 multilineCardEndMarker: "---",
+                calloutLineMarker: ">",
+                calloutCardMarker: [">[!Question]", ">[!Definition]"],
                 clozePatterns: ["**[123;;]answer[;;hint]**"],
             },
         ),
@@ -231,6 +253,8 @@ test("Test parsing of multi line basic cards", () => {
             multilineCardSeparator: "@@",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: [],
         }),
     ).toEqual([[CardType.MultiLineBasic, "Question\n@@\nAnswer", 0, 2]]);
@@ -243,6 +267,8 @@ test("Test parsing of multi line basic cards", () => {
             multilineCardSeparator: "",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: [],
         }),
     ).toEqual([]);
@@ -272,6 +298,8 @@ test("Test parsing of multi line reversed cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: [
                 "==[123;;]answer[;;hint]==",
                 "**[123;;]answer[;;hint]**",
@@ -288,6 +316,8 @@ test("Test parsing of multi line reversed cards", () => {
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
                 multilineCardEndMarker: "---",
+                calloutLineMarker: ">",
+                calloutCardMarker: [">[!Question]", ">[!Definition]"],
                 clozePatterns: [
                     "==[123;;]answer[;;hint]==",
                     "**[123;;]answer[;;hint]**",
@@ -308,6 +338,8 @@ test("Test parsing of multi line reversed cards", () => {
             multilineCardSeparator: "@@",
             multilineReversedCardSeparator: "@@@",
             multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: [],
         }),
     ).toEqual([[CardType.MultiLineReversed, "Question\n@@@\nAnswer", 0, 2]]);
@@ -338,6 +370,8 @@ Line 5
                 multilineCardSeparator: "??",
                 multilineReversedCardSeparator: "???",
                 multilineCardEndMarker: "????",
+                calloutLineMarker: ">",
+                calloutCardMarker: [">[!Question]", ">[!Definition]"],
                 clozePatterns: [],
             },
         ),
@@ -354,6 +388,8 @@ Line 5
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "\t",
             multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: [],
         }),
     ).toEqual([]);
@@ -395,6 +431,8 @@ test("Test parsing of cloze cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: ["**[123;;]answer[;;hint]**", "{{[123;;]answer[;;hint]}}"],
         }),
     ).toEqual([]);
@@ -434,6 +472,8 @@ test("Test parsing of cloze cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: ["==[123;;]answer[;;hint]==", "{{[123;;]answer[;;hint]}}"],
         }),
     ).toEqual([]);
@@ -474,6 +514,8 @@ test("Test parsing of cloze cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: ["==[123;;]answer[;;hint]==", "**[123;;]answer[;;hint]**"],
         }),
     ).toEqual([]);
@@ -488,6 +530,8 @@ test("Test parsing of cloze cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: ["{{[123::]answer[::hint]}}"],
         }),
     ).toEqual([[CardType.Cloze, "Brazilians speak {{Portuguese::language}}", 0, 0]]);
@@ -500,6 +544,8 @@ test("Test parsing of cloze cards", () => {
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
                 multilineCardEndMarker: "",
+                calloutLineMarker: ">",
+                calloutCardMarker: [">[!Question]", ">[!Definition]"],
                 clozePatterns: ["{{[123::]answer[::hint]}}"],
             },
         ),
@@ -516,6 +562,8 @@ test("Test parsing of cloze cards", () => {
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
                 multilineCardEndMarker: "",
+                calloutLineMarker: ">",
+                calloutCardMarker: [">[!Question]", ">[!Definition]"],
                 clozePatterns: ["{{[123::]answer[::hint]}}"],
             },
         ),
@@ -532,6 +580,8 @@ test("Test parsing of cloze cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: ["==answer==[^\\[hint\\]][\\[^123\\]]"],
         }),
     ).toEqual([
@@ -547,6 +597,8 @@ test("Test parsing of cloze cards", () => {
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
                 multilineCardEndMarker: "",
+                calloutLineMarker: ">",
+                calloutCardMarker: [">[!Question]", ">[!Definition]"],
                 clozePatterns: ["==answer==[^\\[hint\\]][\\[^123\\]]"],
             },
         ),
@@ -563,6 +615,8 @@ test("Test parsing of cloze cards", () => {
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
                 multilineCardEndMarker: "",
+                calloutLineMarker: ">",
+                calloutCardMarker: [">[!Question]", ">[!Definition]"],
                 clozePatterns: ["==answer==[^\\[hint\\]][\\[^123\\]]"],
             },
         ),
@@ -584,6 +638,8 @@ test("Test parsing of cloze cards", () => {
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
                 multilineCardEndMarker: "---",
+                calloutLineMarker: ">",
+                calloutCardMarker: [">[!Question]", ">[!Definition]"],
                 clozePatterns: ["==[123;;]answer[;;hint]=="],
             },
         ),
@@ -610,6 +666,132 @@ test("Test parsing of cloze cards", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
+            clozePatterns: [],
+        }),
+    ).toEqual([]);
+});
+
+test("Test parsing of callout cards", () => {
+    // standard symbols
+    expect(parseT(">[!Question] Question\n>Answer", parserOptions)).toEqual([
+        [CardType.Callout, ">[!Question] Question\n>Answer", 0, 1],
+    ]);
+    expect(parseT(">[!Question] Question\n>\n>Answer", parserOptions)).toEqual([
+        [CardType.Callout, ">[!Question] Question\n>\n>Answer", 0, 2],
+    ]);
+    expect(parseT(">[!Question] Question\n>Answer 1\n>Answer2", parserOptions)).toEqual([
+        [CardType.Callout, ">[!Question] Question\n>Answer 1\n>Answer2", 0, 2],
+    ]);
+    expect(parseT(">[!Question] Question\n>Answer 1\n>Answer2\n\n\n\n", parserOptions)).toEqual([
+        [CardType.Callout, ">[!Question] Question\n>Answer 1\n>Answer2", 0, 2],
+    ]);
+    expect(
+        parseT(">[!Question] Question\n>Answer <!--SR:!2021-08-11,4,270-->", parserOptions),
+    ).toEqual([
+        [CardType.Callout, ">[!Question] Question\n>Answer <!--SR:!2021-08-11,4,270-->", 0, 1],
+    ]);
+    expect(
+        parseT(">[!Question] Question\n>\n>Answer <!--SR:!2021-08-11,4,270-->", parserOptions),
+    ).toEqual([
+        [CardType.Callout, ">[!Question] Question\n>\n>Answer <!--SR:!2021-08-11,4,270-->", 0, 2],
+    ]);
+    expect(
+        parseT(
+            ">[!Question] Question\n>Answer 1\n>Answer2 <!--SR:!2021-08-11,4,270-->",
+            parserOptions,
+        ),
+    ).toEqual([
+        [
+            CardType.Callout,
+            ">[!Question] Question\n>Answer 1\n>Answer2 <!--SR:!2021-08-11,4,270-->",
+            0,
+            2,
+        ],
+    ]);
+    expect(
+        parseT(
+            ">[!Question] Question\n>Answer 1\n>Answer2\n<!--SR:!2021-08-11,4,270-->",
+            parserOptions,
+        ),
+    ).toEqual([
+        [
+            CardType.Callout,
+            ">[!Question] Question\n>Answer 1\n>Answer2\n<!--SR:!2021-08-11,4,270-->",
+            0,
+            3,
+        ],
+    ]);
+    expect(parseT(">[!Question] Question\n>Answer line 1\n>Answer line 2", parserOptions)).toEqual([
+        [CardType.Callout, ">[!Question] Question\n>Answer line 1\n>Answer line 2", 0, 2],
+    ]);
+    expect(
+        parseT(
+            "#Title\n\nLine0\n>[!Question] Q1\n>A1\n>AnswerExtra\n\n>[!Question] Q2\n>A2",
+            parserOptions,
+        ),
+    ).toEqual([
+        [CardType.Callout, ">[!Question] Q1\n>A1\n>AnswerExtra", 3, 5],
+        [CardType.Callout, ">[!Question] Q2\n>A2", 7, 8],
+    ]);
+    expect(
+        parseT("#flashcards/tag-on-previous-line\n>[!Question] Question\n>Answer", parserOptions),
+    ).toEqual([[CardType.Callout, ">[!Question] Question\n>Answer", 1, 2]]);
+    // Mutli Symbols
+    expect(
+        parseT(">[!Definition] Question\n>Answer line 1\n>Answer line 2", parserOptions),
+    ).toEqual([[CardType.Callout, ">[!Question] Question\n>Answer line 1\n>Answer line 2", 0, 2]]);
+    expect(
+        parseT(
+            ">[!Definition] Question\n>Answer line 1\n>Answer line 2\n\n>[!Question] Question\n>Answer line 1\n>Answer line 2\n",
+            parserOptions,
+        ),
+    ).toEqual([
+        [CardType.Callout, ">[!Definition] Question\n>Answer line 1\n>Answer line 2", 0, 2],
+        [CardType.Callout, ">[!Question] Question\n>Answer line 1\n>Answer line 2", 2, 4],
+    ]);
+    // Custom symbols
+    expect(
+        parseT(">[!Custom] Question\n>Answer line 1\n>Answer line 2\n\n", {
+            singleLineCardSeparator: "::",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Custom]"],
+            clozePatterns: ["**[123;;]answer[;;hint]**"],
+        }),
+    ).toEqual([[CardType.Callout, ">[!Custom] Question\n>Answer line 1\n>Answer line 2", 0, 2]]);
+    expect(
+        parseT(
+            ">[!Card] Question 1\n>Answer line 1\n>Answer line 2\n\n\n>[!Multi] Question 2\n>Answer line 1\n>Answer line 2\n\nirrelavant",
+            {
+                singleLineCardSeparator: "::",
+                singleLineReversedCardSeparator: ":::",
+                multilineCardSeparator: "?",
+                multilineReversedCardSeparator: "??",
+                multilineCardEndMarker: "---",
+                calloutLineMarker: ">",
+                calloutCardMarker: [">[!Card]"],
+                clozePatterns: ["**[123;;]answer[;;hint]**"],
+            },
+        ),
+    ).toEqual([
+        [CardType.Callout, ">[!Card] Question 1\n>Answer line 1\n>Answer line 2", 0, 2],
+        [CardType.Callout, ">[!Card] Question 2\n>Answer line 1\n>Answer line 2", 5, 7],
+    ]);
+    // empty string or whitespace character provided
+    expect(
+        parseT(">[!Question] Question\n>Answer", {
+            singleLineCardSeparator: "::",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            calloutLineMarker: ">",
+            calloutCardMarker: [""],
             clozePatterns: [],
         }),
     ).toEqual([]);
@@ -774,6 +956,8 @@ test("Test not parsing 'cards' in codeblocks", () => {
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "",
+            calloutLineMarker: ">",
+            calloutCardMarker: [">[!Question]", ">[!Definition]"],
             clozePatterns: [
                 "==[123;;]answer[;;hint]==",
                 "**[123;;]answer[;;hint]**",
