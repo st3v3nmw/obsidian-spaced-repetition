@@ -1,4 +1,4 @@
-import { ItemView, setIcon, WorkspaceLeaf } from "obsidian";
+import { ItemView, MarkdownView, setIcon, WorkspaceLeaf } from "obsidian";
 
 import { SR_TAB_VIEW } from "src/constants";
 import { Deck } from "src/deck";
@@ -133,6 +133,7 @@ export class SRTabView extends ItemView {
                     this.viewContentEl.createDiv(),
                     this._showDecksList.bind(this),
                     this._doEditQuestionText.bind(this),
+                    this._jumpToCurrentCard.bind(this),
                 );
             }
 
@@ -206,6 +207,29 @@ export class SRTabView extends ItemView {
                 this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
             })
             .catch((reason) => console.log(reason));
+    }
+
+    private async _jumpToCurrentCard(): Promise<void> {
+        const currentQuestion = this.reviewSequencer.currentQuestion;
+        if (!currentQuestion) return;
+
+        const file = currentQuestion.note.file.tfile;
+        const blockId = currentQuestion.questionText.obsidianBlockId;
+        const line = Math.max(0, currentQuestion.lineNo ?? 0);
+
+        if (blockId) {
+            await this.app.workspace.openLinkText(`${file.path}#${blockId}`, file.path, false);
+            return;
+        }
+
+        const leaf = this.app.workspace.getLeaf(false);
+        await leaf.openFile(file, { eState: { line } });
+
+        const markdownView = leaf.view as MarkdownView;
+        if (markdownView?.editor) {
+            markdownView.editor.setCursor({ line, ch: 0 });
+            markdownView.editor.scrollIntoView({ from: { line, ch: 0 }, to: { line, ch: 0 } });
+        }
     }
 
     private _createBackButton() {
