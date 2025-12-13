@@ -59,6 +59,7 @@ export class CardUI {
 
     public controls: HTMLDivElement;
     public editButton: HTMLButtonElement;
+    public jumpToButton: HTMLButtonElement;
     public resetButton: HTMLButtonElement;
     public infoButton: HTMLButtonElement;
     public skipButton: HTMLButtonElement;
@@ -83,6 +84,7 @@ export class CardUI {
     private reviewMode: FlashcardReviewMode;
     private backToDeck: () => void;
     private editClickHandler: () => void;
+    private jumpToClickHandler: () => Promise<void>;
 
     constructor(
         app: App,
@@ -93,6 +95,7 @@ export class CardUI {
         view: HTMLDivElement,
         backToDeck: () => void,
         editClickHandler: () => void,
+        jumpToClickHandler: () => Promise<void>,
     ) {
         // Init properties
         this.app = app;
@@ -102,6 +105,7 @@ export class CardUI {
         this.reviewMode = reviewMode;
         this.backToDeck = backToDeck;
         this.editClickHandler = editClickHandler;
+        this.jumpToClickHandler = jumpToClickHandler;
         this.view = view;
         this.chosenDeck = null;
 
@@ -254,6 +258,7 @@ export class CardUI {
 
     private _createCardControls() {
         this._createEditButton();
+        this._createJumpToButton();
         this._createResetButton();
         this._createCardInfoButton();
         this._createSkipButton();
@@ -266,6 +271,16 @@ export class CardUI {
         this.editButton.setAttribute("aria-label", t("EDIT_CARD"));
         this.editButton.addEventListener("click", async () => {
             this.editClickHandler();
+        });
+    }
+
+    private _createJumpToButton() {
+        this.jumpToButton = this.controls.createEl("button");
+        this.jumpToButton.addClasses(["sr-button", "sr-jumpto-button"]);
+        setIcon(this.jumpToButton, "arrow-up-right");
+        this.jumpToButton.setAttribute("aria-label", t("OPEN_NOTE_FOR_REVIEW"));
+        this.jumpToButton.addEventListener("click", async () => {
+            await this.jumpToClickHandler();
         });
     }
 
