@@ -90,6 +90,8 @@ export default {
         "Voer tags in, gescheiden door spaties of nieuwe regels, bijvoorbeeld #flitskaarten #stapel2 #stapel3.",
     CONVERT_FOLDERS_TO_DECKS: "Converteer mappen naar stapels en substapels",
     CONVERT_FOLDERS_TO_DECKS_DESC: "Dit is een alternatief voor de optie flitskaarttags hierboven.",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS:
         "Planningsopmerking opslaan op dezelfde regel als de laatste regel van de flitskaart?",
     INLINE_SCHEDULING_COMMENTS_DESC:

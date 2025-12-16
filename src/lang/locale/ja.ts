@@ -89,6 +89,8 @@ export default {
     CONVERT_FOLDERS_TO_DECKS: "フォルダをデッキとサブデッキとして使用しますか？",
     CONVERT_FOLDERS_TO_DECKS_DESC:
         "これは上記のタグを使用したデッキ構築の代替となるオプションです。",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS:
         "フラッシュカードの最終行と同一の行にスケジューリングコメントを保存しますか？",
     INLINE_SCHEDULING_COMMENTS_DESC:

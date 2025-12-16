@@ -86,6 +86,8 @@ export default {
     FLASHCARD_TAGS_DESC: "#2أدخل الوُسوم مفصولة بمسافات أو أسطر جديدة ، أي بطاقات# رزمة3# رزمة",
     CONVERT_FOLDERS_TO_DECKS: "تحويل المجلدات إلى ملفات أصلية و ملفات الفرعية؟",
     CONVERT_FOLDERS_TO_DECKS_DESC: ".هذا هو بديل لخيار وسوم البطاقة أعلاه",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS: "حفظ تعليق الجدولة على نفس السطر مثل السطر الأخير للبطاقة ؟",
     INLINE_SCHEDULING_COMMENTS_DESC: "لا تكسر تنسيق القائمة HTML سيؤدي تشغيل هذا إلى جعل تعليقات",
     BURY_SIBLINGS_TILL_NEXT_DAY: "أخفي البطاقات الشقيقة حتى اليوم التالي",

@@ -87,6 +87,8 @@ export default {
         "태그를 공백 또는 빈 줄로 구분해서 입력해주세요. 예) '#flashcards #deck2 #deck3'",
     CONVERT_FOLDERS_TO_DECKS: "폴더를 덱과 서브덱으로 사용할까요?",
     CONVERT_FOLDERS_TO_DECKS_DESC: "이 기능은 위의 플래시카드 태그 옵션을 대체합니다.",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS:
         "플래시카드의 마지막 줄과 동일한 줄에 스케줄링 코멘트를 저장하시겠습니까?",
     INLINE_SCHEDULING_COMMENTS_DESC:

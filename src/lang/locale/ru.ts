@@ -96,6 +96,8 @@ export default {
         "Укажите теги разделенные Enter-ом или пробелом, например: #flashcards #deck2 #deck3.",
     CONVERT_FOLDERS_TO_DECKS: "Конвертировать папки в уровни и подуровни?",
     CONVERT_FOLDERS_TO_DECKS_DESC: "Это альтернатива описанному выше варианту тегов флэш-карт",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS: "Сохранять комментарий планирования на последней строке карточки?",
     INLINE_SCHEDULING_COMMENTS_DESC:
         "Включение этой настройки сделает так, что HTML комментарии не будут ломать форматирование списка.",
