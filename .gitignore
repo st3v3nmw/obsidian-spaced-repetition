@@ -5,8 +5,14 @@
 # vscode
 .vscode
 
+# devcontainer
+.devcontainer
+
 # npm
 node_modules
+
+# pnpm
+.pnpm-store
 
 # yarn
 yarn-error.log
@@ -20,6 +26,8 @@ yarn-error.log
 
 # build
 build
+main.js
+data.json
 
 # testing
 coverage
