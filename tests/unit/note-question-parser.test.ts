@@ -21,6 +21,11 @@ settingsConvertFoldersToDecks.convertFoldersToDecks = true;
 const parserConvertFoldersToDecks: NoteQuestionParser = createTestNoteQuestionParser(
     settingsConvertFoldersToDecks,
 );
+const settingsIncludeFrontmatterTags: SRSettings = { ...DEFAULT_SETTINGS };
+settingsIncludeFrontmatterTags.alwaysIncludeFrontmatterTags = true;
+const parserIncludeFrontmatterTags: NoteQuestionParser = createTestNoteQuestionParser(
+    settingsIncludeFrontmatterTags,
+);
 
 beforeAll(() => {
     setupStaticDateProvider20230906();
@@ -868,6 +873,44 @@ A::B
         ];
         expect(
             await parserWithDefaultSettings.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
+        ).toMatchObject(expected);
+    });
+});
+
+describe("Settings: Always include frontmatter tags", () => {
+    test("Topic tag from frontmatter is included along with question tag", async () => {
+        const noteText: string = `---
+tags:
+  - flashcards/frontmatter-tag
+---
+#flashcards/question-tag
+Q1::A1
+    `;
+        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        const folderTopicPath: TopicPath = TopicPath.emptyPath;
+        const expected = [
+            {
+                questionType: CardType.SingleLineBasic,
+                topicPathList: TopicPathList.fromPsv(
+                    "#flashcards/question-tag|#flashcards/frontmatter-tag",
+                    4,
+                ),
+                cards: [
+                    new Card({
+                        front: "Q1",
+                        back: "A1",
+                    }),
+                ],
+            },
+        ];
+        expect(
+            await parserIncludeFrontmatterTags.createQuestionList(
                 noteFile,
                 TextDirection.Ltr,
                 folderTopicPath,
