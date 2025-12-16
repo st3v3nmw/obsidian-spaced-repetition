@@ -126,7 +126,7 @@ export class SRSettingTab extends PluginSettingTab {
                         await this.plugin.savePluginData();
                     }),
             );
-            
+
         new Setting(containerEl)
             .setName(t("ALWAYS_INCLUDE_FRONTMATTER_TAGS"))
             .setDesc(t("ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC"))
