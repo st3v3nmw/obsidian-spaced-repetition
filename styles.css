@@ -236,6 +236,7 @@
     --side-button-size: 44px;
     --side-button-clearance: calc(var(--side-button-size));
     overflow: hidden !important;
+    padding-top: env(safe-area-inset-top);
 }
 
 #sr-modal .modal-header {
@@ -247,14 +248,14 @@
 }
 
 body:not(.native-scrollbars) #sr-modal .modal-close-button {
-    top: 12px;
+    top: max(12px, calc(12px + env(safe-area-inset-top)));
 }
 
 .sr-back-button {
     z-index: 21;
     cursor: var(--cursor);
     position: absolute;
-    top: 12px;
+    top: max(15px, calc(15px + env(safe-area-inset-top)));
     left: 12px;
     font-size: 26px;
     line-height: 22px;
