@@ -161,7 +161,8 @@ export class TopicPathList {
         return result;
     }
 
-    extend(other: TopicPathList): void {
+    extend(other?: TopicPathList): void {
+        if (!other) return;
         const newList: TopicPath[] = [...this.list];
         for (const otherTopicPath of other.list) {
             let foundMatch = false;

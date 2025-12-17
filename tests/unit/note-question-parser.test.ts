@@ -887,6 +887,7 @@ describe("Settings: Always include frontmatter tags", () => {
         const noteText: string = `---
 tags:
   - flashcards/frontmatter-tag
+  - some-other-tag
 ---
 #flashcards/question-tag
 Q1::A1
@@ -899,7 +900,42 @@ Q1::A1
                 questionType: CardType.SingleLineBasic,
                 topicPathList: TopicPathList.fromPsv(
                     "#flashcards/question-tag|#flashcards/frontmatter-tag",
-                    4,
+                    5,
+                ),
+                cards: [
+                    new Card({
+                        front: "Q1",
+                        back: "A1",
+                    }),
+                ],
+            },
+        ];
+        expect(
+            await parserIncludeFrontmatterTags.createQuestionList(
+                noteFile,
+                TextDirection.Ltr,
+                folderTopicPath,
+                true,
+            ),
+        ).toMatchObject(expected);
+    });
+
+    test("frontmatter tag is empty", async () => {
+        const noteText: string = `---
+tags: []
+---
+#flashcards/question-tag
+Q1::A1
+    `;
+        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        const folderTopicPath: TopicPath = TopicPath.emptyPath;
+        const expected = [
+            {
+                questionType: CardType.SingleLineBasic,
+                topicPathList: TopicPathList.fromPsv(
+                    "#flashcards/question-tag",
+                    3,
                 ),
                 cards: [
                     new Card({
