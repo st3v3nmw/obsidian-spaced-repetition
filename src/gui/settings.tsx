@@ -288,7 +288,7 @@ export class SRSettingTab extends PluginSettingTab {
             "beforeend",
             t("CLOZE_PATTERNS_DESC", {
                 docsUrl:
-                    "https://www.stephenmwangi.com/obsidian-spaced-repetition/flashcards/cloze-cards/#cloze-types",
+                    "https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/cloze-cards/#cloze-types",
             }),
         );
         clozePatternsEl.addTextArea((text) =>
@@ -826,7 +826,7 @@ export class SRSettingTab extends PluginSettingTab {
         algoSettingEl.descEl.insertAdjacentHTML(
             "beforeend",
             t("CHECK_ALGORITHM_WIKI", {
-                algoUrl: "https://www.stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
+                algoUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
             }),
         );
         algoSettingEl.addDropdown((dropdown) =>
@@ -1047,7 +1047,7 @@ export class SRSettingTab extends PluginSettingTab {
         containerEl.createEl("p").insertAdjacentHTML(
             "beforeend",
             t("CHECK_WIKI", {
-                wikiUrl: "https://www.stephenmwangi.com/obsidian-spaced-repetition/",
+                wikiUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/",
             }),
         );
 
@@ -1098,7 +1098,7 @@ export class SRSettingTab extends PluginSettingTab {
             "beforeend",
             t("CODE_CONTRIBUTION_INFO", {
                 codeContributionUrl:
-                    "https://www.stephenmwangi.com/obsidian-spaced-repetition/contributing/#code",
+                    "https://stephenmwangi.com/obsidian-spaced-repetition/contributing/#code",
             }),
         );
 
@@ -1106,7 +1106,7 @@ export class SRSettingTab extends PluginSettingTab {
             "beforeend",
             t("TRANSLATION_CONTRIBUTION_INFO", {
                 translationContributionUrl:
-                    "https://www.stephenmwangi.com/obsidian-spaced-repetition/contributing/#translating",
+                    "https://stephenmwangi.com/obsidian-spaced-repetition/contributing/#translating",
             }),
         );
     }
