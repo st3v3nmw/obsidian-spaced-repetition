@@ -86,6 +86,8 @@ export default {
     FLASHCARD_TAGS_DESC: "输入标签，用空格或新建行分隔，例如：#flashcards #deck2 #deck3.",
     CONVERT_FOLDERS_TO_DECKS: "将文件夹内容转换为卡片组和子卡片组",
     CONVERT_FOLDERS_TO_DECKS_DESC: "此选项为卡片标签选项的替代选项。",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS: "将计划重复日期保存在卡片最后一行的同一行",
     INLINE_SCHEDULING_COMMENTS_DESC: "HTML注释不再破坏列表格式",
     BURY_SIBLINGS_TILL_NEXT_DAY: "将关联卡片隐藏至下一天",

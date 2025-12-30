@@ -94,6 +94,8 @@ export default {
         "Mehrere Tags mit Leerzeichen oder Zeilenumbrüchen getrennt angeben. Bsp. #karte #stapel2 #stapel3.",
     CONVERT_FOLDERS_TO_DECKS: "Ordner in Stapel und Substapel umwandeln?",
     CONVERT_FOLDERS_TO_DECKS_DESC: 'Eine Alternative zur oberen "Lernkarten Tags" Option.',
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS:
         "Den Fortschritt in der gleichen Zeile wie die letzte Zeile einer Lernkartei speichern?",
     INLINE_SCHEDULING_COMMENTS_DESC:

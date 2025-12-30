@@ -127,6 +127,18 @@ export class SRSettingTab extends PluginSettingTab {
                     }),
             );
 
+        new Setting(containerEl)
+            .setName(t("ALWAYS_INCLUDE_FRONTMATTER_TAGS"))
+            .setDesc(t("ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.alwaysIncludeFrontmatterTags)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.alwaysIncludeFrontmatterTags = value;
+                        await this.plugin.savePluginData();
+                    }),
+            );
+
         this.createSettingFoldersToIgnore(containerEl);
 
         containerEl.createEl("h3", { text: t("GROUP_FLASHCARD_REVIEW") });

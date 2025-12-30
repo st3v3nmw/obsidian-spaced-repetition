@@ -88,6 +88,8 @@ export default {
     CONVERT_FOLDERS_TO_DECKS: "Klasörleri destelere ve alt destelere dönüştür?",
     CONVERT_FOLDERS_TO_DECKS_DESC:
         "Bu, yukarıdaki Flash Kart etiketleri seçeneğine bir alternatiftir.",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS: "Planlama yorumunu flash kartın son satırıyla aynı satıra kaydet?",
     INLINE_SCHEDULING_COMMENTS_DESC:
         "Bunu açmak, HTML yorumlarının liste biçimlendirmesini bozmamasını sağlar.",

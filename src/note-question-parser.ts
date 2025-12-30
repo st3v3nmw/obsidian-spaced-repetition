@@ -363,6 +363,13 @@ export class NoteQuestionParser {
                 }
             }
         }
+        if (
+            result !== this.frontmatterTopicPathList &&
+            this.settings.alwaysIncludeFrontmatterTags
+        ) {
+            result.extend(this.frontmatterTopicPathList);
+        }
+
         return result;
     }
 }
