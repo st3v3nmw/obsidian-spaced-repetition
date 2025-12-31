@@ -139,7 +139,7 @@ Specifically, this project uses [MkDocs Material](https://squidfunk.github.io/mk
 
 These files reside in `docs/docs/` in the respective language's folder. For instance, English docs are located in `docs/docs/en/`.
 
-The docs are served on [https://www.stephenmwangi.com/obsidian-spaced-repetition/](https://www.stephenmwangi.com/obsidian-spaced-repetition/).
+The docs are served on [https://stephenmwangi.com/obsidian-spaced-repetition/](https://stephenmwangi.com/obsidian-spaced-repetition/).
 
 For small changes, you can simply open an pull request for merging (against the `master` branch).
 The changes will be live once a new [release](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases) is made.
