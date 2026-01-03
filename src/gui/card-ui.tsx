@@ -6,6 +6,7 @@ import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { textInterval } from "src/algorithms/osr/note-scheduling";
 import { Card } from "src/card";
 import { Deck } from "src/deck";
+import { escapeHtml } from "src/escape-html";
 import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
@@ -69,6 +70,9 @@ export class CardUI {
     public easyButton: HTMLButtonElement;
     public answerButton: HTMLButtonElement;
     public lastPressed: number;
+
+    private clozeInputs: NodeListOf<Element>;
+    private clozeAnswers: NodeListOf<Element>;
 
     private chosenDeck: Deck | null;
     private totalCardsInSession: number = 0;
@@ -217,6 +221,9 @@ export class CardUI {
 
         // Update response buttons
         this._resetResponseButtons();
+
+        // Setup cloze input listeners
+        this._setupClozeInputListeners();
     }
 
     private get _currentCard(): Card {
@@ -557,6 +564,35 @@ export class CardUI {
         }
     }
 
+    private _setupClozeInputListeners(): void {
+        this.clozeInputs = document.querySelectorAll(".cloze-input");
+
+        this.clozeInputs.forEach((input) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            input.addEventListener("change", (e) => {});
+        });
+    }
+
+    private _evaluateClozeAnswers(): void {
+        this.clozeAnswers = document.querySelectorAll(".cloze-answer");
+
+        if (this.clozeAnswers.length === this.clozeInputs.length) {
+            for (let i = 0; i < this.clozeAnswers.length; i++) {
+                const clozeInput = this.clozeInputs[i] as HTMLInputElement;
+                const clozeAnswer = this.clozeAnswers[i] as HTMLElement;
+
+                const inputText = clozeInput.value.trim();
+                const answerText = clozeAnswer.innerText.trim();
+
+                const answerElement =
+                    inputText === answerText
+                        ? `<span style="color: green">${escapeHtml(inputText)}</span>`
+                        : `[<span style="color: red; text-decoration: line-through;">${escapeHtml(inputText)}</span><span style="color: green">${answerText}</span>]`;
+                clozeAnswer.innerHTML = answerElement;
+            }
+        }
+    }
+
     private _showAnswer(): void {
         const timeNow = now();
         if (
@@ -590,6 +626,9 @@ export class CardUI {
             this._currentQuestion.questionText.textDirection,
         );
 
+        // Evaluate cloze answers
+        this._evaluateClozeAnswers();
+
         // Show response buttons
         this.answerButton.addClass("sr-is-hidden");
         this.hardButton.removeClass("sr-is-hidden");
@@ -620,9 +659,10 @@ export class CardUI {
     }
 
     private _keydownHandler = (e: KeyboardEvent) => {
-        // Prevents any input, if the edit modal is open or if the view is not in focus
+        // Prevents any input, if the edit modal is open, input area is in focus, or if the view is not in focus
         if (
             document.activeElement.nodeName === "TEXTAREA" ||
+            document.activeElement.nodeName === "INPUT" ||
             this.mode === FlashcardMode.Closed ||
             !this.plugin.getSRInFocusState()
         ) {
