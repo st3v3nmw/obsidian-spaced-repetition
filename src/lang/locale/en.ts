@@ -167,6 +167,7 @@ export default {
     CHECK_ALGORITHM_WIKI:
         'For more information, check the <a href="${algoUrl}">algorithm details</a>.',
     SM2_OSR_VARIANT: "OSR's variant of SM-2",
+    CUSTOM_INTERVALS: "Custom Intervals",
     BASE_EASE: "Base ease",
     BASE_EASE_DESC: "minimum = 130, preferrably approximately 250.",
     BASE_EASE_MIN_WARNING: "The base ease must be at least 130.",
@@ -176,6 +177,12 @@ export default {
     EASY_BONUS_DESC:
         "The easy bonus allows you to set the difference in intervals between answering Good and Easy on a flashcard/note (minimum = 100%).",
     EASY_BONUS_MIN_WARNING: "The easy bonus must be at least 100.",
+    CUSTOM_INTERVAL_EASY: "Easy Interval (days)",
+    CUSTOM_INTERVAL_EASY_DESC: "Number of days before the next review when answering Easy.",
+    CUSTOM_INTERVAL_GOOD: "Good Interval (days)",
+    CUSTOM_INTERVAL_GOOD_DESC: "Number of days before the next review when answering Good.",
+    CUSTOM_INTERVAL_HARD: "Hard Interval (days)",
+    CUSTOM_INTERVAL_HARD_DESC: "Number of days before the next review when answering Hard.",
     LOAD_BALANCE: "Enable load balancer",
     LOAD_BALANCE_DESC: `Slightly tweaks the interval so that the number of reviews per day is more consistent.
         It's like Anki's fuzz but instead of being random, it picks the day with the least amount of reviews.

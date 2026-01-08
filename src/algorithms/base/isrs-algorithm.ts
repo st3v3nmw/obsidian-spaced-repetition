@@ -7,6 +7,7 @@ import { INoteEaseList } from "src/note-ease-list";
 
 export enum Algorithm {
     SM_2_OSR = "SM-2-OSR",
+    CUSTOM_INTERVALS = "Custom-Intervals",
 }
 
 export interface ISrsAlgorithm {
