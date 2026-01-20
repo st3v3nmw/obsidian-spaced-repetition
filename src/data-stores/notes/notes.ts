@@ -9,6 +9,7 @@ import { RepItemStorageInfo } from "src/data-stores/base/rep-item-storage-info";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
 import { DateUtil, formatDateYYYYMMDD, globalDateProvider } from "src/utils/dates";
+import { MultiLineTextFinder } from "src/utils/strings";
 
 export class StoreInNotes implements IDataStore {
     private settings: SRSettings;
@@ -66,5 +67,21 @@ export class StoreInNotes implements IDataStore {
         const newText: string = question.updateQuestionWithinNoteText(fileText, this.settings);
         await question.note.file.write(newText);
         question.hasChanged = false;
+    }
+
+    async questionDelete(question: Question): Promise<void> {
+        const fileText: string = await question.note.file.read();
+        const originalText: string = question.questionText.original;
+        const newText = MultiLineTextFinder.findAndReplace(fileText, originalText, "");
+        if (newText) {
+            await question.note.file.write(newText);
+        } else {
+            console.error(
+                `questionDelete: Text not found: ${originalText.substring(
+                    0,
+                    100,
+                )} in note: ${fileText.substring(0, 100)}`,
+            );
+        }
     }
 }

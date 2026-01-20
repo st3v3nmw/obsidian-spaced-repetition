@@ -669,6 +669,18 @@ export class SRSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
+            .setName(t("SHOW_DELETE_BUTTON"))
+            .setDesc(t("SHOW_DELETE_BUTTON_DESC"))
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.data.settings.showDeleteButton)
+                    .onChange(async (value) => {
+                        this.plugin.data.settings.showDeleteButton = value;
+                        await this.plugin.savePluginData();
+                    }),
+            );
+
+        new Setting(containerEl)
             .setName(t("CARD_MODAL_HEIGHT_PERCENT"))
             .setDesc(t("CARD_MODAL_SIZE_PERCENT_DESC"))
             .addSlider((slider) =>

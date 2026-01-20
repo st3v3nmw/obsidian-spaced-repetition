@@ -38,6 +38,7 @@ Although you may want to review or cram all cards across all decks, you often ma
 2 | Reset | Reset the review schedule information - the review interval is set to 1 day, and the ease is set to the default value
 3 | Info | Shows the scheduling information for the card
 4 | Skip | Skip the current card without reviewing
+5 | Delete | Delete the card from the note (Ctrl/Cmd + Click to force delete without confirmation)
 
 ### Context
 

@@ -45,6 +45,7 @@ export interface SRSettings {
     flashcardGoodText: string;
     flashcardHardText: string;
     reviewButtonDelay: number;
+    showDeleteButton: boolean;
     openViewInNewTab: boolean;
 
     // algorithm
@@ -105,6 +106,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),
     reviewButtonDelay: 0,
+    showDeleteButton: false,
     openViewInNewTab: false,
 
     // algorithm

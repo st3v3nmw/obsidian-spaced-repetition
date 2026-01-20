@@ -62,6 +62,7 @@ export class CardUI {
     public resetButton: HTMLButtonElement;
     public infoButton: HTMLButtonElement;
     public skipButton: HTMLButtonElement;
+    public deleteButton: HTMLButtonElement;
 
     public response: HTMLDivElement;
     public hardButton: HTMLButtonElement;
@@ -257,6 +258,9 @@ export class CardUI {
         this._createResetButton();
         this._createCardInfoButton();
         this._createSkipButton();
+        if (this.settings.showDeleteButton) {
+            this._createDeleteButton();
+        }
     }
 
     private _createEditButton() {
@@ -301,6 +305,36 @@ export class CardUI {
 
     private async _skipCurrentCard(): Promise<void> {
         this.reviewSequencer.skipCurrentCard();
+        await this._showNextCard();
+    }
+
+    private _createDeleteButton() {
+        this.deleteButton = this.controls.createEl("button");
+        this.deleteButton.addClasses(["sr-button", "sr-delete-button"]);
+        setIcon(this.deleteButton, "trash");
+        this.deleteButton.setAttribute("aria-label", t("DELETE_CARD"));
+        this.deleteButton.addEventListener("click", async (e) => {
+            await this._deleteCurrentCard(e.ctrlKey || e.metaKey);
+        });
+    }
+
+    private async _deleteCurrentCard(force: boolean = false): Promise<void> {
+        const timeNow = now();
+        if (
+            this.lastPressed &&
+            timeNow - this.lastPressed < this.plugin.data.settings.reviewButtonDelay
+        ) {
+            return;
+        }
+        this.lastPressed = timeNow;
+
+        if (!force) {
+            if (!window.confirm(t("DELETE_CARD_CONFIRMATION"))) {
+                return;
+            }
+        }
+
+        await this.reviewSequencer.deleteCurrentCardFromNote();
         await this._showNextCard();
     }
 
