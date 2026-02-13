@@ -53,6 +53,7 @@ export class SRTabView extends ItemView {
     ) {
         super(leaf);
         this.plugin = plugin;
+        this.navigation = false;
         this.settings = plugin.data.settings;
         this.loadReviewSequencerData = loadReviewSequencerData;
 
