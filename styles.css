@@ -64,7 +64,7 @@
 
 @media only screen and (orientation: landscape) {
     .is-mobile:not(.is-tablet) .sr-tab-view {
-        padding: 0 8px;
+        padding: 0 8px 16px 8px;
     }
 
     .is-mobile:not(.is-tablet) #sr-modal .sr-modal-content {
@@ -122,6 +122,7 @@
 }
 
 @media only screen and (orientation: landscape) and (max-height: 460px) {
+
     #sr-modal,
     .sr-tab-view {
         --side-button-size: 35px !important;
@@ -159,17 +160,19 @@
 /* MARK: Mobile portrait mode */
 
 @media only screen and (orientation: portrait) {
+
     .is-mobile:not(.is-tablet) .sr-flashcard,
     .is-mobile:not(.is-tablet) .sr-deck-list {
         gap: 12px;
     }
 
     .is-mobile:not(.is-tablet) .sr-tab-view {
-        padding: 0 8px;
+        padding: 0 8px 16px 8px;
     }
 }
 
 @media only screen and (orientation: portrait) and (max-width: 650px) {
+
     .is-mobile:not(.is-tablet) .sr-chosen-deck-name,
     .is-mobile:not(.is-tablet) .sr-current-deck-name {
         max-width: 15ch;
@@ -178,7 +181,7 @@
 
 @media only screen and (orientation: portrait) and (max-width: 550px) {
     .is-mobile .sr-tab-view {
-        padding: 0 8px;
+        padding: 0 8px 16px 8px;
     }
 
     .is-mobile:not(.is-tablet) .sr-chosen-deck-name,
@@ -189,11 +192,12 @@
 
 @media only screen and (orientation: portrait) and (max-width: 500px) {
     .is-mobile .sr-tab-view {
-        padding: 0 8px;
+        padding: 0 8px 16px 8px;
     }
 }
 
 @media only screen and (orientation: portrait) and (max-width: 440px) {
+
     .is-mobile:not(.is-tablet) .sr-chosen-deck-name,
     .is-mobile:not(.is-tablet) .sr-current-deck-name {
         max-width: 8ch;
@@ -201,6 +205,7 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 410px) {
+
     .is-mobile:not(.is-tablet) .sr-chosen-deck-name,
     .is-mobile:not(.is-tablet) .sr-current-deck-name {
         max-width: 6ch;
@@ -218,7 +223,7 @@
     }
 
     .is-mobile .sr-tab-view {
-        padding: 0 4px;
+        padding: 0 4px 16px 4px;
     }
 }
 
@@ -470,7 +475,6 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     font-size: var(--font-text-size);
     overflow-y: auto;
     user-select: text;
-    padding-inline: 8px;
     flex-grow: 1;
 }
 
@@ -960,13 +964,11 @@ th.gridjs-th:last-child {
 
 .gridjs-loading-bar:after {
     animation: shimmer 2s infinite;
-    background-image: linear-gradient(
-        90deg,
-        hsla(0, 0%, 80%, 0),
-        hsla(0, 0%, 80%, 0.2) 20%,
-        hsla(0, 0%, 80%, 0.5) 60%,
-        hsla(0, 0%, 80%, 0)
-    );
+    background-image: linear-gradient(90deg,
+            hsla(0, 0%, 80%, 0),
+            hsla(0, 0%, 80%, 0.2) 20%,
+            hsla(0, 0%, 80%, 0.5) 60%,
+            hsla(0, 0%, 80%, 0));
     content: "";
     transform: translateX(-100%);
 }

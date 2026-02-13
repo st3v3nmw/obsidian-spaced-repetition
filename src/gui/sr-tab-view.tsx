@@ -107,6 +107,19 @@ export class SRTabView extends ItemView {
      */
     async onOpen() {
         try {
+            // Reposition the navbar if it's mobile, because lese it overlaps the buttons in the tab view
+            if (document.body.classList.contains("is-mobile")) {
+                const mobileNavbar = document.getElementsByClassName("mobile-navbar")[0];
+                if (mobileNavbar) {
+                    (mobileNavbar as HTMLElement).style.position = "relative";
+                }
+            }
+
+            // Removes the bottom fade mask if it's mobile and floating nav, because else it overlaps the bottom part of the flashcard and makes it hard to read
+            if (document.body.classList.contains("is-phone") && document.body.classList.contains("is-floating-nav")) {
+                document.body.style.setProperty("--view-bottom-fade-mask", "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(16px - 0px))");
+            }
+
             this._createBackButton();
             const loadedData = await this.loadReviewSequencerData();
 
@@ -159,6 +172,18 @@ export class SRTabView extends ItemView {
      * Ensures that resources associated with these views are properly released.
      */
     async onClose() {
+        // Resets the changes made in onOpen
+        if (document.body.classList.contains("is-mobile")) {
+            const mobileNavbar = document.getElementsByClassName("mobile-navbar")[0];
+            if (mobileNavbar) {
+                (mobileNavbar as HTMLElement).style.position = "unset";
+            }
+        }
+
+        // Resets the changes made in onOpen
+        if (document.body.classList.contains("is-phone") && document.body.classList.contains("is-floating-nav")) {
+            document.body.style.setProperty("--view-bottom-fade-mask", "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(34px - 0px + 12px))");
+        }
         if (this.deckView) this.deckView.close();
         if (this.flashcardView) this.flashcardView.close();
     }
