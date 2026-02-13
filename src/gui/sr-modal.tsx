@@ -1,4 +1,4 @@
-import { App, ButtonComponent, Modal } from "obsidian";
+import { App, ButtonComponent, Modal, Platform } from "obsidian";
 
 import { Deck } from "src/deck";
 import {
@@ -12,7 +12,7 @@ import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
-import getPlatform from "src/utils/platform-detector";
+import EmulatedPlatform from "src/utils/platform-detector";
 
 export enum FlashcardMode {
     Deck,
@@ -145,7 +145,7 @@ export class FlashcardModal extends Modal {
         this.backButton = new ButtonComponent(this.modalEl);
         this.backButton.setClass("sr-back-button");
         this.backButton.setClass("sr-is-hidden");
-        if (getPlatform().isPhone) {
+        if (EmulatedPlatform().isPhone || Platform.isPhone) {
             this.backButton.setClass("mod-raised");
         } else {
             this.backButton.setClass("clickable-icon");

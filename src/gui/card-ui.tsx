@@ -16,7 +16,7 @@ import type SRPlugin from "src/main";
 import { Note } from "src/note";
 import { CardType, Question } from "src/question";
 import { SRSettings } from "src/settings";
-import getPlatform from "src/utils/platform-detector";
+import EmulatedPlatform from "src/utils/platform-detector";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
 
 export class CardUI {
@@ -267,7 +267,7 @@ export class CardUI {
         this.editButton.buttonEl.setAttribute("aria-label", t("EDIT_CARD"));
         this.editButton.setClass("sr-button");
         this.editButton.setClass("sr-edit-button");
-        if (getPlatform().isPhone) {
+        if (EmulatedPlatform().isPhone || Platform.isPhone) {
             this.editButton.setClass("mod-raised");
         }
         this.editButton.onClick(async () => {
@@ -279,7 +279,7 @@ export class CardUI {
         this.resetButton = new ButtonComponent(this.controls);
         this.resetButton.setClass("sr-button");
         this.resetButton.setClass("sr-reset-button");
-        if (getPlatform().isPhone) {
+        if (EmulatedPlatform().isPhone || Platform.isPhone) {
             this.resetButton.setClass("mod-raised");
         }
         this.resetButton.setIcon("refresh-cw");
@@ -294,7 +294,7 @@ export class CardUI {
         this.infoButton = new ButtonComponent(this.controls);
         this.infoButton.setClass("sr-button");
         this.infoButton.setClass("sr-info-button");
-        if (getPlatform().isPhone) {
+        if (EmulatedPlatform().isPhone || Platform.isPhone) {
             this.infoButton.setClass("mod-raised");
         }
         this.infoButton.setIcon("info");
@@ -309,7 +309,7 @@ export class CardUI {
         this.skipButton = new ButtonComponent(this.controls);
         this.skipButton.setClass("sr-button");
         this.skipButton.setClass("sr-skip-button");
-        if (getPlatform().isPhone) {
+        if (EmulatedPlatform().isPhone || Platform.isPhone) {
             this.skipButton.setClass("mod-raised");
         }
         this.skipButton.setIcon("chevrons-right");
@@ -564,7 +564,7 @@ export class CardUI {
         const interval: number = schedule.interval;
 
         if (this.settings.showIntervalInReviewButtons) {
-            if (Platform.isMobile) {
+            if (EmulatedPlatform().isMobile || Platform.isMobile) {
                 button.setButtonText(textInterval(interval, true));
             } else {
                 button.setButtonText(`${buttonName} - ${textInterval(interval, false)}`);

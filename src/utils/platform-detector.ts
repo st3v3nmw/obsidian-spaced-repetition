@@ -1,36 +1,30 @@
-import { Platform } from "obsidian";
-
 import { DEBUG_MODE_ENABLED } from "src/constants";
 
-export interface CustomPlatform {
+export interface EmulatedPlatform {
     isDesktop: boolean;
     isMobile: boolean;
     isPhone: boolean;
     isTablet: boolean;
+    isEmulated: boolean;
 }
 
 /**
- * Detects the current and also emulated (once debug mode is active) platform and returns a CustomPlatform object with boolean properties indicating whether the current platform is desktop, mobile, tablet, or phone.
+ * Detects the emulated platform (once debug mode is active) and returns a CustomPlatform object with boolean properties indicating whether the emulated platform is desktop, mobile, tablet, or phone.
  *
- * @returns
+ * @returns {EmulatedPlatform} An object containing boolean properties for the emulated platform.
  */
-export default function getPlatform(): CustomPlatform {
+export default function EmulatedPlatform(): EmulatedPlatform {
     return {
-        isDesktop:
-            (!document.body.hasClass("emulate-mobile") && DEBUG_MODE_ENABLED) ||
-            Platform.isDesktop ||
-            Platform.isDesktopApp,
-        isMobile:
-            (document.body.hasClass("emulate-mobile") && DEBUG_MODE_ENABLED) || Platform.isMobile,
+        isDesktop: DEBUG_MODE_ENABLED && !document.body.hasClass("emulate-mobile"),
+        isMobile: DEBUG_MODE_ENABLED && document.body.hasClass("emulate-mobile"),
         isPhone:
-            (document.body.hasClass("emulate-mobile") &&
-                document.body.hasClass("is-phone") &&
-                DEBUG_MODE_ENABLED) ||
-            Platform.isPhone,
+            DEBUG_MODE_ENABLED &&
+            document.body.hasClass("emulate-mobile") &&
+            document.body.hasClass("is-phone"),
         isTablet:
-            (document.body.hasClass("emulate-mobile") &&
-                document.body.hasClass("is-tablet") &&
-                DEBUG_MODE_ENABLED) ||
-            Platform.isTablet,
+            DEBUG_MODE_ENABLED &&
+            document.body.hasClass("emulate-mobile") &&
+            document.body.hasClass("is-tablet"),
+        isEmulated: DEBUG_MODE_ENABLED && document.body.hasClass("emulate-mobile"),
     };
 }
