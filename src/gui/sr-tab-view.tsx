@@ -116,8 +116,14 @@ export class SRTabView extends ItemView {
             }
 
             // Removes the bottom fade mask if it's mobile and floating nav, because else it overlaps the bottom part of the flashcard and makes it hard to read
-            if (document.body.classList.contains("is-phone") && document.body.classList.contains("is-floating-nav")) {
-                document.body.style.setProperty("--view-bottom-fade-mask", "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(16px - 0px))");
+            if (
+                document.body.classList.contains("is-phone") &&
+                document.body.classList.contains("is-floating-nav")
+            ) {
+                document.body.style.setProperty(
+                    "--view-bottom-fade-mask",
+                    "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(16px - 0px))",
+                );
             }
 
             this._createBackButton();
@@ -181,8 +187,14 @@ export class SRTabView extends ItemView {
         }
 
         // Resets the changes made in onOpen
-        if (document.body.classList.contains("is-phone") && document.body.classList.contains("is-floating-nav")) {
-            document.body.style.setProperty("--view-bottom-fade-mask", "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(34px - 0px + 12px))");
+        if (
+            document.body.classList.contains("is-phone") &&
+            document.body.classList.contains("is-floating-nav")
+        ) {
+            document.body.style.setProperty(
+                "--view-bottom-fade-mask",
+                "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(34px - 0px + 12px))",
+            );
         }
         if (this.deckView) this.deckView.close();
         if (this.flashcardView) this.flashcardView.close();

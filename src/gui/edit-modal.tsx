@@ -123,31 +123,29 @@ export class FlashcardEditModal extends Modal {
 
     // -> Response section
 
-    private _createSaveButton(
-        container: HTMLElement,
-    ) {
+    private _createSaveButton(container: HTMLElement) {
         this.saveButton = new ButtonComponent(container);
         this.saveButton.setClass("sr-response-button");
         this.saveButton.setClass("sr-save-button");
         this.saveButton.setClass("sr-bg-green");
         this.saveButton.setButtonText(t("SAVE"));
-        this.saveButton.onClick((evt) => { this.saveClickCallback(evt); });
+        this.saveButton.onClick((evt) => {
+            this.saveClickCallback(evt);
+        });
     }
 
-    private _createCancelButton(
-        container: HTMLElement,
-    ) {
+    private _createCancelButton(container: HTMLElement) {
         this.cancelButton = new ButtonComponent(container);
         this.cancelButton.setClass("sr-response-button");
         this.cancelButton.setClass("sr-cancel-button");
         this.cancelButton.setClass("sr-bg-red");
         this.cancelButton.setButtonText(t("CANCEL"));
-        this.cancelButton.onClick((evt) => { this.cancelClickCallback(evt); });
+        this.cancelButton.onClick((evt) => {
+            this.cancelClickCallback(evt);
+        });
     }
 
-    private _createSpacerButton(
-        container: HTMLElement,
-    ) {
+    private _createSpacerButton(container: HTMLElement) {
         const button = container.createEl("button");
         button.addClasses(["sr-response-button", "sr-spacer"]);
         button.setText("");

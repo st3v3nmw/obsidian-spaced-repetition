@@ -142,7 +142,6 @@ export class FlashcardModal extends Modal {
     }
 
     private _createBackButton() {
-
         this.backButton = new ButtonComponent(this.modalEl);
         this.backButton.setClass("sr-back-button");
         this.backButton.setClass("sr-is-hidden");
