@@ -1,4 +1,4 @@
-import { App, Modal } from "obsidian";
+import { App, ButtonComponent, Modal } from "obsidian";
 
 import { t } from "src/lang/helpers";
 import { TextDirection } from "src/utils/strings";
@@ -11,8 +11,8 @@ export class FlashcardEditModal extends Modal {
     public title: HTMLDivElement;
     public textArea: HTMLTextAreaElement;
     public response: HTMLDivElement;
-    public saveButton: HTMLButtonElement;
-    public cancelButton: HTMLButtonElement;
+    public saveButton: ButtonComponent;
+    public cancelButton: ButtonComponent;
 
     private resolvePromise: (input: string) => void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -123,23 +123,41 @@ export class FlashcardEditModal extends Modal {
 
     // -> Response section
 
-    private _createResponseButton(
+    private _createSaveButton(
         container: HTMLElement,
-        text: string,
-        colorClass: string,
-        callback: (evt: MouseEvent) => void,
+    ) {
+        this.saveButton = new ButtonComponent(container);
+        this.saveButton.setClass("sr-response-button");
+        this.saveButton.setClass("sr-save-button");
+        this.saveButton.setClass("sr-bg-green");
+        this.saveButton.setButtonText(t("SAVE"));
+        this.saveButton.onClick((evt) => { this.saveClickCallback(evt); });
+    }
+
+    private _createCancelButton(
+        container: HTMLElement,
+    ) {
+        this.cancelButton = new ButtonComponent(container);
+        this.cancelButton.setClass("sr-response-button");
+        this.cancelButton.setClass("sr-cancel-button");
+        this.cancelButton.setClass("sr-bg-red");
+        this.cancelButton.setButtonText(t("CANCEL"));
+        this.cancelButton.onClick((evt) => { this.cancelClickCallback(evt); });
+    }
+
+    private _createSpacerButton(
+        container: HTMLElement,
     ) {
         const button = container.createEl("button");
-        button.addClasses(["sr-response-button", colorClass]);
-        button.setText(text);
-        button.addEventListener("click", callback);
+        button.addClasses(["sr-response-button", "sr-spacer"]);
+        button.setText("");
     }
 
     private _createResponse(mainContentContainer: HTMLElement) {
         const response: HTMLDivElement = mainContentContainer.createDiv();
         response.addClass("sr-response");
-        this._createResponseButton(response, t("CANCEL"), "sr-bg-red", this.cancelClickCallback);
-        this._createResponseButton(response, "", "sr-spacer", () => {});
-        this._createResponseButton(response, t("SAVE"), "sr-bg-green", this.saveClickCallback);
+        this._createCancelButton(response);
+        this._createSpacerButton(response);
+        this._createSaveButton(response);
     }
 }

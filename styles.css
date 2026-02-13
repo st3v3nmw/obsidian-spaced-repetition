@@ -49,10 +49,7 @@
 }
 
 .sr-button {
-    box-shadow: none !important;
     cursor: pointer;
-    width: var(--side-button-size);
-    height: var(--side-button-size);
 }
 
 .sr-back-button:hover,
@@ -62,30 +59,40 @@
 
 /* MARK: Mobile landscape mode */
 
+.is-mobile .sr-deck-list .sr-header-stats-count,
+.is-mobile .sr-deck-list .sr-tree-stats-count {
+    padding: var(--size-2-2) var(--size-2-3);
+    border-radius: var(--tag-radius);
+}
+
+body:not(.is-phone) .sr-response {
+    padding: var(--size-2-2) 0;
+}
+
 @media only screen and (orientation: landscape) {
-    .is-mobile:not(.is-tablet) .sr-tab-view {
+    .is-phone .sr-tab-view {
         padding: 0 8px 8px 8px;
     }
 
-    .is-mobile:not(.is-tablet) #sr-modal .sr-modal-content {
+    .is-phone #sr-modal .sr-modal-content {
         padding: 8px;
     }
 
-    .is-mobile:not(.is-tablet) #sr-modal,
-    .is-mobile:not(.is-tablet) .sr-tab-view {
+    .is-phone #sr-modal,
+    .is-phone .sr-tab-view {
         --side-button-clearance: calc(calc(var(--side-button-size)) + 8px);
     }
 
-    .is-mobile:not(.is-tablet) .sr-deck-list,
-    .is-mobile:not(.is-tablet) .sr-flashcard {
+    .is-phone .sr-deck-list,
+    .is-phone .sr-flashcard {
         gap: 8px;
     }
 
-    .is-mobile:not(.is-tablet) .sr-deck-list hr {
+    .is-phone .sr-deck-list hr {
         margin-bottom: 8px;
     }
 
-    .is-mobile:not(.is-tablet) .sr-flashcard .sr-controls {
+    .is-phone .sr-flashcard .sr-controls {
         width: unset !important;
         flex-direction: column;
         position: absolute;
@@ -95,64 +102,58 @@
         padding-left: 8px;
     }
 
-    .is-mobile:not(.is-tablet) .sr-flashcard .sr-chosen-deck-info > *,
-    .is-mobile:not(.is-tablet) .sr-flashcard .sr-current-deck-info > * {
+    .is-phone .sr-flashcard .sr-chosen-deck-info > *,
+    .is-phone .sr-flashcard .sr-current-deck-info > * {
         font-size: medium;
     }
 
-    .is-mobile:not(.is-tablet) .sr-tab-view .sr-flashcard .sr-info-section {
+    .is-phone .sr-tab-view .sr-flashcard .sr-info-section {
         margin: 0 0 0 calc(var(--side-button-clearance));
     }
 
-    .is-mobile:not(.is-tablet) #sr-modal .sr-flashcard .sr-info-section {
+    .is-phone #sr-modal .sr-flashcard .sr-info-section {
         margin: 0 calc(var(--side-button-clearance));
     }
 
-    .is-mobile:not(.is-tablet) .sr-flashcard .sr-content {
+    .is-phone .sr-flashcard .sr-content {
         margin: 0 0 0 calc(var(--side-button-clearance));
     }
 
-    .is-mobile:not(.is-tablet) .sr-flashcard .sr-content hr {
+    .is-phone .sr-flashcard .sr-content hr {
         margin: 2px 0;
     }
 
-    .is-mobile:not(.is-tablet) .sr-response-button {
+    .is-phone .sr-response-button {
         height: 48px !important;
     }
 }
 
-@media only screen and (orientation: landscape) and (max-height: 460px) {
-
-    #sr-modal,
-    .sr-tab-view {
-        --side-button-size: 35px !important;
+@media only screen and (orientation: landscape) and (max-height: 490px) {
+    .is-phone .sr-tab-view .sr-flashcard .sr-info-section {
+        --side-button-clearance: calc(var(--side-button-size) * 3) !important;
     }
 
-    .is-mobile:not(.is-tablet) .sr-response {
+    .is-phone .sr-tab-view .sr-back-button {
+        left: calc(var(--side-button-size) * 2) !important;
+        top: 0px !important;
+    }
+
+    .is-phone .sr-response {
         margin: 0 0 0 calc(var(--side-button-clearance));
     }
 
-    .is-mobile:not(.is-tablet) .sr-response-button {
+    .is-phone .sr-response-button {
         height: 32px !important;
     }
 
-    .is-mobile:not(.is-tablet) .sr-flashcard .sr-content p {
+    .is-phone .sr-flashcard .sr-content p {
         margin-block-start: 0.5rem;
         margin-block-end: 0.5rem;
     }
 }
 
 @media only screen and (orientation: landscape) and (max-height: 400px) {
-    .is-mobile:not(.is-tablet) .sr-tab-view .sr-flashcard .sr-info-section {
-        --side-button-clearance: calc(var(--side-button-size) * 3) !important;
-    }
-
-    .is-mobile:not(.is-tablet) .sr-tab-view .sr-back-button {
-        left: calc(var(--side-button-size) * 2) !important;
-        top: 0px !important;
-    }
-
-    .is-mobile:not(.is-tablet) .sr-flashcard {
+    .is-phone .sr-flashcard {
         gap: 4px;
     }
 }
@@ -161,12 +162,12 @@
 
 @media only screen and (orientation: portrait) {
 
-    .is-mobile:not(.is-tablet) .sr-flashcard,
-    .is-mobile:not(.is-tablet) .sr-deck-list {
+    .is-phone .sr-flashcard,
+    .is-phone .sr-deck-list {
         gap: 12px;
     }
 
-    .is-mobile:not(.is-tablet) .sr-tab-view {
+    .is-phone .sr-tab-view {
         padding: 0 8px 16px 8px;
     }
 
@@ -178,8 +179,8 @@
 
 @media only screen and (orientation: portrait) and (max-width: 650px) {
 
-    .is-mobile:not(.is-tablet) .sr-chosen-deck-name,
-    .is-mobile:not(.is-tablet) .sr-current-deck-name {
+    .is-phone .sr-chosen-deck-name,
+    .is-phone .sr-current-deck-name {
         max-width: 15ch;
     }
 }
@@ -189,8 +190,8 @@
         padding: 0 8px 16px 8px;
     }
 
-    .is-mobile:not(.is-tablet) .sr-chosen-deck-name,
-    .is-mobile:not(.is-tablet) .sr-current-deck-name {
+    .is-phone .sr-chosen-deck-name,
+    .is-phone .sr-current-deck-name {
         max-width: 10ch;
     }
 }
@@ -203,16 +204,16 @@
 
 @media only screen and (orientation: portrait) and (max-width: 440px) {
 
-    .is-mobile:not(.is-tablet) .sr-chosen-deck-name,
-    .is-mobile:not(.is-tablet) .sr-current-deck-name {
+    .is-phone .sr-chosen-deck-name,
+    .is-phone .sr-current-deck-name {
         max-width: 8ch;
     }
 }
 
 @media only screen and (orientation: portrait) and (max-width: 410px) {
 
-    .is-mobile:not(.is-tablet) .sr-chosen-deck-name,
-    .is-mobile:not(.is-tablet) .sr-current-deck-name {
+    .is-phone .sr-chosen-deck-name,
+    .is-phone .sr-current-deck-name {
         max-width: 6ch;
     }
 }
@@ -270,12 +271,20 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     line-height: 22px;
     height: 26px;
     width: 26px;
-    padding: 0 var(--size-2-2);
-    border-radius: var(--radius-s);
-    color: var(--text-muted);
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+#sr-modal .sr-back-button {
+    height: 30px;
+    width: 30px;
+}
+
+.is-mobile #sr-modal .sr-back-button {
+    height: var(--side-button-size);
+    width: var(--side-button-size);
+    padding: var(--size-4-1) var(--size-4-3);
 }
 
 /* MARK: Tab view */
@@ -506,8 +515,7 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     line-height: 48px;
     text-align: center;
     cursor: pointer;
-    border-radius: 4px;
-    user-select: text;
+    user-select: none;
 }
 
 /* MARK: EditModal */

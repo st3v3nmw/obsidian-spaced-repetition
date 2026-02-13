@@ -1,5 +1,5 @@
 import { now } from "moment";
-import { App, Notice, Platform, setIcon } from "obsidian";
+import { App, ButtonComponent, Notice, Platform, setIcon } from "obsidian";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
@@ -16,6 +16,7 @@ import type SRPlugin from "src/main";
 import { Note } from "src/note";
 import { CardType, Question } from "src/question";
 import { SRSettings } from "src/settings";
+import getPlatform from "src/utils/platform-selector";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
 
 export class CardUI {
@@ -58,16 +59,16 @@ export class CardUI {
     public content: HTMLDivElement;
 
     public controls: HTMLDivElement;
-    public editButton: HTMLButtonElement;
-    public resetButton: HTMLButtonElement;
-    public infoButton: HTMLButtonElement;
-    public skipButton: HTMLButtonElement;
+    public editButton: ButtonComponent;
+    public resetButton: ButtonComponent;
+    public infoButton: ButtonComponent;
+    public skipButton: ButtonComponent;
 
     public response: HTMLDivElement;
-    public hardButton: HTMLButtonElement;
-    public goodButton: HTMLButtonElement;
-    public easyButton: HTMLButtonElement;
-    public answerButton: HTMLButtonElement;
+    public hardButton: ButtonComponent;
+    public goodButton: ButtonComponent;
+    public easyButton: ButtonComponent;
+    public answerButton: ButtonComponent;
     public lastPressed: number;
 
     private chosenDeck: Deck | null;
@@ -260,41 +261,61 @@ export class CardUI {
     }
 
     private _createEditButton() {
-        this.editButton = this.controls.createEl("button");
-        this.editButton.addClasses(["sr-button", "sr-edit-button"]);
-        setIcon(this.editButton, "edit");
-        this.editButton.setAttribute("aria-label", t("EDIT_CARD"));
-        this.editButton.addEventListener("click", async () => {
+        this.editButton = new ButtonComponent(this.controls);
+        this.editButton.setIcon("edit");
+        this.editButton.setTooltip(t("EDIT_CARD"));
+        this.editButton.buttonEl.setAttribute("aria-label", t("EDIT_CARD"));
+        this.editButton.setClass("sr-button");
+        this.editButton.setClass("sr-edit-button");
+        if (getPlatform().isPhone) {
+            this.editButton.setClass("mod-raised");
+        }
+        this.editButton.onClick(async () => {
             this.editClickHandler();
         });
     }
 
     private _createResetButton() {
-        this.resetButton = this.controls.createEl("button");
-        this.resetButton.addClasses(["sr-button", "sr-reset-button"]);
-        setIcon(this.resetButton, "refresh-cw");
-        this.resetButton.setAttribute("aria-label", t("RESET_CARD_PROGRESS"));
-        this.resetButton.addEventListener("click", () => {
+        this.resetButton = new ButtonComponent(this.controls);
+        this.resetButton.setClass("sr-button");
+        this.resetButton.setClass("sr-reset-button");
+        if (getPlatform().isPhone) {
+            this.resetButton.setClass("mod-raised");
+        }
+        this.resetButton.setIcon("refresh-cw");
+        this.resetButton.setTooltip(t("RESET_CARD_PROGRESS"));
+        this.resetButton.buttonEl.setAttribute("aria-label", t("RESET_CARD_PROGRESS"));
+        this.resetButton.onClick(() => {
             this._processReview(ReviewResponse.Reset);
         });
     }
 
     private _createCardInfoButton() {
-        this.infoButton = this.controls.createEl("button");
-        this.infoButton.addClasses(["sr-button", "sr-info-button"]);
-        setIcon(this.infoButton, "info");
-        this.infoButton.setAttribute("aria-label", "View Card Info");
-        this.infoButton.addEventListener("click", async () => {
+        this.infoButton = new ButtonComponent(this.controls);
+        this.infoButton.setClass("sr-button");
+        this.infoButton.setClass("sr-info-button");
+        if (getPlatform().isPhone) {
+            this.infoButton.setClass("mod-raised");
+        }
+        this.infoButton.setIcon("info");
+        this.infoButton.setTooltip(t("VIEW_CARD_INFO"));
+        this.infoButton.buttonEl.setAttribute("aria-label", t("VIEW_CARD_INFO"));
+        this.infoButton.onClick(async () => {
             this._displayCurrentCardInfoNotice();
         });
     }
 
     private _createSkipButton() {
-        this.skipButton = this.controls.createEl("button");
-        this.skipButton.addClasses(["sr-button", "sr-skip-button"]);
-        setIcon(this.skipButton, "chevrons-right");
-        this.skipButton.setAttribute("aria-label", t("SKIP"));
-        this.skipButton.addEventListener("click", () => {
+        this.skipButton = new ButtonComponent(this.controls);
+        this.skipButton.setClass("sr-button");
+        this.skipButton.setClass("sr-skip-button");
+        if (getPlatform().isPhone) {
+            this.skipButton.setClass("mod-raised");
+        }
+        this.skipButton.setIcon("chevrons-right");
+        this.skipButton.setTooltip(t("SKIP"));
+        this.skipButton.buttonEl.setAttribute("aria-label", t("SKIP"));
+        this.skipButton.onClick(() => {
             this._skipCurrentCard();
         });
     }
@@ -478,65 +499,61 @@ export class CardUI {
 
     private _resetResponseButtons() {
         // Sets all buttons in to their default state
-        this.answerButton.removeClass("sr-is-hidden");
-        this.hardButton.addClass("sr-is-hidden");
-        this.goodButton.addClass("sr-is-hidden");
-        this.easyButton.addClass("sr-is-hidden");
+        this.answerButton.buttonEl.removeClass("sr-is-hidden");
+        this.hardButton.buttonEl.addClass("sr-is-hidden");
+        this.goodButton.buttonEl.addClass("sr-is-hidden");
+        this.easyButton.buttonEl.addClass("sr-is-hidden");
     }
 
     private _createShowAnswerButton() {
-        this.answerButton = this.response.createEl("button");
-        this.answerButton.addClasses(["sr-response-button", "sr-show-answer-button", "sr-bg-blue"]);
-        this.answerButton.setText(t("SHOW_ANSWER"));
-        this.answerButton.addEventListener("click", () => {
+        this.answerButton = new ButtonComponent(this.response);
+        this.answerButton.setClass("sr-response-button");
+        this.answerButton.setClass("sr-show-answer-button");
+        this.answerButton.setClass("sr-bg-blue");
+        this.answerButton.setButtonText(t("SHOW_ANSWER"));
+        this.answerButton.onClick(() => {
             this._showAnswer();
         });
     }
 
     private _createHardButton() {
-        this.hardButton = this.response.createEl("button");
-        this.hardButton.addClasses([
-            "sr-response-button",
-            "sr-hard-button",
-            "sr-bg-red",
-            "sr-is-hidden",
-        ]);
-        this.hardButton.setText(this.settings.flashcardHardText);
-        this.hardButton.addEventListener("click", () => {
+        this.hardButton = new ButtonComponent(this.response);
+        this.hardButton.setClass("sr-response-button");
+        this.hardButton.setClass("sr-hard-button");
+        this.hardButton.setClass("sr-bg-red");
+        this.hardButton.setClass("sr-is-hidden");
+        this.hardButton.setButtonText(this.settings.flashcardHardText);
+        this.hardButton.onClick(() => {
             this._processReview(ReviewResponse.Hard);
         });
     }
 
     private _createGoodButton() {
-        this.goodButton = this.response.createEl("button");
-        this.goodButton.addClasses([
-            "sr-response-button",
-            "sr-good-button",
-            "sr-bg-blue",
-            "sr-is-hidden",
-        ]);
-        this.goodButton.setText(this.settings.flashcardGoodText);
-        this.goodButton.addEventListener("click", () => {
+        this.goodButton = new ButtonComponent(this.response);
+        this.goodButton.setClass("sr-response-button");
+        this.goodButton.setClass("sr-good-button");
+        this.goodButton.setClass("sr-bg-blue");
+        this.goodButton.setClass("sr-is-hidden");
+        this.goodButton.setButtonText(this.settings.flashcardGoodText);
+        this.goodButton.onClick(() => {
             this._processReview(ReviewResponse.Good);
         });
     }
 
     private _createEasyButton() {
-        this.easyButton = this.response.createEl("button");
-        this.easyButton.addClasses([
-            "sr-response-button",
-            "sr-hard-button",
-            "sr-bg-green",
-            "sr-is-hidden",
-        ]);
-        this.easyButton.setText(this.settings.flashcardEasyText);
-        this.easyButton.addEventListener("click", () => {
+        this.easyButton = new ButtonComponent(this.response);
+        this.easyButton.setClass("sr-response-button");
+        this.easyButton.setClass("sr-hard-button");
+        this.easyButton.setClass("sr-bg-green");
+        this.easyButton.setClass("sr-is-hidden");
+        this.easyButton.setButtonText(this.settings.flashcardEasyText);
+        this.easyButton.onClick(() => {
             this._processReview(ReviewResponse.Easy);
         });
     }
 
     private _setupEaseButton(
-        button: HTMLElement,
+        button: ButtonComponent,
         buttonName: string,
         reviewResponse: ReviewResponse,
     ) {
@@ -548,12 +565,12 @@ export class CardUI {
 
         if (this.settings.showIntervalInReviewButtons) {
             if (Platform.isMobile) {
-                button.setText(textInterval(interval, true));
+                button.setButtonText(textInterval(interval, true));
             } else {
-                button.setText(`${buttonName} - ${textInterval(interval, false)}`);
+                button.setButtonText(`${buttonName} - ${textInterval(interval, false)}`);
             }
         } else {
-            button.setText(buttonName);
+            button.setButtonText(buttonName);
         }
     }
 
@@ -591,16 +608,16 @@ export class CardUI {
         );
 
         // Show response buttons
-        this.answerButton.addClass("sr-is-hidden");
-        this.hardButton.removeClass("sr-is-hidden");
-        this.easyButton.removeClass("sr-is-hidden");
+        this.answerButton.buttonEl.addClass("sr-is-hidden");
+        this.hardButton.buttonEl.removeClass("sr-is-hidden");
+        this.easyButton.buttonEl.removeClass("sr-is-hidden");
 
         if (this.reviewMode === FlashcardReviewMode.Cram) {
             this.response.addClass("is-cram");
-            this.hardButton.setText(`${this.settings.flashcardHardText}`);
-            this.easyButton.setText(`${this.settings.flashcardEasyText}`);
+            this.hardButton.setButtonText(`${this.settings.flashcardHardText}`);
+            this.easyButton.setButtonText(`${this.settings.flashcardEasyText}`);
         } else {
-            this.goodButton.removeClass("sr-is-hidden");
+            this.goodButton.buttonEl.removeClass("sr-is-hidden");
             this._setupEaseButton(
                 this.hardButton,
                 this.settings.flashcardHardText,

@@ -1,4 +1,4 @@
-import { App, Modal, setIcon } from "obsidian";
+import { App, ButtonComponent, Modal } from "obsidian";
 
 import { Deck } from "src/deck";
 import {
@@ -12,6 +12,7 @@ import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
+import getPlatform from "src/utils/platform-selector";
 
 export enum FlashcardMode {
     Deck,
@@ -28,7 +29,7 @@ export class FlashcardModal extends Modal {
     private reviewMode: FlashcardReviewMode;
     private deckView: DeckUI;
     private flashcardView: CardUI;
-    public backButton: HTMLDivElement;
+    public backButton: ButtonComponent;
 
     constructor(
         app: App,
@@ -116,7 +117,7 @@ export class FlashcardModal extends Modal {
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         if (this.reviewSequencer.hasCurrentCard) {
             this._showFlashcard(deck);
-            this.backButton.removeClass("sr-is-hidden");
+            this.backButton.buttonEl.removeClass("sr-is-hidden");
         } else {
             this._showDecksList();
         }
@@ -141,12 +142,20 @@ export class FlashcardModal extends Modal {
     }
 
     private _createBackButton() {
-        this.backButton = this.modalEl.createDiv();
-        this.backButton.addClasses(["sr-back-button", "sr-is-hidden"]);
-        setIcon(this.backButton, "arrow-left");
-        this.backButton.setAttribute("aria-label", t("BACK"));
-        this.backButton.addEventListener("click", () => {
-            this.backButton.addClass("sr-is-hidden");
+
+        this.backButton = new ButtonComponent(this.modalEl);
+        this.backButton.setClass("sr-back-button");
+        this.backButton.setClass("sr-is-hidden");
+        if (getPlatform().isPhone) {
+            this.backButton.setClass("mod-raised");
+        } else {
+            this.backButton.setClass("clickable-icon");
+        }
+        this.backButton.setIcon("arrow-left");
+        this.backButton.setTooltip(t("BACK"));
+        this.backButton.buttonEl.setAttribute("aria-label", t("BACK"));
+        this.backButton.onClick(() => {
+            this.backButton.setClass("sr-is-hidden");
             this._showDecksList();
         });
     }
