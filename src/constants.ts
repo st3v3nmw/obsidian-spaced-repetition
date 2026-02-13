@@ -44,5 +44,6 @@ export const SR_HTML_COMMENT_END = "-->";
 
 export const SR_TAB_VIEW = "spaced-repetition-tab-view";
 
-// This is a flag to disable the error hiding workaround that was implemented in the SRTabView to catch the first inevitable error that occurs when loading the review sequencer data, but then letting all subsequent errors through. This is because the error hiding was also hiding errors that were occurring after the first one, which was making it difficult to debug and fix those errors. This workaround allows us to disable the error hiding and let all errors through, while still catching the first inevitable error in the console.
-export const DISABLE_ERROR_HIDING_WORKAROUND = false;
+// Disables the error hiding workaround (see src/gui/sr-tab-view.tsx)
+// Enables emulated mobile detection via the getPlatform() function
+export const DEBUG_MODE_ENABLED = false;

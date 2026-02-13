@@ -1,6 +1,6 @@
 import { ItemView, setIcon, WorkspaceLeaf } from "obsidian";
 
-import { DISABLE_ERROR_HIDING_WORKAROUND, SR_TAB_VIEW } from "src/constants";
+import { DEBUG_MODE_ENABLED, SR_TAB_VIEW } from "src/constants";
 import { Deck } from "src/deck";
 import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
 import { CardUI } from "src/gui/card-ui";
@@ -166,7 +166,7 @@ export class SRTabView extends ItemView {
              * So we have to live with this error and just catch it the first time around.
              * Lets any other errors through that might occur.
              */
-            if (this.openErrorCount > 0 || DISABLE_ERROR_HIDING_WORKAROUND) {
+            if (this.openErrorCount > 0 || DEBUG_MODE_ENABLED) {
                 console.error(e);
             }
             this.openErrorCount++;

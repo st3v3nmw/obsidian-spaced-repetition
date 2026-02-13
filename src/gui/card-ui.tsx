@@ -16,7 +16,7 @@ import type SRPlugin from "src/main";
 import { Note } from "src/note";
 import { CardType, Question } from "src/question";
 import { SRSettings } from "src/settings";
-import getPlatform from "src/utils/platform-selector";
+import getPlatform from "src/utils/platform-detector";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
 
 export class CardUI {
