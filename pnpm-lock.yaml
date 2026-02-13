@@ -82,8 +82,8 @@ importers:
         specifier: ^2.30.1
         version: 2.30.1
       obsidian:
-        specifier: ^1.10.3
-        version: 1.10.3(@codemirror/state@6.4.1)(@codemirror/view@6.33.0)
+        specifier: ^1.12.0
+        version: 1.12.0(@codemirror/state@6.4.1)(@codemirror/view@6.33.0)
       pre-commit:
         specifier: ^1.2.2
         version: 1.2.2
@@ -1776,8 +1776,8 @@ packages:
   nwsapi@2.2.22:
     resolution: {integrity: sha512-ujSMe1OWVn55euT1ihwCI1ZcAaAU3nxUiDwfDQldc51ZXaB9m2AyOn6/jh1BLe2t/G8xd6uKG1UBF2aZJeg2SQ==}
 
-  obsidian@1.10.3:
-    resolution: {integrity: sha512-VP+ZSxNMG7y6Z+sU9WqLvJAskCfkFrTz2kFHWmmzis+C+4+ELjk/sazwcTHrHXNZlgCeo8YOlM6SOrAFCynNew==}
+  obsidian@1.12.0:
+    resolution: {integrity: sha512-goA2DNTIPO3IRtsqzUs6UQmVJkwZayIKXnI3tLZX/NO+t1yl7YuZrfVEL1JyUkthCJyaZMn8WOlp7mX18acWxA==}
     peerDependencies:
       '@codemirror/state': 6.5.0
       '@codemirror/view': 6.38.6
@@ -4383,7 +4383,7 @@ snapshots:
 
   nwsapi@2.2.22: {}
 
-  obsidian@1.10.3(@codemirror/state@6.4.1)(@codemirror/view@6.33.0):
+  obsidian@1.12.0(@codemirror/state@6.4.1)(@codemirror/view@6.33.0):
     dependencies:
       '@codemirror/state': 6.4.1
       '@codemirror/view': 6.33.0
