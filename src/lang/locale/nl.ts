@@ -21,6 +21,7 @@ export default {
     CURRENT_EASE_HELP_TEXT: "Huidige Moeilijkheid: ",
     CURRENT_INTERVAL_HELP_TEXT: "Huidige Interval: ",
     CARD_GENERATED_FROM: "Gegenereerd van: ${notePath}",
+    VIEW_CARD_INFO: "View Card Info",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Open een notitie voor beoordeling",

@@ -21,6 +21,7 @@ export default {
     CURRENT_EASE_HELP_TEXT: "目前掌握程度：",
     CURRENT_INTERVAL_HELP_TEXT: "目前间隔：",
     CARD_GENERATED_FROM: "生成自：${notePath}",
+    VIEW_CARD_INFO: "View Card Info",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "打开一个笔记开始复习",
