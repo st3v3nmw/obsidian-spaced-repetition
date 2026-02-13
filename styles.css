@@ -64,7 +64,7 @@
 
 @media only screen and (orientation: landscape) {
     .is-mobile:not(.is-tablet) .sr-tab-view {
-        padding: 0 8px 16px 8px;
+        padding: 0 8px 8px 8px;
     }
 
     .is-mobile:not(.is-tablet) #sr-modal .sr-modal-content {
@@ -168,6 +168,11 @@
 
     .is-mobile:not(.is-tablet) .sr-tab-view {
         padding: 0 8px 16px 8px;
+    }
+
+    .sr-deck-list .sr-header {
+        gap: 8px;
+        margin-top: 32px;
     }
 }
 
