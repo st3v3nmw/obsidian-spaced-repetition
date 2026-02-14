@@ -63,6 +63,17 @@
 .is-mobile .sr-deck-list .sr-tree-stats-count {
     padding: var(--size-2-2) var(--size-2-3);
     border-radius: var(--tag-radius);
+    line-height: 1;
+    height: 21px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.is-mobile .sr-deck-list .sr-tree-stats-count {
+    width: calc(3ch + var(--size-2-3) * 2);
+    padding: 0px;
 }
 
 body:not(.is-phone) .sr-response {
