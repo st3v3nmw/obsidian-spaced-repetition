@@ -378,8 +378,11 @@ export default class SRPlugin extends Plugin {
         if (
             this.data.settings.openViewInNewTab && // Is a modal opening relevant for focus?
             mutationList.length > 0 &&
-            mutationList.filter((mutation) => mutation.type === "childList" &&
-                (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0)).length > 0
+            mutationList.filter(
+                (mutation) =>
+                    mutation.type === "childList" &&
+                    (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0),
+            ).length > 0
         ) {
             const modal = document.querySelector(".modal-container"); // Check your modal selector
             // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
@@ -457,9 +460,9 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                t("SYNC_TIME_TAKEN", {
-                    t: Date.now() - now.valueOf(),
-                }),
+                    t("SYNC_TIME_TAKEN", {
+                        t: Date.now() - now.valueOf(),
+                    }),
             );
         }
     }

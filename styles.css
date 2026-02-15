@@ -525,6 +525,50 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     user-select: none;
 }
 
+body:not(.is-mobile) .sr-response-button.sr-show-answer-button,
+body:not(.is-mobile) .sr-response-button.sr-hard-button,
+body:not(.is-mobile) .sr-response-button.sr-good-button,
+body:not(.is-mobile) .sr-response-button.sr-easy-button {
+    position: relative;
+}
+
+body:not(.is-mobile) .sr-response-button.sr-show-answer-button::after,
+body:not(.is-mobile) .sr-response-button.sr-hard-button::after,
+body:not(.is-mobile) .sr-response-button.sr-good-button::after,
+body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    height: 0.8rem;
+    background-color: rgb(0 0 0 / 0%);
+    border-radius: var(--input-radius);
+    line-height: 1;
+    padding: 2px 4px;
+    padding-top: 3px;
+    font-size: x-small;
+    box-shadow:
+        inset 1px 1px rgb(255 255 255 / 20%),
+        inset -1px -1px rgb(0 0 0 / 20%);
+    color: #f7f7f7;
+    font-family: var(--font-monospace);
+}
+
+body:not(.is-mobile) .sr-response-button.sr-show-answer-button::after {
+    content: "Space";
+}
+
+body:not(.is-mobile) .sr-response-button.sr-hard-button::after {
+    content: "1";
+}
+
+body:not(.is-mobile) .sr-response-button.sr-good-button::after {
+    content: "2";
+}
+
+body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
+    content: "3";
+}
+
 /* MARK: EditModal */
 
 .sr-edit-modal {

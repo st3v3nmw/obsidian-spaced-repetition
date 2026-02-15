@@ -106,8 +106,6 @@ export class CardUI {
         this.view = view;
         this.chosenDeck = null;
 
-
-
         // Build ui
         this.init();
     }
@@ -553,7 +551,7 @@ export class CardUI {
     private _createEasyButton() {
         this.easyButton = new ButtonComponent(this.response);
         this.easyButton.setClass("sr-response-button");
-        this.easyButton.setClass("sr-hard-button");
+        this.easyButton.setClass("sr-easy-button");
         this.easyButton.setClass("sr-bg-green");
         this.easyButton.setClass("sr-is-hidden");
         this.easyButton.setButtonText(this.settings.flashcardEasyText);
