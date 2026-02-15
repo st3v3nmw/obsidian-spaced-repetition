@@ -49,6 +49,8 @@ export default class SRPlugin extends Plugin {
     private osrSidebar: OsrSidebar;
     private nextNoteReviewHandler: NextNoteReviewHandler;
 
+    private externalModalObserver: MutationObserver;
+
     private ribbonIcon: HTMLElement | null = null;
     private statusBar: HTMLElement | null = null;
     private isSRInFocus: boolean = false;
@@ -356,6 +358,11 @@ export default class SRPlugin extends Plugin {
         this.registerEvent(
             this.app.workspace.on("active-leaf-change", this.handleFocusChange.bind(this)),
         );
+        this.externalModalObserver = new MutationObserver(this.handleExternalModalOpen.bind(this));
+        this.externalModalObserver.observe(document.body, {
+            childList: true,
+            subtree: true,
+        });
     }
 
     public removeSRFocusListener() {
@@ -365,6 +372,19 @@ export default class SRPlugin extends Plugin {
 
     public handleFocusChange(leaf: WorkspaceLeaf | null) {
         this.setSRViewInFocus(leaf !== null && leaf.view instanceof SRTabView);
+    }
+
+    public handleExternalModalOpen(mutationList: MutationRecord[]) {
+        if (
+            this.data.settings.openViewInNewTab && // Is a modal opening relevant for focus?
+            mutationList.length > 0 &&
+            mutationList.filter((mutation) => mutation.type === "childList" &&
+                (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0)).length > 0
+        ) {
+            const modal = document.querySelector(".modal-container"); // Check your modal selector
+            // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
+            this.setSRViewInFocus(modal === null && this.isSRInFocus);
+        }
     }
 
     public setSRViewInFocus(value: boolean) {
@@ -437,9 +457,9 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                    t("SYNC_TIME_TAKEN", {
-                        t: Date.now() - now.valueOf(),
-                    }),
+                t("SYNC_TIME_TAKEN", {
+                    t: Date.now() - now.valueOf(),
+                }),
             );
         }
     }

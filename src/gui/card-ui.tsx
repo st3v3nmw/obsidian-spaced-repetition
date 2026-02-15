@@ -106,6 +106,8 @@ export class CardUI {
         this.view = view;
         this.chosenDeck = null;
 
+
+
         // Build ui
         this.init();
     }
@@ -180,6 +182,14 @@ export class CardUI {
     close() {
         this.hide();
         document.removeEventListener("keydown", this._keydownHandler);
+    }
+
+    blockKeyInput(block: boolean) {
+        if (block) {
+            document.addEventListener("keydown", this._keydownHandler);
+        } else {
+            document.removeEventListener("keydown", this._keydownHandler);
+        }
     }
 
     // #region -> Functions & helpers
@@ -641,7 +651,9 @@ export class CardUI {
         if (
             document.activeElement.nodeName === "TEXTAREA" ||
             this.mode === FlashcardMode.Closed ||
-            !this.plugin.getSRInFocusState()
+            !this.plugin.getSRInFocusState() ||
+            Platform.isMobile || // No keyboard events on mobile
+            EmulatedPlatform().isMobile
         ) {
             return;
         }
@@ -656,6 +668,8 @@ export class CardUI {
                 this._skipCurrentCard();
                 consumeKeyEvent();
                 break;
+            case "Enter":
+            case "NumpadEnter":
             case "Space":
                 if (this.mode === FlashcardMode.Front) {
                     this._showAnswer();
@@ -664,14 +678,6 @@ export class CardUI {
                     this._processReview(ReviewResponse.Good);
                     consumeKeyEvent();
                 }
-                break;
-            case "Enter":
-            case "NumpadEnter":
-                if (this.mode !== FlashcardMode.Front) {
-                    break;
-                }
-                this._showAnswer();
-                consumeKeyEvent();
                 break;
             case "Numpad1":
             case "Digit1":
