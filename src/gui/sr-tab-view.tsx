@@ -1,4 +1,4 @@
-import { ButtonComponent, ItemView, Platform, WorkspaceLeaf } from "obsidian";
+import { ButtonComponent, ItemView, WorkspaceLeaf } from "obsidian";
 
 import { DEBUG_MODE_ENABLED, SR_TAB_VIEW } from "src/constants";
 import { Deck } from "src/deck";
@@ -10,7 +10,6 @@ import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
-import EmulatedPlatform from "src/utils/platform-detector";
 
 /**
  * Represents a tab view for spaced repetition plugin.
@@ -251,11 +250,7 @@ export class SRTabView extends ItemView {
         this.backButton = new ButtonComponent(this.viewContentEl);
         this.backButton.setClass("sr-back-button");
         this.backButton.setClass("sr-is-hidden");
-        if (EmulatedPlatform().isPhone || Platform.isPhone) {
-            this.backButton.setClass("mod-raised");
-        } else {
-            this.backButton.setClass("clickable-icon");
-        }
+        this.backButton.setClass("clickable-icon");
         this.backButton.setIcon("arrow-left");
         this.backButton.setTooltip(t("BACK"));
         this.backButton.buttonEl.setAttribute("aria-label", t("BACK"));

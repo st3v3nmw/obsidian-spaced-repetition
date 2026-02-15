@@ -80,6 +80,11 @@ body:not(.is-phone) .sr-response {
     padding: var(--size-2-2) 0;
 }
 
+.is-phone .sr-tab-view .sr-back-button {
+    width: 30px;
+    height: 30px;
+}
+
 @media only screen and (orientation: landscape) {
     .is-phone .sr-tab-view {
         padding: 0 8px 8px 8px;
