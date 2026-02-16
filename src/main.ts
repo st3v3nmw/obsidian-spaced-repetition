@@ -386,7 +386,9 @@ export default class SRPlugin extends Plugin {
         ) {
             const modal = document.querySelector(".modal-container"); // Check your modal selector
             // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
-            this.setSRViewInFocus(modal === null && this.app.workspace.getActiveViewOfType(SRTabView) !== null);
+            this.setSRViewInFocus(
+                modal === null && this.app.workspace.getActiveViewOfType(SRTabView) !== null,
+            );
         }
     }
 
@@ -460,9 +462,9 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                t("SYNC_TIME_TAKEN", {
-                    t: Date.now() - now.valueOf(),
-                }),
+                    t("SYNC_TIME_TAKEN", {
+                        t: Date.now() - now.valueOf(),
+                    }),
             );
         }
     }

@@ -80,11 +80,6 @@ body:not(.is-phone) .sr-response {
     padding: var(--size-2-2) 0;
 }
 
-.is-phone .sr-tab-view .sr-back-button {
-    width: 30px;
-    height: 30px;
-}
-
 @media only screen and (orientation: landscape) {
     .is-phone .sr-tab-view {
         padding: 0 8px 8px 8px;
@@ -279,18 +274,9 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     position: absolute;
     top: 12px;
     left: 12px;
-    font-size: 26px;
-    line-height: 22px;
-    height: 26px;
-    width: 26px;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-#sr-modal .sr-back-button {
-    height: 30px;
-    width: 30px;
 }
 
 .is-mobile #sr-modal .sr-back-button {
