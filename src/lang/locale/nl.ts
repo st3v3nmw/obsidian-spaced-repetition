@@ -245,4 +245,8 @@ export default {
     SEARCH: "Zoeken",
     PREVIOUS: "Vorige",
     NEXT: "Volgende",
+    DELETE_CARD: "Delete Card",
+    DELETE_CARD_CONFIRMATION: "Are you sure you want to delete this card?",
+    SHOW_DELETE_BUTTON: "Show Delete button",
+    SHOW_DELETE_BUTTON_DESC: "Add a delete button to the card review UI.",
 };

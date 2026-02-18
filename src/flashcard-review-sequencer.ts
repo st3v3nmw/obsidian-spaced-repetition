@@ -30,6 +30,7 @@ export interface IFlashcardReviewSequencer {
     determineCardSchedule(response: ReviewResponse, card: Card): RepItemScheduleInfo;
     processReview(response: ReviewResponse): Promise<void>;
     updateCurrentQuestionText(text: string): Promise<void>;
+    deleteCurrentCardFromNote(): Promise<void>;
 }
 
 /**
@@ -328,5 +329,12 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         q.actualQuestion = text;
 
         await DataStore.getInstance().questionWrite(this.currentQuestion);
+    }
+
+    async deleteCurrentCardFromNote(): Promise<void> {
+        const question = this.currentQuestion;
+        await DataStore.getInstance().questionDelete(question);
+        this._originalDeckTree.deleteQuestionFromAllDecks(question, false);
+        this.cardSequencer.deleteCurrentQuestionFromAllDecks();
     }
 }

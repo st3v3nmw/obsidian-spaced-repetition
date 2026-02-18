@@ -21,6 +21,8 @@ export default {
     CURRENT_EASE_HELP_TEXT: "目前掌握程度：",
     CURRENT_INTERVAL_HELP_TEXT: "目前间隔：",
     CARD_GENERATED_FROM: "生成自：${notePath}",
+    DELETE_CARD: "删除卡片",
+    DELETE_CARD_CONFIRMATION: "你确定要删除这张卡片吗？",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "打开一个笔记开始复习",
@@ -94,6 +96,8 @@ export default {
     SHOW_CARD_CONTEXT_DESC: "例如：标题 > 副标题 > 小标题 > ... > 小标题",
     SHOW_INTERVAL_IN_REVIEW_BUTTONS: "将下次复习时间显示在复习按钮",
     SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC: "了解你的卡片被推迟了多久对你很有用",
+    SHOW_DELETE_BUTTON: "显示删除按钮",
+    SHOW_DELETE_BUTTON_DESC: "在卡片复习界面添加删除按钮。",
     CARD_MODAL_HEIGHT_PERCENT: "卡片高度百分比",
     CARD_MODAL_SIZE_PERCENT_DESC: "请在移动端使用并需要浏览较大图片时设为100%",
     RESET_DEFAULT: "重置为默认",
