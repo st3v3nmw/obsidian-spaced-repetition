@@ -211,17 +211,18 @@ export class SRTabView extends ItemView {
 
     private _showFlashcard(deck: Deck): void {
         this._hideDecksList();
+        this.backButton.buttonEl.removeClass("sr-is-hidden");
         this.flashcardView.show(deck);
     }
 
     private _hideFlashcard(): void {
+        this.backButton.buttonEl.addClass("sr-is-hidden");
         this.flashcardView.hide();
     }
 
     private _startReviewOfDeck(deck: Deck) {
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         if (this.reviewSequencer.hasCurrentCard) {
-            this.backButton.buttonEl.removeClass("sr-is-hidden");
             this._showFlashcard(deck);
         } else {
             this._showDecksList();

@@ -106,10 +106,12 @@ export class FlashcardModal extends Modal {
 
     private _showFlashcard(deck: Deck): void {
         this._hideDecksList();
+        this.backButton.buttonEl.removeClass("sr-is-hidden");
         this.flashcardView.show(deck);
     }
 
     private _hideFlashcard(): void {
+        this.backButton.buttonEl.addClass("sr-is-hidden");
         this.flashcardView.hide();
     }
 
@@ -117,7 +119,6 @@ export class FlashcardModal extends Modal {
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         if (this.reviewSequencer.hasCurrentCard) {
             this._showFlashcard(deck);
-            this.backButton.buttonEl.removeClass("sr-is-hidden");
         } else {
             this._showDecksList();
         }
