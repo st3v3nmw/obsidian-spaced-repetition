@@ -105,6 +105,15 @@ export default {
         "모바일 버전 혹은 매우 큰 이미지가 있는 경우 100%로 설정해야 합니다.",
     RESET_DEFAULT: "기본값으로 초기화",
     CARD_MODAL_WIDTH_PERCENT: "플래시카드 너비 비율",
+    SCROLL_TO_CLOZE_AUTO: "Auto-scroll to cloze",
+    SCROLL_TO_CLOZE_AUTO_DESC:
+        "Automatically scroll the hidden cloze deletion (e.g., [...]) into view when the card is shown.",
+    SCROLL_BEHAVIOR: "Scroll behavior",
+    SCROLL_BEHAVIOR_DESC:
+        "Choose how the card scrolls to the hidden cloze — instantly or smoothly with animation.",
+    SCROLL_BLOCK: "Scroll position",
+    SCROLL_BLOCK_DESC:
+        "Define where the hidden cloze will appear in the view after scrolling — top, center, bottom, or nearest visible.",
     RANDOMIZE_CARD_ORDER: "리뷰중인 카드의 순서를 랜덤으로 두시겠습니까?",
     REVIEW_CARD_ORDER_WITHIN_DECK: "Order cards in a deck are displayed during review",
     REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL: "Sequentially within a deck (All new cards first)",

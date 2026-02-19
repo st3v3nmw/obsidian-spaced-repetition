@@ -104,6 +104,15 @@ export default {
         "Powinno być ustawione na 100% na urządzeniach mobilnych lub gdy masz bardzo duże obrazy",
     RESET_DEFAULT: "Zresetuj do domyślnych",
     CARD_MODAL_WIDTH_PERCENT: "Procentowa szerokość fiszki",
+    SCROLL_TO_CLOZE_AUTO: "Auto-scroll to cloze",
+    SCROLL_TO_CLOZE_AUTO_DESC:
+        "Automatically scroll the hidden cloze deletion (e.g., [...]) into view when the card is shown.",
+    SCROLL_BEHAVIOR: "Scroll behavior",
+    SCROLL_BEHAVIOR_DESC:
+        "Choose how the card scrolls to the hidden cloze — instantly or smoothly with animation.",
+    SCROLL_BLOCK: "Scroll position",
+    SCROLL_BLOCK_DESC:
+        "Define where the hidden cloze will appear in the view after scrolling — top, center, bottom, or nearest visible.",
     RANDOMIZE_CARD_ORDER: "Czy losować kolejność kart podczas przeglądu?",
     REVIEW_CARD_ORDER_WITHIN_DECK: "Kolejność kart w talii wyświetlana podczas przeglądania",
     REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL:

@@ -719,6 +719,49 @@ export class SRSettingTab extends PluginSettingTab {
                         this.display();
                     });
             });
+        new Setting(containerEl)
+            .setName(t("SCROLL_TO_CLOZE_AUTO"))
+            .setDesc(t("SCROLL_TO_CLOZE_AUTO_DESC"))
+            .addToggle((toggle) =>
+                toggle.setValue(this.plugin.data.settings.scrollToCloze).onChange(async (value) => {
+                    this.plugin.data.settings.scrollToCloze = value;
+                    await this.plugin.savePluginData();
+                }),
+            );
+
+        new Setting(containerEl)
+            .setName(t("SCROLL_BEHAVIOR"))
+            .setDesc(t("SCROLL_BEHAVIOR_DESC"))
+            .addDropdown((dropdown) =>
+                dropdown
+                    .addOptions({
+                        auto: "Auto (instant)",
+                        smooth: "Smooth (animated)",
+                    })
+                    .setValue(this.plugin.data.settings.scrollBehavior)
+                    .onChange(async (value: "auto" | "smooth") => {
+                        this.plugin.data.settings.scrollBehavior = value;
+                        await this.plugin.savePluginData();
+                    }),
+            );
+
+        new Setting(containerEl)
+            .setName(t("SCROLL_BLOCK"))
+            .setDesc(t("SCROLL_BLOCK_DESC"))
+            .addDropdown((dropdown) =>
+                dropdown
+                    .addOptions({
+                        start: "Start (top of view)",
+                        center: "Center (middle of view)",
+                        end: "End (bottom of view)",
+                        nearest: "Nearest (minimum scroll)",
+                    })
+                    .setValue(this.plugin.data.settings.scrollBlock)
+                    .onChange(async (value: "start" | "center" | "end" | "nearest") => {
+                        this.plugin.data.settings.scrollBlock = value;
+                        await this.plugin.savePluginData();
+                    }),
+            );
 
         containerEl.createEl("h3", { text: t("GROUP_FLASHCARDS_NOTES") });
         new Setting(containerEl)

@@ -107,6 +107,15 @@ export default {
         "モバイル版、または非常に大きなサイズの画像がある場合には100%にする必要があります。",
     RESET_DEFAULT: "デフォルト値にリセットする",
     CARD_MODAL_WIDTH_PERCENT: "フラッシュカードの横サイズのパーセンテージ",
+    SCROLL_TO_CLOZE_AUTO: "Auto-scroll to cloze",
+    SCROLL_TO_CLOZE_AUTO_DESC:
+        "Automatically scroll the hidden cloze deletion (e.g., [...]) into view when the card is shown.",
+    SCROLL_BEHAVIOR: "Scroll behavior",
+    SCROLL_BEHAVIOR_DESC:
+        "Choose how the card scrolls to the hidden cloze — instantly or smoothly with animation.",
+    SCROLL_BLOCK: "Scroll position",
+    SCROLL_BLOCK_DESC:
+        "Define where the hidden cloze will appear in the view after scrolling — top, center, bottom, or nearest visible.",
     RANDOMIZE_CARD_ORDER: "レビュー中のカードの順番をランダムにしますか？",
     REVIEW_CARD_ORDER_WITHIN_DECK: "Order cards in a deck are displayed during review",
     REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL: "Sequentially within a deck (All new cards first)",
