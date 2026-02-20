@@ -30,6 +30,7 @@ export default {
     CURRENT_EASE_HELP_TEXT: "Текущий прогресс: ",
     CURRENT_INTERVAL_HELP_TEXT: "Текущий интервал: ",
     CARD_GENERATED_FROM: "Сгенерированно из: ${notePath}",
+    VIEW_CARD_INFO: "View Card Info",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Открыть заметку для изучения",

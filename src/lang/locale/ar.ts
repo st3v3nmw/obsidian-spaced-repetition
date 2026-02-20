@@ -21,6 +21,7 @@ export default {
     CURRENT_EASE_HELP_TEXT: ":السهولة الحالية",
     CURRENT_INTERVAL_HELP_TEXT: ":الفاصل الزمني الحالي",
     CARD_GENERATED_FROM: "${notePath} :تم إنشاؤها من",
+    VIEW_CARD_INFO: "View Card Info",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "افتح الملاحظة للمراجعة",

@@ -23,11 +23,11 @@ import {
     FlashcardReviewSequencer,
     IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
+import { SRModalView } from "src/gui/obsidian-views/sr-modal-view";
+import { SRTabView } from "src/gui/obsidian-views/sr-tab-view";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/review-queue-list-view";
 import { SRSettingTab } from "src/gui/settings";
 import { OsrSidebar } from "src/gui/sidebar";
-import { FlashcardModal } from "src/gui/sr-modal";
-import { SRTabView } from "src/gui/sr-tab-view";
 import TabViewManager from "src/gui/tab-view-manager";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
@@ -48,6 +48,8 @@ export default class SRPlugin extends Plugin {
     public tabViewManager: TabViewManager;
     private osrSidebar: OsrSidebar;
     private nextNoteReviewHandler: NextNoteReviewHandler;
+
+    private externalModalObserver: MutationObserver;
 
     private ribbonIcon: HTMLElement | null = null;
     private statusBar: HTMLElement | null = null;
@@ -356,6 +358,11 @@ export default class SRPlugin extends Plugin {
         this.registerEvent(
             this.app.workspace.on("active-leaf-change", this.handleFocusChange.bind(this)),
         );
+        this.externalModalObserver = new MutationObserver(this.handleExternalModalOpen.bind(this));
+        this.externalModalObserver.observe(document.body, {
+            childList: true,
+            subtree: true,
+        });
     }
 
     public removeSRFocusListener() {
@@ -365,6 +372,24 @@ export default class SRPlugin extends Plugin {
 
     public handleFocusChange(leaf: WorkspaceLeaf | null) {
         this.setSRViewInFocus(leaf !== null && leaf.view instanceof SRTabView);
+    }
+
+    public handleExternalModalOpen(mutationList: MutationRecord[]) {
+        if (
+            this.data.settings.openViewInNewTab && // Is a modal opening relevant for focus?
+            mutationList.length > 0 &&
+            mutationList.filter(
+                (mutation) =>
+                    mutation.type === "childList" &&
+                    (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0),
+            ).length > 0
+        ) {
+            const modal = document.querySelector(".modal-container"); // Check your modal selector
+            // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
+            this.setSRViewInFocus(
+                modal === null && this.app.workspace.getActiveViewOfType(SRTabView) !== null,
+            );
+        }
     }
 
     public setSRViewInFocus(value: boolean) {
@@ -401,7 +426,7 @@ export default class SRPlugin extends Plugin {
         );
 
         this.setSRViewInFocus(true);
-        new FlashcardModal(
+        new SRModalView(
             this.app,
             this,
             this.data.settings,

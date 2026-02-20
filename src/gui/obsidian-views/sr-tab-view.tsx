@@ -1,11 +1,11 @@
-import { ItemView, setIcon, WorkspaceLeaf } from "obsidian";
+import { ButtonComponent, ItemView, WorkspaceLeaf } from "obsidian";
 
-import { SR_TAB_VIEW } from "src/constants";
+import { DEBUG_MODE_ENABLED, SR_TAB_VIEW } from "src/constants";
 import { Deck } from "src/deck";
 import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
-import { CardUI } from "src/gui/card-ui";
-import { DeckUI } from "src/gui/deck-ui";
-import { FlashcardEditModal } from "src/gui/edit-modal";
+import { CardUI } from "src/gui/content-container/card-container/card-container";
+import { DeckContainer } from "src/gui/content-container/deck-container";
+import { FlashcardEditModal } from "src/gui/obsidian-views/edit-modal";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Question } from "src/question";
@@ -38,10 +38,10 @@ export class SRTabView extends ItemView {
     private viewContentEl: HTMLElement;
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
-    private deckView: DeckUI;
+    private deckView: DeckContainer;
     private flashcardView: CardUI;
     private openErrorCount: number = 0; // Counter for catching the first inevitable error but the letting the other through
-    public backButton: HTMLDivElement;
+    public backButton: ButtonComponent;
 
     constructor(
         leaf: WorkspaceLeaf,
@@ -53,6 +53,7 @@ export class SRTabView extends ItemView {
     ) {
         super(leaf);
         this.plugin = plugin;
+        this.navigation = false;
         this.settings = plugin.data.settings;
         this.loadReviewSequencerData = loadReviewSequencerData;
 
@@ -60,6 +61,7 @@ export class SRTabView extends ItemView {
         if (viewContent.length > 0) {
             this.viewContainerEl = viewContent[0] as HTMLElement;
             this.viewContainerEl.addClass("sr-tab-view");
+            this.viewContainerEl.addClass("sr-view");
 
             this.viewContentEl = this.viewContainerEl.createDiv("sr-tab-view-content");
 
@@ -68,7 +70,12 @@ export class SRTabView extends ItemView {
             this.viewContentEl.style.width = this.settings.flashcardWidthPercentage + "%";
             this.viewContentEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
 
-            this.viewContainerEl.appendChild(this.viewContentEl);
+            if (
+                this.settings.flashcardHeightPercentage < 100 ||
+                this.settings.flashcardWidthPercentage < 100
+            ) {
+                this.viewContentEl.addClass("sr-center-view");
+            }
         }
     }
 
@@ -106,7 +113,26 @@ export class SRTabView extends ItemView {
      */
     async onOpen() {
         try {
-            this._createBackButton();
+            // Reposition the navbar if it's mobile, because lese it overlaps the buttons in the tab view
+            if (document.body.classList.contains("is-mobile")) {
+                const mobileNavbar = document.getElementsByClassName("mobile-navbar")[0];
+                if (mobileNavbar) {
+                    (mobileNavbar as HTMLElement).style.position = "relative";
+                }
+            }
+
+            // Removes the bottom fade mask if it's mobile and floating nav, because else it overlaps the bottom part of the flashcard and makes it hard to read
+            if (
+                document.body.classList.contains("is-phone") &&
+                document.body.classList.contains("is-floating-nav")
+            ) {
+                document.body.style.setProperty(
+                    "--view-bottom-fade-mask",
+                    "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(16px - 0px))",
+                );
+            }
+
+            // this._createBackButton();
             const loadedData = await this.loadReviewSequencerData();
 
             this.reviewSequencer = loadedData.reviewSequencer;
@@ -114,7 +140,7 @@ export class SRTabView extends ItemView {
 
             if (this.deckView === undefined) {
                 // Init static elements in views
-                this.deckView = new DeckUI(
+                this.deckView = new DeckContainer(
                     this.plugin,
                     this.settings,
                     this.reviewSequencer,
@@ -146,7 +172,7 @@ export class SRTabView extends ItemView {
              * So we have to live with this error and just catch it the first time around.
              * Lets any other errors through that might occur.
              */
-            if (this.openErrorCount > 0) {
+            if (this.openErrorCount > 0 || DEBUG_MODE_ENABLED) {
                 console.error(e);
             }
             this.openErrorCount++;
@@ -158,6 +184,24 @@ export class SRTabView extends ItemView {
      * Ensures that resources associated with these views are properly released.
      */
     async onClose() {
+        // Resets the changes made in onOpen
+        if (document.body.classList.contains("is-mobile")) {
+            const mobileNavbar = document.getElementsByClassName("mobile-navbar")[0];
+            if (mobileNavbar) {
+                (mobileNavbar as HTMLElement).style.position = "unset";
+            }
+        }
+
+        // Resets the changes made in onOpen
+        if (
+            document.body.classList.contains("is-phone") &&
+            document.body.classList.contains("is-floating-nav")
+        ) {
+            document.body.style.setProperty(
+                "--view-bottom-fade-mask",
+                "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(34px - 0px + 12px))",
+            );
+        }
         if (this.deckView) this.deckView.close();
         if (this.flashcardView) this.flashcardView.close();
     }
@@ -173,17 +217,18 @@ export class SRTabView extends ItemView {
 
     private _showFlashcard(deck: Deck): void {
         this._hideDecksList();
+        // this.backButton.buttonEl.removeClass("sr-is-hidden");
         this.flashcardView.show(deck);
     }
 
     private _hideFlashcard(): void {
+        // this.backButton.buttonEl.addClass("sr-is-hidden");
         this.flashcardView.hide();
     }
 
     private _startReviewOfDeck(deck: Deck) {
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         if (this.reviewSequencer.hasCurrentCard) {
-            this.backButton.removeClass("sr-is-hidden");
             this._showFlashcard(deck);
         } else {
             this._showDecksList();
@@ -209,12 +254,15 @@ export class SRTabView extends ItemView {
     }
 
     private _createBackButton() {
-        this.backButton = this.viewContentEl.createDiv();
-        this.backButton.addClasses(["sr-back-button", "sr-is-hidden"]);
-        setIcon(this.backButton, "arrow-left");
-        this.backButton.setAttribute("aria-label", t("BACK"));
-        this.backButton.addEventListener("click", () => {
-            this.backButton.addClass("sr-is-hidden");
+        this.backButton = new ButtonComponent(this.viewContentEl);
+        this.backButton.setClass("sr-back-button");
+        this.backButton.setClass("sr-is-hidden");
+        this.backButton.setClass("clickable-icon");
+        this.backButton.setIcon("arrow-left");
+        this.backButton.setTooltip(t("BACK"));
+        this.backButton.buttonEl.setAttribute("aria-label", t("BACK"));
+        this.backButton.onClick(() => {
+            this.backButton.setClass("sr-is-hidden");
             this._showDecksList();
         });
     }

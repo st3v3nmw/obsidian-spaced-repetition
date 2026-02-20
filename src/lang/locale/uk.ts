@@ -25,6 +25,7 @@ export default {
     CURRENT_EASE_HELP_TEXT: "Поточний коефіцієнт легкості: ",
     CURRENT_INTERVAL_HELP_TEXT: "Поточний інтервал: ",
     CARD_GENERATED_FROM: "Створено з: ${notePath}",
+    VIEW_CARD_INFO: "View Card Info",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Відкрити нотатку для повторення",

@@ -583,6 +583,8 @@ export class SRSettingTab extends PluginSettingTab {
                     .onChange(async (value) => {
                         if (value) {
                             this.plugin.registerSRFocusListener();
+                            this.plugin.data.settings.flashcardHeightPercentage = 100;
+                            this.plugin.data.settings.flashcardWidthPercentage = 100;
                         } else {
                             this.plugin.tabViewManager.closeAllTabViews();
 

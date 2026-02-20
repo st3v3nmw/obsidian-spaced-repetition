@@ -82,7 +82,8 @@ Please note that:
 
 1. Make your changes.
 2. Run `pnpm dev` to watch for changes & rebuild the plugin automatically.
-3. You could create symbolic links between the build files and the Obsidian vault, example:
+3.
+4. You could create symbolic links between the build files and the Obsidian vault, example:
 
     ```bash
     # remove existing files in the Obsidian vault
@@ -95,17 +96,19 @@ Please note that:
 
     - This can be coupled with the [Hot Reload plugin](https://github.com/pjeby/hot-reload)
 
-4. Document the "user-facing" changes e.g. new feature, UI change, etc.
-5. If your "business logic" is properly decoupled from Obsidian APIs, write some unit tests.
+5. Document the "user-facing" changes e.g. new feature, UI change, etc.
+6. If your "business logic" is properly decoupled from Obsidian APIs, write some unit tests.
     - This project uses [jest](https://jestjs.io/), tests are stored in `tests/`.
     - `pnpm test`
-6. Before pushing your changes, run the linter: `pnpm lint`
+7. Before pushing your changes, run the linter: `pnpm lint`
     - Format the code in case any warnings are raised: `pnpm format`
-7. Open the pull request.
+8. Open the pull request.
 
 ### UI changes
 
 - All UI changes should be made in the `src/gui/` folder.
+
+- Enable the debug mode by setting `ENABLE_DEBUG_MODE` to `true` in `src/constants.ts`(Don't forget to revert it back to `false` after you're done).
 
 - Put your changes under the right section (see "MARK:" or "#region" comments in the code).
 

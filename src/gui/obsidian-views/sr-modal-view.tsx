@@ -1,14 +1,13 @@
-import { App, Modal, setIcon } from "obsidian";
+import { App, Modal } from "obsidian";
 
 import { Deck } from "src/deck";
 import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import { CardUI } from "src/gui/card-ui";
-import { DeckUI } from "src/gui/deck-ui";
-import { FlashcardEditModal } from "src/gui/edit-modal";
-import { t } from "src/lang/helpers";
+import { CardUI } from "src/gui/content-container/card-container/card-container";
+import { DeckContainer } from "src/gui/content-container/deck-container";
+import { FlashcardEditModal } from "src/gui/obsidian-views/edit-modal";
 import type SRPlugin from "src/main";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
@@ -20,15 +19,14 @@ export enum FlashcardMode {
     Closed,
 }
 
-export class FlashcardModal extends Modal {
+export class SRModalView extends Modal {
     public plugin: SRPlugin;
     public mode: FlashcardMode;
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
-    private deckView: DeckUI;
+    private deckView: DeckContainer;
     private flashcardView: CardUI;
-    public backButton: HTMLDivElement;
 
     constructor(
         app: App,
@@ -50,7 +48,8 @@ export class FlashcardModal extends Modal {
         this.modalEl.style.maxHeight = this.settings.flashcardHeightPercentage + "%";
         this.modalEl.style.width = this.settings.flashcardWidthPercentage + "%";
         this.modalEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
-        this.modalEl.setAttribute("id", "sr-modal");
+        this.modalEl.setAttribute("id", "sr-modal-view");
+        this.modalEl.addClass("sr-view");
 
         if (
             this.settings.flashcardHeightPercentage >= 100 ||
@@ -62,12 +61,13 @@ export class FlashcardModal extends Modal {
         this.contentEl.addClass("sr-modal-content");
 
         // Init static elements in views
-        this.deckView = new DeckUI(
+        this.deckView = new DeckContainer(
             this.plugin,
             this.settings,
             this.reviewSequencer,
             this.contentEl.createDiv(),
             this._startReviewOfDeck.bind(this),
+            this.close.bind(this),
         );
 
         this.flashcardView = new CardUI(
@@ -79,11 +79,11 @@ export class FlashcardModal extends Modal {
             this.contentEl.createDiv(),
             this._showDecksList.bind(this),
             this._doEditQuestionText.bind(this),
+            this.close.bind(this),
         );
     }
 
     onOpen(): void {
-        this._createBackButton();
         this._showDecksList();
     }
 
@@ -116,7 +116,6 @@ export class FlashcardModal extends Modal {
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         if (this.reviewSequencer.hasCurrentCard) {
             this._showFlashcard(deck);
-            this.backButton.removeClass("sr-is-hidden");
         } else {
             this._showDecksList();
         }
@@ -138,16 +137,5 @@ export class FlashcardModal extends Modal {
                 this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
             })
             .catch((reason) => console.log(reason));
-    }
-
-    private _createBackButton() {
-        this.backButton = this.modalEl.createDiv();
-        this.backButton.addClasses(["sr-back-button", "sr-is-hidden"]);
-        setIcon(this.backButton, "arrow-left");
-        this.backButton.setAttribute("aria-label", t("BACK"));
-        this.backButton.addEventListener("click", () => {
-            this.backButton.addClass("sr-is-hidden");
-            this._showDecksList();
-        });
     }
 }
