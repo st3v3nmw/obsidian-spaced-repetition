@@ -3,7 +3,7 @@ import { ButtonComponent, ItemView, WorkspaceLeaf } from "obsidian";
 import { DEBUG_MODE_ENABLED, SR_TAB_VIEW } from "src/constants";
 import { Deck } from "src/deck";
 import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
-import { CardUI } from "src/gui/card-ui";
+import { CardUI } from "src/gui/card-ui/card-ui";
 import { DeckUI } from "src/gui/deck-ui";
 import { FlashcardEditModal } from "src/gui/edit-modal";
 import { t } from "src/lang/helpers";
@@ -64,11 +64,6 @@ export class SRTabView extends ItemView {
 
             this.viewContentEl = this.viewContainerEl.createDiv("sr-tab-view-content");
 
-            this.viewContentEl.style.height = this.settings.flashcardHeightPercentage + "%";
-            this.viewContentEl.style.maxHeight = this.settings.flashcardHeightPercentage + "%";
-            this.viewContentEl.style.width = this.settings.flashcardWidthPercentage + "%";
-            this.viewContentEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
-
             this.viewContainerEl.appendChild(this.viewContentEl);
         }
     }
@@ -126,7 +121,7 @@ export class SRTabView extends ItemView {
                 );
             }
 
-            this._createBackButton();
+            // this._createBackButton();
             const loadedData = await this.loadReviewSequencerData();
 
             this.reviewSequencer = loadedData.reviewSequencer;
@@ -211,12 +206,12 @@ export class SRTabView extends ItemView {
 
     private _showFlashcard(deck: Deck): void {
         this._hideDecksList();
-        this.backButton.buttonEl.removeClass("sr-is-hidden");
+        // this.backButton.buttonEl.removeClass("sr-is-hidden");
         this.flashcardView.show(deck);
     }
 
     private _hideFlashcard(): void {
-        this.backButton.buttonEl.addClass("sr-is-hidden");
+        // this.backButton.buttonEl.addClass("sr-is-hidden");
         this.flashcardView.hide();
     }
 

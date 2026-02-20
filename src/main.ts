@@ -26,8 +26,8 @@ import {
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/review-queue-list-view";
 import { SRSettingTab } from "src/gui/settings";
 import { OsrSidebar } from "src/gui/sidebar";
-import { FlashcardModal } from "src/gui/sr-modal";
-import { SRTabView } from "src/gui/sr-tab-view";
+import { FlashcardModal } from "src/gui/obsidian-views/sr-modal";
+import { SRTabView } from "src/gui/obsidian-views/sr-tab-view";
 import TabViewManager from "src/gui/tab-view-manager";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
@@ -462,9 +462,9 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                    t("SYNC_TIME_TAKEN", {
-                        t: Date.now() - now.valueOf(),
-                    }),
+                t("SYNC_TIME_TAKEN", {
+                    t: Date.now() - now.valueOf(),
+                }),
             );
         }
     }

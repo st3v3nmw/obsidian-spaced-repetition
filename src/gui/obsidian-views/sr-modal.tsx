@@ -1,18 +1,16 @@
-import { App, ButtonComponent, Modal, Platform } from "obsidian";
+import { App, Modal } from "obsidian";
 
 import { Deck } from "src/deck";
 import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import { CardUI } from "src/gui/card-ui";
+import { CardUI } from "src/gui/card-ui/card-ui";
 import { DeckUI } from "src/gui/deck-ui";
 import { FlashcardEditModal } from "src/gui/edit-modal";
-import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
-import EmulatedPlatform from "src/utils/platform-detector";
 
 export enum FlashcardMode {
     Deck,
@@ -29,7 +27,6 @@ export class FlashcardModal extends Modal {
     private reviewMode: FlashcardReviewMode;
     private deckView: DeckUI;
     private flashcardView: CardUI;
-    public backButton: ButtonComponent;
 
     constructor(
         app: App,
@@ -69,6 +66,7 @@ export class FlashcardModal extends Modal {
             this.reviewSequencer,
             this.contentEl.createDiv(),
             this._startReviewOfDeck.bind(this),
+            this.close.bind(this),
         );
 
         this.flashcardView = new CardUI(
@@ -80,11 +78,11 @@ export class FlashcardModal extends Modal {
             this.contentEl.createDiv(),
             this._showDecksList.bind(this),
             this._doEditQuestionText.bind(this),
+            this.close.bind(this),
         );
     }
 
     onOpen(): void {
-        this._createBackButton();
         this._showDecksList();
     }
 
@@ -106,12 +104,10 @@ export class FlashcardModal extends Modal {
 
     private _showFlashcard(deck: Deck): void {
         this._hideDecksList();
-        this.backButton.buttonEl.removeClass("sr-is-hidden");
         this.flashcardView.show(deck);
     }
 
     private _hideFlashcard(): void {
-        this.backButton.buttonEl.addClass("sr-is-hidden");
         this.flashcardView.hide();
     }
 
@@ -140,23 +136,5 @@ export class FlashcardModal extends Modal {
                 this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
             })
             .catch((reason) => console.log(reason));
-    }
-
-    private _createBackButton() {
-        this.backButton = new ButtonComponent(this.modalEl);
-        this.backButton.setClass("sr-back-button");
-        this.backButton.setClass("sr-is-hidden");
-        if (EmulatedPlatform().isPhone || Platform.isPhone) {
-            this.backButton.setClass("mod-raised");
-        } else {
-            this.backButton.setClass("clickable-icon");
-        }
-        this.backButton.setIcon("arrow-left");
-        this.backButton.setTooltip(t("BACK"));
-        this.backButton.buttonEl.setAttribute("aria-label", t("BACK"));
-        this.backButton.onClick(() => {
-            this.backButton.setClass("sr-is-hidden");
-            this._showDecksList();
-        });
     }
 }

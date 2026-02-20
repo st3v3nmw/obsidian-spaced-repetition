@@ -44,17 +44,17 @@
     flex-direction: column;
 }
 
-.is-tablet .sr-button {
-    padding: var(--size-4-1) var(--size-4-3) !important;
-}
-
 .sr-button {
     cursor: pointer;
 }
 
-.sr-back-button:hover,
-.sr-button:hover {
-    background-color: var(--background-modifier-hover);
+.sr-button:disabled {
+    cursor: not-allowed;
+}
+
+.sr-hide-by-scaling {
+    scale: 0;
+    user-select: none;
 }
 
 /* MARK: Mobile landscape mode */
@@ -89,13 +89,9 @@ body:not(.is-phone) .sr-response {
         padding: 8px;
     }
 
-    .is-phone #sr-modal,
-    .is-phone .sr-tab-view {
-        --side-button-clearance: calc(calc(var(--side-button-size)) + 8px);
-    }
-
     .is-phone .sr-deck-list,
-    .is-phone .sr-flashcard {
+    .is-phone .sr-flashcard,
+    .is-phone .sr-main-wrapper {
         gap: 8px;
     }
 
@@ -103,31 +99,46 @@ body:not(.is-phone) .sr-response {
         margin-bottom: 8px;
     }
 
-    .is-phone .sr-flashcard .sr-controls {
+    .is-phone .sr-flashcard {
+        flex-direction: row;
+    }
+
+    .is-phone #sr-modal,
+    .is-phone .sr-tab-view {
+        --side-button-size: 30px !important;
+    }
+
+    .is-phone .sr-flashcard .sr-horizontal-back-button {
+        display: inline-flex;
+    }
+
+    .is-phone .sr-flashcard .sr-controls-bar {
         width: unset !important;
         flex-direction: column;
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        padding-left: 8px;
+        justify-content: center;
+        gap: var(--size-4-2);
+    }
+
+    .is-phone .sr-flashcard .sr-card-controls {
+        width: unset !important;
+        flex-direction: column;
+        justify-content: center;
+        gap: var(--size-4-2);
+    }
+
+    .is-phone .sr-flashcard .sr-controls-bar .sr-button {
+        width: var(--side-button-size);
+        height: var(--side-button-size);
+        padding: var(--size-4-1);
+    }
+
+    .is-phone .sr-flashcard .sr-card-controls {
+        flex-direction: column;
     }
 
     .is-phone .sr-flashcard .sr-chosen-deck-info > *,
     .is-phone .sr-flashcard .sr-current-deck-info > * {
         font-size: medium;
-    }
-
-    .is-phone .sr-tab-view .sr-flashcard .sr-info-section {
-        margin: 0 0 0 calc(var(--side-button-clearance));
-    }
-
-    .is-phone #sr-modal .sr-flashcard .sr-info-section {
-        margin: 0 calc(var(--side-button-clearance));
-    }
-
-    .is-phone .sr-flashcard .sr-content {
-        margin: 0 0 0 calc(var(--side-button-clearance));
     }
 
     .is-phone .sr-flashcard .sr-content hr {
@@ -140,19 +151,6 @@ body:not(.is-phone) .sr-response {
 }
 
 @media only screen and (orientation: landscape) and (max-height: 490px) {
-    .is-phone .sr-tab-view .sr-flashcard .sr-info-section {
-        --side-button-clearance: calc(var(--side-button-size) * 3) !important;
-    }
-
-    .is-phone .sr-tab-view .sr-back-button {
-        left: calc(var(--side-button-size) * 2) !important;
-        top: 0px !important;
-    }
-
-    .is-phone .sr-response {
-        margin: 0 0 0 calc(var(--side-button-clearance));
-    }
-
     .is-phone .sr-response-button {
         height: 32px !important;
     }
@@ -164,7 +162,9 @@ body:not(.is-phone) .sr-response {
 }
 
 @media only screen and (orientation: landscape) and (max-height: 400px) {
-    .is-phone .sr-flashcard {
+
+    .is-phone .sr-flashcard,
+    .is-phone .sr-main-wrapper {
         gap: 4px;
     }
 }
@@ -172,8 +172,10 @@ body:not(.is-phone) .sr-response {
 /* MARK: Mobile portrait mode */
 
 @media only screen and (orientation: portrait) {
+
     .is-phone .sr-flashcard,
-    .is-phone .sr-deck-list {
+    .is-phone .sr-deck-list,
+    .is-phone .sr-main-wrapper {
         gap: 12px;
     }
 
@@ -183,11 +185,11 @@ body:not(.is-phone) .sr-response {
 
     .sr-deck-list .sr-header {
         gap: 8px;
-        margin-top: 32px;
     }
 }
 
 @media only screen and (orientation: portrait) and (max-width: 650px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 15ch;
@@ -212,6 +214,7 @@ body:not(.is-phone) .sr-response {
 }
 
 @media only screen and (orientation: portrait) and (max-width: 440px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 8ch;
@@ -219,6 +222,7 @@ body:not(.is-phone) .sr-response {
 }
 
 @media only screen and (orientation: portrait) and (max-width: 410px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 6ch;
@@ -232,7 +236,7 @@ body:not(.is-phone) .sr-response {
 
     #sr-modal,
     .sr-tab-view {
-        --side-button-size: 35px !important;
+        --side-button-size: 25px !important;
     }
 
     .is-mobile .sr-tab-view {
@@ -242,47 +246,20 @@ body:not(.is-phone) .sr-response {
 
 /* MARK: Modal */
 
-#sr-modal {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-#sr-modal,
-.sr-tab-view {
-    --side-button-size: 44px;
-    --side-button-clearance: calc(var(--side-button-size));
-    overflow: hidden !important;
-}
-
+#sr-modal .modal-close-button,
 #sr-modal .modal-header {
     display: none;
 }
 
-#sr-modal .modal-close-button {
-    z-index: 21;
+#sr-modal,
+.sr-tab-view {
+    overflow: hidden !important;
+    padding: var(--size-4-4);
 }
 
-body:not(.native-scrollbars) #sr-modal .modal-close-button {
-    top: 12px;
-}
-
-.sr-back-button {
-    z-index: 21;
-    cursor: var(--cursor);
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.is-mobile #sr-modal .sr-back-button {
-    height: var(--side-button-size);
-    width: var(--side-button-size);
-    padding: var(--size-4-1) var(--size-4-3);
+.is-mobile #sr-modal,
+.is-mobile .sr-tab-view {
+    --side-button-size: 44px;
 }
 
 /* MARK: Tab view */
@@ -292,27 +269,29 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     flex-direction: column;
 }
 
-.sr-tab-view-content {
-    flex-grow: 1;
-    margin: auto;
-}
-
 .sr-modal-content,
 .sr-tab-view {
+    overflow: hidden;
     position: relative;
+}
+
+.sr-tab-view-content {
+    flex-grow: 1;
     overflow: hidden;
 }
 
 /* MARK: Views*/
 
 .sr-deck-list,
-.sr-flashcard {
+.sr-flashcard,
+.sr-main-wrapper {
     gap: 16px;
 }
 
 .sr-deck-list,
 .sr-flashcard,
-.sr-edit-view {
+.sr-edit-view,
+.sr-main-wrapper {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -349,6 +328,19 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
 
 .sr-deck-list .sr-header {
     gap: 8px;
+}
+
+.sr-title-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+/* Spacer element to center the title */
+.sr-spacer {
+    scale: 0;
 }
 
 .sr-deck-list .sr-header-stats-container {
@@ -396,13 +388,15 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
 
 /* MARK: FlashcardReviewView */
 
-.sr-flashcard .sr-button:disabled {
-    cursor: not-allowed;
-}
-
-.sr-flashcard .sr-controls {
+.sr-flashcard .sr-controls-bar {
     display: flex;
     width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sr-flashcard .sr-card-controls {
+    display: flex;
     gap: var(--size-4-4);
     justify-content: center;
     align-items: center;
@@ -412,6 +406,10 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     display: flex;
     flex-direction: column;
     gap: 8px;
+}
+
+.sr-flashcard .sr-horizontal-back-button {
+    display: none;
 }
 
 .sr-flashcard .sr-deck-progress-info {
@@ -1019,13 +1017,11 @@ th.gridjs-th:last-child {
 
 .gridjs-loading-bar:after {
     animation: shimmer 2s infinite;
-    background-image: linear-gradient(
-        90deg,
-        hsla(0, 0%, 80%, 0),
-        hsla(0, 0%, 80%, 0.2) 20%,
-        hsla(0, 0%, 80%, 0.5) 60%,
-        hsla(0, 0%, 80%, 0)
-    );
+    background-image: linear-gradient(90deg,
+            hsla(0, 0%, 80%, 0),
+            hsla(0, 0%, 80%, 0.2) 20%,
+            hsla(0, 0%, 80%, 0.5) 60%,
+            hsla(0, 0%, 80%, 0));
     content: "";
     transform: translateX(-100%);
 }

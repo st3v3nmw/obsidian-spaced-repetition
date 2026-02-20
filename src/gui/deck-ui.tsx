@@ -1,3 +1,4 @@
+import { ButtonComponent, Platform } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
@@ -7,11 +8,12 @@ import {
     DeckStats,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import { FlashcardMode } from "src/gui/sr-modal";
+import { FlashcardMode } from "src/gui/obsidian-views/sr-modal";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
 import { TopicPath } from "src/topic-path";
+import EmulatedPlatform from "src/utils/platform-detector";
 
 export class DeckUI {
     public plugin: SRPlugin;
@@ -20,7 +22,11 @@ export class DeckUI {
 
     public view: HTMLDivElement;
     public header: HTMLDivElement;
+    public titleWrapper: HTMLDivElement;
+    public spacerEl: ButtonComponent;
     public title: HTMLDivElement;
+    public closeButton: ButtonComponent;
+
     public stats: HTMLDivElement;
     public headerDivider: HTMLHRElement;
     public content: HTMLDivElement;
@@ -28,6 +34,7 @@ export class DeckUI {
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private startReviewOfDeck: (deck: Deck) => void;
+    private closeModal: () => void | undefined;
 
     constructor(
         plugin: SRPlugin,
@@ -35,6 +42,7 @@ export class DeckUI {
         reviewSequencer: IFlashcardReviewSequencer,
         view: HTMLDivElement,
         startReviewOfDeck: (deck: Deck) => void,
+        closeModal?: () => void,
     ) {
         // Init properties
         this.plugin = plugin;
@@ -42,6 +50,7 @@ export class DeckUI {
         this.reviewSequencer = reviewSequencer;
         this.view = view;
         this.startReviewOfDeck = startReviewOfDeck;
+        this.closeModal = closeModal;
 
         // Build ui
         this.init();
@@ -56,9 +65,18 @@ export class DeckUI {
         this.header = this.view.createDiv();
         this.header.addClass("sr-header");
 
-        this.title = this.header.createDiv();
+        this.titleWrapper = this.header.createDiv();
+        this.titleWrapper.addClass("sr-title-wrapper");
+
+        this.spacerEl = new ButtonComponent(this.titleWrapper);
+        this.spacerEl.setIcon("circle-question-mark");
+        this.spacerEl.buttonEl.addClass("sr-spacer");
+
+        this.title = this.titleWrapper.createDiv();
         this.title.addClass("sr-title");
         this.title.setText(t("DECKS"));
+
+        this._createModalCloseButton();
 
         this.stats = this.header.createDiv();
         this.stats.addClass("sr-header-stats-container");
@@ -106,6 +124,26 @@ export class DeckUI {
     }
 
     // -> Header
+
+    private _createModalCloseButton() {
+        this.closeButton = new ButtonComponent(this.titleWrapper);
+        this.closeButton.setClass("sr-modal-close-button");
+        this.closeButton.setIcon("x");
+        this.closeButton.setClass("sr-button");
+        if (this.closeModal === undefined) {
+            this.closeButton.setClass("sr-hide-by-scaling");
+        }
+
+        if (EmulatedPlatform().isPhone || Platform.isPhone) {
+            this.closeButton.setClass("mod-raised");
+        } else {
+            this.closeButton.setClass("clickable-icon");
+        }
+
+        this.closeButton.onClick(async () => {
+            if (this.closeModal) this.closeModal();
+        });
+    }
 
     private _createHeaderStats() {
         const statistics: DeckStats = this.reviewSequencer.getDeckStats(TopicPath.emptyPath);

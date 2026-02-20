@@ -1,17 +1,18 @@
 import { now } from "moment";
-import { App, ButtonComponent, Notice, Platform, setIcon } from "obsidian";
+import { App, ButtonComponent, Platform, setIcon } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { textInterval } from "src/algorithms/osr/note-scheduling";
 import { Card } from "src/card";
 import { Deck } from "src/deck";
 import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import { FlashcardMode } from "src/gui/sr-modal";
-import { t } from "src/lang/helpers";
+import BackButton from "src/gui/card-ui/controls-bar/back-button";
+import CardInfoNotice from "src/gui/card-ui/controls-bar/card-info-notice";
+import ControlsBar from "src/gui/card-ui/controls-bar/controls-bar";
+import Response from "src/gui/card-ui/response-section/response";
+import { FlashcardMode } from "src/gui/obsidian-views/sr-modal";
 import type SRPlugin from "src/main";
 import { Note } from "src/note";
 import { CardType, Question } from "src/question";
@@ -57,18 +58,12 @@ export class CardUI {
     public cardContext: HTMLElement;
 
     public content: HTMLDivElement;
+    public mainWrapper: HTMLDivElement;
 
-    public controls: HTMLDivElement;
-    public editButton: ButtonComponent;
-    public resetButton: ButtonComponent;
-    public infoButton: ButtonComponent;
-    public skipButton: ButtonComponent;
+    public controlsBar: ControlsBar;
+    public horizontalBackButton: ButtonComponent;
 
-    public response: HTMLDivElement;
-    public hardButton: ButtonComponent;
-    public goodButton: ButtonComponent;
-    public easyButton: ButtonComponent;
-    public answerButton: ButtonComponent;
+    public response: Response;
     public lastPressed: number;
 
     private chosenDeck: Deck | null;
@@ -84,6 +79,7 @@ export class CardUI {
     private reviewMode: FlashcardReviewMode;
     private backToDeck: () => void;
     private editClickHandler: () => void;
+    private closeModal: () => void | undefined;
 
     constructor(
         app: App,
@@ -94,6 +90,7 @@ export class CardUI {
         view: HTMLDivElement,
         backToDeck: () => void,
         editClickHandler: () => void,
+        closeModal?: () => void,
     ) {
         // Init properties
         this.app = app;
@@ -105,6 +102,7 @@ export class CardUI {
         this.editClickHandler = editClickHandler;
         this.view = view;
         this.chosenDeck = null;
+        this.closeModal = closeModal;
 
         // Build ui
         this.init();
@@ -118,20 +116,27 @@ export class CardUI {
     init() {
         this.view.addClasses(["sr-flashcard", "sr-is-hidden"]);
 
-        this.controls = this.view.createDiv();
-        this.controls.addClass("sr-controls");
+        this.controlsBar = new ControlsBar(this.view,
+            () => this.backToDeck(),
+            () => this.editClickHandler(),
+            (response: ReviewResponse) => this._processReview(response),
+            () => this._displayCurrentCardInfoNotice(),
+            () => this._skipCurrentCard(),
+            this.closeModal ? this.closeModal.bind(this) : undefined
+        );
 
-        this._createCardControls();
+        this.mainWrapper = this.view.createDiv();
+        this.mainWrapper.addClass("sr-main-wrapper");
 
         this._createInfoSection();
 
-        this.content = this.view.createDiv();
+        this.content = this.mainWrapper.createDiv();
         this.content.addClass("sr-content");
 
-        this.response = this.view.createDiv();
-        this.response.addClass("sr-response");
-
-        this._createResponseButtons();
+        this.response = new Response(this.mainWrapper, this.settings,
+            () => this._showAnswer(),
+            (response: ReviewResponse) => this._processReview(response)
+        );
     }
 
     /**
@@ -182,6 +187,11 @@ export class CardUI {
         document.removeEventListener("keydown", this._keydownHandler);
     }
 
+    /**
+     * Blocks the key input to the FlashcardView
+     *
+     * @param block
+     */
     blockKeyInput(block: boolean) {
         if (block) {
             document.addEventListener("keydown", this._keydownHandler);
@@ -193,7 +203,7 @@ export class CardUI {
     // #region -> Functions & helpers
 
     private async _drawContent() {
-        this.resetButton.disabled = true;
+        this.controlsBar.resetButton.disabled = true;
 
         // Update current deck info
         this.mode = FlashcardMode.Front;
@@ -225,7 +235,7 @@ export class CardUI {
         this.content.scrollTop = 0;
 
         // Update response buttons
-        this._resetResponseButtons();
+        this.response.resetResponseButtons();
     }
 
     private get _currentCard(): Card {
@@ -262,70 +272,7 @@ export class CardUI {
     // #region -> Controls
 
     private _createCardControls() {
-        this._createEditButton();
-        this._createResetButton();
-        this._createCardInfoButton();
-        this._createSkipButton();
-    }
 
-    private _createEditButton() {
-        this.editButton = new ButtonComponent(this.controls);
-        this.editButton.setIcon("edit");
-        this.editButton.setTooltip(t("EDIT_CARD"));
-        this.editButton.buttonEl.setAttribute("aria-label", t("EDIT_CARD"));
-        this.editButton.setClass("sr-button");
-        this.editButton.setClass("sr-edit-button");
-        if (EmulatedPlatform().isPhone || Platform.isPhone) {
-            this.editButton.setClass("mod-raised");
-        }
-        this.editButton.onClick(async () => {
-            this.editClickHandler();
-        });
-    }
-
-    private _createResetButton() {
-        this.resetButton = new ButtonComponent(this.controls);
-        this.resetButton.setClass("sr-button");
-        this.resetButton.setClass("sr-reset-button");
-        if (EmulatedPlatform().isPhone || Platform.isPhone) {
-            this.resetButton.setClass("mod-raised");
-        }
-        this.resetButton.setIcon("refresh-cw");
-        this.resetButton.setTooltip(t("RESET_CARD_PROGRESS"));
-        this.resetButton.buttonEl.setAttribute("aria-label", t("RESET_CARD_PROGRESS"));
-        this.resetButton.onClick(() => {
-            this._processReview(ReviewResponse.Reset);
-        });
-    }
-
-    private _createCardInfoButton() {
-        this.infoButton = new ButtonComponent(this.controls);
-        this.infoButton.setClass("sr-button");
-        this.infoButton.setClass("sr-info-button");
-        if (EmulatedPlatform().isPhone || Platform.isPhone) {
-            this.infoButton.setClass("mod-raised");
-        }
-        this.infoButton.setIcon("info");
-        this.infoButton.setTooltip(t("VIEW_CARD_INFO"));
-        this.infoButton.buttonEl.setAttribute("aria-label", t("VIEW_CARD_INFO"));
-        this.infoButton.onClick(async () => {
-            this._displayCurrentCardInfoNotice();
-        });
-    }
-
-    private _createSkipButton() {
-        this.skipButton = new ButtonComponent(this.controls);
-        this.skipButton.setClass("sr-button");
-        this.skipButton.setClass("sr-skip-button");
-        if (EmulatedPlatform().isPhone || Platform.isPhone) {
-            this.skipButton.setClass("mod-raised");
-        }
-        this.skipButton.setIcon("chevrons-right");
-        this.skipButton.setTooltip(t("SKIP"));
-        this.skipButton.buttonEl.setAttribute("aria-label", t("SKIP"));
-        this.skipButton.onClick(() => {
-            this._skipCurrentCard();
-        });
     }
 
     private async _skipCurrentCard(): Promise<void> {
@@ -334,26 +281,22 @@ export class CardUI {
     }
 
     private _displayCurrentCardInfoNotice() {
-        const schedule = this._currentCard.scheduleInfo;
-
-        const currentEaseStr = t("CURRENT_EASE_HELP_TEXT") + (schedule?.latestEase ?? t("NEW"));
-        const currentIntervalStr =
-            t("CURRENT_INTERVAL_HELP_TEXT") + textInterval(schedule?.interval, false);
-        const generatedFromStr = t("CARD_GENERATED_FROM", {
-            notePath: this._currentQuestion.note.filePath,
-        });
-
-        new Notice(currentEaseStr + "\n" + currentIntervalStr + "\n" + generatedFromStr);
+        new CardInfoNotice(this._currentCard.scheduleInfo, this._currentQuestion.note.filePath);
     }
 
     // #region -> Deck Info
 
     private _createInfoSection() {
-        this.infoSection = this.view.createDiv();
+        this.infoSection = this.mainWrapper.createDiv();
         this.infoSection.addClass("sr-info-section");
 
         this.deckProgressInfo = this.infoSection.createDiv();
         this.deckProgressInfo.addClass("sr-deck-progress-info");
+
+        this.horizontalBackButton = new BackButton(this.deckProgressInfo, () => this.backToDeck(), [
+            "clickable-icon",
+            "sr-horizontal-back-button",
+        ].join(" "));
 
         this.chosenDeckInfo = this.deckProgressInfo.createDiv();
         this.chosenDeckInfo.addClass("sr-chosen-deck-info");
@@ -498,90 +441,6 @@ export class CardUI {
 
     // #region -> Response
 
-    private _createResponseButtons() {
-        this._createShowAnswerButton();
-        this._createHardButton();
-        this._createGoodButton();
-        this._createEasyButton();
-    }
-
-    private _resetResponseButtons() {
-        // Sets all buttons in to their default state
-        this.answerButton.buttonEl.removeClass("sr-is-hidden");
-        this.hardButton.buttonEl.addClass("sr-is-hidden");
-        this.goodButton.buttonEl.addClass("sr-is-hidden");
-        this.easyButton.buttonEl.addClass("sr-is-hidden");
-    }
-
-    private _createShowAnswerButton() {
-        this.answerButton = new ButtonComponent(this.response);
-        this.answerButton.setClass("sr-response-button");
-        this.answerButton.setClass("sr-show-answer-button");
-        this.answerButton.setClass("sr-bg-blue");
-        this.answerButton.setButtonText(t("SHOW_ANSWER"));
-        this.answerButton.onClick(() => {
-            this._showAnswer();
-        });
-    }
-
-    private _createHardButton() {
-        this.hardButton = new ButtonComponent(this.response);
-        this.hardButton.setClass("sr-response-button");
-        this.hardButton.setClass("sr-hard-button");
-        this.hardButton.setClass("sr-bg-red");
-        this.hardButton.setClass("sr-is-hidden");
-        this.hardButton.setButtonText(this.settings.flashcardHardText);
-        this.hardButton.onClick(() => {
-            this._processReview(ReviewResponse.Hard);
-        });
-    }
-
-    private _createGoodButton() {
-        this.goodButton = new ButtonComponent(this.response);
-        this.goodButton.setClass("sr-response-button");
-        this.goodButton.setClass("sr-good-button");
-        this.goodButton.setClass("sr-bg-blue");
-        this.goodButton.setClass("sr-is-hidden");
-        this.goodButton.setButtonText(this.settings.flashcardGoodText);
-        this.goodButton.onClick(() => {
-            this._processReview(ReviewResponse.Good);
-        });
-    }
-
-    private _createEasyButton() {
-        this.easyButton = new ButtonComponent(this.response);
-        this.easyButton.setClass("sr-response-button");
-        this.easyButton.setClass("sr-easy-button");
-        this.easyButton.setClass("sr-bg-green");
-        this.easyButton.setClass("sr-is-hidden");
-        this.easyButton.setButtonText(this.settings.flashcardEasyText);
-        this.easyButton.onClick(() => {
-            this._processReview(ReviewResponse.Easy);
-        });
-    }
-
-    private _setupEaseButton(
-        button: ButtonComponent,
-        buttonName: string,
-        reviewResponse: ReviewResponse,
-    ) {
-        const schedule: RepItemScheduleInfo = this.reviewSequencer.determineCardSchedule(
-            reviewResponse,
-            this._currentCard,
-        );
-        const interval: number = schedule.interval;
-
-        if (this.settings.showIntervalInReviewButtons) {
-            if (EmulatedPlatform().isMobile || Platform.isMobile) {
-                button.setButtonText(textInterval(interval, true));
-            } else {
-                button.setButtonText(`${buttonName} - ${textInterval(interval, false)}`);
-            }
-        } else {
-            button.setButtonText(buttonName);
-        }
-    }
-
     private _showAnswer(): void {
         const timeNow = now();
         if (
@@ -594,7 +453,7 @@ export class CardUI {
 
         this.mode = FlashcardMode.Back;
 
-        this.resetButton.disabled = false;
+        this.controlsBar.resetButton.disabled = false;
 
         // Show answer text
         if (this._currentQuestion.questionType !== CardType.Cloze) {
@@ -616,32 +475,7 @@ export class CardUI {
         );
 
         // Show response buttons
-        this.answerButton.buttonEl.addClass("sr-is-hidden");
-        this.hardButton.buttonEl.removeClass("sr-is-hidden");
-        this.easyButton.buttonEl.removeClass("sr-is-hidden");
-
-        if (this.reviewMode === FlashcardReviewMode.Cram) {
-            this.response.addClass("is-cram");
-            this.hardButton.setButtonText(`${this.settings.flashcardHardText}`);
-            this.easyButton.setButtonText(`${this.settings.flashcardEasyText}`);
-        } else {
-            this.goodButton.buttonEl.removeClass("sr-is-hidden");
-            this._setupEaseButton(
-                this.hardButton,
-                this.settings.flashcardHardText,
-                ReviewResponse.Hard,
-            );
-            this._setupEaseButton(
-                this.goodButton,
-                this.settings.flashcardGoodText,
-                ReviewResponse.Good,
-            );
-            this._setupEaseButton(
-                this.easyButton,
-                this.settings.flashcardEasyText,
-                ReviewResponse.Easy,
-            );
-        }
+        this.response.showRatingButtons(this.reviewMode, this.settings, this.reviewSequencer, this._currentCard);
     }
 
     private _keydownHandler = (e: KeyboardEvent) => {
