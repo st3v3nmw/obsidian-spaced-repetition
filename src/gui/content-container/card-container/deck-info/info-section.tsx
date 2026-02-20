@@ -2,7 +2,8 @@ import { ButtonComponent, setIcon } from "obsidian";
 
 import { Deck } from "src/deck";
 import { DeckStats } from "src/flashcard-review-sequencer";
-import BackButton from "src/gui/card-ui/controls-bar/back-button";
+import BackButtonComponent from "src/gui/content-container/card-container/controls/back-button";
+import ModalCloseButtonComponent from "src/gui/modal-close-button";
 import { Note } from "src/note";
 import { Question } from "src/question";
 
@@ -35,19 +36,26 @@ export default class InfoSectionComponent {
     public currentDeckCardCounter: HTMLDivElement;
     public currentDeckCardCounterIcon: HTMLDivElement;
     public horizontalBackButton: ButtonComponent;
+    public horizontalCloseButton: ButtonComponent;
     public cardContext: HTMLElement;
 
-    constructor(container: HTMLDivElement, showContextInCards: boolean, backToDeck: () => void) {
+    constructor(
+        container: HTMLDivElement,
+        showContextInCards: boolean,
+        backToDeck: () => void,
+        closeModal: () => void | undefined,
+    ) {
         this.infoSection = container.createDiv();
         this.infoSection.addClass("sr-info-section");
 
         this.deckProgressInfo = this.infoSection.createDiv();
         this.deckProgressInfo.addClass("sr-deck-progress-info");
 
-        this.horizontalBackButton = new BackButton(this.deckProgressInfo, () => backToDeck(), [
-            "clickable-icon",
-            "sr-horizontal-back-button",
-        ]);
+        this.horizontalBackButton = new BackButtonComponent(
+            this.deckProgressInfo,
+            () => backToDeck(),
+            ["clickable-icon", "sr-horizontal-back-button"],
+        );
 
         this.chosenDeckInfo = this.deckProgressInfo.createDiv();
         this.chosenDeckInfo.addClass("sr-chosen-deck-info");
@@ -103,13 +111,33 @@ export default class InfoSectionComponent {
         this.currentDeckCardCounterIcon.addClass("sr-current-deck-card-counter-icon");
         setIcon(this.currentDeckCardCounterIcon, "credit-card");
 
+        this.deckProgressInfo
+            .createDiv()
+            .addClasses(["sr-flex-spacer", "sr-horizontal-flex-spacer"]);
+
+        this.horizontalCloseButton = new ModalCloseButtonComponent(
+            this.deckProgressInfo,
+            () => closeModal && closeModal(),
+            [
+                !closeModal && "sr-hide-by-scaling",
+                !closeModal && "hide-height",
+                "mod-raised",
+                "sr-horizontal-close-button",
+            ],
+        );
+
         if (showContextInCards) {
             this.cardContext = this.infoSection.createDiv();
             this.cardContext.addClass("sr-context");
         }
     }
 
-    public updateChosenDeckInfo(chosenDeck: Deck, deckStats: DeckStats, totalCardsInSession: number, totalDecksInSession: number) {
+    public updateChosenDeckInfo(
+        chosenDeck: Deck,
+        deckStats: DeckStats,
+        totalCardsInSession: number,
+        totalDecksInSession: number,
+    ) {
         const chosenDeckStats = deckStats;
 
         this.chosenDeckName.setText(`${chosenDeck.deckName}`);
@@ -133,7 +161,13 @@ export default class InfoSectionComponent {
         );
     }
 
-    public updateCurrentDeckInfo(chosenDeck: Deck, currentDeck: Deck, currentDeckStats: DeckStats, flashcardCardOrder: string, currentDeckTotalCardsInQueue: number) {
+    public updateCurrentDeckInfo(
+        chosenDeck: Deck,
+        currentDeck: Deck,
+        currentDeckStats: DeckStats,
+        flashcardCardOrder: string,
+        currentDeckTotalCardsInQueue: number,
+    ) {
         if (chosenDeck.subdecks.length === 0) {
             if (!this.currentDeckInfo.hasClass("sr-is-hidden")) {
                 this.currentDeckInfo.addClass("sr-is-hidden");
@@ -155,7 +189,11 @@ export default class InfoSectionComponent {
         }
     }
 
-    public updateCardContext(showContextInCards: boolean, currentQuestion: Question, currentNote: Note) {
+    public updateCardContext(
+        showContextInCards: boolean,
+        currentQuestion: Question,
+        currentNote: Note,
+    ) {
         if (!this.cardContext) return;
         if (!showContextInCards) {
             this.cardContext.setText("");

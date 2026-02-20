@@ -5,7 +5,7 @@ import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { textInterval } from "src/algorithms/osr/note-scheduling";
 import { Card } from "src/card";
 import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
-import SRResponseButtonComponent from "src/gui/card-ui/response-section/sr-response-button";
+import SRResponseButtonComponent from "src/gui/content-container/card-container/response-section/sr-response-button";
 import { t } from "src/lang/helpers";
 import { SRSettings } from "src/settings";
 import EmulatedPlatform from "src/utils/platform-detector";
@@ -17,7 +17,12 @@ export default class ResponseSectionComponent {
     public easyButton: SRResponseButtonComponent;
     public answerButton: SRResponseButtonComponent;
 
-    constructor(container: HTMLElement, settings: SRSettings, showAnswer: () => void, processReview: (response: ReviewResponse) => void) {
+    constructor(
+        container: HTMLElement,
+        settings: SRSettings,
+        showAnswer: () => void,
+        processReview: (response: ReviewResponse) => void,
+    ) {
         this.responseEl = container.createDiv();
         this.responseEl.addClass("sr-response");
 
@@ -62,8 +67,12 @@ export default class ResponseSectionComponent {
         this.easyButton.buttonEl.addClass("sr-is-hidden");
     }
 
-    public showRatingButtons(reviewMode: FlashcardReviewMode, settings: SRSettings, reviewSequencer: IFlashcardReviewSequencer,
-        currentCard: Card) {
+    public showRatingButtons(
+        reviewMode: FlashcardReviewMode,
+        settings: SRSettings,
+        reviewSequencer: IFlashcardReviewSequencer,
+        currentCard: Card,
+    ) {
         // Shows the rating buttons and hides the show answer button
         this.answerButton.buttonEl.addClass("sr-is-hidden");
 

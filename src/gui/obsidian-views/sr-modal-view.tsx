@@ -5,9 +5,9 @@ import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import { CardUI } from "src/gui/card-ui/card-ui";
-import { DeckUI } from "src/gui/deck-ui";
-import { FlashcardEditModal } from "src/gui/edit-modal";
+import { CardUI } from "src/gui/content-container/card-container/card-container";
+import { DeckContainer } from "src/gui/content-container/deck-container";
+import { FlashcardEditModal } from "src/gui/obsidian-views/edit-modal";
 import type SRPlugin from "src/main";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
@@ -19,13 +19,13 @@ export enum FlashcardMode {
     Closed,
 }
 
-export class FlashcardModal extends Modal {
+export class SRModalView extends Modal {
     public plugin: SRPlugin;
     public mode: FlashcardMode;
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
-    private deckView: DeckUI;
+    private deckView: DeckContainer;
     private flashcardView: CardUI;
 
     constructor(
@@ -48,7 +48,8 @@ export class FlashcardModal extends Modal {
         this.modalEl.style.maxHeight = this.settings.flashcardHeightPercentage + "%";
         this.modalEl.style.width = this.settings.flashcardWidthPercentage + "%";
         this.modalEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
-        this.modalEl.setAttribute("id", "sr-modal");
+        this.modalEl.setAttribute("id", "sr-modal-view");
+        this.modalEl.addClass("sr-view");
 
         if (
             this.settings.flashcardHeightPercentage >= 100 ||
@@ -60,7 +61,7 @@ export class FlashcardModal extends Modal {
         this.contentEl.addClass("sr-modal-content");
 
         // Init static elements in views
-        this.deckView = new DeckUI(
+        this.deckView = new DeckContainer(
             this.plugin,
             this.settings,
             this.reviewSequencer,

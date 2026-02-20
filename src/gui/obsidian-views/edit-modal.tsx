@@ -147,7 +147,7 @@ export class FlashcardEditModal extends Modal {
 
     private _createSpacerButton(container: HTMLElement) {
         const button = container.createEl("button");
-        button.addClasses(["sr-response-button", "sr-spacer"]);
+        button.addClasses(["sr-response-button", "sr-dummy-button"]);
         button.setText("");
     }
 

@@ -8,27 +8,29 @@ import {
     DeckStats,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import { FlashcardMode } from "src/gui/obsidian-views/sr-modal";
+import ModalCloseButtonComponent from "src/gui/modal-close-button";
+import { FlashcardMode } from "src/gui/obsidian-views/sr-modal-view";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
 import { TopicPath } from "src/topic-path";
 import EmulatedPlatform from "src/utils/platform-detector";
 
-export class DeckUI {
+export class DeckContainer {
     public plugin: SRPlugin;
     public mode: FlashcardMode;
     public contentEl: HTMLElement;
 
-    public view: HTMLDivElement;
+    public containerEl: HTMLDivElement;
     public header: HTMLDivElement;
     public titleWrapper: HTMLDivElement;
-    public spacerEl: ButtonComponent;
+    public dummyButtonEl: ButtonComponent;
     public title: HTMLDivElement;
     public closeButton: ButtonComponent;
 
     public stats: HTMLDivElement;
     public headerDivider: HTMLHRElement;
+    public scrollWrapper: HTMLDivElement;
     public content: HTMLDivElement;
 
     private reviewSequencer: IFlashcardReviewSequencer;
@@ -40,7 +42,7 @@ export class DeckUI {
         plugin: SRPlugin,
         settings: SRSettings,
         reviewSequencer: IFlashcardReviewSequencer,
-        view: HTMLDivElement,
+        containerEl: HTMLDivElement,
         startReviewOfDeck: (deck: Deck) => void,
         closeModal?: () => void,
     ) {
@@ -48,7 +50,7 @@ export class DeckUI {
         this.plugin = plugin;
         this.settings = settings;
         this.reviewSequencer = reviewSequencer;
-        this.view = view;
+        this.containerEl = containerEl;
         this.startReviewOfDeck = startReviewOfDeck;
         this.closeModal = closeModal;
 
@@ -60,32 +62,49 @@ export class DeckUI {
      * Initializes all static elements in the DeckListView
      */
     init(): void {
-        this.view.addClasses(["sr-deck-list", "sr-is-hidden"]);
+        this.containerEl.addClasses(["sr-container", "sr-deck-container", "sr-is-hidden"]);
 
-        this.header = this.view.createDiv();
+        this.header = this.containerEl.createDiv();
         this.header.addClass("sr-header");
 
         this.titleWrapper = this.header.createDiv();
         this.titleWrapper.addClass("sr-title-wrapper");
 
-        this.spacerEl = new ButtonComponent(this.titleWrapper);
-        this.spacerEl.setIcon("circle-question-mark");
-        this.spacerEl.buttonEl.addClass("sr-spacer");
-        this.spacerEl.buttonEl.addClass("sr-hide-by-scaling");
+        this.dummyButtonEl = new ButtonComponent(this.titleWrapper)
+            .setIcon("circle-question-mark")
+            .setClass("sr-dummy-button")
+            .setClass("sr-hide-by-scaling")
+            .setClass("hide-height");
+
+        this.titleWrapper.createDiv().addClass("sr-flex-spacer");
 
         this.title = this.titleWrapper.createDiv();
         this.title.addClass("sr-title");
         this.title.setText(t("DECKS"));
 
-        this._createModalCloseButton();
+        this.titleWrapper.createDiv().addClass("sr-flex-spacer");
+
+        this.closeButton = new ModalCloseButtonComponent(
+            this.titleWrapper,
+            () => this.closeModal && this.closeModal(),
+            [
+                !this.closeModal && "sr-hide-by-scaling",
+                !this.closeModal && "hide-height",
+                EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "clickable-icon",
+                "sr-modal-close-button",
+            ],
+        );
 
         this.stats = this.header.createDiv();
         this.stats.addClass("sr-header-stats-container");
         this._createHeaderStats();
 
-        this.headerDivider = this.view.createEl("hr");
+        this.headerDivider = this.containerEl.createEl("hr");
 
-        this.content = this.view.createDiv();
+        this.scrollWrapper = this.containerEl.createDiv();
+        this.scrollWrapper.addClass("sr-scroll-wrapper");
+
+        this.content = this.scrollWrapper.createDiv();
         this.content.addClass("sr-content");
     }
 
@@ -103,8 +122,8 @@ export class DeckUI {
             this._createTree(deck, this.content);
         }
 
-        if (this.view.hasClass("sr-is-hidden")) {
-            this.view.removeClass("sr-is-hidden");
+        if (this.containerEl.hasClass("sr-is-hidden")) {
+            this.containerEl.removeClass("sr-is-hidden");
         }
     }
 
@@ -112,8 +131,8 @@ export class DeckUI {
      * Hides the DeckListView
      */
     hide() {
-        if (!this.view.hasClass("sr-is-hidden")) {
-            this.view.addClass("sr-is-hidden");
+        if (!this.containerEl.hasClass("sr-is-hidden")) {
+            this.containerEl.addClass("sr-is-hidden");
         }
     }
 
@@ -125,26 +144,6 @@ export class DeckUI {
     }
 
     // -> Header
-
-    private _createModalCloseButton() {
-        this.closeButton = new ButtonComponent(this.titleWrapper);
-        this.closeButton.setClass("sr-modal-close-button");
-        this.closeButton.setIcon("x");
-        this.closeButton.setClass("sr-button");
-        if (this.closeModal === undefined) {
-            this.closeButton.setClass("sr-hide-by-scaling");
-        }
-
-        if (EmulatedPlatform().isPhone || Platform.isPhone) {
-            this.closeButton.setClass("mod-raised");
-        } else {
-            this.closeButton.setClass("clickable-icon");
-        }
-
-        this.closeButton.onClick(async () => {
-            if (this.closeModal) this.closeModal();
-        });
-    }
 
     private _createHeaderStats() {
         const statistics: DeckStats = this.reviewSequencer.getDeckStats(TopicPath.emptyPath);

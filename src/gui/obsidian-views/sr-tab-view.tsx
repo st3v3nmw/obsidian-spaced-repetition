@@ -3,9 +3,9 @@ import { ButtonComponent, ItemView, WorkspaceLeaf } from "obsidian";
 import { DEBUG_MODE_ENABLED, SR_TAB_VIEW } from "src/constants";
 import { Deck } from "src/deck";
 import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
-import { CardUI } from "src/gui/card-ui/card-ui";
-import { DeckUI } from "src/gui/deck-ui";
-import { FlashcardEditModal } from "src/gui/edit-modal";
+import { CardUI } from "src/gui/content-container/card-container/card-container";
+import { DeckContainer } from "src/gui/content-container/deck-container";
+import { FlashcardEditModal } from "src/gui/obsidian-views/edit-modal";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Question } from "src/question";
@@ -38,7 +38,7 @@ export class SRTabView extends ItemView {
     private viewContentEl: HTMLElement;
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
-    private deckView: DeckUI;
+    private deckView: DeckContainer;
     private flashcardView: CardUI;
     private openErrorCount: number = 0; // Counter for catching the first inevitable error but the letting the other through
     public backButton: ButtonComponent;
@@ -61,6 +61,7 @@ export class SRTabView extends ItemView {
         if (viewContent.length > 0) {
             this.viewContainerEl = viewContent[0] as HTMLElement;
             this.viewContainerEl.addClass("sr-tab-view");
+            this.viewContainerEl.addClass("sr-view");
 
             this.viewContentEl = this.viewContainerEl.createDiv("sr-tab-view-content");
 
@@ -69,7 +70,12 @@ export class SRTabView extends ItemView {
             this.viewContentEl.style.width = this.settings.flashcardWidthPercentage + "%";
             this.viewContentEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
 
-            this.viewContainerEl.appendChild(this.viewContentEl);
+            if (
+                this.settings.flashcardHeightPercentage < 100 ||
+                this.settings.flashcardWidthPercentage < 100
+            ) {
+                this.viewContentEl.addClass("sr-center-view");
+            }
         }
     }
 
@@ -134,7 +140,7 @@ export class SRTabView extends ItemView {
 
             if (this.deckView === undefined) {
                 // Init static elements in views
-                this.deckView = new DeckUI(
+                this.deckView = new DeckContainer(
                     this.plugin,
                     this.settings,
                     this.reviewSequencer,

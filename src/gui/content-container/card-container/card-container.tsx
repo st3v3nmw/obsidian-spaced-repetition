@@ -8,11 +8,11 @@ import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import CardInfoNotice from "src/gui/card-ui/controls-bar/card-info-notice";
-import ControlsBarComponent from "src/gui/card-ui/controls-bar/controls-bar";
-import InfoSection from "src/gui/card-ui/deck-info/info-section";
-import ResponseSectionComponent from "src/gui/card-ui/response-section/response-section";
-import { FlashcardMode } from "src/gui/obsidian-views/sr-modal";
+import CardInfoNotice from "src/gui/content-container/card-container/controls/card-info-notice";
+import ControlsComponent from "src/gui/content-container/card-container/controls/controls";
+import InfoSection from "src/gui/content-container/card-container/deck-info/info-section";
+import ResponseSectionComponent from "src/gui/content-container/card-container/response-section/response-section";
+import { FlashcardMode } from "src/gui/obsidian-views/sr-modal-view";
 import type SRPlugin from "src/main";
 import { Note } from "src/note";
 import { CardType, Question } from "src/question";
@@ -29,10 +29,11 @@ export class CardUI {
 
     public infoSection: InfoSection;
 
-    public content: HTMLDivElement;
     public mainWrapper: HTMLDivElement;
+    public scrollWrapper: HTMLDivElement;
+    public content: HTMLDivElement;
 
-    public controlsBar: ControlsBarComponent;
+    public controls: ControlsComponent;
 
     public response: ResponseSectionComponent;
     public lastPressed: number;
@@ -85,28 +86,40 @@ export class CardUI {
      * Initializes all static elements in the FlashcardView
      */
     init() {
-        this.view.addClasses(["sr-flashcard", "sr-is-hidden"]);
+        this.view.addClasses(["sr-container", "sr-card-container", "sr-is-hidden"]);
 
-        this.controlsBar = new ControlsBarComponent(this.view,
+        this.controls = new ControlsComponent(
+            this.view,
+            !this.settings.openViewInNewTab,
             () => this.backToDeck(),
             () => this.editClickHandler(),
             (response: ReviewResponse) => this._processReview(response),
             () => this._displayCurrentCardInfoNotice(),
             () => this._skipCurrentCard(),
-            this.closeModal ? this.closeModal.bind(this) : undefined
+            this.closeModal ? this.closeModal.bind(this) : undefined,
         );
 
         this.mainWrapper = this.view.createDiv();
         this.mainWrapper.addClass("sr-main-wrapper");
 
-        this.infoSection = new InfoSection(this.mainWrapper, this.settings.showContextInCards, () => this.backToDeck());
+        this.infoSection = new InfoSection(
+            this.mainWrapper,
+            this.settings.showContextInCards,
+            () => this.backToDeck(),
+            this.closeModal ? this.closeModal.bind(this) : undefined,
+        );
 
-        this.content = this.mainWrapper.createDiv();
+        this.scrollWrapper = this.mainWrapper.createDiv();
+        this.scrollWrapper.addClass("sr-scroll-wrapper");
+
+        this.content = this.scrollWrapper.createDiv();
         this.content.addClass("sr-content");
 
-        this.response = new ResponseSectionComponent(this.mainWrapper, this.settings,
+        this.response = new ResponseSectionComponent(
+            this.mainWrapper,
+            this.settings,
             () => this._showAnswer(),
-            (response: ReviewResponse) => this._processReview(response)
+            (response: ReviewResponse) => this._processReview(response),
         );
     }
 
@@ -174,7 +187,7 @@ export class CardUI {
     // #region -> Functions & helpers
 
     private async _drawContent() {
-        this.controlsBar.resetButton.disabled = true;
+        this.controls.resetButton.disabled = true;
 
         // Update current deck info
         this.mode = FlashcardMode.Front;
@@ -255,9 +268,24 @@ export class CardUI {
 
     private _updateInfoBar(chosenDeck: Deck, currentDeck: Deck) {
         const currentDeckStats = this.reviewSequencer.getDeckStats(currentDeck.getTopicPath());
-        this.infoSection.updateChosenDeckInfo(chosenDeck, currentDeckStats, this.totalCardsInSession, this.totalDecksInSession);
-        this.infoSection.updateCurrentDeckInfo(chosenDeck, currentDeck, currentDeckStats, this.settings.flashcardCardOrder, this.currentDeckTotalCardsInQueue);
-        this.infoSection.updateCardContext(this.settings.showContextInCards, this._currentQuestion, this._currentNote);
+        this.infoSection.updateChosenDeckInfo(
+            chosenDeck,
+            currentDeckStats,
+            this.totalCardsInSession,
+            this.totalDecksInSession,
+        );
+        this.infoSection.updateCurrentDeckInfo(
+            chosenDeck,
+            currentDeck,
+            currentDeckStats,
+            this.settings.flashcardCardOrder,
+            this.currentDeckTotalCardsInQueue,
+        );
+        this.infoSection.updateCardContext(
+            this.settings.showContextInCards,
+            this._currentQuestion,
+            this._currentNote,
+        );
     }
 
     // #region -> Response
@@ -274,7 +302,7 @@ export class CardUI {
 
         this.mode = FlashcardMode.Back;
 
-        this.controlsBar.resetButton.disabled = false;
+        this.controls.resetButton.disabled = false;
 
         // Show answer text
         if (this._currentQuestion.questionType !== CardType.Cloze) {
@@ -296,7 +324,12 @@ export class CardUI {
         );
 
         // Show response buttons
-        this.response.showRatingButtons(this.reviewMode, this.settings, this.reviewSequencer, this._currentCard);
+        this.response.showRatingButtons(
+            this.reviewMode,
+            this.settings,
+            this.reviewSequencer,
+            this._currentCard,
+        );
     }
 
     private _keydownHandler = (e: KeyboardEvent) => {
