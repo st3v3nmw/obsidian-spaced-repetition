@@ -268,9 +268,10 @@ export class CardUI {
 
     private _updateInfoBar(chosenDeck: Deck, currentDeck: Deck) {
         const currentDeckStats = this.reviewSequencer.getDeckStats(currentDeck.getTopicPath());
+        const chosenDeckStats = this.reviewSequencer.getDeckStats(chosenDeck.getTopicPath());
         this.infoSection.updateChosenDeckInfo(
             chosenDeck,
-            currentDeckStats,
+            chosenDeckStats,
             this.totalCardsInSession,
             this.totalDecksInSession,
         );
