@@ -64,6 +64,11 @@ export class SRTabView extends ItemView {
 
             this.viewContentEl = this.viewContainerEl.createDiv("sr-tab-view-content");
 
+            this.viewContentEl.style.height = this.settings.flashcardHeightPercentage + "%";
+            this.viewContentEl.style.maxHeight = this.settings.flashcardHeightPercentage + "%";
+            this.viewContentEl.style.width = this.settings.flashcardWidthPercentage + "%";
+            this.viewContentEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
+
             this.viewContainerEl.appendChild(this.viewContentEl);
         }
     }
