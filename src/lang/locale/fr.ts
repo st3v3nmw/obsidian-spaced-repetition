@@ -90,6 +90,8 @@ export default {
     CONVERT_FOLDERS_TO_DECKS: "Convertir les dossiers en paquets et sous-paquets ?",
     CONVERT_FOLDERS_TO_DECKS_DESC:
         "Ceci est une alternative aux tags de flashcards présentés ci-dessus.",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS:
         "Sauvegarder le commentaire de planification dans la dernière ligne de la flashcard ?",
     INLINE_SCHEDULING_COMMENTS_DESC:

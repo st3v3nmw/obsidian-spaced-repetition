@@ -88,6 +88,8 @@ export default {
         "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.",
     CONVERT_FOLDERS_TO_DECKS: "Convert folders to decks and subdecks",
     CONVERT_FOLDERS_TO_DECKS_DESC: "This is an alternative to the Flashcard tags option above.",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS:
         "Save scheduling comment on the same line as the flashcard's last line?",
     INLINE_SCHEDULING_COMMENTS_DESC:
