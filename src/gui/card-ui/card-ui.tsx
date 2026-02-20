@@ -1,5 +1,5 @@
 import { now } from "moment";
-import { App, ButtonComponent, Platform, setIcon } from "obsidian";
+import { App, Platform } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { Card } from "src/card";
@@ -8,10 +8,10 @@ import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import BackButton from "src/gui/card-ui/controls-bar/back-button";
 import CardInfoNotice from "src/gui/card-ui/controls-bar/card-info-notice";
-import ControlsBar from "src/gui/card-ui/controls-bar/controls-bar";
-import Response from "src/gui/card-ui/response-section/response";
+import ControlsBarComponent from "src/gui/card-ui/controls-bar/controls-bar";
+import InfoSection from "src/gui/card-ui/deck-info/info-section";
+import ResponseSectionComponent from "src/gui/card-ui/response-section/response-section";
 import { FlashcardMode } from "src/gui/obsidian-views/sr-modal";
 import type SRPlugin from "src/main";
 import { Note } from "src/note";
@@ -27,43 +27,14 @@ export class CardUI {
 
     public view: HTMLDivElement;
 
-    public infoSection: HTMLDivElement;
-    public deckProgressInfo: HTMLDivElement;
-
-    public chosenDeckInfo: HTMLDivElement;
-    public chosenDeckName: HTMLDivElement;
-
-    public chosenDeckCounterWrapper: HTMLDivElement;
-    public chosenDeckCounterDivider: HTMLDivElement;
-
-    public chosenDeckCardCounterWrapper: HTMLDivElement;
-    public chosenDeckCardCounter: HTMLDivElement;
-    public chosenDeckCardCounterIcon: HTMLDivElement;
-
-    public chosenDeckSubDeckCounterWrapper: HTMLDivElement;
-    public chosenDeckSubDeckCounter: HTMLDivElement;
-    public chosenDeckSubDeckCounterIcon: HTMLDivElement;
-
-    public currentDeckInfo: HTMLDivElement;
-    public currentDeckName: HTMLDivElement;
-
-    public currentDeckCounterWrapper: HTMLDivElement;
-
-    public currentDeckCounterDivider: HTMLDivElement;
-
-    public currentDeckCardCounterWrapper: HTMLDivElement;
-    public currentDeckCardCounter: HTMLDivElement;
-    public currentDeckCardCounterIcon: HTMLDivElement;
-
-    public cardContext: HTMLElement;
+    public infoSection: InfoSection;
 
     public content: HTMLDivElement;
     public mainWrapper: HTMLDivElement;
 
-    public controlsBar: ControlsBar;
-    public horizontalBackButton: ButtonComponent;
+    public controlsBar: ControlsBarComponent;
 
-    public response: Response;
+    public response: ResponseSectionComponent;
     public lastPressed: number;
 
     private chosenDeck: Deck | null;
@@ -116,7 +87,7 @@ export class CardUI {
     init() {
         this.view.addClasses(["sr-flashcard", "sr-is-hidden"]);
 
-        this.controlsBar = new ControlsBar(this.view,
+        this.controlsBar = new ControlsBarComponent(this.view,
             () => this.backToDeck(),
             () => this.editClickHandler(),
             (response: ReviewResponse) => this._processReview(response),
@@ -128,12 +99,12 @@ export class CardUI {
         this.mainWrapper = this.view.createDiv();
         this.mainWrapper.addClass("sr-main-wrapper");
 
-        this._createInfoSection();
+        this.infoSection = new InfoSection(this.mainWrapper, this.settings.showContextInCards, () => this.backToDeck());
 
         this.content = this.mainWrapper.createDiv();
         this.content.addClass("sr-content");
 
-        this.response = new Response(this.mainWrapper, this.settings,
+        this.response = new ResponseSectionComponent(this.mainWrapper, this.settings,
             () => this._showAnswer(),
             (response: ReviewResponse) => this._processReview(response)
         );
@@ -271,10 +242,6 @@ export class CardUI {
 
     // #region -> Controls
 
-    private _createCardControls() {
-
-    }
-
     private async _skipCurrentCard(): Promise<void> {
         this.reviewSequencer.skipCurrentCard();
         await this._showNextCard();
@@ -286,157 +253,11 @@ export class CardUI {
 
     // #region -> Deck Info
 
-    private _createInfoSection() {
-        this.infoSection = this.mainWrapper.createDiv();
-        this.infoSection.addClass("sr-info-section");
-
-        this.deckProgressInfo = this.infoSection.createDiv();
-        this.deckProgressInfo.addClass("sr-deck-progress-info");
-
-        this.horizontalBackButton = new BackButton(this.deckProgressInfo, () => this.backToDeck(), [
-            "clickable-icon",
-            "sr-horizontal-back-button",
-        ].join(" "));
-
-        this.chosenDeckInfo = this.deckProgressInfo.createDiv();
-        this.chosenDeckInfo.addClass("sr-chosen-deck-info");
-        this.chosenDeckName = this.chosenDeckInfo.createDiv();
-        this.chosenDeckName.addClass("sr-chosen-deck-name");
-
-        this.chosenDeckCounterWrapper = this.chosenDeckInfo.createDiv();
-        this.chosenDeckCounterWrapper.addClass("sr-chosen-deck-counter-wrapper");
-
-        this.chosenDeckCounterDivider = this.chosenDeckCounterWrapper.createDiv();
-        this.chosenDeckCounterDivider.addClass("sr-chosen-deck-counter-divider");
-
-        this.chosenDeckCardCounterWrapper = this.chosenDeckCounterWrapper.createDiv();
-        this.chosenDeckCardCounterWrapper.addClass("sr-chosen-deck-card-counter-wrapper");
-
-        this.chosenDeckCardCounter = this.chosenDeckCardCounterWrapper.createDiv();
-        this.chosenDeckCardCounter.addClass("sr-chosen-deck-card-counter");
-
-        this.chosenDeckCardCounterIcon = this.chosenDeckCardCounterWrapper.createDiv();
-        this.chosenDeckCardCounterIcon.addClass("sr-chosen-deck-card-counter-icon");
-        setIcon(this.chosenDeckCardCounterIcon, "credit-card");
-
-        this.chosenDeckSubDeckCounterWrapper = this.chosenDeckCounterWrapper.createDiv();
-        this.chosenDeckSubDeckCounterWrapper.addClass("sr-is-hidden");
-        this.chosenDeckSubDeckCounterWrapper.addClass("sr-chosen-deck-subdeck-counter-wrapper");
-
-        this.chosenDeckSubDeckCounter = this.chosenDeckSubDeckCounterWrapper.createDiv();
-        this.chosenDeckSubDeckCounter.addClass("sr-chosen-deck-subdeck-counter");
-
-        this.chosenDeckSubDeckCounterIcon = this.chosenDeckSubDeckCounterWrapper.createDiv();
-        this.chosenDeckSubDeckCounterIcon.addClass("sr-chosen-deck-subdeck-counter-icon");
-        setIcon(this.chosenDeckSubDeckCounterIcon, "layers");
-
-        this.currentDeckInfo = this.deckProgressInfo.createDiv();
-        this.currentDeckInfo.addClass("sr-is-hidden");
-        this.currentDeckInfo.addClass("sr-current-deck-info");
-
-        this.currentDeckName = this.currentDeckInfo.createDiv();
-        this.currentDeckName.addClass("sr-current-deck-name");
-
-        this.currentDeckCounterWrapper = this.currentDeckInfo.createDiv();
-        this.currentDeckCounterWrapper.addClass("sr-current-deck-counter-wrapper");
-
-        this.currentDeckCounterDivider = this.currentDeckCounterWrapper.createDiv();
-        this.currentDeckCounterDivider.addClass("sr-current-deck-counter-divider");
-
-        this.currentDeckCardCounterWrapper = this.currentDeckCounterWrapper.createDiv();
-        this.currentDeckCardCounterWrapper.addClass("sr-current-deck-card-counter-wrapper");
-
-        this.currentDeckCardCounter = this.currentDeckCardCounterWrapper.createDiv();
-        this.currentDeckCardCounter.addClass("sr-current-deck-card-counter");
-        this.currentDeckCardCounterIcon = this.currentDeckCardCounterWrapper.createDiv();
-        this.currentDeckCardCounterIcon.addClass("sr-current-deck-card-counter-icon");
-        setIcon(this.currentDeckCardCounterIcon, "credit-card");
-
-        if (this.settings.showContextInCards) {
-            this.cardContext = this.infoSection.createDiv();
-            this.cardContext.addClass("sr-context");
-        }
-    }
-
     private _updateInfoBar(chosenDeck: Deck, currentDeck: Deck) {
-        this._updateChosenDeckInfo(chosenDeck);
-        this._updateCurrentDeckInfo(chosenDeck, currentDeck);
-        this._updateCardContext();
-    }
-
-    private _updateChosenDeckInfo(chosenDeck: Deck) {
-        const chosenDeckStats = this.reviewSequencer.getDeckStats(chosenDeck.getTopicPath());
-
-        this.chosenDeckName.setText(`${chosenDeck.deckName}`);
-        this.chosenDeckCardCounter.setText(
-            `${this.totalCardsInSession - chosenDeckStats.cardsInQueueCount}/${this.totalCardsInSession}`,
-        );
-
-        if (chosenDeck.subdecks.length === 0) {
-            if (!this.chosenDeckSubDeckCounterWrapper.hasClass("sr-is-hidden")) {
-                this.chosenDeckSubDeckCounterWrapper.addClass("sr-is-hidden");
-            }
-            return;
-        }
-
-        if (this.chosenDeckSubDeckCounterWrapper.hasClass("sr-is-hidden")) {
-            this.chosenDeckSubDeckCounterWrapper.removeClass("sr-is-hidden");
-        }
-
-        this.chosenDeckSubDeckCounter.setText(
-            `${this.totalDecksInSession - chosenDeckStats.decksInQueueOfThisDeckCount}/${this.totalDecksInSession}`,
-        );
-    }
-
-    private _updateCurrentDeckInfo(chosenDeck: Deck, currentDeck: Deck) {
-        if (chosenDeck.subdecks.length === 0) {
-            if (!this.currentDeckInfo.hasClass("sr-is-hidden")) {
-                this.currentDeckInfo.addClass("sr-is-hidden");
-            }
-            return;
-        }
-
-        if (this.currentDeckInfo.hasClass("sr-is-hidden")) {
-            this.currentDeckInfo.removeClass("sr-is-hidden");
-        }
-
-        this.currentDeckName.setText(`${currentDeck.deckName}`);
-
-        const isRandomMode = this.settings.flashcardCardOrder === "EveryCardRandomDeckAndCard";
-        if (!isRandomMode) {
-            const currentDeckStats = this.reviewSequencer.getDeckStats(currentDeck.getTopicPath());
-            this.currentDeckCardCounter.setText(
-                `${this.currentDeckTotalCardsInQueue - currentDeckStats.cardsInQueueOfThisDeckCount}/${this.currentDeckTotalCardsInQueue}`,
-            );
-        }
-    }
-
-    private _updateCardContext() {
-        if (!this.cardContext) return;
-        if (!this.settings.showContextInCards) {
-            this.cardContext.setText("");
-            return;
-        }
-        this.cardContext.setText(
-            ` ${this._formatQuestionContextText(this._currentQuestion.questionContext)}`,
-        );
-    }
-
-    private _formatQuestionContextText(questionContext: string[]): string {
-        const separator: string = " > ";
-        let result = this._currentNote.file.basename;
-        questionContext.forEach((context) => {
-            // Check for links trim [[ ]]
-            if (context.startsWith("[[") && context.endsWith("]]")) {
-                context = context.replace("[[", "").replace("]]", "");
-                // Use replacement text if any
-                if (context.contains("|")) {
-                    context = context.split("|")[1];
-                }
-            }
-            result += separator + context;
-        });
-        return result;
+        const currentDeckStats = this.reviewSequencer.getDeckStats(currentDeck.getTopicPath());
+        this.infoSection.updateChosenDeckInfo(chosenDeck, currentDeckStats, this.totalCardsInSession, this.totalDecksInSession);
+        this.infoSection.updateCurrentDeckInfo(chosenDeck, currentDeck, currentDeckStats, this.settings.flashcardCardOrder, this.currentDeckTotalCardsInQueue);
+        this.infoSection.updateCardContext(this.settings.showContextInCards, this._currentQuestion, this._currentNote);
     }
 
     // #region -> Response

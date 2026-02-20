@@ -1,9 +1,9 @@
-import SRButton from "src/gui/sr-button";
+import SRButtonComponent from "src/gui/sr-button";
 
-export default class SRResponseButton extends SRButton {
-    constructor(container: HTMLElement, props: { className?: string, icon?: string, tooltip?: string, text?: string, onClick: () => void }) {
+export default class SRResponseButtonComponent extends SRButtonComponent {
+    constructor(container: HTMLElement, props: { classNames?: string[], icon?: string, tooltip?: string, text?: string, onClick: () => void }) {
         super(container, {
-            className: ["sr-response-button", props.className].join(" "),
+            classNames: ["sr-response-button", ...(props.classNames ?? [])],
             icon: props.icon,
             tooltip: props.tooltip,
             text: props.text,

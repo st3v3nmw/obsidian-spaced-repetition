@@ -1,10 +1,10 @@
-import SRButton from "src/gui/sr-button";
+import SRButtonComponent from "src/gui/sr-button";
 import { t } from "src/lang/helpers";
 
-export default class CardInfoButton extends SRButton {
-    public constructor(container: HTMLElement, infoClickHandler: () => void, className?: string) {
+export default class CardInfoButtonComponent extends SRButtonComponent {
+    public constructor(container: HTMLElement, infoClickHandler: () => void, classNames?: string[]) {
         super(container, {
-            className: ["sr-info-button", className].join(" "),
+            classNames: ["sr-info-button", ...(classNames ?? [])],
             icon: "info",
             tooltip: t("VIEW_CARD_INFO"),
             onClick: () => {

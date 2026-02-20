@@ -1,11 +1,11 @@
 import { ButtonComponent, IconName } from "obsidian";
 
-export default class SRButton extends ButtonComponent {
-    constructor(container: HTMLElement, props?: { className?: string, icon?: IconName, tooltip?: string, text?: string, onClick?: () => void }) {
+export default class SRButtonComponent extends ButtonComponent {
+    constructor(container: HTMLElement, props?: { classNames?: string[], icon?: IconName, tooltip?: string, text?: string, onClick?: () => void }) {
         super(container);
         this.setClass("sr-button");
         if (props) {
-            if (props.className) this.setClass(props.className);
+            if (props.classNames) this.buttonEl.addClasses(props.classNames);
             if (props.icon) this.setIcon(props.icon);
             if (props.tooltip) this.setTooltip(props.tooltip);
             if (props.tooltip) this.buttonEl.setAttribute("aria-label", props.tooltip);

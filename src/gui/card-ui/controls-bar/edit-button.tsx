@@ -1,10 +1,10 @@
-import SRButton from "src/gui/sr-button";
+import SRButtonComponent from "src/gui/sr-button";
 import { t } from "src/lang/helpers";
 
-export default class EditButton extends SRButton {
-    public constructor(container: HTMLElement, editClickHandler: () => void, className?: string) {
+export default class EditButtonComponent extends SRButtonComponent {
+    public constructor(container: HTMLElement, editClickHandler: () => void, classNames?: string[]) {
         super(container, {
-            className: ["sr-edit-button", className].join(" "),
+            classNames: ["sr-edit-button", ...(classNames ?? [])],
             icon: "edit",
             tooltip: t("EDIT_CARD"),
             onClick: () => {

@@ -71,6 +71,7 @@ export class DeckUI {
         this.spacerEl = new ButtonComponent(this.titleWrapper);
         this.spacerEl.setIcon("circle-question-mark");
         this.spacerEl.buttonEl.addClass("sr-spacer");
+        this.spacerEl.buttonEl.addClass("sr-hide-by-scaling");
 
         this.title = this.titleWrapper.createDiv();
         this.title.addClass("sr-title");

@@ -5,48 +5,48 @@ import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { textInterval } from "src/algorithms/osr/note-scheduling";
 import { Card } from "src/card";
 import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
-import SRResponseButton from "src/gui/card-ui/response-section/sr-response-button";
+import SRResponseButtonComponent from "src/gui/card-ui/response-section/sr-response-button";
 import { t } from "src/lang/helpers";
 import { SRSettings } from "src/settings";
 import EmulatedPlatform from "src/utils/platform-detector";
 
-export default class Response {
+export default class ResponseSectionComponent {
     public responseEl: HTMLDivElement;
-    public hardButton: ButtonComponent;
-    public goodButton: ButtonComponent;
-    public easyButton: ButtonComponent;
-    public answerButton: ButtonComponent;
+    public hardButton: SRResponseButtonComponent;
+    public goodButton: SRResponseButtonComponent;
+    public easyButton: SRResponseButtonComponent;
+    public answerButton: SRResponseButtonComponent;
 
     constructor(container: HTMLElement, settings: SRSettings, showAnswer: () => void, processReview: (response: ReviewResponse) => void) {
         this.responseEl = container.createDiv();
         this.responseEl.addClass("sr-response");
 
-        this.answerButton = new SRResponseButton(this.responseEl, {
-            className: ["sr-bg-blue"].join(" "),
+        this.answerButton = new SRResponseButtonComponent(this.responseEl, {
+            classNames: ["sr-bg-blue", "sr-show-answer-button"],
             text: t("SHOW_ANSWER"),
             onClick: () => {
                 showAnswer();
             },
         });
 
-        this.hardButton = new SRResponseButton(this.responseEl, {
-            className: ["sr-bg-red", "sr-is-hidden"].join(" "),
+        this.hardButton = new SRResponseButtonComponent(this.responseEl, {
+            classNames: ["sr-bg-red", "sr-hard-button", "sr-is-hidden"],
             text: settings.flashcardHardText,
             onClick: () => {
                 processReview(ReviewResponse.Hard);
             },
         });
 
-        this.goodButton = new SRResponseButton(this.responseEl, {
-            className: ["sr-bg-blue", "sr-is-hidden"].join(" "),
+        this.goodButton = new SRResponseButtonComponent(this.responseEl, {
+            classNames: ["sr-bg-blue", "sr-good-button", "sr-is-hidden"],
             text: settings.flashcardGoodText,
             onClick: () => {
                 processReview(ReviewResponse.Good);
             },
         });
 
-        this.easyButton = new SRResponseButton(this.responseEl, {
-            className: ["sr-bg-green", "sr-is-hidden"].join(" "),
+        this.easyButton = new SRResponseButtonComponent(this.responseEl, {
+            classNames: ["sr-bg-green", "sr-easy-button", "sr-is-hidden"],
             text: settings.flashcardEasyText,
             onClick: () => {
                 processReview(ReviewResponse.Easy);

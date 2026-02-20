@@ -1,10 +1,10 @@
-import SRButton from "src/gui/sr-button";
+import SRButtonComponent from "src/gui/sr-button";
 import { t } from "src/lang/helpers";
 
-export default class ModalCloseButton extends SRButton {
-    public constructor(container: HTMLElement, closeModal: () => void, className?: string) {
+export default class ModalCloseButtonComponent extends SRButtonComponent {
+    public constructor(container: HTMLElement, closeModal: () => void, classNames?: string[]) {
         super(container, {
-            className: ["sr-modal-close-button", className].join(" "),
+            classNames: ["sr-modal-close-button", ...(classNames ?? [])],
             icon: "x",
             tooltip: t("CLOSE"),
             onClick: () => {

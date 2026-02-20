@@ -1,10 +1,10 @@
-import SRButton from "src/gui/sr-button";
+import SRButtonComponent from "src/gui/sr-button";
 import { t } from "src/lang/helpers";
 
-export default class SkipButton extends SRButton {
-    public constructor(container: HTMLElement, skipClickHandler: () => void, className?: string) {
+export default class SkipButtonComponent extends SRButtonComponent {
+    public constructor(container: HTMLElement, skipClickHandler: () => void, classNames?: string[]) {
         super(container, {
-            className: ["sr-skip-button", className].join(" "),
+            classNames: ["sr-skip-button", ...(classNames ?? [])],
             icon: "chevrons-right",
             tooltip: t("SKIP"),
             onClick: () => {
