@@ -11,6 +11,8 @@ export interface ParserOptions {
     multilineReversedCardSeparator: string;
     multilineCardEndMarker: string;
     clozePatterns: string[];
+    calloutCardMarker: string[];
+    calloutLineMarker: string;
 }
 
 export function setDebugParser(value: boolean) {
@@ -117,8 +119,8 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
         if (
             // We've probably reached the end of a card
             (isEmptyLine && !options.multilineCardEndMarker) ||
-            // Empty line & we're not picking up any card
-            (isEmptyLine && cardType == null) ||
+            // Empty line AND (we're not picking up any card OR callout is done)
+            (isEmptyLine && (cardType == null || cardType == CardType.Callout)) ||
             // We've reached the end of a multi line card &
             //  we're using custom end markers
             hasMultilineCardEndMarker
@@ -190,6 +192,22 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
         } else if (cardType === null && clozecrafter.isClozeNote(currentLine)) {
             // Pick up cloze cards
             cardType = CardType.Cloze;
+        } else if (
+            cardType === null &&
+            options.calloutCardMarker.length != 0 &&
+            // no marker is empty
+            options.calloutCardMarker.every((marker) => marker.trim().length > 0) &&
+            // at least one marker matches the start of the current line
+            options.calloutCardMarker.some((marker) =>
+                currentLine.trim().toLowerCase().startsWith(marker.toLowerCase()),
+            )
+        ) {
+            // remove all lines before the question(=current line) from cardText
+            const split = cardText.split("\n");
+            cardText = split[split.length - 1];
+            // increase firstLineNo accordingly
+            firstLineNo += split.length - 1;
+            cardType = CardType.Callout;
         }
     }
 
