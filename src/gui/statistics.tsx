@@ -13,7 +13,8 @@ import {
     Tooltip,
 } from "chart.js";
 import { Grid } from "gridjs";
-import path from "path";
+import { App } from "obsidian";
+// import path from "path";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
@@ -39,6 +40,7 @@ Chart.register(
 );
 
 export class StatisticsView {
+    private app: App;
     private containerEl: HTMLElement;
     private osrCore: OsrCore;
 
@@ -48,9 +50,10 @@ export class StatisticsView {
     private cardTypesChart: Chart;
     private noteStatsGrid: Grid;
 
-    constructor(containerEl: HTMLElement, osrCore: OsrCore) {
+    constructor(containerEl: HTMLElement, osrCore: OsrCore, app: App) {
         this.containerEl = containerEl;
         this.osrCore = osrCore;
+        this.app = app;
     }
 
     render(): void {
@@ -196,10 +199,9 @@ export class StatisticsView {
 
         const noteEases = mapRecord(
             SrsAlgorithm.getInstance().noteStats().dict,
-            (key: string, value: number): [string, number] => [
-                path.parse(key).name,
-                Math.round(value),
-            ],
+            (key: string, value: number): [string, number] => {
+                return [key.split(".")[0], Math.round(value)];
+            },
         );
 
         this.noteStatsGrid = new Grid({
@@ -234,11 +236,11 @@ export class StatisticsView {
     }
 
     destroy(): void {
-        this.forecastChart.destroy();
-        this.intervalsChart.destroy();
-        this.easesChart.destroy();
-        this.cardTypesChart.destroy();
-        this.noteStatsGrid.destroy();
+        if (this.forecastChart) this.forecastChart.destroy();
+        if (this.intervalsChart) this.intervalsChart.destroy();
+        if (this.easesChart) this.easesChart.destroy();
+        if (this.cardTypesChart) this.cardTypesChart.destroy();
+        if (this.noteStatsGrid) this.noteStatsGrid.destroy();
     }
 }
 

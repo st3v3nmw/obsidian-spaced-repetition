@@ -72,6 +72,7 @@ export class SRSettingTab extends PluginSettingTab {
                         this.statistics = new StatisticsView(
                             containerElement,
                             this.plugin.osrAppCore,
+                            this.plugin.app,
                         );
                         this.statistics.render();
                     },
