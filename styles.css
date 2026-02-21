@@ -100,6 +100,7 @@
 /* MARK: Modal */
 
 #sr-modal-view {
+
     & .modal-close-button,
     & .modal-header {
         display: none;
@@ -440,6 +441,7 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 650px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 15ch;
@@ -447,6 +449,7 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 550px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 10ch;
@@ -467,6 +470,7 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 440px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 8ch;
@@ -474,6 +478,7 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 410px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 6ch;
@@ -592,13 +597,6 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     cursor: default;
 }
 
-/*  MARK: Statistics */
-
-#sr-chart-period {
-    appearance: menulist;
-    border-right: 8px solid transparent;
-}
-
 /* MARK: Settings Tab */
 
 /*
@@ -620,8 +618,6 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
 
 /* Style the tab */
 .sr-settings-tab {
-    height: 100%;
-    width: 100%;
     overflow: hidden;
 }
 
@@ -701,6 +697,13 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
 .sr-settings-tab-content-inner {
     display: flex;
     flex-direction: column;
+}
+
+/*  MARK: Statistics */
+
+#sr-chart-period {
+    appearance: menulist;
+    border-right: 8px solid transparent;
 }
 
 /* MARK: gridjs */
@@ -1057,13 +1060,11 @@ th.gridjs-th:last-child {
 
 .gridjs-loading-bar:after {
     animation: shimmer 2s infinite;
-    background-image: linear-gradient(
-        90deg,
-        hsla(0, 0%, 80%, 0),
-        hsla(0, 0%, 80%, 0.2) 20%,
-        hsla(0, 0%, 80%, 0.5) 60%,
-        hsla(0, 0%, 80%, 0)
-    );
+    background-image: linear-gradient(90deg,
+            hsla(0, 0%, 80%, 0),
+            hsla(0, 0%, 80%, 0.2) 20%,
+            hsla(0, 0%, 80%, 0.5) 60%,
+            hsla(0, 0%, 80%, 0));
     content: "";
     transform: translateX(-100%);
 }
