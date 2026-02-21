@@ -67,11 +67,15 @@ export class NoteReviewQueue {
 
             // It was a new note, remove it from the new notes and schedule it.
             if (!wasDueInDeck) {
-                reviewDeck.newNotes.splice(
-                    reviewDeck.newNotes.findIndex((newNote: ISRFile) => newNote.path === note.path),
-                    1,
+                const noteIndex = reviewDeck.newNotes.findIndex(
+                    (newNote: ISRFile) => newNote.path === note.path,
                 );
-                reviewDeck.scheduledNotes.push(new SchedNote(note, scheduleInfo.dueDate.valueOf()));
+                if (noteIndex !== -1) {
+                    reviewDeck.newNotes.splice(noteIndex, 1);
+                    reviewDeck.scheduledNotes.push(
+                        new SchedNote(note, scheduleInfo.dueDate.valueOf()),
+                    );
+                }
             }
         });
     }
