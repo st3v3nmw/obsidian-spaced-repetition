@@ -4,8 +4,8 @@ import { FlashcardsPage } from "src/gui/obsidian-views/settings-tab/settings-pag
 import { HelpPage } from "src/gui/obsidian-views/settings-tab/settings-page/help-page";
 import { NotesPage } from "src/gui/obsidian-views/settings-tab/settings-page/notes-page";
 import { SchedulingPage } from "src/gui/obsidian-views/settings-tab/settings-page/scheduling-page";
+import { StatisticsPage } from "src/gui/obsidian-views/settings-tab/settings-page/statistics-page";
 import { UIPreferencesPage } from "src/gui/obsidian-views/settings-tab/settings-page/ui-preferences-page";
-import { StatisticsView } from "src/gui/obsidian-views/settings-tab/statistics";
 import { createTabs, TabStructure } from "src/gui/obsidian-views/settings-tab/tabs";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
@@ -21,7 +21,7 @@ function applySettingsUpdate(callback: () => void): void {
 export class SRSettingTab extends PluginSettingTab {
     private plugin: SRPlugin;
     private tabStructure: TabStructure;
-    private statistics: StatisticsView;
+    private statisticsPage: StatisticsPage;
 
     constructor(app: App, plugin: SRPlugin) {
         super(app, plugin);
@@ -40,7 +40,6 @@ export class SRSettingTab extends PluginSettingTab {
                     icon: "SpacedRepIcon",
                     contentGenerator: (containerElement: HTMLElement) => {
                         new FlashcardsPage(containerElement, this.plugin, applySettingsUpdate, this.display.bind(this));
-                        return new Promise<void>((resolve) => { resolve(); });
                     }
                 },
                 "main-notes": {
@@ -48,7 +47,6 @@ export class SRSettingTab extends PluginSettingTab {
                     icon: "book-text",
                     contentGenerator: (containerElement: HTMLElement) => {
                         new NotesPage(containerElement, this.plugin, applySettingsUpdate, this.display.bind(this));
-                        return new Promise<void>((resolve) => { resolve(); });
                     }
                 },
                 "main-algorithm": {
@@ -56,7 +54,6 @@ export class SRSettingTab extends PluginSettingTab {
                     icon: "calendar",
                     contentGenerator: (containerElement: HTMLElement) => {
                         new SchedulingPage(containerElement, this.plugin, applySettingsUpdate, this.display.bind(this));
-                        return new Promise<void>((resolve) => { resolve(); });
                     }
                 },
                 "main-ui-preferences": {
@@ -64,23 +61,17 @@ export class SRSettingTab extends PluginSettingTab {
                     icon: "presentation",
                     contentGenerator: (containerElement: HTMLElement) => {
                         new UIPreferencesPage(containerElement, this.plugin, applySettingsUpdate, this.display.bind(this));
-                        return new Promise<void>((resolve) => { resolve(); });
                     }
                 },
                 "main-statistics": {
                     title: t("STATS_TITLE"),
                     icon: "bar-chart-3",
-                    contentGenerator: async (containerElement: HTMLElement): Promise<void> => {
-                        if (this.plugin.osrAppCore.cardStats === null) {
-                            await this.plugin.sync();
-                        }
-
-                        this.statistics = new StatisticsView(
+                    contentGenerator: (containerElement: HTMLElement) => {
+                        this.statisticsPage = new StatisticsPage(
                             containerElement,
-                            this.plugin.osrAppCore,
-                            this.plugin.app,
+                            this.plugin,
                         );
-                        this.statistics.render();
+                        this.statisticsPage.render();
                     },
                 },
                 "main-help": {
@@ -88,23 +79,18 @@ export class SRSettingTab extends PluginSettingTab {
                     icon: "badge-help",
                     contentGenerator: (containerElement: HTMLElement) => {
                         new HelpPage(containerElement, this.plugin, applySettingsUpdate, this.display.bind(this), setDebugParser);
-                        return new Promise<void>((resolve) => { resolve(); });
                     }
                 },
             },
             this.lastPosition.tabName,
         );
 
-        // KEEP THIS AFTER CREATING ALL ELEMENTS:
         // Scroll to the position when the settings modal was last open,
-        //  but do it after content generating has finished.
-        this.tabStructure.contentGeneratorPromises[this.tabStructure.activeTabId].then(() => {
-            this.rememberLastPosition(this.containerEl);
-        });
+        this.rememberLastPosition(this.containerEl);
     }
 
     hide(): void {
-        this.statistics.destroy();
+        this.statisticsPage.destroy();
         this.containerEl.empty();
     }
 

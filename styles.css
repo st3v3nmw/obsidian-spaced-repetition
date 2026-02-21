@@ -701,9 +701,11 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
 
 /*  MARK: Statistics */
 
-#sr-chart-period {
-    appearance: menulist;
-    border-right: 8px solid transparent;
+.sr-statistics-page {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4-4);
 }
 
 /* MARK: gridjs */

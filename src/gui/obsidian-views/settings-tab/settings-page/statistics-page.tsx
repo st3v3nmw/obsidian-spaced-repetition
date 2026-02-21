@@ -13,8 +13,7 @@ import {
     Tooltip,
 } from "chart.js";
 import { Grid } from "gridjs";
-import { App } from "obsidian";
-// import path from "path";
+import { DropdownComponent } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
@@ -23,6 +22,7 @@ import { textInterval } from "src/algorithms/osr/note-scheduling";
 import { OsrCore } from "src/core";
 import { CardListType } from "src/deck";
 import { t } from "src/lang/helpers";
+import SRPlugin from "src/main";
 import { Stats } from "src/stats";
 import { getKeysPreserveType, getTypedObjectEntries, mapRecord } from "src/utils/types";
 
@@ -39,10 +39,9 @@ Chart.register(
     ArcElement,
 );
 
-export class StatisticsView {
-    private app: App;
+export class StatisticsPage {
     private containerEl: HTMLElement;
-    private osrCore: OsrCore;
+    private plugin: SRPlugin;
 
     private forecastChart: Chart;
     private intervalsChart: Chart;
@@ -50,28 +49,39 @@ export class StatisticsView {
     private cardTypesChart: Chart;
     private noteStatsGrid: Grid;
 
-    constructor(containerEl: HTMLElement, osrCore: OsrCore, app: App) {
-        this.containerEl = containerEl;
-        this.osrCore = osrCore;
-        this.app = app;
+    constructor(containerEl: HTMLElement, plugin: SRPlugin) {
+        this.containerEl = containerEl.createDiv();
+        this.containerEl.addClass("sr-statistics-page");
+        this.plugin = plugin;
     }
 
     render(): void {
-        this.containerEl.style.textAlign = "center";
+        new DropdownComponent(this.containerEl)
+            .addOption("month", t("MONTH"))
+            .addOption("quarter", t("QUARTER"))
+            .addOption("year", t("YEAR"))
+            .addOption("lifetime", t("LIFETIME"))
+            .setValue("month")
+            .selectEl.setAttr("id", "sr-chart-period");
 
-        this.containerEl.innerHTML += (
-            <select id="sr-chart-period">
-                <option value="month" selected>
-                    {t("MONTH")}
-                </option>
-                <option value="quarter">{t("QUARTER")}</option>
-                <option value="year">{t("YEAR")}</option>
-                <option value="lifetime">{t("LIFETIME")}</option>
-            </select>
-        );
+        if (this.plugin.osrAppCore.cardStats === null) {
+            this.plugin.sync().then(_ => this.renderCharts(this.plugin.osrAppCore));
+        } else {
+            this.renderCharts(this.plugin.osrAppCore);
+        }
+    }
 
+    destroy(): void {
+        if (this.forecastChart) this.forecastChart.destroy();
+        if (this.intervalsChart) this.intervalsChart.destroy();
+        if (this.easesChart) this.easesChart.destroy();
+        if (this.cardTypesChart) this.cardTypesChart.destroy();
+        if (this.noteStatsGrid) this.noteStatsGrid.destroy();
+    }
+
+    private renderCharts(osrCore: OsrCore): void {
         // Add forecast
-        const cardStats: Stats = this.osrCore.cardStats;
+        const cardStats: Stats = osrCore.cardStats;
         let maxN: number = cardStats.delayedDays.getMaxValue();
         for (let dueOffset = 0; dueOffset <= maxN; dueOffset++) {
             cardStats.delayedDays.clearCountIfMissing(dueOffset);
@@ -133,11 +143,11 @@ export class StatisticsView {
 
         // Add intervals
         const averageInterval: string = textInterval(
-                Math.round(
-                    (cardStats.intervals.getTotalOfValueMultiplyCount() / scheduledCount) * 10,
-                ) / 10 || 0,
-                false,
-            ),
+            Math.round(
+                (cardStats.intervals.getTotalOfValueMultiplyCount() / scheduledCount) * 10,
+            ) / 10 || 0,
+            false,
+        ),
             longestInterval: string = textInterval(cardStats.intervals.getMaxValue(), false);
 
         this.intervalsChart = createStatsChart(
@@ -175,7 +185,7 @@ export class StatisticsView {
         );
 
         // Add card types
-        const totalCardsCount: number = this.osrCore.reviewableDeckTree.getDistinctCardCount(
+        const totalCardsCount: number = osrCore.reviewableDeckTree.getDistinctCardCount(
             CardListType.All,
             true,
         );
@@ -234,15 +244,8 @@ export class StatisticsView {
         });
         this.noteStatsGrid.render(document.getElementById("noteStats"));
     }
-
-    destroy(): void {
-        if (this.forecastChart) this.forecastChart.destroy();
-        if (this.intervalsChart) this.intervalsChart.destroy();
-        if (this.easesChart) this.easesChart.destroy();
-        if (this.cardTypesChart) this.cardTypesChart.destroy();
-        if (this.noteStatsGrid) this.noteStatsGrid.destroy();
-    }
 }
+
 
 function createStatsChart(
     type: keyof ChartTypeRegistry,
@@ -259,8 +262,9 @@ function createStatsChart(
     const style = getComputedStyle(document.body);
     const textColor = style.getPropertyValue("--text-normal");
 
-    let scales = {},
-        backgroundColor = ["#2196f3"];
+    let scales = {};
+    let backgroundColor = ["#2196f3"];
+
     if (type !== "pie") {
         scales = {
             x: {
@@ -269,13 +273,14 @@ function createStatsChart(
                     text: xAxisTitle,
                     color: textColor,
                 },
+
             },
             y: {
                 title: {
                     display: true,
                     text: yAxisTitle,
                     color: textColor,
-                },
+                }
             },
         };
     } else {
@@ -293,6 +298,7 @@ function createStatsChart(
                     label: seriesTitle,
                     backgroundColor,
                     data: shouldFilter ? data.slice(0, 31) : data,
+                    borderRadius: 4,
                 },
             ],
         },
@@ -319,6 +325,9 @@ function createStatsChart(
                 legend: {
                     display: false,
                 },
+            },
+            animation: {
+                duration: 0,
             },
             aspectRatio: 2,
         },
