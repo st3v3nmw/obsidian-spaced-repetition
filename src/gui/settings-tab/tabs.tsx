@@ -58,12 +58,17 @@ export function createTabs(
     activateTabId: string,
 ): TabStructure {
     const tabHeader = containerElement.createEl("div", {
-        attr: { class: "sr-tab-header" },
+        attr: { class: "sr-settings-tab-header" },
     });
+
+    const tabHeaderButtonWrapper = tabHeader.createEl("div", {
+        attr: { class: "sr-settings-tab-header-button-wrapper" },
+    });
+
     const tabContentContainers: TabContentContainers = {};
     const tabButtons: TabButtons = {};
     const tabStructure: TabStructure = {
-        header: tabHeader,
+        header: tabHeaderButtonWrapper,
         // Indicate that the first tab is active.
         // This does not affect what tab is active in practice, it just reports the active tab.
         activeTabId: Object.keys(tabs)[0] as string,
@@ -76,9 +81,9 @@ export function createTabs(
         const tab = tabs[tabId];
 
         // Create button
-        const button = tabHeader.createEl("button", {
+        const button = tabHeaderButtonWrapper.createEl("button", {
             attr: {
-                class: "sr-tab-header-button",
+                class: "sr-settings-tab-header-button",
                 activateTab: "sr-tab-" + tabId,
             },
         });
@@ -90,8 +95,8 @@ export function createTabs(
             // Hide all tab contents and get the max dimensions
             let maxWidth = 0;
             let maxHeight = 0;
-            const tabHeader = tabButton.parentElement;
-            if (null === tabHeader) {
+            const tabHeaderButtonWrapper = tabButton.parentElement;
+            if (null === tabHeaderButtonWrapper) {
                 throw new Error("Tab header is missing. Did not get a parent from tab button.");
             }
             const containerElement = tabHeader.parentElement;
@@ -103,7 +108,7 @@ export function createTabs(
 
             // Do not get all tab contents that exist,
             //  because there might be multiple tab systems open at the same time.
-            const tabContents = containerElement.findAll("div.sr-tab-content");
+            const tabContents = containerElement.findAll("div.sr-settings-tab-content");
             const isMainSettingsModal = containerElement.hasClass("vertical-tab-content");
             for (const index in tabContents) {
                 const tabContent = tabContents[index];
@@ -128,7 +133,9 @@ export function createTabs(
             // Remove active status from all buttons
             // Do not get all tab buttons that exist,
             //  because there might be multiple tab systems open at the same time.
-            const adjacentTabButtons = tabHeader.findAll(".sr-tab-header-button");
+            const adjacentTabButtons = tabHeaderButtonWrapper.findAll(
+                ".sr-settings-tab-header-button",
+            );
             for (const index in adjacentTabButtons) {
                 const tabButton = adjacentTabButtons[index];
                 tabButton.removeClass("sr-tab-active");
@@ -175,13 +182,15 @@ export function createTabs(
 
         // Create content container
         tabContentContainers[tabId] = containerElement.createEl("div", {
-            attr: { class: "sr-tab-content", id: "sr-tab-" + tabId },
+            attr: { class: "sr-settings-tab-content", id: "sr-tab-" + tabId },
+        });
+
+        const innerContentContainer = tabContentContainers[tabId].createEl("div", {
+            attr: { class: "sr-settings-tab-content-inner" },
         });
 
         // Generate content
-        tabStructure.contentGeneratorPromises[tabId] = tab.contentGenerator(
-            tabContentContainers[tabId],
-        );
+        tabStructure.contentGeneratorPromises[tabId] = tab.contentGenerator(innerContentContainer);
 
         // Memorize the first tab's button
         if (undefined === firstButton) {

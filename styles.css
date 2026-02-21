@@ -599,7 +599,7 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     border-right: 8px solid transparent;
 }
 
-/* MARK: Tab elements */
+/* MARK: Settings Tab */
 
 /*
  * Tab elements
@@ -615,48 +615,92 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
  *  - Changed/removed borders.
  *  - Removed button transition.
  *  - Changed button border-radiuses
- *  - Added margin-right rule to .sr-tab-header-button .
+ *  - Added margin-right rule to .sr-settings-tab-header-button .
  */
 
 /* Style the tab */
-.sr-tab-header {
-    border-bottom: 6px solid var(--background-modifier-border);
+.sr-settings-tab {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.sr-settings-tab-header {
+    border-bottom: 2px solid var(--background-modifier-border);
+    overflow-x: auto;
+    display: flex;
+    padding-bottom: var(--size-4-2);
+    width: 100%;
+}
+
+@media only screen and (min-height: 600px) {
+    body:not(.is-phone) .sr-settings-tab-header {
+        padding-bottom: var(--size-4-4);
+    }
+}
+
+@media only screen and (orientation: landscape) {
+    .is-phone .sr-settings-tab-header {
+        padding-bottom: var(--size-4-1);
+    }
+}
+
+.sr-settings-tab-header-button-wrapper {
+    display: flex;
+    gap: var(--size-4-2);
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Style the buttons that are used to open the tab content */
-button.sr-tab-header-button {
-    background-color: unset;
-    border: none;
-    box-shadow: none;
-    /* Remove a "border" that came via Obsidian 0.16.0. */
+.sr-settings-tab-header-button {
     outline: none;
     cursor: pointer;
-    padding: 14px 16px;
-    margin-right: 6px;
-    /* Reduced margin. Obsidian's default margin-right for button is 12px (0 for other margins). */
-    border-radius: 10px 10px 0 0;
-    /* 0 0 = No border-radius at bottom */
 }
 
 /* Create an active/current tablink class */
-button.sr-tab-header-button.sr-tab-active,
-button.sr-tab-header-button:hover {
-    background-color: var(--background-modifier-border);
+.sr-settings-tab-header-button {
+    &:hover {
+        background-color: var(--background-modifier-hover);
+    }
+
+    &.sr-tab-active,
+    &.sr-tab-active:hover {
+        background-color: var(--background-modifier-active-hover);
+    }
 }
 
-.sr-tab-header-button svg {
+.sr-settings-tab-header-button svg {
     vertical-align: middle;
     /* Not middle but close enough. */
 }
 
 /* Style the tab content */
-.sr-tab-content {
+
+.sr-settings-tab-content {
     display: none;
-    padding: 6px 12px;
+    padding: var(--size-4-2) var(--size-4-3);
+
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
 }
 
-.sr-tab-content.sr-tab-active {
-    display: block;
+@media only screen and (min-height: 600px) {
+    body:not(.is-phone) .sr-settings-tab-content {
+        padding: var(--size-4-3) var(--size-4-4);
+    }
+}
+
+.sr-settings-tab-content.sr-tab-active {
+    display: flex;
+}
+
+.sr-settings-tab-content-inner {
+    display: flex;
+    flex-direction: column;
 }
 
 /* MARK: gridjs */

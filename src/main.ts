@@ -26,7 +26,7 @@ import {
 import { SRModalView } from "src/gui/obsidian-views/sr-modal-view";
 import { SRTabView } from "src/gui/obsidian-views/sr-tab-view";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/review-queue-list-view";
-import { SRSettingTab } from "src/gui/settings";
+import { SRSettingTab } from "src/gui/settings-tab/settings";
 import { OsrSidebar } from "src/gui/sidebar";
 import TabViewManager from "src/gui/tab-view-manager";
 import { appIcon } from "src/icons/app-icon";
