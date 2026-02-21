@@ -1,7 +1,7 @@
 import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 
-import { StatisticsView } from "src/gui/statistics";
-import { createTabs, TabStructure } from "src/gui/tabs";
+import { StatisticsView } from "src/gui/settings-tab/statistics";
+import { createTabs, TabStructure } from "src/gui/settings-tab/tabs";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { setDebugParser } from "src/parser";
@@ -28,11 +28,7 @@ export class SRSettingTab extends PluginSettingTab {
         const { containerEl } = this;
 
         containerEl.empty();
-
-        const header = containerEl.createEl("h4", {
-            text: `${t("SETTINGS_HEADER")}`,
-        });
-        header.addClass("sr-centered");
+        containerEl.addClass("sr-settings-tab");
 
         this.tabStructure = createTabs(
             containerEl,
