@@ -6,12 +6,19 @@ import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
 
 export class NotesPage extends SettingsPage {
-    constructor(containerEl: HTMLElement, plugin: SRPlugin, applySettingsUpdate: (callback: () => unknown) => void, display: () => void) {
+    constructor(
+        containerEl: HTMLElement,
+        plugin: SRPlugin,
+        applySettingsUpdate: (callback: () => unknown) => void,
+        display: () => void,
+    ) {
         super(containerEl, plugin, applySettingsUpdate, display);
 
-        new SettingGroup(containerEl).setHeading(t("GROUP_TAGS_FOLDERS"))
+        new SettingGroup(containerEl)
+            .setHeading(t("GROUP_TAGS_FOLDERS"))
             .addSetting((setting: Setting) => {
-                setting.setName(t("TAGS_TO_REVIEW"))
+                setting
+                    .setName(t("TAGS_TO_REVIEW"))
                     .setDesc(t("TAGS_TO_REVIEW_DESC"))
                     .addTextArea((text) =>
                         text
@@ -23,11 +30,14 @@ export class NotesPage extends SettingsPage {
                                 });
                             }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("FOLDERS_TO_IGNORE"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("FOLDERS_TO_IGNORE"))
                     .setDesc(t("FOLDERS_TO_IGNORE_DESC"))
                     .addTextArea((text) =>
-                        text.setValue(this.plugin.data.settings.noteFoldersToIgnore.join("\n"))
+                        text
+                            .setValue(this.plugin.data.settings.noteFoldersToIgnore.join("\n"))
                             .onChange((value) => {
                                 this.applySettingsUpdate(async () => {
                                     this.plugin.data.settings.noteFoldersToIgnore = value
@@ -42,16 +52,21 @@ export class NotesPage extends SettingsPage {
                     );
             });
 
-        new SettingGroup(containerEl).setHeading(t("NOTES_REVIEW_QUEUE"))
+        new SettingGroup(containerEl)
+            .setHeading(t("NOTES_REVIEW_QUEUE"))
             .addSetting((setting: Setting) => {
                 setting.setName(t("AUTO_NEXT_NOTE")).addToggle((toggle) =>
-                    toggle.setValue(this.plugin.data.settings.autoNextNote).onChange(async (value) => {
-                        this.plugin.data.settings.autoNextNote = value;
-                        await this.plugin.savePluginData();
-                    }),
+                    toggle
+                        .setValue(this.plugin.data.settings.autoNextNote)
+                        .onChange(async (value) => {
+                            this.plugin.data.settings.autoNextNote = value;
+                            await this.plugin.savePluginData();
+                        }),
                 );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("OPEN_RANDOM_NOTE"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("OPEN_RANDOM_NOTE"))
                     .setDesc(t("OPEN_RANDOM_NOTE_DESC"))
                     .addToggle((toggle) =>
                         toggle
@@ -61,7 +76,8 @@ export class NotesPage extends SettingsPage {
                                 await this.plugin.savePluginData();
                             }),
                     );
-            }).addSetting((setting: Setting) => {
+            })
+            .addSetting((setting: Setting) => {
                 setting.setName(t("REVIEW_PANE_ON_STARTUP")).addToggle((toggle) =>
                     toggle
                         .setValue(this.plugin.data.settings.enableNoteReviewPaneOnStartup)
@@ -70,8 +86,10 @@ export class NotesPage extends SettingsPage {
                             await this.plugin.savePluginData();
                         }),
                 );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("MAX_N_DAYS_REVIEW_QUEUE"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("MAX_N_DAYS_REVIEW_QUEUE"))
                     .addExtraButton((button) => {
                         button
                             .setIcon("reset")
@@ -99,7 +117,8 @@ export class NotesPage extends SettingsPage {
                                             return;
                                         }
 
-                                        this.plugin.data.settings.maxNDaysNotesReviewQueue = numValue;
+                                        this.plugin.data.settings.maxNDaysNotesReviewQueue =
+                                            numValue;
                                         await this.plugin.savePluginData();
                                     } else {
                                         new Notice(t("VALID_NUMBER_WARNING"));

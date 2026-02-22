@@ -6,12 +6,19 @@ import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
 
 export class UIPreferencesPage extends SettingsPage {
-    constructor(containerEl: HTMLElement, plugin: SRPlugin, applySettingsUpdate: (callback: () => unknown) => void, display: () => void) {
+    constructor(
+        containerEl: HTMLElement,
+        plugin: SRPlugin,
+        applySettingsUpdate: (callback: () => unknown) => void,
+        display: () => void,
+    ) {
         super(containerEl, plugin, applySettingsUpdate, display);
 
-        new SettingGroup(containerEl).setHeading(t("OBSIDIAN_INTEGRATION"))
+        new SettingGroup(containerEl)
+            .setHeading(t("OBSIDIAN_INTEGRATION"))
             .addSetting((setting: Setting) => {
-                setting.setName(t("OPEN_IN_TAB"))
+                setting
+                    .setName(t("OPEN_IN_TAB"))
                     .setDesc(t("OPEN_IN_TAB_DESC"))
                     .addToggle((toggle) =>
                         toggle
@@ -31,8 +38,10 @@ export class UIPreferencesPage extends SettingsPage {
                                 await this.plugin.savePluginData();
                             }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("SHOW_RIBBON_ICON"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_RIBBON_ICON"))
                     .setDesc(t("SHOW_RIBBON_ICON_DESC"))
                     .addToggle((toggle) =>
                         toggle
@@ -43,18 +52,24 @@ export class UIPreferencesPage extends SettingsPage {
                                 this.plugin.showRibbonIcon(value);
                             }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("SHOW_STATUS_BAR"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_STATUS_BAR"))
                     .setDesc(t("SHOW_STATUS_BAR_DESC"))
                     .addToggle((toggle) =>
-                        toggle.setValue(this.plugin.data.settings.showStatusBar).onChange(async (value) => {
-                            this.plugin.data.settings.showStatusBar = value;
-                            await this.plugin.savePluginData();
-                            this.plugin.showStatusBar(value);
-                        }),
+                        toggle
+                            .setValue(this.plugin.data.settings.showStatusBar)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showStatusBar = value;
+                                await this.plugin.savePluginData();
+                                this.plugin.showStatusBar(value);
+                            }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("ENABLE_FILE_MENU_REVIEW_OPTIONS"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("ENABLE_FILE_MENU_REVIEW_OPTIONS"))
                     .setDesc(t("ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
                     .addToggle((toggle) =>
                         toggle
@@ -67,9 +82,11 @@ export class UIPreferencesPage extends SettingsPage {
                     );
             });
 
-        new SettingGroup(containerEl).setHeading(t("FLASHCARDS"))
+        new SettingGroup(containerEl)
+            .setHeading(t("FLASHCARDS"))
             .addSetting((setting: Setting) => {
-                setting.setName(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE"))
+                setting
+                    .setName(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE"))
                     .setDesc(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC"))
                     .addToggle((toggle) =>
                         toggle
@@ -79,8 +96,10 @@ export class UIPreferencesPage extends SettingsPage {
                                 await this.plugin.savePluginData();
                             }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("SHOW_CARD_CONTEXT"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_CARD_CONTEXT"))
                     .setDesc(t("SHOW_CARD_CONTEXT_DESC"))
                     .addToggle((toggle) =>
                         toggle
@@ -90,8 +109,10 @@ export class UIPreferencesPage extends SettingsPage {
                                 await this.plugin.savePluginData();
                             }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("SHOW_INTERVAL_IN_REVIEW_BUTTONS"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_INTERVAL_IN_REVIEW_BUTTONS"))
                     .setDesc(t("SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC"))
                     .addToggle((toggle) =>
                         toggle
@@ -101,8 +122,10 @@ export class UIPreferencesPage extends SettingsPage {
                                 await this.plugin.savePluginData();
                             }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("CARD_MODAL_HEIGHT_PERCENT"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("CARD_MODAL_HEIGHT_PERCENT"))
                     .setDesc(t("CARD_MODAL_SIZE_PERCENT_DESC"))
                     .addExtraButton((button) => {
                         button
@@ -126,8 +149,10 @@ export class UIPreferencesPage extends SettingsPage {
                                 await this.plugin.savePluginData();
                             }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("CARD_MODAL_WIDTH_PERCENT"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("CARD_MODAL_WIDTH_PERCENT"))
                     .setDesc(t("CARD_MODAL_SIZE_PERCENT_DESC"))
                     .addExtraButton((button) => {
                         button
@@ -153,9 +178,11 @@ export class UIPreferencesPage extends SettingsPage {
                     );
             });
 
-        new SettingGroup(containerEl).setHeading(t("GROUP_FLASHCARDS_NOTES"))
+        new SettingGroup(containerEl)
+            .setHeading(t("GROUP_FLASHCARDS_NOTES"))
             .addSetting((setting: Setting) => {
-                setting.setName(t("FLASHCARD_EASY_LABEL"))
+                setting
+                    .setName(t("FLASHCARD_EASY_LABEL"))
                     .setDesc(t("FLASHCARD_EASY_DESC"))
                     .addExtraButton((button) => {
                         button
@@ -170,15 +197,19 @@ export class UIPreferencesPage extends SettingsPage {
                             });
                     })
                     .addText((text) =>
-                        text.setValue(this.plugin.data.settings.flashcardEasyText).onChange((value) => {
-                            applySettingsUpdate(async () => {
-                                this.plugin.data.settings.flashcardEasyText = value;
-                                await this.plugin.savePluginData();
-                            });
-                        }),
+                        text
+                            .setValue(this.plugin.data.settings.flashcardEasyText)
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    this.plugin.data.settings.flashcardEasyText = value;
+                                    await this.plugin.savePluginData();
+                                });
+                            }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("FLASHCARD_GOOD_LABEL"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("FLASHCARD_GOOD_LABEL"))
                     .setDesc(t("FLASHCARD_GOOD_DESC"))
                     .addExtraButton((button) => {
                         button
@@ -193,15 +224,19 @@ export class UIPreferencesPage extends SettingsPage {
                             });
                     })
                     .addText((text) =>
-                        text.setValue(this.plugin.data.settings.flashcardGoodText).onChange((value) => {
-                            applySettingsUpdate(async () => {
-                                this.plugin.data.settings.flashcardGoodText = value;
-                                await this.plugin.savePluginData();
-                            });
-                        }),
+                        text
+                            .setValue(this.plugin.data.settings.flashcardGoodText)
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    this.plugin.data.settings.flashcardGoodText = value;
+                                    await this.plugin.savePluginData();
+                                });
+                            }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("FLASHCARD_HARD_LABEL"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("FLASHCARD_HARD_LABEL"))
                     .setDesc(t("FLASHCARD_HARD_DESC"))
                     .addExtraButton((button) => {
                         button
@@ -216,16 +251,19 @@ export class UIPreferencesPage extends SettingsPage {
                             });
                     })
                     .addText((text) =>
-                        text.setValue(this.plugin.data.settings.flashcardHardText).onChange((value) => {
-                            applySettingsUpdate(async () => {
-                                this.plugin.data.settings.flashcardHardText = value;
-                                await this.plugin.savePluginData();
-                            });
-                        }),
+                        text
+                            .setValue(this.plugin.data.settings.flashcardHardText)
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    this.plugin.data.settings.flashcardHardText = value;
+                                    await this.plugin.savePluginData();
+                                });
+                            }),
                     );
             })
             .addSetting((setting: Setting) => {
-                setting.setName(t("REVIEW_BUTTON_DELAY"))
+                setting
+                    .setName(t("REVIEW_BUTTON_DELAY"))
                     .setDesc(t("REVIEW_BUTTON_DELAY_DESC"))
                     .addExtraButton((button) => {
                         button
@@ -250,6 +288,5 @@ export class UIPreferencesPage extends SettingsPage {
                             }),
                     );
             });
-
     }
 }

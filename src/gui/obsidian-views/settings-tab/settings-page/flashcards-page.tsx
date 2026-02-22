@@ -6,15 +6,23 @@ import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
 
 export class FlashcardsPage extends SettingsPage {
-    constructor(containerEl: HTMLElement, plugin: SRPlugin, applySettingsUpdate: (callback: () => unknown) => void, display: () => void) {
+    constructor(
+        containerEl: HTMLElement,
+        plugin: SRPlugin,
+        applySettingsUpdate: (callback: () => unknown) => void,
+        display: () => void,
+    ) {
         super(containerEl, plugin, applySettingsUpdate, display);
 
-        new SettingGroup(containerEl).setHeading(t("GROUP_TAGS_FOLDERS"))
+        new SettingGroup(containerEl)
+            .setHeading(t("GROUP_TAGS_FOLDERS"))
             .addSetting((setting: Setting) => {
-                setting.setName(t("FLASHCARD_TAGS"))
+                setting
+                    .setName(t("FLASHCARD_TAGS"))
                     .setDesc(t("FLASHCARD_TAGS_DESC"))
                     .addTextArea((text) =>
-                        text.setValue(this.plugin.data.settings.flashcardTags.join(" "))
+                        text
+                            .setValue(this.plugin.data.settings.flashcardTags.join(" "))
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
                                     this.plugin.data.settings.flashcardTags = value.split(/\s+/);
@@ -24,10 +32,12 @@ export class FlashcardsPage extends SettingsPage {
                     );
             })
             .addSetting((setting: Setting) => {
-                setting.setName(t("CONVERT_FOLDERS_TO_DECKS"))
+                setting
+                    .setName(t("CONVERT_FOLDERS_TO_DECKS"))
                     .setDesc(t("CONVERT_FOLDERS_TO_DECKS_DESC"))
                     .addToggle((toggle) =>
-                        toggle.setValue(this.plugin.data.settings.convertFoldersToDecks)
+                        toggle
+                            .setValue(this.plugin.data.settings.convertFoldersToDecks)
                             .onChange(async (value) => {
                                 this.plugin.data.settings.convertFoldersToDecks = value;
                                 await this.plugin.savePluginData();
@@ -35,10 +45,12 @@ export class FlashcardsPage extends SettingsPage {
                     );
             })
             .addSetting((setting: Setting) => {
-                setting.setName(t("BURY_SIBLINGS_TILL_NEXT_DAY"))
+                setting
+                    .setName(t("BURY_SIBLINGS_TILL_NEXT_DAY"))
                     .setDesc(t("BURY_SIBLINGS_TILL_NEXT_DAY_DESC"))
                     .addToggle((toggle) =>
-                        toggle.setValue(this.plugin.data.settings.burySiblingCards)
+                        toggle
+                            .setValue(this.plugin.data.settings.burySiblingCards)
                             .onChange(async (value) => {
                                 this.plugin.data.settings.burySiblingCards = value;
                                 await this.plugin.savePluginData();
@@ -46,10 +58,12 @@ export class FlashcardsPage extends SettingsPage {
                     );
             })
             .addSetting((setting: Setting) => {
-                setting.setName(t("FOLDERS_TO_IGNORE"))
+                setting
+                    .setName(t("FOLDERS_TO_IGNORE"))
                     .setDesc(t("FOLDERS_TO_IGNORE_DESC"))
                     .addTextArea((text) =>
-                        text.setValue(this.plugin.data.settings.noteFoldersToIgnore.join("\n"))
+                        text
+                            .setValue(this.plugin.data.settings.noteFoldersToIgnore.join("\n"))
                             .onChange((value) => {
                                 this.applySettingsUpdate(async () => {
                                     this.plugin.data.settings.noteFoldersToIgnore = value
@@ -64,12 +78,15 @@ export class FlashcardsPage extends SettingsPage {
                     );
             });
 
-        new SettingGroup(containerEl).setHeading(t("GROUP_FLASHCARD_REVIEW"))
+        new SettingGroup(containerEl)
+            .setHeading(t("GROUP_FLASHCARD_REVIEW"))
             .addSetting((setting: Setting) => {
-                setting.setName(t("BURY_SIBLINGS_TILL_NEXT_DAY"))
+                setting
+                    .setName(t("BURY_SIBLINGS_TILL_NEXT_DAY"))
                     .setDesc(t("BURY_SIBLINGS_TILL_NEXT_DAY_DESC"))
                     .addToggle((toggle) =>
-                        toggle.setValue(this.plugin.data.settings.burySiblingCards)
+                        toggle
+                            .setValue(this.plugin.data.settings.burySiblingCards)
                             .onChange(async (value) => {
                                 this.plugin.data.settings.burySiblingCards = value;
                                 await this.plugin.savePluginData();
@@ -77,76 +94,79 @@ export class FlashcardsPage extends SettingsPage {
                     );
             })
             .addSetting((setting: Setting) => {
-                setting.setName(t("REVIEW_CARD_ORDER_WITHIN_DECK"))
-                    .addDropdown((dropdown) =>
-                        dropdown
-                            .addOptions({
-                                NewFirstSequential: t("REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL"),
-                                DueFirstSequential: t("REVIEW_CARD_ORDER_DUE_FIRST_SEQUENTIAL"),
-                                NewFirstRandom: t("REVIEW_CARD_ORDER_NEW_FIRST_RANDOM"),
-                                DueFirstRandom: t("REVIEW_CARD_ORDER_DUE_FIRST_RANDOM"),
-                                EveryCardRandomDeckAndCard: t("REVIEW_CARD_ORDER_RANDOM_DECK_AND_CARD"),
-                            })
-                            .setValue(this.plugin.data.settings.flashcardCardOrder)
-                            .onChange(async (value) => {
-                                this.plugin.data.settings.flashcardCardOrder = value;
-                                await this.plugin.savePluginData();
-                                this.display();
-                            }),
-                    );
+                setting.setName(t("REVIEW_CARD_ORDER_WITHIN_DECK")).addDropdown((dropdown) =>
+                    dropdown
+                        .addOptions({
+                            NewFirstSequential: t("REVIEW_CARD_ORDER_NEW_FIRST_SEQUENTIAL"),
+                            DueFirstSequential: t("REVIEW_CARD_ORDER_DUE_FIRST_SEQUENTIAL"),
+                            NewFirstRandom: t("REVIEW_CARD_ORDER_NEW_FIRST_RANDOM"),
+                            DueFirstRandom: t("REVIEW_CARD_ORDER_DUE_FIRST_RANDOM"),
+                            EveryCardRandomDeckAndCard: t("REVIEW_CARD_ORDER_RANDOM_DECK_AND_CARD"),
+                        })
+                        .setValue(this.plugin.data.settings.flashcardCardOrder)
+                        .onChange(async (value) => {
+                            this.plugin.data.settings.flashcardCardOrder = value;
+                            await this.plugin.savePluginData();
+                            this.display();
+                        }),
+                );
             })
             .addSetting((setting: Setting) => {
                 const deckOrderEnabled: boolean =
                     this.plugin.data.settings.flashcardCardOrder != "EveryCardRandomDeckAndCard";
-                setting.setName(t("REVIEW_DECK_ORDER"))
-                    .addDropdown((dropdown) =>
-                        dropdown
-                            .addOptions(
-                                deckOrderEnabled
-                                    ? {
-                                        // eslint-disable-next-line camelcase
-                                        PrevDeckComplete_Sequential: t(
-                                            "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
-                                        ),
-                                        // eslint-disable-next-line camelcase
-                                        PrevDeckComplete_Random: t(
-                                            "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
-                                        ),
-                                    }
-                                    : {
-                                        EveryCardRandomDeckAndCard: t(
-                                            "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
-                                        ),
-                                    },
-                            )
-                            .setValue(
-                                deckOrderEnabled
-                                    ? this.plugin.data.settings.flashcardDeckOrder
-                                    : "EveryCardRandomDeckAndCard",
-                            )
-                            .setDisabled(!deckOrderEnabled)
-                            .onChange(async (value) => {
-                                this.plugin.data.settings.flashcardDeckOrder = value;
-                                await this.plugin.savePluginData();
-                            }),
-                    );
+                setting.setName(t("REVIEW_DECK_ORDER")).addDropdown((dropdown) =>
+                    dropdown
+                        .addOptions(
+                            deckOrderEnabled
+                                ? {
+                                      // eslint-disable-next-line camelcase
+                                      PrevDeckComplete_Sequential: t(
+                                          "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
+                                      ),
+                                      // eslint-disable-next-line camelcase
+                                      PrevDeckComplete_Random: t(
+                                          "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
+                                      ),
+                                  }
+                                : {
+                                      EveryCardRandomDeckAndCard: t(
+                                          "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
+                                      ),
+                                  },
+                        )
+                        .setValue(
+                            deckOrderEnabled
+                                ? this.plugin.data.settings.flashcardDeckOrder
+                                : "EveryCardRandomDeckAndCard",
+                        )
+                        .setDisabled(!deckOrderEnabled)
+                        .onChange(async (value) => {
+                            this.plugin.data.settings.flashcardDeckOrder = value;
+                            await this.plugin.savePluginData();
+                        }),
+                );
             });
 
-        new SettingGroup(containerEl).setHeading(t("GROUP_FLASHCARD_SEPARATORS"))
+        new SettingGroup(containerEl)
+            .setHeading(t("GROUP_FLASHCARD_SEPARATORS"))
             .addSetting((setting: Setting) => {
                 const convertHighlightsToClozesEl = setting.setName(
                     t("CONVERT_HIGHLIGHTS_TO_CLOZES"),
                 );
                 convertHighlightsToClozesEl.descEl.insertAdjacentHTML(
                     "beforeend",
-                    t("CONVERT_HIGHLIGHTS_TO_CLOZES_DESC", { defaultPattern: "==[123;;]answer[;;hint]==" }),
+                    t("CONVERT_HIGHLIGHTS_TO_CLOZES_DESC", {
+                        defaultPattern: "==[123;;]answer[;;hint]==",
+                    }),
                 );
                 convertHighlightsToClozesEl.addToggle((toggle) =>
                     toggle
                         .setValue(this.plugin.data.settings.convertHighlightsToClozes)
                         .onChange(async (value) => {
                             const defaultHightlightPattern = "==[123;;]answer[;;hint]==";
-                            const clozePatternSet = new Set(this.plugin.data.settings.clozePatterns);
+                            const clozePatternSet = new Set(
+                                this.plugin.data.settings.clozePatterns,
+                            );
 
                             if (value) {
                                 clozePatternSet.add(defaultHightlightPattern);
@@ -163,19 +183,21 @@ export class FlashcardsPage extends SettingsPage {
                 );
             })
             .addSetting((setting: Setting) => {
-                const convertBoldTextToClozesEl = setting.setName(
-                    t("CONVERT_BOLD_TEXT_TO_CLOZES"),
-                );
+                const convertBoldTextToClozesEl = setting.setName(t("CONVERT_BOLD_TEXT_TO_CLOZES"));
                 convertBoldTextToClozesEl.descEl.insertAdjacentHTML(
                     "beforeend",
-                    t("CONVERT_BOLD_TEXT_TO_CLOZES_DESC", { defaultPattern: "**[123;;]answer[;;hint]**" }),
+                    t("CONVERT_BOLD_TEXT_TO_CLOZES_DESC", {
+                        defaultPattern: "**[123;;]answer[;;hint]**",
+                    }),
                 );
                 convertBoldTextToClozesEl.addToggle((toggle) =>
                     toggle
                         .setValue(this.plugin.data.settings.convertBoldTextToClozes)
                         .onChange(async (value) => {
                             const defaultBoldPattern = "**[123;;]answer[;;hint]**";
-                            const clozePatternSet = new Set(this.plugin.data.settings.clozePatterns);
+                            const clozePatternSet = new Set(
+                                this.plugin.data.settings.clozePatterns,
+                            );
 
                             if (value) {
                                 clozePatternSet.add(defaultBoldPattern);
@@ -206,7 +228,9 @@ export class FlashcardsPage extends SettingsPage {
                         .setValue(this.plugin.data.settings.convertCurlyBracketsToClozes)
                         .onChange(async (value) => {
                             const defaultCurlyBracketsPattern = "{{[123;;]answer[;;hint]}}";
-                            const clozePatternSet = new Set(this.plugin.data.settings.clozePatterns);
+                            const clozePatternSet = new Set(
+                                this.plugin.data.settings.clozePatterns,
+                            );
 
                             if (value) {
                                 clozePatternSet.add(defaultCurlyBracketsPattern);
@@ -223,15 +247,19 @@ export class FlashcardsPage extends SettingsPage {
                 );
             })
             .addSetting((setting: Setting) => {
-                setting.setName(t("CLOZE_PATTERNS"))
-                    .setDesc(t("CLOZE_PATTERNS_DESC", {
-                        docsUrl:
-                            "https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/cloze-cards/#cloze-types",
-                    }))
+                setting
+                    .setName(t("CLOZE_PATTERNS"))
+                    .setDesc(
+                        t("CLOZE_PATTERNS_DESC", {
+                            docsUrl:
+                                "https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/cloze-cards/#cloze-types",
+                        }),
+                    )
                     .addTextArea((text) =>
-                        text.setPlaceholder(
-                            "Example:\n==[123;;]answer[;;hint]==\n**[123;;]answer[;;hint]**\n{{[123;;]answer[;;hint]}}",
-                        )
+                        text
+                            .setPlaceholder(
+                                "Example:\n==[123;;]answer[;;hint]==\n**[123;;]answer[;;hint]**\n{{[123;;]answer[;;hint]}}",
+                            )
                             .setValue(this.plugin.data.settings.clozePatterns.join("\n"))
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
@@ -271,7 +299,8 @@ export class FlashcardsPage extends SettingsPage {
                     );
             })
             .addSetting((setting: Setting) => {
-                setting.setName(t("INLINE_CARDS_SEPARATOR"))
+                setting
+                    .setName(t("INLINE_CARDS_SEPARATOR"))
                     .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
                     .addExtraButton((button) => {
                         button
@@ -297,7 +326,8 @@ export class FlashcardsPage extends SettingsPage {
                     );
             })
             .addSetting((setting: Setting) => {
-                setting.setName(t("INLINE_REVERSED_CARDS_SEPARATOR"))
+                setting
+                    .setName(t("INLINE_REVERSED_CARDS_SEPARATOR"))
                     .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
                     .addExtraButton((button) => {
                         button
@@ -316,14 +346,16 @@ export class FlashcardsPage extends SettingsPage {
                             .setValue(this.plugin.data.settings.singleLineReversedCardSeparator)
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.plugin.data.settings.singleLineReversedCardSeparator = value;
+                                    this.plugin.data.settings.singleLineReversedCardSeparator =
+                                        value;
                                     await this.plugin.savePluginData();
                                 });
                             }),
                     );
             })
             .addSetting((setting: Setting) => {
-                setting.setName(t("MULTILINE_CARDS_SEPARATOR"))
+                setting
+                    .setName(t("MULTILINE_CARDS_SEPARATOR"))
                     .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
                     .addExtraButton((button) => {
                         button
@@ -349,7 +381,8 @@ export class FlashcardsPage extends SettingsPage {
                     );
             })
             .addSetting((setting: Setting) => {
-                setting.setName(t("MULTILINE_REVERSED_CARDS_SEPARATOR"))
+                setting
+                    .setName(t("MULTILINE_REVERSED_CARDS_SEPARATOR"))
                     .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
                     .addExtraButton((button) => {
                         button
@@ -368,14 +401,16 @@ export class FlashcardsPage extends SettingsPage {
                             .setValue(this.plugin.data.settings.multilineReversedCardSeparator)
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.plugin.data.settings.multilineReversedCardSeparator = value;
+                                    this.plugin.data.settings.multilineReversedCardSeparator =
+                                        value;
                                     await this.plugin.savePluginData();
                                 });
                             }),
                     );
             })
             .addSetting((setting: Setting) => {
-                setting.setName(t("MULTILINE_CARDS_END_MARKER"))
+                setting
+                    .setName(t("MULTILINE_CARDS_END_MARKER"))
                     .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
                     .addExtraButton((button) => {
                         button

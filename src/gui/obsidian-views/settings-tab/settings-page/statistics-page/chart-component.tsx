@@ -42,14 +42,13 @@ export default class ChartComponent extends SettingsItemOverrideComponent {
                         text: xAxisTitle,
                         color: textColor,
                     },
-
                 },
                 y: {
                     title: {
                         display: yAxisTitle !== "",
                         text: yAxisTitle,
                         color: textColor,
-                    }
+                    },
                 },
             };
         } else {
@@ -57,7 +56,6 @@ export default class ChartComponent extends SettingsItemOverrideComponent {
         }
 
         const shouldFilter = canvasId === "forecastChart" || canvasId === "intervalsChart";
-
 
         const statsChart = new Chart(document.getElementById(canvasId) as HTMLCanvasElement, {
             type,
@@ -134,7 +132,8 @@ export default class ChartComponent extends SettingsItemOverrideComponent {
         }
 
         document.getElementById(`${canvasId}Summary`).innerText = summary;
-        document.getElementById(`${canvasId}Summary`).style.textAlign = canvasId === "cardTypesChart" ? "right" : "center";
+        document.getElementById(`${canvasId}Summary`).style.textAlign =
+            canvasId === "cardTypesChart" ? "right" : "center";
 
         this.chart = statsChart;
     }

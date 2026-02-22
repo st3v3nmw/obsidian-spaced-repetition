@@ -5,10 +5,17 @@ import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 
 export class HelpPage extends SettingsPage {
-    constructor(containerEl: HTMLElement, plugin: SRPlugin, applySettingsUpdate: (callback: () => unknown) => void, display: () => void, setDebugParser: (value: boolean) => void) {
+    constructor(
+        containerEl: HTMLElement,
+        plugin: SRPlugin,
+        applySettingsUpdate: (callback: () => unknown) => void,
+        display: () => void,
+        setDebugParser: (value: boolean) => void,
+    ) {
         super(containerEl, plugin, applySettingsUpdate, display);
 
-        new SettingGroup(containerEl).setHeading(t("HELP"))
+        new SettingGroup(containerEl)
+            .setHeading(t("HELP"))
             .addSetting((setting: Setting) => {
                 setting.infoEl.insertAdjacentHTML(
                     "beforeend",
@@ -16,7 +23,8 @@ export class HelpPage extends SettingsPage {
                         wikiUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/",
                     }),
                 );
-            }).addSetting((setting: Setting) => {
+            })
+            .addSetting((setting: Setting) => {
                 setting.infoEl.insertAdjacentHTML(
                     "beforeend",
                     t("GITHUB_DISCUSSIONS", {
@@ -24,7 +32,8 @@ export class HelpPage extends SettingsPage {
                             "https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/",
                     }),
                 );
-            }).addSetting((setting: Setting) => {
+            })
+            .addSetting((setting: Setting) => {
                 setting.infoEl.insertAdjacentHTML(
                     "beforeend",
                     t("GITHUB_ISSUES", {
@@ -33,7 +42,8 @@ export class HelpPage extends SettingsPage {
                 );
             });
 
-        new SettingGroup(containerEl).setHeading(t("GROUP_CONTRIBUTING"))
+        new SettingGroup(containerEl)
+            .setHeading(t("GROUP_CONTRIBUTING"))
             .addSetting((setting: Setting) => {
                 setting.infoEl.insertAdjacentHTML(
                     "beforeend",
@@ -41,7 +51,8 @@ export class HelpPage extends SettingsPage {
                         githubProjectUrl: "https://github.com/st3v3nmw/obsidian-spaced-repetition",
                     }),
                 );
-            }).addSetting((setting: Setting) => {
+            })
+            .addSetting((setting: Setting) => {
                 setting.infoEl.insertAdjacentHTML(
                     "beforeend",
                     t("CODE_CONTRIBUTION_INFO", {
@@ -49,7 +60,8 @@ export class HelpPage extends SettingsPage {
                             "https://stephenmwangi.com/obsidian-spaced-repetition/contributing/#code",
                     }),
                 );
-            }).addSetting((setting: Setting) => {
+            })
+            .addSetting((setting: Setting) => {
                 setting.infoEl.insertAdjacentHTML(
                     "beforeend",
                     t("TRANSLATION_CONTRIBUTION_INFO", {
@@ -59,28 +71,28 @@ export class HelpPage extends SettingsPage {
                 );
             });
 
-        new SettingGroup(containerEl).setHeading(t("LOGGING"))
+        new SettingGroup(containerEl)
+            .setHeading(t("LOGGING"))
             .addSetting((setting: Setting) => {
-                setting.setName(t("DISPLAY_SCHEDULING_DEBUG_INFO"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.plugin.data.settings.showSchedulingDebugMessages)
-                            .onChange(async (value) => {
-                                this.plugin.data.settings.showSchedulingDebugMessages = value;
-                                await this.plugin.savePluginData();
-                            }),
-                    );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("DISPLAY_PARSER_DEBUG_INFO"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.plugin.data.settings.showParserDebugMessages)
-                            .onChange(async (value) => {
-                                this.plugin.data.settings.showParserDebugMessages = value;
-                                setDebugParser(this.plugin.data.settings.showParserDebugMessages);
-                                await this.plugin.savePluginData();
-                            }),
-                    );
+                setting.setName(t("DISPLAY_SCHEDULING_DEBUG_INFO")).addToggle((toggle) =>
+                    toggle
+                        .setValue(this.plugin.data.settings.showSchedulingDebugMessages)
+                        .onChange(async (value) => {
+                            this.plugin.data.settings.showSchedulingDebugMessages = value;
+                            await this.plugin.savePluginData();
+                        }),
+                );
+            })
+            .addSetting((setting: Setting) => {
+                setting.setName(t("DISPLAY_PARSER_DEBUG_INFO")).addToggle((toggle) =>
+                    toggle
+                        .setValue(this.plugin.data.settings.showParserDebugMessages)
+                        .onChange(async (value) => {
+                            this.plugin.data.settings.showParserDebugMessages = value;
+                            setDebugParser(this.plugin.data.settings.showParserDebugMessages);
+                            await this.plugin.savePluginData();
+                        }),
+                );
             });
     }
 }

@@ -26,12 +26,13 @@ export default class NoteStatsComponent extends SettingsItemOverrideComponent {
             search: true,
             autoWidth: false,
             data: Object.entries(noteEases).sort((a, b) => b[1] - a[1]),
-            pagination: Object.entries(noteEases).length > rowsPerPage
-                ? {
-                    limit: rowsPerPage,
-                    summary: false,
-                }
-                : undefined,
+            pagination:
+                Object.entries(noteEases).length > rowsPerPage
+                    ? {
+                          limit: rowsPerPage,
+                          summary: false,
+                      }
+                    : undefined,
             language: {
                 search: {
                     placeholder: t("SEARCH"),

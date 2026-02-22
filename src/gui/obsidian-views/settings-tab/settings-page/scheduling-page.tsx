@@ -6,12 +6,19 @@ import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
 
 export class SchedulingPage extends SettingsPage {
-    constructor(containerEl: HTMLElement, plugin: SRPlugin, applySettingsUpdate: (callback: () => unknown) => void, display: () => void) {
+    constructor(
+        containerEl: HTMLElement,
+        plugin: SRPlugin,
+        applySettingsUpdate: (callback: () => unknown) => void,
+        display: () => void,
+    ) {
         super(containerEl, plugin, applySettingsUpdate, display);
 
-        new SettingGroup(containerEl).setHeading(t("ALGORITHM"))
+        new SettingGroup(containerEl)
+            .setHeading(t("ALGORITHM"))
             .addSetting((setting: Setting) => {
-                const algoSettingEl = setting.setName(t("ALGORITHM"))
+                const algoSettingEl = setting
+                    .setName(t("ALGORITHM"))
                     .setDesc("")
                     .addDropdown((dropdown) =>
                         dropdown
@@ -31,8 +38,10 @@ export class SchedulingPage extends SettingsPage {
                         algoUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
                     }),
                 );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("BASE_EASE"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("BASE_EASE"))
                     .setDesc(t("BASE_EASE_DESC"))
                     .addExtraButton((button) => {
                         button
@@ -46,26 +55,32 @@ export class SchedulingPage extends SettingsPage {
                             });
                     })
                     .addText((text) =>
-                        text.setValue(this.plugin.data.settings.baseEase.toString()).onChange((value) => {
-                            applySettingsUpdate(async () => {
-                                const numValue: number = Number.parseInt(value);
-                                if (!isNaN(numValue)) {
-                                    if (numValue < 130) {
-                                        new Notice(t("BASE_EASE_MIN_WARNING"));
-                                        text.setValue(this.plugin.data.settings.baseEase.toString());
-                                        return;
-                                    }
+                        text
+                            .setValue(this.plugin.data.settings.baseEase.toString())
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    const numValue: number = Number.parseInt(value);
+                                    if (!isNaN(numValue)) {
+                                        if (numValue < 130) {
+                                            new Notice(t("BASE_EASE_MIN_WARNING"));
+                                            text.setValue(
+                                                this.plugin.data.settings.baseEase.toString(),
+                                            );
+                                            return;
+                                        }
 
-                                    this.plugin.data.settings.baseEase = numValue;
-                                    await this.plugin.savePluginData();
-                                } else {
-                                    new Notice(t("VALID_NUMBER_WARNING"));
-                                }
-                            });
-                        }),
+                                        this.plugin.data.settings.baseEase = numValue;
+                                        await this.plugin.savePluginData();
+                                    } else {
+                                        new Notice(t("VALID_NUMBER_WARNING"));
+                                    }
+                                });
+                            }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("LAPSE_INTERVAL_CHANGE"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("LAPSE_INTERVAL_CHANGE"))
                     .setDesc(t("LAPSE_INTERVAL_CHANGE_DESC"))
                     .addExtraButton((button) => {
                         button
@@ -89,8 +104,10 @@ export class SchedulingPage extends SettingsPage {
                                 await this.plugin.savePluginData();
                             }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("EASY_BONUS"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("EASY_BONUS"))
                     .setDesc(t("EASY_BONUS_DESC"))
                     .addExtraButton((button) => {
                         button
@@ -113,7 +130,9 @@ export class SchedulingPage extends SettingsPage {
                                         if (numValue < 1.0) {
                                             new Notice(t("EASY_BONUS_MIN_WARNING"));
                                             text.setValue(
-                                                (this.plugin.data.settings.easyBonus * 100).toString(),
+                                                (
+                                                    this.plugin.data.settings.easyBonus * 100
+                                                ).toString(),
                                             );
                                             return;
                                         }
@@ -126,18 +145,23 @@ export class SchedulingPage extends SettingsPage {
                                 });
                             }),
                     );
-
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("LOAD_BALANCE"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("LOAD_BALANCE"))
                     .setDesc(t("LOAD_BALANCE_DESC"))
                     .addToggle((toggle) =>
-                        toggle.setValue(this.plugin.data.settings.loadBalance).onChange(async (value) => {
-                            this.plugin.data.settings.loadBalance = value;
-                            await this.plugin.savePluginData();
-                        }),
+                        toggle
+                            .setValue(this.plugin.data.settings.loadBalance)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.loadBalance = value;
+                                await this.plugin.savePluginData();
+                            }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("MAX_INTERVAL"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("MAX_INTERVAL"))
                     .setDesc(t("MAX_INTERVAL_DESC"))
                     .addExtraButton((button) => {
                         button
@@ -174,15 +198,18 @@ export class SchedulingPage extends SettingsPage {
                                 });
                             }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("MAX_LINK_CONTRIB"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("MAX_LINK_CONTRIB"))
                     .setDesc(t("MAX_LINK_CONTRIB_DESC"))
                     .addExtraButton((button) => {
                         button
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.plugin.data.settings.maxLinkFactor = DEFAULT_SETTINGS.maxLinkFactor;
+                                this.plugin.data.settings.maxLinkFactor =
+                                    DEFAULT_SETTINGS.maxLinkFactor;
                                 await this.plugin.savePluginData();
 
                                 this.display();
@@ -200,9 +227,11 @@ export class SchedulingPage extends SettingsPage {
                     );
             });
 
-        new SettingGroup(containerEl).setHeading(t("GROUP_DATA_STORAGE"))
+        new SettingGroup(containerEl)
+            .setHeading(t("GROUP_DATA_STORAGE"))
             .addSetting((setting: Setting) => {
-                setting.setName(t("GROUP_DATA_STORAGE"))
+                setting
+                    .setName(t("GROUP_DATA_STORAGE"))
                     .setDesc(t("GROUP_DATA_STORAGE_DESC"))
                     .addDropdown((dropdown) =>
                         dropdown
@@ -215,8 +244,10 @@ export class SchedulingPage extends SettingsPage {
                                 await this.plugin.savePluginData();
                             }),
                     );
-            }).addSetting((setting: Setting) => {
-                setting.setName(t("INLINE_SCHEDULING_COMMENTS"))
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("INLINE_SCHEDULING_COMMENTS"))
                     .setDesc(t("INLINE_SCHEDULING_COMMENTS_DESC"))
                     .addToggle((toggle) =>
                         toggle

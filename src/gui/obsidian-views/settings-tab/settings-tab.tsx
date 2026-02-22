@@ -40,38 +40,55 @@ export class SRSettingTab extends PluginSettingTab {
                     title: t("FLASHCARDS"),
                     icon: "SpacedRepIcon",
                     contentGenerator: (containerElement: HTMLElement) => {
-                        new FlashcardsPage(containerElement, this.plugin, applySettingsUpdate, this.display.bind(this));
-                    }
+                        new FlashcardsPage(
+                            containerElement,
+                            this.plugin,
+                            applySettingsUpdate,
+                            this.display.bind(this),
+                        );
+                    },
                 },
                 "main-notes": {
                     title: t("NOTES"),
                     icon: "book-text",
                     contentGenerator: (containerElement: HTMLElement) => {
-                        new NotesPage(containerElement, this.plugin, applySettingsUpdate, this.display.bind(this));
-                    }
+                        new NotesPage(
+                            containerElement,
+                            this.plugin,
+                            applySettingsUpdate,
+                            this.display.bind(this),
+                        );
+                    },
                 },
                 "main-algorithm": {
                     title: t("SCHEDULING"),
                     icon: "calendar",
                     contentGenerator: (containerElement: HTMLElement) => {
-                        new SchedulingPage(containerElement, this.plugin, applySettingsUpdate, this.display.bind(this));
-                    }
+                        new SchedulingPage(
+                            containerElement,
+                            this.plugin,
+                            applySettingsUpdate,
+                            this.display.bind(this),
+                        );
+                    },
                 },
                 "main-ui-preferences": {
                     title: t("UI"),
                     icon: "presentation",
                     contentGenerator: (containerElement: HTMLElement) => {
-                        new UIPreferencesPage(containerElement, this.plugin, applySettingsUpdate, this.display.bind(this));
-                    }
+                        new UIPreferencesPage(
+                            containerElement,
+                            this.plugin,
+                            applySettingsUpdate,
+                            this.display.bind(this),
+                        );
+                    },
                 },
                 "main-statistics": {
                     title: t("STATS_TITLE"),
                     icon: "bar-chart-3",
                     contentGenerator: (containerElement: HTMLElement) => {
-                        this.statisticsPage = new StatisticsPage(
-                            containerElement,
-                            this.plugin,
-                        );
+                        this.statisticsPage = new StatisticsPage(containerElement, this.plugin);
                         this.statisticsPage.render();
                     },
                 },
@@ -79,8 +96,14 @@ export class SRSettingTab extends PluginSettingTab {
                     title: t("HELP"),
                     icon: "badge-help",
                     contentGenerator: (containerElement: HTMLElement) => {
-                        new HelpPage(containerElement, this.plugin, applySettingsUpdate, this.display.bind(this), setDebugParser);
-                    }
+                        new HelpPage(
+                            containerElement,
+                            this.plugin,
+                            applySettingsUpdate,
+                            this.display.bind(this),
+                            setDebugParser,
+                        );
+                    },
                 },
             },
             this.lastPosition.tabName,
@@ -99,9 +122,9 @@ export class SRSettingTab extends PluginSettingTab {
         scrollPosition: number;
         tabName: string;
     } = {
-            scrollPosition: 0,
-            tabName: "main-flashcards",
-        };
+        scrollPosition: 0,
+        tabName: "main-flashcards",
+    };
 
     private rememberLastPosition(containerElement: HTMLElement) {
         const lastPosition = this.lastPosition;

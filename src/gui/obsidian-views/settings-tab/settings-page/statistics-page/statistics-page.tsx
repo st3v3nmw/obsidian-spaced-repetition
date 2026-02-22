@@ -82,7 +82,7 @@ export class StatisticsPage {
 
     private renderCharts(osrCore: OsrCore): void {
         if (!osrCore.cardStats) {
-            this.plugin.sync().then(_ => this.renderCharts(this.plugin.osrAppCore));
+            this.plugin.sync().then((_) => this.renderCharts(this.plugin.osrAppCore));
             return;
         }
 
@@ -131,9 +131,8 @@ export class StatisticsPage {
 
         // Add intervals
         const averageInterval: string = textInterval(
-            Math.round(
-                (cardStats.intervals.getTotalOfValueMultiplyCount() / scheduledCount) * 10,
-            ) / 10 || 0,
+            Math.round((cardStats.intervals.getTotalOfValueMultiplyCount() / scheduledCount) * 10) /
+                10 || 0,
             false,
         );
         const longestInterval: string = textInterval(cardStats.intervals.getMaxValue(), false);
@@ -166,25 +165,23 @@ export class StatisticsPage {
         const averageEase: number =
             Math.round(cardStats.eases.getTotalOfValueMultiplyCount() / scheduledCount) || 0;
 
-        new SettingGroup(this.containerEl)
-            .setHeading(t("EASES"))
-            .addSetting((setting: Setting) => {
-                this.easesChart = new ChartComponent(
-                    setting.settingEl,
-                    "easesChart",
-                    "easesChartSummary",
-                    "bar",
-                    "",
-                    "",
-                    Object.keys(cardStats.eases.dict),
-                    Object.values(cardStats.eases.dict),
-                    t("EASES_SUMMARY", { avgEase: averageEase }),
-                    t("COUNT"),
-                    t("EASES"),
-                    t("NUMBER_OF_CARDS"),
-                );
-                return this.easesChart;
-            });
+        new SettingGroup(this.containerEl).setHeading(t("EASES")).addSetting((setting: Setting) => {
+            this.easesChart = new ChartComponent(
+                setting.settingEl,
+                "easesChart",
+                "easesChartSummary",
+                "bar",
+                "",
+                "",
+                Object.keys(cardStats.eases.dict),
+                Object.values(cardStats.eases.dict),
+                t("EASES_SUMMARY", { avgEase: averageEase }),
+                t("COUNT"),
+                t("EASES"),
+                t("NUMBER_OF_CARDS"),
+            );
+            return this.easesChart;
+        });
 
         // Add card types
         const totalCardsCount: number = osrCore.reviewableDeckTree.getDistinctCardCount(
@@ -224,12 +221,9 @@ export class StatisticsPage {
             },
         );
 
-        new SettingGroup(this.containerEl)
-            .setHeading(t("NOTES"))
-            .addSetting((setting: Setting) => {
-                this.noteStatsGrid = new NoteStatsComponent(setting.settingEl, noteEases);
-                return this.noteStatsGrid;
-            });
-
+        new SettingGroup(this.containerEl).setHeading(t("NOTES")).addSetting((setting: Setting) => {
+            this.noteStatsGrid = new NoteStatsComponent(setting.settingEl, noteEases);
+            return this.noteStatsGrid;
+        });
     }
 }
