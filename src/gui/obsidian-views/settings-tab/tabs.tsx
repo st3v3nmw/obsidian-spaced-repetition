@@ -23,7 +23,7 @@ import h from "vhtml";
 export interface Tab {
     title: string;
     icon: string;
-    contentGenerator: (containerElement: HTMLElement) => Promise<void>;
+    contentGenerator: (containerElement: HTMLElement) => void;
 }
 
 export interface TabStructure {
@@ -34,9 +34,6 @@ export interface TabStructure {
     };
     contentContainers: {
         [key: string]: HTMLElement;
-    };
-    contentGeneratorPromises: {
-        [key: string]: Promise<void>;
     };
 }
 
@@ -74,7 +71,6 @@ export function createTabs(
         activeTabId: Object.keys(tabs)[0] as string,
         buttons: tabButtons,
         contentContainers: tabContentContainers,
-        contentGeneratorPromises: {},
     };
     let firstButton: HTMLElement | undefined;
     for (const tabId in tabs) {
@@ -190,7 +186,7 @@ export function createTabs(
         });
 
         // Generate content
-        tabStructure.contentGeneratorPromises[tabId] = tab.contentGenerator(innerContentContainer);
+        tab.contentGenerator(innerContentContainer);
 
         // Memorize the first tab's button
         if (undefined === firstButton) {
