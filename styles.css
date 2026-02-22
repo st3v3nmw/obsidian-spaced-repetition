@@ -702,18 +702,54 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
 /*  MARK: Statistics */
 
 .sr-statistics-page {
-    text-align: center;
     display: flex;
     flex-direction: column;
     gap: var(--size-4-4);
 }
 
-/* MARK: gridjs */
+.sr-setting-override > .setting-item-name,
+.sr-setting-override > .setting-item-control,
+.sr-setting-override > .setting-item-info {
+    display: none;
+}
 
-/*
- * gridjs
- * put everything SR plugin specific above this block
- */
+.sr-chart-container {
+    height: 100%;
+    width: 100%;
+}
+
+/* MARK: gridjs -> NoteStatsComponent */
+
+.gridjs *,
+.gridjs :after,
+.gridjs :before {
+    box-sizing: border-box;
+}
+
+.gridjs-wrapper {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    border-color: #e5e7eb;
+    border-style: solid;
+    border-radius: 8px 8px 0 0;
+    border-width: 1px 1px 0 1px;
+    display: block;
+    overflow: auto;
+    position: relative;
+    width: 100%;
+    z-index: 1;
+    height: calc(45px * 10 + 54px);
+}
+
+.gridjs-wrapper:nth-last-of-type(2) {
+    border-bottom-width: 1px;
+    border-radius: 8px;
+}
+
+.gridjs-search-input {
+    width: 100%;
+}
+
 .gridjs-footer button,
 .gridjs-head button {
     background-color: transparent;
@@ -757,13 +793,11 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
 
 .gridjs-footer {
     background-color: #fff;
-    border-bottom-width: 1px;
+    border-style: solid;
+    border-width: 0px 1px 1px 1px;
     border-color: #e5e7eb;
     border-radius: 0 0 8px 8px;
     border-top: 1px solid #e5e7eb;
-    box-shadow:
-        0 1px 3px 0 rgba(0, 0, 0, 0.1),
-        0 1px 2px 0 rgba(0, 0, 0, 0.26);
     display: block;
     padding: 12px 24px;
     position: relative;
@@ -796,6 +830,9 @@ input.gridjs-input:focus {
 
 .gridjs-pagination {
     color: #3d4044;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .gridjs-pagination:after {
@@ -810,7 +847,10 @@ input.gridjs-input:focus {
 }
 
 .gridjs-pagination .gridjs-pages {
-    float: right;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--size-4-2);
 }
 
 .gridjs-pagination .gridjs-pages button {
@@ -926,9 +966,13 @@ td.gridjs-td {
 }
 
 td.gridjs-td {
+    overflow: hidden;
     border: 1px solid #e5e7eb;
-    box-sizing: content-box;
+    box-sizing: border-box;
     padding: 12px 24px;
+    max-height: calc(45px - 24px);
+    text-overflow: ellipsis;
+    text-wrap-mode: nowrap;
 }
 
 td.gridjs-td:first-child {
@@ -1010,40 +1054,7 @@ th.gridjs-th:last-child {
     border-bottom: 0;
 }
 
-.gridjs *,
-.gridjs :after,
-.gridjs :before {
-    box-sizing: border-box;
-}
 
-.gridjs-wrapper {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    border-color: #e5e7eb;
-    border-radius: 8px 8px 0 0;
-    border-top-width: 1px;
-    box-shadow:
-        0 1px 3px 0 rgba(0, 0, 0, 0.1),
-        0 1px 2px 0 rgba(0, 0, 0, 0.26);
-    display: block;
-    overflow: auto;
-    position: relative;
-    width: 100%;
-    z-index: 1;
-}
-
-.gridjs-wrapper:nth-last-of-type(2) {
-    border-bottom-width: 1px;
-    border-radius: 8px;
-}
-
-.gridjs-search {
-    float: left;
-}
-
-.gridjs-search-input {
-    width: 250px;
-}
 
 .gridjs-loading-bar {
     background-color: #fff;

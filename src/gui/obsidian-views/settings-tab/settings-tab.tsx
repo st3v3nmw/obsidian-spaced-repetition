@@ -4,7 +4,7 @@ import { FlashcardsPage } from "src/gui/obsidian-views/settings-tab/settings-pag
 import { HelpPage } from "src/gui/obsidian-views/settings-tab/settings-page/help-page";
 import { NotesPage } from "src/gui/obsidian-views/settings-tab/settings-page/notes-page";
 import { SchedulingPage } from "src/gui/obsidian-views/settings-tab/settings-page/scheduling-page";
-import { StatisticsPage } from "src/gui/obsidian-views/settings-tab/settings-page/statistics-page";
+import { StatisticsPage } from "src/gui/obsidian-views/settings-tab/settings-page/statistics-page/statistics-page";
 import { UIPreferencesPage } from "src/gui/obsidian-views/settings-tab/settings-page/ui-preferences-page";
 import { createTabs, TabStructure } from "src/gui/obsidian-views/settings-tab/tabs";
 import { t } from "src/lang/helpers";
