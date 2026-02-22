@@ -26,6 +26,7 @@ export class SRSettingTab extends PluginSettingTab {
     constructor(app: App, plugin: SRPlugin) {
         super(app, plugin);
         this.plugin = plugin;
+        this.icon = "SpacedRepIcon";
     }
 
     display(): void {
