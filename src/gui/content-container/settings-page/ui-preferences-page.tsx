@@ -16,7 +16,15 @@ export class UIPreferencesPage extends SettingsPage {
         openPage: (pageType: SettingsPageType) => void,
         scrollListener: (scrollPosition: number) => void,
     ) {
-        super(containerEl, plugin, pageType, applySettingsUpdate, display, openPage, scrollListener);
+        super(
+            containerEl,
+            plugin,
+            pageType,
+            applySettingsUpdate,
+            display,
+            openPage,
+            scrollListener,
+        );
 
         new SettingGroup(this.containerEl)
             .setHeading(t("OBSIDIAN_INTEGRATION"))

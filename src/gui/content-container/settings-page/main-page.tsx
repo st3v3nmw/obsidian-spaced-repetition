@@ -1,11 +1,22 @@
 import { ButtonComponent, setIcon, Setting, SettingGroup } from "obsidian";
 
 import { SettingsPage } from "src/gui/content-container/settings-page/settings-page";
-import { getPageIcon, getPageName, SettingsPageType, SettingsPageTypesArray } from "src/gui/content-container/settings-page/settings-page-manager";
+import {
+    getPageIcon,
+    getPageName,
+    SettingsPageType,
+    SettingsPageTypesArray,
+} from "src/gui/content-container/settings-page/settings-page-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { setDebugParser } from "src/parser";
 
+/**
+ * Represents the main settings page, from which all other settings pages are accessed.
+ *
+ * @class MainPage
+ * @extends {SettingsPage}
+ */
 export class MainPage extends SettingsPage {
     constructor(
         pageContainerEl: HTMLElement,
@@ -14,27 +25,30 @@ export class MainPage extends SettingsPage {
         openPage: (pageType: SettingsPageType) => void,
         scrollListener: (scrollPosition: number) => void,
     ) {
-        super(pageContainerEl, plugin, pageType, () => { }, () => { }, openPage, scrollListener);
+        super(
+            pageContainerEl,
+            plugin,
+            pageType,
+            () => {},
+            () => {},
+            openPage,
+            scrollListener,
+        );
 
         this.containerEl.addClass("sr-main-page");
 
-        const mainSettingsGroup = new SettingGroup(this.containerEl)
-            .setHeading("Settings"); // TODO: add t("MAIN_SETTINGS")
+        const mainSettingsGroup = new SettingGroup(this.containerEl).setHeading("Settings"); // TODO: add t("MAIN_SETTINGS")
 
-        SettingsPageTypesArray.forEach(pageType => {
+        SettingsPageTypesArray.forEach((pageType) => {
             if (pageType === "main-page") return;
             mainSettingsGroup.addSetting((setting: Setting) => {
-                setting
-                    .setName(getPageName(pageType))
-                    .addButton((button: ButtonComponent) => {
-                        button
-                            .setIcon("chevron-right")
-                            .onClick(() => {
-                                this.openPage(pageType);
-                            });
-
-                        button.buttonEl.addClass("clickable-icon");
+                setting.setName(getPageName(pageType)).addButton((button: ButtonComponent) => {
+                    button.setIcon("chevron-right").onClick(() => {
+                        this.openPage(pageType);
                     });
+
+                    button.buttonEl.addClass("clickable-icon");
+                });
                 const iconEl = document.createElement("div");
                 iconEl.addClass("sr-settings-page-title-icon");
                 setIcon(iconEl, getPageIcon(pageType));

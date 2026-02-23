@@ -1,8 +1,17 @@
 import { ButtonComponent, setIcon } from "obsidian";
 
-import { getPageIcon, getPageName, SettingsPageType } from "src/gui/content-container/settings-page/settings-page-manager";
+import {
+    getPageIcon,
+    getPageName,
+    SettingsPageType,
+} from "src/gui/content-container/settings-page/settings-page-manager";
 import SRPlugin from "src/main";
 
+/**
+ * Represents a settings page.
+ *
+ * @class SettingsPage
+ */
 export abstract class SettingsPage {
     protected pageContainerEl: HTMLElement;
     protected pageHeaderEl: HTMLElement;
@@ -72,6 +81,9 @@ export abstract class SettingsPage {
         });
     }
 
+    /**
+     * Scrolls to the specified position.
+     */
     public scrollTo(scrollPosition: number): void {
         this.containerEl.scrollTo({
             top: scrollPosition,
@@ -79,6 +91,9 @@ export abstract class SettingsPage {
         });
     }
 
+    /**
+     * Gets the SettingsPage type.
+     */
     public getPageType(): SettingsPageType {
         return this.pageType;
     }
@@ -90,12 +105,18 @@ export abstract class SettingsPage {
         this.removeScrollListener();
     }
 
+    /**
+     * Removes the scroll listener from the SettingsPage.
+     */
     public removeScrollListener(): void {
         this.containerEl.removeEventListener("scroll", (_) => {
             this.scrollListener(this.containerEl.scrollTop);
         });
     }
 
+    /**
+     * Adds the scroll listener to the SettingsPage.
+     */
     public addScrollListener(): void {
         this.containerEl.addEventListener("scroll", (_) => {
             this.scrollListener(this.containerEl.scrollTop);
@@ -107,6 +128,9 @@ export abstract class SettingsPage {
      */
     public render?(): void;
 
+    /**
+     * Shows the SettingsPage.
+     */
     public show(): void {
         if (this.pageContainerEl.hasClass("sr-is-hidden")) {
             this.pageContainerEl.removeClass("sr-is-hidden");
@@ -114,6 +138,9 @@ export abstract class SettingsPage {
         }
     }
 
+    /**
+     * Hides the SettingsPage.
+     */
     public hide(): void {
         if (!this.pageContainerEl.hasClass("sr-is-hidden")) {
             this.pageContainerEl.addClass("sr-is-hidden");
@@ -121,6 +148,9 @@ export abstract class SettingsPage {
         }
     }
 
+    /**
+     * Backs to the main page.
+     */
     protected backToMainPage(): void {
         this.openPage("main-page");
     }

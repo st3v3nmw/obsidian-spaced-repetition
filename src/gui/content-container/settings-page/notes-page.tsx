@@ -6,6 +6,12 @@ import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
 
+/**
+ * Represents a notes settings page.
+ *
+ * @class NotesPage
+ * @extends {SettingsPage}
+ */
 export class NotesPage extends SettingsPage {
     constructor(
         pageContainerEl: HTMLElement,
@@ -16,7 +22,15 @@ export class NotesPage extends SettingsPage {
         openPage: (pageType: SettingsPageType) => void,
         scrollListener: (scrollPosition: number) => void,
     ) {
-        super(pageContainerEl, plugin, pageType, applySettingsUpdate, display, openPage, scrollListener);
+        super(
+            pageContainerEl,
+            plugin,
+            pageType,
+            applySettingsUpdate,
+            display,
+            openPage,
+            scrollListener,
+        );
 
         new SettingGroup(this.containerEl)
             .setHeading(t("GROUP_TAGS_FOLDERS"))

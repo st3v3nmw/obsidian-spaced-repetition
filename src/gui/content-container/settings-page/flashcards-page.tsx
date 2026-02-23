@@ -6,6 +6,12 @@ import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
 
+/**
+ * Represents a flashcards settings page.
+ *
+ * @class FlashcardsPage
+ * @extends {SettingsPage}
+ */
 export class FlashcardsPage extends SettingsPage {
     constructor(
         pageContainerEl: HTMLElement,
@@ -16,7 +22,15 @@ export class FlashcardsPage extends SettingsPage {
         openPage: (pageType: SettingsPageType) => void,
         scrollListener: (scrollPosition: number) => void,
     ) {
-        super(pageContainerEl, plugin, pageType, applySettingsUpdate, display, openPage, scrollListener);
+        super(
+            pageContainerEl,
+            plugin,
+            pageType,
+            applySettingsUpdate,
+            display,
+            openPage,
+            scrollListener,
+        );
 
         new SettingGroup(this.containerEl)
             .setHeading(t("GROUP_TAGS_FOLDERS"))
@@ -123,20 +137,20 @@ export class FlashcardsPage extends SettingsPage {
                         .addOptions(
                             deckOrderEnabled
                                 ? {
-                                    // eslint-disable-next-line camelcase
-                                    PrevDeckComplete_Sequential: t(
-                                        "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
-                                    ),
-                                    // eslint-disable-next-line camelcase
-                                    PrevDeckComplete_Random: t(
-                                        "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
-                                    ),
-                                }
+                                      // eslint-disable-next-line camelcase
+                                      PrevDeckComplete_Sequential: t(
+                                          "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
+                                      ),
+                                      // eslint-disable-next-line camelcase
+                                      PrevDeckComplete_Random: t(
+                                          "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
+                                      ),
+                                  }
                                 : {
-                                    EveryCardRandomDeckAndCard: t(
-                                        "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
-                                    ),
-                                },
+                                      EveryCardRandomDeckAndCard: t(
+                                          "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
+                                      ),
+                                  },
                         )
                         .setValue(
                             deckOrderEnabled

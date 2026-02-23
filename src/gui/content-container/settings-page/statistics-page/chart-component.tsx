@@ -2,6 +2,12 @@ import { Chart, ChartTypeRegistry } from "chart.js";
 
 import SettingsItemOverrideComponent from "src/gui/content-container/settings-page/statistics-page/settings-item-override-component";
 
+/**
+ * Represents a chart component.
+ *
+ * @class ChartComponent
+ * @extends {SettingsItemOverrideComponent}
+ */
 export default class ChartComponent extends SettingsItemOverrideComponent {
     private canvasContainerEl: HTMLDivElement;
     private canvasEl: HTMLCanvasElement;
@@ -102,7 +108,7 @@ export default class ChartComponent extends SettingsItemOverrideComponent {
                 responsive: true,
                 animation: {
                     duration: 0,
-                }
+                },
             },
         });
 

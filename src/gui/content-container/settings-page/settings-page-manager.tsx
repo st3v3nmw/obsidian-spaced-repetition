@@ -11,10 +11,39 @@ import { UIPreferencesPage } from "src/gui/content-container/settings-page/ui-pr
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 
-export type SettingsPageType = "main-page" | "flashcards-page" | "notes-page" | "scheduling-page" | "ui-preferences-page" | "statistics-page";
+/**
+ * Represents a possible settings page type.
+ *
+ * @type {SettingsPageType}
+ */
+export type SettingsPageType =
+    | "main-page"
+    | "flashcards-page"
+    | "notes-page"
+    | "scheduling-page"
+    | "ui-preferences-page"
+    | "statistics-page";
 
-export const SettingsPageTypesArray: ReadonlyArray<SettingsPageType> = ["main-page", "flashcards-page", "notes-page", "scheduling-page", "ui-preferences-page", "statistics-page"];
+/**
+ * Represents an array of all available settings page types.
+ *
+ * @type {ReadonlyArray<SettingsPageType>}
+ */
+export const SettingsPageTypesArray: ReadonlyArray<SettingsPageType> = [
+    "main-page",
+    "flashcards-page",
+    "notes-page",
+    "scheduling-page",
+    "ui-preferences-page",
+    "statistics-page",
+];
 
+/**
+ * Gets the name of a settings page.
+ *
+ * @param {SettingsPageType} pageType - The settings page type.
+ * @returns {string} The name of the settings page.
+ */
 export function getPageName(pageType: SettingsPageType): string {
     switch (pageType) {
         case "main-page":
@@ -32,6 +61,12 @@ export function getPageName(pageType: SettingsPageType): string {
     }
 }
 
+/**
+ * Gets the icon of a settings page.
+ *
+ * @param {SettingsPageType} pageType - The settings page type.
+ * @returns {string} The icon of the settings page.
+ */
 export function getPageIcon(pageType: SettingsPageType): string {
     switch (pageType) {
         case "main-page":
@@ -49,6 +84,11 @@ export function getPageIcon(pageType: SettingsPageType): string {
     }
 }
 
+/**
+ * Represents a settings page manager.
+ *
+ * @class SettingsPageManager
+ */
 export class SettingsPageManager {
     private containerEl: HTMLElement;
     private plugin: SRPlugin;
@@ -57,7 +97,13 @@ export class SettingsPageManager {
     private currentPage: SettingsPageType;
     private updateLastPageState: (lastPage: SettingsPageType, lastScrollPosition: number) => void;
 
-    constructor(containerEl: HTMLElement, plugin: SRPlugin, lastPage: SettingsPageType, lastScrollPosition: number, updateLastPageState: (lastPage: SettingsPageType, lastScrollPosition: number) => void) {
+    constructor(
+        containerEl: HTMLElement,
+        plugin: SRPlugin,
+        lastPage: SettingsPageType,
+        lastScrollPosition: number,
+        updateLastPageState: (lastPage: SettingsPageType, lastScrollPosition: number) => void,
+    ) {
         this.containerEl = containerEl;
         this.plugin = plugin;
         this.updateLastPageState = updateLastPageState;
@@ -68,12 +114,18 @@ export class SettingsPageManager {
         this.pages[this.getPageIndex(this.currentPage)].scrollTo(lastScrollPosition);
     }
 
+    /**
+     * Destroys the SettingsPageManager and all its pages.
+     */
     destroy() {
-        this.pages.forEach(page => page.destroy && page.destroy());
+        this.pages.forEach((page) => page.destroy && page.destroy());
     }
 
+    /**
+     * Renders the SettingsPageManager.
+     */
     render() {
-        this.pages.forEach(page => page.render && page.render());
+        this.pages.forEach((page) => page.render && page.render());
     }
 
     // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
@@ -94,8 +146,8 @@ export class SettingsPageManager {
                             this.plugin,
                             pageType,
                             this.openPage.bind(this),
-                            this.scrollListener.bind(this)
-                        )
+                            this.scrollListener.bind(this),
+                        ),
                     );
                     break;
                 case "flashcards-page":
@@ -107,8 +159,8 @@ export class SettingsPageManager {
                             this.applySettingsUpdate.bind(this),
                             this.createPages.bind(this),
                             this.openPage.bind(this),
-                            this.scrollListener.bind(this)
-                        )
+                            this.scrollListener.bind(this),
+                        ),
                     );
                     break;
                 case "notes-page":
@@ -120,8 +172,8 @@ export class SettingsPageManager {
                             this.applySettingsUpdate.bind(this),
                             this.createPages.bind(this),
                             this.openPage.bind(this),
-                            this.scrollListener.bind(this)
-                        )
+                            this.scrollListener.bind(this),
+                        ),
                     );
                     break;
                 case "scheduling-page":
@@ -133,8 +185,8 @@ export class SettingsPageManager {
                             this.applySettingsUpdate.bind(this),
                             this.createPages.bind(this),
                             this.openPage.bind(this),
-                            this.scrollListener.bind(this)
-                        )
+                            this.scrollListener.bind(this),
+                        ),
                     );
                     break;
                 case "ui-preferences-page":
@@ -146,8 +198,8 @@ export class SettingsPageManager {
                             this.applySettingsUpdate.bind(this),
                             this.createPages.bind(this),
                             this.openPage.bind(this),
-                            this.scrollListener.bind(this)
-                        )
+                            this.scrollListener.bind(this),
+                        ),
                     );
                     break;
                 case "statistics-page":
@@ -157,8 +209,8 @@ export class SettingsPageManager {
                             this.plugin,
                             pageType,
                             this.openPage.bind(this),
-                            this.scrollListener.bind(this)
-                        )
+                            this.scrollListener.bind(this),
+                        ),
                     );
                     break;
             }
@@ -170,7 +222,7 @@ export class SettingsPageManager {
     }
 
     private getPageIndex(pageType: SettingsPageType): number {
-        return this.pages.findIndex(page => page.getPageType() === pageType);
+        return this.pages.findIndex((page) => page.getPageType() === pageType);
     }
 
     private openPage(pageType: SettingsPageType): void {

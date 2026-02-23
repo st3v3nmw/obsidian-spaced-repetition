@@ -41,6 +41,12 @@ Chart.register(
     ArcElement,
 );
 
+/**
+ * Represents a statistics settings page.
+ *
+ * @class StatisticsPage
+ * @extends {SettingsPage}
+ */
 export class StatisticsPage extends SettingsPage {
     private forecastChart: ChartComponent;
     private intervalsChart: ChartComponent;
@@ -48,8 +54,22 @@ export class StatisticsPage extends SettingsPage {
     private cardTypesChart: ChartComponent;
     private noteStatsGrid: NoteStatsComponent;
 
-    constructor(pageContainerEl: HTMLElement, plugin: SRPlugin, pageType: SettingsPageType, openPage: (pageType: SettingsPageType) => void, scrollListener: (scrollPosition: number) => void) {
-        super(pageContainerEl, plugin, pageType, () => { }, () => { }, openPage, scrollListener);
+    constructor(
+        pageContainerEl: HTMLElement,
+        plugin: SRPlugin,
+        pageType: SettingsPageType,
+        openPage: (pageType: SettingsPageType) => void,
+        scrollListener: (scrollPosition: number) => void,
+    ) {
+        super(
+            pageContainerEl,
+            plugin,
+            pageType,
+            () => {},
+            () => {},
+            openPage,
+            scrollListener,
+        );
         this.containerEl.addClass("sr-statistics-page");
         this.plugin = plugin;
 
@@ -69,6 +89,9 @@ export class StatisticsPage extends SettingsPage {
         this.renderCharts(this.plugin.osrAppCore);
     }
 
+    /**
+     * Destroys the StatisticsPagea and all its components.
+     */
     destroy(): void {
         if (this.forecastChart) this.forecastChart.destroy();
         if (this.intervalsChart) this.intervalsChart.destroy();
@@ -132,7 +155,7 @@ export class StatisticsPage extends SettingsPage {
         // Add intervals
         const averageInterval: string = textInterval(
             Math.round((cardStats.intervals.getTotalOfValueMultiplyCount() / scheduledCount) * 10) /
-            10 || 0,
+                10 || 0,
             false,
         );
         const longestInterval: string = textInterval(cardStats.intervals.getMaxValue(), false);
