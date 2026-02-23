@@ -98,3 +98,37 @@ test("CardType.Cloze", () => {
         ),
     ]);
 });
+describe("CardType.Callout", () => {
+    test("Basic", () => {
+        expect(
+            CardFrontBackUtil.expand(CardType.Callout, ">[!Question] F1\nB1\nB2", DEFAULT_SETTINGS),
+        ).toEqual([new CardFrontBack("F1", "B1\nB2")]);
+    });
+    test("Default Fold Open", () => {
+        expect(
+            CardFrontBackUtil.expand(
+                CardType.Callout,
+                ">[!Question]+ F1\nB1\nB2",
+                DEFAULT_SETTINGS,
+            ),
+        ).toEqual([new CardFrontBack("F1", "B1\nB2")]);
+    });
+    test("Default Fold Close", () => {
+        expect(
+            CardFrontBackUtil.expand(
+                CardType.Callout,
+                ">[!Question]- F1\nB1\nB2",
+                DEFAULT_SETTINGS,
+            ),
+        ).toEqual([new CardFrontBack("F1", "B1\nB2")]);
+    });
+    test("Lowercase label", () => {
+        expect(
+            CardFrontBackUtil.expand(
+                CardType.Callout,
+                ">[!question]+ F1\nB1\nB2",
+                DEFAULT_SETTINGS,
+            ),
+        ).toEqual([new CardFrontBack("F1", "B1\nB2")]);
+    });
+});

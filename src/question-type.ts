@@ -105,11 +105,29 @@ class QuestionTypeCloze implements IQuestionTypeHandler {
             back = clozeNote.getCardBack(i, clozeFormatter);
             result.push(new CardFrontBack(front, back));
         }
-
         return result;
     }
 }
 
+class CalloutType implements IQuestionTypeHandler {
+    expand(questionText: string, settings: SRSettings): CardFrontBack[] {
+        const questionLines = questionText.split("\n");
+        // assume the line is supposed to become a flashcard and thus has a valid `calloutCardMarker`
+        // then deleting everything in the `[]` brackets suffices to delete the marker
+        const regex = new RegExp("^>\\[.*?\\][+-]?", "i");
+        // question is always in the first line
+        const side1: string = questionLines[0].replace(regex, "").trim();
+        const side2 = questionLines
+            .slice(1)
+            // remove first level of `calloutLineMarker`
+            .map((line) => line.replace(settings.calloutLineMarker, ""))
+            .join("\n")
+            .trim();
+
+        const result: CardFrontBack[] = [new CardFrontBack(side1, side2)];
+        return result;
+    }
+}
 export class QuestionTypeClozeFormatter implements IClozeFormatter {
     asking(answer?: string, hint?: string): string {
         return `<span style='color:#2196f3'>${!hint ? "[...]" : `[${hint}]`}</span>`;
@@ -142,6 +160,9 @@ export class QuestionTypeFactory {
                 break;
             case CardType.Cloze:
                 handler = new QuestionTypeCloze();
+                break;
+            case CardType.Callout:
+                handler = new CalloutType();
                 break;
         }
         return handler;

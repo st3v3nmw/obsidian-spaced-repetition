@@ -17,6 +17,7 @@ export enum CardType {
     MultiLineBasic,
     MultiLineReversed,
     Cloze,
+    Callout,
 }
 
 // QuestionText comprises the following components:

@@ -151,6 +151,8 @@ export class NoteQuestionParser {
             multilineReversedCardSeparator: settings.multilineReversedCardSeparator,
             multilineCardEndMarker: settings.multilineCardEndMarker,
             clozePatterns: settings.clozePatterns,
+            calloutCardMarker: settings.calloutCardMarker,
+            calloutLineMarker: settings.calloutLineMarker,
         };
 
         // We pass contentText which has the frontmatter blanked out; see extractFrontmatter for reasoning
