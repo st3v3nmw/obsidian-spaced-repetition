@@ -933,10 +933,7 @@ Q1::A1
         const expected = [
             {
                 questionType: CardType.SingleLineBasic,
-                topicPathList: TopicPathList.fromPsv(
-                    "#flashcards/question-tag",
-                    3,
-                ),
+                topicPathList: TopicPathList.fromPsv("#flashcards/question-tag", 3),
                 cards: [
                     new Card({
                         front: "Q1",
