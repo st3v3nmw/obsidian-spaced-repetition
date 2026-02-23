@@ -19,8 +19,10 @@ import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { textInterval } from "src/algorithms/osr/note-scheduling";
 import { OsrCore } from "src/core";
 import { CardListType } from "src/deck";
+import { SettingsPage } from "src/gui/obsidian-views/settings-tab/settings-page/settings-page";
 import ChartComponent from "src/gui/obsidian-views/settings-tab/settings-page/statistics-page/chart-component";
 import NoteStatsComponent from "src/gui/obsidian-views/settings-tab/settings-page/statistics-page/note-stats-component";
+import { SettingsPageType } from "src/gui/obsidian-views/settings-tab/settings-page-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Stats } from "src/stats";
@@ -39,23 +41,18 @@ Chart.register(
     ArcElement,
 );
 
-export class StatisticsPage {
-    private containerEl: HTMLElement;
-    private plugin: SRPlugin;
-
+export class StatisticsPage extends SettingsPage {
     private forecastChart: ChartComponent;
     private intervalsChart: ChartComponent;
     private easesChart: ChartComponent;
     private cardTypesChart: ChartComponent;
     private noteStatsGrid: NoteStatsComponent;
 
-    constructor(containerEl: HTMLElement, plugin: SRPlugin) {
-        this.containerEl = containerEl.createDiv();
+    constructor(pageContainerEl: HTMLElement, plugin: SRPlugin, pageType: SettingsPageType, openPage: (pageType: SettingsPageType) => void, scrollListener: (scrollPosition: number) => void) {
+        super(pageContainerEl, plugin, pageType, () => { }, () => { }, openPage, scrollListener);
         this.containerEl.addClass("sr-statistics-page");
         this.plugin = plugin;
-    }
 
-    render(): void {
         new Setting(this.containerEl)
             .setName("Period") // TODO: add t("CHART_PERIOD")
             .setDesc("Period of time to display in the charts") // TODO: add t("CHART_PERIOD_DESC")
@@ -78,6 +75,9 @@ export class StatisticsPage {
         if (this.easesChart) this.easesChart.destroy();
         if (this.cardTypesChart) this.cardTypesChart.destroy();
         if (this.noteStatsGrid) this.noteStatsGrid.destroy();
+        this.containerEl.removeEventListener("scroll", (_) => {
+            this.scrollListener(this.containerEl.scrollTop);
+        });
     }
 
     private renderCharts(osrCore: OsrCore): void {
@@ -132,7 +132,7 @@ export class StatisticsPage {
         // Add intervals
         const averageInterval: string = textInterval(
             Math.round((cardStats.intervals.getTotalOfValueMultiplyCount() / scheduledCount) * 10) /
-                10 || 0,
+            10 || 0,
             false,
         );
         const longestInterval: string = textInterval(cardStats.intervals.getMaxValue(), false);

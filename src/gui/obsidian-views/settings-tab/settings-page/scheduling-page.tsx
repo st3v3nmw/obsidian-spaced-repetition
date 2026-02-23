@@ -1,20 +1,24 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
 import { SettingsPage } from "src/gui/obsidian-views/settings-tab/settings-page/settings-page";
+import { SettingsPageType } from "src/gui/obsidian-views/settings-tab/settings-page-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
 
 export class SchedulingPage extends SettingsPage {
     constructor(
-        containerEl: HTMLElement,
+        pageContainerEl: HTMLElement,
         plugin: SRPlugin,
+        pageType: SettingsPageType,
         applySettingsUpdate: (callback: () => unknown) => void,
         display: () => void,
+        openPage: (pageType: SettingsPageType) => void,
+        scrollListener: (scrollPosition: number) => void,
     ) {
-        super(containerEl, plugin, applySettingsUpdate, display);
+        super(pageContainerEl, plugin, pageType, applySettingsUpdate, display, openPage, scrollListener);
 
-        new SettingGroup(containerEl)
+        new SettingGroup(this.containerEl)
             .setHeading(t("ALGORITHM"))
             .addSetting((setting: Setting) => {
                 const algoSettingEl = setting
@@ -227,7 +231,7 @@ export class SchedulingPage extends SettingsPage {
                     );
             });
 
-        new SettingGroup(containerEl)
+        new SettingGroup(this.containerEl)
             .setHeading(t("GROUP_DATA_STORAGE"))
             .addSetting((setting: Setting) => {
                 setting
