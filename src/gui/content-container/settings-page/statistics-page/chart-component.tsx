@@ -1,6 +1,6 @@
 import { Chart, ChartTypeRegistry } from "chart.js";
 
-import SettingsItemOverrideComponent from "src/gui/obsidian-views/settings-tab/settings-page/statistics-page/settings-item-override-component";
+import SettingsItemOverrideComponent from "src/gui/content-container/settings-page/statistics-page/settings-item-override-component";
 
 export default class ChartComponent extends SettingsItemOverrideComponent {
     private canvasContainerEl: HTMLDivElement;
@@ -92,6 +92,7 @@ export default class ChartComponent extends SettingsItemOverrideComponent {
                             style: "italic",
                         },
                         color: textColor,
+                        padding: { top: 0, bottom: 24 },
                     },
                     legend: {
                         display: false,

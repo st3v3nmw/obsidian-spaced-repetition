@@ -1,6 +1,6 @@
 import { App, PluginSettingTab } from "obsidian";
 
-import { SettingsPageManager, SettingsPageType } from "src/gui/obsidian-views/settings-tab/settings-page-manager";
+import { SettingsPageManager, SettingsPageType } from "src/gui/content-container/settings-page/settings-page-manager";
 import type SRPlugin from "src/main";
 
 export class SRSettingTab extends PluginSettingTab {

@@ -1,6 +1,6 @@
 import { ButtonComponent, setIcon } from "obsidian";
 
-import { getPageIcon, getPageName, SettingsPageType } from "src/gui/obsidian-views/settings-tab/settings-page-manager";
+import { getPageIcon, getPageName, SettingsPageType } from "src/gui/content-container/settings-page/settings-page-manager";
 import SRPlugin from "src/main";
 
 export abstract class SettingsPage {

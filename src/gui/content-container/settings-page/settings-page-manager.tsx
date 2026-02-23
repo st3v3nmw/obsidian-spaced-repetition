@@ -1,13 +1,13 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
-import { FlashcardsPage } from "src/gui/obsidian-views/settings-tab/settings-page/flashcards-page";
-import { MainPage } from "src/gui/obsidian-views/settings-tab/settings-page/main-page";
-import { NotesPage } from "src/gui/obsidian-views/settings-tab/settings-page/notes-page";
-import { SchedulingPage } from "src/gui/obsidian-views/settings-tab/settings-page/scheduling-page";
-import { SettingsPage } from "src/gui/obsidian-views/settings-tab/settings-page/settings-page";
-import { StatisticsPage } from "src/gui/obsidian-views/settings-tab/settings-page/statistics-page/statistics-page";
-import { UIPreferencesPage } from "src/gui/obsidian-views/settings-tab/settings-page/ui-preferences-page";
+import { FlashcardsPage } from "src/gui/content-container/settings-page/flashcards-page";
+import { MainPage } from "src/gui/content-container/settings-page/main-page";
+import { NotesPage } from "src/gui/content-container/settings-page/notes-page";
+import { SchedulingPage } from "src/gui/content-container/settings-page/scheduling-page";
+import { SettingsPage } from "src/gui/content-container/settings-page/settings-page";
+import { StatisticsPage } from "src/gui/content-container/settings-page/statistics-page/statistics-page";
+import { UIPreferencesPage } from "src/gui/content-container/settings-page/ui-preferences-page";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 

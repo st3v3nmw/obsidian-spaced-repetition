@@ -884,6 +884,7 @@ body:not(.is-phone) .sr-settings-page-content {
     padding: 0;
 }
 
+
 input.gridjs-input {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -927,10 +928,29 @@ input.gridjs-input:focus {
     gap: var(--size-4-2);
 }
 
+.is-mobile .gridjs-pagination .gridjs-pages {
+    gap: 0;
+}
+
+.is-mobile .gridjs-pagination .gridjs-pages button {
+    border-right: none;
+    border-radius: 0;
+}
+
+.gridjs-pagination .gridjs-pages button:last-child {
+    border-bottom-right-radius: 6px;
+    border-top-right-radius: 6px;
+    border-right: 1px solid #d2d6dc;
+}
+
+.gridjs-pagination .gridjs-pages button:first-child {
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
+}
+
 .gridjs-pagination .gridjs-pages button {
     background-color: #fff;
     border: 1px solid #d2d6dc;
-    border-right: none;
     outline: none;
     padding: 5px 14px;
     -webkit-user-select: none;
@@ -968,17 +988,6 @@ input.gridjs-input:focus {
 .gridjs-pagination .gridjs-pages button.gridjs-currentPage {
     background-color: #f7f7f7;
     font-weight: 700;
-}
-
-.gridjs-pagination .gridjs-pages button:last-child {
-    border-bottom-right-radius: 6px;
-    border-right: 1px solid #d2d6dc;
-    border-top-right-radius: 6px;
-}
-
-.gridjs-pagination .gridjs-pages button:first-child {
-    border-bottom-left-radius: 6px;
-    border-top-left-radius: 6px;
 }
 
 .gridjs-pagination .gridjs-pages button:last-child:focus {

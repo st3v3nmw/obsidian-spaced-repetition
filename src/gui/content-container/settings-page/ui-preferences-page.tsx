@@ -1,7 +1,7 @@
 import { Setting, SettingGroup } from "obsidian";
 
-import { SettingsPage } from "src/gui/obsidian-views/settings-tab/settings-page/settings-page";
-import { SettingsPageType } from "src/gui/obsidian-views/settings-tab/settings-page-manager";
+import { SettingsPage } from "src/gui/content-container/settings-page/settings-page";
+import { SettingsPageType } from "src/gui/content-container/settings-page/settings-page-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";

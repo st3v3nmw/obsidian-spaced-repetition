@@ -23,7 +23,7 @@ import {
     FlashcardReviewSequencer,
     IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import { SRSettingTab } from "src/gui/obsidian-views/settings-tab/settings-tab";
+import { SRSettingTab } from "src/gui/obsidian-views/settings-tab";
 import { SRModalView } from "src/gui/obsidian-views/sr-modal-view";
 import { SRTabView } from "src/gui/obsidian-views/sr-tab-view";
 import TabViewManager from "src/gui/obsidian-views/tab-view-manager";

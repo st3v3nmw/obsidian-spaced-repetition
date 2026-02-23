@@ -1,6 +1,6 @@
 import { Grid } from "gridjs";
 
-import SettingsItemOverrideComponent from "src/gui/obsidian-views/settings-tab/settings-page/statistics-page/settings-item-override-component";
+import SettingsItemOverrideComponent from "src/gui/content-container/settings-page/statistics-page/settings-item-override-component";
 import { t } from "src/lang/helpers";
 
 export default class NoteStatsComponent extends SettingsItemOverrideComponent {
@@ -20,7 +20,7 @@ export default class NoteStatsComponent extends SettingsItemOverrideComponent {
                 {
                     name: t("EASE"),
                     sort: true,
-                    width: "200px",
+                    width: "110px",
                 },
             ],
             search: true,
@@ -29,9 +29,9 @@ export default class NoteStatsComponent extends SettingsItemOverrideComponent {
             pagination:
                 Object.entries(noteEases).length > rowsPerPage
                     ? {
-                          limit: rowsPerPage,
-                          summary: false,
-                      }
+                        limit: rowsPerPage,
+                        summary: false,
+                    }
                     : undefined,
             language: {
                 search: {
