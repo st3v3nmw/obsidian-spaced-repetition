@@ -26,9 +26,9 @@ import {
 import { SRSettingTab } from "src/gui/obsidian-views/settings-tab/settings-tab";
 import { SRModalView } from "src/gui/obsidian-views/sr-modal-view";
 import { SRTabView } from "src/gui/obsidian-views/sr-tab-view";
+import TabViewManager from "src/gui/obsidian-views/tab-view-manager";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/review-queue-list-view";
 import { OsrSidebar } from "src/gui/sidebar";
-import TabViewManager from "src/gui/tab-view-manager";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/next-note-review-handler";
@@ -462,9 +462,9 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                    t("SYNC_TIME_TAKEN", {
-                        t: Date.now() - now.valueOf(),
-                    }),
+                t("SYNC_TIME_TAKEN", {
+                    t: Date.now() - now.valueOf(),
+                }),
             );
         }
     }

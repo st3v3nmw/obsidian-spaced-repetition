@@ -20,7 +20,7 @@ import { SRSettings } from "src/settings";
 import EmulatedPlatform from "src/utils/platform-detector";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
 
-export class CardUI {
+export class CardContainer {
     public app: App;
     public plugin: SRPlugin;
     public mode: FlashcardMode;
@@ -37,6 +37,8 @@ export class CardUI {
 
     public response: ResponseSectionComponent;
     public lastPressed: number;
+
+    public isActive: boolean = false;
 
     private chosenDeck: Deck | null;
     private totalCardsInSession: number = 0;
@@ -140,6 +142,7 @@ export class CardUI {
         await this._drawContent();
 
         this.view.removeClass("sr-is-hidden");
+        this.isActive = true;
         document.addEventListener("keydown", this._keydownHandler);
     }
 
@@ -161,6 +164,7 @@ export class CardUI {
 
         document.removeEventListener("keydown", this._keydownHandler);
         this.view.addClass("sr-is-hidden");
+        this.isActive = false;
     }
 
     /**

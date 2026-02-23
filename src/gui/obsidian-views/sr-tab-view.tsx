@@ -3,10 +3,9 @@ import { ButtonComponent, ItemView, WorkspaceLeaf } from "obsidian";
 import { DEBUG_MODE_ENABLED, SR_TAB_VIEW } from "src/constants";
 import { Deck } from "src/deck";
 import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
-import { CardUI } from "src/gui/content-container/card-container/card-container";
+import { CardContainer } from "src/gui/content-container/card-container/card-container";
 import { DeckContainer } from "src/gui/content-container/deck-container";
 import { FlashcardEditModal } from "src/gui/obsidian-views/edit-modal";
-import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
@@ -38,10 +37,10 @@ export class SRTabView extends ItemView {
     private viewContentEl: HTMLElement;
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
-    private deckView: DeckContainer;
-    private flashcardView: CardUI;
+    private deckContainer: DeckContainer;
     private openErrorCount: number = 0; // Counter for catching the first inevitable error but the letting the other through
     public backButton: ButtonComponent;
+    private cardContainer: CardContainer;
 
     constructor(
         leaf: WorkspaceLeaf,
@@ -138,9 +137,9 @@ export class SRTabView extends ItemView {
             this.reviewSequencer = loadedData.reviewSequencer;
             this.reviewMode = loadedData.mode;
 
-            if (this.deckView === undefined) {
+            if (this.deckContainer === undefined) {
                 // Init static elements in views
-                this.deckView = new DeckContainer(
+                this.deckContainer = new DeckContainer(
                     this.plugin,
                     this.settings,
                     this.reviewSequencer,
@@ -149,8 +148,8 @@ export class SRTabView extends ItemView {
                 );
             }
 
-            if (this.flashcardView === undefined) {
-                this.flashcardView = new CardUI(
+            if (this.cardContainer === undefined) {
+                this.cardContainer = new CardContainer(
                     this.app,
                     this.plugin,
                     this.settings,
@@ -202,28 +201,28 @@ export class SRTabView extends ItemView {
                 "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(34px - 0px + 12px))",
             );
         }
-        if (this.deckView) this.deckView.close();
-        if (this.flashcardView) this.flashcardView.close();
+        if (this.deckContainer) this.deckContainer.close();
+        if (this.cardContainer) this.cardContainer.close();
     }
 
     private _showDecksList(): void {
         this._hideFlashcard();
-        this.deckView.show();
+        this.deckContainer.show();
     }
 
     private _hideDecksList(): void {
-        this.deckView.hide();
+        this.deckContainer.hide();
     }
 
     private _showFlashcard(deck: Deck): void {
         this._hideDecksList();
         // this.backButton.buttonEl.removeClass("sr-is-hidden");
-        this.flashcardView.show(deck);
+        this.cardContainer.show(deck);
     }
 
     private _hideFlashcard(): void {
         // this.backButton.buttonEl.addClass("sr-is-hidden");
-        this.flashcardView.hide();
+        this.cardContainer.hide();
     }
 
     private _startReviewOfDeck(deck: Deck) {
@@ -251,19 +250,5 @@ export class SRTabView extends ItemView {
                 this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
             })
             .catch((reason) => console.log(reason));
-    }
-
-    private _createBackButton() {
-        this.backButton = new ButtonComponent(this.viewContentEl);
-        this.backButton.setClass("sr-back-button");
-        this.backButton.setClass("sr-is-hidden");
-        this.backButton.setClass("clickable-icon");
-        this.backButton.setIcon("arrow-left");
-        this.backButton.setTooltip(t("BACK"));
-        this.backButton.buttonEl.setAttribute("aria-label", t("BACK"));
-        this.backButton.onClick(() => {
-            this.backButton.setClass("sr-is-hidden");
-            this._showDecksList();
-        });
     }
 }
