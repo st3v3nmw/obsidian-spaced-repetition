@@ -138,7 +138,7 @@ export default {
 
 这些文件存放于`docs/docs/`相应的语言文件夹内。例如，英文文档位于 `docs/docs/en/`目录下。
 
-文档托管于[https://www.stephenmwangi.com/obsidian-spaced-repetition/](https://www.stephenmwangi.com/obsidian-spaced-repetition/)。
+文档托管于[https://stephenmwangi.com/obsidian-spaced-repetition/](https://stephenmwangi.com/obsidian-spaced-repetition/)。
 
 对于微小改动，您可以仅提交 Pull Request 来合并(针对 `master` 分支)。
 这些修改将在新[发行版](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases)发布时生效。

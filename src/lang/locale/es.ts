@@ -21,6 +21,7 @@ export default {
     CURRENT_EASE_HELP_TEXT: "Facilidad Actual: ",
     CURRENT_INTERVAL_HELP_TEXT: "Intervalo Actual: ",
     CARD_GENERATED_FROM: "Generado Desde: ${notePath}",
+    VIEW_CARD_INFO: "View Card Info",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Abrir nota para revisión",

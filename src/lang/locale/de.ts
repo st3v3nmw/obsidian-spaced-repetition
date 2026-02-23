@@ -24,6 +24,7 @@ export default {
     CURRENT_EASE_HELP_TEXT: "Aktuelle Schwierigkeit: ",
     CURRENT_INTERVAL_HELP_TEXT: "Aktueller Intervall: ",
     CARD_GENERATED_FROM: "Erstellt von: ${notePath}",
+    VIEW_CARD_INFO: "Karteninformationen anzeigen",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Notiz zur Wiederholung öffnen",
