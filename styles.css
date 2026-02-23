@@ -594,80 +594,14 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
 
 /* MARK: Settings Tab */
 
-/*
- * Tab elements
- * This CSS is copied from https://github.com/Taitava/obsidian-shellcommands
- * Jarkko Linnanvirta https://github.com/Taitava comments below...
- *  - Renamed classes
- *
- * This CSS is copied 2021-10-21 from https://www.w3schools.com/howto/howto_js_tabs.asp
- * Modifications:
- *  - Renamed classes
- *  - Added tab icons.
- *  - Changed colors.
- *  - Changed/removed borders.
- *  - Removed button transition.
- *  - Changed button border-radiuses
- *  - Added margin-right rule to .sr-settings-tab-header-button .
- */
-
 /* Style the tab */
 .sr-settings-tab {
     overflow: hidden;
 }
 
-.sr-settings-tab-header {
-    border-bottom: 2px solid var(--background-modifier-border);
-    overflow-x: auto;
-    display: flex;
-    padding-bottom: var(--size-4-2);
-    width: 100%;
+.is-phone .modal.mod-settings .sr-settings-tab {
+    padding-bottom: max(var(--safe-area-inset-bottom), var(--size-4-4));
 }
-
-@media only screen and (min-height: 600px) {
-    body:not(.is-phone) .sr-settings-tab-header {
-        padding-bottom: var(--size-4-4);
-    }
-}
-
-@media only screen and (orientation: landscape) {
-    .is-phone .sr-settings-tab-header {
-        padding-bottom: var(--size-4-1);
-    }
-}
-
-.sr-settings-tab-header-button-wrapper {
-    display: flex;
-    gap: var(--size-4-2);
-    flex-grow: 1;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Style the buttons that are used to open the tab content */
-.sr-settings-tab-header-button {
-    outline: none;
-    cursor: pointer;
-}
-
-/* Create an active/current tablink class */
-.sr-settings-tab-header-button {
-    &:hover {
-        background-color: var(--background-modifier-hover);
-    }
-
-    &.sr-tab-active,
-    &.sr-tab-active:hover {
-        background-color: var(--background-modifier-active-hover);
-    }
-}
-
-.sr-settings-tab-header-button svg {
-    vertical-align: middle;
-    /* Not middle but close enough. */
-}
-
-/* Style the tab content */
 
 .sr-main-page {
     & .sr-settings-page-title-icon {
@@ -684,7 +618,7 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     }
 }
 
-.is-phone .modal .sr-settings-tab {
+.sr-settings-tab {
     & .sr-main-page {
         & .setting-item {
             flex-direction: row !important;
@@ -692,10 +626,6 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
 
             & .setting-item-info {
                 align-self: unset !important;
-
-                & .sr-settings-page-title {
-                    font-size: var(--font-ui-normal);
-                }
             }
 
             & .setting-item-control {
@@ -703,6 +633,12 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
                 justify-content: flex-end !important;
             }
         }
+    }
+}
+
+.is-phone .modal .sr-settings-tab {
+    & .sr-settings-page-title {
+        font-size: var(--font-ui-normal);
     }
 
     & .sr-settings-page-title-wrapper {
