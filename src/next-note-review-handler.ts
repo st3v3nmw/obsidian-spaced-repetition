@@ -1,6 +1,6 @@
 import { App, Notice, TFile } from "obsidian";
 
-import { ReviewDeckSelectionModal } from "src/gui/review-deck-selection-modal";
+import { ReviewDeckSelectionModal } from "src/gui/obsidian-views/modals/review-deck-selection-modal";
 import { t } from "src/lang/helpers";
 import { NoteReviewQueue } from "src/note-review-queue";
 import { SRSettings } from "src/settings";

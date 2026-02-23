@@ -4,7 +4,7 @@ import { SR_TAB_VIEW } from "src/constants";
 import { OsrAppCore } from "src/core";
 import { Deck } from "src/deck";
 import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
-import { SRTabView } from "src/gui/obsidian-views/sr-tab-view";
+import { SRTabView } from "src/gui/obsidian-views/item-views/sr-tab-view";
 import SRPlugin from "src/main";
 import { TabViewType } from "src/utils/types";
 

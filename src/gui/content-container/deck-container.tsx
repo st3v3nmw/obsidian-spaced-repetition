@@ -8,8 +8,8 @@ import {
     DeckStats,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import ModalCloseButtonComponent from "src/gui/modal-close-button";
-import { FlashcardMode } from "src/gui/obsidian-views/sr-modal-view";
+import ModalCloseButtonComponent from "src/gui/content-container/modal-close-button";
+import { FlashcardMode } from "src/gui/obsidian-views/modals/sr-modal-view";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";

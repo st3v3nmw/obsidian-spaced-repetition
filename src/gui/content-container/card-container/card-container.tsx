@@ -12,7 +12,7 @@ import CardInfoNotice from "src/gui/content-container/card-container/controls/ca
 import ControlsComponent from "src/gui/content-container/card-container/controls/controls";
 import InfoSection from "src/gui/content-container/card-container/deck-info/info-section";
 import ResponseSectionComponent from "src/gui/content-container/card-container/response-section/response-section";
-import { FlashcardMode } from "src/gui/obsidian-views/sr-modal-view";
+import { FlashcardMode } from "src/gui/obsidian-views/modals/sr-modal-view";
 import type SRPlugin from "src/main";
 import { Note } from "src/note";
 import { CardType, Question } from "src/question";

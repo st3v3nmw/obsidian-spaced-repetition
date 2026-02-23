@@ -3,7 +3,7 @@ import { ButtonComponent, setIcon } from "obsidian";
 import { Deck } from "src/deck";
 import { DeckStats } from "src/flashcard-review-sequencer";
 import BackButtonComponent from "src/gui/content-container/card-container/controls/back-button";
-import ModalCloseButtonComponent from "src/gui/modal-close-button";
+import ModalCloseButtonComponent from "src/gui/content-container/modal-close-button";
 import { Note } from "src/note";
 import { Question } from "src/question";
 

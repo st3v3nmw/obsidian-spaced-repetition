@@ -7,7 +7,7 @@ import {
 } from "src/flashcard-review-sequencer";
 import { CardContainer } from "src/gui/content-container/card-container/card-container";
 import { DeckContainer } from "src/gui/content-container/deck-container";
-import { FlashcardEditModal } from "src/gui/obsidian-views/edit-modal";
+import { FlashcardEditModal } from "src/gui/obsidian-views/modals/edit-modal";
 import type SRPlugin from "src/main";
 import { Question } from "src/question";
 import { SRSettings } from "src/settings";
