@@ -1,20 +1,38 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
-import { SettingsPage } from "src/gui/obsidian-views/settings-tab/settings-page/settings-page";
+import { SettingsPage } from "src/gui/content-container/settings-page/settings-page";
+import { SettingsPageType } from "src/gui/content-container/settings-page/settings-page-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
 
+/**
+ * Represents a notes settings page.
+ *
+ * @class NotesPage
+ * @extends {SettingsPage}
+ */
 export class NotesPage extends SettingsPage {
     constructor(
-        containerEl: HTMLElement,
+        pageContainerEl: HTMLElement,
         plugin: SRPlugin,
+        pageType: SettingsPageType,
         applySettingsUpdate: (callback: () => unknown) => void,
         display: () => void,
+        openPage: (pageType: SettingsPageType) => void,
+        scrollListener: (scrollPosition: number) => void,
     ) {
-        super(containerEl, plugin, applySettingsUpdate, display);
+        super(
+            pageContainerEl,
+            plugin,
+            pageType,
+            applySettingsUpdate,
+            display,
+            openPage,
+            scrollListener,
+        );
 
-        new SettingGroup(containerEl)
+        new SettingGroup(this.containerEl)
             .setHeading(t("GROUP_TAGS_FOLDERS"))
             .addSetting((setting: Setting) => {
                 setting
@@ -52,7 +70,7 @@ export class NotesPage extends SettingsPage {
                     );
             });
 
-        new SettingGroup(containerEl)
+        new SettingGroup(this.containerEl)
             .setHeading(t("NOTES_REVIEW_QUEUE"))
             .addSetting((setting: Setting) => {
                 setting.setName(t("AUTO_NEXT_NOTE")).addToggle((toggle) =>

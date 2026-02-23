@@ -594,104 +594,112 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
 
 /* MARK: Settings Tab */
 
-/*
- * Tab elements
- * This CSS is copied from https://github.com/Taitava/obsidian-shellcommands
- * Jarkko Linnanvirta https://github.com/Taitava comments below...
- *  - Renamed classes
- *
- * This CSS is copied 2021-10-21 from https://www.w3schools.com/howto/howto_js_tabs.asp
- * Modifications:
- *  - Renamed classes
- *  - Added tab icons.
- *  - Changed colors.
- *  - Changed/removed borders.
- *  - Removed button transition.
- *  - Changed button border-radiuses
- *  - Added margin-right rule to .sr-settings-tab-header-button .
- */
-
 /* Style the tab */
 .sr-settings-tab {
     overflow: hidden;
 }
 
-.sr-settings-tab-header {
-    border-bottom: 2px solid var(--background-modifier-border);
-    overflow-x: auto;
+.is-phone .modal.mod-settings .sr-settings-tab {
+    padding-bottom: max(var(--safe-area-inset-bottom), var(--size-4-4));
+}
+
+.sr-main-page {
+    & .sr-settings-page-title-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    & .sr-settings-page-title {
+        display: flex;
+        align-items: center;
+        gap: var(--size-4-2);
+        font-size: var(--font-ui-large);
+    }
+}
+
+.sr-settings-tab {
+    & .sr-main-page {
+        & .setting-item {
+            flex-direction: row !important;
+            align-items: center !important;
+
+            & .setting-item-info {
+                align-self: unset !important;
+            }
+
+            & .setting-item-control {
+                width: unset !important;
+                justify-content: flex-end !important;
+            }
+        }
+    }
+}
+
+.is-phone .modal .sr-settings-tab {
+    & .sr-settings-page-title {
+        font-size: var(--font-ui-normal);
+    }
+
+    & .sr-settings-page-title-wrapper {
+        font-size: var(--font-ui-normal);
+        padding-left: var(--size-4-2);
+        border-left: 1px solid var(--background-modifier-border);
+    }
+
+    & .sr-settings-page-header {
+        padding: var(--size-4-2);
+        border: unset;
+        background-color: var(--setting-items-background);
+        border-radius: var(--setting-items-radius);
+    }
+}
+
+.sr-settings-page {
     display: flex;
-    padding-bottom: var(--size-4-2);
+    flex-direction: column;
+    gap: var(--size-4-4);
+    height: 100%;
     width: 100%;
-}
+    overflow: hidden;
 
-@media only screen and (min-height: 600px) {
-    body:not(.is-phone) .sr-settings-tab-header {
-        padding-bottom: var(--size-4-4);
+    & button {
+        cursor: pointer;
     }
 }
 
-@media only screen and (orientation: landscape) {
-    .is-phone .sr-settings-tab-header {
-        padding-bottom: var(--size-4-1);
-    }
-}
-
-.sr-settings-tab-header-button-wrapper {
+.sr-settings-page-header {
     display: flex;
+    align-items: center;
     gap: var(--size-4-2);
-    flex-grow: 1;
+    padding-bottom: var(--size-4-2);
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.sr-settings-page-title-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--size-4-2);
+    font-size: var(--font-ui-large);
+}
+
+.sr-settings-page-title-icon {
+    display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* Style the buttons that are used to open the tab content */
-.sr-settings-tab-header-button {
-    outline: none;
-    cursor: pointer;
-}
-
-/* Create an active/current tablink class */
-.sr-settings-tab-header-button {
-    &:hover {
-        background-color: var(--background-modifier-hover);
-    }
-
-    &.sr-tab-active,
-    &.sr-tab-active:hover {
-        background-color: var(--background-modifier-active-hover);
-    }
-}
-
-.sr-settings-tab-header-button svg {
-    vertical-align: middle;
-    /* Not middle but close enough. */
-}
-
-/* Style the tab content */
-
-.sr-settings-tab-content {
-    display: none;
-    padding: var(--size-4-2) var(--size-4-3);
-
+.sr-settings-page-content {
+    display: flex;
     flex-direction: column;
     overflow-x: hidden;
     overflow-y: auto;
     height: 100%;
 }
 
-@media only screen and (min-height: 600px) {
-    body:not(.is-phone) .sr-settings-tab-content {
-        padding: var(--size-4-3) var(--size-4-4);
-    }
-}
-
-.sr-settings-tab-content.sr-tab-active {
-    display: flex;
-}
-
-.sr-settings-tab-content-inner {
-    display: flex;
-    flex-direction: column;
+body:not(.is-phone) .sr-settings-page-content {
+    padding-right: var(--size-4-1);
 }
 
 /*  MARK: Statistics */
@@ -708,9 +716,11 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     display: none;
 }
 
-.sr-chart-container {
+.sr-chart-container,
+.sr-chart-canvas-container {
     height: 100%;
     width: 100%;
+    position: relative;
 }
 
 /* MARK: gridjs -> NoteStatsComponent */
@@ -848,10 +858,29 @@ input.gridjs-input:focus {
     gap: var(--size-4-2);
 }
 
+.is-mobile .gridjs-pagination .gridjs-pages {
+    gap: 0;
+}
+
+.is-mobile .gridjs-pagination .gridjs-pages button {
+    border-right: none;
+    border-radius: 0;
+}
+
+.gridjs-pagination .gridjs-pages button:last-child {
+    border-bottom-right-radius: 6px;
+    border-top-right-radius: 6px;
+    border-right: 1px solid #d2d6dc;
+}
+
+.gridjs-pagination .gridjs-pages button:first-child {
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
+}
+
 .gridjs-pagination .gridjs-pages button {
     background-color: #fff;
     border: 1px solid #d2d6dc;
-    border-right: none;
     outline: none;
     padding: 5px 14px;
     -webkit-user-select: none;
@@ -889,17 +918,6 @@ input.gridjs-input:focus {
 .gridjs-pagination .gridjs-pages button.gridjs-currentPage {
     background-color: #f7f7f7;
     font-weight: 700;
-}
-
-.gridjs-pagination .gridjs-pages button:last-child {
-    border-bottom-right-radius: 6px;
-    border-right: 1px solid #d2d6dc;
-    border-top-right-radius: 6px;
-}
-
-.gridjs-pagination .gridjs-pages button:first-child {
-    border-bottom-left-radius: 6px;
-    border-top-left-radius: 6px;
 }
 
 .gridjs-pagination .gridjs-pages button:last-child:focus {

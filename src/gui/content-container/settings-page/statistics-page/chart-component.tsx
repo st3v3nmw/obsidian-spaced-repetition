@@ -1,8 +1,15 @@
 import { Chart, ChartTypeRegistry } from "chart.js";
 
-import SettingsItemOverrideComponent from "src/gui/obsidian-views/settings-tab/settings-page/statistics-page/settings-item-override-component";
+import SettingsItemOverrideComponent from "src/gui/content-container/settings-page/statistics-page/settings-item-override-component";
 
+/**
+ * Represents a chart component.
+ *
+ * @class ChartComponent
+ * @extends {SettingsItemOverrideComponent}
+ */
 export default class ChartComponent extends SettingsItemOverrideComponent {
+    private canvasContainerEl: HTMLDivElement;
     private canvasEl: HTMLCanvasElement;
     private summaryEl: HTMLDivElement;
     private chart: Chart;
@@ -23,7 +30,9 @@ export default class ChartComponent extends SettingsItemOverrideComponent {
     ) {
         super(parentContainerEl);
         this.containerEl.addClass("sr-chart-container");
-        this.canvasEl = this.containerEl.createEl("canvas");
+        this.canvasContainerEl = this.containerEl.createDiv();
+        this.canvasContainerEl.addClass("sr-chart-canvas-container");
+        this.canvasEl = this.canvasContainerEl.createEl("canvas");
         this.canvasEl.id = canvasId;
         this.summaryEl = this.containerEl.createDiv();
         this.summaryEl.id = summaryId;
@@ -89,21 +98,23 @@ export default class ChartComponent extends SettingsItemOverrideComponent {
                             style: "italic",
                         },
                         color: textColor,
+                        padding: { top: 0, bottom: 24 },
                     },
                     legend: {
                         display: false,
                     },
                 },
+                aspectRatio: 2,
+                responsive: true,
                 animation: {
                     duration: 0,
                 },
-                aspectRatio: 2,
             },
         });
 
         if (shouldFilter) {
             const chartPeriodEl = document.getElementById("sr-chart-period") as HTMLSelectElement;
-            chartPeriodEl.addEventListener("click", () => {
+            chartPeriodEl.addEventListener("change", () => {
                 let filteredLabels, filteredData;
                 const chartPeriod = chartPeriodEl.value;
                 if (chartPeriod === "month") {

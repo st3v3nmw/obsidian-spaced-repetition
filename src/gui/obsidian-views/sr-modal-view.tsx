@@ -5,7 +5,7 @@ import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/flashcard-review-sequencer";
-import { CardUI } from "src/gui/content-container/card-container/card-container";
+import { CardContainer } from "src/gui/content-container/card-container/card-container";
 import { DeckContainer } from "src/gui/content-container/deck-container";
 import { FlashcardEditModal } from "src/gui/obsidian-views/edit-modal";
 import type SRPlugin from "src/main";
@@ -25,8 +25,8 @@ export class SRModalView extends Modal {
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
-    private deckView: DeckContainer;
-    private flashcardView: CardUI;
+    private deckContainer: DeckContainer;
+    private cardContainer: CardContainer;
 
     constructor(
         app: App,
@@ -61,7 +61,7 @@ export class SRModalView extends Modal {
         this.contentEl.addClass("sr-modal-content");
 
         // Init static elements in views
-        this.deckView = new DeckContainer(
+        this.deckContainer = new DeckContainer(
             this.plugin,
             this.settings,
             this.reviewSequencer,
@@ -70,7 +70,7 @@ export class SRModalView extends Modal {
             this.close.bind(this),
         );
 
-        this.flashcardView = new CardUI(
+        this.cardContainer = new CardContainer(
             this.app,
             this.plugin,
             this.settings,
@@ -90,26 +90,26 @@ export class SRModalView extends Modal {
     onClose(): void {
         this.plugin.setSRViewInFocus(false);
         this.mode = FlashcardMode.Closed;
-        this.deckView.close();
-        this.flashcardView.close();
+        this.deckContainer.close();
+        this.cardContainer.close();
     }
 
     private _showDecksList(): void {
         this._hideFlashcard();
-        this.deckView.show();
+        this.deckContainer.show();
     }
 
     private _hideDecksList(): void {
-        this.deckView.hide();
+        this.deckContainer.hide();
     }
 
     private _showFlashcard(deck: Deck): void {
         this._hideDecksList();
-        this.flashcardView.show(deck);
+        this.cardContainer.show(deck);
     }
 
     private _hideFlashcard(): void {
-        this.flashcardView.hide();
+        this.cardContainer.hide();
     }
 
     private _startReviewOfDeck(deck: Deck) {

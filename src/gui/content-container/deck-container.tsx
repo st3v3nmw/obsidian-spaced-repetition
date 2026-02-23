@@ -33,6 +33,8 @@ export class DeckContainer {
     public scrollWrapper: HTMLDivElement;
     public content: HTMLDivElement;
 
+    public isActive: boolean = false;
+
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private startReviewOfDeck: (deck: Deck) => void;
@@ -124,6 +126,7 @@ export class DeckContainer {
 
         if (this.containerEl.hasClass("sr-is-hidden")) {
             this.containerEl.removeClass("sr-is-hidden");
+            this.isActive = true;
         }
     }
 
@@ -133,6 +136,7 @@ export class DeckContainer {
     hide() {
         if (!this.containerEl.hasClass("sr-is-hidden")) {
             this.containerEl.addClass("sr-is-hidden");
+            this.isActive = false;
         }
     }
 

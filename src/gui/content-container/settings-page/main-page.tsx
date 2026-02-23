@@ -1,20 +1,67 @@
-import { Setting, SettingGroup } from "obsidian";
+import { ButtonComponent, setIcon, Setting, SettingGroup } from "obsidian";
 
-import { SettingsPage } from "src/gui/obsidian-views/settings-tab/settings-page/settings-page";
+import { SettingsPage } from "src/gui/content-container/settings-page/settings-page";
+import {
+    getPageIcon,
+    getPageName,
+    SettingsPageType,
+    SettingsPageTypesArray,
+} from "src/gui/content-container/settings-page/settings-page-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { setDebugParser } from "src/parser";
 
-export class HelpPage extends SettingsPage {
+/**
+ * Represents the main settings page, from which all other settings pages are accessed.
+ *
+ * @class MainPage
+ * @extends {SettingsPage}
+ */
+export class MainPage extends SettingsPage {
     constructor(
-        containerEl: HTMLElement,
+        pageContainerEl: HTMLElement,
         plugin: SRPlugin,
-        applySettingsUpdate: (callback: () => unknown) => void,
-        display: () => void,
-        setDebugParser: (value: boolean) => void,
+        pageType: SettingsPageType,
+        openPage: (pageType: SettingsPageType) => void,
+        scrollListener: (scrollPosition: number) => void,
     ) {
-        super(containerEl, plugin, applySettingsUpdate, display);
+        super(
+            pageContainerEl,
+            plugin,
+            pageType,
+            () => {},
+            () => {},
+            openPage,
+            scrollListener,
+        );
 
-        new SettingGroup(containerEl)
+        this.containerEl.addClass("sr-main-page");
+
+        const mainSettingsGroup = new SettingGroup(this.containerEl).setHeading("Settings"); // TODO: add t("MAIN_SETTINGS")
+
+        SettingsPageTypesArray.forEach((pageType) => {
+            if (pageType === "main-page") return;
+            mainSettingsGroup.addSetting((setting: Setting) => {
+                setting.setName(getPageName(pageType)).addButton((button: ButtonComponent) => {
+                    button.setIcon("chevron-right").onClick(() => {
+                        this.openPage(pageType);
+                    });
+
+                    button.buttonEl.addClass("clickable-icon");
+                });
+                const iconEl = document.createElement("div");
+                iconEl.addClass("sr-settings-page-title-icon");
+                setIcon(iconEl, getPageIcon(pageType));
+
+                setting.nameEl.insertBefore(iconEl, setting.nameEl.firstChild);
+                setting.nameEl.addClass("sr-settings-page-title");
+                setting.settingEl.addEventListener("click", () => {
+                    this.openPage(pageType);
+                });
+            });
+        });
+
+        new SettingGroup(this.containerEl)
             .setHeading(t("HELP"))
             .addSetting((setting: Setting) => {
                 setting.infoEl.insertAdjacentHTML(
@@ -42,7 +89,7 @@ export class HelpPage extends SettingsPage {
                 );
             });
 
-        new SettingGroup(containerEl)
+        new SettingGroup(this.containerEl)
             .setHeading(t("GROUP_CONTRIBUTING"))
             .addSetting((setting: Setting) => {
                 setting.infoEl.insertAdjacentHTML(
@@ -71,7 +118,7 @@ export class HelpPage extends SettingsPage {
                 );
             });
 
-        new SettingGroup(containerEl)
+        new SettingGroup(this.containerEl)
             .setHeading(t("LOGGING"))
             .addSetting((setting: Setting) => {
                 setting.setName(t("DISPLAY_SCHEDULING_DEBUG_INFO")).addToggle((toggle) =>
