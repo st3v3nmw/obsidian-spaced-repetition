@@ -2,6 +2,7 @@
 import h from "vhtml";
 
 import { FlashcardsPage } from "src/gui/content-container/settings-page/flashcards-page";
+import { GamificationPage } from "src/gui/content-container/settings-page/gamification-page";
 import { MainPage } from "src/gui/content-container/settings-page/main-page";
 import { NotesPage } from "src/gui/content-container/settings-page/notes-page";
 import { SchedulingPage } from "src/gui/content-container/settings-page/scheduling-page";
@@ -22,7 +23,8 @@ export type SettingsPageType =
     | "notes-page"
     | "scheduling-page"
     | "ui-preferences-page"
-    | "statistics-page";
+    | "statistics-page"
+    | "gamification-page";
 
 /**
  * Represents an array of all available settings page types.
@@ -36,6 +38,7 @@ export const SettingsPageTypesArray: ReadonlyArray<SettingsPageType> = [
     "scheduling-page",
     "ui-preferences-page",
     "statistics-page",
+    "gamification-page",
 ];
 
 /**
@@ -58,6 +61,8 @@ export function getPageName(pageType: SettingsPageType): string {
             return t("UI");
         case "statistics-page":
             return t("STATS_TITLE");
+        case "gamification-page":
+            return "Gamification"; // TODO(byq77): add t("GAMIFICATION")
     }
 }
 
@@ -81,6 +86,8 @@ export function getPageIcon(pageType: SettingsPageType): string {
             return "presentation";
         case "statistics-page":
             return "bar-chart-3";
+        case "gamification-page":
+            return "dice";
     }
 }
 
@@ -208,6 +215,19 @@ export class SettingsPageManager {
                             newPageContainerEl,
                             this.plugin,
                             pageType,
+                            this.openPage.bind(this),
+                            this.scrollListener.bind(this),
+                        ),
+                    );
+                    break;
+                case "gamification-page":
+                    this.pages.push(
+                        new GamificationPage(
+                            newPageContainerEl,
+                            this.plugin,
+                            pageType,
+                            this.applySettingsUpdate.bind(this),
+                            this.createPages.bind(this),
                             this.openPage.bind(this),
                             this.scrollListener.bind(this),
                         ),
