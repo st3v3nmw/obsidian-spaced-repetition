@@ -47,3 +47,7 @@ env.sh
 # AI Tooling
 .claude/
 .sourcerer/
+.github/prompts/
+
+# Misc
+scripts
