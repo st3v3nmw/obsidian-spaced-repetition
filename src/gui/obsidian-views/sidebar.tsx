@@ -4,6 +4,7 @@ import {
     REVIEW_QUEUE_VIEW_TYPE,
     ReviewQueueListView,
 } from "src/gui/obsidian-views/item-views/review-queue-list-view";
+import SRPlugin from "src/main";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { SRSettings } from "src/settings";
 
@@ -46,6 +47,7 @@ export class OsrSidebar {
                 leaf,
                 this.nextNoteReviewHandler,
                 this.settings,
+                this.plugin as SRPlugin,
             ));
         });
     }

@@ -65,7 +65,7 @@ export default class StatusBarManager {
                     statusBarItem = new IconTextStatusBarItem(this.plugin, statusBarItemType, {
                         icon: "SpacedRepIcon",
                         show: showItems,
-                        tooltip: "Review your cards", // TODO: Translate
+                        tooltip: "Open deck for review", // TODO: Translate
                         tooltipPosition: "top",
                         onClick: async () => {
                             if (!this.plugin.osrAppCore.syncLock) {

@@ -281,6 +281,11 @@
         gap: var(--size-4-4);
     }
 
+    & .sr-reset-button.mod-warning {
+        color: var(--text-error);
+        background-color: var(--interactive-normal);
+    }
+
     & .sr-main-wrapper {
         gap: var(--container-gap);
         display: flex;
@@ -590,6 +595,79 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
 .sr-edit-view .sr-response-button.sr-dummy-button {
     opacity: 0;
     cursor: default;
+}
+
+/* MARK: Note Review Page */
+
+.sr-note-review-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4-4);
+
+    .tree-item.mod-root > .tree-item-children {
+        padding-inline-start: 0;
+        margin-inline-start: 0;
+        border-inline-start: none;
+    }
+
+    & .tree-item-self:hover {
+        background-color: var(--background-modifier-hover);
+        border-radius: var(--input-radius);
+    }
+
+    .nav-file-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .nav-file-title-content {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-grow: 1;
+    }
+
+    .sr-review-context-btn {
+        &:hover {
+            background-color: var(--background-modifier-hover);
+            cursor: pointer;
+        }
+    }
+}
+
+.sr-note-review-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4-2);
+    padding: var(--size-4-2);
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.sr-note-review-header-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--size-4-2);
+}
+
+.sr-note-review-header-title-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sr-note-review-header-title {
+    font-size: var(--font-ui-large);
+    font-weight: var(--font-semibold);
+}
+
+.sr-note-review-header-subtitle-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: var(--size-4-2);
+    font-size: var(--font-ui-small);
+    color: var(--text-faint);
 }
 
 /* MARK: Status Bar */
