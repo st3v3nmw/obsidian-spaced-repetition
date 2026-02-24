@@ -463,9 +463,9 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                    t("SYNC_TIME_TAKEN", {
-                        t: Date.now() - now.valueOf(),
-                    }),
+                t("SYNC_TIME_TAKEN", {
+                    t: Date.now() - now.valueOf(),
+                }),
             );
         }
     }
@@ -593,7 +593,7 @@ export default class SRPlugin extends Plugin {
         this.statusBarManager = new StatusBarManager(this, this.data.settings.showStatusBar);
     }
 
-    private updateStatusBar() {
+    public updateStatusBar() {
         if (this.data.settings.showStatusBar) {
             this.statusBarManager.setText(
                 `${this.osrAppCore.remainingDeckTree.getCardCount(

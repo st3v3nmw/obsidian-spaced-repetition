@@ -75,7 +75,7 @@ export class UIPreferencesPage extends SettingsPage {
                             .onChange(async (value) => {
                                 this.plugin.data.settings.showStatusBar = value;
                                 await this.plugin.savePluginData();
-                                this.plugin.stat;
+                                this.plugin.updateStatusBar();
                             }),
                     );
             })
