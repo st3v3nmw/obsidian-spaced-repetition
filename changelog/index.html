@@ -1,0 +1,3568 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the Obsidian Spaced Repetition plugin">
+      
+      
+        <meta name="author" content="Stephen Mwangi">
+      
+      
+        <link rel="canonical" href="https://stephenmwangi.com/obsidian-spaced-repetition/changelog/">
+      
+      
+        <link rel="prev" href="../contributing/">
+      
+      
+        <link rel="next" href="../license/">
+      
+      
+        
+          <link rel="alternate" href="./" hreflang="en">
+        
+          <link rel="alternate" href="../zh/changelog/" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Changelog - Obsidian Spaced Repetition</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#changelog" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Obsidian Spaced Repetition" class="md-header__button md-logo" aria-label="Obsidian Spaced Repetition" data-md-component="logo">
+      
+  <img src="../favicon.ico" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Obsidian Spaced Repetition
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Changelog
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../zh/changelog/" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    st3v3nmw/obsidian-spaced-repetition
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Obsidian Spaced Repetition" class="md-nav__button md-logo" aria-label="Obsidian Spaced Repetition" data-md-component="logo">
+      
+  <img src="../favicon.ico" alt="logo">
+
+    </a>
+    Obsidian Spaced Repetition
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    st3v3nmw/obsidian-spaced-repetition
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flashcards
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Flashcards
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flashcards/flashcards-overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flashcards Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flashcards/q-and-a-cards/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Question & Answer Cards
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flashcards/cloze-cards/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloze Cards
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flashcards/cards-with-blank-lines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cards with Blank Lines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flashcards/decks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Organizing into Decks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flashcards/reviewing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reviewing & Cramming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flashcards/statistics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Options & Commands
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Options & Commands
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Options
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plugin-commands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Algorithms & Data Storage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Algorithms & Data Storage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../algorithms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repetition Algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-storage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Additional
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Additional
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resources/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spaced Repetition Guides
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Changelog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1136" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1135" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1134" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1133" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1132" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1131" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1129" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.9
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1128" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.8
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1127" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1126" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1125" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1124" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1123" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1122" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1121" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1120" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1112" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.11.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1111" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.11.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1110" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.11.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1105" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.10.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1104" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.10.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1103" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.10.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1102" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.10.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1101" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.10.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.10.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#194" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#193" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#192" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#191" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#190" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#180" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.8.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#172" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.7.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#171" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.7.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#170" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.7.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#162" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.6.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#161" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.6.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#160" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.6.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#158" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.8
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#157" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#156" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#155" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#154" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#153" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#152" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#151" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#150" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#149" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.9
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#148" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.8
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#147" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#146" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#145" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#144" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#143" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#142" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#141" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#140" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#132" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#131" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#123" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#122" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#121" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#120" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#112" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#111" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#110" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#101" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Changelog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1136" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1135" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1134" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1133" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1132" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1131" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1129" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.9
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1128" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.8
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1127" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1126" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1125" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1124" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1123" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1122" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1121" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1120" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1112" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.11.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1111" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.11.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1110" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.11.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1105" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.10.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1104" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.10.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1103" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.10.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1102" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.10.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1101" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.10.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.10.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#194" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#193" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#192" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#191" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#190" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#180" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.8.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#172" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.7.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#171" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.7.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#170" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.7.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#162" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.6.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#161" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.6.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#160" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.6.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#158" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.8
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#157" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#156" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#155" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#154" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#153" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#152" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#151" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#150" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#149" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.9
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#148" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.8
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#147" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#146" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#145" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#144" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#143" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#142" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#141" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#140" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#132" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#131" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#123" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#122" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#121" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#120" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#112" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#111" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#110" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#101" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Changelog</h1>
+
+<h3 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h3>
+<p>All notable changes to this project will be documented in this file. Dates are displayed in UTC.</p>
+<p>Generated by <a href="https://github.com/CookPete/auto-changelog"><code>auto-changelog</code></a>.</p>
+<h4 id="1136"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.13.5...1.13.6">1.13.6</a><a class="headerlink" href="#1136" title="Permanent link">&para;</a></h4>
+<ul>
+<li>feat: The settings open in tab, card width, card height are now dependent on the device that one is on <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1379"><code>#1379</code></a></li>
+<li>feat: redesigned &amp; fixed the note review view <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1378"><code>#1378</code></a></li>
+<li>feat: redesigned statusbar items <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1377"><code>#1377</code></a></li>
+<li>feat: redesigned settings tab for better accessability <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1376"><code>#1376</code></a></li>
+<li>feat: refactored settings view &amp; statistics view into several components <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1374"><code>#1374</code></a></li>
+</ul>
+<h4 id="1135"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.13.4...1.13.5">1.13.5</a><a class="headerlink" href="#1135" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>21 February 2026</p>
+</blockquote>
+<ul>
+<li>chore: bump version to v1.3.5 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1372"><code>#1372</code></a></li>
+<li>chore(deps): bump ajv from 6.12.6 to 6.14.0 in the npm_and_yarn group across 1 directory <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1367"><code>#1367</code></a></li>
+<li>fix: Fixed that the layout in the settings ui was breaking on small screens <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1370"><code>#1370</code></a></li>
+<li>fix: fixed that the ribbon button was opening a modal instead of a tab, even though openViewInTab was set to true <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1369"><code>#1369</code></a></li>
+<li>fix: Fixed that the settings view on mobile was broken, after opening the sr plugin once <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1368"><code>#1368</code></a></li>
+<li>fix: fixed layout issues that came in with the new obsidian mobile version <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1361"><code>#1361</code></a></li>
+<li>chore(deps): bump minimatch from 10.1.1 to 10.2.1 in the npm_and_yarn group across 1 directory <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1366"><code>#1366</code></a></li>
+<li>feat: add Ukrainian (uk) language support <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1350"><code>#1350</code></a></li>
+<li>chore(deps): bump the npm_and_yarn group across 1 directory with 2 updates <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1363"><code>#1363</code></a></li>
+<li>chore(deps): bump preact from 10.27.2 to 10.28.2 in the npm_and_yarn group across 1 directory <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1353"><code>#1353</code></a></li>
+<li>docs: host docs on apex domain <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1349"><code>#1349</code></a></li>
+</ul>
+<h4 id="1134"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.13.3...1.13.4">1.13.4</a><a class="headerlink" href="#1134" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>30 November 2025</p>
+</blockquote>
+<ul>
+<li>chore: bump version to v1.13.4 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1335"><code>#1335</code></a></li>
+<li>chore: bump docs dependencies <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1334"><code>#1334</code></a></li>
+<li>fix: add check to make sure card context exists <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1281"><code>#1281</code></a></li>
+<li>chore: bump dependencies <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1333"><code>#1333</code></a></li>
+<li>chore(deps-dev): bump esbuild from 0.23.1 to 0.25.0 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1332"><code>#1332</code></a></li>
+<li>chore(lang): fix formatting <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1331"><code>#1331</code></a></li>
+<li>feat: add Dutch translation <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1327"><code>#1327</code></a></li>
+</ul>
+<h4 id="1133"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.13.2...1.13.3">1.13.3</a><a class="headerlink" href="#1133" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>23 March 2025</p>
+</blockquote>
+<ul>
+<li>chore: bump version to v1.13.3 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1247"><code>#1247</code></a></li>
+<li>chore: update dependencies <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1246"><code>#1246</code></a></li>
+<li>fix: update zh-cn.ts <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1231"><code>#1231</code></a></li>
+<li>docs: Revise some of the Chinese Docs <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1243"><code>#1243</code></a></li>
+<li>fix: mobile screen rotation fix <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1194"><code>#1194</code></a></li>
+<li>refactor: clearIfNewDay <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1226"><code>#1226</code></a></li>
+<li>fix(scheduler): clear buried questions on new day <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1199"><code>#1199</code></a></li>
+<li>chore: update dependencies <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1225"><code>#1225</code></a></li>
+<li>chore: update dependencies <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1216"><code>#1216</code></a></li>
+<li>chore: update turkish translation <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1198"><code>#1198</code></a></li>
+<li>fix: Change Decks list card count box size <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1211"><code>#1211</code></a></li>
+<li>feat: add Ukrainian language support <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1215"><code>#1215</code></a></li>
+<li>chore(deps): bump @eslint/plugin-kit from 0.2.0 to 0.2.4 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1191"><code>#1191</code></a></li>
+<li>feat: Option for viewing sr decks and cards in tabs <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1169"><code>#1169</code></a></li>
+<li>fix: Add description to cloze settings <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1158"><code>#1158</code></a></li>
+</ul>
+<h4 id="1132"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.13.1...1.13.2">1.13.2</a><a class="headerlink" href="#1132" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>21 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: bump version to v1.13.2 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1148"><code>#1148</code></a></li>
+<li>refactor: make fuzzing less aggressive <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1147"><code>#1147</code></a></li>
+<li>fix(note stats): destroy grid after closing settings <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1146"><code>#1146</code></a></li>
+<li>fix(sidebar): duplicate icons &amp; reviewQueueView undefined exception <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1145"><code>#1145</code></a></li>
+<li>fix: picking up of inline reversed cards <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1143"><code>#1143</code></a></li>
+<li>fix(multiline cards): the Qn should start from the immediate empty line above it <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1142"><code>#1142</code></a></li>
+<li>fix(load balancer): update due dates histogram after review <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1141"><code>#1141</code></a></li>
+<li>feat: add note stats <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1140"><code>#1140</code></a></li>
+<li>chore(git hook): add precommit-hook to handle validation checks <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/903"><code>#903</code></a></li>
+<li>feat: add load balancer setting <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1139"><code>#1139</code></a></li>
+<li>ci: add codecov <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1131"><code>#1131</code></a></li>
+<li>fix: link to docs for cloze patterns setting <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1127"><code>#1127</code></a></li>
+</ul>
+<h4 id="1131"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.13.0...1.13.1">1.13.1</a><a class="headerlink" href="#1131" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>14 October 2024</p>
+</blockquote>
+<ul>
+<li>fix: cloze patterns settings upgrade <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1126"><code>#1126</code></a></li>
+<li>docs: update README links <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1120"><code>#1120</code></a></li>
+</ul>
+<h4 id="1130"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.12.9...1.13.0">1.13.0</a><a class="headerlink" href="#1130" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>13 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: bump version to v1.13.0 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1119"><code>#1119</code></a></li>
+<li>docs: document custom cloze patterns <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1118"><code>#1118</code></a></li>
+<li>refactor: parser &amp; cloze patterns <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1117"><code>#1117</code></a></li>
+<li>fix(ui): render markdown content for questions in nested lists <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1114"><code>#1114</code></a></li>
+<li>fix(ui): render markdown content for questions in nested lists (#1114) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/1113"><code>#1113</code></a></li>
+</ul>
+<h4 id="1129"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.12.8...1.12.9">1.12.9</a><a class="headerlink" href="#1129" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>6 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: bump version to v1.12.9 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1109"><code>#1109</code></a></li>
+<li>chore: add linting for camelcase variables <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1098"><code>#1098</code></a></li>
+<li>refactor: move the statistics to the plugin's settings <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1096"><code>#1096</code></a></li>
+<li>fix: remove caret from package manager definition <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1095"><code>#1095</code></a></li>
+<li>refactor: update settings <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1094"><code>#1094</code></a></li>
+<li>fix: sidebar note display <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1093"><code>#1093</code></a></li>
+</ul>
+<h4 id="1128"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.12.7...1.12.8">1.12.8</a><a class="headerlink" href="#1128" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>25 September 2024</p>
+</blockquote>
+<ul>
+<li>chore: bump version to v1.12.8 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1092"><code>#1092</code></a></li>
+<li>feat: added delay option for the review buttons <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1049"><code>#1049</code></a></li>
+<li>fix: ignore *<em>/</em>.excalidraw.md files by default <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1090"><code>#1090</code></a></li>
+<li>fix: Only consider filtered notes for next note <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1089"><code>#1089</code></a></li>
+<li>fix: Review only due notes <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1088"><code>#1088</code></a></li>
+<li>feat: extended card title <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1027"><code>#1027</code></a></li>
+<li>chore: structure docs &amp; utils directories <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1087"><code>#1087</code></a></li>
+<li>fix: ignore with glob patterns <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1086"><code>#1086</code></a></li>
+<li>ci: lint PR title <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1085"><code>#1085</code></a></li>
+<li>fix: Review only due notes (#1088) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/328"><code>#328</code></a></li>
+<li>feat: extended card title (#1027) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/548"><code>#548</code></a> <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/1000"><code>#1000</code></a></li>
+</ul>
+<h4 id="1127"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.12.6...1.12.7">1.12.7</a><a class="headerlink" href="#1127" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>22 September 2024</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.12.7 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1084"><code>#1084</code></a></li>
+<li>fix: parsing code blocks &amp; custom separators <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1081"><code>#1081</code></a></li>
+<li>chore: remove e2e testing <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1083"><code>#1083</code></a></li>
+<li>update french translation <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1082"><code>#1082</code></a></li>
+<li>French translation <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1080"><code>#1080</code></a></li>
+<li>chore: update dependencies, linting, &amp; tests <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1056"><code>#1056</code></a></li>
+<li>Added options to show/hide (1) ribbon icon, (2) status bar, (3) file menu options <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1066"><code>#1066</code></a></li>
+<li>Translate to Turkish <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1078"><code>#1078</code></a></li>
+<li>fix: parsing code blocks &amp; custom separators (#1081) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/1072"><code>#1072</code></a> <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/1077"><code>#1077</code></a></li>
+<li>chore: update dependencies, linting, &amp; tests (#1056) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/548"><code>#548</code></a> <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/1000"><code>#1000</code></a></li>
+</ul>
+<h4 id="1126"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.12.5...1.12.6">1.12.6</a><a class="headerlink" href="#1126" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>15 September 2024</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.12.6 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1071"><code>#1071</code></a></li>
+<li>Bug 1041 bad transclusion render (format &amp; lint) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1062"><code>#1062</code></a></li>
+<li>Fixed <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1061"><code>#1061</code></a></li>
+<li>Fixed docs references for: Major reworking of the documentation <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1051"><code>#1051</code></a></li>
+<li>feat: refactor code to support diff methods of storing the scheduling info, and diff SR algorithms <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1006"><code>#1006</code></a></li>
+<li>Added new option allowing for multiline cards with empty lines <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1012"><code>#1012</code></a></li>
+<li>fix: arrows in note review panel don't move <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/962"><code>#962</code></a></li>
+<li>[FIX] isEqualOrSubPath function <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1048"><code>#1048</code></a></li>
+<li>Major reworking of the documentation <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1032"><code>#1032</code></a></li>
+<li>fix: add language switcher to docs <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1043"><code>#1043</code></a></li>
+<li>[FEAT] Split the long list of options into categories within a tab control <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1021"><code>#1021</code></a></li>
+<li>feat: refactor code to support diff methods of storing the scheduling info, and diff SR algorithms (#1006) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/548"><code>#548</code></a> <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/1000"><code>#1000</code></a></li>
+</ul>
+<h4 id="1125"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.12.4...1.12.5">1.12.5</a><a class="headerlink" href="#1125" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>1 August 2024</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.12.5 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1031"><code>#1031</code></a></li>
+<li>Support RTL flashcards specified by frontmatter "direction" attribute <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/935"><code>#935</code></a></li>
+<li>FEAT-990 Mobile landscape mode and functional size sliders <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/998"><code>#998</code></a></li>
+<li>[FIX] Cards missing when horizontal rule present in document <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/970"><code>#970</code></a></li>
+<li>Filter due notes when all are scheduled <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/947"><code>#947</code></a></li>
+<li>fix #1000 sidebar indent <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/1001"><code>#1001</code></a></li>
+<li>[FIX] Include link parsing for Review context <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/964"><code>#964</code></a></li>
+<li>[FIX] Not scroll back to top after review <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/971"><code>#971</code></a></li>
+<li>[FIX] Folder ignore sorts all folder starting with string <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/972"><code>#972</code></a></li>
+<li>add translation: zh-cn <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/982"><code>#982</code></a></li>
+<li>Improved issue templates <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/963"><code>#963</code></a></li>
+<li>Update German localization <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/961"><code>#961</code></a></li>
+<li>Filter due notes when all are scheduled (#947) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/548"><code>#548</code></a></li>
+<li>fix #1000 sidebar indent (#1001) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/1000"><code>#1000</code></a></li>
+</ul>
+<h4 id="1124"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.12.3...1.12.4">1.12.4</a><a class="headerlink" href="#1124" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>20 April 2024</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.12.4 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/940"><code>#940</code></a></li>
+<li>chore: fix package manager issue in CI <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/939"><code>#939</code></a></li>
+<li>Missing flashcards (bug introduced in 1.12.0) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/927"><code>#927</code></a></li>
+</ul>
+<h4 id="1123"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.12.2...1.12.3">1.12.3</a><a class="headerlink" href="#1123" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>11 April 2024</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.12.3 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/930"><code>#930</code></a></li>
+<li>Fixed slow load of flashcard modal (bug introduced in 1.12.0) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/926"><code>#926</code></a></li>
+</ul>
+<h4 id="1122"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.12.1...1.12.2">1.12.2</a><a class="headerlink" href="#1122" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>27 March 2024</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.12.2 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/921"><code>#921</code></a></li>
+<li>fix bug with recognizing frontmatter topic tags (led to missing cards shown for review) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/920"><code>#920</code></a></li>
+<li>style: reorder stats containers <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/912"><code>#912</code></a></li>
+</ul>
+<h4 id="1121"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.12.0...1.12.1">1.12.1</a><a class="headerlink" href="#1121" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>20 March 2024</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.12.1 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/911"><code>#911</code></a></li>
+<li>[Overhaul] Implementation of a more consistent &amp; modern UI <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/899"><code>#899</code></a></li>
+<li>Unrelated Tags in Card Selection Modal since version 1.12.0 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/910"><code>#910</code></a></li>
+</ul>
+<h4 id="1120"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.11.2...1.12.0">1.12.0</a><a class="headerlink" href="#1120" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>19 March 2024</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.12.0 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/905"><code>#905</code></a></li>
+<li>chore: add entry to Italian and Polish translation <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/898"><code>#898</code></a></li>
+<li>[FEAT] Command to open notes review panel - #840. <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/846"><code>#846</code></a></li>
+<li>Gui refactored into separate views | rewrite of keydown handler into event handler <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/873"><code>#873</code></a></li>
+<li>Make reset button (flashcard review modal) enabled for both new and due cards <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/650"><code>#650</code></a></li>
+<li>Support multi-deck cards #495, and multiple decks in a single note #705 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/834"><code>#834</code></a></li>
+<li>fix(reset button): restore #650 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/7f7d2bbd20bb94b6ad8e737d40c76b2aef9c5b49"><code>7f7d2bb</code></a></li>
+</ul>
+<h4 id="1112"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.11.1...1.11.2">1.11.2</a><a class="headerlink" href="#1112" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>4 March 2024</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.11.2 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/893"><code>#893</code></a></li>
+<li>Add polish translation <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/889"><code>#889</code></a></li>
+<li>Add support for Italian <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/886"><code>#886</code></a></li>
+<li>update dependencies <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/892"><code>#892</code></a></li>
+<li>update <code>zh</code> translate <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/871"><code>#871</code></a></li>
+<li>fix card isNew <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/874"><code>#874</code></a></li>
+<li>Fix implemented and tested <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/867"><code>#867</code></a></li>
+<li>Implementation of some little UI improvements <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/869"><code>#869</code></a></li>
+<li>Support Obsidian block IDs on same line as flashcard scheduling comment <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/856"><code>#856</code></a></li>
+</ul>
+<h4 id="1111"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.11.0...1.11.1">1.11.1</a><a class="headerlink" href="#1111" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>22 January 2024</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.11.1 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/854"><code>#854</code></a></li>
+<li>chore: fix README to point to new project board <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/848"><code>#848</code></a></li>
+<li>chore: update pt-br.ts for Brazilian Portuguese translation <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/765"><code>#765</code></a></li>
+<li>chore: update dependencies <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/845"><code>#845</code></a></li>
+<li>Bug 826 auto review next note doesn't work when first note reviewed is not selected from sidebar <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/827"><code>#827</code></a></li>
+<li>Completion and improvement of <code>ru</code> translation. <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/838"><code>#838</code></a></li>
+<li>[FIX] Bug #841. <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/842"><code>#842</code></a></li>
+<li>Fix/bug 424 review next cache race <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/821"><code>#821</code></a></li>
+<li>fix:multiLineTextFinder to handle null return value from find method <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/830"><code>#830</code></a></li>
+<li>Fixes bug #670 apply label customisation easy/good/hard uniformly across buttons &amp; menu <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/835"><code>#835</code></a></li>
+</ul>
+<h4 id="1110"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.10.5...1.11.0">1.11.0</a><a class="headerlink" href="#1110" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>9 January 2024</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.11.0 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/832"><code>#832</code></a></li>
+<li>chore: Update dependencies <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/824"><code>#824</code></a></li>
+<li>Support richer set of flashcard ordering during review <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/820"><code>#820</code></a></li>
+<li>Bug 800/812 nested lists indentation <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/818"><code>#818</code></a></li>
+<li>Bug 799 Cloze Breaks When }} Encountered <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/816"><code>#816</code></a></li>
+<li>Bug: review note corrupts metadata for files with cr/lf line endings 776 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/802"><code>#802</code></a></li>
+<li>Update manifest.json <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/793"><code>#793</code></a></li>
+</ul>
+<h4 id="1105"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.10.4...1.10.5">1.10.5</a><a class="headerlink" href="#1105" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>12 November 2023</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.10.5 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/789"><code>#789</code></a></li>
+<li>Bug edit flashcard sometimes corrupts question text in file <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/784"><code>#784</code></a></li>
+<li>Bug note review invalid metadata 764 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/782"><code>#782</code></a></li>
+</ul>
+<h4 id="1104"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.10.3...1.10.4">1.10.4</a><a class="headerlink" href="#1104" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>30 October 2023</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.10.4 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/780"><code>#780</code></a></li>
+<li>Bug fix: questions now removed from postponement list; etc <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/775"><code>#775</code></a></li>
+<li>fix: multi-line tag ('$$') converted to single-line ('$') after card reviewed <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/b9c354d6e48def1d90571378aa5ab7e1096bd725"><code>b9c354d</code></a></li>
+</ul>
+<h4 id="1103"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.10.2...1.10.3">1.10.3</a><a class="headerlink" href="#1103" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>23 October 2023</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.10.3 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/772"><code>#772</code></a></li>
+<li>doc: update note about the reversed card <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/699"><code>#699</code></a></li>
+<li>Fix bugs regarding bury sibling cards <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/763"><code>#763</code></a></li>
+</ul>
+<h4 id="1102"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.10.1...1.10.2">1.10.2</a><a class="headerlink" href="#1102" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>9 October 2023</p>
+</blockquote>
+<ul>
+<li>Bump version to 1.10.2 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/756"><code>#756</code></a></li>
+<li>refactor: Separate business logic from user interface code <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/751"><code>#751</code></a></li>
+<li>Remove the spaces before and after the question marks in the multi-line basic flashcards <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/719"><code>#719</code></a></li>
+<li>chore: Update dependencies <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/44e9bb63dad5e8ab664f7582aa403386d341aa44"><code>44e9bb6</code></a></li>
+<li>chore: Update dependencies <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/1f69f9641920d7caf70e7928c62a13f24ef81ff5"><code>1f69f96</code></a></li>
+<li>feat: Add E2E testing <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/1ef066308c893642d2b968bc0e7b75873af68960"><code>1ef0663</code></a></li>
+</ul>
+<h4 id="1101"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.10.0...1.10.1">1.10.1</a><a class="headerlink" href="#1101" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>5 May 2023</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.10.1 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/679"><code>#679</code></a></li>
+<li>style: Fix formatting <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/678"><code>#678</code></a></li>
+<li>remove skip after modifying card text <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/671"><code>#671</code></a></li>
+<li>Add translations to the Spanish language. <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/667"><code>#667</code></a></li>
+<li>Update translations <code>zh-cn.ts</code> and <code>zh-tw.ts</code> <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/676"><code>#676</code></a></li>
+<li>Close very old issues (&gt;= 1 year) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/665"><code>#665</code></a></li>
+<li>Update changelog <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/664"><code>#664</code></a></li>
+<li>show MAX_INTERVAL unit in title <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/643"><code>#643</code></a></li>
+<li>Fix issue requiring collapseIcon to be clicked twice to expand/collapsed deck tree <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/656"><code>#656</code></a></li>
+<li>Update ru.ts <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/657"><code>#657</code></a></li>
+<li>Consume keyboard event in flashcard modal <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/637"><code>#637</code></a></li>
+</ul>
+<h4 id="1100"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.9.4...1.10.0">1.10.0</a><a class="headerlink" href="#1100" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>6 February 2023</p>
+</blockquote>
+<ul>
+<li>Remove custom dir mkdocs setting <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/622"><code>#622</code></a></li>
+<li>Bump version to v1.10.0 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/621"><code>#621</code></a></li>
+<li>Add a skip button to the flashcards menu <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/620"><code>#620</code></a></li>
+<li>Get rid of Giscus comments <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/619"><code>#619</code></a></li>
+<li>Fix ar.ts formatting <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/618"><code>#618</code></a></li>
+<li>update ar.ts for Arabic translation <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/616"><code>#616</code></a></li>
+<li>Fixed some terms. <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/611"><code>#611</code></a></li>
+<li>Fix card info <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/593"><code>#593</code></a></li>
+<li>Add note title to card context <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/592"><code>#592</code></a></li>
+<li>Update Changelog <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/591"><code>#591</code></a></li>
+<li>Add per-deck cramming command <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/515"><code>#515</code></a></li>
+<li>Add flashcards menu <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/589"><code>#589</code></a></li>
+<li>Add flashcard editing modal <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/587"><code>#587</code></a></li>
+<li>Update esbuild dep <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/e33ec93fdc44d17807d032232238ee29235ec2f5"><code>e33ec93</code></a></li>
+<li>Update plugin version <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/2bf13a9f58c76b6adcc25f1eee8e5557d05547ab"><code>2bf13a9</code></a></li>
+<li>Add skip card logic <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/fef51b6d6071e4a1ce35097a5882e282e6ee1a4f"><code>fef51b6</code></a></li>
+</ul>
+<h4 id="194"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.9.3...1.9.4">1.9.4</a><a class="headerlink" href="#194" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>8 January 2023</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.9.4 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/588"><code>#588</code></a></li>
+<li>Minor UI fixes on flashcards <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/586"><code>#586</code></a></li>
+</ul>
+<h4 id="193"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.9.2...1.9.3">1.9.3</a><a class="headerlink" href="#193" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>2 January 2023</p>
+</blockquote>
+<ul>
+<li>Bump version to v1.9.3 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/576"><code>#576</code></a></li>
+<li>Minor UI and docs fixes <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/575"><code>#575</code></a></li>
+</ul>
+<h4 id="192"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.9.1...1.9.2">1.9.2</a><a class="headerlink" href="#192" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>2 January 2023</p>
+</blockquote>
+<ul>
+<li>Fix changelog path <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/574"><code>#574</code></a></li>
+<li>Bump version to v1.9.2 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/573"><code>#573</code></a></li>
+<li>Update contribution docs <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/572"><code>#572</code></a></li>
+<li>Add root CONTRIBUTING.md <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/566"><code>#566</code></a></li>
+<li>Fix release gh-action 2 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/565"><code>#565</code></a></li>
+<li>Fix release gh-action <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/564"><code>#564</code></a></li>
+<li>Update docs <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/563"><code>#563</code></a></li>
+<li>Add upload docs GitHub action <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/562"><code>#562</code></a></li>
+<li>Move wiki to GitHub pages <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/561"><code>#561</code></a></li>
+<li>Update flashcards image formats <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/560"><code>#560</code></a></li>
+<li>Make flashcard text selectable <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/559"><code>#559</code></a></li>
+<li>Prevent regex from matching to last --- in file <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/532"><code>#532</code></a></li>
+</ul>
+<h4 id="191"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.9.0...1.9.1">1.9.1</a><a class="headerlink" href="#191" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>12 December 2022</p>
+</blockquote>
+<ul>
+<li>Fix README formatting and bump version <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/546"><code>#546</code></a></li>
+<li>Fix extra note review panes being added <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/545"><code>#545</code></a></li>
+<li>Add list of translations into README <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/544"><code>#544</code></a></li>
+</ul>
+<h4 id="190"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.8.0...1.9.0">1.9.0</a><a class="headerlink" href="#190" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>12 December 2022</p>
+</blockquote>
+<ul>
+<li>Fix back button <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/543"><code>#543</code></a></li>
+<li>Revert to npm over yarn <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/542"><code>#542</code></a></li>
+<li>Fix zh-TW formatting <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/541"><code>#541</code></a></li>
+<li>Update dependencies <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/539"><code>#539</code></a></li>
+<li>Add REVIEW_PANE_ON_STARTUP <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/540"><code>#540</code></a></li>
+<li>Traditional Chinese strings. (zh-TW) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/536"><code>#536</code></a></li>
+<li>Update zh-cn.ts <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/535"><code>#535</code></a></li>
+<li>Make the note review pane optional <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/531"><code>#531</code></a></li>
+<li>Add Brazilian Portuguese Translation 🇧🇷 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/518"><code>#518</code></a></li>
+<li>Replace crlf to lf on card parse <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/523"><code>#523</code></a></li>
+<li>style: set the flashcard's font size as user editor, with var(--font-text-size) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/480"><code>#480</code></a></li>
+<li>Added new setting to collapse/expand subdecks <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/510"><code>#510</code></a></li>
+<li>Add curly brackets as option for cloze fields <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/d8c0e9eca2c569f38dd2d656b564d4656c0ec1d3"><code>d8c0e9e</code></a></li>
+<li>[feat] add modal history feature <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/c6bb8f01674ef0b66f9e352894412f5b67036283"><code>c6bb8f0</code></a></li>
+</ul>
+<h4 id="180"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.7.2...1.8.0">1.8.0</a><a class="headerlink" href="#180" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>24 July 2022</p>
+</blockquote>
+<ul>
+<li>Regenerate yarn.lock file <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/474"><code>#474</code></a></li>
+<li>Fix breakage with Obsidian v15.4 and add customizable review buttons <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/469"><code>#469</code></a></li>
+<li>Bump minimist from 1.2.5 to 1.2.6 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/473"><code>#473</code></a></li>
+<li>Bump moment from 2.29.1 to 2.29.4 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/472"><code>#472</code></a></li>
+<li>Fixed mistakes in ru.ts <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/464"><code>#464</code></a></li>
+<li>Add "ogg" as supported audio file format <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/425"><code>#425</code></a></li>
+<li>Update jest config <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/419"><code>#419</code></a></li>
+<li>fix: handle code fences better <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/402"><code>#402</code></a></li>
+<li>Add and run prettier <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/413"><code>#413</code></a></li>
+<li>Translate Korean <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/417"><code>#417</code></a></li>
+<li>Update zh-cn.ts <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/416"><code>#416</code></a></li>
+<li>Fix breakage with Obsidian v15.4 and add customizable review buttons (#469) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/273"><code>#273</code></a></li>
+<li>add lockfile <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/c386dc3781dcc3db096dec4b50535f35e63b4fb4"><code>c386dc3</code></a></li>
+<li>Add localization check <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/bce5c22998754d523e16921f9b92b9140e22c051"><code>bce5c22</code></a></li>
+<li>Upgrade dependencies <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/9d34c562cc7f27abbb6448f8e7e16aa939eadb6f"><code>9d34c56</code></a></li>
+</ul>
+<h4 id="172"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.7.1...1.7.2">1.7.2</a><a class="headerlink" href="#172" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>21 February 2022</p>
+</blockquote>
+<ul>
+<li>I<code>ve done the translation to Russian.  [</code>#403`](https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/403)</li>
+<li>Add czech translations <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/391"><code>#391</code></a></li>
+<li>Update zh-cn.ts <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/364"><code>#364</code></a></li>
+<li>Промежуточное сохранение <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/1f0f46c001432908843c4bd65e2312f1ac26923e"><code>1f0f46c</code></a></li>
+<li>Intermediate result saving) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/e35c0121fd45a95077cd7baa891bdc60631d9419"><code>e35c012</code></a></li>
+<li>Intermediate result saving))) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/8ac56aea69a28525a957d9e1ecea40d6ab397101"><code>8ac56ae</code></a></li>
+</ul>
+<h4 id="171"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.7.0...1.7.1">1.7.1</a><a class="headerlink" href="#171" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>2 January 2022</p>
+</blockquote>
+<ul>
+<li>Fix textInterval - more accurate calculations <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/3b0446a57f2b4d9871fcd1dce4c21902ee2d5c55"><code>3b0446a</code></a></li>
+<li>Remove dependabot <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/2236396ceee59024ffdb2a995a14de881e6ffc83"><code>2236396</code></a></li>
+<li>Fix tag override <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/07e1de4924f2d3a8a8b759c8a47d2a38bf667085"><code>07e1de4</code></a></li>
+</ul>
+<h4 id="170"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.6.2...1.7.0">1.7.0</a><a class="headerlink" href="#170" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>1 January 2022</p>
+</blockquote>
+<ul>
+<li>Stats &amp; transclusion improvements <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/358"><code>#358</code></a></li>
+<li>Bump typescript from 4.4.4 to 4.5.4 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/355"><code>#355</code></a></li>
+<li>Bump obsidian from 0.12.17 to 0.13.11 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/356"><code>#356</code></a></li>
+<li>Bump @types/node from 16.11.17 to 17.0.5 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/357"><code>#357</code></a></li>
+<li>Fix first time random card selection <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/353"><code>#353</code></a></li>
+<li>[Bug fix] for HTML Comment parsing <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/350"><code>#350</code></a></li>
+<li>Scheduling fixes &amp; tests <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/352"><code>#352</code></a></li>
+<li>Remove dependence on Obsidian Charts plugin <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/351"><code>#351</code></a></li>
+<li>Scheduling unit tests <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/316"><code>#316</code></a></li>
+<li>Changing interpolate to an optional arg of t <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/315"><code>#315</code></a></li>
+<li>Bump @typescript-eslint/parser from 4.33.0 to 5.8.0 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/345"><code>#345</code></a></li>
+<li>Bump @types/node from 16.11.14 to 17.0.1 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/344"><code>#344</code></a></li>
+<li>Bump esbuild from 0.13.15 to 0.14.5 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/341"><code>#341</code></a></li>
+<li>Bump @typescript-eslint/eslint-plugin from 4.33.0 to 5.7.0 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/340"><code>#340</code></a></li>
+<li>Correct notes(s) to note(s) in en.ts lang file <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/323"><code>#323</code></a></li>
+<li>ja: added Japanese translation <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/318"><code>#318</code></a></li>
+<li>Bump eslint from 7.32.0 to 8.3.0 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/326"><code>#326</code></a></li>
+<li>Overwrite deck on card <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/299"><code>#299</code></a></li>
+<li>Open file was changed to "Edit Later" <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/300"><code>#300</code></a></li>
+<li>Bump esbuild from 0.12.29 to 0.13.2 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/302"><code>#302</code></a></li>
+<li>Updated to display mp3 and webm audio on flashcards <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/297"><code>#297</code></a></li>
+<li>Added translations DE <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/298"><code>#298</code></a></li>
+<li>Cram Flashcards <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/291"><code>#291</code></a></li>
+<li>Fix collapsed/expanded states when redrawing the sidebar <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/290"><code>#290</code></a></li>
+<li>Using tags from User Preferences and not their full name that includes the sibling <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/292"><code>#292</code></a></li>
+<li>Change Eases x-axis from DAYS to EASES <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/285"><code>#285</code></a></li>
+<li>Fix dependencies &amp; esbuild workflow <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/66766a89bd61ba42bdca5f5598d4e4d33a802485"><code>66766a8</code></a></li>
+<li>Change some innerHTML text to JSX <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/3623efc1fab470a217b2aa72060e6c4640a1ac6a"><code>3623efc</code></a></li>
+<li>transclusions initial implementation <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/0e12388cecca43981cbd7ae3dcbfebc4b6eb4097"><code>0e12388</code></a></li>
+</ul>
+<h4 id="162"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.6.1...1.6.2">1.6.2</a><a class="headerlink" href="#162" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>29 August 2021</p>
+</blockquote>
+<ul>
+<li>Returned cursor position on "open file" or "Edit later" <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/281"><code>#281</code></a></li>
+<li>Change "Open file" to "Edit later" <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/280"><code>#280</code></a></li>
+<li>Add bolded to cloze cards conversion <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/277"><code>#277</code></a></li>
+<li>Develop <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/276"><code>#276</code></a></li>
+<li>Update (see PR notes) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/271"><code>#271</code></a></li>
+<li>New Icon for app <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/275"><code>#275</code></a></li>
+<li>Move to ESBUILD from rollup <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/268"><code>#268</code></a></li>
+<li>Added for those working with VSCODE <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/265"><code>#265</code></a></li>
+<li>Roll back caching &amp; more stats <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/264"><code>#264</code></a></li>
+<li>Fixes <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/263"><code>#263</code></a></li>
+<li>Switch to esbuild <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/177bc785aa13cb2dc47012d20ae9d634adb2aed0"><code>177bc78</code></a></li>
+<li>Delete main.js <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/76b94d1597ff8699fb84ac4f8ff8e26badb4f661"><code>76b94d1</code></a></li>
+<li>Refactor <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/26d9dbd6064b3659f280432ad0419d6be7b03c1c"><code>26d9dbd</code></a></li>
+</ul>
+<h4 id="161"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.6.0...1.6.1">1.6.1</a><a class="headerlink" href="#161" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>19 August 2021</p>
+</blockquote>
+<ul>
+<li>Multiple review queues fixes <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/258"><code>#258</code></a></li>
+<li>Add multiple note review queues &amp; curly braces consistency in blocks <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/252"><code>#252</code></a></li>
+<li>Fixes <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/251"><code>#251</code></a></li>
+<li>Bump @types/jest from 26.0.24 to 27.0.1 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/245"><code>#245</code></a></li>
+<li>Refactor &amp; change code's line max length <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/236"><code>#236</code></a></li>
+<li>Merge WIP for multiple review queues <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/234"><code>#234</code></a></li>
+<li>Add option to ignore folders in note review <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/232"><code>#232</code></a></li>
+<li>Prettier <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/1d4bcdcf342a454ee11245746b9d5f47e3c8f511"><code>1d4bcdc</code></a></li>
+<li>block curly brace consistency <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/d9181f560eaa68935cd67d6892c5c2bc1218094d"><code>d9181f5</code></a></li>
+<li>First pass at implementing "review decks". <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/069619c56b40879ef3d80e2e2bf855a7a34aef9f"><code>069619c</code></a></li>
+</ul>
+<h4 id="160"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.5.8...1.6.0">1.6.0</a><a class="headerlink" href="#160" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>8 August 2021</p>
+</blockquote>
+<ul>
+<li>Parser tests <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/230"><code>#230</code></a></li>
+<li>Single &amp; multiline cards <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/229"><code>#229</code></a></li>
+<li>Fix logger &amp; legacy scheduling <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/228"><code>#228</code></a></li>
+<li>Generalize flashcards processing &amp; logging <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/227"><code>#227</code></a></li>
+<li>Caching &amp; settings debounce fix <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/226"><code>#226</code></a></li>
+<li>Bump @rollup/plugin-commonjs from 19.0.2 to 20.0.0 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/225"><code>#225</code></a></li>
+<li>Add single &amp; multiline reversed cards <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/c3e6c0de0a090cca9885613829f99ac318c80904"><code>c3e6c0d</code></a></li>
+<li>Fix settings - debounce <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/17d749608652b8d6d159950a0bce42b8167c77f5"><code>17d7496</code></a></li>
+<li>Add caching <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/3808ce0cb2a2039df28922fcdf4dc95372d7c500"><code>3808ce0</code></a></li>
+</ul>
+<h4 id="158"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.5.7...1.5.8">1.5.8</a><a class="headerlink" href="#158" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>4 August 2021</p>
+</blockquote>
+<ul>
+<li>Add multilingual support <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/223"><code>#223</code></a></li>
+<li>Fix bugs with cloze cards &amp; newlines <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/222"><code>#222</code></a></li>
+<li>Refactor <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/220"><code>#220</code></a></li>
+<li>Fixes <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/219"><code>#219</code></a></li>
+<li>Fix statistics view - accumulate overdue cards, linearity <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/217"><code>#217</code></a></li>
+<li>Go to flashcard position after clicking open file <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/215"><code>#215</code></a></li>
+<li>Code refactor <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/214"><code>#214</code></a></li>
+<li>Allow flashcard height and width to be customizable <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/210"><code>#210</code></a></li>
+<li>Bump @types/node from 15.14.1 to 16.3.0 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/188"><code>#188</code></a></li>
+<li>Refactor code <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/05d3217d437db429766c6b8821d7ab70a071a0b0"><code>05d3217</code></a></li>
+<li>Create CODE_OF_CONDUCT.md <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/9798c690f96756a33b9bec50525e3978d251671d"><code>9798c69</code></a></li>
+<li>rename related to siblings <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/82651b4efc0421ac1c7cc38019e30fde5c2cfc0f"><code>82651b4</code></a></li>
+</ul>
+<h4 id="157"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.5.6...1.5.7">1.5.7</a><a class="headerlink" href="#157" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>20 June 2021</p>
+</blockquote>
+<ul>
+<li>Randomize card order option <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/170"><code>#170</code></a></li>
+<li>resize image, large screen mode <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/169"><code>#169</code></a></li>
+<li>per deck totals <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/168"><code>#168</code></a></li>
+<li>fix bug when parsing nonexistent images <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/166"><code>#166</code></a></li>
+<li>Parse card only once <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/165"><code>#165</code></a></li>
+<li>bump version to 1.5.7 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/856d423f72683fd2b8ac27245f0f540992319b1b"><code>856d423</code></a></li>
+<li>randomize card order option <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/3f2d97ef67b4a9ce1041f7b6d5e735c3addc453b"><code>3f2d97e</code></a></li>
+<li>fix bug when parsing nonexistent files <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/c906afe7eb69a66abc22cc68f079bc32afb4e274"><code>c906afe</code></a></li>
+</ul>
+<h4 id="156"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.5.5...1.5.6">1.5.6</a><a class="headerlink" href="#156" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>13 June 2021</p>
+</blockquote>
+<ul>
+<li>bump version to 1.5.6 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/b47915af31a59b38050ea1c29583e619da51b043"><code>b47915a</code></a></li>
+<li>bug fix <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/ad2f3ecfa16a7f3b76d93e24f7b055018512b324"><code>ad2f3ec</code></a></li>
+</ul>
+<h4 id="155"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.5.4...1.5.5">1.5.5</a><a class="headerlink" href="#155" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>12 June 2021</p>
+</blockquote>
+<ul>
+<li>Cards forecast stats <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/155"><code>#155</code></a></li>
+<li>started on 'forecast' <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/cdb57d491367f334b3821cbfae15905dbea27163"><code>cdb57d4</code></a></li>
+<li>forecast <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/cee6503cdf50821eec9e53c98343f3d03005798b"><code>cee6503</code></a></li>
+<li>refactor <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/ab52d365560063688d43513586ab7045d63101e0"><code>ab52d36</code></a></li>
+</ul>
+<h4 id="154"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.5.3...1.5.4">1.5.4</a><a class="headerlink" href="#154" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>11 June 2021</p>
+</blockquote>
+<ul>
+<li>bump version to 1.5.4 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/356fd31938feadc5bb1643f9c7d7fab9630c5881"><code>356fd31</code></a></li>
+<li>fix load balancer bug <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/317f716bd4c270aa26ee47d1d3a2446032f08ca2"><code>317f716</code></a></li>
+</ul>
+<h4 id="153"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.5.2...1.5.3">1.5.3</a><a class="headerlink" href="#153" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>10 June 2021</p>
+</blockquote>
+<ul>
+<li>fixes <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/150"><code>#150</code></a></li>
+<li>Overall deck counts and sync locks <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/149"><code>#149</code></a></li>
+<li>sync locks <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/4d4f3d4a40047ea651c9b94d2ccab3c29d9bbafc"><code>4d4f3d4</code></a></li>
+<li>overall deck counts <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/c7eb5cfec881f7730e93daf4c6402316165cb019"><code>c7eb5cf</code></a></li>
+<li>bump version to 1.5.3 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/e4a897cad14af159f63ad6f2ce053532babcce13"><code>e4a897c</code></a></li>
+</ul>
+<h4 id="152"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.5.1...1.5.2">1.5.2</a><a class="headerlink" href="#152" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>7 June 2021</p>
+</blockquote>
+<ul>
+<li>save buryList data fix <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/143"><code>#143</code></a></li>
+<li>fix deck transition behavior <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/142"><code>#142</code></a></li>
+<li>better burying of cards <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/141"><code>#141</code></a></li>
+<li>fix CSS on light themes <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/140"><code>#140</code></a></li>
+<li>show folders based on the presence of flashcards instead of files <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/137"><code>#137</code></a></li>
+<li>show folders based on the presence of flashcards inside of them instead of files <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/a65ca7f53e826c3cf0b094bac4c1f08fc638bff7"><code>a65ca7f</code></a></li>
+<li>bump version to 1.5.2 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/3ffe4f00eec8a0f89873909f4f03f1794ba977fd"><code>3ffe4f0</code></a></li>
+<li>make async <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/0541e770ec80d0f060cf8349c5fc8a7b77eecfff"><code>0541e77</code></a></li>
+</ul>
+<h4 id="151"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.5.0...1.5.1">1.5.1</a><a class="headerlink" href="#151" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>6 June 2021</p>
+</blockquote>
+<ul>
+<li>fix deck counts going into negatives <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/132"><code>#132</code></a></li>
+<li>bump version to 1.5.1 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/b309a27f39c6bbd7e5272921a62b620c9de6d86f"><code>b309a27</code></a></li>
+</ul>
+<h4 id="150"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.4.9...1.5.0">1.5.0</a><a class="headerlink" href="#150" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>6 June 2021</p>
+</blockquote>
+<ul>
+<li>load balancing <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/131"><code>#131</code></a></li>
+<li>Boost cards after delay. <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/130"><code>#130</code></a></li>
+<li>fix parsing of http(s) image links <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/128"><code>#128</code></a></li>
+<li>Bump @rollup/plugin-node-resolve from 9.0.0 to 13.0.0 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/126"><code>#126</code></a></li>
+<li>Bump @rollup/plugin-commonjs from 15.1.0 to 19.0.0 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/127"><code>#127</code></a></li>
+<li>Bump @rollup/plugin-typescript from 6.1.0 to 8.2.1 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/125"><code>#125</code></a></li>
+<li>Bump @types/node from 14.17.2 to 15.12.1 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/124"><code>#124</code></a></li>
+<li>Nested decks feature <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/123"><code>#123</code></a></li>
+<li>showFileNameInFileLink option <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/116"><code>#116</code></a></li>
+<li>nested decks feature <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/32141750dfab0cad5cc6a84858f0bbe3b50385b9"><code>3214175</code></a></li>
+<li>types <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/0af6c12f0767af5dc7fbb57b05c2f6babbf0a29c"><code>0af6c12</code></a></li>
+<li>Create codeql-analysis.yml <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/492f9a8f9c33b62418c250ff2c78da688c1577eb"><code>492f9a8</code></a></li>
+</ul>
+<h4 id="149"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.4.8...1.4.9">1.4.9</a><a class="headerlink" href="#149" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>31 May 2021</p>
+</blockquote>
+<ul>
+<li>Settings: split tags with newlines and spaces <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/107"><code>#107</code></a></li>
+<li>Fix dollar signs replacement <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/106"><code>#106</code></a></li>
+<li>Fix reset progress NaN bug <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/105"><code>#105</code></a></li>
+<li>bump version to 1.4.9 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/fe9b37fce8d26ebcf1c5942001bc0fca41d80394"><code>fe9b37f</code></a></li>
+<li>Remove redundant \n <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/83ef96830eff65ca2b951155d82e8d111636b36a"><code>83ef968</code></a></li>
+</ul>
+<h4 id="148"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.4.7...1.4.8">1.4.8</a><a class="headerlink" href="#148" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>21 May 2021</p>
+</blockquote>
+<ul>
+<li>Ignore codeblocks <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/98"><code>#98</code></a></li>
+<li>ignore codeblocks <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/390aa720b1faf04b5491a8990a53c756b4d4da4e"><code>390aa72</code></a></li>
+<li>bump version to 1.4.8 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/f5d635c18f3817b0e288e56f9decdc9e17a840c8"><code>f5d635c</code></a></li>
+</ul>
+<h4 id="147"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.4.6...1.4.7">1.4.7</a><a class="headerlink" href="#147" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>21 May 2021</p>
+</blockquote>
+<ul>
+<li>disable cloze cards option <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/97"><code>#97</code></a></li>
+<li>regexes &amp; fix <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/95"><code>#95</code></a></li>
+<li>store original front and back text to put back after review <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/94"><code>#94</code></a></li>
+<li>show card context setting <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/89"><code>#89</code></a></li>
+<li>fix review flashcards command <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/85"><code>#85</code></a></li>
+<li>bump version to 1.4.7 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/8b84184f592cfa46d2ac774e04e36bbf1bb2754d"><code>8b84184</code></a></li>
+<li>addContextToCard option <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/a4197c3ae9b5a4f901e2d8eb3a06fa68f7370d78"><code>a4197c3</code></a></li>
+<li>remove these console.logs <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/4098f1086969b6ce4b099950a36f63af529c751a"><code>4098f10</code></a></li>
+</ul>
+<h4 id="146"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.4.5...1.4.6">1.4.6</a><a class="headerlink" href="#146" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>16 May 2021</p>
+</blockquote>
+<ul>
+<li>Rewrite cards with the correct separator <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/0cde960f0fca9415e5299689cca51e8225be4642"><code>0cde960</code></a></li>
+<li>bump version to 1.4.6 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/2e46d77c9adf01fe5e0e1254deb9720378f3ad24"><code>2e46d77</code></a></li>
+</ul>
+<h4 id="145"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.4.4...1.4.5">1.4.5</a><a class="headerlink" href="#145" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>16 May 2021</p>
+</blockquote>
+<ul>
+<li>Make flashcard separators configurable <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/77"><code>#77</code></a></li>
+<li>Indentation to be preserved while making flashcard <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/75"><code>#75</code></a></li>
+<li>Limit on number of days to display on right panel <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/74"><code>#74</code></a></li>
+<li>Image support <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/73"><code>#73</code></a></li>
+<li>Update plugin settings <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/72"><code>#72</code></a></li>
+<li>Maximum interval option <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/71"><code>#71</code></a></li>
+<li>Use month(s) &amp; year(s) when intervals get too big <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/69"><code>#69</code></a></li>
+<li>Shortcut for review flashcards <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/68"><code>#68</code></a></li>
+<li>maximumInterval option <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/d793c4269aa01b420e3a7abbdc859777ee9b8e1b"><code>d793c42</code></a></li>
+<li>applyDebounceTimer <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/3b3ca00d6358260cbcceeebb8e717abb011778e0"><code>3b3ca00</code></a></li>
+<li>Settings sliders <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/ead217dff0b65377bd6326cf44a6a1d434a29c65"><code>ead217d</code></a></li>
+</ul>
+<h4 id="144"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.4.3...1.4.4">1.4.4</a><a class="headerlink" href="#144" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>8 May 2021</p>
+</blockquote>
+<ul>
+<li>Fixes for better mobile UI/UX <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/57"><code>#57</code></a></li>
+<li>fix versions <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/b7cb3cde583de16d10fd1f252e4562e9a09f8b90"><code>b7cb3cd</code></a></li>
+<li>bump version to 1.4.4 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/0a59d8f7b8ea42808e81fd6eefe6825f2d229ad7"><code>0a59d8f</code></a></li>
+<li>More mobile UI/UX fixes <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/accbf0c1549f4d16a4161dd64a879a18cd9a6fad"><code>accbf0c</code></a></li>
+</ul>
+<h4 id="143"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.4.2...1.4.3">1.4.3</a><a class="headerlink" href="#143" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>8 May 2021</p>
+</blockquote>
+<ul>
+<li>bump version to 1.4.3 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/55"><code>#55</code></a></li>
+<li>Change date format to YYYY-MM-DD <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/54"><code>#54</code></a></li>
+<li>Fix issue with horizontal rules during notes review <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/51"><code>#51</code></a></li>
+<li>Decks, make flashcards view scrollable <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/50"><code>#50</code></a></li>
+<li>Refactor <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/47"><code>#47</code></a></li>
+<li>refactor <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/f633e7220aac9d3f58e85d92b6eef9e874d6dc94"><code>f633e72</code></a></li>
+<li>started on decks <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/0c1944e01c14dfac0be53f500442237755d37dad"><code>0c1944e</code></a></li>
+<li>moved some enums &amp; interfaces to types.ts <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/503ec0f5085cb7498768682bdc73291e5b5a3d1f"><code>503ec0f</code></a></li>
+</ul>
+<h4 id="142"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.4.1...1.4.2">1.4.2</a><a class="headerlink" href="#142" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>2 May 2021</p>
+</blockquote>
+<ul>
+<li>Setting to remove review options from file menu <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/953147e7475f7d61bdbda5666bfacb28bdc2cfd9"><code>953147e</code></a></li>
+<li>bump version to 1.4.2 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/aafd4ef9ac52395cfa3a87219a33d2b5b8cc6bd4"><code>aafd4ef</code></a></li>
+<li>Update README.md <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/335bb6f4eb848e2ba474e60a4174b29164737fdd"><code>335bb6f</code></a></li>
+</ul>
+<h4 id="141"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.4.0...1.4.1">1.4.1</a><a class="headerlink" href="#141" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>1 May 2021</p>
+</blockquote>
+<ul>
+<li>Fix Broken Link in README <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/42"><code>#42</code></a></li>
+<li>bump version to 1.4.1 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/c389a2f787d5992aa7efb35aa5cb2b313d1b2e44"><code>c389a2f</code></a></li>
+<li>Fix broken link in settings <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/65fe74b3b19540b4d528a502c3b87ff488724202"><code>65fe74b</code></a></li>
+<li>Fix Broken Link <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/3da32ac31f55866f952357e77422c10502e77580"><code>3da32ac</code></a></li>
+</ul>
+<h4 id="140"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.3.2...1.4.0">1.4.0</a><a class="headerlink" href="#140" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>1 May 2021</p>
+</blockquote>
+<ul>
+<li>Add flashcards count to statusbar, bugs fix <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/41"><code>#41</code></a></li>
+<li>Reset card's progress <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/40"><code>#40</code></a></li>
+<li>Cleaned up settings <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/39"><code>#39</code></a></li>
+<li>Support for cloze deletion cards <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/38"><code>#38</code></a></li>
+<li>change to ISO8601 dates <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/37"><code>#37</code></a></li>
+<li>Added support for cloze deletions <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/ef29e1448484099f64e346f960ca0c68122e166a"><code>ef29e14</code></a></li>
+<li>docs <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/d12cb0e15729d99c87b5108d9166b4621f32814a"><code>d12cb0e</code></a></li>
+<li>Burying of related cards <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/12344ccab62e782744121107a59ffc4dad792847"><code>12344cc</code></a></li>
+</ul>
+<h4 id="132"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.3.1...1.3.2">1.3.2</a><a class="headerlink" href="#132" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>20 April 2021</p>
+</blockquote>
+<ul>
+<li>fixes <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/a5edede3d484ace930337993ae63fe3cb3d2a602"><code>a5edede</code></a></li>
+<li>update plugin description <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/cb779fe6ac0c30d19d944c13899483f931f5c29f"><code>cb779fe</code></a></li>
+<li>bump version to 1.3.2 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/b6c5317debf199e6a2a82349aa6ffd3812b43b65"><code>b6c5317</code></a></li>
+</ul>
+<h4 id="131"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.3.0...1.3.1">1.3.1</a><a class="headerlink" href="#131" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>19 April 2021</p>
+</blockquote>
+<ul>
+<li>allow for both kinds of review in the same file <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/06cda8813f67fe6b51fb9f99b87939efe97f6cad"><code>06cda88</code></a></li>
+<li>bump version to 1.3.1 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/3f524565730383c2f664f837ac428ab99dae3fec"><code>3f52456</code></a></li>
+<li>Update README.md <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/d6686c752cbf3a5f5d2255990470d0e43bbe4460"><code>d6686c7</code></a></li>
+</ul>
+<h4 id="130"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.2.3...1.3.0">1.3.0</a><a class="headerlink" href="#130" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>19 April 2021</p>
+</blockquote>
+<ul>
+<li>Functional flashcards support (I hope) <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/23"><code>#23</code></a></li>
+<li>Some work on flashcard support <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/22"><code>#22</code></a></li>
+<li>Split plugin into separate 'modules' <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/21"><code>#21</code></a></li>
+<li>split plugin into separate 'modules' <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/df30fb8f9fbf4025a747463323f403e1b861b93f"><code>df30fb8</code></a></li>
+<li>Flashcard UI/UX <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/efb8d780ed91643b3418a7bdda03cb5501bb7f30"><code>efb8d78</code></a></li>
+<li>Flashcards seem to be working <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/ad8b22cc987f83c28c4732a5964b5fe0ac6bbf1c"><code>ad8b22c</code></a></li>
+</ul>
+<h4 id="123"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.2.2...1.2.3">1.2.3</a><a class="headerlink" href="#123" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>15 April 2021</p>
+</blockquote>
+<ul>
+<li>Add a third review state: good <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/18"><code>#18</code></a></li>
+<li>add a third review state: good <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/51ea4eceba7b79fcac413c5e3c92ed0d1a98a438"><code>51ea4ec</code></a></li>
+<li>Update README.md <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/78b83ada931a588c2dc3ad497505f5e62b2a8155"><code>78b83ad</code></a></li>
+<li>Bump version to 1.2.3 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/0ac4cb14cc5aabf3a4e040979323f7a438bf5c29"><code>0ac4cb1</code></a></li>
+</ul>
+<h4 id="122"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.2.1...1.2.2">1.2.2</a><a class="headerlink" href="#122" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>14 April 2021</p>
+</blockquote>
+<ul>
+<li>add EASY and HARD review commands <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/3be20ce72db8f413ab6c1452e4430be3009faa39"><code>3be20ce</code></a></li>
+<li>Bump version to 1.2.2 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/e1bb32f2d81e0595aa27640fa7f81aabdb35f2be"><code>e1bb32f</code></a></li>
+<li>Update README.md <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/3609e7254d1794ad8a50c48d99388d523d0a5950"><code>3609e72</code></a></li>
+</ul>
+<h4 id="121"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.2.0...1.2.1">1.2.1</a><a class="headerlink" href="#121" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>14 April 2021</p>
+</blockquote>
+<ul>
+<li>make SRS opt-in not opt-out <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/ee0eb3fcf615382e6258b566349144378341a97a"><code>ee0eb3f</code></a></li>
+<li>Update README.md <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/5217c27ef6c7b5f36109ab9afd71a5e9d33de6af"><code>5217c27</code></a></li>
+<li>Update README.md <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/37255271dbf02f97dc3ba75e0cc502dfa711203b"><code>3725527</code></a></li>
+</ul>
+<h4 id="120"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.1.2...1.2.0">1.2.0</a><a class="headerlink" href="#120" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>13 April 2021</p>
+</blockquote>
+<ul>
+<li>Mechanism to only review certain tags <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/11"><code>#11</code></a></li>
+<li>Notice on YAML attributes change <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/852479fb51d6c37b7371f25e978c1e71eaadf382"><code>852479f</code></a></li>
+<li>bump version to 1.2.0 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/327f5cd8e6a6ff94e4630e0db31e89dfc3c27baf"><code>327f5cd</code></a></li>
+<li>fix <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/43fb6ce80dd44f98efe45ad212d71a0e247becc7"><code>43fb6ce</code></a></li>
+</ul>
+<h4 id="112"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.1.1...1.1.2">1.1.2</a><a class="headerlink" href="#112" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>13 April 2021</p>
+</blockquote>
+<ul>
+<li>Update docs <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/9"><code>#9</code></a></li>
+<li>refactor <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/936437499dd2d5f9cc1686b997040d632b055242"><code>9364374</code></a></li>
+<li>Bump version to 1.1.2 <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/c4632c1e9c23805ac6f96a92e0f5a3e406486ed0"><code>c4632c1</code></a></li>
+<li>Update README.md <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/65c4e4bb3255d931a8b3cafbd95092cff6e491a8"><code>65c4e4b</code></a></li>
+</ul>
+<h4 id="111"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.1.0...1.1.1">1.1.1</a><a class="headerlink" href="#111" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>12 April 2021</p>
+</blockquote>
+<ul>
+<li>Refactor <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/6"><code>#6</code></a></li>
+<li>refactor <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/5"><code>#5</code></a></li>
+<li>Added file context menu <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/pull/3"><code>#3</code></a></li>
+<li>fix <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/348bdff726b2eddc124e4ae449d35f3cab6eba21"><code>348bdff</code></a></li>
+<li>Update README.md <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/df01880695ca57b3c9f72cdb14559a64e6fbd2fb"><code>df01880</code></a></li>
+<li>fix initial ease calculation <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/12f1622d061a8f65e8b7afc26f051cb4d5fd22fb"><code>12f1622</code></a></li>
+</ul>
+<h4 id="110"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.0.1...1.1.0">1.1.0</a><a class="headerlink" href="#110" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>11 April 2021</p>
+</blockquote>
+<ul>
+<li>added file context menu <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/6c197787af52f3e5d7288054d993101ef37de0d4"><code>6c19778</code></a></li>
+</ul>
+<h4 id="101"><a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/compare/1.0.0...1.0.1">1.0.1</a><a class="headerlink" href="#101" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>11 April 2021</p>
+</blockquote>
+<ul>
+<li>refactor <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/f67301e6e7a7056c08a3bd11fd0415dbc21a27d7"><code>f67301e</code></a></li>
+<li>refactor types <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/3a4c5e07bbbec171f90586e73b2f07b2b777fd07"><code>3a4c5e0</code></a></li>
+<li>changed plugin name <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/acb5d4a82ca45068f94e15671040de48e4e19362"><code>acb5d4a</code></a></li>
+</ul>
+<h4 id="100">1.0.0<a class="headerlink" href="#100" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>9 April 2021</p>
+</blockquote>
+<ul>
+<li>prettier tab width fix <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/6bf72b1d8e77b497ea0914517835645aaf9d80ef"><code>6bf72b1</code></a></li>
+<li>better handling of new notes <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/57ca3a9d3a70d53146c4b03b252b178dadb8bd3f"><code>57ca3a9</code></a></li>
+<li>settings input sanitization &amp; prettify <a href="https://github.com/st3v3nmw/obsidian-spaced-repetition/commit/5e68d8b21955c3bcb409229de702fe01bc945844"><code>5e68d8b</code></a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.top", "navigation.expand", "toc.follow"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>
