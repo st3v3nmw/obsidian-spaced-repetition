@@ -4,8 +4,7 @@
 
 Fight the forgetting curve by reviewing flashcards & notes using spaced repetition.
 
-- Check the documentation [here](https://stephenmwangi.com/obsidian-spaced-repetition/).
-- Check the [roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/3/) for upcoming features & fixes.
+- For more information on how to use the plugin, check the [documentation](https://stephenmwangi.com/obsidian-spaced-repetition/).
 - Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug report.
 - Visit the [discussions](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/) section for Q&A help, feedback, and general discussion.
 - The plugin has been translated into _Arabic, Chinese, Czech, Dutch, French, German, Italian, Korean, Japanese, Polish, Portuguese, Spanish, Russian, Turkish, and Ukrainian_ by the Obsidian community 😄.
@@ -13,34 +12,36 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
 
 ## Features
 
-- Flashcards
-    - [Decks](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/decks/) (Using Obsidian's hierarchical tags or folder structure)
-    - [Single-line style](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#single-line-basic) (`Question::Answer`)
-    - [Single-line reversed style](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#single-line-bidirectional) (`Question:::Answer`)
-    - [Multi-line style](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#multi-line-basic) (Separated by `?`)
-    - [Multi-line reversed style](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#multi-line-bidirectional) (Separated by `??`)
-    - [Cloze cards](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/cloze-cards/) (`==highlight==` your cloze deletions!, `**bolded text**`, `{{text in curly braces}}`, or use custom cloze patterns)
+- Reviewing Flashcards
+    - [Getting started](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/flashcards-overview/) (Using Obsidian's hierarchical tags or folder structure)
+    - Creating Flashcards
+        - [Single-line style](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#single-line-basic) (`Question::Answer`)
+        - [Single-line reversed style](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#single-line-bidirectional) (`Question:::Answer`)
+        - [Multi-line style](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#multi-line-basic) (Separated by `?`)
+        - [Multi-line reversed style](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/q-and-a-cards/#multi-line-bidirectional) (Separated by `??`)
+        - [Cloze cards](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/cloze-cards/) (`==highlight==` your cloze deletions!, `**bolded text**`, `{{text in curly braces}}`, or use custom cloze patterns)
+        - Rich text support in flashcards (inherited from Obsidian)
+            - Images, Audio, & Video
+            - LaTeX
+            - Code syntax highlighting
+            - Footnotes
+    - [Organize Decks](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/decks/) (Using Obsidian's hierarchical tags or folder structure)
     - [Card context - automatic titles based on headings](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/reviewing/#context) (i.e. `Note title > Heading 1 > Subheading`)
-    - Rich text support in flashcards (inherited from Obsidian)
-        - Images, Audio, & Video
-        - LaTeX
-        - Code syntax highlighting
-        - Footnotes
-- Notes
-    - [Reviewing entire notes](https://stephenmwangi.com/obsidian-spaced-repetition/notes/)
+- Reviewing Notes
+    - [Getting started](https://stephenmwangi.com/obsidian-spaced-repetition/notes/)
+    - [Due Notes for review](https://stephenmwangi.com/obsidian-spaced-repetition/notes/#note-review-queue)
+    - [How to review a note](https://stephenmwangi.com/obsidian-spaced-repetition/notes/#reviewing)
 - [Statistics](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/statistics/)
 
-### Coming Soon
+## Links & Resources
 
-1. FSRS
+- [Documentation](https://stephenmwangi.com/obsidian-spaced-repetition/).
+- [Roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/3/) (Sry, slighty out of date)
+- [Issues](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/)
 
-- [ ] Store scheduling info in a dedicated file (`.yaml`)
-- [ ] Migrate from one storage system to another
-- [ ] Implement FSRS
-- [ ] Update documentation
+### Support
 
-## Usage
-
-Check the [documentation](https://stephenmwangi.com/obsidian-spaced-repetition/) for more details.
-
-<a href='https://ko-fi.com/M4M44DEN6' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi3.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+<div style="display: flex; gap: 10px; flex-direction: column; ">
+    <div style="font-size: 1em; font-weight: bold;">Stephen Mwangi (Owner):</div>
+    <a href='https://ko-fi.com/M4M44DEN6' target='_blank'><img height='30' style='border:0px;height:30px;' src='https://cdn.ko-fi.com/cdn/kofi3.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+</div>
