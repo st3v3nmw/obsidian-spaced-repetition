@@ -396,6 +396,11 @@
         margin-top: 0;
     }
 
+    & .sr-content > ul,
+    & .sr-content > ol {
+        padding-left: var(--size-4-6);
+    }
+
     & .sr-content hr {
         backdrop-filter: invert(40%);
         border-top-style: dashed;
@@ -701,7 +706,6 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
         display: flex;
         align-items: center;
         gap: var(--size-4-2);
-        font-size: var(--font-ui-large);
     }
 }
 
@@ -724,10 +728,6 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
 }
 
 .is-phone .modal .sr-settings-tab {
-    & .sr-settings-page-title {
-        font-size: var(--font-ui-normal);
-    }
-
     & .sr-settings-page-title-wrapper {
         font-size: var(--font-ui-normal);
         padding-left: var(--size-4-2);

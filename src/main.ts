@@ -1,4 +1,4 @@
-import { Menu, Notice, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
+import { Menu, Notice, Platform, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
@@ -41,6 +41,7 @@ import { NoteReviewQueue } from "src/note/note-review-queue";
 import { setDebugParser } from "src/parser";
 import { DEFAULT_DATA, PluginData } from "src/plugin-data";
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
+import EmulatedPlatform from "src/utils/platform-detector";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
 
 export default class SRPlugin extends Plugin {
@@ -233,7 +234,12 @@ export default class SRPlugin extends Plugin {
                 }
                 await this.sync();
 
-                if (this.data.settings.openViewInNewTab) {
+                const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
+                const openInNewTab =
+                    (!isMobile && this.data.settings.openViewInNewTab) ||
+                    (isMobile && this.data.settings.openViewInNewTabMobile);
+
+                if (openInNewTab) {
                     this.tabViewManager.openSRTabView(this.osrAppCore, FlashcardReviewMode.Review);
                 } else {
                     this.openFlashcardModal(
@@ -250,7 +256,12 @@ export default class SRPlugin extends Plugin {
             name: t("CRAM_ALL_CARDS"),
             callback: async () => {
                 await this.sync();
-                if (this.data.settings.openViewInNewTab) {
+                const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
+                const openInNewTab =
+                    (!isMobile && this.data.settings.openViewInNewTab) ||
+                    (isMobile && this.data.settings.openViewInNewTabMobile);
+
+                if (openInNewTab) {
                     this.tabViewManager.openSRTabView(this.osrAppCore, FlashcardReviewMode.Cram);
                 } else {
                     this.openFlashcardModal(
@@ -270,8 +281,12 @@ export default class SRPlugin extends Plugin {
                 if (!openFile || openFile.extension !== "md") {
                     return;
                 }
+                const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
+                const openInNewTab =
+                    (!isMobile && this.data.settings.openViewInNewTab) ||
+                    (isMobile && this.data.settings.openViewInNewTabMobile);
 
-                if (this.data.settings.openViewInNewTab) {
+                if (openInNewTab) {
                     this.tabViewManager.openSRTabView(
                         this.osrAppCore,
                         FlashcardReviewMode.Review,
@@ -291,8 +306,12 @@ export default class SRPlugin extends Plugin {
                 if (!openFile || openFile.extension !== "md") {
                     return;
                 }
+                const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
+                const openInNewTab =
+                    (!isMobile && this.data.settings.openViewInNewTab) ||
+                    (isMobile && this.data.settings.openViewInNewTabMobile);
 
-                if (this.data.settings.openViewInNewTab) {
+                if (openInNewTab) {
                     this.tabViewManager.openSRTabView(
                         this.osrAppCore,
                         FlashcardReviewMode.Cram,
@@ -567,7 +586,12 @@ export default class SRPlugin extends Plugin {
             this.ribbonIcon = this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
                 if (!this.osrAppCore.syncLock) {
                     await this.sync();
-                    if (this.data.settings.openViewInNewTab) {
+                    const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
+                    const openInNewTab =
+                        (!isMobile && this.data.settings.openViewInNewTab) ||
+                        (isMobile && this.data.settings.openViewInNewTabMobile);
+
+                    if (openInNewTab) {
                         this.tabViewManager.openSRTabView(
                             this.osrAppCore,
                             FlashcardReviewMode.Review,
@@ -593,7 +617,7 @@ export default class SRPlugin extends Plugin {
         this.statusBarManager = new StatusBarManager(this, this.data.settings.showStatusBar);
     }
 
-    private updateStatusBar() {
+    public updateStatusBar() {
         if (this.data.settings.showStatusBar) {
             this.statusBarManager.setText(
                 `${this.osrAppCore.remainingDeckTree.getCardCount(
