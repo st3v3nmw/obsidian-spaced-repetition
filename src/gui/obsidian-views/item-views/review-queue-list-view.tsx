@@ -80,7 +80,9 @@ export class ReviewQueueListView extends ItemView {
     }
 
     private createTree(parentEl: HTMLElement) {
-        const childrenEl: HTMLElement = parentEl.createDiv("tree-item-children nav-folder-children");
+        const childrenEl: HTMLElement = parentEl.createDiv(
+            "tree-item-children nav-folder-children",
+        );
 
         for (const [deckKey, deck] of this.noteReviewQueue.reviewDecks) {
             const deckCollapsed = !deck.activeFolders.has(deck.deckName);
@@ -89,7 +91,12 @@ export class ReviewQueueListView extends ItemView {
         }
     }
 
-    private createDeckTreeItem(parentEl: HTMLElement, deckKey: string, deck: NoteReviewDeck, deckCollapsed: boolean) {
+    private createDeckTreeItem(
+        parentEl: HTMLElement,
+        deckKey: string,
+        deck: NoteReviewDeck,
+        deckCollapsed: boolean,
+    ) {
         const deckFolderEl: HTMLElement = this.createFolder(
             parentEl,
             deckKey,
@@ -97,8 +104,6 @@ export class ReviewQueueListView extends ItemView {
             false,
             deck,
         ).getElementsByClassName("tree-item-children nav-folder-children")[0] as HTMLElement;
-
-        console.log(deckKey, deck.newNotes, deck.scheduledNotes);
 
         if (deck.newNotes.length > 0) {
             this.createNewNotesFolder(deckFolderEl, deck, deckCollapsed);
@@ -108,7 +113,11 @@ export class ReviewQueueListView extends ItemView {
         }
     }
 
-    private createNewNotesFolder(parentEl: HTMLElement, deck: NoteReviewDeck, deckCollapsed: boolean) {
+    private createNewNotesFolder(
+        parentEl: HTMLElement,
+        deck: NoteReviewDeck,
+        deckCollapsed: boolean,
+    ) {
         const activeFile: TFile | null = this.app.workspace.getActiveFile();
         const newNotesFolderEl: HTMLElement = this.createFolder(
             parentEl,
@@ -119,8 +128,8 @@ export class ReviewQueueListView extends ItemView {
         );
 
         for (const newFile of deck.newNotes) {
-
-            const fileIsOpen = activeFile !== undefined && activeFile !== null && newFile.path === activeFile.path;
+            const fileIsOpen =
+                activeFile !== undefined && activeFile !== null && newFile.path === activeFile.path;
             if (fileIsOpen) {
                 deck.activeFolders.add(deck.deckName);
                 deck.activeFolders.add(t("NEW"));
@@ -137,7 +146,11 @@ export class ReviewQueueListView extends ItemView {
         }
     }
 
-    private createScheduledNotesFolder(parentEl: HTMLElement, deck: NoteReviewDeck, deckCollapsed: boolean) {
+    private createScheduledNotesFolder(
+        parentEl: HTMLElement,
+        deck: NoteReviewDeck,
+        deckCollapsed: boolean,
+    ) {
         const activeFile: TFile | null = this.app.workspace.getActiveFile();
         const now: number = Date.now();
         let currUnix = -1;
@@ -257,7 +270,9 @@ export class ReviewQueueListView extends ItemView {
             navFileTitle.addClass("is-active");
         }
 
-        const navFileTitleInner: HTMLElement = navFileTitle.createDiv("tree-item-inner nav-file-title-content");
+        const navFileTitleInner: HTMLElement = navFileTitle.createDiv(
+            "tree-item-inner nav-file-title-content",
+        );
         navFileTitleInner.setText(file.basename);
         navFileTitleInner.addEventListener(
             "click",
@@ -266,10 +281,12 @@ export class ReviewQueueListView extends ItemView {
                 await this.nextNoteReviewHandler.openNote(deck.deckName, file);
                 return false;
             },
-            false
+            false,
         );
 
-        const navFileContextBtn: HTMLElement = navFileTitle.createDiv("sr-review-context-btn clickable-icon");
+        const navFileContextBtn: HTMLElement = navFileTitle.createDiv(
+            "sr-review-context-btn clickable-icon",
+        );
         setIcon(navFileContextBtn, "ellipsis-vertical");
         navFileContextBtn.addEventListener("click", async (event: MouseEvent) => {
             event.preventDefault();
