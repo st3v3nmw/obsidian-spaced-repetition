@@ -602,6 +602,60 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     cursor: default;
 }
 
+/* MARK: Note Review Page */
+
+.sr-note-review-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4-4);
+
+    .nav-file-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .nav-file-title-content {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-grow: 1;
+    }
+
+    .sr-review-context-btn {
+        &:hover {
+            background-color: var(--background-modifier-hover);
+        }
+    }
+}
+
+.sr-note-review-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4-2);
+    padding: var(--size-4-2);
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.sr-note-review-header-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--size-4-2);
+}
+
+.sr-note-review-header-title-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sr-note-review-header-title {
+    font-size: var(--font-ui-large);
+    font-weight: var(--font-semibold);
+}
+
+
+
 /* MARK: Status Bar */
 
 .sr-status-bar-item {
