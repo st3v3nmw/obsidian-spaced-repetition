@@ -1,6 +1,6 @@
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
+import { Question } from "src/card/questions/question";
 import { RepItemStorageInfo } from "src/data-stores/base/rep-item-storage-info";
-import { Question } from "src/question";
 
 export enum DataStoreName {
     NOTES = "NOTES",

@@ -6,7 +6,7 @@ import CardInfoButtonComponent from "src/gui/content-container/card-container/co
 import EditButtonComponent from "src/gui/content-container/card-container/controls/edit-button";
 import ResetButtonComponent from "src/gui/content-container/card-container/controls/reset-button";
 import SkipButtonComponent from "src/gui/content-container/card-container/controls/skip-button";
-import ModalCloseButtonComponent from "src/gui/modal-close-button";
+import ModalCloseButtonComponent from "src/gui/content-container/modal-close-button";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 export default class ControlsComponent {

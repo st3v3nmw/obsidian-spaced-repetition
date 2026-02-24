@@ -1,13 +1,16 @@
 import { ButtonComponent, ItemView, WorkspaceLeaf } from "obsidian";
 
+import {
+    FlashcardReviewMode,
+    IFlashcardReviewSequencer,
+} from "src/card/flashcard-review-sequencer";
+import { Question } from "src/card/questions/question";
 import { DEBUG_MODE_ENABLED, SR_TAB_VIEW } from "src/constants";
-import { Deck } from "src/deck";
-import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
+import { Deck } from "src/deck/deck";
 import { CardContainer } from "src/gui/content-container/card-container/card-container";
 import { DeckContainer } from "src/gui/content-container/deck-container";
-import { FlashcardEditModal } from "src/gui/obsidian-views/edit-modal";
+import { FlashcardEditModal } from "src/gui/obsidian-views/modals/edit-modal";
 import SRPlugin from "src/main";
-import { Question } from "src/question";
 import { SRSettings } from "src/settings";
 
 /**

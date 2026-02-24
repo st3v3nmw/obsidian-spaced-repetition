@@ -4,42 +4,43 @@ import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { ObsidianVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
 import { SrsAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
+import {
+    FlashcardReviewMode,
+    FlashcardReviewSequencer,
+    IFlashcardReviewSequencer,
+} from "src/card/flashcard-review-sequencer";
+import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
 import { OsrAppCore } from "src/core";
 import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
 import { DataStoreInNoteAlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
 import { DataStore } from "src/data-stores/base/data-store";
 import { StoreInNotes } from "src/data-stores/notes/notes";
-import { CardListType, Deck, DeckTreeFilter } from "src/deck";
+import { CardListType, Deck, DeckTreeFilter } from "src/deck/deck";
 import {
     CardOrder,
     DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
-} from "src/deck-tree-iterator";
+} from "src/deck/deck-tree-iterator";
+import { TopicPath } from "src/deck/topic-path";
 import { ISRFile, SrTFile } from "src/file";
-import {
-    FlashcardReviewMode,
-    FlashcardReviewSequencer,
-    IFlashcardReviewSequencer,
-} from "src/flashcard-review-sequencer";
+import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/obsidian-views/item-views/review-queue-list-view";
+import { SRTabView } from "src/gui/obsidian-views/item-views/sr-tab-view";
+import TabViewManager from "src/gui/obsidian-views/item-views/tab-view-manager";
+import { SRModalView } from "src/gui/obsidian-views/modals/sr-modal-view";
 import { SRSettingTab } from "src/gui/obsidian-views/settings-tab";
-import { SRModalView } from "src/gui/obsidian-views/sr-modal-view";
-import { SRTabView } from "src/gui/obsidian-views/sr-tab-view";
-import TabViewManager from "src/gui/obsidian-views/tab-view-manager";
-import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/review-queue-list-view";
-import { OsrSidebar } from "src/gui/sidebar";
+import { OsrSidebar } from "src/gui/obsidian-views/sidebar";
+import StatusBarManager from "src/gui/obsidian-views/statusbar-items/status-bar-manager";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
-import { NextNoteReviewHandler } from "src/next-note-review-handler";
-import { Note } from "src/note";
-import { NoteFileLoader } from "src/note-file-loader";
-import { NoteReviewQueue } from "src/note-review-queue";
+import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
+import { Note } from "src/note/note";
+import { NoteFileLoader } from "src/note/note-file-loader";
+import { NoteReviewQueue } from "src/note/note-review-queue";
 import { setDebugParser } from "src/parser";
 import { DEFAULT_DATA, PluginData } from "src/plugin-data";
-import { QuestionPostponementList } from "src/question-postponement-list";
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
-import { TopicPath } from "src/topic-path";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
 
 export default class SRPlugin extends Plugin {
@@ -47,12 +48,12 @@ export default class SRPlugin extends Plugin {
     public osrAppCore: OsrAppCore;
     public tabViewManager: TabViewManager;
     private osrSidebar: OsrSidebar;
-    private nextNoteReviewHandler: NextNoteReviewHandler;
+    public nextNoteReviewHandler: NextNoteReviewHandler;
 
     private externalModalObserver: MutationObserver;
 
     private ribbonIcon: HTMLElement | null = null;
-    private statusBar: HTMLElement | null = null;
+    private statusBarManager: StatusBarManager | null = null;
     private isSRInFocus: boolean = false;
     private fileMenuHandler: (
         menu: Menu,
@@ -108,7 +109,7 @@ export default class SRPlugin extends Plugin {
 
         appIcon();
 
-        this.showStatusBar(this.data.settings.showStatusBar);
+        this.addStatusBarManager();
 
         this.showRibbonIcon(this.data.settings.showRibbonIcon);
 
@@ -414,7 +415,7 @@ export default class SRPlugin extends Plugin {
             reviewMode,
         );
     }
-    private openFlashcardModal(
+    public openFlashcardModal(
         fullDeckTree: Deck,
         remainingDeckTree: Deck,
         reviewMode: FlashcardReviewMode,
@@ -470,15 +471,18 @@ export default class SRPlugin extends Plugin {
     }
 
     private onOsrVaultDataChanged() {
-        this.statusBar.setText(
-            t("STATUS_BAR", {
-                dueNotesCount: this.osrAppCore.noteReviewQueue.dueNotesCount,
-                dueFlashcardsCount: this.osrAppCore.remainingDeckTree.getCardCount(
-                    CardListType.All,
-                    true,
-                ),
-            }),
-        );
+        // TODO: Translate
+        this.updateStatusBar();
+
+        // this.statusBarManager.setText(
+        //     t("STATUS_BAR", {
+        //         dueNotesCount: this.osrAppCore.noteReviewQueue.dueNotesCount,
+        //         dueFlashcardsCount: this.osrAppCore.remainingDeckTree.getCardCount(
+        //             CardListType.All,
+        //             true,
+        //         ),
+        //     }),
+        // );
 
         if (this.data.settings.enableNoteReviewPaneOnStartup) this.osrSidebar.redraw();
     }
@@ -585,25 +589,25 @@ export default class SRPlugin extends Plugin {
         }
     }
 
-    showStatusBar(status: boolean) {
-        // if it does not exist, we create it
-        if (!this.statusBar) {
-            this.statusBar = this.addStatusBarItem();
-            this.statusBar.classList.add("mod-clickable");
-            this.statusBar.setAttribute("aria-label", t("OPEN_NOTE_FOR_REVIEW"));
-            this.statusBar.setAttribute("aria-label-position", "top");
-            this.statusBar.addEventListener("click", async () => {
-                if (!this.osrAppCore.syncLock) {
-                    await this.sync();
-                    this.nextNoteReviewHandler.reviewNextNoteModal();
-                }
-            });
+    private addStatusBarManager() {
+        this.statusBarManager = new StatusBarManager(this, this.data.settings.showStatusBar);
+    }
+
+    private updateStatusBar() {
+        if (this.data.settings.showStatusBar) {
+            this.statusBarManager.setText(
+                `${this.osrAppCore.remainingDeckTree.getCardCount(
+                    CardListType.All,
+                    true,
+                )} card(s) due`,
+                "card-review",
+            );
+            this.statusBarManager.setText(
+                `${this.osrAppCore.noteReviewQueue.dueNotesCount} note(s) due`,
+                "note-review",
+            );
         }
 
-        if (status) {
-            this.statusBar.style.display = "";
-        } else {
-            this.statusBar.style.display = "none";
-        }
+        this.statusBarManager.showStatusBarItems(this.data.settings.showStatusBar);
     }
 }

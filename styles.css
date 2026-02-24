@@ -592,6 +592,15 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     cursor: default;
 }
 
+/* MARK: Status Bar */
+
+.sr-status-bar-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-4-1);
+}
+
 /* MARK: Settings Tab */
 
 /* Style the tab */
