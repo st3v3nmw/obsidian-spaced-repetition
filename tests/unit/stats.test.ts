@@ -1,4 +1,4 @@
-import { Stats } from "src/stats";
+import { Stats } from "src/deck/stats";
 
 describe("Stats", () => {
     let stats: Stats;

@@ -1,6 +1,6 @@
 import { ClozeCrafter, IClozeFormatter } from "clozecraft";
 
-import { CardType } from "src/question";
+import { CardType } from "src/card/questions/question";
 import { SRSettings } from "src/settings";
 import { findLineIndexOfSearchStringIgnoringWs } from "src/utils/strings";
 

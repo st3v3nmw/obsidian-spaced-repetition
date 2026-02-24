@@ -1,4 +1,4 @@
-import { Question, QuestionText } from "src/question";
+import { Question, QuestionText } from "src/card/questions/question";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { TextDirection } from "src/utils/strings";
 

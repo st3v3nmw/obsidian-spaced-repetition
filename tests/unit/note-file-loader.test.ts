@@ -1,7 +1,7 @@
-import { Note } from "src/note";
-import { NoteFileLoader } from "src/note-file-loader";
+import { Note } from "src/note/note";
+import { NoteFileLoader } from "src/note/note-file-loader";
 import { DEFAULT_SETTINGS } from "src/settings";
-import { TopicPath } from "src/topic-path";
+import { TopicPath } from "src/deck/topic-path";
 import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";

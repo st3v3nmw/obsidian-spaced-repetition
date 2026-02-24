@@ -1,6 +1,6 @@
-import { Deck } from "src/deck";
+import { Deck } from "src/deck/deck";
 import { ISRFile } from "src/file";
-import { Question } from "src/question";
+import { Question } from "src/card/questions/question";
 import { SRSettings } from "src/settings";
 
 export class Note {
@@ -33,9 +33,8 @@ export class Note {
         let str: string = `Note: ${desc}: ${this.questionList.length} questions\r\n`;
         for (let i = 0; i < this.questionList.length; i++) {
             const q: Question = this.questionList[i];
-            str += `[${i}]: ${q.questionType}: ${q.lineNo}: ${q.topicPathList?.format("|")}: ${
-                q.questionText.original
-            }\r\n`;
+            str += `[${i}]: ${q.questionType}: ${q.lineNo}: ${q.topicPathList?.format("|")}: ${q.questionText.original
+                }\r\n`;
         }
         console.debug(str);
     }

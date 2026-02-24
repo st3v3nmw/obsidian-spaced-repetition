@@ -1,9 +1,9 @@
-import { Deck } from "src/deck";
-import { Note } from "src/note";
-import { NoteFileLoader } from "src/note-file-loader";
-import { NoteParser } from "src/note-parser";
+import { Deck } from "src/deck/deck";
+import { Note } from "src/note/note";
+import { NoteFileLoader } from "src/note/note-file-loader";
+import { NoteParser } from "src/note/note-parser";
 import { DEFAULT_SETTINGS } from "src/settings";
-import { TopicPath } from "src/topic-path";
+import { TopicPath } from "src/deck/topic-path";
 import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";

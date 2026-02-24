@@ -2,8 +2,8 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { OsrCore } from "src/core";
-import { NoteReviewQueue } from "src/note-review-queue";
-import { QuestionPostponementList } from "src/question-postponement-list";
+import { NoteReviewQueue } from "src/note/note-review-queue";
+import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
 import { SRSettings } from "src/settings";
 
 import { UnitTestSRFile } from "./unit-test-file";
@@ -29,7 +29,7 @@ export class UnitTestOsrCore extends OsrCore {
             questionPostponementList,
             this.infoFinder,
             settings,
-            () => {},
+            () => { },
             new NoteReviewQueue(),
         );
     }

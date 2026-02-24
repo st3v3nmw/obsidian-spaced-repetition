@@ -1,15 +1,15 @@
 import { App, Modal } from "obsidian";
 
-import { Deck } from "src/deck";
+import { Deck } from "src/deck/deck";
 import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
-} from "src/flashcard-review-sequencer";
+} from "src/card/flashcard-review-sequencer";
 import { CardContainer } from "src/gui/content-container/card-container/card-container";
 import { DeckContainer } from "src/gui/content-container/deck-container";
 import { FlashcardEditModal } from "src/gui/obsidian-views/modals/edit-modal";
 import type SRPlugin from "src/main";
-import { Question } from "src/question";
+import { Question } from "src/card/questions/question";
 import { SRSettings } from "src/settings";
 
 export enum FlashcardMode {

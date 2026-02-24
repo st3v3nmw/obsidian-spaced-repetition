@@ -1,9 +1,9 @@
 import { ISRFile } from "src/file";
-import { Note } from "src/note";
-import { NoteQuestionParser } from "src/note-question-parser";
-import { Question } from "src/question";
+import { Note } from "src/note/note";
+import { NoteQuestionParser } from "src/note/note-question-parser";
+import { Question } from "src/card/questions/question";
 import { SRSettings } from "src/settings";
-import { TopicPath } from "src/topic-path";
+import { TopicPath } from "src/deck/topic-path";
 import { TextDirection } from "src/utils/strings";
 
 export class NoteFileLoader {

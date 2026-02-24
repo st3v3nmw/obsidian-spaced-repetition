@@ -1,6 +1,6 @@
 import { parse, ParsedQuestionInfo, setDebugParser } from "src/parser";
 import { ParserOptions } from "src/parser";
-import { CardType } from "src/question";
+import { CardType } from "src/card/questions/question";
 
 const parserOptions: ParserOptions = {
     singleLineCardSeparator: "::",
@@ -376,7 +376,7 @@ test("Test parsing of cloze cards", () => {
     expect(
         parseT(
             "some text before\n\na deletion on\nsuch ==wow==\n\n" +
-                "many text\nsuch surprise ==wow== more ==text==\nsome text after\n\nHmm",
+            "many text\nsuch surprise ==wow== more ==text==\nsome text after\n\nHmm",
             parserOptions,
         ),
     ).toEqual([
@@ -415,7 +415,7 @@ test("Test parsing of cloze cards", () => {
     expect(
         parseT(
             "some text before\n\na deletion on\nsuch **wow**\n\n" +
-                "many text\nsuch surprise **wow** more **text**\nsome text after\n\nHmm",
+            "many text\nsuch surprise **wow** more **text**\nsome text after\n\nHmm",
             parserOptions,
         ),
     ).toEqual([
@@ -454,7 +454,7 @@ test("Test parsing of cloze cards", () => {
     expect(
         parseT(
             "some text before\n\na deletion on\nsuch {{wow}}\n\n" +
-                "many text\nsuch surprise {{wow}} more {{text}}\nsome text after\n\nHmm",
+            "many text\nsuch surprise {{wow}} more {{text}}\nsome text after\n\nHmm",
             parserOptions,
         ),
     ).toEqual([
@@ -619,17 +619,17 @@ test("Test parsing of a mix of card types", () => {
     expect(
         parseT(
             "# Lorem Ipsum\n\nLorem ipsum dolor ==sit amet==, consectetur ==adipiscing== elit.\n" +
-                "Duis magna arcu, eleifend rhoncus ==euismod non,==\nlaoreet vitae enim.\n\n" +
-                "Fusce placerat::velit in pharetra gravida\n\n" +
-                "Donec dapibus ullamcorper aliquam.\n??\nDonec dapibus ullamcorper aliquam.\n<!--SR:2021-08-11,4,270-->",
+            "Duis magna arcu, eleifend rhoncus ==euismod non,==\nlaoreet vitae enim.\n\n" +
+            "Fusce placerat::velit in pharetra gravida\n\n" +
+            "Donec dapibus ullamcorper aliquam.\n??\nDonec dapibus ullamcorper aliquam.\n<!--SR:2021-08-11,4,270-->",
             parserOptions,
         ),
     ).toEqual([
         [
             CardType.Cloze,
             "Lorem ipsum dolor ==sit amet==, consectetur ==adipiscing== elit.\n" +
-                "Duis magna arcu, eleifend rhoncus ==euismod non,==\n" +
-                "laoreet vitae enim.",
+            "Duis magna arcu, eleifend rhoncus ==euismod non,==\n" +
+            "laoreet vitae enim.",
             2,
             4,
         ],
@@ -666,14 +666,14 @@ test("Test parsing cards with codeblocks", () => {
     expect(
         parseT(
             "How do you ... Python?\n?\n" +
-                "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
+            "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
             parserOptions,
         ),
     ).toEqual([
         [
             CardType.MultiLineBasic,
             "How do you ... Python?\n?\n" +
-                "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
+            "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
             0,
             6,
         ],
@@ -683,14 +683,14 @@ test("Test parsing cards with codeblocks", () => {
     expect(
         parseT(
             "How do you ... Python?\n?\n" +
-                "```python\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
+            "```python\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
             parserOptions,
         ),
     ).toEqual([
         [
             CardType.MultiLineBasic,
             "How do you ... Python?\n?\n" +
-                "```python\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
+            "```python\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
             0,
             9,
         ],
@@ -700,30 +700,30 @@ test("Test parsing cards with codeblocks", () => {
     expect(
         parseT(
             "Nested Markdown?\n?\n" +
-                "````ad-note\n\n" +
-                "```git\n" +
-                "+ print('hello')\n" +
-                "- print('world')\n" +
-                "```\n\n" +
-                "~~~python\n" +
-                "print('hello world')\n" +
-                "~~~\n" +
-                "````",
+            "````ad-note\n\n" +
+            "```git\n" +
+            "+ print('hello')\n" +
+            "- print('world')\n" +
+            "```\n\n" +
+            "~~~python\n" +
+            "print('hello world')\n" +
+            "~~~\n" +
+            "````",
             parserOptions,
         ),
     ).toEqual([
         [
             CardType.MultiLineBasic,
             "Nested Markdown?\n?\n" +
-                "````ad-note\n\n" +
-                "```git\n" +
-                "+ print('hello')\n" +
-                "- print('world')\n" +
-                "```\n\n" +
-                "~~~python\n" +
-                "print('hello world')\n" +
-                "~~~\n" +
-                "````",
+            "````ad-note\n\n" +
+            "```git\n" +
+            "+ print('hello')\n" +
+            "- print('world')\n" +
+            "```\n\n" +
+            "~~~python\n" +
+            "print('hello world')\n" +
+            "~~~\n" +
+            "````",
             0,
             12,
         ],
@@ -794,7 +794,7 @@ test("Test not parsing 'cards' in codeblocks", () => {
 describe("Parser debug messages", () => {
     test("Messages disabled", () => {
         // replace console error log with an empty mock function
-        const logSpy = jest.spyOn(global.console, "log").mockImplementation(() => {});
+        const logSpy = jest.spyOn(global.console, "log").mockImplementation(() => { });
         setDebugParser(false);
 
         parse("", parserOptions);
@@ -806,7 +806,7 @@ describe("Parser debug messages", () => {
 
     test("Messages enabled", () => {
         // replace console error log with an empty mock function
-        const logSpy = jest.spyOn(global.console, "log").mockImplementation(() => {});
+        const logSpy = jest.spyOn(global.console, "log").mockImplementation(() => { });
         setDebugParser(true);
 
         parse("", parserOptions);

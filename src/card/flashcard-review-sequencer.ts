@@ -1,17 +1,17 @@
 import { ISrsAlgorithm } from "src/algorithms/base/isrs-algorithm";
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { Card } from "src/card";
+import { Card } from "src/card/card";
 import { TICKS_PER_DAY } from "src/constants";
 import { DataStore } from "src/data-stores/base/data-store";
-import { CardListType, Deck } from "src/deck";
-import { IDeckTreeIterator } from "src/deck-tree-iterator";
+import { CardListType, Deck } from "src/deck/deck";
+import { IDeckTreeIterator } from "src/deck/deck-tree-iterator";
 import { DueDateHistogram } from "src/due-date-histogram";
-import { Note } from "src/note";
-import { Question, QuestionText } from "src/question";
-import { IQuestionPostponementList } from "src/question-postponement-list";
+import { Note } from "src/note/note";
+import { Question, QuestionText } from "src/card/questions/question";
+import { IQuestionPostponementList } from "src/card/questions/question-postponement-list";
 import { SRSettings } from "src/settings";
-import { TopicPath } from "src/topic-path";
+import { TopicPath } from "src/deck/topic-path";
 import { globalDateProvider } from "src/utils/dates";
 
 export interface IFlashcardReviewSequencer {

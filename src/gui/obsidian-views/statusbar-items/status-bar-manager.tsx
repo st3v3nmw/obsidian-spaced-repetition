@@ -1,6 +1,6 @@
 import { request } from "obsidian";
 
-import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
+import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import IconTextStatusBarItem from "src/gui/obsidian-views/statusbar-items/icon-text-statusbar-item";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";

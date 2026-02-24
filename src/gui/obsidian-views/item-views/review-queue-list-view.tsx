@@ -2,9 +2,9 @@ import { ItemView, Menu, TFile, WorkspaceLeaf } from "obsidian";
 
 import { COLLAPSE_ICON, TICKS_PER_DAY } from "src/constants";
 import { t } from "src/lang/helpers";
-import { NextNoteReviewHandler } from "src/next-note-review-handler";
-import { NoteReviewDeck } from "src/note-review-deck";
-import { NoteReviewQueue } from "src/note-review-queue";
+import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
+import { NoteReviewDeck } from "src/note/note-review-deck";
+import { NoteReviewQueue } from "src/note/note-review-queue";
 import { SRSettings } from "src/settings";
 
 export const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";

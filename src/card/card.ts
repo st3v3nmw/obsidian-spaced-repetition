@@ -1,6 +1,6 @@
 import { RepetitionItem } from "src/algorithms/base/repetition-item";
-import { CardListType } from "src/deck";
-import { Question } from "src/question";
+import { CardListType } from "src/deck/deck";
+import { Question } from "src/card/questions/question";
 
 export class Card extends RepetitionItem {
     question: Question;

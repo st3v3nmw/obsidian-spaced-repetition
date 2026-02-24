@@ -4,25 +4,27 @@ import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { ObsidianVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
 import { SrsAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
+import {
+    FlashcardReviewMode,
+    FlashcardReviewSequencer,
+    IFlashcardReviewSequencer,
+} from "src/card/flashcard-review-sequencer";
+import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
 import { OsrAppCore } from "src/core";
 import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
 import { DataStoreInNoteAlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
 import { DataStore } from "src/data-stores/base/data-store";
 import { StoreInNotes } from "src/data-stores/notes/notes";
-import { CardListType, Deck, DeckTreeFilter } from "src/deck";
+import { CardListType, Deck, DeckTreeFilter } from "src/deck/deck";
 import {
     CardOrder,
     DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
-} from "src/deck-tree-iterator";
+} from "src/deck/deck-tree-iterator";
+import { TopicPath } from "src/deck/topic-path";
 import { ISRFile, SrTFile } from "src/file";
-import {
-    FlashcardReviewMode,
-    FlashcardReviewSequencer,
-    IFlashcardReviewSequencer,
-} from "src/flashcard-review-sequencer";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/obsidian-views/item-views/review-queue-list-view";
 import { SRTabView } from "src/gui/obsidian-views/item-views/sr-tab-view";
 import TabViewManager from "src/gui/obsidian-views/item-views/tab-view-manager";
@@ -32,15 +34,13 @@ import { OsrSidebar } from "src/gui/obsidian-views/sidebar";
 import StatusBarManager from "src/gui/obsidian-views/statusbar-items/status-bar-manager";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
-import { NextNoteReviewHandler } from "src/next-note-review-handler";
-import { Note } from "src/note";
-import { NoteFileLoader } from "src/note-file-loader";
-import { NoteReviewQueue } from "src/note-review-queue";
+import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
+import { Note } from "src/note/note";
+import { NoteFileLoader } from "src/note/note-file-loader";
+import { NoteReviewQueue } from "src/note/note-review-queue";
 import { setDebugParser } from "src/parser";
 import { DEFAULT_DATA, PluginData } from "src/plugin-data";
-import { QuestionPostponementList } from "src/question-postponement-list";
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
-import { TopicPath } from "src/topic-path";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
 
 export default class SRPlugin extends Plugin {

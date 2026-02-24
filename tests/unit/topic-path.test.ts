@@ -1,4 +1,4 @@
-import { TopicPath } from "src/topic-path";
+import { TopicPath } from "src/deck/topic-path";
 
 describe("Constructor exception handling", () => {
     test("Constructor rejects null path", () => {

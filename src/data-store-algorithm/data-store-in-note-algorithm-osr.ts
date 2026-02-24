@@ -3,7 +3,7 @@ import moment from "moment";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
-import { Card } from "src/card";
+import { Card } from "src/card/card";
 import {
     ALLOWED_DATE_FORMATS,
     SCHEDULING_INFO_REGEX,
@@ -13,7 +13,7 @@ import {
 } from "src/constants";
 import { IDataStoreAlgorithm } from "src/data-store-algorithm/idata-store-algorithm";
 import { ISRFile } from "src/file";
-import { Question } from "src/question";
+import { Question } from "src/card/questions/question";
 import { SRSettings } from "src/settings";
 import { formatDateYYYYMMDD } from "src/utils/dates";
 
@@ -60,8 +60,8 @@ export class DataStoreInNoteAlgorithmOsr implements IDataStoreAlgorithm {
             fileText = fileText.replace(
                 SCHEDULING_INFO_REGEX,
                 `---\n${schedulingInfo[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
-                    `${schedulingInfo[5]}---`,
+                `sr-interval: ${interval}\nsr-ease: ${ease}\n` +
+                `${schedulingInfo[5]}---`,
             );
         } else if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
             // new note with existing YAML front matter
@@ -69,7 +69,7 @@ export class DataStoreInNoteAlgorithmOsr implements IDataStoreAlgorithm {
             fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
                 `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
-                    `sr-interval: ${interval}\nsr-ease: ${ease}\n---`,
+                `sr-interval: ${interval}\nsr-ease: ${ease}\n---`,
             );
         } else {
             fileText =
