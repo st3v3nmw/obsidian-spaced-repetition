@@ -55,24 +55,32 @@ export class NoteReviewQueue {
     }
 
     updateScheduleInfo(note: ISRFile, scheduleInfo: RepItemScheduleInfo): void {
-        this.reviewDecks.forEach((reviewDeck: NoteReviewDeck) => {
-            let wasDueInDeck = false;
-            for (const scheduledNote of reviewDeck.scheduledNotes) {
-                if (scheduledNote.note.path === note.path) {
-                    scheduledNote.dueUnix = scheduleInfo.dueDate.valueOf();
-                    wasDueInDeck = true;
-                    break;
-                }
+        for (const reviewDeck of this.reviewDecks.values()) {
+            const isNewNoteInDeck = reviewDeck.newNotes.some(
+                (newNote) => newNote.path === note.path,
+            );
+            const isScheduledNoteInDeck = reviewDeck.scheduledNotes.some(
+                (scheduledNote) => scheduledNote.note.path === note.path,
+            );
+            const isInDeck = isNewNoteInDeck || isScheduledNoteInDeck;
+
+            if (!isInDeck) continue;
+
+            if (isNewNoteInDeck) {
+                // It was a new note, remove it from the new notes and schedule it.
+                const indexOfNote = reviewDeck.newNotes.findIndex(
+                    (newNote) => newNote.path === note.path,
+                );
+                reviewDeck.newNotes.splice(indexOfNote, 1);
+                reviewDeck.scheduledNotes.push(new SchedNote(note, scheduleInfo.dueDate.valueOf()));
+            } else if (isScheduledNoteInDeck) {
+                const scheduledNote = reviewDeck.scheduledNotes.find(
+                    (scheduledNote) => scheduledNote.note.path === note.path,
+                );
+                scheduledNote.dueUnix = scheduleInfo.dueDate.valueOf();
             }
 
-            // It was a new note, remove it from the new notes and schedule it.
-            if (!wasDueInDeck) {
-                reviewDeck.newNotes.splice(
-                    reviewDeck.newNotes.findIndex((newNote: ISRFile) => newNote.path === note.path),
-                    1,
-                );
-                reviewDeck.scheduledNotes.push(new SchedNote(note, scheduleInfo.dueDate.valueOf()));
-            }
-        });
+            break;
+        }
     }
 }

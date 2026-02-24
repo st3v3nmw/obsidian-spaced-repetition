@@ -8,7 +8,7 @@ export default class ResetButtonComponent extends SRButtonComponent {
         classNames?: string[],
     ) {
         super(container, {
-            classNames: ["sr-reset-button", ...(classNames ?? [])],
+            classNames: ["sr-reset-button", "mod-warning", ...(classNames ?? [])],
             icon: "refresh-cw",
             tooltip: t("RESET_CARD_PROGRESS"),
             onClick: () => {
