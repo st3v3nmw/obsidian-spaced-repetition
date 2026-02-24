@@ -33,6 +33,50 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
     - [How to review a note](https://stephenmwangi.com/obsidian-spaced-repetition/notes/#reviewing)
 - [Statistics](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/statistics/)
 
+## Usage TLDR
+
+**Creating Decks**
+
+1. Add the tag #flashcards in a note, where you want to write your cards
+2. If you want to have your cards in a specific sub deck, then add your sub deck name to the tag like so: #flashcards/YOUR_SUB_DECK_NAME
+3. Write your card in the note which where you've added your tag
+
+**Creating Cards**
+
+1. Decide what card type you need:
+    - Single line -> Card format: Question::Answer
+    - Single line reversable -> Card format: Question:::Answer
+    - Multi line -> Card format:
+      Question
+      ?
+      Answer
+    - Multi line reversable -> Card format:
+      Question
+      ??
+      Answer
+2. Write your card (In one of those formats) in a note that you have tagged as a deck
+
+**Reviewing Cards**
+
+1. Open the list of all decks with either of two commands(ctrl+p):
+    - Review Flashcards from all notes -> Here the algorithim decides based on your past reviews, which cards are due to review
+    - Select a deck to cram -> All decks and all cards are reviewable and the algorithim is fully ignored
+2. Or open the list of all decks within your currently opened note(ctrl+p):
+    - Review flashcards in this note -> Here the algorithim decides based on your past reviews, which cards from this note are due to review
+    - Cram flashcards in this note -> All decks and all cards from this note are reviewable and the algorithim is fully ignored
+3. Select a deck and rate your ability to remember the answer to the current question -> this tells the algorithim what you know well and what you don't
+
+**Creating & reviewing whole notes**
+
+Sometimes it makes more sense to recall a whole note, when it isnt just pure facts which you have to learn.
+This is where marking a note for review comes in handy.
+
+1. Just like with decks add the tag #review to your note to mark them as reviewable
+2. To see which notes are due for review open the note review queue via the command(ctrl+p): Open Notes Review Queue in sidebar
+3. There you can open up the notes for review, just as if you would open them up in your file explorer, only that they are sorted her by when they are due for review
+4. Once you have recalled/reviewed your note you can rate your recall ability by executing the command(ctrl+p, or just via the 3 dots next to the note): Review note as YOUR_RATING
+    - The algorithim will take your rating into account to calculate a new due date, when you have to review it again
+
 ## Links & Resources
 
 - [Documentation](https://stephenmwangi.com/obsidian-spaced-repetition/).
