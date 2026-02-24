@@ -74,6 +74,12 @@ export class ReviewQueueListView extends ItemView {
 
         titleWrapper.createDiv("sr-note-review-header-title").setText(t("OPEN_NOTE_FOR_REVIEW"));
 
+        const subTitleWrapper = this.contentEl.createDiv("sr-note-review-header-subtitle-wrapper");
+        // TODO: Translate
+        subTitleWrapper
+            .createDiv("sr-note-review-header-subtitle")
+            .setText("Click on the 3 dots next to the note to open the review menu.");
+
         this.treeEl = this.contentEl.createDiv("tree-item nav-folder mod-root");
 
         this.createTree(this.treeEl);
@@ -213,6 +219,7 @@ export class ReviewQueueListView extends ItemView {
     ): HTMLElement {
         const folderEl: HTMLDivElement = parentEl.createDiv("tree-item nav-folder");
         const folderTitleEl: HTMLDivElement = folderEl.createDiv("tree-item-self nav-folder-title");
+        folderTitleEl.classList.add("is-clickable");
         const childrenEl: HTMLDivElement = folderEl.createDiv(
             "tree-item-children nav-folder-children",
         );
@@ -266,6 +273,8 @@ export class ReviewQueueListView extends ItemView {
         }
 
         const navFileTitle: HTMLElement = navFileEl.createDiv("tree-item-self nav-file-title");
+        navFileTitle.addClass("is-clickable");
+
         if (fileElActive) {
             navFileTitle.addClass("is-active");
         }
