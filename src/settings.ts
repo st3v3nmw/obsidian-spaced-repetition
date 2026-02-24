@@ -108,7 +108,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),
     reviewButtonDelay: 0,
-    openViewInNewTab: false,
+    openViewInNewTab: true,
     openViewInNewTabMobile: false,
 
     // algorithm
