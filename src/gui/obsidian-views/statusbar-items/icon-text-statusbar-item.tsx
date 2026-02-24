@@ -7,15 +7,17 @@ import SRPlugin from "src/main";
 export default class IconTextStatusBarItem extends TextStatusBarItem {
     protected icon: string;
     protected iconEl: HTMLElement;
-    constructor(plugin: SRPlugin, type: StatusBarItemType,
+    constructor(
+        plugin: SRPlugin,
+        type: StatusBarItemType,
         props: {
-            icon: string,
-            text?: string | string[],
-            show?: boolean,
-            tooltip?: string,
-            tooltipPosition?: string
-            onClick?: () => unknown
-        }
+            icon: string;
+            text?: string | string[];
+            show?: boolean;
+            tooltip?: string;
+            tooltipPosition?: string;
+            onClick?: () => unknown;
+        },
     ) {
         super(plugin, type, props);
 
@@ -26,7 +28,8 @@ export default class IconTextStatusBarItem extends TextStatusBarItem {
         this.segments = [];
         this.statusBarItem.empty();
 
-        if (this.icon !== undefined || icon !== undefined) this.setStatusBarItemIcon(icon ? icon : this.icon);
+        if (this.icon !== undefined || icon !== undefined)
+            this.setStatusBarItemIcon(icon ? icon : this.icon);
 
         if (text !== undefined && typeof text === "string") {
             this.createTextSegment(text);

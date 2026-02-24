@@ -7,7 +7,17 @@ export default class StatusBarItem {
     protected segments: HTMLElement[];
     protected type: StatusBarItemType;
 
-    constructor(plugin: SRPlugin, type: StatusBarItemType, props: { show?: boolean, segments?: HTMLElement[], tooltip?: string, tooltipPosition?: string, onClick?: () => unknown }) {
+    constructor(
+        plugin: SRPlugin,
+        type: StatusBarItemType,
+        props: {
+            show?: boolean;
+            segments?: HTMLElement[];
+            tooltip?: string;
+            tooltipPosition?: string;
+            onClick?: () => unknown;
+        },
+    ) {
         this.plugin = plugin;
         this.type = type;
         this.statusBarItem = this.plugin.addStatusBarItem();

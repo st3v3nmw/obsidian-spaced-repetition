@@ -6,7 +6,11 @@ import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 
 export type StatusBarItemType = "card-review" | "note-review" | "update-available";
-export const StatusBarItemTypesArray: ReadonlyArray<StatusBarItemType> = ["card-review", "note-review", "update-available"];
+export const StatusBarItemTypesArray: ReadonlyArray<StatusBarItemType> = [
+    "card-review",
+    "note-review",
+    "update-available",
+];
 
 export default class StatusBarManager {
     protected statusBarItems: IconTextStatusBarItem[];
@@ -20,7 +24,9 @@ export default class StatusBarManager {
     }
 
     setText(text: string | string[], statusBarItemType: StatusBarItemType): void {
-        const statusBarItem = this.statusBarItems.find((statusBarItem) => statusBarItem.getStatusBarItemType() === statusBarItemType);
+        const statusBarItem = this.statusBarItems.find(
+            (statusBarItem) => statusBarItem.getStatusBarItemType() === statusBarItemType,
+        );
         if (statusBarItem !== undefined) {
             statusBarItem.setText(text);
         }
@@ -31,7 +37,8 @@ export default class StatusBarManager {
             this.createStatusBarItems(state);
         } else if (state === true && this.statusBarItems.length > 0) {
             this.statusBarItems.forEach((statusBarItem) => {
-                if (statusBarItem.getStatusBarItemType() !== "update-available") statusBarItem.show();
+                if (statusBarItem.getStatusBarItemType() !== "update-available")
+                    statusBarItem.show();
             });
         } else {
             this.statusBarItems.forEach((statusBarItem) => {
@@ -41,7 +48,9 @@ export default class StatusBarManager {
     }
 
     showStatusBarItem(state: boolean, statusBarItemType: StatusBarItemType): void {
-        const statusBarItem = this.statusBarItems.find((statusBarItem) => statusBarItem.getStatusBarItemType() === statusBarItemType);
+        const statusBarItem = this.statusBarItems.find(
+            (statusBarItem) => statusBarItem.getStatusBarItemType() === statusBarItemType,
+        );
         if (statusBarItem !== undefined) {
             statusBarItem.show();
         }
@@ -74,7 +83,7 @@ export default class StatusBarManager {
                                     );
                                 }
                             }
-                        }
+                        },
                     });
                     break;
                 case "note-review":
@@ -88,7 +97,7 @@ export default class StatusBarManager {
                                 await this.plugin.sync();
                                 this.plugin.nextNoteReviewHandler.reviewNextNoteModal();
                             }
-                        }
+                        },
                     });
                     break;
                 case "update-available":
@@ -104,8 +113,10 @@ export default class StatusBarManager {
             this.statusBarItems.push(statusBarItem);
         });
 
-        if (showItems && this.plugin.manifest.version !== await this.getNewestVersion()) {
-            const updateItem = this.statusBarItems.find((statusBarItem) => statusBarItem.getStatusBarItemType() === "update-available");
+        if (showItems && this.plugin.manifest.version !== (await this.getNewestVersion())) {
+            const updateItem = this.statusBarItems.find(
+                (statusBarItem) => statusBarItem.getStatusBarItemType() === "update-available",
+            );
 
             updateItem.show();
             updateItem.setText("Spaced Repetition: new Update!");
@@ -123,7 +134,7 @@ export default class StatusBarManager {
                 );
             };
 
-            const latestVersion = ((await gitAPIrequest())
+            const latestVersion = (await gitAPIrequest())
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .filter((el: any) => !el.draft && !el.prerelease)
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -136,7 +147,7 @@ export default class StatusBarManager {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .filter((el: any) => el.version.match(/^\d+\.\d+\.\d+$/))
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .sort((el1: any, el2: any) => el2.published - el1.published)[0].version) as string;
+                .sort((el1: any, el2: any) => el2.published - el1.published)[0].version as string;
 
             return latestVersion;
         } catch (e) {

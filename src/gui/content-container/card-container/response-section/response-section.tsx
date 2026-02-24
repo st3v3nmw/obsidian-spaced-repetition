@@ -4,7 +4,10 @@ import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info"
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { textInterval } from "src/algorithms/osr/note-scheduling";
 import { Card } from "src/card/card";
-import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/card/flashcard-review-sequencer";
+import {
+    FlashcardReviewMode,
+    IFlashcardReviewSequencer,
+} from "src/card/flashcard-review-sequencer";
 import SRResponseButtonComponent from "src/gui/content-container/card-container/response-section/sr-response-button";
 import { t } from "src/lang/helpers";
 import { SRSettings } from "src/settings";
