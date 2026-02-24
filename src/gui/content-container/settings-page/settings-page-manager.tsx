@@ -96,6 +96,7 @@ export class SettingsPageManager {
     private applyDebounceTimer: number = 0;
     private currentPage: SettingsPageType;
     private updateLastPageState: (lastPage: SettingsPageType, lastScrollPosition: number) => void;
+    private display: () => void;
 
     constructor(
         containerEl: HTMLElement,
@@ -103,10 +104,12 @@ export class SettingsPageManager {
         lastPage: SettingsPageType,
         lastScrollPosition: number,
         updateLastPageState: (lastPage: SettingsPageType, lastScrollPosition: number) => void,
+        display: () => void,
     ) {
         this.containerEl = containerEl;
         this.plugin = plugin;
         this.updateLastPageState = updateLastPageState;
+        this.display = display;
 
         this.createPages();
         this.currentPage = lastPage;
@@ -145,6 +148,7 @@ export class SettingsPageManager {
                             newPageContainerEl,
                             this.plugin,
                             pageType,
+                            this.display,
                             this.openPage.bind(this),
                             this.scrollListener.bind(this),
                         ),
@@ -157,7 +161,7 @@ export class SettingsPageManager {
                             this.plugin,
                             pageType,
                             this.applySettingsUpdate.bind(this),
-                            this.createPages.bind(this),
+                            this.display,
                             this.openPage.bind(this),
                             this.scrollListener.bind(this),
                         ),
@@ -170,7 +174,7 @@ export class SettingsPageManager {
                             this.plugin,
                             pageType,
                             this.applySettingsUpdate.bind(this),
-                            this.createPages.bind(this),
+                            this.display,
                             this.openPage.bind(this),
                             this.scrollListener.bind(this),
                         ),
@@ -183,7 +187,7 @@ export class SettingsPageManager {
                             this.plugin,
                             pageType,
                             this.applySettingsUpdate.bind(this),
-                            this.createPages.bind(this),
+                            this.display,
                             this.openPage.bind(this),
                             this.scrollListener.bind(this),
                         ),
@@ -196,7 +200,7 @@ export class SettingsPageManager {
                             this.plugin,
                             pageType,
                             this.applySettingsUpdate.bind(this),
-                            this.createPages.bind(this),
+                            this.display,
                             this.openPage.bind(this),
                             this.scrollListener.bind(this),
                         ),

@@ -29,6 +29,7 @@ export class SRSettingTab extends PluginSettingTab {
                 this.lastPage = lastPage;
                 this.lastScrollPosition = lastScrollPosition;
             },
+            this.display.bind(this),
         );
     }
 

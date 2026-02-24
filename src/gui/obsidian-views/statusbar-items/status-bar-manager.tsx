@@ -1,9 +1,10 @@
-import { request } from "obsidian";
+import { Platform, request } from "obsidian";
 
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import IconTextStatusBarItem from "src/gui/obsidian-views/statusbar-items/icon-text-statusbar-item";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import EmulatedPlatform from "src/utils/platform-detector";
 
 export type StatusBarItemType = "card-review" | "note-review" | "update-available";
 export const StatusBarItemTypesArray: ReadonlyArray<StatusBarItemType> = [
@@ -70,7 +71,12 @@ export default class StatusBarManager {
                         onClick: async () => {
                             if (!this.plugin.osrAppCore.syncLock) {
                                 await this.plugin.sync();
-                                if (this.plugin.data.settings.openViewInNewTab) {
+                                const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
+                                const openInNewTab =
+                                    (!isMobile && this.plugin.data.settings.openViewInNewTab) ||
+                                    (isMobile && this.plugin.data.settings.openViewInNewTabMobile);
+
+                                if (openInNewTab) {
                                     this.plugin.tabViewManager.openSRTabView(
                                         this.plugin.osrAppCore,
                                         FlashcardReviewMode.Review,
