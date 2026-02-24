@@ -1,9 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
 
+import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
 import { OsrCore } from "src/core";
 import { NoteReviewQueue } from "src/note/note-review-queue";
-import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
 import { SRSettings } from "src/settings";
 
 import { UnitTestSRFile } from "./unit-test-file";

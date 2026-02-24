@@ -2,18 +2,18 @@ import { ButtonComponent, Platform } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
-import { COLLAPSE_ICON } from "src/constants";
-import { Deck } from "src/deck/deck";
 import {
     DeckStats,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/card/flashcard-review-sequencer";
+import { COLLAPSE_ICON } from "src/constants";
+import { Deck } from "src/deck/deck";
+import { TopicPath } from "src/deck/topic-path";
 import ModalCloseButtonComponent from "src/gui/content-container/modal-close-button";
 import { FlashcardMode } from "src/gui/obsidian-views/modals/sr-modal-view";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
-import { TopicPath } from "src/deck/topic-path";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 export class DeckContainer {

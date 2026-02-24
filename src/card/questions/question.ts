@@ -5,10 +5,10 @@ import {
 } from "src/constants";
 import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
 import { DataStore } from "src/data-stores/base/data-store";
+import { TopicPath, TopicPathList, TopicPathWithWs } from "src/deck/topic-path";
 import { Note } from "src/note/note";
 import { ParsedQuestionInfo } from "src/parser";
 import { SRSettings } from "src/settings";
-import { TopicPath, TopicPathList, TopicPathWithWs } from "src/deck/topic-path";
 import { cyrb53, MultiLineTextFinder, stringTrimStart, TextDirection } from "src/utils/strings";
 
 export enum CardType {

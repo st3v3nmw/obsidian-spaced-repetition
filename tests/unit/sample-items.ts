@@ -1,10 +1,10 @@
 import { Deck } from "src/deck/deck";
 import { CardOrder, DeckOrder, DeckTreeIterator } from "src/deck/deck-tree-iterator";
+import { TopicPath } from "src/deck/topic-path";
 import { Note } from "src/note/note";
 import { NoteParser } from "src/note/note-parser";
 import { NoteQuestionParser } from "src/note/note-question-parser";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
-import { TopicPath } from "src/deck/topic-path";
 import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";

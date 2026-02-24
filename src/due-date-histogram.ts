@@ -10,8 +10,8 @@ import {
     IDeckTreeIterator,
     IIteratorOrder,
 } from "src/deck/deck-tree-iterator";
-import { NoteReviewDeck, SchedNote } from "src/note/note-review-deck";
 import { TopicPath } from "src/deck/topic-path";
+import { NoteReviewDeck, SchedNote } from "src/note/note-review-deck";
 import { globalDateProvider } from "src/utils/dates";
 
 export class DueDateHistogram {

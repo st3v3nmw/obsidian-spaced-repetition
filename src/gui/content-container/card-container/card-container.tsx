@@ -3,11 +3,12 @@ import { App, Platform } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { Card } from "src/card/card";
-import { Deck } from "src/deck/deck";
 import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/card/flashcard-review-sequencer";
+import { CardType, Question } from "src/card/questions/question";
+import { Deck } from "src/deck/deck";
 import CardInfoNotice from "src/gui/content-container/card-container/controls/card-info-notice";
 import ControlsComponent from "src/gui/content-container/card-container/controls/controls";
 import InfoSection from "src/gui/content-container/card-container/deck-info/info-section";
@@ -15,7 +16,6 @@ import ResponseSectionComponent from "src/gui/content-container/card-container/r
 import { FlashcardMode } from "src/gui/obsidian-views/modals/sr-modal-view";
 import type SRPlugin from "src/main";
 import { Note } from "src/note/note";
-import { CardType, Question } from "src/card/questions/question";
 import { SRSettings } from "src/settings";
 import EmulatedPlatform from "src/utils/platform-detector";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
