@@ -29,6 +29,7 @@ import TabViewManager from "src/gui/obsidian-views/item-views/tab-view-manager";
 import { SRModalView } from "src/gui/obsidian-views/modals/sr-modal-view";
 import { SRSettingTab } from "src/gui/obsidian-views/settings-tab";
 import { OsrSidebar } from "src/gui/obsidian-views/sidebar";
+import StatusBarManager from "src/gui/obsidian-views/statusbar-items/status-bar-manager";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/next-note-review-handler";
@@ -47,12 +48,12 @@ export default class SRPlugin extends Plugin {
     public osrAppCore: OsrAppCore;
     public tabViewManager: TabViewManager;
     private osrSidebar: OsrSidebar;
-    private nextNoteReviewHandler: NextNoteReviewHandler;
+    public nextNoteReviewHandler: NextNoteReviewHandler;
 
     private externalModalObserver: MutationObserver;
 
     private ribbonIcon: HTMLElement | null = null;
-    private statusBar: HTMLElement | null = null;
+    private statusBarManager: StatusBarManager | null = null;
     private isSRInFocus: boolean = false;
     private fileMenuHandler: (
         menu: Menu,
@@ -108,7 +109,7 @@ export default class SRPlugin extends Plugin {
 
         appIcon();
 
-        this.showStatusBar(this.data.settings.showStatusBar);
+        this.addStatusBarManager();
 
         this.showRibbonIcon(this.data.settings.showRibbonIcon);
 
@@ -414,7 +415,7 @@ export default class SRPlugin extends Plugin {
             reviewMode,
         );
     }
-    private openFlashcardModal(
+    public openFlashcardModal(
         fullDeckTree: Deck,
         remainingDeckTree: Deck,
         reviewMode: FlashcardReviewMode,
@@ -470,15 +471,18 @@ export default class SRPlugin extends Plugin {
     }
 
     private onOsrVaultDataChanged() {
-        this.statusBar.setText(
-            t("STATUS_BAR", {
-                dueNotesCount: this.osrAppCore.noteReviewQueue.dueNotesCount,
-                dueFlashcardsCount: this.osrAppCore.remainingDeckTree.getCardCount(
-                    CardListType.All,
-                    true,
-                ),
-            }),
-        );
+        // TODO: Translate
+        this.updateStatusBar();
+
+        // this.statusBarManager.setText(
+        //     t("STATUS_BAR", {
+        //         dueNotesCount: this.osrAppCore.noteReviewQueue.dueNotesCount,
+        //         dueFlashcardsCount: this.osrAppCore.remainingDeckTree.getCardCount(
+        //             CardListType.All,
+        //             true,
+        //         ),
+        //     }),
+        // );
 
         if (this.data.settings.enableNoteReviewPaneOnStartup) this.osrSidebar.redraw();
     }
@@ -585,25 +589,19 @@ export default class SRPlugin extends Plugin {
         }
     }
 
-    showStatusBar(status: boolean) {
-        // if it does not exist, we create it
-        if (!this.statusBar) {
-            this.statusBar = this.addStatusBarItem();
-            this.statusBar.classList.add("mod-clickable");
-            this.statusBar.setAttribute("aria-label", t("OPEN_NOTE_FOR_REVIEW"));
-            this.statusBar.setAttribute("aria-label-position", "top");
-            this.statusBar.addEventListener("click", async () => {
-                if (!this.osrAppCore.syncLock) {
-                    await this.sync();
-                    this.nextNoteReviewHandler.reviewNextNoteModal();
-                }
-            });
+    private addStatusBarManager() {
+        this.statusBarManager = new StatusBarManager(this, this.data.settings.showStatusBar);
+    }
+
+    private updateStatusBar() {
+        if (this.data.settings.showStatusBar) {
+            this.statusBarManager.setText(`${this.osrAppCore.remainingDeckTree.getCardCount(
+                CardListType.All,
+                true,
+            )} card(s) due`, "card-review");
+            this.statusBarManager.setText(`${this.osrAppCore.noteReviewQueue.dueNotesCount} note(s) due`, "note-review");
         }
 
-        if (status) {
-            this.statusBar.style.display = "";
-        } else {
-            this.statusBar.style.display = "none";
-        }
+        this.statusBarManager.showStatusBarItems(this.data.settings.showStatusBar);
     }
 }
