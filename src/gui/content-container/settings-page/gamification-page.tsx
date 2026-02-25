@@ -147,7 +147,7 @@ export class GamificationPage extends SettingsPage {
                             })
                             .setDisabled(
                                 !this.plugin.data.settings.habiticaUserId ||
-                                !this.plugin.data.settings.habiticaApiToken,
+                                    !this.plugin.data.settings.habiticaApiToken,
                             ),
                     )
                     .setDisabled(!this.plugin.data.settings.enableHabiticaIntegration);
@@ -156,7 +156,9 @@ export class GamificationPage extends SettingsPage {
 
     private async retrieveHabiticaTaskIds(): Promise<void> {
         const userId = this.app.secretStorage.getSecret(this.plugin.data.settings.habiticaUserId);
-        const apiToken = this.app.secretStorage.getSecret(this.plugin.data.settings.habiticaApiToken);
+        const apiToken = this.app.secretStorage.getSecret(
+            this.plugin.data.settings.habiticaApiToken,
+        );
 
         if (!userId || !apiToken) {
             new Notice("Please set Habitica User ID and API Token first");
