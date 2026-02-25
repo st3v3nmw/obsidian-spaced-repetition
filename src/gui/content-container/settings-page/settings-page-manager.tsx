@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import h from "vhtml";
+import { App } from "obsidian";
 
 import { FlashcardsPage } from "src/gui/content-container/settings-page/flashcards-page";
 import { GamificationPage } from "src/gui/content-container/settings-page/gamification-page";
@@ -97,6 +96,7 @@ export function getPageIcon(pageType: SettingsPageType): string {
  * @class SettingsPageManager
  */
 export class SettingsPageManager {
+    private app: App;
     private containerEl: HTMLElement;
     private plugin: SRPlugin;
     private pages: SettingsPage[] = [];
@@ -106,6 +106,7 @@ export class SettingsPageManager {
     private display: () => void;
 
     constructor(
+        app: App,
         containerEl: HTMLElement,
         plugin: SRPlugin,
         lastPage: SettingsPageType,
@@ -113,6 +114,7 @@ export class SettingsPageManager {
         updateLastPageState: (lastPage: SettingsPageType, lastScrollPosition: number) => void,
         display: () => void,
     ) {
+        this.app = app;
         this.containerEl = containerEl;
         this.plugin = plugin;
         this.updateLastPageState = updateLastPageState;
@@ -227,11 +229,12 @@ export class SettingsPageManager {
                 case "gamification-page":
                     this.pages.push(
                         new GamificationPage(
+                            this.app,
                             newPageContainerEl,
                             this.plugin,
                             pageType,
                             this.applySettingsUpdate.bind(this),
-                            this.createPages.bind(this),
+                            this.display,
                             this.openPage.bind(this),
                             this.scrollListener.bind(this),
                         ),
