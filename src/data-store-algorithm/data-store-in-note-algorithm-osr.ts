@@ -3,7 +3,8 @@ import moment from "moment";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
-import { Card } from "src/card";
+import { Card } from "src/card/card";
+import { Question } from "src/card/questions/question";
 import {
     ALLOWED_DATE_FORMATS,
     SCHEDULING_INFO_REGEX,
@@ -13,7 +14,6 @@ import {
 } from "src/constants";
 import { IDataStoreAlgorithm } from "src/data-store-algorithm/idata-store-algorithm";
 import { ISRFile } from "src/file";
-import { Question } from "src/question";
 import { SRSettings } from "src/settings";
 import { formatDateYYYYMMDD } from "src/utils/dates";
 

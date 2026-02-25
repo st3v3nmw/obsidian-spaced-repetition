@@ -1,6 +1,6 @@
+import { CardType } from "src/card/questions/question";
 import { parse, ParsedQuestionInfo, setDebugParser } from "src/parser";
 import { ParserOptions } from "src/parser";
-import { CardType } from "src/question";
 
 const parserOptions: ParserOptions = {
     singleLineCardSeparator: "::",

@@ -1,16 +1,17 @@
-import { App, Modal } from "obsidian";
+import { App, Modal, Platform } from "obsidian";
 
-import { Deck } from "src/deck";
 import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
-} from "src/flashcard-review-sequencer";
+} from "src/card/flashcard-review-sequencer";
+import { Question } from "src/card/questions/question";
+import { Deck } from "src/deck/deck";
 import { CardContainer } from "src/gui/content-container/card-container/card-container";
 import { DeckContainer } from "src/gui/content-container/deck-container";
-import { FlashcardEditModal } from "src/gui/obsidian-views/edit-modal";
+import { FlashcardEditModal } from "src/gui/obsidian-views/modals/edit-modal";
 import type SRPlugin from "src/main";
-import { Question } from "src/question";
 import { SRSettings } from "src/settings";
+import EmulatedPlatform from "src/utils/platform-detector";
 
 export enum FlashcardMode {
     Deck,
@@ -44,16 +45,23 @@ export class SRModalView extends Modal {
         this.reviewMode = reviewMode;
 
         // Setup base containers
-        this.modalEl.style.height = this.settings.flashcardHeightPercentage + "%";
-        this.modalEl.style.maxHeight = this.settings.flashcardHeightPercentage + "%";
-        this.modalEl.style.width = this.settings.flashcardWidthPercentage + "%";
-        this.modalEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
+        if (Platform.isMobile || EmulatedPlatform().isMobile) {
+            this.modalEl.style.height = this.settings.flashcardHeightPercentageMobile + "%";
+            this.modalEl.style.maxHeight = this.settings.flashcardHeightPercentageMobile + "%";
+            this.modalEl.style.width = this.settings.flashcardWidthPercentageMobile + "%";
+            this.modalEl.style.maxWidth = this.settings.flashcardWidthPercentageMobile + "%";
+        } else {
+            this.modalEl.style.height = this.settings.flashcardHeightPercentage + "%";
+            this.modalEl.style.maxHeight = this.settings.flashcardHeightPercentage + "%";
+            this.modalEl.style.width = this.settings.flashcardWidthPercentage + "%";
+            this.modalEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
+        }
         this.modalEl.setAttribute("id", "sr-modal-view");
         this.modalEl.addClass("sr-view");
 
         if (
-            this.settings.flashcardHeightPercentage >= 100 ||
-            this.settings.flashcardWidthPercentage >= 100
+            parseInt(this.modalEl.style.height.split("%")[0]) >= 100 ||
+            parseInt(this.modalEl.style.width.split("%")[0]) >= 100
         ) {
             this.modalEl.style.borderRadius = "0";
         }

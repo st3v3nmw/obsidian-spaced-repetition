@@ -1,11 +1,11 @@
 import { ButtonComponent, setIcon } from "obsidian";
 
-import { Deck } from "src/deck";
-import { DeckStats } from "src/flashcard-review-sequencer";
+import { DeckStats } from "src/card/flashcard-review-sequencer";
+import { Question } from "src/card/questions/question";
+import { Deck } from "src/deck/deck";
 import BackButtonComponent from "src/gui/content-container/card-container/controls/back-button";
-import ModalCloseButtonComponent from "src/gui/modal-close-button";
-import { Note } from "src/note";
-import { Question } from "src/question";
+import ModalCloseButtonComponent from "src/gui/content-container/modal-close-button";
+import { Note } from "src/note/note";
 
 export default class InfoSectionComponent {
     public infoSection: HTMLDivElement;

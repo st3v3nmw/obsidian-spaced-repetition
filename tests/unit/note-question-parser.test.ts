@@ -1,12 +1,12 @@
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
-import { Card } from "src/card";
+import { Card } from "src/card/card";
+import { CardType, Question } from "src/card/questions/question";
 import { TICKS_PER_DAY } from "src/constants";
+import { TopicPath, TopicPathList } from "src/deck/topic-path";
 import { frontmatterTagPseudoLineNum, ISRFile } from "src/file";
-import { NoteQuestionParser } from "src/note-question-parser";
-import { CardType, Question } from "src/question";
+import { NoteQuestionParser } from "src/note/note-question-parser";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
-import { TopicPath, TopicPathList } from "src/topic-path";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 

@@ -1,4 +1,4 @@
-import { NoteEaseList } from "src/note-ease-list";
+import { NoteEaseList } from "src/note/note-ease-list";
 import { DEFAULT_SETTINGS } from "src/settings";
 
 test("baseEase", async () => {

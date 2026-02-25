@@ -1,6 +1,6 @@
-import { Deck } from "src/deck";
+import { Question } from "src/card/questions/question";
+import { Deck } from "src/deck/deck";
 import { ISRFile } from "src/file";
-import { Question } from "src/question";
 import { SRSettings } from "src/settings";
 
 export class Note {

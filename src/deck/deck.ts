@@ -1,8 +1,8 @@
-import { Card } from "src/card";
-import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
-import { Question } from "src/question";
-import { IQuestionPostponementList } from "src/question-postponement-list";
-import { TopicPath, TopicPathList } from "src/topic-path";
+import { Card } from "src/card/card";
+import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
+import { Question } from "src/card/questions/question";
+import { IQuestionPostponementList } from "src/card/questions/question-postponement-list";
+import { TopicPath, TopicPathList } from "src/deck/topic-path";
 
 export enum CardListType {
     NewCard,

@@ -18,14 +18,14 @@ import h from "vhtml";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { textInterval } from "src/algorithms/osr/note-scheduling";
 import { OsrCore } from "src/core";
-import { CardListType } from "src/deck";
+import { CardListType } from "src/deck/deck";
+import { Stats } from "src/deck/stats";
 import { SettingsPage } from "src/gui/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/gui/content-container/settings-page/settings-page-manager";
 import ChartComponent from "src/gui/content-container/settings-page/statistics-page/chart-component";
 import NoteStatsComponent from "src/gui/content-container/settings-page/statistics-page/note-stats-component";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
-import { Stats } from "src/stats";
 import { getKeysPreserveType, getTypedObjectEntries, mapRecord } from "src/utils/types";
 
 Chart.register(

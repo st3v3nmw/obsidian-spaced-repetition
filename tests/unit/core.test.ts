@@ -1,10 +1,10 @@
 import moment from "moment";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { CardListType } from "src/deck";
+import { CardListType } from "src/deck/deck";
 import { NoteDueDateHistogram } from "src/due-date-histogram";
 import { ISRFile } from "src/file";
-import { NoteReviewDeck, SchedNote } from "src/note-review-deck";
+import { NoteReviewDeck, SchedNote } from "src/note/note-review-deck";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { formatDateYYYYMMDD, setupStaticDateProvider20230906 } from "src/utils/dates";
 

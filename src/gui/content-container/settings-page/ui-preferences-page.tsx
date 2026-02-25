@@ -1,10 +1,11 @@
-import { Setting, SettingGroup } from "obsidian";
+import { Platform, Setting, SettingGroup } from "obsidian";
 
 import { SettingsPage } from "src/gui/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/gui/content-container/settings-page/settings-page-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
+import EmulatedPlatform from "src/utils/platform-detector";
 
 export class UIPreferencesPage extends SettingsPage {
     constructor(
@@ -32,24 +33,36 @@ export class UIPreferencesPage extends SettingsPage {
                 setting
                     .setName(t("OPEN_IN_TAB"))
                     .setDesc(t("OPEN_IN_TAB_DESC"))
-                    .addToggle((toggle) =>
+                    .addToggle((toggle) => {
+                        const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
                         toggle
-                            .setValue(this.plugin.data.settings.openViewInNewTab)
+                            .setValue(
+                                isMobile
+                                    ? this.plugin.data.settings.openViewInNewTabMobile
+                                    : this.plugin.data.settings.openViewInNewTab,
+                            )
                             .onChange(async (value) => {
-                                if (value) {
-                                    this.plugin.registerSRFocusListener();
+                                if (isMobile) {
+                                    this.plugin.data.settings.openViewInNewTabMobile = value;
+                                    this.plugin.data.settings.flashcardHeightPercentageMobile = 100;
+                                    this.plugin.data.settings.flashcardWidthPercentageMobile = 100;
+                                } else {
+                                    this.plugin.data.settings.openViewInNewTab = value;
                                     this.plugin.data.settings.flashcardHeightPercentage = 100;
                                     this.plugin.data.settings.flashcardWidthPercentage = 100;
+                                }
+
+                                if (value) {
+                                    this.plugin.registerSRFocusListener();
                                 } else {
                                     this.plugin.tabViewManager.closeAllTabViews();
 
                                     // Remove focus from SR and remove event listener for focus change
                                     this.plugin.removeSRFocusListener();
                                 }
-                                this.plugin.data.settings.openViewInNewTab = value;
                                 await this.plugin.savePluginData();
-                            }),
-                    );
+                            });
+                    });
             })
             .addSetting((setting: Setting) => {
                 setting
@@ -75,7 +88,7 @@ export class UIPreferencesPage extends SettingsPage {
                             .onChange(async (value) => {
                                 this.plugin.data.settings.showStatusBar = value;
                                 await this.plugin.savePluginData();
-                                this.plugin.showStatusBar(value);
+                                this.plugin.updateStatusBar();
                             }),
                     );
             })
@@ -144,23 +157,39 @@ export class UIPreferencesPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.plugin.data.settings.flashcardHeightPercentage =
-                                    DEFAULT_SETTINGS.flashcardHeightPercentage;
+                                const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
+                                if (isMobile) {
+                                    this.plugin.data.settings.flashcardHeightPercentageMobile =
+                                        DEFAULT_SETTINGS.flashcardHeightPercentageMobile;
+                                } else {
+                                    this.plugin.data.settings.flashcardHeightPercentage =
+                                        DEFAULT_SETTINGS.flashcardHeightPercentage;
+                                }
                                 await this.plugin.savePluginData();
 
                                 this.display();
                             });
                     })
-                    .addSlider((slider) =>
+                    .addSlider((slider) => {
+                        const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
                         slider
                             .setLimits(10, 100, 5)
-                            .setValue(this.plugin.data.settings.flashcardHeightPercentage)
+                            .setValue(
+                                isMobile
+                                    ? this.plugin.data.settings.flashcardHeightPercentageMobile
+                                    : this.plugin.data.settings.flashcardHeightPercentage,
+                            )
                             .setDynamicTooltip()
                             .onChange(async (value) => {
-                                this.plugin.data.settings.flashcardHeightPercentage = value;
+                                if (isMobile) {
+                                    this.plugin.data.settings.flashcardHeightPercentageMobile =
+                                        value;
+                                } else {
+                                    this.plugin.data.settings.flashcardHeightPercentage = value;
+                                }
                                 await this.plugin.savePluginData();
-                            }),
-                    );
+                            });
+                    });
             })
             .addSetting((setting: Setting) => {
                 setting
@@ -171,23 +200,39 @@ export class UIPreferencesPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.plugin.data.settings.flashcardWidthPercentage =
-                                    DEFAULT_SETTINGS.flashcardWidthPercentage;
+                                const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
+                                if (isMobile) {
+                                    this.plugin.data.settings.flashcardWidthPercentageMobile =
+                                        DEFAULT_SETTINGS.flashcardWidthPercentageMobile;
+                                } else {
+                                    this.plugin.data.settings.flashcardWidthPercentage =
+                                        DEFAULT_SETTINGS.flashcardWidthPercentage;
+                                }
                                 await this.plugin.savePluginData();
 
                                 this.display();
                             });
                     })
-                    .addSlider((slider) =>
+                    .addSlider((slider) => {
+                        const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
                         slider
                             .setLimits(10, 100, 5)
-                            .setValue(this.plugin.data.settings.flashcardWidthPercentage)
+                            .setValue(
+                                isMobile
+                                    ? this.plugin.data.settings.flashcardWidthPercentageMobile
+                                    : this.plugin.data.settings.flashcardWidthPercentage,
+                            )
                             .setDynamicTooltip()
                             .onChange(async (value) => {
-                                this.plugin.data.settings.flashcardWidthPercentage = value;
+                                if (isMobile) {
+                                    this.plugin.data.settings.flashcardWidthPercentageMobile =
+                                        value;
+                                } else {
+                                    this.plugin.data.settings.flashcardWidthPercentage = value;
+                                }
                                 await this.plugin.savePluginData();
-                            }),
-                    );
+                            });
+                    });
             });
 
         new SettingGroup(this.containerEl)

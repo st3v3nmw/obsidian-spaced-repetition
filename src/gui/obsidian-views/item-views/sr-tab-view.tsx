@@ -1,14 +1,18 @@
-import { ButtonComponent, ItemView, WorkspaceLeaf } from "obsidian";
+import { ButtonComponent, ItemView, Platform, WorkspaceLeaf } from "obsidian";
 
+import {
+    FlashcardReviewMode,
+    IFlashcardReviewSequencer,
+} from "src/card/flashcard-review-sequencer";
+import { Question } from "src/card/questions/question";
 import { DEBUG_MODE_ENABLED, SR_TAB_VIEW } from "src/constants";
-import { Deck } from "src/deck";
-import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
+import { Deck } from "src/deck/deck";
 import { CardContainer } from "src/gui/content-container/card-container/card-container";
 import { DeckContainer } from "src/gui/content-container/deck-container";
-import { FlashcardEditModal } from "src/gui/obsidian-views/edit-modal";
+import { FlashcardEditModal } from "src/gui/obsidian-views/modals/edit-modal";
 import SRPlugin from "src/main";
-import { Question } from "src/question";
 import { SRSettings } from "src/settings";
+import EmulatedPlatform from "src/utils/platform-detector";
 
 /**
  * Represents a tab view for spaced repetition plugin.
@@ -64,10 +68,20 @@ export class SRTabView extends ItemView {
 
             this.viewContentEl = this.viewContainerEl.createDiv("sr-tab-view-content");
 
-            this.viewContentEl.style.height = this.settings.flashcardHeightPercentage + "%";
-            this.viewContentEl.style.maxHeight = this.settings.flashcardHeightPercentage + "%";
-            this.viewContentEl.style.width = this.settings.flashcardWidthPercentage + "%";
-            this.viewContentEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
+            if (Platform.isMobile || EmulatedPlatform().isMobile) {
+                this.viewContentEl.style.height =
+                    this.settings.flashcardHeightPercentageMobile + "%";
+                this.viewContentEl.style.maxHeight =
+                    this.settings.flashcardHeightPercentageMobile + "%";
+                this.viewContentEl.style.width = this.settings.flashcardWidthPercentageMobile + "%";
+                this.viewContentEl.style.maxWidth =
+                    this.settings.flashcardWidthPercentageMobile + "%";
+            } else {
+                this.viewContentEl.style.height = this.settings.flashcardHeightPercentage + "%";
+                this.viewContentEl.style.maxHeight = this.settings.flashcardHeightPercentage + "%";
+                this.viewContentEl.style.width = this.settings.flashcardWidthPercentage + "%";
+                this.viewContentEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
+            }
 
             if (
                 this.settings.flashcardHeightPercentage < 100 ||

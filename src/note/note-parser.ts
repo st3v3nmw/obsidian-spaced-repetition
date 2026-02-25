@@ -1,8 +1,8 @@
+import { TopicPath } from "src/deck/topic-path";
 import { ISRFile } from "src/file";
-import { Note } from "src/note";
-import { NoteQuestionParser } from "src/note-question-parser";
+import { Note } from "src/note/note";
+import { NoteQuestionParser } from "src/note/note-question-parser";
 import { SRSettings } from "src/settings";
-import { TopicPath } from "src/topic-path";
 import { TextDirection } from "src/utils/strings";
 
 export class NoteParser {

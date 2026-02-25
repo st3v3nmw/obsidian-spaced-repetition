@@ -22,18 +22,11 @@ export class MainPage extends SettingsPage {
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
         pageType: SettingsPageType,
+        display: () => void,
         openPage: (pageType: SettingsPageType) => void,
         scrollListener: (scrollPosition: number) => void,
     ) {
-        super(
-            pageContainerEl,
-            plugin,
-            pageType,
-            () => {},
-            () => {},
-            openPage,
-            scrollListener,
-        );
+        super(pageContainerEl, plugin, pageType, () => {}, display, openPage, scrollListener);
 
         this.containerEl.addClass("sr-main-page");
 
