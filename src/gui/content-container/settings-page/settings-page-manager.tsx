@@ -61,7 +61,7 @@ export function getPageName(pageType: SettingsPageType): string {
         case "statistics-page":
             return t("STATS_TITLE");
         case "gamification-page":
-            return "Gamification"; // TODO(byq77): add t("GAMIFICATION")
+            return t("GAMIFICATION");
     }
 }
 

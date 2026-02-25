@@ -35,11 +35,11 @@ export class GamificationPage extends SettingsPage {
         this.app = app;
 
         new SettingGroup(this.containerEl)
-            .setHeading("Habitica") // TODO(byq77): add t("GROUP_HABITICA")
+            .setHeading(t("GROUP_HABITICA"))
             .addSetting((setting: Setting) => {
                 setting
-                    .setName("Enable Habitica integration") // TODO(byq77): add t("ENABLE_HABITICA_INTEGRATION")
-                    .setDesc("Description") // TODO(byq77): add t("ENABLE_HABITICA_INTEGRATION_DESC")
+                    .setName(t("ENABLE_HABITICA_INTEGRATION"))
+                    .setDesc(t("ENABLE_HABITICA_INTEGRATION_DESC"))
                     .addToggle((toggle) =>
                         toggle
                             .setValue(this.plugin.data.settings.enableHabiticaIntegration)
@@ -55,8 +55,8 @@ export class GamificationPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
-                    .setName("User ID") // TODO(byq77): add t("HABITICA_USER_ID")
-                    .setDesc("The unique number that identifies your user in Habitica.") // TODO(byq77): add t("HABITICA_USER_ID_DESC")
+                    .setName(t("HABITICA_USER_ID"))
+                    .setDesc(t("HABITICA_USER_ID_DESC"))
                     .addComponent((el) =>
                         new SecretComponent(this.app, el)
                             .setValue(this.plugin.data.settings.habiticaUserId)
@@ -69,8 +69,8 @@ export class GamificationPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
-                    .setName("API Token") // TODO(byq77): add t("HABITICA_API_TOKEN")
-                    .setDesc("Required for authentication of your API calls.") // TODO(byq77): t("HABITICA_API_TOKEN_DESC")
+                    .setName(t("HABITICA_API_TOKEN"))
+                    .setDesc(t("HABITICA_API_TOKEN_DESC"))
                     .addComponent((el) =>
                         new SecretComponent(this.app, el)
                             .setValue(this.plugin.data.settings.habiticaApiToken)
@@ -83,8 +83,8 @@ export class GamificationPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
-                    .setName("Easy Task ID") // TODO(byq77): add t("HABITICA_EASY_TASK_ID")
-                    .setDesc("Description") // TODO(byq77): add t("HABITICA_EASY_TASK_ID_DESC")
+                    .setName(t("HABITICA_EASY_TASK_ID"))
+                    .setDesc(t("HABITICA_EASY_TASK_ID_DESC"))
                     .addText(
                         (text) =>
                             text
@@ -101,8 +101,8 @@ export class GamificationPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
-                    .setName("Good Task ID") // TODO(byq77): add t("HABITICA_GOOD_TASK_ID")
-                    .setDesc("Description") // TODO(byq77): add t("HABITICA_GOOD_TASK_ID_DESC")
+                    .setName(t("HABITICA_GOOD_TASK_ID"))
+                    .setDesc(t("HABITICA_GOOD_TASK_ID_DESC"))
                     .addText(
                         (text) =>
                             text
@@ -119,8 +119,8 @@ export class GamificationPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
-                    .setName("Hard Task ID") // TODO(byq77): add t("HABITICA_HARD_TASK_ID")
-                    .setDesc("Description") // TODO(byq77): add t("HABITICA_HARD_TASK_ID_DESC")
+                    .setName(t("HABITICA_HARD_TASK_ID"))
+                    .setDesc(t("HABITICA_HARD_TASK_ID_DESC"))
                     .addText(
                         (text) =>
                             text
