@@ -569,7 +569,10 @@ export default class SRPlugin extends Plugin {
         this.data = Object.assign({}, DEFAULT_DATA, loadedData);
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
         setDebugParser(this.data.settings.showParserDebugMessages);
-        GamificationScorer.instance = new HabiticaScorer(this.app, this.data.settings);
+        GamificationScorer.instance = new HabiticaScorer(
+            this.app.secretStorage,
+            this.data.settings,
+        );
         this.setupDataStoreAndAlgorithmInstances(this.data.settings);
     }
 

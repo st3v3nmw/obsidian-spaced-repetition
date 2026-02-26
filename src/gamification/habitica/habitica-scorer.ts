@@ -1,15 +1,15 @@
-import { App } from "obsidian";
+import { SecretStorage } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { IGamificationScorer } from "src/gamification/base/igamification-scorer";
 import { SRSettings } from "src/settings";
 
 export class HabiticaScorer implements IGamificationScorer {
-    private app: App;
+    private secretStorage: SecretStorage;
     private settings: SRSettings;
     private taskMapping: Record<ReviewResponse, keyof SRSettings | null>;
-    constructor(app: App, settings: SRSettings) {
-        this.app = app;
+    constructor(secretStorage: SecretStorage, settings: SRSettings) {
+        this.secretStorage = secretStorage;
         this.settings = settings;
         this.taskMapping = {
             [ReviewResponse.Easy]: "flashcardEasyTaskId",
@@ -25,8 +25,8 @@ export class HabiticaScorer implements IGamificationScorer {
             return;
         }
 
-        const userId = this.app.secretStorage.getSecret(this.settings.habiticaUserId);
-        const apiToken = this.app.secretStorage.getSecret(this.settings.habiticaApiToken);
+        const userId = this.secretStorage.getSecret(this.settings.habiticaUserId);
+        const apiToken = this.secretStorage.getSecret(this.settings.habiticaApiToken);
 
         if (!userId || !apiToken) {
             console.warn("HabiticaScorer: Missing Habitica credentials");
@@ -39,7 +39,7 @@ export class HabiticaScorer implements IGamificationScorer {
             return;
         }
         const taskId = this.settings[taskSettingKey];
-        if (!taskId) {
+        if (!taskId || typeof taskId !== "string") {
             console.warn("HabiticaScorer: No points for Reset response");
             return;
         }
