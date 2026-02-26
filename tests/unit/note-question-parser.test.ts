@@ -11,7 +11,10 @@ import { setupStaticDateProvider20230906 } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
-import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
+import {
+    unitTestSetupGamificationScorer,
+    unitTestSetupStandardDataStoreAlgorithm,
+} from "./helpers/unit-test-setup";
 import { createTestNoteQuestionParser } from "./sample-items";
 
 const parserWithDefaultSettings: NoteQuestionParser =
@@ -25,6 +28,7 @@ const parserConvertFoldersToDecks: NoteQuestionParser = createTestNoteQuestionPa
 beforeAll(() => {
     setupStaticDateProvider20230906();
     unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    unitTestSetupGamificationScorer();
 });
 
 describe("No flashcard questions", () => {

@@ -10,7 +10,10 @@ import { formatDateYYYYMMDD, setupStaticDateProvider20230906 } from "src/utils/d
 
 import { UnitTestOsrCore } from "./helpers/unit-test-core";
 import { unitTestCheckNoteFrontmatter } from "./helpers/unit-test-helper";
-import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
+import {
+    unitTestSetupGamificationScorer,
+    unitTestSetupStandardDataStoreAlgorithm,
+} from "./helpers/unit-test-setup";
 
 function checkDeckTreeCounts(
     osrCore: UnitTestOsrCore,
@@ -51,6 +54,7 @@ function checkScheduledNote(
 beforeAll(() => {
     setupStaticDateProvider20230906();
     unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    unitTestSetupGamificationScorer();
 });
 
 test("No questions in the text; no files tagged as notes", async () => {

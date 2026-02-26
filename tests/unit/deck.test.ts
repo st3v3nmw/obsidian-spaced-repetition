@@ -3,11 +3,15 @@ import { CardListType, Deck } from "src/deck/deck";
 import { TopicPath } from "src/deck/topic-path";
 import { DEFAULT_SETTINGS } from "src/settings";
 
-import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
+import {
+    unitTestSetupGamificationScorer,
+    unitTestSetupStandardDataStoreAlgorithm,
+} from "./helpers/unit-test-setup";
 import { SampleItemDecks } from "./sample-items";
 
 beforeAll(() => {
     unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    unitTestSetupGamificationScorer();
 });
 
 describe("constructor", () => {

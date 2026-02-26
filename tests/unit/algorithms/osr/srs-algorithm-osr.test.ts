@@ -1,10 +1,14 @@
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { DEFAULT_SETTINGS } from "src/settings";
 
-import { unitTestSetupStandardDataStoreAlgorithm } from "../../helpers/unit-test-setup";
+import {
+    unitTestSetupGamificationScorer,
+    unitTestSetupStandardDataStoreAlgorithm,
+} from "../../helpers/unit-test-setup";
 
 beforeAll(() => {
     unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    unitTestSetupGamificationScorer();
 });
 
 test("SrsAlgorithmOsr should return note stats", () => {

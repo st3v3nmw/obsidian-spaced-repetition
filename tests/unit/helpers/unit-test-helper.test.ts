@@ -9,12 +9,16 @@ import {
     unitTestParseForOutgoingLinks,
 } from "./unit-test-helper";
 import { UnitTestLinkInfoFinder } from "./unit-test-link-info-finder";
-import { unitTestSetupStandardDataStoreAlgorithm } from "./unit-test-setup";
+import {
+    unitTestSetupGamificationScorer,
+    unitTestSetupStandardDataStoreAlgorithm,
+} from "./unit-test-setup";
 
 let linkInfoFinder: UnitTestLinkInfoFinder;
 
 beforeAll(() => {
     unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    unitTestSetupGamificationScorer();
 });
 
 describe("unitTest_GetAllTagsFromTextEx", () => {
