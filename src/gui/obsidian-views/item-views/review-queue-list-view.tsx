@@ -70,7 +70,7 @@ export class ReviewQueueListView extends ItemView {
         const titleWrapper = this.headerEl.createDiv("sr-note-review-header-title-wrapper");
 
         const titleIcon = titleWrapper.createDiv("sr-note-review-header-title-icon");
-        setIcon(titleIcon, "SpacedRepIcon");
+        setIcon(titleIcon, "lucide-file-clock");
 
         titleWrapper.createDiv("sr-note-review-header-title").setText(t("OPEN_NOTE_FOR_REVIEW"));
 

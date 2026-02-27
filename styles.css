@@ -687,6 +687,10 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     align-items: center;
     justify-content: center;
     gap: var(--size-4-1);
+
+    &.mod-clickable {
+        --cursor: pointer;
+    }
 }
 
 /* MARK: Settings Tab */
