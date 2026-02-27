@@ -9,6 +9,7 @@ import {
 } from "src/card/flashcard-review-sequencer";
 import { CardType, Question } from "src/card/questions/question";
 import { Deck } from "src/deck/deck";
+import { escapeHtml } from "src/escape-html";
 import CardInfoNotice from "src/gui/content-container/card-container/controls/card-info-notice";
 import ControlsComponent from "src/gui/content-container/card-container/controls/controls";
 import InfoSection from "src/gui/content-container/card-container/deck-info/info-section";
@@ -47,6 +48,9 @@ export class CardContainer {
     private currentDeck: Deck | null;
     private previousDeck: Deck | null;
     private currentDeckTotalCardsInQueue: number = 0;
+
+    private clozeInputs: NodeListOf<Element>;
+    private clozeAnswers: NodeListOf<Element>;
 
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
@@ -224,6 +228,9 @@ export class CardContainer {
 
         // Update response buttons
         this.response.resetResponseButtons();
+
+        // Setup cloze input listeners
+        this._setupClozeInputListeners();
     }
 
     private get _currentCard(): Card {
@@ -293,6 +300,35 @@ export class CardContainer {
         );
     }
 
+    private _setupClozeInputListeners(): void {
+        this.clozeInputs = document.querySelectorAll(".cloze-input");
+
+        this.clozeInputs.forEach((input) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            input.addEventListener("change", (e) => {});
+        });
+    }
+
+    private _evaluateClozeAnswers(): void {
+        this.clozeAnswers = document.querySelectorAll(".cloze-answer");
+
+        if (this.clozeAnswers.length === this.clozeInputs.length) {
+            for (let i = 0; i < this.clozeAnswers.length; i++) {
+                const clozeInput = this.clozeInputs[i] as HTMLInputElement;
+                const clozeAnswer = this.clozeAnswers[i] as HTMLElement;
+
+                const inputText = clozeInput.value.trim();
+                const answerText = clozeAnswer.innerText.trim();
+
+                const answerElement =
+                    inputText === answerText
+                        ? `<span style="color: green">${escapeHtml(inputText)}</span>`
+                        : `[<span style="color: red; text-decoration: line-through;">${escapeHtml(inputText)}</span><span style="color: green">${answerText}</span>]`;
+                clozeAnswer.innerHTML = answerElement;
+            }
+        }
+    }
+
     // #region -> Response
 
     private _showAnswer(): void {
@@ -328,6 +364,9 @@ export class CardContainer {
             this._currentQuestion.questionText.textDirection,
         );
 
+        // Evaluate cloze answers
+        this._evaluateClozeAnswers();
+
         // Show response buttons
         this.response.showRatingButtons(
             this.reviewMode,
@@ -341,6 +380,7 @@ export class CardContainer {
         // Prevents any input, if the edit modal is open or if the view is not in focus
         if (
             document.activeElement.nodeName === "TEXTAREA" ||
+            document.activeElement.nodeName === "INPUT" ||
             this.mode === FlashcardMode.Closed ||
             !this.plugin.getSRInFocusState() ||
             Platform.isMobile || // No keyboard events on mobile
