@@ -37,6 +37,14 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
 
 **[Statistics 📈](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/statistics/)**
 
+### Info/Disclaimer
+
+**\*Quick appologies here:** Sry for the small ui in the tab view once one installed the plugin for the first time.\*
+_I changed some default settings and forgot to adjust others that depend on them. Should be fixed in the next release._
+_For now to fix it just go into the plugin settings, then "UI Preferences" and adjust the height and width of cards to 100%._
+
+_- Kyle (Current Parttime Maintainer) -_
+
 ## Usage TLDR 🚀
 
 **Creating Decks**

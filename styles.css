@@ -100,7 +100,6 @@
 /* MARK: Modal */
 
 #sr-modal-view {
-
     & .modal-close-button,
     & .modal-header {
         display: none;
@@ -451,7 +450,6 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 650px) {
-
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 15ch;
@@ -459,7 +457,6 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 550px) {
-
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 10ch;
@@ -480,7 +477,6 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 440px) {
-
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 8ch;
@@ -488,7 +484,6 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 410px) {
-
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 6ch;
@@ -1180,11 +1175,13 @@ th.gridjs-th:last-child {
 
 .gridjs-loading-bar:after {
     animation: shimmer 2s infinite;
-    background-image: linear-gradient(90deg,
-            hsla(0, 0%, 80%, 0),
-            hsla(0, 0%, 80%, 0.2) 20%,
-            hsla(0, 0%, 80%, 0.5) 60%,
-            hsla(0, 0%, 80%, 0));
+    background-image: linear-gradient(
+        90deg,
+        hsla(0, 0%, 80%, 0),
+        hsla(0, 0%, 80%, 0.2) 20%,
+        hsla(0, 0%, 80%, 0.5) 60%,
+        hsla(0, 0%, 80%, 0)
+    );
     content: "";
     transform: translateX(-100%);
 }
