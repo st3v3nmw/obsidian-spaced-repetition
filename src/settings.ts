@@ -100,15 +100,15 @@ export const DEFAULT_SETTINGS: SRSettings = {
     initiallyExpandAllSubdecksInTree: false,
     showContextInCards: true,
     showIntervalInReviewButtons: true,
-    flashcardHeightPercentage: 80,
-    flashcardWidthPercentage: 40,
+    flashcardHeightPercentage: 60,
+    flashcardWidthPercentage: 60,
     flashcardHeightPercentageMobile: 100,
     flashcardWidthPercentageMobile: 100,
     flashcardEasyText: t("EASY"),
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),
     reviewButtonDelay: 0,
-    openViewInNewTab: true,
+    openViewInNewTab: false,
     openViewInNewTabMobile: false,
 
     // algorithm
