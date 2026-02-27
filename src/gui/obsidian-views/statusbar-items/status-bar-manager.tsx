@@ -157,7 +157,7 @@ export default class StatusBarManager {
 
             return latestVersion;
         } catch (e) {
-            console.log({ where: "Utils/checkExcalidrawVersion", error: e });
+            console.log({ error: e });
             return this.plugin.manifest.version;
         }
     }

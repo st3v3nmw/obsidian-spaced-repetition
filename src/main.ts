@@ -557,7 +557,7 @@ export default class SRPlugin extends Plugin {
     }
 
     createSrTFile(note: TFile): SrTFile {
-        return new SrTFile(this.app.vault, this.app.metadataCache, note);
+        return new SrTFile(this.app.vault, this.app.metadataCache, this.app.fileManager, note);
     }
 
     async loadPluginData(): Promise<void> {

@@ -112,16 +112,16 @@
 }
 
 .is-mobile #sr-modal-view {
-    padding-top: max(var(--safe-area-inset-top), var(--view-padding)) !important;
+    padding-top: max(var(--safe-area-inset-top), calc(var(--view-padding) * 2)) !important;
     padding-right: max(var(--safe-area-inset-right), var(--view-padding)) !important;
     padding-left: max(var(--safe-area-inset-left), var(--view-padding)) !important;
-    padding-bottom: max(var(--safe-area-inset-bottom), var(--view-padding)) !important;
+    padding-bottom: max(var(--safe-area-inset-bottom), calc(var(--view-padding) * 2)) !important;
 }
 
 /* MARK: Tab view */
 
 .sr-tab-view {
-    padding: 0px var(--view-padding) calc(var(--view-padding) * 2) var(--view-padding) !important;
+    padding: 0px var(--view-padding) var(--view-padding) var(--view-padding) !important;
 }
 
 .sr-tab-view-content.sr-center-view {
@@ -682,6 +682,10 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     align-items: center;
     justify-content: center;
     gap: var(--size-4-1);
+
+    &.mod-clickable {
+        --cursor: pointer;
+    }
 }
 
 /* MARK: Settings Tab */
