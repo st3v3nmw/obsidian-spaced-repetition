@@ -1,17 +1,17 @@
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
-import { Card } from "src/card";
+import { Card } from "src/card/card";
 import { TICKS_PER_DAY } from "src/constants";
-import { Deck } from "src/deck";
+import { Deck } from "src/deck/deck";
 import {
     CardOrder,
     DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
-} from "src/deck-tree-iterator";
-import { NoteReviewDeck, SchedNote } from "src/note-review-deck";
-import { TopicPath } from "src/topic-path";
+} from "src/deck/deck-tree-iterator";
+import { TopicPath } from "src/deck/topic-path";
+import { NoteReviewDeck, SchedNote } from "src/note/note-review-deck";
 import { globalDateProvider } from "src/utils/dates";
 
 export class DueDateHistogram {

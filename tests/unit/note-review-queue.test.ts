@@ -1,5 +1,6 @@
+import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { DueDateHistogram } from "src/due-date-histogram";
-import { DEFAULT_SETTINGS } from "src/settings";
+import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { setupStaticDateProvider, setupStaticDateProvider20230906 } from "src/utils/dates";
 
 import { UnitTestOsrCore } from "./helpers/unit-test-core";
@@ -48,5 +49,49 @@ describe("dueNotesCount", () => {
         // A.md due 2023-09-10 (in 4 days time)
         await osrCore.loadTestVault("notes4");
         expect(osrCore.noteReviewQueue.dueNotesCount).toEqual(1);
+    });
+});
+
+describe("updateScheduleInfo", () => {
+    test("Multiple review decks", async () => {
+        const modifiedSettings: SRSettings = {
+            ...DEFAULT_SETTINGS,
+            tagsToReview: ["#review", "#review-2"],
+        };
+        const osrCore: UnitTestOsrCore = new UnitTestOsrCore({
+            ...modifiedSettings,
+        });
+
+        await osrCore.loadTestVault("notes7");
+        expect(osrCore.noteReviewQueue.reviewDecks.size).toEqual(2);
+
+        await osrCore.saveNoteReviewResponse(
+            osrCore.getFileByNoteName("A"),
+            ReviewResponse.Easy,
+            modifiedSettings,
+        );
+
+        expect(osrCore.noteReviewQueue.reviewDecks.get("#review")?.newNotes.length).toEqual(0);
+        expect(osrCore.noteReviewQueue.reviewDecks.get("#review")?.scheduledNotes.length).toEqual(
+            1,
+        );
+        expect(osrCore.noteReviewQueue.reviewDecks.get("#review-2")?.newNotes.length).toEqual(1);
+        expect(osrCore.noteReviewQueue.reviewDecks.get("#review-2")?.scheduledNotes.length).toEqual(
+            0,
+        );
+
+        await osrCore.saveNoteReviewResponse(
+            osrCore.getFileByNoteName("A"),
+            ReviewResponse.Easy,
+            modifiedSettings,
+        );
+        expect(osrCore.noteReviewQueue.reviewDecks.get("#review")?.scheduledNotes.length).toEqual(
+            1,
+        );
+        expect(osrCore.noteReviewQueue.reviewDecks.get("#review")?.newNotes.length).toEqual(0);
+        expect(osrCore.noteReviewQueue.reviewDecks.get("#review-2")?.newNotes.length).toEqual(1);
+        expect(osrCore.noteReviewQueue.reviewDecks.get("#review-2")?.scheduledNotes.length).toEqual(
+            0,
+        );
     });
 });

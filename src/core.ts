@@ -5,19 +5,18 @@ import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { IOsrVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
-import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
-import { Deck, DeckTreeFilter } from "src/deck";
-import { DeckTreeStatsCalculator } from "src/deck-tree-stats-calculator";
+import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
+import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
+import { Deck, DeckTreeFilter } from "src/deck/deck";
+import { DeckTreeStatsCalculator } from "src/deck/deck-tree-stats-calculator";
+import { Stats } from "src/deck/stats";
+import { TopicPath } from "src/deck/topic-path";
 import { CardDueDateHistogram, NoteDueDateHistogram } from "src/due-date-histogram";
 import { ISRFile, SrTFile } from "src/file";
-import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
-import { Note } from "src/note";
-import { NoteFileLoader } from "src/note-file-loader";
-import { NoteReviewQueue } from "src/note-review-queue";
-import { QuestionPostponementList } from "src/question-postponement-list";
+import { Note } from "src/note/note";
+import { NoteFileLoader } from "src/note/note-file-loader";
+import { NoteReviewQueue } from "src/note/note-review-queue";
 import { SettingsUtil, SRSettings } from "src/settings";
-import { Stats } from "src/stats";
-import { TopicPath } from "src/topic-path";
 import { globalDateProvider } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 
@@ -95,8 +94,7 @@ export class OsrCore {
     }
 
     protected async processFile(noteFile: ISRFile): Promise<void> {
-        const schedule: RepItemScheduleInfo =
-            await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
+        const schedule: RepItemScheduleInfo = await noteFile.getNoteSchedule();
         let note: Note = null;
 
         // Update the graph of links between notes
@@ -122,8 +120,7 @@ export class OsrCore {
         if (matchedNoteTags.length == 0) {
             return;
         }
-        const noteSchedule: RepItemScheduleInfo =
-            await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
+        const noteSchedule: RepItemScheduleInfo = await noteFile.getNoteSchedule();
         this._noteReviewQueue.addNoteToQueue(noteFile, noteSchedule, matchedNoteTags);
     }
 
@@ -157,8 +154,7 @@ export class OsrCore {
         settings: SRSettings,
     ): Promise<void> {
         // Get the current schedule for the note (null if new note)
-        const originalNoteSchedule: RepItemScheduleInfo =
-            await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
+        const originalNoteSchedule: RepItemScheduleInfo = await noteFile.getNoteSchedule();
 
         // Calculate the new/updated schedule
         let noteSchedule: RepItemScheduleInfo;
@@ -179,7 +175,7 @@ export class OsrCore {
         }
 
         // Store away the new schedule info
-        await DataStoreAlgorithm.getInstance().noteSetSchedule(noteFile, noteSchedule);
+        await noteFile.setNoteSchedule(noteSchedule);
 
         // Generate the histogram for the due dates for all the notes
         // (This could be optimized to make the small adjustments to the histogram, but simpler to implement
@@ -270,6 +266,6 @@ export class OsrAppCore extends OsrCore {
     }
 
     createSrTFile(note: TFile): SrTFile {
-        return new SrTFile(this.app.vault, this.app.metadataCache, note);
+        return new SrTFile(this.app.vault, this.app.metadataCache, this.app.fileManager, note);
     }
 }

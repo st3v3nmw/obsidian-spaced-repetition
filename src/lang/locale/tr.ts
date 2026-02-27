@@ -21,6 +21,7 @@ export default {
     CURRENT_EASE_HELP_TEXT: "Mevcut Kolaylık: ",
     CURRENT_INTERVAL_HELP_TEXT: "Mevcut Aralık: ",
     CARD_GENERATED_FROM: "${notePath} kaynağından oluşturuldu.",
+    VIEW_CARD_INFO: "View Card Info",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Gözden geçirmek için bir not aç",
