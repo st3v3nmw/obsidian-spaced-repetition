@@ -47,6 +47,7 @@ export class SrTFile implements ISRFile {
         this.vault = vault;
         this.metadataCache = metadataCache;
         this.file = file;
+        this.fileManager = fileManager;
     }
 
     get path(): string {
