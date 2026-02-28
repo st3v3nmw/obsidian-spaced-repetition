@@ -122,6 +122,9 @@ export default {
         "Losowo (gdy wszystkie karty w poprzedniej talii przeglądnięte)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Losowa karta z losowej talii",
     DISABLE_CLOZE_CARDS: "Wyłączyć karty zamaskowane?",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Convert cloze patterns to input fields",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
+        "Replace cloze patterns with input fields when reviewing cloze cards.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Konwertować ==podświetlenia== na karty zamaskowane?",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         'Dodaj/usuń <code>${defaultPattern}</code> z "Wzory kart zamaskowanych"',

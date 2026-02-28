@@ -131,6 +131,9 @@ export default {
         "Zufällige Reihenfolge (sobald alle Karten im vorherigen Stapel wiederholt wurden)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Zufällige Karte von zufälligem Stapel",
     DISABLE_CLOZE_CARDS: "Lückentextkarten deaktivieren?",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Konvertiere Lückentext zu Eingabefelder",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
+        "Ersetze Lückentext mit Eingabefeldern, wenn Lückentextkarten angezeigt werden.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==Hervorgehobenen== Text in Lückentextkarten umwandeln?",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         'Füge/entferne das <code>${defaultPattern}</code> zu deinen "Lückentextmuster" hinzu',
