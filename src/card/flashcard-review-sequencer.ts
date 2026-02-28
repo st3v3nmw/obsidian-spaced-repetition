@@ -10,6 +10,7 @@ import { CardListType, Deck } from "src/deck/deck";
 import { IDeckTreeIterator } from "src/deck/deck-tree-iterator";
 import { TopicPath } from "src/deck/topic-path";
 import { DueDateHistogram } from "src/due-date-histogram";
+import { IGamificationScorer } from "src/gamification/base/igamification-scorer";
 import { Note } from "src/note/note";
 import { SRSettings } from "src/settings";
 import { globalDateProvider } from "src/utils/dates";
@@ -108,12 +109,14 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     private srsAlgorithm: ISrsAlgorithm;
     private questionPostponementList: IQuestionPostponementList;
     private dueDateFlashcardHistogram: DueDateHistogram;
+    private gamificationScorer: IGamificationScorer;
 
     constructor(
         reviewMode: FlashcardReviewMode,
         cardSequencer: IDeckTreeIterator,
         settings: SRSettings,
         srsAlgorithm: ISrsAlgorithm,
+        gamificationScorer: IGamificationScorer,
         questionPostponementList: IQuestionPostponementList,
         dueDateFlashcardHistogram: DueDateHistogram,
     ) {
@@ -121,6 +124,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         this.cardSequencer = cardSequencer;
         this.settings = settings;
         this.srsAlgorithm = srsAlgorithm;
+        this.gamificationScorer = gamificationScorer;
         this.questionPostponementList = questionPostponementList;
         this.dueDateFlashcardHistogram = dueDateFlashcardHistogram;
     }
@@ -230,10 +234,12 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     async processReview(response: ReviewResponse): Promise<void> {
         switch (this.reviewMode) {
             case FlashcardReviewMode.Review:
+                await this.gamificationScorer.score(response);
                 await this.processReviewReviewMode(response);
                 break;
 
             case FlashcardReviewMode.Cram:
+                await this.gamificationScorer.score(response);
                 await this.processReviewCramMode(response);
                 break;
         }

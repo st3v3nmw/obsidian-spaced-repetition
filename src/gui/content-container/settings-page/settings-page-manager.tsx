@@ -1,7 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import h from "vhtml";
+import { App } from "obsidian";
 
 import { FlashcardsPage } from "src/gui/content-container/settings-page/flashcards-page";
+import { GamificationPage } from "src/gui/content-container/settings-page/gamification-page";
 import { MainPage } from "src/gui/content-container/settings-page/main-page";
 import { NotesPage } from "src/gui/content-container/settings-page/notes-page";
 import { SchedulingPage } from "src/gui/content-container/settings-page/scheduling-page";
@@ -22,7 +22,8 @@ export type SettingsPageType =
     | "notes-page"
     | "scheduling-page"
     | "ui-preferences-page"
-    | "statistics-page";
+    | "statistics-page"
+    | "gamification-page";
 
 /**
  * Represents an array of all available settings page types.
@@ -36,6 +37,7 @@ export const SettingsPageTypesArray: ReadonlyArray<SettingsPageType> = [
     "scheduling-page",
     "ui-preferences-page",
     "statistics-page",
+    "gamification-page",
 ];
 
 /**
@@ -58,6 +60,8 @@ export function getPageName(pageType: SettingsPageType): string {
             return t("UI");
         case "statistics-page":
             return t("STATS_TITLE");
+        case "gamification-page":
+            return t("GAMIFICATION");
     }
 }
 
@@ -81,6 +85,8 @@ export function getPageIcon(pageType: SettingsPageType): string {
             return "presentation";
         case "statistics-page":
             return "bar-chart-3";
+        case "gamification-page":
+            return "dice";
     }
 }
 
@@ -90,6 +96,7 @@ export function getPageIcon(pageType: SettingsPageType): string {
  * @class SettingsPageManager
  */
 export class SettingsPageManager {
+    private app: App;
     private containerEl: HTMLElement;
     private plugin: SRPlugin;
     private pages: SettingsPage[] = [];
@@ -99,6 +106,7 @@ export class SettingsPageManager {
     private display: () => void;
 
     constructor(
+        app: App,
         containerEl: HTMLElement,
         plugin: SRPlugin,
         lastPage: SettingsPageType,
@@ -106,6 +114,7 @@ export class SettingsPageManager {
         updateLastPageState: (lastPage: SettingsPageType, lastScrollPosition: number) => void,
         display: () => void,
     ) {
+        this.app = app;
         this.containerEl = containerEl;
         this.plugin = plugin;
         this.updateLastPageState = updateLastPageState;
@@ -212,6 +221,20 @@ export class SettingsPageManager {
                             newPageContainerEl,
                             this.plugin,
                             pageType,
+                            this.openPage.bind(this),
+                            this.scrollListener.bind(this),
+                        ),
+                    );
+                    break;
+                case "gamification-page":
+                    this.pages.push(
+                        new GamificationPage(
+                            this.app,
+                            newPageContainerEl,
+                            this.plugin,
+                            pageType,
+                            this.applySettingsUpdate.bind(this),
+                            this.display,
                             this.openPage.bind(this),
                             this.scrollListener.bind(this),
                         ),

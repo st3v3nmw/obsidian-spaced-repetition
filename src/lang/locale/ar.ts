@@ -190,6 +190,28 @@ export default {
     EXPERIMENTAL: "Experimental",
     HELP: "Help",
     STORE_IN_NOTES: "In the notes",
+    GAMIFICATION: "Gamification",
+    GROUP_HABITICA: "Habitica",
+    ENABLE_HABITICA_INTEGRATION: "Enable Habitica integration.",
+    ENABLE_HABITICA_INTEGRATION_DESC:
+        "Supercharge your spaced repetation and active recall habits.",
+    HABITICA_USER_ID: "User ID",
+    HABITICA_USER_ID_DESC: "The unique number that identifies your user in Habitica.",
+    HABITICA_API_TOKEN: "API Token",
+    HABITICA_API_TOKEN_DESC: "Required for authentication of your API calls.",
+    HABITICA_EASY_TASK_ID: "Easy Task ID",
+    HABITICA_EASY_TASK_ID_DESC:
+        "The ID of the task that will be scored when you review a flashcard/note as easy.",
+    HABITICA_GOOD_TASK_ID: "Good Task ID",
+    HABITICA_GOOD_TASK_ID_DESC:
+        "The ID of the task that will be scored when you review a flashcard/note as good.",
+    HABITICA_HARD_TASK_ID: "Hard Task ID",
+    HABITICA_HARD_TASK_ID_DESC:
+        "The ID of the task that will be scored when you review a flashcard/note as hard.",
+    RETRIEVE_HABITICA_TASK_IDS: "Retrieve Task IDs from Habitica",
+    RETRIEVE_HABITICA_TASK_IDS_DESC:
+        "Automatically fetch task IDs from your Habitica account. This will look for habits named 'Spaced Repetition Easy', 'Spaced Repetition Good', and 'Spaced Repetition Hard'.",
+    RETRIEVE_TASK_IDS: "Retrieve Task IDs",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "ملاحظات قائمة المراجعة",

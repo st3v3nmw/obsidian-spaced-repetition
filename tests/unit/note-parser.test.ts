@@ -6,13 +6,17 @@ import { setupStaticDateProvider20230906 } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
-import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
+import {
+    unitTestSetupGamificationScorer,
+    unitTestSetupStandardDataStoreAlgorithm,
+} from "./helpers/unit-test-setup";
 
 const parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
 
 beforeAll(() => {
     setupStaticDateProvider20230906();
     unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    unitTestSetupGamificationScorer();
 });
 
 describe("Multiple questions in the text", () => {

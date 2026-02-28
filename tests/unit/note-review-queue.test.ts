@@ -4,11 +4,15 @@ import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { setupStaticDateProvider, setupStaticDateProvider20230906 } from "src/utils/dates";
 
 import { UnitTestOsrCore } from "./helpers/unit-test-core";
-import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
+import {
+    unitTestSetupGamificationScorer,
+    unitTestSetupStandardDataStoreAlgorithm,
+} from "./helpers/unit-test-setup";
 
 beforeAll(() => {
     setupStaticDateProvider20230906();
     unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    unitTestSetupGamificationScorer();
 });
 
 function checkHistogramValue(histogram: DueDateHistogram, nDays: number, expectedValue: number) {

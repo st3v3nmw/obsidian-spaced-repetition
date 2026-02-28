@@ -25,6 +25,8 @@ import {
 } from "src/deck/deck-tree-iterator";
 import { TopicPath } from "src/deck/topic-path";
 import { ISRFile, SrTFile } from "src/file";
+import { GamificationScorer } from "src/gamification/base/gamification-scorer";
+import { HabiticaScorer } from "src/gamification/habitica/habitica-scorer";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/obsidian-views/item-views/review-queue-list-view";
 import { SRTabView } from "src/gui/obsidian-views/item-views/sr-tab-view";
 import TabViewManager from "src/gui/obsidian-views/item-views/tab-view-manager";
@@ -349,6 +351,7 @@ export default class SRPlugin extends Plugin {
             deckIterator,
             this.data.settings,
             SrsAlgorithm.getInstance(),
+            GamificationScorer.getInstance(),
             this.osrAppCore.questionPostponementList,
             this.osrAppCore.dueDateFlashcardHistogram,
         );
@@ -566,7 +569,10 @@ export default class SRPlugin extends Plugin {
         this.data = Object.assign({}, DEFAULT_DATA, loadedData);
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
         setDebugParser(this.data.settings.showParserDebugMessages);
-
+        GamificationScorer.instance = new HabiticaScorer(
+            this.app.secretStorage,
+            this.data.settings,
+        );
         this.setupDataStoreAndAlgorithmInstances(this.data.settings);
     }
 

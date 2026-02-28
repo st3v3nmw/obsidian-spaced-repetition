@@ -64,6 +64,14 @@ export interface SRSettings {
     // logging
     showSchedulingDebugMessages: boolean;
     showParserDebugMessages: boolean;
+
+    // gamification
+    enableHabiticaIntegration: boolean;
+    habiticaUserId: string;
+    habiticaApiToken: string;
+    flashcardEasyTaskId: string;
+    flashcardGoodTaskId: string;
+    flashcardHardTaskId: string;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
@@ -127,6 +135,14 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // logging
     showSchedulingDebugMessages: false,
     showParserDebugMessages: false,
+
+    // gamification
+    enableHabiticaIntegration: false,
+    habiticaUserId: "",
+    habiticaApiToken: "",
+    flashcardEasyTaskId: "",
+    flashcardGoodTaskId: "",
+    flashcardHardTaskId: "",
 };
 
 export function upgradeSettings(settings: SRSettings) {

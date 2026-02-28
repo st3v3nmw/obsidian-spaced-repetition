@@ -5,11 +5,15 @@ import { DataStore } from "src/data-stores/base/data-store";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
-import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
+import {
+    unitTestSetupGamificationScorer,
+    unitTestSetupStandardDataStoreAlgorithm,
+} from "./helpers/unit-test-setup";
 
 beforeAll(() => {
     setupStaticDateProvider20230906();
     unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+    unitTestSetupGamificationScorer();
 });
 
 test("No schedule info for question", () => {

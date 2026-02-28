@@ -21,6 +21,7 @@ export class SRSettingTab extends PluginSettingTab {
 
     display(): void {
         this.settingsPageManager = new SettingsPageManager(
+            this.app,
             this.containerEl,
             this.plugin,
             this.lastPage,
