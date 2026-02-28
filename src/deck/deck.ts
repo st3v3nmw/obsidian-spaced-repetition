@@ -254,7 +254,8 @@ export class Deck {
 
     debugLogToConsole(desc: string = null, indent: number = 0) {
         let str: string = desc != null ? `${desc}: ` : "";
-        console.log((str += this.toString(indent)));
+        str += this.toString(indent);
+        console.log(str);
     }
 
     toString(indent: number = 0): string {

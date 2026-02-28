@@ -122,7 +122,7 @@ export default class TabViewManager {
     public async openTabView(type: string, newLeaf?: PaneType | boolean) {
         const { workspace } = this.plugin.app;
 
-        let leaf: WorkspaceLeaf | null = null;
+        let leaf: WorkspaceLeaf | null;
         const leaves = workspace.getLeavesOfType(type);
 
         if (leaves.length > 0) {
