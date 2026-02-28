@@ -3,8 +3,9 @@
 export const SCHEDULING_INFO_REGEX =
     /^---\r?\n((?:.*\r?\n)*)sr-due: (.+)\r?\nsr-interval: (\d+)\r?\nsr-ease: (\d+)\r?\n((?:.*\r?\n)?)---/;
 
-export const SCHEDULING_INFO_BLOCK = /---\s(sr-due:[^>\n]+)\s(sr-interval:[^>\n]+)\s(sr-ease:[^>\n]+)\s---/g;
-export const SCHEDULING_INFO_TEXT = /(sr-due:[^>\n]+)\s(sr-interval:[^>\n]+)\s(sr-ease:[^>\n]+)\s/g
+export const SCHEDULING_INFO_BLOCK =
+    /---\s(sr-due:[^>\n]+)\s(sr-interval:[^>\n]+)\s(sr-ease:[^>\n]+)\s---/g;
+export const SCHEDULING_INFO_TEXT = /(sr-due:[^>\n]+)\s(sr-interval:[^>\n]+)\s(sr-ease:[^>\n]+)\s/g;
 
 export const YAML_FRONT_MATTER_REGEX = /^---\r?\n((?:.*\r?\n)*?)---/;
 

@@ -10,7 +10,11 @@ import { SCHEDULING_EXTRACTOR, SCHEDULING_INFO_BLOCK, SCHEDULING_INFO_TEXT } fro
  */
 function modifyFile(vault: Vault, file: TFile): Promise<string> {
     return vault.process(file, (data) => {
-        return data.replace(SCHEDULING_INFO_BLOCK, "").replace(SCHEDULING_INFO_TEXT, "").replace(SCHEDULING_EXTRACTOR, "").trim();
+        return data
+            .replace(SCHEDULING_INFO_BLOCK, "")
+            .replace(SCHEDULING_INFO_TEXT, "")
+            .replace(SCHEDULING_EXTRACTOR, "")
+            .trim();
     });
 }
 
