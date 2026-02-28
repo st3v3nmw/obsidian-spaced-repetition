@@ -132,8 +132,7 @@ export class QuestionText {
         const originalWithoutSR = DataStore.getInstance().questionRemoveScheduleInfo(original);
         let actualQuestion: string = originalWithoutSR.trimEnd();
 
-        let topicPathWithWs: TopicPathWithWs = null;
-        let blockId: string = null;
+        let topicPathWithWs: TopicPathWithWs;
 
         // originalWithoutSR - [[preTopicPathWs] TopicPath [postTopicPathWs]] Question [whitespace blockId]
         const topicPath = TopicPath.getTopicPathFromCardText(originalWithoutSR);
@@ -145,7 +144,7 @@ export class QuestionText {
             const cardText3: string = cardText2.replaceAll(OBSIDIAN_TAG_AT_STARTOFLINE_REGEX, "");
 
             // actualQuestion - Question [whitespace blockId]
-            let postTopicPathWs: string = null;
+            let postTopicPathWs: string;
             [postTopicPathWs, actualQuestion] = stringTrimStart(cardText3);
             if (!settings.convertFoldersToDecks) {
                 topicPathWithWs = new TopicPathWithWs(topicPath, preTopicPathWs, postTopicPathWs);
@@ -153,9 +152,8 @@ export class QuestionText {
         }
 
         // actualQuestion - Question [whitespace blockId]
-        [actualQuestion, blockId] = this.extractObsidianBlockId(actualQuestion);
-
-        return [topicPathWithWs, actualQuestion, blockId];
+        const [strippedQuestion, blockId] = this.extractObsidianBlockId(actualQuestion);
+        return [topicPathWithWs, strippedQuestion, blockId];
     }
 
     static extractObsidianBlockId(text: string): [string, string] {
@@ -167,6 +165,7 @@ export class QuestionText {
             const newLength = question.length - blockId.length;
             question = question.substring(0, newLength).trimEnd();
         }
+
         return [question, blockId];
     }
 

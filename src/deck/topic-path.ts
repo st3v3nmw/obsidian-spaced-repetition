@@ -39,11 +39,9 @@ export class TopicPath {
     }
 
     static getTopicPathOfFile(noteFile: ISRFile, settings: SRSettings): TopicPath {
-        let deckPath: string[] = [];
         let result: TopicPath = TopicPath.emptyPath;
-
         if (settings.convertFoldersToDecks) {
-            deckPath = noteFile.path.split("/");
+            const deckPath = noteFile.path.split("/");
             deckPath.pop(); // remove filename
             if (deckPath.length != 0) {
                 result = new TopicPath(deckPath);

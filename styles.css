@@ -406,6 +406,10 @@
         border-top-style: dashed;
         margin: 1rem 0;
     }
+
+    & .sr-content .cloze-input {
+        height: 1.4rem;
+    }
 }
 
 .is-phone .sr-card-container .sr-controls {

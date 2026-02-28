@@ -76,7 +76,8 @@ export class SrsAlgorithmOsr implements ISrsAlgorithm {
                 this.settings,
             );
         }
-        let ease: number = null;
+
+        let ease: number;
         if (flashcardsInNoteAvgEase && noteEase) {
             ease = (flashcardsInNoteAvgEase + noteEase) / 2;
         } else {

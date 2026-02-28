@@ -13,12 +13,12 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Use Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
-                  node-version: "20"
+                  node-version: "24"
 
             - name: Build
               id: build
@@ -34,7 +34,7 @@ jobs:
 
             - name: Extract release notes
               id: extract-release-notes
-              uses: ffurrer2/extract-release-notes@v1
+              uses: ffurrer2/extract-release-notes@v2
               with:
                   changelog_file: docs/docs/changelog.md
 
@@ -96,9 +96,9 @@ jobs:
                   asset_content_type: text/css
 
             - name: Use Python
-              uses: actions/setup-python@v3
+              uses: actions/setup-python@v6
               with:
-                  python-version: "3.12"
+                  python-version: "3.14"
 
             - name: Install dependencies
               run: pip install -r requirements.txt
