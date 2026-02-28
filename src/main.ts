@@ -1,4 +1,4 @@
-import { Menu, Notice, Platform, Plugin, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
+import { Notice, Platform, Plugin, TFile } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
@@ -15,7 +15,7 @@ import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorith
 import { DataStoreInNoteAlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
 import { DataStore } from "src/data-stores/base/data-store";
 import { StoreInNotes } from "src/data-stores/notes/notes";
-import { CardListType, Deck, DeckTreeFilter } from "src/deck/deck";
+import { Deck, DeckTreeFilter } from "src/deck/deck";
 import {
     CardOrder,
     DeckOrder,
@@ -26,13 +26,8 @@ import {
 import { TopicPath } from "src/deck/topic-path";
 import { ISRFile, SrTFile } from "src/file";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/obsidian-views/item-views/review-queue-list-view";
-import { SRTabView } from "src/gui/obsidian-views/item-views/sr-tab-view";
-import TabViewManager from "src/gui/obsidian-views/item-views/tab-view-manager";
 import { SRModalView } from "src/gui/obsidian-views/modals/sr-modal-view";
-import { SRSettingTab } from "src/gui/obsidian-views/settings-tab";
-import { OsrSidebar } from "src/gui/obsidian-views/sidebar";
-import StatusBarManager from "src/gui/obsidian-views/statusbar-items/status-bar-manager";
-import { appIcon } from "src/icons/app-icon";
+import { UIManager } from "src/gui/obsidian-views/ui-manager";
 import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { Note } from "src/note/note";
@@ -47,29 +42,11 @@ import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
 export default class SRPlugin extends Plugin {
     public data: PluginData;
     public osrAppCore: OsrAppCore;
-    public tabViewManager: TabViewManager;
-    private osrSidebar: OsrSidebar;
+    public uiManager: UIManager;
+
     public nextNoteReviewHandler: NextNoteReviewHandler;
 
-    private externalModalObserver: MutationObserver;
-
-    private ribbonIcon: HTMLElement | null = null;
-    private statusBarManager: StatusBarManager | null = null;
-    private isSRInFocus: boolean = false;
-    private fileMenuHandler: (
-        menu: Menu,
-        file: TAbstractFile,
-        source: string,
-        leaf?: WorkspaceLeaf,
-    ) => void;
-
     async onload(): Promise<void> {
-        // Closes all still open tab views when the plugin is loaded, because it causes bugs / empty windows otherwise
-        this.tabViewManager = new TabViewManager(this);
-        this.app.workspace.onLayoutReady(async () => {
-            this.tabViewManager.closeAllTabViews();
-        });
-
         await this.loadPluginData();
 
         const noteReviewQueue = new NoteReviewQueue();
@@ -78,17 +55,6 @@ export default class SRPlugin extends Plugin {
             this.data.settings,
             noteReviewQueue,
         );
-
-        this.osrSidebar = new OsrSidebar(this, this.data.settings, this.nextNoteReviewHandler);
-        this.osrSidebar.init();
-        this.app.workspace.onLayoutReady(async () => {
-            await this.osrSidebar.activateReviewQueueViewPanel();
-            setTimeout(async () => {
-                if (!this.osrAppCore.syncLock) {
-                    await this.sync();
-                }
-            }, 2000);
-        });
 
         const questionPostponementList: QuestionPostponementList = new QuestionPostponementList(
             this,
@@ -108,71 +74,12 @@ export default class SRPlugin extends Plugin {
             noteReviewQueue,
         );
 
-        appIcon();
-
-        this.addStatusBarManager();
-
-        this.showRibbonIcon(this.data.settings.showRibbonIcon);
-
-        this.showFileMenuItems(!this.data.settings.disableFileMenuReviewOptions);
+        this.uiManager = new UIManager(this);
 
         this.addPluginCommands();
-
-        this.addSettingTab(new SRSettingTab(this.app, this));
-
-        this.registerSRFocusListener();
     }
 
-    showFileMenuItems(status: boolean) {
-        // define the handler if it was not defined yet
-        if (this.fileMenuHandler === undefined) {
-            this.fileMenuHandler = (menu, fileish: TAbstractFile) => {
-                if (fileish instanceof TFile && fileish.extension === "md") {
-                    menu.addItem((item) => {
-                        item.setTitle(
-                            t("REVIEW_DIFFICULTY_FILE_MENU", {
-                                difficulty: this.data.settings.flashcardEasyText,
-                            }),
-                        )
-                            .setIcon("SpacedRepIcon")
-                            .onClick(() => {
-                                this.saveNoteReviewResponse(fileish, ReviewResponse.Easy);
-                            });
-                    });
 
-                    menu.addItem((item) => {
-                        item.setTitle(
-                            t("REVIEW_DIFFICULTY_FILE_MENU", {
-                                difficulty: this.data.settings.flashcardGoodText,
-                            }),
-                        )
-                            .setIcon("SpacedRepIcon")
-                            .onClick(() => {
-                                this.saveNoteReviewResponse(fileish, ReviewResponse.Good);
-                            });
-                    });
-
-                    menu.addItem((item) => {
-                        item.setTitle(
-                            t("REVIEW_DIFFICULTY_FILE_MENU", {
-                                difficulty: this.data.settings.flashcardHardText,
-                            }),
-                        )
-                            .setIcon("SpacedRepIcon")
-                            .onClick(() => {
-                                this.saveNoteReviewResponse(fileish, ReviewResponse.Hard);
-                            });
-                    });
-                }
-            };
-        }
-
-        if (status) {
-            this.registerEvent(this.app.workspace.on("file-menu", this.fileMenuHandler));
-        } else {
-            this.app.workspace.off("file-menu", this.fileMenuHandler);
-        }
-    }
 
     private addPluginCommands() {
         this.addCommand({
@@ -240,7 +147,7 @@ export default class SRPlugin extends Plugin {
                     (isMobile && this.data.settings.openViewInNewTabMobile);
 
                 if (openInNewTab) {
-                    this.tabViewManager.openSRTabView(this.osrAppCore, FlashcardReviewMode.Review);
+                    this.uiManager.tabViewManager.openSRTabView(this.osrAppCore, FlashcardReviewMode.Review);
                 } else {
                     this.openFlashcardModal(
                         this.osrAppCore.reviewableDeckTree,
@@ -262,7 +169,7 @@ export default class SRPlugin extends Plugin {
                     (isMobile && this.data.settings.openViewInNewTabMobile);
 
                 if (openInNewTab) {
-                    this.tabViewManager.openSRTabView(this.osrAppCore, FlashcardReviewMode.Cram);
+                    this.uiManager.tabViewManager.openSRTabView(this.osrAppCore, FlashcardReviewMode.Cram);
                 } else {
                     this.openFlashcardModal(
                         this.osrAppCore.reviewableDeckTree,
@@ -287,7 +194,7 @@ export default class SRPlugin extends Plugin {
                     (isMobile && this.data.settings.openViewInNewTabMobile);
 
                 if (openInNewTab) {
-                    this.tabViewManager.openSRTabView(
+                    this.uiManager.tabViewManager.openSRTabView(
                         this.osrAppCore,
                         FlashcardReviewMode.Review,
                         openFile,
@@ -312,7 +219,7 @@ export default class SRPlugin extends Plugin {
                     (isMobile && this.data.settings.openViewInNewTabMobile);
 
                 if (openInNewTab) {
-                    this.tabViewManager.openSRTabView(
+                    this.uiManager.tabViewManager.openSRTabView(
                         this.osrAppCore,
                         FlashcardReviewMode.Cram,
                         openFile,
@@ -327,14 +234,14 @@ export default class SRPlugin extends Plugin {
             id: "srs-open-review-queue-view",
             name: t("OPEN_REVIEW_QUEUE_VIEW"),
             callback: async () => {
-                await this.osrSidebar.openReviewQueueView();
+                await this.uiManager.sidebarManager.openReviewQueueView();
             },
         });
     }
 
     onunload(): void {
         this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).forEach((leaf) => leaf.detach());
-        this.tabViewManager.closeAllTabViews();
+        this.uiManager.destroy();
     }
 
     public getPreparedReviewSequencer(
@@ -374,51 +281,6 @@ export default class SRPlugin extends Plugin {
         return { deckTree, remainingDeckTree, mode };
     }
 
-    public registerSRFocusListener() {
-        this.registerEvent(
-            this.app.workspace.on("active-leaf-change", this.handleFocusChange.bind(this)),
-        );
-        this.externalModalObserver = new MutationObserver(this.handleExternalModalOpen.bind(this));
-        this.externalModalObserver.observe(document.body, {
-            childList: true,
-            subtree: true,
-        });
-    }
-
-    public removeSRFocusListener() {
-        this.setSRViewInFocus(false);
-        this.app.workspace.off("active-leaf-change", this.handleFocusChange.bind(this));
-    }
-
-    public handleFocusChange(leaf: WorkspaceLeaf | null) {
-        this.setSRViewInFocus(leaf !== null && leaf.view instanceof SRTabView);
-    }
-
-    public handleExternalModalOpen(mutationList: MutationRecord[]) {
-        if (
-            this.data.settings.openViewInNewTab && // Is a modal opening relevant for focus?
-            mutationList.length > 0 &&
-            mutationList.filter(
-                (mutation) =>
-                    mutation.type === "childList" &&
-                    (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0),
-            ).length > 0
-        ) {
-            const modal = document.querySelector(".modal-container"); // Check your modal selector
-            // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
-            this.setSRViewInFocus(
-                modal === null && this.app.workspace.getActiveViewOfType(SRTabView) !== null,
-            );
-        }
-    }
-
-    public setSRViewInFocus(value: boolean) {
-        this.isSRInFocus = value;
-    }
-
-    public getSRInFocusState(): boolean {
-        return this.isSRInFocus;
-    }
 
     private async openFlashcardModalForSingleNote(
         noteFile: TFile,
@@ -445,7 +307,7 @@ export default class SRPlugin extends Plugin {
             reviewMode,
         );
 
-        this.setSRViewInFocus(true);
+        this.uiManager.setSRViewInFocus(true);
         new SRModalView(
             this.app,
             this,
@@ -482,16 +344,16 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                    t("SYNC_TIME_TAKEN", {
-                        t: Date.now() - now.valueOf(),
-                    }),
+                t("SYNC_TIME_TAKEN", {
+                    t: Date.now() - now.valueOf(),
+                }),
             );
         }
     }
 
     private onOsrVaultDataChanged() {
         // TODO: Translate
-        this.updateStatusBar();
+        this.uiManager.updateStatusBar();
 
         // this.statusBarManager.setText(
         //     t("STATUS_BAR", {
@@ -503,7 +365,7 @@ export default class SRPlugin extends Plugin {
         //     }),
         // );
 
-        if (this.data.settings.enableNoteReviewPaneOnStartup) this.osrSidebar.redraw();
+        if (this.data.settings.enableNoteReviewPaneOnStartup) this.uiManager.sidebarManager.redraw();
     }
 
     async loadNote(noteFile: TFile): Promise<Note> {
@@ -580,58 +442,7 @@ export default class SRPlugin extends Plugin {
         await this.saveData(this.data);
     }
 
-    showRibbonIcon(status: boolean) {
-        // if it does not exist, we create it
-        if (!this.ribbonIcon) {
-            this.ribbonIcon = this.addRibbonIcon("SpacedRepIcon", t("REVIEW_CARDS"), async () => {
-                if (!this.osrAppCore.syncLock) {
-                    await this.sync();
-                    const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
-                    const openInNewTab =
-                        (!isMobile && this.data.settings.openViewInNewTab) ||
-                        (isMobile && this.data.settings.openViewInNewTabMobile);
 
-                    if (openInNewTab) {
-                        this.tabViewManager.openSRTabView(
-                            this.osrAppCore,
-                            FlashcardReviewMode.Review,
-                        );
-                    } else {
-                        this.openFlashcardModal(
-                            this.osrAppCore.reviewableDeckTree,
-                            this.osrAppCore.remainingDeckTree,
-                            FlashcardReviewMode.Review,
-                        );
-                    }
-                }
-            });
-        }
-        if (status) {
-            this.ribbonIcon.style.display = "";
-        } else {
-            this.ribbonIcon.style.display = "none";
-        }
-    }
 
-    private addStatusBarManager() {
-        this.statusBarManager = new StatusBarManager(this, this.data.settings.showStatusBar);
-    }
 
-    public updateStatusBar() {
-        if (this.data.settings.showStatusBar) {
-            this.statusBarManager.setText(
-                `${this.osrAppCore.remainingDeckTree.getCardCount(
-                    CardListType.All,
-                    true,
-                )} card(s) due`,
-                "card-review",
-            );
-            this.statusBarManager.setText(
-                `${this.osrAppCore.noteReviewQueue.dueNotesCount} note(s) due`,
-                "note-review",
-            );
-        }
-
-        this.statusBarManager.showStatusBarItems(this.data.settings.showStatusBar);
-    }
 }

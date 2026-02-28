@@ -105,7 +105,7 @@ export default class TabViewManager {
      */
     public closeAllTabViews() {
         this.forEachTabViewType((viewType) => {
-            this.plugin.app.workspace.detachLeavesOfType(viewType.type);
+            this.plugin.app.workspace.getLeavesOfType(viewType.type).forEach((leaf: WorkspaceLeaf) => leaf.detach());
         });
     }
 

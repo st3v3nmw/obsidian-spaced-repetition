@@ -8,7 +8,7 @@ import SRPlugin from "src/main";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { SRSettings } from "src/settings";
 
-export class OsrSidebar {
+export class SidebarManager {
     private plugin: Plugin;
     private settings: SRSettings;
     private nextNoteReviewHandler: NextNoteReviewHandler;
