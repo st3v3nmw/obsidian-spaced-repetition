@@ -120,6 +120,9 @@ export default {
         "Aléatoire (quand toutes les cartes du paquet précédent sont apprises)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Carte au hasard dans un paquet au hasard",
     DISABLE_CLOZE_CARDS: "Désactiver les textes à trous ?",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Convert cloze patterns to input fields",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
+        "Replace cloze patterns with input fields when reviewing cloze cards.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Convertir ==soulignages== en trous ?",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         'Ajouter/supprimer le <code>${defaultPattern}</code> de vos "Cloze Patterns"',

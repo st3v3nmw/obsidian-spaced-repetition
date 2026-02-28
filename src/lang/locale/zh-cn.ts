@@ -111,6 +111,9 @@ export default {
     REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM: "乱序 (在前一卡片组内卡片都复习完后)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "卡片组及卡片都乱序",
     DISABLE_CLOZE_CARDS: "不进行完形填空",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Convert cloze patterns to input fields",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
+        "Replace cloze patterns with input fields when reviewing cloze cards.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "将 ==高亮== 转换为完形填空",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         '添加/删除 "完形填空模式" 中的 <code>${defaultPattern}</code>',

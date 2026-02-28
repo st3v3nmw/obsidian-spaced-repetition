@@ -168,6 +168,21 @@ export class FlashcardsPage extends SettingsPage {
         new SettingGroup(this.containerEl)
             .setHeading(t("GROUP_FLASHCARD_SEPARATORS"))
             .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("CONVERT_CLOZE_PATTERNS_TO_INPUTS"))
+                    .setDesc(t("CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.convertClozePatternsToInputs)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.convertClozePatternsToInputs = value;
+                                await this.plugin.savePluginData();
+
+                                this.display();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
                 const convertHighlightsToClozesEl = setting.setName(
                     t("CONVERT_HIGHLIGHTS_TO_CLOZES"),
                 );

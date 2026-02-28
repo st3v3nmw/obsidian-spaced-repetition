@@ -125,6 +125,9 @@ export default {
         "Willekeurig (als alle kaarten in de vorige stapel zijn herzien)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Willekeurige kaart uit willekeurige stapel",
     DISABLE_CLOZE_CARDS: "Cloze-kaarten uitschakelen?",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Convert cloze patterns to input fields",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
+        "Replace cloze patterns with input fields when reviewing cloze cards.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Converteer ==highlights== naar clozes",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         'Voeg de <code>${defaultPattern}</code> toe aan/verwijder deze uit uw "Cloze-patronen"',

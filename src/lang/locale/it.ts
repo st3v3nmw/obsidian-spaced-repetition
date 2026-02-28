@@ -124,6 +124,9 @@ export default {
         "A caso (quando le schede nel mazzo precedente saranno state riviste)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Scheda a caso da mazzo a caso",
     DISABLE_CLOZE_CARDS: "Disabilita schede con spazi da riempire?",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Convert cloze patterns to input fields",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
+        "Replace cloze patterns with input fields when reviewing cloze cards.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Convertire ==testo evidenziato== in spazi da riempire?",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         'Aggiungi/rimuovi <code>${defaultPattern}</code> dai tuoi "Modelli per spazi da riempire"',
