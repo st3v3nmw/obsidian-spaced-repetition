@@ -95,7 +95,7 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
     let cardText = "";
     let cardType: CardType | null = null;
     let firstLineNo = 0,
-        lastLineNo = 0;
+        lastLineNo: number;
 
     const clozecrafter = new ClozeCrafter(options.clozePatterns);
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
