@@ -21,6 +21,7 @@ export default {
     CURRENT_EASE_HELP_TEXT: "Current Ease: ",
     CURRENT_INTERVAL_HELP_TEXT: "Current Interval: ",
     CARD_GENERATED_FROM: "Generated from: ${notePath}",
+    VIEW_CARD_INFO: "View Card Info",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "리뷰할 노트 열기",
@@ -119,6 +120,9 @@ export default {
         "Randomly (once all cards in previous deck reviewed)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
     DISABLE_CLOZE_CARDS: "빈 칸 채우기 카드를 비활성화하시겠습니까?",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Convert cloze patterns to input fields",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
+        "Replace cloze patterns with input fields when reviewing cloze cards.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==highlights== 를 빈 칸 채우기로 전환하시겠습니까?",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         '"빈 칸 채우기 패턴" 에서 <code>${defaultPattern}</code> 를 추가/제거하시겠습니까?',

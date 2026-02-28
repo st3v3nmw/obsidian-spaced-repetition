@@ -21,6 +21,7 @@ export default {
     CURRENT_EASE_HELP_TEXT: "Facilidad Actual: ",
     CURRENT_INTERVAL_HELP_TEXT: "Intervalo Actual: ",
     CARD_GENERATED_FROM: "Generado Desde: ${notePath}",
+    VIEW_CARD_INFO: "View Card Info",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Abrir nota para revisión",
@@ -118,6 +119,9 @@ export default {
         "Randomly (once all cards in previous deck reviewed)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
     DISABLE_CLOZE_CARDS: "¿Deshabilitar deletreo de huecos en las tarjetas?",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Convert cloze patterns to input fields",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
+        "Replace cloze patterns with input fields when reviewing cloze cards.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "¿Convertir ==resaltados== a deletreo de huecos?",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         'Añadir/eliminar el <code>${defaultPattern}</code> de tus "Patrones de Deletreo de Huecos"',

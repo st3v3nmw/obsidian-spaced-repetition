@@ -1,4 +1,6 @@
+import moment, { Moment } from "moment";
 import {
+    FileManager,
     FrontMatterCache,
     getAllTags as ObsidianGetAllTags,
     HeadingCache,
@@ -8,6 +10,10 @@ import {
     Vault,
 } from "obsidian";
 
+import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
+import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { ALLOWED_DATE_FORMATS } from "src/constants";
+import { formatDateYYYYMMDD } from "src/utils/dates";
 import { parseObsidianFrontmatterTag, TextDirection } from "src/utils/strings";
 
 // NOTE: Line numbers are zero based
@@ -15,6 +21,8 @@ export interface ISRFile {
     get path(): string;
     get basename(): string;
     get tfile(): TFile;
+    setNoteSchedule(repItemScheduleInfo: RepItemScheduleInfo): Promise<void>;
+    getNoteSchedule(): Promise<RepItemScheduleInfo>;
     getFrontmatter(): Promise<Map<string, string>>;
     getAllTagsFromCache(): string[];
     getAllTagsFromText(): TagCache[];
@@ -31,13 +39,15 @@ export const frontmatterTagPseudoLineNum: number = -1;
 // NOTE: Line numbers are zero based
 export class SrTFile implements ISRFile {
     file: TFile;
+    fileManager: FileManager;
     vault: Vault;
     metadataCache: MetadataCache;
 
-    constructor(vault: Vault, metadataCache: MetadataCache, file: TFile) {
+    constructor(vault: Vault, metadataCache: MetadataCache, fileManager: FileManager, file: TFile) {
         this.vault = vault;
         this.metadataCache = metadataCache;
         this.file = file;
+        this.fileManager = fileManager;
     }
 
     get path(): string {
@@ -50,6 +60,38 @@ export class SrTFile implements ISRFile {
 
     get tfile(): TFile {
         return this.file;
+    }
+
+    async getNoteSchedule(): Promise<RepItemScheduleInfo> {
+        let result: RepItemScheduleInfo = null;
+        const frontmatter: Map<string, string> = await this.getFrontmatter();
+
+        if (
+            frontmatter &&
+            frontmatter.has("sr-due") &&
+            frontmatter.has("sr-interval") &&
+            frontmatter.has("sr-ease")
+        ) {
+            const dueDate: Moment = moment(frontmatter.get("sr-due"), ALLOWED_DATE_FORMATS);
+            const interval: number = parseFloat(frontmatter.get("sr-interval"));
+            const ease: number = parseFloat(frontmatter.get("sr-ease"));
+            result = new RepItemScheduleInfoOsr(dueDate, interval, ease);
+        }
+        return result;
+    }
+
+    async setNoteSchedule(repItemScheduleInfo: RepItemScheduleInfo): Promise<void> {
+        const schedInfo: RepItemScheduleInfoOsr = repItemScheduleInfo as RepItemScheduleInfoOsr;
+        const dueString: string = formatDateYYYYMMDD(schedInfo.dueDate);
+        const interval: number = schedInfo.interval;
+        const ease: number = schedInfo.latestEase;
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await this.fileManager.processFrontMatter(this.tfile, (frontmatter: any) => {
+            frontmatter["sr-due"] = dueString;
+            frontmatter["sr-interval"] = interval;
+            frontmatter["sr-ease"] = ease;
+        });
     }
 
     async getFrontmatter(): Promise<Map<string, string>> {

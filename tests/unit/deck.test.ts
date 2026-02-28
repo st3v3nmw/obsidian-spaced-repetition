@@ -1,7 +1,7 @@
-import { Card } from "src/card";
-import { CardListType, Deck } from "src/deck";
+import { Card } from "src/card/card";
+import { CardListType, Deck } from "src/deck/deck";
+import { TopicPath } from "src/deck/topic-path";
 import { DEFAULT_SETTINGS } from "src/settings";
-import { TopicPath } from "src/topic-path";
 
 import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 import { SampleItemDecks } from "./sample-items";

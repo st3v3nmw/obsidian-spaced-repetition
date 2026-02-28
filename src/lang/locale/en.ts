@@ -21,6 +21,7 @@ export default {
     CURRENT_EASE_HELP_TEXT: "Current Ease: ",
     CURRENT_INTERVAL_HELP_TEXT: "Current Interval: ",
     CARD_GENERATED_FROM: "Generated from: ${notePath}",
+    VIEW_CARD_INFO: "View Card Info",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Open a note for review",
@@ -118,6 +119,9 @@ export default {
         "Randomly (once all cards in previous deck reviewed)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
     DISABLE_CLOZE_CARDS: "Disable cloze cards?",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Convert cloze patterns to input fields",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
+        "Replace cloze patterns with input fields when reviewing cloze cards.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Convert ==highlights== to clozes",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         'Add/remove the <code>${defaultPattern}</code> from your "Cloze Patterns"',

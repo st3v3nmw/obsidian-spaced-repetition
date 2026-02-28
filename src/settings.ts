@@ -1,5 +1,3 @@
-import { Platform } from "obsidian";
-
 import { Algorithm } from "src/algorithms/base/isrs-algorithm";
 import { DataStoreName } from "src/data-stores/base/data-store";
 import { t } from "src/lang/helpers";
@@ -13,6 +11,7 @@ export interface SRSettings {
     randomizeCardOrder: boolean;
     flashcardCardOrder: string;
     flashcardDeckOrder: string;
+    convertClozePatternsToInputs: boolean;
     convertHighlightsToClozes: boolean;
     convertBoldTextToClozes: boolean;
     convertCurlyBracketsToClozes: boolean;
@@ -41,10 +40,13 @@ export interface SRSettings {
     showIntervalInReviewButtons: boolean;
     flashcardHeightPercentage: number;
     flashcardWidthPercentage: number;
+    flashcardHeightPercentageMobile: number;
+    flashcardWidthPercentageMobile: number;
     flashcardEasyText: string;
     flashcardGoodText: string;
     flashcardHardText: string;
     reviewButtonDelay: number;
+    openViewInNewTabMobile: boolean;
     openViewInNewTab: boolean;
 
     // algorithm
@@ -73,6 +75,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     randomizeCardOrder: null,
     flashcardCardOrder: "DueFirstRandom",
     flashcardDeckOrder: "PrevDeckComplete_Sequential",
+    convertClozePatternsToInputs: false,
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
     convertCurlyBracketsToClozes: false,
@@ -99,13 +102,16 @@ export const DEFAULT_SETTINGS: SRSettings = {
     initiallyExpandAllSubdecksInTree: false,
     showContextInCards: true,
     showIntervalInReviewButtons: true,
-    flashcardHeightPercentage: Platform.isMobile ? 100 : 80,
-    flashcardWidthPercentage: Platform.isMobile ? 100 : 40,
+    flashcardHeightPercentage: 60,
+    flashcardWidthPercentage: 60,
+    flashcardHeightPercentageMobile: 100,
+    flashcardWidthPercentageMobile: 100,
     flashcardEasyText: t("EASY"),
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),
     reviewButtonDelay: 0,
     openViewInNewTab: false,
+    openViewInNewTabMobile: false,
 
     // algorithm
     algorithm: Algorithm.SM_2_OSR,

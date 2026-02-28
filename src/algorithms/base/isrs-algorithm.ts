@@ -2,8 +2,8 @@ import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info"
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { DueDateHistogram } from "src/due-date-histogram";
-import { Note } from "src/note";
-import { INoteEaseList } from "src/note-ease-list";
+import { Note } from "src/note/note";
+import { INoteEaseList } from "src/note/note-ease-list";
 
 export enum Algorithm {
     SM_2_OSR = "SM-2-OSR",

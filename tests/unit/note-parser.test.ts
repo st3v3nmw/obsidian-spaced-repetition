@@ -1,7 +1,7 @@
-import { Note } from "src/note";
-import { NoteParser } from "src/note-parser";
+import { TopicPath } from "src/deck/topic-path";
+import { Note } from "src/note/note";
+import { NoteParser } from "src/note/note-parser";
 import { DEFAULT_SETTINGS } from "src/settings";
-import { TopicPath } from "src/topic-path";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 

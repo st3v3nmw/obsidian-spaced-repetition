@@ -30,6 +30,7 @@ export default {
     CURRENT_EASE_HELP_TEXT: "Текущий прогресс: ",
     CURRENT_INTERVAL_HELP_TEXT: "Текущий интервал: ",
     CARD_GENERATED_FROM: "Сгенерированно из: ${notePath}",
+    VIEW_CARD_INFO: "View Card Info",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Открыть заметку для изучения",
@@ -128,6 +129,9 @@ export default {
         "Случайно (после изучения всех карт из предыдущей колоды)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Случайная карта из случайной колоды",
     DISABLE_CLOZE_CARDS: "Выключить карты с пропусками (пример: [...])?",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Convert cloze patterns to input fields",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
+        "Replace cloze patterns with input fields when reviewing cloze cards.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "Конвертировать ==выделенный текст== в пропуски (пример: [...])?",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         'Добавить/удалить <code>${defaultPattern}</code> в ваши "Шаблоны пропусков"',

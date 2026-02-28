@@ -21,6 +21,7 @@ export default {
     CURRENT_EASE_HELP_TEXT: "目前掌握程度：",
     CURRENT_INTERVAL_HELP_TEXT: "目前間隔時間：",
     CARD_GENERATED_FROM: "生成自：${notePath}",
+    VIEW_CARD_INFO: "View Card Info",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "打開一個筆記開始復習",
@@ -111,6 +112,9 @@ export default {
     REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM: "亂序 (在前一牌組內卡片都復習完後)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "牌組及卡片都亂序",
     DISABLE_CLOZE_CARDS: "停用填空克漏字卡片？",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Convert cloze patterns to input fields",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
+        "Replace cloze patterns with input fields when reviewing cloze cards.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "將 ==高亮== 轉換為填空克漏字？",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         '在 "填空克漏字模式" 中加入/移除 <code>${defaultPattern}</code>',

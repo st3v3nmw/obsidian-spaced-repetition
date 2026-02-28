@@ -21,6 +21,7 @@ export default {
     CURRENT_EASE_HELP_TEXT: "Mevcut Kolaylık: ",
     CURRENT_INTERVAL_HELP_TEXT: "Mevcut Aralık: ",
     CARD_GENERATED_FROM: "${notePath} kaynağından oluşturuldu.",
+    VIEW_CARD_INFO: "View Card Info",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Gözden geçirmek için bir not aç",
@@ -118,6 +119,9 @@ export default {
         "Rastgele olarak (Önceki destedeki tüm kartlar gözden geçirildikten sonra)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Rastgele desteden rastgele kart",
     DISABLE_CLOZE_CARDS: "Gizli kartları devre dışı bırak?",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Convert cloze patterns to input fields",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
+        "Replace cloze patterns with input fields when reviewing cloze cards.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==Vurgulanan== metni gizli kartlara dönüştür?",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         '"Cloze Patterns"den <code>${defaultPattern</code> öğesini ekleyin/kaldırın',
