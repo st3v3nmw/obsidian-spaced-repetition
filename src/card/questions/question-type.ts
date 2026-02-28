@@ -96,7 +96,11 @@ class QuestionTypeCloze implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
         const clozecrafter = new ClozeCrafter(settings.clozePatterns);
         const clozeNote = clozecrafter.createClozeNote(questionText);
-        const clozeFormatter = new QuestionTypeClozeFormatter();
+
+        // Determine which question formatter to use based on settings (Cloze patterns as inputs or not).
+        const clozeFormatter = settings.convertClozePatternsToInputs
+            ? new QuestionTypeClozeInputFormatter()
+            : new QuestionTypeClozeFormatter();
 
         let front: string, back: string;
         const result: CardFrontBack[] = [];
@@ -117,6 +121,20 @@ export class QuestionTypeClozeFormatter implements IClozeFormatter {
 
     showingAnswer(answer: string, _hint?: string): string {
         return `<span style='color:#2196f3'>${answer}</span>`;
+    }
+
+    hiding(answer?: string, hint?: string): string {
+        return `<span style='color:var(--code-comment)'>${!hint ? "[...]" : `[${hint}]`}</span>`;
+    }
+}
+
+export class QuestionTypeClozeInputFormatter implements IClozeFormatter {
+    asking(answer?: string, hint?: string): string {
+        return `<span style='color:#2196f3'><input class="cloze-input" type="text" size="${!answer ? 1 : answer.length}" />${!hint ? "" : `[${hint}]`}</span>`;
+    }
+
+    showingAnswer(answer: string, _hint?: string): string {
+        return `<span class="cloze-answer" style='color:#2196f3'>${answer}</span>`;
     }
 
     hiding(answer?: string, hint?: string): string {
