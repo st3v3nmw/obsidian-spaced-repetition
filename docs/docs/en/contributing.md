@@ -106,7 +106,7 @@ Please note that:
 
 ### UI changes
 
-- All UI changes should be made in the `src/gui/` folder.
+- All UI changes should be made in the `src/ui/` folder.
 
 - Enable the debug mode by setting `ENABLE_DEBUG_MODE` to `true` in `src/constants.ts`(Don't forget to revert it back to `false` after you're done).
 
