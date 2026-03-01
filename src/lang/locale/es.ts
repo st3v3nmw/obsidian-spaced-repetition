@@ -89,6 +89,8 @@ export default {
     CONVERT_FOLDERS_TO_DECKS: "¿Convertir directorios a mazos y submazos?",
     CONVERT_FOLDERS_TO_DECKS_DESC:
         "Esta es una opción alternativa a las etiquetas de las Tarjetas de Memorización.",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS:
         "¿Guardar el comentario para programación de las tarjetas en la última línea?",
     INLINE_SCHEDULING_COMMENTS_DESC:

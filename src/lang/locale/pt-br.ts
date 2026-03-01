@@ -91,6 +91,8 @@ export default {
     CONVERT_FOLDERS_TO_DECKS: "Converter pastas para baralhos e sub-baralhos?",
     CONVERT_FOLDERS_TO_DECKS_DESC:
         "Isso é uma alternativa para a opção de etiqueta dos Flashcards em cima.",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS:
         "Salvar comentários de agendamento na mesma linha que a última linha do flashcard?",
     INLINE_SCHEDULING_COMMENTS_DESC:

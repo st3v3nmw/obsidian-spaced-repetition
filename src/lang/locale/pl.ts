@@ -88,6 +88,9 @@ export default {
         "Wprowadź tagi oddzielone spacją lub nowymi liniami, np. #fiszki #talia2 #talia3.",
     CONVERT_FOLDERS_TO_DECKS: "Czy konwertować foldery na talie i podtalie?",
     CONVERT_FOLDERS_TO_DECKS_DESC: "Jest to alternatywa dla opcji tagów fiszek powyżej.",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Zawsze używaj tagów z frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC:
+        "Włączenie tej opcji spowoduje, że karty w notatce będą zawsze dodawana do talii z frontmatter.",
     INLINE_SCHEDULING_COMMENTS:
         "Czy zachować komentarz harmonogramowania w tej samej linii co ostatnia linia fiszki?",
     INLINE_SCHEDULING_COMMENTS_DESC:

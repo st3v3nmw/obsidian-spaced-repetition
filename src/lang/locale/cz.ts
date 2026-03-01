@@ -88,6 +88,8 @@ export default {
         "Zadete tagy oodělené mezerou nebo odřádkováním například. #kartičky #balíčke2 #balíček3.",
     CONVERT_FOLDERS_TO_DECKS: "Převést složky na balíčky a podbalíčky?",
     CONVERT_FOLDERS_TO_DECKS_DESC: "Toto je alternativa k tagům kartiček viz nastavení výše.",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS:
         "Uložit plánovací komentář na stejný řádek jako poslední položka kartičky?",
     INLINE_SCHEDULING_COMMENTS_DESC:

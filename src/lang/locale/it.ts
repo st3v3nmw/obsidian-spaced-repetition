@@ -90,6 +90,8 @@ export default {
     CONVERT_FOLDERS_TO_DECKS: "Trasformare cartelle in mazzi e sotto-mazzi?",
     CONVERT_FOLDERS_TO_DECKS_DESC:
         "Questa è un'alternativa all'opzione delle etichette delle schede sopra.",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS:
         "Salvare il commento per l'orario sulla stessa linea dell'ultimna linea della scheda?",
     INLINE_SCHEDULING_COMMENTS_DESC:

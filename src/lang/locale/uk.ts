@@ -94,6 +94,8 @@ export default {
         "Введіть теги, розділені пробілами або новими рядками (напр. #flashcards #deck2 #deck3).",
     CONVERT_FOLDERS_TO_DECKS: "Перетворювати теки на колоди",
     CONVERT_FOLDERS_TO_DECKS_DESC: "Це альтернативний варіант до тегів карток вище.",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: "Always add cards to decks defined by frontmatter tags.",
     INLINE_SCHEDULING_COMMENTS:
         "Зберігати коментар планування в тому ж рядку, що й останній рядок картки?",
     INLINE_SCHEDULING_COMMENTS_DESC:
