@@ -1,7 +1,9 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
+import { deleteSchedulingData } from "src/delete-scheduling-data";
 import { SettingsPage } from "src/gui/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/gui/content-container/settings-page/settings-page-manager";
+import { ConfirmationModal } from "src/gui/obsidian-views/modals/confirmation-modal";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
@@ -275,6 +277,27 @@ export class SchedulingPage extends SettingsPage {
                                 await this.plugin.savePluginData();
                             }),
                     );
+            });
+        new SettingGroup(this.containerEl)
+            .setHeading(t("DELETE_SCHEDULING_DATA"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("DELETE_SCHEDULING_DATA"))
+                    .setDesc(t("DELETE_SCHEDULING_DATA_IN_NOTES_AND_FLASHCARDS"))
+                    .addButton((button) => {
+                        button
+                            .setButtonText(t("DELETE"))
+                            .setClass("mod-warning")
+                            .onClick(async () => {
+                                new ConfirmationModal(
+                                    this.plugin.app,
+                                    t("DELETE_SCHEDULING_DATA"),
+                                    t("CONFIRM_SCHEDULING_DATA_DELETION"),
+                                    t("SCHEDULING_DATA_HAS_BEEN_DELETED"),
+                                    deleteSchedulingData,
+                                ).open();
+                            });
+                    });
             });
     }
 }

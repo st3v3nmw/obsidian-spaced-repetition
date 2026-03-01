@@ -1,6 +1,10 @@
 import { TFile, Vault } from "obsidian";
 
-import { SCHEDULING_EXTRACTOR, SCHEDULING_INFO_BLOCK, SCHEDULING_INFO_TEXT } from "src/constants";
+import {
+    FLASHCARD_SCHEDULE_INFO,
+    NOTE_SCHEDULE_INFO_BLOCK,
+    NOTE_SCHEDULE_INFO_TEXT,
+} from "src/constants";
 
 /**
  * Modifies a file to remove scheduling data.
@@ -11,9 +15,9 @@ import { SCHEDULING_EXTRACTOR, SCHEDULING_INFO_BLOCK, SCHEDULING_INFO_TEXT } fro
 function modifyFile(vault: Vault, file: TFile): Promise<string> {
     return vault.process(file, (data) => {
         return data
-            .replace(SCHEDULING_INFO_BLOCK, "")
-            .replace(SCHEDULING_INFO_TEXT, "")
-            .replace(SCHEDULING_EXTRACTOR, "")
+            .replace(NOTE_SCHEDULE_INFO_BLOCK, "")
+            .replace(NOTE_SCHEDULE_INFO_TEXT, "")
+            .replace(FLASHCARD_SCHEDULE_INFO, "")
             .trim();
     });
 }
@@ -24,7 +28,7 @@ function modifyFile(vault: Vault, file: TFile): Promise<string> {
 export function deleteSchedulingData() {
     const files = this.app.vault.getMarkdownFiles();
 
-    for (const file of files) {
-        modifyFile(this.app.vault, file);
+    for (let i = 0; i < files.length; i++) {
+        modifyFile(this.app.vault, files[i]);
     }
 }
