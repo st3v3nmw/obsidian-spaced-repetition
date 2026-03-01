@@ -18,7 +18,7 @@ module.exports = {
         // GUI & Obsidian coupled code
         "src/core.ts",
         "src/file.ts",
-        "src/gui/",
+        "src/ui/",
         "src/icons/",
         "src/main.ts",
         "src/next-note-review-handler.ts",

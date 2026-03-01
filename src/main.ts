@@ -25,9 +25,6 @@ import {
 } from "src/deck/deck-tree-iterator";
 import { TopicPath } from "src/deck/topic-path";
 import { ISRFile, SrTFile } from "src/file";
-import { REVIEW_QUEUE_VIEW_TYPE } from "src/gui/obsidian-views/item-views/review-queue-list-view";
-import { SRModalView } from "src/gui/obsidian-views/modals/sr-modal-view";
-import { UIManager } from "src/gui/obsidian-views/ui-manager";
 import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { Note } from "src/note/note";
@@ -36,6 +33,9 @@ import { NoteReviewQueue } from "src/note/note-review-queue";
 import { setDebugParser } from "src/parser";
 import { DEFAULT_DATA, PluginData } from "src/plugin-data";
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
+import { REVIEW_QUEUE_VIEW_TYPE } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
+import { SRModalView } from "src/ui/obsidian-ui-components/modals/sr-modal-view";
+import { UIManager } from "src/ui/ui-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
 
