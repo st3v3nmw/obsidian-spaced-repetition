@@ -1,10 +1,9 @@
-import { Platform, request } from "obsidian";
+import { request } from "obsidian";
 
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import IconTextStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/icon-text-statusbar-item";
-import EmulatedPlatform from "src/utils/platform-detector";
 
 export type StatusBarItemType = "card-review" | "note-review" | "update-available";
 export const StatusBarItemTypesArray: ReadonlyArray<StatusBarItemType> = [
@@ -69,26 +68,9 @@ export default class StatusBarManager {
                         tooltip: "Open deck for review", // TODO: Translate
                         tooltipPosition: "top",
                         onClick: async () => {
-                            if (!this.plugin.osrAppCore.syncLock) {
-                                await this.plugin.sync();
-                                const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
-                                const openInNewTab =
-                                    (!isMobile && this.plugin.data.settings.openViewInNewTab) ||
-                                    (isMobile && this.plugin.data.settings.openViewInNewTabMobile);
-
-                                if (openInNewTab) {
-                                    this.plugin.uiManager.tabViewManager.openSRTabView(
-                                        this.plugin.osrAppCore,
-                                        FlashcardReviewMode.Review,
-                                    );
-                                } else {
-                                    this.plugin.openFlashcardModal(
-                                        this.plugin.osrAppCore.reviewableDeckTree,
-                                        this.plugin.osrAppCore.remainingDeckTree,
-                                        FlashcardReviewMode.Review,
-                                    );
-                                }
-                            }
+                            await this.plugin.uiManager.openDeckContainer(
+                                FlashcardReviewMode.Review,
+                            );
                         },
                     });
                     break;
@@ -110,7 +92,7 @@ export default class StatusBarManager {
                     statusBarItem = new IconTextStatusBarItem(this.plugin, statusBarItemType, {
                         icon: "lucide-circle-arrow-up",
                         show: false,
-                        tooltip: "Update available",
+                        tooltip: "Update available", // TODO: Translate
                         tooltipPosition: "top",
                     });
                     break;

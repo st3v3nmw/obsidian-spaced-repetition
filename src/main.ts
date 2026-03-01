@@ -1,4 +1,4 @@
-import { Notice, Platform, Plugin, TFile } from "obsidian";
+import { Notice, Plugin, TFile } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
@@ -34,9 +34,7 @@ import { setDebugParser } from "src/parser";
 import { DEFAULT_DATA, PluginData } from "src/plugin-data";
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
-import { SRModalView } from "src/ui/obsidian-ui-components/modals/sr-modal-view";
 import { UIManager } from "src/ui/ui-manager";
-import EmulatedPlatform from "src/utils/platform-detector";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
 
 export default class SRPlugin extends Plugin {
@@ -78,8 +76,6 @@ export default class SRPlugin extends Plugin {
 
         this.addPluginCommands();
     }
-
-
 
     private addPluginCommands() {
         this.addCommand({
@@ -136,25 +132,7 @@ export default class SRPlugin extends Plugin {
             id: "srs-review-flashcards",
             name: t("REVIEW_ALL_CARDS"),
             callback: async () => {
-                if (this.osrAppCore.syncLock) {
-                    return;
-                }
-                await this.sync();
-
-                const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
-                const openInNewTab =
-                    (!isMobile && this.data.settings.openViewInNewTab) ||
-                    (isMobile && this.data.settings.openViewInNewTabMobile);
-
-                if (openInNewTab) {
-                    this.uiManager.tabViewManager.openSRTabView(this.osrAppCore, FlashcardReviewMode.Review);
-                } else {
-                    this.openFlashcardModal(
-                        this.osrAppCore.reviewableDeckTree,
-                        this.osrAppCore.remainingDeckTree,
-                        FlashcardReviewMode.Review,
-                    );
-                }
+                await this.uiManager.openDeckContainer(FlashcardReviewMode.Review);
             },
         });
 
@@ -162,21 +140,7 @@ export default class SRPlugin extends Plugin {
             id: "srs-cram-flashcards",
             name: t("CRAM_ALL_CARDS"),
             callback: async () => {
-                await this.sync();
-                const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
-                const openInNewTab =
-                    (!isMobile && this.data.settings.openViewInNewTab) ||
-                    (isMobile && this.data.settings.openViewInNewTabMobile);
-
-                if (openInNewTab) {
-                    this.uiManager.tabViewManager.openSRTabView(this.osrAppCore, FlashcardReviewMode.Cram);
-                } else {
-                    this.openFlashcardModal(
-                        this.osrAppCore.reviewableDeckTree,
-                        this.osrAppCore.reviewableDeckTree,
-                        FlashcardReviewMode.Cram,
-                    );
-                }
+                await this.uiManager.openDeckContainer(FlashcardReviewMode.Cram);
             },
         });
 
@@ -188,20 +152,7 @@ export default class SRPlugin extends Plugin {
                 if (!openFile || openFile.extension !== "md") {
                     return;
                 }
-                const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
-                const openInNewTab =
-                    (!isMobile && this.data.settings.openViewInNewTab) ||
-                    (isMobile && this.data.settings.openViewInNewTabMobile);
-
-                if (openInNewTab) {
-                    this.uiManager.tabViewManager.openSRTabView(
-                        this.osrAppCore,
-                        FlashcardReviewMode.Review,
-                        openFile,
-                    );
-                } else {
-                    this.openFlashcardModalForSingleNote(openFile, FlashcardReviewMode.Review);
-                }
+                await this.uiManager.openDeckContainer(FlashcardReviewMode.Review, openFile);
             },
         });
 
@@ -213,20 +164,7 @@ export default class SRPlugin extends Plugin {
                 if (!openFile || openFile.extension !== "md") {
                     return;
                 }
-                const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
-                const openInNewTab =
-                    (!isMobile && this.data.settings.openViewInNewTab) ||
-                    (isMobile && this.data.settings.openViewInNewTabMobile);
-
-                if (openInNewTab) {
-                    this.uiManager.tabViewManager.openSRTabView(
-                        this.osrAppCore,
-                        FlashcardReviewMode.Cram,
-                        openFile,
-                    );
-                } else {
-                    this.openFlashcardModalForSingleNote(openFile, FlashcardReviewMode.Cram);
-                }
+                await this.uiManager.openDeckContainer(FlashcardReviewMode.Cram, openFile);
             },
         });
 
@@ -281,42 +219,6 @@ export default class SRPlugin extends Plugin {
         return { deckTree, remainingDeckTree, mode };
     }
 
-
-    private async openFlashcardModalForSingleNote(
-        noteFile: TFile,
-        reviewMode: FlashcardReviewMode,
-    ): Promise<void> {
-        const singleNoteDeckData = await this.getPreparedDecksForSingleNoteReview(
-            noteFile,
-            reviewMode,
-        );
-        this.openFlashcardModal(
-            singleNoteDeckData.deckTree,
-            singleNoteDeckData.remainingDeckTree,
-            reviewMode,
-        );
-    }
-    public openFlashcardModal(
-        fullDeckTree: Deck,
-        remainingDeckTree: Deck,
-        reviewMode: FlashcardReviewMode,
-    ): void {
-        const reviewSequencerData = this.getPreparedReviewSequencer(
-            fullDeckTree,
-            remainingDeckTree,
-            reviewMode,
-        );
-
-        this.uiManager.setSRViewInFocus(true);
-        new SRModalView(
-            this.app,
-            this,
-            this.data.settings,
-            reviewSequencerData.reviewSequencer,
-            reviewSequencerData.mode,
-        ).open();
-    }
-
     private static createDeckTreeIterator(settings: SRSettings): IDeckTreeIterator {
         let cardOrder: CardOrder = CardOrder[settings.flashcardCardOrder as keyof typeof CardOrder];
         if (cardOrder === undefined) cardOrder = CardOrder.DueFirstSequential;
@@ -344,28 +246,17 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                t("SYNC_TIME_TAKEN", {
-                    t: Date.now() - now.valueOf(),
-                }),
+                    t("SYNC_TIME_TAKEN", {
+                        t: Date.now() - now.valueOf(),
+                    }),
             );
         }
     }
 
     private onOsrVaultDataChanged() {
-        // TODO: Translate
         this.uiManager.updateStatusBar();
-
-        // this.statusBarManager.setText(
-        //     t("STATUS_BAR", {
-        //         dueNotesCount: this.osrAppCore.noteReviewQueue.dueNotesCount,
-        //         dueFlashcardsCount: this.osrAppCore.remainingDeckTree.getCardCount(
-        //             CardListType.All,
-        //             true,
-        //         ),
-        //     }),
-        // );
-
-        if (this.data.settings.enableNoteReviewPaneOnStartup) this.uiManager.sidebarManager.redraw();
+        if (this.data.settings.enableNoteReviewPaneOnStartup)
+            this.uiManager.sidebarManager.redraw();
     }
 
     async loadNote(noteFile: TFile): Promise<Note> {
@@ -441,8 +332,4 @@ export default class SRPlugin extends Plugin {
     async savePluginData(): Promise<void> {
         await this.saveData(this.data);
     }
-
-
-
-
 }

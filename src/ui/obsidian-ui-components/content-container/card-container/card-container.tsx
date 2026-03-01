@@ -305,7 +305,7 @@ export class CardContainer {
 
         this.clozeInputs.forEach((input) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            input.addEventListener("change", (e) => { });
+            input.addEventListener("change", (e) => {});
         });
     }
 

@@ -65,8 +65,8 @@ export class StatisticsPage extends SettingsPage {
             pageContainerEl,
             plugin,
             pageType,
-            () => { },
-            () => { },
+            () => {},
+            () => {},
             openPage,
             scrollListener,
         );
@@ -155,7 +155,7 @@ export class StatisticsPage extends SettingsPage {
         // Add intervals
         const averageInterval: string = textInterval(
             Math.round((cardStats.intervals.getTotalOfValueMultiplyCount() / scheduledCount) * 10) /
-            10 || 0,
+                10 || 0,
             false,
         );
         const longestInterval: string = textInterval(cardStats.intervals.getMaxValue(), false);

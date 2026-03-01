@@ -35,9 +35,9 @@ export default class NoteStatsComponent extends SettingsItemOverrideComponent {
             pagination:
                 Object.entries(noteEases).length > rowsPerPage
                     ? {
-                        limit: rowsPerPage,
-                        summary: false,
-                    }
+                          limit: rowsPerPage,
+                          summary: false,
+                      }
                     : undefined,
             language: {
                 search: {
