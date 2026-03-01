@@ -2,10 +2,16 @@
 // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/776
 export const SCHEDULING_INFO_REGEX =
     /^---\r?\n((?:.*\r?\n)*)sr-due: (.+)\r?\nsr-interval: (\d+)\r?\nsr-ease: (\d+)\r?\n((?:.*\r?\n)?)---/;
+
+export const NOTE_SCHEDULE_INFO_BLOCK = /---\ssr-due:.+\ssr-interval:.+\ssr-ease:.+\s---\s?/g;
+export const NOTE_SCHEDULE_INFO_TEXT = /sr-due:.+\ssr-interval:.+\ssr-ease:.+\s?/g;
+export const FLASHCARD_SCHEDULE_INFO = /\s?<!--SR:!.+?-->/g;
+
 export const YAML_FRONT_MATTER_REGEX = /^---\r?\n((?:.*\r?\n)*?)---/;
 
 export const MULTI_SCHEDULING_EXTRACTOR = /!([\d-]+),(\d+),(\d+)/gm;
 export const LEGACY_SCHEDULING_EXTRACTOR = /<!--SR:([\d-]+),(\d+),(\d+)-->/gm;
+
 export const OBSIDIAN_TAG_AT_STARTOFLINE_REGEX = /^#[^\s#]+/gi;
 
 // https://help.obsidian.md/Linking+notes+and+files/Internal+links#Link+to+a+block+in+a+note
