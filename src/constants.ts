@@ -50,6 +50,6 @@ export const SR_HTML_COMMENT_END = "-->";
 
 export const SR_TAB_VIEW = "spaced-repetition-tab-view";
 
-// Disables the error hiding workaround (see src/gui/sr-tab-view.tsx)
+// Disables the error hiding workaround (see src/ui/sr-tab-view.tsx)
 // Enables emulated platform detection via the EmulatedPlatform() function
 export const DEBUG_MODE_ENABLED = false;

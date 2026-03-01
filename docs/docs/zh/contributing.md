@@ -104,7 +104,7 @@ export default {
 
 ### UI 修改
 
-- 所有 UI 修改都应当在`src/gui/`目录内完成。
+- 所有 UI 修改都应当在`src/ui/`目录内完成。
 
 - 将修改放在正确的区域 (参考代码中的 "MARK:" 或 "#region" 注释)。
 
