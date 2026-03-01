@@ -17,8 +17,7 @@ function modifyFile(vault: Vault, file: TFile): Promise<string> {
         return data
             .replace(NOTE_SCHEDULE_INFO_BLOCK, "")
             .replace(NOTE_SCHEDULE_INFO_TEXT, "")
-            .replace(FLASHCARD_SCHEDULE_INFO, "")
-            .trim();
+            .replace(FLASHCARD_SCHEDULE_INFO, "");
     });
 }
 
