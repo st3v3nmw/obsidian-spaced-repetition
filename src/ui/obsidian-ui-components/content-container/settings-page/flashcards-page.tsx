@@ -135,20 +135,20 @@ export class FlashcardsPage extends SettingsPage {
                         .addOptions(
                             deckOrderEnabled
                                 ? {
-                                    // eslint-disable-next-line camelcase
-                                    PrevDeckComplete_Sequential: t(
-                                        "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
-                                    ),
-                                    // eslint-disable-next-line camelcase
-                                    PrevDeckComplete_Random: t(
-                                        "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
-                                    ),
-                                }
+                                      // eslint-disable-next-line camelcase
+                                      PrevDeckComplete_Sequential: t(
+                                          "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
+                                      ),
+                                      // eslint-disable-next-line camelcase
+                                      PrevDeckComplete_Random: t(
+                                          "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
+                                      ),
+                                  }
                                 : {
-                                    EveryCardRandomDeckAndCard: t(
-                                        "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
-                                    ),
-                                },
+                                      EveryCardRandomDeckAndCard: t(
+                                          "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
+                                      ),
+                                  },
                         )
                         .setValue(
                             deckOrderEnabled
@@ -278,8 +278,7 @@ export class FlashcardsPage extends SettingsPage {
                 );
             })
             .addSetting((setting: Setting) => {
-                const clozePatterns = setting
-                    .setName(t("CLOZE_PATTERNS"));
+                const clozePatterns = setting.setName(t("CLOZE_PATTERNS"));
 
                 clozePatterns.descEl.insertAdjacentHTML(
                     "beforeend",
