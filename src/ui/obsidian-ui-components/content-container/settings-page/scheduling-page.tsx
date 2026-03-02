@@ -1,12 +1,12 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
 import { deleteSchedulingData } from "src/delete-scheduling-data";
-import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
+import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 
 /**
  * Represents a scheduling settings page.
