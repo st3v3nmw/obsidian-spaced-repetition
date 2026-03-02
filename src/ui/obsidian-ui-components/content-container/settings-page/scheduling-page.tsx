@@ -1,6 +1,6 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
-import { deleteSchedulingData } from "src/delete-scheduling-data";
+import { deleteAllSchedulingData } from "src/delete-scheduling-data";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
@@ -294,7 +294,7 @@ export class SchedulingPage extends SettingsPage {
                                     t("DELETE_SCHEDULING_DATA"),
                                     t("CONFIRM_SCHEDULING_DATA_DELETION"),
                                     t("SCHEDULING_DATA_HAS_BEEN_DELETED"),
-                                    deleteSchedulingData,
+                                    deleteAllSchedulingData,
                                 ).open();
                             });
                     });

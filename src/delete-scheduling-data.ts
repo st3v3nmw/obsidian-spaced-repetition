@@ -10,10 +10,9 @@ import {
  * Modifies a file to remove scheduling data.
  * @param vault - The Obsidian vault instance.
  * @param file - The file to modify.
- * @returns - A promise that resolves to the modified file content.
  */
-function modifyFile(vault: Vault, file: TFile): Promise<string> {
-    return vault.process(file, (data) => {
+function removeSchedulingInfo(vault: Vault, file: TFile) {
+    vault.process(file, (data) => {
         return data
             .replace(NOTE_SCHEDULE_INFO_BLOCK, "")
             .replace(NOTE_SCHEDULE_INFO_TEXT, "")
@@ -24,10 +23,10 @@ function modifyFile(vault: Vault, file: TFile): Promise<string> {
 /**
  * Deletes all scheduling data from all markdown files in the vault.
  */
-export function deleteSchedulingData() {
+export function deleteAllSchedulingData() {
     const files = this.app.vault.getMarkdownFiles();
 
     for (let i = 0; i < files.length; i++) {
-        modifyFile(this.app.vault, files[i]);
+        removeSchedulingInfo(this.app.vault, files[i]);
     }
 }
