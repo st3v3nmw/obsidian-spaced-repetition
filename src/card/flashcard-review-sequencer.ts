@@ -264,7 +264,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         }
 
         // Move/delete the card
-        if (response == ReviewResponse.Reset) {
+        if (response === ReviewResponse.Reset) {
             this.cardSequencer.moveCurrentCardToEndOfList();
             this.cardSequencer.nextCard();
         } else {
@@ -289,7 +289,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     async processReviewCramMode(response: ReviewResponse): Promise<void> {
-        if (response == ReviewResponse.Easy) this.deleteCurrentCard();
+        if (response === ReviewResponse.Easy) this.deleteCurrentCard();
         else {
             this.cardSequencer.moveCurrentCardToEndOfList();
             this.cardSequencer.nextCard();
@@ -299,7 +299,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     determineCardSchedule(response: ReviewResponse, card: Card): RepItemScheduleInfo {
         let result: RepItemScheduleInfo;
 
-        if (response == ReviewResponse.Reset) {
+        if (response === ReviewResponse.Reset) {
             // Resetting the card schedule
             result = this.srsAlgorithm.cardGetResetSchedule();
         } else {

@@ -117,7 +117,7 @@ export class OsrCore {
         const tags = noteFile.getAllTagsFromCache();
 
         const matchedNoteTags = SettingsUtil.filterForNoteReviewTag(this.settings, tags);
-        if (matchedNoteTags.length == 0) {
+        if (matchedNoteTags.length === 0) {
             return;
         }
         const noteSchedule: RepItemScheduleInfo = await noteFile.getNoteSchedule();
@@ -158,7 +158,7 @@ export class OsrCore {
 
         // Calculate the new/updated schedule
         let noteSchedule: RepItemScheduleInfo;
-        if (originalNoteSchedule == null) {
+        if (originalNoteSchedule === null) {
             noteSchedule = SrsAlgorithm.getInstance().noteCalcNewSchedule(
                 noteFile.path,
                 this.osrNoteGraph,

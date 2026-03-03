@@ -10,7 +10,7 @@ export function testTimeStart(): void {
 }
 
 export function testTimeLog(desc: string): void {
-    if (testTimeInfo == null) testTimeStart();
+    if (testTimeInfo === null) testTimeStart();
     testTimeInfo.push([desc, moment().valueOf()]);
 }
 

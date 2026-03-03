@@ -60,7 +60,7 @@ function markerInsideCodeBlock(text: string, marker: string, markerIndex: number
 
 function hasInlineMarker(text: string, marker: string): boolean {
     // No marker provided
-    if (marker.length == 0) return false;
+    if (marker.length === 0) return false;
 
     // Check if the marker is in the text
     const markerIdx = text.indexOf(marker);
@@ -80,6 +80,8 @@ function hasInlineMarker(text: string, marker: string): boolean {
  * @returns An array of parsed question information
  */
 export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[] {
+    // TODO: make this a final state machine
+    // TODO: keep in mind that cleanup is also needed for rouge sr comments
     if (debugParser) {
         console.log("Text to parse:\n<<<" + text + ">>>");
     }
@@ -97,11 +99,11 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
     let firstLineNo = 0,
         lastLineNo: number;
 
-    const clozecrafter = new ClozeCrafter(options.clozePatterns);
+    const clozeCrafter = new ClozeCrafter(options.clozePatterns);
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
     for (let i = 0; i < lines.length; i++) {
-        const currentLine = lines[i],
-            currentTrimmed = lines[i].trim();
+        const currentLine = lines[i];
+        const currentTrimmed = lines[i].trim();
 
         // Skip everything in HTML comments
         if (currentLine.startsWith("<!--") && !currentLine.startsWith("<!--SR:")) {
@@ -111,14 +113,15 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
         }
 
         // Have we reached the end of a card?
-        const isEmptyLine = currentTrimmed.length == 0;
+        const isEmptyLine = currentTrimmed.length === 0;
         const hasMultilineCardEndMarker =
-            options.multilineCardEndMarker && currentTrimmed == options.multilineCardEndMarker;
+            options.multilineCardEndMarker && !isEmptyLine && currentTrimmed === options.multilineCardEndMarker;
+
         if (
             // We've probably reached the end of a card
             (isEmptyLine && !options.multilineCardEndMarker) ||
             // Empty line & we're not picking up any card
-            (isEmptyLine && cardType == null) ||
+            (isEmptyLine && cardType === null) ||
             // We've reached the end of a multi line card &
             //  we're using custom end markers
             hasMultilineCardEndMarker
@@ -126,6 +129,10 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
             if (cardType) {
                 // Create a new card
                 lastLineNo = i - 1;
+                if (options.multilineCardEndMarker && (cardType === CardType.MultiLineBasic || cardType === CardType.MultiLineReversed)) {
+                    console.log(cardText);
+                }
+
                 cards.push(
                     new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo),
                 );
@@ -151,7 +158,7 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
             }
         }
 
-        if (cardType == CardType.SingleLineBasic || cardType == CardType.SingleLineReversed) {
+        if (cardType === CardType.SingleLineBasic || cardType === CardType.SingleLineReversed) {
             cardText = currentLine;
             firstLineNo = i;
 
@@ -187,7 +194,7 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
             }
             cardText += "\n" + codeBlockClose;
             i++;
-        } else if (cardType === null && clozecrafter.isClozeNote(currentLine)) {
+        } else if (cardType === null && clozeCrafter.isClozeNote(currentLine)) {
             // Pick up cloze cards
             cardType = CardType.Cloze;
         }
@@ -205,3 +212,135 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
 
     return cards;
 }
+
+
+// // Save the previous card info to handle cases where a mix of multiline and multiline with specific end symbol cards are used
+//     let prevCardIndex: number = -1;
+//     let potentialForSpacedMultilineCard: boolean = false;
+
+//     let cardText = "";
+//     let cardType: CardType | null = null;
+//     let firstLineNo = 0;
+//     let lastLineNo: number;
+
+//     const clozeCrafter = new ClozeCrafter(options.clozePatterns);
+//     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
+//     for (let i = 0; i < lines.length; i++) {
+//         const currentLine = lines[i];
+//         const currentTrimmed = lines[i].trim();
+
+//         // Skip everything in HTML comments
+//         if (currentLine.startsWith("<!--") && !currentLine.startsWith("<!--SR:")) {
+//             while (i + 1 < lines.length && !currentLine.includes("-->")) i++;
+//             i++;
+//             continue;
+//         }
+
+//         // Have we reached the end of a card?
+//         const isEmptyLine = currentTrimmed.length === 0;
+//         const hasMultilineCardEndMarker =
+//             options.multilineCardEndMarker && !isEmptyLine && currentTrimmed === options.multilineCardEndMarker;
+
+//         if (!isEmptyLine && !hasMultilineCardEndMarker) {
+//             // Update card text
+//             if (cardText.length > 0) {
+//                 cardText += "\n";
+//             }
+//             cardText += currentLine.trimEnd();
+
+//             // Pick up inline cards
+//             for (const { separator, type } of inlineSeparators) {
+//                 if (hasInlineMarker(currentLine, separator)) {
+//                     cardType = type;
+//                     break;
+//                 }
+//             }
+
+//         }
+
+
+//         if (
+//             // We've probably reached the end of a card
+//             // Empty line & we're not picking up any card
+//             isEmptyLine ||
+//             // We've reached the end of a multi line card &
+//             //  we're using custom end markers
+//             hasMultilineCardEndMarker
+//         ) {
+//             if (cardType) {
+//                 // Create a new card
+//                 lastLineNo = i - 1;
+//                 if (options.multilineCardEndMarker && (cardType === CardType.MultiLineBasic || cardType === CardType.MultiLineReversed)) {
+//                     potentialForSpacedMultilineCard = true;
+//                 }
+
+//                 prevCardIndex = cards.length;
+
+//                 cards.push(
+//                     new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo),
+//                 );
+
+//                 cardType = null;
+//             }
+
+//             cardText = "";
+//             firstLineNo = i + 1;
+//             continue;
+//         }
+
+
+
+//         if (cardType === CardType.SingleLineBasic || cardType === CardType.SingleLineReversed) {
+//             cardText = currentLine;
+//             firstLineNo = i;
+
+//             // Pick up scheduling information if present
+//             if (i + 1 < lines.length && lines[i + 1].startsWith("<!--SR:")) {
+//                 cardText += "\n" + lines[i + 1];
+//                 i++;
+//             }
+
+//             lastLineNo = i;
+//             prevCardIndex = cards.length;
+//             cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
+
+//             cardType = null;
+//             cardText = "";
+//         } else if (currentTrimmed === options.multilineCardSeparator) {
+//             // Ignore card if the front of the card is empty
+//             if (cardText.length > 1) {
+//                 // Pick up multiline basic cards
+//                 cardType = CardType.MultiLineBasic;
+//             }
+//         } else if (currentTrimmed === options.multilineReversedCardSeparator) {
+//             // Ignore card if the front of the card is empty
+//             if (cardText.length > 1) {
+//                 // Pick up multiline basic cards
+//                 cardType = CardType.MultiLineReversed;
+//             }
+//         } else if (currentLine.startsWith("```") || currentLine.startsWith("~~~")) {
+//             // Pick up codeblocks
+//             const codeBlockClose = currentLine.match(/`+|~+/)[0];
+//             while (i + 1 < lines.length && !lines[i + 1].startsWith(codeBlockClose)) {
+//                 i++;
+//                 cardText += "\n" + lines[i];
+//             }
+//             cardText += "\n" + codeBlockClose;
+//             i++;
+//         } else if (cardType === null && clozeCrafter.isClozeNote(currentLine)) {
+//             // Pick up cloze cards
+//             cardType = CardType.Cloze;
+//         }
+//     }
+
+//     // Do we have a card left in the queue?
+//     if (cardType && cardText) {
+//         lastLineNo = lines.length - 1;
+//         cards.push(new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo));
+//     }
+
+//     if (debugParser) {
+//         console.log("Parsed cards:\n", cards);
+//     }
+
+//     return cards;

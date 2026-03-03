@@ -188,7 +188,7 @@ export class SrTFile implements ISRFile {
         const frontMatter = fileCache?.frontmatter;
         if (frontMatter && frontMatter?.direction) {
             const str: string = (frontMatter.direction + "").toLowerCase();
-            result = str == "rtl" ? TextDirection.Rtl : TextDirection.Ltr;
+            result = str === "rtl" ? TextDirection.Rtl : TextDirection.Ltr;
         }
         return result;
     }

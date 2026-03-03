@@ -64,7 +64,7 @@ export class FlashcardEditModal extends Modal {
         this.textArea.addClass("sr-input");
         this.textArea.setText(this.modalText ?? "");
         this.textArea.addEventListener("keydown", this.saveOnEnterCallback);
-        if (this.textDirection == TextDirection.Rtl) {
+        if (this.textDirection === TextDirection.Rtl) {
             this.textArea.setAttribute("dir", "rtl");
         }
 

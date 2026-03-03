@@ -25,7 +25,7 @@ export class RepItemScheduleInfoOsr extends RepItemScheduleInfo {
         this.interval = Math.round(interval);
         this.latestEase = latestEase;
         this.delayedBeforeReviewTicks = delayedBeforeReviewTicks;
-        if (dueDate && delayedBeforeReviewTicks == null) {
+        if (dueDate && delayedBeforeReviewTicks === null) {
             this.delayedBeforeReviewTicks = globalDateProvider.today.valueOf() - dueDate.valueOf();
         }
     }

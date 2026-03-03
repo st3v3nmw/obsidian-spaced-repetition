@@ -72,7 +72,7 @@ export class NoteQuestionParser {
 
             // Create the question list
             let textDirection: TextDirection = noteFile.getTextDirection();
-            if (textDirection == TextDirection.Unspecified) textDirection = defaultTextDirection;
+            if (textDirection === TextDirection.Unspecified) textDirection = defaultTextDirection;
             this.questionList = this.doCreateQuestionList(
                 noteText,
                 textDirection,
@@ -126,6 +126,13 @@ export class NoteQuestionParser {
                     question.questionText.original,
                     null,
                 );
+
+            // TODO: this length mismatch deletes the scheduling info on multiline cloze cards, after setting the multiline symbol
+            // TODO: actually the issue is with the multiline cards not the cloze cards. The cloze ones without +++ are detected
+            // TODO: but not the simple multiline cards without +++, which is why there is too many schedule comments and one of them will be deleted
+
+            console.log(cardFrontBackList);
+            console.log(cardScheduleInfoList);
 
             // we have some extra scheduling dates to delete
             const correctLength = cardFrontBackList.length;
@@ -248,7 +255,7 @@ export class NoteQuestionParser {
         //      2. is not question specific (determined by line number) - i.e. is "note level"
         const noteLevelTagList: TagCache[] = flashcardTagList.filter(
             (item) =>
-                item.position.start.line == frontmatterTagPseudoLineNum &&
+                item.position.start.line === frontmatterTagPseudoLineNum &&
                 this.isNoteLevelFlashcardTag(item),
         );
         if (noteLevelTagList.length > 0) {

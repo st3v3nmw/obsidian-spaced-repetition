@@ -6,7 +6,7 @@ export class TopicPath {
     path: string[];
 
     constructor(path: string[]) {
-        if (path == null) throw "null path";
+        if (path === null) throw "null path";
         if (path.some((str) => str.includes("/"))) throw "path entries must not contain '/'";
         this.path = path;
     }
@@ -89,17 +89,17 @@ export class TopicPath {
     }
 
     static isValidTag(tag: string): boolean {
-        if (tag == null || tag.length == 0) return false;
+        if (tag === null || tag.length === 0) return false;
         if (tag[0] != "#") return false;
-        if (tag.length == 1) return false;
+        if (tag.length === 1) return false;
 
         return true;
     }
 
     static getTopicPathFromTag(tag: string): TopicPath {
-        if (tag == null || tag.length == 0) throw "Null/empty tag";
+        if (tag === null || tag.length === 0) throw "Null/empty tag";
         if (tag[0] != "#") throw "Tag must start with #";
-        if (tag.length == 1) throw "Invalid tag";
+        if (tag.length === 1) throw "Invalid tag";
 
         const path: string[] = tag
             .replace("#", "")
@@ -128,7 +128,7 @@ export class TopicPathList {
     lineNum: number;
 
     constructor(list: TopicPath[], lineNum: number = null) {
-        if (list == null) throw "TopicPathList null";
+        if (list === null) throw "TopicPathList null";
         this.list = list;
         this.lineNum = lineNum;
     }

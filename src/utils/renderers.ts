@@ -26,7 +26,7 @@ export class RenderMarkdownWrapper {
         if (recursiveDepth > 4) return;
 
         let el: HTMLElement;
-        if (textDirection == TextDirection.Rtl) {
+        if (textDirection === TextDirection.Rtl) {
             el = containerEl.createDiv();
             el.setAttribute("dir", "rtl");
         } else el = containerEl;
@@ -84,10 +84,10 @@ export class RenderMarkdownWrapper {
                     el.addEventListener(
                         "click",
                         (ev) =>
-                            ((ev.target as HTMLElement).style.minWidth =
-                                (ev.target as HTMLElement).style.minWidth === "100%"
-                                    ? null
-                                    : "100%"),
+                        ((ev.target as HTMLElement).style.minWidth =
+                            (ev.target as HTMLElement).style.minWidth === "100%"
+                                ? null
+                                : "100%"),
                     );
                 },
             );
