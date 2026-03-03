@@ -320,11 +320,9 @@ export class FlashcardsPage extends SettingsPage {
                                     }
 
                                     if (clozePatternSet.has(defaultCurlyBracketsPattern)) {
-                                        this.plugin.data.settings.convertCurlyBracketsToClozes =
-                                            true;
+                                        this.plugin.data.settings.convertCurlyBracketsToClozes = true;
                                     } else {
-                                        this.plugin.data.settings.convertCurlyBracketsToClozes =
-                                            false;
+                                        this.plugin.data.settings.convertCurlyBracketsToClozes = false;
                                     }
 
                                     this.plugin.data.settings.clozePatterns = [...clozePatternSet];
