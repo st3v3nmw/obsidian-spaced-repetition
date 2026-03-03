@@ -7,7 +7,7 @@ import { CardFrontBack, CardFrontBackUtil } from "src/card/questions/question-ty
 import { DataStore } from "src/data-stores/base/data-store";
 import { TopicPath, TopicPathList } from "src/deck/topic-path";
 import { frontmatterTagPseudoLineNum, ISRFile } from "src/file";
-import { parse, ParsedQuestionInfo, ParserOptions } from "src/parser";
+import { ParsedQuestionInfo, ParserOptions, QuestionParser } from "src/parser";
 import { SettingsUtil, SRSettings } from "src/settings";
 import {
     splitNoteIntoFrontmatterAndContent,
@@ -161,7 +161,7 @@ export class NoteQuestionParser {
         };
 
         // We pass contentText which has the frontmatter blanked out; see extractFrontmatter for reasoning
-        return parse(this.contentText, parserOptions);
+        return QuestionParser.parse(this.contentText, parserOptions);
     }
 
     private createQuestionObject(
