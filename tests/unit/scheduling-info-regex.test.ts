@@ -29,6 +29,11 @@ describe("FLASHCARD_SCHEDULE_INFO", () => {
         ]);
     });
 
+    test("SR comment with leading newline character", async () => {
+        const text: string = "\n<!--SR:!2023-09-02,4,270-->";
+        expect(FLASHCARD_SCHEDULE_INFO.test(text)).toEqual(true);
+    });
+
     test("Remove SR comments from text", async () => {
         const text: string =
             "<!--SR:!2023-09-02,4,270-->\n<!--SR:!2023-09-02,4,270!2023-09-02,5,270!2023-09-02,6,270!2023-09-02,7,270--><!--SR:!2023-09-02,4,270-->\n <!--SR:!2023-09-02,4,270-->\n<!--SR:!2023-09-02,4,270-->Hello <!--SR:!2023-09-02,4,270--> World<!--SR:!2023-09-02,4,270-->!\n\n<!--SR:!2023-09-02,4,270--><!--SR:!2023-09-02,4,270--><!--SR:!2023-09-02,4,270!2023-09-02,5,270!2023-09-02,6,270!2023-09-02,7,270-->";
