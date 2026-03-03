@@ -39,13 +39,27 @@ export class ParsedQuestionInfo {
 }
 
 // All the states that the parser can be in, when parsing a note for cards
-export type ParserStates = "READY_TO_PARSE" | "NOTHING_DETECTED" | "SR_HTML_COMMENT_DETECTED" | "NON_SR_HTML_COMMENT_DETECTED" |
-    "SINGLE_LINE_BASIC_DETECTED" | "SINGLE_LINE_REVERSED_DETECTED" | "MULTI_LINE_BASIC_DETECTED" |
-    "MULTI_LINE_REVERSED_DETECTED" | "CLOZE_DETECTED";
+export type ParserStates = "READY_TO_PARSE" | "LOOKING_FOR_CARD_START" | "FOUND_CLOZE_LOOK_FOR_CONTINUATION";
 
 export class QuestionParser {
-    static debugParser = false;
-    static currentParserState: ParserStates = "READY_TO_PARSE";
+    static debugParser = false; // Enable to see the parser state changes
+    static currentParserState: ParserStates = "READY_TO_PARSE"; // The current parser state
+    static readonly srCommentStart = "<!--SR:"; // The start of a scheduling info comment
+    static readonly nonSrCommentStart = "<!--"; // The start of a non scheduling info comment
+    static readonly commentEnd = "-->"; // The end of a comment
+    static multilineCardEndMarker: string | undefined = undefined; // The multiline card end marker
+
+    static cardText: string = ""; // The text of the current card
+    static potentialCardTextLines: string[] = []; // The potential additional text of the previous card -> important for multiline cards
+    static potentialFrontCardText: string = ""; // The potential text of the front of the current card -> important for multiline cards
+    static potentialBackCardText: string = ""; // The potential text of the back of the current card -> important for multiline cards
+    static firstLineNo: number = -1; // The first line number of the current card
+    static lastLineNo: number = -1; // The last line number of the current card
+    static cardType: CardType | null = null; // The type of the current card
+    static cards: ParsedQuestionInfo[] = []; // The list of detected cards
+    static lines: string[] = []; // The lines of the current note
+    static currentLine: string = ""; // The current line
+    static currentLineTrimmed: string = ""; // The current line trimmed without whitespace
 
     /**
      * Returns flashcards found in `text`
@@ -70,44 +84,138 @@ export class QuestionParser {
         ];
         inlineSeparators.sort((a, b) => b.separator.length - a.separator.length);
 
-        const cards: ParsedQuestionInfo[] = [];
-        let cardText = "";
-        let cardType: CardType | null = null;
-        let firstLineNo = 0,
-            lastLineNo: number;
-
+        // Create the cloze crafter
         const clozeCrafter = new ClozeCrafter(options.clozePatterns);
-        const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
 
-        // TODO: make this a final state machine
-        // TODO: keep in mind that cleanup is also needed for rouge sr comments
-        for (let i = 0; i < lines.length; i++) {
-            const currentLine = lines[i];
-            const currentTrimmed = lines[i].trim();
+        // Split the text into lines
+        QuestionParser.lines = text.replaceAll("\r\n", "\n").split("\n");
+
+        // Start parsing
+        QuestionParser.firstLineNo = 0;
+        QuestionParser.currentParserState = "LOOKING_FOR_CARD_START";
+
+        for (let i = 0; i < QuestionParser.lines.length; i++) {
+            QuestionParser.currentLine = QuestionParser.lines[i];
+            QuestionParser.currentLineTrimmed = QuestionParser.currentLine.trim();
+            // define a function that will skip to the next line for quicker parsing
+            const skipLine = () => {
+                i++;
+                QuestionParser.currentLine = QuestionParser.lines[i];
+                QuestionParser.currentLineTrimmed = QuestionParser.currentLine.trim();
+                if (QuestionParser.debugParser) {
+                    console.log("Skipping line: " + QuestionParser.currentLine);
+                    console.log("Current parser state: " + QuestionParser.currentParserState);
+                }
+                return i;
+            };
+
+            const getScheduleInfoIfPresent = () => {
+                if (i + 1 < QuestionParser.lines.length && QuestionParser.lines[i + 1].startsWith("<!--SR:")) {
+                    return QuestionParser.lines[i + 1].trim();
+                }
+                return "";
+            };
+
+            if (QuestionParser.debugParser) {
+                console.log("Current line: " + QuestionParser.currentLine);
+                console.log("Current parser state: " + QuestionParser.currentParserState);
+            }
 
             // Analyze the current line based on the current state
-            switch (QuestionParser.currentParserState) {
-                case "READY_TO_PARSE": // Start of parsing a note at Line 0
+            switch (QuestionParser.currentParserState as ParserStates) {
+                case "FOUND_CLOZE_LOOK_FOR_CONTINUATION": {
+                    if (QuestionParser.cards.last().cardType !== CardType.Cloze) {
+                        throw new Error("Cloze card continuation state without cloze card");
+                    }
+
+                    // We are on the lookout for a multiline cloze card
+                    if (QuestionParser.multilineCardEndMarker) {
+                        // Here we consider all lines until the multiline card end marker shows up
+                        // TODO: implement multiline cloze card detection
+                    } else {
+                        // Here only non empty lines are considered
+
+                        if (QuestionParser.isMultiLineCardSeparator(
+                            QuestionParser.currentLineTrimmed,
+                            [options.multilineCardSeparator, options.multilineReversedCardSeparator])
+                        ) {
+                            // We found a multiline card separator, so the potential card text may be part of the coming multiline card -> we revert the current line
+
+                            // Go back to last cloze card
+                            if (QuestionParser.potentialCardTextLines.length === 0) {
+                                // TODO: Test this case
+                                // Found a headless multiline card separator like this:
+                                /*
+                                    This is a ==Cloze== question
+                                    ??
+                                    This is the answer of the headless multiline card
+                                */
+
+                                if (debugParser) {
+                                    console.log("Found multiline card separator without a question text");
+                                }
+
+                                // Skip past the faulty multiline card separator and continue with the next line
+                                QuestionParser.currentParserState = "LOOKING_FOR_CARD_START";
+                                break;
+                            }
+
+                            // Reset the current line for the card start state to handle the multiline card
+                            i = QuestionParser.cards.last().lastLineNum;
+                            QuestionParser.currentLine = QuestionParser.lines[i];
+                            QuestionParser.currentLineTrimmed = QuestionParser.currentLine.trim();
+                            QuestionParser.potentialCardTextLines = [];
+                            QuestionParser.currentParserState = "LOOKING_FOR_CARD_START";
+
+                            break;
+                        } else if (
+                            QuestionParser.currentLineTrimmed.length === 0 ||
+                            // IDEA: maybe collect all unused sr comments and clean them/warn user
+                            QuestionParser.isSRHTMLComment(QuestionParser.currentLineTrimmed) ||
+                            QuestionParser.isStartOfNonSRHTMLComment(QuestionParser.currentLineTrimmed)
+                        ) {
+                            // We found skippable text, so we are done here for this cloze
+                            this.addPotentialCardTextToPreviousCard();
+                            QuestionParser.currentParserState = "LOOKING_FOR_CARD_START";
+                        } else if (QuestionParser.hasInlineMarker(QuestionParser.currentLineTrimmed, QuestionParser.multilineCardEndMarker)) {
+                            // We found an inline card, so we add it and are done here for this cloze
+                            this.addPotentialCardTextToPreviousCard();
+                            QuestionParser.checkForInlineCardAndAddToList(
+                                i,
+                                inlineSeparators,
+                                skipLine.bind(this),
+                                getScheduleInfoIfPresent.bind(this)
+                            );
+                            QuestionParser.currentParserState = "LOOKING_FOR_CARD_START";
+                            break;
+                        } else {
+                            // We found a cloze card or some text, which could belong to the previous cloze card so we store it and continue to look for further text or clozes
+                            QuestionParser.potentialCardTextLines.push(QuestionParser.currentLine);
+
+                            if (clozeCrafter.isClozeNote(QuestionParser.currentLineTrimmed)) {
+                                QuestionParser.addPotentialCardTextToPreviousCard();
+                            }
+
+                            QuestionParser.potentialCardTextLines.push(QuestionParser.currentLine);
+                            QuestionParser.currentParserState = "FOUND_CLOZE_LOOK_FOR_CONTINUATION";
+                            break;
+                        }
+                    }
                     break;
-                case "NON_SR_HTML_COMMENT_DETECTED": // Reached a line that is a non SR HTML comment
-                    // Could go on for a while, so we skip till we find the end of the comment
+                }
+                case "LOOKING_FOR_CARD_START": { // Looking for the start of a card
+                    QuestionParser.handleFreshCardStart(
+                        i,
+                        clozeCrafter,
+                        inlineSeparators,
+                        skipLine.bind(this),
+                        getScheduleInfoIfPresent.bind(this)
+                    );
+
                     break;
-                case "SR_HTML_COMMENT_DETECTED": // Reached a line that is a SR HTML comment
-                    // Shouldn't be multiline
-                    break;
-                case "SINGLE_LINE_BASIC_DETECTED": // Reached a line that is a single line basic card
-                    // Shouldn't be multiline
-                    break;
-                case "SINGLE_LINE_REVERSED_DETECTED": // Reached a line that is a single line reversed card
-                    // Shouldn't be multiline
-                    break;
-                case "MULTI_LINE_BASIC_DETECTED":
-                    break;
-                case "MULTI_LINE_REVERSED_DETECTED":
-                    break;
-                case "NOTHING_DETECTED": // This is an empty line
-                    // Could go on for a while
-                    break;
+                }
+                default:
+                    throw new Error("Impossible parser state: " + QuestionParser.currentParserState);
             }
 
             // ----- OLD CODE -----
@@ -224,25 +332,247 @@ export class QuestionParser {
 
     private static resetParserState() {
         QuestionParser.currentParserState = "READY_TO_PARSE";
+        QuestionParser.multilineCardEndMarker = undefined;
+        QuestionParser.cards = [];
+        QuestionParser.lines = [];
+        QuestionParser.currentLine = "";
+        QuestionParser.currentLineTrimmed = "";
+
+        QuestionParser.resetCardSpecificParserState();
+    }
+
+    private static resetCardSpecificParserState() {
+        QuestionParser.cardText = "";
+        QuestionParser.potentialFrontCardText = "";
+        QuestionParser.potentialBackCardText = "";
+        QuestionParser.potentialCardTextLines = [];
+        QuestionParser.firstLineNo = -1;
+        QuestionParser.lastLineNo = -1;
+        QuestionParser.cardType = null;
+    }
+
+    /**
+     * Handles the start of a new card
+     *
+     * This function should only be used when it really doesn't matter what the past line or the past card was
+     *
+     * @param i - The current line number
+     * @param clozeCrafter - The cloze crafter
+     * @param inlineSeparators - The inline separators
+     * @param skipLine - The skip line function
+     * @param getScheduleInfoIfPresent - The get schedule info if present function
+     */
+    private static handleFreshCardStart(i: number, clozeCrafter: ClozeCrafter, inlineSeparators: Array<{ separator: string, type: CardType }>, skipLine: () => number, getScheduleInfoIfPresent: () => string) {
+        // Skip any non HTML Comments & empty lines, as we don't care about them yet in this parser state
+        // because we are not yet looking out for multiline cards here
+        let breakOut = false;
+        while (!breakOut) {
+            breakOut = !QuestionParser.skipPastNonSRHTMLComment(skipLine);
+            breakOut = breakOut && !QuestionParser.skipPastSRHTMLComment(skipLine); // IDEA: Maybe collect all unused sr comments and clean them/warn user
+            breakOut = breakOut && !QuestionParser.skipPastEmptyLines(skipLine);
+        }
+
+        // Now we are in a line, where we know that it isnt empty, and it isnt a comment
+        // Pick up inline cards and add them to the list of cards
+        const hadInlineCard = QuestionParser.checkForInlineCardAndAddToList(
+            i,
+            inlineSeparators,
+            skipLine,
+            getScheduleInfoIfPresent
+        );
+
+        if (hadInlineCard) {
+            // Found an inline card, the next line could be anything, so we start again
+            QuestionParser.currentParserState = "LOOKING_FOR_CARD_START";
+            return;
+        }
+
+        // Didn't find an inline card, so we are now looking for a cloze card
+        const hadClozeCard = QuestionParser.checkForClozeCardAndAddToList(
+            i,
+            clozeCrafter,
+            skipLine,
+            getScheduleInfoIfPresent
+        );
+
+        if (hadClozeCard) {
+            // Found a cloze card, so the next line could be anything, so we start again
+            if (QuestionParser.cards.last().text.includes(QuestionParser.srCommentStart)) {
+                // Because we found the sheduling info comment, we know that the next line is not part of the cloze
+                QuestionParser.currentParserState = "LOOKING_FOR_CARD_START";
+                return;
+            }
+
+            // Now we go and look for a new card, but this time we are on the lookout, if the cloze card continues
+            // on to a multiline cloze card
+            QuestionParser.currentParserState = "FOUND_CLOZE_LOOK_FOR_CONTINUATION";
+            return;
+        }
+
+        // Didn't find an inline card or a cloze card, so we are now looking for a multiline card
+        // TODO: implement multiline card detection
+    }
+
+    private static checkForClozeCardAndAddToList(i: number, clozeCrafter: ClozeCrafter, skipLine: () => number, getScheduleInfoIfPresent: () => string): boolean {
+        const currentLineEndTrimmed = QuestionParser.currentLine.trimEnd();
+        const hasClozeCard = clozeCrafter.isClozeNote(currentLineEndTrimmed);
+
+        if (hasClozeCard) {
+            QuestionParser.cardType = CardType.Cloze;
+            QuestionParser.cardText = currentLineEndTrimmed;
+            QuestionParser.firstLineNo = i;
+            const scheduleInfo = getScheduleInfoIfPresent();
+            if (scheduleInfo.length > 0) {
+                QuestionParser.cardText += "\n" + scheduleInfo;
+                skipLine();
+            }
+
+            QuestionParser.lastLineNo = scheduleInfo.length > 0 ? i + 1 : i; // Either the end of the card, or the schedule info of the card
+            QuestionParser.addNewCardToList();
+
+            // Clean up for next card
+            QuestionParser.resetCardSpecificParserState();
+        }
+
+        return hasClozeCard;
+    }
+
+    private static checkForInlineCardAndAddToList(i: number, inlineSeparators: Array<{ separator: string, type: CardType }>, skipLine: () => number, getScheduleInfoIfPresent: () => string): boolean {
+        let hadInlineCard = false;
+
+        for (const { separator, type } of inlineSeparators) {
+            if (QuestionParser.hasInlineMarker(QuestionParser.currentLine, separator)) {
+                // We have found an inline card, setup all extractable info
+                const currentLineEndTrimmed = QuestionParser.currentLine.trimEnd();
+                QuestionParser.cardType = type;
+                QuestionParser.cardText = currentLineEndTrimmed;
+                QuestionParser.potentialFrontCardText = currentLineEndTrimmed.split(separator)[0];
+                QuestionParser.potentialBackCardText = currentLineEndTrimmed.split(separator)[1];
+                QuestionParser.firstLineNo = i;
+
+                // Pick up scheduling information if present
+                const scheduleInfo = getScheduleInfoIfPresent();
+                if (scheduleInfo.length > 0) {
+                    QuestionParser.cardText += "\n" + scheduleInfo;
+                    skipLine();
+                }
+
+                QuestionParser.lastLineNo = scheduleInfo.length > 0 ? i + 1 : i; // Either the end of the card, or the schedule info of the card
+                QuestionParser.addNewCardToList();
+
+                // Clean up for next card
+                QuestionParser.resetCardSpecificParserState();
+                hadInlineCard = true;
+                break;
+            }
+        }
+
+        return hadInlineCard;
+    }
+
+    private static addNewCardToList() {
+        QuestionParser.cards.push(
+            new ParsedQuestionInfo(
+                QuestionParser.cardType,
+                QuestionParser.cardText,
+                QuestionParser.firstLineNo,
+                QuestionParser.lastLineNo
+            )
+        );
+    }
+
+    private static addPotentialCardTextToPreviousCard() {
+        if (QuestionParser.potentialCardTextLines.length > 0) {
+            QuestionParser.cards.last().lastLineNum += QuestionParser.potentialCardTextLines.length;
+            // TODO: Test if one should use length - 1 instead of length
+            QuestionParser.cards.last().text += "\n" + QuestionParser.potentialCardTextLines.join("\n");
+            QuestionParser.potentialCardTextLines = [];
+        }
     }
 
     static isStartOfNonSRHTMLComment(line: string): boolean {
-        return line.startsWith("<!--") && !line.startsWith("<!--SR:");
+        return line.startsWith(QuestionParser.nonSrCommentStart) && !line.startsWith(QuestionParser.srCommentStart);
     }
 
     static isEndOfHTMLComment(line: string): boolean {
-        return line.includes("-->");
+        return line.includes(QuestionParser.commentEnd);
     }
 
     static isSRHTMLComment(line: string): boolean {
-        return line.startsWith("<!--SR:");
+        return line.startsWith(QuestionParser.srCommentStart);
     }
 
     static isMultiLineCardEndMarker(line: string, multilineCardEndMarker: string): boolean {
         return line.trim() === multilineCardEndMarker;
     }
 
+    private static skipPastEmptyLines(skipLine: () => number): boolean {
+        // Skip empty lines until we find something that is not empty
+        let foundEmptyLine = false;
+        while (QuestionParser.currentLineTrimmed.length === 0) {
+            foundEmptyLine = true;
+            skipLine();
+        }
+
+        return foundEmptyLine;
+    }
+
+    private static skipPastSRHTMLComment(skipLine: () => number): boolean {
+        // return true if we found the end of the sr comment
+        if (
+            QuestionParser.isSRHTMLComment(QuestionParser.currentLine)
+        ) {
+            if (QuestionParser.isEndOfHTMLComment(QuestionParser.currentLine)) {
+                // End of sr comment should be in the same line as the start of the sr comment
+                skipLine();
+                return true;
+            } else {
+                throw new Error("SR comment not ended on same line as start");
+            }
+        }
+        return false;
+    }
+
+    private static skipPastNonSRHTMLComment(skipLine: () => number) {
+        // return true if we found the end of the non sr comment
+        if (
+            QuestionParser.isStartOfNonSRHTMLComment(QuestionParser.currentLine) &&
+            QuestionParser.isEndOfHTMLComment(QuestionParser.currentLine)
+        ) {
+            // End of comment is in the same line as the start of the comment
+            skipLine();
+            return true;
+        }
+
+
+        if (QuestionParser.isStartOfNonSRHTMLComment(QuestionParser.currentLine)) {
+            // Comment is on multiple lines
+            // Could go on for a while, so we skipping till we are one line past the end of the comment
+            let i = skipLine();
+            while (
+                i < QuestionParser.lines.length &&
+                !QuestionParser.isEndOfHTMLComment(QuestionParser.currentLine)
+            ) {
+                i = skipLine();
+            }
+
+            i = skipLine();
+            return true;
+        }
+        return false;
+    }
+
+    static isMultiLineCardSeparator(text: string, markers: string[]): boolean {
+        markers.forEach((marker) => {
+            if (text.includes(marker)) {
+                return true;
+            }
+        });
+        return false;
+    }
+
     static markerInsideCodeBlock(text: string, marker: string, markerIndex: number): boolean {
+        // TODO: Handle codeblocks
         let goingBack = markerIndex - 1,
             goingForward = markerIndex + marker.length;
         let backTicksBefore = 0,
