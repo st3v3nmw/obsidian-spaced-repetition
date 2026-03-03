@@ -74,8 +74,8 @@ export class StatisticsPage extends SettingsPage {
         this.plugin = plugin;
 
         new Setting(this.containerEl)
-            .setName("Period") // TODO: add t("CHART_PERIOD")
-            .setDesc("Period of time to display in the charts") // TODO: add t("CHART_PERIOD_DESC")
+            .setName(t("PERIOD_TITLE"))
+            .setDesc(t("PERIOD_DESC"))
             .addDropdown((el) => {
                 el.addOption("month", t("MONTH"))
                     .addOption("quarter", t("QUARTER"))

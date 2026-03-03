@@ -65,7 +65,7 @@ export default class StatusBarManager {
                     statusBarItem = new IconTextStatusBarItem(this.plugin, statusBarItemType, {
                         icon: "SpacedRepIcon",
                         show: showItems,
-                        tooltip: "Open deck for review", // TODO: Translate
+                        tooltip: t("OPEN_DECK_FOR_REVIEW"),
                         tooltipPosition: "top",
                         onClick: async () => {
                             await this.plugin.uiManager.openDeckContainer(
@@ -92,7 +92,7 @@ export default class StatusBarManager {
                     statusBarItem = new IconTextStatusBarItem(this.plugin, statusBarItemType, {
                         icon: "lucide-circle-arrow-up",
                         show: false,
-                        tooltip: "Update available", // TODO: Translate
+                        tooltip: t("UPDATE_AVAILABLE"),
                         tooltipPosition: "top",
                     });
                     break;

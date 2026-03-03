@@ -253,4 +253,18 @@ export default {
     SEARCH: "Search",
     PREVIOUS: "Previous",
     NEXT: "Next",
+    // settings.ts
+    SETTINGS_TAB_HEADING: "Settings",
+    MAIN_SETTINGS_PAGE: "MAIN_SETTINGS",
+
+    // NoteReviewQueue.ts
+    NOTE_REVIEW_QUEUE_HINT: "Click on the 3 dots next to the note to open the review menu.",
+
+    // StatusBarManager.ts
+    OPEN_DECK_FOR_REVIEW: "Open deck for review",
+    UPDATE_AVAILABLE: "Update available",
+
+    // Statistics
+    PERIOD_TITLE: "Period",
+    PERIOD_DESC: "Period of time to display in the charts",
 };
