@@ -21,7 +21,8 @@ module.exports = {
         "src/ui/",
         "src/icons/",
         "src/main.ts",
-        "src/next-note-review-handler.ts",
+        "src/delete-scheduling-data.ts",
+        "src/note/next-note-review-handler.ts",
         "src/plugin-data.ts",
         "src/utils/renderers.ts",
 
