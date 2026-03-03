@@ -219,6 +219,7 @@ export default {
     CONFIRM_SCHEDULING_DATA_DELETION:
         "Are you sure you want to delete all scheduling data from your notes and flashcards? This action cannot be undone.",
     CONFIRM: "Confirm",
+    SCHEDULING_DATA_DELETION_IN_PROGRESS: "Scheduling data deletion in progress...",
     SCHEDULING_DATA_HAS_BEEN_DELETED:
         "Scheduling data has been deleted from all notes and flashcards.",
 

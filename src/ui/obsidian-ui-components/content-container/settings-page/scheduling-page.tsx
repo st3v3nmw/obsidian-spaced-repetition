@@ -293,7 +293,7 @@ export class SchedulingPage extends SettingsPage {
                                     this.plugin.app,
                                     t("DELETE_SCHEDULING_DATA"),
                                     t("CONFIRM_SCHEDULING_DATA_DELETION"),
-                                    t("SCHEDULING_DATA_HAS_BEEN_DELETED"),
+                                    t("SCHEDULING_DATA_DELETION_IN_PROGRESS"),
                                     deleteAllSchedulingData,
                                 ).open();
                             });

@@ -10,14 +10,14 @@ export class ConfirmationModal extends Modal {
      * Creates a confirmation modal.
      * @param app - The Obsidian app instance.
      * @param title - Title of the modal.
-     * @param message - Body message of the modal.
+     * @param description - Description text in the modal body.
      * @param confirmationMessage - Notice message to display upon confirmation.
      * @param onConfirm - Callback function to execute upon confirmation.
      */
     constructor(
         app: App,
         title: string,
-        message: string,
+        description: string,
         confirmationMessage?: string,
         onConfirm?: () => void,
     ) {
@@ -26,7 +26,7 @@ export class ConfirmationModal extends Modal {
         this.setTitle(title);
         this.titleEl.addClass("modal-header");
 
-        this.setContent(message);
+        this.setContent(description);
         this.contentEl.addClass("modal-content");
 
         new Setting(this.contentEl)
@@ -36,11 +36,11 @@ export class ConfirmationModal extends Modal {
                     .setButtonText(t("CONFIRM"))
                     .setClass("mod-warning")
                     .onClick(() => {
-                        if (onConfirm) {
-                            onConfirm();
-                        }
                         if (confirmationMessage) {
                             new Notice(confirmationMessage);
+                        }
+                        if (onConfirm) {
+                            onConfirm();
                         }
                         this.close();
                     }),

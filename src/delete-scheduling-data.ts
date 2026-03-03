@@ -1,32 +1,39 @@
-import { TFile, Vault } from "obsidian";
+import { Notice, TFile, Vault } from "obsidian";
 
-import {
-    FLASHCARD_SCHEDULE_INFO,
-    NOTE_SCHEDULE_INFO_BLOCK,
-    NOTE_SCHEDULE_INFO_TEXT,
-} from "src/constants";
+import { FLASHCARD_SCHEDULE_INFO } from "src/constants";
+import { t } from "src/lang/helpers";
 
 /**
- * Modifies a file to remove scheduling data.
+ * Removes scheduling information from a file.
  * @param vault - The Obsidian vault instance.
- * @param file - The file to modify.
+ * @param file - The file to remove scheduling information from.
  */
-function removeSchedulingInfo(vault: Vault, file: TFile) {
-    vault.process(file, (data) => {
-        return data
-            .replace(NOTE_SCHEDULE_INFO_BLOCK, "")
-            .replace(NOTE_SCHEDULE_INFO_TEXT, "")
-            .replace(FLASHCARD_SCHEDULE_INFO, "");
-    });
+async function removeSchedulingInfo(vault: Vault, file: TFile) {
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await this.app.fileManager.processFrontMatter(file, (frontmatter: any) => {
+            delete frontmatter["sr-due"];
+            delete frontmatter["sr-interval"];
+            delete frontmatter["sr-ease"];
+        });
+
+        await vault.process(file, (data) => {
+            return data.replace(FLASHCARD_SCHEDULE_INFO, "");
+        });
+    } catch (e) {
+        console.log({ filePath: file.path, error: e });
+    }
 }
 
 /**
  * Deletes all scheduling data from all markdown files in the vault.
  */
-export function deleteAllSchedulingData() {
+export async function deleteAllSchedulingData() {
     const files = this.app.vault.getMarkdownFiles();
 
     for (let i = 0; i < files.length; i++) {
-        removeSchedulingInfo(this.app.vault, files[i]);
+        await removeSchedulingInfo(this.app.vault, files[i]);
     }
+
+    new Notice(t("SCHEDULING_DATA_HAS_BEEN_DELETED"));
 }
