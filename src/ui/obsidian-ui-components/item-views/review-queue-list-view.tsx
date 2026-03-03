@@ -75,10 +75,9 @@ export class ReviewQueueListView extends ItemView {
         titleWrapper.createDiv("sr-note-review-header-title").setText(t("OPEN_NOTE_FOR_REVIEW"));
 
         const subTitleWrapper = this.contentEl.createDiv("sr-note-review-header-subtitle-wrapper");
-        // TODO: Translate
         subTitleWrapper
             .createDiv("sr-note-review-header-subtitle")
-            .setText("Click on the 3 dots next to the note to open the review menu.");
+            .setText(t("NOTE_REVIEW_QUEUE_HINT"));
 
         this.treeEl = this.contentEl.createDiv("tree-item nav-folder mod-root");
 

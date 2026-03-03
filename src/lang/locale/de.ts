@@ -58,13 +58,13 @@ export default {
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition",
-    GROUP_TAGS_FOLDERS: "Tags & Folders",
+    GROUP_TAGS_FOLDERS: "Tags & Ordner",
     GROUP_FLASHCARD_REVIEW: "Flashcard Review",
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
     GROUP_DATA_STORAGE: "Storage of Scheduling Data",
     GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
-    GROUP_CONTRIBUTING: "Contributing",
+    GROUP_CONTRIBUTING: "Helfen",
     CHECK_WIKI: 'Weitere Informationen gibt es im <a href="${wikiUrl}">Wiki</a> (english).',
     GITHUB_DISCUSSIONS:
         'Visit the <a href="${discussionsUrl}">discussions</a> section for Q&A help, feedback, and general discussion.',
@@ -78,7 +78,7 @@ export default {
         '<a href="${translationContributionUrl}">Here\'s</a> how to translate the plugin to another language.',
     FOLDERS_TO_IGNORE: "Ausgeschlossene Ordner",
     FOLDERS_TO_IGNORE_DESC:
-        "Enter folder paths or glob patterns on separate lines e.g. Templates/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
+        "Geben Sie Pfad- oder Globalemuster in separaten Zeilen an, z.B. Templates/Scripts oder **/*.excalidraw.md. Diese Einstellung gilt für Flashcards und Notizen.",
     OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Lernkarten",
     FLASHCARD_EASY_LABEL: "Einfach Knopf Text",
@@ -104,7 +104,7 @@ export default {
         "Verwandte Karten sind aus der gleichen Karte generiert worden (z.B. Lückentextkarten oder beidseitige Karten).",
     SHOW_CARD_CONTEXT: "Kontext in den Karten anzeigen?",
     SHOW_CARD_CONTEXT_DESC: "Bsp. Titel > Überschrift 1 > Sektion > ... > Untersektion",
-    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Show next review time in the review buttons",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Zeige nächsten Review-Zeit in den Review-Buttons",
     SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
         "Useful to know how far in the future your cards are being pushed.",
     CARD_MODAL_HEIGHT_PERCENT: "Höhe der Lernkartei in Prozent",
@@ -262,7 +262,23 @@ export default {
     CARD_TYPE_YOUNG: "Jung",
     CARD_TYPE_MATURE: "Ausgereift",
     CARD_TYPES_SUMMARY: "Insgesamt ${totalCardsCount} Karten",
-    SEARCH: "Search",
+    SEARCH: "Suche",
     PREVIOUS: "Previous",
     NEXT: "Next",
+
+    // settings.ts
+    SETTINGS_TAB_HEADING: "Einstellungen",
+    MAIN_SETTINGS_PAGE: "MAIN_SETTINGS",
+
+    // NoteReviewQueue.ts
+    NOTE_REVIEW_QUEUE_HINT:
+        "Klicke auf die 3 Punkte neben der Notiz, um das Review-Menü zu öffnen.",
+
+    // StatusBarManager.ts
+    OPEN_DECK_FOR_REVIEW: "Stapel zum Wiederholung öffnen",
+    UPDATE_AVAILABLE: "Update verfügbar",
+
+    // Statistics
+    PERIOD_TITLE: "Zeitraum",
+    PERIOD_DESC: "Zeitraum, in dem die Diagramme angezeigt werden",
 };
