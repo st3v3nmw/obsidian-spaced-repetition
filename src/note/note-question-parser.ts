@@ -292,9 +292,9 @@ export class NoteQuestionParser {
         // We group together all tags that are on the same line, taking advantage of flashcardTagList being ordered by line number
         let list: TagCache[] = [] as TagCache[];
         for (const tag of contentTagCacheList) {
-            if (list.length != 0) {
+            if (list.length !== 0) {
                 const startLineNum: number = list[0].position.start.line;
-                if (startLineNum != tag.position.start.line) {
+                if (startLineNum !== tag.position.start.line) {
                     result.push(this.createTopicPathList(list, startLineNum));
                     list = [] as TagCache[];
                 }

@@ -133,9 +133,10 @@ export const DEFAULT_SETTINGS: SRSettings = {
 
 export function upgradeSettings(settings: SRSettings) {
     if (
-        settings.randomizeCardOrder != null &&
-        settings.flashcardCardOrder === null &&
-        settings.flashcardDeckOrder === null
+        settings.randomizeCardOrder !== null &&
+        settings.randomizeCardOrder !== undefined &&
+        (settings.flashcardCardOrder === null || settings.flashcardCardOrder === undefined) &&
+        (settings.flashcardDeckOrder === null || settings.flashcardDeckOrder === undefined)
     ) {
         settings.flashcardCardOrder = settings.randomizeCardOrder
             ? "DueFirstRandom"
@@ -146,7 +147,7 @@ export function upgradeSettings(settings: SRSettings) {
         settings.randomizeCardOrder = null;
     }
 
-    if (settings.clozePatterns === null) {
+    if (settings.clozePatterns === null || settings.clozePatterns === undefined) {
         settings.clozePatterns = [];
 
         if (settings.convertHighlightsToClozes)

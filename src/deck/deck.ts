@@ -215,9 +215,9 @@ export class Deck {
 
     deleteCardFromThisDeck(card: Card, exceptionIfMissing: boolean): void {
         const newIdx = this.newFlashcards.indexOf(card);
-        if (newIdx != -1) this.newFlashcards.splice(newIdx, 1);
+        if (newIdx !== -1) this.newFlashcards.splice(newIdx, 1);
         const dueIdx = this.dueFlashcards.indexOf(card);
-        if (dueIdx != -1) this.dueFlashcards.splice(dueIdx, 1);
+        if (dueIdx !== -1) this.dueFlashcards.splice(dueIdx, 1);
         if (newIdx === -1 && dueIdx === -1 && exceptionIfMissing) {
             throw `deleteCardFromThisDeck: Card: ${card.front} not found in deck: ${this.deckName}`;
         }
@@ -253,7 +253,7 @@ export class Deck {
     }
 
     debugLogToConsole(desc: string = null, indent: number = 0) {
-        let str: string = desc != null ? `${desc}: ` : "";
+        let str: string = desc !== null && desc !== undefined ? `${desc}: ` : "";
         str += this.toString(indent);
         console.log(str);
     }

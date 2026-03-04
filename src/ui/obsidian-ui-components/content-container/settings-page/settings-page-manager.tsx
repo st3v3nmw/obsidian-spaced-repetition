@@ -47,7 +47,7 @@ export const SettingsPageTypesArray: ReadonlyArray<SettingsPageType> = [
 export function getPageName(pageType: SettingsPageType): string {
     switch (pageType) {
         case "main-page":
-            return "MAIN_SETTINGS"; // TODO: add t("MAIN_SETTINGS")
+            return t("MAIN_SETTINGS_PAGE");
         case "flashcards-page":
             return t("FLASHCARDS");
         case "notes-page":

@@ -58,7 +58,7 @@ export function cyrb53(str: string, seed = 0): string {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function convertToStringOrEmpty(v: any): string {
     let result: string = "";
-    if (v != null && v != undefined) {
+    if (v !== null && v !== undefined) {
         result = v + "";
     }
     return result;
@@ -232,7 +232,7 @@ export class MultiLineTextFinder {
                 sourceTextArray,
                 searchTextArray,
             );
-            if (lineNo !== null) {
+            if (lineNo !== null && lineNo !== undefined) {
                 const replacementTextArray = splitTextIntoLineArray(replacementText);
                 const linesToRemove: number = searchTextArray.length;
                 sourceTextArray.splice(lineNo, linesToRemove, ...replacementTextArray);

@@ -126,7 +126,9 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     get hasCurrentCard(): boolean {
-        return this.cardSequencer.currentCard != null;
+        return (
+            this.cardSequencer.currentCard !== null && this.cardSequencer.currentCard !== undefined
+        );
     }
 
     get currentCard(): Card {
@@ -240,7 +242,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     async processReviewReviewMode(response: ReviewResponse): Promise<void> {
-        if (response != ReviewResponse.Reset || this.currentCard.hasSchedule) {
+        if (response !== ReviewResponse.Reset || this.currentCard.hasSchedule) {
             const oldSchedule = this.currentCard.scheduleInfo;
 
             // We need to update the schedule if:

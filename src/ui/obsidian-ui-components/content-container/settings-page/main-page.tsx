@@ -30,8 +30,9 @@ export class MainPage extends SettingsPage {
 
         this.containerEl.addClass("sr-main-page");
 
-        const mainSettingsGroup = new SettingGroup(this.containerEl).setHeading("Settings"); // TODO: add t("MAIN_SETTINGS")
-
+        const mainSettingsGroup = new SettingGroup(this.containerEl).setHeading(
+            t("SETTINGS_TAB_HEADING"),
+        );
         SettingsPageTypesArray.forEach((pageType) => {
             if (pageType === "main-page") return;
             mainSettingsGroup.addSetting((setting: Setting) => {

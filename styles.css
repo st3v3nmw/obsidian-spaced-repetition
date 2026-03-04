@@ -82,7 +82,7 @@
 /* MARK: Views General*/
 
 .sr-view {
-    --view-padding: var(--size-4-4);
+    --view-padding: var(--size-4-3);
     display: flex;
     flex-direction: column;
 }
@@ -121,7 +121,15 @@
 /* MARK: Tab view */
 
 .sr-tab-view {
-    padding: 0px var(--view-padding) var(--view-padding) var(--view-padding) !important;
+    --bottom-statusbar-clearance: var(--size-4-8);
+    padding-top: 0 !important;
+    padding-right: var(--view-padding) !important;
+    padding-left: var(--view-padding) !important;
+    padding-bottom: max(
+        var(--view-padding),
+        var(--bottom-statusbar-clearance),
+        var(--safe-area-inset-bottom)
+    ) !important;
 }
 
 .sr-tab-view-content.sr-center-view {
@@ -282,8 +290,13 @@
     }
 
     & .sr-reset-button.mod-warning {
+        --interactive-warning-hover: #fdf6f6;
         color: var(--text-error);
         background-color: var(--interactive-normal);
+
+        &:hover {
+            background-color: var(--interactive-warning-hover);
+        }
     }
 
     & .sr-main-wrapper {
@@ -604,6 +617,13 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
 .sr-edit-view .sr-response-button.sr-dummy-button {
     opacity: 0;
     cursor: default;
+}
+
+/* MARK: Confirmation Modal */
+
+.sr-confirmation-modal-header {
+    text-align: start;
+    margin-left: unset;
 }
 
 /* MARK: Note Review Page */

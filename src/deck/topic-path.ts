@@ -43,7 +43,7 @@ export class TopicPath {
         if (settings.convertFoldersToDecks) {
             const deckPath = noteFile.path.split("/");
             deckPath.pop(); // remove filename
-            if (deckPath.length != 0) {
+            if (deckPath.length !== 0) {
                 result = new TopicPath(deckPath);
             }
         } else {
@@ -70,7 +70,7 @@ export class TopicPath {
         if (this.isEmptyPath) return topicPath.isEmptyPath;
         if (this.path.length > topicPath.path.length) return false;
         for (let i = 0; i < this.path.length; i++) {
-            if (this.path[i] != topicPath.path[i]) return false;
+            if (this.path[i] !== topicPath.path[i]) return false;
         }
         return true;
     }
@@ -90,7 +90,7 @@ export class TopicPath {
 
     static isValidTag(tag: string): boolean {
         if (tag === null || tag.length === 0) return false;
-        if (tag[0] != "#") return false;
+        if (tag[0] !== "#") return false;
         if (tag.length === 1) return false;
 
         return true;
@@ -98,7 +98,7 @@ export class TopicPath {
 
     static getTopicPathFromTag(tag: string): TopicPath {
         if (tag === null || tag.length === 0) throw "Null/empty tag";
-        if (tag[0] != "#") throw "Tag must start with #";
+        if (tag[0] !== "#") throw "Tag must start with #";
         if (tag.length === 1) throw "Invalid tag";
 
         const path: string[] = tag
@@ -114,7 +114,7 @@ export class TopicPath {
         if (settings.convertFoldersToDecks) {
             const deckPath: string[] = noteFile.path.split("/");
             deckPath.pop(); // remove filename
-            if (deckPath.length != 0) {
+            if (deckPath.length !== 0) {
                 result = new TopicPath(deckPath);
             }
         }
