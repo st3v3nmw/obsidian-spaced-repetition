@@ -7,6 +7,7 @@ import { DEFAULT_SETTINGS } from "src/settings";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
+import { DateUtil, globalDateProvider, IDayBoundary } from "src/utils/dates";
 
 /**
  * Represents a scheduling settings page.
@@ -217,6 +218,39 @@ export class SchedulingPage extends SettingsPage {
                                     }
                                 });
                             }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("START_OF_DAY"))
+                    .setDesc(t("START_OF_DAY_DESC"))
+                    .addExtraButton((button) => {
+                        button
+                            .setIcon("reset")
+                            .setTooltip(t("RESET_DEFAULT"))
+                            .onClick(async () => {
+                                this.plugin.data.settings.startOfDay = DEFAULT_SETTINGS.startOfDay;
+                                await this.plugin.savePluginData();
+
+                                this.display();
+                            });
+                    })
+                    .addText((text) =>
+                        text.setValue(this.plugin.data.settings.startOfDay).onChange((value) => {
+                            applySettingsUpdate(async () => {
+                                const dayBoundary: IDayBoundary | null =
+                                    DateUtil.strToDayBoundary(value);
+                                if (dayBoundary === null) {
+                                    new Notice(t("INVALID_START_OF_DAY_WARNING"));
+                                    return;
+                                } else {
+                                    this.plugin.data.settings.startOfDay = value;
+                                    await this.plugin.savePluginData();
+                                    globalDateProvider.setDayBoundary(dayBoundary);
+                                    console.log("Day boundary set to", dayBoundary);
+                                }
+                            });
+                        }),
                     );
             })
             .addSetting((setting: Setting) => {

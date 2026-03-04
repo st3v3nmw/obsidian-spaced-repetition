@@ -276,4 +276,9 @@ export default {
     CONFIRM_SCHEDULING_DATA_DELETION_OF_CURRENT_CARD:
         "Are you sure you want to delete the scheduling data from your current card? This action cannot be undone.",
     SCHEDULING_DATA_DELETION_IN_PROGRESS_OF_CURRENT_CARD: "Deleting the cards scheduling data...",
+
+    // Settings > Scheduling
+    START_OF_DAY: "Start of day",
+    START_OF_DAY_DESC: "The time at which the day begins (Format: HH:MM:SS, Default: 00:00:00)",
+    INVALID_START_OF_DAY_WARNING: "Invalid format for start of day",
 };

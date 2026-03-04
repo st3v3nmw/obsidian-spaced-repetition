@@ -57,6 +57,7 @@ export interface SRSettings {
     loadBalance: boolean;
     maximumInterval: number;
     maxLinkFactor: number;
+    startOfDay: string;
 
     // storage
     dataStore: string;
@@ -121,6 +122,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     loadBalance: true,
     maximumInterval: 36525,
     maxLinkFactor: 1.0,
+    startOfDay: "00:00:00",
 
     // storage
     dataStore: DataStoreName.NOTES,
