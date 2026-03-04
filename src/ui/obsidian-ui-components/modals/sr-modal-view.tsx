@@ -92,7 +92,14 @@ export class SRModalView extends Modal {
     }
 
     onOpen(): void {
-        this._showDecksList();
+        const subdecksWithCardsInQueue: Deck[] = this.reviewSequencer.getSubDecksWithCardsInQueue(
+            this.reviewSequencer.originalDeckTree,
+        );
+        if (subdecksWithCardsInQueue.length === 1) {
+            this._showFlashcard(this.reviewSequencer.originalDeckTree.subdecks[0]);
+        } else {
+            this._showDecksList();
+        }
     }
 
     onClose(): void {

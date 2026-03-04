@@ -32,8 +32,10 @@ export default class IconTextStatusBarItem extends TextStatusBarItem {
             this.setStatusBarItemIcon(icon ? icon : this.icon);
 
         if (text !== undefined && typeof text === "string") {
+            this.text = text;
             this.createTextSegment(text);
         } else if (text !== undefined && Array.isArray(text)) {
+            this.text = text;
             for (const textSegment of text) {
                 this.createTextSegment(textSegment);
             }
