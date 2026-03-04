@@ -17,7 +17,7 @@ import { Note } from "src/note/note";
 import { NoteFileLoader } from "src/note/note-file-loader";
 import { NoteReviewQueue } from "src/note/note-review-queue";
 import { SettingsUtil, SRSettings } from "src/settings";
-import { globalDateProvider } from "src/utils/dates";
+import { globalDateProvider, IDayBoundary } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 
 export interface IOsrVaultEvents {
@@ -82,6 +82,20 @@ export class OsrCore {
         this._questionPostponementList = questionPostponementList;
         this._dueDateFlashcardHistogram = new CardDueDateHistogram();
         this._dueDateNoteHistogram = new NoteDueDateHistogram();
+        try {
+            const startOfDayElements: string[] = this.settings.startOfDay.split(":");
+            if (startOfDayElements.length !== 3) {
+                throw new Error("Invalid format for start of day");
+            }
+            const dayBoundary: IDayBoundary = {
+                hour: parseInt(startOfDayElements[0]),
+                minute: parseInt(startOfDayElements[1]),
+                second: parseInt(startOfDayElements[2]),
+            };
+            globalDateProvider.setDayBoundary(dayBoundary);
+        } catch (e) {
+            console.error("Invalid format for start of day", e);
+        }
     }
 
     protected loadInit(): void {
