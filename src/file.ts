@@ -132,7 +132,7 @@ export class SrTFile implements ISRFile {
 
     private getFrontmatterTags(frontmatter: FrontMatterCache): TagCache[] {
         const result: TagCache[] = [] as TagCache[];
-        const frontmatterTags: string = frontmatter != null ? frontmatter["tags"] + "" : null;
+        const frontmatterTags: string = frontmatter !== null ? frontmatter["tags"] + "" : null;
         if (frontmatterTags) {
             // Parse the frontmatter tag string into a list, each entry including the leading "#"
             const tagStrList: string[] = parseObsidianFrontmatterTag(frontmatterTags);

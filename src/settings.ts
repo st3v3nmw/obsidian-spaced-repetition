@@ -133,7 +133,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
 
 export function upgradeSettings(settings: SRSettings) {
     if (
-        settings.randomizeCardOrder != null &&
+        settings.randomizeCardOrder !== null &&
         settings.flashcardCardOrder == null &&
         settings.flashcardDeckOrder == null
     ) {

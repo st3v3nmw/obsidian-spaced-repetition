@@ -260,7 +260,7 @@ export class CardContainer {
     }
 
     private async _showNextCard(): Promise<void> {
-        if (this._currentCard != null) await this.refresh();
+        if (this._currentCard !== null) await this.refresh();
         else this.backToDeck();
     }
 
@@ -305,7 +305,7 @@ export class CardContainer {
 
         this.clozeInputs.forEach((input) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            input.addEventListener("change", (e) => {});
+            input.addEventListener("change", (e) => { });
         });
     }
 

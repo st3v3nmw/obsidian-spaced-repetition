@@ -48,7 +48,7 @@ export class QuestionPostponementList implements IQuestionPostponementList {
 
     async write(): Promise<void> {
         // This is null only whilst unit testing is being performed
-        if (this.plugin == null) return;
+        if (this.plugin === null) return;
 
         await this.plugin.savePluginData();
     }

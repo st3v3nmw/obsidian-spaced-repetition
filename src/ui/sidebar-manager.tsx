@@ -34,7 +34,7 @@ export class SidebarManager {
 
     private getActiveLeaf(type: string): WorkspaceLeaf | null {
         const leaves = this.app.workspace.getLeavesOfType(type);
-        if (leaves.length == 0) {
+        if (leaves.length === 0) {
             return this.app.workspace.getRightLeaf(false);
         }
 

@@ -31,9 +31,9 @@ export class Deck {
 
     public getCardCount(cardListType: CardListType, includeSubdeckCounts: boolean): number {
         let result: number = 0;
-        if (cardListType == CardListType.NewCard || cardListType == CardListType.All)
+        if (cardListType === CardListType.NewCard || cardListType === CardListType.All)
             result += this.newFlashcards.length;
-        if (cardListType == CardListType.DueCard || cardListType == CardListType.All)
+        if (cardListType === CardListType.DueCard || cardListType === CardListType.All)
             result += this.dueFlashcards.length;
 
         if (includeSubdeckCounts) {
@@ -100,7 +100,7 @@ export class Deck {
     }
 
     get isRootDeck() {
-        return this.parent == null;
+        return this.parent === null;
     }
 
     getDeckByTopicTag(tag: string): Deck {
@@ -164,11 +164,11 @@ export class Deck {
     }
 
     getCardListForCardType(cardListType: CardListType): Card[] {
-        return cardListType == CardListType.DueCard ? this.dueFlashcards : this.newFlashcards;
+        return cardListType === CardListType.DueCard ? this.dueFlashcards : this.newFlashcards;
     }
 
     appendCard(topicPathList: TopicPathList, cardObj: Card): void {
-        if (topicPathList.list.length == 0) {
+        if (topicPathList.list.length === 0) {
             this.appendCardToRootDeck(cardObj);
         } else {
             // We explicitly are adding the same card object to each of the specified decks
@@ -215,10 +215,10 @@ export class Deck {
 
     deleteCardFromThisDeck(card: Card, exceptionIfMissing: boolean): void {
         const newIdx = this.newFlashcards.indexOf(card);
-        if (newIdx != -1) this.newFlashcards.splice(newIdx, 1);
+        if (newIdx !== -1) this.newFlashcards.splice(newIdx, 1);
         const dueIdx = this.dueFlashcards.indexOf(card);
-        if (dueIdx != -1) this.dueFlashcards.splice(dueIdx, 1);
-        if (newIdx == -1 && dueIdx == -1 && exceptionIfMissing) {
+        if (dueIdx !== -1) this.dueFlashcards.splice(dueIdx, 1);
+        if (newIdx === -1 && dueIdx === -1 && exceptionIfMissing) {
             throw `deleteCardFromThisDeck: Card: ${card.front} not found in deck: ${this.deckName}`;
         }
     }
@@ -253,7 +253,7 @@ export class Deck {
     }
 
     debugLogToConsole(desc: string = null, indent: number = 0) {
-        let str: string = desc != null ? `${desc}: ` : "";
+        let str: string = desc !== null ? `${desc}: ` : "";
         str += this.toString(indent);
         console.log(str);
     }
@@ -299,8 +299,8 @@ export class Deck {
 
     static otherListType(cardListType: CardListType): CardListType {
         let result: CardListType;
-        if (cardListType == CardListType.NewCard) result = CardListType.DueCard;
-        else if (cardListType == CardListType.DueCard) result = CardListType.NewCard;
+        if (cardListType === CardListType.NewCard) result = CardListType.DueCard;
+        else if (cardListType === CardListType.DueCard) result = CardListType.NewCard;
         else throw "Invalid cardListType";
         return result;
     }
@@ -318,7 +318,7 @@ export class DeckTreeFilter {
     ): Deck {
         return deckTree.copyWithCardFilter(
             (card) =>
-                (reviewMode == FlashcardReviewMode.Cram || card.isNew || card.isDue) &&
+                (reviewMode === FlashcardReviewMode.Cram || card.isNew || card.isDue) &&
                 !questionPostponementList.includes(card.question),
         );
     }

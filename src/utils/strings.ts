@@ -58,7 +58,7 @@ export function cyrb53(str: string, seed = 0): string {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function convertToStringOrEmpty(v: any): string {
     let result: string = "";
-    if (v != null && v != undefined) {
+    if (v !== null && v !== undefined) {
         result = v + "";
     }
     return result;
@@ -143,7 +143,7 @@ export function findLineIndexOfSearchStringIgnoringWs(
 ): number {
     let result: number = -1;
     for (let i = 0; i < lines.length; i++) {
-        if (lines[i].trim() == searchString) {
+        if (lines[i].trim() === searchString) {
             result = i;
             break;
         }
@@ -249,8 +249,8 @@ export class MultiLineTextFinder {
         for (let sourceIdx = 0; sourceIdx < sourceText.length; sourceIdx++) {
             const sourceLine: string = sourceText[sourceIdx].trim();
             const searchLine: string = searchText[searchIdx].trim();
-            if (searchLine == sourceLine) {
-                if (searchIdx == maxSearchIdx) {
+            if (searchLine === sourceLine) {
+                if (searchIdx === maxSearchIdx) {
                     result = sourceIdx - searchIdx;
                     break;
                 }

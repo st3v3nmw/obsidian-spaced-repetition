@@ -4,7 +4,7 @@ test("Check that localization entries are consistent across all files", () => {
         const expectedKeys: string[] = Object.keys(localeMap["en"]);
         for (const [languageCode, locale] of Object.entries(localeMap) as [string, string[]][]) {
             const localeKeys = Object.keys(locale);
-            if (localeKeys.length == 0 || languageCode == "en") continue;
+            if (localeKeys.length === 0 || languageCode === "en") continue;
 
             const unmappedKeys = expectedKeys.filter((x) => !localeKeys.includes(x));
             expect(
@@ -26,7 +26,7 @@ test("Test translation unknown locale", () => {
         const mockLocale = moment.locale as jest.MockedFunction<() => string>;
         mockLocale.mockImplementation(() => "ki"); // Kikuyu
         const { t } = require("src/lang/helpers");
-        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
         expect(t("DECKS")).toEqual("Decks");
         expect(consoleSpy).toHaveBeenCalledWith("SRS error: Locale ki not found.");
     });
