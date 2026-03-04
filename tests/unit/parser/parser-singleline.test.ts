@@ -63,16 +63,6 @@ test("Test parsing of single line basic cards", () => {
 
     // custom symbols
     expect(
-        parseT("Question&&Answer", {
-            singleLineCardSeparator: "&&",
-            singleLineReversedCardSeparator: ":::",
-            multilineCardSeparator: "?",
-            multilineReversedCardSeparator: "??",
-            multilineCardEndMarker: "---",
-            clozePatterns: [],
-        }),
-    ).toEqual([[CardType.SingleLineBasic, "Question&&Answer", 0, 0]]);
-    expect(
         parseT("Question=Answer", {
             singleLineCardSeparator: "=",
             singleLineReversedCardSeparator: ":::",
@@ -82,6 +72,39 @@ test("Test parsing of single line basic cards", () => {
             clozePatterns: [],
         }),
     ).toEqual([[CardType.SingleLineBasic, "Question=Answer", 0, 0]]);
+    expect(
+        parseT("Question&&Answer", {
+            singleLineCardSeparator: "&&",
+            singleLineReversedCardSeparator: "&&&",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            clozePatterns: [],
+        }),
+    ).toEqual([[CardType.SingleLineBasic, "Question&&Answer", 0, 0]]);
+    expect(
+        parseT("Question:::Answer", {
+            singleLineCardSeparator: ":::",
+            singleLineReversedCardSeparator: "::",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            clozePatterns: [],
+        }),
+    ).toEqual([[CardType.SingleLineBasic, "Question:::Answer", 0, 0]]);
+    expect(
+        parseT("Qn 1?:>Answer.\n\nQn 2?<:>Answer.\n", {
+            singleLineCardSeparator: ":>",
+            singleLineReversedCardSeparator: "<:>",
+            multilineCardSeparator: ";>",
+            multilineReversedCardSeparator: "<;>",
+            multilineCardEndMarker: "---",
+            clozePatterns: [],
+        }),
+    ).toEqual([
+        [CardType.SingleLineBasic, "Qn 1?:>Answer.", 0, 0],
+        [CardType.SingleLineReversed, "Qn 2?<:>Answer.", 2, 2],
+    ]);
 
     // empty string or whitespace character provided
     expect(
@@ -101,6 +124,16 @@ test("Test parsing of single line reversed cards", () => {
     execInlineCardsTestWithSeparator(":::");
 
     // custom symbols
+    expect(
+        parseT("Question==Answer", {
+            singleLineCardSeparator: "=",
+            singleLineReversedCardSeparator: "==",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "---",
+            clozePatterns: [],
+        }),
+    ).toEqual([[CardType.SingleLineReversed, "Question==Answer", 0, 0]]);
     expect(
         parseT("Question&&&Answer", {
             singleLineCardSeparator: "::",
