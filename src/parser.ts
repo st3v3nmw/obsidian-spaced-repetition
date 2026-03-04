@@ -2,7 +2,7 @@ import { ClozeCrafter } from "clozecraft";
 
 import { CardType } from "src/card/questions/question";
 
-export let debugParser = false;
+export let debugParser = false; // TODO: disable
 
 export interface ParserOptions {
     singleLineCardSeparator: string;
@@ -39,9 +39,10 @@ export class ParsedQuestionInfo {
 }
 
 // All the states that the parser can be in, when parsing a note for cards
-export type ParserStates = "READY_TO_PARSE" | "LOOKING_FOR_CARD_START" | "FOUND_CLOZE_LOOK_FOR_CONTINUATION";
+export type ParserStates = "READY_TO_PARSE" | "LOOKING_FOR_CARD_START" | "SKIPPING_HTML_COMMENT" | "FOUND_CLOZE_LOOK_FOR_CONTINUATION";
 
 export class QuestionParser {
+    // TODO: disable
     static debugParser = false; // Enable to see the parser state changes
     static currentParserState: ParserStates = "READY_TO_PARSE"; // The current parser state
     static readonly srCommentStart = "<!--SR:"; // The start of a scheduling info comment
@@ -110,8 +111,11 @@ export class QuestionParser {
             };
 
             const getScheduleInfoIfPresent = () => {
-                if (i + 1 < QuestionParser.lines.length && QuestionParser.lines[i + 1].startsWith("<!--SR:")) {
-                    return QuestionParser.lines[i + 1].trim();
+                if (
+                    i + 1 < QuestionParser.lines.length &&
+                    QuestionParser.isSRHTMLComment(QuestionParser.lines[i + 1].trim())
+                ) {
+                    return QuestionParser.lines[i + 1];
                 }
                 return "";
             };
@@ -127,6 +131,16 @@ export class QuestionParser {
                     if (QuestionParser.cards.last().cardType !== CardType.Cloze) {
                         throw new Error("Cloze card continuation state without cloze card");
                     }
+
+                    /*
+                        These things are given in this state:
+                        - The previous line was one of the following:
+                            - A line with a cloze in it
+                            - Not the sheduling info comment of the cloze sentence
+                            - Text, which potentially could belong to the previous cloze card
+                        - The previous card was a cloze card
+                        - We have no knowledge of the current line
+                    */
 
                     // We are on the lookout for a multiline cloze card
                     if (QuestionParser.multilineCardEndMarker) {
@@ -203,7 +217,26 @@ export class QuestionParser {
                     }
                     break;
                 }
+                case "SKIPPING_HTML_COMMENT": {
+                    /*
+                        These things are given in this state:
+                        - The previous line was part of a comment
+                        - The current line has to be either the end of the comment or just a part of the comment
+                    */
+                    if (QuestionParser.isEndOfHTMLComment(QuestionParser.currentLine)) {
+                        // End of comment is in the same line as the start of the comment
+                        QuestionParser.currentParserState = "LOOKING_FOR_CARD_START";
+                    }
+                    QuestionParser.currentParserState = "SKIPPING_HTML_COMMENT";
+                    break;
+                }
                 case "LOOKING_FOR_CARD_START": { // Looking for the start of a card
+                    /*
+                        These things are given in this state:
+                        - The previous line is irrelevant
+                        - The previous card is irrelevant
+                        - We have no knowledge of the current line
+                    */
                     QuestionParser.handleFreshCardStart(
                         i,
                         clozeCrafter,
@@ -217,117 +250,13 @@ export class QuestionParser {
                 default:
                     throw new Error("Impossible parser state: " + QuestionParser.currentParserState);
             }
-
-            // ----- OLD CODE -----
-
-            // Skip everything in HTML comments
-            if (currentLine.startsWith("<!--") && !currentLine.startsWith("<!--SR:")) {
-                while (i + 1 < lines.length && !currentLine.includes("-->")) i++;
-                i++;
-                continue;
-            }
-
-            // Have we reached the end of a card?
-            const isEmptyLine = currentTrimmed.length === 0;
-            const hasMultilineCardEndMarker =
-                options.multilineCardEndMarker && !isEmptyLine && currentTrimmed === options.multilineCardEndMarker;
-
-            if (
-                // We've probably reached the end of a card
-                (isEmptyLine && !options.multilineCardEndMarker) ||
-                // Empty line & we're not picking up any card
-                (isEmptyLine && cardType === null) ||
-                // We've reached the end of a multi line card &
-                //  we're using custom end markers
-                hasMultilineCardEndMarker
-            ) {
-                if (cardType) {
-                    // Create a new card
-                    lastLineNo = i - 1;
-                    if (options.multilineCardEndMarker && (cardType === CardType.MultiLineBasic || cardType === CardType.MultiLineReversed)) {
-                        console.log(cardText);
-                    }
-
-                    cards.push(
-                        new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo),
-                    );
-                    cardType = null;
-                }
-
-                cardText = "";
-                firstLineNo = i + 1;
-                continue;
-            }
-
-            // Update card text
-            if (cardText.length > 0) {
-                cardText += "\n";
-            }
-            cardText += currentLine.trimEnd();
-
-            // Pick up inline cards
-            for (const { separator, type } of inlineSeparators) {
-                if (QuestionParser.hasInlineMarker(currentLine, separator)) {
-                    cardType = type;
-                    break;
-                }
-            }
-
-            if (cardType === CardType.SingleLineBasic || cardType === CardType.SingleLineReversed) {
-                cardText = currentLine;
-                firstLineNo = i;
-
-                // Pick up scheduling information if present
-                if (i + 1 < lines.length && lines[i + 1].startsWith("<!--SR:")) {
-                    cardText += "\n" + lines[i + 1];
-                    i++;
-                }
-
-                lastLineNo = i;
-                cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
-
-                cardType = null;
-                cardText = "";
-            } else if (currentTrimmed === options.multilineCardSeparator) {
-                // Ignore card if the front of the card is empty
-                if (cardText.length > 1) {
-                    // Pick up multiline basic cards
-                    cardType = CardType.MultiLineBasic;
-                }
-            } else if (currentTrimmed === options.multilineReversedCardSeparator) {
-                // Ignore card if the front of the card is empty
-                if (cardText.length > 1) {
-                    // Pick up multiline basic cards
-                    cardType = CardType.MultiLineReversed;
-                }
-            } else if (currentLine.startsWith("```") || currentLine.startsWith("~~~")) {
-                // Pick up codeblocks
-                const codeBlockClose = currentLine.match(/`+|~+/)[0];
-                while (i + 1 < lines.length && !lines[i + 1].startsWith(codeBlockClose)) {
-                    i++;
-                    cardText += "\n" + lines[i];
-                }
-                cardText += "\n" + codeBlockClose;
-                i++;
-            } else if (cardType === null && clozeCrafter.isClozeNote(currentLine)) {
-                // Pick up cloze cards
-                cardType = CardType.Cloze;
-            }
-        }
-
-        // Do we have a card left in the queue?
-        if (cardType && cardText) {
-            lastLineNo = lines.length - 1;
-            cards.push(new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo));
         }
 
         if (debugParser) {
-            console.log("Parsed cards:\n", cards);
+            console.log("Parsed cards:\n", QuestionParser.cards);
         }
-
-        this.resetParserState();
-
-        return cards;
+        QuestionParser.resetCardSpecificParserState();
+        return QuestionParser.cards;
     }
 
     private static resetParserState() {
@@ -365,11 +294,21 @@ export class QuestionParser {
     private static handleFreshCardStart(i: number, clozeCrafter: ClozeCrafter, inlineSeparators: Array<{ separator: string, type: CardType }>, skipLine: () => number, getScheduleInfoIfPresent: () => string) {
         // Skip any non HTML Comments & empty lines, as we don't care about them yet in this parser state
         // because we are not yet looking out for multiline cards here
-        let breakOut = false;
-        while (!breakOut) {
-            breakOut = !QuestionParser.skipPastNonSRHTMLComment(skipLine);
-            breakOut = breakOut && !QuestionParser.skipPastSRHTMLComment(skipLine); // IDEA: Maybe collect all unused sr comments and clean them/warn user
-            breakOut = breakOut && !QuestionParser.skipPastEmptyLines(skipLine);
+        if (
+            // We found an empty line
+            QuestionParser.currentLineTrimmed.length === 0 ||
+            // End of comment is in the same line as the start of the comment
+            (QuestionParser.isStartOfNonSRHTMLComment(QuestionParser.currentLine) &&
+                QuestionParser.isEndOfHTMLComment(QuestionParser.currentLine)) ||
+            // We found some rouge sr comment -> IDEA: maybe notify user
+            QuestionParser.isSRHTMLComment(QuestionParser.currentLine)
+        ) {
+            return;
+        }
+
+        if (QuestionParser.isStartOfNonSRHTMLComment(QuestionParser.currentLine) && !QuestionParser.isEndOfHTMLComment(QuestionParser.currentLine)) {
+            QuestionParser.currentParserState = "SKIPPING_HTML_COMMENT";
+            return;
         }
 
         // Now we are in a line, where we know that it isnt empty, and it isnt a comment
@@ -382,6 +321,7 @@ export class QuestionParser {
         );
 
         if (hadInlineCard) {
+            if (debugParser) console.log("Found inline card at line " + i);
             // Found an inline card, the next line could be anything, so we start again
             QuestionParser.currentParserState = "LOOKING_FOR_CARD_START";
             return;
@@ -396,6 +336,7 @@ export class QuestionParser {
         );
 
         if (hadClozeCard) {
+            if (debugParser) console.log("Found cloze card");
             // Found a cloze card, so the next line could be anything, so we start again
             if (QuestionParser.cards.last().text.includes(QuestionParser.srCommentStart)) {
                 // Because we found the sheduling info comment, we know that the next line is not part of the cloze
@@ -506,62 +447,6 @@ export class QuestionParser {
         return line.trim() === multilineCardEndMarker;
     }
 
-    private static skipPastEmptyLines(skipLine: () => number): boolean {
-        // Skip empty lines until we find something that is not empty
-        let foundEmptyLine = false;
-        while (QuestionParser.currentLineTrimmed.length === 0) {
-            foundEmptyLine = true;
-            skipLine();
-        }
-
-        return foundEmptyLine;
-    }
-
-    private static skipPastSRHTMLComment(skipLine: () => number): boolean {
-        // return true if we found the end of the sr comment
-        if (
-            QuestionParser.isSRHTMLComment(QuestionParser.currentLine)
-        ) {
-            if (QuestionParser.isEndOfHTMLComment(QuestionParser.currentLine)) {
-                // End of sr comment should be in the same line as the start of the sr comment
-                skipLine();
-                return true;
-            } else {
-                throw new Error("SR comment not ended on same line as start");
-            }
-        }
-        return false;
-    }
-
-    private static skipPastNonSRHTMLComment(skipLine: () => number) {
-        // return true if we found the end of the non sr comment
-        if (
-            QuestionParser.isStartOfNonSRHTMLComment(QuestionParser.currentLine) &&
-            QuestionParser.isEndOfHTMLComment(QuestionParser.currentLine)
-        ) {
-            // End of comment is in the same line as the start of the comment
-            skipLine();
-            return true;
-        }
-
-
-        if (QuestionParser.isStartOfNonSRHTMLComment(QuestionParser.currentLine)) {
-            // Comment is on multiple lines
-            // Could go on for a while, so we skipping till we are one line past the end of the comment
-            let i = skipLine();
-            while (
-                i < QuestionParser.lines.length &&
-                !QuestionParser.isEndOfHTMLComment(QuestionParser.currentLine)
-            ) {
-                i = skipLine();
-            }
-
-            i = skipLine();
-            return true;
-        }
-        return false;
-    }
-
     static isMultiLineCardSeparator(text: string, markers: string[]): boolean {
         markers.forEach((marker) => {
             if (text.includes(marker)) {
@@ -605,3 +490,105 @@ export class QuestionParser {
         return !QuestionParser.markerInsideCodeBlock(text, marker, markerIdx);
     }
 }
+
+
+//     // Skip everything in HTML comments
+//     if (currentLine.startsWith("<!--") && !currentLine.startsWith("<!--SR:")) {
+//         while (i + 1 < lines.length && !currentLine.includes("-->")) i++;
+//         i++;
+//         continue;
+//     }
+
+//     // Have we reached the end of a card?
+//     const isEmptyLine = currentTrimmed.length === 0;
+//     const hasMultilineCardEndMarker =
+//         options.multilineCardEndMarker && !isEmptyLine && currentTrimmed === options.multilineCardEndMarker;
+
+//     if (
+//         // We've probably reached the end of a card
+//         (isEmptyLine && !options.multilineCardEndMarker) ||
+//         // Empty line & we're not picking up any card
+//         (isEmptyLine && cardType === null) ||
+//         // We've reached the end of a multi line card &
+//         //  we're using custom end markers
+//         hasMultilineCardEndMarker
+//     ) {
+//         if (cardType) {
+//             // Create a new card
+//             lastLineNo = i - 1;
+//             if (options.multilineCardEndMarker && (cardType === CardType.MultiLineBasic || cardType === CardType.MultiLineReversed)) {
+//                 console.log(cardText);
+//             }
+
+//             cards.push(
+//                 new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo),
+//             );
+//             cardType = null;
+//         }
+
+//         cardText = "";
+//         firstLineNo = i + 1;
+//         continue;
+//     }
+
+//     // Update card text
+//     if (cardText.length > 0) {
+//         cardText += "\n";
+//     }
+//     cardText += currentLine.trimEnd();
+
+//     // Pick up inline cards
+//     for (const { separator, type } of inlineSeparators) {
+//         if (QuestionParser.hasInlineMarker(currentLine, separator)) {
+//             cardType = type;
+//             break;
+//         }
+//     }
+
+//     if (cardType === CardType.SingleLineBasic || cardType === CardType.SingleLineReversed) {
+//         cardText = currentLine;
+//         firstLineNo = i;
+
+//         // Pick up scheduling information if present
+//         if (i + 1 < lines.length && lines[i + 1].startsWith("<!--SR:")) {
+//             cardText += "\n" + lines[i + 1];
+//             i++;
+//         }
+
+//         lastLineNo = i;
+//         cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
+
+//         cardType = null;
+//         cardText = "";
+//     } else if (currentTrimmed === options.multilineCardSeparator) {
+//         // Ignore card if the front of the card is empty
+//         if (cardText.length > 1) {
+//             // Pick up multiline basic cards
+//             cardType = CardType.MultiLineBasic;
+//         }
+//     } else if (currentTrimmed === options.multilineReversedCardSeparator) {
+//         // Ignore card if the front of the card is empty
+//         if (cardText.length > 1) {
+//             // Pick up multiline basic cards
+//             cardType = CardType.MultiLineReversed;
+//         }
+//     } else if (currentLine.startsWith("```") || currentLine.startsWith("~~~")) {
+//         // Pick up codeblocks
+//         const codeBlockClose = currentLine.match(/`+|~+/)[0];
+//         while (i + 1 < lines.length && !lines[i + 1].startsWith(codeBlockClose)) {
+//             i++;
+//             cardText += "\n" + lines[i];
+//         }
+//         cardText += "\n" + codeBlockClose;
+//         i++;
+//     } else if (cardType === null && clozeCrafter.isClozeNote(currentLine)) {
+//         // Pick up cloze cards
+//         cardType = CardType.Cloze;
+//     }
+// }
+
+// // Do we have a card left in the queue?
+// if (cardType && cardText) {
+//     lastLineNo = lines.length - 1;
+//     cards.push(new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo));
+// }
