@@ -37,8 +37,8 @@ export class StoreInNotes implements IDataStore {
             const dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
             let info: RepItemScheduleInfo;
             if (
-                dueDate == null ||
-                formatDateYYYYMMDD(dueDate) == RepItemScheduleInfoOsr.dummyDueDateForNewCard
+                dueDate === null ||
+                formatDateYYYYMMDD(dueDate) === RepItemScheduleInfoOsr.dummyDueDateForNewCard
             ) {
                 info = null;
             } else {

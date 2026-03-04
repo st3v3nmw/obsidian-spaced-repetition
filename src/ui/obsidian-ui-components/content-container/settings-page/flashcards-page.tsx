@@ -129,7 +129,7 @@ export class FlashcardsPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 const deckOrderEnabled: boolean =
-                    this.plugin.data.settings.flashcardCardOrder != "EveryCardRandomDeckAndCard";
+                    this.plugin.data.settings.flashcardCardOrder !== "EveryCardRandomDeckAndCard";
                 setting.setName(t("REVIEW_DECK_ORDER")).addDropdown((dropdown) =>
                     dropdown
                         .addOptions(

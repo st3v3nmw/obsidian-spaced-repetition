@@ -20,7 +20,7 @@ export class RepetitionItem {
 
     // scheduling
     get hasSchedule(): boolean {
-        return this.scheduleInfo != null;
+        return this.scheduleInfo !== null && this.scheduleInfo !== undefined;
     }
 
     get isNew(): boolean {

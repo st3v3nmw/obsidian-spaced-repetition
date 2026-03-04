@@ -72,7 +72,7 @@ export class NoteQuestionParser {
 
             // Create the question list
             let textDirection: TextDirection = noteFile.getTextDirection();
-            if (textDirection == TextDirection.Unspecified) textDirection = defaultTextDirection;
+            if (textDirection === TextDirection.Unspecified) textDirection = defaultTextDirection;
             this.questionList = this.doCreateQuestionList(
                 noteText,
                 textDirection,
@@ -248,7 +248,7 @@ export class NoteQuestionParser {
         //      2. is not question specific (determined by line number) - i.e. is "note level"
         const noteLevelTagList: TagCache[] = flashcardTagList.filter(
             (item) =>
-                item.position.start.line == frontmatterTagPseudoLineNum &&
+                item.position.start.line === frontmatterTagPseudoLineNum &&
                 this.isNoteLevelFlashcardTag(item),
         );
         if (noteLevelTagList.length > 0) {
@@ -285,9 +285,9 @@ export class NoteQuestionParser {
         // We group together all tags that are on the same line, taking advantage of flashcardTagList being ordered by line number
         let list: TagCache[] = [] as TagCache[];
         for (const tag of contentTagCacheList) {
-            if (list.length != 0) {
+            if (list.length !== 0) {
                 const startLineNum: number = list[0].position.start.line;
-                if (startLineNum != tag.position.start.line) {
+                if (startLineNum !== tag.position.start.line) {
                     result.push(this.createTopicPathList(list, startLineNum));
                     list = [] as TagCache[];
                 }

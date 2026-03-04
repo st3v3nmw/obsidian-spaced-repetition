@@ -97,9 +97,10 @@ export class CardContainer {
         this.controls = new ControlsComponent(
             this.view,
             !this.settings.openViewInNewTab,
+            this.app,
             () => this.backToDeck(),
             () => this.editClickHandler(),
-            (response: ReviewResponse) => this._processReview(response),
+            async (response: ReviewResponse) => await this._processReview(response),
             () => this._displayCurrentCardInfoNotice(),
             () => this._skipCurrentCard(),
             this.closeModal ? this.closeModal.bind(this) : undefined,
@@ -260,7 +261,7 @@ export class CardContainer {
     }
 
     private async _showNextCard(): Promise<void> {
-        if (this._currentCard != null) await this.refresh();
+        if (this._currentCard !== null && this._currentCard !== undefined) await this.refresh();
         else this.backToDeck();
     }
 
@@ -343,7 +344,7 @@ export class CardContainer {
 
         this.mode = FlashcardMode.Back;
 
-        this.controls.resetButton.disabled = false;
+        this.controls.resetButton.setDisabled(false);
 
         // Show answer text
         if (this._currentQuestion.questionType !== CardType.Cloze) {

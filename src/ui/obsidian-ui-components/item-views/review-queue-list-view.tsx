@@ -164,7 +164,7 @@ export class ReviewQueueListView extends ItemView {
         const maxDaysToRender: number = this.settings.maxNDaysNotesReviewQueue;
 
         for (const sNote of deck.scheduledNotes) {
-            if (sNote.dueUnix != currUnix) {
+            if (sNote.dueUnix !== currUnix) {
                 const nDays: number = Math.ceil((sNote.dueUnix - now) / TICKS_PER_DAY);
 
                 if (nDays > maxDaysToRender) {

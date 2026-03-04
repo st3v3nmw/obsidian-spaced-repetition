@@ -26,7 +26,7 @@ export class RenderMarkdownWrapper {
         if (recursiveDepth > 4) return;
 
         let el: HTMLElement;
-        if (textDirection == TextDirection.Rtl) {
+        if (textDirection === TextDirection.Rtl) {
             el = containerEl.createDiv();
             el.setAttribute("dir", "rtl");
         } else el = containerEl;

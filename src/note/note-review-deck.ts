@@ -72,7 +72,7 @@ export class NoteReviewDeck {
         // sort scheduled notes by date & within those days, sort them by importance
         this._scheduledNotes = this.scheduledNotes.sort((a: SchedNote, b: SchedNote) => {
             const result = a.dueUnix - b.dueUnix;
-            if (result != 0) {
+            if (result !== 0) {
                 return result;
             }
             return (pageranks[b.note.path] || 0) - (pageranks[a.note.path] || 0);

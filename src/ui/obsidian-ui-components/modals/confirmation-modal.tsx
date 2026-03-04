@@ -19,28 +19,28 @@ export class ConfirmationModal extends Modal {
         title: string,
         description: string,
         confirmationMessage?: string,
-        onConfirm?: () => void,
+        onConfirm?: () => unknown,
     ) {
         super(app);
 
         this.setTitle(title);
-        this.titleEl.addClass("modal-header");
+        this.titleEl.addClass("sr-confirmation-modal-header");
 
         this.setContent(description);
-        this.contentEl.addClass("modal-content");
+        this.contentEl.addClass("sr-confirmation-modal-content");
 
         new Setting(this.contentEl)
-            .setClass("modal-button-container")
+            .setClass("sr-confirmation-modal-button-container")
             .addButton((button) =>
                 button
                     .setButtonText(t("CONFIRM"))
                     .setClass("mod-warning")
-                    .onClick(() => {
+                    .onClick(async () => {
                         if (confirmationMessage) {
                             new Notice(confirmationMessage);
                         }
                         if (onConfirm) {
-                            onConfirm();
+                            await onConfirm();
                         }
                         this.close();
                     }),

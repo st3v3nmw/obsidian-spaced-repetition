@@ -4,7 +4,7 @@ test("Check that localization entries are consistent across all files", () => {
         const expectedKeys: string[] = Object.keys(localeMap["en"]);
         for (const [languageCode, locale] of Object.entries(localeMap) as [string, string[]][]) {
             const localeKeys = Object.keys(locale);
-            if (localeKeys.length == 0 || languageCode == "en") continue;
+            if (localeKeys.length === 0 || languageCode === "en") continue;
 
             const unmappedKeys = expectedKeys.filter((x) => !localeKeys.includes(x));
             expect(

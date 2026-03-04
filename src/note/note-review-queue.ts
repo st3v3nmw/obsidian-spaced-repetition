@@ -40,7 +40,7 @@ export class NoteReviewQueue {
                 this.reviewDecks.set(matchedNoteTag, new NoteReviewDeck(matchedNoteTag));
             }
         }
-        if (noteSchedule == null) {
+        if (noteSchedule === null) {
             for (const matchedNoteTag of matchedNoteTags) {
                 this.reviewDecks.get(matchedNoteTag).newNotes.push(noteFile);
             }

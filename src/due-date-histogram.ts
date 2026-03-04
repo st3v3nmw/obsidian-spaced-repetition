@@ -25,7 +25,7 @@ export class DueDateHistogram {
 
     constructor(rec: Record<number, number> = null) {
         this.dueDatesMap = new Map<number, number>();
-        if (rec != null) {
+        if (rec !== null && rec !== undefined) {
             Object.entries(rec).forEach(([key, value]) => {
                 this.dueDatesMap.set(Number(key), value);
             });

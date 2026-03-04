@@ -282,7 +282,7 @@ export default class SRPlugin extends Plugin {
         // Get the direction with Obsidian's own setting
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const v: any = (this.app.vault as any).getConfig("rightToLeft");
-        return convertToStringOrEmpty(v) == "true" ? TextDirection.Rtl : TextDirection.Ltr;
+        return convertToStringOrEmpty(v) === "true" ? TextDirection.Rtl : TextDirection.Ltr;
     }
 
     async saveNoteReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
