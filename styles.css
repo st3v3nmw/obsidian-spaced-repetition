@@ -425,6 +425,10 @@
     }
 }
 
+.is-mobile .sr-card-container .cloze-input {
+    width: unset;
+}
+
 .is-phone .sr-card-container .sr-controls {
     gap: var(--size-4-3);
 }

@@ -1,5 +1,5 @@
 import { now } from "moment";
-import { App, MarkdownView, Platform } from "obsidian";
+import { App, MarkdownView, Notice, Platform } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { Card } from "src/card/card";
@@ -281,6 +281,10 @@ export class CardContainer {
         const currentQuestion = this.reviewSequencer.currentQuestion;
         if (!currentQuestion) return;
 
+        if (!this.settings.openViewInNewTab) {
+            new Notice("Note was opened in new tab in the background");
+        }
+
         const file = currentQuestion.note.file.tfile;
         const blockId = currentQuestion.questionText.obsidianBlockId;
         const line = Math.max(0, currentQuestion.lineNo ?? 0);
@@ -330,7 +334,7 @@ export class CardContainer {
 
         this.clozeInputs.forEach((input) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            input.addEventListener("change", (e) => { });
+            input.addEventListener("change", (e) => {});
         });
     }
 
