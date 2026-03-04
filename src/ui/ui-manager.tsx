@@ -123,7 +123,7 @@ export class UIManager {
     }
 
     public handleFocusChange(leaf: WorkspaceLeaf | null) {
-        this.setSRViewInFocus(leaf !== null && leaf.view instanceof SRTabView);
+        this.setSRViewInFocus(leaf !== null && leaf !== undefined && leaf.view instanceof SRTabView);
     }
 
     public handleExternalModalOpen(mutationList: MutationRecord[]) {
@@ -139,7 +139,7 @@ export class UIManager {
             const modal = document.querySelector(".modal-container"); // Check your modal selector
             // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
             this.setSRViewInFocus(
-                modal === null && this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null,
+                (modal === null || modal === undefined) && this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null && this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
             );
         }
     }

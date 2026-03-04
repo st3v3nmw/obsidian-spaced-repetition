@@ -133,13 +133,13 @@ export default class TabViewManager {
         } else {
             // Our view could not be found in the workspace, create a new leaf as a tab
             leaf = workspace.getLeaf(newLeaf);
-            if (leaf !== null) {
+            if (leaf !== null && leaf !== undefined) {
                 await leaf.setViewState({ type: type, active: true });
             }
         }
 
         // "Reveal" the leaf in case it is in a collapsed sidebar
-        if (leaf !== null) {
+        if (leaf !== null && leaf !== undefined) {
             workspace.revealLeaf(leaf);
         }
     }

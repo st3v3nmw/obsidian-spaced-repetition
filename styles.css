@@ -620,6 +620,14 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     cursor: default;
 }
 
+/* MARK: Confirmation Modal */
+
+.sr-confirmation-modal-header {
+    text-align: start;
+    margin-left: unset;
+}
+
+
 /* MARK: Note Review Page */
 
 .sr-note-review-page {

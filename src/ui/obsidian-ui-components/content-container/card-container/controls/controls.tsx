@@ -1,4 +1,4 @@
-import { Platform } from "obsidian";
+import { App, Platform } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import BackButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/controls/back-button";
@@ -21,9 +21,10 @@ export default class ControlsComponent {
     constructor(
         container: HTMLElement,
         isModal: boolean,
+        app: App,
         backToDeck: () => void,
         editClickHandler: () => void,
-        processReview: (response: ReviewResponse) => void,
+        processReview: (response: ReviewResponse) => Promise<void>,
         displayCurrentCardInfoNotice: () => void,
         skipCurrentCard: () => void,
         closeModal?: () => void,
@@ -47,9 +48,12 @@ export default class ControlsComponent {
 
         this.resetButton = new ResetButtonComponent(
             this.controls,
-            () => processReview(ReviewResponse.Reset),
-            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
+            app,
+            async () => await processReview(ReviewResponse.Reset),
+            [EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "undefined"],
         );
+
+        this.resetButton.setDisabled(true);
 
         this.infoButton = new CardInfoButtonComponent(
             this.controls,
@@ -74,5 +78,9 @@ export default class ControlsComponent {
                 EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "clickable-icon",
             ],
         );
+    }
+
+    setResetButtonDisabled(disabled: boolean) {
+        this.resetButton.buttonEl.toggleClass("mod-disabled", disabled);
     }
 }

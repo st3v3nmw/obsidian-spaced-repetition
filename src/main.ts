@@ -246,9 +246,9 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                    t("SYNC_TIME_TAKEN", {
-                        t: Date.now() - now.valueOf(),
-                    }),
+                t("SYNC_TIME_TAKEN", {
+                    t: Date.now() - now.valueOf(),
+                }),
             );
         }
     }
@@ -282,7 +282,7 @@ export default class SRPlugin extends Plugin {
         // Get the direction with Obsidian's own setting
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const v: any = (this.app.vault as any).getConfig("rightToLeft");
-        return convertToStringOrEmpty(v) == "true" ? TextDirection.Rtl : TextDirection.Ltr;
+        return convertToStringOrEmpty(v) === "true" ? TextDirection.Rtl : TextDirection.Ltr;
     }
 
     async saveNoteReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {

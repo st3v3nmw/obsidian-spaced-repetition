@@ -232,7 +232,7 @@ export class MultiLineTextFinder {
                 sourceTextArray,
                 searchTextArray,
             );
-            if (lineNo !== null) {
+            if (lineNo !== null && lineNo !== undefined) {
                 const replacementTextArray = splitTextIntoLineArray(replacementText);
                 const linesToRemove: number = searchTextArray.length;
                 sourceTextArray.splice(lineNo, linesToRemove, ...replacementTextArray);

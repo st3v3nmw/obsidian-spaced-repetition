@@ -253,7 +253,7 @@ export class Deck {
     }
 
     debugLogToConsole(desc: string = null, indent: number = 0) {
-        let str: string = desc !== null ? `${desc}: ` : "";
+        let str: string = desc !== null && desc !== undefined ? `${desc}: ` : "";
         str += this.toString(indent);
         console.log(str);
     }
