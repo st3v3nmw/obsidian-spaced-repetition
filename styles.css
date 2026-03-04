@@ -287,8 +287,13 @@
     }
 
     & .sr-reset-button.mod-warning {
+        --interactive-warning-hover: #fdf6f6;
         color: var(--text-error);
         background-color: var(--interactive-normal);
+
+        &:hover {
+            background-color: var(--interactive-warning-hover);
+        }
     }
 
     & .sr-main-wrapper {
