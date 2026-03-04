@@ -1,4 +1,7 @@
-import { TopicPath } from "src/deck/topic-path";
+import { TopicPath, TopicPathList } from "src/deck/topic-path";
+import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
+
+import { UnitTestSRFile } from "./helpers/unit-test-file";
 
 describe("Constructor exception handling", () => {
     test("Constructor rejects null path", () => {
@@ -82,6 +85,45 @@ describe("getTopicPathFromCardText", () => {
         const path: TopicPath = TopicPath.getTopicPathFromCardText(cardText);
 
         expect(path).toEqual(new TopicPath(["flashcards", "science", "chemistry"]));
+    });
+});
+
+describe("getTopicPathOfFile", () => {
+    test("Note with folder", () => {
+        const settings: SRSettings = { ...DEFAULT_SETTINGS, convertFoldersToDecks: true };
+        const noteText: string = `#flashcards/test
+            Q1::A1
+            Q2::A2
+            Q3::A3
+        `;
+        const file: UnitTestSRFile = new UnitTestSRFile(noteText, "flashcards/test/note.md");
+        const path: TopicPath = TopicPath.getTopicPathOfFile(file, settings);
+
+        expect(path).toEqual(new TopicPath(["flashcards", "test"]));
+    });
+});
+
+describe("getFolderPathFromFilename", () => {
+    test("Note with folder", () => {
+        const settings: SRSettings = { ...DEFAULT_SETTINGS, convertFoldersToDecks: true };
+        const noteText: string = `#flashcards/test
+            Q1::A1
+            Q2::A2
+            Q3::A3
+        `;
+        const file: UnitTestSRFile = new UnitTestSRFile(noteText, "flashcards/test/note.md");
+        const path: TopicPath = TopicPath.getFolderPathFromFilename(file, settings);
+
+        expect(path).toEqual(new TopicPath(["flashcards", "test"]));
+
+        const file2: UnitTestSRFile = new UnitTestSRFile(noteText, "note.md");
+        const path2: TopicPath = TopicPath.getFolderPathFromFilename(file2, settings);
+        expect(path2).toEqual(new TopicPath([]));
+
+        const settings2: SRSettings = { ...DEFAULT_SETTINGS, convertFoldersToDecks: false };
+        const path3: TopicPath = TopicPath.getFolderPathFromFilename(file, settings2);
+
+        expect(path3).toEqual(new TopicPath([]));
     });
 });
 
@@ -234,5 +276,39 @@ describe("isValidTag", () => {
 
     test("Valid tags", () => {
         expect(TopicPath.isValidTag("#flashcards")).toEqual(true);
+    });
+});
+
+describe("TopicPathList", () => {
+    test("Note with folder", () => {
+        const settings: SRSettings = { ...DEFAULT_SETTINGS, convertFoldersToDecks: true };
+        const noteText: string = `#flashcards/test
+            Q1::A1
+            Q2::A2
+            Q3::A3
+        `;
+        const file: UnitTestSRFile = new UnitTestSRFile(noteText, "flashcards/test/note.md");
+        const path: TopicPath = TopicPath.getFolderPathFromFilename(file, settings);
+
+        const file2: UnitTestSRFile = new UnitTestSRFile(noteText, "flashcards/banana/note.md");
+        const path2: TopicPath = TopicPath.getFolderPathFromFilename(file2, settings);
+
+        const file3: UnitTestSRFile = new UnitTestSRFile(noteText, "deck/banana/note.md");
+        const path3: TopicPath = TopicPath.getFolderPathFromFilename(file3, settings);
+
+        const topicPathList: TopicPathList = new TopicPathList([path, path2]);
+        const topicPathList2: TopicPathList = new TopicPathList([path, path3]);
+        expect(topicPathList.length).toEqual(2);
+        expect(topicPathList.isAnyElementSameOrAncestorOf(path)).toEqual(true);
+
+        expect(TopicPathList.empty()).toEqual(new TopicPathList([]));
+
+        expect(
+            TopicPathList.filterValidTopicPathsFromTagList(topicPathList, TopicPathList.empty()),
+        ).toEqual(new TopicPathList([]));
+
+        expect(
+            TopicPathList.filterValidTopicPathsFromTagList(topicPathList2, topicPathList),
+        ).toEqual(new TopicPathList([path]));
     });
 });
