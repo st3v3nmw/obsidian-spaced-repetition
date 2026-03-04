@@ -1067,7 +1067,8 @@ async function checkStats(
         expect(c.getDeckStats(topicPath)).toEqual(expectedDeckStats);
         if (expectedCardFront)
             expect(c.reviewSequencer.currentCard.front).toEqual(expectedCardFront);
-        if (reviewResponse !== null && reviewResponse !== undefined) await c.reviewSequencer.processReview(reviewResponse);
+        if (reviewResponse !== null && reviewResponse !== undefined)
+            await c.reviewSequencer.processReview(reviewResponse);
     }
 }
 

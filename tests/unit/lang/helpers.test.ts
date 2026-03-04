@@ -26,7 +26,7 @@ test("Test translation unknown locale", () => {
         const mockLocale = moment.locale as jest.MockedFunction<() => string>;
         mockLocale.mockImplementation(() => "ki"); // Kikuyu
         const { t } = require("src/lang/helpers");
-        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
         expect(t("DECKS")).toEqual("Decks");
         expect(consoleSpy).toHaveBeenCalledWith("SRS error: Locale ki not found.");
     });

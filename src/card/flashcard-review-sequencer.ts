@@ -126,7 +126,9 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     get hasCurrentCard(): boolean {
-        return this.cardSequencer.currentCard !== null && this.cardSequencer.currentCard !== undefined;
+        return (
+            this.cardSequencer.currentCard !== null && this.cardSequencer.currentCard !== undefined
+        );
     }
 
     get currentCard(): Card {

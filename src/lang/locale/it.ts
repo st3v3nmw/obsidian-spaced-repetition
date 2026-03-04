@@ -270,4 +270,10 @@ export default {
     // Statistics
     PERIOD_TITLE: "Period",
     PERIOD_DESC: "Period of time to display in the charts",
+
+    // Card controls reset button
+    DELETE_SCHEDULING_DATA_OF_CURRENT_CARD: "Delete card scheduling data?",
+    CONFIRM_SCHEDULING_DATA_DELETION_OF_CURRENT_CARD:
+        "Are you sure you want to delete the scheduling data from your current card? This action cannot be undone.",
+    SCHEDULING_DATA_DELETION_IN_PROGRESS_OF_CURRENT_CARD: "Deleting the cards scheduling data...",
 };

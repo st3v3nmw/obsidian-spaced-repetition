@@ -29,7 +29,7 @@ export class UnitTestOsrCore extends OsrCore {
             questionPostponementList,
             this.infoFinder,
             settings,
-            () => { },
+            () => {},
             new NoteReviewQueue(),
         );
     }

@@ -51,7 +51,8 @@ class SingleDeckIterator {
 
     get currentCard(): Card {
         let result: Card = null;
-        if (this.cardIdx !== null && this.cardIdx !== undefined) result = this.deck.getCard(this.cardIdx, this.cardListType);
+        if (this.cardIdx !== null && this.cardIdx !== undefined)
+            result = this.deck.getCard(this.cardIdx, this.cardListType);
         return result;
     }
 
@@ -211,7 +212,11 @@ export class DeckTreeIterator implements IDeckTreeIterator {
     private weightedRandomNumber: WeightedRandomNumber;
 
     get hasCurrentCard(): boolean {
-        return this.deckIdx !== null && this.deckIdx !== undefined && this.singleDeckIterator.hasCurrentCard;
+        return (
+            this.deckIdx !== null &&
+            this.deckIdx !== undefined &&
+            this.singleDeckIterator.hasCurrentCard
+        );
     }
 
     get currentTopicPath(): TopicPath {
@@ -225,7 +230,11 @@ export class DeckTreeIterator implements IDeckTreeIterator {
 
     get currentCard(): Card {
         let result: Card = null;
-        if (this.deckIdx !== null && this.deckIdx !== undefined && this.singleDeckIterator.hasCurrentCard)
+        if (
+            this.deckIdx !== null &&
+            this.deckIdx !== undefined &&
+            this.singleDeckIterator.hasCurrentCard
+        )
             result = this.singleDeckIterator.currentCard;
         return result;
     }
@@ -266,7 +275,8 @@ export class DeckTreeIterator implements IDeckTreeIterator {
 
     private setDeckIdx(deckIdx?: number): void {
         this.deckIdx = deckIdx;
-        if (deckIdx !== null && deckIdx !== undefined) this.singleDeckIterator.setDeck(this.deckArray[deckIdx]);
+        if (deckIdx !== null && deckIdx !== undefined)
+            this.singleDeckIterator.setDeck(this.deckArray[deckIdx]);
     }
 
     nextCard(): boolean {
