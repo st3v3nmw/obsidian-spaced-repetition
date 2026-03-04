@@ -49,12 +49,41 @@ const execInlineCardsTestWithSeparator = (separator: string) => {
     ]);
 
     expect(parseT(["#Title", "Q1" + separator + "A1", "Q2" + separator + " A2"].join("\n"), parserOptions)).toEqual([
-        [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, ["Q1" + separator + "A1"].join("\n"), 2, 2],
-        [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, ["Q2" + separator + " A2"].join("\n"), 3, 3],
+        [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, ["Q1" + separator + "A1"].join("\n"), 1, 1],
+        [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, ["Q2" + separator + " A2"].join("\n"), 2, 2],
+    ]);
+
+    expect(parseT(["#Title", "Q1" + separator + "A1", "<!--SR:2021-08-11,4,270-->", "Q2" + separator + " A2", "<!--SR:2021-08-11,4,270-->"].join("\n"), parserOptions)).toEqual([
+        [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, ["Q1" + separator + "A1", "<!--SR:2021-08-11,4,270-->"].join("\n"), 1, 2],
+        [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, ["Q2" + separator + " A2", "<!--SR:2021-08-11,4,270-->"].join("\n"), 3, 4],
+    ]);
+    // Rouge sr comments
+    expect(parseT(["#Title", "<!--SR:2021-08-11,4,270-->", "Q1" + separator + "A1", "<!--SR:2021-08-11,4,270-->", "<!--SR:2021-08-11,4,270-->", "Q2" + separator + " A2", "<!--SR:2021-08-11,4,270-->"].join("\n"), parserOptions)).toEqual([
+        [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, ["Q1" + separator + "A1", "<!--SR:2021-08-11,4,270-->"].join("\n"), 2, 3],
+        [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, ["Q2" + separator + " A2", "<!--SR:2021-08-11,4,270-->"].join("\n"), 5, 6],
     ]);
 
     expect(parseT(["#flashcards/science Question " + separator + "Answer"].join("\n"), parserOptions)).toEqual([
         [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, ["#flashcards/science Question " + separator + "Answer"].join("\n"), 0, 0],
+    ]);
+    expect(parseT(["#flashcards/science", " Question " + separator + "Answer"].join("\n"), parserOptions)).toEqual([
+        [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, [" Question " + separator + "Answer"].join("\n"), 1, 1],
+    ]);
+    expect(parseT(["#flashcards/science #flashcards/math", "Question " + separator + "Answer"].join("\n"), parserOptions)).toEqual([
+        [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, ["Question " + separator + "Answer"].join("\n"), 1, 1],
+    ]);
+    expect(parseT(["#flashcards/science", "#flashcards/math", "Question " + separator + "Answer"].join("\n"), parserOptions)).toEqual([
+        [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, ["Question " + separator + "Answer"].join("\n"), 2, 2],
+    ]);
+    // Rouge sr comments
+    expect(parseT(["#flashcards/science", "<!--SR:2021-08-11,4,270-->", "#flashcards/math", "Question " + separator + "Answer"].join("\n"), parserOptions)).toEqual([
+        [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, ["Question " + separator + "Answer"].join("\n"), 3, 3],
+    ]);
+    expect(parseT(["#flashcards/science", "<!--SR:2021-08-11,4,270-->", "#flashcards/math", "Question " + separator + "Answer <!--SR:2021-08-11,4,270-->"].join("\n"), parserOptions)).toEqual([
+        [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, ["Question " + separator + "Answer <!--SR:2021-08-11,4,270-->"].join("\n"), 3, 3],
+    ]);
+    expect(parseT(["#flashcards/science", "<!--SR:2021-08-11,4,270-->", "#flashcards/math", "Question " + separator + "Answer", "<!--SR:2021-08-11,4,270-->"].join("\n"), parserOptions)).toEqual([
+        [separator === "::" ? CardType.SingleLineBasic : CardType.SingleLineReversed, ["Question " + separator + "Answer", "<!--SR:2021-08-11,4,270-->"].join("\n"), 3, 4],
     ]);
 };
 
