@@ -27,6 +27,7 @@ export default class ControlsComponent {
         processReview: (response: ReviewResponse) => Promise<void>,
         displayCurrentCardInfoNotice: () => void,
         skipCurrentCard: () => void,
+        jumpToCurrentCard: () => Promise<void>,
         closeModal?: () => void,
     ) {
         this.controls = container.createDiv();
