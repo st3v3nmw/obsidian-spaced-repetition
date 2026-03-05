@@ -11,7 +11,7 @@
         "test": "pnpm jest",
         "validate": "concurrently --kill-others-on-fail -g -p \"[{name}]\" -n \"format,lint,test\" \"pnpm:format\" \"pnpm:lint\" \"pnpm:test\"",
         "precommit-msg": "echo 'Pre-commit checks...'",
-        "changelog": "pnpm auto-changelog --template=compact --package && pnpm prettier --write docs/docs/changelog.md"
+        "changelog": "pnpm auto-changelog --template=compact --package --output docs/docs/changelog.md && pnpm prettier --write docs/docs/changelog.md"
     },
     "keywords": [
         "obsidian",
