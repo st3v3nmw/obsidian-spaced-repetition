@@ -10,9 +10,9 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
 - The plugin has been translated into _Arabic, Chinese, Czech, Dutch, French, German, Italian, Korean, Japanese, Polish, Portuguese, Spanish, Russian, Turkish, and Ukrainian_ by the Obsidian community 😄.
     - To help translate this plugin to your language, check the [translation guide here](https://stephenmwangi.com/obsidian-spaced-repetition/contributing/#translating_1).
 
-## ⚡ Features
+## Features⚡
 
-#### 🗃️ Reviewing Flashcards
+#### Reviewing Flashcards🗃️
 
 - [Getting started](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/flashcards-overview/) (Using Obsidian's hierarchical tags or folder structure)
 - Creating Flashcards
@@ -29,15 +29,18 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
 - [Organize Decks](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/decks/) (Using Obsidian's hierarchical tags or folder structure)
 - [Card context - automatic titles based on headings](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/reviewing/#context) (i.e. `Note title > Heading 1 > Subheading`)
 
-#### 📄 Reviewing Notes
+#### Reviewing Notes📄
 
 - [Getting started](https://stephenmwangi.com/obsidian-spaced-repetition/notes/)
 - [Due Notes for review](https://stephenmwangi.com/obsidian-spaced-repetition/notes/#note-review-queue)
 - [How to review a note](https://stephenmwangi.com/obsidian-spaced-repetition/notes/#reviewing)
 
-#### [Statistics 📈](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/statistics/)
+#### [Statistics📈](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/statistics/)
 
-## 🚀 Usage TLDR
+<br/>
+<br/>
+
+## Usage TLDR🚀
 
 #### Creating Decks
 
@@ -92,25 +95,14 @@ This is where marking a note for review comes in handy.
 4. Once you have recalled/reviewed your note you can rate your recall ability by executing the command(ctrl+p, or just via the 3 dots next to the note): _Review note as YOUR_RATING_
     - The algorithm will take your rating into account to calculate a new due date, when you have to review it again
 
-## ℹ️ Info on the next few releases
-
-- The next few releases will be more focused on fixing bugs and on cleaning up/making the code more maintainable.
-    - The first main goal is to overhaul the card parser, so that it is more flexible and less error prone.
-    - The second main goal is to refactor the business logic, so that it is more maintainable and easier to understand.
-- Along the way I might be adding some minor features.
-- The next big feature will be major improvements to the review of whole notes
-- After that is done I will have a look into implementing the FSRS algorithm, as it was often requested.
-    - But I first want to do the clean up the code, or else it might get too messy/complicated to implement it.
-
-_- Kyle (Current Maintainer) -_
-
-## 🔗 Links & Resources
+## Links & Resources🔗
 
 - [Documentation](https://stephenmwangi.com/obsidian-spaced-repetition/).
-- [Roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/3/) (Sry, slightly out of date)
+- [Roadmap](https://github.com/st3v3nmw/obsidian-spaced-repetition/projects/3/)
+- [Dev News](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/categories/development-news)
 - [Issues](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/)
 
-## 💻 Support Development
+## Support Development💻
 
 <div style="display: flex; gap: 10px; flex-direction: row; flex-wrap: wrap; ">
     <div style="font-size: 1em; font-weight: bold; white-space: nowrap;">Stephen Mwangi (Owner):</div>

@@ -31,6 +31,10 @@ Fight the forgetting curve by reviewing flashcards & notes using spaced repetiti
 
 </div>
 
+#### Info
+
+_The documentation is a bit out of date. So take everything with a grain of salt. We are working on updating the documentation bit by bit._
+
 ---
 
 ## Quick Demo

@@ -154,12 +154,12 @@ For larger diffs, it's important that you check how your docs look like as expla
 #### Initial Setup
 
 1. Create a virtual environment: `python3 -m venv venv`
-2. Activate it: `. venv/bin/activate`
+2. Activate it: `. venv/bin/activate` or `venv\Scripts\activate` if you are on Windows
 3. Install the required dependencies: `pip install -r requirements.txt`
 
 #### Viewing
 
-1. Activate the virtual environment: `. venv/bin/activate`
+1. Activate the virtual environment: `. venv/bin/activate` or `venv\Scripts\activate` if you are on Windows
 2. Serve the docs: `mkdocs serve`
 3. View your documentation locally on [http://127.0.0.1:8000/obsidian-spaced-repetition/](http://127.0.0.1:8000/obsidian-spaced-repetition/), any changes you make will reflect on the browser instantly.
 
