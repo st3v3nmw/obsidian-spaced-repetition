@@ -82,20 +82,62 @@ export function formatDate(
 export interface IDateProvider {
     get now(): Moment;
     get today(): Moment;
+    getDayBoundary(): IDayBoundary | null;
+    setDayBoundary(dayBoundary: IDayBoundary | null): void;
+}
+
+export interface IDayBoundary {
+    hour: number;
+    minute: number;
+    second: number;
 }
 
 export class LiveDateProvider implements IDateProvider {
+    private dayBoundary: IDayBoundary | null = null;
+
     get now(): Moment {
         return moment();
     }
 
     get today(): Moment {
-        return moment().startOf("day");
+        let result: Moment = moment().startOf("day");
+
+        // Skip to old today behavior if dayBoundary is set and it is midnight to avoid day boundary issues
+        if (
+            this.dayBoundary &&
+            this.dayBoundary.hour !== 0 &&
+            this.dayBoundary.minute !== 0 &&
+            this.dayBoundary.second !== 0
+        ) {
+            const nowTime = moment();
+            const customDayBoundary = moment()
+                .hour(this.dayBoundary.hour)
+                .minute(this.dayBoundary.minute)
+                .second(this.dayBoundary.second)
+                .millisecond(0);
+
+            if (nowTime.isBefore(customDayBoundary)) {
+                result = moment().startOf("day").subtract(1, "day");
+            } else {
+                result = moment().startOf("day");
+            }
+        }
+
+        return result;
+    }
+
+    getDayBoundary(): IDayBoundary | null {
+        return this.dayBoundary;
+    }
+
+    setDayBoundary(dayBoundary: IDayBoundary | null): void {
+        this.dayBoundary = dayBoundary;
     }
 }
 
 export class StaticDateProvider implements IDateProvider {
     private moment: Moment;
+    private dayBoundary: IDayBoundary | null = null;
 
     constructor(moment: Moment) {
         this.moment = moment;
@@ -112,11 +154,48 @@ export class StaticDateProvider implements IDateProvider {
     static fromDateStr(str: string): StaticDateProvider {
         return new StaticDateProvider(DateUtil.dateStrToMoment(str));
     }
+
+    getDayBoundary(): IDayBoundary | null {
+        return this.dayBoundary;
+    }
+
+    setDayBoundary(dayBoundary: IDayBoundary | null): void {
+        this.dayBoundary = dayBoundary;
+    }
 }
 
 export class DateUtil {
     static dateStrToMoment(str: string): Moment {
         return moment(str, ALLOWED_DATE_FORMATS);
+    }
+
+    static strToDayBoundary(str: string): IDayBoundary | null {
+        const dayStr: string[] = str.split(":");
+        if (dayStr.length !== 3) {
+            return null;
+        }
+
+        const hour: number = parseInt(dayStr[0]);
+        if (hour < 0 || hour > 23 || Number.isNaN(hour)) {
+            return null;
+        }
+
+        const minute: number = parseInt(dayStr[1]);
+        if (minute < 0 || minute > 59 || Number.isNaN(minute)) {
+            return null;
+        }
+
+        const second: number = parseInt(dayStr[2]);
+        if (second < 0 || second > 59 || Number.isNaN(second)) {
+            return null;
+        }
+
+        const dayBoundary: IDayBoundary = {
+            hour: hour,
+            minute: minute,
+            second: second,
+        };
+        return dayBoundary;
     }
 }
 

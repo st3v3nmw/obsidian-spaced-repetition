@@ -1,5 +1,5 @@
 import { now } from "moment";
-import { App, Platform } from "obsidian";
+import { App, MarkdownView, Notice, Platform } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { Card } from "src/card/card";
@@ -103,6 +103,7 @@ export class CardContainer {
             async (response: ReviewResponse) => await this._processReview(response),
             () => this._displayCurrentCardInfoNotice(),
             () => this._skipCurrentCard(),
+            this._jumpToCurrentCard.bind(this),
             this.closeModal ? this.closeModal.bind(this) : undefined,
         );
 
@@ -274,6 +275,38 @@ export class CardContainer {
 
     private _displayCurrentCardInfoNotice() {
         new CardInfoNotice(this._currentCard.scheduleInfo, this._currentQuestion.note.filePath);
+    }
+
+    private async _jumpToCurrentCard(): Promise<void> {
+        const currentQuestion = this.reviewSequencer.currentQuestion;
+        if (!currentQuestion) return;
+
+        if (
+            (!this.settings.openViewInNewTab &&
+                !(Platform.isMobile || EmulatedPlatform().isMobile)) ||
+            (!this.settings.openViewInNewTabMobile &&
+                (Platform.isMobile || EmulatedPlatform().isMobile))
+        ) {
+            new Notice("Note was opened in new tab in the background");
+        }
+
+        const file = currentQuestion.note.file.tfile;
+        const blockId = currentQuestion.questionText.obsidianBlockId;
+        const line = Math.max(0, currentQuestion.lineNo ?? 0);
+
+        if (blockId) {
+            await this.app.workspace.openLinkText(`${file.path}#${blockId}`, file.path, false);
+            return;
+        }
+
+        const leaf = this.app.workspace.getLeaf("tab");
+        await leaf.openFile(file, { eState: { line } });
+
+        const markdownView = leaf.view as MarkdownView;
+        if (markdownView?.editor) {
+            markdownView.editor.setCursor({ line, ch: 0 });
+            markdownView.editor.scrollIntoView({ from: { line, ch: 0 }, to: { line, ch: 0 } });
+        }
     }
 
     // #region -> Deck Info

@@ -71,10 +71,7 @@ export class UIManager {
             }, 2000);
         });
 
-        this.statusBarManager = new StatusBarManager(
-            this.plugin,
-            this.plugin.data.settings.showStatusBar,
-        );
+        this.statusBarManager = new StatusBarManager(this.plugin);
 
         this.showRibbonIcon(this.plugin.data.settings.showRibbonIcon);
         this.showFileMenuItems(this.plugin.data.settings.disableFileMenuReviewOptions);
@@ -95,12 +92,15 @@ export class UIManager {
                     CardListType.All,
                     true,
                 )} card(s) due`,
+                this.plugin.data.settings.showStatusBar,
                 "card-review",
             );
             this.statusBarManager.setText(
                 `${this.plugin.osrAppCore.noteReviewQueue.dueNotesCount} note(s) due`,
+                this.plugin.data.settings.showStatusBar,
                 "note-review",
             );
+            this.statusBarManager.showUpdateAvailableItemIfAvailable();
         }
 
         this.statusBarManager.showStatusBarItems(this.plugin.data.settings.showStatusBar);

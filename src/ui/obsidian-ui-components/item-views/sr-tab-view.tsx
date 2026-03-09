@@ -175,7 +175,15 @@ export class SRTabView extends ItemView {
                 );
             }
 
-            this._showDecksList();
+            const subdecksWithCardsInQueue: Deck[] =
+                this.reviewSequencer.getSubDecksWithCardsInQueue(
+                    this.reviewSequencer.originalDeckTree,
+                );
+            if (subdecksWithCardsInQueue.length === 1) {
+                this._showFlashcard(this.reviewSequencer.originalDeckTree.subdecks[0]);
+            } else {
+                this._showDecksList();
+            }
         } catch (e) {
             /*
              * There will be an error, when opening obsidian, because if a tab is still open from the last session,
