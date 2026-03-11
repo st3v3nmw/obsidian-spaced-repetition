@@ -7,7 +7,8 @@ import { CardFrontBack, CardFrontBackUtil } from "src/card/questions/question-ty
 import { DataStore } from "src/data-stores/base/data-store";
 import { TopicPath, TopicPathList } from "src/deck/topic-path";
 import { frontmatterTagPseudoLineNum, ISRFile } from "src/file";
-import { ParsedQuestionInfo, ParserOptions, QuestionParser } from "src/parser";
+import { QuestionParser } from "src/parser/parser";
+import { ParsedQuestionInfo, ParserOptions } from "src/parser/parser-data-structure";
 import { SettingsUtil, SRSettings } from "src/settings";
 import {
     splitNoteIntoFrontmatterAndContent,
@@ -158,10 +159,11 @@ export class NoteQuestionParser {
             multilineReversedCardSeparator: settings.multilineReversedCardSeparator,
             multilineCardEndMarker: settings.multilineCardEndMarker,
             clozePatterns: settings.clozePatterns,
+            useAtomicClozes: settings.useAtomicClozes,
         };
 
         // We pass contentText which has the frontmatter blanked out; see extractFrontmatter for reasoning
-        return QuestionParser.parse(this.contentText, parserOptions);
+        return QuestionParser.parse(this.noteFile.path, this.contentText, parserOptions);
     }
 
     private createQuestionObject(

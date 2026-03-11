@@ -7,7 +7,7 @@ import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorith
 import { DataStore } from "src/data-stores/base/data-store";
 import { TopicPath, TopicPathList, TopicPathWithWs } from "src/deck/topic-path";
 import { Note } from "src/note/note";
-import { ParsedQuestionInfo } from "src/parser";
+import { ParsedQuestionInfo } from "src/parser/parser-data-structure";
 import { SRSettings } from "src/settings";
 import { cyrb53, MultiLineTextFinder, stringTrimStart, TextDirection } from "src/utils/strings";
 

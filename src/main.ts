@@ -30,7 +30,7 @@ import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { Note } from "src/note/note";
 import { NoteFileLoader } from "src/note/note-file-loader";
 import { NoteReviewQueue } from "src/note/note-review-queue";
-import { setDebugParser } from "src/parser";
+import { QuestionParser } from "src/parser/parser";
 import { DEFAULT_DATA, PluginData } from "src/plugin-data";
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
@@ -318,7 +318,7 @@ export default class SRPlugin extends Plugin {
         if (loadedData?.settings) upgradeSettings(loadedData.settings);
         this.data = Object.assign({}, DEFAULT_DATA, loadedData);
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
-        setDebugParser(this.data.settings.showParserDebugMessages);
+        QuestionParser.setDebugParser(this.data.settings.showParserDebugMessages);
 
         this.setupDataStoreAndAlgorithmInstances(this.data.settings);
     }

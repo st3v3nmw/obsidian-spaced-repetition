@@ -1,6 +1,7 @@
 import { CardType } from "src/card/questions/question";
 
 import { parserOptions, parseT } from "../helpers/unit-test-parser-helper";
+// TODO: Expand this test
 
 test("Test parsing cards with codeblocks", () => {
     // `inline`
@@ -109,6 +110,7 @@ test("Test not parsing 'cards' in codeblocks", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            useAtomicClozes: false,
             multilineCardEndMarker: "",
             clozePatterns: [
                 "==[123;;]answer[;;hint]==",

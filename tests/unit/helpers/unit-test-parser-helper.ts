@@ -1,5 +1,6 @@
 import { CardType } from "src/card/questions/question";
-import { ParsedQuestionInfo, ParserOptions, QuestionParser } from "src/parser";
+import { QuestionParser } from "src/parser/parser";
+import { ParsedQuestionInfo, ParserOptions } from "src/parser/parser-data-structure";
 
 export const parserOptions: ParserOptions = {
     singleLineCardSeparator: "::",
@@ -12,6 +13,7 @@ export const parserOptions: ParserOptions = {
         "**[123;;]answer[;;hint]**",
         "{{[123;;]answer[;;hint]}}",
     ],
+    useAtomicClozes: false,
 };
 
 /**
@@ -20,8 +22,8 @@ export const parserOptions: ParserOptions = {
  * Created when the actual parser changed from returning [CardType, string, number, number] to ParsedQuestionInfo.
  * It's purpose is to minimise changes to all the test cases here during the parser()->parserEx() change.
  */
-export function parseT(text: string, options: ParserOptions): [CardType, string, number, number][] {
-    const list: ParsedQuestionInfo[] = QuestionParser.parse(text, options);
+export function parseT(text: string, options: ParserOptions = parserOptions, path: string = "test.md"): [CardType, string, number, number][] {
+    const list: ParsedQuestionInfo[] = QuestionParser.parse(path, text, options);
     const result: [CardType, string, number, number][] = [];
     for (const item of list) {
         result.push([item.cardType, item.text, item.firstLineNum, item.lastLineNum]);
