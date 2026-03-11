@@ -135,20 +135,20 @@ export class FlashcardsPage extends SettingsPage {
                         .addOptions(
                             deckOrderEnabled
                                 ? {
-                                      // eslint-disable-next-line camelcase
-                                      PrevDeckComplete_Sequential: t(
-                                          "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
-                                      ),
-                                      // eslint-disable-next-line camelcase
-                                      PrevDeckComplete_Random: t(
-                                          "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
-                                      ),
-                                  }
+                                    // eslint-disable-next-line camelcase
+                                    PrevDeckComplete_Sequential: t(
+                                        "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
+                                    ),
+                                    // eslint-disable-next-line camelcase
+                                    PrevDeckComplete_Random: t(
+                                        "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
+                                    ),
+                                }
                                 : {
-                                      EveryCardRandomDeckAndCard: t(
-                                          "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
-                                      ),
-                                  },
+                                    EveryCardRandomDeckAndCard: t(
+                                        "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
+                                    ),
+                                },
                         )
                         .setValue(
                             deckOrderEnabled
@@ -174,6 +174,21 @@ export class FlashcardsPage extends SettingsPage {
                             .setValue(this.plugin.data.settings.convertClozePatternsToInputs)
                             .onChange(async (value) => {
                                 this.plugin.data.settings.convertClozePatternsToInputs = value;
+                                await this.plugin.savePluginData();
+
+                                this.display();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("ATOMIC_CLOZES"))
+                    .setDesc(t("ATOMIC_CLOZES_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.useAtomicClozes)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.useAtomicClozes = value;
                                 await this.plugin.savePluginData();
 
                                 this.display();
