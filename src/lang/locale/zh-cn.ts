@@ -255,4 +255,12 @@ export default {
     START_OF_DAY: "Start of day",
     START_OF_DAY_DESC: "The time at which the day begins (Format: HH:MM:SS, Default: 00:00:00)",
     INVALID_START_OF_DAY_WARNING: "Invalid format for start of day",
+    // Settings > main-page
+    INFO: "Info",
+    // Card responses
+    AGAIN: "Again",
+    // Settings > info
+    CHECK_ROADMAP: 'Check out the <a href="${roadMapUrl}">roadmap</a> for upcoming features.',
+    CHECK_DEV_NEWS:
+        'Check out the <a href="${devNewsUrl}">dev news</a> for the latest development news.',
 };
