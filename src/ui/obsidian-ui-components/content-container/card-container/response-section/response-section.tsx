@@ -15,6 +15,7 @@ import EmulatedPlatform from "src/utils/platform-detector";
 
 export default class ResponseSectionComponent {
     public responseEl: HTMLDivElement;
+    public againButton: SRResponseButtonComponent;
     public hardButton: SRResponseButtonComponent;
     public goodButton: SRResponseButtonComponent;
     public easyButton: SRResponseButtonComponent;
@@ -34,6 +35,14 @@ export default class ResponseSectionComponent {
             text: t("SHOW_ANSWER"),
             onClick: () => {
                 showAnswer();
+            },
+        });
+
+        this.againButton = new SRResponseButtonComponent(this.responseEl, {
+            classNames: ["sr-bg-yellow", "sr-again-button", "sr-is-hidden"],
+            text: settings.flashcardAgainText,
+            onClick: () => {
+                processReview(ReviewResponse.Again);
             },
         });
 
@@ -65,6 +74,7 @@ export default class ResponseSectionComponent {
     public resetResponseButtons() {
         // Sets all buttons in to their default state
         this.answerButton.buttonEl.removeClass("sr-is-hidden");
+        this.againButton.buttonEl.addClass("sr-is-hidden");
         this.hardButton.buttonEl.addClass("sr-is-hidden");
         this.goodButton.buttonEl.addClass("sr-is-hidden");
         this.easyButton.buttonEl.addClass("sr-is-hidden");
@@ -81,14 +91,36 @@ export default class ResponseSectionComponent {
 
         if (reviewMode === FlashcardReviewMode.Cram) {
             this.responseEl.addClass("is-cram");
-            this.hardButton.setButtonText(`${settings.flashcardHardText}`);
+            this.againButton.setButtonText(`${settings.flashcardAgainText}`);
             this.easyButton.setButtonText(`${settings.flashcardEasyText}`);
+
+            if (this.againButton.buttonEl.hasClass("sr-is-hidden")) {
+                this.againButton.buttonEl.removeClass("sr-is-hidden");
+            }
+            if (this.easyButton.buttonEl.hasClass("sr-is-hidden")) {
+                this.easyButton.buttonEl.removeClass("sr-is-hidden");
+            }
+
             if (!this.goodButton.buttonEl.hasClass("sr-is-hidden")) {
                 this.goodButton.buttonEl.addClass("sr-is-hidden");
             }
+            if (!this.hardButton.buttonEl.hasClass("sr-is-hidden")) {
+                this.hardButton.buttonEl.addClass("sr-is-hidden");
+            }
         } else {
             if (this.responseEl.hasClass("is-cram")) this.responseEl.removeClass("is-cram");
+            this.againButton.buttonEl.removeClass("sr-is-hidden");
+            this.hardButton.buttonEl.removeClass("sr-is-hidden");
             this.goodButton.buttonEl.removeClass("sr-is-hidden");
+            this.easyButton.buttonEl.removeClass("sr-is-hidden");
+            this._setupEaseButton(
+                this.againButton,
+                settings.flashcardAgainText,
+                reviewSequencer,
+                currentCard,
+                settings,
+                ReviewResponse.Again,
+            );
             this._setupEaseButton(
                 this.hardButton,
                 settings.flashcardHardText,
@@ -114,8 +146,6 @@ export default class ResponseSectionComponent {
                 ReviewResponse.Easy,
             );
         }
-        this.hardButton.buttonEl.removeClass("sr-is-hidden");
-        this.easyButton.buttonEl.removeClass("sr-is-hidden");
     }
 
     private _setupEaseButton(

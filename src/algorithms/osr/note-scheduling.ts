@@ -17,7 +17,9 @@ export function osrSchedule(
     dueDateHistogram?: DueDateHistogram,
 ): Record<string, number> {
     const delayedBeforeReviewDays = Math.max(0, Math.floor(delayedBeforeReview / TICKS_PER_DAY));
-    let interval: number = originalInterval;
+    // We need to ensure that interval is at least 1, otherwise the interval calculations will be off
+    // It could be 0, if the user has clicked the "Again" button
+    let interval: number = Math.max(1, originalInterval);
 
     if (response === ReviewResponse.Easy) {
         ease += 20;
@@ -31,6 +33,9 @@ export function osrSchedule(
             1,
             (interval + delayedBeforeReviewDays / 4) * settings.lapsesIntervalChange,
         );
+    } else if (response === ReviewResponse.Again) {
+        ease = Math.max(130, ease - 20);
+        interval = 0;
     }
 
     // replaces random fuzz with load balancing over the fuzz interval
