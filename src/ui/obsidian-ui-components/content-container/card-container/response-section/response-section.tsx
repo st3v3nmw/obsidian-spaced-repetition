@@ -39,7 +39,7 @@ export default class ResponseSectionComponent {
         });
 
         this.againButton = new SRResponseButtonComponent(this.responseEl, {
-            classNames: ["sr-bg-yellow", "sr-again-button", "sr-is-hidden"],
+            classNames: ["sr-bg-red", "sr-again-button", "sr-is-hidden"],
             text: settings.flashcardAgainText,
             onClick: () => {
                 processReview(ReviewResponse.Again);
@@ -47,7 +47,7 @@ export default class ResponseSectionComponent {
         });
 
         this.hardButton = new SRResponseButtonComponent(this.responseEl, {
-            classNames: ["sr-bg-red", "sr-hard-button", "sr-is-hidden"],
+            classNames: ["sr-bg-yellow", "sr-hard-button", "sr-is-hidden"],
             text: settings.flashcardHardText,
             onClick: () => {
                 processReview(ReviewResponse.Hard);

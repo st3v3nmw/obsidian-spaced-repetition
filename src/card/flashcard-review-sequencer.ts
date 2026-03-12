@@ -250,7 +250,10 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             //  (2) or reset a due card
             // Nothing to do if a user resets a new card
             this.currentCard.scheduleInfo = this.determineCardSchedule(response, this.currentCard);
-            this.currentCard.scheduleInfo.interval = Math.max(1, this.currentCard.scheduleInfo.interval);
+            this.currentCard.scheduleInfo.interval = Math.max(
+                1,
+                this.currentCard.scheduleInfo.interval,
+            );
 
             // Update the source file with the updated schedule
             await DataStore.getInstance().questionWriteSchedule(this.currentQuestion);
