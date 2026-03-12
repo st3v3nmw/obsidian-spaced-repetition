@@ -1,4 +1,4 @@
-/* ../../AppData/Local/Temp/tmp-9916-2tG9xWbKknnq/obsidian-spaced-repetition/src/ui/styles.css */
+/* ../../AppData/Local/Temp/tmp-8472-mgIYSl8GQ9Xn/obsidian-spaced-repetition/src/ui/styles.css */
 .sr-bg-blue,
 .sr-bg-yellow,
 .sr-bg-green,
@@ -205,7 +205,7 @@
         margin-bottom: 0;
         &.is-disabled {
             cursor: not-allowed;
-            opacity: 0.5;
+            opacity: 0.6;
         }
     }
     & .sr-tree-stats-container {
@@ -653,6 +653,10 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     gap: var(--size-4-2);
     padding-bottom: var(--size-4-2);
     border-bottom: 1px solid var(--background-modifier-border);
+    cursor: pointer;
+}
+.sr-settings-page-title-setting {
+    cursor: pointer;
 }
 .sr-settings-page-title-wrapper {
     display: flex;

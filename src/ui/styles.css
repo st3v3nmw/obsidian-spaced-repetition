@@ -809,6 +809,11 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     gap: var(--size-4-2);
     padding-bottom: var(--size-4-2);
     border-bottom: 1px solid var(--background-modifier-border);
+    cursor: pointer;
+}
+
+.sr-settings-page-title-setting {
+    cursor: pointer;
 }
 
 .sr-settings-page-title-wrapper {
