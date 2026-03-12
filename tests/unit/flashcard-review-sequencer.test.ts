@@ -460,6 +460,44 @@ describe("processReview", () => {
             });
         });
 
+        describe("ReviewResponse.Again", () => {
+            test("Simple test - 3 cards all due in same deck", async () => {
+                // the unit testing fixed date of 2023-09-06
+                const text: string = `
+                    #flashcards Q1::A1 <!--SR:!2023-09-06,4,270-->
+                    #flashcards Q2::A2 <!--SR:!2023-09-02,5,270-->
+                    #flashcards Q3::A3 <!--SR:!2023-09-02,6,270-->`;
+
+                const c: TestContext = TestContext.Create(
+                    orderDueFirstSequential,
+                    FlashcardReviewMode.Review,
+                    DEFAULT_SETTINGS,
+                    text,
+                );
+                await c.setSequencerDeckTreeFromOriginalText();
+
+                // State before calling processReview
+                const card = c.reviewSequencer.currentCard;
+                const againCardDueDate: string = card.scheduleInfo.dueDate
+                    .clone()
+                    .format("YYYY-MM-DD");
+                expect(card.front).toEqual("Q1");
+                expect(card.scheduleInfo).toMatchObject({
+                    latestEase: 270,
+                    interval: 4,
+                });
+
+                await c.reviewSequencer.processReview(ReviewResponse.Again);
+                expect(card.front).toEqual("Q1");
+                expect(card.scheduleInfo).toMatchObject({
+                    latestEase: 250,
+                    interval: 1,
+                });
+
+                expect(card.scheduleInfo.dueDate.format("YYYY-MM-DD")).toEqual(againCardDueDate);
+            });
+        });
+
         describe("ReviewResponse.Easy", () => {
             test("Card schedule is updated, next card becomes current", async () => {
                 const expected: Info1 = {
