@@ -11,6 +11,7 @@ import { SRSettings } from "src/settings";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container";
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
+import { globalDateProvider } from "src/utils/dates";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 export enum FlashcardMode {
@@ -95,8 +96,39 @@ export class SRModalView extends Modal {
         const subdecksWithCardsInQueue: Deck[] = this.reviewSequencer.getSubDecksWithCardsInQueue(
             this.reviewSequencer.originalDeckTree,
         );
-        if (subdecksWithCardsInQueue.length === 1) {
-            this._showFlashcard(this.reviewSequencer.originalDeckTree.subdecks[0]);
+
+        let openImmediately: boolean = false;
+        let deckWithCards = null;
+
+        for (const subdeck of subdecksWithCardsInQueue) {
+            const hasNewCards: boolean = subdeck.newFlashcards.length > 0;
+            const hasDueCards: boolean = subdeck.dueFlashcards.length > 0;
+            const hasDueCardsToday: boolean =
+                hasDueCards &&
+                subdeck.dueFlashcards.some((card) => {
+                    const dueDate: number = card.scheduleInfo.dueDateAsUnix;
+                    const today: number = globalDateProvider.today.valueOf();
+                    return dueDate < today;
+                });
+
+            const hasCardsToday: boolean = hasNewCards || hasDueCardsToday;
+
+            if (
+                openImmediately &&
+                (hasCardsToday || this.reviewMode === FlashcardReviewMode.Cram)
+            ) {
+                openImmediately = false;
+                break;
+            }
+
+            if (hasCardsToday || this.reviewMode === FlashcardReviewMode.Cram) {
+                openImmediately = true;
+                deckWithCards = subdeck;
+            }
+        }
+
+        if (openImmediately) {
+            this._showFlashcard(deckWithCards);
         } else {
             this._showDecksList();
         }
