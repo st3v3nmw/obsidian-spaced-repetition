@@ -1,6 +1,10 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
-import { deleteAllSchedulingData } from "src/delete-scheduling-data";
+import {
+    deleteAllSchedulingData,
+    deleteAllSchedulingDataInCards,
+    deleteAllSchedulingDataInNotes,
+} from "src/delete-scheduling-data";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
@@ -313,11 +317,11 @@ export class SchedulingPage extends SettingsPage {
                     );
             });
         new SettingGroup(this.containerEl)
-            .setHeading(t("DELETE_SCHEDULING_DATA"))
+            .setHeading(t("DELETE_SCHEDULING_DATA_ALL"))
             .addSetting((setting: Setting) => {
                 setting
-                    .setName(t("DELETE_SCHEDULING_DATA"))
-                    .setDesc(t("DELETE_SCHEDULING_DATA_IN_NOTES_AND_FLASHCARDS"))
+                    .setName(t("DELETE_SCHEDULING_DATA_ALL"))
+                    .setDesc(t("DELETE_SCHEDULING_DATA_ALL_DESC"))
                     .addButton((button) => {
                         button
                             .setButtonText(t("DELETE"))
@@ -325,10 +329,48 @@ export class SchedulingPage extends SettingsPage {
                             .onClick(async () => {
                                 new ConfirmationModal(
                                     this.plugin.app,
-                                    t("DELETE_SCHEDULING_DATA"),
-                                    t("CONFIRM_SCHEDULING_DATA_DELETION"),
-                                    t("SCHEDULING_DATA_DELETION_IN_PROGRESS"),
+                                    t("DELETE_SCHEDULING_DATA_ALL"),
+                                    t("CONFIRM_SCHEDULING_DATA_ALL_DELETION"),
+                                    t("SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS"),
                                     deleteAllSchedulingData,
+                                ).open();
+                            });
+                    });
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("DELETE_SCHEDULING_DATA_IN_NOTES"))
+                    .setDesc(t("DELETE_SCHEDULING_DATA_IN_NOTES_DESC"))
+                    .addButton((button) => {
+                        button
+                            .setButtonText(t("DELETE"))
+                            .setClass("mod-warning")
+                            .onClick(async () => {
+                                new ConfirmationModal(
+                                    this.plugin.app,
+                                    t("DELETE_SCHEDULING_DATA_IN_NOTES"),
+                                    t("CONFIRM_SCHEDULING_DATA_IN_NOTES_DELETION"),
+                                    t("SCHEDULING_DATA_IN_NOTES_DELETION_IN_PROGRESS"),
+                                    deleteAllSchedulingDataInNotes,
+                                ).open();
+                            });
+                    });
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("DELETE_SCHEDULING_DATA_IN_CARDS"))
+                    .setDesc(t("DELETE_SCHEDULING_DATA_IN_CARDS_DESC"))
+                    .addButton((button) => {
+                        button
+                            .setButtonText(t("DELETE"))
+                            .setClass("mod-warning")
+                            .onClick(async () => {
+                                new ConfirmationModal(
+                                    this.plugin.app,
+                                    t("DELETE_SCHEDULING_DATA_IN_CARDS"),
+                                    t("CONFIRM_SCHEDULING_DATA_IN_CARDS_DELETION"),
+                                    t("SCHEDULING_DATA_IN_CARDS_DELETION_IN_PROGRESS"),
+                                    deleteAllSchedulingDataInCards,
                                 ).open();
                             });
                     });

@@ -1,20 +1,25 @@
-/* ../../AppData/Local/Temp/tmp-24860-Z01bwckGo06t/obsidian-spaced-repetition/src/ui/styles.css */
+/* ../../AppData/Local/Temp/tmp-12296-ahEl5qkrVQe7/obsidian-spaced-repetition/src/ui/styles.css */
 .sr-bg-blue,
+.sr-bg-yellow,
 .sr-bg-green,
 .sr-bg-red {
     color: #ffffff !important;
 }
 
 .sr-bg-green {
-    background-color: #4caf50 !important;
+    background-color: hsl(122, 39%, 49%) !important;
 }
 
 .sr-bg-blue {
-    background-color: #2094f3 !important;
+    background-color: hsl(207, 90%, 54%) !important;
 }
 
 .sr-bg-red {
-    background-color: #ff7043 !important;
+    background-color: hsl(14, 100%, 63%) !important;
+}
+
+.sr-bg-yellow {
+    background-color: hsl(38, 88%, 58%) !important;
 }
 
 .sr-deck-container .sr-tree-item-row:hover .sr-bg-green,
@@ -30,6 +35,11 @@
 .sr-deck-container .sr-tree-item-row:hover .sr-bg-red,
 .sr-response-button.sr-bg-red:hover {
     background-color: hsl(14, 100%, 58%) !important;
+}
+
+.sr-deck-container .sr-tree-item-row:hover .sr-bg-yellow,
+.sr-response-button.sr-bg-yellow:hover {
+    background-color: hsl(38, 88%, 53%) !important;
 }
 
 .sr-is-hidden {
@@ -236,6 +246,11 @@
         padding-top: 2px;
         padding-bottom: 2px;
         margin-bottom: 0;
+
+        &.is-disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
     }
 
     & .sr-tree-stats-container {
@@ -409,10 +424,6 @@
     }
 }
 
-.is-mobile .sr-card-container .cloze-input {
-    width: unset;
-}
-
 .is-phone .sr-card-container .sr-controls {
     gap: var(--size-4-3);
 }
@@ -527,6 +538,7 @@ body:not(.is-phone) .sr-response {
 }
 
 body:not(.is-mobile) .sr-response-button.sr-show-answer-button,
+body:not(.is-mobile) .sr-response-button.sr-again-button,
 body:not(.is-mobile) .sr-response-button.sr-hard-button,
 body:not(.is-mobile) .sr-response-button.sr-good-button,
 body:not(.is-mobile) .sr-response-button.sr-easy-button {
@@ -553,6 +565,10 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button {
 
 body:not(.is-mobile) .sr-response-button.sr-show-answer-button::after {
     content: "Space";
+}
+
+body:not(.is-mobile) .sr-response-button.sr-again-button::after {
+    content: "0";
 }
 
 body:not(.is-mobile) .sr-response-button.sr-hard-button::after {
@@ -764,6 +780,11 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     gap: var(--size-4-2);
     padding-bottom: var(--size-4-2);
     border-bottom: 1px solid var(--background-modifier-border);
+    cursor: pointer;
+}
+
+.sr-settings-page-title-setting {
+    cursor: pointer;
 }
 
 .sr-settings-page-title-wrapper {

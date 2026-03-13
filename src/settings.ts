@@ -43,6 +43,7 @@ export interface SRSettings {
     flashcardWidthPercentage: number;
     flashcardHeightPercentageMobile: number;
     flashcardWidthPercentageMobile: number;
+    flashcardAgainText: string;
     flashcardEasyText: string;
     flashcardGoodText: string;
     flashcardHardText: string;
@@ -109,6 +110,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardWidthPercentage: 60,
     flashcardHeightPercentageMobile: 100,
     flashcardWidthPercentageMobile: 100,
+    flashcardAgainText: t("AGAIN"),
     flashcardEasyText: t("EASY"),
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),
