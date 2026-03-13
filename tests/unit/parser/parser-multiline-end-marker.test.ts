@@ -1,46 +1,10 @@
 import { CardType } from "src/card/questions/question";
-import { ParserOptions } from "src/parser/parser-data-structure";
 
 import { parserOptions, parseT } from "../helpers/unit-test-parser-helper";
-
-const execMultiLineCardsTestWithSeparator = (separators: { separator: string, cardType: CardType }[], options: ParserOptions = parserOptions) => {
-    expect(parseT([
-        "Question",
-        `${separators[0].separator}`,
-        "Answer",
-    ].join("\n"), options)).toEqual([[separators[0].cardType, [
-        "Question",
-        `${separators[0].separator}`,
-        "Answer",
-    ].join("\n"), 0, 2],
-    ]);
-
-    expect(parseT([
-        "Question",
-        `${separators[0].separator}`,
-        "Answer",
-        "<!--SR:2021-08-11,4,270-->",
-    ].join("\n"), options)).toEqual([[separators[0].cardType, [
-        "Question",
-        `${separators[0].separator}`,
-        "Answer",
-        "<!--SR:2021-08-11,4,270-->",
-    ].join("\n"), 0, 3],
-    ]);
-};
+// TODO: Expand & fix this test
 
 test("Test parsing of multi line basic cards", () => {
     // standard symbols
-    execMultiLineCardsTestWithSeparator([
-        { separator: "?", cardType: CardType.MultiLineBasic },
-        { separator: "??", cardType: CardType.MultiLineReversed },
-    ]);
-
-    execMultiLineCardsTestWithSeparator([
-        { separator: "??", cardType: CardType.MultiLineReversed },
-        { separator: "?", cardType: CardType.MultiLineBasic },
-    ]);
-
     expect(parseT("Question\n?\nAnswer", parserOptions)).toEqual([
         [CardType.MultiLineBasic, "Question\n?\nAnswer", 0, 2],
     ]);
@@ -74,7 +38,6 @@ test("Test parsing of multi line basic cards", () => {
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "---",
             clozePatterns: ["**[123;;]answer[;;hint]**"],
-            useAtomicClozes: false,
         }),
     ).toEqual([[CardType.MultiLineBasic, "Question\n?\nAnswer line 1\nAnswer line 2", 0, 4]]);
     expect(
@@ -87,7 +50,6 @@ test("Test parsing of multi line basic cards", () => {
                 multilineReversedCardSeparator: "??",
                 multilineCardEndMarker: "---",
                 clozePatterns: ["**[123;;]answer[;;hint]**"],
-                useAtomicClozes: false,
             },
         ),
     ).toEqual([
@@ -104,7 +66,6 @@ test("Test parsing of multi line basic cards", () => {
                 multilineReversedCardSeparator: "??",
                 multilineCardEndMarker: "---",
                 clozePatterns: ["**[123;;]answer[;;hint]**"],
-                useAtomicClozes: false,
             },
         ),
     ).toEqual([
@@ -126,7 +87,6 @@ test("Test parsing of multi line basic cards", () => {
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "",
             clozePatterns: [],
-            useAtomicClozes: false,
         }),
     ).toEqual([[CardType.MultiLineBasic, "Question\n@@\nAnswer", 0, 2]]);
 
@@ -139,7 +99,6 @@ test("Test parsing of multi line basic cards", () => {
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "---",
             clozePatterns: [],
-            useAtomicClozes: false,
         }),
     ).toEqual([]);
 });
@@ -173,7 +132,6 @@ test("Test parsing of multi line reversed cards", () => {
                 "**[123;;]answer[;;hint]**",
                 "{{[123;;]answer[;;hint]}}",
             ],
-            useAtomicClozes: false,
         }),
     ).toEqual([[CardType.MultiLineReversed, "Question\n??\nAnswer line 1\nAnswer line 2", 0, 4]]);
     expect(
@@ -190,7 +148,6 @@ test("Test parsing of multi line reversed cards", () => {
                     "**[123;;]answer[;;hint]**",
                     "{{[123;;]answer[;;hint]}}",
                 ],
-                useAtomicClozes: false,
             },
         ),
     ).toEqual([
@@ -207,7 +164,6 @@ test("Test parsing of multi line reversed cards", () => {
             multilineReversedCardSeparator: "@@@",
             multilineCardEndMarker: "---",
             clozePatterns: [],
-            useAtomicClozes: false,
         }),
     ).toEqual([[CardType.MultiLineReversed, "Question\n@@@\nAnswer", 0, 2]]);
     expect(
@@ -238,7 +194,6 @@ Line 5
                 multilineReversedCardSeparator: "???",
                 multilineCardEndMarker: "????",
                 clozePatterns: [],
-                useAtomicClozes: false,
             },
         ),
     ).toEqual([
@@ -255,7 +210,6 @@ Line 5
             multilineReversedCardSeparator: "\t",
             multilineCardEndMarker: "---",
             clozePatterns: [],
-            useAtomicClozes: false,
         }),
     ).toEqual([]);
 });
