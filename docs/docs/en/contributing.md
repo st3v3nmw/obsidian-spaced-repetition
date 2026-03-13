@@ -44,13 +44,15 @@ Sample `en.ts` file:
 ```typescript
 // English
 
-export default {
+const en: IBaseLocale = {
     EASY: "Easy",
     SHOW_ANSWER: "Show Answer",
     DAYS_STR_IVL: "${interval} days",
     CHECK_ALGORITHM_WIKI:
         'For more information, check the <a href="${algoUrl}">algorithm implementation</a>.',
 };
+
+export default en;
 ```
 
 Equivalent `sw.ts` file:
@@ -58,13 +60,17 @@ Equivalent `sw.ts` file:
 ```typescript
 // Swahili
 
-export default {
+const sw: IBaseLocale = {
+    ...en, // inherit translations from English, if any are missing
+    // Override english translations here
     EASY: "Rahisi",
     SHOW_ANSWER: "Onyesha Jibu",
     DAYS_STR_IVL: "Siku ${interval}",
     CHECK_ALGORITHM_WIKI:
         'Kwa habari zaidi, angalia <a href="${algoUrl}">utekelezaji wa algorithm</a>.',
 };
+
+export default sw;
 ```
 
 <sub><sup>A part of that last one is uhh, Google translated, I have a working understanding of Swahili but not enough to write computerese lol.</sup></sub>

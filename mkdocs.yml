@@ -36,7 +36,14 @@ theme:
         - toc.follow
 
 nav:
-    - Index: index.md
+    - Home:
+          - Introduction: index.md
+          - Guides:
+                - Spaced Repetition Guides: resources.md
+          - Contributing:
+                - Contributing: contributing.md
+                - Changelog: changelog.md
+                - License: license.md
     - Flashcards:
           - Flashcards Overview: flashcards/flashcards-overview.md
           - Question & Answer Cards: flashcards/q-and-a-cards.md
@@ -52,12 +59,6 @@ nav:
     - Algorithms & Data Storage:
           - Repetition Algorithms: algorithms.md
           - Data Storage: data-storage.md
-    - Guides:
-          - Spaced Repetition Guides: resources.md
-    - Contributing:
-          - Contributing: contributing.md
-          - Changelog: changelog.md
-          - License: license.md
 
 plugins:
     - search
