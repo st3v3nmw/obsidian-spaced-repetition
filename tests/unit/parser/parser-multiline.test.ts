@@ -4,6 +4,7 @@ import { ParserOptions } from "src/parser/parser-data-structure";
 import { parserOptions, parseT } from "../helpers/unit-test-parser-helper";
 
 const execMultiLineCardsTestWithSeparator = (separators: { separator: string, cardType: CardType }[], options: ParserOptions = parserOptions) => {
+    // Simplest multiline cards
     expect(parseT([
         "Question",
         `${separators[0].separator}`,
@@ -27,6 +28,8 @@ const execMultiLineCardsTestWithSeparator = (separators: { separator: string, ca
         "<!--SR:2021-08-11,4,270-->",
     ].join("\n"), 0, 3],
     ]);
+
+    // Simple multiline cards with schedule
 };
 
 test("Test parsing of multi line basic cards", () => {

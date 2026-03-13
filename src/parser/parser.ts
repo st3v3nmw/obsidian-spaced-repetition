@@ -150,6 +150,9 @@ export class QuestionParser {
                 */
                 if (
                     parserData.options.multilineCardEndMarker !== null &&
+                    parserData.options.multilineCardEndMarker !== undefined &&
+                    parserData.options.multilineCardEndMarker !== "" &&
+                    parserData.options.multilineCardEndMarker.trim() !== "" &&
                     (parserData.searchForMultilineCards || parserData.searchForMultilineCloze)
                 ) {
                     // Only handle this if multiline cards are enabled and we are already searching for multiline cards or clozes

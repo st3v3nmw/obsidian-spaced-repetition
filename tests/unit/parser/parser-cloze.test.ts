@@ -153,7 +153,7 @@ const execSingleLineClozeCardsTestWithMarker = (leftMarker: string, rightMarker:
         "some text after",
         "",
     ].join("\n"), options)).toEqual([[CardType.Cloze, [
-        `${leftMarker}deletion${rightMarker} test`,
+        `${leftMarker}deletion${rightMarker} test  & ${leftMarker}deletion2${rightMarker} test2`,
         "<!--SR:2022-08-11,4,270-->"
     ].join("\n"), 14, 15],
     ]);
@@ -168,7 +168,7 @@ const execSingleLineClozeCardsTestWithMarker = (leftMarker: string, rightMarker:
         "",
         "some text before",
         "",
-        `${leftMarker}deletion${rightMarker} test`,
+        `${leftMarker}deletion${rightMarker}`,
         "<!--SR:2022-08-11,4,270-->",
         "",
         "some text after",
@@ -496,7 +496,7 @@ const execMultiLineClozeCardsTest = (leftMarker: string, rightMarker: string, op
     ].join("\n"), options)).toEqual([[CardType.Cloze, [
         "some text before",
         "some text before",
-        `${leftMarker}deletion${rightMarker} test & ${leftMarker}deletion2${rightMarker} test2`,
+        `${leftMarker}deletion${rightMarker} test`,
         "some text after",
         "some text after",
         "<!--SR:2022-08-11,4,270-->"
@@ -518,12 +518,10 @@ const execMultiLineClozeCardsTest = (leftMarker: string, rightMarker: string, op
         "some text after",
     ].join("\n"), 17, 22],
     [CardType.Cloze, [
-        "some text before",
-        "some text before",
-        `${leftMarker}deletion${rightMarker} test & ${leftMarker}deletion2${rightMarker} test2`,
+        `${leftMarker}deletion${rightMarker} test`,
         "some text after",
         "some text after",
-        "<!--SR:2022-08-11,4,270-->"
+        "some text after",
     ].join("\n"), 28, 31],
     ]);
 
@@ -566,7 +564,7 @@ const execMultiLineClozeCardsTest = (leftMarker: string, rightMarker: string, op
     ].join("\n"), options)).toEqual([[CardType.Cloze, [
         "some text before",
         "some text before",
-        `${leftMarker}deletion${rightMarker} test & ${leftMarker}deletion2${rightMarker} test2`,
+        `${leftMarker}deletion${rightMarker} test`,
         "some text after",
         "some text after",
         "<!--SR:2022-08-11,4,270-->"
@@ -599,7 +597,7 @@ const execMultiLineClozeCardsTest = (leftMarker: string, rightMarker: string, op
         "some text after",
         "some text after",
         "<!--SR:2022-08-11,4,270-->"
-    ].join("\n"), 29, 32],
+    ].join("\n"), 29, 34],
     ]);
 
     // Multiple multiline clozes with schedule and 2 clozes on the same line mixed with text and mixed with rouge sr comments
@@ -648,7 +646,7 @@ const execMultiLineClozeCardsTest = (leftMarker: string, rightMarker: string, op
     ].join("\n"), options)).toEqual([[CardType.Cloze, [
         "some text before",
         "some text before",
-        `${leftMarker}deletion${rightMarker} test & ${leftMarker}deletion2${rightMarker} test2`,
+        `${leftMarker}deletion${rightMarker} test`,
         "some text after",
         "some text after",
         "<!--SR:2022-08-11,4,270-->"
@@ -815,7 +813,7 @@ const execMultiLineClozeCardsWithAtomicClozesTest = (leftMarker: string, rightMa
         "",
     ].join("\n"), options)).toEqual([[CardType.Cloze, [
         `${leftMarker}deletion${rightMarker} test`,
-    ].join("\n"), 1, 1],
+    ].join("\n"), 2, 2],
     ]);
 
     expect(parseT([
@@ -976,13 +974,8 @@ const execMultiLineClozeCardsWithAtomicClozesTest = (leftMarker: string, rightMa
         "some text after",
         "some text after",
     ].join("\n"), options)).toEqual([[CardType.Cloze, [
-        "some text before",
-        "some text before",
-        `${leftMarker}deletion${rightMarker} test & ${leftMarker}deletion2${rightMarker} test2`,
-        "some text after",
-        "some text after",
-        "<!--SR:2022-08-11,4,270-->"
-    ].join("\n"), 1, 6],
+        `${leftMarker}deletion${rightMarker} test`,
+    ].join("\n"), 3, 3],
     [CardType.Cloze, [
         `${leftMarker}deletion${rightMarker} test & ${leftMarker}deletion2${rightMarker} test2`,
     ].join("\n"), 12, 12],
@@ -990,8 +983,8 @@ const execMultiLineClozeCardsWithAtomicClozesTest = (leftMarker: string, rightMa
         `${leftMarker}deletion${rightMarker} test & ${leftMarker}deletion2${rightMarker} test2`,
     ].join("\n"), 19, 19],
     [CardType.Cloze, [
-        `${leftMarker}deletion${rightMarker} test & ${leftMarker}deletion2${rightMarker} test2`,
-    ].join("\n"), 30, 30],
+        `${leftMarker}deletion${rightMarker} test`,
+    ].join("\n"), 28, 28],
     ]);
 
     expect(parseT([
@@ -1031,7 +1024,7 @@ const execMultiLineClozeCardsWithAtomicClozesTest = (leftMarker: string, rightMa
         "some text after",
         "some text after",
     ].join("\n"), options)).toEqual([[CardType.Cloze, [
-        `${leftMarker}deletion${rightMarker} test & ${leftMarker}deletion2${rightMarker} test2`,
+        `${leftMarker}deletion${rightMarker} test`,
         "<!--SR:2022-08-11,4,270-->",
     ].join("\n"), 3, 4],
     [CardType.Cloze, [
@@ -1093,7 +1086,7 @@ const execMultiLineClozeCardsWithAtomicClozesTest = (leftMarker: string, rightMa
         "some text after",
         "some text after",
     ].join("\n"), options)).toEqual([[CardType.Cloze, [
-        `${leftMarker}deletion${rightMarker} test & ${leftMarker}deletion2${rightMarker} test2`,
+        `${leftMarker}deletion${rightMarker} test`,
     ].join("\n"), 3, 3],
     [CardType.Cloze, [
         `${leftMarker}deletion${rightMarker} test & ${leftMarker}deletion2${rightMarker} test2`,
@@ -1169,13 +1162,13 @@ const execMultiLineClozeCardsWithAtomicClozesTest = (leftMarker: string, rightMa
         "<!--SR:2021-08-11,4,270-->",
     ].join("\n"),
         {
+            ...options,
             singleLineCardSeparator: "::",
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "",
             clozePatterns: [`${leftMarker}answer${rightMarker}[^\\[hint\\]][\\[^123\\]]`],
-            useAtomicClozes: false,
 
         }),
     ).toEqual([[CardType.Cloze, [
@@ -1188,13 +1181,13 @@ const execMultiLineClozeCardsWithAtomicClozesTest = (leftMarker: string, rightMa
         "Some text after",
     ].join("\n"),
         {
+            ...options,
             singleLineCardSeparator: "::",
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "",
             clozePatterns: [`${leftMarker}answer${rightMarker}[^\\[hint\\]][\\[^123\\]]`],
-            useAtomicClozes: false,
         },
     )).toEqual([[CardType.Cloze, [
         `Brazilians speak ${leftMarker}Portuguese${rightMarker} & Brazilians speak ${leftMarker}Portuguese${rightMarker}^[language][^1]`,
@@ -1207,13 +1200,13 @@ const execMultiLineClozeCardsWithAtomicClozesTest = (leftMarker: string, rightMa
         "<!--SR:2021-08-11,4,270-->",
     ].join("\n"),
         {
+            ...options,
             singleLineCardSeparator: "::",
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
             multilineCardEndMarker: "",
             clozePatterns: [`${leftMarker}answer${rightMarker}[^\\[hint\\]][\\[^123\\]]`],
-            useAtomicClozes: false,
         },
     ),
     ).toEqual([
