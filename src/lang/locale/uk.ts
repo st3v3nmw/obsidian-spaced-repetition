@@ -3,8 +3,11 @@
 // https://github.com/kratiuk
 
 // Слава захисникам та захисницям України! 🇺🇦
+import { IBaseLocale } from "src/lang/base-locale";
+import en from "src/lang/locale/en";
 
-export default {
+const uk: IBaseLocale = {
+    ...en,
     // flashcard-modal.tsx
     DECKS: "Колоди карток",
     DUE_CARDS: "Картки до повторення",
@@ -205,14 +208,13 @@ export default {
     EXPERIMENTAL: "Експериментальне",
     HELP: "Довідка",
     STORE_IN_NOTES: "У нотатках",
-    DELETE_SCHEDULING_DATA: "Delete Scheduling Data",
-    DELETE_SCHEDULING_DATA_IN_NOTES_AND_FLASHCARDS:
-        "Delete scheduling data from all notes and flashcards.",
+    DELETE_SCHEDULING_DATA_ALL: "Delete Scheduling Data",
+    DELETE_SCHEDULING_DATA_ALL_DESC: "Delete scheduling data from all notes and flashcards.",
     DELETE: "Delete",
-    CONFIRM_SCHEDULING_DATA_DELETION:
+    CONFIRM_SCHEDULING_DATA_ALL_DELETION:
         "Are you sure you want to delete all scheduling data from your notes and flashcards? This action cannot be undone.",
     CONFIRM: "Confirm",
-    SCHEDULING_DATA_DELETION_IN_PROGRESS: "Scheduling data deletion in progress...",
+    SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS: "Scheduling data deletion in progress...",
     SCHEDULING_DATA_HAS_BEEN_DELETED:
         "Scheduling data has been deleted from all notes and flashcards.",
 
@@ -278,3 +280,5 @@ export default {
     START_OF_DAY_DESC: "The time at which the day begins (Format: HH:MM:SS, Default: 00:00:00)",
     INVALID_START_OF_DAY_WARNING: "Invalid format for start of day",
 };
+
+export default uk;

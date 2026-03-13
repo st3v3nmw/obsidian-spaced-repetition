@@ -1,3 +1,9 @@
 // Norsk
+import { IBaseLocale } from "src/lang/base-locale";
+import en from "src/lang/locale/en";
 
-export default {};
+const no: IBaseLocale = {
+    ...en,
+};
+
+export default no;
