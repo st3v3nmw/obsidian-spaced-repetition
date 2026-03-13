@@ -1,0 +1,22 @@
+[data-md-color-scheme="slate"][data-md-color-primary="blue"] {
+    --md-primary-fg-color--light: #42a5f5;
+    --md-primary-fg-color--dark: #1975d2;
+    --md-primary-fg-color: var(--md-primary-fg-color--dark);
+    --md-primary-bg-color: #fff;
+    --md-primary-bg-color--light: #ffffffb3;
+}
+
+.youtube {
+    color: #ee0f0f;
+}
+
+hr {
+    border: none !important;
+    height: 4px;
+    background-color: #333;
+}
+
+.thin {
+    border: none !important;
+    height: 1px;
+}
