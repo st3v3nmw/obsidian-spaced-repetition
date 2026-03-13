@@ -31,7 +31,7 @@ module.exports = {
 
         // don't include in results
         "src/declarations.d.ts",
-        "src/lang/locale/",
+        "src/lang/",
     ],
     coverageDirectory: "coverage",
     collectCoverage: true,

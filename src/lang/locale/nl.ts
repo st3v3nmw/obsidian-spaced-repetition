@@ -1,6 +1,9 @@
 // Nederlands
+import { IBaseLocale } from "src/lang/base-locale";
+import en from "src/lang/locale/en";
 
-export default {
+const nl: IBaseLocale = {
+    ...en,
     // flashcard-modal.tsx
     DECKS: "Stapel",
     DUE_CARDS: "Te beoordelen kaarten",
@@ -212,14 +215,13 @@ export default {
     EXPERIMENTAL: "Experimenteel",
     HELP: "Help",
     STORE_IN_NOTES: "In de notities",
-    DELETE_SCHEDULING_DATA: "Delete Scheduling Data",
-    DELETE_SCHEDULING_DATA_IN_NOTES_AND_FLASHCARDS:
-        "Delete scheduling data from all notes and flashcards.",
+    DELETE_SCHEDULING_DATA_ALL: "Delete Scheduling Data",
+    DELETE_SCHEDULING_DATA_ALL_DESC: "Delete scheduling data from all notes and flashcards.",
     DELETE: "Delete",
-    CONFIRM_SCHEDULING_DATA_DELETION:
+    CONFIRM_SCHEDULING_DATA_ALL_DELETION:
         "Are you sure you want to delete all scheduling data from your notes and flashcards? This action cannot be undone.",
     CONFIRM: "Confirm",
-    SCHEDULING_DATA_DELETION_IN_PROGRESS: "Scheduling data deletion in progress...",
+    SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS: "Scheduling data deletion in progress...",
     SCHEDULING_DATA_HAS_BEEN_DELETED:
         "Scheduling data has been deleted from all notes and flashcards.",
 
@@ -293,3 +295,5 @@ export default {
     CHECK_DEV_NEWS:
         'Check out the <a href="${devNewsUrl}">dev news</a> for the latest development news.',
 };
+
+export default nl;
