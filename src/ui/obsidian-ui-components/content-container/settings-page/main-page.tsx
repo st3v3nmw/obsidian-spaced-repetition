@@ -35,6 +35,7 @@ export class MainPage extends SettingsPage {
         );
         SettingsPageTypesArray.forEach((pageType) => {
             if (pageType === "main-page") return;
+            if (pageType === "statistics-page") return;
             mainSettingsGroup.addSetting((setting: Setting) => {
                 setting.setName(getPageName(pageType)).addButton((button: ButtonComponent) => {
                     button.setIcon("chevron-right").onClick(() => {
@@ -49,6 +50,7 @@ export class MainPage extends SettingsPage {
 
                 setting.nameEl.insertBefore(iconEl, setting.nameEl.firstChild);
                 setting.nameEl.addClass("sr-settings-page-title");
+                setting.settingEl.addClass("sr-settings-page-title-setting");
                 setting.settingEl.addEventListener("click", () => {
                     this.openPage(pageType);
                 });
@@ -56,7 +58,28 @@ export class MainPage extends SettingsPage {
         });
 
         new SettingGroup(this.containerEl)
-            .setHeading(t("HELP"))
+            .setHeading(t("INFO"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(getPageName("statistics-page"))
+                    .addButton((button: ButtonComponent) => {
+                        button.setIcon("chevron-right").onClick(() => {
+                            this.openPage("statistics-page");
+                        });
+
+                        button.buttonEl.addClass("clickable-icon");
+                    });
+                const iconEl = document.createElement("div");
+                iconEl.addClass("sr-settings-page-title-icon");
+                setIcon(iconEl, getPageIcon("statistics-page"));
+
+                setting.nameEl.insertBefore(iconEl, setting.nameEl.firstChild);
+                setting.nameEl.addClass("sr-settings-page-title");
+                setting.settingEl.addClass("sr-settings-page-title-setting");
+                setting.settingEl.addEventListener("click", () => {
+                    this.openPage("statistics-page");
+                });
+            })
             .addSetting((setting: Setting) => {
                 setting.infoEl.insertAdjacentHTML(
                     "beforeend",
@@ -65,6 +88,26 @@ export class MainPage extends SettingsPage {
                     }),
                 );
             })
+            .addSetting((setting: Setting) => {
+                setting.infoEl.insertAdjacentHTML(
+                    "beforeend",
+                    t("CHECK_ROADMAP", {
+                        roadMapUrl: "https://github.com/users/st3v3nmw/projects/6",
+                    }),
+                );
+            })
+            .addSetting((setting: Setting) => {
+                setting.infoEl.insertAdjacentHTML(
+                    "beforeend",
+                    t("CHECK_DEV_NEWS", {
+                        devNewsUrl:
+                            "https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/categories/development-news",
+                    }),
+                );
+            });
+
+        new SettingGroup(this.containerEl)
+            .setHeading(t("HELP") + " & " + t("GROUP_CONTRIBUTING"))
             .addSetting((setting: Setting) => {
                 setting.infoEl.insertAdjacentHTML(
                     "beforeend",
@@ -81,10 +124,7 @@ export class MainPage extends SettingsPage {
                         issuesUrl: "https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/",
                     }),
                 );
-            });
-
-        new SettingGroup(this.containerEl)
-            .setHeading(t("GROUP_CONTRIBUTING"))
+            })
             .addSetting((setting: Setting) => {
                 setting.infoEl.insertAdjacentHTML(
                     "beforeend",

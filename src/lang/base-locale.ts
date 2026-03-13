@@ -245,4 +245,12 @@ export interface IBaseLocale {
     CONFIRM_SCHEDULING_DATA_IN_CARDS_DELETION: string;
     SCHEDULING_DATA_IN_NOTES_DELETION_IN_PROGRESS: string;
     SCHEDULING_DATA_IN_CARDS_DELETION_IN_PROGRESS: string;
+
+    // Settings > main-page
+    INFO: string;
+    // Card responses
+    AGAIN: string;
+    // Settings > info
+    CHECK_ROADMAP: string;
+    CHECK_DEV_NEWS: string;
 }

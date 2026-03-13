@@ -13,7 +13,7 @@ export default class ResetButtonComponent extends SRButtonComponent {
     ) {
         super(container, {
             classNames: ["sr-reset-button", "mod-warning", ...(classNames ?? [])],
-            icon: "rotate-ccw",
+            icon: "history",
             tooltip: t("RESET_CARD_PROGRESS"),
             onClick: () => {
                 new ConfirmationModal(

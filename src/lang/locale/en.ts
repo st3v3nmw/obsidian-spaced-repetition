@@ -284,6 +284,14 @@ const en: IBaseLocale = {
         "Are you sure you want to delete all scheduling data from your cards? This action cannot be undone.",
     SCHEDULING_DATA_IN_NOTES_DELETION_IN_PROGRESS: "Scheduling data deletion in progress...",
     SCHEDULING_DATA_IN_CARDS_DELETION_IN_PROGRESS: "Scheduling data deletion in progress...",
+    // Settings > main-page
+    INFO: "Info",
+    // Card responses
+    AGAIN: "Again",
+    // Settings > info
+    CHECK_ROADMAP: 'Check out the <a href="${roadMapUrl}">roadmap</a> for upcoming features.',
+    CHECK_DEV_NEWS:
+        'Check out the <a href="${devNewsUrl}">dev news</a> for the latest development news.',
 };
 
 export default en;

@@ -153,8 +153,6 @@ class SingleDeckIterator {
 
     moveCurrentCardToEndOfList(): void {
         this.ensureCurrentCard();
-        const cardList: Card[] = this.deck.getCardListForCardType(this.cardListType);
-        if (cardList.length <= 1) return;
         const card = this.currentCard;
         this.deck.deleteCardAtIndex(this.cardIdx, this.cardListType);
         this.deck.appendCardToRootDeck(card);

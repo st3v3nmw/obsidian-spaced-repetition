@@ -3,6 +3,7 @@ import { App, Menu, Platform } from "obsidian";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { t } from "src/lang/helpers";
 import BackButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/controls/back-button";
+import EditButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/controls/edit-button";
 import MenuDotsButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/controls/menu-dots-button";
 import ResetButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/controls/reset-button";
 import SkipButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/controls/skip-button";
@@ -12,6 +13,7 @@ import EmulatedPlatform from "src/utils/platform-detector";
 export default class ControlsComponent {
     public controls: HTMLDivElement;
     public backButton: BackButtonComponent;
+    public editButton: EditButtonComponent;
     public modalCloseButton: ModalCloseButtonComponent;
     public resetButton: ResetButtonComponent;
     public skipButton: SkipButtonComponent;
@@ -40,6 +42,12 @@ export default class ControlsComponent {
 
         this.controls.createDiv().addClass("sr-flex-spacer");
 
+        this.editButton = new EditButtonComponent(
+            this.controls,
+            () => editClickHandler(),
+            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
+        );
+
         this.menuDotsButton = new MenuDotsButtonComponent(
             this.controls,
             (evt: MouseEvent) => {
@@ -50,13 +58,6 @@ export default class ControlsComponent {
                         .setIcon("arrow-up-right")
                         .onClick(() => {
                             jumpToCurrentCard();
-                        });
-                });
-                cardMenu.addItem((item) => {
-                    item.setTitle(t("EDIT_CARD"))
-                        .setIcon("pencil")
-                        .onClick(() => {
-                            editClickHandler();
                         });
                 });
                 cardMenu.addItem((item) => {

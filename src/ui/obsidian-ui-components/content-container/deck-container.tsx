@@ -182,9 +182,10 @@ export class DeckContainer {
     // -> Tree content
 
     private _createTree(deck: Deck, container: HTMLElement): void {
+        const deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
         const deckTree: HTMLElement = container.createDiv("tree-item sr-tree-item-container");
         const deckTreeSelf: HTMLElement = deckTree.createDiv(
-            "tree-item-self tag-pane-tag is-clickable sr-tree-item-row",
+            `tree-item-self tag-pane-tag ${deckStats.dueCount > 0 || deckStats.newCount > 0 ? "is-clickable" : "is-disabled"} sr-tree-item-row`,
         );
 
         const shouldBeInitiallyExpanded: boolean = this.settings.initiallyExpandAllSubdecksInTree;
@@ -205,7 +206,6 @@ export class DeckContainer {
         const deckTreeOuter: HTMLDivElement = deckTreeSelf.createDiv();
         deckTreeOuter.addClasses(["tree-item-flair-outer", "sr-tree-stats-container"]);
 
-        const deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
         this._createStats(deckStats, deckTreeOuter);
 
         const deckTreeChildren: HTMLElement = deckTree.createDiv("tree-item-children");
