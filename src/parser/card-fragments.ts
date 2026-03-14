@@ -1,4 +1,10 @@
-export type CardFragmentType = "ROUGE_SR_COMMENT" | "ROUGE_MULTILINE_SEPARATOR" | "MALFORMED_INLINE_CARD" | "MALFORMED_MULTILINE_CARD_WITH_END_MARKER" | "MALFORMED_MULTILINE_CARD" | "ROUGE_MULTILINE_END_MARKER";
+export type CardFragmentType =
+    | "ROUGE_SR_COMMENT"
+    | "ROUGE_MULTILINE_SEPARATOR"
+    | "MALFORMED_INLINE_CARD"
+    | "MALFORMED_MULTILINE_CARD_WITH_END_MARKER"
+    | "MALFORMED_MULTILINE_CARD"
+    | "ROUGE_MULTILINE_END_MARKER";
 
 /**
  * A collection of notes with card fragments
@@ -17,7 +23,8 @@ export class NotesWithCardFragments {
      * @param cardFragment
      */
     addCardFragment(notePath: string, noteText: string, cardFragment: CardFragment): void {
-        let noteWithCardFragments: NoteWithCardFragments = this.notesWithCardFragments.get(notePath);
+        let noteWithCardFragments: NoteWithCardFragments =
+            this.notesWithCardFragments.get(notePath);
 
         if (!noteWithCardFragments) {
             noteWithCardFragments = new NoteWithCardFragments(notePath, noteText, []);
@@ -29,7 +36,10 @@ export class NotesWithCardFragments {
     }
 
     resetNote(notePath: string, noteText: string) {
-        this.notesWithCardFragments.set(notePath, new NoteWithCardFragments(notePath, noteText, []));
+        this.notesWithCardFragments.set(
+            notePath,
+            new NoteWithCardFragments(notePath, noteText, []),
+        );
     }
 }
 

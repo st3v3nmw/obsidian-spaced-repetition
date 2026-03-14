@@ -5,7 +5,17 @@ import { CardFragment, NotesWithCardFragments } from "src/parser/card-fragments"
 import { ParsedQuestionInfo, ParserData, ParserOptions } from "src/parser/parser-data-structure";
 
 // All the states that the parser can be in, when parsing a note for cards
-export type ParserStates = "READY_TO_PARSE" | "PARSE_LINE" | "EMPTY_LINE" | "TEXT" | "NON_SR_HTML_COMMENT" | "SR_HTML_COMMENT" | "CLOZE" | "INLINE_CARD" | "MULTILINE_SEPARATOR" | "MULTILINE_END_MARKER";
+export type ParserStates =
+    | "READY_TO_PARSE"
+    | "PARSE_LINE"
+    | "EMPTY_LINE"
+    | "TEXT"
+    | "NON_SR_HTML_COMMENT"
+    | "SR_HTML_COMMENT"
+    | "CLOZE"
+    | "INLINE_CARD"
+    | "MULTILINE_SEPARATOR"
+    | "MULTILINE_END_MARKER";
 
 /**
  * The parser class
@@ -23,7 +33,7 @@ export class QuestionParser {
     static readonly nonSrCommentStart = "<!--"; // The start of a non scheduling info comment
     static readonly commentEnd = "-->"; // The end of a comment
 
-    static debugParser = true; // Enable to see the parser state changes
+    static debugParser = false; // Enable to see the parser state changes
     static notesWithCardFragments: NotesWithCardFragments = new NotesWithCardFragments(); // The list of notes with card fragments from the last parsing of each note
 
     /**
@@ -52,17 +62,18 @@ export class QuestionParser {
 
             // Set the current parser state to PARSE_LINE
             // which is the initial state, where it determines the next state based on the current line
-            parserData.currentParserState = "PARSE_LINE";
+            parserData.setParserState("PARSE_LINE");
 
             if (QuestionParser.debugParser) {
-                console.log("[DEBUG]: Current line: " + parserData.lineData.currentLine, parserData.lineData.currentLineNum);
+                console.log(
+                    "[DEBUG]: Current line: " + parserData.lineData.currentLine,
+                    parserData.lineData.currentLineNum,
+                );
                 console.log("[DEBUG]: Current parser state: " + parserData.currentParserState);
             }
 
             // Parse the current line based on the current parser data
-            parserData = QuestionParser.parseLine(
-                parserData,
-            );
+            parserData = QuestionParser.parseLine(parserData);
         }
 
         if (QuestionParser.debugParser) {
@@ -73,72 +84,96 @@ export class QuestionParser {
         return parserData.cardData.cards;
     }
 
-    private static parseLine(
-        parserData: ParserData,
-    ): ParserData {
+    private static parseLine(parserData: ParserData): ParserData {
         // Trim the current line for easier parsing and use in function calls
         const currentLineTrimmed: string = parserData.lineData.currentLineTrimmed;
 
         if (QuestionParser.debugParser) {
             console.log("[DEBUG]: Current state: " + parserData.currentParserState);
-            console.log("[DEBUG]: Current line: " + parserData.lineData.currentLine, parserData.lineData.currentLineNum);
+            console.log(
+                "[DEBUG]: Current line: " + parserData.lineData.currentLine,
+                parserData.lineData.currentLineNum,
+            );
         }
 
         // Handle any relevant states, that a line can be in
         switch (parserData.currentParserState) {
             case "PARSE_LINE": {
                 // Route to the correct state based on line content
-                if (currentLineTrimmed.length === 0) { // Empty line
-                    parserData.currentParserState = "EMPTY_LINE";
+                if (currentLineTrimmed.length === 0) {
+                    // Empty line
+                    parserData.setParserState("EMPTY_LINE");
                 } else if (
-                    QuestionParser.isMultiLineCardEndMarker(currentLineTrimmed, parserData.options.multilineCardEndMarker)
-                ) { // Multiline card end marker
+                    QuestionParser.isMultiLineCardEndMarker(
+                        currentLineTrimmed,
+                        parserData.options.multilineCardEndMarker,
+                    )
+                ) {
+                    // Multiline card end marker
                     if (parserData.searchForMultilineCloze || parserData.searchForMultilineCards) {
-                        parserData.currentParserState = "MULTILINE_END_MARKER";
+                        parserData.setParserState("MULTILINE_END_MARKER");
                     } else {
                         // This shouldn't be here in the current line
-                        QuestionParser.notesWithCardFragments.addCardFragment(parserData.notePath, parserData.noteText, {
-                            endLineNum: parserData.lineData.currentLineNum,
-                            startLineNum: parserData.lineData.currentLineNum,
-                            type: "ROUGE_MULTILINE_END_MARKER",
-                            text: currentLineTrimmed
-                        });
-                        parserData.currentParserState = "PARSE_LINE";
+                        QuestionParser.notesWithCardFragments.addCardFragment(
+                            parserData.notePath,
+                            parserData.noteText,
+                            {
+                                endLineNum: parserData.lineData.currentLineNum,
+                                startLineNum: parserData.lineData.currentLineNum,
+                                type: "ROUGE_MULTILINE_END_MARKER",
+                                text: currentLineTrimmed,
+                            },
+                        );
                         break;
                     }
-                } else if (QuestionParser.hasStartOfNonSRHTMLComment(currentLineTrimmed)) { // Non sr info comment
-                    parserData.currentParserState = "NON_SR_HTML_COMMENT";
-                } else if (QuestionParser.hasSRHTMLComment(currentLineTrimmed)) { // SR info comment
-                    parserData.currentParserState = "SR_HTML_COMMENT";
+                } else if (QuestionParser.hasStartOfNonSRHTMLComment(currentLineTrimmed)) {
+                    // Non sr info comment
+                    parserData.setParserState("NON_SR_HTML_COMMENT");
+                } else if (QuestionParser.hasSRHTMLComment(currentLineTrimmed)) {
+                    // SR info comment
+                    parserData.setParserState("SR_HTML_COMMENT");
                 } else if (
-                    QuestionParser.hasInlineSeparator(currentLineTrimmed, parserData.lineData.inlineSeparators.map(x => x.separator))
-                ) { // Inline card
-                    parserData.currentParserState = "INLINE_CARD";
-                } else if (QuestionParser.hasClozes(currentLineTrimmed, parserData.clozeCrafter)) { // Cloze card
-                    parserData.currentParserState = "CLOZE";
+                    QuestionParser.hasInlineSeparator(
+                        currentLineTrimmed,
+                        parserData.lineData.inlineSeparators.map((x) => x.separator),
+                    )
+                ) {
+                    // Inline card
+                    parserData.setParserState("INLINE_CARD");
+                } else if (QuestionParser.hasClozes(currentLineTrimmed, parserData.clozeCrafter)) {
+                    // Cloze card
+                    parserData.setParserState("CLOZE");
                 } else if (
-                    QuestionParser.isMultiLineCardSeparator(currentLineTrimmed, parserData.lineData.multilineSeparators.map(x => x.separator))
-                ) { // Multiline card separator
-                    const potentialNewCard: ParsedQuestionInfo | null = parserData.cardData.potentialNewCard;
+                    QuestionParser.isMultiLineCardSeparator(
+                        currentLineTrimmed,
+                        parserData.lineData.multilineSeparators.map((x) => x.separator),
+                    )
+                ) {
+                    // Multiline card separator
+                    const potentialNewCard: ParsedQuestionInfo | null =
+                        parserData.cardData.potentialNewCard;
                     if (
                         potentialNewCard === null ||
                         potentialNewCard.text.length === 0 ||
                         potentialNewCard.frontText.length === 0
                     ) {
                         // This shouldn't be here in the current line
-                        QuestionParser.notesWithCardFragments.addCardFragment(parserData.notePath, parserData.noteText, {
-                            endLineNum: parserData.lineData.currentLineNum,
-                            startLineNum: parserData.lineData.currentLineNum,
-                            type: "MALFORMED_MULTILINE_CARD",
-                            text: currentLineTrimmed
-                        });
-                        parserData.currentParserState = "PARSE_LINE";
+                        QuestionParser.notesWithCardFragments.addCardFragment(
+                            parserData.notePath,
+                            parserData.noteText,
+                            {
+                                endLineNum: parserData.lineData.currentLineNum,
+                                startLineNum: parserData.lineData.currentLineNum,
+                                type: "MALFORMED_MULTILINE_CARD",
+                                text: currentLineTrimmed,
+                            },
+                        );
                         break;
                     }
-                    parserData.currentParserState = "MULTILINE_SEPARATOR";
-
-                } else { // Text
-                    parserData.currentParserState = "TEXT";
+                    parserData.setParserState("MULTILINE_SEPARATOR");
+                } else {
+                    // Text
+                    parserData.setParserState("TEXT");
                 }
                 return QuestionParser.parseLine(parserData);
             }
@@ -156,21 +191,18 @@ export class QuestionParser {
                     (parserData.searchForMultilineCards || parserData.searchForMultilineCloze)
                 ) {
                     // Only handle this if multiline cards are enabled and we are already searching for multiline cards or clozes
-                    parserData.currentParserState = "TEXT";
+
+                    parserData.setParserState("TEXT");
                     return QuestionParser.parseLine(parserData);
-                }
-                else {
-                    parserData.currentParserState = "PARSE_LINE";
+                } else {
                     parserData.endMultiLineSearch();
                 }
                 break;
             }
 
             case "NON_SR_HTML_COMMENT": {
-                if (QuestionParser.hasEndOfHTMLComment(currentLineTrimmed)) {
-                    parserData.currentParserState = "PARSE_LINE";
-                } else {
-                    parserData.currentParserState = "NON_SR_HTML_COMMENT";
+                if (!QuestionParser.hasEndOfHTMLComment(currentLineTrimmed)) {
+                    parserData.setParserState("NON_SR_HTML_COMMENT");
                 }
                 parserData.endMultiLineSearch();
                 break;
@@ -181,12 +213,15 @@ export class QuestionParser {
                     endLineNum: parserData.lineData.currentLineNum,
                     startLineNum: parserData.lineData.currentLineNum,
                     type: "ROUGE_SR_COMMENT",
-                    text: parserData.lineData.currentLine
+                    text: parserData.lineData.currentLine,
                 };
 
                 const addRougeSRComment = () => {
-                    QuestionParser.notesWithCardFragments.addCardFragment(parserData.notePath, parserData.noteText, potentialRougeCardFragment);
-                    parserData.currentParserState = "PARSE_LINE";
+                    QuestionParser.notesWithCardFragments.addCardFragment(
+                        parserData.notePath,
+                        parserData.noteText,
+                        potentialRougeCardFragment,
+                    );
                     parserData.endMultiLineSearch();
                     return parserData;
                 };
@@ -197,7 +232,8 @@ export class QuestionParser {
                     break;
                 }
 
-                const lastCard: ParsedQuestionInfo = parserData.cardData.cards[parserData.cardData.lastCardIndex];
+                const lastCard: ParsedQuestionInfo =
+                    parserData.cardData.cards[parserData.cardData.lastCardIndex];
                 // Last card is not connected to this SR comment
                 if (lastCard.lastLineNum + 1 !== parserData.lineData.currentLineNum) {
                     parserData = addRougeSRComment();
@@ -211,10 +247,23 @@ export class QuestionParser {
                 }
 
                 // Last card is connected to this SR comment
+                if (
+                    parserData.cardData.potentialNewCard !== null &&
+                    parserData.cardData.potentialNewCard.cardType !== null &&
+                    (parserData.cardData.potentialNewCard.cardType === CardType.MultiLineBasic ||
+                        parserData.cardData.potentialNewCard.cardType ===
+                            CardType.MultiLineReversed) &&
+                    (parserData.cardData.potentialNewCard.backText === null ||
+                        parserData.cardData.potentialNewCard.backText.length === 0)
+                ) {
+                    parserData.endMultiLineSearch();
+                }
                 parserData.cardData.addCurrentLineToLastCard(parserData.lineData);
-                parserData.currentParserState = "PARSE_LINE";
 
-                if (parserData.options.multilineCardEndMarker === null || parserData.options.multilineCardEndMarker.length === 0) {
+                if (
+                    parserData.options.multilineCardEndMarker === null ||
+                    parserData.options.multilineCardEndMarker.length === 0
+                ) {
                     // Multiline card end marker is disabled, so we can be sure that the multiline search is finished
                     parserData.endMultiLineSearch();
                 }
@@ -222,27 +271,134 @@ export class QuestionParser {
             }
 
             case "INLINE_CARD": {
-                parserData.cardData.addInlineCardToList(parserData.lineData, parserData.notePath, parserData.noteText);
-                parserData.currentParserState = "PARSE_LINE";
+                parserData.cardData.addInlineCardToList(
+                    parserData.lineData,
+                    parserData.notePath,
+                    parserData.noteText,
+                );
                 parserData.endMultiLineSearch();
                 break;
             }
 
             case "MULTILINE_SEPARATOR": {
-                parserData.cardData.addStartOfMultilineCardToList(parserData.lineData);
+                if (parserData.searchForMultilineCards || parserData.searchForMultilineCloze) {
+                    // End multiline search if it is still active & transfer last line to the new card
+                    // if it is possible
+
+                    const lastCard = parserData.cardData.getLastCard();
+                    if (lastCard === null) {
+                        // This happens if there are somehow no cards in the list, so it doesn't make sense to continue
+                        break;
+                    }
+                    const lastLineNum = lastCard.lastLineNum;
+                    const linesOfLastCard = lastCard.text.split("\n");
+                    const lastLine = linesOfLastCard[linesOfLastCard.length - 1];
+                    // console.log("LAST CARD where we have to remove the last line", "\n", lastCard);
+
+                    // To be able to add the last line to the new card, it must be text
+                    // Parsing is done in the following order:
+                    // 1. Read line -> STATE: PARSE_LINE
+                    // 2. Handle detected line -> should be text here -> STATE: TEXT
+                    const indexOfLastParserState = parserData.getIndexOfLastParserState();
+                    // Here -1 because the last one should be PARSE_LINE and we want the one before that
+                    if (
+                        parserData.getPrevParserStateAtIndex(indexOfLastParserState - 1) === "TEXT"
+                    ) {
+                        // If this is the case, we can safely add the last line to the new card, because we have this situation:
+                        /*
+                            Prev Question
+                            ?
+                            Previous Answer
+                            Previous Extra Answer / Maybe Question <- last line so we add it to the new card / remove it from the last card
+                            ? <- We are here
+                            New Answer
+                        */
+
+                        // Transfer last line to the new card
+                        const newPotentialCard = parserData.cardData.potentialNewCard;
+
+                        const cardType = QuestionParser.getMultilineCardType(
+                            lastLine,
+                            parserData.lineData.multilineSeparators,
+                        );
+                        if (cardType !== null) {
+                            newPotentialCard.cardType = cardType;
+                        }
+                        newPotentialCard.text =
+                            lastLine + "\n" + parserData.lineData.currentLineEndTrimmed;
+                        newPotentialCard.firstLineNum = lastLineNum;
+                        newPotentialCard.lastLineNum = parserData.lineData.currentLineNum;
+                        newPotentialCard.frontText = lastLine;
+                        newPotentialCard.backText = null;
+
+                        // console.log("NEW POTENTIAL CARD with last line added", "\n", newPotentialCard);
+
+                        parserData.cardData.potentialNewCard = newPotentialCard;
+
+                        // Remove last line from last card
+                        lastCard.lastLineNum--;
+                        lastCard.text = lastCard.text.split("\n").slice(0, -1).join("\n");
+                        if (lastCard.backText !== null && lastCard.backText.length > 0) {
+                            lastCard.backText = lastCard.backText
+                                .split("\n")
+                                .slice(0, -1)
+                                .join("\n");
+                        }
+
+                        // console.log("LAST CARD, where we removed the last line", "\n", lastCard);
+                        parserData.cardData.cards[parserData.cardData.lastCardIndex] = lastCard;
+
+                        break;
+                    }
+
+                    // If we are here, then its a malformed multiline card
+                    parserData.endMultiLineSearch();
+                    break;
+                }
+
+                parserData.cardData.potentialNewCard.lastLineNum =
+                    parserData.lineData.currentLineNum;
+                parserData.cardData.potentialNewCard.text +=
+                    "\n" + parserData.lineData.currentLineEndTrimmed;
+                const multilineCardType = QuestionParser.getMultilineCardType(
+                    parserData.lineData.currentLineTrimmed,
+                    parserData.lineData.multilineSeparators,
+                );
+                if (multilineCardType !== null) {
+                    parserData.cardData.potentialNewCard.cardType = multilineCardType;
+                }
+
                 // Begin a new multiline search with multiline cards
-                parserData.endMultiLineSearch();
                 parserData.searchForMultilineCards = true;
-                parserData.currentParserState = "PARSE_LINE";
+                parserData.searchForMultilineCloze = false;
                 break;
             }
 
             case "MULTILINE_END_MARKER": {
                 const lastCard: ParsedQuestionInfo | null = parserData.cardData.getLastCard();
 
-                if (lastCard === null) throw new Error("Malformed multiline card -> somehow the fragment wasn't caught in PARSE_LINE");
+                if (lastCard === null)
+                    throw new Error(
+                        "Malformed multiline card -> somehow the fragment wasn't caught in PARSE_LINE",
+                    );
 
-                if (lastCard.backText === null && parserData.searchForMultilineCards) {
+                const addMalformedMultilineCardFragment = () => {
+                    QuestionParser.notesWithCardFragments.addCardFragment(
+                        parserData.notePath,
+                        parserData.noteText,
+                        {
+                            endLineNum: lastCard.lastLineNum + 1,
+                            startLineNum: lastCard.firstLineNum,
+                            type: "MALFORMED_MULTILINE_CARD_WITH_END_MARKER",
+                            text: lastCard.text + "\n" + parserData.lineData.currentLine,
+                        },
+                    );
+                };
+
+                if (
+                    (lastCard.backText === null || lastCard.backText.length === 0) &&
+                    parserData.searchForMultilineCards
+                ) {
                     // Here the card fragment is malformed, as it doesn't have a back text
                     /*
                         Question
@@ -250,25 +406,32 @@ export class QuestionParser {
                         +++
                     */
 
-                    QuestionParser.notesWithCardFragments.addCardFragment(parserData.notePath, parserData.noteText, {
-                        endLineNum: lastCard.lastLineNum + 1,
-                        startLineNum: lastCard.firstLineNum,
-                        type: "MALFORMED_MULTILINE_CARD_WITH_END_MARKER",
-                        text: lastCard.text + "\n" + parserData.lineData.currentLine
-                    });
+                    addMalformedMultilineCardFragment();
                 }
 
-                parserData.cardData.addCurrentLineToLastCard(parserData.lineData, parserData.searchForMultilineCards);
-                parserData.currentParserState = "PARSE_LINE";
+                if (parserData.searchForMultilineCards && !parserData.searchForMultilineCloze) {
+                    parserData.cardData.addMultilineCardToList(parserData.lineData, () => {
+                        addMalformedMultilineCardFragment();
+                    });
+                } else {
+                    parserData.cardData.addCurrentLineToLastCard(
+                        parserData.lineData,
+                        parserData.searchForMultilineCards,
+                    );
+                }
+
                 parserData.endMultiLineSearch();
                 break;
             }
 
             case "CLOZE": {
+                if (parserData.searchForMultilineCards || parserData.options.useAtomicClozes) {
+                    // End multiline search if it could be active
+                    parserData.endMultiLineSearch();
+                }
+
                 if (parserData.options.useAtomicClozes) {
                     parserData.cardData.addAtomicClozeToList(parserData.lineData);
-                    parserData.currentParserState = "PARSE_LINE";
-                    parserData.endMultiLineSearch();
                     break;
                 }
 
@@ -287,10 +450,42 @@ export class QuestionParser {
             case "TEXT": {
                 // Adds current line to the last card or potential new card
                 // This state shall only be entered when the current line is connected to the last card or if it belongs to the potential new card
-                if ((parserData.searchForMultilineCloze || parserData.searchForMultilineCards)) {
-                    if (!parserData.cardData.cards[parserData.cardData.lastCardIndex].text.includes(QuestionParser.srCommentStart)) {
-                        parserData.cardData.addCurrentLineToLastCard(parserData.lineData, parserData.searchForMultilineCards);
-                        parserData.currentParserState = "PARSE_LINE";
+
+                if (parserData.searchForMultilineCloze || parserData.searchForMultilineCards) {
+                    if (
+                        parserData.cardData.potentialNewCard !== null &&
+                        parserData.cardData.potentialNewCard.backText === null &&
+                        parserData.cardData.potentialNewCard.cardType !== null &&
+                        (parserData.cardData.potentialNewCard.cardType ===
+                            CardType.MultiLineBasic ||
+                            parserData.cardData.potentialNewCard.cardType ===
+                                CardType.MultiLineReversed)
+                    ) {
+                        parserData.cardData.addMultilineCardToList(parserData.lineData, () => {
+                            QuestionParser.notesWithCardFragments.addCardFragment(
+                                parserData.notePath,
+                                parserData.noteText,
+                                {
+                                    endLineNum: parserData.lineData.currentLineNum,
+                                    startLineNum: parserData.lineData.currentLineNum,
+                                    type: "MALFORMED_MULTILINE_CARD",
+                                    text: parserData.lineData.currentLineTrimmed,
+                                },
+                            );
+                        });
+
+                        break;
+                    }
+
+                    if (
+                        !parserData.cardData.cards[parserData.cardData.lastCardIndex].text.includes(
+                            QuestionParser.srCommentStart,
+                        )
+                    ) {
+                        parserData.cardData.addCurrentLineToLastCard(
+                            parserData.lineData,
+                            parserData.searchForMultilineCards,
+                        );
                         break;
                     }
                     // This only happens if the multiline card end marker is enabled, but not used with this card
@@ -299,20 +494,23 @@ export class QuestionParser {
 
                 // From here on, we know that this text could be long to a new card or it is just some random text in the note
 
-                if (parserData.cardData.potentialNewCard === null && parserData.lineData.currentLineTrimmed.length > 0) {
+                if (
+                    parserData.cardData.potentialNewCard === null &&
+                    parserData.lineData.currentLineTrimmed.length > 0
+                ) {
                     parserData.cardData.initNewPotentialCard(
-                        CardType.MultiLineBasic,
+                        CardType.Cloze,
                         parserData.lineData.currentLineEndTrimmed,
                         parserData.lineData.currentLineNum,
                         parserData.lineData.currentLineNum,
                         parserData.lineData.currentLineEndTrimmed,
                     );
-                    parserData.currentParserState = "PARSE_LINE";
                     break;
                 }
 
                 // We have a potential new card, so we add the current line to it
-                const modifiedPotentialCard: ParsedQuestionInfo = parserData.cardData.potentialNewCard;
+                const modifiedPotentialCard: ParsedQuestionInfo =
+                    parserData.cardData.potentialNewCard;
                 modifiedPotentialCard.text += "\n" + parserData.lineData.currentLine;
                 modifiedPotentialCard.frontText += "\n" + parserData.lineData.currentLine;
                 modifiedPotentialCard.lastLineNum = parserData.lineData.currentLineNum;
@@ -338,7 +536,10 @@ export class QuestionParser {
      * @returns
      */
     static hasStartOfNonSRHTMLComment(trimmedLine: string): boolean {
-        return trimmedLine.startsWith(QuestionParser.nonSrCommentStart) && !trimmedLine.startsWith(QuestionParser.srCommentStart);
+        return (
+            trimmedLine.startsWith(QuestionParser.nonSrCommentStart) &&
+            !trimmedLine.startsWith(QuestionParser.srCommentStart)
+        );
     }
 
     /**
@@ -368,10 +569,16 @@ export class QuestionParser {
      * @param multilineCardEndMarker
      * @returns
      */
-    static isMultiLineCardEndMarker(trimmedLine: string, multilineCardEndMarker: string | null): boolean {
-        return multilineCardEndMarker !== null &&
+    static isMultiLineCardEndMarker(
+        trimmedLine: string,
+        multilineCardEndMarker: string | null,
+    ): boolean {
+        return (
+            multilineCardEndMarker !== null &&
+            multilineCardEndMarker !== "" &&
             trimmedLine.startsWith(multilineCardEndMarker) &&
-            trimmedLine.length === multilineCardEndMarker.length;
+            trimmedLine.length === multilineCardEndMarker.length
+        );
     }
 
     /**
@@ -382,14 +589,28 @@ export class QuestionParser {
      * @returns
      */
     static isMultiLineCardSeparator(trimmedLine: string, separators: string[]): boolean {
-        separators.forEach((separator) => {
-            if (trimmedLine.startsWith(separator) &&
-                trimmedLine.length === separator.length) {
+        for (const separator of separators) {
+            if (trimmedLine.startsWith(separator) && trimmedLine.length === separator.length) {
                 return true;
             }
-        });
+        }
 
         return false;
+    }
+
+    static getMultilineCardType(
+        trimmedLine: string,
+        separators: Array<{ separator: string; type: CardType }>,
+    ): CardType | null {
+        for (const separator of separators) {
+            if (
+                trimmedLine.startsWith(separator.separator) &&
+                trimmedLine.length === separator.separator.length
+            ) {
+                return separator.type;
+            }
+        }
+        return null;
     }
 
     /**
@@ -400,7 +621,11 @@ export class QuestionParser {
      * @param markerIndex - The index of the marker in the text
      * @returns
      */
-    static isMarkerInsideCodeBlock(trimmedLine: string, marker: string, markerIndex: number): boolean {
+    static isMarkerInsideCodeBlock(
+        trimmedLine: string,
+        marker: string,
+        markerIndex: number,
+    ): boolean {
         // TODO: Handle codeblocks
         let goingBack = markerIndex - 1,
             goingForward = markerIndex + marker.length;
@@ -435,7 +660,8 @@ export class QuestionParser {
             const separatorIdx = trimmedLine.indexOf(separator);
             if (separatorIdx === -1) continue;
             // Check if it's inside an inline code block
-            if (QuestionParser.isMarkerInsideCodeBlock(trimmedLine, separator, separatorIdx)) continue;
+            if (QuestionParser.isMarkerInsideCodeBlock(trimmedLine, separator, separatorIdx))
+                continue;
             return true;
         }
 
@@ -453,7 +679,6 @@ export class QuestionParser {
         return clozeCrafter.isClozeNote(trimmedLine);
     }
 }
-
 
 //     // Skip everything in HTML comments
 //     if (currentLine.startsWith("<!--") && !currentLine.startsWith("<!--SR:")) {

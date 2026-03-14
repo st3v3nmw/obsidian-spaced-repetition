@@ -22,7 +22,11 @@ export const parserOptions: ParserOptions = {
  * Created when the actual parser changed from returning [CardType, string, number, number] to ParsedQuestionInfo.
  * It's purpose is to minimise changes to all the test cases here during the parser()->parserEx() change.
  */
-export function parseT(text: string, options: ParserOptions = parserOptions, path: string = "test.md"): [CardType, string, number, number][] {
+export function parseT(
+    text: string,
+    options: ParserOptions = parserOptions,
+    path: string = "test.md",
+): [CardType, string, number, number][] {
     const list: ParsedQuestionInfo[] = QuestionParser.parse(path, text, options);
     const result: [CardType, string, number, number][] = [];
     for (const item of list) {

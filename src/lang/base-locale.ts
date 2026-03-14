@@ -254,6 +254,6 @@ export interface IBaseLocale {
     CHECK_ROADMAP: string;
     CHECK_DEV_NEWS: string;
     // Settings > Flashcards
-    ATOMIC_CLOZES: string,
-    ATOMIC_CLOZES_DESC: string,
+    ATOMIC_CLOZES: string;
+    ATOMIC_CLOZES_DESC: string;
 }

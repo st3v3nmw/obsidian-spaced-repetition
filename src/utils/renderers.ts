@@ -84,10 +84,10 @@ export class RenderMarkdownWrapper {
                     el.addEventListener(
                         "click",
                         (ev) =>
-                        ((ev.target as HTMLElement).style.minWidth =
-                            (ev.target as HTMLElement).style.minWidth === "100%"
-                                ? null
-                                : "100%"),
+                            ((ev.target as HTMLElement).style.minWidth =
+                                (ev.target as HTMLElement).style.minWidth === "100%"
+                                    ? null
+                                    : "100%"),
                     );
                 },
             );

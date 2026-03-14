@@ -2,6 +2,7 @@ import { CardType } from "src/card/questions/question";
 
 import { parserOptions, parseT } from "../helpers/unit-test-parser-helper";
 
+// TODO: Add card fragment tests
 // TODO: Expand this test
 test("Test not parsing cards in HTML comments", () => {
     expect(parseT("<!--question::answer test-->", parserOptions)).toEqual([]);

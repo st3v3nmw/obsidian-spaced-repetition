@@ -26,7 +26,7 @@ export class MainPage extends SettingsPage {
         openPage: (pageType: SettingsPageType) => void,
         scrollListener: (scrollPosition: number) => void,
     ) {
-        super(pageContainerEl, plugin, pageType, () => { }, display, openPage, scrollListener);
+        super(pageContainerEl, plugin, pageType, () => {}, display, openPage, scrollListener);
 
         this.containerEl.addClass("sr-main-page");
 
@@ -170,7 +170,9 @@ export class MainPage extends SettingsPage {
                         .setValue(this.plugin.data.settings.showParserDebugMessages)
                         .onChange(async (value) => {
                             this.plugin.data.settings.showParserDebugMessages = value;
-                            QuestionParser.setDebugParser(this.plugin.data.settings.showParserDebugMessages);
+                            QuestionParser.setDebugParser(
+                                this.plugin.data.settings.showParserDebugMessages,
+                            );
                             await this.plugin.savePluginData();
                         }),
                 );

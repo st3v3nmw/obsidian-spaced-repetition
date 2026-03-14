@@ -3,135 +3,661 @@ import { ParserOptions } from "src/parser/parser-data-structure";
 
 import { parserOptions, parseT } from "../helpers/unit-test-parser-helper";
 
-const execMultiLineCardsTestWithSeparator = (separators: { separator: string, cardType: CardType }[], options: ParserOptions = parserOptions) => {
+// TODO: Add card fragment tests
+
+const execMultiLineCardsTestWithSeparator = (
+    separators: { separator: string; cardType: CardType }[],
+    options: ParserOptions,
+) => {
+    console.log("EXPECTING THESE SEPARATORS: \n", separators);
+    console.log("EXPECTING THE MAIN SEPARATOR TOBE: \n", separators[0]);
+
+    console.log("OPTIONS ARE: ", options);
     // Simplest multiline cards
-    expect(parseT([
-        "Question",
-        `${separators[0].separator}`,
-        "Answer",
-    ].join("\n"), options)).toEqual([[separators[0].cardType, [
-        "Question",
-        `${separators[0].separator}`,
-        "Answer",
-    ].join("\n"), 0, 2],
+    expect(
+        parseT(["Question", `${separators[0].separator}`, "Answer"].join("\n"), options),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            ["Question", `${separators[0].separator}`, "Answer"].join("\n"),
+            0,
+            2,
+        ],
     ]);
 
-    expect(parseT([
-        "Question",
-        `${separators[0].separator}`,
-        "Answer",
-        "<!--SR:2021-08-11,4,270-->",
-    ].join("\n"), options)).toEqual([[separators[0].cardType, [
-        "Question",
-        `${separators[0].separator}`,
-        "Answer",
-        "<!--SR:2021-08-11,4,270-->",
-    ].join("\n"), 0, 3],
-    ]);
+    // Simple malformed multiline cards
+
+    expect(parseT([`${separators[0].separator}`, "Answer"].join("\n"), options)).toEqual([]);
+
+    expect(parseT(["Question", `${separators[0].separator}`].join("\n"), options)).toEqual([]);
 
     // Simple multiline cards with schedule
+
+    expect(
+        parseT(
+            ["Question", `${separators[0].separator}`, "Answer", "<!--SR:2022-08-11,4,270-->"].join(
+                "\n",
+            ),
+            options,
+        ),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            ["Question", `${separators[0].separator}`, "Answer", "<!--SR:2022-08-11,4,270-->"].join(
+                "\n",
+            ),
+            0,
+            3,
+        ],
+    ]);
+
+    expect(
+        parseT(
+            [
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "",
+                "<!--SR:2022-08-11,4,270-->",
+            ].join("\n"),
+            options,
+        ),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            ["Question", `${separators[0].separator}`, "Answer"].join("\n"),
+            0,
+            2,
+        ],
+    ]);
+
+    expect(
+        parseT(
+            [
+                "Question",
+                `${separators[0].separator}`,
+                "Answer<!--SR:2022-08-11,4,270-->",
+                "",
+                "<!--SR:2022-08-11,4,270-->",
+            ].join("\n"),
+            options,
+        ),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            ["Question", `${separators[0].separator}`, "Answer<!--SR:2022-08-11,4,270-->"].join(
+                "\n",
+            ),
+            0,
+            2,
+        ],
+    ]);
+
+    // Big Multiline cards with schedule
+
+    expect(
+        parseT(
+            [
+                "",
+                "Some text before",
+                "",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "<!--SR:2022-08-11,4,270-->",
+            ].join("\n"),
+            options,
+        ),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            [
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "<!--SR:2022-08-11,4,270-->",
+            ].join("\n"),
+            3,
+            7,
+        ],
+    ]);
+
+    expect(
+        parseT(
+            [
+                "",
+                "Some text before",
+                "",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+                "Text after",
+                "",
+            ].join("\n"),
+            options,
+        ),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            [
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+            ].join("\n"),
+            3,
+            9,
+        ],
+    ]);
+
+    expect(
+        parseT(
+            [
+                "",
+                "Some text before",
+                "",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+                "Text after",
+                "",
+            ].join("\n"),
+            options,
+        ),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            ["Some text before", "Question", `${separators[0].separator}`, "Answer"].join("\n"),
+            3,
+            6,
+        ],
+    ]);
+
+    // Big Multiline cards with schedule & tags
+
+    expect(
+        parseT(
+            [
+                "",
+                "Some text before",
+                "",
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+                "Text after",
+                "",
+            ].join("\n"),
+            options,
+        ),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            [
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+            ].join("\n"),
+            3,
+            7,
+        ],
+    ]);
+
+    // Punctuation tests
+
+    expect(
+        parseT(
+            [
+                "",
+                "Some text before",
+                "",
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question?",
+                `${separators[0].separator}`,
+                "Answer",
+                "",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+                "Text after",
+                "",
+            ].join("\n"),
+            options,
+        ),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            [
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question?",
+                `${separators[0].separator}`,
+                "Answer",
+            ].join("\n"),
+            3,
+            7,
+        ],
+    ]);
+
+    expect(
+        parseT(
+            [
+                "",
+                "Some text before",
+                "",
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question??",
+                `${separators[0].separator}`,
+                "Answer",
+                "",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+                "Text after",
+                "",
+            ].join("\n"),
+            options,
+        ),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            [
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question??",
+                `${separators[0].separator}`,
+                "Answer",
+            ].join("\n"),
+            3,
+            7,
+        ],
+    ]);
+
+    expect(
+        parseT(
+            [
+                "",
+                "Some text before",
+                "",
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question@",
+                `${separators[0].separator}`,
+                "Answer",
+                "",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+                "Text after",
+                "",
+            ].join("\n"),
+            options,
+        ),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            [
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question@",
+                `${separators[0].separator}`,
+                "Answer",
+            ].join("\n"),
+            3,
+            7,
+        ],
+    ]);
+
+    expect(
+        parseT(
+            [
+                "",
+                "Some text before",
+                "",
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question@@",
+                `${separators[0].separator}`,
+                "Answer",
+                "",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+                "Text after",
+                "",
+            ].join("\n"),
+            options,
+        ),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            [
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question@@",
+                `${separators[0].separator}`,
+                "Answer",
+            ].join("\n"),
+            3,
+            7,
+        ],
+    ]);
+
+    expect(
+        parseT(
+            [
+                "",
+                "Some text before",
+                "",
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question!",
+                `${separators[0].separator}`,
+                "Answer",
+                "",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+                "Text after",
+                "",
+            ].join("\n"),
+            options,
+        ),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            [
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question!",
+                `${separators[0].separator}`,
+                "Answer",
+            ].join("\n"),
+            3,
+            7,
+        ],
+    ]);
+
+    // Multiple multiline cards with schedule and tags
+
+    expect(
+        parseT(
+            [
+                "",
+                "Some text before",
+                "",
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+                "Text after",
+                "",
+                "",
+                "Some text before",
+                "",
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+                "Text after",
+                "",
+            ].join("\n"),
+            options,
+        ),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            [
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+            ].join("\n"),
+            3,
+            9,
+        ],
+        [
+            separators[0].cardType,
+            [
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+            ].join("\n"),
+            15,
+            29,
+        ],
+    ]);
+
+    expect(
+        parseT(
+            [
+                "",
+                "Some text before",
+                "",
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+                "Text after",
+                "",
+                "",
+                "Some text before",
+                "",
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+                "Text after",
+                "Text after",
+                "",
+            ].join("\n"),
+            options,
+        ),
+    ).toEqual([
+        [
+            separators[0].cardType,
+            [
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+            ].join("\n"),
+            3,
+            9,
+        ],
+        [
+            separators[0].cardType,
+            [
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+            ].join("\n"),
+            10,
+            24,
+        ],
+        [
+            separators[0].cardType,
+            [
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Some text before",
+            ].join("\n"),
+            30,
+            44,
+        ],
+        [
+            separators[0].cardType,
+            [
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "#flashcards/tag-on-previous-line #flashcards/tag-on-previous-line/test",
+                "Some text before",
+            ].join("\n"),
+            45,
+            50,
+        ],
+        [
+            separators[0].cardType,
+            [
+                "Question",
+                `${separators[0].separator}`,
+                "Answer",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "Text after",
+                "<!--SR:2022-08-11,4,270-->",
+            ].join("\n"),
+            51,
+            63,
+        ],
+    ]);
 };
 
 test("Test parsing of multi line basic cards", () => {
     // standard symbols
-    execMultiLineCardsTestWithSeparator([
-        { separator: "?", cardType: CardType.MultiLineBasic },
-        { separator: "??", cardType: CardType.MultiLineReversed },
-    ]);
-
-    execMultiLineCardsTestWithSeparator([
-        { separator: "??", cardType: CardType.MultiLineReversed },
-        { separator: "?", cardType: CardType.MultiLineBasic },
-    ]);
-
-    expect(parseT("Question\n?\nAnswer", parserOptions)).toEqual([
-        [CardType.MultiLineBasic, "Question\n?\nAnswer", 0, 2],
-    ]);
-    expect(parseT("Question\n? \nAnswer", parserOptions)).toEqual([
-        [CardType.MultiLineBasic, "Question\n?\nAnswer", 0, 2],
-    ]);
-    expect(parseT("Question\n?\nAnswer <!--SR:!2021-08-11,4,270-->", parserOptions)).toEqual([
-        [CardType.MultiLineBasic, "Question\n?\nAnswer <!--SR:!2021-08-11,4,270-->", 0, 2],
-    ]);
-    expect(parseT("Question\n?\nAnswer\n<!--SR:2021-08-11,4,270-->", parserOptions)).toEqual([
-        [CardType.MultiLineBasic, "Question\n?\nAnswer\n<!--SR:2021-08-11,4,270-->", 0, 3],
-    ]);
-    expect(parseT("Question line 1\nQuestion line 2\n?\nAnswer", parserOptions)).toEqual([
-        [CardType.MultiLineBasic, "Question line 1\nQuestion line 2\n?\nAnswer", 0, 3],
-    ]);
-    expect(parseT("Question\n?\nAnswer line 1\nAnswer line 2", parserOptions)).toEqual([
-        [CardType.MultiLineBasic, "Question\n?\nAnswer line 1\nAnswer line 2", 0, 3],
-    ]);
-    expect(parseT("#Title\n\nLine0\nQ1\n?\nA1\nAnswerExtra\n\nQ2\n?\nA2", parserOptions)).toEqual([
-        [CardType.MultiLineBasic, "Line0\nQ1\n?\nA1\nAnswerExtra", 2, 6],
-        [CardType.MultiLineBasic, "Q2\n?\nA2", 8, 10],
-    ]);
-    expect(parseT("#flashcards/tag-on-previous-line\nQuestion\n?\nAnswer", parserOptions)).toEqual([
-        [CardType.MultiLineBasic, "#flashcards/tag-on-previous-line\nQuestion\n?\nAnswer", 0, 3],
-    ]);
-    expect(
-        parseT("Question\n?\nAnswer line 1\nAnswer line 2\n\n---", {
-            singleLineCardSeparator: "::",
-            singleLineReversedCardSeparator: ":::",
-            multilineCardSeparator: "?",
-            multilineReversedCardSeparator: "??",
-            multilineCardEndMarker: "---",
-            clozePatterns: ["**[123;;]answer[;;hint]**"],
-            useAtomicClozes: false,
-        }),
-    ).toEqual([[CardType.MultiLineBasic, "Question\n?\nAnswer line 1\nAnswer line 2", 0, 4]]);
-    expect(
-        parseT(
-            "Question 1\n?\nAnswer line 1\nAnswer line 2\n\n---\nQuestion 2\n?\nAnswer line 1\nAnswer line 2\n---\n",
-            {
-                singleLineCardSeparator: "::",
-                singleLineReversedCardSeparator: ":::",
-                multilineCardSeparator: "?",
-                multilineReversedCardSeparator: "??",
-                multilineCardEndMarker: "---",
-                clozePatterns: ["**[123;;]answer[;;hint]**"],
-                useAtomicClozes: false,
-            },
-        ),
-    ).toEqual([
-        [CardType.MultiLineBasic, "Question 1\n?\nAnswer line 1\nAnswer line 2", 0, 4],
-        [CardType.MultiLineBasic, "Question 2\n?\nAnswer line 1\nAnswer line 2", 6, 9],
-    ]);
-    expect(
-        parseT(
-            "Question 1\n?\nAnswer line 1\nAnswer line 2\n\n---\nQuestion with empty line after question mark\n?\n\nAnswer line 1\nAnswer line 2\n---\n",
-            {
-                singleLineCardSeparator: "::",
-                singleLineReversedCardSeparator: ":::",
-                multilineCardSeparator: "?",
-                multilineReversedCardSeparator: "??",
-                multilineCardEndMarker: "---",
-                clozePatterns: ["**[123;;]answer[;;hint]**"],
-                useAtomicClozes: false,
-            },
-        ),
-    ).toEqual([
-        [CardType.MultiLineBasic, "Question 1\n?\nAnswer line 1\nAnswer line 2", 0, 4],
+    const options: ParserOptions = {
+        ...parserOptions,
+        multilineCardSeparator: "?",
+        multilineReversedCardSeparator: "??",
+    };
+    execMultiLineCardsTestWithSeparator(
         [
-            CardType.MultiLineBasic,
-            "Question with empty line after question mark\n?\n\nAnswer line 1\nAnswer line 2",
-            6,
-            10,
+            { separator: options.multilineCardSeparator, cardType: CardType.MultiLineBasic },
+            {
+                separator: options.multilineReversedCardSeparator,
+                cardType: CardType.MultiLineReversed,
+            },
         ],
-    ]);
-
-    // custom symbols
-    expect(
-        parseT("Question\n@@\nAnswer\n\nsfdg", {
-            singleLineCardSeparator: "::",
-            singleLineReversedCardSeparator: ":::",
-            multilineCardSeparator: "@@",
-            multilineReversedCardSeparator: "??",
-            multilineCardEndMarker: "",
-            clozePatterns: [],
-            useAtomicClozes: false,
-        }),
-    ).toEqual([[CardType.MultiLineBasic, "Question\n@@\nAnswer", 0, 2]]);
+        options,
+    );
 
     // empty string or whitespace character provided
     expect(
@@ -140,114 +666,78 @@ test("Test parsing of multi line basic cards", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "",
             multilineReversedCardSeparator: "??",
-            multilineCardEndMarker: "---",
+            multilineCardEndMarker: "",
+            clozePatterns: [],
+            useAtomicClozes: false,
+        }),
+    ).toEqual([]);
+
+    expect(
+        parseT("Question\n?\nAnswer", {
+            singleLineCardSeparator: "::",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: " ",
+            multilineReversedCardSeparator: "??",
+            multilineCardEndMarker: "",
             clozePatterns: [],
             useAtomicClozes: false,
         }),
     ).toEqual([]);
 });
 
+test("Test parsing of multi line basic cards with custom separators", () => {
+    // Reversed separators
+    let options: ParserOptions = {
+        ...parserOptions,
+        multilineCardSeparator: "??",
+        multilineReversedCardSeparator: "?",
+    };
+    execMultiLineCardsTestWithSeparator(
+        [
+            { separator: options.multilineCardSeparator, cardType: CardType.MultiLineBasic },
+            {
+                separator: options.multilineReversedCardSeparator,
+                cardType: CardType.MultiLineReversed,
+            },
+        ],
+        options,
+    );
+
+    // Custom separators
+    options = {
+        ...parserOptions,
+        multilineCardSeparator: "@",
+        multilineReversedCardSeparator: "@@",
+    };
+    execMultiLineCardsTestWithSeparator(
+        [
+            { separator: options.multilineCardSeparator, cardType: CardType.MultiLineBasic },
+            {
+                separator: options.multilineReversedCardSeparator,
+                cardType: CardType.MultiLineReversed,
+            },
+        ],
+        options,
+    );
+});
+
 test("Test parsing of multi line reversed cards", () => {
     // standard symbols
-    expect(parseT("Question\n??\nAnswer", parserOptions)).toEqual([
-        [CardType.MultiLineReversed, "Question\n??\nAnswer", 0, 2],
-    ]);
-    expect(parseT("Question line 1\nQuestion line 2\n??\nAnswer", parserOptions)).toEqual([
-        [CardType.MultiLineReversed, "Question line 1\nQuestion line 2\n??\nAnswer", 0, 3],
-    ]);
-    expect(parseT("Question\n??\nAnswer line 1\nAnswer line 2", parserOptions)).toEqual([
-        [CardType.MultiLineReversed, "Question\n??\nAnswer line 1\nAnswer line 2", 0, 3],
-    ]);
-    expect(parseT("#Title\n\nLine0\nQ1\n??\nA1\nAnswerExtra\n\nQ2\n??\nA2", parserOptions)).toEqual(
+    const options: ParserOptions = {
+        ...parserOptions,
+        multilineCardSeparator: "?",
+        multilineReversedCardSeparator: "??",
+    };
+    execMultiLineCardsTestWithSeparator(
         [
-            [CardType.MultiLineReversed, "Line0\nQ1\n??\nA1\nAnswerExtra", 2, 6],
-            [CardType.MultiLineReversed, "Q2\n??\nA2", 8, 10],
+            {
+                separator: options.multilineReversedCardSeparator,
+                cardType: CardType.MultiLineReversed,
+            },
+            { separator: options.multilineCardSeparator, cardType: CardType.MultiLineBasic },
         ],
+        options,
     );
-    expect(
-        parseT("Question\n??\nAnswer line 1\nAnswer line 2\n\n---", {
-            singleLineCardSeparator: "::",
-            singleLineReversedCardSeparator: ":::",
-            multilineCardSeparator: "?",
-            multilineReversedCardSeparator: "??",
-            multilineCardEndMarker: "---",
-            clozePatterns: [
-                "==[123;;]answer[;;hint]==",
-                "**[123;;]answer[;;hint]**",
-                "{{[123;;]answer[;;hint]}}",
-            ],
-            useAtomicClozes: false,
-        }),
-    ).toEqual([[CardType.MultiLineReversed, "Question\n??\nAnswer line 1\nAnswer line 2", 0, 4]]);
-    expect(
-        parseT(
-            "Question 1\n?\nAnswer line 1\nAnswer line 2\n\n---\nQuestion 2\n??\nAnswer line 1\nAnswer line 2\n---\n",
-            {
-                singleLineCardSeparator: "::",
-                singleLineReversedCardSeparator: ":::",
-                multilineCardSeparator: "?",
-                multilineReversedCardSeparator: "??",
-                multilineCardEndMarker: "---",
-                clozePatterns: [
-                    "==[123;;]answer[;;hint]==",
-                    "**[123;;]answer[;;hint]**",
-                    "{{[123;;]answer[;;hint]}}",
-                ],
-                useAtomicClozes: false,
-            },
-        ),
-    ).toEqual([
-        [CardType.MultiLineBasic, "Question 1\n?\nAnswer line 1\nAnswer line 2", 0, 4],
-        [CardType.MultiLineReversed, "Question 2\n??\nAnswer line 1\nAnswer line 2", 6, 9],
-    ]);
-
-    // custom symbols
-    expect(
-        parseT("Question\n@@@\nAnswer\n---", {
-            singleLineCardSeparator: "::",
-            singleLineReversedCardSeparator: ":::",
-            multilineCardSeparator: "@@",
-            multilineReversedCardSeparator: "@@@",
-            multilineCardEndMarker: "---",
-            clozePatterns: [],
-            useAtomicClozes: false,
-        }),
-    ).toEqual([[CardType.MultiLineReversed, "Question\n@@@\nAnswer", 0, 2]]);
-    expect(
-        parseT(
-            `line 1
-
-
-line 2
-
-Question 1?
-??
-Answer to question 1
-????
-line 3
-
-line 4
-
-Question 2?
-??
-Answer to question 2
-????
-Line 5
-`,
-            {
-                singleLineCardSeparator: ":::",
-                singleLineReversedCardSeparator: "::::",
-                multilineCardSeparator: "??",
-                multilineReversedCardSeparator: "???",
-                multilineCardEndMarker: "????",
-                clozePatterns: [],
-                useAtomicClozes: false,
-            },
-        ),
-    ).toEqual([
-        [CardType.MultiLineBasic, "Question 1?\n??\nAnswer to question 1", 5, 7],
-        [CardType.MultiLineBasic, "Question 2?\n??\nAnswer to question 2", 13, 15],
-    ]);
 
     // empty string or whitespace character provided
     expect(
@@ -255,10 +745,57 @@ Line 5
             singleLineCardSeparator: "::",
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
-            multilineReversedCardSeparator: "\t",
-            multilineCardEndMarker: "---",
+            multilineReversedCardSeparator: "",
+            multilineCardEndMarker: "",
             clozePatterns: [],
             useAtomicClozes: false,
         }),
     ).toEqual([]);
+
+    expect(
+        parseT("Question\n??\nAnswer", {
+            singleLineCardSeparator: "::",
+            singleLineReversedCardSeparator: ":::",
+            multilineCardSeparator: "?",
+            multilineReversedCardSeparator: " ",
+            multilineCardEndMarker: "",
+            clozePatterns: [],
+            useAtomicClozes: false,
+        }),
+    ).toEqual([]);
+});
+
+test("Test parsing of multi line reversed cards with custom separators", () => {
+    // Reversed separators
+    let options = {
+        ...parserOptions,
+        multilineCardSeparator: "??",
+        multilineReversedCardSeparator: "?",
+    };
+    execMultiLineCardsTestWithSeparator(
+        [
+            {
+                separator: options.multilineReversedCardSeparator,
+                cardType: CardType.MultiLineReversed,
+            },
+            { separator: options.multilineCardSeparator, cardType: CardType.MultiLineBasic },
+        ],
+        options,
+    );
+
+    options = {
+        ...parserOptions,
+        multilineCardSeparator: "@",
+        multilineReversedCardSeparator: "@@",
+    };
+    execMultiLineCardsTestWithSeparator(
+        [
+            {
+                separator: options.multilineReversedCardSeparator,
+                cardType: CardType.MultiLineReversed,
+            },
+            { separator: options.multilineCardSeparator, cardType: CardType.MultiLineBasic },
+        ],
+        options,
+    );
 });
