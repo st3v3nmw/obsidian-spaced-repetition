@@ -2,7 +2,7 @@ import { ButtonComponent, setIcon, Setting, SettingGroup } from "obsidian";
 
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
-import { setDebugParser } from "src/parser";
+import { QuestionParser } from "src/parser/parser";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import {
     getPageIcon,
@@ -170,7 +170,9 @@ export class MainPage extends SettingsPage {
                         .setValue(this.plugin.data.settings.showParserDebugMessages)
                         .onChange(async (value) => {
                             this.plugin.data.settings.showParserDebugMessages = value;
-                            setDebugParser(this.plugin.data.settings.showParserDebugMessages);
+                            QuestionParser.setDebugParser(
+                                this.plugin.data.settings.showParserDebugMessages,
+                            );
                             await this.plugin.savePluginData();
                         }),
                 );

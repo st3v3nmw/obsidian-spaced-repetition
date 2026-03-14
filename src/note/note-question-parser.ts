@@ -7,7 +7,8 @@ import { CardFrontBack, CardFrontBackUtil } from "src/card/questions/question-ty
 import { DataStore } from "src/data-stores/base/data-store";
 import { TopicPath, TopicPathList } from "src/deck/topic-path";
 import { frontmatterTagPseudoLineNum, ISRFile } from "src/file";
-import { parse, ParsedQuestionInfo, ParserOptions } from "src/parser";
+import { QuestionParser } from "src/parser/parser";
+import { ParsedQuestionInfo, ParserOptions } from "src/parser/parser-data-structure";
 import { SettingsUtil, SRSettings } from "src/settings";
 import {
     splitNoteIntoFrontmatterAndContent,
@@ -127,6 +128,13 @@ export class NoteQuestionParser {
                     null,
                 );
 
+            // TODO: this length mismatch deletes the scheduling info on multiline cloze cards, after setting the multiline symbol
+            // TODO: actually the issue is with the multiline cards not the cloze cards. The cloze ones without +++ are detected
+            // TODO: but not the simple multiline cards without +++, which is why there is too many schedule comments and one of them will be deleted
+
+            console.log(cardFrontBackList);
+            console.log(cardScheduleInfoList);
+
             // we have some extra scheduling dates to delete
             const correctLength = cardFrontBackList.length;
             if (cardScheduleInfoList.length > correctLength) {
@@ -151,10 +159,11 @@ export class NoteQuestionParser {
             multilineReversedCardSeparator: settings.multilineReversedCardSeparator,
             multilineCardEndMarker: settings.multilineCardEndMarker,
             clozePatterns: settings.clozePatterns,
+            useAtomicClozes: settings.useAtomicClozes,
         };
 
         // We pass contentText which has the frontmatter blanked out; see extractFrontmatter for reasoning
-        return parse(this.contentText, parserOptions);
+        return QuestionParser.parse(this.noteFile.path, this.contentText, parserOptions);
     }
 
     private createQuestionObject(
