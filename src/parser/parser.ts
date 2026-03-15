@@ -2,7 +2,7 @@ import { ClozeCrafter } from "clozecraft";
 
 import { CardType } from "src/card/questions/question";
 import { CardFragment, NotesWithCardFragments } from "src/parser/card-fragments";
-import { ParsedQuestionInfo, ParserData, ParserOptions } from "src/parser/parser-data-structure";
+import { IHTMLCommentSearchResultElement, ParsedQuestionInfo, ParserData, ParserOptions } from "src/parser/parser-data-structure";
 
 // All the states that the parser can be in, when parsing a note for cards
 export type ParserStates =
@@ -10,7 +10,9 @@ export type ParserStates =
     | "PARSE_LINE"
     | "EMPTY_LINE"
     | "TEXT"
-    | "NON_SR_HTML_COMMENT"
+    | "NON_SR_HTML_COMMENT_START"
+    | "NON_SR_HTML_COMMENT_END"
+    | "NON_SR_HTML_COMMENT_MIDDLE"
     | "SR_HTML_COMMENT"
     | "CLOZE"
     | "INLINE_CARD"
@@ -100,7 +102,9 @@ export class QuestionParser {
         switch (parserData.currentParserState) {
             case "PARSE_LINE": {
                 // Route to the correct state based on line content
-                if (currentLineTrimmed.length === 0) {
+                if (QuestionParser.isMiddleOfNonSRHTMLComment(parserData)) {
+                    parserData.setParserState("NON_SR_HTML_COMMENT_MIDDLE");
+                } else if (currentLineTrimmed.length === 0) {
                     // Empty line
                     parserData.setParserState("EMPTY_LINE");
                 } else if (
@@ -128,7 +132,10 @@ export class QuestionParser {
                     }
                 } else if (QuestionParser.hasStartOfNonSRHTMLComment(currentLineTrimmed)) {
                     // Non sr info comment
-                    parserData.setParserState("NON_SR_HTML_COMMENT");
+                    parserData.setParserState("NON_SR_HTML_COMMENT_START");
+                } else if (QuestionParser.hasEndOfNonSRHTMLComment(currentLineTrimmed)) {
+                    // Non sr info comment
+                    parserData.setParserState("NON_SR_HTML_COMMENT_END");
                 } else if (QuestionParser.hasSRHTMLComment(currentLineTrimmed)) {
                     // SR info comment
                     parserData.setParserState("SR_HTML_COMMENT");
@@ -200,11 +207,26 @@ export class QuestionParser {
                 break;
             }
 
-            case "NON_SR_HTML_COMMENT": {
-                if (!QuestionParser.hasEndOfHTMLComment(currentLineTrimmed)) {
-                    parserData.setParserState("NON_SR_HTML_COMMENT");
-                }
-                parserData.endMultiLineSearch();
+            case "NON_SR_HTML_COMMENT_START": {
+                console.log("NON_SR_HTML_COMMENT");
+                // TODO: Implement
+                // Has end on same line if num of end markers is === num of start markers
+                // Else I only care about that any open ones get closed
+                // Search for text before start of comment
+                break;
+            }
+
+            case "NON_SR_HTML_COMMENT_MIDDLE": {
+                // Skip line till all start comments are closed
+                parserData.currentParserState = "PARSE_LINE";
+                break;
+            }
+
+
+            case "NON_SR_HTML_COMMENT_END": {
+                console.log("NON_SR_HTML_COMMENT");
+                // TODO: Implement
+
                 break;
             }
 
@@ -252,7 +274,7 @@ export class QuestionParser {
                     parserData.cardData.potentialNewCard.cardType !== null &&
                     (parserData.cardData.potentialNewCard.cardType === CardType.MultiLineBasic ||
                         parserData.cardData.potentialNewCard.cardType ===
-                            CardType.MultiLineReversed) &&
+                        CardType.MultiLineReversed) &&
                     (parserData.cardData.potentialNewCard.backText === null ||
                         parserData.cardData.potentialNewCard.backText.length === 0)
                 ) {
@@ -459,7 +481,7 @@ export class QuestionParser {
                         (parserData.cardData.potentialNewCard.cardType ===
                             CardType.MultiLineBasic ||
                             parserData.cardData.potentialNewCard.cardType ===
-                                CardType.MultiLineReversed)
+                            CardType.MultiLineReversed)
                     ) {
                         parserData.cardData.addMultilineCardToList(parserData.lineData, () => {
                             QuestionParser.notesWithCardFragments.addCardFragment(
@@ -537,7 +559,32 @@ export class QuestionParser {
      */
     static hasStartOfNonSRHTMLComment(trimmedLine: string): boolean {
         return (
-            trimmedLine.startsWith(QuestionParser.nonSrCommentStart) &&
+            trimmedLine.includes(QuestionParser.nonSrCommentStart) &&
+            !trimmedLine.includes(QuestionParser.srCommentStart)
+        );
+    }
+
+    /**
+     * Returns true if the parser is currently in the middle of a non sr html comment
+     *
+     * @param parserData
+     * @returns
+     */
+    private static isMiddleOfNonSRHTMLComment(parserData: ParserData): boolean {
+        return (
+            parserData.searchForHTMLCommentEnds > 0
+        );
+    }
+
+    /**
+     * Returns true if the trimmed line starts with the nonSrCommentStart
+     *
+     * @param trimmedLine
+     * @returns
+     */
+    static hasEndOfNonSRHTMLComment(trimmedLine: string): boolean {
+        return (
+            trimmedLine.includes(QuestionParser.nonSrCommentStart) &&
             !trimmedLine.startsWith(QuestionParser.srCommentStart)
         );
     }

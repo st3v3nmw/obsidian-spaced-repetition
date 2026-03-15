@@ -1,7 +1,7 @@
 import { CardType } from "src/card/questions/question";
 import { ParserOptions } from "src/parser/parser-data-structure";
 
-import { parserOptions, parseT } from "../helpers/unit-test-parser-helper";
+import { parserOptions, parseT } from "../../helpers/unit-test-parser-helper";
 
 // TODO: Add card fragment tests
 
@@ -331,9 +331,9 @@ const execSingleLineClozeCardsTestWithMarker = (
         expect(
             parseT(
                 "lorem ipsum " +
-                    leftMarker +
-                    "dolor won" +
-                    rightMarker.substring(0, rightMarker.length - 1),
+                leftMarker +
+                "dolor won" +
+                rightMarker.substring(0, rightMarker.length - 1),
                 options,
             ),
         ).toEqual([]);

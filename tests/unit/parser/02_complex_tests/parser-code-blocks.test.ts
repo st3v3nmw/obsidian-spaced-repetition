@@ -1,6 +1,6 @@
 import { CardType } from "src/card/questions/question";
 
-import { parserOptions, parseT } from "../helpers/unit-test-parser-helper";
+import { parserOptions, parseT } from "../../helpers/unit-test-parser-helper";
 // TODO: Add card fragment tests
 // TODO: Expand this test
 
@@ -27,14 +27,14 @@ test("Test parsing cards with codeblocks", () => {
     expect(
         parseT(
             "How do you ... Python?\n?\n" +
-                "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
+            "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
             parserOptions,
         ),
     ).toEqual([
         [
             CardType.MultiLineBasic,
             "How do you ... Python?\n?\n" +
-                "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
+            "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
             0,
             6,
         ],
@@ -44,14 +44,14 @@ test("Test parsing cards with codeblocks", () => {
     expect(
         parseT(
             "How do you ... Python?\n?\n" +
-                "```python\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
+            "```python\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
             parserOptions,
         ),
     ).toEqual([
         [
             CardType.MultiLineBasic,
             "How do you ... Python?\n?\n" +
-                "```python\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
+            "```python\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
             0,
             9,
         ],
@@ -61,30 +61,30 @@ test("Test parsing cards with codeblocks", () => {
     expect(
         parseT(
             "Nested Markdown?\n?\n" +
-                "````ad-note\n\n" +
-                "```git\n" +
-                "+ print('hello')\n" +
-                "- print('world')\n" +
-                "```\n\n" +
-                "~~~python\n" +
-                "print('hello world')\n" +
-                "~~~\n" +
-                "````",
+            "````ad-note\n\n" +
+            "```git\n" +
+            "+ print('hello')\n" +
+            "- print('world')\n" +
+            "```\n\n" +
+            "~~~python\n" +
+            "print('hello world')\n" +
+            "~~~\n" +
+            "````",
             parserOptions,
         ),
     ).toEqual([
         [
             CardType.MultiLineBasic,
             "Nested Markdown?\n?\n" +
-                "````ad-note\n\n" +
-                "```git\n" +
-                "+ print('hello')\n" +
-                "- print('world')\n" +
-                "```\n\n" +
-                "~~~python\n" +
-                "print('hello world')\n" +
-                "~~~\n" +
-                "````",
+            "````ad-note\n\n" +
+            "```git\n" +
+            "+ print('hello')\n" +
+            "- print('world')\n" +
+            "```\n\n" +
+            "~~~python\n" +
+            "print('hello world')\n" +
+            "~~~\n" +
+            "````",
             0,
             12,
         ],

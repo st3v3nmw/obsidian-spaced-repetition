@@ -44,6 +44,15 @@ export class ParsedQuestionInfo {
     }
 }
 
+export interface IHTMLCommentSearchResultElement {
+    type: "NON_SR_COMMENT" | "SR_COMMENT";
+    indexOfStart: number;
+    comment: string;
+    uncommentedTextBeforeComment: string;
+    uncommentedTextAfterComment: string;
+    isClosed: boolean;
+}
+
 /**
  * The line data class
  *
@@ -196,8 +205,8 @@ export class CardData {
             lastCard.backText !== null
                 ? lastCard.backText + "\n" + lineData.currentLine
                 : searchForMultilineCards
-                  ? lineData.currentLine
-                  : null,
+                    ? lineData.currentLine
+                    : null,
         );
         this.cards[this.lastCardIndex] = modifiedLastCard;
     }
@@ -355,6 +364,7 @@ export class ParserData {
     clozeCrafter: ClozeCrafter; // The cloze crafter
     searchForMultilineCards: boolean; // Whether to search for multiline cards
     searchForMultilineCloze: boolean; // Whether to search for lines for the prev cloze card
+    searchForHTMLCommentEnds: number; // Whether to search for lines for the prev cloze card
 
     /**
      * Creates a new instance of ParserData
@@ -380,6 +390,7 @@ export class ParserData {
         this.options = options;
         this.notePath = notePath;
         this.noteText = noteText;
+        this.searchForHTMLCommentEnds = 0;
         // Sort inline and multiline separators by length, longest first
         const inlineSeparators = [
             { separator: options.singleLineCardSeparator, type: CardType.SingleLineBasic },
