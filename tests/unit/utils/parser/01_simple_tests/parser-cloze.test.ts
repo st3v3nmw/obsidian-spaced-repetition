@@ -1,7 +1,7 @@
 import { CardType } from "src/card/questions/question";
 import ParserOptions from "src/utils/parsers/data-structures/parser/parser-options";
 
-import { parserOptions, parseT } from "../../helpers/unit-test-parser-helper";
+import { parserOptions, parseT } from "tests/unit/helpers/unit-test-parser-helper";
 
 // TODO: Add card fragment tests
 

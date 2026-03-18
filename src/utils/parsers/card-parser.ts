@@ -1,6 +1,6 @@
 import { NotesWithCardFragments } from "src/utils/parsers/data-structures/cards/card-fragments/note-with-card-fragments";
 import ParsedCardInfo from "src/utils/parsers/data-structures/parser/parsed-card-info";
-import { ParserData } from "src/utils/parsers/data-structures/parser/parser-data-structure";
+import { ParserData } from "src/utils/parsers/data-structures/parser/parser-data";
 import ParserOptions from "src/utils/parsers/data-structures/parser/parser-options";
 import LineParser from "src/utils/parsers/line-parser";
 

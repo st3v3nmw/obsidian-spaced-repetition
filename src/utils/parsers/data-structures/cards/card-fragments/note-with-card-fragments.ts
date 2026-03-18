@@ -1,4 +1,4 @@
-import { CardFragment, CardFragmentType } from "src/utils/parser/data-structures/card-fragments/card-fragment";
+import { CardFragment, CardFragmentType } from "src/utils/parsers/data-structures/cards/card-fragments/card-fragment";
 
 /**
  * A collection of notes with card fragments
