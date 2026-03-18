@@ -44,13 +44,10 @@ export class ParsedQuestionInfo {
     }
 }
 
-export interface IHTMLCommentSearchResultElement {
-    type: "NON_SR_COMMENT" | "SR_COMMENT";
-    indexOfStart: number;
-    comment: string;
-    uncommentedTextBeforeComment: string;
-    uncommentedTextAfterComment: string;
-    isClosed: boolean;
+export interface HTMLCommentSearchResultElement {
+    startIndex: number;
+    endIndex: number;
+    text: string;
 }
 
 /**

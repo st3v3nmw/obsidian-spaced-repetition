@@ -2,7 +2,7 @@ import { ClozeCrafter } from "clozecraft";
 
 import { CardType } from "src/card/questions/question";
 import { CardFragment, NotesWithCardFragments } from "src/parser/card-fragments";
-import { IHTMLCommentSearchResultElement, ParsedQuestionInfo, ParserData, ParserOptions } from "src/parser/parser-data-structure";
+import { HTMLCommentSearchResultElement, ParsedQuestionInfo, ParserData, ParserOptions } from "src/parser/parser-data-structure";
 
 // All the states that the parser can be in, when parsing a note for cards
 export type ParserStates =
@@ -10,9 +10,9 @@ export type ParserStates =
     | "PARSE_LINE"
     | "EMPTY_LINE"
     | "TEXT"
-    | "NON_SR_HTML_COMMENT_START"
-    | "NON_SR_HTML_COMMENT_END"
-    | "NON_SR_HTML_COMMENT_MIDDLE"
+    | "HTML_COMMENT_START"
+    | "HTML_COMMENT_END"
+    | "HTML_COMMENT_MIDDLE"
     | "SR_HTML_COMMENT"
     | "CLOZE"
     | "INLINE_CARD"
@@ -103,7 +103,7 @@ export class QuestionParser {
             case "PARSE_LINE": {
                 // Route to the correct state based on line content
                 if (QuestionParser.isMiddleOfNonSRHTMLComment(parserData)) {
-                    parserData.setParserState("NON_SR_HTML_COMMENT_MIDDLE");
+                    parserData.setParserState("HTML_COMMENT_MIDDLE");
                 } else if (currentLineTrimmed.length === 0) {
                     // Empty line
                     parserData.setParserState("EMPTY_LINE");
@@ -130,15 +130,12 @@ export class QuestionParser {
                         );
                         break;
                     }
-                } else if (QuestionParser.hasStartOfNonSRHTMLComment(currentLineTrimmed)) {
+                } else if (QuestionParser.indexOfHTMLCommentStart(currentLineTrimmed) >= 0) {
                     // Non sr info comment
-                    parserData.setParserState("NON_SR_HTML_COMMENT_START");
-                } else if (QuestionParser.hasEndOfNonSRHTMLComment(currentLineTrimmed)) {
+                    parserData.setParserState("HTML_COMMENT_START");
+                } else if (QuestionParser.indexOfHTMLCommentEnd(currentLineTrimmed) >= 0) {
                     // Non sr info comment
-                    parserData.setParserState("NON_SR_HTML_COMMENT_END");
-                } else if (QuestionParser.hasSRHTMLComment(currentLineTrimmed)) {
-                    // SR info comment
-                    parserData.setParserState("SR_HTML_COMMENT");
+                    parserData.setParserState("HTML_COMMENT_END");
                 } else if (
                     QuestionParser.hasInlineSeparator(
                         currentLineTrimmed,
@@ -207,26 +204,69 @@ export class QuestionParser {
                 break;
             }
 
-            case "NON_SR_HTML_COMMENT_START": {
-                console.log("NON_SR_HTML_COMMENT");
-                // TODO: Implement
-                // Has end on same line if num of end markers is === num of start markers
-                // Else I only care about that any open ones get closed
-                // Search for text before start of comment
+            case "HTML_COMMENT_START": {
+                let whitespaceBeforeText = "";
+                if (parserData.lineData.currentLine.length !== parserData.lineData.currentLineEndTrimmed.length) {
+                    // Has whitespace before text so we save it for later
+
+                    const indexOfFirstNonWhitespace = parserData.lineData.currentLine.indexOf(parserData.lineData.currentLineEndTrimmed);
+                    whitespaceBeforeText = parserData.lineData.currentLine.substring(0, indexOfFirstNonWhitespace);
+                }
+
+                const srCommentsInLine = QuestionParser.getSRCommentsInLine(parserData.lineData.currentLineTrimmed);
+                const htmlCommentsInLine = QuestionParser.getHTMLCommentsInLine(parserData.lineData.currentLineTrimmed, srCommentsInLine);
+
+                const commentsWithoutEnd = htmlCommentsInLine.filter((htmlComment) => htmlComment.endIndex < 0);
+
+                let uncommentedText = "";
+
+                for (let i = 0; i < parserData.lineData.currentLineTrimmed.length; i++) {
+                    const htmlComment = htmlCommentsInLine.find((htmlComment) => htmlComment.startIndex === i);
+
+                    if (!htmlComment) {
+                        // Add any text or sr comment before next comment
+                        uncommentedText += parserData.lineData.currentLineTrimmed[i];
+                        continue;
+                    }
+
+                    if (htmlComment.endIndex < 0) {
+                        // Comment doesn't have an end
+                        // Exit search for end of comment -> comment ends on next few lines
+                        break;
+                    }
+
+                    // Skip till end of comment to add text after comment
+                    i = htmlComment.endIndex;
+                }
+
+                // Removed all html comments so we handle any remaining text
+                const uncommentedTextEndTrimmed = whitespaceBeforeText + uncommentedText.trimEnd();
+                parserData.lineData.currentLineTrimmed = uncommentedText.trim();
+                parserData.lineData.currentLineEndTrimmed = uncommentedTextEndTrimmed;
+                parserData.lineData.currentLine = uncommentedTextEndTrimmed;
+
+                parserData.setParserState("PARSE_LINE");
+                parserData = QuestionParser.parseLine(parserData);
+
+                // Now add all the remaining open comments so that we can handle them later
+                parserData.searchForHTMLCommentEnds = commentsWithoutEnd.length;
+
                 break;
             }
 
-            case "NON_SR_HTML_COMMENT_MIDDLE": {
+            case "HTML_COMMENT_MIDDLE": {
                 // Skip line till all start comments are closed
-                parserData.currentParserState = "PARSE_LINE";
+                parserData.setParserState("PARSE_LINE");
                 break;
             }
 
 
-            case "NON_SR_HTML_COMMENT_END": {
+            case "HTML_COMMENT_END": {
                 console.log("NON_SR_HTML_COMMENT");
                 // TODO: Implement
-
+                // TODO: Decrement with amount of comments end markers
+                // Maybe merge with HTML COMMENT START, as there could be a start in an endline and vice versa
+                parserData.setParserState("PARSE_LINE");
                 break;
             }
 
@@ -557,10 +597,9 @@ export class QuestionParser {
      * @param trimmedLine
      * @returns
      */
-    static hasStartOfNonSRHTMLComment(trimmedLine: string): boolean {
+    static indexOfHTMLCommentStart(trimmedLine: string, index: number = 0): number {
         return (
-            trimmedLine.includes(QuestionParser.nonSrCommentStart) &&
-            !trimmedLine.includes(QuestionParser.srCommentStart)
+            trimmedLine.indexOf(QuestionParser.nonSrCommentStart, index)
         );
     }
 
@@ -582,21 +621,10 @@ export class QuestionParser {
      * @param trimmedLine
      * @returns
      */
-    static hasEndOfNonSRHTMLComment(trimmedLine: string): boolean {
+    static indexOfHTMLCommentEnd(trimmedLine: string, index: number = 0): number {
         return (
-            trimmedLine.includes(QuestionParser.nonSrCommentStart) &&
-            !trimmedLine.startsWith(QuestionParser.srCommentStart)
+            trimmedLine.indexOf(QuestionParser.nonSrCommentStart, index)
         );
-    }
-
-    /**
-     * Returns true if the trimmed line ends with the commentEnd
-     *
-     * @param trimmedLine
-     * @returns
-     */
-    static hasEndOfHTMLComment(trimmedLine: string): boolean {
-        return trimmedLine.endsWith(QuestionParser.commentEnd);
     }
 
     /**
@@ -605,8 +633,88 @@ export class QuestionParser {
      * @param trimmedLine
      * @returns
      */
-    static hasSRHTMLComment(trimmedLine: string): boolean {
-        return trimmedLine.startsWith(QuestionParser.srCommentStart);
+    static getSRHTMLComment(trimmedLine: string, index: number = 0): HTMLCommentSearchResultElement {
+        const startIndex = trimmedLine.indexOf(QuestionParser.srCommentStart, index);
+        if (startIndex < 0) {
+            return { startIndex: -1, endIndex: -1, text: "" };
+        }
+
+        const endIndex = trimmedLine.indexOf(QuestionParser.commentEnd, startIndex);
+
+        return { startIndex, endIndex, text: trimmedLine.substring(startIndex, endIndex + 1) };
+    }
+
+    /**
+     * Returns the sr comments in the line
+     *
+     * @param trimmedLine
+     * @returns
+     */
+    static getSRCommentsInLine(trimmedLine: string): HTMLCommentSearchResultElement[] {
+        const srCommentsInLine: HTMLCommentSearchResultElement[] = [];
+
+        let nextSRComment = QuestionParser.getSRHTMLComment(trimmedLine, 0);
+
+        while (nextSRComment.text.length > 0) {
+            srCommentsInLine.push(nextSRComment);
+
+            nextSRComment = QuestionParser.getSRHTMLComment(trimmedLine, nextSRComment.endIndex + 1);
+        }
+
+        return srCommentsInLine;
+    }
+
+    static getHTMLCommentsInLine(trimmedLine: string, externalSrCommentsInLine: HTMLCommentSearchResultElement[] = []): HTMLCommentSearchResultElement[] {
+        let srCommentsInLine = externalSrCommentsInLine;
+
+        if (srCommentsInLine.length === 0) {
+            srCommentsInLine = QuestionParser.getSRCommentsInLine(trimmedLine);
+        }
+
+        const htmlCommentsInLine: HTMLCommentSearchResultElement[] = [];
+
+        for (let i = 0; i < trimmedLine.length; i++) {
+            const indexOfStart = QuestionParser.indexOfHTMLCommentStart(trimmedLine, i);
+            if (indexOfStart < 0) {
+                // No start found
+                break;
+            }
+
+            const srCommentWithSameStartIndex = srCommentsInLine.find((srComment) => srComment.startIndex === indexOfStart);
+            if (srCommentWithSameStartIndex) {
+                // Skip sr comment
+                i = srCommentWithSameStartIndex.endIndex;
+                continue;
+            }
+
+            let indexOfEnd = QuestionParser.indexOfHTMLCommentEnd(trimmedLine, indexOfStart);
+
+            if (indexOfEnd < 0) {
+                // No end found
+                htmlCommentsInLine.push({ startIndex: indexOfStart, endIndex: -1, text: trimmedLine.substring(indexOfStart) });
+                return htmlCommentsInLine;
+            }
+
+            let srCommentWithSameEndIndex = srCommentsInLine.find((srComment) => srComment.endIndex === indexOfEnd);
+
+            while (srCommentWithSameEndIndex) {
+                // Skip sr comment end till
+                indexOfEnd = QuestionParser.indexOfHTMLCommentEnd(trimmedLine, srCommentWithSameEndIndex.endIndex + 1);
+                if (indexOfEnd < 0) {
+                    // No valid end found
+                    htmlCommentsInLine.push({ startIndex: indexOfStart, endIndex: -1, text: trimmedLine.substring(indexOfStart) });
+                    return htmlCommentsInLine;
+                }
+                srCommentWithSameEndIndex = srCommentsInLine.find((srComment) => srComment.endIndex === indexOfEnd);
+            }
+
+            // Found end
+            htmlCommentsInLine.push({ startIndex: indexOfStart, endIndex: indexOfEnd, text: trimmedLine.substring(indexOfStart, indexOfEnd + 1) });
+
+            i = indexOfEnd;
+        }
+
+        return htmlCommentsInLine;
     }
 
     /**
