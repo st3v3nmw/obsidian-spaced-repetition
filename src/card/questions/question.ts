@@ -7,7 +7,7 @@ import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorith
 import { DataStore } from "src/data-stores/base/data-store";
 import { TopicPath, TopicPathList, TopicPathWithWs } from "src/deck/topic-path";
 import { Note } from "src/note/note";
-import { ParsedQuestionInfo } from "src/parser/parser-data-structure";
+import ParsedCardInfo from "src/utils/parsers/data-structures/parser/parsed-card-info";
 import { SRSettings } from "src/settings";
 import { cyrb53, MultiLineTextFinder, stringTrimStart, TextDirection } from "src/utils/strings";
 
@@ -182,7 +182,7 @@ export class QuestionText {
 
 export class Question {
     note: Note;
-    parsedQuestionInfo: ParsedQuestionInfo;
+    parsedQuestionInfo: ParsedCardInfo;
     topicPathList: TopicPathList;
     questionText: QuestionText;
     hasEditLaterTag: boolean;
@@ -285,7 +285,7 @@ export class Question {
 
     static Create(
         settings: SRSettings,
-        parsedQuestionInfo: ParsedQuestionInfo,
+        parsedQuestionInfo: ParsedCardInfo,
         noteTopicPathList: TopicPathList,
         textDirection: TextDirection,
         context: string[],

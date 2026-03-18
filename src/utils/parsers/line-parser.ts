@@ -1,96 +1,22 @@
 import { ClozeCrafter } from "clozecraft";
 
 import { CardType } from "src/card/questions/question";
-import { CardFragment, NotesWithCardFragments } from "src/parser/card-fragments";
-import { HTMLCommentSearchResultElement, ParsedQuestionInfo, ParserData, ParserOptions } from "src/parser/parser-data-structure";
+import { CardParser } from "src/utils/parsers/card-parser";
+import { CardFragment } from "src/utils/parsers/data-structures/cards/card-fragments/card-fragment";
+import HTMLCommentSearchResultElement from "src/utils/parsers/data-structures/lines/html-comment";
+import ParsedCardInfo from "src/utils/parsers/data-structures/parser/parsed-card-info";
+import { ParserData } from "src/utils/parsers/data-structures/parser/parser-data-structure";
 
-// All the states that the parser can be in, when parsing a note for cards
-export type ParserStates =
-    | "READY_TO_PARSE"
-    | "PARSE_LINE"
-    | "EMPTY_LINE"
-    | "TEXT"
-    | "HTML_COMMENT_START"
-    | "HTML_COMMENT_END"
-    | "HTML_COMMENT_MIDDLE"
-    | "SR_HTML_COMMENT"
-    | "CLOZE"
-    | "INLINE_CARD"
-    | "MULTILINE_SEPARATOR"
-    | "MULTILINE_END_MARKER";
-
-/**
- * The parser class
- *
- * This class is responsible for parsing the text of a note for cards.
- * It is a state machine that parses the text line by line and
- * always first determines in which state it should be in based on the current line. Then it parses the line based on the current state.
- *
- * While parsing it also keeps track of any card fragments that it finds in each note along the way, so that they can be handled later.This is done by keeping a list of note paths and a list of rouge card fragments for each note path.
- *
- * It also has an option for verbose debugging, which can be enabled or disabled.
- */
-export class QuestionParser {
+export default class LineParser {
     static readonly srCommentStart = "<!--SR:"; // The start of a scheduling info comment
     static readonly nonSrCommentStart = "<!--"; // The start of a non scheduling info comment
     static readonly commentEnd = "-->"; // The end of a comment
 
-    static debugParser = false; // Enable to see the parser state changes
-    static notesWithCardFragments: NotesWithCardFragments = new NotesWithCardFragments(); // The list of notes with card fragments from the last parsing of each note
-
-    /**
-     * Returns flashcards found in `text`
-     *
-     * It is best that the text does not contain frontmatter, see extractFrontmatter for reasoning
-     *
-     * @param noteText - The text to extract flashcards from
-     * @param ParserOptions - Parser options
-     * @returns An array of parsed question information
-     */
-    static parse(notePath: string, noteText: string, options: ParserOptions): ParsedQuestionInfo[] {
-        if (QuestionParser.debugParser) {
-            console.log("[DEBUG]: Text to parse:\n<<<" + noteText + ">>>");
-        }
-
-        // Reset the rouge card fragments for the note, as it will be rebuild while parsing
-        QuestionParser.notesWithCardFragments.resetNote(notePath, noteText);
-
-        // Create a fresh parser data object
-        let parserData = new ParserData(options, noteText, notePath);
-
-        // Parse the note line by line
-        for (let i = 0; i < parserData.lineData.lines.length; i++) {
-            parserData.lineData.setCurrentLine(i);
-
-            // Set the current parser state to PARSE_LINE
-            // which is the initial state, where it determines the next state based on the current line
-            parserData.setParserState("PARSE_LINE");
-
-            if (QuestionParser.debugParser) {
-                console.log(
-                    "[DEBUG]: Current line: " + parserData.lineData.currentLine,
-                    parserData.lineData.currentLineNum,
-                );
-                console.log("[DEBUG]: Current parser state: " + parserData.currentParserState);
-            }
-
-            // Parse the current line based on the current parser data
-            parserData = QuestionParser.parseLine(parserData);
-        }
-
-        if (QuestionParser.debugParser) {
-            console.log("[DEBUG]: Parsed cards:\n", parserData.cardData.cards);
-        }
-
-        // Return the list of parsed cards
-        return parserData.cardData.cards;
-    }
-
-    private static parseLine(parserData: ParserData): ParserData {
+    static parseLine(parserData: ParserData): ParserData {
         // Trim the current line for easier parsing and use in function calls
         const currentLineTrimmed: string = parserData.lineData.currentLineTrimmed;
 
-        if (QuestionParser.debugParser) {
+        if (CardParser.debugParser) {
             console.log("[DEBUG]: Current state: " + parserData.currentParserState);
             console.log(
                 "[DEBUG]: Current line: " + parserData.lineData.currentLine,
@@ -102,13 +28,13 @@ export class QuestionParser {
         switch (parserData.currentParserState) {
             case "PARSE_LINE": {
                 // Route to the correct state based on line content
-                if (QuestionParser.isMiddleOfNonSRHTMLComment(parserData)) {
+                if (LineParser.isMiddleOfNonSRHTMLComment(parserData)) {
                     parserData.setParserState("HTML_COMMENT_MIDDLE");
                 } else if (currentLineTrimmed.length === 0) {
                     // Empty line
                     parserData.setParserState("EMPTY_LINE");
                 } else if (
-                    QuestionParser.isMultiLineCardEndMarker(
+                    LineParser.isMultiLineCardEndMarker(
                         currentLineTrimmed,
                         parserData.options.multilineCardEndMarker,
                     )
@@ -118,7 +44,7 @@ export class QuestionParser {
                         parserData.setParserState("MULTILINE_END_MARKER");
                     } else {
                         // This shouldn't be here in the current line
-                        QuestionParser.notesWithCardFragments.addCardFragment(
+                        CardParser.notesWithCardFragments.addCardFragment(
                             parserData.notePath,
                             parserData.noteText,
                             {
@@ -130,31 +56,31 @@ export class QuestionParser {
                         );
                         break;
                     }
-                } else if (QuestionParser.indexOfHTMLCommentStart(currentLineTrimmed) >= 0) {
-                    // Non sr info comment
-                    parserData.setParserState("HTML_COMMENT_START");
-                } else if (QuestionParser.indexOfHTMLCommentEnd(currentLineTrimmed) >= 0) {
-                    // Non sr info comment
-                    parserData.setParserState("HTML_COMMENT_END");
                 } else if (
-                    QuestionParser.hasInlineSeparator(
+                    LineParser.indexOfHTMLCommentStart(currentLineTrimmed) >= 0 ||
+                    LineParser.indexOfHTMLCommentEnd(currentLineTrimmed) >= 0
+                ) {
+                    // Non sr info comment
+                    parserData.setParserState("HTML_COMMENT_START_OR_END");
+                } else if (
+                    LineParser.hasInlineSeparator(
                         currentLineTrimmed,
                         parserData.lineData.inlineSeparators.map((x) => x.separator),
                     )
                 ) {
                     // Inline card
                     parserData.setParserState("INLINE_CARD");
-                } else if (QuestionParser.hasClozes(currentLineTrimmed, parserData.clozeCrafter)) {
+                } else if (LineParser.hasClozes(currentLineTrimmed, parserData.clozeCrafter)) {
                     // Cloze card
                     parserData.setParserState("CLOZE");
                 } else if (
-                    QuestionParser.isMultiLineCardSeparator(
+                    LineParser.isMultiLineCardSeparator(
                         currentLineTrimmed,
                         parserData.lineData.multilineSeparators.map((x) => x.separator),
                     )
                 ) {
                     // Multiline card separator
-                    const potentialNewCard: ParsedQuestionInfo | null =
+                    const potentialNewCard: ParsedCardInfo | null =
                         parserData.cardData.potentialNewCard;
                     if (
                         potentialNewCard === null ||
@@ -162,7 +88,7 @@ export class QuestionParser {
                         potentialNewCard.frontText.length === 0
                     ) {
                         // This shouldn't be here in the current line
-                        QuestionParser.notesWithCardFragments.addCardFragment(
+                        CardParser.notesWithCardFragments.addCardFragment(
                             parserData.notePath,
                             parserData.noteText,
                             {
@@ -179,7 +105,7 @@ export class QuestionParser {
                     // Text
                     parserData.setParserState("TEXT");
                 }
-                return QuestionParser.parseLine(parserData);
+                return LineParser.parseLine(parserData);
             }
 
             case "EMPTY_LINE": {
@@ -197,14 +123,18 @@ export class QuestionParser {
                     // Only handle this if multiline cards are enabled and we are already searching for multiline cards or clozes
 
                     parserData.setParserState("TEXT");
-                    return QuestionParser.parseLine(parserData);
+                    return LineParser.parseLine(parserData);
                 } else {
                     parserData.endMultiLineSearch();
                 }
                 break;
             }
 
-            case "HTML_COMMENT_START": {
+            case "HTML_COMMENT_START_OR_END": {
+                // TODO: Implement end of HTML comment
+                // TODO: Decrement with amount of comments end markers
+                // Maybe merge with HTML COMMENT START, as there could be a start in an endline and vice versa
+
                 let whitespaceBeforeText = "";
                 if (parserData.lineData.currentLine.length !== parserData.lineData.currentLineEndTrimmed.length) {
                     // Has whitespace before text so we save it for later
@@ -213,8 +143,8 @@ export class QuestionParser {
                     whitespaceBeforeText = parserData.lineData.currentLine.substring(0, indexOfFirstNonWhitespace);
                 }
 
-                const srCommentsInLine = QuestionParser.getSRCommentsInLine(parserData.lineData.currentLineTrimmed);
-                const htmlCommentsInLine = QuestionParser.getHTMLCommentsInLine(parserData.lineData.currentLineTrimmed, srCommentsInLine);
+                const srCommentsInLine = LineParser.getSRCommentsInLine(parserData.lineData.currentLineTrimmed, parserData.lineData.currentLineNum);
+                const htmlCommentsInLine = LineParser.getHTMLCommentsInLine(parserData.lineData.currentLineTrimmed, parserData.lineData.currentLineNum, srCommentsInLine);
 
                 const commentsWithoutEnd = htmlCommentsInLine.filter((htmlComment) => htmlComment.endIndex < 0);
 
@@ -246,26 +176,16 @@ export class QuestionParser {
                 parserData.lineData.currentLine = uncommentedTextEndTrimmed;
 
                 parserData.setParserState("PARSE_LINE");
-                parserData = QuestionParser.parseLine(parserData);
+                parserData = LineParser.parseLine(parserData);
 
-                // Now add all the remaining open comments so that we can handle them later
-                parserData.searchForHTMLCommentEnds = commentsWithoutEnd.length;
+                // Now add all the remaining open comments so that we can handle them later, if there are any
+                parserData.stillOpenHTMLComments = parserData.stillOpenHTMLComments.concat(commentsWithoutEnd);
 
                 break;
             }
 
             case "HTML_COMMENT_MIDDLE": {
                 // Skip line till all start comments are closed
-                parserData.setParserState("PARSE_LINE");
-                break;
-            }
-
-
-            case "HTML_COMMENT_END": {
-                console.log("NON_SR_HTML_COMMENT");
-                // TODO: Implement
-                // TODO: Decrement with amount of comments end markers
-                // Maybe merge with HTML COMMENT START, as there could be a start in an endline and vice versa
                 parserData.setParserState("PARSE_LINE");
                 break;
             }
@@ -279,7 +199,7 @@ export class QuestionParser {
                 };
 
                 const addRougeSRComment = () => {
-                    QuestionParser.notesWithCardFragments.addCardFragment(
+                    CardParser.notesWithCardFragments.addCardFragment(
                         parserData.notePath,
                         parserData.noteText,
                         potentialRougeCardFragment,
@@ -294,7 +214,7 @@ export class QuestionParser {
                     break;
                 }
 
-                const lastCard: ParsedQuestionInfo =
+                const lastCard: ParsedCardInfo =
                     parserData.cardData.cards[parserData.cardData.lastCardIndex];
                 // Last card is not connected to this SR comment
                 if (lastCard.lastLineNum + 1 !== parserData.lineData.currentLineNum) {
@@ -379,7 +299,7 @@ export class QuestionParser {
                         // Transfer last line to the new card
                         const newPotentialCard = parserData.cardData.potentialNewCard;
 
-                        const cardType = QuestionParser.getMultilineCardType(
+                        const cardType = LineParser.getMultilineCardType(
                             lastLine,
                             parserData.lineData.multilineSeparators,
                         );
@@ -393,8 +313,6 @@ export class QuestionParser {
                         newPotentialCard.frontText = lastLine;
                         newPotentialCard.backText = null;
 
-                        // console.log("NEW POTENTIAL CARD with last line added", "\n", newPotentialCard);
-
                         parserData.cardData.potentialNewCard = newPotentialCard;
 
                         // Remove last line from last card
@@ -407,7 +325,6 @@ export class QuestionParser {
                                 .join("\n");
                         }
 
-                        // console.log("LAST CARD, where we removed the last line", "\n", lastCard);
                         parserData.cardData.cards[parserData.cardData.lastCardIndex] = lastCard;
 
                         break;
@@ -422,7 +339,7 @@ export class QuestionParser {
                     parserData.lineData.currentLineNum;
                 parserData.cardData.potentialNewCard.text +=
                     "\n" + parserData.lineData.currentLineEndTrimmed;
-                const multilineCardType = QuestionParser.getMultilineCardType(
+                const multilineCardType = LineParser.getMultilineCardType(
                     parserData.lineData.currentLineTrimmed,
                     parserData.lineData.multilineSeparators,
                 );
@@ -437,7 +354,7 @@ export class QuestionParser {
             }
 
             case "MULTILINE_END_MARKER": {
-                const lastCard: ParsedQuestionInfo | null = parserData.cardData.getLastCard();
+                const lastCard: ParsedCardInfo | null = parserData.cardData.getLastCard();
 
                 if (lastCard === null)
                     throw new Error(
@@ -445,7 +362,7 @@ export class QuestionParser {
                     );
 
                 const addMalformedMultilineCardFragment = () => {
-                    QuestionParser.notesWithCardFragments.addCardFragment(
+                    CardParser.notesWithCardFragments.addCardFragment(
                         parserData.notePath,
                         parserData.noteText,
                         {
@@ -524,7 +441,7 @@ export class QuestionParser {
                             CardType.MultiLineReversed)
                     ) {
                         parserData.cardData.addMultilineCardToList(parserData.lineData, () => {
-                            QuestionParser.notesWithCardFragments.addCardFragment(
+                            CardParser.notesWithCardFragments.addCardFragment(
                                 parserData.notePath,
                                 parserData.noteText,
                                 {
@@ -541,7 +458,7 @@ export class QuestionParser {
 
                     if (
                         !parserData.cardData.cards[parserData.cardData.lastCardIndex].text.includes(
-                            QuestionParser.srCommentStart,
+                            LineParser.srCommentStart,
                         )
                     ) {
                         parserData.cardData.addCurrentLineToLastCard(
@@ -571,7 +488,7 @@ export class QuestionParser {
                 }
 
                 // We have a potential new card, so we add the current line to it
-                const modifiedPotentialCard: ParsedQuestionInfo =
+                const modifiedPotentialCard: ParsedCardInfo =
                     parserData.cardData.potentialNewCard;
                 modifiedPotentialCard.text += "\n" + parserData.lineData.currentLine;
                 modifiedPotentialCard.frontText += "\n" + parserData.lineData.currentLine;
@@ -587,9 +504,6 @@ export class QuestionParser {
         return parserData;
     }
 
-    public static setDebugParser(value: boolean) {
-        QuestionParser.debugParser = value;
-    }
 
     /**
      * Returns true if the trimmed line starts with the nonSrCommentStart
@@ -599,7 +513,7 @@ export class QuestionParser {
      */
     static indexOfHTMLCommentStart(trimmedLine: string, index: number = 0): number {
         return (
-            trimmedLine.indexOf(QuestionParser.nonSrCommentStart, index)
+            trimmedLine.indexOf(LineParser.nonSrCommentStart, index)
         );
     }
 
@@ -611,7 +525,7 @@ export class QuestionParser {
      */
     private static isMiddleOfNonSRHTMLComment(parserData: ParserData): boolean {
         return (
-            parserData.searchForHTMLCommentEnds > 0
+            parserData.stillOpenHTMLComments.length > 0
         );
     }
 
@@ -623,7 +537,7 @@ export class QuestionParser {
      */
     static indexOfHTMLCommentEnd(trimmedLine: string, index: number = 0): number {
         return (
-            trimmedLine.indexOf(QuestionParser.nonSrCommentStart, index)
+            trimmedLine.indexOf(LineParser.nonSrCommentStart, index)
         );
     }
 
@@ -633,15 +547,15 @@ export class QuestionParser {
      * @param trimmedLine
      * @returns
      */
-    static getSRHTMLComment(trimmedLine: string, index: number = 0): HTMLCommentSearchResultElement {
-        const startIndex = trimmedLine.indexOf(QuestionParser.srCommentStart, index);
+    static getSRHTMLComment(trimmedLine: string, lineNumber: number, index: number = 0): HTMLCommentSearchResultElement {
+        const startIndex = trimmedLine.indexOf(LineParser.srCommentStart, index);
         if (startIndex < 0) {
-            return { startIndex: -1, endIndex: -1, text: "" };
+            return { startIndex: -1, endIndex: -1, text: "", lineNumber };
         }
 
-        const endIndex = trimmedLine.indexOf(QuestionParser.commentEnd, startIndex);
+        const endIndex = trimmedLine.indexOf(LineParser.commentEnd, startIndex);
 
-        return { startIndex, endIndex, text: trimmedLine.substring(startIndex, endIndex + 1) };
+        return { startIndex, endIndex, text: trimmedLine.substring(startIndex, endIndex + 1), lineNumber };
     }
 
     /**
@@ -650,31 +564,31 @@ export class QuestionParser {
      * @param trimmedLine
      * @returns
      */
-    static getSRCommentsInLine(trimmedLine: string): HTMLCommentSearchResultElement[] {
+    static getSRCommentsInLine(trimmedLine: string, lineNumber: number): HTMLCommentSearchResultElement[] {
         const srCommentsInLine: HTMLCommentSearchResultElement[] = [];
 
-        let nextSRComment = QuestionParser.getSRHTMLComment(trimmedLine, 0);
+        let nextSRComment = LineParser.getSRHTMLComment(trimmedLine, 0);
 
         while (nextSRComment.text.length > 0) {
             srCommentsInLine.push(nextSRComment);
 
-            nextSRComment = QuestionParser.getSRHTMLComment(trimmedLine, nextSRComment.endIndex + 1);
+            nextSRComment = LineParser.getSRHTMLComment(trimmedLine, lineNumber, nextSRComment.endIndex + 1);
         }
 
         return srCommentsInLine;
     }
 
-    static getHTMLCommentsInLine(trimmedLine: string, externalSrCommentsInLine: HTMLCommentSearchResultElement[] = []): HTMLCommentSearchResultElement[] {
+    static getHTMLCommentsInLine(trimmedLine: string, lineNumber: number, externalSrCommentsInLine: HTMLCommentSearchResultElement[] = []): HTMLCommentSearchResultElement[] {
         let srCommentsInLine = externalSrCommentsInLine;
 
         if (srCommentsInLine.length === 0) {
-            srCommentsInLine = QuestionParser.getSRCommentsInLine(trimmedLine);
+            srCommentsInLine = LineParser.getSRCommentsInLine(trimmedLine, lineNumber);
         }
 
         const htmlCommentsInLine: HTMLCommentSearchResultElement[] = [];
 
         for (let i = 0; i < trimmedLine.length; i++) {
-            const indexOfStart = QuestionParser.indexOfHTMLCommentStart(trimmedLine, i);
+            const indexOfStart = LineParser.indexOfHTMLCommentStart(trimmedLine, i);
             if (indexOfStart < 0) {
                 // No start found
                 break;
@@ -687,11 +601,11 @@ export class QuestionParser {
                 continue;
             }
 
-            let indexOfEnd = QuestionParser.indexOfHTMLCommentEnd(trimmedLine, indexOfStart);
+            let indexOfEnd = LineParser.indexOfHTMLCommentEnd(trimmedLine, indexOfStart);
 
             if (indexOfEnd < 0) {
                 // No end found
-                htmlCommentsInLine.push({ startIndex: indexOfStart, endIndex: -1, text: trimmedLine.substring(indexOfStart) });
+                htmlCommentsInLine.push({ startIndex: indexOfStart, endIndex: -1, text: trimmedLine.substring(indexOfStart), lineNumber });
                 return htmlCommentsInLine;
             }
 
@@ -699,17 +613,17 @@ export class QuestionParser {
 
             while (srCommentWithSameEndIndex) {
                 // Skip sr comment end till
-                indexOfEnd = QuestionParser.indexOfHTMLCommentEnd(trimmedLine, srCommentWithSameEndIndex.endIndex + 1);
+                indexOfEnd = LineParser.indexOfHTMLCommentEnd(trimmedLine, srCommentWithSameEndIndex.endIndex + 1);
                 if (indexOfEnd < 0) {
                     // No valid end found
-                    htmlCommentsInLine.push({ startIndex: indexOfStart, endIndex: -1, text: trimmedLine.substring(indexOfStart) });
+                    htmlCommentsInLine.push({ startIndex: indexOfStart, endIndex: -1, text: trimmedLine.substring(indexOfStart), lineNumber });
                     return htmlCommentsInLine;
                 }
                 srCommentWithSameEndIndex = srCommentsInLine.find((srComment) => srComment.endIndex === indexOfEnd);
             }
 
             // Found end
-            htmlCommentsInLine.push({ startIndex: indexOfStart, endIndex: indexOfEnd, text: trimmedLine.substring(indexOfStart, indexOfEnd + 1) });
+            htmlCommentsInLine.push({ startIndex: indexOfStart, endIndex: indexOfEnd, text: trimmedLine.substring(indexOfStart, indexOfEnd + 1), lineNumber });
 
             i = indexOfEnd;
         }
@@ -815,7 +729,7 @@ export class QuestionParser {
             const separatorIdx = trimmedLine.indexOf(separator);
             if (separatorIdx === -1) continue;
             // Check if it's inside an inline code block
-            if (QuestionParser.isMarkerInsideCodeBlock(trimmedLine, separator, separatorIdx))
+            if (LineParser.isMarkerInsideCodeBlock(trimmedLine, separator, separatorIdx))
                 continue;
             return true;
         }
@@ -834,104 +748,3 @@ export class QuestionParser {
         return clozeCrafter.isClozeNote(trimmedLine);
     }
 }
-
-//     // Skip everything in HTML comments
-//     if (currentLine.startsWith("<!--") && !currentLine.startsWith("<!--SR:")) {
-//         while (i + 1 < lines.length && !currentLine.includes("-->")) i++;
-//         i++;
-//         continue;
-//     }
-
-//     // Have we reached the end of a card?
-//     const isEmptyLine = currentTrimmed.length === 0;
-//     const hasMultilineCardEndMarker =
-//         options.multilineCardEndMarker && !isEmptyLine && currentTrimmed === options.multilineCardEndMarker;
-
-//     if (
-//         // We've probably reached the end of a card
-//         (isEmptyLine && !options.multilineCardEndMarker) ||
-//         // Empty line & we're not picking up any card
-//         (isEmptyLine && cardType === null) ||
-//         // We've reached the end of a multi line card &
-//         //  we're using custom end markers
-//         hasMultilineCardEndMarker
-//     ) {
-//         if (cardType) {
-//             // Create a new card
-//             lastLineNo = i - 1;
-//             if (options.multilineCardEndMarker && (cardType === CardType.MultiLineBasic || cardType === CardType.MultiLineReversed)) {
-//                 console.log(cardText);
-//             }
-
-//             cards.push(
-//                 new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo),
-//             );
-//             cardType = null;
-//         }
-
-//         cardText = "";
-//         firstLineNo = i + 1;
-//         continue;
-//     }
-
-//     // Update card text
-//     if (cardText.length > 0) {
-//         cardText += "\n";
-//     }
-//     cardText += currentLine.trimEnd();
-
-//     // Pick up inline cards
-//     for (const { separator, type } of inlineSeparators) {
-//         if (QuestionParser.hasInlineMarker(currentLine, separator)) {
-//             cardType = type;
-//             break;
-//         }
-//     }
-
-//     if (cardType === CardType.SingleLineBasic || cardType === CardType.SingleLineReversed) {
-//         cardText = currentLine;
-//         firstLineNo = i;
-
-//         // Pick up scheduling information if present
-//         if (i + 1 < lines.length && lines[i + 1].startsWith("<!--SR:")) {
-//             cardText += "\n" + lines[i + 1];
-//             i++;
-//         }
-
-//         lastLineNo = i;
-//         cards.push(new ParsedQuestionInfo(cardType, cardText, firstLineNo, lastLineNo));
-
-//         cardType = null;
-//         cardText = "";
-//     } else if (currentTrimmed === options.multilineCardSeparator) {
-//         // Ignore card if the front of the card is empty
-//         if (cardText.length > 1) {
-//             // Pick up multiline basic cards
-//             cardType = CardType.MultiLineBasic;
-//         }
-//     } else if (currentTrimmed === options.multilineReversedCardSeparator) {
-//         // Ignore card if the front of the card is empty
-//         if (cardText.length > 1) {
-//             // Pick up multiline basic cards
-//             cardType = CardType.MultiLineReversed;
-//         }
-//     } else if (currentLine.startsWith("```") || currentLine.startsWith("~~~")) {
-//         // Pick up codeblocks
-//         const codeBlockClose = currentLine.match(/`+|~+/)[0];
-//         while (i + 1 < lines.length && !lines[i + 1].startsWith(codeBlockClose)) {
-//             i++;
-//             cardText += "\n" + lines[i];
-//         }
-//         cardText += "\n" + codeBlockClose;
-//         i++;
-//     } else if (cardType === null && clozeCrafter.isClozeNote(currentLine)) {
-//         // Pick up cloze cards
-//         cardType = CardType.Cloze;
-//     }
-// }
-
-// // Do we have a card left in the queue?
-// if (cardType && cardText) {
-//     lastLineNo = lines.length - 1;
-//     cards.push(new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo));
-// }

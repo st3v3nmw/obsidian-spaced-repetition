@@ -1,5 +1,5 @@
 import { CardType } from "src/card/questions/question";
-import { ParserOptions } from "src/parser/parser-data-structure";
+import ParserOptions from "src/utils/parsers/data-structures/parser/parser-options";
 
 import { parserOptions, parseT } from "../../helpers/unit-test-parser-helper";
 
