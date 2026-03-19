@@ -86,14 +86,14 @@ export default class CardData {
         const lastCard: ParsedCardInfo = this.cards[this.lastCardIndex];
         const modifiedLastCard: ParsedCardInfo = new ParsedCardInfo(
             lastCard.cardType,
-            lastCard.text + "\n" + lineData.currentLine,
+            lastCard.text + "\n" + lineData.currentLineEndTrimmed,
             lastCard.firstLineNum,
             lineData.currentLineNum,
             lastCard.frontText,
             lastCard.backText !== null
-                ? lastCard.backText + "\n" + lineData.currentLine
+                ? lastCard.backText + "\n" + lineData.currentLineEndTrimmed
                 : searchForMultilineCards
-                    ? lineData.currentLine
+                    ? lineData.currentLineEndTrimmed
                     : null,
         );
         this.cards[this.lastCardIndex] = modifiedLastCard;

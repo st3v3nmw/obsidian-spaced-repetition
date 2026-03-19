@@ -1,7 +1,7 @@
 import { CardType } from "src/card/questions/question";
 import ParserOptions from "src/utils/parsers/data-structures/parser/parser-options";
 
-import { parserOptions, parseT } from "tests/unit/helpers/unit-test-parser-helper";
+import { parserOptions, parseT } from "../../../helpers/unit-test-parser-helper";
 
 // TODO: Add card fragment tests
 
@@ -1245,7 +1245,10 @@ const execMultiLineClozeCardsWithAtomicClozesTest = (
     ).toEqual([
         [
             CardType.Cloze,
-            [`${leftMarker}deletion${rightMarker} test`, "<!--SR:2022-08-11,4,270-->"].join("\n"),
+            [
+                `${leftMarker}deletion${rightMarker} test`,
+                "<!--SR:2022-08-11,4,270-->"
+            ].join("\n"),
             2,
             3,
         ],
@@ -1262,7 +1265,14 @@ const execMultiLineClozeCardsWithAtomicClozesTest = (
             ].join("\n"),
             options,
         ),
-    ).toEqual([[CardType.Cloze, [`test ${leftMarker}deletion${rightMarker}`].join("\n"), 2, 2]]);
+    ).toEqual([
+        [
+            CardType.Cloze,
+            [
+                `test ${leftMarker}deletion${rightMarker}`,
+            ].join("\n"), 2, 2
+        ]
+    ]);
 
     expect(
         parseT(

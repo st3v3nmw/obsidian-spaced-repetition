@@ -42,6 +42,7 @@ export class CardParser {
         // Parse the note line by line
         for (let i = 0; i < parserData.lineData.lines.length; i++) {
             parserData.lineData.setCurrentLine(i);
+            parserData.noHTMLCommentsInCurrentLine = false;
 
             // Set the current parser state to PARSE_LINE
             // which is the initial state, where it determines the next state based on the current line

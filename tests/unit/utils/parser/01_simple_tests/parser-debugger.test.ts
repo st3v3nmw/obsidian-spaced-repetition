@@ -1,6 +1,6 @@
 import { CardParser } from "src/utils/parsers/card-parser";
 
-import { parserOptions } from "tests/unit/helpers/unit-test-parser-helper";
+import { parserOptions } from "../../../helpers/unit-test-parser-helper";
 
 describe("Parser debug messages", () => {
     test("Messages disabled", () => {

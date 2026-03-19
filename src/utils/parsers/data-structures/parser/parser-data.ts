@@ -32,6 +32,7 @@ export class ParserData {
     searchForMultilineCards: boolean; // Whether to search for multiline cards
     searchForMultilineCloze: boolean; // Whether to search for lines for the prev cloze card
     stillOpenHTMLComments: HTMLCommentSearchResultElement[]; // The still open html comments
+    noHTMLCommentsInCurrentLine: boolean; // Flag to indicate if there are no HTML comments in the current line
 
     /**
      * Creates a new instance of ParserData
@@ -57,6 +58,7 @@ export class ParserData {
         this.options = options;
         this.notePath = notePath;
         this.noteText = noteText;
+        this.noHTMLCommentsInCurrentLine = false;
         this.stillOpenHTMLComments = [];
         // Sort inline and multiline separators by length, longest first
         const inlineSeparators = [

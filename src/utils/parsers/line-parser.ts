@@ -11,14 +11,8 @@ export default class LineParser {
     static readonly srCommentStart = "<!--SR:"; // The start of a scheduling info comment
     static readonly nonSrCommentStart = "<!--"; // The start of a non scheduling info comment
     static readonly commentEnd = "-->"; // The end of a comment
-    static parserCallCount = 0;
 
     static parseLine(parserData: ParserData): ParserData {
-        // LineParser.parserCallCount++;
-        // if (LineParser.parserCallCount > 1000) {
-        //     throw new Error("Infinite loop detected");
-        // }
-
         // Trim the current line for easier parsing and use in function calls
         const currentLineTrimmed: string = parserData.lineData.currentLineTrimmed;
 
@@ -63,8 +57,10 @@ export default class LineParser {
                         break;
                     }
                 } else if (
-                    LineParser.indexOfHTMLCommentStart(currentLineTrimmed) >= 0 ||
-                    LineParser.indexOfHTMLCommentEnd(currentLineTrimmed) >= 0
+                    !parserData.noHTMLCommentsInCurrentLine && (
+                        LineParser.indexOfHTMLCommentStart(currentLineTrimmed) >= 0 ||
+                        LineParser.indexOfHTMLCommentEnd(currentLineTrimmed) >= 0
+                    )
                 ) {
                     // Non sr info comment
                     parserData.setParserState("HTML_COMMENT_START_OR_END");
@@ -142,17 +138,21 @@ export default class LineParser {
                 const srCommentsInLine = LineParser.getSRCommentsInLine(parserData.lineData.currentLineTrimmed, parserData.lineData.currentLineNum);
 
                 const htmlCommentsInLine = LineParser.getHTMLCommentsInLine(parserData.lineData.currentLineTrimmed, parserData.lineData.currentLineNum, srCommentsInLine);
-                console.log("----------------", htmlCommentsInLine);
-                console.log("xxxxxxxxxxxx", srCommentsInLine);
-                console.log("xxxxxxxxxxxx", !LineParser.isMiddleOfNonSRHTMLComment(parserData));
+
                 if (
                     htmlCommentsInLine.length === 0 &&
                     srCommentsInLine.length > 0 &&
                     !LineParser.isMiddleOfNonSRHTMLComment(parserData)
                 ) {
                     // No html comments & not within a html comment, but there are SR comments
-                    parserData.setParserState("SR_HTML_COMMENT");
+                    if (parserData.lineData.currentLineTrimmed.startsWith("<!--SR:")) {
+                        parserData.setParserState("SR_HTML_COMMENT");
+                    } else {
+                        parserData.noHTMLCommentsInCurrentLine = true;
+                        parserData.setParserState("PARSE_LINE");
+                    }
                     parserData = LineParser.parseLine(parserData);
+
                     break;
                 }
 
@@ -231,7 +231,6 @@ export default class LineParser {
                 parserData.lineData.currentLine = uncommentedTextEndTrimmed;
 
                 parserData.setParserState("PARSE_LINE");
-                console.log("????????????", uncommentedTextEndTrimmed, parserData.stillOpenHTMLComments);
                 parserData = LineParser.parseLine(parserData);
 
                 // Now add all the remaining open comments so that we can handle them later, if there are any
@@ -272,7 +271,7 @@ export default class LineParser {
 
                 const lastCard: ParsedCardInfo =
                     parserData.cardData.cards[parserData.cardData.lastCardIndex];
-                // Last card is not connected to this SR comment
+                // Last card is not connected to this SR comment by being on the next line
                 if (lastCard.lastLineNum + 1 !== parserData.lineData.currentLineNum) {
                     parserData = addRougeSRComment();
                     break;
@@ -296,6 +295,22 @@ export default class LineParser {
                 ) {
                     parserData.endMultiLineSearch();
                 }
+
+                // Check if it is also connected in the case of atomic clozes, where no text from the next line is added apart from the scheduling info comment
+                if (parserData.options.useAtomicClozes && lastCard.cardType === CardType.Cloze) {
+                    // It will only be connected if there is no other text in the current line
+
+                    if (
+                        !parserData.lineData.currentLineTrimmed.startsWith("<!--SR:") &&
+                        !LineParser.hasClozes(parserData.lineData.currentLineTrimmed, parserData.clozeCrafter) &&
+                        !LineParser.hasInlineSeparator(parserData.lineData.currentLineTrimmed, parserData.lineData.inlineSeparators.map((x) => x.separator)) &&
+                        !LineParser.isMultiLineCardSeparator(parserData.lineData.currentLineTrimmed, parserData.lineData.multilineSeparators.map((x) => x.separator))
+                    ) {
+                        parserData = addRougeSRComment();
+                        break;
+                    }
+                }
+
                 parserData.cardData.addCurrentLineToLastCard(parserData.lineData);
 
                 if (
@@ -331,7 +346,6 @@ export default class LineParser {
                     const lastLineNum = lastCard.lastLineNum;
                     const linesOfLastCard = lastCard.text.split("\n");
                     const lastLine = linesOfLastCard[linesOfLastCard.length - 1];
-                    // console.log("LAST CARD where we have to remove the last line", "\n", lastCard);
 
                     // To be able to add the last line to the new card, it must be text
                     // Parsing is done in the following order:
@@ -625,6 +639,7 @@ export default class LineParser {
      * @returns
      */
     static getSRCommentsInLine(trimmedLine: string, lineNumber: number): HTMLCommentSearchResultElement[] {
+        // TODO: Maybe merge this with getHTMLCommentsInLine
         const srCommentsInLine: HTMLCommentSearchResultElement[] = [];
 
         let nextSRComment = LineParser.getSRHTMLComment(trimmedLine, 0);
