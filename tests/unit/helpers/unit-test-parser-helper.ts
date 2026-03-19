@@ -21,7 +21,7 @@ export const parserOptions: ParserOptions = {
  * This function is a small wrapper around parse used for testing only.
  *  It generates a parser each time, overwriting the default one.
  * Created when the actual parser changed from returning [CardType, string, number, number] to ParsedCardInfo.
- * It's purpose is to minimise changes to all the test cases here during the parser()->parserEx() change.
+ * It's purpose is to minimize changes to all the test cases here during the parser()->parserEx() change.
  */
 export function parseT(
     text: string,

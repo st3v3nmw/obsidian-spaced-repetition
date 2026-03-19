@@ -1,17 +1,22 @@
-import { ClozeCrafter } from "clozecraft";
-
 import { CardType } from "src/card/questions/question";
 import { CardParser } from "src/utils/parsers/card-parser";
 import { CardFragment } from "src/utils/parsers/data-structures/cards/card-fragments/card-fragment";
 import HTMLCommentSearchResultElement from "src/utils/parsers/data-structures/lines/html-comment";
 import ParsedCardInfo from "src/utils/parsers/data-structures/parser/parsed-card-info";
 import { ParserData } from "src/utils/parsers/data-structures/parser/parser-data";
+import StringDetector from "src/utils/parsers/detectors/string-detector";
 
+/**
+ * The line parser class
+ *
+ * This class is responsible for parsing a line of text into potential new cards.
+ * It is a state machine that parses the line depending on the current state.
+ * always first determines in which state it should be in based on the current line. Then it parses the line based on the current state.
+ *
+ * While parsing it also keeps track of any card fragments that it finds in each note along the way, so that they can be handled later.This is done by keeping a list of note paths and a list of rouge card fragments for each note path.
+ *
+ */
 export default class LineParser {
-    static readonly srCommentStart = "<!--SR:"; // The start of a scheduling info comment
-    static readonly nonSrCommentStart = "<!--"; // The start of a non scheduling info comment
-    static readonly commentEnd = "-->"; // The end of a comment
-
     static parseLine(parserData: ParserData): ParserData {
         // Trim the current line for easier parsing and use in function calls
         const currentLineTrimmed: string = parserData.lineData.currentLineTrimmed;
@@ -28,13 +33,13 @@ export default class LineParser {
         switch (parserData.currentParserState) {
             case "PARSE_LINE": {
                 // Route to the correct state based on line content
-                if (LineParser.isMiddleOfNonSRHTMLComment(parserData)) {
+                if (LineParser.parserIsInMiddleOfNonSRHTMLComment(parserData)) {
                     parserData.setParserState("HTML_COMMENT_MIDDLE");
                 } else if (currentLineTrimmed.length === 0) {
                     // Empty line
                     parserData.setParserState("EMPTY_LINE");
                 } else if (
-                    LineParser.isMultiLineCardEndMarker(
+                    StringDetector.isMultiLineCardEndMarker(
                         currentLineTrimmed,
                         parserData.options.multilineCardEndMarker,
                     )
@@ -58,25 +63,25 @@ export default class LineParser {
                     }
                 } else if (
                     !parserData.noHTMLCommentsInCurrentLine && (
-                        LineParser.indexOfHTMLCommentStart(currentLineTrimmed) >= 0 ||
-                        LineParser.indexOfHTMLCommentEnd(currentLineTrimmed) >= 0
+                        StringDetector.indexOfHTMLCommentStart(currentLineTrimmed) >= 0 ||
+                        StringDetector.indexOfHTMLCommentEnd(currentLineTrimmed) >= 0
                     )
                 ) {
                     // Non sr info comment
                     parserData.setParserState("HTML_COMMENT_START_OR_END");
                 } else if (
-                    LineParser.hasInlineSeparator(
+                    StringDetector.hasInlineSeparator(
                         currentLineTrimmed,
                         parserData.lineData.inlineSeparators.map((x) => x.separator),
                     )
                 ) {
                     // Inline card
                     parserData.setParserState("INLINE_CARD");
-                } else if (LineParser.hasClozes(currentLineTrimmed, parserData.clozeCrafter)) {
+                } else if (StringDetector.hasClozes(currentLineTrimmed, parserData.clozeCrafter)) {
                     // Cloze card
                     parserData.setParserState("CLOZE");
                 } else if (
-                    LineParser.isMultiLineCardSeparator(
+                    StringDetector.isMultiLineCardSeparator(
                         currentLineTrimmed,
                         parserData.lineData.multilineSeparators.map((x) => x.separator),
                     )
@@ -89,7 +94,7 @@ export default class LineParser {
                         potentialNewCard.text.length === 0 ||
                         potentialNewCard.frontText.length === 0
                     ) {
-                        // This shouldn't be here in the current line
+                        // The multi line card separator shouldn't be here in the current line
                         CardParser.notesWithCardFragments.addCardFragment(
                             parserData.notePath,
                             parserData.noteText,
@@ -111,43 +116,24 @@ export default class LineParser {
                 break;
             }
 
-            case "EMPTY_LINE": {
-                /* Empty line
-                    -> relevant > we handle it
-                    -> irrelevant > we skip it
-                */
-                if (
-                    parserData.options.multilineCardEndMarker !== null &&
-                    parserData.options.multilineCardEndMarker !== undefined &&
-                    parserData.options.multilineCardEndMarker !== "" &&
-                    parserData.options.multilineCardEndMarker.trim() !== "" &&
-                    (parserData.searchForMultilineCards || parserData.searchForMultilineCloze)
-                ) {
-                    // Only handle this if multiline cards are enabled and we are already searching for multiline cards or clozes
-
-                    parserData.setParserState("TEXT");
-                    parserData = LineParser.parseLine(parserData);
-                    break;
-                } else {
-                    parserData.endMultiLineSearch();
-                }
-                break;
-            }
-
             case "HTML_COMMENT_START_OR_END": {
-                const srCommentsInLine = LineParser.getSRCommentsInLine(parserData.lineData.currentLineTrimmed, parserData.lineData.currentLineNum);
+                // TODO: Improve this mess, as it is too complex to understand
+                const srCommentsInLine = StringDetector.getSRCommentsInLine(parserData.lineData.currentLineTrimmed, parserData.lineData.currentLineNum);
 
-                const htmlCommentsInLine = LineParser.getHTMLCommentsInLine(parserData.lineData.currentLineTrimmed, parserData.lineData.currentLineNum, srCommentsInLine);
+                const htmlCommentsInLine = StringDetector.getHTMLCommentsInLine(parserData.lineData.currentLineTrimmed, parserData.lineData.currentLineNum, srCommentsInLine);
+
+                const parsedHtmlCommentsInLIne: HTMLCommentSearchResultElement[] = [];
 
                 if (
                     htmlCommentsInLine.length === 0 &&
                     srCommentsInLine.length > 0 &&
-                    !LineParser.isMiddleOfNonSRHTMLComment(parserData)
+                    !LineParser.parserIsInMiddleOfNonSRHTMLComment(parserData)
                 ) {
                     // No html comments & not within a html comment, but there are SR comments
                     if (parserData.lineData.currentLineTrimmed.startsWith("<!--SR:")) {
                         parserData.setParserState("SR_HTML_COMMENT");
                     } else {
+                        // There is a mix of SR comments and text, so we can handle it differently by parsing the text first
                         parserData.noHTMLCommentsInCurrentLine = true;
                         parserData.setParserState("PARSE_LINE");
                     }
@@ -157,42 +143,45 @@ export default class LineParser {
                 }
 
                 // We know now that there is a mix of SR comments, HTML comments and text so we can handle it
-                //  all starts and ends of HTML comments that are new in this line
-                let commentsWithoutEnd = htmlCommentsInLine.filter((htmlComment) => htmlComment.endIndex < 0).sort((a, b) => a.startIndex - b.startIndex);
-
+                //  all loose starts and ends of HTML comments that are new in this line
+                const commentsWithoutEnd = htmlCommentsInLine.filter((htmlComment) => htmlComment.endIndex < 0).sort((a, b) => a.startIndex - b.startIndex);
                 let commentsWithoutStart = htmlCommentsInLine.filter((htmlComment) => htmlComment.startIndex < 0).sort((a, b) => a.endIndex - b.endIndex);
+
+                // Save whitespace before text
+                const whitespaceBeforeText = StringDetector.getWhitespaceBeforeText(
+                    parserData.lineData.currentLine,
+                    parserData.lineData.currentLineTrimmed,
+                    parserData.lineData.currentLineEndTrimmed
+                );
 
                 // Prep to collect uncommented text
                 let uncommentedText = "";
-
-                // Save whitespace before text
-                let whitespaceBeforeText = "";
-                if (parserData.lineData.currentLineTrimmed.length !== parserData.lineData.currentLineEndTrimmed.length) {
-                    // Has whitespace before text so we save it for later
-                    const indexOfFirstNonWhitespace = parserData.lineData.currentLine.indexOf(parserData.lineData.currentLineTrimmed);
-                    whitespaceBeforeText = parserData.lineData.currentLine.substring(0, indexOfFirstNonWhitespace);
-                }
+                // Check if we are still in a comment from the previous line
+                let isInCommentFromPrevLine = parserData.stillOpenHTMLComments.length > 0; // Flag to indicate if we are still in a comment from the previous line
 
                 // Skip all text in comments and extract the text outside of them
-                let isInComment = parserData.stillOpenHTMLComments.length > 0;
                 for (let i = 0; i < parserData.lineData.currentLineTrimmed.length; i++) {
-                    if (isInComment) {
+                    // console.log(parserData.lineData.currentLineTrimmed[i], isInCommentFromPrevLine);
+                    // Check if we are still in a comment from the previous line
+                    if (isInCommentFromPrevLine) {
                         // If still in a comment, then we need to close it else we skip that text
-                        const newCommentEndIndex = commentsWithoutStart.findIndex((comment) => {
+                        const indexOfNewCommentEnd = commentsWithoutStart.findIndex((comment) => {
                             return comment.endIndex >= i;
                         });
 
-                        if (newCommentEndIndex >= 0) {
+                        if (indexOfNewCommentEnd >= 0) {
                             // Jump to the end of the comment
-                            i = commentsWithoutStart[newCommentEndIndex].endIndex;
+                            i = commentsWithoutStart[indexOfNewCommentEnd].endIndex;
                             // Close one of the open comments if we don't just close one from this line
                             const newCommentStartIndex = commentsWithoutEnd.findIndex((comment) => {
                                 return comment.startIndex < i;
                             });
 
                             if (newCommentStartIndex >= 0) {
-                                // Close one of the open comments from this line
-                                commentsWithoutEnd = commentsWithoutEnd.filter(comment => comment.startIndex > i);
+                                // This should never happen, but maybe it happens because of a bug
+                                throw new Error("Comments without end should not have start index > i");
+                                // // Close one of the open comments from this line
+                                // commentsWithoutEnd = commentsWithoutEnd.filter(comment => comment.startIndex > i);
                             } else {
                                 // Close the last open comment from a previous line
                                 parserData.stillOpenHTMLComments.pop();
@@ -201,26 +190,41 @@ export default class LineParser {
                             // Remove the comment from the list of comments without start
                             commentsWithoutStart = commentsWithoutStart.filter(comment => comment.endIndex > i);
                             // Update the flag
-                            isInComment = parserData.stillOpenHTMLComments.length > 0;
+                            isInCommentFromPrevLine = parserData.stillOpenHTMLComments.length > 0;
+                            continue;
+                        } else {
+                            // We are still in a comment from the previous line
+                            // But there are no more end of comments in the current line
+                            // So we can stop parsing the line
+                            break;
                         }
-
-                        // Skip the text
-                        continue;
                     }
 
-                    // Now we are either not in a comment or we are in a comment but it just started
-                    // Check if we are in a comment by a start of a new comment
-                    const newCommentStartIndex = commentsWithoutEnd.findIndex((comment) => {
+                    // Now we are either not in a comment or we are right at the start of a new comment
+                    // Check if we are right at the start of a new comment
+                    const indexOfNewCommentStart = htmlCommentsInLine.findIndex((comment) => {
                         return comment.startIndex >= i;
                     });
 
-                    isInComment = newCommentStartIndex >= 0;
-                    if (isInComment) {
-                        // We are in a comment, so we skip the text till the end of the comment
-                        continue;
+                    // console.log("?????", indexOfNewCommentStart, htmlCommentsInLine);
+
+                    if (indexOfNewCommentStart >= 0) {
+                        // A new comment is starting here
+                        const newComment = htmlCommentsInLine[indexOfNewCommentStart];
+
+                        if (newComment.endIndex >= 0) {
+                            // this comment end in the same line, so we can skip to the end of the comment
+                            parsedHtmlCommentsInLIne.push(newComment);
+                            i = newComment.endIndex;
+                            continue;
+                        }
+
+                        // The comment doesn't end in the same line, we can stop parsing the line
+                        break;
+
                     }
 
-                    // We are not in a comment, so we add the text
+                    // We are not in a comment, so we add the text to the uncommented text
                     uncommentedText += parserData.lineData.currentLineTrimmed[i];
                 }
 
@@ -302,9 +306,9 @@ export default class LineParser {
 
                     if (
                         !parserData.lineData.currentLineTrimmed.startsWith("<!--SR:") &&
-                        !LineParser.hasClozes(parserData.lineData.currentLineTrimmed, parserData.clozeCrafter) &&
-                        !LineParser.hasInlineSeparator(parserData.lineData.currentLineTrimmed, parserData.lineData.inlineSeparators.map((x) => x.separator)) &&
-                        !LineParser.isMultiLineCardSeparator(parserData.lineData.currentLineTrimmed, parserData.lineData.multilineSeparators.map((x) => x.separator))
+                        !StringDetector.hasClozes(parserData.lineData.currentLineTrimmed, parserData.clozeCrafter) &&
+                        !StringDetector.hasInlineSeparator(parserData.lineData.currentLineTrimmed, parserData.lineData.inlineSeparators.map((x) => x.separator)) &&
+                        !StringDetector.isMultiLineCardSeparator(parserData.lineData.currentLineTrimmed, parserData.lineData.multilineSeparators.map((x) => x.separator))
                     ) {
                         parserData = addRougeSRComment();
                         break;
@@ -369,7 +373,7 @@ export default class LineParser {
                         // Transfer last line to the new card
                         const newPotentialCard = parserData.cardData.potentialNewCard;
 
-                        const cardType = LineParser.getMultilineCardType(
+                        const cardType = StringDetector.getMultilineCardType(
                             lastLine,
                             parserData.lineData.multilineSeparators,
                         );
@@ -409,7 +413,7 @@ export default class LineParser {
                     parserData.lineData.currentLineNum;
                 parserData.cardData.potentialNewCard.text +=
                     "\n" + parserData.lineData.currentLineEndTrimmed;
-                const multilineCardType = LineParser.getMultilineCardType(
+                const multilineCardType = StringDetector.getMultilineCardType(
                     parserData.lineData.currentLineTrimmed,
                     parserData.lineData.multilineSeparators,
                 );
@@ -528,7 +532,7 @@ export default class LineParser {
 
                     if (
                         !parserData.cardData.cards[parserData.cardData.lastCardIndex].text.includes(
-                            LineParser.srCommentStart,
+                            StringDetector.srCommentStart,
                         )
                     ) {
                         parserData.cardData.addCurrentLineToLastCard(
@@ -568,23 +572,34 @@ export default class LineParser {
                 break;
             }
 
+            case "EMPTY_LINE": {
+                /* Empty line
+                    -> relevant > we handle it
+                    -> irrelevant > we skip it
+                */
+                if (
+                    parserData.options.multilineCardEndMarker !== null &&
+                    parserData.options.multilineCardEndMarker !== undefined &&
+                    parserData.options.multilineCardEndMarker !== "" &&
+                    parserData.options.multilineCardEndMarker.trim() !== "" &&
+                    (parserData.searchForMultilineCards || parserData.searchForMultilineCloze)
+                ) {
+                    // Only handle this if multiline cards are enabled and we are already searching for multiline cards or clozes
+
+                    parserData.setParserState("TEXT");
+                    parserData = LineParser.parseLine(parserData);
+                    break;
+                } else {
+                    parserData.endMultiLineSearch();
+                }
+                break;
+            }
+
+
             default:
                 throw new Error("Impossible parser state: " + parserData.currentParserState);
         }
         return parserData;
-    }
-
-
-    /**
-     * Returns true if the trimmed line starts with the nonSrCommentStart
-     *
-     * @param trimmedLine
-     * @returns
-     */
-    static indexOfHTMLCommentStart(trimmedLine: string, index: number = 0): number {
-        return (
-            trimmedLine.indexOf(LineParser.nonSrCommentStart, index)
-        );
     }
 
     /**
@@ -593,277 +608,9 @@ export default class LineParser {
      * @param parserData
      * @returns
      */
-    private static isMiddleOfNonSRHTMLComment(parserData: ParserData): boolean {
+    private static parserIsInMiddleOfNonSRHTMLComment(parserData: ParserData): boolean {
         return (
             parserData.stillOpenHTMLComments.length > 0
         );
-    }
-
-    /**
-     * Returns true if the trimmed line starts with the nonSrCommentStart
-     *
-     * @param trimmedLine
-     * @returns
-     */
-    static indexOfHTMLCommentEnd(trimmedLine: string, index: number = 0): number {
-        return (
-            trimmedLine.indexOf(LineParser.nonSrCommentStart, index)
-        );
-    }
-
-    /**
-     * Returns true if the trimmed line starts with the srCommentStart
-     *
-     * @param trimmedLine
-     * @returns
-     */
-    static getSRHTMLComment(trimmedLine: string, lineNumber: number, index: number = 0): HTMLCommentSearchResultElement {
-        const startIndex = trimmedLine.indexOf(LineParser.srCommentStart, index);
-        if (startIndex === -1) {
-            return { startIndex: -1, endIndex: -1, text: "", lineNumber };
-        }
-
-        const endIndex = trimmedLine.indexOf(LineParser.commentEnd, startIndex) + LineParser.commentEnd.length;
-        if (endIndex === -1) {
-            // Vaulty sr comment, as it doesn't have a closing comment
-            return { startIndex: -1, endIndex: -1, text: "", lineNumber };
-        }
-
-        return { startIndex, endIndex, text: trimmedLine.substring(startIndex, endIndex + 1), lineNumber };
-    }
-
-    /**
-     * Returns the sr comments in the line
-     *
-     * @param trimmedLine
-     * @returns
-     */
-    static getSRCommentsInLine(trimmedLine: string, lineNumber: number): HTMLCommentSearchResultElement[] {
-        // TODO: Maybe merge this with getHTMLCommentsInLine
-        const srCommentsInLine: HTMLCommentSearchResultElement[] = [];
-
-        let nextSRComment = LineParser.getSRHTMLComment(trimmedLine, 0);
-        while (nextSRComment.startIndex >= 0) {
-            srCommentsInLine.push(nextSRComment);
-
-            nextSRComment = LineParser.getSRHTMLComment(trimmedLine, lineNumber, nextSRComment.startIndex + nextSRComment.text.length);
-        }
-
-        return srCommentsInLine;
-    }
-
-    static getHTMLCommentsInLine(trimmedLine: string, lineNumber: number, externalSrCommentsInLine: HTMLCommentSearchResultElement[] = []): HTMLCommentSearchResultElement[] {
-        // Prepare the list of SR comments in the line to filter those out, as they are not HTML comments
-        const srCommentsInLine = externalSrCommentsInLine.length > 0
-            ? externalSrCommentsInLine
-            : LineParser.getSRCommentsInLine(trimmedLine, lineNumber);
-
-        const htmlCommentsInLine: HTMLCommentSearchResultElement[] = [];
-
-        // Find all HTML comments in the line (Regardless if they just start or end)
-        // Loop until we find no more HTML comments or reach the end of the line
-        for (let i = 0; i < trimmedLine.length; i++) {
-            const lastHtmlComment = htmlCommentsInLine.length > 0
-                ? htmlCommentsInLine[htmlCommentsInLine.length - 1]
-                : null;
-
-            const indexOfStart = LineParser.indexOfHTMLCommentStart(trimmedLine, i);
-
-            // No more start of comments found
-            if (indexOfStart < 0 && (lastHtmlComment === null || lastHtmlComment.endIndex !== -1)) break;
-
-            if (indexOfStart > 0 && indexOfStart > i) {
-                if (
-                    indexOfStart < 0 ||
-                    indexOfStart > trimmedLine.length ||
-                    indexOfStart < i
-                ) {
-                    throw new Error("Malformed HTML comment start");
-                }
-                i = indexOfStart;
-                continue;
-            }
-
-            if (indexOfStart > 0) {
-                // Check if comment at i is a SR comment
-                const srCommentWithSameStartIndex = srCommentsInLine.filter((srComment) => srComment.startIndex === indexOfStart);
-                if (srCommentWithSameStartIndex.length > 0) {
-                    // It is an sr comment -> skip it
-                    if (
-                        srCommentWithSameStartIndex[0].endIndex < 0 ||
-                        srCommentWithSameStartIndex[0].endIndex > trimmedLine.length ||
-                        srCommentWithSameStartIndex[0].endIndex < i
-                    ) {
-                        throw new Error("Malformed SR comment end");
-                    }
-
-                    i = srCommentWithSameStartIndex[0].endIndex;
-                    continue;
-                }
-
-                // It isn't an sr comment, so it must be an HTML comment
-                htmlCommentsInLine.push({ startIndex: indexOfStart, endIndex: -1, text: trimmedLine.substring(indexOfStart), lineNumber });
-            }
-
-            // Find the end of the comment and check if it is the end of an sr comment
-            const indexOfEnd = LineParser.indexOfHTMLCommentEnd(trimmedLine, indexOfStart) + LineParser.commentEnd.length;
-
-            if (indexOfEnd < 0) {
-                // No more end of comments found
-                return htmlCommentsInLine;
-            } else if (indexOfEnd > 0 && indexOfEnd > i) {
-                // Jump to next end of comment
-                if (
-                    indexOfEnd < 0 ||
-                    indexOfEnd > trimmedLine.length ||
-                    indexOfEnd < i
-                ) {
-                    throw new Error("Malformed HTML comment end");
-                }
-
-                i = indexOfEnd;
-                continue;
-            }
-
-            // indexOfEnd >= 0 && indexOfEnd === i
-            // Check if end of comment at i is part of an SR comment
-            const srCommentWithSameEndIndex = srCommentsInLine.filter((srComment) => srComment.endIndex === indexOfEnd);
-            if (srCommentWithSameEndIndex.length > 0) {
-                // It is an sr comment -> skip it
-                continue;
-            }
-
-            // It isn't an sr comment, so it must be an HTML comment
-            // Update the last HTML comment if it is still open else create a new one
-            if (lastHtmlComment !== null && lastHtmlComment.endIndex === -1) {
-                lastHtmlComment.endIndex = indexOfEnd;
-                lastHtmlComment.text = trimmedLine.substring(lastHtmlComment.startIndex, indexOfEnd + 1);
-
-                htmlCommentsInLine[htmlCommentsInLine.length - 1] = lastHtmlComment;
-            } else {
-                htmlCommentsInLine.push({ startIndex: -1, endIndex: indexOfEnd, text: "", lineNumber });
-            }
-
-            // Continue with the next start of comment
-        }
-
-        return htmlCommentsInLine;
-    }
-
-    /**
-     * Returns true if the trimmed line is the multilineCardEndMarker
-     *
-     * @param trimmedLine
-     * @param multilineCardEndMarker
-     * @returns
-     */
-    static isMultiLineCardEndMarker(
-        trimmedLine: string,
-        multilineCardEndMarker: string | null,
-    ): boolean {
-        return (
-            multilineCardEndMarker !== null &&
-            multilineCardEndMarker !== "" &&
-            trimmedLine.startsWith(multilineCardEndMarker) &&
-            trimmedLine.length === multilineCardEndMarker.length
-        );
-    }
-
-    /**
-     * Returns true if the trimmed line is one of the multiline card separators
-     *
-     * @param trimmedLine - The text to check
-     * @param separators - The multiline card separators
-     * @returns
-     */
-    static isMultiLineCardSeparator(trimmedLine: string, separators: string[]): boolean {
-        for (const separator of separators) {
-            if (trimmedLine.startsWith(separator) && trimmedLine.length === separator.length) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    static getMultilineCardType(
-        trimmedLine: string,
-        separators: Array<{ separator: string; type: CardType }>,
-    ): CardType | null {
-        for (const separator of separators) {
-            if (
-                trimmedLine.startsWith(separator.separator) &&
-                trimmedLine.length === separator.separator.length
-            ) {
-                return separator.type;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns true if the marker is inside a code block
-     *
-     * @param trimmedLine - The text to check
-     * @param marker - The marker
-     * @param markerIndex - The index of the marker in the text
-     * @returns
-     */
-    static isMarkerInsideCodeBlock(
-        trimmedLine: string,
-        marker: string,
-        markerIndex: number,
-    ): boolean {
-        // TODO: Handle codeblocks
-        let goingBack = markerIndex - 1,
-            goingForward = markerIndex + marker.length;
-        let backTicksBefore = 0,
-            backTicksAfter = 0;
-
-        while (goingBack >= 0) {
-            if (trimmedLine[goingBack] === "`") backTicksBefore++;
-            goingBack--;
-        }
-
-        while (goingForward < trimmedLine.length) {
-            if (trimmedLine[goingForward] === "`") backTicksAfter++;
-            goingForward++;
-        }
-
-        // If there's an odd number of backticks before and after,
-        //  the marker is inside an inline code block
-        return backTicksBefore % 2 === 1 && backTicksAfter % 2 === 1;
-    }
-
-    /**
-     * Returns true if the trimmed line has one of the inline separators
-     *
-     * @param trimmedLine - The text to check
-     * @param separators - The inline separators
-     * @returns
-     */
-    static hasInlineSeparator(trimmedLine: string, separators: string[]): boolean {
-        // Check if the marker is in the text
-        for (const separator of separators) {
-            const separatorIdx = trimmedLine.indexOf(separator);
-            if (separatorIdx === -1) continue;
-            // Check if it's inside an inline code block
-            if (LineParser.isMarkerInsideCodeBlock(trimmedLine, separator, separatorIdx))
-                continue;
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns there are any clozes within the trimmed line
-     *
-     * @param trimmedLine - The trimmed line to check
-     * @param clozeCrafter - The cloze crafter
-     * @returns True if there are clozes
-     */
-    static hasClozes(trimmedLine: string, clozeCrafter: ClozeCrafter): boolean {
-        return clozeCrafter.isClozeNote(trimmedLine);
     }
 }
