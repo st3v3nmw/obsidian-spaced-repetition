@@ -14,7 +14,7 @@ export default class StringDetector {
     static readonly commentEnd = "-->"; // The end of a comment
 
     /**
-     * Returns true if the trimmed line starts with the nonSrCommentStart
+     * Returns the index of the start of the next HTML comment start
      *
      * @param trimmedLine
      * @returns
@@ -26,14 +26,14 @@ export default class StringDetector {
     }
 
     /**
-     * Returns true if the trimmed line starts with the nonSrCommentStart
+     * Returns the index of the start of the next HTML comment end
      *
      * @param trimmedLine
      * @returns
      */
     static indexOfHTMLCommentEnd(trimmedLine: string, index: number = 0): number {
         return (
-            trimmedLine.indexOf(StringDetector.nonSrCommentStart, index)
+            trimmedLine.indexOf(StringDetector.commentEnd, index)
         );
     }
 
@@ -49,15 +49,23 @@ export default class StringDetector {
             return { startIndex: -1, endIndex: -1, text: trimmedLine, lineNumber };
         }
 
+        if (startIndex > trimmedLine.length) {
+            throw new Error("Malformed SR comment start with out of bounds index");
+        }
+
         let endIndex = trimmedLine.indexOf(StringDetector.commentEnd, startIndex);
         if (endIndex === -1) {
             // Vaulty sr comment, as it doesn't have a closing comment
             return { startIndex: -1, endIndex: -1, text: trimmedLine, lineNumber };
         }
 
-        endIndex += StringDetector.commentEnd.length;
+        if (endIndex > trimmedLine.length) {
+            throw new Error("Malformed SR comment end with out of bounds index");
+        }
 
-        return { startIndex, endIndex, text: trimmedLine.substring(startIndex, endIndex), lineNumber };
+        endIndex += StringDetector.commentEnd.length - 1;
+
+        return { startIndex, endIndex, text: trimmedLine.substring(startIndex, endIndex + 1), lineNumber };
     }
 
     /**
@@ -70,7 +78,7 @@ export default class StringDetector {
         // TODO: Maybe merge this with getHTMLCommentsInLine
         const srCommentsInLine: HTMLCommentSearchResultElement[] = [];
 
-        let nextSRComment = StringDetector.getSRHTMLComment(trimmedLine, 0);
+        let nextSRComment = StringDetector.getSRHTMLComment(trimmedLine, lineNumber);
         while (nextSRComment.startIndex >= 0) {
             srCommentsInLine.push(nextSRComment);
 
@@ -87,98 +95,81 @@ export default class StringDetector {
             : StringDetector.getSRCommentsInLine(trimmedLine, lineNumber);
 
         const htmlCommentsInLine: HTMLCommentSearchResultElement[] = [];
-        const indicesWithoutStart: number[] = [];
-        const indicesWithoutEnd: number[] = [];
 
         // Find all HTML comments in the line (Regardless if they just start or end)
         // Loop until we find no more HTML comments or reach the end of the line
         for (let i = 0; i < trimmedLine.length; i++) {
-            const lastHtmlComment = htmlCommentsInLine.length > 0
-                ? htmlCommentsInLine[htmlCommentsInLine.length - 1]
-                : null;
+            const nextIndexOfStart = StringDetector.indexOfHTMLCommentStart(trimmedLine, i);
+            const nextIndexOfEnd = StringDetector.indexOfHTMLCommentEnd(trimmedLine, i);
 
-            const indexOfStart = StringDetector.indexOfHTMLCommentStart(trimmedLine, i);
+            // No more start / end of comments found
+            if (nextIndexOfStart < 0 && nextIndexOfEnd < 0) break;
 
-            // No more start of comments found
-            if (indexOfStart < 0 && (lastHtmlComment === null || lastHtmlComment.endIndex !== -1)) break;
-
-            if (indexOfStart >= 0 && indexOfStart >= i) {
-                if (
-                    indexOfStart > trimmedLine.length
-                ) {
-                    throw new Error("Malformed HTML comment start");
-                }
-
-                if (indexOfStart !== i) {
-                    // Jump to start of comment
-                    i = indexOfStart;
-                }
+            // Jump to next relevant index
+            if (nextIndexOfStart === nextIndexOfEnd) {
+                // This shouldn't happen, so it must be a bug in the detector of start and end
+                throw new Error("Malformed HTML comment with start and end index the same");
             }
 
-            if (indexOfStart >= 0) {
-                // Check if comment at i is a SR comment
-                const srCommentWithSameStartIndex = srCommentsInLine.filter((srComment) => srComment.startIndex === indexOfStart);
+            // Here we know start !== end and they can't be -1 at the same time
+            if (nextIndexOfStart !== -1 && (nextIndexOfStart < nextIndexOfEnd || nextIndexOfEnd === -1)) {
+                i = nextIndexOfStart;
+            } else if (nextIndexOfEnd !== -1 && (nextIndexOfStart === -1 || nextIndexOfEnd < nextIndexOfStart)) {
+                i = nextIndexOfEnd;
+            } else {
+                // This shouldn't happen, so it must be a bug in the detector of start and end
+                throw new Error(`Weird arrangement of indices in the detection of html comments. Start index: ${nextIndexOfStart} | End index: ${nextIndexOfEnd}`);
+            }
 
-                if (srCommentWithSameStartIndex.length > 0) {
-                    // It is an sr comment -> skip it
-                    if (
-                        srCommentWithSameStartIndex[0].endIndex < 0 ||
-                        srCommentWithSameStartIndex[0].endIndex > trimmedLine.length ||
-                        srCommentWithSameStartIndex[0].endIndex < i
-                    ) {
-                        throw new Error("Malformed SR comment end");
+            // Now we are at an index, that is either the start or the end of a comment
+            // Check if comment index at i is a part of an SR comment
+            if (
+                (i === nextIndexOfStart &&
+                    srCommentsInLine.filter(srComment => srComment.startIndex === i).length > 0) ||
+                (i === nextIndexOfEnd &&
+                    srCommentsInLine.filter(srComment => srComment.endIndex === i + StringDetector.commentEnd.length - 1).length > 0)
+            ) {
+                // This start or end index is part of an SR comment so we don't add it to the list
+                continue;
+            }
+
+            // Here we know that it isn't an sr comment, so it must be a HTML comment
+            // -> Add it to the list or maybe find the last comments end, if it is open
+
+            if (htmlCommentsInLine.length > 0 && i === nextIndexOfEnd) {
+                let foundOpenComment = false;
+                // TODO: The outer comment always wins with closing
+                for (let j = htmlCommentsInLine.length - 1; j >= 0; j--) {
+                    // Potential candidates for last open comment
+                    const htmlComment = htmlCommentsInLine[j];
+
+                    if (htmlComment.endIndex === -1) {
+                        // This is the last open comment so we can update / close it
+                        htmlComment.endIndex = i + StringDetector.commentEnd.length - 1;
+                        htmlComment.text = trimmedLine.substring(
+                            htmlComment.startIndex,
+                            htmlComment.endIndex + 1
+                        );
+                        foundOpenComment = true;
+                        break;
                     }
+                }
 
-                    i = srCommentWithSameStartIndex[0].endIndex;
+                if (foundOpenComment) {
+                    // We found an open comment so we can continue
                     continue;
                 }
-
-                // It isn't an sr comment, so it must be an HTML comment
-                htmlCommentsInLine.push({ startIndex: indexOfStart, endIndex: -1, text: trimmedLine.substring(indexOfStart), lineNumber });
             }
 
-            // Find the end of the comment and check if it is the end of an sr comment
-            let indexOfEnd = StringDetector.indexOfHTMLCommentEnd(trimmedLine, indexOfStart);
-
-            if (indexOfEnd < 0) {
-                // No more end of comments found
-                return htmlCommentsInLine;
-            } else if (indexOfEnd >= 0 && indexOfEnd >= i) {
-                indexOfEnd += StringDetector.commentEnd.length;
-
-                // Jump to next end of comment
-                if (
-                    indexOfEnd < 0 ||
-                    indexOfEnd > trimmedLine.length ||
-                    indexOfEnd < i
-                ) {
-                    throw new Error("Malformed HTML comment end");
-                }
-
-                i = indexOfEnd;
-                continue;
-            }
-
-            // indexOfEnd >= 0 && indexOfEnd === i
-            // Check if end of comment at i is part of an SR comment
-            const srCommentWithSameEndIndex = srCommentsInLine.filter((srComment) => srComment.endIndex === indexOfEnd);
-            if (srCommentWithSameEndIndex.length > 0) {
-                // It is an sr comment -> skip it
-                continue;
-            }
-
-            // It isn't an sr comment, so it must be an HTML comment
-            // Update the last HTML comment if it is still open else create a new one
-            if (lastHtmlComment !== null && lastHtmlComment.endIndex === -1) {
-                lastHtmlComment.endIndex = indexOfEnd;
-                lastHtmlComment.text = trimmedLine.substring(lastHtmlComment.startIndex, indexOfEnd);
-
-                htmlCommentsInLine[htmlCommentsInLine.length - 1] = lastHtmlComment;
-            } else {
-                htmlCommentsInLine.push({ startIndex: -1, endIndex: indexOfEnd, text: "", lineNumber });
-            }
-
-            // Continue with the next start of comment
+            // Add the comment to the list if it isn't an sr comment and also not the close end to an open comment
+            htmlCommentsInLine.push({
+                startIndex: i === nextIndexOfStart ? i : -1,
+                endIndex: i === nextIndexOfEnd ? i + StringDetector.commentEnd.length - 1 : -1,
+                text: i === nextIndexOfStart
+                    ? StringDetector.nonSrCommentStart
+                    : StringDetector.commentEnd,
+                lineNumber,
+            });
         }
 
         return htmlCommentsInLine;
