@@ -1,7 +1,6 @@
 import { CardType } from "src/card/questions/question";
 import { CardParser } from "src/utils/parsers/card-parser";
 import { CardFragment } from "src/utils/parsers/data-structures/cards/card-fragments/card-fragment";
-import HTMLCommentSearchResultElement from "src/utils/parsers/data-structures/lines/html-comment";
 import ParsedCardInfo from "src/utils/parsers/data-structures/parser/parsed-card-info";
 import { ParserData } from "src/utils/parsers/data-structures/parser/parser-data";
 import StringDetector from "src/utils/parsers/detectors/string-detector";
@@ -33,8 +32,18 @@ export default class LineParser {
         switch (parserData.currentParserState) {
             case "PARSE_LINE": {
                 // Route to the correct state based on line content
-                if (LineParser.parserIsInMiddleOfNonSRHTMLComment(parserData)) {
+                if (
+                    !parserData.noHTMLCommentsInCurrentLine && (
+                        StringDetector.indexOfHTMLCommentStart(currentLineTrimmed) >= 0 ||
+                        StringDetector.indexOfHTMLCommentEnd(currentLineTrimmed) >= 0
+                    )
+                ) {
+                    // Non sr info comment
+                    parserData.setParserState("HTML_COMMENT_START_OR_END");
+                } else if (LineParser.parserIsInMiddleOfNonSRHTMLComment(parserData)) {
+                    // Non sr info comment
                     parserData.setParserState("HTML_COMMENT_MIDDLE");
+
                 } else if (currentLineTrimmed.length === 0) {
                     // Empty line
                     parserData.setParserState("EMPTY_LINE");
@@ -61,14 +70,6 @@ export default class LineParser {
                         );
                         break;
                     }
-                } else if (
-                    !parserData.noHTMLCommentsInCurrentLine && (
-                        StringDetector.indexOfHTMLCommentStart(currentLineTrimmed) >= 0 ||
-                        StringDetector.indexOfHTMLCommentEnd(currentLineTrimmed) >= 0
-                    )
-                ) {
-                    // Non sr info comment
-                    parserData.setParserState("HTML_COMMENT_START_OR_END");
                 } else if (
                     StringDetector.hasInlineSeparator(
                         currentLineTrimmed,
@@ -122,15 +123,21 @@ export default class LineParser {
 
                 const htmlCommentsInLine = StringDetector.getHTMLCommentsInLine(parserData.lineData.currentLineTrimmed, parserData.lineData.currentLineNum, srCommentsInLine);
 
-                const parsedHtmlCommentsInLIne: HTMLCommentSearchResultElement[] = [];
-
                 if (
                     htmlCommentsInLine.length === 0 &&
-                    srCommentsInLine.length > 0 &&
-                    !LineParser.parserIsInMiddleOfNonSRHTMLComment(parserData)
+                    srCommentsInLine.length > 0
                 ) {
                     // No html comments & not within a html comment, but there are SR comments
-                    if (parserData.lineData.currentLineTrimmed.startsWith("<!--SR:")) {
+
+                    if (LineParser.parserIsInMiddleOfNonSRHTMLComment(parserData)) {
+                        // We are in the middle of a non sr html comment, so we can't handle this as a SR comment, so we just skip this line
+                        break;
+                    }
+
+                    if (
+                        parserData.lineData.currentLineTrimmed.startsWith("<!--SR:") &&
+                        !LineParser.parserIsInMiddleOfNonSRHTMLComment(parserData)
+                    ) {
                         parserData.setParserState("SR_HTML_COMMENT");
                     } else {
                         // There is a mix of SR comments and text, so we can handle it differently by parsing the text first
@@ -143,9 +150,8 @@ export default class LineParser {
                 }
 
                 // We know now that there is a mix of SR comments, HTML comments and text so we can handle it
-                //  all loose starts and ends of HTML comments that are new in this line
-                const commentsWithoutEnd = htmlCommentsInLine.filter((htmlComment) => htmlComment.endIndex < 0).sort((a, b) => a.startIndex - b.startIndex);
-                let commentsWithoutStart = htmlCommentsInLine.filter((htmlComment) => htmlComment.startIndex < 0).sort((a, b) => a.endIndex - b.endIndex);
+                // all new starts of HTML comments that are new in this line and not handled somewhere
+                let commentsWithoutEnd = htmlCommentsInLine.filter((htmlComment) => htmlComment.endIndex < 0).sort((a, b) => a.startIndex - b.startIndex);
 
                 // Save whitespace before text
                 const whitespaceBeforeText = StringDetector.getWhitespaceBeforeText(
@@ -156,41 +162,28 @@ export default class LineParser {
 
                 // Prep to collect uncommented text
                 let uncommentedText = "";
+                let indexOfNextComment = -1;
                 // Check if we are still in a comment from the previous line
                 let isInCommentFromPrevLine = parserData.stillOpenHTMLComments.length > 0; // Flag to indicate if we are still in a comment from the previous line
 
                 // Skip all text in comments and extract the text outside of them
                 for (let i = 0; i < parserData.lineData.currentLineTrimmed.length; i++) {
-                    // console.log(parserData.lineData.currentLineTrimmed[i], isInCommentFromPrevLine);
                     // Check if we are still in a comment from the previous line
                     if (isInCommentFromPrevLine) {
-                        // If still in a comment, then we need to close it else we skip that text
-                        const indexOfNewCommentEnd = commentsWithoutStart.findIndex((comment) => {
-                            return comment.endIndex >= i;
-                        });
+                        // If still in a comment, then we need to close it else we skip that whole line
+                        const nextCommentEnd = htmlCommentsInLine.filter((comment) => comment.endIndex >= i);
 
-                        if (indexOfNewCommentEnd >= 0) {
+                        if (nextCommentEnd.length > 0) {
+                            const nextCommentEndIndex = nextCommentEnd[0].endIndex;
                             // Jump to the end of the comment
-                            i = commentsWithoutStart[indexOfNewCommentEnd].endIndex;
-                            // Close one of the open comments if we don't just close one from this line
-                            const newCommentStartIndex = commentsWithoutEnd.findIndex((comment) => {
-                                return comment.startIndex < i;
-                            });
+                            i = nextCommentEndIndex;
+                            // Close all open comments from the previous line
+                            parserData.stillOpenHTMLComments = [];
 
-                            if (newCommentStartIndex >= 0) {
-                                // This should never happen, but maybe it happens because of a bug
-                                throw new Error("Comments without end should not have start index > i");
-                                // // Close one of the open comments from this line
-                                // commentsWithoutEnd = commentsWithoutEnd.filter(comment => comment.startIndex > i);
-                            } else {
-                                // Close the last open comment from a previous line
-                                parserData.stillOpenHTMLComments.pop();
-                            }
-
-                            // Remove the comment from the list of comments without start
-                            commentsWithoutStart = commentsWithoutStart.filter(comment => comment.endIndex > i);
+                            // Remove all comments from the list of comments without end, which are in the comment, that we just closed
+                            commentsWithoutEnd = commentsWithoutEnd.filter(comment => comment.startIndex > i);
                             // Update the flag
-                            isInCommentFromPrevLine = parserData.stillOpenHTMLComments.length > 0;
+                            isInCommentFromPrevLine = false;
                             continue;
                         } else {
                             // We are still in a comment from the previous line
@@ -200,28 +193,28 @@ export default class LineParser {
                         }
                     }
 
-                    // Now we are either not in a comment or we are right at the start of a new comment
+                    // Now we are either not in a comment(We are also not in a comment, if it is just a rouge end) or we are right at the start of a new comment
                     // Check if we are right at the start of a new comment
-                    const indexOfNewCommentStart = htmlCommentsInLine.findIndex((comment) => {
-                        return comment.startIndex >= i;
-                    });
+                    if (indexOfNextComment < 0) {
+                        // Find the next start index
+                        indexOfNextComment = htmlCommentsInLine.findIndex((comment) => {
+                            return comment.startIndex >= i;
+                        });
+                    }
 
-                    // console.log("?????", indexOfNewCommentStart, htmlCommentsInLine);
-
-                    if (indexOfNewCommentStart >= 0) {
+                    if (indexOfNextComment >= 0 && htmlCommentsInLine[indexOfNextComment].startIndex === i) {
                         // A new comment is starting here
-                        const newComment = htmlCommentsInLine[indexOfNewCommentStart];
+                        const newComment = htmlCommentsInLine[indexOfNextComment];
+                        indexOfNextComment = -1; // Reset the next start index for the next iteration
 
                         if (newComment.endIndex >= 0) {
                             // this comment end in the same line, so we can skip to the end of the comment
-                            parsedHtmlCommentsInLIne.push(newComment);
                             i = newComment.endIndex;
                             continue;
                         }
 
-                        // The comment doesn't end in the same line, we can stop parsing the line
+                        // The comment doesn't end in the same line, we can stop parsing the line, as any text after this is part of the comment, until it is closed
                         break;
-
                     }
 
                     // We are not in a comment, so we add the text to the uncommented text
@@ -229,13 +222,22 @@ export default class LineParser {
                 }
 
                 // We have gone through the whole line, so now we can handle any remaining uncommented text
-                const uncommentedTextEndTrimmed = whitespaceBeforeText + uncommentedText.trimEnd();
-                parserData.lineData.currentLineTrimmed = uncommentedText.trim();
-                parserData.lineData.currentLineEndTrimmed = uncommentedTextEndTrimmed;
-                parserData.lineData.currentLine = uncommentedTextEndTrimmed;
+                if (uncommentedText.trim().length > 0) {
+                    // There is some text left, so we st the current line to the trimmed text
+                    const uncommentedTextEndTrimmed = whitespaceBeforeText + uncommentedText.trimEnd();
+                    parserData.lineData.currentLineTrimmed = uncommentedText.trim();
+                    parserData.lineData.currentLineEndTrimmed = uncommentedTextEndTrimmed;
+                    parserData.lineData.currentLine = uncommentedTextEndTrimmed;
 
-                parserData.setParserState("PARSE_LINE");
-                parserData = LineParser.parseLine(parserData);
+                    // Disable HTML comment detection here because we have handled any comments.
+                    // There are only fragments of comments left like "-->" which can now just be handled as text
+                    parserData.noHTMLCommentsInCurrentLine = true;
+                    parserData.setParserState("PARSE_LINE");
+                    parserData = LineParser.parseLine(parserData);
+
+                    // Reset the no HTML comments in current line flag for the next line
+                    parserData.noHTMLCommentsInCurrentLine = false;
+                }
 
                 // Now add all the remaining open comments so that we can handle them later, if there are any
                 parserData.stillOpenHTMLComments = parserData.stillOpenHTMLComments.concat(commentsWithoutEnd);
@@ -594,7 +596,6 @@ export default class LineParser {
                 }
                 break;
             }
-
 
             default:
                 throw new Error("Impossible parser state: " + parserData.currentParserState);

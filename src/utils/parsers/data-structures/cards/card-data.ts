@@ -2,7 +2,7 @@ import { CardType } from "src/card/questions/question";
 import { CardParser } from "src/utils/parsers/card-parser";
 import LineData from "src/utils/parsers/data-structures/lines/line-data";
 import ParsedCardInfo from "src/utils/parsers/data-structures/parser/parsed-card-info";
-import LineParser from "src/utils/parsers/line-parser";
+import StringDetector from "src/utils/parsers/detectors/string-detector";
 
 /**
  * The card data class
@@ -110,7 +110,7 @@ export default class CardData {
             const trimmedLine = line.trim();
 
             if (
-                LineParser.isMultiLineCardSeparator(
+                StringDetector.isMultiLineCardSeparator(
                     trimmedLine,
                     multilineSeparators.map((x) => x.separator),
                 )
@@ -123,7 +123,7 @@ export default class CardData {
                     return;
                 }
 
-                const separatorType = LineParser.getMultilineCardType(
+                const separatorType = StringDetector.getMultilineCardType(
                     trimmedLine,
                     multilineSeparators,
                 );
@@ -160,7 +160,7 @@ export default class CardData {
         for (const { separator, type } of inlineSeparators) {
             if (
                 // We have found an inline card separator
-                LineParser.hasInlineSeparator(lineData.currentLineTrimmed, [separator]) &&
+                StringDetector.hasInlineSeparator(lineData.currentLineTrimmed, [separator]) &&
                 (lineData.currentLineTrimmed.length === separator.length || // No card text
                     lineData.currentLineTrimmed.endsWith(separator) || // Card text ends with separator
                     lineData.currentLineTrimmed.startsWith(separator)) // Card text starts with separator
@@ -173,7 +173,7 @@ export default class CardData {
                 });
                 break;
             } else if (
-                LineParser.hasInlineSeparator(lineData.currentLineTrimmed, [separator])
+                StringDetector.hasInlineSeparator(lineData.currentLineTrimmed, [separator])
             ) {
                 // We have found an inline card, setup all extractable info
                 const newCard = new ParsedCardInfo(
