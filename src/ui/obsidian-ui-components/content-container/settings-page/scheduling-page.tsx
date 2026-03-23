@@ -1,5 +1,6 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
+import { Algorithm } from "src/algorithms/base/isrs-algorithm";
 import {
     deleteAllSchedulingData,
     deleteAllSchedulingDataInCards,
@@ -39,8 +40,9 @@ export class SchedulingPage extends SettingsPage {
             scrollListener,
         );
 
-        new SettingGroup(this.containerEl)
-            .setHeading(t("ALGORITHM"))
+        const algorithmGroup = new SettingGroup(this.containerEl).setHeading(t("ALGORITHM"));
+
+        algorithmGroup
             .addSetting((setting: Setting) => {
                 const algoSettingEl = setting
                     .setName(t("ALGORITHM"))
@@ -49,11 +51,16 @@ export class SchedulingPage extends SettingsPage {
                         dropdown
                             .addOptions({
                                 "SM-2-OSR": t("SM2_OSR_VARIANT"),
+                                FSRS: "FSRS",
                             })
                             .setValue(this.plugin.data.settings.algorithm)
                             .onChange(async (value) => {
                                 this.plugin.data.settings.algorithm = value;
                                 await this.plugin.savePluginData();
+                                this.plugin.setupDataStoreAndAlgorithmInstances(
+                                    this.plugin.data.settings,
+                                );
+                                this.display();
                             }),
                     );
 
@@ -63,8 +70,59 @@ export class SchedulingPage extends SettingsPage {
                         algoUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
                     }),
                 );
-            })
-            .addSetting((setting: Setting) => {
+            });
+
+        algorithmGroup.addSetting((setting: Setting) => {
+            setting
+                .setName("Flashcard algorithm scope")
+                .setDesc(
+                    "The selected algorithm applies to flashcards and clozes only. Whole-note review continues to use the existing OSR scheduler.",
+                );
+        });
+
+        if (this.plugin.data.settings.algorithm === Algorithm.FSRS) {
+            algorithmGroup.addSetting((setting: Setting) => {
+                setting
+                    .setName("FSRS desired retention")
+                    .setDesc("Target recall probability used by FSRS for flashcard scheduling.")
+                    .addExtraButton((button) => {
+                        button
+                            .setIcon("reset")
+                            .setTooltip(t("RESET_DEFAULT"))
+                            .onClick(async () => {
+                                this.plugin.data.settings.fsrsDesiredRetention =
+                                    DEFAULT_SETTINGS.fsrsDesiredRetention;
+                                await this.plugin.savePluginData();
+                                this.display();
+                            });
+                    })
+                    .addText((text) =>
+                        text
+                            .setValue(this.plugin.data.settings.fsrsDesiredRetention.toString())
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    const numValue = Number.parseFloat(value);
+                                    if (
+                                        Number.isNaN(numValue) ||
+                                        numValue <= 0 ||
+                                        numValue > 1
+                                    ) {
+                                        new Notice("FSRS desired retention must be between 0 and 1.");
+                                        text.setValue(
+                                            this.plugin.data.settings.fsrsDesiredRetention.toString(),
+                                        );
+                                        return;
+                                    }
+
+                                    this.plugin.data.settings.fsrsDesiredRetention = numValue;
+                                    await this.plugin.savePluginData();
+                                });
+                            }),
+                    );
+            });
+        }
+
+        algorithmGroup.addSetting((setting: Setting) => {
                 setting
                     .setName(t("BASE_EASE"))
                     .setDesc(t("BASE_EASE_DESC"))
@@ -102,8 +160,8 @@ export class SchedulingPage extends SettingsPage {
                                 });
                             }),
                     );
-            })
-            .addSetting((setting: Setting) => {
+            });
+        algorithmGroup.addSetting((setting: Setting) => {
                 setting
                     .setName(t("LAPSE_INTERVAL_CHANGE"))
                     .setDesc(t("LAPSE_INTERVAL_CHANGE_DESC"))

@@ -16,14 +16,17 @@ import { globalDateProvider } from "src/utils/dates";
 
 export interface IFlashcardReviewSequencer {
     get hasCurrentCard(): boolean;
+    get hasPendingCards(): boolean;
     get currentCard(): Card;
     get currentQuestion(): Question;
     get currentNote(): Note;
     get currentDeck(): Deck;
+    get nextPendingDueUnix(): number | null;
     get originalDeckTree(): Deck;
 
     setDeckTree(originalDeckTree: Deck, remainingDeckTree: Deck): void;
     setCurrentDeck(topicPath: TopicPath): void;
+    refreshCurrentDeck(): void;
     getDeckStats(topicPath: TopicPath): DeckStats;
     getSubDecksWithCardsInQueue(deck: Deck): Deck[];
     skipCurrentCard(): void;
@@ -95,6 +98,11 @@ export enum FlashcardReviewMode {
     Review,
 }
 
+interface PendingCard {
+    card: Card;
+    dueUnix: number;
+}
+
 export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     // We need the original deck tree so that we can still provide the total cards in each deck
     private _originalDeckTree: Deck;
@@ -108,6 +116,8 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     private srsAlgorithm: ISrsAlgorithm;
     private questionPostponementList: IQuestionPostponementList;
     private dueDateFlashcardHistogram: DueDateHistogram;
+    private pendingCards: PendingCard[] = [];
+    private currentTopicPath: TopicPath = TopicPath.emptyPath;
 
     constructor(
         reviewMode: FlashcardReviewMode,
@@ -131,6 +141,10 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         );
     }
 
+    get hasPendingCards(): boolean {
+        return this.pendingCards.length > 0;
+    }
+
     get currentCard(): Card {
         return this.cardSequencer.currentCard;
     }
@@ -143,6 +157,12 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         return this.cardSequencer.currentDeck;
     }
 
+    get nextPendingDueUnix(): number | null {
+        return this.pendingCards.length > 0
+            ? Math.min(...this.pendingCards.map((pendingCard) => pendingCard.dueUnix))
+            : null;
+    }
+
     get currentNote(): Note {
         return this.currentQuestion.note;
     }
@@ -153,12 +173,19 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         this.cardSequencer.setBaseDeck(remainingDeckTree);
         this._originalDeckTree = originalDeckTree;
         this.remainingDeckTree = remainingDeckTree;
+        this.pendingCards = [];
         this.setCurrentDeck(TopicPath.emptyPath);
     }
 
     setCurrentDeck(topicPath: TopicPath): void {
+        this.currentTopicPath = topicPath;
+        this.wakeDuePendingCards();
         this.cardSequencer.setIteratorTopicPath(topicPath);
         this.cardSequencer.nextCard();
+    }
+
+    refreshCurrentDeck(): void {
+        this.setCurrentDeck(this.currentTopicPath);
     }
 
     get originalDeckTree(): Deck {
@@ -166,6 +193,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     getDeckStats(topicPath: TopicPath): DeckStats {
+        this.wakeDuePendingCards();
         const totalCount: number = this._originalDeckTree
             .getDeck(topicPath)
             .getDistinctCardCount(CardListType.All, true);
@@ -206,6 +234,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     getSubDecksWithCardsInQueue(deck: Deck): Deck[] {
+        this.wakeDuePendingCards();
         let subDecksWithCardsInQueue: Deck[] = [];
 
         deck.subdecks.forEach((subDeck) => {
@@ -242,6 +271,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     async processReviewReviewMode(response: ReviewResponse): Promise<void> {
+        let shortTermRequeue: "none" | "immediate" | "pending" = "none";
         if (response !== ReviewResponse.Reset || this.currentCard.hasSchedule) {
             const oldSchedule = this.currentCard.scheduleInfo;
 
@@ -250,27 +280,31 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             //  (2) or reset a due card
             // Nothing to do if a user resets a new card
             this.currentCard.scheduleInfo = this.determineCardSchedule(response, this.currentCard);
-            this.currentCard.scheduleInfo.interval = Math.max(
-                1,
-                this.currentCard.scheduleInfo.interval,
-            );
+            shortTermRequeue = this.getShortTermRequeueMode(this.currentCard.scheduleInfo);
 
             // Update the source file with the updated schedule
             await DataStore.getInstance().questionWriteSchedule(this.currentQuestion);
 
             if (oldSchedule) {
-                const today: number = globalDateProvider.today.valueOf();
+                const now: number = globalDateProvider.now.valueOf();
                 const nDays: number = Math.ceil(
-                    (oldSchedule.dueDateAsUnix - today) / TICKS_PER_DAY,
+                    (oldSchedule.dueDateAsUnix - now) / TICKS_PER_DAY,
                 );
 
                 this.dueDateFlashcardHistogram.decrement(nDays);
             }
             this.dueDateFlashcardHistogram.increment(this.currentCard.scheduleInfo.interval);
+        } else if (response === ReviewResponse.Reset) {
+            shortTermRequeue = "immediate";
         }
 
-        // Move/delete the card
-        if (response === ReviewResponse.Reset) {
+        if (shortTermRequeue === "pending") {
+            await this.handlePendingRequeue();
+        } else if (shortTermRequeue === "immediate" || response === ReviewResponse.Reset) {
+            if (this.settings.burySiblingCards) {
+                await this.burySiblingCards();
+                this.deleteSiblingCardsFromAllDecks();
+            }
             this.cardSequencer.moveCurrentCardToEndOfList();
             this.cardSequencer.nextCard();
         } else {
@@ -294,12 +328,66 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         }
     }
 
+    private deleteSiblingCardsFromAllDecks(): void {
+        for (const siblingCard of this.currentQuestion.cards) {
+            if (Object.is(siblingCard, this.currentCard)) {
+                continue;
+            }
+
+            this.remainingDeckTree.deleteCardFromAllDecks(siblingCard, false);
+        }
+    }
+
+    private async handlePendingRequeue(): Promise<void> {
+        const pendingCard = this.currentCard;
+        const dueUnix = pendingCard.scheduleInfo?.dueDateAsUnix;
+
+        if (this.settings.burySiblingCards) {
+            await this.burySiblingCards();
+            this.deleteSiblingCardsFromAllDecks();
+        }
+
+        this.cardSequencer.deleteCurrentCardFromAllDecks();
+        this.pendingCards.push({ card: pendingCard, dueUnix });
+    }
+
     async processReviewCramMode(response: ReviewResponse): Promise<void> {
         if (response === ReviewResponse.Easy) this.deleteCurrentCard();
         else {
             this.cardSequencer.moveCurrentCardToEndOfList();
             this.cardSequencer.nextCard();
         }
+    }
+
+    private getShortTermRequeueMode(
+        scheduleInfo: RepItemScheduleInfo | null,
+    ): "none" | "immediate" | "pending" {
+        if (!scheduleInfo || scheduleInfo.interval >= 1) {
+            return "none";
+        }
+
+        return scheduleInfo.isDue() ? "immediate" : "pending";
+    }
+
+    private wakeDuePendingCards(): void {
+        if (this.pendingCards.length === 0) {
+            return;
+        }
+
+        const nowUnix = globalDateProvider.now.valueOf();
+        const remainingPendingCards: PendingCard[] = [];
+        for (const pendingCard of this.pendingCards) {
+            if (pendingCard.dueUnix <= nowUnix) {
+                this.remainingDeckTree.appendCard(
+                    pendingCard.card.question.topicPathList,
+                    pendingCard.card,
+                );
+            } else {
+                remainingPendingCards.push(pendingCard);
+            }
+        }
+
+        this.pendingCards = remainingPendingCards;
     }
 
     determineCardSchedule(response: ReviewResponse, card: Card): RepItemScheduleInfo {

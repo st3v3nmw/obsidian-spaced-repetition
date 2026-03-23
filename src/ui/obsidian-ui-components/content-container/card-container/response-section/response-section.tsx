@@ -2,7 +2,7 @@ import { ButtonComponent, Platform } from "obsidian";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { textInterval } from "src/algorithms/osr/note-scheduling";
+import { formatScheduleInterval } from "src/algorithms/schedule-display";
 import { Card } from "src/card/card";
 import {
     FlashcardReviewMode,
@@ -74,6 +74,14 @@ export default class ResponseSectionComponent {
     public resetResponseButtons() {
         // Sets all buttons in to their default state
         this.answerButton.buttonEl.removeClass("sr-is-hidden");
+        this.againButton.buttonEl.addClass("sr-is-hidden");
+        this.hardButton.buttonEl.addClass("sr-is-hidden");
+        this.goodButton.buttonEl.addClass("sr-is-hidden");
+        this.easyButton.buttonEl.addClass("sr-is-hidden");
+    }
+
+    public hideAllButtons() {
+        this.answerButton.buttonEl.addClass("sr-is-hidden");
         this.againButton.buttonEl.addClass("sr-is-hidden");
         this.hardButton.buttonEl.addClass("sr-is-hidden");
         this.goodButton.buttonEl.addClass("sr-is-hidden");
@@ -160,13 +168,12 @@ export default class ResponseSectionComponent {
             reviewResponse,
             currentCard,
         );
-        const interval: number = schedule.interval;
 
         if (settings.showIntervalInReviewButtons) {
             if (EmulatedPlatform().isMobile || Platform.isMobile) {
-                button.setButtonText(textInterval(interval, true));
+                button.setButtonText(formatScheduleInterval(schedule, true));
             } else {
-                button.setButtonText(`${buttonName} - ${textInterval(interval, false)}`);
+                button.setButtonText(`${buttonName} - ${formatScheduleInterval(schedule, false)}`);
             }
         } else {
             button.setButtonText(buttonName);
