@@ -5,8 +5,7 @@ import { parserOptions, parseT } from "../../../helpers/unit-test-parser-helper"
 // TODO: Add card fragment tests
 // TODO: Expand this test
 
-test("Test parsing cards with codeblocks", () => {
-    // `inline`
+test("Test parsing inline cards with codeblocks", () => {
     expect(
         parseT(
             "my inline question containing `some inline code` in it::and this is answer possibly containing `inline` code.",
@@ -20,22 +19,35 @@ test("Test parsing cards with codeblocks", () => {
             0,
         ],
     ]);
+
     expect(parseT("this has some ==`inline`== code", parserOptions)).toEqual([
         [CardType.Cloze, "this has some ==`inline`== code", 0, 0],
     ]);
+});
 
+test("Test parsing multiline cards with codeblocks", () => {
     // ```block```, no blank lines
     expect(
-        parseT(
-            "How do you ... Python?\n?\n" +
-            "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
-            parserOptions,
-        ),
+        parseT([
+            "How do you ... Python?",
+            "?",
+            "```",
+            "print('Hello World!')",
+            "print('Howdy?')",
+            "lambda x: x[0]",
+            "```",
+        ].join("\n"), parserOptions),
     ).toEqual([
         [
-            CardType.MultiLineBasic,
-            "How do you ... Python?\n?\n" +
-            "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```",
+            CardType.MultiLineBasic, [
+                "How do you ... Python?",
+                "?",
+                "```",
+                "print('Hello World!')",
+                "print('Howdy?')",
+                "lambda x: x[0]",
+                "```",
+            ].join("\n"),
             0,
             6,
         ],
@@ -43,18 +55,40 @@ test("Test parsing cards with codeblocks", () => {
 
     // ```block```, with blank lines
     expect(
-        parseT(
-            "How do you ... Python?\n?\n" +
-            "```python\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
-            parserOptions,
-        ),
+        parseT([
+            "How do you ... Python?",
+            "?",
+            "```",
+            "",
+            "def fn():",
+            "   print('Hello World!')",
+            "   print('Howdy?')",
+            "",
+            "fn()",
+            "",
+            "lambda x: x[0]",
+            "",
+            "```",
+        ].join("\n"), parserOptions),
     ).toEqual([
         [
-            CardType.MultiLineBasic,
-            "How do you ... Python?\n?\n" +
-            "```python\nprint('Hello World!')\n\n\nprint('Howdy?')\n\nlambda x: x[0]\n```",
+            CardType.MultiLineBasic, [
+                "How do you ... Python?",
+                "?",
+                "```",
+                "",
+                "def fn():",
+                "   print('Hello World!')",
+                "   print('Howdy?')",
+                "",
+                "fn()",
+                "",
+                "lambda x: x[0]",
+                "",
+                "```",
+            ].join("\n"),
             0,
-            9,
+            12,
         ],
     ]);
 
