@@ -29,7 +29,9 @@ export class StoreInNotes implements IDataStore {
             return this.parseMultiScheduleComment(schedulingComment);
         }
 
-        const legacyMultiScheduling = [...originalQuestionText.matchAll(MULTI_SCHEDULING_EXTRACTOR)];
+        const legacyMultiScheduling = [
+            ...originalQuestionText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
+        ];
         if (legacyMultiScheduling.length > 0) {
             return legacyMultiScheduling.map((match) =>
                 this.parseLegacySchedule(match[1], parseInt(match[2]), parseInt(match[3])),
@@ -118,7 +120,8 @@ export class StoreInNotes implements IDataStore {
             return null;
         }
 
-        const delayBeforeReviewTicks: number = dueDate.valueOf() - globalDateProvider.today.valueOf();
+        const delayBeforeReviewTicks: number =
+            dueDate.valueOf() - globalDateProvider.today.valueOf();
         return new RepItemScheduleInfoOsr(dueDate, interval, ease, delayBeforeReviewTicks);
     }
 }

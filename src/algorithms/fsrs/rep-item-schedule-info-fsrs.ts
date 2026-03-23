@@ -41,7 +41,9 @@ export class RepItemScheduleInfoFsrs extends RepItemScheduleInfo {
         this.lastReview = lastReview;
         this.latestEase = difficultyToEase(difficulty);
         this.delayedBeforeReviewTicks =
-            dueDate && globalDateProvider.now ? globalDateProvider.now.valueOf() - dueDate.valueOf() : 0;
+            dueDate && globalDateProvider.now
+                ? globalDateProvider.now.valueOf() - dueDate.valueOf()
+                : 0;
     }
 
     static fromFsrsCard(card: Card | CardInput): RepItemScheduleInfoFsrs {

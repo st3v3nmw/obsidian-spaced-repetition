@@ -98,7 +98,11 @@ export class SrsAlgorithmFsrs implements ISrsAlgorithm {
                 ? schedule.toFsrsCardInput(now)
                 : legacyScheduleToFsrsCard(schedule, now);
 
-        const recordLog = this.scheduler.next(card, now.toDate(), reviewResponseToFsrsGrade(response));
+        const recordLog = this.scheduler.next(
+            card,
+            now.toDate(),
+            reviewResponseToFsrsGrade(response),
+        );
         return RepItemScheduleInfoFsrs.fromFsrsCard(recordLog.card);
     }
 }

@@ -75,3 +75,25 @@ test("Single FSRS schedule info for question", () => {
     });
     expect(actual[0].dueDate.toDate().toISOString()).toEqual("2023-09-06T00:10:00.000Z");
 });
+
+test("Mixed OSR and FSRS schedule info for question", () => {
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+        "What symbol represents an electric field:: $\\large \\vec E$<!--SR:!2023-09-02,4,270!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z-->",
+        null,
+    );
+
+    expect(actual).toHaveLength(2);
+    expect(actual[0]).toEqual(
+        RepItemScheduleInfoOsr.fromDueDateStr("2023-09-02", 4, 270, -4 * TICKS_PER_DAY),
+    );
+    expect(actual[1]).toBeInstanceOf(RepItemScheduleInfoFsrs);
+    expect(actual[1]).toMatchObject({
+        interval: 0,
+        stability: 0.4,
+        difficulty: 5.5,
+        state: State.Learning,
+        reps: 1,
+        lapses: 0,
+        learningSteps: 1,
+    });
+});

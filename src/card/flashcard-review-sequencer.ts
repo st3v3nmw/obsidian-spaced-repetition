@@ -287,9 +287,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
             if (oldSchedule) {
                 const now: number = globalDateProvider.now.valueOf();
-                const nDays: number = Math.ceil(
-                    (oldSchedule.dueDateAsUnix - now) / TICKS_PER_DAY,
-                );
+                const nDays: number = Math.ceil((oldSchedule.dueDateAsUnix - now) / TICKS_PER_DAY);
 
                 this.dueDateFlashcardHistogram.decrement(nDays);
             }

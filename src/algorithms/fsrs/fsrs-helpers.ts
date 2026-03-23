@@ -1,11 +1,5 @@
 import moment, { Moment } from "moment";
-import {
-    CardInput,
-    FSRSParameters,
-    Grade,
-    Rating,
-    State,
-} from "ts-fsrs";
+import { CardInput, FSRSParameters, Grade, Rating, State } from "ts-fsrs";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";

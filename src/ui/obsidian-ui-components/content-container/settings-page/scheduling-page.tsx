@@ -21,6 +21,13 @@ import { DateUtil, globalDateProvider, IDayBoundary } from "src/utils/dates";
  * @extends {SettingsPage}
  */
 export class SchedulingPage extends SettingsPage {
+    private async setAlgorithm(algorithm: Algorithm): Promise<void> {
+        this.plugin.data.settings.algorithm = algorithm;
+        await this.plugin.savePluginData();
+        this.plugin.setupDataStoreAndAlgorithmInstances(this.plugin.data.settings);
+        this.display();
+    }
+
     constructor(
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
@@ -42,35 +49,54 @@ export class SchedulingPage extends SettingsPage {
 
         const algorithmGroup = new SettingGroup(this.containerEl).setHeading(t("ALGORITHM"));
 
-        algorithmGroup
-            .addSetting((setting: Setting) => {
-                const algoSettingEl = setting
-                    .setName(t("ALGORITHM"))
-                    .setDesc("")
-                    .addDropdown((dropdown) =>
-                        dropdown
-                            .addOptions({
-                                "SM-2-OSR": t("SM2_OSR_VARIANT"),
-                                FSRS: "FSRS",
-                            })
-                            .setValue(this.plugin.data.settings.algorithm)
-                            .onChange(async (value) => {
-                                this.plugin.data.settings.algorithm = value;
-                                await this.plugin.savePluginData();
-                                this.plugin.setupDataStoreAndAlgorithmInstances(
-                                    this.plugin.data.settings,
-                                );
-                                this.display();
-                            }),
-                    );
+        algorithmGroup.addSetting((setting: Setting) => {
+            const algoSettingEl = setting
+                .setName(t("ALGORITHM"))
+                .setDesc("")
+                .addDropdown((dropdown) =>
+                    dropdown
+                        .addOptions({
+                            "SM-2-OSR": t("SM2_OSR_VARIANT"),
+                            FSRS: "FSRS",
+                        })
+                        .setValue(this.plugin.data.settings.algorithm)
+                        .onChange(async (value) => {
+                            const selectedAlgorithm = value as Algorithm;
+                            const currentAlgorithm = this.plugin.data.settings
+                                .algorithm as Algorithm;
 
-                algoSettingEl.descEl.insertAdjacentHTML(
-                    "beforeend",
-                    t("CHECK_ALGORITHM_WIKI", {
-                        algoUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
-                    }),
+                            if (selectedAlgorithm === currentAlgorithm) {
+                                return;
+                            }
+
+                            if (
+                                currentAlgorithm === Algorithm.SM_2_OSR &&
+                                selectedAlgorithm === Algorithm.FSRS
+                            ) {
+                                dropdown.setValue(currentAlgorithm);
+                                new ConfirmationModal(
+                                    this.plugin.app,
+                                    t("SWITCH_TO_FSRS_ALGORITHM"),
+                                    t("CONFIRM_FSRS_ALGORITHM_SWITCH"),
+                                    undefined,
+                                    async () => {
+                                        await this.setAlgorithm(selectedAlgorithm);
+                                    },
+                                ).open();
+                                return;
+                            }
+
+                            await this.setAlgorithm(selectedAlgorithm);
+                        }),
                 );
-            });
+
+            algoSettingEl.descEl.insertAdjacentHTML(
+                "beforeend",
+                t("CHECK_ALGORITHM_WIKI", {
+                    algoUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
+                }),
+            );
+        });
 
         algorithmGroup.addSetting((setting: Setting) => {
             setting
@@ -102,12 +128,10 @@ export class SchedulingPage extends SettingsPage {
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
                                     const numValue = Number.parseFloat(value);
-                                    if (
-                                        Number.isNaN(numValue) ||
-                                        numValue <= 0 ||
-                                        numValue > 1
-                                    ) {
-                                        new Notice("FSRS desired retention must be between 0 and 1.");
+                                    if (Number.isNaN(numValue) || numValue <= 0 || numValue > 1) {
+                                        new Notice(
+                                            "FSRS desired retention must be between 0 and 1.",
+                                        );
                                         text.setValue(
                                             this.plugin.data.settings.fsrsDesiredRetention.toString(),
                                         );
@@ -123,45 +147,46 @@ export class SchedulingPage extends SettingsPage {
         }
 
         algorithmGroup.addSetting((setting: Setting) => {
-                setting
-                    .setName(t("BASE_EASE"))
-                    .setDesc(t("BASE_EASE_DESC"))
-                    .addExtraButton((button) => {
-                        button
-                            .setIcon("reset")
-                            .setTooltip(t("RESET_DEFAULT"))
-                            .onClick(async () => {
-                                this.plugin.data.settings.baseEase = DEFAULT_SETTINGS.baseEase;
-                                await this.plugin.savePluginData();
+            setting
+                .setName(t("BASE_EASE"))
+                .setDesc(t("BASE_EASE_DESC"))
+                .addExtraButton((button) => {
+                    button
+                        .setIcon("reset")
+                        .setTooltip(t("RESET_DEFAULT"))
+                        .onClick(async () => {
+                            this.plugin.data.settings.baseEase = DEFAULT_SETTINGS.baseEase;
+                            await this.plugin.savePluginData();
 
-                                this.display();
-                            });
-                    })
-                    .addText((text) =>
-                        text
-                            .setValue(this.plugin.data.settings.baseEase.toString())
-                            .onChange((value) => {
-                                applySettingsUpdate(async () => {
-                                    const numValue: number = Number.parseInt(value);
-                                    if (!isNaN(numValue)) {
-                                        if (numValue < 130) {
-                                            new Notice(t("BASE_EASE_MIN_WARNING"));
-                                            text.setValue(
-                                                this.plugin.data.settings.baseEase.toString(),
-                                            );
-                                            return;
-                                        }
-
-                                        this.plugin.data.settings.baseEase = numValue;
-                                        await this.plugin.savePluginData();
-                                    } else {
-                                        new Notice(t("VALID_NUMBER_WARNING"));
+                            this.display();
+                        });
+                })
+                .addText((text) =>
+                    text
+                        .setValue(this.plugin.data.settings.baseEase.toString())
+                        .onChange((value) => {
+                            applySettingsUpdate(async () => {
+                                const numValue: number = Number.parseInt(value);
+                                if (!isNaN(numValue)) {
+                                    if (numValue < 130) {
+                                        new Notice(t("BASE_EASE_MIN_WARNING"));
+                                        text.setValue(
+                                            this.plugin.data.settings.baseEase.toString(),
+                                        );
+                                        return;
                                     }
-                                });
-                            }),
-                    );
-            });
-        algorithmGroup.addSetting((setting: Setting) => {
+
+                                    this.plugin.data.settings.baseEase = numValue;
+                                    await this.plugin.savePluginData();
+                                } else {
+                                    new Notice(t("VALID_NUMBER_WARNING"));
+                                }
+                            });
+                        }),
+                );
+        });
+        algorithmGroup
+            .addSetting((setting: Setting) => {
                 setting
                     .setName(t("LAPSE_INTERVAL_CHANGE"))
                     .setDesc(t("LAPSE_INTERVAL_CHANGE_DESC"))

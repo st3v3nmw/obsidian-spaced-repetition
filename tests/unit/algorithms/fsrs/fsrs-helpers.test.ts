@@ -13,7 +13,7 @@ import {
 } from "src/algorithms/fsrs/fsrs-helpers";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { DEFAULT_SETTINGS } from "src/settings";
-import { globalDateProvider,setupStaticDateProvider20230906 } from "src/utils/dates";
+import { globalDateProvider, setupStaticDateProvider20230906 } from "src/utils/dates";
 
 beforeAll(() => {
     setupStaticDateProvider20230906();
