@@ -148,14 +148,8 @@ test("Test parsing of HTML comments", () => {
     expect(StringDetector.getHTMLCommentsInLine("<!--Some text before <!--Some text in comment--> <!--Some text after-->-->", 4)).toEqual([
         {
             startIndex: 0,
-            endIndex: 73,
-            text: "<!--Some text before <!--Some text in comment--> <!--Some text after-->-->",
-            lineNumber: 4,
-        },
-        {
-            startIndex: 21,
             endIndex: 47,
-            text: "<!--Some text in comment-->",
+            text: "<!--Some text before <!--Some text in comment-->",
             lineNumber: 4,
         },
         {
@@ -163,29 +157,85 @@ test("Test parsing of HTML comments", () => {
             endIndex: 70,
             text: "<!--Some text after-->",
             lineNumber: 4,
-        }
+        },
+        {
+            startIndex: -1,
+            endIndex: 73,
+            text: "-->",
+            lineNumber: 4,
+        },
     ]);
 
-    // TODO: The outer comment always wins with closing
-    expect(StringDetector.getHTMLCommentsInLine("<!--Some text before <!--Some text in comment> <!--Some text after-->-->", 4)).toEqual([
+    // Comments which test that the outer comment always wins with closing & how leftovers are handled
+    expect(StringDetector.getHTMLCommentsInLine("<!--Some text before <!--Some text in comment+++ <!--Some text after-->-->", 4)).toEqual([
         {
             startIndex: 0,
-            endIndex: 73,
-            text: "<!--Some text before <!--Some text in comment> <!--Some text after-->-->",
+            endIndex: 70,
+            text: "<!--Some text before <!--Some text in comment+++ <!--Some text after-->",
             lineNumber: 4,
         },
         {
-            startIndex: 21,
+            startIndex: -1,
+            endIndex: 73,
+            text: "-->",
+            lineNumber: 4,
+        },
+    ]);
+
+    expect(StringDetector.getHTMLCommentsInLine("<!--Some text before <!--Some text in comment+++ <!--Some text after+++-->", 4)).toEqual([
+        {
+            startIndex: 0,
+            endIndex: 73,
+            text: "<!--Some text before <!--Some text in comment+++ <!--Some text after+++-->",
+            lineNumber: 4,
+        },
+    ]);
+
+    expect(StringDetector.getHTMLCommentsInLine("<!--Some text before <!--Some text in comment--> <!--Some text after++++++", 4)).toEqual([
+        {
+            startIndex: 0,
             endIndex: 47,
-            text: "<!--Some text in comment> <!--Some text after-->",
+            text: "<!--Some text before <!--Some text in comment-->",
             lineNumber: 4,
         },
         {
             startIndex: 49,
-            endIndex: 70,
+            endIndex: -1,
             text: "<!--",
             lineNumber: 4,
-        }
+        },
+    ]);
+
+    // Multiple HTML comments in a row with SR comments
+
+    expect(StringDetector.getHTMLCommentsInLine("<!--Some text before <!--SR:e text in comment--> <!--Some text after-->-->", 4)).toEqual([
+        {
+            startIndex: 0,
+            endIndex: 70,
+            text: "<!--Some text before <!--SR:e text in comment--> <!--Some text after-->",
+            lineNumber: 4,
+        },
+        {
+            startIndex: -1,
+            endIndex: 73,
+            text: "-->",
+            lineNumber: 4,
+        },
+    ]);
+
+    expect(StringDetector.getHTMLCommentsInLine("<!--Some text before <!--Some text in comment--> <!--SR:e text after-->-->", 4)).toEqual([
+        {
+            startIndex: 0,
+            endIndex: 47,
+            text: "<!--Some text before <!--Some text in comment-->",
+            lineNumber: 4,
+        },
+        {
+            startIndex: -1,
+            endIndex: 73,
+            text: "-->",
+            lineNumber: 4,
+        },
     ]);
 
     expect(StringDetector.getHTMLCommentsInLine("Some text before Some text in comment Some text after", 1)).toEqual([]);

@@ -94,7 +94,15 @@ export default class StringDetector {
             ? externalSrCommentsInLine
             : StringDetector.getSRCommentsInLine(trimmedLine, lineNumber);
 
-        const htmlCommentsInLine: HTMLCommentSearchResultElement[] = [];
+        // List of any fragments of HTML comments that we found
+        let potentialHtmlCommentsInLine: HTMLCommentSearchResultElement[] = [];
+
+        // List of any actual HTML comments that we found -> We try to reconstruct them from the fragments
+        // It contains only the following:
+        // - Any closed html comments before the first uncloseable open comment
+        // - Any leftover unclosable open start comments
+        // - Any leftover un opened end comments
+        const actualHtmlCommentsInLine: HTMLCommentSearchResultElement[] = [];
 
         // Find all HTML comments in the line (Regardless if they just start or end)
         // Loop until we find no more HTML comments or reach the end of the line
@@ -134,22 +142,28 @@ export default class StringDetector {
             }
 
             // Here we know that it isn't an sr comment, so it must be a HTML comment
-            // -> Add it to the list or maybe find the last comments end, if it is open
+            // -> Add it to the list if it is a new comment start
+            // -> Or close an open one like obsidian does:
+            //      -> If we found an end of a comment, we close the first open comment, that we find
+            //      -> Any other start of a comment within the range from first open comment to this close comment is fully ignored in any further parsing
 
-            if (htmlCommentsInLine.length > 0 && i === nextIndexOfEnd) {
+            // Handle closing of open comments
+            if (potentialHtmlCommentsInLine.length > 0 && i === nextIndexOfEnd) {
                 let foundOpenComment = false;
-                // TODO: The outer comment always wins with closing
-                for (let j = htmlCommentsInLine.length - 1; j >= 0; j--) {
-                    // Potential candidates for last open comment
-                    const htmlComment = htmlCommentsInLine[j];
+                for (let j = 0; j < potentialHtmlCommentsInLine.length; j++) {
+                    // Potential candidates for first open comment
+                    const htmlComment = potentialHtmlCommentsInLine[j];
 
                     if (htmlComment.endIndex === -1) {
-                        // This is the last open comment so we can update / close it
+                        // This is the first open comment so we can update / close it
                         htmlComment.endIndex = i + StringDetector.commentEnd.length - 1;
                         htmlComment.text = trimmedLine.substring(
                             htmlComment.startIndex,
                             htmlComment.endIndex + 1
                         );
+                        actualHtmlCommentsInLine.push(htmlComment);
+                        // Remove any potential open comments that are before this one, as they are either closed or within the closed comment
+                        potentialHtmlCommentsInLine = potentialHtmlCommentsInLine.filter(htmlComment => htmlComment.startIndex > i);
                         foundOpenComment = true;
                         break;
                     }
@@ -161,8 +175,9 @@ export default class StringDetector {
                 }
             }
 
-            // Add the comment to the list if it isn't an sr comment and also not the close end to an open comment
-            htmlCommentsInLine.push({
+            // Handle adding of new comments to the list of potential comments
+            // We only add comments to the actual list if they are closed or if we definitely know that they are not closeable
+            potentialHtmlCommentsInLine.push({
                 startIndex: i === nextIndexOfStart ? i : -1,
                 endIndex: i === nextIndexOfEnd ? i + StringDetector.commentEnd.length - 1 : -1,
                 text: i === nextIndexOfStart
@@ -172,7 +187,19 @@ export default class StringDetector {
             });
         }
 
-        return htmlCommentsInLine;
+        // Are there any still open comments?
+        // If so, then we just return them, plus any closed comments, that we found before them
+        const commentFragments = potentialHtmlCommentsInLine.filter(htmlComment => htmlComment.endIndex === -1 || htmlComment.startIndex === -1);
+
+        if (commentFragments.length > 0) {
+            // We found some fragments of comments, so we add them to the actual list
+            // These should be one of the following (Can't be both):
+            // - Any leftover unclosable open start comments
+            // - Any leftover un opened end comments
+            actualHtmlCommentsInLine.push(...commentFragments);
+        }
+
+        return actualHtmlCommentsInLine;
     }
 
     /**
