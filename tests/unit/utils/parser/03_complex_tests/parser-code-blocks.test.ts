@@ -95,72 +95,349 @@ test("Test parsing multiline cards with codeblocks", () => {
     // nested markdown
     expect(
         parseT(
-            "Nested Markdown?\n?\n" +
-            "````ad-note\n\n" +
-            "```git\n" +
-            "+ print('hello')\n" +
-            "- print('world')\n" +
-            "```\n\n" +
-            "~~~python\n" +
-            "print('hello world')\n" +
-            "~~~\n" +
-            "````",
+            [
+                "Nested Markdown?",
+                "?",
+                "````ad-note",
+                "",
+                "```git",
+                "+ print('hello')",
+                "- print('world')",
+                "```",
+                "",
+                "~~~python",
+                "print('hello world')",
+                "~~~",
+                "````",
+            ].join("\n"),
             parserOptions,
         ),
     ).toEqual([
         [
             CardType.MultiLineBasic,
-            "Nested Markdown?\n?\n" +
-            "````ad-note\n\n" +
-            "```git\n" +
-            "+ print('hello')\n" +
-            "- print('world')\n" +
-            "```\n\n" +
-            "~~~python\n" +
-            "print('hello world')\n" +
-            "~~~\n" +
-            "````",
+            [
+                "Nested Markdown?",
+                "?",
+                "````ad-note",
+                "",
+                "```git",
+                "+ print('hello')",
+                "- print('world')",
+                "```",
+                "",
+                "~~~python",
+                "print('hello world')",
+                "~~~",
+                "````",
+            ].join("\n"),
             0,
             12,
         ],
     ]);
 });
 
+test("Test parsing cloze cards with codeblocks", () => {
+    // Single line cloze
+    expect(
+        parseT([
+            "How do you ==...== Python: ==`print('Hello World!')`==",
+        ].join("\n"), parserOptions),
+    ).toEqual([
+        [
+            CardType.Cloze, [
+                "How do you ==...== Python: ==`print('Hello World!')`==",
+            ].join("\n"),
+            0,
+            0,
+        ],
+    ]);
+
+    // multi line cloze
+
+    expect(
+        parseT([
+            "How do you ==...== Python?",
+            "==`print('Hello World!')`==",
+        ].join("\n"), parserOptions),
+    ).toEqual([
+        [
+            CardType.Cloze, [
+                "How do you ==...== Python?",
+                "==`print('Hello World!')`==",
+            ].join("\n"),
+            0,
+            1,
+        ],
+    ]);
+
+    // TODO: Implement some day, that cloze content can be multiline -> Deviates from anki syntax, so offer a hint about that
+    expect(
+        parseT([
+            "How do you ==...== Python?",
+            "```",
+            "def fn():",
+            "   print('Hello World!')",
+            "   print('Howdy?')",
+            "fn()",
+            "lambda x: x[0]",
+            "```",
+        ].join("\n"), parserOptions),
+    ).toEqual([
+        [
+            CardType.Cloze, [
+                "How do you ==...== Python?",
+                "```",
+                "def fn():",
+                "   print('Hello World!')",
+                "   print('Howdy?')",
+                "fn()",
+                "lambda x: x[0]",
+                "```",
+            ].join("\n"),
+            0,
+            7,
+        ],
+    ]);
+
+    // multi line cloze with blank lines
+    expect(
+        parseT([
+            "How do you ... ==Python==?",
+            "```",
+            "",
+            "def fn():",
+            "   print('Hello World!')",
+            "   print('Howdy?')",
+            "",
+            "fn()",
+            "",
+            "lambda x: x[0]",
+            "",
+            "```",
+            "",
+            "text after codeblock",
+        ].join("\n"), parserOptions),
+    ).toEqual([
+        [
+            CardType.Cloze, [
+                "How do you ... ==Python==?",
+                "```",
+                "",
+                "def fn():",
+                "   print('Hello World!')",
+                "   print('Howdy?')",
+                "",
+                "fn()",
+                "",
+                "lambda x: x[0]",
+                "",
+                "```",
+            ].join("\n"),
+            0,
+            12,
+        ],
+    ]);
+
+    expect(
+        parseT([
+            "How do you ==...== Python?",
+            "```",
+            "",
+            "def fn():",
+            "   ==print('Hello World!')==",
+            "   print('Howdy?')",
+            "",
+            "fn()",
+            "",
+            "lambda x: x[0]",
+            "",
+            "```",
+            "text after codeblock",
+            "",
+        ].join("\n"), parserOptions),
+    ).toEqual([
+        [
+            CardType.Cloze, [
+                "How do you ==...== Python?",
+                "```",
+                "",
+                "def fn():",
+                "   print('Hello World!')",
+                "   print('Howdy?')",
+                "",
+                "fn()",
+                "",
+                "lambda x: x[0]",
+                "",
+                "```",
+                "text after codeblock",
+            ].join("\n"),
+            0,
+            13,
+        ],
+    ]);
+
+    // nested markdown
+    expect(
+        parseT(
+            [
+                "Nested ==Markdown==?",
+                "````ad-note",
+                "",
+                "```git",
+                "+ print('hello')",
+                "- print('world')",
+                "```",
+                "",
+                "~~~python",
+                "print('hello world')",
+                "~~~",
+                "````",
+            ].join("\n"),
+            parserOptions,
+        ),
+    ).toEqual([
+        [
+            CardType.Cloze,
+            [
+                "Nested ==Markdown==?",
+                "````ad-note",
+                "",
+                "```git",
+                "+ print('hello')",
+                "- print('world')",
+                "```",
+                "",
+                "~~~python",
+                "print('hello world')",
+                "~~~",
+                "````",
+            ].join("\n"),
+            0,
+            11,
+        ],
+    ]);
+});
+
 test("Test not parsing 'cards' in codeblocks", () => {
-    // block
-    expect(parseT("```\nCodeblockq::CodeblockA\n```", parserOptions)).toEqual([]);
-    expect(parseT("```\nCodeblockq:::CodeblockA\n```", parserOptions)).toEqual([]);
+    // inline
+    expect(parseT(
+        [
+            "`Codeblockq::CodeblockA`"
+        ].join("\n"),
+        parserOptions)).toEqual([]);
+
+    expect(parseT(
+        [
+            "`Codeblockq:::CodeblockA`"
+        ].join("\n"),
+        parserOptions)).toEqual([]);
+
+    expect(parseT(
+        [
+            "Text before codeblock",
+            "`Codeblockq ==CodeblockA==`",
+            "text after codeblock"
+        ].join("\n"),
+        parserOptions)).toEqual([]);
+
+    expect(parseT(
+        [
+            "Text before codeblock",
+            "```markdown",
+            "Text in markdown block ==highlighted text==!",
+            "```",
+            "text after codeblock"
+        ].join("\n"),
+        parserOptions)).toEqual([]);
+
+    expect(parseT(
+        [
+            "Text before codeblock",
+            "```markdown",
+            "Text in markdown block **bold text**!",
+            "```",
+            "text after codeblock"
+        ].join("\n"),
+        parserOptions)).toEqual([]);
+
+    expect(parseT(
+        [
+            "Text before codeblock",
+            "```",
+            "foo = {{'a': 2}}",
+            "```",
+            "text after codeblock"
+        ].join("\n"),
+        parserOptions)).toEqual([]);
+
+    // 2nd cloze will just be parsed as text
     expect(
-        parseT("# Title\n\n```markdown\nsome ==highlighted text==!\n```\n\nmore!", parserOptions),
-    ).toEqual([]);
+        parseT([
+            "How do you ==...== Python?",
+            "`==print('Hello World!')==``",
+        ].join("\n"), parserOptions),
+    ).toEqual([
+        [
+            CardType.Cloze, [
+                "How do you ==...== Python?",
+                "`==print('Hello World!')==`",
+            ].join("\n"),
+            0,
+            1,
+        ],
+    ]);
+
     expect(
-        parseT("# Title\n```markdown\nsome **bolded text**!\n```\n\nmore!", parserOptions),
-    ).toEqual([]);
-    expect(parseT("# Title\n\n```\nfoo = {{'a': 2}}\n```\n\nmore!", parserOptions)).toEqual([]);
+        parseT([
+            "How do you ==...== Python?",
+            "`==print('Hello World!')==``",
+        ].join("\n"), parserOptions),
+    ).toEqual([
+        [
+            CardType.Cloze, [
+                "How do you ==...== Python?",
+                "```",
+                "==print('Hello World!')==",
+                "```",
+            ].join("\n"),
+            0,
+            3,
+        ],
+    ]);
 
     // inline
-    expect(parseT("`Inlineq::InlineA`", parserOptions)).toEqual([]);
     expect(
-        parseT("# Title\n`if (a & b) {}`\nmore!", {
-            singleLineCardSeparator: "&",
-            singleLineReversedCardSeparator: ":::",
-            multilineCardSeparator: "?",
-            multilineReversedCardSeparator: "??",
-            useAtomicClozes: false,
-            multilineCardEndMarker: "",
-            clozePatterns: [
-                "==[123;;]answer[;;hint]==",
-                "**[123;;]answer[;;hint]**",
-                "{{[123;;]answer[;;hint]}}",
-            ],
-        }),
+        parseT([
+            "# Title",
+            "`if (a & b) {}`",
+            "more!",
+        ].join("\n"),
+            {
+                singleLineCardSeparator: "&",
+                singleLineReversedCardSeparator: ":::",
+                multilineCardSeparator: "?",
+                multilineReversedCardSeparator: "??",
+                useAtomicClozes: false,
+                multilineCardEndMarker: "",
+                clozePatterns: [
+                    "==[123;;]answer[;;hint]==",
+                    "**[123;;]answer[;;hint]**",
+                    "{{[123;;]answer[;;hint]}}",
+                ],
+            }),
     ).toEqual([]);
 
     // combo
     expect(
-        parseT(
-            "Question::Answer\n\n```\nCodeblockq::CodeblockA\n```\n\n`Inlineq::InlineA`\n",
-            parserOptions,
-        ),
+        parseT([
+            "Question::Answer",
+            "",
+            "```",
+            "Codeblockq::CodeblockA",
+            "```",
+            "",
+            "`Inlineq::InlineA`",
+        ].join("\n"), parserOptions),
     ).toEqual([[CardType.SingleLineBasic, "Question::Answer", 0, 0]]);
 });
