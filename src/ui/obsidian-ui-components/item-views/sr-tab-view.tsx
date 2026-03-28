@@ -12,7 +12,6 @@ import { SRSettings } from "src/settings";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container";
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
-import { globalDateProvider } from "src/utils/dates";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 /**
@@ -187,12 +186,7 @@ export class SRTabView extends ItemView {
                 const hasNewCards: boolean = subdeck.newFlashcards.length > 0;
                 const hasDueCards: boolean = subdeck.dueFlashcards.length > 0;
                 const hasDueCardsToday: boolean =
-                    hasDueCards &&
-                    subdeck.dueFlashcards.some((card) => {
-                        const dueDate: number = card.scheduleInfo.dueDateAsUnix;
-                        const today: number = globalDateProvider.today.valueOf();
-                        return dueDate < today;
-                    });
+                    hasDueCards && subdeck.dueFlashcards.some((card) => card.isDue);
 
                 const hasCardsToday: boolean = hasNewCards || hasDueCardsToday;
                 if (

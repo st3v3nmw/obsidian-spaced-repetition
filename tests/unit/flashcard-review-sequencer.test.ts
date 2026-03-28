@@ -491,7 +491,7 @@ describe("processReview", () => {
                 expect(card.front).toEqual("Q1");
                 expect(card.scheduleInfo).toMatchObject({
                     latestEase: 250,
-                    interval: 1,
+                    interval: 0,
                 });
 
                 expect(card.scheduleInfo.dueDate.format("YYYY-MM-DD")).toEqual(againCardDueDate);

@@ -144,6 +144,8 @@ export interface IBaseLocale {
     ALGORITHM: string;
     CHECK_ALGORITHM_WIKI: string;
     SM2_OSR_VARIANT: string;
+    SWITCH_TO_FSRS_ALGORITHM: string;
+    CONFIRM_FSRS_ALGORITHM_SWITCH: string;
     BASE_EASE: string;
     BASE_EASE_DESC: string;
     BASE_EASE_MIN_WARNING: string;
