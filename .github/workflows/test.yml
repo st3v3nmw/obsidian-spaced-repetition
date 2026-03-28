@@ -11,15 +11,19 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            - uses: actions/checkout@v6
             - name: Setup Node
               uses: actions/setup-node@v6
               with:
                   node-version: "24"
+                  cache: "pnpm"
 
-            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v5
+              with:
+                  version: 10
 
             - name: Install Dependencies
-              run: npm install -g pnpm && pnpm install
+              run: pnpm ci
 
             - name: Lint
               run: pnpm lint || (echo && echo "Run 'pnpm format' to fix." && exit 1)
@@ -28,6 +32,6 @@ jobs:
               run: pnpm test
 
             - name: Upload results to Codecov
-              uses: codecov/codecov-action@v4
+              uses: codecov/codecov-action@v6
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
