@@ -7,6 +7,7 @@ export interface IBaseLocale {
     BACK: string;
     SKIP: string;
     EDIT_CARD: string;
+    JUMP_TO_CARD: string;
     RESET_CARD_PROGRESS: string;
     HARD: string;
     GOOD: string;
