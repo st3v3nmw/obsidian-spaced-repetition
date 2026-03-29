@@ -273,6 +273,9 @@ const en: IBaseLocale = {
     START_OF_DAY_DESC: "The time at which the day begins (Format: HH:MM:SS, Default: 00:00:00)",
     INVALID_START_OF_DAY_WARNING: "Invalid format for start of day",
 
+    // Settings > Flashcards
+    ATOMIC_CLOZES: "Atomic clozes",
+    ATOMIC_CLOZES_DESC: "Make clozes atomic, i.e. disables multi-line clozes completely",
     // Settings > Scheduling > Delete
     DELETE_SCHEDULING_DATA_IN_NOTES: "Delete Scheduling Data in Notes",
     DELETE_SCHEDULING_DATA_IN_NOTES_DESC: "Delete scheduling data from all notes and flashcards.",
