@@ -12,6 +12,8 @@ export default class StringDetector {
     static readonly srCommentStart = "<!--SR:"; // The start of a scheduling info comment
     static readonly nonSrCommentStart = "<!--"; // The start of a non scheduling info comment
     static readonly commentEnd = "-->"; // The end of a comment
+    static readonly codeBlockTicsInline = "`";
+    static readonly codeBlockTicsMultiline = "```";
 
     /**
      * Returns the index of the start of the next HTML comment start
@@ -34,6 +36,12 @@ export default class StringDetector {
     static indexOfHTMLCommentEnd(trimmedLine: string, index: number = 0): number {
         return (
             trimmedLine.indexOf(StringDetector.commentEnd, index)
+        );
+    }
+
+    static indexOfCodeBlockMarker(trimmedLine: string, index: number = 0): number {
+        return (
+            trimmedLine.indexOf(StringDetector.codeBlockTicsMultiline, index)
         );
     }
 
@@ -254,23 +262,23 @@ export default class StringDetector {
     }
 
     /**
-     * Returns true if the marker is inside a code block
+     * Returns true if the pattern is inside a code block
      *
      * @param trimmedLine - The text to check
-     * @param marker - The marker
-     * @param markerIndex - The index of the marker in the text
+     * @param startIndex - The index of the pattern start in the text
+     * @param endIndex - The index of the pattern end in the text
      * @returns
      */
-    static isMarkerInsideCodeBlock(
+    static isPatternInsideCodeBlock(
         trimmedLine: string,
-        marker: string,
-        markerIndex: number,
+        startIndex: number,
+        endIndex: number,
     ): boolean {
-        // TODO: Handle codeblocks
-        let goingBack = markerIndex - 1,
-            goingForward = markerIndex + marker.length;
-        let backTicksBefore = 0,
-            backTicksAfter = 0;
+        // TODO: Maybe include also miss formatted inline codeblocks, like ``==codeblock==```
+        let goingBack = startIndex - 1;
+        let goingForward = endIndex;
+        let backTicksBefore = 0;
+        let backTicksAfter = 0;
 
         while (goingBack >= 0) {
             if (trimmedLine[goingBack] === "`") backTicksBefore++;
@@ -283,7 +291,7 @@ export default class StringDetector {
         }
 
         // If there's an odd number of backticks before and after,
-        //  the marker is inside an inline code block
+        // the marker is inside an inline code block
         return backTicksBefore % 2 === 1 && backTicksAfter % 2 === 1;
     }
 
@@ -300,7 +308,7 @@ export default class StringDetector {
             const separatorIdx = trimmedLine.indexOf(separator);
             if (separatorIdx === -1) continue;
             // Check if it's inside an inline code block
-            if (StringDetector.isMarkerInsideCodeBlock(trimmedLine, separator, separatorIdx))
+            if (StringDetector.isPatternInsideCodeBlock(trimmedLine, separatorIdx, separatorIdx + separator.length))
                 continue;
             return true;
         }
@@ -315,8 +323,37 @@ export default class StringDetector {
      * @param clozeCrafter - The cloze crafter
      * @returns True if there are clozes
      */
-    static hasClozes(trimmedLine: string, clozeCrafter: ClozeCrafter): boolean {
-        return clozeCrafter.isClozeNote(trimmedLine);
+    static hasClozes(trimmedLine: string, clozeCrafter: ClozeCrafter, clozePatterns: string[]): boolean {
+        const clozeNote = clozeCrafter.createClozeNote(trimmedLine);
+        if (clozeNote === null) return false;
+
+        let numberOfClozes = clozeNote.numCards;
+
+        for (let i = 0; i < clozeNote.numCards; i++) {
+            const clozeCard = clozeNote.getCardFront(i);
+            for (const clozePattern of clozePatterns) {
+                // Detect the start and end of the cloze and check if it is inside a code block
+
+                // The start of the cloze is always a [ regardless of the pattern, as clozecraft uses [ and ] as the markers for the cloze, even if the pattern is different
+                const startOfCloze = clozeCard.indexOf("[");
+                if (startOfCloze < 0) continue;
+
+                const endOfCloze = clozeCard.indexOf(
+                    "]",
+                    startOfCloze + 1
+                );
+                if (endOfCloze < 0) {
+                    console.warn(`Found a cloze pattern start without an end in the card front: ${clozeCard}. This is likely a malformed cloze and should be fixed. The pattern start was: ${clozePattern[0] + clozePattern[1]} and the expected pattern end was: ${clozePattern[clozePattern.length - 2] + clozePattern[clozePattern.length - 1]}`);
+                    continue;
+                }
+
+                if (StringDetector.isPatternInsideCodeBlock(clozeCard, startOfCloze, endOfCloze)) {
+                    numberOfClozes--;
+                }
+            }
+        }
+
+        return numberOfClozes > 0;
     }
 
     /**

@@ -133,6 +133,19 @@ test("Test not parsing cards in HTML comments", () => {
     ]);
 
     expect(parseT([
+        "---",
+        "- tags: [flashcards]",
+        "---",
+        "",
+        "<!--",
+        "-->",
+        "",
+        "Question:::Answer on same line",
+    ].join("\n"), parserOptions)).toEqual([
+        [CardType.SingleLineReversed, "Question:::Answer on same line", 7, 7],
+    ]);
+
+    expect(parseT([
         "Text before",
         "<!--question",
         "?",

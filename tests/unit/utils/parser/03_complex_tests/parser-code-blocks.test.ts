@@ -234,7 +234,7 @@ test("Test parsing cloze cards with codeblocks", () => {
                 "```",
             ].join("\n"),
             0,
-            12,
+            11,
         ],
     ]);
 
@@ -262,7 +262,7 @@ test("Test parsing cloze cards with codeblocks", () => {
                 "```",
                 "",
                 "def fn():",
-                "   print('Hello World!')",
+                "   ==print('Hello World!')==",
                 "   print('Howdy?')",
                 "",
                 "fn()",
@@ -273,7 +273,7 @@ test("Test parsing cloze cards with codeblocks", () => {
                 "text after codeblock",
             ].join("\n"),
             0,
-            13,
+            12,
         ],
     ]);
 
@@ -319,7 +319,7 @@ test("Test parsing cloze cards with codeblocks", () => {
     ]);
 });
 
-test("Test not parsing 'cards' in codeblocks", () => {
+test("Test not parsing single line 'cards' in codeblocks", () => {
     // inline
     expect(parseT(
         [
@@ -335,8 +335,142 @@ test("Test not parsing 'cards' in codeblocks", () => {
 
     expect(parseT(
         [
+            "`Codeblockq ==CodeblockA==`",
+        ].join("\n"),
+        parserOptions)).toEqual([]);
+
+    // Checking atomic clozes
+    expect(parseT(
+        [
             "Text before codeblock",
             "`Codeblockq ==CodeblockA==`",
+            "text after codeblock"
+        ].join("\n"),
+        { ...parserOptions, useAtomicClozes: true })).toEqual([]);
+
+    expect(parseT(
+        [
+            "Text before codeblock",
+            "```",
+            "block ==highlighted text==!",
+            "```",
+            "text after codeblock"
+        ].join("\n"),
+        { ...parserOptions, useAtomicClozes: true })).toEqual([]);
+
+    expect(parseT(
+        [
+            "Text before codeblock",
+            "```markdown",
+            "Text in markdown block ==highlighted text==!",
+            "```",
+            "text after codeblock"
+        ].join("\n"),
+        { ...parserOptions, useAtomicClozes: true })).toEqual([]);
+
+    expect(parseT(
+        [
+            "Text before codeblock",
+            "```markdown",
+            "Text in markdown block **bold text**!",
+            "```",
+            "text after codeblock"
+        ].join("\n"),
+        { ...parserOptions, useAtomicClozes: true })).toEqual([]);
+
+    expect(parseT(
+        [
+            "Text before codeblock",
+            "```",
+            "foo = {{'a': 2}}",
+            "```",
+            "text after codeblock"
+        ].join("\n"),
+        { ...parserOptions, useAtomicClozes: true })).toEqual([]);
+
+    expect(
+        parseT([
+            "How do you ==...== Python?",
+            "```",
+            "==print('Hello World!')==",
+            "```",
+        ].join("\n"), { ...parserOptions, useAtomicClozes: true }),
+    ).toEqual([
+        [
+            CardType.Cloze, [
+                "How do you ==...== Python?",
+            ].join("\n"),
+            0,
+            0,
+        ],
+    ]);
+
+    expect(
+        parseT([
+            "How do you ==...== Python?",
+            "`==print('Hello World!')==`",
+        ].join("\n"), { ...parserOptions, useAtomicClozes: true }),
+    ).toEqual([
+        [
+            CardType.Cloze, [
+                "How do you ==...== Python?",
+            ].join("\n"),
+            0,
+            0,
+        ],
+    ]);
+
+    // inline
+    expect(
+        parseT([
+            "# Title",
+            "`if (a & b) {}`",
+            "more!",
+        ].join("\n"),
+            {
+                singleLineCardSeparator: "&",
+                singleLineReversedCardSeparator: ":::",
+                multilineCardSeparator: "?",
+                multilineReversedCardSeparator: "??",
+                useAtomicClozes: false,
+                multilineCardEndMarker: "",
+                clozePatterns: [
+                    "==[123;;]answer[;;hint]==",
+                    "**[123;;]answer[;;hint]**",
+                    "{{[123;;]answer[;;hint]}}",
+                ],
+            }),
+    ).toEqual([]);
+});
+
+
+test("Test not parsing multiline 'cards' in codeblocks", () => {
+    expect(parseT(
+        [
+            "Text before codeblock",
+            "`Codeblockq ==CodeblockA==`",
+            "text after codeblock"
+        ].join("\n"),
+        parserOptions)).toEqual([]);
+
+    expect(parseT(
+        [
+            "Text before codeblock",
+            "```",
+            "Text in",
+            "?",
+            "block ==highlighted text==!",
+            "```",
+            "text after codeblock"
+        ].join("\n"),
+        parserOptions)).toEqual([]);
+
+    expect(parseT(
+        [
+            "Text before codeblock",
+            "Text in",
+            "`?`",
+            "block",
             "text after codeblock"
         ].join("\n"),
         parserOptions)).toEqual([]);
@@ -375,13 +509,13 @@ test("Test not parsing 'cards' in codeblocks", () => {
     expect(
         parseT([
             "How do you ==...== Python?",
-            "`==print('Hello World!')==``",
+            "``==print('Hello World!')==``",
         ].join("\n"), parserOptions),
     ).toEqual([
         [
             CardType.Cloze, [
                 "How do you ==...== Python?",
-                "`==print('Hello World!')==`",
+                "``==print('Hello World!')==``",
             ].join("\n"),
             0,
             1,
@@ -397,6 +531,24 @@ test("Test not parsing 'cards' in codeblocks", () => {
         [
             CardType.Cloze, [
                 "How do you ==...== Python?",
+                "`==print('Hello World!')==``",
+            ].join("\n"),
+            0,
+            1,
+        ],
+    ]);
+
+    expect(
+        parseT([
+            "How do you ==...== Python?",
+            "```",
+            "==print('Hello World!')==",
+            "```",
+        ].join("\n"), parserOptions),
+    ).toEqual([
+        [
+            CardType.Cloze, [
+                "How do you ==...== Python?",
                 "```",
                 "==print('Hello World!')==",
                 "```",
@@ -405,28 +557,6 @@ test("Test not parsing 'cards' in codeblocks", () => {
             3,
         ],
     ]);
-
-    // inline
-    expect(
-        parseT([
-            "# Title",
-            "`if (a & b) {}`",
-            "more!",
-        ].join("\n"),
-            {
-                singleLineCardSeparator: "&",
-                singleLineReversedCardSeparator: ":::",
-                multilineCardSeparator: "?",
-                multilineReversedCardSeparator: "??",
-                useAtomicClozes: false,
-                multilineCardEndMarker: "",
-                clozePatterns: [
-                    "==[123;;]answer[;;hint]==",
-                    "**[123;;]answer[;;hint]**",
-                    "{{[123;;]answer[;;hint]}}",
-                ],
-            }),
-    ).toEqual([]);
 
     // combo
     expect(

@@ -43,10 +43,15 @@ export default class LineParser {
                 } else if (LineParser.parserIsInMiddleOfNonSRHTMLComment(parserData)) {
                     // Non sr info comment
                     parserData.setParserState("HTML_COMMENT_MIDDLE");
-
                 } else if (currentLineTrimmed.length === 0) {
                     // Empty line
                     parserData.setParserState("EMPTY_LINE");
+                } else if (StringDetector.indexOfCodeBlockMarker(currentLineTrimmed) >= 0) {
+                    // Code block start/end
+                    parserData.setParserState("CODE_BLOCK_START_OR_END");
+                } else if (parserData.isInCodeBlock) {
+                    // Code block middle
+                    parserData.setParserState("CODE_BLOCK_MIDDLE");
                 } else if (
                     StringDetector.isMultiLineCardEndMarker(
                         currentLineTrimmed,
@@ -78,8 +83,10 @@ export default class LineParser {
                 ) {
                     // Inline card
                     parserData.setParserState("INLINE_CARD");
-                } else if (StringDetector.hasClozes(currentLineTrimmed, parserData.clozeCrafter)) {
+                } else if (StringDetector.hasClozes(currentLineTrimmed, parserData.clozeCrafter, parserData.options.clozePatterns)) {
                     // Cloze card
+
+                    console.log(currentLineTrimmed);
                     parserData.setParserState("CLOZE");
                 } else if (
                     StringDetector.isMultiLineCardSeparator(
@@ -308,7 +315,7 @@ export default class LineParser {
 
                     if (
                         !parserData.lineData.currentLineTrimmed.startsWith("<!--SR:") &&
-                        !StringDetector.hasClozes(parserData.lineData.currentLineTrimmed, parserData.clozeCrafter) &&
+                        !StringDetector.hasClozes(parserData.lineData.currentLineTrimmed, parserData.clozeCrafter, parserData.options.clozePatterns) &&
                         !StringDetector.hasInlineSeparator(parserData.lineData.currentLineTrimmed, parserData.lineData.inlineSeparators.map((x) => x.separator)) &&
                         !StringDetector.isMultiLineCardSeparator(parserData.lineData.currentLineTrimmed, parserData.lineData.multilineSeparators.map((x) => x.separator))
                     ) {
@@ -502,6 +509,19 @@ export default class LineParser {
                 break;
             }
 
+            case "CODE_BLOCK_START_OR_END": {
+                parserData.isInCodeBlock = !parserData.isInCodeBlock;
+                parserData.setParserState("TEXT");
+                parserData = LineParser.parseLine(parserData);
+                break;
+            }
+
+            case "CODE_BLOCK_MIDDLE": {
+                parserData.setParserState("TEXT");
+                parserData = LineParser.parseLine(parserData);
+                break;
+            }
+
             case "TEXT": {
                 // Adds current line to the last card or potential new card
                 // This state shall only be entered when the current line is connected to the last card or if it belongs to the potential new card
@@ -580,11 +600,12 @@ export default class LineParser {
                     -> irrelevant > we skip it
                 */
                 if (
-                    parserData.options.multilineCardEndMarker !== null &&
-                    parserData.options.multilineCardEndMarker !== undefined &&
-                    parserData.options.multilineCardEndMarker !== "" &&
-                    parserData.options.multilineCardEndMarker.trim() !== "" &&
-                    (parserData.searchForMultilineCards || parserData.searchForMultilineCloze)
+                    parserData.isInCodeBlock ||
+                    (parserData.options.multilineCardEndMarker !== null &&
+                        parserData.options.multilineCardEndMarker !== undefined &&
+                        parserData.options.multilineCardEndMarker !== "" &&
+                        parserData.options.multilineCardEndMarker.trim() !== "" &&
+                        (parserData.searchForMultilineCards || parserData.searchForMultilineCloze))
                 ) {
                     // Only handle this if multiline cards are enabled and we are already searching for multiline cards or clozes
 

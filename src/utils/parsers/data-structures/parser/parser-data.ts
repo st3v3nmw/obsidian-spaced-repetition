@@ -17,7 +17,6 @@ import { ParserStates } from "src/utils/parsers/data-structures/parser/parser-st
  * whether to search for multiline clozes, and the searchForMultilineCloze flag.
  *
  * @class ParserData
- * @extends {ParserData}
  */
 export class ParserData {
     options: ParserOptions; // The parser options
@@ -32,7 +31,8 @@ export class ParserData {
     searchForMultilineCards: boolean; // Whether to search for multiline cards
     searchForMultilineCloze: boolean; // Whether to search for lines for the prev cloze card
     stillOpenHTMLComments: HTMLCommentSearchResultElement[]; // The still open html comments
-    noHTMLCommentsInCurrentLine: boolean; // Flag to indicate if there are no HTML comments in the current line
+    noHTMLCommentsInCurrentLine: boolean; // Flag to indicate if there are no HTML comments in the current line, which is used for parsing a line with comments a second time after they were removed
+    isInCodeBlock: boolean; // Flag to indicate if all current detected lines are within a code block, which determines if they are handled as text or not
 
     /**
      * Creates a new instance of ParserData
@@ -82,6 +82,7 @@ export class ParserData {
         this.cardData = new CardData();
         this.searchForMultilineCards = false;
         this.searchForMultilineCloze = false;
+        this.isInCodeBlock = false;
         this.clozeCrafter = new ClozeCrafter(options.clozePatterns);
     }
 

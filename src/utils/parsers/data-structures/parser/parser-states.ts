@@ -6,6 +6,8 @@ export type ParserStates =
     | "TEXT"
     | "HTML_COMMENT_START_OR_END"
     | "HTML_COMMENT_MIDDLE"
+    | "CODE_BLOCK_START_OR_END"
+    | "CODE_BLOCK_MIDDLE"
     | "SR_HTML_COMMENT"
     | "CLOZE"
     | "INLINE_CARD"
