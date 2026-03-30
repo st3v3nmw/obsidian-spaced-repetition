@@ -21,9 +21,7 @@ jobs:
             - uses: pnpm/action-setup@v5
               with:
                   version: 10
-
-            - name: Install Dependencies
-              run: pnpm ci
+                  run_install: true
 
             - name: Lint
               run: pnpm lint || (echo && echo "Run 'pnpm format' to fix." && exit 1)
