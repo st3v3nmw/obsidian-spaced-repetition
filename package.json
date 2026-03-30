@@ -39,7 +39,7 @@
         "esbuild-plugin-postcss2": "^0.1.2",
         "eslint": "^10.1.0",
         "eslint-plugin-simple-import-sort": "^12.1.1",
-        "eslint-plugin-unicorn": "^63.0.0",
+        "eslint-plugin-unicorn": "^64.0.0",
         "jest": "^30.3.0",
         "jest-environment-jsdom": "^30.3.0",
         "jest-expect-message": "^1.1.3",
