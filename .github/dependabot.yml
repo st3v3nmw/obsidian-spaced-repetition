@@ -3,17 +3,24 @@ updates:
     - package-ecosystem: "npm"
       directory: "/"
       schedule:
-          interval: "weekly"
+          interval: "monthly"
       groups:
-          minor-and-patch:
-              update-types:
-                  - "minor"
-                  - "patch"
+          npm:
+              patterns:
+                  - "*"
+    - package-ecosystem: "pip"
+      directory: "/"
+      schedule:
+          interval: "monthly"
+      groups:
+          pip:
+              patterns:
+                  - "*"
     - package-ecosystem: "github-actions"
       directory: "/"
       schedule:
-          interval: "weekly"
+          interval: "monthly"
       groups:
-          all-deps:
+          github-actions:
               patterns:
                   - "*"
