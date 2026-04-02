@@ -11,6 +11,7 @@ const en: IBaseLocale = {
     BACK: "Back",
     SKIP: "Skip",
     EDIT_CARD: "Edit Card",
+    JUMP_TO_CARD: "Jump to Card",
     RESET_CARD_PROGRESS: "Reset card's progress",
     HARD: "Hard",
     GOOD: "Good",
