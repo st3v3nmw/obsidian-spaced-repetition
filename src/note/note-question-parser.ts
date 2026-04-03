@@ -7,7 +7,9 @@ import { CardFrontBack, CardFrontBackUtil } from "src/card/questions/question-ty
 import { DataStore } from "src/data-stores/base/data-store";
 import { TopicPath, TopicPathList } from "src/deck/topic-path";
 import { frontmatterTagPseudoLineNum, ISRFile } from "src/file";
-import { parse, ParsedQuestionInfo, ParserOptions } from "src/parser";
+import ParsedCardInfo from "src/utils/parsers/data-structures/parser/parsed-card-info";
+import ParserOptions from "src/utils/parsers/data-structures/parser/parser-options";
+import { CardParser } from "src/utils/parsers/card-parser";
 import { SettingsUtil, SRSettings } from "src/settings";
 import {
     splitNoteIntoFrontmatterAndContent,
@@ -109,7 +111,7 @@ export class NoteQuestionParser {
         this.tagCacheList = tagCacheList;
 
         const result: Question[] = [];
-        const parsedQuestionInfoList: ParsedQuestionInfo[] = this.parseQuestions();
+        const parsedQuestionInfoList: ParsedCardInfo[] = this.parseQuestions();
         for (const parsedQuestionInfo of parsedQuestionInfoList) {
             const question: Question = this.createQuestionObject(parsedQuestionInfo, textDirection);
 
@@ -127,6 +129,13 @@ export class NoteQuestionParser {
                     null,
                 );
 
+            // TODO: this length mismatch deletes the scheduling info on multiline cloze cards, after setting the multiline symbol
+            // TODO: actually the issue is with the multiline cards not the cloze cards. The cloze ones without +++ are detected
+            // TODO: but not the simple multiline cards without +++, which is why there is too many schedule comments and one of them will be deleted
+
+            console.log(cardFrontBackList);
+            console.log(cardScheduleInfoList);
+
             // we have some extra scheduling dates to delete
             const correctLength = cardFrontBackList.length;
             if (cardScheduleInfoList.length > correctLength) {
@@ -142,7 +151,7 @@ export class NoteQuestionParser {
         return result;
     }
 
-    private parseQuestions(): ParsedQuestionInfo[] {
+    private parseQuestions(): ParsedCardInfo[] {
         const settings = this.settings;
         const parserOptions: ParserOptions = {
             singleLineCardSeparator: settings.singleLineCardSeparator,
@@ -151,14 +160,15 @@ export class NoteQuestionParser {
             multilineReversedCardSeparator: settings.multilineReversedCardSeparator,
             multilineCardEndMarker: settings.multilineCardEndMarker,
             clozePatterns: settings.clozePatterns,
+            useAtomicClozes: settings.useAtomicClozes,
         };
 
         // We pass contentText which has the frontmatter blanked out; see extractFrontmatter for reasoning
-        return parse(this.contentText, parserOptions);
+        return CardParser.parse(this.noteFile.path, this.contentText, parserOptions);
     }
 
     private createQuestionObject(
-        parsedQuestionInfo: ParsedQuestionInfo,
+        parsedQuestionInfo: ParsedCardInfo,
         textDirection: TextDirection,
     ): Question {
         const questionContext: string[] = this.noteFile.getQuestionContext(

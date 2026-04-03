@@ -181,6 +181,21 @@ export class FlashcardsPage extends SettingsPage {
                     );
             })
             .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("ATOMIC_CLOZES"))
+                    .setDesc(t("ATOMIC_CLOZES_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.useAtomicClozes)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.useAtomicClozes = value;
+                                await this.plugin.savePluginData();
+
+                                this.display();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
                 const convertHighlightsToClozesEl = setting.setName(
                     t("CONVERT_HIGHLIGHTS_TO_CLOZES"),
                 );
