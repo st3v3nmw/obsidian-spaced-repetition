@@ -150,7 +150,7 @@ These files reside in `docs/docs/` in the respective language's folder. For inst
 
 The docs are served on [https://stephenmwangi.com/obsidian-spaced-repetition/](https://stephenmwangi.com/obsidian-spaced-repetition/).
 
-For small changes, you can simply open an pull request for merging (against the `master` branch).
+For small changes, you can simply open an pull request for merging (against the `main` branch).
 The changes will be live once a new [release](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases) is made.
 
 For larger diffs, it's important that you check how your docs look like as explained below.
@@ -200,7 +200,7 @@ Example using `v1.9.2`:
     git push --set-upstream origin release-v1.9.2
     ```
 
-5. Open and merge the PR into `master`.
-6. Locally, switch back to `master` and pull the changes: `git switch master && git pull`
+5. Open and merge the PR into `main`.
+6. Locally, switch back to `main` and pull the changes: `git switch main && git pull`
 7. Create a git tag with the version: `git tag -a 1.9.2 -m "1.9.2"`
-8. Push the tag: `git push --tags`. <br> You're all set! [This GitHub action](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/.github/workflows/release.yml) should pick it up, create a release, publish it, and update the live documentation.
+8. Push the tag: `git push --tags`. <br> You're all set! [This GitHub action](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/main/.github/workflows/release.yml) should pick it up, create a release, publish it, and update the live documentation.

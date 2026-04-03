@@ -6,7 +6,7 @@ The statistics section can be accessed in the `Statistics` section in the plugin
 
 Stats on the number of cards due in the future.
 
-<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/master/docs/media/en/stats_forecast.png" />
+<img src="https://raw.githubusercontent.com/st3v3nmw/obsidian-spaced-repetition/main/docs/media/en/stats_forecast.png" />
 
 ### Intervals
 
