@@ -233,6 +233,13 @@ export class CardContainer {
 
         // Setup cloze input listeners
         this._setupClozeInputListeners();
+        // auto-focus the first cloze input if this card is a cloze card
+        if (this._currentQuestion.questionType === CardType.Cloze) {
+            const firstInput = document.querySelector(".cloze-input") as HTMLInputElement;
+            if (firstInput) {
+                firstInput.focus();
+            }
+        }
     }
 
     private get _currentCard(): Card {
@@ -338,11 +345,16 @@ export class CardContainer {
         this.clozeInputs = document.querySelectorAll(".cloze-input");
 
         this.clozeInputs.forEach((input) => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            input.addEventListener("change", (e) => {});
+            input.addEventListener("keydown", (e: KeyboardEvent) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    (input as HTMLElement).blur();
+                    this._showAnswer();
+                }
+            });
         });
     }
-
     private _evaluateClozeAnswers(): void {
         this.clozeAnswers = document.querySelectorAll(".cloze-answer");
 
@@ -408,6 +420,9 @@ export class CardContainer {
             this.reviewSequencer,
             this._currentCard,
         );
+        // NEW: restore keyboard focus after cloze confirmation
+        this.plugin.uiManager.setSRViewInFocus(true);
+        this.response.againButton.buttonEl.focus();
     }
 
     private _keydownHandler = (e: KeyboardEvent) => {
