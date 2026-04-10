@@ -20,7 +20,7 @@
 
 !!! warning "警告"
 
-    该条目长时间未更新, 请注意参见 [源代码](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/src/algorithms/osr/srs-algorithm-osr.ts)
+    该条目长时间未更新, 请注意参见 [源代码](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/main/src/algorithms/osr/srs-algorithm-osr.ts)
 
 - 当存在外链时: 初始熟练度 = (1 - 链接加权) _ 基础熟练度 + 链接加权 _ 外链平均熟练度
 - 链接加权 = 最大外链因子 \* min(1.0, log(外链数目 + 0.5) / log(64)) (以自适应不同情况)
