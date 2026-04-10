@@ -146,35 +146,8 @@ export class SRTabView extends ItemView {
                 );
             }
 
-            // this._createBackButton();
-            const loadedData = await this.loadReviewSequencerData();
-
-            this.reviewSequencer = loadedData.reviewSequencer;
-            this.reviewMode = loadedData.mode;
-
-            if (this.deckContainer === undefined) {
-                // Init static elements in views
-                this.deckContainer = new DeckContainer(
-                    this.plugin,
-                    this.settings,
-                    this.reviewSequencer,
-                    this.viewContentEl.createDiv(),
-                    this._startReviewOfDeck.bind(this),
-                );
-            }
-
-            if (this.cardContainer === undefined) {
-                this.cardContainer = new CardContainer(
-                    this.app,
-                    this.plugin,
-                    this.settings,
-                    this.reviewSequencer,
-                    this.reviewMode,
-                    this.viewContentEl.createDiv(),
-                    this._showDecksList.bind(this),
-                    this._doEditQuestionText.bind(this),
-                );
-            }
+            await this._setUpReviewSequencer();
+            await this._setUpContentContainers();
 
             const subdecksWithCardsInQueue: Deck[] =
                 this.reviewSequencer.getSubDecksWithCardsInQueue(
@@ -209,7 +182,7 @@ export class SRTabView extends ItemView {
                 }
             }
 
-            if (openImmediately || this.reviewMode === FlashcardReviewMode.Cram) {
+            if (openImmediately) {
                 this._showFlashcard(deckWithCards);
             } else {
                 this._showDecksList();
@@ -257,6 +230,39 @@ export class SRTabView extends ItemView {
         if (this.cardContainer) this.cardContainer.close();
     }
 
+    private async _setUpReviewSequencer() {
+        const loadedData = await this.loadReviewSequencerData();
+
+        this.reviewSequencer = loadedData.reviewSequencer;
+        this.reviewMode = loadedData.mode;
+    }
+
+    private async _setUpContentContainers(rebuildContainers: boolean = false) {
+        if (this.deckContainer === undefined || rebuildContainers) {
+            // Init static elements in views
+            this.deckContainer = new DeckContainer(
+                this.plugin,
+                this.settings,
+                this.reviewSequencer,
+                this.viewContentEl.createDiv(),
+                this._startReviewOfDeck.bind(this),
+            );
+        }
+
+        if (this.cardContainer === undefined || rebuildContainers) {
+            this.cardContainer = new CardContainer(
+                this.app,
+                this.plugin,
+                this.settings,
+                this.reviewSequencer,
+                this.reviewMode,
+                this.viewContentEl.createDiv(),
+                this._showDecksList.bind(this),
+                this._doEditQuestionText.bind(this),
+            );
+        }
+    }
+
     private _showDecksList(): void {
         this._hideFlashcard();
         this.deckContainer.show();
@@ -268,12 +274,10 @@ export class SRTabView extends ItemView {
 
     private _showFlashcard(deck: Deck): void {
         this._hideDecksList();
-        // this.backButton.buttonEl.removeClass("sr-is-hidden");
         this.cardContainer.show(deck);
     }
 
     private _hideFlashcard(): void {
-        // this.backButton.buttonEl.addClass("sr-is-hidden");
         this.cardContainer.hide();
     }
 
