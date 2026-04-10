@@ -95,6 +95,12 @@
     --view-padding: var(--size-4-3);
     display: flex;
     flex-direction: column;
+
+    & .MathJax {
+        overflow-x: auto;
+        margin: 0;
+        padding: 1em 0;
+    }
 }
 
 .is-mobile .sr-view {
