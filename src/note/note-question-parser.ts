@@ -7,10 +7,10 @@ import { CardFrontBack, CardFrontBackUtil } from "src/card/questions/question-ty
 import { DataStore } from "src/data-stores/base/data-store";
 import { TopicPath, TopicPathList } from "src/deck/topic-path";
 import { frontmatterTagPseudoLineNum, ISRFile } from "src/file";
+import { SettingsUtil, SRSettings } from "src/settings";
+import { CardParser } from "src/utils/parsers/card-parser";
 import ParsedCardInfo from "src/utils/parsers/data-structures/parser/parsed-card-info";
 import ParserOptions from "src/utils/parsers/data-structures/parser/parser-options";
-import { CardParser } from "src/utils/parsers/card-parser";
-import { SettingsUtil, SRSettings } from "src/settings";
 import {
     splitNoteIntoFrontmatterAndContent,
     splitTextIntoLineArray,

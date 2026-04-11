@@ -7,8 +7,8 @@ import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorith
 import { DataStore } from "src/data-stores/base/data-store";
 import { TopicPath, TopicPathList, TopicPathWithWs } from "src/deck/topic-path";
 import { Note } from "src/note/note";
-import ParsedCardInfo from "src/utils/parsers/data-structures/parser/parsed-card-info";
 import { SRSettings } from "src/settings";
+import ParsedCardInfo from "src/utils/parsers/data-structures/parser/parsed-card-info";
 import { cyrb53, MultiLineTextFinder, stringTrimStart, TextDirection } from "src/utils/strings";
 
 export enum CardType {

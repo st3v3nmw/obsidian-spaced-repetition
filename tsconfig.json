@@ -1,36 +1,23 @@
 {
     "compilerOptions": {
+        "baseUrl": "./",
         "paths": {
-            "src/*": [
-                "./src/*"
-            ]
+            "src/*": ["src/*"]
         },
         "inlineSourceMap": true,
         "inlineSources": true,
-        "module": "node16",
+        "module": "ESNEXT",
         "target": "ES2018",
+        "types": ["node", "jest"],
         "allowJs": true,
         "noImplicitAny": true,
-        "moduleResolution": "node16",
+        "moduleResolution": "node",
         "esModuleInterop": true,
         "importHelpers": true,
-        "lib": [
-            "dom",
-            "dom.Iterable",
-            "scripthost",
-            "ES5",
-            "ES6",
-            "ES7",
-            "ES2021"
-        ],
+        "lib": ["dom", "dom.Iterable", "scripthost", "ES5", "ES6", "ES7", "ES2021"],
         "jsx": "react",
         "jsxFactory": "h"
     },
-    "include": [
-        "**/*.ts",
-        "**/*.tsx"
-    ],
-    "files": [
-        "node_modules/jest-expect-message/types/index.d.ts"
-    ]
+    "include": ["**/*.ts", "**/*.tsx"],
+    "files": ["node_modules/jest-expect-message/types/index.d.ts"]
 }

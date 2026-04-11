@@ -2,7 +2,6 @@ import { ButtonComponent, setIcon, Setting, SettingGroup } from "obsidian";
 
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
-import { CardParser } from "src/utils/parsers/card-parser";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import {
     getPageIcon,
@@ -10,6 +9,7 @@ import {
     SettingsPageType,
     SettingsPageTypesArray,
 } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
+import { CardParser } from "src/utils/parsers/card-parser";
 
 /**
  * Represents the main settings page, from which all other settings pages are accessed.
@@ -26,7 +26,7 @@ export class MainPage extends SettingsPage {
         openPage: (pageType: SettingsPageType) => void,
         scrollListener: (scrollPosition: number) => void,
     ) {
-        super(pageContainerEl, plugin, pageType, () => { }, display, openPage, scrollListener);
+        super(pageContainerEl, plugin, pageType, () => {}, display, openPage, scrollListener);
 
         this.containerEl.addClass("sr-main-page");
 

@@ -331,9 +331,9 @@ const execSingleLineClozeCardsTestWithMarker = (
         expect(
             parseT(
                 "lorem ipsum " +
-                leftMarker +
-                "dolor won" +
-                rightMarker.substring(0, rightMarker.length - 1),
+                    leftMarker +
+                    "dolor won" +
+                    rightMarker.substring(0, rightMarker.length - 1),
                 options,
             ),
         ).toEqual([]);
@@ -1245,10 +1245,7 @@ const execMultiLineClozeCardsWithAtomicClozesTest = (
     ).toEqual([
         [
             CardType.Cloze,
-            [
-                `${leftMarker}deletion${rightMarker} test`,
-                "<!--SR:2022-08-11,4,270-->"
-            ].join("\n"),
+            [`${leftMarker}deletion${rightMarker} test`, "<!--SR:2022-08-11,4,270-->"].join("\n"),
             2,
             3,
         ],
@@ -1265,14 +1262,7 @@ const execMultiLineClozeCardsWithAtomicClozesTest = (
             ].join("\n"),
             options,
         ),
-    ).toEqual([
-        [
-            CardType.Cloze,
-            [
-                `test ${leftMarker}deletion${rightMarker}`,
-            ].join("\n"), 2, 2
-        ]
-    ]);
+    ).toEqual([[CardType.Cloze, [`test ${leftMarker}deletion${rightMarker}`].join("\n"), 2, 2]]);
 
     expect(
         parseT(

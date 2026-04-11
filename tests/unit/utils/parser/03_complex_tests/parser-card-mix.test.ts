@@ -9,17 +9,17 @@ test("Test parsing of a mix of card types", () => {
     expect(
         parseT(
             "# Lorem Ipsum\n\nLorem ipsum dolor ==sit amet==, consectetur ==adipiscing== elit.\n" +
-            "Duis magna arcu, eleifend rhoncus ==euismod non,==\nlaoreet vitae enim.\n\n" +
-            "Fusce placerat::velit in pharetra gravida\n\n" +
-            "Donec dapibus ullamcorper aliquam.\n??\nDonec dapibus ullamcorper aliquam.\n<!--SR:2021-08-11,4,270-->",
+                "Duis magna arcu, eleifend rhoncus ==euismod non,==\nlaoreet vitae enim.\n\n" +
+                "Fusce placerat::velit in pharetra gravida\n\n" +
+                "Donec dapibus ullamcorper aliquam.\n??\nDonec dapibus ullamcorper aliquam.\n<!--SR:2021-08-11,4,270-->",
             parserOptions,
         ),
     ).toEqual([
         [
             CardType.Cloze,
             "Lorem ipsum dolor ==sit amet==, consectetur ==adipiscing== elit.\n" +
-            "Duis magna arcu, eleifend rhoncus ==euismod non,==\n" +
-            "laoreet vitae enim.",
+                "Duis magna arcu, eleifend rhoncus ==euismod non,==\n" +
+                "laoreet vitae enim.",
             2,
             4,
         ],

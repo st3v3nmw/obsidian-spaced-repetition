@@ -1,4 +1,3 @@
-
 import { CardType } from "src/card/questions/question";
 
 /**

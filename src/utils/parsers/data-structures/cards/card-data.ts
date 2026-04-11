@@ -93,8 +93,8 @@ export default class CardData {
             lastCard.backText !== null
                 ? lastCard.backText + "\n" + lineData.currentLineEndTrimmed
                 : searchForMultilineCards
-                    ? lineData.currentLineEndTrimmed
-                    : null,
+                  ? lineData.currentLineEndTrimmed
+                  : null,
         );
         this.cards[this.lastCardIndex] = modifiedLastCard;
     }

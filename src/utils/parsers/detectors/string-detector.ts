@@ -22,9 +22,7 @@ export default class StringDetector {
      * @returns
      */
     static indexOfHTMLCommentStart(trimmedLine: string, index: number = 0): number {
-        return (
-            trimmedLine.indexOf(StringDetector.nonSrCommentStart, index)
-        );
+        return trimmedLine.indexOf(StringDetector.nonSrCommentStart, index);
     }
 
     /**
@@ -34,15 +32,11 @@ export default class StringDetector {
      * @returns
      */
     static indexOfHTMLCommentEnd(trimmedLine: string, index: number = 0): number {
-        return (
-            trimmedLine.indexOf(StringDetector.commentEnd, index)
-        );
+        return trimmedLine.indexOf(StringDetector.commentEnd, index);
     }
 
     static indexOfCodeBlockMarker(trimmedLine: string, index: number = 0): number {
-        return (
-            trimmedLine.indexOf(StringDetector.codeBlockTicsMultiline, index)
-        );
+        return trimmedLine.indexOf(StringDetector.codeBlockTicsMultiline, index);
     }
 
     /**
@@ -51,7 +45,11 @@ export default class StringDetector {
      * @param trimmedLine
      * @returns
      */
-    static getSRHTMLComment(trimmedLine: string, lineNumber: number, index: number = 0): HTMLCommentSearchResultElement {
+    static getSRHTMLComment(
+        trimmedLine: string,
+        lineNumber: number,
+        index: number = 0,
+    ): HTMLCommentSearchResultElement {
         const startIndex = trimmedLine.indexOf(StringDetector.srCommentStart, index);
         if (startIndex === -1) {
             return { startIndex: -1, endIndex: -1, text: trimmedLine, lineNumber };
@@ -73,7 +71,12 @@ export default class StringDetector {
 
         endIndex += StringDetector.commentEnd.length - 1;
 
-        return { startIndex, endIndex, text: trimmedLine.substring(startIndex, endIndex + 1), lineNumber };
+        return {
+            startIndex,
+            endIndex,
+            text: trimmedLine.substring(startIndex, endIndex + 1),
+            lineNumber,
+        };
     }
 
     /**
@@ -82,7 +85,10 @@ export default class StringDetector {
      * @param trimmedLine
      * @returns
      */
-    static getSRCommentsInLine(trimmedLine: string, lineNumber: number): HTMLCommentSearchResultElement[] {
+    static getSRCommentsInLine(
+        trimmedLine: string,
+        lineNumber: number,
+    ): HTMLCommentSearchResultElement[] {
         // TODO: Maybe merge this with getHTMLCommentsInLine
         const srCommentsInLine: HTMLCommentSearchResultElement[] = [];
 
@@ -90,17 +96,26 @@ export default class StringDetector {
         while (nextSRComment.startIndex >= 0) {
             srCommentsInLine.push(nextSRComment);
 
-            nextSRComment = StringDetector.getSRHTMLComment(trimmedLine, lineNumber, nextSRComment.startIndex + nextSRComment.text.length);
+            nextSRComment = StringDetector.getSRHTMLComment(
+                trimmedLine,
+                lineNumber,
+                nextSRComment.startIndex + nextSRComment.text.length,
+            );
         }
 
         return srCommentsInLine;
     }
 
-    static getHTMLCommentsInLine(trimmedLine: string, lineNumber: number, externalSrCommentsInLine: HTMLCommentSearchResultElement[] = []): HTMLCommentSearchResultElement[] {
+    static getHTMLCommentsInLine(
+        trimmedLine: string,
+        lineNumber: number,
+        externalSrCommentsInLine: HTMLCommentSearchResultElement[] = [],
+    ): HTMLCommentSearchResultElement[] {
         // Prepare the list of SR comments in the line to filter those out, as they are not HTML comments
-        const srCommentsInLine = externalSrCommentsInLine.length > 0
-            ? externalSrCommentsInLine
-            : StringDetector.getSRCommentsInLine(trimmedLine, lineNumber);
+        const srCommentsInLine =
+            externalSrCommentsInLine.length > 0
+                ? externalSrCommentsInLine
+                : StringDetector.getSRCommentsInLine(trimmedLine, lineNumber);
 
         // List of any fragments of HTML comments that we found
         let potentialHtmlCommentsInLine: HTMLCommentSearchResultElement[] = [];
@@ -128,22 +143,34 @@ export default class StringDetector {
             }
 
             // Here we know start !== end and they can't be -1 at the same time
-            if (nextIndexOfStart !== -1 && (nextIndexOfStart < nextIndexOfEnd || nextIndexOfEnd === -1)) {
+            if (
+                nextIndexOfStart !== -1 &&
+                (nextIndexOfStart < nextIndexOfEnd || nextIndexOfEnd === -1)
+            ) {
                 i = nextIndexOfStart;
-            } else if (nextIndexOfEnd !== -1 && (nextIndexOfStart === -1 || nextIndexOfEnd < nextIndexOfStart)) {
+            } else if (
+                nextIndexOfEnd !== -1 &&
+                (nextIndexOfStart === -1 || nextIndexOfEnd < nextIndexOfStart)
+            ) {
                 i = nextIndexOfEnd;
             } else {
                 // This shouldn't happen, so it must be a bug in the detector of start and end
-                throw new Error(`Weird arrangement of indices in the detection of html comments. Start index: ${nextIndexOfStart} | End index: ${nextIndexOfEnd}`);
+                throw new Error(
+                    `Weird arrangement of indices in the detection of html comments. Start index: ${nextIndexOfStart} | End index: ${nextIndexOfEnd}`,
+                );
             }
 
             // Now we are at an index, that is either the start or the end of a comment
             // Check if comment index at i is a part of an SR comment
             if (
                 (i === nextIndexOfStart &&
-                    srCommentsInLine.filter(srComment => srComment.startIndex === i).length > 0) ||
+                    srCommentsInLine.filter((srComment) => srComment.startIndex === i).length >
+                        0) ||
                 (i === nextIndexOfEnd &&
-                    srCommentsInLine.filter(srComment => srComment.endIndex === i + StringDetector.commentEnd.length - 1).length > 0)
+                    srCommentsInLine.filter(
+                        (srComment) =>
+                            srComment.endIndex === i + StringDetector.commentEnd.length - 1,
+                    ).length > 0)
             ) {
                 // This start or end index is part of an SR comment so we don't add it to the list
                 continue;
@@ -167,11 +194,13 @@ export default class StringDetector {
                         htmlComment.endIndex = i + StringDetector.commentEnd.length - 1;
                         htmlComment.text = trimmedLine.substring(
                             htmlComment.startIndex,
-                            htmlComment.endIndex + 1
+                            htmlComment.endIndex + 1,
                         );
                         actualHtmlCommentsInLine.push(htmlComment);
                         // Remove any potential open comments that are before this one, as they are either closed or within the closed comment
-                        potentialHtmlCommentsInLine = potentialHtmlCommentsInLine.filter(htmlComment => htmlComment.startIndex > i);
+                        potentialHtmlCommentsInLine = potentialHtmlCommentsInLine.filter(
+                            (htmlComment) => htmlComment.startIndex > i,
+                        );
                         foundOpenComment = true;
                         break;
                     }
@@ -188,16 +217,19 @@ export default class StringDetector {
             potentialHtmlCommentsInLine.push({
                 startIndex: i === nextIndexOfStart ? i : -1,
                 endIndex: i === nextIndexOfEnd ? i + StringDetector.commentEnd.length - 1 : -1,
-                text: i === nextIndexOfStart
-                    ? StringDetector.nonSrCommentStart
-                    : StringDetector.commentEnd,
+                text:
+                    i === nextIndexOfStart
+                        ? StringDetector.nonSrCommentStart
+                        : StringDetector.commentEnd,
                 lineNumber,
             });
         }
 
         // Are there any still open comments?
         // If so, then we just return them, plus any closed comments, that we found before them
-        const commentFragments = potentialHtmlCommentsInLine.filter(htmlComment => htmlComment.endIndex === -1 || htmlComment.startIndex === -1);
+        const commentFragments = potentialHtmlCommentsInLine.filter(
+            (htmlComment) => htmlComment.endIndex === -1 || htmlComment.startIndex === -1,
+        );
 
         if (commentFragments.length > 0) {
             // We found some fragments of comments, so we add them to the actual list
@@ -308,7 +340,13 @@ export default class StringDetector {
             const separatorIdx = trimmedLine.indexOf(separator);
             if (separatorIdx === -1) continue;
             // Check if it's inside an inline code block
-            if (StringDetector.isPatternInsideCodeBlock(trimmedLine, separatorIdx, separatorIdx + separator.length))
+            if (
+                StringDetector.isPatternInsideCodeBlock(
+                    trimmedLine,
+                    separatorIdx,
+                    separatorIdx + separator.length,
+                )
+            )
                 continue;
             return true;
         }
@@ -323,7 +361,11 @@ export default class StringDetector {
      * @param clozeCrafter - The cloze crafter
      * @returns True if there are clozes
      */
-    static hasClozes(trimmedLine: string, clozeCrafter: ClozeCrafter, clozePatterns: string[]): boolean {
+    static hasClozes(
+        trimmedLine: string,
+        clozeCrafter: ClozeCrafter,
+        clozePatterns: string[],
+    ): boolean {
         const clozeNote = clozeCrafter.createClozeNote(trimmedLine);
         if (clozeNote === null) return false;
 
@@ -338,12 +380,11 @@ export default class StringDetector {
                 const startOfCloze = clozeCard.indexOf("[");
                 if (startOfCloze < 0) continue;
 
-                const endOfCloze = clozeCard.indexOf(
-                    "]",
-                    startOfCloze + 1
-                );
+                const endOfCloze = clozeCard.indexOf("]", startOfCloze + 1);
                 if (endOfCloze < 0) {
-                    console.warn(`Found a cloze pattern start without an end in the card front: ${clozeCard}. This is likely a malformed cloze and should be fixed. The pattern start was: ${clozePattern[0] + clozePattern[1]} and the expected pattern end was: ${clozePattern[clozePattern.length - 2] + clozePattern[clozePattern.length - 1]}`);
+                    console.warn(
+                        `Found a cloze pattern start without an end in the card front: ${clozeCard}. This is likely a malformed cloze and should be fixed. The pattern start was: ${clozePattern[0] + clozePattern[1]} and the expected pattern end was: ${clozePattern[clozePattern.length - 2] + clozePattern[clozePattern.length - 1]}`,
+                    );
                     continue;
                 }
 
@@ -364,7 +405,11 @@ export default class StringDetector {
      * @param currentLineEndTrimmed - The current line end trimmed
      * @returns The whitespace before text
      */
-    static getWhitespaceBeforeText(currentLine: string, currentLineTrimmed: string, currentLineEndTrimmed: string): string {
+    static getWhitespaceBeforeText(
+        currentLine: string,
+        currentLineTrimmed: string,
+        currentLineEndTrimmed: string,
+    ): string {
         let whitespaceBeforeText = "";
         if (currentLineTrimmed.length !== currentLineEndTrimmed.length) {
             // Has whitespace before text so we extract it
