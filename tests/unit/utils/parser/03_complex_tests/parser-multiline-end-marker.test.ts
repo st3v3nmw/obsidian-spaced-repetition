@@ -7,10 +7,140 @@ import { parserOptions, parseT } from "../../../helpers/unit-test-parser-helper"
 // TODO: Expand & fix this test
 // TODO: Test everything again with end marker
 
-test("Test parsing of multi line basic cards", () => {
-    // standard symbols
-    expect(parseT("Question\n?\nAnswer", parserOptions)).toEqual([
-        [CardType.MultiLineBasic, "Question\n?\nAnswer", 0, 2],
+
+test("Test that the standard multiline card recognition still works with multi line end marker enabled, but not used", () => {
+    const parserOptionsWithEndMarker = {
+        ...parserOptions,
+        multilineCardEndMarker: "---",
+    };
+
+    expect(parseT(
+        [
+            "Text before card",
+            "",
+            "Question",
+            "Question1",
+            "?",
+            "Answer",
+            "Answer1",
+            "",
+            "Text after card",
+            "Text before card",
+            "",
+            "Question",
+            "Question2",
+            "??",
+            "Answer",
+            "Answer2",
+            "",
+            "Text after card",
+        ].join("\n"),
+        parserOptionsWithEndMarker
+    )).toEqual([
+        [
+            CardType.MultiLineBasic,
+            [
+                "Question",
+                "Question1",
+                "?",
+                "Answer",
+                "Answer1",
+            ].join("\n"),
+            2, 6
+        ],
+        [
+            CardType.MultiLineReversed,
+            [
+                "Question",
+                "Question2",
+                "?",
+                "Answer",
+                "Answer2",
+            ].join("\n"),
+            11, 15
+        ]
+    ]);
+});
+
+test("Test that the standard cloze card recognition still works with multi line end marker enabled, but not used", () => {
+    const parserOptionsWithEndMarker = {
+        ...parserOptions,
+        multilineCardEndMarker: "---",
+    };
+
+    expect(parseT(
+        [
+            "Text before card",
+            "",
+            "Question",
+            "Question1",
+            "==Cloze1==",
+            "Answer",
+            "Answer1",
+            "",
+            "Text after card",
+            "Text before card",
+            "",
+            "Question",
+            "Question2",
+            "==Cloze2==",
+            "Answer",
+            "Answer2",
+            "",
+            "Text after card",
+        ].join("\n"),
+        parserOptionsWithEndMarker
+    )).toEqual([
+        [
+            CardType.Cloze,
+            [
+                "Question",
+                "Question1",
+                "==Cloze1==",
+                "Answer",
+                "Answer1",
+            ].join("\n"),
+            2, 6
+        ],
+        [
+            CardType.Cloze,
+            [
+                "Question",
+                "Question2",
+                "==Cloze2==",
+                "Answer",
+                "Answer2",
+            ].join("\n"),
+            11, 15
+        ]
+    ]);
+});
+
+
+test("Test parsing of multi line cards with end marker", () => {
+    const parserOptionsWithEndMarker = {
+        ...parserOptions,
+        multilineCardEndMarker: "---",
+    };
+
+    // standard symbols still work
+    expect(parseT(
+        [
+            "Question",
+            "?",
+            "Answer",
+        ].join("\n"),
+        parserOptions
+    )).toEqual([
+        [
+            CardType.MultiLineBasic,
+            [
+                "Question",
+                "?",
+                "Answer",
+            ].join("\n"),
+            0, 2
+        ]
     ]);
     expect(parseT("Question\n? \nAnswer", parserOptions)).toEqual([
         [CardType.MultiLineBasic, "Question\n?\nAnswer", 0, 2],
@@ -107,7 +237,12 @@ test("Test parsing of multi line basic cards", () => {
     ).toEqual([]);
 });
 
-test("Test parsing of multi line reversed cards", () => {
+test("Test parsing of multiline line cloze cards with end marker", () => {
+    const parserOptionsWithEndMarker = {
+        ...parserOptions,
+        multilineCardEndMarker: "---",
+    };
+
     // standard symbols
     expect(parseT("Question\n??\nAnswer", parserOptions)).toEqual([
         [CardType.MultiLineReversed, "Question\n??\nAnswer", 0, 2],
@@ -216,4 +351,306 @@ Line 5
             clozePatterns: [],
         }),
     ).toEqual([]);
+});
+
+test("Test that the standard multiline card recognition still works with multi line end marker enabled, but not used sometimes", () => {
+    const parserOptionsWithEndMarker = {
+        ...parserOptions,
+        multilineCardEndMarker: "---",
+    };
+
+    expect(parseT(
+        [
+            "Text before card",
+            "",
+            "Question",
+            "Question1",
+            "?",
+            "Answer",
+            "Answer1",
+            "",
+            "Text after card",
+            "Text before card",
+            "",
+            "Question",
+            "Question2",
+            "??",
+            "Answer",
+            "Answer2",
+            "",
+            "Text after card",
+            "Text before card",
+            "",
+            "Question",
+            "Question3",
+            "??",
+            "Answer",
+            "Answer3",
+            "",
+            "Answer3",
+            "---",
+        ].join("\n"),
+        parserOptionsWithEndMarker
+    )).toEqual([
+        [
+            CardType.MultiLineBasic,
+            [
+                "Question",
+                "Question1",
+                "?",
+                "Answer",
+                "Answer1",
+            ].join("\n"),
+            2, 6
+        ],
+        [
+            CardType.MultiLineReversed,
+            [
+                "Question",
+                "Question2",
+                "?",
+                "Answer",
+                "Answer2",
+            ].join("\n"),
+            11, 15
+        ],
+        [
+            CardType.MultiLineReversed,
+            [
+                "Question",
+                "Question3",
+                "?",
+                "Answer",
+                "Answer3",
+                "",
+                "Answer3",
+                "---",
+            ].join("\n"),
+            20, 27
+        ]
+    ]);
+
+    expect(parseT(
+        [
+            "Text before card",
+            "",
+            "Question",
+            "Question1",
+            "?",
+            "Answer",
+            "Answer1",
+            "",
+            "Text after card",
+            "Text before card",
+            "",
+            "Question",
+            "Question2",
+            "??",
+            "Answer",
+            "Answer2",
+            "",
+            "Answer2",
+            "---",
+            "Text before card",
+            "",
+            "Question",
+            "Question3",
+            "??",
+            "Answer",
+            "Answer3",
+            "",
+            "Answer3",
+        ].join("\n"),
+        parserOptionsWithEndMarker
+    )).toEqual([
+        [
+            CardType.MultiLineBasic,
+            [
+                "Question",
+                "Question1",
+                "?",
+                "Answer",
+                "Answer1",
+            ].join("\n"),
+            2, 6
+        ],
+        [
+            CardType.MultiLineReversed,
+            [
+                "Question",
+                "Question2",
+                "?",
+                "Answer",
+                "Answer2",
+                "",
+                "Answer2",
+                "---",
+            ].join("\n"),
+            11, 18
+        ],
+        [
+            CardType.MultiLineReversed,
+            [
+                "Question",
+                "Question3",
+                "?",
+                "Answer",
+                "Answer3",
+            ].join("\n"),
+            21, 25
+        ]
+    ]);
+});
+
+test("Test that the standard cloze card recognition still works with multi line end marker enabled, but not used sometimes", () => {
+    const parserOptionsWithEndMarker = {
+        ...parserOptions,
+        multilineCardEndMarker: "---",
+    };
+
+    expect(parseT(
+        [
+            "Text before card",
+            "",
+            "Question",
+            "Question1",
+            "==Cloze1==",
+            "Answer",
+            "Answer1",
+            "",
+            "Text after card",
+            "Text before card",
+            "",
+            "Question",
+            "Question2",
+            "==Cloze2==",
+            "Answer",
+            "Answer2",
+            "",
+            "Text after card",
+            "Text before card",
+            "",
+            "Question",
+            "Question3",
+            "==Cloze3==",
+            "Answer",
+            "Answer3",
+            "",
+            "Answer3",
+            "---",
+            "",
+            "Text after card",
+        ].join("\n"),
+        parserOptionsWithEndMarker
+    )).toEqual([
+        [
+            CardType.Cloze,
+            [
+                "Question",
+                "Question1",
+                "==Cloze1==",
+                "Answer",
+                "Answer1",
+            ].join("\n"),
+            2, 6
+        ],
+        [
+            CardType.Cloze,
+            [
+                "Question",
+                "Question2",
+                "==Cloze2==",
+                "Answer",
+                "Answer2",
+            ].join("\n"),
+            11, 15
+        ],
+        [
+            CardType.Cloze,
+            [
+                "Question",
+                "Question3",
+                "==Cloze3==",
+                "Answer",
+                "Answer3",
+                "",
+                "Answer3",
+                "---",
+            ].join("\n"),
+            20, 27
+        ]
+    ]);
+
+    expect(parseT(
+        [
+            "Text before card",
+            "",
+            "Question",
+            "Question1",
+            "==Cloze1==",
+            "Answer",
+            "Answer1",
+            "",
+            "Text after card",
+            "Text before card",
+            "",
+            "Question",
+            "Question2",
+            "==Cloze2==",
+            "Answer",
+            "Answer2",
+            "",
+            "Answer2",
+            "---",
+            "Text before card",
+            "",
+            "Question",
+            "Question3",
+            "==Cloze3==",
+            "Answer",
+            "Answer3",
+            "",
+            "Text after card",
+            "",
+            "Text after card",
+        ].join("\n"),
+        parserOptionsWithEndMarker
+    )).toEqual([
+        [
+            CardType.Cloze,
+            [
+                "Question",
+                "Question1",
+                "==Cloze1==",
+                "Answer",
+                "Answer1",
+            ].join("\n"),
+            2, 6
+        ],
+        [
+            CardType.Cloze,
+            [
+                "Question",
+                "Question2",
+                "==Cloze2==",
+                "Answer",
+                "Answer2",
+                "",
+                "Answer2",
+                "---",
+            ].join("\n"),
+            11, 18
+        ],
+        [
+            CardType.Cloze,
+            [
+                "Question",
+                "Question3",
+                "==Cloze3==",
+                "Answer",
+                "Answer3",
+            ].join("\n"),
+            20, 25
+        ]
+    ]);
 });
