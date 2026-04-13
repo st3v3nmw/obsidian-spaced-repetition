@@ -323,7 +323,7 @@ export default class LineParser {
                     parserData.cardData.potentialNewCard.cardType !== null &&
                     (parserData.cardData.potentialNewCard.cardType === CardType.MultiLineBasic ||
                         parserData.cardData.potentialNewCard.cardType ===
-                        CardType.MultiLineReversed) &&
+                            CardType.MultiLineReversed) &&
                     (parserData.cardData.potentialNewCard.backText === null ||
                         parserData.cardData.potentialNewCard.backText.length === 0)
                 ) {
@@ -565,9 +565,7 @@ export default class LineParser {
 
                 if (parserData.searchForMultilineCloze || parserData.searchForMultilineCards) {
                     // We are searching for multiline cards or multiline clozes, so we handle this line as being part of a multiline card
-                    if (
-                        !parserData.cardData.wasPotentialNewCardAlreadyAddedToList()
-                    ) {
+                    if (!parserData.cardData.wasPotentialNewCardAlreadyAddedToList()) {
                         // Text belongs to the current initialized potential multiline card which we are adding now to the list of cards, as it is not yet added to the list of cards
                         parserData.cardData.addMultilineCardToList(parserData.lineData, () => {
                             CardParser.notesWithCardFragments.addCardFragment(
@@ -604,9 +602,7 @@ export default class LineParser {
                 }
 
                 // From here on, we know that this text could belong to a new card or it is just some random text in the note
-                if (
-                    parserData.cardData.potentialNewCard === null
-                ) {
+                if (parserData.cardData.potentialNewCard === null) {
                     // There is no potential new card, so we can start a new one with this line if it is not empty, otherwise we just skip it, because it doesn't make sense to have an empty line at the start of a potential card
                     if (parserData.lineData.currentLineTrimmed.length > 0) {
                         parserData.cardData.initNewPotentialCard(

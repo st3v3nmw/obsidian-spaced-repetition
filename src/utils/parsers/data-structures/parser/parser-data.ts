@@ -5,7 +5,7 @@ import { CardParser } from "src/utils/parsers/card-parser";
 import CardData from "src/utils/parsers/data-structures/cards/card-data";
 import HTMLCommentSearchResultElement from "src/utils/parsers/data-structures/lines/html-comment";
 import LineData from "src/utils/parsers/data-structures/lines/line-data";
-// import ParsedCardInfo from "src/utils/parsers/data-structures/parser/parsed-card-info";
+import ParsedCardInfo from "src/utils/parsers/data-structures/parser/parsed-card-info";
 import ParserOptions from "src/utils/parsers/data-structures/parser/parser-options";
 import { ParserStates } from "src/utils/parsers/data-structures/parser/parser-states";
 
@@ -34,7 +34,6 @@ export class ParserData {
     stillOpenHTMLComments: HTMLCommentSearchResultElement[]; // The still open html comments
     noHTMLCommentsInCurrentLine: boolean; // Flag to indicate if there are no HTML comments in the current line, which is used for parsing a line with comments a second time after they were removed
     isInCodeBlock: boolean; // Flag to indicate if all current detected lines are within a code block, which determines if they are handled as text or not
-
 
     /**
      * Creates a new instance of ParserData
@@ -98,18 +97,37 @@ export class ParserData {
             });
         }
 
-        // // Here we remove any text after the first empty line, if the end marker wasn't found even though it was enabled
-        // if (this.options.multilineCardEndMarker !== null && this.options.multilineCardEndMarker !== "") {
-        //     const lastCard: ParsedCardInfo | null = this.cardData.getLastCard();
-        //     if (
-        //         lastCard !== null &&
-        //         (lastCard.cardType === CardType.MultiLineBasic || lastCard.cardType === CardType.MultiLineReversed) &&
-        //         lastCard.lineNumOfFirstEmptyLine !== -1 &&
-        //         lastCard.text.split("\n")[lastCard.lastLineNum] !== this.options.multilineCardEndMarker
-        //     ) {
-
-        //     }
-        // }
+        // Here we remove any text after the first empty line, if the end marker wasn't found even though it was enabled
+        if (
+            this.options.multilineCardEndMarker !== null &&
+            this.options.multilineCardEndMarker !== ""
+        ) {
+            const lastCard: ParsedCardInfo | null = this.cardData.getLastCard();
+            if (
+                lastCard !== null &&
+                (lastCard.cardType === CardType.MultiLineBasic ||
+                    lastCard.cardType === CardType.MultiLineReversed) &&
+                lastCard.lineNumOfFirstEmptyLine !== -1 &&
+                lastCard.text.split("\n")[lastCard.lastLineNum] !==
+                    this.options.multilineCardEndMarker
+            ) {
+                const modifiedLastCard = new ParsedCardInfo(
+                    lastCard.cardType,
+                    lastCard.text.split("\n").slice(0, lastCard.lineNumOfFirstEmptyLine).join("\n"),
+                    lastCard.firstLineNum,
+                    lastCard.lineNumOfFirstEmptyLine - 1,
+                    lastCard.frontText,
+                    lastCard.backText !== null
+                        ? lastCard.backText
+                              .split("\n")
+                              .slice(0, lastCard.lineNumOfFirstEmptyLine)
+                              .join("\n")
+                        : null,
+                    -1,
+                );
+                this.cardData.replaceLastCard(modifiedLastCard);
+            }
+        }
 
         this.cardData.resetPotentialCardData();
         this.searchForMultilineCards = false;

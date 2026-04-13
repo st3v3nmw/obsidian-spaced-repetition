@@ -86,8 +86,8 @@ export default class CardData {
             lastCard.backText !== null
                 ? lastCard.backText + "\n" + lineData.currentLineEndTrimmed
                 : searchForMultilineCards
-                    ? lineData.currentLineEndTrimmed
-                    : null,
+                  ? lineData.currentLineEndTrimmed
+                  : null,
             lastCard.lineNumOfFirstEmptyLine === -1 && lineData.currentLineTrimmed === ""
                 ? lineData.currentLineNum
                 : lastCard.lineNumOfFirstEmptyLine,
@@ -131,7 +131,9 @@ export default class CardData {
 
                 if (separatorType === null) {
                     // This should never happen, but we just return to be safe
-                    console.error("Separator type is null when trying to add multiline card to list");
+                    console.error(
+                        "Separator type is null when trying to add multiline card to list",
+                    );
                     return;
                 }
 
@@ -148,7 +150,8 @@ export default class CardData {
                     lineData.currentLineNum,
                     potentialNewCard.frontText,
                     potentialNewCard.backText,
-                    potentialNewCard.lineNumOfFirstEmptyLine === -1 && lineData.currentLineTrimmed === ""
+                    potentialNewCard.lineNumOfFirstEmptyLine === -1 &&
+                        lineData.currentLineTrimmed === ""
                         ? lineData.currentLineNum
                         : potentialNewCard.lineNumOfFirstEmptyLine,
                 );
@@ -230,6 +233,10 @@ export default class CardData {
         }
     }
 
+    replaceLastCard(newCard: ParsedCardInfo) {
+        this.cards[this.lastCardIndex] = newCard;
+    }
+
     /**
      * Returns true if the potential new card has already been added to the list of cards
      */
@@ -238,13 +245,13 @@ export default class CardData {
             - If the potential new card is null, then it has not been added to the list of cards
             - If the potential new card has a back text & the cardtype is know, then it has been added to the list of cards already
         */
-        return !(this.potentialNewCard !== null &&
+        return !(
+            this.potentialNewCard !== null &&
             this.potentialNewCard.backText === null &&
             this.potentialNewCard.cardType !== null &&
-            (this.potentialNewCard.cardType ===
-                CardType.MultiLineBasic ||
-                this.potentialNewCard.cardType ===
-                CardType.MultiLineReversed));
+            (this.potentialNewCard.cardType === CardType.MultiLineBasic ||
+                this.potentialNewCard.cardType === CardType.MultiLineReversed)
+        );
     }
 
     /**
