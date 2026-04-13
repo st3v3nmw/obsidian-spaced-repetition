@@ -165,7 +165,7 @@ export default class StringDetector {
             if (
                 (i === nextIndexOfStart &&
                     srCommentsInLine.filter((srComment) => srComment.startIndex === i).length >
-                        0) ||
+                    0) ||
                 (i === nextIndexOfEnd &&
                     srCommentsInLine.filter(
                         (srComment) =>
@@ -253,6 +253,8 @@ export default class StringDetector {
         trimmedLine: string,
         multilineCardEndMarker: string | null,
     ): boolean {
+        console.log(multilineCardEndMarker,
+            trimmedLine);
         return (
             multilineCardEndMarker !== null &&
             multilineCardEndMarker !== "" &&

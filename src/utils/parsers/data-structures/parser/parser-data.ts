@@ -5,6 +5,7 @@ import { CardParser } from "src/utils/parsers/card-parser";
 import CardData from "src/utils/parsers/data-structures/cards/card-data";
 import HTMLCommentSearchResultElement from "src/utils/parsers/data-structures/lines/html-comment";
 import LineData from "src/utils/parsers/data-structures/lines/line-data";
+// import ParsedCardInfo from "src/utils/parsers/data-structures/parser/parsed-card-info";
 import ParserOptions from "src/utils/parsers/data-structures/parser/parser-options";
 import { ParserStates } from "src/utils/parsers/data-structures/parser/parser-states";
 
@@ -34,6 +35,7 @@ export class ParserData {
     noHTMLCommentsInCurrentLine: boolean; // Flag to indicate if there are no HTML comments in the current line, which is used for parsing a line with comments a second time after they were removed
     isInCodeBlock: boolean; // Flag to indicate if all current detected lines are within a code block, which determines if they are handled as text or not
 
+
     /**
      * Creates a new instance of ParserData
      *
@@ -42,17 +44,6 @@ export class ParserData {
      * @param notePath - The note path
      */
     constructor(options: ParserOptions, noteText: string, notePath: string) {
-        this.reset(options, noteText, notePath);
-    }
-
-    /**
-     * Resets the parser data
-     *
-     * @param options - The parser options
-     * @param noteText - The note text
-     * @param notePath - The note path
-     */
-    reset(options: ParserOptions, noteText: string, notePath: string) {
         this.prevParserStates = [];
         this.prevParserStatesWithoutParseLine = [];
         this.options = options;
@@ -76,8 +67,8 @@ export class ParserData {
         ];
 
         multilineSeparators.sort((a, b) => b.separator.length - a.separator.length);
-
         this.setParserState("READY_TO_PARSE");
+        this.currentParserState = "READY_TO_PARSE";
         this.lineData = new LineData(noteText, inlineSeparators, multilineSeparators);
         this.cardData = new CardData();
         this.searchForMultilineCards = false;
@@ -98,6 +89,7 @@ export class ParserData {
             (this.cardData.potentialNewCard.backText === null ||
                 this.cardData.potentialNewCard.backText.length === 0)
         ) {
+            // Here we add a fragment for the current multiline card, as it is malformed, because it doesn't have a back text
             CardParser.notesWithCardFragments.addCardFragment(this.notePath, this.noteText, {
                 endLineNum: this.lineData.currentLineNum,
                 startLineNum: this.lineData.currentLineNum,
@@ -105,6 +97,19 @@ export class ParserData {
                 text: this.lineData.currentLineTrimmed,
             });
         }
+
+        // // Here we remove any text after the first empty line, if the end marker wasn't found even though it was enabled
+        // if (this.options.multilineCardEndMarker !== null && this.options.multilineCardEndMarker !== "") {
+        //     const lastCard: ParsedCardInfo | null = this.cardData.getLastCard();
+        //     if (
+        //         lastCard !== null &&
+        //         (lastCard.cardType === CardType.MultiLineBasic || lastCard.cardType === CardType.MultiLineReversed) &&
+        //         lastCard.lineNumOfFirstEmptyLine !== -1 &&
+        //         lastCard.text.split("\n")[lastCard.lastLineNum] !== this.options.multilineCardEndMarker
+        //     ) {
+
+        //     }
+        // }
 
         this.cardData.resetPotentialCardData();
         this.searchForMultilineCards = false;

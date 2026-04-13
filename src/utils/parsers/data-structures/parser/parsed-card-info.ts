@@ -9,6 +9,7 @@ export default class ParsedCardInfo {
     // Line numbers start at 0
     firstLineNum: number;
     lastLineNum: number;
+    lineNumOfFirstEmptyLine: number; // The line number of the first empty line, if any
 
     constructor(
         cardType: CardType,
@@ -17,6 +18,7 @@ export default class ParsedCardInfo {
         lastLineNum: number,
         frontText: string | null = null,
         backText: string | null = null,
+        lineNumOfFirstEmptyLine: number = -1,
     ) {
         this.cardType = cardType;
         this.text = text;
@@ -24,6 +26,7 @@ export default class ParsedCardInfo {
         this.lastLineNum = lastLineNum;
         this.frontText = frontText;
         this.backText = backText;
+        this.lineNumOfFirstEmptyLine = lineNumOfFirstEmptyLine;
     }
 
     isQuestionLineNum(lineNum: number): boolean {

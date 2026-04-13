@@ -16,22 +16,15 @@ import StringDetector from "src/utils/parsers/detectors/string-detector";
 export default class CardData {
     cards: ParsedCardInfo[]; // The list of detected cards
     lastCardIndex: number; // The index of the last card
-    potentialNewCard: ParsedCardInfo | null; // The potential new card, which is the card that is currently being parsed
+    potentialNewCard: ParsedCardInfo | null; // The potential new card, which is the card that is currently being parsed if it couldn't be added to the list of cards right away
 
     /**
      * Creates a new instance of CardData
      */
     constructor() {
-        this.reset();
-    }
-
-    /**
-     * Resets the card data
-     */
-    reset() {
         this.cards = [];
         this.lastCardIndex = -1;
-        this.resetPotentialCardData();
+        this.potentialNewCard = null;
     }
 
     /**
@@ -93,20 +86,28 @@ export default class CardData {
             lastCard.backText !== null
                 ? lastCard.backText + "\n" + lineData.currentLineEndTrimmed
                 : searchForMultilineCards
-                  ? lineData.currentLineEndTrimmed
-                  : null,
+                    ? lineData.currentLineEndTrimmed
+                    : null,
+            lastCard.lineNumOfFirstEmptyLine === -1 && lineData.currentLineTrimmed === ""
+                ? lineData.currentLineNum
+                : lastCard.lineNumOfFirstEmptyLine,
         );
         this.cards[this.lastCardIndex] = modifiedLastCard;
     }
 
     addMultilineCardToList(lineData: LineData, addMultilineCardFragment: () => void): void {
         const potentialNewCard: ParsedCardInfo | null = this.potentialNewCard;
+        if (potentialNewCard === null) {
+            // This should never happen, but we just return to be safe
+            console.error("Potential new card is null when trying to add multiline card to list");
+            return;
+        }
 
         const multilineSeparators = lineData.multilineSeparators;
-
         const linesOfPotentialNewCard = potentialNewCard.text.split("\n");
 
         for (const line of linesOfPotentialNewCard) {
+            // Go through each line of the potential new card and check if it contains a multiline card separator
             const trimmedLine = line.trim();
 
             if (
@@ -128,6 +129,12 @@ export default class CardData {
                     multilineSeparators,
                 );
 
+                if (separatorType === null) {
+                    // This should never happen, but we just return to be safe
+                    console.error("Separator type is null when trying to add multiline card to list");
+                    return;
+                }
+
                 if (potentialNewCard.backText === null) {
                     potentialNewCard.backText = lineData.currentLine;
                 } else {
@@ -141,6 +148,9 @@ export default class CardData {
                     lineData.currentLineNum,
                     potentialNewCard.frontText,
                     potentialNewCard.backText,
+                    potentialNewCard.lineNumOfFirstEmptyLine === -1 && lineData.currentLineTrimmed === ""
+                        ? lineData.currentLineNum
+                        : potentialNewCard.lineNumOfFirstEmptyLine,
                 );
 
                 this.addCardToList(newCard);
@@ -218,6 +228,23 @@ export default class CardData {
             this.cards[this.lastCardIndex].firstLineNum = this.potentialNewCard.firstLineNum;
             this.resetPotentialCardData();
         }
+    }
+
+    /**
+     * Returns true if the potential new card has already been added to the list of cards
+     */
+    wasPotentialNewCardAlreadyAddedToList(): boolean {
+        /* Explanation:
+            - If the potential new card is null, then it has not been added to the list of cards
+            - If the potential new card has a back text & the cardtype is know, then it has been added to the list of cards already
+        */
+        return !(this.potentialNewCard !== null &&
+            this.potentialNewCard.backText === null &&
+            this.potentialNewCard.cardType !== null &&
+            (this.potentialNewCard.cardType ===
+                CardType.MultiLineBasic ||
+                this.potentialNewCard.cardType ===
+                CardType.MultiLineReversed));
     }
 
     /**

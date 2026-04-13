@@ -31,21 +31,6 @@ export default class LineData {
         inlineSeparators: Array<{ separator: string; type: CardType }>,
         multilineSeparators: Array<{ separator: string; type: CardType }>,
     ) {
-        this.reset(noteText, inlineSeparators, multilineSeparators);
-    }
-
-    /**
-     * Resets the line data
-     *
-     * @param noteText - The note text
-     * @param inlineSeparators - The inline separators
-     * @param multilineSeparators - The multiline separators
-     */
-    reset(
-        noteText: string,
-        inlineSeparators: Array<{ separator: string; type: CardType }>,
-        multilineSeparators: Array<{ separator: string; type: CardType }>,
-    ): void {
         this.lines = noteText.replaceAll("\r\n", "\n").split("\n");
         this.currentLineNum = -1;
         this.currentLine = "";

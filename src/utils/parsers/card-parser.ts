@@ -5,7 +5,7 @@ import ParserOptions from "src/utils/parsers/data-structures/parser/parser-optio
 import LineParser from "src/utils/parsers/line-parser";
 
 /**
- * The parser class
+ * The card parser class
  *
  * This class is responsible for parsing the text of a note for cards.
  * It is a state machine that parses the text line by line and
@@ -20,7 +20,7 @@ export class CardParser {
     static notesWithCardFragments: NotesWithCardFragments = new NotesWithCardFragments(); // The list of notes with card fragments from the last parsing of each note
 
     /**
-     * Returns flashcards found in `text`
+     * Returns flashcards found in `noteText`
      *
      * It is best that the text does not contain frontmatter, see extractFrontmatter for reasoning
      *

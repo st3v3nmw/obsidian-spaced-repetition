@@ -20,7 +20,7 @@ export class NotesWithCardFragments {
      * @param cardFragment
      */
     addCardFragment(notePath: string, noteText: string, cardFragment: CardFragment): void {
-        let noteWithCardFragments: NoteWithCardFragments =
+        let noteWithCardFragments: NoteWithCardFragments | undefined =
             this.notesWithCardFragments.get(notePath);
 
         if (!noteWithCardFragments) {

@@ -105,6 +105,7 @@ export default class LineParser {
                     if (
                         potentialNewCard === null ||
                         potentialNewCard.text.length === 0 ||
+                        potentialNewCard.frontText === null ||
                         potentialNewCard.frontText.length === 0
                     ) {
                         // The multi line card separator shouldn't be here in the current line
@@ -322,7 +323,7 @@ export default class LineParser {
                     parserData.cardData.potentialNewCard.cardType !== null &&
                     (parserData.cardData.potentialNewCard.cardType === CardType.MultiLineBasic ||
                         parserData.cardData.potentialNewCard.cardType ===
-                            CardType.MultiLineReversed) &&
+                        CardType.MultiLineReversed) &&
                     (parserData.cardData.potentialNewCard.backText === null ||
                         parserData.cardData.potentialNewCard.backText.length === 0)
                 ) {
@@ -377,6 +378,12 @@ export default class LineParser {
             }
 
             case "MULTILINE_SEPARATOR": {
+                if (parserData.cardData.potentialNewCard === null) {
+                    // If we are here, then its a malformed multiline card
+                    parserData.endMultiLineSearch();
+                    break;
+                }
+
                 if (parserData.searchForMultilineCards || parserData.searchForMultilineCloze) {
                     // End multiline search if it is still active & transfer last line to the new card
                     // if it is possible
@@ -411,7 +418,6 @@ export default class LineParser {
 
                         // Transfer last line to the new card
                         const newPotentialCard = parserData.cardData.potentialNewCard;
-
                         const cardType = StringDetector.getMultilineCardType(
                             lastLine,
                             parserData.lineData.multilineSeparators,
@@ -419,6 +425,7 @@ export default class LineParser {
                         if (cardType !== null) {
                             newPotentialCard.cardType = cardType;
                         }
+
                         newPotentialCard.text =
                             lastLine + "\n" + parserData.lineData.currentLineEndTrimmed;
                         newPotentialCard.firstLineNum = lastLineNum;
@@ -553,19 +560,15 @@ export default class LineParser {
             }
 
             case "TEXT": {
-                // Adds current line to the last card or potential new card
-                // This state shall only be entered when the current line is connected to the last card or if it belongs to the potential new card
+                // Adds current line to the last card or the current potential new card (also starts a new potential card)
+                // This state shall only be entered when the current line is connected to the last card or if it belongs to the current  potential new card
 
                 if (parserData.searchForMultilineCloze || parserData.searchForMultilineCards) {
+                    // We are searching for multiline cards or multiline clozes, so we handle this line as being part of a multiline card
                     if (
-                        parserData.cardData.potentialNewCard !== null &&
-                        parserData.cardData.potentialNewCard.backText === null &&
-                        parserData.cardData.potentialNewCard.cardType !== null &&
-                        (parserData.cardData.potentialNewCard.cardType ===
-                            CardType.MultiLineBasic ||
-                            parserData.cardData.potentialNewCard.cardType ===
-                                CardType.MultiLineReversed)
+                        !parserData.cardData.wasPotentialNewCardAlreadyAddedToList()
                     ) {
+                        // Text belongs to the current initialized potential multiline card which we are adding now to the list of cards, as it is not yet added to the list of cards
                         parserData.cardData.addMultilineCardToList(parserData.lineData, () => {
                             CardParser.notesWithCardFragments.addCardFragment(
                                 parserData.notePath,
@@ -582,6 +585,8 @@ export default class LineParser {
                         break;
                     }
 
+                    // Here we know that the current line belongs to the last card, so we add it to the last card, if it hasn't been closed by a scheduling info comment yet
+
                     if (
                         !parserData.cardData.cards[parserData.cardData.lastCardIndex].text.includes(
                             StringDetector.srCommentStart,
@@ -593,27 +598,30 @@ export default class LineParser {
                         );
                         break;
                     }
+
                     // This only happens if the multiline card end marker is enabled, but not used with this card
                     parserData.endMultiLineSearch();
                 }
 
-                // From here on, we know that this text could be long to a new card or it is just some random text in the note
-
+                // From here on, we know that this text could belong to a new card or it is just some random text in the note
                 if (
-                    parserData.cardData.potentialNewCard === null &&
-                    parserData.lineData.currentLineTrimmed.length > 0
+                    parserData.cardData.potentialNewCard === null
                 ) {
-                    parserData.cardData.initNewPotentialCard(
-                        CardType.Cloze,
-                        parserData.lineData.currentLineEndTrimmed,
-                        parserData.lineData.currentLineNum,
-                        parserData.lineData.currentLineNum,
-                        parserData.lineData.currentLineEndTrimmed,
-                    );
+                    // There is no potential new card, so we can start a new one with this line if it is not empty, otherwise we just skip it, because it doesn't make sense to have an empty line at the start of a potential card
+                    if (parserData.lineData.currentLineTrimmed.length > 0) {
+                        parserData.cardData.initNewPotentialCard(
+                            CardType.Cloze,
+                            parserData.lineData.currentLineEndTrimmed,
+                            parserData.lineData.currentLineNum,
+                            parserData.lineData.currentLineNum,
+                            parserData.lineData.currentLineEndTrimmed,
+                        );
+                    }
+
                     break;
                 }
 
-                // We have a potential new card, so we add the current line to it
+                // There was already a potential new card, so we just add the current line to it, because it is connected to the potential new card, otherwise we would have entered the TEXT state
                 const modifiedPotentialCard: ParsedCardInfo = parserData.cardData.potentialNewCard;
                 modifiedPotentialCard.text += "\n" + parserData.lineData.currentLine;
                 modifiedPotentialCard.frontText += "\n" + parserData.lineData.currentLine;
@@ -637,7 +645,7 @@ export default class LineParser {
                         (parserData.searchForMultilineCards || parserData.searchForMultilineCloze))
                 ) {
                     // Only handle this if multiline cards are enabled and we are already searching for multiline cards or clozes
-
+                    // TODO: Implement back stepping if multilineendmarker isn't found
                     parserData.setParserState("TEXT");
                     parserData = LineParser.parseLine(parserData);
                     break;
