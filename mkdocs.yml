@@ -11,26 +11,39 @@ docs_dir: docs/docs
 
 theme:
     name: material
-    logo: favicon.ico
+    logo: favicon_white.ico
     favicon: favicon.ico
     icon:
         repo: fontawesome/brands/github
     palette:
         - scheme: default
+          primary: blue
+          accent: blue
           toggle:
               icon: material/brightness-7
               name: Switch to dark mode
         - scheme: slate
+          primary: blue
+          accent: blue
           toggle:
               icon: material/brightness-4
               name: Switch to light mode
     features:
-        - navigation.top
+        - navigation.tabs
+        - navigation.tabs.sticky
         - navigation.expand
+        - navigation.top
         - toc.follow
 
 nav:
-    - Index: index.md
+    - Home:
+          - Introduction: index.md
+          - Guides:
+                - Spaced Repetition Guides: resources.md
+          - Contributing:
+                - Contributing: contributing.md
+                - Changelog: changelog.md
+                - License: license.md
     - Flashcards:
           - Flashcards Overview: flashcards/flashcards-overview.md
           - Question & Answer Cards: flashcards/q-and-a-cards.md
@@ -46,11 +59,6 @@ nav:
     - Algorithms & Data Storage:
           - Repetition Algorithms: algorithms.md
           - Data Storage: data-storage.md
-    - Additional:
-          - Spaced Repetition Guides: resources.md
-          - Contributing: contributing.md
-          - Changelog: changelog.md
-          - License: license.md
 
 plugins:
     - search

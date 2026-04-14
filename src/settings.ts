@@ -12,6 +12,7 @@ export interface SRSettings {
     randomizeCardOrder: boolean;
     flashcardCardOrder: string;
     flashcardDeckOrder: string;
+    convertClozePatternsToInputs: boolean;
     convertHighlightsToClozes: boolean;
     convertBoldTextToClozes: boolean;
     convertCurlyBracketsToClozes: boolean;
@@ -42,6 +43,7 @@ export interface SRSettings {
     flashcardWidthPercentage: number;
     flashcardHeightPercentageMobile: number;
     flashcardWidthPercentageMobile: number;
+    flashcardAgainText: string;
     flashcardEasyText: string;
     flashcardGoodText: string;
     flashcardHardText: string;
@@ -57,6 +59,7 @@ export interface SRSettings {
     loadBalance: boolean;
     maximumInterval: number;
     maxLinkFactor: number;
+    startOfDay: string;
 
     // storage
     dataStore: string;
@@ -76,6 +79,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     randomizeCardOrder: null,
     flashcardCardOrder: "DueFirstRandom",
     flashcardDeckOrder: "PrevDeckComplete_Sequential",
+    convertClozePatternsToInputs: false,
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
     convertCurlyBracketsToClozes: false,
@@ -102,15 +106,16 @@ export const DEFAULT_SETTINGS: SRSettings = {
     initiallyExpandAllSubdecksInTree: false,
     showContextInCards: true,
     showIntervalInReviewButtons: true,
-    flashcardHeightPercentage: 80,
-    flashcardWidthPercentage: 40,
+    flashcardHeightPercentage: 60,
+    flashcardWidthPercentage: 60,
     flashcardHeightPercentageMobile: 100,
     flashcardWidthPercentageMobile: 100,
+    flashcardAgainText: t("AGAIN"),
     flashcardEasyText: t("EASY"),
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),
     reviewButtonDelay: 0,
-    openViewInNewTab: true,
+    openViewInNewTab: false,
     openViewInNewTabMobile: false,
 
     // algorithm
@@ -121,6 +126,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     loadBalance: true,
     maximumInterval: 36525,
     maxLinkFactor: 1.0,
+    startOfDay: "00:00:00",
 
     // storage
     dataStore: DataStoreName.NOTES,
@@ -133,9 +139,10 @@ export const DEFAULT_SETTINGS: SRSettings = {
 
 export function upgradeSettings(settings: SRSettings) {
     if (
-        settings.randomizeCardOrder != null &&
-        settings.flashcardCardOrder == null &&
-        settings.flashcardDeckOrder == null
+        settings.randomizeCardOrder !== null &&
+        settings.randomizeCardOrder !== undefined &&
+        (settings.flashcardCardOrder === null || settings.flashcardCardOrder === undefined) &&
+        (settings.flashcardDeckOrder === null || settings.flashcardDeckOrder === undefined)
     ) {
         settings.flashcardCardOrder = settings.randomizeCardOrder
             ? "DueFirstRandom"
@@ -146,7 +153,7 @@ export function upgradeSettings(settings: SRSettings) {
         settings.randomizeCardOrder = null;
     }
 
-    if (settings.clozePatterns == null) {
+    if (settings.clozePatterns === null || settings.clozePatterns === undefined) {
         settings.clozePatterns = [];
 
         if (settings.convertHighlightsToClozes)

@@ -2,8 +2,12 @@
 
 // Obsidian specific names (folder, note, tag, etc.) are consistent with the German translation:
 // https://github.com/obsidianmd/obsidian-translations/blob/master/de.json
+import { IBaseLocale } from "src/lang/base-locale";
+import en from "src/lang/locale/en";
 
-export default {
+const de: IBaseLocale = {
+    ...en,
+
     // flashcard-modal.tsx
     DECKS: "Stapel",
     DUE_CARDS: "Anstehende Karten",
@@ -58,13 +62,13 @@ export default {
 
     // settings.ts
     SETTINGS_HEADER: "Spaced Repetition",
-    GROUP_TAGS_FOLDERS: "Tags & Folders",
+    GROUP_TAGS_FOLDERS: "Tags & Ordner",
     GROUP_FLASHCARD_REVIEW: "Flashcard Review",
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
     GROUP_DATA_STORAGE: "Storage of Scheduling Data",
     GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
-    GROUP_CONTRIBUTING: "Contributing",
+    GROUP_CONTRIBUTING: "Helfen",
     CHECK_WIKI: 'Weitere Informationen gibt es im <a href="${wikiUrl}">Wiki</a> (english).',
     GITHUB_DISCUSSIONS:
         'Visit the <a href="${discussionsUrl}">discussions</a> section for Q&A help, feedback, and general discussion.',
@@ -78,7 +82,7 @@ export default {
         '<a href="${translationContributionUrl}">Here\'s</a> how to translate the plugin to another language.',
     FOLDERS_TO_IGNORE: "Ausgeschlossene Ordner",
     FOLDERS_TO_IGNORE_DESC:
-        "Enter folder paths or glob patterns on separate lines e.g. Templates/Scripts or **/*.excalidraw.md. This setting is common to both flashcards and notes.",
+        "Geben Sie Pfad- oder Globalemuster in separaten Zeilen an, z.B. Templates/Scripts oder **/*.excalidraw.md. Diese Einstellung gilt für Flashcards und Notizen.",
     OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Lernkarten",
     FLASHCARD_EASY_LABEL: "Einfach Knopf Text",
@@ -106,7 +110,7 @@ export default {
         "Verwandte Karten sind aus der gleichen Karte generiert worden (z.B. Lückentextkarten oder beidseitige Karten).",
     SHOW_CARD_CONTEXT: "Kontext in den Karten anzeigen?",
     SHOW_CARD_CONTEXT_DESC: "Bsp. Titel > Überschrift 1 > Sektion > ... > Untersektion",
-    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Show next review time in the review buttons",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Zeige nächsten Review-Zeit in den Review-Buttons",
     SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
         "Useful to know how far in the future your cards are being pushed.",
     CARD_MODAL_HEIGHT_PERCENT: "Höhe der Lernkartei in Prozent",
@@ -133,6 +137,9 @@ export default {
         "Zufällige Reihenfolge (sobald alle Karten im vorherigen Stapel wiederholt wurden)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Zufällige Karte von zufälligem Stapel",
     DISABLE_CLOZE_CARDS: "Lückentextkarten deaktivieren?",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Konvertiere Lückentext zu Eingabefelder",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
+        "Ersetze Lückentext mit Eingabefeldern, wenn Lückentextkarten angezeigt werden.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "==Hervorgehobenen== Text in Lückentextkarten umwandeln?",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         'Füge/entferne das <code>${defaultPattern}</code> zu deinen "Lückentextmuster" hinzu',
@@ -217,6 +224,15 @@ export default {
     EXPERIMENTAL: "Experimental",
     HELP: "Help",
     STORE_IN_NOTES: "In the notes",
+    DELETE_SCHEDULING_DATA_ALL: "Delete Scheduling Data",
+    DELETE_SCHEDULING_DATA_ALL_DESC: "Delete scheduling data from all notes and flashcards.",
+    DELETE: "Delete",
+    CONFIRM_SCHEDULING_DATA_ALL_DELETION:
+        "Are you sure you want to delete all scheduling data from your notes and flashcards? This action cannot be undone.",
+    CONFIRM: "Confirm",
+    SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS: "Scheduling data deletion in progress...",
+    SCHEDULING_DATA_HAS_BEEN_DELETED:
+        "Scheduling data has been deleted from all notes and flashcards.",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Anstehende Notizen zur Wiederholung",
@@ -251,7 +267,44 @@ export default {
     CARD_TYPE_YOUNG: "Jung",
     CARD_TYPE_MATURE: "Ausgereift",
     CARD_TYPES_SUMMARY: "Insgesamt ${totalCardsCount} Karten",
-    SEARCH: "Search",
+    SEARCH: "Suche",
     PREVIOUS: "Previous",
     NEXT: "Next",
+
+    // settings.ts
+    SETTINGS_TAB_HEADING: "Einstellungen",
+    MAIN_SETTINGS_PAGE: "MAIN_SETTINGS",
+
+    // NoteReviewQueue.ts
+    NOTE_REVIEW_QUEUE_HINT:
+        "Klicke auf die 3 Punkte neben der Notiz, um das Review-Menü zu öffnen.",
+
+    // StatusBarManager.ts
+    OPEN_DECK_FOR_REVIEW: "Stapel zum Wiederholung öffnen",
+    UPDATE_AVAILABLE: "Update verfügbar",
+
+    // Statistics
+    PERIOD_TITLE: "Zeitraum",
+    PERIOD_DESC: "Zeitraum, in dem die Diagramme angezeigt werden",
+
+    // Card controls reset button
+    DELETE_SCHEDULING_DATA_OF_CURRENT_CARD: "Delete card scheduling data?",
+    CONFIRM_SCHEDULING_DATA_DELETION_OF_CURRENT_CARD:
+        "Are you sure you want to delete the scheduling data from your current card? This action cannot be undone.",
+    SCHEDULING_DATA_DELETION_IN_PROGRESS_OF_CURRENT_CARD: "Deleting the cards scheduling data...",
+
+    // Settings > Scheduling
+    START_OF_DAY: "Start of day",
+    START_OF_DAY_DESC: "The time at which the day begins (Format: HH:MM:SS, Default: 00:00:00)",
+    INVALID_START_OF_DAY_WARNING: "Invalid format for start of day",
+    // Settings > main-page
+    INFO: "Info",
+    // Card responses
+    AGAIN: "Again",
+    // Settings > info
+    CHECK_ROADMAP: 'Check out the <a href="${roadMapUrl}">roadmap</a> for upcoming features.',
+    CHECK_DEV_NEWS:
+        'Check out the <a href="${devNewsUrl}">dev news</a> for the latest development news.',
 };
+
+export default de;

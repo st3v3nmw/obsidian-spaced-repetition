@@ -7,7 +7,6 @@ import { IOsrVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-n
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
-import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
 import { Deck, DeckTreeFilter } from "src/deck/deck";
 import { DeckTreeStatsCalculator } from "src/deck/deck-tree-stats-calculator";
 import { Stats } from "src/deck/stats";
@@ -18,7 +17,7 @@ import { Note } from "src/note/note";
 import { NoteFileLoader } from "src/note/note-file-loader";
 import { NoteReviewQueue } from "src/note/note-review-queue";
 import { SettingsUtil, SRSettings } from "src/settings";
-import { globalDateProvider } from "src/utils/dates";
+import { globalDateProvider, IDayBoundary } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 
 export interface IOsrVaultEvents {
@@ -83,6 +82,20 @@ export class OsrCore {
         this._questionPostponementList = questionPostponementList;
         this._dueDateFlashcardHistogram = new CardDueDateHistogram();
         this._dueDateNoteHistogram = new NoteDueDateHistogram();
+        try {
+            const startOfDayElements: string[] = this.settings.startOfDay.split(":");
+            if (startOfDayElements.length !== 3) {
+                throw new Error("Invalid format for start of day");
+            }
+            const dayBoundary: IDayBoundary = {
+                hour: parseInt(startOfDayElements[0]),
+                minute: parseInt(startOfDayElements[1]),
+                second: parseInt(startOfDayElements[2]),
+            };
+            globalDateProvider.setDayBoundary(dayBoundary);
+        } catch (e) {
+            console.error("Invalid format for start of day", e);
+        }
     }
 
     protected loadInit(): void {
@@ -95,8 +108,7 @@ export class OsrCore {
     }
 
     protected async processFile(noteFile: ISRFile): Promise<void> {
-        const schedule: RepItemScheduleInfo =
-            await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
+        const schedule: RepItemScheduleInfo = await noteFile.getNoteSchedule();
         let note: Note = null;
 
         // Update the graph of links between notes
@@ -119,11 +131,10 @@ export class OsrCore {
         const tags = noteFile.getAllTagsFromCache();
 
         const matchedNoteTags = SettingsUtil.filterForNoteReviewTag(this.settings, tags);
-        if (matchedNoteTags.length == 0) {
+        if (matchedNoteTags.length === 0) {
             return;
         }
-        const noteSchedule: RepItemScheduleInfo =
-            await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
+        const noteSchedule: RepItemScheduleInfo = await noteFile.getNoteSchedule();
         this._noteReviewQueue.addNoteToQueue(noteFile, noteSchedule, matchedNoteTags);
     }
 
@@ -157,12 +168,11 @@ export class OsrCore {
         settings: SRSettings,
     ): Promise<void> {
         // Get the current schedule for the note (null if new note)
-        const originalNoteSchedule: RepItemScheduleInfo =
-            await DataStoreAlgorithm.getInstance().noteGetSchedule(noteFile);
+        const originalNoteSchedule: RepItemScheduleInfo = await noteFile.getNoteSchedule();
 
         // Calculate the new/updated schedule
         let noteSchedule: RepItemScheduleInfo;
-        if (originalNoteSchedule == null) {
+        if (originalNoteSchedule === null) {
             noteSchedule = SrsAlgorithm.getInstance().noteCalcNewSchedule(
                 noteFile.path,
                 this.osrNoteGraph,
@@ -179,7 +189,7 @@ export class OsrCore {
         }
 
         // Store away the new schedule info
-        await DataStoreAlgorithm.getInstance().noteSetSchedule(noteFile, noteSchedule);
+        await noteFile.setNoteSchedule(noteSchedule);
 
         // Generate the histogram for the due dates for all the notes
         // (This could be optimized to make the small adjustments to the histogram, but simpler to implement
@@ -270,6 +280,6 @@ export class OsrAppCore extends OsrCore {
     }
 
     createSrTFile(note: TFile): SrTFile {
-        return new SrTFile(this.app.vault, this.app.metadataCache, note);
+        return new SrTFile(this.app.vault, this.app.metadataCache, this.app.fileManager, note);
     }
 }

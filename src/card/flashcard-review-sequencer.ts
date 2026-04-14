@@ -126,7 +126,9 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     get hasCurrentCard(): boolean {
-        return this.cardSequencer.currentCard != null;
+        return (
+            this.cardSequencer.currentCard !== null && this.cardSequencer.currentCard !== undefined
+        );
     }
 
     get currentCard(): Card {
@@ -240,7 +242,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     async processReviewReviewMode(response: ReviewResponse): Promise<void> {
-        if (response != ReviewResponse.Reset || this.currentCard.hasSchedule) {
+        if (response !== ReviewResponse.Reset || this.currentCard.hasSchedule) {
             const oldSchedule = this.currentCard.scheduleInfo;
 
             // We need to update the schedule if:
@@ -248,6 +250,10 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             //  (2) or reset a due card
             // Nothing to do if a user resets a new card
             this.currentCard.scheduleInfo = this.determineCardSchedule(response, this.currentCard);
+            this.currentCard.scheduleInfo.interval = Math.max(
+                1,
+                this.currentCard.scheduleInfo.interval,
+            );
 
             // Update the source file with the updated schedule
             await DataStore.getInstance().questionWriteSchedule(this.currentQuestion);
@@ -264,7 +270,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         }
 
         // Move/delete the card
-        if (response == ReviewResponse.Reset) {
+        if (response === ReviewResponse.Reset) {
             this.cardSequencer.moveCurrentCardToEndOfList();
             this.cardSequencer.nextCard();
         } else {
@@ -289,7 +295,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     async processReviewCramMode(response: ReviewResponse): Promise<void> {
-        if (response == ReviewResponse.Easy) this.deleteCurrentCard();
+        if (response === ReviewResponse.Easy) this.deleteCurrentCard();
         else {
             this.cardSequencer.moveCurrentCardToEndOfList();
             this.cardSequencer.nextCard();
@@ -299,7 +305,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     determineCardSchedule(response: ReviewResponse, card: Card): RepItemScheduleInfo {
         let result: RepItemScheduleInfo;
 
-        if (response == ReviewResponse.Reset) {
+        if (response === ReviewResponse.Reset) {
             // Resetting the card schedule
             result = this.srsAlgorithm.cardGetResetSchedule();
         } else {

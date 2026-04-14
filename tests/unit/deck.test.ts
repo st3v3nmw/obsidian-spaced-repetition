@@ -333,7 +333,7 @@ Q3::A3 <!--SR:!2023-09-02,4,270-->`;
             const originalCountPreCopy: number = original.getCardCount(CardListType.All, true);
             expect(originalCountPreCopy).toEqual(6);
 
-            original.copyWithCardFilter((card) => parseInt(card.front[1]) % 2 == 1);
+            original.copyWithCardFilter((card) => parseInt(card.front[1]) % 2 === 1);
             const originalCountPostCopy: number = original.getCardCount(CardListType.All, true);
             expect(originalCountPreCopy).toEqual(originalCountPostCopy);
         });
@@ -354,7 +354,7 @@ Q3::A3 <!--SR:!2023-09-02,4,270-->`;
             );
 
             const copy: Deck = original.copyWithCardFilter(
-                (card) => parseInt(card.front[1]) % 2 == 1,
+                (card) => parseInt(card.front[1]) % 2 === 1,
             );
 
             let subdeck: Deck = copy.getDeck(new TopicPath(["flashcards"]));

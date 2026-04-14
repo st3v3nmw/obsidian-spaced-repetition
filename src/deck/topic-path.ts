@@ -6,7 +6,7 @@ export class TopicPath {
     path: string[];
 
     constructor(path: string[]) {
-        if (path == null) throw "null path";
+        if (path === null) throw "null path";
         if (path.some((str) => str.includes("/"))) throw "path entries must not contain '/'";
         this.path = path;
     }
@@ -39,13 +39,11 @@ export class TopicPath {
     }
 
     static getTopicPathOfFile(noteFile: ISRFile, settings: SRSettings): TopicPath {
-        let deckPath: string[] = [];
         let result: TopicPath = TopicPath.emptyPath;
-
         if (settings.convertFoldersToDecks) {
-            deckPath = noteFile.path.split("/");
+            const deckPath = noteFile.path.split("/");
             deckPath.pop(); // remove filename
-            if (deckPath.length != 0) {
+            if (deckPath.length !== 0) {
                 result = new TopicPath(deckPath);
             }
         } else {
@@ -72,7 +70,7 @@ export class TopicPath {
         if (this.isEmptyPath) return topicPath.isEmptyPath;
         if (this.path.length > topicPath.path.length) return false;
         for (let i = 0; i < this.path.length; i++) {
-            if (this.path[i] != topicPath.path[i]) return false;
+            if (this.path[i] !== topicPath.path[i]) return false;
         }
         return true;
     }
@@ -91,17 +89,17 @@ export class TopicPath {
     }
 
     static isValidTag(tag: string): boolean {
-        if (tag == null || tag.length == 0) return false;
-        if (tag[0] != "#") return false;
-        if (tag.length == 1) return false;
+        if (tag === null || tag.length === 0) return false;
+        if (tag[0] !== "#") return false;
+        if (tag.length === 1) return false;
 
         return true;
     }
 
     static getTopicPathFromTag(tag: string): TopicPath {
-        if (tag == null || tag.length == 0) throw "Null/empty tag";
-        if (tag[0] != "#") throw "Tag must start with #";
-        if (tag.length == 1) throw "Invalid tag";
+        if (tag === null || tag.length === 0) throw "Null/empty tag";
+        if (tag[0] !== "#") throw "Tag must start with #";
+        if (tag.length === 1) throw "Invalid tag";
 
         const path: string[] = tag
             .replace("#", "")
@@ -116,7 +114,7 @@ export class TopicPath {
         if (settings.convertFoldersToDecks) {
             const deckPath: string[] = noteFile.path.split("/");
             deckPath.pop(); // remove filename
-            if (deckPath.length != 0) {
+            if (deckPath.length !== 0) {
                 result = new TopicPath(deckPath);
             }
         }
@@ -130,7 +128,7 @@ export class TopicPathList {
     lineNum: number;
 
     constructor(list: TopicPath[], lineNum: number = null) {
-        if (list == null) throw "TopicPathList null";
+        if (list === null) throw "TopicPathList null";
         this.list = list;
         this.lineNum = lineNum;
     }

@@ -1,6 +1,9 @@
 // 简体中文
+import { IBaseLocale } from "src/lang/base-locale";
+import en from "src/lang/locale/en";
 
-export default {
+const zhCN: IBaseLocale = {
+    ...en,
     // flashcard-modal.tsx
     DECKS: "卡组",
     DUE_CARDS: "到期卡片",
@@ -113,6 +116,9 @@ export default {
     REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM: "乱序 (在前一卡片组内卡片都复习完后)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "卡片组及卡片都乱序",
     DISABLE_CLOZE_CARDS: "不进行完形填空",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Convert cloze patterns to input fields",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
+        "Replace cloze patterns with input fields when reviewing cloze cards.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "将 ==高亮== 转换为完形填空",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         '添加/删除 "完形填空模式" 中的 <code>${defaultPattern}</code>',
@@ -182,6 +188,15 @@ export default {
     EXPERIMENTAL: "Experimental",
     HELP: "Help",
     STORE_IN_NOTES: "In the notes",
+    DELETE_SCHEDULING_DATA_ALL: "Delete Scheduling Data",
+    DELETE_SCHEDULING_DATA_ALL_DESC: "Delete scheduling data from all notes and flashcards.",
+    DELETE: "Delete",
+    CONFIRM_SCHEDULING_DATA_ALL_DELETION:
+        "Are you sure you want to delete all scheduling data from your notes and flashcards? This action cannot be undone.",
+    CONFIRM: "Confirm",
+    SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS: "Scheduling data deletion in progress...",
+    SCHEDULING_DATA_HAS_BEEN_DELETED:
+        "Scheduling data has been deleted from all notes and flashcards.",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "笔记复习序列",
@@ -219,4 +234,39 @@ export default {
     SEARCH: "Search",
     PREVIOUS: "Previous",
     NEXT: "Next",
+    // settings.ts
+    SETTINGS_TAB_HEADING: "Settings",
+    MAIN_SETTINGS_PAGE: "MAIN_SETTINGS",
+
+    // NoteReviewQueue.ts
+    NOTE_REVIEW_QUEUE_HINT: "Click on the 3 dots next to the note to open the review menu.",
+
+    // StatusBarManager.ts
+    OPEN_DECK_FOR_REVIEW: "Open deck for review",
+    UPDATE_AVAILABLE: "Update available",
+
+    // Statistics
+    PERIOD_TITLE: "Period",
+    PERIOD_DESC: "Period of time to display in the charts",
+
+    // Card controls reset button
+    DELETE_SCHEDULING_DATA_OF_CURRENT_CARD: "Delete card scheduling data?",
+    CONFIRM_SCHEDULING_DATA_DELETION_OF_CURRENT_CARD:
+        "Are you sure you want to delete the scheduling data from your current card? This action cannot be undone.",
+    SCHEDULING_DATA_DELETION_IN_PROGRESS_OF_CURRENT_CARD: "Deleting the cards scheduling data...",
+
+    // Settings > Scheduling
+    START_OF_DAY: "Start of day",
+    START_OF_DAY_DESC: "The time at which the day begins (Format: HH:MM:SS, Default: 00:00:00)",
+    INVALID_START_OF_DAY_WARNING: "Invalid format for start of day",
+    // Settings > main-page
+    INFO: "Info",
+    // Card responses
+    AGAIN: "Again",
+    // Settings > info
+    CHECK_ROADMAP: 'Check out the <a href="${roadMapUrl}">roadmap</a> for upcoming features.',
+    CHECK_DEV_NEWS:
+        'Check out the <a href="${devNewsUrl}">dev news</a> for the latest development news.',
 };
+
+export default zhCN;

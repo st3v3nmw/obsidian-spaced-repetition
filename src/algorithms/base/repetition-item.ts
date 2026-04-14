@@ -5,6 +5,7 @@ export enum ReviewResponse {
     Easy,
     Good,
     Hard,
+    Again,
     Reset,
 }
 export enum RepetitionPhase {
@@ -20,7 +21,7 @@ export class RepetitionItem {
 
     // scheduling
     get hasSchedule(): boolean {
-        return this.scheduleInfo != null;
+        return this.scheduleInfo !== null && this.scheduleInfo !== undefined;
     }
 
     get isNew(): boolean {

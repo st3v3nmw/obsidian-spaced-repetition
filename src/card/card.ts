@@ -20,9 +20,6 @@ export class Card extends RepetitionItem {
     }
 
     formatSchedule(): string {
-        let result: string = "";
-        if (this.hasSchedule) result = this.scheduleInfo.formatCardScheduleForHtmlComment();
-        else result = "New";
-        return result;
+        return this.hasSchedule ? this.scheduleInfo.formatCardScheduleForHtmlComment() : "New";
     }
 }

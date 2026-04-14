@@ -18,10 +18,11 @@ module.exports = {
         // GUI & Obsidian coupled code
         "src/core.ts",
         "src/file.ts",
-        "src/gui/",
+        "src/ui/",
         "src/icons/",
         "src/main.ts",
-        "src/next-note-review-handler.ts",
+        "src/delete-scheduling-data.ts",
+        "src/note/next-note-review-handler.ts",
         "src/plugin-data.ts",
         "src/utils/renderers.ts",
 
@@ -30,7 +31,7 @@ module.exports = {
 
         // don't include in results
         "src/declarations.d.ts",
-        "src/lang/locale/",
+        "src/lang/",
     ],
     coverageDirectory: "coverage",
     collectCoverage: true,

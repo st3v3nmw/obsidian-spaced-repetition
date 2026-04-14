@@ -76,7 +76,8 @@ export class SrsAlgorithmOsr implements ISrsAlgorithm {
                 this.settings,
             );
         }
-        let ease: number = null;
+
+        let ease: number;
         if (flashcardsInNoteAvgEase && noteEase) {
             ease = (flashcardsInNoteAvgEase + noteEase) / 2;
         } else {
@@ -155,7 +156,7 @@ export class SrsAlgorithmOsr implements ISrsAlgorithm {
     cardGetResetSchedule(): RepItemScheduleInfo {
         const interval = SrsAlgorithmOsr.initialInterval;
         const ease = this.settings.baseEase;
-        const dueDate = globalDateProvider.today.add(interval, "d");
+        const dueDate = globalDateProvider.today;
         return new RepItemScheduleInfoOsr(dueDate, interval, ease);
     }
 

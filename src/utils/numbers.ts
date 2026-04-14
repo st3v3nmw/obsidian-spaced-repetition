@@ -46,7 +46,7 @@ export class StaticRandomNumberProvider implements IRandomNumberProvider {
     next: number;
 
     getInteger(lowerBound: number, upperBound: number): number {
-        if (lowerBound != this.expectedLowerBound || upperBound != this.expectedUpperBound)
+        if (lowerBound !== this.expectedLowerBound || upperBound !== this.expectedUpperBound)
             throw `lowerBound: A${lowerBound}/E${this.expectedLowerBound}, upperBound: A${upperBound}/E${this.expectedUpperBound}`;
         return this.next;
     }

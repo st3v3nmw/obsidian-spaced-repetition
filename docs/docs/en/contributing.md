@@ -44,13 +44,15 @@ Sample `en.ts` file:
 ```typescript
 // English
 
-export default {
+const en: IBaseLocale = {
     EASY: "Easy",
     SHOW_ANSWER: "Show Answer",
     DAYS_STR_IVL: "${interval} days",
     CHECK_ALGORITHM_WIKI:
         'For more information, check the <a href="${algoUrl}">algorithm implementation</a>.',
 };
+
+export default en;
 ```
 
 Equivalent `sw.ts` file:
@@ -58,13 +60,17 @@ Equivalent `sw.ts` file:
 ```typescript
 // Swahili
 
-export default {
+const sw: IBaseLocale = {
+    ...en, // inherit translations from English, if any are missing
+    // Override english translations here
     EASY: "Rahisi",
     SHOW_ANSWER: "Onyesha Jibu",
     DAYS_STR_IVL: "Siku ${interval}",
     CHECK_ALGORITHM_WIKI:
         'Kwa habari zaidi, angalia <a href="${algoUrl}">utekelezaji wa algorithm</a>.',
 };
+
+export default sw;
 ```
 
 <sub><sup>A part of that last one is uhh, Google translated, I have a working understanding of Swahili but not enough to write computerese lol.</sup></sub>
@@ -106,7 +112,7 @@ Please note that:
 
 ### UI changes
 
-- All UI changes should be made in the `src/gui/` folder.
+- All UI changes should be made in the `src/ui/` folder.
 
 - Enable the debug mode by setting `ENABLE_DEBUG_MODE` to `true` in `src/constants.ts`(Don't forget to revert it back to `false` after you're done).
 
@@ -144,7 +150,7 @@ These files reside in `docs/docs/` in the respective language's folder. For inst
 
 The docs are served on [https://stephenmwangi.com/obsidian-spaced-repetition/](https://stephenmwangi.com/obsidian-spaced-repetition/).
 
-For small changes, you can simply open an pull request for merging (against the `master` branch).
+For small changes, you can simply open an pull request for merging (against the `main` branch).
 The changes will be live once a new [release](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases) is made.
 
 For larger diffs, it's important that you check how your docs look like as explained below.
@@ -154,12 +160,12 @@ For larger diffs, it's important that you check how your docs look like as expla
 #### Initial Setup
 
 1. Create a virtual environment: `python3 -m venv venv`
-2. Activate it: `. venv/bin/activate`
+2. Activate it: `. venv/bin/activate` or `venv\Scripts\activate` if you are on Windows
 3. Install the required dependencies: `pip install -r requirements.txt`
 
 #### Viewing
 
-1. Activate the virtual environment: `. venv/bin/activate`
+1. Activate the virtual environment: `. venv/bin/activate` or `venv\Scripts\activate` if you are on Windows
 2. Serve the docs: `mkdocs serve`
 3. View your documentation locally on [http://127.0.0.1:8000/obsidian-spaced-repetition/](http://127.0.0.1:8000/obsidian-spaced-repetition/), any changes you make will reflect on the browser instantly.
 
@@ -194,7 +200,7 @@ Example using `v1.9.2`:
     git push --set-upstream origin release-v1.9.2
     ```
 
-5. Open and merge the PR into `master`.
-6. Locally, switch back to `master` and pull the changes: `git switch master && git pull`
+5. Open and merge the PR into `main`.
+6. Locally, switch back to `main` and pull the changes: `git switch main && git pull`
 7. Create a git tag with the version: `git tag -a 1.9.2 -m "1.9.2"`
-8. Push the tag: `git push --tags`. <br> You're all set! [This GitHub action](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/.github/workflows/release.yml) should pick it up, create a release, publish it, and update the live documentation.
+8. Push the tag: `git push --tags`. <br> You're all set! [This GitHub action](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/main/.github/workflows/release.yml) should pick it up, create a release, publish it, and update the live documentation.

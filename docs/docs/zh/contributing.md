@@ -104,7 +104,7 @@ export default {
 
 ### UI 修改
 
-- 所有 UI 修改都应当在`src/gui/`目录内完成。
+- 所有 UI 修改都应当在`src/ui/`目录内完成。
 
 - 将修改放在正确的区域 (参考代码中的 "MARK:" 或 "#region" 注释)。
 
@@ -140,7 +140,7 @@ export default {
 
 文档托管于[https://stephenmwangi.com/obsidian-spaced-repetition/](https://stephenmwangi.com/obsidian-spaced-repetition/)。
 
-对于微小改动，您可以仅提交 Pull Request 来合并(针对 `master` 分支)。
+对于微小改动，您可以仅提交 Pull Request 来合并(针对 `main` 分支)。
 这些修改将在新[发行版](https://github.com/st3v3nmw/obsidian-spaced-repetition/releases)发布时生效。
 
 对于大幅改动，您必须如下所述，检查文档外观。
@@ -190,7 +190,7 @@ export default {
     git push --set-upstream origin release-v1.9.2
     ```
 
-5. 提交合并到 `master` 分支的 Pull Request。
-6. 在本地，切换到 `master` 分支并拉取修改： `git switch master && git pull`
+5. 提交合并到 `main` 分支的 Pull Request。
+6. 在本地，切换到 `main` 分支并拉取修改： `git switch main && git pull`
 7. 以版本号创建 git 标签： `git tag -a 1.9.2 -m "1.9.2"`
-8. 推送标签: `git push --tags`. <br> 您已经完成了所有流程！ [这个 GitHub action](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/master/.github/workflows/release.yml) 会自动触发，创建一个发行版并发布，同时更新在线文档。
+8. 推送标签: `git push --tags`. <br> 您已经完成了所有流程！ [这个 GitHub action](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/main/.github/workflows/release.yml) 会自动触发，创建一个发行版并发布，同时更新在线文档。

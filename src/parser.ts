@@ -60,7 +60,7 @@ function markerInsideCodeBlock(text: string, marker: string, markerIndex: number
 
 function hasInlineMarker(text: string, marker: string): boolean {
     // No marker provided
-    if (marker.length == 0) return false;
+    if (marker.length === 0) return false;
 
     // Check if the marker is in the text
     const markerIdx = text.indexOf(marker);
@@ -95,7 +95,7 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
     let cardText = "";
     let cardType: CardType | null = null;
     let firstLineNo = 0,
-        lastLineNo = 0;
+        lastLineNo: number;
 
     const clozecrafter = new ClozeCrafter(options.clozePatterns);
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
@@ -111,14 +111,14 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
         }
 
         // Have we reached the end of a card?
-        const isEmptyLine = currentTrimmed.length == 0;
+        const isEmptyLine = currentTrimmed.length === 0;
         const hasMultilineCardEndMarker =
-            options.multilineCardEndMarker && currentTrimmed == options.multilineCardEndMarker;
+            options.multilineCardEndMarker && currentTrimmed === options.multilineCardEndMarker;
         if (
             // We've probably reached the end of a card
             (isEmptyLine && !options.multilineCardEndMarker) ||
             // Empty line & we're not picking up any card
-            (isEmptyLine && cardType == null) ||
+            (isEmptyLine && cardType === null) ||
             // We've reached the end of a multi line card &
             //  we're using custom end markers
             hasMultilineCardEndMarker
@@ -151,7 +151,7 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
             }
         }
 
-        if (cardType == CardType.SingleLineBasic || cardType == CardType.SingleLineReversed) {
+        if (cardType === CardType.SingleLineBasic || cardType === CardType.SingleLineReversed) {
             cardText = currentLine;
             firstLineNo = i;
 
