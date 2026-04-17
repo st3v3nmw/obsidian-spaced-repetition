@@ -299,6 +299,23 @@ export class CardContainer {
             return;
         }
 
+        // If the file is already open in another leaf, open it in the current one to prevent duplicates
+        const existingLeaf = this.app.workspace.getLeavesOfType("markdown").find((leaf) => {
+            const view = leaf.view as MarkdownView;
+            return view.file?.path === file.path;
+        });
+
+        if (existingLeaf) {
+            await existingLeaf.openFile(file, { eState: { line } });
+            this.app.workspace.setActiveLeaf(existingLeaf);
+            const markdownView = existingLeaf.view as MarkdownView;
+            if (markdownView?.editor) {
+                markdownView.editor.setCursor({ line, ch: 0 });
+                markdownView.editor.scrollIntoView({ from: { line, ch: 0 }, to: { line, ch: 0 } });
+            }
+            return;
+        }
+
         const leaf = this.app.workspace.getLeaf("tab");
         await leaf.openFile(file, { eState: { line } });
 
