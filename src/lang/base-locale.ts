@@ -173,6 +173,8 @@ export interface IBaseLocale {
     CONFIRM: string;
     SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS: string;
     SCHEDULING_DATA_HAS_BEEN_DELETED: string;
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS: string;
+    ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: string;
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: string;
