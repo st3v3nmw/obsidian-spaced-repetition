@@ -37,13 +37,13 @@ export default class InfoSectionComponent {
     public currentDeckCardCounterIcon: HTMLDivElement;
     public horizontalBackButton: ButtonComponent;
     public horizontalCloseButton: ButtonComponent;
-    public cardContext: HTMLElement;
+    public cardContext: HTMLElement | undefined;
 
     constructor(
         container: HTMLDivElement,
         showContextInCards: boolean,
         backToDeck: () => void,
-        closeModal: () => void | undefined,
+        closeModal: (() => void) | undefined,
     ) {
         this.infoSection = container.createDiv();
         this.infoSection.addClass("sr-info-section");
@@ -119,8 +119,8 @@ export default class InfoSectionComponent {
             this.deckProgressInfo,
             () => closeModal && closeModal(),
             [
-                !closeModal && "sr-hide-by-scaling",
-                !closeModal && "hide-height",
+                closeModal === undefined ? "sr-hide-by-scaling" : "",
+                closeModal === undefined ? "hide-height" : "",
                 "mod-raised",
                 "sr-horizontal-close-button",
             ],
