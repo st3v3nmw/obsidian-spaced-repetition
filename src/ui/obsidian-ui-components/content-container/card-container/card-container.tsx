@@ -49,7 +49,7 @@ export class CardContainer {
     private previousDeck: Deck | null;
     private currentDeckTotalCardsInQueue: number = 0;
 
-    private clozeInputs: NodeListOf<Element>;
+    private clozeInputs: NodeListOf<HTMLInputElement>;
     private clozeAnswers: NodeListOf<Element>;
 
     private reviewSequencer: IFlashcardReviewSequencer;
@@ -57,7 +57,7 @@ export class CardContainer {
     private reviewMode: FlashcardReviewMode;
     private backToDeck: () => void;
     private editClickHandler: () => void;
-    private closeModal: () => void | undefined;
+    private closeModal: (() => void) | undefined;
 
     constructor(
         app: App,
@@ -208,6 +208,9 @@ export class CardContainer {
                 this.currentDeck.getTopicPath(),
             );
             this.currentDeckTotalCardsInQueue = currentDeckStats.cardsInQueueOfThisDeckCount;
+        }
+        if (this.chosenDeck === null) {
+            throw new Error("chosenDeck is null in CardContainer.ts");
         }
 
         this._updateInfoBar(this.chosenDeck, this.currentDeck);
@@ -428,8 +431,9 @@ export class CardContainer {
     private _keydownHandler = (e: KeyboardEvent) => {
         // Prevents any input, if the edit modal is open or if the view is not in focus
         if (
-            document.activeElement.nodeName === "TEXTAREA" ||
-            document.activeElement.nodeName === "INPUT" ||
+            (document.activeElement !== null &&
+                (document.activeElement.nodeName === "TEXTAREA" ||
+                    document.activeElement.nodeName === "INPUT")) ||
             this.mode === FlashcardMode.Closed ||
             !this.plugin.uiManager.getSRInFocusState() ||
             Platform.isMobile || // No keyboard events on mobile
