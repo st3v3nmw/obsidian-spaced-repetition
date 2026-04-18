@@ -17,9 +17,15 @@ import CardInfoNotice from "src/ui/obsidian-ui-components/content-container/card
 import ControlsComponent from "src/ui/obsidian-ui-components/content-container/card-container/controls/controls";
 import InfoSection from "src/ui/obsidian-ui-components/content-container/card-container/deck-info/info-section";
 import ResponseSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section";
-import { FlashcardMode } from "src/ui/obsidian-ui-components/modals/sr-modal-view";
 import EmulatedPlatform from "src/utils/platform-detector";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
+
+export enum FlashcardMode {
+    Deck,
+    Front,
+    Back,
+    Closed,
+}
 
 export class CardContainer {
     public app: App;
@@ -57,7 +63,7 @@ export class CardContainer {
     private reviewMode: FlashcardReviewMode;
     private backToDeck: () => void;
     private editClickHandler: () => void;
-    private closeModal: (() => void) | undefined;
+    private closeModal?: () => void;
 
     constructor(
         app: App,
@@ -83,15 +89,7 @@ export class CardContainer {
         this.closeModal = closeModal;
 
         // Build ui
-        this.init();
-    }
-
-    // #region -> public methods
-
-    /**
-     * Initializes all static elements in the FlashcardView
-     */
-    init() {
+        this.mode = FlashcardMode.Closed;
         this.view.addClasses(["sr-container", "sr-card-container", "sr-is-hidden"]);
 
         this.controls = new ControlsComponent(
@@ -130,6 +128,8 @@ export class CardContainer {
             (response: ReviewResponse) => this._processReview(response),
         );
     }
+
+    // #region -> public methods
 
     /**
      * Shows the FlashcardView if it is hidden

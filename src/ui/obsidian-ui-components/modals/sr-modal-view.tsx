@@ -9,21 +9,13 @@ import { Deck } from "src/deck/deck";
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
-import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container";
+import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
 import { globalDateProvider } from "src/utils/dates";
 import EmulatedPlatform from "src/utils/platform-detector";
 
-export enum FlashcardMode {
-    Deck,
-    Front,
-    Back,
-    Closed,
-}
-
 export class SRModalView extends Modal {
     public plugin: SRPlugin;
-    public mode: FlashcardMode;
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
@@ -98,7 +90,7 @@ export class SRModalView extends Modal {
         );
 
         let openImmediately: boolean = false;
-        let deckWithCards = null;
+        let deckWithCards: Deck | null = null;
 
         for (const subdeck of subdecksWithCardsInQueue) {
             const hasNewCards: boolean = subdeck.newFlashcards.length > 0;
@@ -127,7 +119,7 @@ export class SRModalView extends Modal {
             }
         }
 
-        if (openImmediately) {
+        if (openImmediately && deckWithCards !== null) {
             this._showFlashcard(deckWithCards);
         } else {
             this._showDecksList();
@@ -136,7 +128,6 @@ export class SRModalView extends Modal {
 
     onClose(): void {
         this.plugin.uiManager.setSRViewInFocus(false);
-        this.mode = FlashcardMode.Closed;
         this.deckContainer.close();
         this.cardContainer.close();
     }

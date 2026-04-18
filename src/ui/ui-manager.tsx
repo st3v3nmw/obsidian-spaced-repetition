@@ -1,4 +1,5 @@
-import { Menu, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
+import "src/ui/styles.css";
+import { Menu, MenuItem, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
@@ -34,17 +35,10 @@ export class UIManager {
     private plugin: SRPlugin;
     public tabViewManager: TabViewManager;
     public sidebarManager: SidebarManager;
-    public statusBarManager: StatusBarManager | null = null;
+    public statusBarManager: StatusBarManager;
     private ribbonIcon: HTMLElement | null = null;
     private isSRInFocus: boolean = false;
-    private externalModalObserver: MutationObserver;
-
-    private fileMenuHandler: (
-        menu: Menu,
-        file: TAbstractFile,
-        source: string,
-        leaf?: WorkspaceLeaf,
-    ) => void;
+    private externalModalObserver: MutationObserver | null = null;
 
     constructor(plugin: SRPlugin) {
         this.plugin = plugin;
@@ -81,7 +75,7 @@ export class UIManager {
 
     destroy() {
         this.removeSRFocusListener();
-        this.plugin.app.workspace.off("file-menu", this.fileMenuHandler);
+        this.plugin.app.workspace.off("file-menu", this.fileMenuHandler.bind(this));
         this.tabViewManager.closeAllTabViews();
     }
 
@@ -142,8 +136,8 @@ export class UIManager {
             // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
             this.setSRViewInFocus(
                 (modal === null || modal === undefined) &&
-                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
-                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
+                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
+                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
             );
         }
     }
@@ -233,55 +227,55 @@ export class UIManager {
     }
 
     showFileMenuItems(status: boolean) {
-        // define the handler if it was not defined yet
-        if (this.fileMenuHandler === undefined) {
-            this.fileMenuHandler = (menu, fileish: TAbstractFile) => {
-                if (fileish instanceof TFile && fileish.extension === "md") {
-                    menu.addItem((item) => {
-                        item.setTitle(
-                            t("REVIEW_DIFFICULTY_FILE_MENU", {
-                                difficulty: this.plugin.data.settings.flashcardEasyText,
-                            }),
-                        )
-                            .setIcon("SpacedRepIcon")
-                            .onClick(() => {
-                                this.plugin.saveNoteReviewResponse(fileish, ReviewResponse.Easy);
-                            });
-                    });
-
-                    menu.addItem((item) => {
-                        item.setTitle(
-                            t("REVIEW_DIFFICULTY_FILE_MENU", {
-                                difficulty: this.plugin.data.settings.flashcardGoodText,
-                            }),
-                        )
-                            .setIcon("SpacedRepIcon")
-                            .onClick(() => {
-                                this.plugin.saveNoteReviewResponse(fileish, ReviewResponse.Good);
-                            });
-                    });
-
-                    menu.addItem((item) => {
-                        item.setTitle(
-                            t("REVIEW_DIFFICULTY_FILE_MENU", {
-                                difficulty: this.plugin.data.settings.flashcardHardText,
-                            }),
-                        )
-                            .setIcon("SpacedRepIcon")
-                            .onClick(() => {
-                                this.plugin.saveNoteReviewResponse(fileish, ReviewResponse.Hard);
-                            });
-                    });
-                }
-            };
-        }
-
         if (status) {
             this.plugin.registerEvent(
-                this.plugin.app.workspace.on("file-menu", this.fileMenuHandler),
+                this.plugin.app.workspace.on("file-menu", this.fileMenuHandler.bind(this)),
             );
         } else {
-            this.plugin.app.workspace.off("file-menu", this.fileMenuHandler);
+            this.plugin.app.workspace.off("file-menu", this.fileMenuHandler.bind(this));
+        }
+    }
+
+    private fileMenuHandler(
+        menu: Menu,
+        file: TAbstractFile
+    ) {
+        if (file instanceof TFile && file.extension === "md") {
+            menu.addItem((item: MenuItem) => {
+                item.setTitle(
+                    t("REVIEW_DIFFICULTY_FILE_MENU", {
+                        difficulty: this.plugin.data.settings.flashcardEasyText,
+                    }),
+                )
+                    .setIcon("SpacedRepIcon")
+                    .onClick(() => {
+                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Easy);
+                    });
+            });
+
+            menu.addItem((item) => {
+                item.setTitle(
+                    t("REVIEW_DIFFICULTY_FILE_MENU", {
+                        difficulty: this.plugin.data.settings.flashcardGoodText,
+                    }),
+                )
+                    .setIcon("SpacedRepIcon")
+                    .onClick(() => {
+                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Good);
+                    });
+            });
+
+            menu.addItem((item) => {
+                item.setTitle(
+                    t("REVIEW_DIFFICULTY_FILE_MENU", {
+                        difficulty: this.plugin.data.settings.flashcardHardText,
+                    }),
+                )
+                    .setIcon("SpacedRepIcon")
+                    .onClick(() => {
+                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Hard);
+                    });
+            });
         }
     }
 }

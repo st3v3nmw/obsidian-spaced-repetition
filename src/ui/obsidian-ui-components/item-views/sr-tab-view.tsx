@@ -10,7 +10,7 @@ import { Deck } from "src/deck/deck";
 import SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
-import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container";
+import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
 import { globalDateProvider } from "src/utils/dates";
 import EmulatedPlatform from "src/utils/platform-detector";
@@ -154,7 +154,7 @@ export class SRTabView extends ItemView {
                     this.reviewSequencer.originalDeckTree,
                 );
             let openImmediately: boolean = false;
-            let deckWithCards = null;
+            let deckWithCards: Deck | null = null;
 
             for (const subdeck of subdecksWithCardsInQueue) {
                 const hasNewCards: boolean = subdeck.newFlashcards.length > 0;
@@ -182,7 +182,7 @@ export class SRTabView extends ItemView {
                 }
             }
 
-            if (openImmediately) {
+            if (openImmediately && deckWithCards !== null) {
                 this._showFlashcard(deckWithCards);
             } else {
                 this._showDecksList();

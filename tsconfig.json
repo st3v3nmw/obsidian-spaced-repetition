@@ -2,7 +2,9 @@
     "compilerOptions": {
         "baseUrl": "./",
         "paths": {
-            "src/*": ["src/*"]
+            "src/*": [
+                "src/*"
+            ]
         },
         "inlineSourceMap": true,
         "inlineSources": true,
@@ -13,10 +15,23 @@
         "moduleResolution": "node",
         "esModuleInterop": true,
         "importHelpers": true,
-        "lib": ["dom", "dom.Iterable", "scripthost", "ES5", "ES6", "ES7", "ES2021"],
+        "lib": [
+            "dom",
+            "dom.Iterable",
+            "scripthost",
+            "ES5",
+            "ES6",
+            "ES7",
+            "ES2021"
+        ],
         "jsx": "react",
-        "jsxFactory": "h"
+        "jsxFactory": "h",
     },
-    "include": ["**/*.ts", "**/*.tsx"],
-    "files": ["node_modules/jest-expect-message/types/index.d.ts"]
+    "include": [
+        "**/*.ts",
+        "**/*.tsx",
+    ],
+    "files": [
+        "node_modules/jest-expect-message/types/index.d.ts"
+    ]
 }

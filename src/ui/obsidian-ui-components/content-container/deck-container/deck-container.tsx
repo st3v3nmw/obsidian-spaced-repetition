@@ -1,3 +1,4 @@
+import "src/ui/obsidian-ui-components/content-container/deck-container/deck-container.css";
 import { ButtonComponent, Platform } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
@@ -13,13 +14,10 @@ import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
 import ModalCloseButtonComponent from "src/ui/obsidian-ui-components/content-container/modal-close-button";
-import { FlashcardMode } from "src/ui/obsidian-ui-components/modals/sr-modal-view";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 export class DeckContainer {
     public plugin: SRPlugin;
-    public mode: FlashcardMode;
-    public contentEl: HTMLElement;
 
     public containerEl: HTMLDivElement;
     public header: HTMLDivElement;
@@ -38,7 +36,7 @@ export class DeckContainer {
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private startReviewOfDeck: (deck: Deck) => void;
-    private closeModal: () => void | undefined;
+    private closeModal?: () => void;
 
     constructor(
         plugin: SRPlugin,
@@ -57,13 +55,6 @@ export class DeckContainer {
         this.closeModal = closeModal;
 
         // Build ui
-        this.init();
-    }
-
-    /**
-     * Initializes all static elements in the DeckListView
-     */
-    init(): void {
         this.containerEl.addClasses(["sr-container", "sr-deck-container", "sr-is-hidden"]);
 
         this.header = this.containerEl.createDiv();
@@ -86,15 +77,27 @@ export class DeckContainer {
 
         this.titleWrapper.createDiv().addClass("sr-flex-spacer");
 
+        const closeButtonClasses = [
+            "sr-modal-close-button",
+            EmulatedPlatform().isPhone || Platform.isPhone
+                ? "mod-raised"
+                : "clickable-icon"
+        ];
+
+        if (this.closeModal === undefined) {
+            closeButtonClasses.push("sr-hide-by-scaling");
+            closeButtonClasses.push("hide-height");
+        }
+
+        if (EmulatedPlatform().isPhone || Platform.isPhone) {
+            closeButtonClasses.push("mod-raised");
+            closeButtonClasses.push("clickable-icon");
+        }
+
         this.closeButton = new ModalCloseButtonComponent(
             this.titleWrapper,
             () => this.closeModal && this.closeModal(),
-            [
-                !this.closeModal && "sr-hide-by-scaling",
-                !this.closeModal && "hide-height",
-                EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "clickable-icon",
-                "sr-modal-close-button",
-            ],
+            closeButtonClasses,
         );
 
         this.stats = this.header.createDiv();
@@ -114,8 +117,6 @@ export class DeckContainer {
      * Shows the DeckListView & rerenders dynamic elements
      */
     show(): void {
-        this.mode = FlashcardMode.Deck;
-
         // Redraw in case the stats have changed
         this._createHeaderStats();
 
@@ -191,6 +192,7 @@ export class DeckContainer {
         const shouldBeInitiallyExpanded: boolean = this.settings.initiallyExpandAllSubdecksInTree;
         let collapsed = !shouldBeInitiallyExpanded;
         let collapseIconEl: HTMLElement | null = null;
+
         if (deck.subdecks.length > 0) {
             collapseIconEl = deckTreeSelf.createDiv("tree-item-icon collapse-icon");
             collapseIconEl.innerHTML = COLLAPSE_ICON;
@@ -210,7 +212,7 @@ export class DeckContainer {
 
         const deckTreeChildren: HTMLElement = deckTree.createDiv("tree-item-children");
         deckTreeChildren.style.display = collapsed ? "none" : "block";
-        if (deck.subdecks.length > 0) {
+        if (deck.subdecks.length > 0 && collapseIconEl !== null) {
             collapseIconEl.addEventListener("click", (e) => {
                 if (collapsed) {
                     (collapseIconEl.childNodes[0] as HTMLElement).style.transform = "";

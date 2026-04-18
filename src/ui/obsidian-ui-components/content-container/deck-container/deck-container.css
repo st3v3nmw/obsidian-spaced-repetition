@@ -1,0 +1,106 @@
+/* MARK: Deck Container */
+
+.sr-deck-container {
+    & .sr-header {
+        gap: var(--container-gap);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    & .sr-title-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+
+        & .sr-title {
+            font-size: var(--font-ui-large);
+            font-weight: var(--font-semibold);
+            text-align: center;
+            line-height: var(--line-height-tight);
+        }
+    }
+
+    & .sr-header-stats-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--size-4-2);
+        justify-content: center;
+        align-items: center;
+
+        & .sr-header-stats-count {
+            display: flex;
+            justify-items: center;
+            align-items: center;
+            color: #ffffff;
+            padding: var(--size-4-1);
+
+            & > *:first-child {
+                min-width: 10ch;
+            }
+
+            & > *:last-child {
+                min-width: 3ch;
+                text-align: right;
+            }
+        }
+    }
+
+    & > hr {
+        margin: 2px 0px;
+    }
+
+    .sr-scroll-wrapper {
+        height: 100px;
+        /* Arbitrary height to force the content to scroll */
+        overflow: hidden;
+        flex-grow: 1;
+        display: flex;
+
+        & .sr-content {
+            overflow-x: hidden;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+    }
+
+    & .sr-tree-item-row {
+        padding-top: 2px;
+        padding-bottom: 2px;
+        margin-bottom: 0;
+
+        &.is-disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    }
+
+    & .sr-tree-stats-container {
+        display: flex;
+        gap: var(--size-4-1);
+    }
+
+    & .sr-tree-stats-count {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-width: calc(3ch + var(--size-4-1) * 2);
+        padding: var(--size-4-1);
+        text-align: center;
+        color: #ffffff !important;
+    }
+}
+
+.is-mobile .sr-deck-container .sr-header-stats-count,
+.is-mobile .sr-deck-container .sr-tree-stats-count {
+    border-radius: var(--tag-radius);
+    height: 21px;
+}
+
+@media only screen and (orientation: landscape) {
+    .is-phone .sr-deck-container .sr-header .sr-button {
+        padding: 0;
+    }
+}

@@ -116,6 +116,7 @@
 /* MARK: Modal */
 
 #sr-modal-view {
+
     & .modal-close-button,
     & .modal-header {
         display: none;
@@ -141,11 +142,9 @@
     padding-top: 0 !important;
     padding-right: var(--view-padding) !important;
     padding-left: var(--view-padding) !important;
-    padding-bottom: max(
-        var(--view-padding),
-        var(--bottom-statusbar-clearance),
-        var(--safe-area-inset-bottom)
-    ) !important;
+    padding-bottom: max(var(--view-padding),
+            var(--bottom-statusbar-clearance),
+            var(--safe-area-inset-bottom)) !important;
 }
 
 .sr-tab-view-content.sr-center-view {
@@ -189,113 +188,6 @@
 @media only screen and (orientation: portrait) and (max-width: 340px) {
     .is-phone .sr-container {
         --phone-button-size: 25px !important;
-    }
-}
-
-/* MARK: Deck Container */
-
-.sr-deck-container {
-    & .sr-header {
-        gap: var(--container-gap);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-
-    & .sr-title-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-
-        & .sr-title {
-            font-size: var(--font-ui-large);
-            font-weight: var(--font-semibold);
-            text-align: center;
-            line-height: var(--line-height-tight);
-        }
-    }
-
-    & .sr-header-stats-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--size-4-2);
-        justify-content: center;
-        align-items: center;
-
-        & .sr-header-stats-count {
-            display: flex;
-            justify-items: center;
-            align-items: center;
-            color: #ffffff;
-            padding: var(--size-4-1);
-
-            & > *:first-child {
-                min-width: 10ch;
-            }
-
-            & > *:last-child {
-                min-width: 3ch;
-                text-align: right;
-            }
-        }
-    }
-
-    & > hr {
-        margin: 2px 0px;
-    }
-
-    .sr-scroll-wrapper {
-        height: 100px;
-        /* Arbitrary height to force the content to scroll */
-        overflow: hidden;
-        flex-grow: 1;
-        display: flex;
-
-        & .sr-content {
-            overflow-x: hidden;
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-    }
-
-    & .sr-tree-item-row {
-        padding-top: 2px;
-        padding-bottom: 2px;
-        margin-bottom: 0;
-
-        &.is-disabled {
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-    }
-
-    & .sr-tree-stats-container {
-        display: flex;
-        gap: var(--size-4-1);
-    }
-
-    & .sr-tree-stats-count {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-width: calc(3ch + var(--size-4-1) * 2);
-        padding: var(--size-4-1);
-        text-align: center;
-        color: #ffffff !important;
-    }
-}
-
-.is-mobile .sr-deck-container .sr-header-stats-count,
-.is-mobile .sr-deck-container .sr-tree-stats-count {
-    border-radius: var(--tag-radius);
-    height: 21px;
-}
-
-@media only screen and (orientation: landscape) {
-    .is-phone .sr-deck-container .sr-header .sr-button {
-        padding: 0;
     }
 }
 
@@ -488,6 +380,7 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 650px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 15ch;
@@ -495,6 +388,7 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 550px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 10ch;
@@ -515,6 +409,7 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 440px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 8ch;
@@ -522,6 +417,7 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 410px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 6ch;
@@ -1230,13 +1126,11 @@ th.gridjs-th:last-child {
 
 .gridjs-loading-bar:after {
     animation: shimmer 2s infinite;
-    background-image: linear-gradient(
-        90deg,
-        hsla(0, 0%, 80%, 0),
-        hsla(0, 0%, 80%, 0.2) 20%,
-        hsla(0, 0%, 80%, 0.5) 60%,
-        hsla(0, 0%, 80%, 0)
-    );
+    background-image: linear-gradient(90deg,
+            hsla(0, 0%, 80%, 0),
+            hsla(0, 0%, 80%, 0.2) 20%,
+            hsla(0, 0%, 80%, 0.5) 60%,
+            hsla(0, 0%, 80%, 0));
     content: "";
     transform: translateX(-100%);
 }
