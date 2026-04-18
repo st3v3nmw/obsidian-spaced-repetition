@@ -54,10 +54,12 @@ export default class ControlsComponent {
                 const cardMenu = new Menu();
 
                 cardMenu.addItem((item) => {
-                    item.setTitle("Jump to card") // TODO: Translate
+                    item.setTitle(t("JUMP_TO_CARD"))
                         .setIcon("arrow-up-right")
                         .onClick(() => {
-                            jumpToCurrentCard();
+                            void jumpToCurrentCard().then(() => {
+                                closeModal?.();
+                            });
                         });
                 });
                 cardMenu.addItem((item) => {
@@ -77,7 +79,7 @@ export default class ControlsComponent {
             this.controls,
             app,
             async () => await processReview(ReviewResponse.Reset),
-            [EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "undefined"],
+            [EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : undefined],
         );
         this.resetButton.setDisabled(true);
 
