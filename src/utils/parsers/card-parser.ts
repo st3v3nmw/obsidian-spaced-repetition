@@ -1,3 +1,4 @@
+import { CardType } from "src/card/questions/question";
 import { NotesWithCardFragments } from "src/utils/parsers/data-structures/cards/card-fragments/note-with-card-fragments";
 import ParsedCardInfo from "src/utils/parsers/data-structures/parser/parsed-card-info";
 import { ParserData } from "src/utils/parsers/data-structures/parser/parser-data";
@@ -58,6 +59,24 @@ export class CardParser {
 
             // Parse the current line based on the current parser data
             parserData = LineParser.parseLine(parserData);
+        }
+
+        if (
+            parserData.cardData.potentialCard !== null &&
+            (
+                ((
+                    parserData.cardData.potentialCard.cardType === CardType.MultiLineBasic ||
+                    parserData.cardData.potentialCard.cardType === CardType.MultiLineReversed ||
+                    parserData.cardData.potentialCard.cardType === CardType.SingleLineBasic ||
+                    parserData.cardData.potentialCard.cardType === CardType.SingleLineReversed
+                ) &&
+                    parserData.cardData.potentialCard.backText !== null &&
+                    parserData.cardData.potentialCard.backText.length > 0) ||
+                parserData.cardData.potentialCard.cardType === CardType.Cloze
+            )
+        ) {
+            // We are currently building a potential card, so we add the current line to it, as it belongs to the potential card
+            parserData.addPotentialCardToList();
         }
 
         if (CardParser.debugParser) {

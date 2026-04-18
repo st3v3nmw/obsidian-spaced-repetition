@@ -35,12 +35,18 @@ export default class StringDetector {
         return trimmedLine.indexOf(StringDetector.commentEnd, index);
     }
 
+    /**
+     * Returns the index of the start of the next code block marker
+     * @param trimmedLine The line to search in
+     * @param index The index to start the search from
+     * @returns The index of the start of the next code block marker
+     */
     static indexOfCodeBlockMarker(trimmedLine: string, index: number = 0): number {
         return trimmedLine.indexOf(StringDetector.codeBlockTicsMultiline, index);
     }
 
     /**
-     * Returns true if the trimmed line starts with the srCommentStart
+     * Searches for the start of a scheduling info comment in the trimmed line and returns the comment if found
      *
      * @param trimmedLine
      * @returns
@@ -49,6 +55,7 @@ export default class StringDetector {
         trimmedLine: string,
         lineNumber: number,
         index: number = 0,
+        enableErrors: boolean = true,
     ): HTMLCommentSearchResultElement {
         const startIndex = trimmedLine.indexOf(StringDetector.srCommentStart, index);
         if (startIndex === -1) {
@@ -56,7 +63,10 @@ export default class StringDetector {
         }
 
         if (startIndex > trimmedLine.length) {
-            throw new Error("Malformed SR comment start with out of bounds index");
+            if (enableErrors) {
+                throw new Error("Malformed SR comment start with out of bounds index");
+            }
+            return { startIndex: -1, endIndex: -1, text: trimmedLine, lineNumber };
         }
 
         let endIndex = trimmedLine.indexOf(StringDetector.commentEnd, startIndex);
@@ -66,7 +76,10 @@ export default class StringDetector {
         }
 
         if (endIndex > trimmedLine.length) {
-            throw new Error("Malformed SR comment end with out of bounds index");
+            if (enableErrors) {
+                throw new Error("Malformed SR comment end with out of bounds index");
+            }
+            return { startIndex: startIndex, endIndex: -1, text: trimmedLine, lineNumber };
         }
 
         endIndex += StringDetector.commentEnd.length - 1;
@@ -106,6 +119,13 @@ export default class StringDetector {
         return srCommentsInLine;
     }
 
+    /**
+     * Returns the HTML comments in the line
+     * @param trimmedLine The line to search in
+     * @param lineNumber The line number
+     * @param externalSrCommentsInLine The list of SR comments in the line to filter those out, as they are not HTML comments
+     * @returns The HTML comments in the line
+     */
     static getHTMLCommentsInLine(
         trimmedLine: string,
         lineNumber: number,
@@ -165,7 +185,7 @@ export default class StringDetector {
             if (
                 (i === nextIndexOfStart &&
                     srCommentsInLine.filter((srComment) => srComment.startIndex === i).length >
-                        0) ||
+                    0) ||
                 (i === nextIndexOfEnd &&
                     srCommentsInLine.filter(
                         (srComment) =>
@@ -279,11 +299,18 @@ export default class StringDetector {
         return false;
     }
 
+    /**
+     * Returns the type of the multiline card
+     * @param trimmedLine The line to search in
+     * @param separators The multiline card separators
+     * @returns The type of the multiline card
+     */
     static getMultilineCardType(
         trimmedLine: string,
         separators: Array<{ separator: string; type: CardType }>,
     ): CardType | null {
         for (const separator of separators) {
+            // Separator must be the only thing in the line, so we check if the line starts with the separator and if the length of the line is the same as the length of the separator
             if (
                 trimmedLine.startsWith(separator.separator) &&
                 trimmedLine.length === separator.separator.length
@@ -329,30 +356,57 @@ export default class StringDetector {
     }
 
     /**
-     * Returns true if the trimmed line has one of the inline separators
-     *
-     * @param trimmedLine - The text to check
-     * @param separators - The inline separators
-     * @returns
+     * Returns the correct single line separator
+     * @param trimmedLine The line to search in
+     * @param separators The single line card separators
+     * @returns The correct single line separator
      */
-    static hasInlineSeparator(trimmedLine: string, separators: string[]): boolean {
-        // Check if the marker is in the text
-        for (const separator of separators) {
-            const separatorIdx = trimmedLine.indexOf(separator);
+    static getSingleLineSeparatorInLine(trimmedLine: string, separators: Array<{ separator: string; type: CardType }>): { separator: string; type: CardType } | null {
+        // Sort the separators by length, longest first, to make sure we match the correct separator in case of overlapping separators (e.g. "::" and ":")
+        const sortedSeparators = separators.sort((a, b) => b.separator.length - a.separator.length);
+        for (const separator of sortedSeparators) {
+            // Check if the separator is in the line and if it is not inside an inline code block
+            // TODO: Maybe optimize it by not just looking for the first index of the separator, but for all indices of the separator and checking if any of them is not inside a code block
+            const separatorIdx = trimmedLine.indexOf(separator.separator);
             if (separatorIdx === -1) continue;
             // Check if it's inside an inline code block
             if (
                 StringDetector.isPatternInsideCodeBlock(
                     trimmedLine,
                     separatorIdx,
-                    separatorIdx + separator.length,
+                    separatorIdx + separator.separator.length,
                 )
-            )
+            ) {
                 continue;
-            return true;
+            }
+            return separator;
         }
+        return null;
+    }
 
-        return false;
+    /**
+     * Returns true if the trimmed line has one of the inline separators
+     *
+     * @param trimmedLine - The text to check
+     * @param separators - The inline separators
+     * @returns
+     */
+    static hasAnyInlineSeparator(trimmedLine: string, separators: string[]): boolean {
+        // Mock the data structure for the separators to reuse the getCorrectSingleLineSeparator function
+        const separatorDataStruct = separators.map((separator) => ({ separator, type: CardType.SingleLineBasic }));
+
+        return this.getSingleLineSeparatorInLine(trimmedLine, separatorDataStruct) !== null;
+    }
+
+    /**
+     * Returns the type of the single line card
+     * @param trimmedLine The line to search in
+     * @param separators The single line card separators
+     * @returns The type of the single line card
+     */
+    static getSingleLineCardType(trimmedLine: string, separators: Array<{ separator: string; type: CardType }>): CardType | null {
+        const correctSeparator = this.getSingleLineSeparatorInLine(trimmedLine, separators);
+        return correctSeparator ? correctSeparator.type : null;
     }
 
     /**

@@ -40,6 +40,10 @@ export default class LineData {
         this.multilineSeparators = multilineSeparators;
     }
 
+    /**
+     * Sets the current line
+     * @param lineNum - The line number
+     */
     setCurrentLine(lineNum: number): void {
         this.currentLine = this.lines[lineNum];
         this.currentLineNum = lineNum;

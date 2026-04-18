@@ -1,3 +1,5 @@
+import PotentialCardInfo from "src/utils/parsers/data-structures/parser/potential-card-info";
+
 export type CardFragmentType =
     | "ROUGE_SR_COMMENT"
     | "ROUGE_MULTILINE_SEPARATOR"
@@ -11,8 +13,6 @@ export type CardFragmentType =
  * A card fragment
  */
 export interface CardFragment {
-    text: string;
-    type: CardFragmentType;
-    startLineNum: number;
-    endLineNum: number;
+    type: CardFragmentType; // The type of the card fragment
+    fragmentInfo: PotentialCardInfo // All information known about the card fragment
 }
