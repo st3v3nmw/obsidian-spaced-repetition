@@ -278,7 +278,7 @@ const en: IBaseLocale = {
     ATOMIC_CLOZES_DESC: "Make clozes atomic, i.e. disables multi-line clozes completely",
     // Settings > Scheduling > Delete
     DELETE_SCHEDULING_DATA_IN_NOTES: "Delete Scheduling Data in Notes",
-    DELETE_SCHEDULING_DATA_IN_NOTES_DESC: "Delete scheduling data from all notes and flashcards.",
+    DELETE_SCHEDULING_DATA_IN_NOTES_DESC: "Delete scheduling data from all notes.",
     DELETE_SCHEDULING_DATA_IN_CARDS: "Delete Scheduling Data in Cards",
     DELETE_SCHEDULING_DATA_IN_CARDS_DESC: "Delete scheduling data from all cards.",
     CONFIRM_SCHEDULING_DATA_IN_NOTES_DELETION:

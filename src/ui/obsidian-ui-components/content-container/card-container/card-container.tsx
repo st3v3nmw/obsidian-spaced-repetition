@@ -49,7 +49,7 @@ export class CardContainer {
     private previousDeck: Deck | null;
     private currentDeckTotalCardsInQueue: number = 0;
 
-    private clozeInputs: NodeListOf<Element>;
+    private clozeInputs: NodeListOf<HTMLInputElement>;
     private clozeAnswers: NodeListOf<Element>;
 
     private reviewSequencer: IFlashcardReviewSequencer;
@@ -57,7 +57,7 @@ export class CardContainer {
     private reviewMode: FlashcardReviewMode;
     private backToDeck: () => void;
     private editClickHandler: () => void;
-    private closeModal: () => void | undefined;
+    private closeModal: (() => void) | undefined;
 
     constructor(
         app: App,
@@ -209,6 +209,9 @@ export class CardContainer {
             );
             this.currentDeckTotalCardsInQueue = currentDeckStats.cardsInQueueOfThisDeckCount;
         }
+        if (this.chosenDeck === null) {
+            throw new Error("chosenDeck is null in CardContainer.ts");
+        }
 
         this._updateInfoBar(this.chosenDeck, this.currentDeck);
 
@@ -233,6 +236,13 @@ export class CardContainer {
 
         // Setup cloze input listeners
         this._setupClozeInputListeners();
+        // auto-focus the first cloze input if this card is a cloze card
+        if (this._currentQuestion.questionType === CardType.Cloze) {
+            const firstInput = document.querySelector(".cloze-input") as HTMLInputElement;
+            if (firstInput) {
+                firstInput.focus();
+            }
+        }
     }
 
     private get _currentCard(): Card {
@@ -299,6 +309,23 @@ export class CardContainer {
             return;
         }
 
+        // If the file is already open in another leaf, open it in the current one to prevent duplicates
+        const existingLeaf = this.app.workspace.getLeavesOfType("markdown").find((leaf) => {
+            const view = leaf.view as MarkdownView;
+            return view.file?.path === file.path;
+        });
+
+        if (existingLeaf) {
+            await existingLeaf.openFile(file, { eState: { line } });
+            this.app.workspace.setActiveLeaf(existingLeaf);
+            const markdownView = existingLeaf.view as MarkdownView;
+            if (markdownView?.editor) {
+                markdownView.editor.setCursor({ line, ch: 0 });
+                markdownView.editor.scrollIntoView({ from: { line, ch: 0 }, to: { line, ch: 0 } });
+            }
+            return;
+        }
+
         const leaf = this.app.workspace.getLeaf("tab");
         await leaf.openFile(file, { eState: { line } });
 
@@ -338,11 +365,16 @@ export class CardContainer {
         this.clozeInputs = document.querySelectorAll(".cloze-input");
 
         this.clozeInputs.forEach((input) => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            input.addEventListener("change", (e) => {});
+            input.addEventListener("keydown", (e: KeyboardEvent) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    (input as HTMLElement).blur();
+                    this._showAnswer();
+                }
+            });
         });
     }
-
     private _evaluateClozeAnswers(): void {
         this.clozeAnswers = document.querySelectorAll(".cloze-answer");
 
@@ -408,13 +440,17 @@ export class CardContainer {
             this.reviewSequencer,
             this._currentCard,
         );
+        // NEW: restore keyboard focus after cloze confirmation
+        this.plugin.uiManager.setSRViewInFocus(true);
+        this.response.againButton.buttonEl.focus();
     }
 
     private _keydownHandler = (e: KeyboardEvent) => {
         // Prevents any input, if the edit modal is open or if the view is not in focus
         if (
-            document.activeElement.nodeName === "TEXTAREA" ||
-            document.activeElement.nodeName === "INPUT" ||
+            (document.activeElement !== null &&
+                (document.activeElement.nodeName === "TEXTAREA" ||
+                    document.activeElement.nodeName === "INPUT")) ||
             this.mode === FlashcardMode.Closed ||
             !this.plugin.uiManager.getSRInFocusState() ||
             Platform.isMobile || // No keyboard events on mobile
