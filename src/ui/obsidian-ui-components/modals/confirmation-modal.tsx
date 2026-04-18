@@ -1,3 +1,4 @@
+import "src/ui/obsidian-ui-components/modals/confirmation-modal.css";
 import { App, Modal, Notice, Setting } from "obsidian";
 
 import { t } from "src/lang/helpers";

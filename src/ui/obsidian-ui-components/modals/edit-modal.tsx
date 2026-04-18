@@ -1,3 +1,4 @@
+import "src/ui/obsidian-ui-components/modals/edit-modal.css";
 import { App, ButtonComponent, Modal } from "obsidian";
 
 import { t } from "src/lang/helpers";

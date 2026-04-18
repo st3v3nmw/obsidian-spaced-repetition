@@ -1,3 +1,4 @@
+import "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section.css";
 import { ButtonComponent, Platform } from "obsidian";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";

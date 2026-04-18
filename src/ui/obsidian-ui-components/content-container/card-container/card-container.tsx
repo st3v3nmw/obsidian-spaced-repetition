@@ -1,3 +1,4 @@
+import "src/ui/obsidian-ui-components/content-container/card-container/card-container.css";
 import { now } from "moment";
 import { App, MarkdownView, Notice, Platform } from "obsidian";
 
@@ -43,27 +44,26 @@ export class CardContainer {
     public controls: ControlsComponent;
 
     public response: ResponseSectionComponent;
-    public lastPressed: number;
+    public lastPressed: number = 0;
 
     public isActive: boolean = false;
 
-    private chosenDeck: Deck | null;
+    private chosenDeck: Deck | null = null;
     private totalCardsInSession: number = 0;
     private totalDecksInSession: number = 0;
 
-    private currentDeck: Deck | null;
-    private previousDeck: Deck | null;
+    private currentDeck: Deck | null = null;
+    private previousDeck: Deck | null = null;
     private currentDeckTotalCardsInQueue: number = 0;
 
-    private clozeInputs: NodeListOf<HTMLInputElement>;
-    private clozeAnswers: NodeListOf<Element>;
+    private clozeInputs: NodeListOf<HTMLInputElement> | null = null;
+    private clozeAnswers: NodeListOf<Element> | null = null;
 
     private reviewSequencer: IFlashcardReviewSequencer;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
     private backToDeck: () => void;
     private editClickHandler: () => void;
-    private closeModal?: () => void;
 
     constructor(
         app: App,
@@ -71,7 +71,7 @@ export class CardContainer {
         settings: SRSettings,
         reviewSequencer: IFlashcardReviewSequencer,
         reviewMode: FlashcardReviewMode,
-        view: HTMLDivElement,
+        parentEl: HTMLElement,
         backToDeck: () => void,
         editClickHandler: () => void,
         closeModal?: () => void,
@@ -84,9 +84,7 @@ export class CardContainer {
         this.reviewMode = reviewMode;
         this.backToDeck = backToDeck;
         this.editClickHandler = editClickHandler;
-        this.view = view;
-        this.chosenDeck = null;
-        this.closeModal = closeModal;
+        this.view = parentEl.createDiv();
 
         // Build ui
         this.mode = FlashcardMode.Closed;
@@ -102,7 +100,7 @@ export class CardContainer {
             () => this._displayCurrentCardInfoNotice(),
             () => this._skipCurrentCard(),
             this._jumpToCurrentCard.bind(this),
-            this.closeModal ? this.closeModal.bind(this) : undefined,
+            closeModal,
         );
 
         this.mainWrapper = this.view.createDiv();
@@ -112,7 +110,7 @@ export class CardContainer {
             this.mainWrapper,
             this.settings.showContextInCards,
             () => this.backToDeck(),
-            this.closeModal ? this.closeModal.bind(this) : undefined,
+            closeModal,
         );
 
         this.scrollWrapper = this.mainWrapper.createDiv();
@@ -259,10 +257,7 @@ export class CardContainer {
 
     private async _processReview(response: ReviewResponse): Promise<void> {
         const timeNow = now();
-        if (
-            this.lastPressed &&
-            timeNow - this.lastPressed < this.plugin.data.settings.reviewButtonDelay
-        ) {
+        if (timeNow - this.lastPressed < this.plugin.data.settings.reviewButtonDelay) {
             return;
         }
         this.lastPressed = timeNow;
@@ -378,7 +373,7 @@ export class CardContainer {
     private _evaluateClozeAnswers(): void {
         this.clozeAnswers = document.querySelectorAll(".cloze-answer");
 
-        if (this.clozeAnswers.length === this.clozeInputs.length) {
+        if (this.clozeInputs !== null && this.clozeAnswers.length === this.clozeInputs.length) {
             for (let i = 0; i < this.clozeAnswers.length; i++) {
                 const clozeInput = this.clozeInputs[i] as HTMLInputElement;
                 const clozeAnswer = this.clozeAnswers[i] as HTMLElement;

@@ -1,3 +1,4 @@
+import "src/ui/obsidian-ui-components/item-views/tab-view.css";
 import { ButtonComponent, ItemView, Platform, WorkspaceLeaf } from "obsidian";
 
 import {
@@ -244,7 +245,7 @@ export class SRTabView extends ItemView {
                 this.plugin,
                 this.settings,
                 this.reviewSequencer,
-                this.viewContentEl.createDiv(),
+                this.viewContentEl,
                 this._startReviewOfDeck.bind(this),
             );
         }
@@ -256,7 +257,7 @@ export class SRTabView extends ItemView {
                 this.settings,
                 this.reviewSequencer,
                 this.reviewMode,
-                this.viewContentEl.createDiv(),
+                this.viewContentEl,
                 this._showDecksList.bind(this),
                 this._doEditQuestionText.bind(this),
             );

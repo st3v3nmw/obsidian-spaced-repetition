@@ -43,7 +43,7 @@ export default class InfoSectionComponent {
         container: HTMLDivElement,
         showContextInCards: boolean,
         backToDeck: () => void,
-        closeModal: (() => void) | undefined,
+        closeModal?: () => void,
     ) {
         this.infoSection = container.createDiv();
         this.infoSection.addClass("sr-info-section");
@@ -115,15 +115,23 @@ export default class InfoSectionComponent {
             .createDiv()
             .addClasses(["sr-flex-spacer", "sr-horizontal-flex-spacer"]);
 
+        const closeButtonClasses = [
+            "sr-modal-close-button",
+            "mod-raised",
+            "sr-horizontal-close-button",
+        ];
+
+        console.log(closeModal);
+
+        if (closeModal === undefined) {
+            closeButtonClasses.push("sr-hide-by-scaling");
+            closeButtonClasses.push("hide-height");
+        }
+
         this.horizontalCloseButton = new ModalCloseButtonComponent(
             this.deckProgressInfo,
             () => closeModal && closeModal(),
-            [
-                closeModal === undefined ? "sr-hide-by-scaling" : "",
-                closeModal === undefined ? "hide-height" : "",
-                "mod-raised",
-                "sr-horizontal-close-button",
-            ],
+            closeButtonClasses,
         );
 
         if (showContextInCards) {

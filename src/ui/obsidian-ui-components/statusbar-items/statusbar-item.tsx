@@ -1,3 +1,5 @@
+import "src/ui/obsidian-ui-components/statusbar-items/statusbar-items.css";
+
 import SRPlugin from "src/main";
 import { StatusBarItemType } from "src/ui/status-bar-manager";
 
@@ -23,6 +25,7 @@ export default class StatusBarItem {
         this.statusBarItem = this.plugin.addStatusBarItem();
         this.statusBarItem.addClass("status-bar-item");
         this.statusBarItem.addClass("sr-status-bar-item");
+        this.segments = [];
 
         if (props.show === undefined || props.show === false) {
             this.statusBarItem.addClass("sr-is-hidden");
@@ -31,6 +34,7 @@ export default class StatusBarItem {
         if (props.onClick !== undefined) {
             this.statusBarItem.addClass("mod-clickable");
             this.statusBarItem.addEventListener("click", async () => {
+                if (props.onClick === undefined) return;
                 await props.onClick();
             });
         }

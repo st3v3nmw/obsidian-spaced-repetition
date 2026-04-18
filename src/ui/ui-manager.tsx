@@ -75,6 +75,7 @@ export class UIManager {
 
     destroy() {
         this.removeSRFocusListener();
+        // @ts-expect-error: The types are wrong, but it's fine, because we are just removing the listener
         this.plugin.app.workspace.off("file-menu", this.fileMenuHandler.bind(this));
         this.tabViewManager.closeAllTabViews();
     }
@@ -113,6 +114,7 @@ export class UIManager {
 
     public removeSRFocusListener() {
         this.setSRViewInFocus(false);
+        // @ts-expect-error: The types are wrong, but it's fine, because we are just removing the listener
         this.plugin.app.workspace.off("active-leaf-change", this.handleFocusChange.bind(this));
     }
 
@@ -136,8 +138,8 @@ export class UIManager {
             // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
             this.setSRViewInFocus(
                 (modal === null || modal === undefined) &&
-                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
-                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
+                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
+                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
             );
         }
     }
@@ -232,14 +234,12 @@ export class UIManager {
                 this.plugin.app.workspace.on("file-menu", this.fileMenuHandler.bind(this)),
             );
         } else {
+            // @ts-expect-error: The types are wrong, but it's fine, because we are just removing the listener
             this.plugin.app.workspace.off("file-menu", this.fileMenuHandler.bind(this));
         }
     }
 
-    private fileMenuHandler(
-        menu: Menu,
-        file: TAbstractFile
-    ) {
+    private fileMenuHandler(menu: Menu, file: TAbstractFile) {
         if (file instanceof TFile && file.extension === "md") {
             menu.addItem((item: MenuItem) => {
                 item.setTitle(

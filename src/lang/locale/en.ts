@@ -6,8 +6,12 @@ const en: IBaseLocale = {
     // flashcard-modal.tsx
     DECKS: "Decks",
     DUE_CARDS: "Due Cards",
+    DUE: "Due",
     NEW_CARDS: "New Cards",
+    SEEN_CARDS: "Seen Cards",
+    SEEN: "Seen",
     TOTAL_CARDS: "Total Cards",
+    TOTAL: "Total",
     BACK: "Back",
     SKIP: "Skip",
     EDIT_CARD: "Edit Card",
@@ -292,6 +296,8 @@ const en: IBaseLocale = {
     CHECK_ROADMAP: 'Check out the <a href="${roadMapUrl}">roadmap</a> for upcoming features.',
     CHECK_DEV_NEWS:
         'Check out the <a href="${devNewsUrl}">dev news</a> for the latest development news.',
+
+    OPEN_MENU: "Open menu",
 };
 
 export default en;

@@ -1,3 +1,4 @@
+import "src/ui/obsidian-ui-components/item-views/review-queue-list-view.css";
 import { ItemView, Menu, setIcon, TFile, WorkspaceLeaf } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";

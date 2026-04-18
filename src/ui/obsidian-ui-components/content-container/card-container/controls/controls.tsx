@@ -89,14 +89,19 @@ export default class ControlsComponent {
 
         this.controls.createDiv().addClass("sr-flex-spacer");
 
+        const closeButtonClasses = [
+            EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "clickable-icon",
+        ];
+
+        if (closeModal === undefined) {
+            closeButtonClasses.push("sr-hide-by-scaling");
+            closeButtonClasses.push("hide-height");
+        }
+
         this.modalCloseButton = new ModalCloseButtonComponent(
             this.controls,
             () => closeModal && closeModal(),
-            [
-                !closeModal && "sr-hide-by-scaling",
-                !closeModal && "hide-height",
-                EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "clickable-icon",
-            ],
+            closeButtonClasses,
         );
     }
 

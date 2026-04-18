@@ -1,0 +1,20 @@
+/* MARK: Modal */
+
+#sr-modal-view {
+    & .modal-close-button,
+    & .modal-header {
+        display: none;
+    }
+
+    & .sr-modal-content {
+        overflow: visible;
+        padding: 0;
+    }
+}
+
+.is-mobile #sr-modal-view {
+    padding-top: var(--safe-area-inset-top) !important;
+    padding-right: var(--safe-area-inset-right) !important;
+    padding-left: var(--safe-area-inset-left) !important;
+    padding-bottom: var(--safe-area-inset-bottom) !important;
+}

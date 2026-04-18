@@ -1,0 +1,78 @@
+/* MARK: Response */
+
+.sr-response {
+    display: flex;
+    gap: var(--size-4-4);
+
+    & .sr-response-button {
+        height: 48px;
+        flex-grow: 1;
+        margin: auto;
+        line-height: 48px;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+    }
+}
+
+@media only screen and (orientation: landscape) and (max-height: 490px) {
+    .is-phone .sr-response-button {
+        height: 32px !important;
+    }
+}
+
+@media only screen and (orientation: portrait) and (max-width: 340px) {
+    .is-mobile .sr-response-button {
+        height: 32px !important;
+    }
+}
+
+body:not(.is-phone) .sr-response {
+    padding: var(--size-2-2) 0;
+}
+
+body:not(.is-mobile) .sr-response-button.sr-show-answer-button,
+body:not(.is-mobile) .sr-response-button.sr-again-button,
+body:not(.is-mobile) .sr-response-button.sr-hard-button,
+body:not(.is-mobile) .sr-response-button.sr-good-button,
+body:not(.is-mobile) .sr-response-button.sr-easy-button {
+    position: relative;
+
+    &::after {
+        position: absolute;
+        right: 4px;
+        bottom: 4px;
+        height: 0.8rem;
+        background-color: rgb(0 0 0 / 0%);
+        border-radius: var(--input-radius);
+        line-height: 1;
+        padding: 2px 4px;
+        padding-top: 3px;
+        font-size: x-small;
+        box-shadow:
+            inset 1px 1px rgb(255 255 255 / 20%),
+            inset -1px -1px rgb(0 0 0 / 20%);
+        color: #f7f7f7;
+        font-family: var(--font-monospace);
+    }
+}
+
+body:not(.is-mobile) .sr-response-button.sr-show-answer-button::after {
+    content: "Space";
+}
+
+body:not(.is-mobile) .sr-response-button.sr-again-button::after {
+    content: "0";
+}
+
+body:not(.is-mobile) .sr-response-button.sr-hard-button::after {
+    content: "1";
+}
+
+body:not(.is-mobile) .sr-response-button.sr-good-button::after {
+    content: "2";
+}
+
+body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
+    content: "3";
+}

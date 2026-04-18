@@ -1,3 +1,4 @@
+import "src/ui/obsidian-ui-components/modals/modal-view.css";
 import { App, Modal, Platform } from "obsidian";
 
 import {
@@ -66,7 +67,7 @@ export class SRModalView extends Modal {
             this.plugin,
             this.settings,
             this.reviewSequencer,
-            this.contentEl.createDiv(),
+            this.contentEl,
             this._startReviewOfDeck.bind(this),
             this.close.bind(this),
         );
@@ -77,7 +78,7 @@ export class SRModalView extends Modal {
             this.settings,
             this.reviewSequencer,
             this.reviewMode,
-            this.contentEl.createDiv(),
+            this.contentEl,
             this._showDecksList.bind(this),
             this._doEditQuestionText.bind(this),
             this.close.bind(this),
