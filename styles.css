@@ -6,32 +6,32 @@
     color: #ffffff !important;
 }
 .sr-bg-green {
-    background-color: hsl(122, 39%, 49%) !important;
+    background-color: #47a84a !important;
 }
 .sr-bg-blue {
-    background-color: hsl(207, 90%, 54%) !important;
+    background-color: #3591dd !important;
 }
 .sr-bg-red {
-    background-color: hsl(14, 100%, 63%) !important;
+    background-color: #f25d50 !important;
 }
 .sr-bg-yellow {
-    background-color: hsl(38, 88%, 58%) !important;
+    background-color: #e87743 !important;
 }
 .sr-deck-container .sr-tree-item-row:hover .sr-bg-green,
 .sr-response-button.sr-bg-green:hover {
-    background-color: hsl(122, 39%, 44%) !important;
+    background-color: #429e45 !important;
 }
 .sr-deck-container .sr-tree-item-row:hover .sr-bg-blue,
 .sr-response-button.sr-bg-blue:hover {
-    background-color: hsl(207, 90%, 49%) !important;
+    background-color: #2e8ddc !important;
 }
 .sr-deck-container .sr-tree-item-row:hover .sr-bg-red,
 .sr-response-button.sr-bg-red:hover {
-    background-color: hsl(14, 100%, 58%) !important;
+    background-color: #f15041 !important;
 }
 .sr-deck-container .sr-tree-item-row:hover .sr-bg-yellow,
 .sr-response-button.sr-bg-yellow:hover {
-    background-color: hsl(38, 88%, 53%) !important;
+    background-color: #e66f37 !important;
 }
 .sr-is-hidden {
     display: none !important;
@@ -73,6 +73,11 @@
     --view-padding: var(--size-4-3);
     display: flex;
     flex-direction: column;
+    & .MathJax {
+        overflow-x: auto;
+        margin: 0;
+        padding: 1em 0;
+    }
 }
 .is-mobile .sr-view {
     --view-padding: var(--size-4-2);
