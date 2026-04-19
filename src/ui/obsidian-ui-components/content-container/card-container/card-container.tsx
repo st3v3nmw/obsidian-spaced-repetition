@@ -4,7 +4,6 @@ import { App, Platform } from "obsidian";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import {
     FlashcardReviewMode,
-    IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/card/flashcard-review-sequencer";
 import { CardType } from "src/card/questions/question";
 import { escapeHtml } from "src/escape-html";
@@ -49,8 +48,6 @@ export class CardContainer {
         app: App,
         plugin: SRPlugin,
         settings: SRSettings,
-        reviewSequencer: IFlashcardReviewSequencer,
-        reviewMode: FlashcardReviewMode,
         parentEl: HTMLElement,
         backToDeckHandler: () => void,
         editCardHandler: () => void,

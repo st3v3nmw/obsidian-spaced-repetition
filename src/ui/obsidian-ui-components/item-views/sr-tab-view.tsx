@@ -1,14 +1,11 @@
 import "src/ui/obsidian-ui-components/item-views/tab-view.css";
 import { ItemView, Platform, WorkspaceLeaf } from "obsidian";
 
-import {
-    FlashcardReviewMode,
-    IFlashcardReviewSequencer,
-} from "src/card/flashcard-review-sequencer";
 import { DEBUG_MODE_ENABLED, SR_TAB_VIEW } from "src/constants";
 import SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
+import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 /**
@@ -27,10 +24,7 @@ import EmulatedPlatform from "src/utils/platform-detector";
  * @method onClose - Cleans up resources when the view is closed.
  */
 export class SRTabView extends ItemView {
-    loadReviewSequencerData: () => Promise<{
-        reviewSequencer: IFlashcardReviewSequencer;
-        mode: FlashcardReviewMode;
-    }>;
+    private reviewQueueLoader: ReviewQueueLoader;
     private contentManager: ContentManager | null = null;
 
     private plugin: SRPlugin;
@@ -42,17 +36,14 @@ export class SRTabView extends ItemView {
     constructor(
         leaf: WorkspaceLeaf,
         plugin: SRPlugin,
-        loadReviewSequencerData: () => Promise<{
-            reviewSequencer: IFlashcardReviewSequencer;
-            mode: FlashcardReviewMode;
-        }>,
+        reviewQueueLoader: ReviewQueueLoader,
     ) {
         super(leaf);
         // Init properties
         this.plugin = plugin;
         this.navigation = false;
         this.settings = plugin.data.settings;
-        this.loadReviewSequencerData = loadReviewSequencerData;
+        this.reviewQueueLoader = reviewQueueLoader;
 
         // Build ui
         const viewContent = this.containerEl.getElementsByClassName("view-content");
@@ -141,15 +132,11 @@ export class SRTabView extends ItemView {
                 );
             }
 
-            const loadedData = await this.loadReviewSequencerData();
 
-            const reviewSequencer = loadedData.reviewSequencer;
-            const reviewMode = loadedData.mode;
             this.contentManager = new ContentManager(
                 this.app,
                 this.plugin,
-                reviewSequencer,
-                reviewMode,
+                this.reviewQueueLoader,
                 this.settings,
                 this.viewContentEl,
             );

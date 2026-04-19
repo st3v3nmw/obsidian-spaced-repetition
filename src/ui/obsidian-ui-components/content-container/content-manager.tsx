@@ -18,6 +18,7 @@ import { CardContainer } from "src/ui/obsidian-ui-components/content-container/c
 import CardInfoNotice from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-info-notice";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
+import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import { globalDateProvider } from "src/utils/dates";
 import EmulatedPlatform from "src/utils/platform-detector";
 
@@ -63,14 +64,13 @@ export interface SessionData {
 export default class ContentManager {
     private app: App;
     private plugin: SRPlugin;
-    private reviewSequencer: IFlashcardReviewSequencer;
+    private reviewSequencer: IFlashcardReviewSequencer | null = null;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
     private deckContainer: DeckContainer;
     private cardContainer: CardContainer;
 
-    private contentState: ContentState = ContentState.Closed;
-
+    private reviewQueueLoader: ReviewQueueLoader;
     private sessionData: SessionData | null = null;
 
     private lastPressedOnProcessReview: number = 0;
@@ -78,17 +78,16 @@ export default class ContentManager {
     constructor(
         app: App,
         plugin: SRPlugin,
-        reviewSequencer: IFlashcardReviewSequencer,
-        reviewMode: FlashcardReviewMode,
+        reviewQueueLoader: ReviewQueueLoader,
         settings: SRSettings,
         parentEl: HTMLElement,
         closeModal?: () => void,
     ) {
         this.app = app;
         this.plugin = plugin;
-        this.reviewSequencer = reviewSequencer;
+        this.reviewQueueLoader = reviewQueueLoader;
         this.settings = settings;
-        this.reviewMode = reviewMode;
+        this.reviewMode = reviewQueueLoader.getReviewMode();
 
         this.deckContainer = new DeckContainer(
             parentEl,
@@ -100,8 +99,6 @@ export default class ContentManager {
             this.app,
             this.plugin,
             this.settings,
-            this.reviewSequencer,
-            this.reviewMode,
             parentEl,
             this._showDecksList.bind(this),
             this._doEditQuestionText.bind(this),
@@ -118,11 +115,11 @@ export default class ContentManager {
         this.plugin.uiManager.setSRViewInFocus(false);
         this.deckContainer.hide();
         this.cardContainer.close();
-        this.contentState = ContentState.Closed;
     }
 
-    public open() {
-        this.contentState = ContentState.Deck;
+    public async open() {
+        this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue();
+
         const subdecksWithCardsInQueue: Deck[] = this.reviewSequencer.getSubDecksWithCardsInQueue(
             this.reviewSequencer.originalDeckTree,
         );
@@ -173,6 +170,7 @@ export default class ContentManager {
     }
 
     private async _processReview(response: ReviewResponse): Promise<void> {
+        if (this.reviewSequencer === null) return;
         const timeNow = now();
         if (
             timeNow - this.lastPressedOnProcessReview <
@@ -187,7 +185,7 @@ export default class ContentManager {
     }
 
     private async _showNextCard(): Promise<void> {
-        if (this.sessionData === null || this.reviewSequencer.currentDeck === null) {
+        if (this.sessionData === null || this.reviewSequencer === null || this.reviewSequencer.currentDeck === null) {
             this._showDecksList();
             return;
         }
@@ -222,11 +220,13 @@ export default class ContentManager {
     }
 
     private _skipCurrentCard() {
+        if (this.reviewSequencer === null) return;
         this.reviewSequencer.skipCurrentCard();
         this._showNextCard();
     }
 
     private async _jumpToCurrentCard(): Promise<void> {
+        if (this.reviewSequencer === null) return;
         const currentQuestion = this.reviewSequencer.currentQuestion;
         if (!currentQuestion) return;
 
@@ -299,6 +299,7 @@ export default class ContentManager {
 
     private _determineButtonInterval(reviewResponse: ReviewResponse): number {
         if (this.sessionData === null) return 0;
+        if (this.reviewSequencer === null) return 0;
         const schedule: RepItemScheduleInfo = this.reviewSequencer.determineCardSchedule(
             reviewResponse,
             this.sessionData.cardData.currentCard,
@@ -307,6 +308,7 @@ export default class ContentManager {
     }
 
     private _startReviewOfDeck(deck: Deck) {
+        if (this.reviewSequencer === null) return;
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         if (this.reviewSequencer.hasCurrentCard) {
             this._reviewDeck(deck);
@@ -316,8 +318,8 @@ export default class ContentManager {
     }
 
     private _showDecksList(): void {
+        if (this.reviewSequencer === null) return;
         this._stopDeckReview();
-        this.contentState = ContentState.Deck;
         this.deckContainer.show(this.reviewSequencer, this.settings);
     }
 
@@ -328,7 +330,7 @@ export default class ContentManager {
     private _reviewDeck(deck: Deck): void {
         this._hideDecksList();
         this.sessionData = this._getNewSessionData(deck);
-        this.contentState = ContentState.CardFront;
+        if (this.sessionData === null) return;
         this.cardContainer.open(this.sessionData, this.settings);
     }
 
@@ -337,6 +339,7 @@ export default class ContentManager {
     }
 
     private async _doEditQuestionText(): Promise<void> {
+        if (this.reviewSequencer === null) return;
         const currentQ: Question = this.reviewSequencer.currentQuestion;
 
         // Just the question/answer text; without any preceding topic tag
@@ -349,12 +352,14 @@ export default class ContentManager {
         );
         editModal
             .then(async (modifiedCardText) => {
+                if (this.reviewSequencer === null) return;
                 this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
             })
             .catch((reason) => console.log(reason));
     }
 
-    private _getNewSessionData(deck: Deck): SessionData {
+    private _getNewSessionData(deck: Deck): SessionData | null {
+        if (this.reviewSequencer === null) return null;
         const deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
         const totalCardsInSession: number = deckStats.cardsInQueueCount;
         const totalDecksInSession: number = deckStats.decksInQueueOfThisDeckCount;

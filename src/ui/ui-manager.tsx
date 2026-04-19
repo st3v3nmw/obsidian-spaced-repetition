@@ -3,14 +3,14 @@ import { Menu, MenuItem, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "o
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
-import { OsrAppCore } from "src/core";
-import { CardListType, Deck } from "src/deck/deck";
+import { CardListType } from "src/deck/deck";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
 import { SRModalView } from "src/ui/obsidian-ui-components/modals/sr-modal-view";
 import { SRSettingTab } from "src/ui/obsidian-ui-components/settings-tab";
+import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import { SidebarManager } from "src/ui/sidebar-manager";
 import StatusBarManager from "src/ui/status-bar-manager";
 import TabViewManager from "src/ui/tab-view-manager";
@@ -138,8 +138,8 @@ export class UIManager {
             // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
             this.setSRViewInFocus(
                 (modal === null || modal === undefined) &&
-                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
-                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
+                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
+                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
             );
         }
     }
@@ -155,50 +155,26 @@ export class UIManager {
             (!isMobile && this.plugin.data.settings.openViewInNewTab) ||
             (isMobile && this.plugin.data.settings.openViewInNewTabMobile);
 
+        const reviewQueueLoader = new ReviewQueueLoader(this.plugin, this.plugin.osrAppCore, singleNote ?? null, mode);
+
         if (openInNewTab) {
-            this.tabViewManager.openSRTabView(this.plugin.osrAppCore, mode, singleNote);
+            this.tabViewManager.openSRTabView(reviewQueueLoader);
         } else {
-            this.openFlashcardModal(this.plugin.osrAppCore, mode, singleNote);
+            this.openFlashcardModal(reviewQueueLoader);
         }
     }
 
     public async openFlashcardModal(
-        osrAppCore: OsrAppCore,
-        reviewMode: FlashcardReviewMode,
-        singleNote?: TFile,
+        reviewQueueLoader: ReviewQueueLoader,
     ): Promise<void> {
-        let deckTree: Deck;
-        let remainingDeckTree: Deck;
 
-        if (singleNote) {
-            const singleNoteDeckData = await this.plugin.getPreparedDecksForSingleNoteReview(
-                singleNote,
-                reviewMode,
-            );
-
-            deckTree = singleNoteDeckData.deckTree;
-            remainingDeckTree = singleNoteDeckData.remainingDeckTree;
-        } else {
-            deckTree = osrAppCore.reviewableDeckTree;
-            remainingDeckTree =
-                reviewMode === FlashcardReviewMode.Cram
-                    ? osrAppCore.reviewableDeckTree
-                    : osrAppCore.remainingDeckTree;
-        }
-
-        const reviewSequencerData = this.plugin.getPreparedReviewSequencer(
-            deckTree,
-            remainingDeckTree,
-            reviewMode,
-        );
 
         this.setSRViewInFocus(true);
         new SRModalView(
             this.plugin.app,
             this.plugin,
             this.plugin.data.settings,
-            reviewSequencerData.reviewSequencer,
-            reviewSequencerData.mode,
+            reviewQueueLoader,
         ).open();
     }
 

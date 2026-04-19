@@ -1,13 +1,10 @@
 import "src/ui/obsidian-ui-components/modals/modal-view.css";
 import { App, Modal, Platform } from "obsidian";
 
-import {
-    FlashcardReviewMode,
-    IFlashcardReviewSequencer as IFlashcardReviewSequencer,
-} from "src/card/flashcard-review-sequencer";
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
+import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 export class SRModalView extends Modal {
@@ -17,8 +14,7 @@ export class SRModalView extends Modal {
         app: App,
         plugin: SRPlugin,
         settings: SRSettings,
-        reviewSequencer: IFlashcardReviewSequencer,
-        reviewMode: FlashcardReviewMode,
+        reviewQueueLoader: ReviewQueueLoader,
     ) {
         super(app);
 
@@ -50,8 +46,7 @@ export class SRModalView extends Modal {
         this.contentManager = new ContentManager(
             app,
             plugin,
-            reviewSequencer,
-            reviewMode,
+            reviewQueueLoader,
             settings,
             this.contentEl,
             this.close.bind(this),
