@@ -138,8 +138,8 @@ export class UIManager {
             // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
             this.setSRViewInFocus(
                 (modal === null || modal === undefined) &&
-                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
-                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
+                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
+                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
             );
         }
     }
@@ -155,7 +155,12 @@ export class UIManager {
             (!isMobile && this.plugin.data.settings.openViewInNewTab) ||
             (isMobile && this.plugin.data.settings.openViewInNewTabMobile);
 
-        const reviewQueueLoader = new ReviewQueueLoader(this.plugin, this.plugin.osrAppCore, singleNote ?? null, mode);
+        const reviewQueueLoader = new ReviewQueueLoader(
+            this.plugin,
+            this.plugin.osrAppCore,
+            singleNote ?? null,
+            mode,
+        );
 
         if (openInNewTab) {
             this.tabViewManager.openSRTabView(reviewQueueLoader);
@@ -164,11 +169,7 @@ export class UIManager {
         }
     }
 
-    public async openFlashcardModal(
-        reviewQueueLoader: ReviewQueueLoader,
-    ): Promise<void> {
-
-
+    public async openFlashcardModal(reviewQueueLoader: ReviewQueueLoader): Promise<void> {
         this.setSRViewInFocus(true);
         new SRModalView(
             this.plugin.app,

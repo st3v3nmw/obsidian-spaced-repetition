@@ -4,6 +4,8 @@ import { IBaseLocale } from "src/lang/base-locale";
 
 const en: IBaseLocale = {
     // flashcard-modal.tsx
+    CRAM_MODE: "Cram Mode",
+    REVIEW_MODE: "Review Mode",
     DECKS: "Decks",
     DUE_CARDS: "Due Cards",
     DUE: "Due",

@@ -26,9 +26,8 @@ export default class TabViewManager {
         {
             type: SR_TAB_VIEW,
             viewCreator: (leaf) => {
-                if (this.reviewQueueLoader === null) throw new Error("ReviewQueueLoader is null");
                 return new SRTabView(leaf, this.plugin, this.reviewQueueLoader);
-            }
+            },
         },
     ];
 
@@ -52,9 +51,7 @@ export default class TabViewManager {
      *
      * @returns {Promise<void>} - A promise that resolves when the tab view is opened.
      */
-    public async openSRTabView(
-        reviewQueueLoader: ReviewQueueLoader,
-    ) {
+    public async openSRTabView(reviewQueueLoader: ReviewQueueLoader) {
         this.reviewQueueLoader = reviewQueueLoader;
 
         await this.openTabView(SR_TAB_VIEW, true);

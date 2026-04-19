@@ -1,5 +1,7 @@
 export interface IBaseLocale {
     // flashcard-modal.tsx
+    CRAM_MODE: string;
+    REVIEW_MODE: string;
     DECKS: string;
     DUE_CARDS: string;
     DUE: string;

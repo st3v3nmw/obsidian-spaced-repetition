@@ -561,36 +561,29 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
 
 /* src/ui/obsidian-ui-components/content-container/deck-container/deck-list-header.css */
 .sr-deck-list-header {
-  gap: var(--container-gap);
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 100%;
+  gap: var(--size-4-2);
   border-bottom: 1px solid var(--background-modifier-border);
   padding: var(--size-4-2);
-  & .sr-title-wrapper {
+  & .sr-deck-icon {
     display: flex;
-    align-items: center;
-    justify-content: start;
-    gap: var(--size-4-2);
-    width: 100%;
-    & .sr-deck-icon {
-      display: flex;
-    }
-    & .sr-title {
-      font-size: var(--font-ui-large);
-      font-weight: var(--font-semibold);
-      text-align: center;
-      line-height: var(--line-height-tight);
-    }
+  }
+  & .sr-title {
+    font-size: var(--font-ui-large);
+    font-weight: var(--font-semibold);
+    text-align: center;
+    line-height: var(--line-height-tight);
   }
 }
 @media only screen and (orientation: landscape) {
+  .is-phone .sr-deck-list-header {
+    display: none;
+  }
   .is-phone .sr-deck-container .sr-deck-list-header .sr-button {
     padding: 0;
-  }
-  .is-phone .sr-deck-list-header .sr-title {
-    font-size: var(--font-ui-medium);
   }
 }
 

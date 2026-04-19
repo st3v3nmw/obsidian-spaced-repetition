@@ -2,9 +2,7 @@ import "src/ui/obsidian-ui-components/content-container/card-container/card-cont
 import { App, Platform } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import {
-    FlashcardReviewMode,
-} from "src/card/flashcard-review-sequencer";
+import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { CardType } from "src/card/questions/question";
 import { escapeHtml } from "src/escape-html";
 import { t } from "src/lang/helpers";
@@ -114,7 +112,7 @@ export class CardContainer {
     /**
      * Shows the FlashcardView if it is hidden
      */
-    async open(sessionData: SessionData, settings: SRSettings) {
+    async openSession(sessionData: SessionData, settings: SRSettings) {
         // Prevents rest of code, from running if this was executed multiple times after one another
         if (!this.view.hasClass("sr-is-hidden")) {
             return;
@@ -129,7 +127,7 @@ export class CardContainer {
     /**
      * Hides the FlashcardView if it is visible
      */
-    close() {
+    closeSession() {
         // Prevents the rest of code, from running if this was executed multiple times after one another
         if (this.view.hasClass("sr-is-hidden")) {
             return;

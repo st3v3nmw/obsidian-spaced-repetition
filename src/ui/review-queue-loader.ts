@@ -1,6 +1,9 @@
 import { TFile } from "obsidian";
 
-import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/card/flashcard-review-sequencer";
+import {
+    FlashcardReviewMode,
+    IFlashcardReviewSequencer,
+} from "src/card/flashcard-review-sequencer";
 import { OsrAppCore } from "src/core";
 import { Deck } from "src/deck/deck";
 import SRPlugin from "src/main";
@@ -11,7 +14,12 @@ export class ReviewQueueLoader {
     private singleNote: TFile | null = null;
     private reviewMode: FlashcardReviewMode;
 
-    constructor(plugin: SRPlugin, osrAppCore: OsrAppCore, singleNote: TFile | null, reviewMode: FlashcardReviewMode) {
+    constructor(
+        plugin: SRPlugin,
+        osrAppCore: OsrAppCore,
+        singleNote: TFile | null,
+        reviewMode: FlashcardReviewMode,
+    ) {
         this.osrAppCore = osrAppCore;
         this.singleNote = singleNote;
         this.reviewMode = reviewMode;
@@ -26,7 +34,15 @@ export class ReviewQueueLoader {
         return this.reviewMode;
     }
 
+    setReviewMode(reviewMode: FlashcardReviewMode) {
+        this.reviewMode = reviewMode;
+    }
+
     public async loadReviewQueue(): Promise<IFlashcardReviewSequencer> {
+        if (!this.plugin.osrAppCore.syncLock) {
+            await this.plugin.sync();
+        }
+
         let deckTree: Deck;
         let remainingDeckTree: Deck;
 
@@ -53,6 +69,5 @@ export class ReviewQueueLoader {
         );
 
         return reviewSequencerData.reviewSequencer;
-
     }
 }

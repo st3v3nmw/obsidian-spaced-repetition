@@ -61,6 +61,12 @@ export interface SessionData {
     currentNote: Note;
 }
 
+/**
+ * Manages the content of the deck and flashcard views, by determining their behavior.
+ *
+ * @method open - Opens the content manager, loading the review queue and initializing the deck and flashcard views.
+ * @method close - Closes the content manager, shutting down the deck and flashcard views.
+ */
 export default class ContentManager {
     private app: App;
     private plugin: SRPlugin;
@@ -91,6 +97,7 @@ export default class ContentManager {
 
         this.deckContainer = new DeckContainer(
             parentEl,
+            this._changeReviewMode.bind(this),
             this._startReviewOfDeck.bind(this),
             closeModal,
         );
@@ -113,13 +120,15 @@ export default class ContentManager {
 
     public close() {
         this.plugin.uiManager.setSRViewInFocus(false);
-        this.deckContainer.hide();
-        this.cardContainer.close();
+        this.deckContainer.closeList();
+        this.cardContainer.closeSession();
     }
 
     public async open() {
+        // Prepare a review queue to display
         this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue();
 
+        // Determine if the card view should be opened immediately
         const subdecksWithCardsInQueue: Deck[] = this.reviewSequencer.getSubDecksWithCardsInQueue(
             this.reviewSequencer.originalDeckTree,
         );
@@ -127,6 +136,7 @@ export default class ContentManager {
         let openImmediately: boolean = false;
         let deckWithCards: Deck | null = null;
 
+        // Loop through all decks and determine if any have cards in queue
         for (const subdeck of subdecksWithCardsInQueue) {
             const hasNewCards: boolean = subdeck.newFlashcards.length > 0;
             const hasDueCards: boolean = subdeck.dueFlashcards.length > 0;
@@ -161,32 +171,31 @@ export default class ContentManager {
         }
     }
 
-    private _displayCurrentCardInfoNotice() {
-        if (this.sessionData === null) return;
-        new CardInfoNotice(
-            this.sessionData.cardData.currentCard.scheduleInfo,
-            this.sessionData.currentNote.file.path,
-        );
+    // MARK: Content Manager
+
+    private async _showDecksList(reloadReviewQueue: boolean = false): Promise<void> {
+        if (reloadReviewQueue) {
+            this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue();
+        }
+        if (this.reviewSequencer === null) return;
+        this.cardContainer.closeSession();
+        this.deckContainer.showList(this.reviewSequencer, this.settings, this.reviewMode);
     }
 
-    private async _processReview(response: ReviewResponse): Promise<void> {
-        if (this.reviewSequencer === null) return;
-        const timeNow = now();
-        if (
-            timeNow - this.lastPressedOnProcessReview <
-            this.plugin.data.settings.reviewButtonDelay
-        ) {
-            return;
-        }
-        this.lastPressedOnProcessReview = timeNow;
-
-        await this.reviewSequencer.processReview(response);
-        await this._showNextCard();
+    private _reviewDeck(deck: Deck): void {
+        this.deckContainer.closeList();
+        this.sessionData = this._getNewSessionData(deck);
+        if (this.sessionData === null) return;
+        this.cardContainer.openSession(this.sessionData, this.settings);
     }
 
     private async _showNextCard(): Promise<void> {
-        if (this.sessionData === null || this.reviewSequencer === null || this.reviewSequencer.currentDeck === null) {
-            this._showDecksList();
+        if (
+            this.sessionData === null ||
+            this.reviewSequencer === null ||
+            this.reviewSequencer.currentDeck === null
+        ) {
+            this._showDecksList(true);
             return;
         }
 
@@ -215,14 +224,86 @@ export default class ContentManager {
         ) {
             await this.cardContainer.drawCardFront(this.sessionData, this.settings);
         } else {
-            this._showDecksList();
+            this._showDecksList(true);
         }
     }
 
-    private _skipCurrentCard() {
+    private _getNewSessionData(deck: Deck): SessionData | null {
+        if (this.reviewSequencer === null) return null;
+        const deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
+        const totalCardsInSession: number = deckStats.cardsInQueueCount;
+        const totalDecksInSession: number = deckStats.decksInQueueOfThisDeckCount;
+        const currentCardState: CardState = CardState.Front;
+
+        const currentDeckStats = this.reviewSequencer.getDeckStats(
+            this.reviewSequencer.currentDeck.getTopicPath(),
+        );
+
+        const chosenDeckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
+
+        return {
+            cardData: {
+                currentCard: this.reviewSequencer.currentCard,
+                currentCardState,
+            },
+            deckData: {
+                chosenDeck: deck,
+                currentDeck: this.reviewSequencer.currentDeck,
+                previousDeck: null,
+                currentDeckTotalCardsInQueue: currentDeckStats.cardsInQueueOfThisDeckCount,
+                currentDeckStats: currentDeckStats,
+                previousDeckStats: null,
+                chosenDeckStats: chosenDeckStats,
+            },
+            totalCardsInSession,
+            totalDecksInSession,
+            currentQuestion: this.reviewSequencer.currentQuestion,
+            currentNote: this.reviewSequencer.currentNote,
+        };
+    }
+
+    // MARK: Card button handlers
+
+    private _showAnswer() {
+        if (this.sessionData === null) return;
+
+        const timeNow = now();
+        if (
+            this.lastPressedOnProcessReview &&
+            timeNow - this.lastPressedOnProcessReview < this.plugin.data.settings.reviewButtonDelay
+        ) {
+            return;
+        }
+        this.lastPressedOnProcessReview = timeNow;
+
+        this.sessionData.cardData.currentCardState = CardState.Back;
+
+        this.cardContainer.drawBack(
+            this.sessionData,
+            this.reviewMode,
+            this.settings,
+            this._determineButtonInterval.bind(this),
+        );
+    }
+
+    private async _doEditQuestionText(): Promise<void> {
         if (this.reviewSequencer === null) return;
-        this.reviewSequencer.skipCurrentCard();
-        this._showNextCard();
+        const currentQ: Question = this.reviewSequencer.currentQuestion;
+
+        // Just the question/answer text; without any preceding topic tag
+        const textPrompt = currentQ.questionText.actualQuestion;
+
+        const editModal = FlashcardEditModal.Prompt(
+            this.app,
+            textPrompt,
+            currentQ.questionText.textDirection,
+        );
+        editModal
+            .then(async (modifiedCardText) => {
+                if (this.reviewSequencer === null) return;
+                this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
+            })
+            .catch((reason) => console.log(reason));
     }
 
     private async _jumpToCurrentCard(): Promise<void> {
@@ -275,37 +356,36 @@ export default class ContentManager {
         }
     }
 
-    private _showAnswer() {
-        if (this.sessionData === null) return;
+    private _skipCurrentCard() {
+        if (this.reviewSequencer === null) return;
+        this.reviewSequencer.skipCurrentCard();
+        this._showNextCard();
+    }
 
+    private _displayCurrentCardInfoNotice() {
+        if (this.sessionData === null) return;
+        new CardInfoNotice(
+            this.sessionData.cardData.currentCard.scheduleInfo,
+            this.sessionData.currentNote.file.path,
+        );
+    }
+
+    private async _processReview(response: ReviewResponse): Promise<void> {
+        if (this.reviewSequencer === null) return;
         const timeNow = now();
         if (
-            this.lastPressedOnProcessReview &&
-            timeNow - this.lastPressedOnProcessReview < this.plugin.data.settings.reviewButtonDelay
+            timeNow - this.lastPressedOnProcessReview <
+            this.plugin.data.settings.reviewButtonDelay
         ) {
             return;
         }
         this.lastPressedOnProcessReview = timeNow;
 
-        this.sessionData.cardData.currentCardState = CardState.Back;
-
-        this.cardContainer.drawBack(
-            this.sessionData,
-            this.reviewMode,
-            this.settings,
-            this._determineButtonInterval.bind(this),
-        );
+        await this.reviewSequencer.processReview(response);
+        await this._showNextCard();
     }
 
-    private _determineButtonInterval(reviewResponse: ReviewResponse): number {
-        if (this.sessionData === null) return 0;
-        if (this.reviewSequencer === null) return 0;
-        const schedule: RepItemScheduleInfo = this.reviewSequencer.determineCardSchedule(
-            reviewResponse,
-            this.sessionData.cardData.currentCard,
-        );
-        return schedule.interval;
-    }
+    // MARK: Deck button handlers
 
     private _startReviewOfDeck(deck: Deck) {
         if (this.reviewSequencer === null) return;
@@ -317,78 +397,23 @@ export default class ContentManager {
         }
     }
 
-    private _showDecksList(): void {
-        if (this.reviewSequencer === null) return;
-        this._stopDeckReview();
-        this.deckContainer.show(this.reviewSequencer, this.settings);
+    private async _changeReviewMode(reviewMode: FlashcardReviewMode) {
+        this.reviewQueueLoader.setReviewMode(reviewMode);
+        this.reviewMode = reviewMode;
+        this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue();
+        this.deckContainer.closeList();
+        this._showDecksList();
     }
 
-    private _hideDecksList(): void {
-        this.deckContainer.hide();
-    }
+    // MARK: Utils
 
-    private _reviewDeck(deck: Deck): void {
-        this._hideDecksList();
-        this.sessionData = this._getNewSessionData(deck);
-        if (this.sessionData === null) return;
-        this.cardContainer.open(this.sessionData, this.settings);
-    }
-
-    private _stopDeckReview(): void {
-        this.cardContainer.close();
-    }
-
-    private async _doEditQuestionText(): Promise<void> {
-        if (this.reviewSequencer === null) return;
-        const currentQ: Question = this.reviewSequencer.currentQuestion;
-
-        // Just the question/answer text; without any preceding topic tag
-        const textPrompt = currentQ.questionText.actualQuestion;
-
-        const editModal = FlashcardEditModal.Prompt(
-            this.app,
-            textPrompt,
-            currentQ.questionText.textDirection,
+    private _determineButtonInterval(reviewResponse: ReviewResponse): number {
+        if (this.sessionData === null) return 0;
+        if (this.reviewSequencer === null) return 0;
+        const schedule: RepItemScheduleInfo = this.reviewSequencer.determineCardSchedule(
+            reviewResponse,
+            this.sessionData.cardData.currentCard,
         );
-        editModal
-            .then(async (modifiedCardText) => {
-                if (this.reviewSequencer === null) return;
-                this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
-            })
-            .catch((reason) => console.log(reason));
-    }
-
-    private _getNewSessionData(deck: Deck): SessionData | null {
-        if (this.reviewSequencer === null) return null;
-        const deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
-        const totalCardsInSession: number = deckStats.cardsInQueueCount;
-        const totalDecksInSession: number = deckStats.decksInQueueOfThisDeckCount;
-        const currentCardState: CardState = CardState.Front;
-
-        const currentDeckStats = this.reviewSequencer.getDeckStats(
-            this.reviewSequencer.currentDeck.getTopicPath(),
-        );
-
-        const chosenDeckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
-
-        return {
-            cardData: {
-                currentCard: this.reviewSequencer.currentCard,
-                currentCardState,
-            },
-            deckData: {
-                chosenDeck: deck,
-                currentDeck: this.reviewSequencer.currentDeck,
-                previousDeck: null,
-                currentDeckTotalCardsInQueue: currentDeckStats.cardsInQueueOfThisDeckCount,
-                currentDeckStats: currentDeckStats,
-                previousDeckStats: null,
-                chosenDeckStats: chosenDeckStats,
-            },
-            totalCardsInSession,
-            totalDecksInSession,
-            currentQuestion: this.reviewSequencer.currentQuestion,
-            currentNote: this.reviewSequencer.currentNote,
-        };
+        return schedule.interval;
     }
 }

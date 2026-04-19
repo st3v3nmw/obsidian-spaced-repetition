@@ -1,7 +1,7 @@
 import "src/ui/obsidian-ui-components/item-views/tab-view.css";
 import { ItemView, Platform, WorkspaceLeaf } from "obsidian";
 
-import { DEBUG_MODE_ENABLED, SR_TAB_VIEW } from "src/constants";
+import { SR_TAB_VIEW } from "src/constants";
 import SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
@@ -15,7 +15,7 @@ import EmulatedPlatform from "src/utils/platform-detector";
  *
  * @property {SRPlugin} plugin - The main plugin instance.
  * @property {SRPlugin} leaf - The leaf instance for the view.
- * @property {() => Promise<{reviewSequencer: IFlashcardReviewSequencer;mode: FlashcardReviewMode;}>} loadReviewSequencerData - Callback for loading the reviewSequencer an the selected review mode.
+ * @property {ReviewQueueLoader} reviewQueueLoader - The review queue loader instance.
  *
  * @method getViewType - Returns the view type identifier.
  * @method getIcon - Returns the icon identifier for the view.
@@ -24,19 +24,18 @@ import EmulatedPlatform from "src/utils/platform-detector";
  * @method onClose - Cleans up resources when the view is closed.
  */
 export class SRTabView extends ItemView {
-    private reviewQueueLoader: ReviewQueueLoader;
+    private reviewQueueLoader: ReviewQueueLoader | null = null;
     private contentManager: ContentManager | null = null;
 
     private plugin: SRPlugin;
     private viewContainerEl: HTMLElement | null = null;
     private viewContentEl: HTMLElement | null = null;
     private settings: SRSettings;
-    private openErrorCount: number = 0; // Counter for catching the first inevitable error but the letting the other through
 
     constructor(
         leaf: WorkspaceLeaf,
         plugin: SRPlugin,
-        reviewQueueLoader: ReviewQueueLoader,
+        reviewQueueLoader: ReviewQueueLoader | null,
     ) {
         super(leaf);
         // Init properties
@@ -107,55 +106,45 @@ export class SRTabView extends ItemView {
     /**
      * Initializes the SRTabView when opened by loading the review sequencer data
      * and setting up the deck and flashcard views if they are not already initialized.
-     * Catches and logs errors that occur during the initial loading process.
      */
     async onOpen() {
-        if (this.viewContainerEl === null || this.viewContentEl === null) return;
+        // This happens when the tab was open before the plugin was loaded -> Closing and reopening the obsidian window
+        // So we have to wait for the plugin to load and just ignore this
+        if (
+            this.viewContainerEl === null ||
+            this.viewContentEl === null ||
+            this.reviewQueueLoader === null
+        )
+            return;
 
-        try {
-            // Reposition the navbar if it's mobile, because lese it overlaps the buttons in the tab view
-            if (document.body.classList.contains("is-mobile")) {
-                const mobileNavbar = document.getElementsByClassName("mobile-navbar")[0];
-                if (mobileNavbar) {
-                    (mobileNavbar as HTMLElement).style.position = "relative";
-                }
+        // Reposition the navbar if it's mobile, because lese it overlaps the buttons in the tab view
+        if (document.body.classList.contains("is-mobile")) {
+            const mobileNavbar = document.getElementsByClassName("mobile-navbar")[0];
+            if (mobileNavbar) {
+                (mobileNavbar as HTMLElement).style.position = "relative";
             }
-
-            // Removes the bottom fade mask if it's mobile and floating nav, because else it overlaps the bottom part of the flashcard and makes it hard to read
-            if (
-                document.body.classList.contains("is-phone") &&
-                document.body.classList.contains("is-floating-nav")
-            ) {
-                document.body.style.setProperty(
-                    "--view-bottom-fade-mask",
-                    "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(16px - 0px))",
-                );
-            }
-
-
-            this.contentManager = new ContentManager(
-                this.app,
-                this.plugin,
-                this.reviewQueueLoader,
-                this.settings,
-                this.viewContentEl,
-            );
-
-            this.contentManager.open();
-        } catch (e) {
-            /*
-             * There will be an error, when opening obsidian, because if a tab is still open from the last session,
-             * then it will be loaded before any plugin was loaded, so there is no possibility of cleaning it up fast enough.
-             * This will cause an error, where the sr data structure wasn't initialized just yet.
-             * Sadly there is no way to load the data before the plugin is loaded or close the tab on closing the window.
-             * So we have to live with this error and just catch it the first time around.
-             * Lets any other errors through that might occur.
-             */
-            if (this.openErrorCount > 0 || DEBUG_MODE_ENABLED) {
-                console.error(e);
-            }
-            this.openErrorCount++;
         }
+
+        // Removes the bottom fade mask if it's mobile and floating nav, because else it overlaps the bottom part of the flashcard and makes it hard to read
+        if (
+            document.body.classList.contains("is-phone") &&
+            document.body.classList.contains("is-floating-nav")
+        ) {
+            document.body.style.setProperty(
+                "--view-bottom-fade-mask",
+                "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(16px - 0px))",
+            );
+        }
+
+        this.contentManager = new ContentManager(
+            this.app,
+            this.plugin,
+            this.reviewQueueLoader,
+            this.settings,
+            this.viewContentEl,
+        );
+
+        this.contentManager.open();
     }
 
     /**

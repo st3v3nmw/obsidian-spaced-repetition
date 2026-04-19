@@ -2,7 +2,10 @@ import "src/ui/obsidian-ui-components/content-container/deck-container/deck-cont
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
-import { IFlashcardReviewSequencer as IFlashcardReviewSequencer } from "src/card/flashcard-review-sequencer";
+import {
+    FlashcardReviewMode,
+    IFlashcardReviewSequencer as IFlashcardReviewSequencer,
+} from "src/card/flashcard-review-sequencer";
 import { Deck } from "src/deck/deck";
 import { SRSettings } from "src/settings";
 import DeckListComponent from "src/ui/obsidian-ui-components/content-container/deck-container/deck-list";
@@ -11,9 +14,11 @@ import DeckListHeaderComponent from "src/ui/obsidian-ui-components/content-conta
 export class DeckContainer {
     private containerEl: HTMLDivElement;
     private deckList: DeckListComponent;
+    private deckListHeader: DeckListHeaderComponent;
 
     constructor(
         parentEl: HTMLElement,
+        changeReviewMode: (reviewMode: FlashcardReviewMode) => void,
         startReviewOfDeck: (deck: Deck) => void,
         closeModal?: () => void,
     ) {
@@ -21,7 +26,11 @@ export class DeckContainer {
         this.containerEl = parentEl.createDiv();
         this.containerEl.addClasses(["sr-container", "sr-deck-container", "sr-is-hidden"]);
 
-        new DeckListHeaderComponent(this.containerEl, closeModal);
+        this.deckListHeader = new DeckListHeaderComponent(
+            this.containerEl,
+            changeReviewMode,
+            closeModal,
+        );
 
         this.deckList = new DeckListComponent(this.containerEl, startReviewOfDeck);
     }
@@ -29,8 +38,13 @@ export class DeckContainer {
     /**
      * Shows the DeckListView & rerenders dynamic elements
      */
-    show(reviewSequencer: IFlashcardReviewSequencer, settings: SRSettings) {
+    showList(
+        reviewSequencer: IFlashcardReviewSequencer,
+        settings: SRSettings,
+        reviewMode: FlashcardReviewMode,
+    ) {
         // Redraw in case the stats have changed
+        this.deckListHeader.updateReviewMode(reviewMode);
         this.deckList.redraw(reviewSequencer, settings);
 
         if (this.containerEl.hasClass("sr-is-hidden")) {
@@ -41,7 +55,7 @@ export class DeckContainer {
     /**
      * Hides the DeckListView
      */
-    hide() {
+    closeList() {
         if (!this.containerEl.hasClass("sr-is-hidden")) {
             this.containerEl.addClass("sr-is-hidden");
         }
