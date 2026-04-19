@@ -1,69 +1,49 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/card-container.css";
-import { now } from "moment";
-import { App, MarkdownView, Notice, Platform } from "obsidian";
+import { App, Platform } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { Card } from "src/card/card";
 import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/card/flashcard-review-sequencer";
-import { CardType, Question } from "src/card/questions/question";
-import { Deck } from "src/deck/deck";
+import { CardType } from "src/card/questions/question";
 import { escapeHtml } from "src/escape-html";
+import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
-import { Note } from "src/note/note";
 import { SRSettings } from "src/settings";
-import CardInfoNotice from "src/ui/obsidian-ui-components/content-container/card-container/controls/card-info-notice";
-import ControlsComponent from "src/ui/obsidian-ui-components/content-container/card-container/controls/controls";
-import InfoSection from "src/ui/obsidian-ui-components/content-container/card-container/deck-info/info-section";
+import ContextSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/context-section";
 import ResponseSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section";
+import CardToolbarComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar";
+import {
+    CardState,
+    SessionData,
+} from "src/ui/obsidian-ui-components/content-container/content-manager";
+import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import EmulatedPlatform from "src/utils/platform-detector";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
 
-export enum FlashcardMode {
-    Deck,
-    Front,
-    Back,
-    Closed,
-}
-
 export class CardContainer {
-    public app: App;
-    public plugin: SRPlugin;
-    public mode: FlashcardMode;
+    private app: App;
+    private plugin: SRPlugin;
+    private cardState: CardState;
 
-    public view: HTMLDivElement;
+    private view: HTMLDivElement;
 
-    public infoSection: InfoSection;
+    private toolbar: CardToolbarComponent;
+    private contextSection: ContextSectionComponent;
 
-    public mainWrapper: HTMLDivElement;
-    public scrollWrapper: HTMLDivElement;
-    public content: HTMLDivElement;
+    private scrollWrapper: HTMLDivElement;
+    private content: HTMLDivElement;
 
-    public controls: ControlsComponent;
-
-    public response: ResponseSectionComponent;
-    public lastPressed: number = 0;
-
-    public isActive: boolean = false;
-
-    private chosenDeck: Deck | null = null;
-    private totalCardsInSession: number = 0;
-    private totalDecksInSession: number = 0;
-
-    private currentDeck: Deck | null = null;
-    private previousDeck: Deck | null = null;
-    private currentDeckTotalCardsInQueue: number = 0;
+    private response: ResponseSectionComponent;
 
     private clozeInputs: NodeListOf<HTMLInputElement> | null = null;
     private clozeAnswers: NodeListOf<Element> | null = null;
 
-    private reviewSequencer: IFlashcardReviewSequencer;
-    private settings: SRSettings;
-    private reviewMode: FlashcardReviewMode;
-    private backToDeck: () => void;
-    private editClickHandler: () => void;
+    private processReviewHandler: (response: ReviewResponse) => Promise<void>;
+    private skipCardHandler: () => void;
+    private showAnswerHandler: () => void;
+    private backToDeckHandler: () => void;
 
     constructor(
         app: App,
@@ -72,58 +52,63 @@ export class CardContainer {
         reviewSequencer: IFlashcardReviewSequencer,
         reviewMode: FlashcardReviewMode,
         parentEl: HTMLElement,
-        backToDeck: () => void,
-        editClickHandler: () => void,
+        backToDeckHandler: () => void,
+        editCardHandler: () => void,
+        processReviewHandler: (response: ReviewResponse) => Promise<void>,
+        skipCardHandler: () => void,
+        showAnswerHandler: () => void,
+        jumpToCurrentCardHandler: () => Promise<void>,
+        displayCurrentCardInfoNoticeHandler: () => void,
         closeModal?: () => void,
     ) {
         // Init properties
         this.app = app;
         this.plugin = plugin;
-        this.settings = settings;
-        this.reviewSequencer = reviewSequencer;
-        this.reviewMode = reviewMode;
-        this.backToDeck = backToDeck;
-        this.editClickHandler = editClickHandler;
-        this.view = parentEl.createDiv();
+        this.cardState = CardState.Closed;
+        this.processReviewHandler = processReviewHandler;
+        this.skipCardHandler = skipCardHandler;
+        this.showAnswerHandler = showAnswerHandler;
+        this.backToDeckHandler = backToDeckHandler;
 
         // Build ui
-        this.mode = FlashcardMode.Closed;
+        this.view = parentEl.createDiv();
         this.view.addClasses(["sr-container", "sr-card-container", "sr-is-hidden"]);
 
-        this.controls = new ControlsComponent(
+        this.toolbar = new CardToolbarComponent(
             this.view,
-            !this.settings.openViewInNewTab,
-            this.app,
-            () => this.backToDeck(),
-            () => this.editClickHandler(),
-            async (response: ReviewResponse) => await this._processReview(response),
-            () => this._displayCurrentCardInfoNotice(),
-            () => this._skipCurrentCard(),
-            this._jumpToCurrentCard.bind(this),
+            !settings.openViewInNewTab,
+            backToDeckHandler,
+            editCardHandler,
+            jumpToCurrentCardHandler,
+            displayCurrentCardInfoNoticeHandler,
+            this.skipCardHandler,
+            () => {
+                new ConfirmationModal(
+                    app,
+                    t("DELETE_SCHEDULING_DATA_OF_CURRENT_CARD"),
+                    t("CONFIRM_SCHEDULING_DATA_DELETION_OF_CURRENT_CARD"),
+                    t("SCHEDULING_DATA_DELETION_IN_PROGRESS_OF_CURRENT_CARD"),
+                    async () => {
+                        await this.processReviewHandler(ReviewResponse.Reset);
+                    },
+                ).open();
+            },
             closeModal,
         );
 
-        this.mainWrapper = this.view.createDiv();
-        this.mainWrapper.addClass("sr-main-wrapper");
+        this.contextSection = new ContextSectionComponent(this.view);
 
-        this.infoSection = new InfoSection(
-            this.mainWrapper,
-            this.settings.showContextInCards,
-            () => this.backToDeck(),
-            closeModal,
-        );
-
-        this.scrollWrapper = this.mainWrapper.createDiv();
+        this.scrollWrapper = this.view.createDiv();
         this.scrollWrapper.addClass("sr-scroll-wrapper");
 
         this.content = this.scrollWrapper.createDiv();
         this.content.addClass("sr-content");
 
         this.response = new ResponseSectionComponent(
-            this.mainWrapper,
-            this.settings,
-            () => this._showAnswer(),
-            (response: ReviewResponse) => this._processReview(response),
+            this.view,
+            settings,
+            this.showAnswerHandler,
+            this.processReviewHandler,
         );
     }
 
@@ -132,51 +117,29 @@ export class CardContainer {
     /**
      * Shows the FlashcardView if it is hidden
      */
-    async show(chosenDeck: Deck) {
+    async open(sessionData: SessionData, settings: SRSettings) {
         // Prevents rest of code, from running if this was executed multiple times after one another
         if (!this.view.hasClass("sr-is-hidden")) {
             return;
         }
 
-        this.chosenDeck = chosenDeck;
-        const deckStats = this.reviewSequencer.getDeckStats(chosenDeck.getTopicPath());
-        this.totalCardsInSession = deckStats.cardsInQueueCount;
-        this.totalDecksInSession = deckStats.decksInQueueOfThisDeckCount;
-
-        await this._drawContent();
+        await this.drawCardFront(sessionData, settings);
 
         this.view.removeClass("sr-is-hidden");
-        this.isActive = true;
         document.addEventListener("keydown", this._keydownHandler);
-    }
-
-    /**
-     * Refreshes all dynamic elements
-     */
-    async refresh() {
-        await this._drawContent();
     }
 
     /**
      * Hides the FlashcardView if it is visible
      */
-    hide() {
+    close() {
         // Prevents the rest of code, from running if this was executed multiple times after one another
         if (this.view.hasClass("sr-is-hidden")) {
             return;
         }
-
+        this.cardState = CardState.Closed;
         document.removeEventListener("keydown", this._keydownHandler);
         this.view.addClass("sr-is-hidden");
-        this.isActive = false;
-    }
-
-    /**
-     * Closes the FlashcardView
-     */
-    close() {
-        this.hide();
-        document.removeEventListener("keydown", this._keydownHandler);
     }
 
     /**
@@ -192,39 +155,31 @@ export class CardContainer {
         }
     }
 
-    // #region -> Functions & helpers
-
-    private async _drawContent() {
-        this.controls.resetButton.disabled = true;
+    public async drawCardFront(sessionData: SessionData, settings: SRSettings) {
+        this.toolbar.setResetButtonDisabled(true);
+        this.contextSection.updateCardContext(
+            settings.showContextInCards,
+            sessionData.currentQuestion,
+            sessionData.currentNote,
+        );
 
         // Update current deck info
-        this.mode = FlashcardMode.Front;
-        this.previousDeck = this.currentDeck;
-        this.currentDeck = this.reviewSequencer.currentDeck;
-        if (this.previousDeck !== this.currentDeck) {
-            const currentDeckStats = this.reviewSequencer.getDeckStats(
-                this.currentDeck.getTopicPath(),
-            );
-            this.currentDeckTotalCardsInQueue = currentDeckStats.cardsInQueueOfThisDeckCount;
-        }
-        if (this.chosenDeck === null) {
-            throw new Error("chosenDeck is null in CardContainer.ts");
-        }
+        this.cardState = sessionData.cardData.currentCardState;
 
-        this._updateInfoBar(this.chosenDeck, this.currentDeck);
+        this._updateInfoBar(sessionData, settings.flashcardCardOrder);
 
         // Update card content
         this.content.empty();
         const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
             this.app,
             this.plugin,
-            this._currentNote.filePath,
+            sessionData.currentNote.filePath,
         );
 
         await wrapper.renderMarkdownWrapper(
-            this._currentCard.front.trimStart(),
+            sessionData.cardData.currentCard.front.trimStart(),
             this.content,
-            this._currentQuestion.questionText.textDirection,
+            sessionData.currentQuestion.questionText.textDirection,
         );
         // Set scroll position back to top
         this.content.scrollTop = 0;
@@ -235,7 +190,7 @@ export class CardContainer {
         // Setup cloze input listeners
         this._setupClozeInputListeners();
         // auto-focus the first cloze input if this card is a cloze card
-        if (this._currentQuestion.questionType === CardType.Cloze) {
+        if (sessionData.currentQuestion.questionType === CardType.Cloze) {
             const firstInput = document.querySelector(".cloze-input") as HTMLInputElement;
             if (firstInput) {
                 firstInput.focus();
@@ -243,116 +198,21 @@ export class CardContainer {
         }
     }
 
-    private get _currentCard(): Card {
-        return this.reviewSequencer.currentCard;
-    }
-
-    private get _currentQuestion(): Question {
-        return this.reviewSequencer.currentQuestion;
-    }
-
-    private get _currentNote(): Note {
-        return this.reviewSequencer.currentNote;
-    }
-
-    private async _processReview(response: ReviewResponse): Promise<void> {
-        const timeNow = now();
-        if (timeNow - this.lastPressed < this.plugin.data.settings.reviewButtonDelay) {
-            return;
-        }
-        this.lastPressed = timeNow;
-
-        await this.reviewSequencer.processReview(response);
-        await this._showNextCard();
-    }
-
-    private async _showNextCard(): Promise<void> {
-        if (this._currentCard !== null && this._currentCard !== undefined) await this.refresh();
-        else this.backToDeck();
-    }
-
-    // #region -> Controls
-
-    private async _skipCurrentCard(): Promise<void> {
-        this.reviewSequencer.skipCurrentCard();
-        await this._showNextCard();
-    }
-
-    private _displayCurrentCardInfoNotice() {
-        new CardInfoNotice(this._currentCard.scheduleInfo, this._currentQuestion.note.filePath);
-    }
-
-    private async _jumpToCurrentCard(): Promise<void> {
-        const currentQuestion = this.reviewSequencer.currentQuestion;
-        if (!currentQuestion) return;
-
-        if (
-            (!this.settings.openViewInNewTab &&
-                !(Platform.isMobile || EmulatedPlatform().isMobile)) ||
-            (!this.settings.openViewInNewTabMobile &&
-                (Platform.isMobile || EmulatedPlatform().isMobile))
-        ) {
-            new Notice("Note was opened in new tab in the background");
-        }
-
-        const file = currentQuestion.note.file.tfile;
-        const blockId = currentQuestion.questionText.obsidianBlockId;
-        const line = Math.max(0, currentQuestion.lineNo ?? 0);
-
-        if (blockId) {
-            await this.app.workspace.openLinkText(`${file.path}#${blockId}`, file.path, false);
-            return;
-        }
-
-        // If the file is already open in another leaf, open it in the current one to prevent duplicates
-        const existingLeaf = this.app.workspace.getLeavesOfType("markdown").find((leaf) => {
-            const view = leaf.view as MarkdownView;
-            return view.file?.path === file.path;
-        });
-
-        if (existingLeaf) {
-            await existingLeaf.openFile(file, { eState: { line } });
-            this.app.workspace.setActiveLeaf(existingLeaf);
-            const markdownView = existingLeaf.view as MarkdownView;
-            if (markdownView?.editor) {
-                markdownView.editor.setCursor({ line, ch: 0 });
-                markdownView.editor.scrollIntoView({ from: { line, ch: 0 }, to: { line, ch: 0 } });
-            }
-            return;
-        }
-
-        const leaf = this.app.workspace.getLeaf("tab");
-        await leaf.openFile(file, { eState: { line } });
-
-        const markdownView = leaf.view as MarkdownView;
-        if (markdownView?.editor) {
-            markdownView.editor.setCursor({ line, ch: 0 });
-            markdownView.editor.scrollIntoView({ from: { line, ch: 0 }, to: { line, ch: 0 } });
-        }
-    }
-
     // #region -> Deck Info
 
-    private _updateInfoBar(chosenDeck: Deck, currentDeck: Deck) {
-        const currentDeckStats = this.reviewSequencer.getDeckStats(currentDeck.getTopicPath());
-        const chosenDeckStats = this.reviewSequencer.getDeckStats(chosenDeck.getTopicPath());
-        this.infoSection.updateChosenDeckInfo(
-            chosenDeck,
-            chosenDeckStats,
-            this.totalCardsInSession,
-            this.totalDecksInSession,
-        );
-        this.infoSection.updateCurrentDeckInfo(
-            chosenDeck,
-            currentDeck,
-            currentDeckStats,
-            this.settings.flashcardCardOrder,
-            this.currentDeckTotalCardsInQueue,
-        );
-        this.infoSection.updateCardContext(
-            this.settings.showContextInCards,
-            this._currentQuestion,
-            this._currentNote,
+    private _updateInfoBar(sessionData: SessionData, flashcardCardOrder: string) {
+        if (sessionData.deckData.chosenDeck === null || sessionData.deckData.currentDeck === null)
+            return;
+
+        this.toolbar.updateInfo(
+            sessionData.deckData.chosenDeck,
+            sessionData.deckData.currentDeck,
+            sessionData.deckData.chosenDeckStats,
+            sessionData.deckData.currentDeckStats,
+            sessionData.totalCardsInSession,
+            sessionData.totalDecksInSession,
+            sessionData.deckData.currentDeckTotalCardsInQueue,
+            flashcardCardOrder,
         );
     }
 
@@ -365,7 +225,7 @@ export class CardContainer {
                     e.preventDefault();
                     e.stopPropagation();
                     (input as HTMLElement).blur();
-                    this._showAnswer();
+                    this.showAnswerHandler();
                 }
             });
         });
@@ -390,24 +250,18 @@ export class CardContainer {
         }
     }
 
-    // #region -> Response
+    public drawBack(
+        sessionData: SessionData,
+        reviewMode: FlashcardReviewMode,
+        settings: SRSettings,
+        determineButtonInterval: (response: ReviewResponse) => number,
+    ) {
+        this.cardState = sessionData.cardData.currentCardState;
 
-    private _showAnswer(): void {
-        const timeNow = now();
-        if (
-            this.lastPressed &&
-            timeNow - this.lastPressed < this.plugin.data.settings.reviewButtonDelay
-        ) {
-            return;
-        }
-        this.lastPressed = timeNow;
-
-        this.mode = FlashcardMode.Back;
-
-        this.controls.resetButton.setDisabled(false);
+        this.toolbar.setResetButtonDisabled(false);
 
         // Show answer text
-        if (this._currentQuestion.questionType !== CardType.Cloze) {
+        if (sessionData.currentQuestion.questionType !== CardType.Cloze) {
             const hr: HTMLElement = document.createElement("hr");
             this.content.appendChild(hr);
         } else {
@@ -417,12 +271,12 @@ export class CardContainer {
         const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
             this.app,
             this.plugin,
-            this._currentNote.filePath,
+            sessionData.currentNote.filePath,
         );
         wrapper.renderMarkdownWrapper(
-            this._currentCard.back,
+            sessionData.cardData.currentCard.back,
             this.content,
-            this._currentQuestion.questionText.textDirection,
+            sessionData.currentQuestion.questionText.textDirection,
         );
 
         // Evaluate cloze answers
@@ -430,10 +284,13 @@ export class CardContainer {
 
         // Show response buttons
         this.response.showRatingButtons(
-            this.reviewMode,
-            this.settings,
-            this.reviewSequencer,
-            this._currentCard,
+            reviewMode,
+            settings.flashcardAgainText,
+            settings.flashcardHardText,
+            settings.flashcardGoodText,
+            settings.flashcardEasyText,
+            settings.showIntervalInReviewButtons,
+            determineButtonInterval,
         );
         // NEW: restore keyboard focus after cloze confirmation
         this.plugin.uiManager.setSRViewInFocus(true);
@@ -446,7 +303,7 @@ export class CardContainer {
             (document.activeElement !== null &&
                 (document.activeElement.nodeName === "TEXTAREA" ||
                     document.activeElement.nodeName === "INPUT")) ||
-            this.mode === FlashcardMode.Closed ||
+            this.cardState === CardState.Closed ||
             !this.plugin.uiManager.getSRInFocusState() ||
             Platform.isMobile || // No keyboard events on mobile
             EmulatedPlatform().isMobile
@@ -461,50 +318,50 @@ export class CardContainer {
 
         switch (e.code) {
             case "KeyS":
-                this._skipCurrentCard();
+                this.skipCardHandler();
                 consumeKeyEvent();
                 break;
             case "Enter":
             case "NumpadEnter":
             case "Space":
-                if (this.mode === FlashcardMode.Front) {
-                    this._showAnswer();
+                if (this.cardState === CardState.Front) {
+                    this.showAnswerHandler();
                     consumeKeyEvent();
-                } else if (this.mode === FlashcardMode.Back) {
-                    this._processReview(ReviewResponse.Good);
+                } else if (this.cardState === CardState.Back) {
+                    this.processReviewHandler(ReviewResponse.Good);
                     consumeKeyEvent();
                 }
                 break;
             case "Numpad1":
             case "Digit1":
-                if (this.mode !== FlashcardMode.Back) {
+                if (this.cardState !== CardState.Back) {
                     break;
                 }
-                this._processReview(ReviewResponse.Hard);
+                this.processReviewHandler(ReviewResponse.Hard);
                 consumeKeyEvent();
                 break;
             case "Numpad2":
             case "Digit2":
-                if (this.mode !== FlashcardMode.Back) {
+                if (this.cardState !== CardState.Back) {
                     break;
                 }
-                this._processReview(ReviewResponse.Good);
+                this.processReviewHandler(ReviewResponse.Good);
                 consumeKeyEvent();
                 break;
             case "Numpad3":
             case "Digit3":
-                if (this.mode !== FlashcardMode.Back) {
+                if (this.cardState !== CardState.Back) {
                     break;
                 }
-                this._processReview(ReviewResponse.Easy);
+                this.processReviewHandler(ReviewResponse.Easy);
                 consumeKeyEvent();
                 break;
             case "Numpad0":
             case "Digit0":
-                if (this.mode !== FlashcardMode.Back) {
+                if (this.cardState !== CardState.Back) {
                     break;
                 }
-                this._processReview(ReviewResponse.Reset);
+                this.processReviewHandler(ReviewResponse.Reset);
                 consumeKeyEvent();
                 break;
             default:

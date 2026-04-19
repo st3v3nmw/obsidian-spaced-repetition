@@ -1,14 +1,10 @@
-import { ButtonComponent, setIcon } from "obsidian";
+import { setIcon } from "obsidian";
 
 import { DeckStats } from "src/card/flashcard-review-sequencer";
-import { Question } from "src/card/questions/question";
 import { Deck } from "src/deck/deck";
-import { Note } from "src/note/note";
-import BackButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/controls/back-button";
-import ModalCloseButtonComponent from "src/ui/obsidian-ui-components/content-container/modal-close-button";
 
-export default class InfoSectionComponent {
-    public infoSection: HTMLDivElement;
+export default class DeckInfoComponent {
+    public deckInfoContainer: HTMLDivElement;
     public deckProgressInfo: HTMLDivElement;
 
     public chosenDeckInfo: HTMLDivElement;
@@ -35,27 +31,13 @@ export default class InfoSectionComponent {
     public currentDeckCardCounterWrapper: HTMLDivElement;
     public currentDeckCardCounter: HTMLDivElement;
     public currentDeckCardCounterIcon: HTMLDivElement;
-    public horizontalBackButton: ButtonComponent;
-    public horizontalCloseButton: ButtonComponent;
-    public cardContext: HTMLElement | undefined;
 
-    constructor(
-        container: HTMLDivElement,
-        showContextInCards: boolean,
-        backToDeck: () => void,
-        closeModal?: () => void,
-    ) {
-        this.infoSection = container.createDiv();
-        this.infoSection.addClass("sr-info-section");
+    constructor(parentEl: HTMLDivElement) {
+        this.deckInfoContainer = parentEl.createDiv();
+        this.deckInfoContainer.addClass("sr-info-section");
 
-        this.deckProgressInfo = this.infoSection.createDiv();
+        this.deckProgressInfo = this.deckInfoContainer.createDiv();
         this.deckProgressInfo.addClass("sr-deck-progress-info");
-
-        this.horizontalBackButton = new BackButtonComponent(
-            this.deckProgressInfo,
-            () => backToDeck(),
-            ["clickable-icon", "sr-horizontal-back-button"],
-        );
 
         this.chosenDeckInfo = this.deckProgressInfo.createDiv();
         this.chosenDeckInfo.addClass("sr-chosen-deck-info");
@@ -114,30 +96,6 @@ export default class InfoSectionComponent {
         this.deckProgressInfo
             .createDiv()
             .addClasses(["sr-flex-spacer", "sr-horizontal-flex-spacer"]);
-
-        const closeButtonClasses = [
-            "sr-modal-close-button",
-            "mod-raised",
-            "sr-horizontal-close-button",
-        ];
-
-        console.log(closeModal);
-
-        if (closeModal === undefined) {
-            closeButtonClasses.push("sr-hide-by-scaling");
-            closeButtonClasses.push("hide-height");
-        }
-
-        this.horizontalCloseButton = new ModalCloseButtonComponent(
-            this.deckProgressInfo,
-            () => closeModal && closeModal(),
-            closeButtonClasses,
-        );
-
-        if (showContextInCards) {
-            this.cardContext = this.infoSection.createDiv();
-            this.cardContext.addClass("sr-context");
-        }
     }
 
     public updateChosenDeckInfo(
@@ -195,37 +153,5 @@ export default class InfoSectionComponent {
                 `${currentDeckTotalCardsInQueue - currentDeckStats.cardsInQueueOfThisDeckCount}/${currentDeckTotalCardsInQueue}`,
             );
         }
-    }
-
-    public updateCardContext(
-        showContextInCards: boolean,
-        currentQuestion: Question,
-        currentNote: Note,
-    ) {
-        if (!this.cardContext) return;
-        if (!showContextInCards) {
-            this.cardContext.setText("");
-            return;
-        }
-        this.cardContext.setText(
-            ` ${this._formatQuestionContextText(currentQuestion.questionContext, currentNote)}`,
-        );
-    }
-
-    private _formatQuestionContextText(questionContext: string[], currentNote: Note): string {
-        const separator: string = " > ";
-        let result = currentNote.file.basename;
-        questionContext.forEach((context) => {
-            // Check for links trim [[ ]]
-            if (context.startsWith("[[") && context.endsWith("]]")) {
-                context = context.replace("[[", "").replace("]]", "");
-                // Use replacement text if any
-                if (context.contains("|")) {
-                    context = context.split("|")[1];
-                }
-            }
-            result += separator + context;
-        });
-        return result;
     }
 }

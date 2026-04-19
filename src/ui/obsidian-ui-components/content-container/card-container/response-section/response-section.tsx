@@ -1,14 +1,9 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section.css";
 import { ButtonComponent, Platform } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { textInterval } from "src/algorithms/osr/note-scheduling";
-import { Card } from "src/card/card";
-import {
-    FlashcardReviewMode,
-    IFlashcardReviewSequencer,
-} from "src/card/flashcard-review-sequencer";
+import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 import { SRSettings } from "src/settings";
 import SRResponseButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/response-section/sr-response-button";
@@ -83,17 +78,20 @@ export default class ResponseSectionComponent {
 
     public showRatingButtons(
         reviewMode: FlashcardReviewMode,
-        settings: SRSettings,
-        reviewSequencer: IFlashcardReviewSequencer,
-        currentCard: Card,
+        againButtonText: string,
+        hardButtonText: string,
+        goodButtonText: string,
+        easyButtonText: string,
+        showIntervalInReviewButtons: boolean,
+        determineButtonInterval: (response: ReviewResponse) => number,
     ) {
         // Shows the rating buttons and hides the show answer button
         this.answerButton.buttonEl.addClass("sr-is-hidden");
 
         if (reviewMode === FlashcardReviewMode.Cram) {
             this.responseEl.addClass("is-cram");
-            this.againButton.setButtonText(`${settings.flashcardAgainText}`);
-            this.easyButton.setButtonText(`${settings.flashcardEasyText}`);
+            this.againButton.setButtonText(`${againButtonText}`);
+            this.easyButton.setButtonText(`${easyButtonText}`);
 
             if (this.againButton.buttonEl.hasClass("sr-is-hidden")) {
                 this.againButton.buttonEl.removeClass("sr-is-hidden");
@@ -116,35 +114,27 @@ export default class ResponseSectionComponent {
             this.easyButton.buttonEl.removeClass("sr-is-hidden");
             this._setupEaseButton(
                 this.againButton,
-                settings.flashcardAgainText,
-                reviewSequencer,
-                currentCard,
-                settings,
-                ReviewResponse.Again,
+                againButtonText,
+                determineButtonInterval(ReviewResponse.Again),
+                showIntervalInReviewButtons,
             );
             this._setupEaseButton(
                 this.hardButton,
-                settings.flashcardHardText,
-                reviewSequencer,
-                currentCard,
-                settings,
-                ReviewResponse.Hard,
+                hardButtonText,
+                determineButtonInterval(ReviewResponse.Hard),
+                showIntervalInReviewButtons,
             );
             this._setupEaseButton(
                 this.goodButton,
-                settings.flashcardGoodText,
-                reviewSequencer,
-                currentCard,
-                settings,
-                ReviewResponse.Good,
+                goodButtonText,
+                determineButtonInterval(ReviewResponse.Good),
+                showIntervalInReviewButtons,
             );
             this._setupEaseButton(
                 this.easyButton,
-                settings.flashcardEasyText,
-                reviewSequencer,
-                currentCard,
-                settings,
-                ReviewResponse.Easy,
+                easyButtonText,
+                determineButtonInterval(ReviewResponse.Easy),
+                showIntervalInReviewButtons,
             );
         }
     }
@@ -152,18 +142,10 @@ export default class ResponseSectionComponent {
     private _setupEaseButton(
         button: ButtonComponent,
         buttonName: string,
-        reviewSequencer: IFlashcardReviewSequencer,
-        currentCard: Card,
-        settings: SRSettings,
-        reviewResponse: ReviewResponse,
+        interval: number,
+        showInterval: boolean,
     ) {
-        const schedule: RepItemScheduleInfo = reviewSequencer.determineCardSchedule(
-            reviewResponse,
-            currentCard,
-        );
-        const interval: number = schedule.interval;
-
-        if (settings.showIntervalInReviewButtons) {
+        if (showInterval) {
             if (EmulatedPlatform().isMobile || Platform.isMobile) {
                 button.setButtonText(textInterval(interval, true));
             } else {

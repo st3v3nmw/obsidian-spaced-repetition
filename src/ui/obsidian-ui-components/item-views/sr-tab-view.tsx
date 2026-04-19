@@ -1,19 +1,14 @@
 import "src/ui/obsidian-ui-components/item-views/tab-view.css";
-import { ButtonComponent, ItemView, Platform, WorkspaceLeaf } from "obsidian";
+import { ItemView, Platform, WorkspaceLeaf } from "obsidian";
 
 import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer,
 } from "src/card/flashcard-review-sequencer";
-import { Question } from "src/card/questions/question";
 import { DEBUG_MODE_ENABLED, SR_TAB_VIEW } from "src/constants";
-import { Deck } from "src/deck/deck";
 import SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
-import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
-import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
-import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
-import { globalDateProvider } from "src/utils/dates";
+import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 /**
@@ -36,17 +31,13 @@ export class SRTabView extends ItemView {
         reviewSequencer: IFlashcardReviewSequencer;
         mode: FlashcardReviewMode;
     }>;
+    private contentManager: ContentManager | null = null;
 
     private plugin: SRPlugin;
-    private reviewMode: FlashcardReviewMode;
-    private viewContainerEl: HTMLElement;
-    private viewContentEl: HTMLElement;
-    private reviewSequencer: IFlashcardReviewSequencer;
+    private viewContainerEl: HTMLElement | null = null;
+    private viewContentEl: HTMLElement | null = null;
     private settings: SRSettings;
-    private deckContainer: DeckContainer;
     private openErrorCount: number = 0; // Counter for catching the first inevitable error but the letting the other through
-    public backButton: ButtonComponent;
-    private cardContainer: CardContainer;
 
     constructor(
         leaf: WorkspaceLeaf,
@@ -57,40 +48,41 @@ export class SRTabView extends ItemView {
         }>,
     ) {
         super(leaf);
+        // Init properties
         this.plugin = plugin;
         this.navigation = false;
         this.settings = plugin.data.settings;
         this.loadReviewSequencerData = loadReviewSequencerData;
 
+        // Build ui
         const viewContent = this.containerEl.getElementsByClassName("view-content");
-        if (viewContent.length > 0) {
-            this.viewContainerEl = viewContent[0] as HTMLElement;
-            this.viewContainerEl.addClass("sr-tab-view");
-            this.viewContainerEl.addClass("sr-view");
 
-            this.viewContentEl = this.viewContainerEl.createDiv("sr-tab-view-content");
+        if (viewContent.length === 0) return;
 
-            if (Platform.isMobile || EmulatedPlatform().isMobile) {
-                this.viewContentEl.style.height =
-                    this.settings.flashcardHeightPercentageMobile + "%";
-                this.viewContentEl.style.maxHeight =
-                    this.settings.flashcardHeightPercentageMobile + "%";
-                this.viewContentEl.style.width = this.settings.flashcardWidthPercentageMobile + "%";
-                this.viewContentEl.style.maxWidth =
-                    this.settings.flashcardWidthPercentageMobile + "%";
-            } else {
-                this.viewContentEl.style.height = this.settings.flashcardHeightPercentage + "%";
-                this.viewContentEl.style.maxHeight = this.settings.flashcardHeightPercentage + "%";
-                this.viewContentEl.style.width = this.settings.flashcardWidthPercentage + "%";
-                this.viewContentEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
-            }
+        this.viewContainerEl = viewContent[0] as HTMLElement;
+        this.viewContainerEl.addClass("sr-tab-view");
+        this.viewContainerEl.addClass("sr-view");
 
-            if (
-                this.settings.flashcardHeightPercentage < 100 ||
-                this.settings.flashcardWidthPercentage < 100
-            ) {
-                this.viewContentEl.addClass("sr-center-view");
-            }
+        this.viewContentEl = this.viewContainerEl.createDiv("sr-tab-view-content");
+
+        if (Platform.isMobile || EmulatedPlatform().isMobile) {
+            this.viewContentEl.style.height = this.settings.flashcardHeightPercentageMobile + "%";
+            this.viewContentEl.style.maxHeight =
+                this.settings.flashcardHeightPercentageMobile + "%";
+            this.viewContentEl.style.width = this.settings.flashcardWidthPercentageMobile + "%";
+            this.viewContentEl.style.maxWidth = this.settings.flashcardWidthPercentageMobile + "%";
+        } else {
+            this.viewContentEl.style.height = this.settings.flashcardHeightPercentage + "%";
+            this.viewContentEl.style.maxHeight = this.settings.flashcardHeightPercentage + "%";
+            this.viewContentEl.style.width = this.settings.flashcardWidthPercentage + "%";
+            this.viewContentEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
+        }
+
+        if (
+            this.settings.flashcardHeightPercentage < 100 ||
+            this.settings.flashcardWidthPercentage < 100
+        ) {
+            this.viewContentEl.addClass("sr-center-view");
         }
     }
 
@@ -127,6 +119,8 @@ export class SRTabView extends ItemView {
      * Catches and logs errors that occur during the initial loading process.
      */
     async onOpen() {
+        if (this.viewContainerEl === null || this.viewContentEl === null) return;
+
         try {
             // Reposition the navbar if it's mobile, because lese it overlaps the buttons in the tab view
             if (document.body.classList.contains("is-mobile")) {
@@ -147,47 +141,20 @@ export class SRTabView extends ItemView {
                 );
             }
 
-            await this._setUpReviewSequencer();
-            await this._setUpContentContainers();
+            const loadedData = await this.loadReviewSequencerData();
 
-            const subdecksWithCardsInQueue: Deck[] =
-                this.reviewSequencer.getSubDecksWithCardsInQueue(
-                    this.reviewSequencer.originalDeckTree,
-                );
-            let openImmediately: boolean = false;
-            let deckWithCards: Deck | null = null;
+            const reviewSequencer = loadedData.reviewSequencer;
+            const reviewMode = loadedData.mode;
+            this.contentManager = new ContentManager(
+                this.app,
+                this.plugin,
+                reviewSequencer,
+                reviewMode,
+                this.settings,
+                this.viewContentEl,
+            );
 
-            for (const subdeck of subdecksWithCardsInQueue) {
-                const hasNewCards: boolean = subdeck.newFlashcards.length > 0;
-                const hasDueCards: boolean = subdeck.dueFlashcards.length > 0;
-                const hasDueCardsToday: boolean =
-                    hasDueCards &&
-                    subdeck.dueFlashcards.some((card) => {
-                        const dueDate: number = card.scheduleInfo.dueDateAsUnix;
-                        const today: number = globalDateProvider.today.valueOf();
-                        return dueDate < today;
-                    });
-
-                const hasCardsToday: boolean = hasNewCards || hasDueCardsToday;
-                if (
-                    openImmediately &&
-                    (hasCardsToday || this.reviewMode === FlashcardReviewMode.Cram)
-                ) {
-                    openImmediately = false;
-                    break;
-                }
-
-                if (hasCardsToday || this.reviewMode === FlashcardReviewMode.Cram) {
-                    openImmediately = true;
-                    deckWithCards = subdeck;
-                }
-            }
-
-            if (openImmediately && deckWithCards !== null) {
-                this._showFlashcard(deckWithCards);
-            } else {
-                this._showDecksList();
-            }
+            this.contentManager.open();
         } catch (e) {
             /*
              * There will be an error, when opening obsidian, because if a tab is still open from the last session,
@@ -227,85 +194,7 @@ export class SRTabView extends ItemView {
                 "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(34px - 0px + 12px))",
             );
         }
-        if (this.deckContainer) this.deckContainer.close();
-        if (this.cardContainer) this.cardContainer.close();
-    }
 
-    private async _setUpReviewSequencer() {
-        const loadedData = await this.loadReviewSequencerData();
-
-        this.reviewSequencer = loadedData.reviewSequencer;
-        this.reviewMode = loadedData.mode;
-    }
-
-    private async _setUpContentContainers(rebuildContainers: boolean = false) {
-        if (this.deckContainer === undefined || rebuildContainers) {
-            // Init static elements in views
-            this.deckContainer = new DeckContainer(
-                this.plugin,
-                this.settings,
-                this.reviewSequencer,
-                this.viewContentEl,
-                this._startReviewOfDeck.bind(this),
-            );
-        }
-
-        if (this.cardContainer === undefined || rebuildContainers) {
-            this.cardContainer = new CardContainer(
-                this.app,
-                this.plugin,
-                this.settings,
-                this.reviewSequencer,
-                this.reviewMode,
-                this.viewContentEl,
-                this._showDecksList.bind(this),
-                this._doEditQuestionText.bind(this),
-            );
-        }
-    }
-
-    private _showDecksList(): void {
-        this._hideFlashcard();
-        this.deckContainer.show();
-    }
-
-    private _hideDecksList(): void {
-        this.deckContainer.hide();
-    }
-
-    private _showFlashcard(deck: Deck): void {
-        this._hideDecksList();
-        this.cardContainer.show(deck);
-    }
-
-    private _hideFlashcard(): void {
-        this.cardContainer.hide();
-    }
-
-    private _startReviewOfDeck(deck: Deck) {
-        this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
-        if (this.reviewSequencer.hasCurrentCard) {
-            this._showFlashcard(deck);
-        } else {
-            this._showDecksList();
-        }
-    }
-
-    private async _doEditQuestionText(): Promise<void> {
-        const currentQ: Question = this.reviewSequencer.currentQuestion;
-
-        // Just the question/answer text; without any preceding topic tag
-        const textPrompt = currentQ.questionText.actualQuestion;
-
-        const editModal = FlashcardEditModal.Prompt(
-            this.app,
-            textPrompt,
-            currentQ.questionText.textDirection,
-        );
-        editModal
-            .then(async (modifiedCardText) => {
-                this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
-            })
-            .catch((reason) => console.log(reason));
+        if (this.contentManager) this.contentManager.close();
     }
 }

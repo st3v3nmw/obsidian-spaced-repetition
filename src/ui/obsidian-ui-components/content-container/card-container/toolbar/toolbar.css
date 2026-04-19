@@ -1,0 +1,9 @@
+.sr-card-toolbar {
+    display: flex;
+    gap: var(--size-4-2);
+    justify-content: center;
+    align-items: center;
+
+    border-bottom: 1px solid var(--background-modifier-border);
+    padding: var(--size-4-2);
+}

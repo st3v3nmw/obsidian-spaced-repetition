@@ -5,23 +5,13 @@ import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/card/flashcard-review-sequencer";
-import { Question } from "src/card/questions/question";
-import { Deck } from "src/deck/deck";
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
-import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
-import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
-import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
-import { globalDateProvider } from "src/utils/dates";
+import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 export class SRModalView extends Modal {
-    public plugin: SRPlugin;
-    private reviewSequencer: IFlashcardReviewSequencer;
-    private settings: SRSettings;
-    private reviewMode: FlashcardReviewMode;
-    private deckContainer: DeckContainer;
-    private cardContainer: CardContainer;
+    private contentManager: ContentManager;
 
     constructor(
         app: App,
@@ -32,23 +22,17 @@ export class SRModalView extends Modal {
     ) {
         super(app);
 
-        // Init properties
-        this.plugin = plugin;
-        this.settings = settings;
-        this.reviewSequencer = reviewSequencer;
-        this.reviewMode = reviewMode;
-
         // Setup base containers
         if (Platform.isMobile || EmulatedPlatform().isMobile) {
-            this.modalEl.style.height = this.settings.flashcardHeightPercentageMobile + "%";
-            this.modalEl.style.maxHeight = this.settings.flashcardHeightPercentageMobile + "%";
-            this.modalEl.style.width = this.settings.flashcardWidthPercentageMobile + "%";
-            this.modalEl.style.maxWidth = this.settings.flashcardWidthPercentageMobile + "%";
+            this.modalEl.style.height = settings.flashcardHeightPercentageMobile + "%";
+            this.modalEl.style.maxHeight = settings.flashcardHeightPercentageMobile + "%";
+            this.modalEl.style.width = settings.flashcardWidthPercentageMobile + "%";
+            this.modalEl.style.maxWidth = settings.flashcardWidthPercentageMobile + "%";
         } else {
-            this.modalEl.style.height = this.settings.flashcardHeightPercentage + "%";
-            this.modalEl.style.maxHeight = this.settings.flashcardHeightPercentage + "%";
-            this.modalEl.style.width = this.settings.flashcardWidthPercentage + "%";
-            this.modalEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
+            this.modalEl.style.height = settings.flashcardHeightPercentage + "%";
+            this.modalEl.style.maxHeight = settings.flashcardHeightPercentage + "%";
+            this.modalEl.style.width = settings.flashcardWidthPercentage + "%";
+            this.modalEl.style.maxWidth = settings.flashcardWidthPercentage + "%";
         }
         this.modalEl.setAttribute("id", "sr-modal-view");
         this.modalEl.addClass("sr-view");
@@ -63,118 +47,22 @@ export class SRModalView extends Modal {
         this.contentEl.addClass("sr-modal-content");
 
         // Init static elements in views
-        this.deckContainer = new DeckContainer(
-            this.plugin,
-            this.settings,
-            this.reviewSequencer,
+        this.contentManager = new ContentManager(
+            app,
+            plugin,
+            reviewSequencer,
+            reviewMode,
+            settings,
             this.contentEl,
-            this._startReviewOfDeck.bind(this),
-            this.close.bind(this),
-        );
-
-        this.cardContainer = new CardContainer(
-            this.app,
-            this.plugin,
-            this.settings,
-            this.reviewSequencer,
-            this.reviewMode,
-            this.contentEl,
-            this._showDecksList.bind(this),
-            this._doEditQuestionText.bind(this),
             this.close.bind(this),
         );
     }
 
     onOpen(): void {
-        const subdecksWithCardsInQueue: Deck[] = this.reviewSequencer.getSubDecksWithCardsInQueue(
-            this.reviewSequencer.originalDeckTree,
-        );
-
-        let openImmediately: boolean = false;
-        let deckWithCards: Deck | null = null;
-
-        for (const subdeck of subdecksWithCardsInQueue) {
-            const hasNewCards: boolean = subdeck.newFlashcards.length > 0;
-            const hasDueCards: boolean = subdeck.dueFlashcards.length > 0;
-            const hasDueCardsToday: boolean =
-                hasDueCards &&
-                subdeck.dueFlashcards.some((card) => {
-                    const dueDate: number = card.scheduleInfo.dueDateAsUnix;
-                    const today: number = globalDateProvider.today.valueOf();
-                    return dueDate < today;
-                });
-
-            const hasCardsToday: boolean = hasNewCards || hasDueCardsToday;
-
-            if (
-                openImmediately &&
-                (hasCardsToday || this.reviewMode === FlashcardReviewMode.Cram)
-            ) {
-                openImmediately = false;
-                break;
-            }
-
-            if (hasCardsToday || this.reviewMode === FlashcardReviewMode.Cram) {
-                openImmediately = true;
-                deckWithCards = subdeck;
-            }
-        }
-
-        if (openImmediately && deckWithCards !== null) {
-            this._showFlashcard(deckWithCards);
-        } else {
-            this._showDecksList();
-        }
+        this.contentManager.open();
     }
 
     onClose(): void {
-        this.plugin.uiManager.setSRViewInFocus(false);
-        this.deckContainer.close();
-        this.cardContainer.close();
-    }
-
-    private _showDecksList(): void {
-        this._hideFlashcard();
-        this.deckContainer.show();
-    }
-
-    private _hideDecksList(): void {
-        this.deckContainer.hide();
-    }
-
-    private _showFlashcard(deck: Deck): void {
-        this._hideDecksList();
-        this.cardContainer.show(deck);
-    }
-
-    private _hideFlashcard(): void {
-        this.cardContainer.hide();
-    }
-
-    private _startReviewOfDeck(deck: Deck) {
-        this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
-        if (this.reviewSequencer.hasCurrentCard) {
-            this._showFlashcard(deck);
-        } else {
-            this._showDecksList();
-        }
-    }
-
-    private async _doEditQuestionText(): Promise<void> {
-        const currentQ: Question = this.reviewSequencer.currentQuestion;
-
-        // Just the question/answer text; without any preceding topic tag
-        const textPrompt = currentQ.questionText.actualQuestion;
-
-        const editModal = FlashcardEditModal.Prompt(
-            this.app,
-            textPrompt,
-            currentQ.questionText.textDirection,
-        );
-        editModal
-            .then(async (modifiedCardText) => {
-                this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
-            })
-            .catch((reason) => console.log(reason));
+        this.contentManager.close();
     }
 }

@@ -391,12 +391,6 @@
     }
 }
 
-/* src/ui/obsidian-ui-components/modals/confirmation-modal.css */
-.sr-confirmation-modal-header {
-    text-align: start;
-    margin-left: unset;
-}
-
 /* src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section.css */
 .sr-response {
     display: flex;
@@ -462,6 +456,22 @@ body:not(.is-mobile) .sr-response-button.sr-good-button::after {
 }
 body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     content: "3";
+}
+
+/* src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar.css */
+.sr-card-toolbar {
+    display: flex;
+    gap: var(--size-4-2);
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid var(--background-modifier-border);
+    padding: var(--size-4-2);
+}
+
+/* src/ui/obsidian-ui-components/modals/confirmation-modal.css */
+.sr-confirmation-modal-header {
+    text-align: start;
+    margin-left: unset;
 }
 
 /* src/ui/obsidian-ui-components/content-container/deck-container/deck-container.css */

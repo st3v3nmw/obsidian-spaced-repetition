@@ -26,8 +26,8 @@ export interface IIteratorOrder {
 }
 
 export interface IDeckTreeIterator {
-    get currentDeck(): Deck;
-    get currentCard(): Card;
+    get currentDeck(): Deck | null;
+    get currentCard(): Card | null;
     get hasCurrentCard(): boolean;
     setBaseDeck(baseDeck: Deck): void;
     setIteratorTopicPath(topicPath: TopicPath): void;
@@ -38,7 +38,7 @@ export interface IDeckTreeIterator {
 }
 
 class SingleDeckIterator {
-    deck: Deck;
+    deck: Deck | null = null;
     iteratorOrder: IIteratorOrder;
     preferredCardListType: CardListType;
     cardIdx?: number;
@@ -49,9 +49,9 @@ class SingleDeckIterator {
         return this.cardIdx !== null && this.cardIdx !== undefined;
     }
 
-    get currentCard(): Card {
-        let result: Card = null;
-        if (this.cardIdx !== null && this.cardIdx !== undefined)
+    get currentCard(): Card | null {
+        let result: Card | null = null;
+        if (this.cardIdx !== null && this.cardIdx !== undefined && this.deck !== null)
             result = this.deck.getCard(this.cardIdx, this.cardListType);
         return result;
     }
@@ -221,13 +221,13 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         return this.currentDeck?.getTopicPath();
     }
 
-    get currentDeck(): Deck {
+    get currentDeck(): Deck | null {
         if (this.deckIdx === null || this.deckIdx === undefined) return null;
         return this.deckArray[this.deckIdx];
     }
 
-    get currentCard(): Card {
-        let result: Card = null;
+    get currentCard(): Card | null {
+        let result: Card | null = null;
         if (
             this.deckIdx !== null &&
             this.deckIdx !== undefined &&

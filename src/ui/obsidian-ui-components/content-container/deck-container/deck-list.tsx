@@ -23,7 +23,10 @@ export default class DeckListComponent {
     private reviewedCardsText: HTMLDivElement;
     private totalCardsText: HTMLDivElement;
 
-    public constructor(parentEl: HTMLElement) {
+    private startReviewOfDeck: (deck: Deck) => void;
+
+    public constructor(parentEl: HTMLElement, startReviewOfDeck: (deck: Deck) => void) {
+        this.startReviewOfDeck = startReviewOfDeck;
         // Prep main container
         this.scrollWrapper = parentEl.createDiv();
         this.scrollWrapper.addClass("sr-scroll-wrapper");
@@ -106,11 +109,7 @@ export default class DeckListComponent {
      * @param settings - The settings object.
      * @param reviewSequencer - The review sequencer object.
      */
-    redraw(
-        reviewSequencer: IFlashcardReviewSequencer,
-        settings: SRSettings,
-        startReviewOfDeck: (deck: Deck) => void,
-    ) {
+    redraw(reviewSequencer: IFlashcardReviewSequencer, settings: SRSettings) {
         this.treeContainer.empty();
         const originDeckStats = reviewSequencer.getDeckStats(
             reviewSequencer.originalDeckTree.getTopicPath(),
@@ -126,7 +125,7 @@ export default class DeckListComponent {
                 this.treeContainer,
                 reviewSequencer,
                 settings,
-                startReviewOfDeck,
+                this.startReviewOfDeck,
             );
         }
     }
