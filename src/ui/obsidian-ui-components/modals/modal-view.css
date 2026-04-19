@@ -1,15 +1,17 @@
 /* MARK: Modal */
 
 #sr-modal-view {
-    & .modal-close-button,
-    & .modal-header {
-        display: none;
-    }
+    padding: 0;
+}
 
-    & .sr-modal-content {
-        overflow: visible;
-        padding: 0;
-    }
+#sr-modal-view .sr-modal-content {
+    overflow: visible;
+    padding: 0;
+}
+
+#sr-modal-view .modal-close-button,
+#sr-modal-view .modal-header {
+    display: none;
 }
 
 .is-mobile #sr-modal-view {

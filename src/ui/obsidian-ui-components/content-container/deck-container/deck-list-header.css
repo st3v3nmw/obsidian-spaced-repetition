@@ -32,4 +32,8 @@
     .is-phone .sr-deck-container .sr-deck-list-header .sr-button {
         padding: 0;
     }
+
+    .is-phone .sr-deck-list-header .sr-title {
+        font-size: var(--font-ui-medium);
+    }
 }
