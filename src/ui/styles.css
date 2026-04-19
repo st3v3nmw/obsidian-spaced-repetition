@@ -108,6 +108,8 @@
 /* MARK: Views General*/
 
 .sr-view {
+    container-type: size;
+    container-name: sr-view;
     display: flex;
     flex-direction: column;
 

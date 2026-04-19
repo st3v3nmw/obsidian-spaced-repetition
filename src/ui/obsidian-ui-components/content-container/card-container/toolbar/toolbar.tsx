@@ -49,6 +49,17 @@ export default class CardToolbarComponent {
             EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
         );
 
+        this.resetButton = new ResetButtonComponent(this.toolbar, onOpenResetModalClick, [
+            EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "undefined",
+        ]);
+        this.resetButton.setDisabled(true);
+
+        new SkipButtonComponent(
+            this.toolbar,
+            () => skipCurrentCard(),
+            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
+        );
+
         new MenuDotsButtonComponent(
             this.toolbar,
             (evt: MouseEvent) => {
@@ -72,27 +83,63 @@ export default class CardToolbarComponent {
                 cardMenu.showAtMouseEvent(evt);
             },
             EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
-        );
+        ).setClass("sr-short-menu-button");
 
-        this.resetButton = new ResetButtonComponent(this.toolbar, onOpenResetModalClick, [
-            EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "undefined",
-        ]);
-        this.resetButton.setDisabled(true);
-
-        new SkipButtonComponent(
+        new MenuDotsButtonComponent(
             this.toolbar,
-            () => skipCurrentCard(),
+            (evt: MouseEvent) => {
+                const cardMenu = new Menu();
+
+                cardMenu.addItem((item) => {
+                    item.setTitle(t("EDIT_CARD"))
+                        .setIcon("pencil")
+                        .onClick(() => {
+                            editClickHandler();
+                        });
+                });
+
+                cardMenu.addItem((item) => {
+                    item.setTitle(t("RESET_CARD_PROGRESS"))
+                        .setIcon("reset")
+                        .onClick(() => {
+                            onOpenResetModalClick();
+                        }).setDisabled(this.resetButton.disabled);
+                });
+
+                cardMenu.addItem((item) => {
+                    item.setTitle(t("SKIP"))
+                        .setIcon("chevrons-right")
+                        .onClick(() => {
+                            skipCurrentCard();
+                        });
+                });
+
+                cardMenu.addItem((item) => {
+                    item.setTitle("Jump to card") // TODO: Translate
+                        .setIcon("arrow-up-right")
+                        .onClick(() => {
+                            jumpToCurrentCard();
+                        });
+                });
+                cardMenu.addItem((item) => {
+                    item.setTitle(t("VIEW_CARD_INFO"))
+                        .setIcon("info")
+                        .onClick(() => {
+                            displayCurrentCardInfoNotice();
+                        });
+                });
+
+                cardMenu.showAtMouseEvent(evt);
+            },
             EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
-        );
+        ).setClass("sr-extended-menu-button");
+
+        // If we don't have a close modal, we don't need the close button
+        if (closeModal === undefined) return;
 
         const closeButtonClasses = [
             EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "clickable-icon",
         ];
-
-        if (closeModal === undefined) {
-            closeButtonClasses.push("sr-hide-by-scaling");
-            closeButtonClasses.push("hide-height");
-        }
 
         new ModalCloseButtonComponent(
             this.toolbar,

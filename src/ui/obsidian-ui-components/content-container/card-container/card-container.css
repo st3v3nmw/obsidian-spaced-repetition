@@ -2,14 +2,7 @@
 
 .sr-card-container {
     gap: var(--size-4-4);
-
-    & .sr-controls {
-        display: flex;
-        width: 100%;
-        align-items: center;
-        justify-content: center;
-        gap: var(--size-4-4);
-    }
+    --internal-padding: var(--size-4-2);
 
     & .sr-reset-button.mod-warning {
         --interactive-warning-hover: #fdf6f6;
@@ -33,17 +26,6 @@
         display: flex;
         flex-wrap: wrap;
         gap: var(--size-4-1) var(--size-4-4);
-    }
-
-    & .sr-horizontal-back-button,
-    & .sr-horizontal-flex-spacer,
-    & .sr-horizontal-close-button {
-        display: none;
-        padding: 0;
-    }
-
-    & .sr-horizontal-back-button {
-        margin-left: var(--size-4-4);
     }
 
     & .sr-chosen-deck-info,
@@ -108,6 +90,7 @@
         color: var(--text-faint);
         display: block;
         word-break: break-word;
+        padding: 0 var(--internal-padding);
     }
 
     & .sr-scroll-wrapper {
@@ -116,6 +99,7 @@
         overflow: hidden;
         flex-grow: 1;
         display: flex;
+        padding: 0 var(--internal-padding);
 
         & .sr-content {
             font-size: var(--font-text-size);
@@ -153,29 +137,6 @@
 
 @media only screen and (orientation: landscape) {
     .is-phone .sr-card-container {
-        flex-direction: row;
-
-        .sr-controls {
-            width: unset !important;
-            flex-direction: column;
-            justify-content: center;
-            gap: var(--size-4-2);
-
-            & > *:first-child,
-            & > *:last-child {
-                display: none;
-            }
-
-            & .sr-button {
-                padding: 0;
-            }
-        }
-
-        & .sr-horizontal-flex-spacer,
-        & .sr-horizontal-close-button,
-        & .sr-horizontal-back-button {
-            display: inline-flex;
-        }
 
         & .sr-chosen-deck-info > *,
         & .sr-current-deck-info > * {
@@ -189,6 +150,7 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 650px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 15ch;
@@ -196,6 +158,7 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 550px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 10ch;
@@ -216,6 +179,7 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 440px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 8ch;
@@ -223,6 +187,7 @@
 }
 
 @media only screen and (orientation: portrait) and (max-width: 410px) {
+
     .is-phone .sr-chosen-deck-name,
     .is-phone .sr-current-deck-name {
         max-width: 6ch;

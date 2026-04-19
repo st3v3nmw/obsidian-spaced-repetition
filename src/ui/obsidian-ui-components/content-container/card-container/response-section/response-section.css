@@ -3,6 +3,7 @@
 .sr-response {
     display: flex;
     gap: var(--size-4-4);
+    padding: 0 var(--internal-padding);
 
     & .sr-response-button {
         height: 48px;

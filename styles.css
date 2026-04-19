@@ -144,6 +144,8 @@
   flex-grow: 1;
 }
 .sr-view {
+  container-type: size;
+  container-name: sr-view;
   display: flex;
   flex-direction: column;
   & .MathJax {
@@ -198,13 +200,7 @@
 /* src/ui/obsidian-ui-components/content-container/card-container/card-container.css */
 .sr-card-container {
   gap: var(--size-4-4);
-  & .sr-controls {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    gap: var(--size-4-4);
-  }
+  --internal-padding: var(--size-4-2);
   & .sr-reset-button.mod-warning {
     --interactive-warning-hover: #fdf6f6;
     color: var(--text-error);
@@ -224,15 +220,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--size-4-1) var(--size-4-4);
-  }
-  & .sr-horizontal-back-button,
-  & .sr-horizontal-flex-spacer,
-  & .sr-horizontal-close-button {
-    display: none;
-    padding: 0;
-  }
-  & .sr-horizontal-back-button {
-    margin-left: var(--size-4-4);
   }
   & .sr-chosen-deck-info,
   & .sr-current-deck-info {
@@ -288,12 +275,14 @@
     color: var(--text-faint);
     display: block;
     word-break: break-word;
+    padding: 0 var(--internal-padding);
   }
   & .sr-scroll-wrapper {
     height: 100px;
     overflow: hidden;
     flex-grow: 1;
     display: flex;
+    padding: 0 var(--internal-padding);
     & .sr-content {
       font-size: var(--font-text-size);
       overflow-x: hidden;
@@ -324,25 +313,6 @@
 }
 @media only screen and (orientation: landscape) {
   .is-phone .sr-card-container {
-    flex-direction: row;
-    .sr-controls {
-      width: unset !important;
-      flex-direction: column;
-      justify-content: center;
-      gap: var(--size-4-2);
-      & > *:first-child,
-      & > *:last-child {
-        display: none;
-      }
-      & .sr-button {
-        padding: 0;
-      }
-    }
-    & .sr-horizontal-flex-spacer,
-    & .sr-horizontal-close-button,
-    & .sr-horizontal-back-button {
-      display: inline-flex;
-    }
     & .sr-chosen-deck-info > *,
     & .sr-current-deck-info > * {
       font-size: medium;
@@ -392,6 +362,7 @@
 .sr-response {
   display: flex;
   gap: var(--size-4-4);
+  padding: 0 var(--internal-padding);
   & .sr-response-button {
     height: 48px;
     flex-grow: 1;
@@ -461,6 +432,25 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
   align-items: center;
   border-bottom: 1px solid var(--background-modifier-border);
   padding: var(--size-4-2);
+  & .sr-extended-menu-button {
+    display: none;
+  }
+}
+@container (width < 700px) {
+  .sr-card-toolbar .sr-current-deck-info {
+    display: none;
+  }
+}
+@container (width < 500px) {
+  .sr-card-toolbar .sr-edit-button,
+  .sr-card-toolbar .sr-reset-button,
+  .sr-card-toolbar .sr-short-menu-button,
+  .sr-card-toolbar .sr-skip-button {
+    display: none;
+  }
+  .sr-card-toolbar .sr-extended-menu-button {
+    display: flex;
+  }
 }
 
 /* src/ui/obsidian-ui-components/modals/confirmation-modal.css */
