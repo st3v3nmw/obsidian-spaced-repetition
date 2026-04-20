@@ -2,6 +2,8 @@
 
 #sr-modal-view {
     padding: 0;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 #sr-modal-view .sr-modal-content {
@@ -12,6 +14,10 @@
 #sr-modal-view .modal-close-button,
 #sr-modal-view .modal-header {
     display: none;
+}
+
+body:not(.is-mobile) #sr-modal-view {
+    resize: both;
 }
 
 .is-mobile #sr-modal-view {

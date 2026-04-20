@@ -9,6 +9,8 @@ import EmulatedPlatform from "src/utils/platform-detector";
 
 export class SRModalView extends Modal {
     private contentManager: ContentManager;
+    private plugin: SRPlugin;
+    private resizeObserver: ResizeObserver | null = null;
 
     constructor(
         app: App,
@@ -17,28 +19,21 @@ export class SRModalView extends Modal {
         reviewQueueLoader: ReviewQueueLoader,
     ) {
         super(app);
+        this.plugin = plugin;
 
         // Setup base containers
         if (Platform.isMobile || EmulatedPlatform().isMobile) {
-            this.modalEl.style.height = settings.flashcardHeightPercentageMobile + "%";
-            this.modalEl.style.maxHeight = settings.flashcardHeightPercentageMobile + "%";
-            this.modalEl.style.width = settings.flashcardWidthPercentageMobile + "%";
-            this.modalEl.style.maxWidth = settings.flashcardWidthPercentageMobile + "%";
+            this.setModalSize(settings.flashcardHeightPercentageMobile, settings.flashcardWidthPercentageMobile);
         } else {
-            this.modalEl.style.height = settings.flashcardHeightPercentage + "%";
-            this.modalEl.style.maxHeight = settings.flashcardHeightPercentage + "%";
-            this.modalEl.style.width = settings.flashcardWidthPercentage + "%";
-            this.modalEl.style.maxWidth = settings.flashcardWidthPercentage + "%";
+            this.setModalSize(settings.flashcardHeightPercentage, settings.flashcardWidthPercentage);
+
+            this.resizeObserver = new ResizeObserver(this.onResize.bind(this));
+            this.resizeObserver.observe(this.modalEl);
         }
         this.modalEl.setAttribute("id", "sr-modal-view");
         this.modalEl.addClass("sr-view");
 
-        if (
-            parseInt(this.modalEl.style.height.split("%")[0]) >= 100 ||
-            parseInt(this.modalEl.style.width.split("%")[0]) >= 100
-        ) {
-            this.modalEl.style.borderRadius = "0";
-        }
+
 
         this.contentEl.addClass("sr-modal-content");
 
@@ -59,5 +54,52 @@ export class SRModalView extends Modal {
 
     onClose(): void {
         this.contentManager.close();
+    }
+
+    private onResize(entries: ResizeObserverEntry[]) {
+        const modalEl = entries[0].target as HTMLElement;
+        const parent = modalEl.parentElement;
+
+        console.log("Test", entries);
+
+        if (parent === null) return;
+
+        const elementHeight = modalEl.offsetHeight;
+        const parentHeight = parent.offsetHeight;
+        const heightPercent = (elementHeight / parentHeight) * 100;
+
+        const elementWidth = modalEl.offsetWidth;
+        const parentWidth = parent.offsetWidth;
+        const widthPercent = (elementWidth / parentWidth) * 100;
+
+
+        console.log("Test", heightPercent, widthPercent);
+
+        this.saveSizeToSettings(heightPercent, widthPercent, Platform.isMobile || EmulatedPlatform().isMobile);
+    }
+
+    private setModalSize(heightPercent: number, widthPercent: number) {
+        this.modalEl.style.height = heightPercent + "%";
+        this.modalEl.style.width = widthPercent + "%";
+        if (
+            parseInt(this.modalEl.style.height.split("%")[0]) >= 100 ||
+            parseInt(this.modalEl.style.width.split("%")[0]) >= 100
+        ) {
+            this.modalEl.style.borderRadius = "0";
+        }
+    }
+
+    private async saveSizeToSettings(heightPercent: number, widthPercent: number, isMobile: boolean) {
+        if (isNaN(heightPercent) || isNaN(widthPercent)) return;
+
+        if (isMobile) {
+            this.plugin.data.settings.flashcardHeightPercentageMobile = heightPercent;
+            this.plugin.data.settings.flashcardWidthPercentageMobile = widthPercent;
+        } else {
+            this.plugin.data.settings.flashcardHeightPercentage = heightPercent;
+            this.plugin.data.settings.flashcardWidthPercentage = widthPercent;
+        }
+        await this.plugin.savePluginData();
+        console.log("Saved size to settings");
     }
 }
