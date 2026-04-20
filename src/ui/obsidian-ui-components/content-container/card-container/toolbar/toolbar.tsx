@@ -39,6 +39,10 @@ export default class CardToolbarComponent {
                 : "clickable-icon",
         ]);
 
+        const centerSpacer = this.toolbar.createDiv();
+        centerSpacer.addClass("sr-flex-spacer");
+        centerSpacer.addClass("sr-center-spacer");
+
         this.infoSection = new DeckInfoComponent(this.toolbar);
 
         this.toolbar.createDiv().addClass("sr-flex-spacer");
@@ -82,7 +86,7 @@ export default class CardToolbarComponent {
 
                 cardMenu.showAtMouseEvent(evt);
             },
-            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
+            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"],
         ).setClass("sr-short-menu-button");
 
         new MenuDotsButtonComponent(
@@ -103,7 +107,8 @@ export default class CardToolbarComponent {
                         .setIcon("reset")
                         .onClick(() => {
                             onOpenResetModalClick();
-                        }).setDisabled(this.resetButton.disabled);
+                        })
+                        .setDisabled(this.resetButton.disabled);
                 });
 
                 cardMenu.addItem((item) => {
@@ -131,7 +136,7 @@ export default class CardToolbarComponent {
 
                 cardMenu.showAtMouseEvent(evt);
             },
-            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
+            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"],
         ).setClass("sr-extended-menu-button");
 
         // If we don't have a close modal, we don't need the close button
@@ -169,18 +174,16 @@ export default class CardToolbarComponent {
         currentDeckTotalCardsInQueue: number,
         flashcardCardOrder: string,
     ) {
-        this.infoSection.updateChosenDeckInfo(
-            chosenDeck,
-            chosenDeckStats,
-            totalCardsInSession,
+        this.infoSection.updateInfo(
+            chosenDeck.deckName,
+            chosenDeckStats.cardsInQueueCount,
+            totalCardsInSession - chosenDeckStats.cardsInQueueCount,
             totalDecksInSession,
-        );
-        this.infoSection.updateCurrentDeckInfo(
-            chosenDeck,
-            currentDeck,
-            currentDeckStats,
-            flashcardCardOrder,
+            totalDecksInSession - chosenDeckStats.decksInQueueOfThisDeckCount,
+            currentDeck.deckName,
             currentDeckTotalCardsInQueue,
+            currentDeckTotalCardsInQueue - currentDeckStats.cardsInQueueOfThisDeckCount,
+            flashcardCardOrder === "EveryCardRandomDeckAndCard",
         );
     }
 

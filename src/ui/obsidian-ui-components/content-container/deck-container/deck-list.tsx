@@ -1,7 +1,7 @@
 import "src/ui/obsidian-ui-components/content-container/deck-container/deck-list.css";
-import { setIcon } from "obsidian";
 
 import { DeckStats, IFlashcardReviewSequencer } from "src/card/flashcard-review-sequencer";
+import { COLLAPSE_ICON } from "src/constants";
 import { Deck } from "src/deck/deck";
 import { t } from "src/lang/helpers";
 import { SRSettings } from "src/settings";
@@ -186,7 +186,7 @@ export default class DeckListComponent {
 
         let collapsed = !initiallyExpanded;
         const collapseIconEl = treeRowSelf.createDiv("tree-item-icon collapse-icon");
-        setIcon(collapseIconEl, "right-triangle");
+        collapseIconEl.innerHTML = COLLAPSE_ICON;
         if (collapsed) collapseIconEl.addClass("is-collapsed");
         if (numOfSubdecks === 0) collapseIconEl.style.display = "none";
 

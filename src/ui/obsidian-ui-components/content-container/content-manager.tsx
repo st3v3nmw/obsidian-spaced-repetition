@@ -61,6 +61,8 @@ export interface SessionData {
     currentNote: Note;
 }
 
+// TODO: Refactor/integrate this code with the backend
+
 /**
  * Manages the content of the deck and flashcard views, by determining their behavior.
  *

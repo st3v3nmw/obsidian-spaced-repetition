@@ -1,97 +1,7 @@
 /* MARK: Card Container */
 
 .sr-card-container {
-    gap: var(--size-4-4);
-    --internal-padding: var(--size-4-2);
-
-    & .sr-reset-button.mod-warning {
-        --interactive-warning-hover: #fdf6f6;
-        color: var(--text-error);
-        background-color: var(--interactive-normal);
-
-        &:hover {
-            background-color: var(--interactive-warning-hover);
-        }
-    }
-
-    & .sr-main-wrapper {
-        gap: var(--container-gap);
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 100%;
-    }
-
-    & .sr-deck-progress-info {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--size-4-1) var(--size-4-4);
-    }
-
-    & .sr-chosen-deck-info,
-    & .sr-current-deck-info {
-        display: flex;
-        gap: var(--size-4-3);
-        justify-content: center;
-        align-items: center;
-        flex-wrap: nowrap;
-
-        color: var(--text-muted);
-        text-wrap: nowrap;
-        font-weight: bold;
-
-        & .sr-chosen-deck-name,
-        & .sr-current-deck-name {
-            max-width: 20ch;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        & .sr-chosen-deck-counter-wrapper,
-        & .sr-current-deck-counter-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: var(--size-4-3);
-
-            & .sr-chosen-deck-counter-divider,
-            & .sr-current-deck-counter-divider {
-                display: flex;
-                border: 1px solid var(--text-faint);
-                padding: 1ch 0;
-            }
-
-            & .sr-chosen-deck-card-counter-wrapper,
-            & .sr-current-deck-card-counter-wrapper,
-            & .sr-chosen-deck-subdeck-counter-wrapper {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                gap: 0.5ch;
-
-                & .sr-chosen-deck-card-counter-icon,
-                & .sr-chosen-deck-subdeck-counter-icon,
-                & .sr-current-deck-card-counter-icon {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-
-                    & svg {
-                        --icon-size: 16px;
-                        --icon-stroke: 2.5px;
-                    }
-                }
-            }
-        }
-    }
-
-    & .sr-context {
-        font-style: italic;
-        color: var(--text-faint);
-        display: block;
-        word-break: break-word;
-        padding: 0 var(--internal-padding);
-    }
+    --internal-side-padding: var(--size-4-2);
 
     & .sr-scroll-wrapper {
         height: 100px;
@@ -99,7 +9,6 @@
         overflow: hidden;
         flex-grow: 1;
         display: flex;
-        padding: 0 var(--internal-padding);
 
         & .sr-content {
             font-size: var(--font-text-size);
@@ -108,6 +17,8 @@
             user-select: text;
             flex-grow: 1;
             word-break: break-word;
+            padding: 0 var(--internal-side-padding);
+            padding-top: var(--size-4-2);
         }
     }
 
@@ -131,37 +42,15 @@
     }
 }
 
-.is-phone .sr-card-container .sr-controls {
-    gap: var(--size-4-3);
-}
-
 @media only screen and (orientation: landscape) {
     .is-phone .sr-card-container {
-
-        & .sr-chosen-deck-info > *,
-        & .sr-current-deck-info > * {
-            font-size: medium;
+        & .sr-content {
+            padding-top: 0;
         }
 
         & .sr-content hr {
             margin: 2px 0;
         }
-    }
-}
-
-@media only screen and (orientation: portrait) and (max-width: 650px) {
-
-    .is-phone .sr-chosen-deck-name,
-    .is-phone .sr-current-deck-name {
-        max-width: 15ch;
-    }
-}
-
-@media only screen and (orientation: portrait) and (max-width: 550px) {
-
-    .is-phone .sr-chosen-deck-name,
-    .is-phone .sr-current-deck-name {
-        max-width: 10ch;
     }
 }
 
@@ -175,21 +64,5 @@
             margin-block-start: 0.25rem;
             margin-block-end: 0.25rem;
         }
-    }
-}
-
-@media only screen and (orientation: portrait) and (max-width: 440px) {
-
-    .is-phone .sr-chosen-deck-name,
-    .is-phone .sr-current-deck-name {
-        max-width: 8ch;
-    }
-}
-
-@media only screen and (orientation: portrait) and (max-width: 410px) {
-
-    .is-phone .sr-chosen-deck-name,
-    .is-phone .sr-current-deck-name {
-        max-width: 6ch;
     }
 }

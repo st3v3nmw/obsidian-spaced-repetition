@@ -8,7 +8,7 @@ import { escapeHtml } from "src/escape-html";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
-import ContextSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/context-section";
+import ContextSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/context-section/context-section";
 import ResponseSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section";
 import CardToolbarComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar";
 import {
@@ -27,7 +27,7 @@ export class CardContainer {
     private view: HTMLDivElement;
 
     private toolbar: CardToolbarComponent;
-    private contextSection: ContextSectionComponent;
+    private contextSection: ContextSectionComponent | null = null;
 
     private scrollWrapper: HTMLDivElement;
     private content: HTMLDivElement;
@@ -91,8 +91,6 @@ export class CardContainer {
             closeModal,
         );
 
-        this.contextSection = new ContextSectionComponent(this.view);
-
         this.scrollWrapper = this.view.createDiv();
         this.scrollWrapper.addClass("sr-scroll-wrapper");
 
@@ -152,12 +150,6 @@ export class CardContainer {
 
     public async drawCardFront(sessionData: SessionData, settings: SRSettings) {
         this.toolbar.setResetButtonDisabled(true);
-        this.contextSection.updateCardContext(
-            settings.showContextInCards,
-            sessionData.currentQuestion,
-            sessionData.currentNote,
-        );
-
         // Update current deck info
         this.cardState = sessionData.cardData.currentCardState;
 
@@ -165,6 +157,18 @@ export class CardContainer {
 
         // Update card content
         this.content.empty();
+
+        // Create context section
+        if (settings.showContextInCards) {
+            this.contextSection = new ContextSectionComponent(this.content);
+            this.contextSection.updateCardContext(
+                settings.showContextInCards,
+                sessionData.currentQuestion,
+                sessionData.currentNote,
+            );
+        }
+
+        // Build card content
         const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
             this.app,
             this.plugin,

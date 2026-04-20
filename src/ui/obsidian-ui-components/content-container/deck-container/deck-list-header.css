@@ -20,6 +20,10 @@
     }
 }
 
+.sr-tab-view .sr-deck-list-header {
+    border-top: 1px solid var(--background-modifier-border);
+}
+
 @media only screen and (orientation: landscape) {
     .is-phone .sr-deck-list-header {
         display: none;

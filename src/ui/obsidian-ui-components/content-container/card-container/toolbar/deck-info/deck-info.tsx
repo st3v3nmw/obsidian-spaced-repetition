@@ -1,157 +1,175 @@
+import "src/ui/obsidian-ui-components/content-container/card-container/toolbar/deck-info/deck-info.css";
 import { setIcon } from "obsidian";
 
-import { DeckStats } from "src/card/flashcard-review-sequencer";
-import { Deck } from "src/deck/deck";
+import ProgressCounterComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/deck-info/progress-counter-component";
 
 export default class DeckInfoComponent {
-    public deckInfoContainer: HTMLDivElement;
-    public deckProgressInfo: HTMLDivElement;
+    private deckInfoContainer: HTMLDivElement;
 
-    public chosenDeckInfo: HTMLDivElement;
-    public chosenDeckName: HTMLDivElement;
+    private chosenDeckInfo: HTMLDivElement;
+    private chosenDeckName: HTMLDivElement;
+    private chosenDeckCounterDivider: HTMLDivElement;
+    private chosenDeckCardCounter: ProgressCounterComponent;
+    private chosenDeckSubDeckCounter: ProgressCounterComponent;
 
-    public chosenDeckCounterWrapper: HTMLDivElement;
-    public chosenDeckCounterDivider: HTMLDivElement;
+    private deckPointer: HTMLDivElement;
 
-    public chosenDeckCardCounterWrapper: HTMLDivElement;
-    public chosenDeckCardCounter: HTMLDivElement;
-    public chosenDeckCardCounterIcon: HTMLDivElement;
-
-    public chosenDeckSubDeckCounterWrapper: HTMLDivElement;
-    public chosenDeckSubDeckCounter: HTMLDivElement;
-    public chosenDeckSubDeckCounterIcon: HTMLDivElement;
-
-    public currentDeckInfo: HTMLDivElement;
-    public currentDeckName: HTMLDivElement;
-
-    public currentDeckCounterWrapper: HTMLDivElement;
-
-    public currentDeckCounterDivider: HTMLDivElement;
-
-    public currentDeckCardCounterWrapper: HTMLDivElement;
-    public currentDeckCardCounter: HTMLDivElement;
-    public currentDeckCardCounterIcon: HTMLDivElement;
+    private currentDeckInfo: HTMLDivElement;
+    private currentDeckName: HTMLDivElement;
+    private currentDeckCounterDivider: HTMLDivElement;
+    private currentDeckCardCounter: ProgressCounterComponent;
 
     constructor(parentEl: HTMLDivElement) {
         this.deckInfoContainer = parentEl.createDiv();
         this.deckInfoContainer.addClass("sr-info-section");
 
-        this.deckProgressInfo = this.deckInfoContainer.createDiv();
-        this.deckProgressInfo.addClass("sr-deck-progress-info");
-
-        this.chosenDeckInfo = this.deckProgressInfo.createDiv();
+        this.chosenDeckInfo = this.deckInfoContainer.createDiv();
+        this.chosenDeckInfo.addClass("sr-deck-info");
+        this.chosenDeckInfo.addClass("sr-bg-blue");
         this.chosenDeckInfo.addClass("sr-chosen-deck-info");
+
         this.chosenDeckName = this.chosenDeckInfo.createDiv();
-        this.chosenDeckName.addClass("sr-chosen-deck-name");
+        this.chosenDeckName.addClass("sr-deck-name");
 
-        this.chosenDeckCounterWrapper = this.chosenDeckInfo.createDiv();
-        this.chosenDeckCounterWrapper.addClass("sr-chosen-deck-counter-wrapper");
+        this.chosenDeckCounterDivider = this.chosenDeckInfo.createDiv();
+        this.chosenDeckCounterDivider.addClass("sr-divider");
 
-        this.chosenDeckCounterDivider = this.chosenDeckCounterWrapper.createDiv();
-        this.chosenDeckCounterDivider.addClass("sr-chosen-deck-counter-divider");
+        this.chosenDeckCardCounter = new ProgressCounterComponent(
+            this.chosenDeckInfo,
+            "credit-card",
+            0,
+            0,
+        );
 
-        this.chosenDeckCardCounterWrapper = this.chosenDeckCounterWrapper.createDiv();
-        this.chosenDeckCardCounterWrapper.addClass("sr-chosen-deck-card-counter-wrapper");
+        this.chosenDeckSubDeckCounter = new ProgressCounterComponent(
+            this.chosenDeckInfo,
+            "layers",
+            0,
+            0,
+        );
 
-        this.chosenDeckCardCounter = this.chosenDeckCardCounterWrapper.createDiv();
-        this.chosenDeckCardCounter.addClass("sr-chosen-deck-card-counter");
+        this.deckPointer = this.deckInfoContainer.createDiv();
+        setIcon(this.deckPointer, "chevron-right");
+        this.deckPointer.addClass("sr-deck-pointer");
 
-        this.chosenDeckCardCounterIcon = this.chosenDeckCardCounterWrapper.createDiv();
-        this.chosenDeckCardCounterIcon.addClass("sr-chosen-deck-card-counter-icon");
-        setIcon(this.chosenDeckCardCounterIcon, "credit-card");
-
-        this.chosenDeckSubDeckCounterWrapper = this.chosenDeckCounterWrapper.createDiv();
-        this.chosenDeckSubDeckCounterWrapper.addClass("sr-is-hidden");
-        this.chosenDeckSubDeckCounterWrapper.addClass("sr-chosen-deck-subdeck-counter-wrapper");
-
-        this.chosenDeckSubDeckCounter = this.chosenDeckSubDeckCounterWrapper.createDiv();
-        this.chosenDeckSubDeckCounter.addClass("sr-chosen-deck-subdeck-counter");
-
-        this.chosenDeckSubDeckCounterIcon = this.chosenDeckSubDeckCounterWrapper.createDiv();
-        this.chosenDeckSubDeckCounterIcon.addClass("sr-chosen-deck-subdeck-counter-icon");
-        setIcon(this.chosenDeckSubDeckCounterIcon, "layers");
-
-        this.currentDeckInfo = this.deckProgressInfo.createDiv();
-        this.currentDeckInfo.addClass("sr-is-hidden");
+        this.currentDeckInfo = this.deckInfoContainer.createDiv();
+        this.currentDeckInfo.addClass("sr-deck-info");
+        this.currentDeckInfo.addClass("sr-bg-blue");
         this.currentDeckInfo.addClass("sr-current-deck-info");
 
         this.currentDeckName = this.currentDeckInfo.createDiv();
-        this.currentDeckName.addClass("sr-current-deck-name");
+        this.currentDeckName.addClass("sr-deck-name");
 
-        this.currentDeckCounterWrapper = this.currentDeckInfo.createDiv();
-        this.currentDeckCounterWrapper.addClass("sr-current-deck-counter-wrapper");
-
-        this.currentDeckCounterDivider = this.currentDeckCounterWrapper.createDiv();
-        this.currentDeckCounterDivider.addClass("sr-current-deck-counter-divider");
-
-        this.currentDeckCardCounterWrapper = this.currentDeckCounterWrapper.createDiv();
-        this.currentDeckCardCounterWrapper.addClass("sr-current-deck-card-counter-wrapper");
-
-        this.currentDeckCardCounter = this.currentDeckCardCounterWrapper.createDiv();
-        this.currentDeckCardCounter.addClass("sr-current-deck-card-counter");
-        this.currentDeckCardCounterIcon = this.currentDeckCardCounterWrapper.createDiv();
-        this.currentDeckCardCounterIcon.addClass("sr-current-deck-card-counter-icon");
-        setIcon(this.currentDeckCardCounterIcon, "credit-card");
-
-        this.deckProgressInfo
-            .createDiv()
-            .addClasses(["sr-flex-spacer", "sr-horizontal-flex-spacer"]);
+        this.currentDeckCounterDivider = this.currentDeckInfo.createDiv();
+        this.currentDeckCounterDivider.addClass("sr-divider");
+        this.currentDeckCardCounter = new ProgressCounterComponent(
+            this.currentDeckInfo,
+            "credit-card",
+            0,
+            0,
+        );
     }
 
-    public updateChosenDeckInfo(
-        chosenDeck: Deck,
-        deckStats: DeckStats,
-        totalCardsInSession: number,
-        totalDecksInSession: number,
+    public updateInfo(
+        chosenDeckName: string,
+        totalCardsInChosenDeck: number,
+        cardProgressInChosenDeck: number,
+        totalDecksInChosenDeck: number,
+        deckProgressInChosenDeck: number,
+        currentDeckName: string,
+        currentDeckTotalCardsInDeck: number,
+        cardProgressInCurrentDeck: number,
+        isTotallyRandom: boolean,
     ) {
-        const chosenDeckStats = deckStats;
+        // Set values
+        this.chosenDeckName.setText(chosenDeckName);
+        this.chosenDeckCardCounter.setProgress(cardProgressInChosenDeck, totalCardsInChosenDeck);
+        this.chosenDeckSubDeckCounter.setProgress(deckProgressInChosenDeck, totalDecksInChosenDeck);
 
-        this.chosenDeckName.setText(`${chosenDeck.deckName}`);
-        this.chosenDeckCardCounter.setText(
-            `${totalCardsInSession - chosenDeckStats.cardsInQueueCount}/${totalCardsInSession}`,
+        this.currentDeckName.setText(currentDeckName);
+        this.currentDeckCardCounter.setProgress(
+            cardProgressInCurrentDeck,
+            currentDeckTotalCardsInDeck,
         );
 
-        if (chosenDeck.subdecks.length === 0) {
-            if (!this.chosenDeckSubDeckCounterWrapper.hasClass("sr-is-hidden")) {
-                this.chosenDeckSubDeckCounterWrapper.addClass("sr-is-hidden");
+        const hideCurrentDeckInfo: boolean =
+            chosenDeckName === currentDeckName || totalDecksInChosenDeck === 1;
+        const hideCurrentDeckCardCounter: boolean = isTotallyRandom;
+        const hideSubdeckCounter: boolean = totalDecksInChosenDeck === 1;
+        const hideChosenDeckName: boolean = !hideCurrentDeckInfo;
+        const hideDeckPointer: boolean = hideCurrentDeckInfo;
+        const hideChosenDeckDivider: boolean = hideChosenDeckName;
+        const hideCurrentDeckDivider: boolean = hideCurrentDeckCardCounter;
+
+        // Hide unused elements
+        if (hideChosenDeckName) {
+            if (!this.chosenDeckName.hasClass("sr-is-hidden")) {
+                this.chosenDeckName.addClass("sr-is-hidden");
             }
-            return;
+        } else {
+            if (this.chosenDeckName.hasClass("sr-is-hidden")) {
+                this.chosenDeckName.removeClass("sr-is-hidden");
+            }
         }
 
-        if (this.chosenDeckSubDeckCounterWrapper.hasClass("sr-is-hidden")) {
-            this.chosenDeckSubDeckCounterWrapper.removeClass("sr-is-hidden");
+        if (hideChosenDeckDivider) {
+            if (!this.chosenDeckCounterDivider.hasClass("sr-is-hidden")) {
+                this.chosenDeckCounterDivider.addClass("sr-is-hidden");
+            }
+        } else {
+            if (this.chosenDeckCounterDivider.hasClass("sr-is-hidden")) {
+                this.chosenDeckCounterDivider.removeClass("sr-is-hidden");
+            }
         }
 
-        this.chosenDeckSubDeckCounter.setText(
-            `${totalDecksInSession - chosenDeckStats.decksInQueueOfThisDeckCount}/${totalDecksInSession}`,
-        );
-    }
+        if (hideSubdeckCounter) {
+            if (!this.chosenDeckSubDeckCounter.hasClass("sr-is-hidden")) {
+                this.chosenDeckSubDeckCounter.addClass("sr-is-hidden");
+            }
+        } else {
+            if (this.chosenDeckSubDeckCounter.hasClass("sr-is-hidden")) {
+                this.chosenDeckSubDeckCounter.removeClass("sr-is-hidden");
+            }
+        }
 
-    public updateCurrentDeckInfo(
-        chosenDeck: Deck,
-        currentDeck: Deck,
-        currentDeckStats: DeckStats,
-        flashcardCardOrder: string,
-        currentDeckTotalCardsInQueue: number,
-    ) {
-        if (chosenDeck.subdecks.length === 0) {
+        if (hideDeckPointer) {
+            if (!this.deckPointer.hasClass("sr-is-hidden")) {
+                this.deckPointer.addClass("sr-is-hidden");
+            }
+        } else {
+            if (this.deckPointer.hasClass("sr-is-hidden")) {
+                this.deckPointer.removeClass("sr-is-hidden");
+            }
+        }
+
+        if (hideCurrentDeckInfo) {
             if (!this.currentDeckInfo.hasClass("sr-is-hidden")) {
                 this.currentDeckInfo.addClass("sr-is-hidden");
             }
-            return;
+        } else {
+            if (this.currentDeckInfo.hasClass("sr-is-hidden")) {
+                this.currentDeckInfo.removeClass("sr-is-hidden");
+            }
         }
 
-        if (this.currentDeckInfo.hasClass("sr-is-hidden")) {
-            this.currentDeckInfo.removeClass("sr-is-hidden");
+        if (hideCurrentDeckDivider) {
+            if (!this.currentDeckCounterDivider.hasClass("sr-is-hidden")) {
+                this.currentDeckCounterDivider.addClass("sr-is-hidden");
+            }
+        } else {
+            if (this.currentDeckCounterDivider.hasClass("sr-is-hidden")) {
+                this.currentDeckCounterDivider.removeClass("sr-is-hidden");
+            }
         }
 
-        this.currentDeckName.setText(`${currentDeck.deckName}`);
-
-        const isRandomMode = flashcardCardOrder === "EveryCardRandomDeckAndCard";
-        if (!isRandomMode) {
-            this.currentDeckCardCounter.setText(
-                `${currentDeckTotalCardsInQueue - currentDeckStats.cardsInQueueOfThisDeckCount}/${currentDeckTotalCardsInQueue}`,
-            );
+        if (hideCurrentDeckCardCounter) {
+            if (!this.currentDeckCardCounter.hasClass("sr-is-hidden")) {
+                this.currentDeckCardCounter.addClass("sr-is-hidden");
+            }
+        } else {
+            if (this.currentDeckCardCounter.hasClass("sr-is-hidden")) {
+                this.currentDeckCardCounter.removeClass("sr-is-hidden");
+            }
         }
     }
 }

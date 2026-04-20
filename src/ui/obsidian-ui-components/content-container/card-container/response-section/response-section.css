@@ -3,7 +3,8 @@
 .sr-response {
     display: flex;
     gap: var(--size-4-4);
-    padding: 0 var(--internal-padding);
+    padding: var(--size-4-2) var(--internal-side-padding);
+    border-top: 1px solid var(--background-modifier-border);
 
     & .sr-response-button {
         height: 48px;
@@ -13,24 +14,57 @@
         text-align: center;
         cursor: pointer;
         user-select: none;
+
+        & > * {
+            display: none;
+        }
     }
 }
 
-@media only screen and (orientation: landscape) and (max-height: 490px) {
+.sr-response-button > * {
+    display: none;
+}
+
+.sr-response-button.sr-show-answer-button > span.sr-large-text {
+    display: inline;
+}
+
+.sr-response-button.sr-show-small-text > span.sr-small-text,
+.sr-response-button.sr-show-large-text > span.sr-large-text {
+    display: inline;
+}
+
+.is-phone .sr-response-button:not(.sr-show-answer-button).sr-show-large-text > span.sr-small-text {
+    display: inline;
+}
+
+.is-phone .sr-response-button:not(.sr-show-answer-button).sr-show-large-text > span.sr-large-text {
+    display: none;
+}
+
+@container (width < 580px) {
+    .sr-response-button:not(.sr-show-answer-button).sr-show-large-text > span.sr-small-text {
+        display: inline;
+    }
+
+    .sr-response-button:not(.sr-show-answer-button).sr-show-large-text > span.sr-large-text {
+        display: none;
+    }
+}
+
+@media only screen and (orientation: landscape) {
     .is-phone .sr-response-button {
-        height: 32px !important;
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .is-phone .sr-response {
+        padding-top: var(--size-2-1);
+        padding-bottom: 0;
     }
 }
 
-@media only screen and (orientation: portrait) and (max-width: 340px) {
-    .is-mobile .sr-response-button {
-        height: 32px !important;
-    }
-}
-
-body:not(.is-phone) .sr-response {
-    padding: var(--size-2-2) 0;
-}
+/* MARK: Shortcut in buttons */
 
 body:not(.is-mobile) .sr-response-button.sr-show-answer-button,
 body:not(.is-mobile) .sr-response-button.sr-again-button,

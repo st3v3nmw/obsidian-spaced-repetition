@@ -23,17 +23,22 @@ export class SRModalView extends Modal {
 
         // Setup base containers
         if (Platform.isMobile || EmulatedPlatform().isMobile) {
-            this.setModalSize(settings.flashcardHeightPercentageMobile, settings.flashcardWidthPercentageMobile);
+            this.setModalSize(
+                settings.flashcardHeightPercentageMobile,
+                settings.flashcardWidthPercentageMobile,
+            );
         } else {
-            this.setModalSize(settings.flashcardHeightPercentage, settings.flashcardWidthPercentage);
+            this.setModalSize(
+                settings.flashcardHeightPercentage,
+                settings.flashcardWidthPercentage,
+            );
 
             this.resizeObserver = new ResizeObserver(this.onResize.bind(this));
             this.resizeObserver.observe(this.modalEl);
         }
+
         this.modalEl.setAttribute("id", "sr-modal-view");
         this.modalEl.addClass("sr-view");
-
-
 
         this.contentEl.addClass("sr-modal-content");
 
@@ -60,8 +65,6 @@ export class SRModalView extends Modal {
         const modalEl = entries[0].target as HTMLElement;
         const parent = modalEl.parentElement;
 
-        console.log("Test", entries);
-
         if (parent === null) return;
 
         const elementHeight = modalEl.offsetHeight;
@@ -72,10 +75,11 @@ export class SRModalView extends Modal {
         const parentWidth = parent.offsetWidth;
         const widthPercent = (elementWidth / parentWidth) * 100;
 
-
-        console.log("Test", heightPercent, widthPercent);
-
-        this.saveSizeToSettings(heightPercent, widthPercent, Platform.isMobile || EmulatedPlatform().isMobile);
+        this.saveSizeToSettings(
+            heightPercent,
+            widthPercent,
+            Platform.isMobile || EmulatedPlatform().isMobile,
+        );
     }
 
     private setModalSize(heightPercent: number, widthPercent: number) {
@@ -89,7 +93,11 @@ export class SRModalView extends Modal {
         }
     }
 
-    private async saveSizeToSettings(heightPercent: number, widthPercent: number, isMobile: boolean) {
+    private async saveSizeToSettings(
+        heightPercent: number,
+        widthPercent: number,
+        isMobile: boolean,
+    ) {
         if (isNaN(heightPercent) || isNaN(widthPercent)) return;
 
         if (isMobile) {
@@ -100,6 +108,5 @@ export class SRModalView extends Modal {
             this.plugin.data.settings.flashcardWidthPercentage = widthPercent;
         }
         await this.plugin.savePluginData();
-        console.log("Saved size to settings");
     }
 }

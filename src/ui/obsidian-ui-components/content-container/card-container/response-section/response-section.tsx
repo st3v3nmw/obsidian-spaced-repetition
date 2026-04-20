@@ -1,5 +1,5 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section.css";
-import { ButtonComponent, Platform } from "obsidian";
+import { Platform } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { textInterval } from "src/algorithms/osr/note-scheduling";
@@ -140,19 +140,38 @@ export default class ResponseSectionComponent {
     }
 
     private _setupEaseButton(
-        button: ButtonComponent,
+        button: SRResponseButtonComponent,
         buttonName: string,
         interval: number,
         showInterval: boolean,
     ) {
         if (showInterval) {
+            button.setSmallText(textInterval(interval, true));
+            button.setLargeText(`${buttonName} - ${textInterval(interval, false)}`);
+
             if (EmulatedPlatform().isMobile || Platform.isMobile) {
-                button.setButtonText(textInterval(interval, true));
+                if (button.buttonEl.hasClass("sr-show-large-text")) {
+                    button.buttonEl.removeClass("sr-show-large-text");
+                }
+                if (!button.buttonEl.hasClass("sr-show-small-text")) {
+                    button.buttonEl.addClass("sr-show-small-text");
+                }
             } else {
-                button.setButtonText(`${buttonName} - ${textInterval(interval, false)}`);
+                if (button.buttonEl.hasClass("sr-show-small-text")) {
+                    button.buttonEl.removeClass("sr-show-small-text");
+                }
+                if (!button.buttonEl.hasClass("sr-show-large-text")) {
+                    button.buttonEl.addClass("sr-show-large-text");
+                }
             }
         } else {
-            button.setButtonText(buttonName);
+            if (button.buttonEl.hasClass("sr-show-small-text")) {
+                button.buttonEl.removeClass("sr-show-small-text");
+            }
+            if (!button.buttonEl.hasClass("sr-show-large-text")) {
+                button.buttonEl.addClass("sr-show-large-text");
+            }
+            button.setLargeText(buttonName);
         }
     }
 }
