@@ -4,7 +4,6 @@ import { Question } from "src/card/questions/question";
 import { SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END } from "src/constants";
 import { IDataStoreAlgorithm } from "src/data-store-algorithm/idata-store-algorithm";
 import { SRSettings } from "src/settings";
-import { formatDateYYYYMMDD } from "src/utils/dates";
 
 // Algorithm: The original OSR algorithm
 //      (RZ: Perhaps not the original algorithm, but the only one available in 2023/early 2024)
@@ -29,16 +28,10 @@ export class DataStoreInNoteAlgorithmOsr implements IDataStoreAlgorithm {
     }
 
     formatCardSchedule(card: Card) {
-        let result: string;
         if (card.hasSchedule) {
-            const schedule = card.scheduleInfo as RepItemScheduleInfoOsr;
-            const dateStr = schedule.dueDate
-                ? formatDateYYYYMMDD(schedule.dueDate)
-                : RepItemScheduleInfoOsr.dummyDueDateForNewCard;
-            result = `!${dateStr},${schedule.interval},${schedule.latestEase}`;
-        } else {
-            result = `!${RepItemScheduleInfoOsr.dummyDueDateForNewCard},${RepItemScheduleInfoOsr.initialInterval},${this.settings.baseEase}`;
+            return card.scheduleInfo.formatCardScheduleForHtmlComment();
         }
-        return result;
+
+        return `!${RepItemScheduleInfoOsr.dummyDueDateForNewCard},${RepItemScheduleInfoOsr.initialInterval},${this.settings.baseEase}`;
     }
 }

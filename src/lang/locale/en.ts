@@ -173,6 +173,9 @@ const en: IBaseLocale = {
     CHECK_ALGORITHM_WIKI:
         'For more information, check the <a href="${algoUrl}">algorithm details</a>.',
     SM2_OSR_VARIANT: "OSR's variant of SM-2",
+    SWITCH_TO_FSRS_ALGORITHM: "Switch flashcard algorithm to FSRS?",
+    CONFIRM_FSRS_ALGORITHM_SWITCH:
+        "Switching to FSRS changes how flashcard scheduling data is written. Existing scheduling comments remain readable, but cards reviewed after this change will be rewritten in FSRS format.",
     BASE_EASE: "Base ease",
     BASE_EASE_DESC: "minimum = 130, preferrably approximately 250.",
     BASE_EASE_MIN_WARNING: "The base ease must be at least 130.",

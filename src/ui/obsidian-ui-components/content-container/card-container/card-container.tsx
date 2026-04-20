@@ -2,6 +2,7 @@ import { now } from "moment";
 import { App, MarkdownView, Notice, Platform } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
+import { formatPendingDueTime } from "src/algorithms/schedule-display";
 import { Card } from "src/card/card";
 import {
     FlashcardReviewMode,
@@ -48,6 +49,7 @@ export class CardContainer {
     private currentDeck: Deck | null;
     private previousDeck: Deck | null;
     private currentDeckTotalCardsInQueue: number = 0;
+    private pendingResumeTimeout: number | null = null;
 
     private clozeInputs: NodeListOf<HTMLInputElement>;
     private clozeAnswers: NodeListOf<Element>;
@@ -156,6 +158,7 @@ export class CardContainer {
      * Refreshes all dynamic elements
      */
     async refresh() {
+        this.clearPendingResumeTimeout();
         await this._drawContent();
     }
 
@@ -169,6 +172,7 @@ export class CardContainer {
         }
 
         document.removeEventListener("keydown", this._keydownHandler);
+        this.clearPendingResumeTimeout();
         this.view.addClass("sr-is-hidden");
         this.isActive = false;
     }
@@ -178,6 +182,7 @@ export class CardContainer {
      */
     close() {
         this.hide();
+        this.clearPendingResumeTimeout();
         document.removeEventListener("keydown", this._keydownHandler);
     }
 
@@ -197,6 +202,7 @@ export class CardContainer {
     // #region -> Functions & helpers
 
     private async _drawContent() {
+        this.clearPendingResumeTimeout();
         this.controls.resetButton.disabled = true;
 
         // Update current deck info
@@ -272,8 +278,37 @@ export class CardContainer {
     }
 
     private async _showNextCard(): Promise<void> {
-        if (this._currentCard !== null && this._currentCard !== undefined) await this.refresh();
-        else this.backToDeck();
+        if (this._currentCard !== null && this._currentCard !== undefined) {
+            await this.refresh();
+        } else if (this.reviewSequencer.hasPendingCards) {
+            this._showPendingState();
+        } else {
+            this.backToDeck();
+        }
+    }
+
+    private _showPendingState(): void {
+        this.clearPendingResumeTimeout();
+        const nextPendingDueUnix = this.reviewSequencer.nextPendingDueUnix;
+        if (nextPendingDueUnix === null) {
+            this.backToDeck();
+            return;
+        }
+
+        this.content.empty();
+        this.response.hideAllButtons();
+        this.content.createDiv({
+            cls: "sr-centered",
+            text: `Waiting for the next FSRS review step. Next card due at ${formatPendingDueTime(
+                nextPendingDueUnix,
+            )}.`,
+        });
+
+        const delayMs = Math.max(0, nextPendingDueUnix - Date.now());
+        this.pendingResumeTimeout = window.setTimeout(async () => {
+            this.reviewSequencer.refreshCurrentDeck();
+            await this._showNextCard();
+        }, delayMs + 50);
     }
 
     // #region -> Controls
@@ -285,6 +320,13 @@ export class CardContainer {
 
     private _displayCurrentCardInfoNotice() {
         new CardInfoNotice(this._currentCard.scheduleInfo, this._currentQuestion.note.filePath);
+    }
+
+    private clearPendingResumeTimeout() {
+        if (this.pendingResumeTimeout !== null) {
+            window.clearTimeout(this.pendingResumeTimeout);
+            this.pendingResumeTimeout = null;
+        }
     }
 
     private async _jumpToCurrentCard(): Promise<void> {

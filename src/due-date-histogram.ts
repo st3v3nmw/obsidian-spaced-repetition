@@ -119,7 +119,7 @@ export class CardDueDateHistogram extends DueDateHistogram {
         };
 
         // Iteration is a destructive operation on the supplied tree, so we first take a copy
-        const today: number = globalDateProvider.today.valueOf();
+        const now: number = globalDateProvider.now.valueOf();
         const iterator: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, deckTree.clone());
         iterator.setIteratorTopicPath(TopicPath.emptyPath);
         while (iterator.nextCard()) {
@@ -128,7 +128,7 @@ export class CardDueDateHistogram extends DueDateHistogram {
                 const scheduledCard: RepItemScheduleInfo = card.scheduleInfo;
 
                 const nDays: number = Math.ceil(
-                    (scheduledCard.dueDateAsUnix - today) / TICKS_PER_DAY,
+                    (scheduledCard.dueDateAsUnix - now) / TICKS_PER_DAY,
                 );
                 this.increment(nDays);
             }
