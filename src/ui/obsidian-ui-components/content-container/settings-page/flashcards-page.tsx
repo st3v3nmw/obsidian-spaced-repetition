@@ -5,6 +5,7 @@ import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
+import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 
 /**
  * Represents a flashcards settings page.
@@ -17,10 +18,12 @@ export class FlashcardsPage extends SettingsPage {
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
         pageType: SettingsPageType,
+        didReadMultilineEndMarkerWarning: boolean,
         applySettingsUpdate: (callback: () => unknown) => void,
         display: () => void,
         openPage: (pageType: SettingsPageType) => void,
         scrollListener: (scrollPosition: number) => void,
+        changeMultilineEndMarkerWarningState: (didReadMultilineEndMarkerWarning: boolean) => void,
     ) {
         super(
             pageContainerEl,
@@ -135,20 +138,20 @@ export class FlashcardsPage extends SettingsPage {
                         .addOptions(
                             deckOrderEnabled
                                 ? {
-                                      // eslint-disable-next-line camelcase
-                                      PrevDeckComplete_Sequential: t(
-                                          "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
-                                      ),
-                                      // eslint-disable-next-line camelcase
-                                      PrevDeckComplete_Random: t(
-                                          "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
-                                      ),
-                                  }
+                                    // eslint-disable-next-line camelcase
+                                    PrevDeckComplete_Sequential: t(
+                                        "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
+                                    ),
+                                    // eslint-disable-next-line camelcase
+                                    PrevDeckComplete_Random: t(
+                                        "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
+                                    ),
+                                }
                                 : {
-                                      EveryCardRandomDeckAndCard: t(
-                                          "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
-                                      ),
-                                  },
+                                    EveryCardRandomDeckAndCard: t(
+                                        "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
+                                    ),
+                                },
                         )
                         .setValue(
                             deckOrderEnabled
@@ -165,21 +168,6 @@ export class FlashcardsPage extends SettingsPage {
 
         new SettingGroup(this.containerEl)
             .setHeading(t("GROUP_FLASHCARD_SEPARATORS"))
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("CONVERT_CLOZE_PATTERNS_TO_INPUTS"))
-                    .setDesc(t("CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.plugin.data.settings.convertClozePatternsToInputs)
-                            .onChange(async (value) => {
-                                this.plugin.data.settings.convertClozePatternsToInputs = value;
-                                await this.plugin.savePluginData();
-
-                                this.display();
-                            }),
-                    );
-            })
             .addSetting((setting: Setting) => {
                 setting
                     .setName(t("ATOMIC_CLOZES"))
@@ -459,29 +447,50 @@ export class FlashcardsPage extends SettingsPage {
             .addSetting((setting: Setting) => {
                 setting
                     .setName(t("MULTILINE_CARDS_END_MARKER"))
-                    .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
-                    .addExtraButton((button) => {
-                        button
-                            .setIcon("reset")
-                            .setTooltip(t("RESET_DEFAULT"))
-                            .onClick(async () => {
-                                this.plugin.data.settings.multilineCardEndMarker =
-                                    DEFAULT_SETTINGS.multilineCardEndMarker;
-                                await this.plugin.savePluginData();
+                    .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"));
 
-                                this.display();
-                            });
-                    })
-                    .addText((text) =>
-                        text
-                            .setValue(this.plugin.data.settings.multilineCardEndMarker)
-                            .onChange((value) => {
-                                applySettingsUpdate(async () => {
-                                    this.plugin.data.settings.multilineCardEndMarker = value;
+                if (didReadMultilineEndMarkerWarning) {
+                    setting
+                        .addExtraButton((button) => {
+                            button
+                                .setIcon("reset")
+                                .setTooltip(t("RESET_DEFAULT"))
+                                .onClick(async () => {
+                                    this.plugin.data.settings.multilineCardEndMarker =
+                                        DEFAULT_SETTINGS.multilineCardEndMarker;
                                     await this.plugin.savePluginData();
+
+                                    this.display();
                                 });
-                            }),
-                    );
+                        })
+                        .addText((text) =>
+                            text
+                                .setValue(this.plugin.data.settings.multilineCardEndMarker)
+                                .onChange((value) => {
+                                    applySettingsUpdate(async () => {
+                                        this.plugin.data.settings.multilineCardEndMarker = value;
+                                        await this.plugin.savePluginData();
+                                    });
+                                }),
+                        );
+                } else {
+                    setting.addButton((button) => {
+                        button
+                            .setButtonText("Unlock Setting")
+                            .setClass("mod-warning")
+                            .onClick(async () => {
+                                new ConfirmationModal(
+                                    this.plugin.app,
+                                    "Please read!",
+                                    "Please only change this setting if you already added the characters denoting the end marker to all your multiline / cloze cards. Else you might loose your scheduling data!",
+                                    "Unlocking setting.",
+                                    () => {
+                                        changeMultilineEndMarkerWarningState(true);
+                                    },
+                                ).open();
+                            });
+                    });
+                }
             });
     }
 }

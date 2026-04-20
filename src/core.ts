@@ -109,7 +109,7 @@ export class OsrCore {
 
     protected async processFile(noteFile: ISRFile): Promise<void> {
         const schedule: RepItemScheduleInfo = await noteFile.getNoteSchedule();
-        let note: Note = null;
+        let note: Note | null = null;
 
         // Update the graph of links between notes
         // (Performance note: This only requires accessing Obsidian's metadata cache and not loading the file)
@@ -120,7 +120,7 @@ export class OsrCore {
         const topicPath: TopicPath = this.findTopicPath(noteFile);
         if (topicPath.hasPath) {
             note = await this.loadNote(noteFile, topicPath);
-            note.appendCardsToDeck(this.fullDeckTree);
+            if (note !== null) note.appendCardsToDeck(this.fullDeckTree);
         }
 
         // Give the algorithm a chance to do something with the loaded note
@@ -138,7 +138,7 @@ export class OsrCore {
         this._noteReviewQueue.addNoteToQueue(noteFile, noteSchedule, matchedNoteTags);
     }
 
-    protected finaliseLoad(): void {
+    protected finalizeLoad(): void {
         this.osrNoteGraph.generatePageRanks();
 
         // Reviewable cards are all except those with the "edit later" tag
@@ -216,9 +216,9 @@ export class OsrCore {
     private async buryAllCardsInNote(settings: SRSettings, noteFile: ISRFile): Promise<void> {
         if (settings.burySiblingCards) {
             const topicPath: TopicPath = this.findTopicPath(noteFile);
-            const noteX: Note = await this.loadNote(noteFile, topicPath);
+            const noteX: Note | null = await this.loadNote(noteFile, topicPath);
 
-            if (noteX.questionList.length > 0) {
+            if (noteX !== null && noteX.questionList.length > 0) {
                 for (const question of noteX.questionList) {
                     this._questionPostponementList.add(question);
                 }
@@ -227,10 +227,10 @@ export class OsrCore {
         }
     }
 
-    async loadNote(noteFile: ISRFile, topicPath: TopicPath): Promise<Note> {
+    async loadNote(noteFile: ISRFile, topicPath: TopicPath): Promise<Note | null> {
         const loader: NoteFileLoader = new NoteFileLoader(this.settings);
-        const note: Note = await loader.load(noteFile, this.defaultTextDirection, topicPath);
-        if (note.hasChanged) {
+        const note: Note | null = await loader.load(noteFile, this.defaultTextDirection, topicPath);
+        if (note !== null && note.hasChanged) {
             await note.writeNoteFile(this.settings);
         }
         return note;
@@ -273,7 +273,7 @@ export class OsrAppCore extends OsrCore {
                 await this.processFile(file);
             }
 
-            this.finaliseLoad();
+            this.finalizeLoad();
         } finally {
             this._syncLock = false;
         }

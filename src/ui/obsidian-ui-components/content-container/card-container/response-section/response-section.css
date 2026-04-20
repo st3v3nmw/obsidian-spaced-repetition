@@ -1,0 +1,117 @@
+/* MARK: Response */
+
+.sr-response {
+    display: flex;
+    gap: var(--size-4-4);
+    padding: var(--size-4-2) var(--internal-side-padding);
+    border-top: 1px solid var(--background-modifier-border);
+
+    & .sr-response-button {
+        height: 48px;
+        flex-grow: 1;
+        margin: auto;
+        line-height: 48px;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+
+        & > * {
+            display: none;
+        }
+    }
+}
+
+.sr-edit-view .sr-response {
+    border: none;
+}
+
+.sr-response-button > * {
+    display: none;
+}
+
+.sr-response-button.sr-show-answer-button > span.sr-large-text {
+    display: inline;
+}
+
+.sr-response-button.sr-show-small-text > span.sr-small-text,
+.sr-response-button.sr-show-large-text > span.sr-large-text {
+    display: inline;
+}
+
+.is-phone .sr-response-button:not(.sr-show-answer-button).sr-show-large-text > span.sr-small-text {
+    display: inline;
+}
+
+.is-phone .sr-response-button:not(.sr-show-answer-button).sr-show-large-text > span.sr-large-text {
+    display: none;
+}
+
+@container (width < 580px) {
+    .sr-response-button:not(.sr-show-answer-button).sr-show-large-text > span.sr-small-text {
+        display: inline;
+    }
+
+    .sr-response-button:not(.sr-show-answer-button).sr-show-large-text > span.sr-large-text {
+        display: none;
+    }
+}
+
+@media only screen and (orientation: landscape) {
+    .is-phone .sr-response-button {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .is-phone .sr-response {
+        padding-top: var(--size-2-1);
+        padding-bottom: 0;
+    }
+}
+
+/* MARK: Shortcut in buttons */
+
+body:not(.is-mobile) .sr-response-button.sr-show-answer-button,
+body:not(.is-mobile) .sr-response-button.sr-again-button,
+body:not(.is-mobile) .sr-response-button.sr-hard-button,
+body:not(.is-mobile) .sr-response-button.sr-good-button,
+body:not(.is-mobile) .sr-response-button.sr-easy-button {
+    position: relative;
+
+    &::after {
+        position: absolute;
+        right: 4px;
+        bottom: 4px;
+        height: 0.8rem;
+        background-color: rgb(0 0 0 / 0%);
+        border-radius: var(--input-radius);
+        line-height: 1;
+        padding: 2px 4px;
+        padding-top: 3px;
+        font-size: x-small;
+        box-shadow:
+            inset 1px 1px rgb(255 255 255 / 20%),
+            inset -1px -1px rgb(0 0 0 / 20%);
+        color: #f7f7f7;
+        font-family: var(--font-monospace);
+    }
+}
+
+body:not(.is-mobile) .sr-response-button.sr-show-answer-button::after {
+    content: "Space";
+}
+
+body:not(.is-mobile) .sr-response-button.sr-again-button::after {
+    content: "0";
+}
+
+body:not(.is-mobile) .sr-response-button.sr-hard-button::after {
+    content: "1";
+}
+
+body:not(.is-mobile) .sr-response-button.sr-good-button::after {
+    content: "2";
+}
+
+body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
+    content: "3";
+}

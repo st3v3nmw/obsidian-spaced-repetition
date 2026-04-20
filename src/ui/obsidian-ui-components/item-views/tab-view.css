@@ -1,0 +1,16 @@
+/* MARK: Tab view */
+
+.sr-tab-view {
+    --bottom-statusbar-clearance: var(--size-4-8);
+    padding-top: 0 !important;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+    padding-bottom: max(
+        var(--bottom-statusbar-clearance),
+        var(--safe-area-inset-bottom)
+    ) !important;
+}
+
+.sr-tab-view-content.sr-center-view {
+    margin: auto;
+}

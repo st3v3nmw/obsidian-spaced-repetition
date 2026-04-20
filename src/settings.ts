@@ -8,7 +8,7 @@ export interface SRSettings {
     flashcardTags: string[];
     convertFoldersToDecks: boolean;
     burySiblingCards: boolean;
-    randomizeCardOrder: boolean;
+    randomizeCardOrder: boolean | null;
     flashcardCardOrder: string;
     flashcardDeckOrder: string;
     convertClozePatternsToInputs: boolean;

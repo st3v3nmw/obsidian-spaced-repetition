@@ -1,0 +1,68 @@
+/* MARK: Card Container */
+
+.sr-card-container {
+    --internal-side-padding: var(--size-4-2);
+
+    & .sr-scroll-wrapper {
+        height: 100px;
+        /* Arbitrary height to force the content to scroll */
+        overflow: hidden;
+        flex-grow: 1;
+        display: flex;
+
+        & .sr-content {
+            font-size: var(--font-text-size);
+            overflow-x: hidden;
+            overflow-y: auto;
+            user-select: text;
+            flex-grow: 1;
+            word-break: break-word;
+            padding: 0 var(--internal-side-padding);
+            padding-top: var(--size-4-2);
+        }
+    }
+
+    & .sr-content p {
+        margin-top: 0;
+    }
+
+    & .sr-content > ul,
+    & .sr-content > ol {
+        padding-left: var(--size-4-6);
+    }
+
+    & .sr-content hr {
+        backdrop-filter: invert(40%);
+        border-top-style: dashed;
+        margin: 1rem 0;
+    }
+
+    & .sr-content .cloze-input {
+        height: 1.4rem;
+    }
+}
+
+@media only screen and (orientation: landscape) {
+    .is-phone .sr-card-container {
+        & .sr-content {
+            padding-top: 0;
+        }
+
+        & .sr-content hr {
+            margin: 2px 0;
+        }
+    }
+}
+
+@media only screen and (orientation: landscape) and (max-height: 490px) {
+    .is-phone .sr-card-container .sr-content {
+        & hr {
+            margin: var(--size-4-1) 0;
+        }
+
+        & p {
+            margin-block-start: 0.25rem;
+            margin-block-end: 0.25rem;
+        }
+    }
+}

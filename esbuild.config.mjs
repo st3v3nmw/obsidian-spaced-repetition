@@ -1,10 +1,31 @@
-import esbuild from "esbuild";
-import process from "process";
 import builtins from "builtin-modules";
-import postCssPlugin from "esbuild-plugin-postcss2";
-import { writeFile } from "fs/promises";
+import console from "console";
+import esbuild from "esbuild";
+import fs from "fs";
+import path from "path";
+import process from "process";
 
 const prod = process.argv[2] === "production";
+
+const moveToRootPlugin = {
+    name: "move-to-root",
+    setup(build) {
+        build.onEnd((_) => {
+            const cssFile = path.join("build", "main.css");
+            const targetFile = "styles.css";
+
+            if (fs.existsSync(cssFile)) {
+                let contents = fs.readFileSync(cssFile, "utf8");
+                // Remove source map comment
+                contents = contents.replace(/\/\*#\s*sourceMappingURL=.*?\*\/\s*$/s, "");
+                fs.writeFileSync(targetFile, contents);
+                fs.rmSync(cssFile);
+
+                console.log(`✓ CSS bundled to ${targetFile}`);
+            }
+        });
+    },
+};
 
 const context = await esbuild.context({
     entryPoints: ["src/main.ts"],
@@ -17,6 +38,10 @@ const context = await esbuild.context({
     sourcesContent: !prod,
     treeShaking: true,
     outfile: "build/main.js",
+    loader: {
+        ".css": "css",
+    },
+    plugins: [moveToRootPlugin],
 });
 
 if (prod) {
@@ -24,19 +49,4 @@ if (prod) {
     context.dispose();
 } else {
     context.watch().catch(() => process.exit(1));
-}
-
-// Separate processing for CSS output
-const cssContext = await esbuild.context({
-    entryPoints: ["src/ui/styles.css"],
-    bundle: true,
-    outfile: "styles.css",
-    plugins: [postCssPlugin.default()],
-});
-
-if (prod) {
-    cssContext.rebuild().catch(() => process.exit(1));
-    cssContext.dispose();
-} else {
-    cssContext.watch().catch(() => process.exit(1));
 }

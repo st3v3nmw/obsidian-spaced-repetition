@@ -1,8 +1,7 @@
 {
     "compilerOptions": {
-        "baseUrl": "./",
         "paths": {
-            "src/*": ["src/*"]
+            "src/*": ["./src/*"]
         },
         "inlineSourceMap": true,
         "inlineSources": true,
@@ -11,7 +10,7 @@
         "types": ["node", "jest"],
         "allowJs": true,
         "noImplicitAny": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "esModuleInterop": true,
         "importHelpers": true,
         "lib": ["dom", "dom.Iterable", "scripthost", "ES5", "ES6", "ES7", "ES2021"],
