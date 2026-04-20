@@ -8,9 +8,19 @@
     gap: var(--size-4-2);
     justify-content: space-between;
     align-items: center;
-
+    padding: 0 var(--size-4-2);
     border-bottom: 1px solid var(--background-modifier-border);
-    padding: var(--size-4-2);
+
+    & > * {
+        margin: var(--size-4-2) 0;
+    }
+
+    & > .sr-divider {
+        --divider-height: 100%;
+        --divider-color: var(--background-modifier-border);
+        --divider-width: 1px;
+        margin: 0;
+    }
 
     & .sr-extended-menu-button {
         display: none;
@@ -56,6 +66,7 @@
 .is-phone .sr-card-toolbar .sr-edit-button,
 .is-phone .sr-card-toolbar .sr-reset-button,
 .is-phone .sr-card-toolbar .sr-short-menu-button,
+.is-phone .sr-card-toolbar > .sr-divider,
 .is-phone .sr-card-toolbar .sr-skip-button {
     display: none;
 }
@@ -77,6 +88,7 @@
     .sr-card-toolbar .sr-edit-button,
     .sr-card-toolbar .sr-reset-button,
     .sr-card-toolbar .sr-short-menu-button,
+    .sr-card-toolbar > .sr-divider,
     .sr-card-toolbar .sr-skip-button {
         display: none;
     }

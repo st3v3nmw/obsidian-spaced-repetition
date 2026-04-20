@@ -106,10 +106,11 @@
 }
 
 .sr-divider {
-    --divider-width: 1px;
+    --divider-width: 2px;
     --divider-height: 2ch;
-    border: var(--divider-width) solid var(--text-faint);
-    padding-top: var(--divider-height);
+    --divider-color: var(--text-faint);
+    border-left: var(--divider-width) solid var(--divider-color);
+    height: var(--divider-height);
     width: var(--divider-width);
     max-width: var(--divider-width);
     border-radius: 10px;

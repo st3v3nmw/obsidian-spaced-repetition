@@ -53,9 +53,11 @@ export default class CardToolbarComponent {
             EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
         );
 
-        this.resetButton = new ResetButtonComponent(this.toolbar, onOpenResetModalClick, [
-            EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "undefined",
-        ]);
+        this.resetButton = new ResetButtonComponent(
+            this.toolbar,
+            onOpenResetModalClick,
+            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
+        );
         this.resetButton.setDisabled(true);
 
         new SkipButtonComponent(
@@ -63,6 +65,8 @@ export default class CardToolbarComponent {
             () => skipCurrentCard(),
             EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
         );
+
+        this.toolbar.createDiv("sr-divider");
 
         new MenuDotsButtonComponent(
             this.toolbar,

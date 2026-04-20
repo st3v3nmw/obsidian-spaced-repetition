@@ -75,6 +75,8 @@ export class SRModalView extends Modal {
         const parentWidth = parent.offsetWidth;
         const widthPercent = (elementWidth / parentWidth) * 100;
 
+        this.setReoundedModalCorners(!(heightPercent >= 100 || widthPercent >= 100));
+
         this.saveSizeToSettings(
             heightPercent,
             widthPercent,
@@ -82,15 +84,24 @@ export class SRModalView extends Modal {
         );
     }
 
+    private setReoundedModalCorners(rounded: boolean) {
+        if (rounded) {
+            this.modalEl.style.borderRadius = "var(--modal-radius)";
+        } else {
+            this.modalEl.style.borderRadius = "0";
+        }
+    }
+
     private setModalSize(heightPercent: number, widthPercent: number) {
         this.modalEl.style.height = heightPercent + "%";
         this.modalEl.style.width = widthPercent + "%";
-        if (
-            parseInt(this.modalEl.style.height.split("%")[0]) >= 100 ||
-            parseInt(this.modalEl.style.width.split("%")[0]) >= 100
-        ) {
-            this.modalEl.style.borderRadius = "0";
-        }
+
+        this.setReoundedModalCorners(
+            !(
+                parseInt(this.modalEl.style.height.split("%")[0]) >= 100 ||
+                parseInt(this.modalEl.style.width.split("%")[0]) >= 100
+            ),
+        );
     }
 
     private async saveSizeToSettings(

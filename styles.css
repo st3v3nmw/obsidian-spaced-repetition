@@ -144,10 +144,11 @@
     flex-grow: 1;
 }
 .sr-divider {
-    --divider-width: 1px;
+    --divider-width: 2px;
     --divider-height: 2ch;
-    border: var(--divider-width) solid var(--text-faint);
-    padding-top: var(--divider-height);
+    --divider-color: var(--text-faint);
+    border-left: var(--divider-width) solid var(--divider-color);
+    height: var(--divider-height);
     width: var(--divider-width);
     max-width: var(--divider-width);
     border-radius: 10px;
@@ -360,8 +361,17 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     gap: var(--size-4-2);
     justify-content: space-between;
     align-items: center;
+    padding: 0 var(--size-4-2);
     border-bottom: 1px solid var(--background-modifier-border);
-    padding: var(--size-4-2);
+    & > * {
+        margin: var(--size-4-2) 0;
+    }
+    & > .sr-divider {
+        --divider-height: 100%;
+        --divider-color: var(--background-modifier-border);
+        --divider-width: 1px;
+        margin: 0;
+    }
     & .sr-extended-menu-button {
         display: none;
     }
@@ -397,6 +407,7 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
 .is-phone .sr-card-toolbar .sr-edit-button,
 .is-phone .sr-card-toolbar .sr-reset-button,
 .is-phone .sr-card-toolbar .sr-short-menu-button,
+.is-phone .sr-card-toolbar > .sr-divider,
 .is-phone .sr-card-toolbar .sr-skip-button {
     display: none;
 }
@@ -414,6 +425,7 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
     .sr-card-toolbar .sr-edit-button,
     .sr-card-toolbar .sr-reset-button,
     .sr-card-toolbar .sr-short-menu-button,
+    .sr-card-toolbar > .sr-divider,
     .sr-card-toolbar .sr-skip-button {
         display: none;
     }
