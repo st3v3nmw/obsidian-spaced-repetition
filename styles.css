@@ -274,6 +274,9 @@
         }
     }
 }
+.sr-edit-view .sr-response {
+    border: none;
+}
 .sr-response-button > * {
     display: none;
 }
@@ -379,6 +382,12 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
 }
 .is-mobile .sr-card-toolbar {
     height: auto;
+}
+.is-phone .sr-tab-view .sr-card-toolbar {
+    --deck-info-name-width: 15ch;
+}
+.is-phone #sr-modal-view .sr-card-toolbar {
+    --deck-info-name-width: 10ch;
 }
 @media only screen and (orientation: landscape) {
     .is-phone .sr-card-toolbar {

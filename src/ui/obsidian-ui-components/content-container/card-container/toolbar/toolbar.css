@@ -39,6 +39,14 @@
     height: auto;
 }
 
+.is-phone .sr-tab-view .sr-card-toolbar {
+    --deck-info-name-width: 15ch;
+}
+
+.is-phone #sr-modal-view .sr-card-toolbar {
+    --deck-info-name-width: 10ch;
+}
+
 @media only screen and (orientation: landscape) {
     .is-phone .sr-card-toolbar {
         display: none;
