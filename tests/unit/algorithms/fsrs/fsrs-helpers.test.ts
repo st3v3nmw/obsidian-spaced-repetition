@@ -64,3 +64,19 @@ test("FSRS timestamp helpers", () => {
     expect(parseFsrsTimestamp("-")).toBeNull();
     expect(FSRS_COMMENT_PREFIX).toEqual("fsrs");
 });
+
+test("FSRS helpers handle unsupported responses and missing legacy values", () => {
+    expect(() => reviewResponseToFsrsGrade(ReviewResponse.Reset)).toThrow(
+        "Unsupported FSRS response: 4",
+    );
+    expect(easeToDifficulty(null as never)).toEqual(5.5);
+    expect(easeToDifficulty(undefined as never)).toEqual(5.5);
+    expect(formatFsrsTimestamp(null)).toEqual("-");
+
+    const migrated = legacyScheduleToFsrsCard(null as never, globalDateProvider.now);
+    expect(migrated).toMatchObject({
+        ["scheduled_days"]: 1,
+        difficulty: 5.5,
+    });
+    expect(new Date(migrated.due).toISOString()).toEqual("2023-09-06T00:00:00.000Z");
+});

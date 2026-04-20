@@ -56,3 +56,46 @@ test("converts to and from ts-fsrs card structures", () => {
     expect(new Date(roundTrip.last_review).toISOString()).toEqual("2023-09-03T00:00:00.000Z");
     expect(roundTrip.scheduled_days).toEqual(3);
 });
+
+test("handles missing due dates and review timestamps", () => {
+    const noDueSchedule = new RepItemScheduleInfoFsrs(
+        null as never,
+        0,
+        5.5,
+        0.4,
+        State.Learning,
+        1,
+        0,
+        1,
+        null,
+    );
+    expect(noDueSchedule.delayedBeforeReviewTicks).toEqual(0);
+
+    const roundTrip = new RepItemScheduleInfoFsrs(
+        moment("2023-09-06T00:10:00.000Z"),
+        0,
+        5.5,
+        0.4,
+        State.Learning,
+        1,
+        0,
+        1,
+        null,
+    ).toFsrsCardInput();
+    expect(roundTrip.last_review).toBeNull();
+    expect(roundTrip.elapsed_days).toEqual(0);
+
+    const parsed = RepItemScheduleInfoFsrs.fromFsrsCard({
+        due: "2023-09-06T00:10:00.000Z",
+        stability: 0.4,
+        difficulty: 5.5,
+        ["elapsed_days"]: 0,
+        ["scheduled_days"]: 0,
+        ["learning_steps"]: 1,
+        reps: 1,
+        lapses: 0,
+        state: State.Learning,
+        ["last_review"]: null,
+    });
+    expect(parsed.lastReview).toBeNull();
+});
