@@ -97,17 +97,25 @@ export class SettingsPageManager {
     private currentPage: SettingsPageType;
     private updateLastPageState: (lastPage: SettingsPageType, lastScrollPosition: number) => void;
     private display: () => void;
+    private didReadMultilineEndMarkerWarning: boolean;
+    private changeMultilineEndMarkerWarningState: (
+        didReadMultilineEndMarkerWarning: boolean,
+    ) => void;
 
     constructor(
         containerEl: HTMLElement,
         plugin: SRPlugin,
         lastPage: SettingsPageType,
         lastScrollPosition: number,
+        didReadMultilineEndMarkerWarning: boolean,
         updateLastPageState: (lastPage: SettingsPageType, lastScrollPosition: number) => void,
         display: () => void,
+        changeMultilineEndMarkerWarningState: (didReadMultilineEndMarkerWarning: boolean) => void,
     ) {
         this.containerEl = containerEl;
         this.plugin = plugin;
+        this.didReadMultilineEndMarkerWarning = didReadMultilineEndMarkerWarning;
+        this.changeMultilineEndMarkerWarningState = changeMultilineEndMarkerWarningState;
         this.updateLastPageState = updateLastPageState;
         this.display = display;
 
@@ -160,10 +168,12 @@ export class SettingsPageManager {
                             newPageContainerEl,
                             this.plugin,
                             pageType,
+                            this.didReadMultilineEndMarkerWarning,
                             this.applySettingsUpdate.bind(this),
                             this.display,
                             this.openPage.bind(this),
                             this.scrollListener.bind(this),
+                            this.changeMultilineEndMarkerWarningState.bind(this),
                         ),
                     );
                     break;
