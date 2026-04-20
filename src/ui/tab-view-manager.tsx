@@ -1,11 +1,9 @@
-import { PaneType, TFile, WorkspaceLeaf } from "obsidian";
+import { PaneType, WorkspaceLeaf } from "obsidian";
 
-import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { SR_TAB_VIEW } from "src/constants";
-import { OsrAppCore } from "src/core";
-import { Deck } from "src/deck/deck";
 import SRPlugin from "src/main";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
+import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import { TabViewType } from "src/utils/types";
 
 /**
@@ -21,52 +19,21 @@ import { TabViewType } from "src/utils/types";
  */
 export default class TabViewManager {
     private plugin: SRPlugin;
-    private osrAppCore: OsrAppCore;
-    private shouldOpenSingeNoteTabView: boolean;
-    private chosenReviewModeForTabbedView: FlashcardReviewMode;
-    private chosenSingleNoteForTabbedView: TFile;
+    private reviewQueueLoader: ReviewQueueLoader | null = null;
 
     // Add any new other tab view types to this, then they'll be automatically registered
     private tabViewTypes: TabViewType[] = [
         {
             type: SR_TAB_VIEW,
-            viewCreator: (leaf) =>
-                new SRTabView(leaf, this.plugin, async () => {
-                    // Tabbed views cant get params on open call, so we have to do it here
-                    // This allows us to load the data from inside the view when the open function is called
-                    if (this.shouldOpenSingeNoteTabView) {
-                        const singleNoteDeckData =
-                            await this.plugin.getPreparedDecksForSingleNoteReview(
-                                this.chosenSingleNoteForTabbedView,
-                                this.chosenReviewModeForTabbedView,
-                            );
-
-                        return this.plugin.getPreparedReviewSequencer(
-                            singleNoteDeckData.deckTree,
-                            singleNoteDeckData.remainingDeckTree,
-                            singleNoteDeckData.mode,
-                        );
-                    }
-
-                    const fullDeckTree: Deck = this.osrAppCore.reviewableDeckTree;
-                    const remainingDeckTree: Deck =
-                        this.chosenReviewModeForTabbedView === FlashcardReviewMode.Cram
-                            ? this.osrAppCore.reviewableDeckTree
-                            : this.osrAppCore.remainingDeckTree;
-
-                    return this.plugin.getPreparedReviewSequencer(
-                        fullDeckTree,
-                        remainingDeckTree,
-                        this.chosenReviewModeForTabbedView,
-                    );
-                }),
+            viewCreator: (leaf) => {
+                return new SRTabView(leaf, this.plugin, this.reviewQueueLoader);
+            },
         },
     ];
 
     // Add any needed resourced
     constructor(plugin: SRPlugin) {
         this.plugin = plugin;
-        this.shouldOpenSingeNoteTabView = false;
 
         this.registerAllTabViews();
     }
@@ -84,15 +51,8 @@ export default class TabViewManager {
      *
      * @returns {Promise<void>} - A promise that resolves when the tab view is opened.
      */
-    public async openSRTabView(
-        osrAppCore: OsrAppCore,
-        reviewMode: FlashcardReviewMode,
-        singleNote?: TFile,
-    ) {
-        this.osrAppCore = osrAppCore;
-        this.chosenReviewModeForTabbedView = reviewMode;
-        this.shouldOpenSingeNoteTabView = singleNote !== undefined;
-        if (singleNote) this.chosenSingleNoteForTabbedView = singleNote;
+    public async openSRTabView(reviewQueueLoader: ReviewQueueLoader) {
+        this.reviewQueueLoader = reviewQueueLoader;
 
         await this.openTabView(SR_TAB_VIEW, true);
     }

@@ -1,0 +1,109 @@
+/* MARK: Settings Tab */
+
+/* Style the tab */
+.sr-settings-tab {
+    overflow: hidden;
+}
+
+.is-phone .modal.mod-settings .sr-settings-tab {
+    padding-bottom: max(var(--safe-area-inset-bottom), var(--size-4-4));
+}
+
+.sr-main-page {
+    & .sr-settings-page-title-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    & .sr-settings-page-title {
+        display: flex;
+        align-items: center;
+        gap: var(--size-4-2);
+    }
+}
+
+.sr-settings-tab {
+    & .sr-main-page {
+        & .setting-item {
+            flex-direction: row !important;
+            align-items: center !important;
+
+            & .setting-item-info {
+                align-self: unset !important;
+            }
+
+            & .setting-item-control {
+                width: unset !important;
+                justify-content: flex-end !important;
+            }
+        }
+    }
+}
+
+.is-phone .modal .sr-settings-tab {
+    & .sr-settings-page-title-wrapper {
+        font-size: var(--font-ui-normal);
+        padding-left: var(--size-4-2);
+        border-left: 1px solid var(--background-modifier-border);
+    }
+
+    & .sr-settings-page-header {
+        padding: var(--size-4-2);
+        border: unset;
+        background-color: var(--setting-items-background);
+        border-radius: var(--setting-items-radius);
+    }
+}
+
+.sr-settings-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4-4);
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+
+    & button {
+        cursor: pointer;
+    }
+}
+
+.sr-settings-page-header {
+    display: flex;
+    align-items: center;
+    gap: var(--size-4-2);
+    padding-bottom: var(--size-4-2);
+    border-bottom: 1px solid var(--background-modifier-border);
+    cursor: pointer;
+}
+
+.sr-settings-page-title-setting {
+    cursor: pointer;
+}
+
+.sr-settings-page-title-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--size-4-2);
+    font-size: var(--font-ui-large);
+}
+
+.sr-settings-page-title-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sr-settings-page-content {
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+}
+
+body:not(.is-phone) .sr-settings-page-content {
+    padding-right: var(--size-4-1);
+}

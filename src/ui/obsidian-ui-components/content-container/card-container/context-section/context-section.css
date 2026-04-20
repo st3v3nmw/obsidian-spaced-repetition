@@ -1,0 +1,12 @@
+.sr-context {
+    font-style: italic;
+    color: var(--text-faint);
+    word-break: break-word;
+    padding-bottom: var(--size-4-2);
+}
+
+@media only screen and (orientation: landscape) {
+    .is-phone .sr-context {
+        display: none;
+    }
+}

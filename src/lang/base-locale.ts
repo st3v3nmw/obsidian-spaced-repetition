@@ -1,9 +1,15 @@
 export interface IBaseLocale {
     // flashcard-modal.tsx
+    CRAM_MODE: string;
+    REVIEW_MODE: string;
     DECKS: string;
     DUE_CARDS: string;
+    DUE: string;
     NEW_CARDS: string;
+    SEEN_CARDS: string;
+    SEEN: string;
     TOTAL_CARDS: string;
+    TOTAL: string;
     BACK: string;
     SKIP: string;
     EDIT_CARD: string;
@@ -253,4 +259,5 @@ export interface IBaseLocale {
     // Settings > info
     CHECK_ROADMAP: string;
     CHECK_DEV_NEWS: string;
+    OPEN_MENU: string;
 }

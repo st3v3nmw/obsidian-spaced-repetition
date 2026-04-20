@@ -1,3 +1,4 @@
+import "src/ui/obsidian-ui-components/content-container/settings-page/statistics-page/statistics-page.css";
 import {
     ArcElement,
     BarController,

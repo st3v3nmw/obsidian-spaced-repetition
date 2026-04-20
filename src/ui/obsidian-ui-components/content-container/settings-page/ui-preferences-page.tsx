@@ -105,48 +105,6 @@ export class UIPreferencesPage extends SettingsPage {
                                 this.plugin.uiManager.showFileMenuItems(value);
                             }),
                     );
-            });
-
-        new SettingGroup(this.containerEl)
-            .setHeading(t("FLASHCARDS"))
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE"))
-                    .setDesc(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.plugin.data.settings.initiallyExpandAllSubdecksInTree)
-                            .onChange(async (value) => {
-                                this.plugin.data.settings.initiallyExpandAllSubdecksInTree = value;
-                                await this.plugin.savePluginData();
-                            }),
-                    );
-            })
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("SHOW_CARD_CONTEXT"))
-                    .setDesc(t("SHOW_CARD_CONTEXT_DESC"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.plugin.data.settings.showContextInCards)
-                            .onChange(async (value) => {
-                                this.plugin.data.settings.showContextInCards = value;
-                                await this.plugin.savePluginData();
-                            }),
-                    );
-            })
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("SHOW_INTERVAL_IN_REVIEW_BUTTONS"))
-                    .setDesc(t("SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.plugin.data.settings.showIntervalInReviewButtons)
-                            .onChange(async (value) => {
-                                this.plugin.data.settings.showIntervalInReviewButtons = value;
-                                await this.plugin.savePluginData();
-                            }),
-                    );
             })
             .addSetting((setting: Setting) => {
                 setting
@@ -233,6 +191,63 @@ export class UIPreferencesPage extends SettingsPage {
                                 await this.plugin.savePluginData();
                             });
                     });
+            });
+
+        new SettingGroup(this.containerEl)
+            .setHeading(t("FLASHCARDS"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE"))
+                    .setDesc(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.initiallyExpandAllSubdecksInTree)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.initiallyExpandAllSubdecksInTree = value;
+                                await this.plugin.savePluginData();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_CARD_CONTEXT"))
+                    .setDesc(t("SHOW_CARD_CONTEXT_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showContextInCards)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showContextInCards = value;
+                                await this.plugin.savePluginData();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("CONVERT_CLOZE_PATTERNS_TO_INPUTS"))
+                    .setDesc(t("CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.convertClozePatternsToInputs)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.convertClozePatternsToInputs = value;
+                                await this.plugin.savePluginData();
+
+                                this.display();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_INTERVAL_IN_REVIEW_BUTTONS"))
+                    .setDesc(t("SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showIntervalInReviewButtons)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showIntervalInReviewButtons = value;
+                                await this.plugin.savePluginData();
+                            }),
+                    );
             });
 
         new SettingGroup(this.containerEl)

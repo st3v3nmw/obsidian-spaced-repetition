@@ -1,0 +1,28 @@
+/* MARK: Modal */
+
+#sr-modal-view {
+    padding: 0;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#sr-modal-view .sr-modal-content {
+    overflow: visible;
+    padding: 0;
+}
+
+#sr-modal-view .modal-close-button,
+#sr-modal-view .modal-header {
+    display: none;
+}
+
+body:not(.is-mobile) #sr-modal-view {
+    resize: both;
+}
+
+.is-mobile #sr-modal-view {
+    padding-top: var(--safe-area-inset-top) !important;
+    padding-right: var(--safe-area-inset-right) !important;
+    padding-left: var(--safe-area-inset-left) !important;
+    padding-bottom: var(--safe-area-inset-bottom) !important;
+}
