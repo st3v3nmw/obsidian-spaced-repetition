@@ -76,9 +76,11 @@ export interface IBaseLocale {
     FLASHCARD_EASY_LABEL: string;
     FLASHCARD_GOOD_LABEL: string;
     FLASHCARD_HARD_LABEL: string;
+    FLASHCARD_AGAIN_LABEL: string;
     FLASHCARD_EASY_DESC: string;
     FLASHCARD_GOOD_DESC: string;
     FLASHCARD_HARD_DESC: string;
+    FLASHCARD_AGAIN_DESC: string;
     REVIEW_BUTTON_DELAY: string;
     REVIEW_BUTTON_DELAY_DESC: string;
     FLASHCARD_TAGS: string;

@@ -335,6 +335,33 @@ export class UIPreferencesPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
+                    .setName(t("FLASHCARD_AGAIN_LABEL"))
+                    .setDesc(t("FLASHCARD_AGAIN_DESC"))
+                    .addExtraButton((button) => {
+                        button
+                            .setIcon("reset")
+                            .setTooltip(t("RESET_DEFAULT"))
+                            .onClick(async () => {
+                                this.plugin.data.settings.flashcardAgainText =
+                                    DEFAULT_SETTINGS.flashcardAgainText;
+                                await this.plugin.savePluginData();
+
+                                this.display();
+                            });
+                    })
+                    .addText((text) =>
+                        text
+                            .setValue(this.plugin.data.settings.flashcardAgainText)
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    this.plugin.data.settings.flashcardAgainText = value;
+                                    await this.plugin.savePluginData();
+                                });
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
                     .setName(t("REVIEW_BUTTON_DELAY"))
                     .setDesc(t("REVIEW_BUTTON_DELAY_DESC"))
                     .addExtraButton((button) => {

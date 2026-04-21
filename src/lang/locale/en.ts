@@ -86,9 +86,11 @@ const en: IBaseLocale = {
     FLASHCARD_EASY_LABEL: "Easy Button Text",
     FLASHCARD_GOOD_LABEL: "Good Button Text",
     FLASHCARD_HARD_LABEL: "Hard Button Text",
+    FLASHCARD_AGAIN_LABEL: "Again Button Text",
     FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
     FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
     FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
+    FLASHCARD_AGAIN_DESC: 'Customize the label for the "Again" Button',
     REVIEW_BUTTON_DELAY: "Button Press Delay (ms)",
     REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "Flashcard tags",
@@ -300,6 +302,7 @@ const en: IBaseLocale = {
         'Check out the <a href="${devNewsUrl}">dev news</a> for the latest development news.',
 
     OPEN_MENU: "Open menu",
+
 };
 
 export default en;
