@@ -2,8 +2,8 @@ import "src/ui/obsidian-ui-components/modals/edit-modal.css";
 import { App, ButtonComponent, Modal } from "obsidian";
 
 import { t } from "src/lang/helpers";
-import { TextDirection, includedSeparator } from "src/utils/strings";
 import { SRSettings } from "src/settings";
+import { includedSeparator, TextDirection } from "src/utils/strings";
 
 // from https://github.com/chhoumann/quickadd/blob/bce0b4cdac44b867854d6233796e3406dfd163c6/src/gui/GenericInputPrompt/GenericInputPrompt.ts#L5
 export class FlashcardEditModal extends Modal {
@@ -38,7 +38,12 @@ export class FlashcardEditModal extends Modal {
         return newPromptModal.waitForClose;
     }
 
-    constructor(app: App, settings: SRSettings, existingText: string, textDirection: TextDirection) {
+    constructor(
+        app: App,
+        settings: SRSettings,
+        existingText: string,
+        textDirection: TextDirection,
+    ) {
         super(app);
 
         this.modalText = existingText;
@@ -57,8 +62,8 @@ export class FlashcardEditModal extends Modal {
         // Trim leading \n for multiline
         this.multilineSeparator = this.separator
             ? [settings.multilineCardSeparator, settings.multilineReversedCardSeparator].contains(
-                this.separator,
-            )
+                  this.separator,
+              )
             : false;
         if (this.multilineSeparator) {
             this.textBack = this.textBack.trimStart();

@@ -3,12 +3,12 @@ import {
     cyrb53,
     escapeRegexString,
     findLineIndexOfSearchStringIgnoringWs,
+    includedSeparator,
     literalStringReplace,
     MultiLineTextFinder,
     splitNoteIntoFrontmatterAndContent,
     splitTextIntoLineArray,
     stringTrimStart,
-    includedSeparator,
 } from "src/utils/strings";
 
 describe("escapeRegexString", () => {
