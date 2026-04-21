@@ -7,6 +7,7 @@ import { CardListType } from "src/deck/deck";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
 import { SRModalView } from "src/ui/obsidian-ui-components/modals/sr-modal-view";
 import { SRSettingTab } from "src/ui/obsidian-ui-components/settings-tab";
@@ -15,6 +16,14 @@ import { SidebarManager } from "src/ui/sidebar-manager";
 import StatusBarManager from "src/ui/status-bar-manager";
 import TabViewManager from "src/ui/tab-view-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
+
+export enum UIState {
+    Closed,
+    DeckList,
+    CardFront,
+    CardBack,
+    EditModal,
+}
 
 /**
  * Manages the UI elements of the Spaced Repetition plugin, including the status bar, sidebar, and tab views.
@@ -32,12 +41,15 @@ import EmulatedPlatform from "src/utils/platform-detector";
  * @method setSRViewInFocus - Sets the SR tab view in focus state.
  */
 export class UIManager {
-    private plugin: SRPlugin;
     public tabViewManager: TabViewManager;
     public sidebarManager: SidebarManager;
     public statusBarManager: StatusBarManager;
+    public uiState: UIState = UIState.Closed;
+    public isSRInFocus: boolean = false;
+    public contentManager: ContentManager | null = null;
+
+    private plugin: SRPlugin;
     private ribbonIcon: HTMLElement | null = null;
-    private isSRInFocus: boolean = false;
     private externalModalObserver: MutationObserver | null = null;
 
     constructor(plugin: SRPlugin) {
@@ -73,7 +85,7 @@ export class UIManager {
         this.registerSRFocusListener();
     }
 
-    destroy() {
+    public destroy() {
         this.removeSRFocusListener();
         // @ts-expect-error: The types are wrong, but it's fine, because we are just removing the listener
         this.plugin.app.workspace.off("file-menu", this.fileMenuHandler.bind(this));
@@ -142,6 +154,15 @@ export class UIManager {
                     this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
             );
         }
+    }
+
+    public setUIState(state: UIState) {
+        this.uiState = state;
+    }
+
+    public setContentManager(contentManager: ContentManager) {
+        // TODO: Find a better way to do this, without having to pass the ContentManager around
+        this.contentManager = contentManager;
     }
 
     public async openDeckContainer(mode: FlashcardReviewMode, singleNote?: TFile): Promise<void> {

@@ -36,6 +36,7 @@ const en: IBaseLocale = {
     REVIEW_CARDS: "Review flashcards",
     REVIEW_DIFFICULTY_FILE_MENU: "Review: ${difficulty}",
     REVIEW_NOTE_DIFFICULTY_CMD: "Review note as ${difficulty}",
+    REVIEW_CARD_DIFFICULTY_CMD: "Review card as ${difficulty}",
     CRAM_ALL_CARDS: "Select a deck to cram",
     REVIEW_ALL_CARDS: "Review flashcards from all notes",
     REVIEW_CARDS_IN_NOTE: "Review flashcards in this note",
@@ -217,6 +218,9 @@ const en: IBaseLocale = {
     SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS: "Scheduling data deletion in progress...",
     SCHEDULING_DATA_HAS_BEEN_DELETED:
         "Scheduling data has been deleted from all notes and flashcards.",
+    USE_CUSTOM_HOTKEYS: "Use custom hotkeys",
+    USE_CUSTOM_HOTKEYS_DESC:
+        "Enable custom hotkeys for the review cards commands. The default hotkeys wont be active after enabling this. Custom hotkeys can only be used when using the 'Open in new tab' option.",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Notes Review Queue",
@@ -302,7 +306,6 @@ const en: IBaseLocale = {
         'Check out the <a href="${devNewsUrl}">dev news</a> for the latest development news.',
 
     OPEN_MENU: "Open menu",
-
 };
 
 export default en;

@@ -32,6 +32,7 @@ export interface IBaseLocale {
     REVIEW_CARDS: string;
     REVIEW_DIFFICULTY_FILE_MENU: string;
     REVIEW_NOTE_DIFFICULTY_CMD: string;
+    REVIEW_CARD_DIFFICULTY_CMD: string;
     CRAM_ALL_CARDS: string;
     REVIEW_ALL_CARDS: string;
     REVIEW_CARDS_IN_NOTE: string;
@@ -181,6 +182,8 @@ export interface IBaseLocale {
     CONFIRM: string;
     SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS: string;
     SCHEDULING_DATA_HAS_BEEN_DELETED: string;
+    USE_CUSTOM_HOTKEYS: string;
+    USE_CUSTOM_HOTKEYS_DESC: string;
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: string;
