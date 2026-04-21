@@ -144,6 +144,8 @@ export class SRTabView extends ItemView {
             this.viewContentEl,
         );
 
+        this.plugin.uiManager.setContentManager(this.contentManager);
+
         this.contentManager.open();
     }
 

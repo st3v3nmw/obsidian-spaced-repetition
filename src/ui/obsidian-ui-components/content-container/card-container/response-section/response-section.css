@@ -70,11 +70,13 @@
 
 /* MARK: Shortcut in buttons */
 
-body:not(.is-mobile) .sr-response-button.sr-show-answer-button,
-body:not(.is-mobile) .sr-response-button.sr-again-button,
-body:not(.is-mobile) .sr-response-button.sr-hard-button,
-body:not(.is-mobile) .sr-response-button.sr-good-button,
-body:not(.is-mobile) .sr-response-button.sr-easy-button {
+body:not(.is-mobile)
+    .sr-card-container:not(.sr-custom-hotkeys)
+    .sr-response-button.sr-show-answer-button,
+body:not(.is-mobile) .sr-card-container:not(.sr-custom-hotkeys) .sr-response-button.sr-again-button,
+body:not(.is-mobile) .sr-card-container:not(.sr-custom-hotkeys) .sr-response-button.sr-hard-button,
+body:not(.is-mobile) .sr-card-container:not(.sr-custom-hotkeys) .sr-response-button.sr-good-button,
+body:not(.is-mobile) .sr-card-container:not(.sr-custom-hotkeys) .sr-response-button.sr-easy-button {
     position: relative;
 
     &::after {
@@ -96,22 +98,32 @@ body:not(.is-mobile) .sr-response-button.sr-easy-button {
     }
 }
 
-body:not(.is-mobile) .sr-response-button.sr-show-answer-button::after {
+body:not(.is-mobile)
+    .sr-card-container:not(.sr-custom-hotkeys)
+    .sr-response-button.sr-show-answer-button::after {
     content: "Space";
 }
 
-body:not(.is-mobile) .sr-response-button.sr-again-button::after {
+body:not(.is-mobile)
+    .sr-card-container:not(.sr-custom-hotkeys)
+    .sr-response-button.sr-again-button::after {
     content: "0";
 }
 
-body:not(.is-mobile) .sr-response-button.sr-hard-button::after {
+body:not(.is-mobile)
+    .sr-card-container:not(.sr-custom-hotkeys)
+    .sr-response-button.sr-hard-button::after {
     content: "1";
 }
 
-body:not(.is-mobile) .sr-response-button.sr-good-button::after {
+body:not(.is-mobile)
+    .sr-card-container:not(.sr-custom-hotkeys)
+    .sr-response-button.sr-good-button::after {
     content: "2";
 }
 
-body:not(.is-mobile) .sr-response-button.sr-easy-button::after {
+body:not(.is-mobile)
+    .sr-card-container:not(.sr-custom-hotkeys)
+    .sr-response-button.sr-easy-button::after {
     content: "3";
 }

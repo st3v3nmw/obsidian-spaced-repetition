@@ -49,6 +49,7 @@ export interface SRSettings {
     reviewButtonDelay: number;
     openViewInNewTabMobile: boolean;
     openViewInNewTab: boolean;
+    useCustomHotkeys: boolean;
 
     // algorithm
     algorithm: string;
@@ -115,6 +116,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     reviewButtonDelay: 0,
     openViewInNewTab: false,
     openViewInNewTabMobile: false,
+    useCustomHotkeys: false,
 
     // algorithm
     algorithm: Algorithm.SM_2_OSR,

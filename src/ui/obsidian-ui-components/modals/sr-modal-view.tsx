@@ -51,6 +51,8 @@ export class SRModalView extends Modal {
             this.contentEl,
             this.close.bind(this),
         );
+
+        this.plugin.uiManager.setContentManager(this.contentManager);
     }
 
     onOpen(): void {
@@ -75,7 +77,7 @@ export class SRModalView extends Modal {
         const parentWidth = parent.offsetWidth;
         const widthPercent = (elementWidth / parentWidth) * 100;
 
-        this.setReoundedModalCorners(!(heightPercent >= 100 || widthPercent >= 100));
+        this.setRoundedModalCorners(!(heightPercent >= 100 || widthPercent >= 100));
 
         this.saveSizeToSettings(
             heightPercent,
@@ -84,7 +86,7 @@ export class SRModalView extends Modal {
         );
     }
 
-    private setReoundedModalCorners(rounded: boolean) {
+    private setRoundedModalCorners(rounded: boolean) {
         if (rounded) {
             this.modalEl.style.borderRadius = "var(--modal-radius)";
         } else {
@@ -96,7 +98,7 @@ export class SRModalView extends Modal {
         this.modalEl.style.height = heightPercent + "%";
         this.modalEl.style.width = widthPercent + "%";
 
-        this.setReoundedModalCorners(
+        this.setRoundedModalCorners(
             !(
                 parseInt(this.modalEl.style.height.split("%")[0]) >= 100 ||
                 parseInt(this.modalEl.style.width.split("%")[0]) >= 100
