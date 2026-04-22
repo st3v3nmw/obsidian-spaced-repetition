@@ -4,11 +4,7 @@ import { App } from "obsidian";
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { Question } from "src/card/questions/question";
-import {
-    DEBUG_MODE_ENABLED,
-    LEGACY_SCHEDULING_EXTRACTOR,
-    MULTI_SCHEDULING_EXTRACTOR,
-} from "src/constants";
+import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR } from "src/constants";
 import { IDataStore } from "src/data-stores/base/data-store";
 import { RepItemStorageInfo } from "src/data-stores/base/rep-item-storage-info";
 import { SRSettings } from "src/settings";
@@ -77,14 +73,10 @@ export class StoreInNotes implements IDataStore {
         const fileText: string = await question.note.file.read();
         const originalText: string = question.questionText.original;
         const newText = MultiLineTextFinder.findAndReplace(fileText, originalText, "");
+
+        // Only write if note hasn't changed
         if (newText) {
             await question.note.file.write(newText);
-        } else {
-            // Note has chnaged, but we couldn't find the text
-            if (DEBUG_MODE_ENABLED)
-                console.error(
-                    `questionDelete: Text not found: ${originalText.substring(0, 100)} in note: ${fileText.substring(0, 100)}`,
-                );
         }
     }
 }

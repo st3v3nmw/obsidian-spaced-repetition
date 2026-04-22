@@ -103,7 +103,7 @@ describe("FlashcardReviewSequencer - Bidirectional Deletion", () => {
 
     test("Deleting a bidirectional card removes both cards from queue", async () => {
         // Q1 ::: A1 creates two cards: Q1->A1 and A1->Q1
-        const text: string = "#flashcards Q1:::A1";
+        const text: string = "#flashcards Q1:::A1\n#flashcards A2:::Q2";
 
         const c: TestContext = TestContext.Create(
             orderDueFirstSequential,
@@ -118,8 +118,8 @@ describe("FlashcardReviewSequencer - Bidirectional Deletion", () => {
             TopicPath.getTopicPathFromTag("#flashcards"),
         );
         // Both are new cards
-        expect(initialStats.newCount).toEqual(2);
-        expect(initialStats.cardsInQueueCount).toEqual(2);
+        expect(initialStats.newCount).toEqual(4);
+        expect(initialStats.cardsInQueueCount).toEqual(4);
 
         // Delete the current card
         await c.reviewSequencer.deleteCurrentCardFromNote();
@@ -130,7 +130,7 @@ describe("FlashcardReviewSequencer - Bidirectional Deletion", () => {
         );
 
         // Should be 0
-        expect(statsAfterDelete.newCount).toEqual(0);
-        expect(statsAfterDelete.cardsInQueueCount).toEqual(0);
+        expect(statsAfterDelete.newCount).toEqual(2);
+        expect(statsAfterDelete.cardsInQueueCount).toEqual(2);
     });
 });
