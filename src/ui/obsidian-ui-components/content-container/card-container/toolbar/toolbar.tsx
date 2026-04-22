@@ -75,13 +75,34 @@ export default class CardToolbarComponent {
             (evt: MouseEvent) => {
                 const cardMenu = new Menu();
 
-                cardMenu.addItem((item) => {
-                    item.setTitle("Jump to card") // TODO: Translate
-                        .setIcon("arrow-up-right")
-                        .onClick(() => {
-                            jumpToCurrentCard();
-                        });
-                });
+                if (isModal) {
+                    cardMenu.addItem((item) => {
+                        item.setTitle(t("OPEN_IN_BACKGROUND"))
+                            .setIcon("browser-window")
+                            .onClick(() => {
+                                // Doesn't close modal, just opens in background and focuses
+                                jumpToCurrentCard();
+                            });
+                    });
+                    cardMenu.addItem((item) => {
+                        item.setTitle(t("JUMP_TO_AND_CLOSE"))
+                            .setIcon("arrow-up-right")
+                            .onClick(() => {
+                                jumpToCurrentCard();
+                                if (closeModal) {
+                                    closeModal();
+                                }
+                            });
+                    });
+                } else {
+                    cardMenu.addItem((item) => {
+                        item.setTitle(t("JUMP_TO"))
+                            .setIcon("arrow-up-right")
+                            .onClick(() => {
+                                jumpToCurrentCard();
+                            });
+                    });
+                }
                 cardMenu.addItem((item) => {
                     item.setTitle(t("VIEW_CARD_INFO"))
                         .setIcon("info")
@@ -170,11 +191,7 @@ export default class CardToolbarComponent {
             EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "clickable-icon",
         ];
 
-        new ModalCloseButtonComponent(
-            this.toolbar,
-            () => closeModal && closeModal(),
-            closeButtonClasses,
-        );
+        new ModalCloseButtonComponent(this.toolbar, closeModal, closeButtonClasses);
     }
 
     /**
