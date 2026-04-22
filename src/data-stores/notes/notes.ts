@@ -4,11 +4,16 @@ import { App } from "obsidian";
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { Question } from "src/card/questions/question";
-import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR } from "src/constants";
+import {
+    DEBUG_MODE_ENABLED,
+    LEGACY_SCHEDULING_EXTRACTOR,
+    MULTI_SCHEDULING_EXTRACTOR,
+} from "src/constants";
 import { IDataStore } from "src/data-stores/base/data-store";
 import { RepItemStorageInfo } from "src/data-stores/base/rep-item-storage-info";
 import { SRSettings } from "src/settings";
 import { DateUtil, formatDateYYYYMMDD, globalDateProvider } from "src/utils/dates";
+import { MultiLineTextFinder } from "src/utils/strings";
 
 export class StoreInNotes implements IDataStore {
     private settings: SRSettings;
@@ -66,5 +71,20 @@ export class StoreInNotes implements IDataStore {
         const newText: string = question.updateQuestionWithinNoteText(fileText, this.settings);
         await question.note.file.write(newText);
         question.hasChanged = false;
+    }
+
+    async questionDelete(question: Question): Promise<void> {
+        const fileText: string = await question.note.file.read();
+        const originalText: string = question.questionText.original;
+        const newText = MultiLineTextFinder.findAndReplace(fileText, originalText, "");
+        if (newText) {
+            await question.note.file.write(newText);
+        } else {
+            // Note has chnaged, but we couldn't find the text
+            if (DEBUG_MODE_ENABLED)
+                console.error(
+                    `questionDelete: Text not found: ${originalText.substring(0, 100)} in note: ${fileText.substring(0, 100)}`,
+                );
+        }
     }
 }

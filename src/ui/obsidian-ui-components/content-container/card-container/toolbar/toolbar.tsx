@@ -21,6 +21,8 @@ export default class CardToolbarComponent {
     public constructor(
         parentEl: HTMLElement,
         isModal: boolean,
+        showDeleteButton: boolean,
+        deleteCurrentCard: () => void,
         backToDeckHandler: () => void,
         editClickHandler: () => void,
         jumpToCurrentCard: () => Promise<void>,
@@ -87,6 +89,15 @@ export default class CardToolbarComponent {
                             displayCurrentCardInfoNotice();
                         });
                 });
+                if (showDeleteButton) {
+                    cardMenu.addItem((item) => {
+                        item.setTitle(t("DELETE_CARD"))
+                            .setIcon("trash")
+                            .onClick(() => {
+                                deleteCurrentCard();
+                            });
+                    });
+                }
 
                 cardMenu.showAtMouseEvent(evt);
             },
@@ -137,6 +148,15 @@ export default class CardToolbarComponent {
                             displayCurrentCardInfoNotice();
                         });
                 });
+                if (showDeleteButton) {
+                    cardMenu.addItem((item) => {
+                        item.setTitle(t("DELETE_CARD"))
+                            .setIcon("trash")
+                            .onClick(() => {
+                                deleteCurrentCard();
+                            });
+                    });
+                }
 
                 cardMenu.showAtMouseEvent(evt);
             },

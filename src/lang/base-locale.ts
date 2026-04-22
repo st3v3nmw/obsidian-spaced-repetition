@@ -265,4 +265,8 @@ export interface IBaseLocale {
     CHECK_ROADMAP: string;
     CHECK_DEV_NEWS: string;
     OPEN_MENU: string;
+    DELETE_CARD: string;
+    DELETE_CARD_CONFIRMATION: string;
+    SHOW_DELETE_BUTTON: string;
+    SHOW_DELETE_BUTTON_DESC: string;
 }

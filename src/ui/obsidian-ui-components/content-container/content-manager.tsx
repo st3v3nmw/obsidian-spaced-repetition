@@ -11,12 +11,14 @@ import {
 } from "src/card/flashcard-review-sequencer";
 import { Question } from "src/card/questions/question";
 import { Deck } from "src/deck/deck";
+import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
 import { SRSettings } from "src/settings";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
 import CardInfoNotice from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-info-notice";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
+import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import { UIState } from "src/ui/ui-manager";
@@ -110,6 +112,7 @@ export default class ContentManager {
             this.plugin,
             this.settings,
             parentEl,
+            this._deleteCurrentCard.bind(this),
             this._showDecksList.bind(this),
             this._doEditQuestionText.bind(this),
             this._processReview.bind(this),
@@ -270,6 +273,30 @@ export default class ContentManager {
     }
 
     // MARK: Card button handlers
+
+    public async _deleteCurrentCard() {
+        if (this.sessionData === null || this.reviewSequencer === null) return;
+        const timeNow = now();
+        if (
+            this.lastPressedOnProcessReview &&
+            timeNow - this.lastPressedOnProcessReview < this.plugin.data.settings.reviewButtonDelay
+        ) {
+            return;
+        }
+        this.lastPressedOnProcessReview = timeNow;
+
+        new ConfirmationModal(
+            this.app,
+            t("DELETE_CARD"),
+            t("DELETE_CARD_CONFIRMATION"),
+            t("CANCEL"),
+            async () => {
+                if (this.sessionData === null || this.reviewSequencer === null) return;
+                await this.reviewSequencer.deleteCurrentCardFromNote();
+                await this._showNextCard();
+            },
+        ).open();
+    }
 
     public _showAnswer() {
         if (this.sessionData === null) return;
