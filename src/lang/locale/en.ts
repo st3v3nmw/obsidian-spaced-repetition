@@ -30,6 +30,9 @@ const en: IBaseLocale = {
     CURRENT_INTERVAL_HELP_TEXT: "Current Interval: ",
     CARD_GENERATED_FROM: "Generated from: ${notePath}",
     VIEW_CARD_INFO: "View Card Info",
+    DELETE_CARD: "Delete Card",
+    DELETE_CARD_CONFIRMATION:
+        "This action cannot be undone and might alter your notes in unwanted ways. Are you sure you want to delete this card?",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Open a note for review",
@@ -111,6 +114,8 @@ const en: IBaseLocale = {
     SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Show next review time in the review buttons",
     SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
         "Useful to know how far in the future your cards are being pushed.",
+    SHOW_DELETE_BUTTON: "Show Delete button",
+    SHOW_DELETE_BUTTON_DESC: "Adds a delete button to the card review UI.",
     CARD_MODAL_HEIGHT_PERCENT: "Flashcard Height Percentage",
     CARD_MODAL_SIZE_PERCENT_DESC:
         "Should be set to 100% on mobile or if you have very large images",

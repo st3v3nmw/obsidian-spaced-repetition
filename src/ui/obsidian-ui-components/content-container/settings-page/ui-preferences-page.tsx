@@ -134,6 +134,19 @@ export class UIPreferencesPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
+                    .setName(t("SHOW_DELETE_BUTTON"))
+                    .setDesc(t("SHOW_DELETE_BUTTON_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showDeleteButton)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showDeleteButton = value;
+                                await this.plugin.savePluginData();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
                     .setName(t("CARD_MODAL_HEIGHT_PERCENT"))
                     .setDesc(t("CARD_MODAL_SIZE_PERCENT_DESC"))
                     .addExtraButton((button) => {

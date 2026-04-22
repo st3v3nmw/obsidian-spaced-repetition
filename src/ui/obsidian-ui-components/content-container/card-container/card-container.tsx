@@ -47,6 +47,7 @@ export class CardContainer {
         plugin: SRPlugin,
         settings: SRSettings,
         parentEl: HTMLElement,
+        deleteCurrentCard: () => void,
         backToDeckHandler: () => void,
         editCardHandler: () => void,
         processReviewHandler: (response: ReviewResponse) => Promise<void>,
@@ -74,6 +75,8 @@ export class CardContainer {
         this.toolbar = new CardToolbarComponent(
             this.view,
             !settings.openViewInNewTab,
+            settings.showDeleteButton,
+            deleteCurrentCard,
             backToDeckHandler,
             editCardHandler,
             jumpToCurrentCardHandler,
