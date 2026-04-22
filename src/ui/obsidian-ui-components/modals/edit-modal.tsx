@@ -10,23 +10,23 @@ export class FlashcardEditModal extends Modal {
     public changedText: string;
     public waitForClose: Promise<string>;
 
-    public title: HTMLDivElement;
-    public textAreaFront: HTMLTextAreaElement;
-    public textAreaBack: HTMLTextAreaElement;
-    public response: HTMLDivElement;
-    public saveButton: ButtonComponent;
-    public cancelButton: ButtonComponent;
+    public title: HTMLDivElement | null = null;
+    public textAreaFront: HTMLTextAreaElement | null = null;
+    public textAreaBack: HTMLTextAreaElement | null = null;
+    public response: HTMLDivElement | null = null;
+    public saveButton: ButtonComponent | null = null;
+    public cancelButton: ButtonComponent | null = null;
 
-    private resolvePromise: (input: string) => void;
+    private resolvePromise: ((input: string) => void) | null = null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private rejectPromise: (reason?: any) => void;
+    private rejectPromise: ((reason?: any) => void) | null = null;
     private didSaveChanges = false;
     private readonly modalText: string;
     private textDirection: TextDirection;
-    private textFront: string;
-    private textBack: string;
-    private separator: string;
-    private multilineSeparator: boolean;
+    private textFront: string = "";
+    private textBack: string = "";
+    private separator: string | null;
+    private multilineSeparator: boolean = false;
 
     public static Prompt(
         app: App,
@@ -57,14 +57,18 @@ export class FlashcardEditModal extends Modal {
             settings.singleLineCardSeparator,
             settings.multilineCardSeparator,
         ]);
+
         // Split Text based on the separator
-        [this.textFront, this.textBack] = this.modalText.split(this.separator);
-        // Trim leading \n for multiline
-        this.multilineSeparator = this.separator
-            ? [settings.multilineCardSeparator, settings.multilineReversedCardSeparator].contains(
-                  this.separator,
-              )
-            : false;
+        if (this.separator !== null) {
+            [this.textFront, this.textBack] = this.modalText.split(this.separator);
+
+            // Trim leading \n for multiline
+            this.multilineSeparator = [
+                settings.multilineCardSeparator,
+                settings.multilineReversedCardSeparator,
+            ].contains(this.separator);
+        }
+
         if (this.multilineSeparator) {
             this.textBack = this.textBack.trimStart();
             this.textFront = this.textFront.trimEnd();
@@ -95,18 +99,18 @@ export class FlashcardEditModal extends Modal {
 
         this.textAreaFront = this.contentEl.createEl("textarea");
         this.textAreaFront.addClass("sr-input");
-        this.textAreaFront.setText(this.textFront ?? "");
-        this.textAreaFront.addEventListener("keydown", this.saveOnEnterCallback);
+        this.textAreaFront.setText(this.textFront);
+        this.textAreaFront.addEventListener("keydown", this.keyListenerCallback);
         if (this.textDirection === TextDirection.Rtl) {
             this.textAreaFront.setAttribute("dir", "rtl");
         }
 
-        // Only for cards with seperator
-        if (this.separator) {
+        // Only for cards with separator
+        if (this.separator !== null) {
             this.textAreaBack = this.contentEl.createEl("textarea");
             this.textAreaBack.addClass("sr-input");
-            this.textAreaBack.setText(this.textBack ?? "");
-            this.textAreaBack.addEventListener("keydown", this.saveOnEnterCallback);
+            this.textAreaBack.setText(this.textBack);
+            this.textAreaBack.addEventListener("keydown", this.keyListenerCallback);
             if (this.textDirection === TextDirection.Rtl) {
                 this.textAreaBack.setAttribute("dir", "rtl");
             }
@@ -120,8 +124,9 @@ export class FlashcardEditModal extends Modal {
      */
     onOpen() {
         super.onOpen();
-
-        this.textAreaFront.focus();
+        if (this.textAreaFront !== null) {
+            this.textAreaFront.focus();
+        }
     }
 
     /**
@@ -139,7 +144,19 @@ export class FlashcardEditModal extends Modal {
 
     private cancelClickCallback = (_: MouseEvent) => this.cancel();
 
-    private saveOnEnterCallback = (evt: KeyboardEvent) => {
+    private keyListenerCallback = (evt: KeyboardEvent) => {
+        if (evt.key === "Tab") {
+            evt.preventDefault();
+
+            const textarea = evt.target as HTMLTextAreaElement;
+            const currentCaretStartPosition = textarea.selectionStart;
+            const currentCaretEndPosition = textarea.selectionEnd;
+            const newEndPosition = currentCaretStartPosition + 1;
+
+            textarea.setRangeText("\t", currentCaretStartPosition, currentCaretEndPosition);
+            textarea.setSelectionRange(newEndPosition, newEndPosition);
+        }
+
         if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter") {
             evt.preventDefault();
             this.save();
@@ -147,6 +164,11 @@ export class FlashcardEditModal extends Modal {
     };
 
     private save() {
+        if (this.textAreaFront === null || this.textAreaBack === null) {
+            this.close();
+            return;
+        }
+
         this.didSaveChanges = true;
         this.changedText = this.textAreaFront.value;
         if (this.separator) {
@@ -169,15 +191,19 @@ export class FlashcardEditModal extends Modal {
     }
 
     private resolveInput() {
+        if (this.rejectPromise === null || this.resolvePromise === null) return;
+
         if (!this.didSaveChanges) this.rejectPromise(t("NO_INPUT"));
         else this.resolvePromise(this.changedText);
     }
 
     private removeInputListener() {
-        this.textAreaFront.removeEventListener("keydown", this.saveOnEnterCallback);
+        if (this.textAreaFront !== null) {
+            this.textAreaFront.removeEventListener("keydown", this.keyListenerCallback);
+        }
     }
 
-    // -> Response section
+    // MARK: Response section
 
     private _createSaveButton(container: HTMLElement) {
         this.saveButton = new ButtonComponent(container);

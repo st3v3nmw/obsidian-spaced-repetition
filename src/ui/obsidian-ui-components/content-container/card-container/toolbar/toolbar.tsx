@@ -49,7 +49,7 @@ export default class CardToolbarComponent {
 
         new EditButtonComponent(
             this.toolbar,
-            () => editClickHandler(),
+            editClickHandler,
             EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
         );
 
