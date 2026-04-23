@@ -72,6 +72,14 @@ const en: IBaseLocale = {
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
     GROUP_DATA_STORAGE: "Storage of Scheduling Data",
     GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
+    MIGRATE_TO_PLUGIN_DATA: "Migrate scheduling data to plugin data?",
+    CONFIRM_MIGRATE_TO_PLUGIN_DATA:
+        "All <!--SR:...--> comments and sr-* frontmatter fields will be moved to the plugin data file. This may take a moment on large vaults. Do not edit notes until migration is complete.",
+    MIGRATING_TO_PLUGIN_DATA: "Migrating scheduling data to plugin data...",
+    MIGRATE_TO_NOTES: "Migrate scheduling data back to notes?",
+    CONFIRM_MIGRATE_TO_NOTES:
+        "All scheduling data will be written back as <!--SR:...--> comments and sr-* frontmatter fields. This may take a moment on large vaults. Do not edit notes until migration is complete.",
+    MIGRATING_TO_NOTES: "Migrating scheduling data to notes...",
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
     GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: 'For more information, check the <a href="${wikiUrl}">wiki</a>.',

@@ -15,6 +15,7 @@ import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorith
 import { DataStoreInNoteAlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
 import { DataStoreInPluginDataAlgorithmOsr } from "src/data-store-algorithm/data-store-in-plugin-data-algorithm-osr";
 import { DataStore, DataStoreName } from "src/data-stores/base/data-store";
+import { DataStoreMigrator } from "src/data-stores/data-store-migrator";
 import { StoreInNotes } from "src/data-stores/notes/notes";
 import { StoreInPluginData } from "src/data-stores/plugin-data/plugin-data";
 import { ScheduleDataRepository } from "src/data-stores/plugin-data/schedule-data-repository";
@@ -600,6 +601,25 @@ export default class SRPlugin extends Plugin {
 
         SrsAlgorithm.instance = new SrsAlgorithmOsr(settings);
     }
+    async migrateDataStore(oldMode: DataStoreName, newMode: DataStoreName): Promise<void> {
+        const textDirection = this.getObsidianRtlSetting();
+        if (newMode === DataStoreName.PLUGIN_DATA) {
+            await DataStoreMigrator.migrateToPluginData(
+                this.app,
+                this.data.settings,
+                textDirection,
+                this.scheduleDataRepository,
+            );
+        } else {
+            await DataStoreMigrator.migrateToNotes(
+                this.app,
+                this.data.settings,
+                textDirection,
+                this.scheduleDataRepository,
+            );
+        }
+    }
+
     async savePluginData(): Promise<void> {
         await this.saveData(this.data);
     }

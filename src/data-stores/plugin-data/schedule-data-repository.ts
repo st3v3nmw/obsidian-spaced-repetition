@@ -129,6 +129,14 @@ export class ScheduleDataRepository {
         await this.persist();
     }
 
+    clearState(): void {
+        this.pluginData.scheduleState = {
+            version: 1,
+            noteSchedules: {},
+            cardSchedules: {},
+        };
+    }
+
     async renameFile(oldPath: string, newPath: string): Promise<void> {
         this.ensureState();
 

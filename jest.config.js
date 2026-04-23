@@ -22,6 +22,7 @@ module.exports = {
         "src/icons/",
         "src/main.ts",
         "src/delete-scheduling-data.ts",
+        "src/data-stores/data-store-migrator.ts",
         "src/note/next-note-review-handler.ts",
         "src/plugin-data.ts",
         "src/utils/renderers.ts",

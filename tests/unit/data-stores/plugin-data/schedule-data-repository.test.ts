@@ -189,6 +189,19 @@ describe("ScheduleDataRepository - state initialisation", () => {
         expect(data.scheduleState.cardSchedules["def456"]).toBeDefined();
     });
 
+    test("clearState resets all schedules", async () => {
+        const data = makePluginData();
+        const { repo } = makeRepo(data);
+        const s = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-06", 5, 230);
+        await repo.setNoteSchedule("notes/foo.md", s);
+        await repo.setCardSchedules("abc123", [s]);
+
+        repo.clearState();
+
+        expect(repo.hasNoteSchedule("notes/foo.md")).toBe(false);
+        expect(repo.hasCardSchedules("abc123")).toBe(false);
+    });
+
     test("migration does not overwrite an existing hash-only key", () => {
         const data = makePluginData();
         const existing = [{ dueDate: "2023-09-10", interval: 9, ease: 270 }];

@@ -65,6 +65,12 @@ export interface IBaseLocale {
     GROUP_FLASHCARD_SEPARATORS: string;
     GROUP_DATA_STORAGE: string;
     GROUP_DATA_STORAGE_DESC: string;
+    MIGRATE_TO_PLUGIN_DATA: string;
+    CONFIRM_MIGRATE_TO_PLUGIN_DATA: string;
+    MIGRATING_TO_PLUGIN_DATA: string;
+    MIGRATE_TO_NOTES: string;
+    CONFIRM_MIGRATE_TO_NOTES: string;
+    MIGRATING_TO_NOTES: string;
     GROUP_FLASHCARDS_NOTES: string;
     GROUP_CONTRIBUTING: string;
     CHECK_WIKI: string;
