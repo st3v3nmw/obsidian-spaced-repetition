@@ -25,6 +25,9 @@ export interface IBaseLocale {
     CURRENT_EASE_HELP_TEXT: string;
     CURRENT_INTERVAL_HELP_TEXT: string;
     CARD_GENERATED_FROM: string;
+    JUMP_TO: string;
+    JUMP_TO_AND_CLOSE: string;
+    OPEN_IN_BACKGROUND: string;
     VIEW_CARD_INFO: string;
 
     // main.ts

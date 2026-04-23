@@ -29,6 +29,9 @@ const en: IBaseLocale = {
     CURRENT_EASE_HELP_TEXT: "Current Ease: ",
     CURRENT_INTERVAL_HELP_TEXT: "Current Interval: ",
     CARD_GENERATED_FROM: "Generated from: ${notePath}",
+    JUMP_TO: "Jump to card",
+    JUMP_TO_AND_CLOSE: "Close and jump to card",
+    OPEN_IN_BACKGROUND: "Open card in background",
     VIEW_CARD_INFO: "View Card Info",
     DELETE_CARD: "Delete Card",
     DELETE_CARD_CONFIRMATION:
