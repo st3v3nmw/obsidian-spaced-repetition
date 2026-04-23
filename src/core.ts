@@ -7,6 +7,8 @@ import { IOsrVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-n
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
+import { DataStoreName } from "src/data-stores/base/data-store";
+import { ScheduleDataRepository } from "src/data-stores/plugin-data/schedule-data-repository";
 import { Deck, DeckTreeFilter } from "src/deck/deck";
 import { DeckTreeStatsCalculator } from "src/deck/deck-tree-stats-calculator";
 import { Stats } from "src/deck/stats";
@@ -32,6 +34,7 @@ export class OsrCore {
     private osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder;
     private _questionPostponementList: QuestionPostponementList;
     private _noteReviewQueue: NoteReviewQueue;
+    private scheduleDataRepository: ScheduleDataRepository | null = null;
 
     private fullDeckTree: Deck;
     private _reviewableDeckTree: Deck = new Deck("root", null);
@@ -74,12 +77,14 @@ export class OsrCore {
         settings: SRSettings,
         dataChangedHandler: () => void,
         noteReviewQueue: NoteReviewQueue,
+        scheduleDataRepository: ScheduleDataRepository | null,
     ): void {
         this.settings = settings;
         this.osrNoteLinkInfoFinder = osrNoteLinkInfoFinder;
         this.dataChangedHandler = dataChangedHandler;
         this._noteReviewQueue = noteReviewQueue;
         this._questionPostponementList = questionPostponementList;
+        this.scheduleDataRepository = scheduleDataRepository;
         this._dueDateFlashcardHistogram = new CardDueDateHistogram();
         this._dueDateNoteHistogram = new NoteDueDateHistogram();
         try {
@@ -108,7 +113,7 @@ export class OsrCore {
     }
 
     protected async processFile(noteFile: ISRFile): Promise<void> {
-        const schedule: RepItemScheduleInfo = await noteFile.getNoteSchedule();
+        const schedule: RepItemScheduleInfo = await this.readNoteSchedule(noteFile);
         let note: Note | null = null;
 
         // Update the graph of links between notes
@@ -134,8 +139,43 @@ export class OsrCore {
         if (matchedNoteTags.length === 0) {
             return;
         }
-        const noteSchedule: RepItemScheduleInfo = await noteFile.getNoteSchedule();
+        const noteSchedule: RepItemScheduleInfo = await this.readNoteSchedule(noteFile);
         this._noteReviewQueue.addNoteToQueue(noteFile, noteSchedule, matchedNoteTags);
+    }
+
+    private async readNoteSchedule(noteFile: ISRFile): Promise<RepItemScheduleInfo> {
+        if (
+            this.settings.dataStore !== DataStoreName.PLUGIN_DATA ||
+            this.scheduleDataRepository === null
+        ) {
+            return await noteFile.getNoteSchedule();
+        }
+
+        if (this.scheduleDataRepository.hasNoteSchedule(noteFile.path)) {
+            return this.scheduleDataRepository.getNoteSchedule(noteFile.path);
+        }
+
+        // Fallback to frontmatter to preserve existing users' schedules when switching mode.
+        const legacy = await noteFile.getNoteSchedule();
+        if (legacy) {
+            await this.scheduleDataRepository.setNoteSchedule(noteFile.path, legacy);
+        }
+        return legacy;
+    }
+
+    private async writeNoteSchedule(
+        noteFile: ISRFile,
+        noteSchedule: RepItemScheduleInfo,
+    ): Promise<void> {
+        if (
+            this.settings.dataStore !== DataStoreName.PLUGIN_DATA ||
+            this.scheduleDataRepository === null
+        ) {
+            await noteFile.setNoteSchedule(noteSchedule);
+            return;
+        }
+
+        await this.scheduleDataRepository.setNoteSchedule(noteFile.path, noteSchedule);
     }
 
     protected finalizeLoad(): void {
@@ -168,7 +208,7 @@ export class OsrCore {
         settings: SRSettings,
     ): Promise<void> {
         // Get the current schedule for the note (null if new note)
-        const originalNoteSchedule: RepItemScheduleInfo = await noteFile.getNoteSchedule();
+        const originalNoteSchedule: RepItemScheduleInfo = await this.readNoteSchedule(noteFile);
 
         // Calculate the new/updated schedule
         let noteSchedule: RepItemScheduleInfo;
@@ -189,7 +229,7 @@ export class OsrCore {
         }
 
         // Store away the new schedule info
-        await noteFile.setNoteSchedule(noteSchedule);
+        await this.writeNoteSchedule(noteFile, noteSchedule);
 
         // Generate the histogram for the due dates for all the notes
         // (This could be optimized to make the small adjustments to the histogram, but simpler to implement

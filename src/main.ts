@@ -13,8 +13,11 @@ import { QuestionPostponementList } from "src/card/questions/question-postponeme
 import { OsrAppCore } from "src/core";
 import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
 import { DataStoreInNoteAlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
-import { DataStore } from "src/data-stores/base/data-store";
+import { DataStoreInPluginDataAlgorithmOsr } from "src/data-store-algorithm/data-store-in-plugin-data-algorithm-osr";
+import { DataStore, DataStoreName } from "src/data-stores/base/data-store";
 import { StoreInNotes } from "src/data-stores/notes/notes";
+import { StoreInPluginData } from "src/data-stores/plugin-data/plugin-data";
+import { ScheduleDataRepository } from "src/data-stores/plugin-data/schedule-data-repository";
 import { Deck, DeckTreeFilter } from "src/deck/deck";
 import {
     CardOrder,
@@ -42,6 +45,7 @@ export default class SRPlugin extends Plugin {
     public data: PluginData;
     public osrAppCore: OsrAppCore;
     public uiManager: UIManager;
+    private scheduleDataRepository: ScheduleDataRepository;
 
     public nextNoteReviewHandler: NextNoteReviewHandler;
 
@@ -72,11 +76,23 @@ export default class SRPlugin extends Plugin {
             this.data.settings,
             this.onOsrVaultDataChanged.bind(this),
             noteReviewQueue,
+            this.scheduleDataRepository,
         );
 
         this.uiManager = new UIManager(this);
 
         this.addPluginCommands();
+
+        this.registerEvent(
+            this.app.vault.on("rename", (file, oldPath) => {
+                if (
+                    this.data.settings.dataStore === DataStoreName.PLUGIN_DATA &&
+                    file instanceof TFile
+                ) {
+                    this.scheduleDataRepository.renameFile(oldPath, file.path);
+                }
+            }),
+        );
     }
 
     public removeCustomHotkeys() {
@@ -565,14 +581,24 @@ export default class SRPlugin extends Plugin {
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
         setDebugParser(this.data.settings.showParserDebugMessages);
 
+        this.scheduleDataRepository = new ScheduleDataRepository(
+            this.data,
+            this.savePluginData.bind(this),
+        );
+
         this.setupDataStoreAndAlgorithmInstances(this.data.settings);
     }
 
     setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
-        // For now we can hardcode as we only support the one data store and one algorithm
-        DataStore.instance = new StoreInNotes(settings);
+        if (settings.dataStore === DataStoreName.PLUGIN_DATA) {
+            DataStore.instance = new StoreInPluginData(settings, this.scheduleDataRepository);
+            DataStoreAlgorithm.instance = new DataStoreInPluginDataAlgorithmOsr();
+        } else {
+            DataStore.instance = new StoreInNotes(settings);
+            DataStoreAlgorithm.instance = new DataStoreInNoteAlgorithmOsr(settings);
+        }
+
         SrsAlgorithm.instance = new SrsAlgorithmOsr(settings);
-        DataStoreAlgorithm.instance = new DataStoreInNoteAlgorithmOsr(settings);
     }
     async savePluginData(): Promise<void> {
         await this.saveData(this.data);
