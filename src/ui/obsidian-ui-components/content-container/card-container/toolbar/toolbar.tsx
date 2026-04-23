@@ -1,13 +1,12 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar.css";
-import { Menu, Platform } from "obsidian";
+import { Platform } from "obsidian";
 
 import { DeckStats } from "src/card/flashcard-review-sequencer";
 import { Deck } from "src/deck/deck";
-import { t } from "src/lang/helpers";
 import DeckInfoComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/deck-info/deck-info";
 import BackButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/back-button";
+import CardMenuButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-menu-button";
 import EditButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/edit-button";
-import MenuDotsButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/menu-dots-button";
 import ResetButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/reset-button";
 import SkipButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/skip-button";
 import ModalCloseButtonComponent from "src/ui/obsidian-ui-components/content-container/modal-close-button";
@@ -17,10 +16,11 @@ export default class CardToolbarComponent {
     private toolbar: HTMLDivElement;
     private infoSection: DeckInfoComponent;
     private resetButton: ResetButtonComponent;
+    private extendedMenuButton: CardMenuButtonComponent;
+    private shortMenuButton: CardMenuButtonComponent;
 
     public constructor(
         parentEl: HTMLElement,
-        isModal: boolean,
         showDeleteButton: boolean,
         deleteCurrentCard: () => void,
         backToDeckHandler: () => void,
@@ -34,6 +34,7 @@ export default class CardToolbarComponent {
         // Build ui
         this.toolbar = parentEl.createDiv();
         this.toolbar.addClass("sr-card-toolbar");
+        const isModal = closeModal !== undefined;
 
         new BackButtonComponent(this.toolbar, () => backToDeckHandler(), [
             (EmulatedPlatform().isPhone || Platform.isPhone) && isModal
@@ -52,137 +53,59 @@ export default class CardToolbarComponent {
         new EditButtonComponent(
             this.toolbar,
             editClickHandler,
-            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
+            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"],
         );
 
         this.resetButton = new ResetButtonComponent(
             this.toolbar,
             onOpenResetModalClick,
-            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
+            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"],
         );
         this.resetButton.setDisabled(true);
 
         new SkipButtonComponent(
             this.toolbar,
             () => skipCurrentCard(),
-            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
+            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"],
         );
 
         this.toolbar.createDiv("sr-divider");
 
-        new MenuDotsButtonComponent(
+        this.shortMenuButton = new CardMenuButtonComponent(
             this.toolbar,
-            (evt: MouseEvent) => {
-                const cardMenu = new Menu();
+            false, // isExtended = false
+            showDeleteButton,
+            isModal,
+            this.resetButton.disabled,
+            deleteCurrentCard,
+            editClickHandler,
+            jumpToCurrentCard,
+            displayCurrentCardInfoNotice,
+            skipCurrentCard,
+            onOpenResetModalClick,
+            closeModal,
+            EmulatedPlatform().isPhone || Platform.isPhone
+                ? ["mod-raised", "sr-short-menu-button"]
+                : ["clickable-icon", "sr-short-menu-button"],
+        );
 
-                if (isModal) {
-                    cardMenu.addItem((item) => {
-                        item.setTitle(t("OPEN_IN_BACKGROUND"))
-                            .setIcon("send-to-back")
-                            .onClick(() => {
-                                // Doesn't close modal, just opens in background and focuses
-                                jumpToCurrentCard();
-                            });
-                    });
-                    cardMenu.addItem((item) => {
-                        item.setTitle(t("JUMP_TO_AND_CLOSE"))
-                            .setIcon("arrow-up-right")
-                            .onClick(() => {
-                                jumpToCurrentCard();
-                                if (closeModal) {
-                                    closeModal();
-                                }
-                            });
-                    });
-                } else {
-                    cardMenu.addItem((item) => {
-                        item.setTitle(t("JUMP_TO"))
-                            .setIcon("arrow-up-right")
-                            .onClick(() => {
-                                jumpToCurrentCard();
-                            });
-                    });
-                }
-                cardMenu.addItem((item) => {
-                    item.setTitle(t("VIEW_CARD_INFO"))
-                        .setIcon("info")
-                        .onClick(() => {
-                            displayCurrentCardInfoNotice();
-                        });
-                });
-                if (showDeleteButton) {
-                    cardMenu.addItem((item) => {
-                        item.setTitle(t("DELETE_CARD"))
-                            .setIcon("trash")
-                            .onClick(() => {
-                                deleteCurrentCard();
-                            });
-                    });
-                }
-
-                cardMenu.showAtMouseEvent(evt);
-            },
-            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"],
-        ).setClass("sr-short-menu-button");
-
-        new MenuDotsButtonComponent(
+        this.extendedMenuButton = new CardMenuButtonComponent(
             this.toolbar,
-            (evt: MouseEvent) => {
-                const cardMenu = new Menu();
-
-                cardMenu.addItem((item) => {
-                    item.setTitle(t("EDIT_CARD"))
-                        .setIcon("pencil")
-                        .onClick(() => {
-                            editClickHandler();
-                        });
-                });
-
-                cardMenu.addItem((item) => {
-                    item.setTitle(t("RESET_CARD_PROGRESS"))
-                        .setIcon("reset")
-                        .onClick(() => {
-                            onOpenResetModalClick();
-                        })
-                        .setDisabled(this.resetButton.disabled);
-                });
-
-                cardMenu.addItem((item) => {
-                    item.setTitle(t("SKIP"))
-                        .setIcon("chevrons-right")
-                        .onClick(() => {
-                            skipCurrentCard();
-                        });
-                });
-
-                cardMenu.addItem((item) => {
-                    item.setTitle("Jump to card") // TODO: Translate
-                        .setIcon("arrow-up-right")
-                        .onClick(() => {
-                            jumpToCurrentCard();
-                        });
-                });
-                cardMenu.addItem((item) => {
-                    item.setTitle(t("VIEW_CARD_INFO"))
-                        .setIcon("info")
-                        .onClick(() => {
-                            displayCurrentCardInfoNotice();
-                        });
-                });
-                if (showDeleteButton) {
-                    cardMenu.addItem((item) => {
-                        item.setTitle(t("DELETE_CARD"))
-                            .setIcon("trash")
-                            .onClick(() => {
-                                deleteCurrentCard();
-                            });
-                    });
-                }
-
-                cardMenu.showAtMouseEvent(evt);
-            },
-            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"],
-        ).setClass("sr-extended-menu-button");
+            true, // isExtended = true
+            showDeleteButton,
+            isModal,
+            this.resetButton.disabled,
+            deleteCurrentCard,
+            editClickHandler,
+            jumpToCurrentCard,
+            displayCurrentCardInfoNotice,
+            skipCurrentCard,
+            onOpenResetModalClick,
+            closeModal,
+            EmulatedPlatform().isPhone || Platform.isPhone
+                ? ["mod-raised", "sr-extended-menu-button"]
+                : ["clickable-icon", "sr-extended-menu-button"],
+        );
 
         // If we don't have a close modal, we don't need the close button
         if (closeModal === undefined) return;
@@ -234,5 +157,7 @@ export default class CardToolbarComponent {
      */
     public setResetButtonDisabled(disabled: boolean) {
         this.resetButton.buttonEl.toggleClass("mod-disabled", disabled);
+        this.extendedMenuButton.setResetButtonDisabled(disabled);
+        this.shortMenuButton.setResetButtonDisabled(disabled);
     }
 }
