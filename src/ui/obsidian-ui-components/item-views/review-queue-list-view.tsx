@@ -3,12 +3,14 @@ import { ItemView, Menu, setIcon, TFile, WorkspaceLeaf } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { COLLAPSE_ICON, TICKS_PER_DAY } from "src/constants";
+import { deleteNoteSchedulingDataInNote } from "src/delete-scheduling-data";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { NoteReviewDeck } from "src/note/note-review-deck";
 import { NoteReviewQueue } from "src/note/note-review-queue";
 import { SRSettings } from "src/settings";
+import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 
 export const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
 
@@ -333,6 +335,29 @@ export class ReviewQueueListView extends ItemView {
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
                         this.plugin.saveNoteReviewResponse(file, ReviewResponse.Hard);
+                    });
+            });
+
+            fileMenu.addSeparator();
+
+            fileMenu.addItem((item) => {
+                item.setTitle(t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"))
+                    .setIcon("trash")
+                    .setWarning(true)
+                    .onClick(async () => {
+                        new ConfirmationModal(
+                            this.plugin.app,
+                            t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"),
+                            t("CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION"),
+                            t("NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS"),
+                            () => {
+                                deleteNoteSchedulingDataInNote(
+                                    file,
+                                    this.plugin.data.settings.deleteTagsOnSchedulingDataDeletion,
+                                    this.plugin.data.settings.tagsToReview,
+                                );
+                            },
+                        ).open();
                     });
             });
 

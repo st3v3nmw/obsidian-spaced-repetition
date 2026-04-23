@@ -320,6 +320,20 @@ export class SchedulingPage extends SettingsPage {
             .setHeading(t("DELETE_SCHEDULING_DATA_ALL"))
             .addSetting((setting: Setting) => {
                 setting
+                    .setName(t("DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA"))
+                    .setDesc(t("DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.deleteTagsOnSchedulingDataDeletion)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.deleteTagsOnSchedulingDataDeletion =
+                                    value;
+                                await this.plugin.savePluginData();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
                     .setName(t("DELETE_SCHEDULING_DATA_ALL"))
                     .setDesc(t("DELETE_SCHEDULING_DATA_ALL_DESC"))
                     .addButton((button) => {
@@ -332,7 +346,14 @@ export class SchedulingPage extends SettingsPage {
                                     t("DELETE_SCHEDULING_DATA_ALL"),
                                     t("CONFIRM_SCHEDULING_DATA_ALL_DELETION"),
                                     t("SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS"),
-                                    deleteAllSchedulingData,
+                                    () => {
+                                        deleteAllSchedulingData(
+                                            this.plugin.data.settings
+                                                .deleteTagsOnSchedulingDataDeletion,
+                                            this.plugin.data.settings.flashcardTags,
+                                            this.plugin.data.settings.tagsToReview,
+                                        );
+                                    },
                                 ).open();
                             });
                     });
@@ -351,7 +372,13 @@ export class SchedulingPage extends SettingsPage {
                                     t("DELETE_SCHEDULING_DATA_IN_NOTES"),
                                     t("CONFIRM_SCHEDULING_DATA_IN_NOTES_DELETION"),
                                     t("SCHEDULING_DATA_IN_NOTES_DELETION_IN_PROGRESS"),
-                                    deleteAllSchedulingDataInNotes,
+                                    () => {
+                                        deleteAllSchedulingDataInNotes(
+                                            this.plugin.data.settings
+                                                .deleteTagsOnSchedulingDataDeletion,
+                                            this.plugin.data.settings.tagsToReview,
+                                        );
+                                    },
                                 ).open();
                             });
                     });
@@ -370,7 +397,13 @@ export class SchedulingPage extends SettingsPage {
                                     t("DELETE_SCHEDULING_DATA_IN_CARDS"),
                                     t("CONFIRM_SCHEDULING_DATA_IN_CARDS_DELETION"),
                                     t("SCHEDULING_DATA_IN_CARDS_DELETION_IN_PROGRESS"),
-                                    deleteAllSchedulingDataInCards,
+                                    () => {
+                                        deleteAllSchedulingDataInCards(
+                                            this.plugin.data.settings
+                                                .deleteTagsOnSchedulingDataDeletion,
+                                            this.plugin.data.settings.flashcardTags,
+                                        );
+                                    },
                                 ).open();
                             });
                     });

@@ -124,11 +124,11 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(!this.plugin.data.settings.disableFileMenuReviewOptions)
+                            .setValue(this.plugin.data.settings.showFileMenuReviewOptions)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.disableFileMenuReviewOptions = !value;
-                                await this.plugin.savePluginData();
+                                this.plugin.data.settings.showFileMenuReviewOptions = value;
                                 this.plugin.uiManager.showFileMenuItems(value);
+                                await this.plugin.savePluginData();
                             }),
                     );
             })

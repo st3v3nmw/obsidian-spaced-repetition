@@ -4,11 +4,16 @@ import { Menu, MenuItem, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "o
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { CardListType } from "src/deck/deck";
+import {
+    deleteAllSchedulingDataOfCardsInNote,
+    deleteNoteSchedulingDataInNote,
+} from "src/delete-scheduling-data";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
+import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { SRModalView } from "src/ui/obsidian-ui-components/modals/sr-modal-view";
 import { SRSettingTab } from "src/ui/obsidian-ui-components/settings-tab";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
@@ -51,6 +56,7 @@ export class UIManager {
     private plugin: SRPlugin;
     private ribbonIcon: HTMLElement | null = null;
     private externalModalObserver: MutationObserver | null = null;
+    private areFileMenuItemsShown: boolean = false;
 
     constructor(plugin: SRPlugin) {
         this.plugin = plugin;
@@ -80,7 +86,7 @@ export class UIManager {
         this.statusBarManager = new StatusBarManager(this.plugin);
 
         this.showRibbonIcon(this.plugin.data.settings.showRibbonIcon);
-        this.showFileMenuItems(this.plugin.data.settings.disableFileMenuReviewOptions);
+        this.showFileMenuItems(this.plugin.data.settings.showFileMenuReviewOptions);
         this.plugin.addSettingTab(new SRSettingTab(this.plugin.app, this.plugin));
         this.registerSRFocusListener();
     }
@@ -223,8 +229,8 @@ export class UIManager {
         }
     }
 
-    showFileMenuItems(status: boolean) {
-        if (status) {
+    showFileMenuItems(show: boolean) {
+        if (show) {
             this.plugin.registerEvent(
                 this.plugin.app.workspace.on("file-menu", this.fileMenuHandler.bind(this)),
             );
@@ -269,6 +275,50 @@ export class UIManager {
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
                         this.plugin.saveNoteReviewResponse(file, ReviewResponse.Hard);
+                    });
+            });
+
+            menu.addSeparator();
+
+            menu.addItem((item) => {
+                item.setTitle(t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"))
+                    .setIcon("trash")
+                    .setWarning(true)
+                    .onClick(async () => {
+                        new ConfirmationModal(
+                            this.plugin.app,
+                            t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"),
+                            t("CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION"),
+                            t("NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS"),
+                            () => {
+                                deleteNoteSchedulingDataInNote(
+                                    file,
+                                    this.plugin.data.settings.deleteTagsOnSchedulingDataDeletion,
+                                    this.plugin.data.settings.tagsToReview,
+                                );
+                            },
+                        ).open();
+                    });
+            });
+
+            menu.addItem((item) => {
+                item.setTitle(t("DELETE_SCHEDULING_DATA_OF_CARDS_IN_NOTE"))
+                    .setIcon("trash")
+                    .setWarning(true)
+                    .onClick(async () => {
+                        new ConfirmationModal(
+                            this.plugin.app,
+                            t("DELETE_SCHEDULING_DATA_OF_CARDS_IN_NOTE"),
+                            t("CONFIRM_SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION"),
+                            t("SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION_IN_PROGRESS"),
+                            () => {
+                                deleteAllSchedulingDataOfCardsInNote(
+                                    file,
+                                    this.plugin.data.settings.deleteTagsOnSchedulingDataDeletion,
+                                    this.plugin.data.settings.flashcardTags,
+                                );
+                            },
+                        ).open();
                     });
             });
         }

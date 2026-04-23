@@ -314,6 +314,18 @@ const en: IBaseLocale = {
         'Check out the <a href="${devNewsUrl}">dev news</a> for the latest development news.',
 
     OPEN_MENU: "Open menu",
+    DELETE_NOTE_SCHEDULING_DATA_IN_NOTE: "Delete note scheduling data in note",
+    CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION:
+        "Are you sure you want to delete note scheduling data in this note?",
+    NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS: "Deleting note scheduling data in note...",
+    DELETE_SCHEDULING_DATA_OF_CARDS_IN_NOTE: "Delete scheduling data of cards in note",
+    CONFIRM_SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION:
+        "Are you sure you want to delete scheduling data of cards in note?",
+    SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION_IN_PROGRESS:
+        "Deleting scheduling data of cards in note...",
+
+    DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA: "Delete tags when deleting scheduling data",
+    DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA_DESC: "Delete tags when deleting scheduling data",
 };
 
 export default en;

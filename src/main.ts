@@ -321,13 +321,13 @@ export default class SRPlugin extends Plugin {
             repeatable: false,
             checkCallback: (checking: boolean) => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
-                if (openFile && openFile.extension === "md") {
-                    if (!checking) {
-                        this.saveNoteReviewResponse(openFile, ReviewResponse.Easy);
-                    }
-                    return true;
+
+                if (openFile === null || openFile.extension !== "md") return false;
+
+                if (!checking) {
+                    this.saveNoteReviewResponse(openFile, ReviewResponse.Easy);
                 }
-                return false;
+                return true;
             },
         });
 
@@ -339,13 +339,13 @@ export default class SRPlugin extends Plugin {
             repeatable: false,
             checkCallback: (checking: boolean) => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
-                if (openFile && openFile.extension === "md") {
-                    if (!checking) {
-                        this.saveNoteReviewResponse(openFile, ReviewResponse.Good);
-                    }
-                    return true;
+
+                if (openFile === null || openFile.extension !== "md") return false;
+
+                if (!checking) {
+                    this.saveNoteReviewResponse(openFile, ReviewResponse.Good);
                 }
-                return false;
+                return true;
             },
         });
 
@@ -357,13 +357,13 @@ export default class SRPlugin extends Plugin {
             repeatable: false,
             checkCallback: (checking: boolean) => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
-                if (openFile && openFile.extension === "md") {
-                    if (!checking) {
-                        this.saveNoteReviewResponse(openFile, ReviewResponse.Hard);
-                    }
-                    return true;
+
+                if (openFile === null || openFile.extension !== "md") return false;
+
+                if (!checking) {
+                    this.saveNoteReviewResponse(openFile, ReviewResponse.Hard);
                 }
-                return false;
+                return true;
             },
         });
 
@@ -386,24 +386,32 @@ export default class SRPlugin extends Plugin {
         this.addCommand({
             id: "srs-review-flashcards-in-note",
             name: t("REVIEW_CARDS_IN_NOTE"),
-            callback: async () => {
+            repeatable: false,
+            checkCallback: (checking: boolean) => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
-                if (!openFile || openFile.extension !== "md") {
-                    return;
+
+                if (openFile === null || openFile.extension !== "md") return false;
+
+                if (!checking) {
+                    this.uiManager.openDeckContainer(FlashcardReviewMode.Review, openFile);
                 }
-                await this.uiManager.openDeckContainer(FlashcardReviewMode.Review, openFile);
+                return true;
             },
         });
 
         this.addCommand({
             id: "srs-cram-flashcards-in-note",
             name: t("CRAM_CARDS_IN_NOTE"),
-            callback: async () => {
+            repeatable: false,
+            checkCallback: (checking: boolean) => {
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
-                if (!openFile || openFile.extension !== "md") {
-                    return;
+
+                if (openFile === null || openFile.extension !== "md") return false;
+
+                if (!checking) {
+                    this.uiManager.openDeckContainer(FlashcardReviewMode.Cram, openFile);
                 }
-                await this.uiManager.openDeckContainer(FlashcardReviewMode.Cram, openFile);
+                return true;
             },
         });
 
