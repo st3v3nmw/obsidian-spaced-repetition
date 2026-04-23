@@ -78,7 +78,7 @@ export default class CardToolbarComponent {
                 if (isModal) {
                     cardMenu.addItem((item) => {
                         item.setTitle(t("OPEN_IN_BACKGROUND"))
-                            .setIcon("browser-window")
+                            .setIcon("send-to-back")
                             .onClick(() => {
                                 // Doesn't close modal, just opens in background and focuses
                                 jumpToCurrentCard();
