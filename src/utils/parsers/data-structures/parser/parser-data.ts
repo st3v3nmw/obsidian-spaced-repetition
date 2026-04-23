@@ -197,9 +197,9 @@ export class ParserData {
                 //
                 // The potential card is empty or just text, so we can flag a rouge multiline end marker
                 // The potential card is not eligible for a multiline end marker, so we can flag a rouge multiline end marker
-                fragmentInfo = new PotentialCardInfo(
-                    this.
-                );
+                // TODO: Add this back in
+
+
                 CardParser.notesWithCardFragments.addCardFragment(
                     this.notePath,
                     this.noteText,
