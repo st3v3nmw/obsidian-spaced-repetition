@@ -93,24 +93,21 @@ export class UIManager {
     }
 
     public updateStatusBar() {
+        this.statusBarManager.showStatusBarItems(this.plugin.data.settings.showStatusBar);
+
         if (this.plugin.data.settings.showStatusBar) {
-            this.statusBarManager.setText(
-                `${this.plugin.osrAppCore.remainingDeckTree.getCardCount(
-                    CardListType.All,
-                    true,
-                )} card(s) due`,
+            this.statusBarManager.setCount(
+                this.plugin.osrAppCore.remainingDeckTree.getCardCount(CardListType.All, true),
                 this.plugin.data.settings.showStatusBar,
                 "card-review",
             );
-            this.statusBarManager.setText(
-                `${this.plugin.osrAppCore.noteReviewQueue.dueNotesCount} note(s) due`,
+            this.statusBarManager.setCount(
+                this.plugin.osrAppCore.noteReviewQueue.dueNotesCount,
                 this.plugin.data.settings.showStatusBar,
                 "note-review",
             );
             this.statusBarManager.showUpdateAvailableItemIfAvailable();
         }
-
-        this.statusBarManager.showStatusBarItems(this.plugin.data.settings.showStatusBar);
     }
 
     public registerSRFocusListener() {
