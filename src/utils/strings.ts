@@ -262,3 +262,21 @@ export class MultiLineTextFinder {
         return result;
     }
 }
+
+/**
+ * Checks a text contains one of the given separators.
+ * Priority: Exact match > position in text > order of input separators
+ *
+ * @param text Text to check one of the separators is included
+ * @param separators The separators to check for
+ * @returns The first separators that is included or null if none of them included.
+ */
+export function includedSeparator(text: string, separators: string[]): string | null {
+    // https://www.30secondsofcode.org/js/s/array-has-only-one-match-or-many/
+    const sep = separators.filter((value) => text.includes(value));
+    if (sep.length <= 0) {
+        return null;
+    }
+    sep.sort((a, b) => (a.includes(b) || b.includes(a) ? b.length - a.length : 0));
+    return sep[0];
+}

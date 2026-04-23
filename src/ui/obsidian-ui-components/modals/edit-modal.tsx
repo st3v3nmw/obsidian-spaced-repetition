@@ -2,41 +2,77 @@ import "src/ui/obsidian-ui-components/modals/edit-modal.css";
 import { App, ButtonComponent, Modal } from "obsidian";
 
 import { t } from "src/lang/helpers";
-import { TextDirection } from "src/utils/strings";
+import { SRSettings } from "src/settings";
+import { includedSeparator, TextDirection } from "src/utils/strings";
 
 // from https://github.com/chhoumann/quickadd/blob/bce0b4cdac44b867854d6233796e3406dfd163c6/src/gui/GenericInputPrompt/GenericInputPrompt.ts#L5
 export class FlashcardEditModal extends Modal {
     public changedText: string;
     public waitForClose: Promise<string>;
 
-    public title: HTMLDivElement;
-    public textArea: HTMLTextAreaElement;
-    public response: HTMLDivElement;
-    public saveButton: ButtonComponent;
-    public cancelButton: ButtonComponent;
+    public title: HTMLDivElement | null = null;
+    public textAreaFront: HTMLTextAreaElement | null = null;
+    public textAreaBack: HTMLTextAreaElement | null = null;
+    public response: HTMLDivElement | null = null;
+    public saveButton: ButtonComponent | null = null;
+    public cancelButton: ButtonComponent | null = null;
 
-    private resolvePromise: (input: string) => void;
+    private resolvePromise: ((input: string) => void) | null = null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private rejectPromise: (reason?: any) => void;
+    private rejectPromise: ((reason?: any) => void) | null = null;
     private didSaveChanges = false;
     private readonly modalText: string;
     private textDirection: TextDirection;
+    private textFront: string = "";
+    private textBack: string = "";
+    private separator: string | null;
+    private multilineSeparator: boolean = false;
 
     public static Prompt(
         app: App,
+        settings: SRSettings,
         placeholder: string,
         textDirection: TextDirection,
     ): Promise<string> {
-        const newPromptModal = new FlashcardEditModal(app, placeholder, textDirection);
+        const newPromptModal = new FlashcardEditModal(app, settings, placeholder, textDirection);
         return newPromptModal.waitForClose;
     }
 
-    constructor(app: App, existingText: string, textDirection: TextDirection) {
+    constructor(
+        app: App,
+        settings: SRSettings,
+        existingText: string,
+        textDirection: TextDirection,
+    ) {
         super(app);
 
         this.modalText = existingText;
         this.changedText = existingText;
         this.textDirection = textDirection;
+
+        // Select the separator used
+        this.separator = includedSeparator(this.modalText, [
+            settings.singleLineReversedCardSeparator,
+            settings.multilineReversedCardSeparator,
+            settings.singleLineCardSeparator,
+            settings.multilineCardSeparator,
+        ]);
+
+        // Split Text based on the separator
+        if (this.separator !== null) {
+            [this.textFront, this.textBack] = this.modalText.split(this.separator);
+
+            // Trim leading \n for multiline
+            this.multilineSeparator = [
+                settings.multilineCardSeparator,
+                settings.multilineReversedCardSeparator,
+            ].contains(this.separator);
+        }
+
+        if (this.multilineSeparator) {
+            this.textBack = this.textBack.trimStart();
+            this.textFront = this.textFront.trimEnd();
+        }
 
         this.waitForClose = new Promise<string>((resolve, reject) => {
             this.resolvePromise = resolve;
@@ -61,12 +97,23 @@ export class FlashcardEditModal extends Modal {
         this.title.setText(t("EDIT_CARD"));
         this.title.addClass("sr-title");
 
-        this.textArea = this.contentEl.createEl("textarea");
-        this.textArea.addClass("sr-input");
-        this.textArea.setText(this.modalText ?? "");
-        this.textArea.addEventListener("keydown", this.saveOnEnterCallback);
+        this.textAreaFront = this.contentEl.createEl("textarea");
+        this.textAreaFront.addClass("sr-input");
+        this.textAreaFront.setText(this.textFront);
+        this.textAreaFront.addEventListener("keydown", this.keyListenerCallback);
         if (this.textDirection === TextDirection.Rtl) {
-            this.textArea.setAttribute("dir", "rtl");
+            this.textAreaFront.setAttribute("dir", "rtl");
+        }
+
+        // Only for cards with separator
+        if (this.separator !== null) {
+            this.textAreaBack = this.contentEl.createEl("textarea");
+            this.textAreaBack.addClass("sr-input");
+            this.textAreaBack.setText(this.textBack);
+            this.textAreaBack.addEventListener("keydown", this.keyListenerCallback);
+            if (this.textDirection === TextDirection.Rtl) {
+                this.textAreaBack.setAttribute("dir", "rtl");
+            }
         }
 
         this._createResponse(this.contentEl);
@@ -77,8 +124,9 @@ export class FlashcardEditModal extends Modal {
      */
     onOpen() {
         super.onOpen();
-
-        this.textArea.focus();
+        if (this.textAreaFront !== null) {
+            this.textAreaFront.focus();
+        }
     }
 
     /**
@@ -96,7 +144,19 @@ export class FlashcardEditModal extends Modal {
 
     private cancelClickCallback = (_: MouseEvent) => this.cancel();
 
-    private saveOnEnterCallback = (evt: KeyboardEvent) => {
+    private keyListenerCallback = (evt: KeyboardEvent) => {
+        if (evt.key === "Tab") {
+            evt.preventDefault();
+
+            const textarea = evt.target as HTMLTextAreaElement;
+            const currentCaretStartPosition = textarea.selectionStart;
+            const currentCaretEndPosition = textarea.selectionEnd;
+            const newEndPosition = currentCaretStartPosition + 1;
+
+            textarea.setRangeText("\t", currentCaretStartPosition, currentCaretEndPosition);
+            textarea.setSelectionRange(newEndPosition, newEndPosition);
+        }
+
         if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter") {
             evt.preventDefault();
             this.save();
@@ -104,8 +164,25 @@ export class FlashcardEditModal extends Modal {
     };
 
     private save() {
+        if (this.textAreaFront === null || this.textAreaBack === null) {
+            this.close();
+            return;
+        }
+
         this.didSaveChanges = true;
-        this.changedText = this.textArea.value;
+        this.changedText = this.textAreaFront.value;
+        if (this.separator) {
+            // New line at end of Front
+            if (this.multilineSeparator && !this.textAreaFront.value.endsWith("\n")) {
+                this.changedText += "\n";
+            }
+            this.changedText += this.separator;
+            // New line at start of Back
+            if (this.multilineSeparator && !this.textAreaBack.value.startsWith("\n")) {
+                this.changedText += "\n";
+            }
+            this.changedText += this.textAreaBack.value;
+        }
         this.close();
     }
 
@@ -114,15 +191,19 @@ export class FlashcardEditModal extends Modal {
     }
 
     private resolveInput() {
+        if (this.rejectPromise === null || this.resolvePromise === null) return;
+
         if (!this.didSaveChanges) this.rejectPromise(t("NO_INPUT"));
         else this.resolvePromise(this.changedText);
     }
 
     private removeInputListener() {
-        this.textArea.removeEventListener("keydown", this.saveOnEnterCallback);
+        if (this.textAreaFront !== null) {
+            this.textAreaFront.removeEventListener("keydown", this.keyListenerCallback);
+        }
     }
 
-    // -> Response section
+    // MARK: Response section
 
     private _createSaveButton(container: HTMLElement) {
         this.saveButton = new ButtonComponent(container);

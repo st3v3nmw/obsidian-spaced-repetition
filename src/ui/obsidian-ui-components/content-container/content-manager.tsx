@@ -11,14 +11,17 @@ import {
 } from "src/card/flashcard-review-sequencer";
 import { Question } from "src/card/questions/question";
 import { Deck } from "src/deck/deck";
+import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
 import { SRSettings } from "src/settings";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
 import CardInfoNotice from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-info-notice";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
+import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
+import { UIState } from "src/ui/ui-manager";
 import { globalDateProvider } from "src/utils/dates";
 import EmulatedPlatform from "src/utils/platform-detector";
 
@@ -109,6 +112,7 @@ export default class ContentManager {
             this.plugin,
             this.settings,
             parentEl,
+            this._deleteCurrentCard.bind(this),
             this._showDecksList.bind(this),
             this._doEditQuestionText.bind(this),
             this._processReview.bind(this),
@@ -124,6 +128,7 @@ export default class ContentManager {
         this.plugin.uiManager.setSRViewInFocus(false);
         this.deckContainer.closeList();
         this.cardContainer.closeSession();
+        this.plugin.uiManager.setUIState(UIState.Closed);
     }
 
     public async open() {
@@ -181,6 +186,7 @@ export default class ContentManager {
         }
         if (this.reviewSequencer === null) return;
         this.cardContainer.closeSession();
+        this.plugin.uiManager.setUIState(UIState.DeckList);
         this.deckContainer.showList(this.reviewSequencer, this.settings, this.reviewMode);
     }
 
@@ -188,6 +194,7 @@ export default class ContentManager {
         this.deckContainer.closeList();
         this.sessionData = this._getNewSessionData(deck);
         if (this.sessionData === null) return;
+        this.plugin.uiManager.setUIState(UIState.CardFront);
         this.cardContainer.openSession(this.sessionData, this.settings);
     }
 
@@ -218,6 +225,7 @@ export default class ContentManager {
         this.sessionData.currentQuestion = this.reviewSequencer.currentQuestion;
 
         this.sessionData.cardData.currentCard = this.reviewSequencer.currentCard;
+        this.plugin.uiManager.setUIState(UIState.CardFront);
         this.sessionData.cardData.currentCardState = CardState.Front;
 
         if (
@@ -266,7 +274,31 @@ export default class ContentManager {
 
     // MARK: Card button handlers
 
-    private _showAnswer() {
+    public async _deleteCurrentCard() {
+        if (this.sessionData === null || this.reviewSequencer === null) return;
+        const timeNow = now();
+        if (
+            this.lastPressedOnProcessReview &&
+            timeNow - this.lastPressedOnProcessReview < this.plugin.data.settings.reviewButtonDelay
+        ) {
+            return;
+        }
+        this.lastPressedOnProcessReview = timeNow;
+
+        new ConfirmationModal(
+            this.app,
+            t("DELETE_CARD"),
+            t("DELETE_CARD_CONFIRMATION"),
+            t("CANCEL"),
+            async () => {
+                if (this.sessionData === null || this.reviewSequencer === null) return;
+                await this.reviewSequencer.deleteCurrentCardFromNote();
+                await this._showNextCard();
+            },
+        ).open();
+    }
+
+    public _showAnswer() {
         if (this.sessionData === null) return;
 
         const timeNow = now();
@@ -278,6 +310,7 @@ export default class ContentManager {
         }
         this.lastPressedOnProcessReview = timeNow;
 
+        this.plugin.uiManager.setUIState(UIState.CardBack);
         this.sessionData.cardData.currentCardState = CardState.Back;
 
         this.cardContainer.drawBack(
@@ -294,9 +327,10 @@ export default class ContentManager {
 
         // Just the question/answer text; without any preceding topic tag
         const textPrompt = currentQ.questionText.actualQuestion;
-
+        this.plugin.uiManager.setUIState(UIState.EditModal);
         const editModal = FlashcardEditModal.Prompt(
             this.app,
+            this.settings,
             textPrompt,
             currentQ.questionText.textDirection,
         );
@@ -304,6 +338,7 @@ export default class ContentManager {
             .then(async (modifiedCardText) => {
                 if (this.reviewSequencer === null) return;
                 this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
+                this.plugin.uiManager.setUIState(UIState.CardBack);
             })
             .catch((reason) => console.log(reason));
     }
@@ -358,7 +393,7 @@ export default class ContentManager {
         }
     }
 
-    private _skipCurrentCard() {
+    public _skipCurrentCard() {
         if (this.reviewSequencer === null) return;
         this.reviewSequencer.skipCurrentCard();
         this._showNextCard();
@@ -372,7 +407,7 @@ export default class ContentManager {
         );
     }
 
-    private async _processReview(response: ReviewResponse): Promise<void> {
+    public async _processReview(response: ReviewResponse): Promise<void> {
         if (this.reviewSequencer === null) return;
         const timeNow = now();
         if (

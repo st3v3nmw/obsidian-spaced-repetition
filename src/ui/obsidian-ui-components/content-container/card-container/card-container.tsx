@@ -47,6 +47,7 @@ export class CardContainer {
         plugin: SRPlugin,
         settings: SRSettings,
         parentEl: HTMLElement,
+        deleteCurrentCard: () => void,
         backToDeckHandler: () => void,
         editCardHandler: () => void,
         processReviewHandler: (response: ReviewResponse) => Promise<void>,
@@ -69,9 +70,13 @@ export class CardContainer {
         this.view = parentEl.createDiv();
         this.view.addClasses(["sr-container", "sr-card-container", "sr-is-hidden"]);
 
+        this.setCustomHotKeyState(settings.useCustomHotkeys);
+
         this.toolbar = new CardToolbarComponent(
             this.view,
             !settings.openViewInNewTab,
+            settings.showDeleteButton,
+            deleteCurrentCard,
             backToDeckHandler,
             editCardHandler,
             jumpToCurrentCardHandler,
@@ -199,6 +204,18 @@ export class CardContainer {
 
     // #region -> Deck Info
 
+    private setCustomHotKeyState(state: boolean) {
+        if (state) {
+            if (!this.view.hasClass("sr-custom-hotkeys")) {
+                this.view.addClass("sr-custom-hotkeys");
+            }
+        } else {
+            if (this.view.hasClass("sr-custom-hotkeys")) {
+                this.view.removeClass("sr-custom-hotkeys");
+            }
+        }
+    }
+
     private _updateInfoBar(sessionData: SessionData, flashcardCardOrder: string) {
         if (sessionData.deckData.chosenDeck === null || sessionData.deckData.currentDeck === null)
             return;
@@ -255,6 +272,7 @@ export class CardContainer {
         settings: SRSettings,
         determineButtonInterval: (response: ReviewResponse) => number,
     ) {
+        this.setCustomHotKeyState(settings.useCustomHotkeys);
         this.cardState = sessionData.cardData.currentCardState;
 
         this.toolbar.setResetButtonDisabled(false);
@@ -299,6 +317,7 @@ export class CardContainer {
     private _keydownHandler = (e: KeyboardEvent) => {
         // Prevents any input, if the edit modal is open or if the view is not in focus
         if (
+            this.plugin.data.settings.useCustomHotkeys ||
             (document.activeElement !== null &&
                 (document.activeElement.nodeName === "TEXTAREA" ||
                     document.activeElement.nodeName === "INPUT")) ||

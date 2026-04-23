@@ -25,6 +25,9 @@ export interface IBaseLocale {
     CURRENT_EASE_HELP_TEXT: string;
     CURRENT_INTERVAL_HELP_TEXT: string;
     CARD_GENERATED_FROM: string;
+    JUMP_TO: string;
+    JUMP_TO_AND_CLOSE: string;
+    OPEN_IN_BACKGROUND: string;
     VIEW_CARD_INFO: string;
 
     // main.ts
@@ -32,6 +35,7 @@ export interface IBaseLocale {
     REVIEW_CARDS: string;
     REVIEW_DIFFICULTY_FILE_MENU: string;
     REVIEW_NOTE_DIFFICULTY_CMD: string;
+    REVIEW_CARD_DIFFICULTY_CMD: string;
     CRAM_ALL_CARDS: string;
     REVIEW_ALL_CARDS: string;
     REVIEW_CARDS_IN_NOTE: string;
@@ -76,9 +80,11 @@ export interface IBaseLocale {
     FLASHCARD_EASY_LABEL: string;
     FLASHCARD_GOOD_LABEL: string;
     FLASHCARD_HARD_LABEL: string;
+    FLASHCARD_AGAIN_LABEL: string;
     FLASHCARD_EASY_DESC: string;
     FLASHCARD_GOOD_DESC: string;
     FLASHCARD_HARD_DESC: string;
+    FLASHCARD_AGAIN_DESC: string;
     REVIEW_BUTTON_DELAY: string;
     REVIEW_BUTTON_DELAY_DESC: string;
     FLASHCARD_TAGS: string;
@@ -179,6 +185,8 @@ export interface IBaseLocale {
     CONFIRM: string;
     SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS: string;
     SCHEDULING_DATA_HAS_BEEN_DELETED: string;
+    USE_CUSTOM_HOTKEYS: string;
+    USE_CUSTOM_HOTKEYS_DESC: string;
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: string;
@@ -263,4 +271,8 @@ export interface IBaseLocale {
     ATOMIC_CLOZES: string;
     ATOMIC_CLOZES_DESC: string;
     OPEN_MENU: string;
+    DELETE_CARD: string;
+    DELETE_CARD_CONFIRMATION: string;
+    SHOW_DELETE_BUTTON: string;
+    SHOW_DELETE_BUTTON_DESC: string;
 }

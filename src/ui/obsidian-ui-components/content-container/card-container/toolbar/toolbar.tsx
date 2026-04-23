@@ -21,6 +21,8 @@ export default class CardToolbarComponent {
     public constructor(
         parentEl: HTMLElement,
         isModal: boolean,
+        showDeleteButton: boolean,
+        deleteCurrentCard: () => void,
         backToDeckHandler: () => void,
         editClickHandler: () => void,
         jumpToCurrentCard: () => Promise<void>,
@@ -49,7 +51,7 @@ export default class CardToolbarComponent {
 
         new EditButtonComponent(
             this.toolbar,
-            () => editClickHandler(),
+            editClickHandler,
             EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : undefined,
         );
 
@@ -73,13 +75,34 @@ export default class CardToolbarComponent {
             (evt: MouseEvent) => {
                 const cardMenu = new Menu();
 
-                cardMenu.addItem((item) => {
-                    item.setTitle("Jump to card") // TODO: Translate
-                        .setIcon("arrow-up-right")
-                        .onClick(() => {
-                            jumpToCurrentCard();
-                        });
-                });
+                if (isModal) {
+                    cardMenu.addItem((item) => {
+                        item.setTitle(t("OPEN_IN_BACKGROUND"))
+                            .setIcon("send-to-back")
+                            .onClick(() => {
+                                // Doesn't close modal, just opens in background and focuses
+                                jumpToCurrentCard();
+                            });
+                    });
+                    cardMenu.addItem((item) => {
+                        item.setTitle(t("JUMP_TO_AND_CLOSE"))
+                            .setIcon("arrow-up-right")
+                            .onClick(() => {
+                                jumpToCurrentCard();
+                                if (closeModal) {
+                                    closeModal();
+                                }
+                            });
+                    });
+                } else {
+                    cardMenu.addItem((item) => {
+                        item.setTitle(t("JUMP_TO"))
+                            .setIcon("arrow-up-right")
+                            .onClick(() => {
+                                jumpToCurrentCard();
+                            });
+                    });
+                }
                 cardMenu.addItem((item) => {
                     item.setTitle(t("VIEW_CARD_INFO"))
                         .setIcon("info")
@@ -87,6 +110,15 @@ export default class CardToolbarComponent {
                             displayCurrentCardInfoNotice();
                         });
                 });
+                if (showDeleteButton) {
+                    cardMenu.addItem((item) => {
+                        item.setTitle(t("DELETE_CARD"))
+                            .setIcon("trash")
+                            .onClick(() => {
+                                deleteCurrentCard();
+                            });
+                    });
+                }
 
                 cardMenu.showAtMouseEvent(evt);
             },
@@ -137,6 +169,15 @@ export default class CardToolbarComponent {
                             displayCurrentCardInfoNotice();
                         });
                 });
+                if (showDeleteButton) {
+                    cardMenu.addItem((item) => {
+                        item.setTitle(t("DELETE_CARD"))
+                            .setIcon("trash")
+                            .onClick(() => {
+                                deleteCurrentCard();
+                            });
+                    });
+                }
 
                 cardMenu.showAtMouseEvent(evt);
             },
@@ -150,11 +191,7 @@ export default class CardToolbarComponent {
             EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "clickable-icon",
         ];
 
-        new ModalCloseButtonComponent(
-            this.toolbar,
-            () => closeModal && closeModal(),
-            closeButtonClasses,
-        );
+        new ModalCloseButtonComponent(this.toolbar, closeModal, closeButtonClasses);
     }
 
     /**

@@ -56,13 +56,39 @@ export class UIPreferencesPage extends SettingsPage {
                                     this.plugin.uiManager.registerSRFocusListener();
                                 } else {
                                     this.plugin.uiManager.tabViewManager.closeAllTabViews();
+                                    this.plugin.data.settings.useCustomHotkeys = false;
 
                                     // Remove focus from SR and remove event listener for focus change
                                     this.plugin.uiManager.removeSRFocusListener();
                                 }
                                 await this.plugin.savePluginData();
+                                this.display();
                             });
                     });
+            })
+            .addSetting((setting: Setting) => {
+                const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
+                setting
+                    .setName(t("USE_CUSTOM_HOTKEYS"))
+                    .setDesc(t("USE_CUSTOM_HOTKEYS_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.useCustomHotkeys)
+                            .setDisabled(
+                                (isMobile && !this.plugin.data.settings.openViewInNewTabMobile) ||
+                                    (!isMobile && !this.plugin.data.settings.openViewInNewTab),
+                            )
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.useCustomHotkeys = value;
+                                if (this.plugin.data.settings.useCustomHotkeys) {
+                                    this.plugin.addCustomHotkeys();
+                                } else {
+                                    this.plugin.removeCustomHotkeys();
+                                }
+                                this.plugin.addCustomHotkeys();
+                                await this.plugin.savePluginData();
+                            }),
+                    );
             })
             .addSetting((setting: Setting) => {
                 setting
@@ -103,6 +129,19 @@ export class UIPreferencesPage extends SettingsPage {
                                 this.plugin.data.settings.disableFileMenuReviewOptions = !value;
                                 await this.plugin.savePluginData();
                                 this.plugin.uiManager.showFileMenuItems(value);
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_DELETE_BUTTON"))
+                    .setDesc(t("SHOW_DELETE_BUTTON_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showDeleteButton)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showDeleteButton = value;
+                                await this.plugin.savePluginData();
                             }),
                     );
             })
@@ -328,6 +367,33 @@ export class UIPreferencesPage extends SettingsPage {
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
                                     this.plugin.data.settings.flashcardHardText = value;
+                                    await this.plugin.savePluginData();
+                                });
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("FLASHCARD_AGAIN_LABEL"))
+                    .setDesc(t("FLASHCARD_AGAIN_DESC"))
+                    .addExtraButton((button) => {
+                        button
+                            .setIcon("reset")
+                            .setTooltip(t("RESET_DEFAULT"))
+                            .onClick(async () => {
+                                this.plugin.data.settings.flashcardAgainText =
+                                    DEFAULT_SETTINGS.flashcardAgainText;
+                                await this.plugin.savePluginData();
+
+                                this.display();
+                            });
+                    })
+                    .addText((text) =>
+                        text
+                            .setValue(this.plugin.data.settings.flashcardAgainText)
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    this.plugin.data.settings.flashcardAgainText = value;
                                     await this.plugin.savePluginData();
                                 });
                             }),
