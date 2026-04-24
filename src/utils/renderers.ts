@@ -1,4 +1,4 @@
-import { App, MarkdownRenderer, TFile } from "obsidian";
+import { App, MarkdownRenderChild, MarkdownRenderer, TFile } from "obsidian";
 
 import { AUDIO_FORMATS, IMAGE_FORMATS, VIDEO_FORMATS } from "src/constants";
 import SRPlugin from "src/main";
@@ -30,7 +30,25 @@ export class RenderMarkdownWrapper {
             el = containerEl.createDiv();
             el.setAttribute("dir", "rtl");
         } else el = containerEl;
-        MarkdownRenderer.render(this.app, markdownString, el, this.notePath, this.plugin);
+
+        const renderChild = new MarkdownRenderChild(el);
+        this.plugin.addChild(renderChild);
+        await MarkdownRenderer.render(this.app, markdownString, el, this.notePath, renderChild);
+
+        el.findAll(".internal-link").forEach((el: HTMLElement) => {
+            (el as HTMLAnchorElement).addEventListener("click", (e: MouseEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const href = el.getAttr("href") || el.getAttr("data-href");
+
+                if (href) {
+                    this.app.workspace.openLinkText(href, this.notePath, true);
+                    return true;
+                }
+                return false;
+            });
+        });
 
         el.findAll(".internal-embed").forEach((el) => {
             const link = this.parseLink(el.getAttribute("src"));
