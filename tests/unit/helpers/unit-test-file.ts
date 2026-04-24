@@ -89,6 +89,30 @@ export class UnitTestSRFile implements ISRFile {
         return result;
     }
 
+    async getNoteId(): Promise<string | null> {
+        const frontmatter = await this.getFrontmatter();
+        return frontmatter?.get("sr-id") ?? null;
+    }
+
+    async getOrCreateNoteId(): Promise<string> {
+        const existing = await this.getNoteId();
+        if (existing) return existing;
+        const id = "test-" + Math.random().toString(36).slice(2, 10);
+        const YAML_FRONT_MATTER_REGEX = /^---\r?\n((?:.*\r?\n)*)---/;
+        let fileText = await this.read();
+        if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
+            const match = YAML_FRONT_MATTER_REGEX.exec(fileText);
+            fileText = fileText.replace(
+                YAML_FRONT_MATTER_REGEX,
+                `---\n${match[1]}sr-id: ${id}\n---`,
+            );
+        } else {
+            fileText = `---\nsr-id: ${id}\n---\n\n${fileText}`;
+        }
+        await this.write(fileText);
+        return id;
+    }
+
     get path(): string {
         return this._path;
     }

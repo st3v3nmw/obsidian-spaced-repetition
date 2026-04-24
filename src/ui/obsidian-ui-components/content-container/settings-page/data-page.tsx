@@ -1,5 +1,6 @@
 import { Setting, SettingGroup } from "obsidian";
 
+import { DataStoreName } from "src/data-stores/base/data-store";
 import {
     deleteAllSchedulingData,
     deleteAllSchedulingDataInCards,
@@ -13,7 +14,7 @@ import { SettingsPageType } from "src/ui/obsidian-ui-components/content-containe
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 
 /**
- * Represents a data settings page.
+ * Settings page for data storage options and scheduling data management.
  *
  * @class DataPage
  * @extends {SettingsPage}
@@ -44,17 +45,48 @@ export class DataPage extends SettingsPage {
                 setting
                     .setName(t("GROUP_DATA_STORAGE"))
                     .setDesc(t("GROUP_DATA_STORAGE_DESC"))
-                    .addDropdown((dropdown) =>
+                    .addDropdown((dropdown) => {
                         dropdown
                             .addOptions({
-                                NOTES: t("STORE_IN_NOTES"),
+                                [DataStoreName.NOTES]: t("STORE_IN_NOTES"),
+                                [DataStoreName.PLUGIN_DATA]: "Store in plugin data (beta)",
                             })
                             .setValue(this.plugin.data.settings.dataStore)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.dataStore = value;
-                                await this.plugin.savePluginData();
-                            }),
-                    );
+                                const oldMode = this.plugin.data.settings
+                                    .dataStore as DataStoreName;
+                                const newMode = value as DataStoreName;
+
+                                // Revert the dropdown immediately; only apply after confirmation.
+                                dropdown.setValue(oldMode);
+
+                                const isToPluginData = newMode === DataStoreName.PLUGIN_DATA;
+                                new ConfirmationModal(
+                                    this.plugin.app,
+                                    isToPluginData
+                                        ? t("MIGRATE_TO_PLUGIN_DATA")
+                                        : t("MIGRATE_TO_NOTES"),
+                                    isToPluginData
+                                        ? t("CONFIRM_MIGRATE_TO_PLUGIN_DATA")
+                                        : t("CONFIRM_MIGRATE_TO_NOTES"),
+                                    isToPluginData
+                                        ? t("MIGRATING_TO_PLUGIN_DATA")
+                                        : t("MIGRATING_TO_NOTES"),
+                                    async () => {
+                                        await this.plugin.migrateDataStore(oldMode, newMode);
+                                        dropdown.setValue(newMode);
+                                        this.plugin.data.settings.dataStore = newMode;
+                                        this.plugin.setupDataStoreAndAlgorithmInstances(
+                                            this.plugin.data.settings,
+                                        );
+                                        await this.plugin.savePluginData();
+                                    },
+                                ).open();
+                            });
+                    });
+            })
+            .addSetting((setting: Setting) => {
+                setting.infoEl.insertAdjacentText("beforeend", t("PLUGIN_DATA_STORE_INFO"));
             })
             .addSetting((setting: Setting) => {
                 setting

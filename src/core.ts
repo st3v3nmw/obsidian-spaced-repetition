@@ -151,14 +151,26 @@ export class OsrCore {
             return await noteFile.getNoteSchedule();
         }
 
-        if (this.scheduleDataRepository.hasNoteSchedule(noteFile.path)) {
-            return this.scheduleDataRepository.getNoteSchedule(noteFile.path);
+        // UUID-based lookup (primary path for notes that have been stamped with sr-id).
+        const noteId = await noteFile.getNoteId();
+        if (noteId && this.scheduleDataRepository.hasNoteSchedule(noteId)) {
+            return this.scheduleDataRepository.getNoteSchedule(noteId);
         }
 
-        // Fallback to frontmatter to preserve existing users' schedules when switching mode.
+        // Path-based fallback for entries created before UUID support — migrate on read.
+        if (this.scheduleDataRepository.hasNoteSchedule(noteFile.path)) {
+            const schedule = this.scheduleDataRepository.getNoteSchedule(noteFile.path);
+            const newId = await noteFile.getOrCreateNoteId();
+            await this.scheduleDataRepository.setNoteSchedule(newId, schedule);
+            await this.scheduleDataRepository.deleteNoteSchedule(noteFile.path);
+            return schedule;
+        }
+
+        // Fallback to frontmatter to preserve schedules when switching from notes mode.
         const legacy = await noteFile.getNoteSchedule();
         if (legacy) {
-            await this.scheduleDataRepository.setNoteSchedule(noteFile.path, legacy);
+            const newId = await noteFile.getOrCreateNoteId();
+            await this.scheduleDataRepository.setNoteSchedule(newId, legacy);
         }
         return legacy;
     }
@@ -175,7 +187,8 @@ export class OsrCore {
             return;
         }
 
-        await this.scheduleDataRepository.setNoteSchedule(noteFile.path, noteSchedule);
+        const noteId = await noteFile.getOrCreateNoteId();
+        await this.scheduleDataRepository.setNoteSchedule(noteId, noteSchedule);
     }
 
     protected finalizeLoad(): void {

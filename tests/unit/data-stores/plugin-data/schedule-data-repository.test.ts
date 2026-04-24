@@ -219,6 +219,40 @@ describe("ScheduleDataRepository - state initialisation", () => {
     });
 });
 
+describe("ScheduleDataRepository - UUID-keyed note schedules", () => {
+    test("stores and retrieves schedule by UUID", async () => {
+        const data = makePluginData();
+        const { repo } = makeRepo(data);
+        const s = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-06", 10, 250);
+        await repo.setNoteSchedule("uuid-abc-123", s);
+        expect(repo.hasNoteSchedule("uuid-abc-123")).toBe(true);
+        expect((repo.getNoteSchedule("uuid-abc-123") as RepItemScheduleInfoOsr).interval).toBe(10);
+    });
+
+    test("UUID-keyed entry is unaffected by renameFile with a different path", async () => {
+        const data = makePluginData();
+        const { repo } = makeRepo(data);
+        const s = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-06", 10, 250);
+        await repo.setNoteSchedule("uuid-abc-123", s);
+
+        await repo.renameFile("notes/old.md", "notes/new.md");
+
+        expect(repo.hasNoteSchedule("uuid-abc-123")).toBe(true);
+    });
+
+    test("path-keyed entry is migrated by renameFile", async () => {
+        const data = makePluginData();
+        const { repo } = makeRepo(data);
+        const s = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-06", 10, 250);
+        await repo.setNoteSchedule("notes/old.md", s);
+
+        await repo.renameFile("notes/old.md", "notes/new.md");
+
+        expect(repo.hasNoteSchedule("notes/old.md")).toBe(false);
+        expect(repo.hasNoteSchedule("notes/new.md")).toBe(true);
+    });
+});
+
 describe("ScheduleDataRepository.renameFile", () => {
     test("moves note schedule to new path", async () => {
         const data = makePluginData();

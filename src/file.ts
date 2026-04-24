@@ -23,6 +23,8 @@ export interface ISRFile {
     get tfile(): TFile;
     setNoteSchedule(repItemScheduleInfo: RepItemScheduleInfo): Promise<void>;
     getNoteSchedule(): Promise<RepItemScheduleInfo>;
+    getNoteId(): Promise<string | null>;
+    getOrCreateNoteId(): Promise<string>;
     getFrontmatter(): Promise<Map<string, string>>;
     getAllTagsFromCache(): string[];
     getAllTagsFromText(): TagCache[];
@@ -92,6 +94,22 @@ export class SrTFile implements ISRFile {
             frontmatter["sr-interval"] = interval;
             frontmatter["sr-ease"] = ease;
         });
+    }
+
+    async getNoteId(): Promise<string | null> {
+        const frontmatter = await this.getFrontmatter();
+        return frontmatter?.get("sr-id") ?? null;
+    }
+
+    async getOrCreateNoteId(): Promise<string> {
+        const existing = await this.getNoteId();
+        if (existing) return existing;
+        const id = crypto.randomUUID();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await this.fileManager.processFrontMatter(this.tfile, (frontmatter: any) => {
+            frontmatter["sr-id"] = id;
+        });
+        return id;
     }
 
     async getFrontmatter(): Promise<Map<string, string>> {

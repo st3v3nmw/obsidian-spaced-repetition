@@ -54,15 +54,17 @@ export class DataStoreMigrator {
     ): Promise<void> {
         const srFile = new SrTFile(app.vault, app.metadataCache, app.fileManager, tFile);
 
-        // Note schedule: frontmatter → repository
+        // Note schedule: frontmatter → repository (keyed by UUID written to sr-id).
         const noteSchedule = await srFile.getNoteSchedule();
         if (noteSchedule) {
-            await scheduleDataRepository.setNoteSchedule(srFile.path, noteSchedule);
+            const noteId = await srFile.getOrCreateNoteId();
+            await scheduleDataRepository.setNoteSchedule(noteId, noteSchedule);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await app.fileManager.processFrontMatter(tFile, (fm: any) => {
                 delete fm["sr-due"];
                 delete fm["sr-interval"];
                 delete fm["sr-ease"];
+                // sr-id is intentionally kept — it is the stable schedule key.
             });
         }
 
@@ -144,9 +146,11 @@ export class DataStoreMigrator {
     ): Promise<void> {
         const srFile = new SrTFile(app.vault, app.metadataCache, app.fileManager, tFile);
 
-        // Note schedule: repository → frontmatter
-        if (scheduleDataRepository.hasNoteSchedule(srFile.path)) {
-            const noteSchedule = scheduleDataRepository.getNoteSchedule(srFile.path);
+        // Note schedule: repository → frontmatter (look up by UUID, fall back to path).
+        const noteId = await srFile.getNoteId();
+        const scheduleKey = noteId ?? srFile.path;
+        if (scheduleDataRepository.hasNoteSchedule(scheduleKey)) {
+            const noteSchedule = scheduleDataRepository.getNoteSchedule(scheduleKey);
             if (noteSchedule) {
                 await srFile.setNoteSchedule(noteSchedule);
             }
