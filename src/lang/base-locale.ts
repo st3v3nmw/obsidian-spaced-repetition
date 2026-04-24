@@ -286,4 +286,6 @@ export interface IBaseLocale {
 
     ENABLE_FILE_MENU_DELETE_BUTTON: string;
     ENABLE_FILE_MENU_DELETE_BUTTON_DESC: string;
+
+    DATA_PAGE_NAME: string;
 }

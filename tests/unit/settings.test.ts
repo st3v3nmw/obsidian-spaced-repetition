@@ -24,6 +24,7 @@ describe("SettingsUtil", () => {
             randomizeCardOrder: true,
             flashcardCardOrder: null,
             flashcardDeckOrder: null,
+            disableFileMenuReviewOptions: undefined,
         };
         upgradeSettings(settings);
         expect(settings).toEqual(DEFAULT_SETTINGS);

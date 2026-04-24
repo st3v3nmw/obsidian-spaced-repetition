@@ -330,6 +330,8 @@ const en: IBaseLocale = {
     ENABLE_FILE_MENU_DELETE_BUTTON: "Enable file menu delete button",
     ENABLE_FILE_MENU_DELETE_BUTTON_DESC:
         "Enables the delete button in the file menu for scheduling data",
+
+    DATA_PAGE_NAME: "Data",
 };
 
 export default en;
