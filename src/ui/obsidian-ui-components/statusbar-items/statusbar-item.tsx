@@ -1,17 +1,16 @@
 import "src/ui/obsidian-ui-components/statusbar-items/statusbar-items.css";
 
 import SRPlugin from "src/main";
-import { StatusBarItemType } from "src/ui/status-bar-manager";
+import { StatusBarItemPurpose } from "src/ui/status-bar-manager";
 
 export default class StatusBarItem {
-    protected plugin: SRPlugin;
     protected statusBarItem: HTMLElement;
     protected segments: HTMLElement[];
-    protected type: StatusBarItemType;
+    protected type: StatusBarItemPurpose;
 
     constructor(
         plugin: SRPlugin,
-        type: StatusBarItemType,
+        type: StatusBarItemPurpose,
         props: {
             show?: boolean;
             segments?: HTMLElement[];
@@ -20,9 +19,8 @@ export default class StatusBarItem {
             onClick?: () => unknown;
         },
     ) {
-        this.plugin = plugin;
         this.type = type;
-        this.statusBarItem = this.plugin.addStatusBarItem();
+        this.statusBarItem = plugin.addStatusBarItem();
         this.statusBarItem.addClass("status-bar-item");
         this.statusBarItem.addClass("sr-status-bar-item");
         this.segments = [];
@@ -63,7 +61,7 @@ export default class StatusBarItem {
         }
     }
 
-    getStatusBarItemType(): StatusBarItemType {
+    getStatusBarItemType(): StatusBarItemPurpose {
         return this.type;
     }
 
