@@ -10,6 +10,7 @@ import ParserOptions from "src/utils/parsers/data-structures/parser/parser-optio
 import { ParserStates } from "src/utils/parsers/data-structures/parser/parser-states";
 import PotentialCardInfo from "src/utils/parsers/data-structures/parser/potential-card-info";
 import StringDetector from "src/utils/parsers/detectors/string-detector";
+
 import { CardFragmentType } from "../cards/card-fragments/card-fragment";
 
 /**
@@ -109,7 +110,7 @@ export class ParserData {
             if (
                 StringDetector.isMultiLineCardSeparator(
                     this.lineData.currentLineTrimmed,
-                    this.lineData.multilineSeparators.map((x) => x.separator)
+                    this.lineData.multilineSeparators.map((x) => x.separator),
                 )
             ) {
                 // If the current line is a multiline separator, we want to add the text after the last newline as a new potential card, because it could be the start of a new card
@@ -118,8 +119,14 @@ export class ParserData {
 
                 // Remove last line from last card
                 this.cardData.potentialCard.lastLineNum--;
-                this.cardData.potentialCard.text = this.cardData.potentialCard.text.split("\n").slice(0, -1).join("\n");
-                if (this.cardData.potentialCard.backText !== null && this.cardData.potentialCard.backText.length > 0) {
+                this.cardData.potentialCard.text = this.cardData.potentialCard.text
+                    .split("\n")
+                    .slice(0, -1)
+                    .join("\n");
+                if (
+                    this.cardData.potentialCard.backText !== null &&
+                    this.cardData.potentialCard.backText.length > 0
+                ) {
                     this.cardData.potentialCard.backText = this.cardData.potentialCard.backText
                         .split("\n")
                         .slice(0, -1)
@@ -199,20 +206,15 @@ export class ParserData {
                 // The potential card is not eligible for a multiline end marker, so we can flag a rouge multiline end marker
                 // TODO: Add this back in
 
-
-                CardParser.notesWithCardFragments.addCardFragment(
-                    this.notePath,
-                    this.noteText,
-                    {
-                        type: "ROUGE_MULTILINE_END_MARKER",
-                        fragmentInfo: new PotentialCardInfo(
-                            null,
-                            this.lineData.currentLineTrimmed,
-                            this.lineData.currentLineNum,
-                            this.lineData.currentLineNum,
-                        ),
-                    },
-                );
+                CardParser.notesWithCardFragments.addCardFragment(this.notePath, this.noteText, {
+                    type: "ROUGE_MULTILINE_END_MARKER",
+                    fragmentInfo: new PotentialCardInfo(
+                        null,
+                        this.lineData.currentLineTrimmed,
+                        this.lineData.currentLineNum,
+                        this.lineData.currentLineNum,
+                    ),
+                });
             }
             return "PARSE_LINE";
         } else if (
@@ -239,8 +241,7 @@ export class ParserData {
             )
         ) {
             // Multiline card separator
-            const potentialNewCard: ParsedCardInfo | null =
-                this.cardData.potentialCard;
+            const potentialNewCard: ParsedCardInfo | null = this.cardData.potentialCard;
             if (
                 potentialNewCard === null ||
                 potentialNewCard.text.length === 0 ||
@@ -248,19 +249,15 @@ export class ParserData {
                 potentialNewCard.frontText.length === 0
             ) {
                 // The multi line card separator shouldn't be here in the current line
-                CardParser.notesWithCardFragments.addCardFragment(
-                    this.notePath,
-                    this.noteText,
-                    {
-                        type: "MALFORMED_MULTILINE_CARD",
-                        fragmentInfo: new PotentialCardInfo(
-                            null,
-                            this.lineData.currentLineTrimmed,
-                            this.lineData.currentLineNum,
-                            this.lineData.currentLineNum,
-                        ),
-                    },
-                );
+                CardParser.notesWithCardFragments.addCardFragment(this.notePath, this.noteText, {
+                    type: "MALFORMED_MULTILINE_CARD",
+                    fragmentInfo: new PotentialCardInfo(
+                        null,
+                        this.lineData.currentLineTrimmed,
+                        this.lineData.currentLineNum,
+                        this.lineData.currentLineNum,
+                    ),
+                });
                 return "PARSE_LINE";
             }
             return "MULTILINE_SEPARATOR";

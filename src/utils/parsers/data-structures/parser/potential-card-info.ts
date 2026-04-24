@@ -30,10 +30,8 @@ export default class PotentialCardInfo extends ParsedCardInfo {
      */
     isValidMultiLineCard(): boolean {
         return (
-            (
-                this.cardType === CardType.MultiLineBasic ||
-                this.cardType === CardType.MultiLineReversed
-            ) &&
+            (this.cardType === CardType.MultiLineBasic ||
+                this.cardType === CardType.MultiLineReversed) &&
             this.hasText() &&
             this.hasFrontText() &&
             this.hasBackText() &&
@@ -46,10 +44,7 @@ export default class PotentialCardInfo extends ParsedCardInfo {
      * @returns True if the potential card is a valid atomic cloze card, false otherwise
      */
     isValidAtomicClozeCard(): boolean {
-        return (
-            this.isValidClozeCard() &&
-            this.hasOneLineOfText()
-        );
+        return this.isValidClozeCard() && this.hasOneLineOfText();
     }
 
     /**
@@ -72,10 +67,8 @@ export default class PotentialCardInfo extends ParsedCardInfo {
      */
     isValidSingleLineCard(): boolean {
         return (
-            (
-                this.cardType === CardType.SingleLineBasic ||
-                this.cardType === CardType.SingleLineReversed
-            ) &&
+            (this.cardType === CardType.SingleLineBasic ||
+                this.cardType === CardType.SingleLineReversed) &&
             this.hasText() &&
             this.hasFrontText() &&
             this.hasBackText() &&
@@ -97,7 +90,9 @@ export default class PotentialCardInfo extends ParsedCardInfo {
      * @returns True if the potential card is a valid multiline card, false otherwise
      */
     hasValidLineNum(): boolean {
-        return this.firstLineNum >= 0 && this.lastLineNum >= 0 && this.firstLineNum <= this.lastLineNum;
+        return (
+            this.firstLineNum >= 0 && this.lastLineNum >= 0 && this.firstLineNum <= this.lastLineNum
+        );
     }
 
     // MARK: Properties
@@ -108,23 +103,17 @@ export default class PotentialCardInfo extends ParsedCardInfo {
      */
     isJustText(): boolean {
         return (
-            this.cardType === null &&
-            this.hasText() &&
-            !this.hasFrontText() &&
-            !this.hasBackText()
+            this.cardType === null && this.hasText() && !this.hasFrontText() && !this.hasBackText()
         );
     }
 
     /**
-    * Returns true if the potential card is empty and does not have any information about the card
-    * @returns True if the potential card is empty, false otherwise
-    */
+     * Returns true if the potential card is empty and does not have any information about the card
+     * @returns True if the potential card is empty, false otherwise
+     */
     isEmpty(): boolean {
         return (
-            this.cardType === null &&
-            !this.hasText() &&
-            !this.hasFrontText() &&
-            !this.hasBackText()
+            this.cardType === null && !this.hasText() && !this.hasFrontText() && !this.hasBackText()
         );
     }
 

@@ -185,7 +185,7 @@ export default class StringDetector {
             if (
                 (i === nextIndexOfStart &&
                     srCommentsInLine.filter((srComment) => srComment.startIndex === i).length >
-                    0) ||
+                        0) ||
                 (i === nextIndexOfEnd &&
                     srCommentsInLine.filter(
                         (srComment) =>
@@ -361,7 +361,10 @@ export default class StringDetector {
      * @param separators The single line card separators
      * @returns The correct single line separator
      */
-    static getSingleLineSeparatorInLine(trimmedLine: string, separators: Array<{ separator: string; type: CardType }>): { separator: string; type: CardType } | null {
+    static getSingleLineSeparatorInLine(
+        trimmedLine: string,
+        separators: Array<{ separator: string; type: CardType }>,
+    ): { separator: string; type: CardType } | null {
         // Sort the separators by length, longest first, to make sure we match the correct separator in case of overlapping separators (e.g. "::" and ":")
         const sortedSeparators = separators.sort((a, b) => b.separator.length - a.separator.length);
         for (const separator of sortedSeparators) {
@@ -393,7 +396,10 @@ export default class StringDetector {
      */
     static hasAnyInlineSeparator(trimmedLine: string, separators: string[]): boolean {
         // Mock the data structure for the separators to reuse the getCorrectSingleLineSeparator function
-        const separatorDataStruct = separators.map((separator) => ({ separator, type: CardType.SingleLineBasic }));
+        const separatorDataStruct = separators.map((separator) => ({
+            separator,
+            type: CardType.SingleLineBasic,
+        }));
 
         return this.getSingleLineSeparatorInLine(trimmedLine, separatorDataStruct) !== null;
     }
@@ -404,7 +410,10 @@ export default class StringDetector {
      * @param separators The single line card separators
      * @returns The type of the single line card
      */
-    static getSingleLineCardType(trimmedLine: string, separators: Array<{ separator: string; type: CardType }>): CardType | null {
+    static getSingleLineCardType(
+        trimmedLine: string,
+        separators: Array<{ separator: string; type: CardType }>,
+    ): CardType | null {
         const correctSeparator = this.getSingleLineSeparatorInLine(trimmedLine, separators);
         return correctSeparator ? correctSeparator.type : null;
     }

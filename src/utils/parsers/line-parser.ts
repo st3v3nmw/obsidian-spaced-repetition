@@ -215,20 +215,20 @@ export default class LineParser {
                     return parserData;
                 };
 
-                const lastCard: ParsedCardInfo | null =
-                    parserData.cardData.potentialCard;
+                const lastCard: ParsedCardInfo | null = parserData.cardData.potentialCard;
 
                 // Check if the last card is connected to this SR comment, if not, then we add a rouge SR comment fragment, because this shouldn't be here in the current line
                 if (
                     // We haven't parsed any cards yet, so we can't add a scheduling info comment
-                    lastCard === null || lastCard.cardType === null ||
+                    lastCard === null ||
+                    lastCard.cardType === null ||
                     // Last card is not connected to this SR comment by being on the next line
                     lastCard.lastLineNum + 1 !== parserData.lineData.currentLineNum ||
                     // Last card is connected to this SR comment, but it already has a scheduling info comment
                     lastCard.text.includes("<!--SR:") ||
-                    (
-                        // Check if it is also connected in the case of atomic clozes, where no text from the next line is added apart from the scheduling info comment
-                        parserData.options.useAtomicClozes && lastCard.cardType === CardType.Cloze &&
+                    // Check if it is also connected in the case of atomic clozes, where no text from the next line is added apart from the scheduling info comment
+                    (parserData.options.useAtomicClozes &&
+                        lastCard.cardType === CardType.Cloze &&
                         // It will only be connected if there is no other text in the current line
                         !parserData.lineData.currentLineTrimmed.startsWith("<!--SR:") &&
                         !StringDetector.hasClozes(
@@ -243,8 +243,7 @@ export default class LineParser {
                         !StringDetector.isMultiLineCardSeparator(
                             parserData.lineData.currentLineTrimmed,
                             parserData.lineData.multilineSeparators.map((x) => x.separator),
-                        )
-                    )
+                        ))
                 ) {
                     parserData = addRougeSRComment();
                     break;
@@ -295,13 +294,19 @@ export default class LineParser {
                 ) {
                     // If we are here, then we have two cards back to back
                     parserData.addPotentialCardToList();
-                    parserData.cardData.addCurrentLineToPotentialCard(parserData.lineData, cardType);
+                    parserData.cardData.addCurrentLineToPotentialCard(
+                        parserData.lineData,
+                        cardType,
+                    );
                     break;
                 }
 
                 if (parserData.cardData.potentialCard !== null) {
                     // We are currently building a potential card, so we add the current line to it, as it belongs to the potential card
-                    parserData.cardData.addCurrentLineToPotentialCard(parserData.lineData, cardType);
+                    parserData.cardData.addCurrentLineToPotentialCard(
+                        parserData.lineData,
+                        cardType,
+                    );
                 } else {
                     // We are not currently building a potential card, which means that this is a malformed multiline card
                     CardParser.notesWithCardFragments.addCardFragment(
@@ -327,7 +332,11 @@ export default class LineParser {
 
                 const lastCard: ParsedCardInfo | null = parserData.cardData.potentialCard;
 
-                if (lastCard === null || lastCard.cardType === null || (lastCard.cardType === CardType.Cloze && parserData.options.useAtomicClozes)) {
+                if (
+                    lastCard === null ||
+                    lastCard.cardType === null ||
+                    (lastCard.cardType === CardType.Cloze && parserData.options.useAtomicClozes)
+                ) {
                     // Rouge multiline end marker
                     CardParser.notesWithCardFragments.addCardFragment(
                         parserData.notePath,
@@ -386,11 +395,9 @@ export default class LineParser {
             case "CLOZE": {
                 if (
                     parserData.options.useAtomicClozes ||
-                    (
-                        parserData.cardData.potentialCard !== null &&
+                    (parserData.cardData.potentialCard !== null &&
                         parserData.cardData.potentialCard.cardType !== null &&
-                        parserData.cardData.potentialCard.cardType !== CardType.Cloze
-                    )
+                        parserData.cardData.potentialCard.cardType !== CardType.Cloze)
                 ) {
                     // Add any open potential card, that isn't a cloze card or just text
                     // Or add it as an atomic cloze ends the multi line card
@@ -413,7 +420,7 @@ export default class LineParser {
                     parserData.lineData,
                     parserData.cardData.potentialCard.cardType === null
                         ? CardType.Cloze
-                        : undefined
+                        : undefined,
                 );
 
                 break;
@@ -423,11 +430,12 @@ export default class LineParser {
                 // Close potential card, if there is a single line one open
                 if (
                     parserData.cardData.potentialCard !== null &&
-                    (
-                        parserData.cardData.potentialCard.cardType === CardType.SingleLineBasic ||
-                        parserData.cardData.potentialCard.cardType === CardType.SingleLineReversed ||
-                        (parserData.cardData.potentialCard.cardType === CardType.Cloze && parserData.options.useAtomicClozes)
-                    )) {
+                    (parserData.cardData.potentialCard.cardType === CardType.SingleLineBasic ||
+                        parserData.cardData.potentialCard.cardType ===
+                            CardType.SingleLineReversed ||
+                        (parserData.cardData.potentialCard.cardType === CardType.Cloze &&
+                            parserData.options.useAtomicClozes))
+                ) {
                     parserData.addPotentialCardToList();
                 }
 
@@ -450,11 +458,10 @@ export default class LineParser {
 
                 if (
                     parserData.cardData.potentialCard !== null &&
-                    (
-                        (parserData.options.useAtomicClozes && parserData.cardData.potentialCard.cardType === CardType.Cloze) ||
+                    ((parserData.options.useAtomicClozes &&
+                        parserData.cardData.potentialCard.cardType === CardType.Cloze) ||
                         parserData.cardData.potentialCard.cardType === CardType.SingleLineBasic ||
-                        parserData.cardData.potentialCard.cardType === CardType.SingleLineReversed
-                    )
+                        parserData.cardData.potentialCard.cardType === CardType.SingleLineReversed)
                 ) {
                     // Close the potential card, as we are not adding any more text to it, as it is an atomic cloze
                     parserData.addPotentialCardToList();
@@ -482,18 +489,15 @@ export default class LineParser {
                 */
                 if (
                     parserData.isInCodeBlock ||
-                    (
-                        parserData.options.multilineCardEndMarker !== null &&
+                    (parserData.options.multilineCardEndMarker !== null &&
                         parserData.options.multilineCardEndMarker !== undefined &&
                         parserData.options.multilineCardEndMarker !== "" &&
                         parserData.options.multilineCardEndMarker.trim() !== "" &&
                         parserData.cardData.potentialCard !== null &&
-                        (
-                            parserData.cardData.potentialCard.cardType === CardType.MultiLineBasic ||
-                            parserData.cardData.potentialCard.cardType === CardType.MultiLineReversed ||
-                            parserData.cardData.potentialCard.cardType === CardType.Cloze
-                        )
-                    )
+                        (parserData.cardData.potentialCard.cardType === CardType.MultiLineBasic ||
+                            parserData.cardData.potentialCard.cardType ===
+                                CardType.MultiLineReversed ||
+                            parserData.cardData.potentialCard.cardType === CardType.Cloze))
                 ) {
                     // Only handle this if multiline cards are enabled and we are already searching for multiline cards or clozes
                     parserData.setParserState("TEXT");

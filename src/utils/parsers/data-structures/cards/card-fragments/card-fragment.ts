@@ -14,5 +14,5 @@ export type CardFragmentType =
  */
 export interface CardFragment {
     type: CardFragmentType; // The type of the card fragment
-    fragmentInfo: PotentialCardInfo // All information known about the card fragment
+    fragmentInfo: PotentialCardInfo; // All information known about the card fragment
 }

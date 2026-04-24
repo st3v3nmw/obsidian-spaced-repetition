@@ -60,6 +60,13 @@
   color: var(--text-faint);
 }
 
+/* src/ui/obsidian-ui-components/modals/confirmation-modal.css */
+.sr-confirmation-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 /* src/ui/styles.css */
 .sr-bg-blue,
 .sr-bg-yellow,
@@ -479,12 +486,6 @@ body:not(.is-mobile) .sr-card-container:not(.sr-custom-hotkeys) .sr-response-but
     --icon-size: 16px;
     --icon-stroke: 2.5px;
   }
-}
-
-/* src/ui/obsidian-ui-components/modals/confirmation-modal.css */
-.sr-confirmation-modal-header {
-  text-align: start;
-  margin-left: unset;
 }
 
 /* src/ui/obsidian-ui-components/content-container/deck-container/deck-container.css */

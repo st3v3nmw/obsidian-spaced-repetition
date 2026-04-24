@@ -63,17 +63,13 @@ export class CardParser {
 
         if (
             parserData.cardData.potentialCard !== null &&
-            (
-                ((
-                    parserData.cardData.potentialCard.cardType === CardType.MultiLineBasic ||
-                    parserData.cardData.potentialCard.cardType === CardType.MultiLineReversed ||
-                    parserData.cardData.potentialCard.cardType === CardType.SingleLineBasic ||
-                    parserData.cardData.potentialCard.cardType === CardType.SingleLineReversed
-                ) &&
-                    parserData.cardData.potentialCard.backText !== null &&
-                    parserData.cardData.potentialCard.backText.length > 0) ||
-                parserData.cardData.potentialCard.cardType === CardType.Cloze
-            )
+            (((parserData.cardData.potentialCard.cardType === CardType.MultiLineBasic ||
+                parserData.cardData.potentialCard.cardType === CardType.MultiLineReversed ||
+                parserData.cardData.potentialCard.cardType === CardType.SingleLineBasic ||
+                parserData.cardData.potentialCard.cardType === CardType.SingleLineReversed) &&
+                parserData.cardData.potentialCard.backText !== null &&
+                parserData.cardData.potentialCard.backText.length > 0) ||
+                parserData.cardData.potentialCard.cardType === CardType.Cloze)
         ) {
             // We are currently building a potential card, so we add the current line to it, as it belongs to the potential card
             parserData.addPotentialCardToList();

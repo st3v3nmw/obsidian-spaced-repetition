@@ -50,7 +50,8 @@ export default class ParsedCardInfo {
 
         const srComment = StringDetector.getSRHTMLComment(this.text, 0, 0, false);
         // Save information about the scheduling info comment, as it is a intensive operation
-        this.hasSchedulingInfoFlag = srComment.startIndex !== -1 && srComment.endIndex !== -1 && srComment.text.length > 0;
+        this.hasSchedulingInfoFlag =
+            srComment.startIndex !== -1 && srComment.endIndex !== -1 && srComment.text.length > 0;
 
         return this.hasSchedulingInfoFlag;
     }

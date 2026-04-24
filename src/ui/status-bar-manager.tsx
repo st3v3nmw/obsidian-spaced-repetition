@@ -3,17 +3,18 @@ import { request } from "obsidian";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
-import IconTextStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/icon-text-statusbar-item";
+import CounterStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/counter-statusbar-item";
+import TextStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/text-statusbar-item";
 
-export type StatusBarItemType = "card-review" | "note-review" | "update-available";
-export const StatusBarItemTypesArray: ReadonlyArray<StatusBarItemType> = [
+export type StatusBarItemPurpose = "card-review" | "note-review" | "update-available";
+export const StatusBarItemTypesArray: ReadonlyArray<StatusBarItemPurpose> = [
     "card-review",
     "note-review",
     "update-available",
 ];
 
 export default class StatusBarManager {
-    protected statusBarItems: IconTextStatusBarItem[];
+    protected statusBarItems: TextStatusBarItem[];
     protected plugin: SRPlugin;
 
     constructor(plugin: SRPlugin) {
@@ -26,7 +27,7 @@ export default class StatusBarManager {
     setText(
         text: string | string[],
         showItems: boolean,
-        statusBarItemType: StatusBarItemType,
+        statusBarItemType: StatusBarItemPurpose,
     ): void {
         const statusBarItem = this.statusBarItems.find(
             (statusBarItem) => statusBarItem.getStatusBarItemType() === statusBarItemType,
@@ -38,6 +39,21 @@ export default class StatusBarManager {
             } else {
                 statusBarItem.hide();
             }
+        }
+    }
+
+    setCount(count: number, showItems: boolean, statusBarItemType: StatusBarItemPurpose): void {
+        const statusBarItem = this.statusBarItems.find(
+            (statusBarItem) => statusBarItem.getStatusBarItemType() === statusBarItemType,
+        );
+
+        if (statusBarItem === undefined) return;
+
+        (statusBarItem as CounterStatusBarItem).setCounter(count);
+        if (showItems && count > 0) {
+            statusBarItem.show();
+        } else {
+            statusBarItem.hide();
         }
     }
 
@@ -59,7 +75,7 @@ export default class StatusBarManager {
         }
     }
 
-    showStatusBarItem(state: boolean, statusBarItemType: StatusBarItemType): void {
+    showStatusBarItem(state: boolean, statusBarItemType: StatusBarItemPurpose): void {
         const statusBarItem = this.statusBarItems.find(
             (statusBarItem) => statusBarItem.getStatusBarItemType() === statusBarItemType,
         );
@@ -92,9 +108,12 @@ export default class StatusBarManager {
 
             switch (statusBarItemType) {
                 case "card-review":
-                    statusBarItem = new IconTextStatusBarItem(this.plugin, statusBarItemType, {
+                    statusBarItem = new CounterStatusBarItem(this.plugin, statusBarItemType, {
                         icon: "SpacedRepIcon",
                         show: false,
+                        count: 0,
+                        hideIcon: false,
+                        text: " card(s) due",
                         tooltip: t("OPEN_DECK_FOR_REVIEW"),
                         tooltipPosition: "top",
                         onClick: async () => {
@@ -105,9 +124,12 @@ export default class StatusBarManager {
                     });
                     break;
                 case "note-review":
-                    statusBarItem = new IconTextStatusBarItem(this.plugin, statusBarItemType, {
+                    statusBarItem = new CounterStatusBarItem(this.plugin, statusBarItemType, {
                         icon: "lucide-file-clock",
                         show: false,
+                        text: " note(s) due",
+                        count: 0,
+                        hideIcon: false,
                         tooltip: t("OPEN_NOTE_FOR_REVIEW"),
                         tooltipPosition: "top",
                         onClick: async () => {
@@ -119,9 +141,11 @@ export default class StatusBarManager {
                     });
                     break;
                 case "update-available":
-                    statusBarItem = new IconTextStatusBarItem(this.plugin, statusBarItemType, {
+                    statusBarItem = new TextStatusBarItem(this.plugin, statusBarItemType, {
                         icon: "lucide-circle-arrow-up",
                         show: false,
+                        hideIcon: false,
+                        text: "Spaced Repetition: new Update!",
                         tooltip: t("UPDATE_AVAILABLE"),
                         tooltipPosition: "top",
                     });
@@ -136,7 +160,9 @@ export default class StatusBarManager {
                 (statusBarItem) => statusBarItem.getStatusBarItemType() === "update-available",
             );
 
-            updateItem.setText("Spaced Repetition: new Update!");
+            if (updateItem !== undefined) {
+                updateItem.setText("Spaced Repetition: new Update!");
+            }
         }
     }
 

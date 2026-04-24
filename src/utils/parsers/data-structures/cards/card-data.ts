@@ -90,7 +90,10 @@ export default class CardData {
             }
         } else {
             // Set back text if possible
-            if (this.potentialCard.cardType !== null && this.potentialCard.cardType !== CardType.Cloze) {
+            if (
+                this.potentialCard.cardType !== null &&
+                this.potentialCard.cardType !== CardType.Cloze
+            ) {
                 // If the card type is not cloze and newCardType is undefined, then we can safely set the back text, without adding a separator or anything else unwanted
                 if (this.potentialCard.backText === null) {
                     this.potentialCard.backText = lineData.currentLineEndTrimmed;
@@ -114,18 +117,23 @@ export default class CardData {
      * @param notePath - The note path
      */
     initInlineCardInPotentialCard(lineData: LineData, notePath: string, noteText: string): void {
-        const separator = StringDetector.getSingleLineSeparatorInLine(lineData.currentLineTrimmed, lineData.inlineSeparators);
+        const separator = StringDetector.getSingleLineSeparatorInLine(
+            lineData.currentLineTrimmed,
+            lineData.inlineSeparators,
+        );
 
         if (separator === null) {
-            console.error("Could not find correct inline separator for line: " + lineData.currentLineTrimmed);
+            console.error(
+                "Could not find correct inline separator for line: " + lineData.currentLineTrimmed,
+            );
             return;
         }
 
         if (
             // We have found an inline card separator
-            (lineData.currentLineTrimmed.length === separator.separator.length || // No card text
-                lineData.currentLineTrimmed.endsWith(separator.separator) || // Card text ends with separator
-                lineData.currentLineTrimmed.startsWith(separator.separator)) // Card text starts with separator
+            lineData.currentLineTrimmed.length === separator.separator.length || // No card text
+            lineData.currentLineTrimmed.endsWith(separator.separator) || // Card text ends with separator
+            lineData.currentLineTrimmed.startsWith(separator.separator) // Card text starts with separator
         ) {
             // We have found an inline card, but it is malformed
             CardParser.notesWithCardFragments.addCardFragment(notePath, noteText, {

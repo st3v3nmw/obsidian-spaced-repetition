@@ -124,11 +124,23 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(!this.plugin.data.settings.disableFileMenuReviewOptions)
+                            .setValue(this.plugin.data.settings.showFileMenuReviewOptions)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.disableFileMenuReviewOptions = !value;
+                                this.plugin.data.settings.showFileMenuReviewOptions = value;
                                 await this.plugin.savePluginData();
-                                this.plugin.uiManager.showFileMenuItems(value);
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("ENABLE_FILE_MENU_DELETE_BUTTON"))
+                    .setDesc(t("ENABLE_FILE_MENU_DELETE_BUTTON_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showDeleteButtonInFileMenu)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showDeleteButtonInFileMenu = value;
+                                await this.plugin.savePluginData();
                             }),
                     );
             })
@@ -138,9 +150,9 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("SHOW_DELETE_BUTTON_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.showDeleteButton)
+                            .setValue(this.plugin.data.settings.showDeleteButtonInCardView)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.showDeleteButton = value;
+                                this.plugin.data.settings.showDeleteButtonInCardView = value;
                                 await this.plugin.savePluginData();
                             }),
                     );

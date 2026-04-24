@@ -8,7 +8,7 @@ export interface SRSettings {
     flashcardTags: string[];
     convertFoldersToDecks: boolean;
     burySiblingCards: boolean;
-    randomizeCardOrder: boolean | null;
+    randomizeCardOrder: boolean | undefined;
     flashcardCardOrder: string;
     flashcardDeckOrder: string;
     convertClozePatternsToInputs: boolean;
@@ -30,7 +30,9 @@ export interface SRSettings {
     noteFoldersToIgnore: string[];
     openRandomNote: boolean;
     autoNextNote: boolean;
-    disableFileMenuReviewOptions: boolean;
+    disableFileMenuReviewOptions: boolean | undefined;
+    showFileMenuReviewOptions: boolean;
+    deleteTagsOnSchedulingDataDeletion: boolean;
     maxNDaysNotesReviewQueue: number;
 
     // UI preferences
@@ -49,7 +51,8 @@ export interface SRSettings {
     flashcardHardText: string;
     reviewButtonDelay: number;
     openViewInNewTabMobile: boolean;
-    showDeleteButton: boolean;
+    showDeleteButtonInCardView: boolean;
+    showDeleteButtonInFileMenu: boolean;
     openViewInNewTab: boolean;
     useCustomHotkeys: boolean;
 
@@ -77,7 +80,6 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardTags: ["#flashcards"],
     convertFoldersToDecks: false,
     burySiblingCards: false,
-    randomizeCardOrder: null,
     flashcardCardOrder: "DueFirstRandom",
     flashcardDeckOrder: "PrevDeckComplete_Sequential",
     convertClozePatternsToInputs: false,
@@ -92,6 +94,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     multilineReversedCardSeparator: "??",
     multilineCardEndMarker: "",
     editLaterTag: "#edit-later",
+    randomizeCardOrder: undefined,
 
     // notes
     enableNoteReviewPaneOnStartup: true,
@@ -99,13 +102,15 @@ export const DEFAULT_SETTINGS: SRSettings = {
     noteFoldersToIgnore: ["**/*.excalidraw.md"],
     openRandomNote: false,
     autoNextNote: false,
-    disableFileMenuReviewOptions: false,
+    disableFileMenuReviewOptions: undefined,
+    showFileMenuReviewOptions: true,
+    deleteTagsOnSchedulingDataDeletion: false,
     maxNDaysNotesReviewQueue: 365,
 
     // UI settings
     showRibbonIcon: true,
     showStatusBar: true,
-    initiallyExpandAllSubdecksInTree: false,
+    initiallyExpandAllSubdecksInTree: true,
     showContextInCards: true,
     showIntervalInReviewButtons: true,
     flashcardHeightPercentage: 60,
@@ -117,7 +122,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),
     reviewButtonDelay: 0,
-    showDeleteButton: false,
+    showDeleteButtonInCardView: false,
+    showDeleteButtonInFileMenu: false,
     openViewInNewTab: false,
     openViewInNewTabMobile: false,
     useCustomHotkeys: false,
@@ -154,7 +160,7 @@ export function upgradeSettings(settings: SRSettings) {
         settings.flashcardDeckOrder = "PrevDeckComplete_Sequential";
 
         // After the upgrade, we don't need the old attribute any more
-        settings.randomizeCardOrder = null;
+        settings.randomizeCardOrder = undefined;
     }
 
     if (settings.clozePatterns === null || settings.clozePatterns === undefined) {
@@ -168,6 +174,10 @@ export function upgradeSettings(settings: SRSettings) {
 
         if (settings.convertCurlyBracketsToClozes)
             settings.clozePatterns.push("{{[123;;]answer[;;hint]}}");
+    }
+
+    if (settings.disableFileMenuReviewOptions !== undefined) {
+        settings.disableFileMenuReviewOptions = undefined;
     }
 }
 

@@ -1,34 +1,50 @@
 import SRPlugin from "src/main";
-import StatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/statusbar-item";
-import { StatusBarItemType } from "src/ui/status-bar-manager";
+import IconStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/icon-statusbar-item";
+import { StatusBarItemPurpose } from "src/ui/status-bar-manager";
 
-export default class TextStatusBarItem extends StatusBarItem {
-    protected text: string | string[] | DocumentFragment | DocumentFragment[];
+export default class TextStatusBarItem extends IconStatusBarItem {
+    protected text: string | string[] | DocumentFragment | DocumentFragment[] = "";
 
     constructor(
         plugin: SRPlugin,
-        type: StatusBarItemType,
+        type: StatusBarItemPurpose,
         props: {
-            text?: string | string[];
+            text: string | string[];
+            icon?: string;
+            hideIcon?: boolean;
             show?: boolean;
             tooltip?: string;
             tooltipPosition?: string;
             onClick?: () => unknown;
         },
     ) {
-        super(plugin, type, props);
+        super(plugin, type, {
+            icon: props.icon ? props.icon : "",
+            hideIcon: props.hideIcon,
+            show: props.show,
+            tooltip: props.tooltip,
+            tooltipPosition: props.tooltipPosition,
+            onClick: props.onClick,
+        });
 
-        this.setText(props.text);
+        this.setText(props.text, false);
     }
 
-    setText(text: string | string[] | DocumentFragment | DocumentFragment[]): void {
-        this.segments = [];
-        this.statusBarItem.empty();
+    setText(
+        text: string | string[] | DocumentFragment | DocumentFragment[],
+        cleanSegments: boolean = true,
+    ): void {
+        if (cleanSegments) {
+            this.segments = [];
+            this.statusBarItem.empty();
+            this.iconEl = null;
+            this.setStatusBarItemIcon(this.icon);
+        }
 
-        if (text !== undefined && typeof text === "string") {
+        if (typeof text === "string") {
             this.text = text;
             this.createTextSegment(text);
-        } else if (text !== undefined && Array.isArray(text)) {
+        } else if (Array.isArray(text)) {
             this.text = text;
 
             for (const textSegment of text) {
