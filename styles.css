@@ -61,9 +61,10 @@
 }
 
 /* src/ui/obsidian-ui-components/modals/confirmation-modal.css */
-.sr-confirmation-modal-header {
-    text-align: start;
-    margin-left: unset;
+.sr-confirmation-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 /* src/ui/styles.css */

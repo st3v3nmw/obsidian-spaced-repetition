@@ -108,7 +108,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // UI settings
     showRibbonIcon: true,
     showStatusBar: true,
-    initiallyExpandAllSubdecksInTree: false,
+    initiallyExpandAllSubdecksInTree: true,
     showContextInCards: true,
     showIntervalInReviewButtons: true,
     flashcardHeightPercentage: 60,
@@ -174,10 +174,7 @@ export function upgradeSettings(settings: SRSettings) {
             settings.clozePatterns.push("{{[123;;]answer[;;hint]}}");
     }
 
-    if (
-        settings.disableFileMenuReviewOptions !== null ||
-        settings.disableFileMenuReviewOptions !== undefined
-    ) {
+    if (settings.disableFileMenuReviewOptions !== undefined) {
         settings.disableFileMenuReviewOptions = undefined;
     }
 }

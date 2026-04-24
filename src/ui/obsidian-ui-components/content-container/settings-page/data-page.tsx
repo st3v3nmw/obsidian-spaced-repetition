@@ -7,6 +7,7 @@ import {
 } from "src/delete-scheduling-data";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { DEFAULT_SETTINGS } from "src/settings";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
@@ -156,6 +157,32 @@ export class DataPage extends SettingsPage {
                                                 .deleteTagsOnSchedulingDataDeletion,
                                             this.plugin.data.settings.flashcardTags,
                                         );
+                                    },
+                                ).open();
+                            });
+                    });
+            });
+
+        new SettingGroup(this.containerEl)
+            .setHeading(t("GROUP_RESET_SETTINGS"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("GROUP_RESET_SETTINGS"))
+                    .setDesc(t("GROUP_RESET_SETTINGS_DESC"))
+                    .addButton((button) => {
+                        button
+                            .setButtonText(t("RESET_SETTINGS"))
+                            .setClass("mod-warning")
+                            .onClick(async () => {
+                                new ConfirmationModal(
+                                    this.plugin.app,
+                                    t("RESET_SETTINGS"),
+                                    t("CONFIRM_RESET_SETTINGS"),
+                                    t("RESET_SETTINGS_CONFIRMATION"),
+                                    () => {
+                                        this.plugin.data.settings = DEFAULT_SETTINGS;
+                                        this.plugin.savePluginData();
+                                        this.display();
                                     },
                                 ).open();
                             });

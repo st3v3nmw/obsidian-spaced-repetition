@@ -332,6 +332,11 @@ const en: IBaseLocale = {
         "Enables the delete button in the file menu for scheduling data",
 
     DATA_PAGE_NAME: "Data",
+    GROUP_RESET_SETTINGS: "Reset settings",
+    GROUP_RESET_SETTINGS_DESC: "Reset all settings to their default values",
+    RESET_SETTINGS: "Reset settings",
+    CONFIRM_RESET_SETTINGS: "Are you sure you want to reset all settings to their default values?",
+    RESET_SETTINGS_CONFIRMATION: "Resetting all settings to their default values...",
 };
 
 export default en;

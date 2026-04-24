@@ -288,4 +288,10 @@ export interface IBaseLocale {
     ENABLE_FILE_MENU_DELETE_BUTTON_DESC: string;
 
     DATA_PAGE_NAME: string;
+
+    GROUP_RESET_SETTINGS: string;
+    GROUP_RESET_SETTINGS_DESC: string;
+    RESET_SETTINGS: string;
+    CONFIRM_RESET_SETTINGS: string;
+    RESET_SETTINGS_CONFIRMATION: string;
 }
