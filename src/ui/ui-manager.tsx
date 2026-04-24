@@ -86,7 +86,9 @@ export class UIManager {
         this.statusBarManager = new StatusBarManager(this.plugin);
 
         this.showRibbonIcon(this.plugin.data.settings.showRibbonIcon);
-        this.showFileMenuItems(this.plugin.data.settings.showFileMenuReviewOptions);
+        this.plugin.registerEvent(
+            this.plugin.app.workspace.on("file-menu", this.fileMenuHandler.bind(this)),
+        );
         this.plugin.addSettingTab(new SRSettingTab(this.plugin.app, this.plugin));
         this.registerSRFocusListener();
     }
@@ -229,19 +231,10 @@ export class UIManager {
         }
     }
 
-    showFileMenuItems(show: boolean) {
-        if (show) {
-            this.plugin.registerEvent(
-                this.plugin.app.workspace.on("file-menu", this.fileMenuHandler.bind(this)),
-            );
-        } else {
-            // @ts-expect-error: The types are wrong, but it's fine, because we are just removing the listener
-            this.plugin.app.workspace.off("file-menu", this.fileMenuHandler.bind(this));
-        }
-    }
-
     private fileMenuHandler(menu: Menu, file: TAbstractFile) {
-        if (file instanceof TFile && file.extension === "md") {
+        if (!(file instanceof TFile && file.extension === "md")) return;
+
+        if (this.plugin.data.settings.showFileMenuReviewOptions) {
             menu.addItem((item: MenuItem) => {
                 item.setTitle(
                     t("REVIEW_DIFFICULTY_FILE_MENU", {
@@ -277,9 +270,16 @@ export class UIManager {
                         this.plugin.saveNoteReviewResponse(file, ReviewResponse.Hard);
                     });
             });
+        }
 
+        if (
+            this.plugin.data.settings.showFileMenuReviewOptions &&
+            this.plugin.data.settings.showDeleteButtonInFileMenu
+        ) {
             menu.addSeparator();
+        }
 
+        if (this.plugin.data.settings.showDeleteButtonInFileMenu) {
             menu.addItem((item) => {
                 item.setTitle(t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"))
                     .setIcon("trash")

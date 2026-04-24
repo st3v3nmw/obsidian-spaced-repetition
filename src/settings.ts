@@ -50,7 +50,8 @@ export interface SRSettings {
     flashcardHardText: string;
     reviewButtonDelay: number;
     openViewInNewTabMobile: boolean;
-    showDeleteButton: boolean;
+    showDeleteButtonInCardView: boolean;
+    showDeleteButtonInFileMenu: boolean;
     openViewInNewTab: boolean;
     useCustomHotkeys: boolean;
 
@@ -119,7 +120,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),
     reviewButtonDelay: 0,
-    showDeleteButton: false,
+    showDeleteButtonInCardView: false,
+    showDeleteButtonInFileMenu: false,
     openViewInNewTab: false,
     openViewInNewTabMobile: false,
     useCustomHotkeys: false,

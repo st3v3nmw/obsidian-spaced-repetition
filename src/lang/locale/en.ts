@@ -326,6 +326,10 @@ const en: IBaseLocale = {
 
     DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA: "Delete tags when deleting scheduling data",
     DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA_DESC: "Delete tags when deleting scheduling data",
+
+    ENABLE_FILE_MENU_DELETE_BUTTON: "Enable file menu delete button",
+    ENABLE_FILE_MENU_DELETE_BUTTON_DESC:
+        "Enables the delete button in the file menu for scheduling data",
 };
 
 export default en;

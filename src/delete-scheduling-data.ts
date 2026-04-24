@@ -36,14 +36,14 @@ async function removeTagsFromFile(vault: Vault, file: TFile, tagsToDelete: strin
     try {
         await vault.process(file, (data) => {
             let newData = data;
-            console.log(newData, tagsToDelete);
-            for (const tagToDelete of tagsToDelete) {
+            for (const tagToDelete of tagsToDelete.sort((a, b) => b.length - a.length)) {
                 const regex = new RegExp(
                     // eslint-disable-next-line no-useless-escape
                     `(${tagToDelete}[\/[a-zA-z\-[0-9]*]*\/]*[a-zA-z\-[0-9]*]*)`,
                     "gm",
                 );
                 newData = newData.replace(regex, "");
+                newData = newData.replace(tagToDelete, "");
             }
             return newData;
         });
@@ -56,10 +56,10 @@ async function removeTagsFromFrontmatter(vault: Vault, file: TFile, tagsToDelete
     try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await this.app.fileManager.processFrontMatter(file, (frontmatter: any) => {
-            frontmatter["tags"] = frontmatter["tags"].filter((tag: string) => {
+            frontmatter["tags"] = (frontmatter["tags"] as string[]).filter((tag: string) => {
                 let deleteTag = false;
-                for (const tagToDelete of tagsToDelete) {
-                    if (tag.startsWith(tagToDelete)) {
+                for (const tagToDelete of tagsToDelete.sort((a, b) => b.length - a.length)) {
+                    if (tag.startsWith(tagToDelete.replace("#", ""))) {
                         deleteTag = true;
                         break;
                     }

@@ -74,7 +74,7 @@ export class CardContainer {
 
         this.toolbar = new CardToolbarComponent(
             this.view,
-            settings.showDeleteButton,
+            settings.showDeleteButtonInCardView,
             deleteCurrentCard,
             backToDeckHandler,
             editCardHandler,
