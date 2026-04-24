@@ -48,6 +48,22 @@ export class RenderMarkdownWrapper {
                 }
                 return false;
             });
+
+            (el as HTMLAnchorElement).addEventListener("mouseover", (ev: Event) => {
+                const href = el.getAttr("href") || el.getAttr("data-href");
+                console.log(href);
+                if (href) {
+                    this.app.workspace.trigger("hover-link", {
+                        event: ev,
+                        source: "preview",
+                        hoverParent: this.plugin,
+                        targetEl: el,
+                        linktext: href,
+                    });
+                    return true;
+                }
+                return false;
+            });
         });
 
         el.findAll(".internal-embed").forEach((el) => {
