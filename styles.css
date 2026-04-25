@@ -440,6 +440,21 @@ body:not(.is-mobile)
 .is-phone .sr-card-toolbar .sr-flex-spacer.sr-center-spacer {
     display: flex;
 }
+@container (width < 850px) {
+    .is-mobile .sr-card-toolbar .sr-edit-button,
+    .is-mobile .sr-card-toolbar .sr-reset-button,
+    .is-mobile .sr-card-toolbar .sr-short-menu-button,
+    .is-mobile .sr-card-toolbar > .sr-divider,
+    .is-mobile .sr-card-toolbar .sr-skip-button {
+        display: none;
+    }
+    .is-mobile .sr-card-toolbar .sr-extended-menu-button {
+        display: flex;
+    }
+    .is-mobile .sr-card-toolbar .sr-flex-spacer.sr-center-spacer {
+        display: flex;
+    }
+}
 @container (width < 730px) {
     .sr-card-toolbar {
         --deck-info-name-width: 15ch;
