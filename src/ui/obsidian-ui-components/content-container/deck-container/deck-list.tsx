@@ -116,7 +116,15 @@ export default class DeckListComponent {
         );
 
         // Creates the "All Decks" row
-        this._crateTreeRow("All Decks", originDeckStats, 0, this.treeContainer, false);
+        this._crateTreeRow(
+            "All Decks",
+            originDeckStats,
+            0,
+            this.treeContainer,
+            false,
+            reviewSequencer.originalDeckTree,
+            this.startReviewOfDeck,
+        );
 
         for (const subdeck of reviewSequencer.originalDeckTree.subdecks) {
             // Create the tree row for each deck
