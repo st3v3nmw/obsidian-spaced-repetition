@@ -440,7 +440,15 @@ body:not(.is-mobile)
 .is-phone .sr-card-toolbar .sr-flex-spacer.sr-center-spacer {
     display: flex;
 }
-@container (width < 750px) {
+@container (width < 730px) {
+    .sr-card-toolbar {
+        --deck-info-name-width: 15ch;
+    }
+}
+@container (width < 690px) {
+    .sr-card-toolbar {
+        --deck-info-name-width: 20ch;
+    }
     .sr-card-toolbar .sr-edit-button,
     .sr-card-toolbar .sr-reset-button,
     .sr-card-toolbar .sr-short-menu-button,
