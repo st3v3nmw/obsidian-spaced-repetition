@@ -111,9 +111,7 @@ export default class SRPlugin extends Plugin {
                             document.activeElement.nodeName === "INPUT")
                     )
                 ) {
-                    console.log("Checking:Review Again");
                     if (!checking) {
-                        console.log("Review Again");
                         this.uiManager.contentManager._processReview(ReviewResponse.Again);
                     }
                     return true;

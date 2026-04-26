@@ -245,7 +245,6 @@ export class SchedulingPage extends SettingsPage {
                                     this.plugin.data.settings.startOfDay = value;
                                     await this.plugin.savePluginData();
                                     globalDateProvider.setDayBoundary(dayBoundary);
-                                    console.log("Day boundary set to", dayBoundary);
                                 }
                             });
                         }),
