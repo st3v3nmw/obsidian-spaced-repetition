@@ -207,19 +207,25 @@ export default class ContentManager {
             this._showDecksList(true);
             return;
         }
+        const chosenDeckStats = this.reviewSequencer.getDeckStats(
+            this.sessionData.deckData.chosenDeck.getTopicPath(),
+        );
+        this.sessionData.deckData.chosenDeckStats = chosenDeckStats;
 
         this.sessionData.deckData.previousDeck = this.sessionData.deckData.currentDeck;
-        this.sessionData.deckData.currentDeck = this.reviewSequencer.currentDeck;
         this.sessionData.deckData.previousDeckStats = this.sessionData.deckData.currentDeckStats;
+
+        this.sessionData.deckData.currentDeck = this.reviewSequencer.currentDeck;
 
         const currentDeckStats = this.reviewSequencer.getDeckStats(
             this.reviewSequencer.currentDeck.getTopicPath(),
         );
-
         this.sessionData.deckData.currentDeckStats = currentDeckStats;
 
-        this.sessionData.deckData.currentDeckTotalCardsInQueue =
-            currentDeckStats.cardsInQueueOfThisDeckCount;
+        if (this.sessionData.deckData.previousDeck !== this.sessionData.deckData.currentDeck) {
+            this.sessionData.deckData.currentDeckTotalCardsInQueue =
+                currentDeckStats.cardsInQueueOfThisDeckCount;
+        }
 
         this.sessionData.currentNote = this.reviewSequencer.currentNote;
         this.sessionData.currentQuestion = this.reviewSequencer.currentQuestion;
