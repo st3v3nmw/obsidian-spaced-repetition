@@ -26,6 +26,9 @@ importers:
       short-uuid:
         specifier: ^6.0.3
         version: 6.0.3
+      ts-fsrs:
+        specifier: 5.3.1
+        version: 5.3.1
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1
@@ -2599,6 +2602,10 @@ packages:
     engines: {node: '>=18.12'}
     peerDependencies:
       typescript: '>=4.8.4'
+
+  ts-fsrs@5.3.1:
+    resolution: {integrity: sha512-PP3X4E014TX5QvteWxcrjqDkL8+NDiHhL4ACppejxSWansOndXpk/5EMljYlORRueDJL7ngL7YRC5RhBUhiJ3g==}
+    engines: {node: '>=20.0.0'}
 
   ts-jest@29.4.6:
     resolution: {integrity: sha512-fSpWtOO/1AjSNQguk43hb/JCo16oJDnMJf3CdEGNkqsEX3t0KX96xvyX1D7PfLCpVoKu4MfVrqUkFyblYoY4lA==}
@@ -5556,6 +5563,8 @@ snapshots:
   ts-api-utils@2.5.0(typescript@5.9.3):
     dependencies:
       typescript: 5.9.3
+
+  ts-fsrs@5.3.1: {}
 
   ts-jest@29.4.6(@babel/core@7.29.0)(@jest/transform@30.3.0)(@jest/types@30.3.0)(babel-jest@30.3.0(@babel/core@7.29.0))(esbuild@0.27.4)(jest-util@30.3.0)(jest@30.3.0(@types/node@25.5.0)(ts-node@10.9.2(@types/node@25.5.0)(typescript@5.9.3)))(typescript@5.9.3):
     dependencies:

@@ -85,6 +85,7 @@ export default class ContentManager {
     private sessionData: SessionData | null = null;
 
     private lastPressedOnProcessReview: number = 0;
+    private pendingResumeTimeout: number | null = null;
 
     constructor(
         app: App,
@@ -125,6 +126,7 @@ export default class ContentManager {
     }
 
     public close() {
+        this._clearPendingResumeTimeout();
         this.plugin.uiManager.setSRViewInFocus(false);
         this.deckContainer.closeList();
         this.cardContainer.closeSession();
@@ -151,8 +153,8 @@ export default class ContentManager {
                 hasDueCards &&
                 subdeck.dueFlashcards.some((card) => {
                     const dueDate: number = card.scheduleInfo.dueDateAsUnix;
-                    const today: number = globalDateProvider.today.valueOf();
-                    return dueDate < today;
+                    const nowUnix: number = globalDateProvider.now.valueOf();
+                    return dueDate <= nowUnix;
                 });
 
             const hasCardsToday: boolean = hasNewCards || hasDueCardsToday;
@@ -181,6 +183,7 @@ export default class ContentManager {
     // MARK: Content Manager
 
     private async _showDecksList(reloadReviewQueue: boolean = false): Promise<void> {
+        this._clearPendingResumeTimeout();
         if (reloadReviewQueue) {
             this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue();
         }
@@ -199,14 +202,25 @@ export default class ContentManager {
     }
 
     private async _showNextCard(): Promise<void> {
-        if (
-            this.sessionData === null ||
-            this.reviewSequencer === null ||
-            this.reviewSequencer.currentDeck === null
-        ) {
+        if (this.sessionData === null || this.reviewSequencer === null) {
             this._showDecksList(true);
             return;
         }
+
+        if (!this.reviewSequencer.hasCurrentCard) {
+            if (this.reviewSequencer.hasPendingCards) {
+                this._showPendingState();
+            } else {
+                this._showDecksList(true);
+            }
+            return;
+        }
+
+        if (this.reviewSequencer.currentDeck === null) {
+            this._showDecksList(true);
+            return;
+        }
+
         const chosenDeckStats = this.reviewSequencer.getDeckStats(
             this.sessionData.deckData.chosenDeck.getTopicPath(),
         );
@@ -242,6 +256,26 @@ export default class ContentManager {
         } else {
             this._showDecksList(true);
         }
+    }
+
+    private _showPendingState(): void {
+        if (this.reviewSequencer === null) return;
+        this._clearPendingResumeTimeout();
+        const nextPendingDueUnix = this.reviewSequencer.nextPendingDueUnix;
+        if (nextPendingDueUnix === null) {
+            this._showDecksList(true);
+            return;
+        }
+
+        this.plugin.uiManager.setUIState(UIState.CardFront);
+        this.cardContainer.drawPendingState(nextPendingDueUnix);
+
+        const delayMs = Math.max(0, nextPendingDueUnix - Date.now());
+        this.pendingResumeTimeout = window.setTimeout(async () => {
+            if (this.reviewSequencer === null) return;
+            this.reviewSequencer.refreshCurrentDeck();
+            await this._showNextCard();
+        }, delayMs + 50);
     }
 
     private _getNewSessionData(deck: Deck): SessionData | null {
@@ -323,7 +357,7 @@ export default class ContentManager {
             this.sessionData,
             this.reviewMode,
             this.settings,
-            this._determineButtonInterval.bind(this),
+            this._determineButtonSchedule.bind(this),
         );
     }
 
@@ -450,13 +484,19 @@ export default class ContentManager {
 
     // MARK: Utils
 
-    private _determineButtonInterval(reviewResponse: ReviewResponse): number {
-        if (this.sessionData === null) return 0;
-        if (this.reviewSequencer === null) return 0;
-        const schedule: RepItemScheduleInfo = this.reviewSequencer.determineCardSchedule(
+    private _determineButtonSchedule(reviewResponse: ReviewResponse): RepItemScheduleInfo {
+        if (this.sessionData === null) return null;
+        if (this.reviewSequencer === null) return null;
+        return this.reviewSequencer.determineCardSchedule(
             reviewResponse,
             this.sessionData.cardData.currentCard,
         );
-        return schedule.interval;
+    }
+
+    private _clearPendingResumeTimeout(): void {
+        if (this.pendingResumeTimeout !== null) {
+            window.clearTimeout(this.pendingResumeTimeout);
+            this.pendingResumeTimeout = null;
+        }
     }
 }

@@ -63,6 +63,7 @@ export interface SRSettings {
     loadBalance: boolean;
     maximumInterval: number;
     maxLinkFactor: number;
+    fsrsDesiredRetention: number;
     startOfDay: string;
 
     // storage
@@ -134,6 +135,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     loadBalance: true,
     maximumInterval: 36525,
     maxLinkFactor: 1.0,
+    fsrsDesiredRetention: 0.9,
     startOfDay: "00:00:00",
 
     // storage
@@ -176,6 +178,10 @@ export function upgradeSettings(settings: SRSettings) {
 
     if (settings.disableFileMenuReviewOptions !== undefined) {
         settings.disableFileMenuReviewOptions = undefined;
+    }
+
+    if (settings.fsrsDesiredRetention === null || settings.fsrsDesiredRetention === undefined) {
+        settings.fsrsDesiredRetention = DEFAULT_SETTINGS.fsrsDesiredRetention;
     }
 }
 

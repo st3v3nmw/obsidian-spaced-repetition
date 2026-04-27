@@ -1,7 +1,9 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/card-container.css";
 import { App, Platform } from "obsidian";
 
+import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
+import { formatPendingDueTime } from "src/algorithms/schedule-display";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { CardType } from "src/card/questions/question";
 import { escapeHtml } from "src/escape-html";
@@ -192,6 +194,7 @@ export class CardContainer {
 
         // Setup cloze input listeners
         this._setupClozeInputListeners();
+
         // auto-focus the first cloze input if this card is a cloze card
         if (sessionData.currentQuestion.questionType === CardType.Cloze) {
             const firstInput = document.querySelector(".cloze-input") as HTMLInputElement;
@@ -199,6 +202,19 @@ export class CardContainer {
                 firstInput.focus();
             }
         }
+    }
+
+    public drawPendingState(nextPendingDueUnix: number): void {
+        this.toolbar.setResetButtonDisabled(true);
+        this.cardState = CardState.Front;
+        this.content.empty();
+        this.response.hideAllButtons();
+        this.content.createDiv({
+            cls: "sr-centered",
+            text: `Waiting for the next FSRS review step. Next card due at ${formatPendingDueTime(
+                nextPendingDueUnix,
+            )}.`,
+        });
     }
 
     // #region -> Deck Info
@@ -269,7 +285,7 @@ export class CardContainer {
         sessionData: SessionData,
         reviewMode: FlashcardReviewMode,
         settings: SRSettings,
-        determineButtonInterval: (response: ReviewResponse) => number,
+        determineButtonSchedule: (response: ReviewResponse) => RepItemScheduleInfo,
     ) {
         this.setCustomHotKeyState(settings.useCustomHotkeys);
         this.cardState = sessionData.cardData.currentCardState;
@@ -306,7 +322,7 @@ export class CardContainer {
             settings.flashcardGoodText,
             settings.flashcardEasyText,
             settings.showIntervalInReviewButtons,
-            determineButtonInterval,
+            determineButtonSchedule,
         );
         // NEW: restore keyboard focus after cloze confirmation
         this.plugin.uiManager.setSRViewInFocus(true);

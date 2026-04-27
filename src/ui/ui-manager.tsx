@@ -95,7 +95,6 @@ export class UIManager {
 
     public destroy() {
         this.removeSRFocusListener();
-        // @ts-expect-error: The types are wrong, but it's fine, because we are just removing the listener
         this.plugin.app.workspace.off("file-menu", this.fileMenuHandler.bind(this));
         this.tabViewManager.closeAllTabViews();
     }
@@ -131,7 +130,6 @@ export class UIManager {
 
     public removeSRFocusListener() {
         this.setSRViewInFocus(false);
-        // @ts-expect-error: The types are wrong, but it's fine, because we are just removing the listener
         this.plugin.app.workspace.off("active-leaf-change", this.handleFocusChange.bind(this));
     }
 

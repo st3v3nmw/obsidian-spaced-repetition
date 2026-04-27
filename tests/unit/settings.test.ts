@@ -58,5 +58,46 @@ describe("SettingsUtil", () => {
             convertHighlightsToClozes: false,
             clozePatterns: ["{{[123;;]answer[;;hint]}}"],
         });
+
+        settings = {
+            ...DEFAULT_SETTINGS,
+            randomizeCardOrder: false,
+            flashcardCardOrder: null,
+            flashcardDeckOrder: null,
+            fsrsDesiredRetention: undefined as never,
+        };
+        upgradeSettings(settings);
+        expect(settings).toMatchObject({
+            flashcardCardOrder: "DueFirstSequential",
+            flashcardDeckOrder: "PrevDeckComplete_Sequential",
+            randomizeCardOrder: undefined,
+            fsrsDesiredRetention: DEFAULT_SETTINGS.fsrsDesiredRetention,
+        });
+
+        settings = {
+            ...DEFAULT_SETTINGS,
+            randomizeCardOrder: false,
+            flashcardCardOrder: undefined as never,
+            flashcardDeckOrder: undefined as never,
+        };
+        upgradeSettings(settings);
+        expect(settings).toMatchObject({
+            flashcardCardOrder: "DueFirstSequential",
+            flashcardDeckOrder: "PrevDeckComplete_Sequential",
+        });
+
+        settings = {
+            ...DEFAULT_SETTINGS,
+            randomizeCardOrder: true,
+            flashcardCardOrder: "ExistingCardOrder",
+            flashcardDeckOrder: "ExistingDeckOrder",
+            fsrsDesiredRetention: 0.87,
+        };
+        upgradeSettings(settings);
+        expect(settings).toMatchObject({
+            flashcardCardOrder: "ExistingCardOrder",
+            flashcardDeckOrder: "ExistingDeckOrder",
+            fsrsDesiredRetention: 0.87,
+        });
     });
 });
