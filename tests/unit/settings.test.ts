@@ -58,5 +58,14 @@ describe("SettingsUtil", () => {
             convertHighlightsToClozes: false,
             clozePatterns: ["{{[123;;]answer[;;hint]}}"],
         });
+
+        settings = {
+            ...DEFAULT_SETTINGS,
+            scheduleDataVaultLocation: "   ",
+        };
+        upgradeSettings(settings);
+        expect(settings.scheduleDataVaultLocation).toEqual(
+            DEFAULT_SETTINGS.scheduleDataVaultLocation,
+        );
     });
 });

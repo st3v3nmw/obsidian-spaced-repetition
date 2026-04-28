@@ -131,7 +131,7 @@ export class DataStoreMigrator {
                 }
             }
 
-            scheduleDataRepository.clearState();
+            await scheduleDataRepository.clearStateAndPersist();
         } finally {
             DataStoreAlgorithm.instance = prevAlgorithm;
         }

@@ -49,7 +49,7 @@ export class DataPage extends SettingsPage {
                         dropdown
                             .addOptions({
                                 [DataStoreName.NOTES]: t("STORE_IN_NOTES"),
-                                [DataStoreName.PLUGIN_DATA]: "Store in plugin data (beta)",
+                                [DataStoreName.PLUGIN_DATA]: "Store in vault files (beta)",
                             })
                             .setValue(this.plugin.data.settings.dataStore)
                             .onChange(async (value) => {
@@ -87,6 +87,34 @@ export class DataPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting.infoEl.insertAdjacentText("beforeend", t("PLUGIN_DATA_STORE_INFO"));
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName("Schedule data location in vault")
+                    .setDesc(
+                        'Root folder for schedule files. Data is stored in "Schedule Data" as markdown files.',
+                    )
+                    .addText((text) => {
+                        const commitValue = async () => {
+                            this.plugin.data.settings.scheduleDataVaultLocation =
+                                text.getValue().trim() ||
+                                DEFAULT_SETTINGS.scheduleDataVaultLocation;
+                            await this.plugin.persistScheduleDataNow();
+                            await this.plugin.savePluginData();
+                        };
+
+                        text.setPlaceholder(DEFAULT_SETTINGS.scheduleDataVaultLocation)
+                            .setValue(this.plugin.data.settings.scheduleDataVaultLocation)
+                            .onChange(() => {
+                                this.plugin.data.settings.scheduleDataVaultLocation =
+                                    text.getValue().trim() ||
+                                    DEFAULT_SETTINGS.scheduleDataVaultLocation;
+                            });
+
+                        text.inputEl.addEventListener("blur", () => {
+                            void commitValue();
+                        });
+                    });
             })
             .addSetting((setting: Setting) => {
                 setting

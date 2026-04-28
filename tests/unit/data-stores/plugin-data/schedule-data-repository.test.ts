@@ -1,4 +1,5 @@
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { ScheduleDataMarkdownStorage } from "src/data-stores/plugin-data/schedule-data-markdown-storage";
 import { ScheduleDataRepository } from "src/data-stores/plugin-data/schedule-data-repository";
 import { DEFAULT_DATA, PluginData } from "src/plugin-data";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
@@ -314,5 +315,154 @@ describe("ScheduleDataRepository.renameFile", () => {
         await repo.renameFile("notes/old.md", "notes/new.md");
 
         expect(persistCount).toBe(1);
+    });
+});
+
+describe("ScheduleDataRepository.initialize with markdown storage", () => {
+    function makeStorage(loadedState: PluginData["scheduleState"]): {
+        storage: ScheduleDataMarkdownStorage;
+        save: jest.Mock;
+    } {
+        const save = jest.fn(async () => {});
+        const storage = {
+            load: jest.fn(async () => loadedState),
+            save,
+        } as unknown as ScheduleDataMarkdownStorage;
+        return { storage, save };
+    }
+
+    test("initialize with no storage keeps plugin data state", async () => {
+        const data = makePluginData();
+        const repo = new ScheduleDataRepository(data, async () => {});
+
+        await repo.initialize();
+
+        expect(repo.hasNoteSchedule("missing")).toBe(false);
+        expect(data.scheduleState).toBeDefined();
+    });
+
+    test("initialize prefers loaded file state when file has data", async () => {
+        const data = makePluginData();
+        data.scheduleState.noteSchedules.legacy = {
+            dueDate: "2023-09-06",
+            interval: 1,
+            ease: 100,
+        };
+
+        const fileState: PluginData["scheduleState"] = {
+            version: 1,
+            noteSchedules: {
+                fromFile: { dueDate: "2023-09-07", interval: 5, ease: 250 },
+            },
+            cardSchedules: {},
+        };
+        const { storage, save } = makeStorage(fileState);
+
+        let persistCount = 0;
+        const repo = new ScheduleDataRepository(
+            data,
+            async () => {
+                persistCount++;
+            },
+            storage,
+        );
+
+        await repo.initialize();
+
+        expect(repo.hasNoteSchedule("fromFile")).toBe(true);
+        expect(repo.hasNoteSchedule("legacy")).toBe(false);
+        expect(save).toHaveBeenCalledTimes(1);
+        expect(persistCount).toBe(1);
+        expect(Object.keys(data.scheduleState.noteSchedules)).toHaveLength(0);
+    });
+
+    test("initialize migrates legacy plugin state when loaded file is empty", async () => {
+        const data = makePluginData();
+        data.scheduleState.noteSchedules.legacy = {
+            dueDate: "2023-09-06",
+            interval: 1,
+            ease: 100,
+        };
+
+        const emptyState: PluginData["scheduleState"] = {
+            version: 1,
+            noteSchedules: {},
+            cardSchedules: {},
+        };
+        const { storage, save } = makeStorage(emptyState);
+        const repo = new ScheduleDataRepository(data, async () => {}, storage);
+
+        await repo.initialize();
+
+        expect(repo.hasNoteSchedule("legacy")).toBe(true);
+        expect(save).toHaveBeenCalledTimes(1);
+        const savedState = save.mock.calls[0][0] as PluginData["scheduleState"];
+        expect(savedState.noteSchedules.legacy?.dueDate).toBe("2023-09-06");
+    });
+
+    test("initialize treats card-only loaded file as existing data", async () => {
+        const data = makePluginData();
+        data.scheduleState.noteSchedules.legacy = {
+            dueDate: "2023-09-06",
+            interval: 1,
+            ease: 100,
+        };
+
+        const fileState: PluginData["scheduleState"] = {
+            version: 1,
+            noteSchedules: {},
+            cardSchedules: {
+                c1: [{ dueDate: "2023-09-08", interval: 2, ease: 220 }],
+            },
+        };
+        const { storage } = makeStorage(fileState);
+        const repo = new ScheduleDataRepository(data, async () => {}, storage);
+
+        await repo.initialize();
+
+        expect(repo.hasCardSchedules("c1")).toBe(true);
+        expect(repo.hasNoteSchedule("legacy")).toBe(false);
+    });
+
+    test("persistCurrentState writes through storage when storage is configured", async () => {
+        const data = makePluginData();
+        const { storage, save } = makeStorage({ version: 1, noteSchedules: {}, cardSchedules: {} });
+        const repo = new ScheduleDataRepository(data, async () => {}, storage);
+        await repo.initialize();
+
+        const schedule = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-06", 10, 250);
+        await repo.setNoteSchedule("note1", schedule);
+
+        expect(save).toHaveBeenCalled();
+    });
+
+    test("clearStateAndPersist resets and writes empty state", async () => {
+        const data = makePluginData();
+        const { storage, save } = makeStorage({ version: 1, noteSchedules: {}, cardSchedules: {} });
+        const repo = new ScheduleDataRepository(data, async () => {}, storage);
+        await repo.initialize();
+
+        const schedule = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-06", 10, 250);
+        await repo.setNoteSchedule("note1", schedule);
+        await repo.clearStateAndPersist();
+
+        expect(repo.hasNoteSchedule("note1")).toBe(false);
+        const lastSaved = save.mock.calls[
+            save.mock.calls.length - 1
+        ][0] as PluginData["scheduleState"];
+        expect(lastSaved.noteSchedules).toEqual({});
+        expect(lastSaved.cardSchedules).toEqual({});
+    });
+
+    test("initialize handles undefined legacy plugin state", async () => {
+        const data = makePluginData();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (data as any).scheduleState = undefined;
+        const { storage } = makeStorage({ version: 1, noteSchedules: {}, cardSchedules: {} });
+        const repo = new ScheduleDataRepository(data, async () => {}, storage);
+
+        await repo.initialize();
+
+        expect(repo.hasNoteSchedule("none")).toBe(false);
     });
 });

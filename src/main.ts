@@ -18,6 +18,7 @@ import { DataStore, DataStoreName } from "src/data-stores/base/data-store";
 import { DataStoreMigrator } from "src/data-stores/data-store-migrator";
 import { StoreInNotes } from "src/data-stores/notes/notes";
 import { StoreInPluginData } from "src/data-stores/plugin-data/plugin-data";
+import { ScheduleDataMarkdownStorage } from "src/data-stores/plugin-data/schedule-data-markdown-storage";
 import { ScheduleDataRepository } from "src/data-stores/plugin-data/schedule-data-repository";
 import { Deck, DeckTreeFilter } from "src/deck/deck";
 import {
@@ -582,10 +583,17 @@ export default class SRPlugin extends Plugin {
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
         setDebugParser(this.data.settings.showParserDebugMessages);
 
+        const scheduleStorage = new ScheduleDataMarkdownStorage(
+            this.app,
+            () => this.data.settings.scheduleDataVaultLocation,
+        );
+
         this.scheduleDataRepository = new ScheduleDataRepository(
             this.data,
             this.savePluginData.bind(this),
+            scheduleStorage,
         );
+        await this.scheduleDataRepository.initialize();
 
         this.setupDataStoreAndAlgorithmInstances(this.data.settings);
     }
@@ -622,5 +630,9 @@ export default class SRPlugin extends Plugin {
 
     async savePluginData(): Promise<void> {
         await this.saveData(this.data);
+    }
+
+    async persistScheduleDataNow(): Promise<void> {
+        await this.scheduleDataRepository.persistCurrentState();
     }
 }
