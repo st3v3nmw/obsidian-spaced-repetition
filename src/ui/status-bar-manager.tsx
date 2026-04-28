@@ -57,22 +57,25 @@ export default class StatusBarManager {
         }
     }
 
-    showStatusBarItems(state: boolean): void {
-        if (state === true && this.statusBarItems.length === 0) {
+    showStatusBarItems(showItems: boolean): void {
+        if (this.statusBarItems.length === 0) {
             this.createStatusBarItems();
-            this.statusBarItems.forEach((statusBarItem) => {
-                statusBarItem.show();
-            });
-        } else if (state === true && this.statusBarItems.length > 0) {
-            this.statusBarItems.forEach((statusBarItem) => {
-                if (statusBarItem.getStatusBarItemType() !== "update-available")
-                    statusBarItem.show();
-            });
-        } else {
-            this.statusBarItems.forEach((statusBarItem) => {
-                statusBarItem.hide();
-            });
         }
+
+        this.statusBarItems.forEach((statusBarItem) => {
+            if (showItems) {
+                if (
+                    statusBarItem.getStatusBarItemType() === "update-available" &&
+                    statusBarItem.getText() === ""
+                ) {
+                    statusBarItem.hide();
+                    return;
+                }
+                statusBarItem.show();
+            } else {
+                statusBarItem.hide();
+            }
+        });
     }
 
     showStatusBarItem(state: boolean, statusBarItemType: StatusBarItemPurpose): void {
@@ -85,20 +88,6 @@ export default class StatusBarManager {
             } else {
                 statusBarItem.hide();
             }
-        }
-    }
-
-    showUpdateAvailableItemIfAvailable(): void {
-        const updateItem = this.statusBarItems.find(
-            (statusBarItem) => statusBarItem.getStatusBarItemType() === "update-available",
-        );
-
-        if (
-            updateItem !== undefined &&
-            updateItem.getText() !== undefined &&
-            updateItem.getText() !== ""
-        ) {
-            updateItem.show();
         }
     }
 
@@ -145,7 +134,7 @@ export default class StatusBarManager {
                         icon: "lucide-circle-arrow-up",
                         show: false,
                         hideIcon: false,
-                        text: "Spaced Repetition: new Update!",
+                        text: "",
                         tooltip: t("UPDATE_AVAILABLE"),
                         tooltipPosition: "top",
                     });

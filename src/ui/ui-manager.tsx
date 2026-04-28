@@ -114,7 +114,6 @@ export class UIManager {
                 this.plugin.data.settings.showStatusBar,
                 "note-review",
             );
-            this.statusBarManager.showUpdateAvailableItemIfAvailable();
         }
     }
 
