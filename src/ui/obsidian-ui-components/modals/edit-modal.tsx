@@ -1,9 +1,11 @@
 import "src/ui/obsidian-ui-components/modals/edit-modal.css";
 import { App, ButtonComponent, Modal } from "obsidian";
 
+import { Card } from "src/card/card";
+import { CardType } from "src/card/questions/question";
 import { t } from "src/lang/helpers";
 import { SRSettings } from "src/settings";
-import { includedSeparator, TextDirection } from "src/utils/strings";
+import { TextDirection } from "src/utils/strings";
 
 // from https://github.com/chhoumann/quickadd/blob/bce0b4cdac44b867854d6233796e3406dfd163c6/src/gui/GenericInputPrompt/GenericInputPrompt.ts#L5
 export class FlashcardEditModal extends Modal {
@@ -27,20 +29,29 @@ export class FlashcardEditModal extends Modal {
     private textBack: string = "";
     private separator: string | null;
     private multilineSeparator: boolean = false;
+    private currentCard: Card;
 
     public static Prompt(
         app: App,
         settings: SRSettings,
+        currentCard: Card,
         placeholder: string,
         textDirection: TextDirection,
     ): Promise<string> {
-        const newPromptModal = new FlashcardEditModal(app, settings, placeholder, textDirection);
+        const newPromptModal = new FlashcardEditModal(
+            app,
+            settings,
+            currentCard,
+            placeholder,
+            textDirection,
+        );
         return newPromptModal.waitForClose;
     }
 
     constructor(
         app: App,
         settings: SRSettings,
+        currentCard: Card,
         existingText: string,
         textDirection: TextDirection,
     ) {
@@ -49,29 +60,39 @@ export class FlashcardEditModal extends Modal {
         this.modalText = existingText;
         this.changedText = existingText;
         this.textDirection = textDirection;
+        this.currentCard = currentCard;
 
         // Select the separator used
-        this.separator = includedSeparator(this.modalText, [
-            settings.singleLineReversedCardSeparator,
-            settings.multilineReversedCardSeparator,
-            settings.singleLineCardSeparator,
-            settings.multilineCardSeparator,
-        ]);
+        const cardType = this.currentCard.question.questionType;
+        console.log(cardType);
 
-        // Split Text based on the separator
-        if (this.separator !== null) {
-            [this.textFront, this.textBack] = this.modalText.split(this.separator);
-
-            // Trim leading \n for multiline
-            this.multilineSeparator = [
-                settings.multilineCardSeparator,
-                settings.multilineReversedCardSeparator,
-            ].contains(this.separator);
+        switch (cardType) {
+            case CardType.SingleLineBasic:
+                this.separator = settings.singleLineCardSeparator;
+                break;
+            case CardType.SingleLineReversed:
+                this.separator = settings.singleLineReversedCardSeparator;
+                break;
+            case CardType.MultiLineBasic:
+                this.separator = settings.multilineCardSeparator;
+                break;
+            case CardType.MultiLineReversed:
+                this.separator = settings.multilineReversedCardSeparator;
+                break;
+            case CardType.Cloze:
+                this.separator = null;
+                break;
         }
 
-        if (this.multilineSeparator) {
-            this.textBack = this.textBack.trimStart();
-            this.textFront = this.textFront.trimEnd();
+        if (this.separator !== null) {
+            [this.textFront, this.textBack] = this.modalText.split(this.separator);
+            if (cardType === CardType.MultiLineBasic || cardType === CardType.MultiLineReversed) {
+                this.textBack = this.textBack.trimStart();
+                this.textFront = this.textFront.trimEnd();
+            }
+        } else {
+            this.textFront = this.modalText;
+            this.textBack = "";
         }
 
         this.waitForClose = new Promise<string>((resolve, reject) => {
@@ -101,6 +122,7 @@ export class FlashcardEditModal extends Modal {
         this.textAreaFront.addClass("sr-input");
         this.textAreaFront.setText(this.textFront);
         this.textAreaFront.addEventListener("keydown", this.keyListenerCallback);
+
         if (this.textDirection === TextDirection.Rtl) {
             this.textAreaFront.setAttribute("dir", "rtl");
         }

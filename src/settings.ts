@@ -37,6 +37,9 @@ export interface SRSettings {
     // UI preferences
     showRibbonIcon: boolean;
     showStatusBar: boolean;
+    showCardStatusBarItem: boolean;
+    showNoteStatusBarItem: boolean;
+    showUpdateAvailableStatusBarItem: boolean;
     initiallyExpandAllSubdecksInTree: boolean;
     showContextInCards: boolean;
     showIntervalInReviewButtons: boolean;
@@ -108,6 +111,9 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // UI settings
     showRibbonIcon: true,
     showStatusBar: true,
+    showCardStatusBarItem: true,
+    showNoteStatusBarItem: true,
+    showUpdateAvailableStatusBarItem: true,
     initiallyExpandAllSubdecksInTree: true,
     showContextInCards: true,
     showIntervalInReviewButtons: true,

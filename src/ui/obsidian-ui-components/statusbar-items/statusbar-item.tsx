@@ -22,6 +22,7 @@ export default class StatusBarItem {
         this.type = type;
         this.statusBarItem = plugin.addStatusBarItem();
         this.statusBarItem.addClass("status-bar-item");
+        this.statusBarItem.addClass(type);
         this.statusBarItem.addClass("sr-status-bar-item");
         this.segments = [];
 
@@ -47,6 +48,10 @@ export default class StatusBarItem {
                 this.addSegment(segment);
             }
         }
+    }
+
+    getItem(): HTMLElement {
+        return this.statusBarItem;
     }
 
     show(): void {

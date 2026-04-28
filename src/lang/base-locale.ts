@@ -145,8 +145,15 @@ export interface IBaseLocale {
     UI: string;
     OPEN_IN_TAB: string;
     OPEN_IN_TAB_DESC: string;
+    STATUS_BAR_SETTINGS: string;
     SHOW_STATUS_BAR: string;
     SHOW_STATUS_BAR_DESC: string;
+    SHOW_CARD_STATUS_BAR_ITEM: string;
+    SHOW_CARD_STATUS_BAR_ITEM_DESC: string;
+    SHOW_NOTE_STATUS_BAR_ITEM: string;
+    SHOW_NOTE_STATUS_BAR_ITEM_DESC: string;
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM: string;
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM_DESC: string;
     SHOW_RIBBON_ICON: string;
     SHOW_RIBBON_ICON_DESC: string;
     ENABLE_FILE_MENU_REVIEW_OPTIONS: string;
