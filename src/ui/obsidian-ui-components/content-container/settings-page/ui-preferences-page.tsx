@@ -106,20 +106,6 @@ export class UIPreferencesPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
-                    .setName(t("SHOW_STATUS_BAR"))
-                    .setDesc(t("SHOW_STATUS_BAR_DESC"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.plugin.data.settings.showStatusBar)
-                            .onChange(async (value) => {
-                                this.plugin.data.settings.showStatusBar = value;
-                                await this.plugin.savePluginData();
-                                this.plugin.uiManager.updateStatusBar();
-                            }),
-                    );
-            })
-            .addSetting((setting: Setting) => {
-                setting
                     .setName(t("ENABLE_FILE_MENU_REVIEW_OPTIONS"))
                     .setDesc(t("ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
                     .addToggle((toggle) =>
@@ -242,6 +228,65 @@ export class UIPreferencesPage extends SettingsPage {
                                 await this.plugin.savePluginData();
                             });
                     });
+            });
+
+        new SettingGroup(this.containerEl)
+            .setHeading(t("STATUS_BAR_SETTINGS"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_STATUS_BAR"))
+                    .setDesc(t("SHOW_STATUS_BAR_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showStatusBar)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showStatusBar = value;
+                                await this.plugin.savePluginData();
+                                this.plugin.uiManager.updateStatusBar();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_CARD_STATUS_BAR_ITEM"))
+                    .setDesc(t("SHOW_CARD_STATUS_BAR_ITEM_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showCardStatusBarItem)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showCardStatusBarItem = value;
+                                await this.plugin.savePluginData();
+                                this.plugin.uiManager.updateStatusBar();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_NOTE_STATUS_BAR_ITEM"))
+                    .setDesc(t("SHOW_NOTE_STATUS_BAR_ITEM_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showNoteStatusBarItem)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showNoteStatusBarItem = value;
+                                await this.plugin.savePluginData();
+                                this.plugin.uiManager.updateStatusBar();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM"))
+                    .setDesc(t("SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showUpdateAvailableStatusBarItem)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showUpdateAvailableStatusBarItem = value;
+                                await this.plugin.savePluginData();
+                                this.plugin.uiManager.updateStatusBar();
+                            }),
+                    );
             });
 
         new SettingGroup(this.containerEl)

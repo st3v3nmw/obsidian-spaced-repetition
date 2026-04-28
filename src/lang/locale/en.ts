@@ -174,9 +174,18 @@ const en: IBaseLocale = {
     UI: "User Interface",
     OPEN_IN_TAB: "Open in new tab",
     OPEN_IN_TAB_DESC: "Turn this off to open the plugin in a modal window",
+    STATUS_BAR_SETTINGS: "Status Bar",
     SHOW_STATUS_BAR: "Show status bar",
-    SHOW_STATUS_BAR_DESC:
+    SHOW_STATUS_BAR_DESC: "Turn this off to hide all status messages in Obsidian's status bar",
+    SHOW_CARD_STATUS_BAR_ITEM: "Show card status bar item",
+    SHOW_CARD_STATUS_BAR_ITEM_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_NOTE_STATUS_BAR_ITEM: "Show note status bar item",
+    SHOW_NOTE_STATUS_BAR_ITEM_DESC:
+        "Turn this off to hide the note's review status in Obsidian's status bar",
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM: "Show update available status bar item",
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM_DESC:
+        "Turn this off to hide the update available status bar item",
     SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
     SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     ENABLE_FILE_MENU_REVIEW_OPTIONS:
