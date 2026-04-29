@@ -14,6 +14,42 @@ describe("SettingsUtil", () => {
         expect(SettingsUtil.isAnyTagANoteReviewTag(settings, ["#test"])).toEqual(false);
     });
 
+    test("isAnyTagIgnoredForFlashcards", () => {
+        const settings: SRSettings = {
+            ...DEFAULT_SETTINGS,
+            flashcardTagsToIgnore: ["#archived"],
+        };
+        expect(SettingsUtil.isAnyTagIgnoredForFlashcards(settings, ["#archived"])).toEqual(true);
+        expect(SettingsUtil.isAnyTagIgnoredForFlashcards(settings, ["#archived/old"])).toEqual(
+            true,
+        );
+        expect(SettingsUtil.isAnyTagIgnoredForFlashcards(settings, ["#flashcards"])).toEqual(false);
+        expect(
+            SettingsUtil.isAnyTagIgnoredForFlashcards(settings, ["#flashcards", "#archived"]),
+        ).toEqual(true);
+        const settingsNoIgnore: SRSettings = { ...DEFAULT_SETTINGS, flashcardTagsToIgnore: [] };
+        expect(SettingsUtil.isAnyTagIgnoredForFlashcards(settingsNoIgnore, ["#archived"])).toEqual(
+            false,
+        );
+    });
+
+    test("isAnyTagIgnoredForNotes", () => {
+        const settings: SRSettings = {
+            ...DEFAULT_SETTINGS,
+            noteTagsToIgnore: ["#archived"],
+        };
+        expect(SettingsUtil.isAnyTagIgnoredForNotes(settings, ["#archived"])).toEqual(true);
+        expect(SettingsUtil.isAnyTagIgnoredForNotes(settings, ["#archived/old"])).toEqual(true);
+        expect(SettingsUtil.isAnyTagIgnoredForNotes(settings, ["#review"])).toEqual(false);
+        expect(SettingsUtil.isAnyTagIgnoredForNotes(settings, ["#review", "#archived"])).toEqual(
+            true,
+        );
+        const settingsNoIgnore: SRSettings = { ...DEFAULT_SETTINGS, noteTagsToIgnore: [] };
+        expect(SettingsUtil.isAnyTagIgnoredForNotes(settingsNoIgnore, ["#archived"])).toEqual(
+            false,
+        );
+    });
+
     test("upgradeSettings", () => {
         let settings: SRSettings = { ...DEFAULT_SETTINGS };
         upgradeSettings(settings);

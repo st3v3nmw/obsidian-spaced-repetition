@@ -6,6 +6,7 @@ import { pathMatchesPattern } from "src/utils/fs";
 export interface SRSettings {
     // flashcards
     flashcardTags: string[];
+    flashcardTagsToIgnore: string[];
     convertFoldersToDecks: boolean;
     burySiblingCards: boolean;
     randomizeCardOrder: boolean | undefined;
@@ -26,6 +27,7 @@ export interface SRSettings {
     // notes
     enableNoteReviewPaneOnStartup: boolean;
     tagsToReview: string[];
+    noteTagsToIgnore: string[];
     noteFoldersToIgnore: string[];
     openRandomNote: boolean;
     autoNextNote: boolean;
@@ -80,6 +82,7 @@ export interface SRSettings {
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
     flashcardTags: ["#flashcards"],
+    flashcardTagsToIgnore: [],
     convertFoldersToDecks: false,
     burySiblingCards: false,
     flashcardCardOrder: "DueFirstRandom",
@@ -100,6 +103,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // notes
     enableNoteReviewPaneOnStartup: true,
     tagsToReview: ["#review"],
+    noteTagsToIgnore: [],
     noteFoldersToIgnore: ["**/*.excalidraw.md"],
     openRandomNote: false,
     autoNextNote: false,
@@ -205,6 +209,14 @@ export class SettingsUtil {
             }
         }
         return false;
+    }
+
+    static isAnyTagIgnoredForFlashcards(settings: SRSettings, tags: string[]): boolean {
+        return tags.some((tag) => SettingsUtil.isTagInList(settings.flashcardTagsToIgnore, tag));
+    }
+
+    static isAnyTagIgnoredForNotes(settings: SRSettings, tags: string[]): boolean {
+        return tags.some((tag) => SettingsUtil.isTagInList(settings.noteTagsToIgnore, tag));
     }
 
     // Given a list of tags, return the subset that is in settings.tagsToReview
