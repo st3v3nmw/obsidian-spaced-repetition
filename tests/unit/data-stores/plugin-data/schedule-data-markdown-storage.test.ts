@@ -27,6 +27,10 @@ function makeStorage(rootFolder = "/Spaced Repetition") {
     const contents = new Map<string, string>();
 
     const vault = {
+        getFolderByPath: jest.fn((path: string) => {
+            const file = files.get(path);
+            return file instanceof TFolder ? file : null;
+        }),
         getAbstractFileByPath: jest.fn((path: string) => files.get(path) ?? null),
         createFolder: jest.fn(async (path: string) => {
             files.set(path, makeTFolder(path));
@@ -52,6 +56,10 @@ function makeStorageWithUndefinedRoot() {
     const contents = new Map<string, string>();
 
     const vault = {
+        getFolderByPath: jest.fn((path: string) => {
+            const file = files.get(path);
+            return file instanceof TFolder ? file : null;
+        }),
         getAbstractFileByPath: jest.fn((path: string) => files.get(path) ?? null),
         createFolder: jest.fn(async (path: string) => {
             files.set(path, makeTFolder(path));

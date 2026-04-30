@@ -52,7 +52,9 @@ export class ScheduleDataMarkdownStorage {
         let currentPath = "";
         for (const part of parts) {
             currentPath = currentPath ? `${currentPath}/${part}` : part;
-            const existing = this.app.vault.getAbstractFileByPath(currentPath);
+            const existing =
+                this.app.vault.getFolderByPath(currentPath) ||
+                this.app.vault.getAbstractFileByPath(currentPath);
             if (!existing) {
                 await this.app.vault.createFolder(currentPath);
             }
