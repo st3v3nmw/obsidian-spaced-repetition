@@ -100,6 +100,16 @@ describe("StoreInPluginData.questionCreateSchedule", () => {
         expect((schedules[0] as RepItemScheduleInfoOsr).interval).toBe(4);
     });
 
+    test("returns null for dummy due date entries", () => {
+        const { store } = makeStore();
+        const schedules = store.questionCreateSchedule(
+            `Q::A <!--SR:!${RepItemScheduleInfoOsr.dummyDueDateForNewCard},1,250-->`,
+            null,
+        );
+
+        expect(schedules).toEqual([null]);
+    });
+
     test("returns empty array when no inline schedule and no external data", () => {
         const { store } = makeStore();
         const storageInfo = new RepItemStorageInfo("notes/foo.md", "abc123");
