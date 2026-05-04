@@ -365,6 +365,7 @@ export default class ContentManager {
 
     private async _doEditQuestionText(): Promise<void> {
         if (this.reviewSequencer === null) return;
+        const currentCard: Card = this.reviewSequencer.currentCard;
         const currentQ: Question = this.reviewSequencer.currentQuestion;
 
         // Just the question/answer text; without any preceding topic tag
@@ -373,6 +374,7 @@ export default class ContentManager {
         const editModal = FlashcardEditModal.Prompt(
             this.app,
             this.settings,
+            currentCard,
             textPrompt,
             currentQ.questionText.textDirection,
         );

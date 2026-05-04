@@ -100,20 +100,26 @@ export class UIManager {
     }
 
     public updateStatusBar() {
-        this.statusBarManager.showStatusBarItems(this.plugin.data.settings.showStatusBar);
+        this.statusBarManager.showStatusBarItems(
+            this.plugin.data.settings.showStatusBar,
+            this.plugin.data.settings.showCardStatusBarItem,
+            this.plugin.data.settings.showNoteStatusBarItem,
+            this.plugin.data.settings.showUpdateAvailableStatusBarItem,
+        );
 
         if (this.plugin.data.settings.showStatusBar) {
             this.statusBarManager.setCount(
                 this.plugin.osrAppCore.remainingDeckTree.getCardCount(CardListType.All, true),
-                this.plugin.data.settings.showStatusBar,
+                this.plugin.data.settings.showStatusBar &&
+                    this.plugin.data.settings.showCardStatusBarItem,
                 "card-review",
             );
             this.statusBarManager.setCount(
                 this.plugin.osrAppCore.noteReviewQueue.dueNotesCount,
-                this.plugin.data.settings.showStatusBar,
+                this.plugin.data.settings.showStatusBar &&
+                    this.plugin.data.settings.showNoteStatusBarItem,
                 "note-review",
             );
-            this.statusBarManager.showUpdateAvailableItemIfAvailable();
         }
     }
 
