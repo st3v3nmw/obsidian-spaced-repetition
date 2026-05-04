@@ -20,6 +20,8 @@ module.exports = {
         // GUI & Obsidian coupled code
         "src/core.ts",
         "src/file.ts",
+        "src/parser/card-fragments.ts",
+        "src/parser/parser-data-structure.ts",
         "src/ui/",
         "src/icons/",
         "src/main.ts",

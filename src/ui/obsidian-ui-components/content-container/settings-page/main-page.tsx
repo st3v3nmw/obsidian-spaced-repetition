@@ -2,7 +2,6 @@ import { ButtonComponent, setIcon, Setting, SettingGroup } from "obsidian";
 
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
-import { setDebugParser } from "src/parser";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import {
     getPageIcon,
@@ -10,6 +9,7 @@ import {
     SettingsPageType,
     SettingsPageTypesArray,
 } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
+import { CardParser } from "src/utils/parsers/card-parser";
 
 /**
  * Represents the main settings page, from which all other settings pages are accessed.
@@ -170,7 +170,9 @@ export class MainPage extends SettingsPage {
                         .setValue(this.plugin.data.settings.showParserDebugMessages)
                         .onChange(async (value) => {
                             this.plugin.data.settings.showParserDebugMessages = value;
-                            setDebugParser(this.plugin.data.settings.showParserDebugMessages);
+                            CardParser.setDebugParser(
+                                this.plugin.data.settings.showParserDebugMessages,
+                            );
                             await this.plugin.savePluginData();
                         }),
                 );

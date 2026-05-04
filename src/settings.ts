@@ -16,6 +16,7 @@ export interface SRSettings {
     convertHighlightsToClozes: boolean;
     convertBoldTextToClozes: boolean;
     convertCurlyBracketsToClozes: boolean;
+    useAtomicClozes: boolean;
     clozePatterns: string[];
     singleLineCardSeparator: string;
     singleLineReversedCardSeparator: string;
@@ -94,6 +95,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     convertHighlightsToClozes: true,
     convertBoldTextToClozes: false,
     convertCurlyBracketsToClozes: false,
+    useAtomicClozes: false,
     clozePatterns: ["==[123;;]answer[;;hint]=="],
     singleLineCardSeparator: "::",
     singleLineReversedCardSeparator: ":::",
