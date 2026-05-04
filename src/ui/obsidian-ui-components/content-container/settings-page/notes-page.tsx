@@ -80,8 +80,6 @@ export class NotesPage extends SettingsPage {
                                         .map((v) => v.trim())
                                         .filter((v) => v);
                                     await this.plugin.savePluginData();
-
-                                    this.display();
                                 });
                             }),
                     );
