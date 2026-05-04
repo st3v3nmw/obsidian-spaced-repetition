@@ -1,7 +1,9 @@
 import moment from "moment";
+import { State } from "ts-fsrs";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
+import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import {
     DeckStats,
     FlashcardReviewMode,
@@ -292,6 +294,17 @@ describe("setDeckTree", () => {
         c.reviewSequencer.setDeckTree(Deck.emptyDeck, Deck.emptyDeck);
         expect(c.reviewSequencer.currentDeck).toEqual(null);
         expect(c.reviewSequencer.currentCard).toEqual(null);
+        expect(c.reviewSequencer.hasCurrentCard).toEqual(false);
+
+        const reviewSequencer = c.reviewSequencer as FlashcardReviewSequencer;
+        const internalSequencer = reviewSequencer as unknown as {
+            cardSequencer: { currentCard?: unknown };
+        };
+        Object.defineProperty(internalSequencer.cardSequencer, "currentCard", {
+            value: undefined,
+        });
+        expect(reviewSequencer.hasCurrentCard).toEqual(false);
+        expect(reviewSequencer.currentQuestion).toBeUndefined();
     });
 
     // After setDeckTree, the first card in the deck is the current card
@@ -458,6 +471,32 @@ describe("processReview", () => {
                     interval: 1,
                 });
             });
+
+            test("Reset on a new sibling question buries siblings and moves the current card to the end", async () => {
+                const settings: SRSettings = { ...DEFAULT_SETTINGS, burySiblingCards: true };
+                const text: string = `
+                    #flashcards This single ==question== turns into ==3 separate== ==cards==
+
+                    #flashcards Q1::A1`;
+                const c: TestContext = TestContext.Create(
+                    orderDueFirstSequential,
+                    FlashcardReviewMode.Review,
+                    settings,
+                    text,
+                );
+                await c.setSequencerDeckTreeFromOriginalText();
+                const originalFileText = await c.file.read();
+
+                expect(c.reviewSequencer.currentCard.front).toMatch(clozeQuestion1Card1);
+                await c.reviewSequencer.processReview(ReviewResponse.Reset);
+
+                expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
+                expect(await c.file.read()).toEqual(originalFileText);
+                checkQuestionPostponementListCount(c, 1);
+
+                c.reviewSequencer.skipCurrentCard();
+                expect(c.reviewSequencer.currentCard.front).toMatch(clozeQuestion1Card1);
+            });
         });
 
         describe("ReviewResponse.Again", () => {
@@ -491,7 +530,7 @@ describe("processReview", () => {
                 expect(card.front).toEqual("Q1");
                 expect(card.scheduleInfo).toMatchObject({
                     latestEase: 250,
-                    interval: 1,
+                    interval: 0,
                 });
 
                 expect(card.scheduleInfo.dueDate.format("YYYY-MM-DD")).toEqual(againCardDueDate);
@@ -679,6 +718,75 @@ Q1::A1
                 // Check that there are no questions on the postponement list
                 checkQuestionPostponementListCount(c, 0);
             });
+        });
+
+        test("Pending short-term reviews are tracked until refresh wakes them back into the queue", async () => {
+            const settings: SRSettings = { ...DEFAULT_SETTINGS, burySiblingCards: true };
+            const text: string = `
+                #flashcards ${clozeQuestion1}
+                <!--SR:!2023-09-02,4,270!2023-09-02,5,270!2023-09-02,6,270-->
+
+                #flashcards Q1::A1`;
+            const c: TestContext = TestContext.Create(
+                orderDueFirstSequential,
+                FlashcardReviewMode.Review,
+                settings,
+                text,
+            );
+            const originalDeck = await c.setSequencerDeckTreeFromOriginalText();
+            const reviewSequencer = c.reviewSequencer as FlashcardReviewSequencer;
+            const pendingSchedule = new RepItemScheduleInfoFsrs(
+                moment("2023-09-06T00:10:00.000Z"),
+                0,
+                5.5,
+                0.4,
+                State.Learning,
+                1,
+                0,
+                1,
+                moment("2023-09-06T00:00:00.000Z"),
+            );
+
+            expect(reviewSequencer.hasPendingCards).toEqual(false);
+            expect(reviewSequencer.nextPendingDueUnix).toBeNull();
+            expect(reviewSequencer.currentNote).toEqual(reviewSequencer.currentQuestion.note);
+            expect(reviewSequencer.originalDeckTree).toEqual(originalDeck);
+            jest.spyOn(reviewSequencer, "determineCardSchedule").mockReturnValue(pendingSchedule);
+
+            await reviewSequencer.processReviewReviewMode(ReviewResponse.Good);
+
+            expect(reviewSequencer.hasPendingCards).toEqual(true);
+            expect(reviewSequencer.nextPendingDueUnix).toEqual(pendingSchedule.dueDateAsUnix);
+            expect(reviewSequencer.currentCard.front).toEqual("Q1");
+
+            reviewSequencer.refreshCurrentDeck();
+            expect(reviewSequencer.hasPendingCards).toEqual(true);
+            expect(reviewSequencer.currentCard.front).toEqual("Q1");
+
+            setupStaticDateProviderOriginDatePlusDays(1);
+            reviewSequencer.refreshCurrentDeck();
+
+            expect(reviewSequencer.hasPendingCards).toEqual(false);
+            expect(reviewSequencer.currentCard.front).toMatch(clozeQuestion1Card1);
+        });
+
+        test("Pending cards without stored due dates keep an undefined pending timestamp", async () => {
+            const c: TestContext = TestContext.Create(
+                orderDueFirstSequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                "#flashcards Q1::A1",
+            );
+            await c.setSequencerDeckTreeFromOriginalText();
+
+            const reviewSequencer = c.reviewSequencer as FlashcardReviewSequencer;
+            const internalSequencer = reviewSequencer as unknown as {
+                handlePendingRequeue(): Promise<void>;
+            };
+            await internalSequencer.handlePendingRequeue();
+
+            expect(reviewSequencer.hasPendingCards).toEqual(true);
+            expect(Number.isNaN(reviewSequencer.nextPendingDueUnix as number)).toEqual(true);
         });
 
         test("Answer includes MathJax within $$", async () => {

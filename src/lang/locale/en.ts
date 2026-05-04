@@ -113,6 +113,9 @@ const en: IBaseLocale = {
     FLASHCARD_TAGS: "Flashcard tags",
     FLASHCARD_TAGS_DESC:
         "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.",
+    FLASHCARD_TAGS_TO_IGNORE: "Tags to ignore",
+    FLASHCARD_TAGS_TO_IGNORE_DESC:
+        "Enter tags separated by spaces or newlines. Notes containing any of these tags will be excluded from flashcard review.",
     CONVERT_FOLDERS_TO_DECKS: "Convert folders to decks and subdecks",
     CONVERT_FOLDERS_TO_DECKS_DESC: "This is an alternative to the Flashcard tags option above.",
     INLINE_SCHEDULING_COMMENTS:
@@ -175,6 +178,9 @@ const en: IBaseLocale = {
     REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "Tags to review",
     TAGS_TO_REVIEW_DESC: "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.",
+    NOTE_TAGS_TO_IGNORE: "Tags to ignore",
+    NOTE_TAGS_TO_IGNORE_DESC:
+        "Enter tags separated by spaces or newlines. Notes containing any of these tags will be excluded from note review.",
     OPEN_RANDOM_NOTE: "Open a random note for review",
     OPEN_RANDOM_NOTE_DESC: "When you turn this off, notes are ordered by importance (PageRank).",
     AUTO_NEXT_NOTE: "Open next note automatically after a review",
@@ -184,9 +190,18 @@ const en: IBaseLocale = {
     UI: "User Interface",
     OPEN_IN_TAB: "Open in new tab",
     OPEN_IN_TAB_DESC: "Turn this off to open the plugin in a modal window",
+    STATUS_BAR_SETTINGS: "Status Bar",
     SHOW_STATUS_BAR: "Show status bar",
-    SHOW_STATUS_BAR_DESC:
+    SHOW_STATUS_BAR_DESC: "Turn this off to hide all status messages in Obsidian's status bar",
+    SHOW_CARD_STATUS_BAR_ITEM: "Show card status bar item",
+    SHOW_CARD_STATUS_BAR_ITEM_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_NOTE_STATUS_BAR_ITEM: "Show note status bar item",
+    SHOW_NOTE_STATUS_BAR_ITEM_DESC:
+        "Turn this off to hide the note's review status in Obsidian's status bar",
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM: "Show update available status bar item",
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM_DESC:
+        "Turn this off to hide the update available status bar item",
     SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
     SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     ENABLE_FILE_MENU_REVIEW_OPTIONS:
@@ -200,6 +215,9 @@ const en: IBaseLocale = {
     CHECK_ALGORITHM_WIKI:
         'For more information, check the <a href="${algoUrl}">algorithm details</a>.',
     SM2_OSR_VARIANT: "OSR's variant of SM-2",
+    SWITCH_TO_FSRS_ALGORITHM: "Switch flashcard algorithm to FSRS?",
+    CONFIRM_FSRS_ALGORITHM_SWITCH:
+        "Switching to FSRS may cause unforseen data loss, as it is still not tested enough! Switching changes how flashcard scheduling data is formatted as cards are reviewed. this means that rewritten cards in the FSRS format, will require a lot more parameters and thus a longer, more intrusive, scheduling data comment. There is best effort backwards compatibility for the scheduling comments, in case you might want to switch back to OSR. This means your scheduling data will be rewritten to the OSR format once you review a card with OSR enabled.",
     BASE_EASE: "Base ease",
     BASE_EASE_DESC: "minimum = 130, preferrably approximately 250.",
     BASE_EASE_MIN_WARNING: "The base ease must be at least 130.",
@@ -347,6 +365,9 @@ const en: IBaseLocale = {
     RESET_SETTINGS: "Reset settings",
     CONFIRM_RESET_SETTINGS: "Are you sure you want to reset all settings to their default values?",
     RESET_SETTINGS_CONFIRMATION: "Resetting all settings to their default values...",
+    DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE: "Date format for note review queue",
+    DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE_DESC:
+        'Date format for note review queue (see <a href="${docsUrl}">moment.js</a> for details). It only updates, once the note review queue is reopened.',
 };
 
 export default en;

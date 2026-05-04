@@ -79,6 +79,10 @@ export function formatDate(
     return result;
 }
 
+export function formatDateWithMoment(ticks: number, format: string): string {
+    return moment(ticks).format(format);
+}
+
 export interface IDateProvider {
     get now(): Moment;
     get today(): Moment;

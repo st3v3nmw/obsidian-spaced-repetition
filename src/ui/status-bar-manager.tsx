@@ -24,24 +24,6 @@ export default class StatusBarManager {
         this.createStatusBarItems();
     }
 
-    setText(
-        text: string | string[],
-        showItems: boolean,
-        statusBarItemType: StatusBarItemPurpose,
-    ): void {
-        const statusBarItem = this.statusBarItems.find(
-            (statusBarItem) => statusBarItem.getStatusBarItemType() === statusBarItemType,
-        );
-        if (statusBarItem !== undefined) {
-            statusBarItem.setText(text);
-            if (showItems) {
-                statusBarItem.show();
-            } else {
-                statusBarItem.hide();
-            }
-        }
-    }
-
     setCount(count: number, showItems: boolean, statusBarItemType: StatusBarItemPurpose): void {
         const statusBarItem = this.statusBarItems.find(
             (statusBarItem) => statusBarItem.getStatusBarItemType() === statusBarItemType,
@@ -57,49 +39,64 @@ export default class StatusBarManager {
         }
     }
 
-    showStatusBarItems(state: boolean): void {
-        if (state === true && this.statusBarItems.length === 0) {
+    showStatusBarItems(
+        showItems: boolean, // Overrides all other settings
+        showCardStatusBarItem?: boolean,
+        showNoteStatusBarItem?: boolean,
+        showUpdateAvailableStatusBarItem?: boolean,
+    ): void {
+        if (this.statusBarItems.length === 0) {
             this.createStatusBarItems();
-            this.statusBarItems.forEach((statusBarItem) => {
-                statusBarItem.show();
-            });
-        } else if (state === true && this.statusBarItems.length > 0) {
-            this.statusBarItems.forEach((statusBarItem) => {
-                if (statusBarItem.getStatusBarItemType() !== "update-available")
-                    statusBarItem.show();
-            });
-        } else {
-            this.statusBarItems.forEach((statusBarItem) => {
-                statusBarItem.hide();
-            });
         }
-    }
 
-    showStatusBarItem(state: boolean, statusBarItemType: StatusBarItemPurpose): void {
-        const statusBarItem = this.statusBarItems.find(
-            (statusBarItem) => statusBarItem.getStatusBarItemType() === statusBarItemType,
-        );
-        if (statusBarItem !== undefined) {
-            if (state) {
-                statusBarItem.show();
+        const showCardItem =
+            showCardStatusBarItem === undefined ? showItems : showCardStatusBarItem;
+        const showNoteItem =
+            showNoteStatusBarItem === undefined ? showItems : showNoteStatusBarItem;
+        const showUpdateAvailableItem =
+            showUpdateAvailableStatusBarItem === undefined
+                ? showItems
+                : showUpdateAvailableStatusBarItem;
+
+        this.statusBarItems.forEach((statusBarItem) => {
+            if (showItems) {
+                if (
+                    statusBarItem.getStatusBarItemType() === "update-available" &&
+                    statusBarItem.getText() === ""
+                ) {
+                    statusBarItem.hide();
+                    return;
+                }
+
+                switch (statusBarItem.getStatusBarItemType()) {
+                    case "card-review":
+                        if (showItems && showCardItem) {
+                            statusBarItem.show();
+                        } else {
+                            statusBarItem.hide();
+                        }
+                        break;
+                    case "note-review":
+                        if (showItems && showNoteItem) {
+                            statusBarItem.show();
+                        } else {
+                            statusBarItem.hide();
+                        }
+                        break;
+                    case "update-available":
+                        if (showItems && showUpdateAvailableItem) {
+                            statusBarItem.show();
+                        } else {
+                            statusBarItem.hide();
+                        }
+                        break;
+                    default:
+                        statusBarItem.show();
+                }
             } else {
                 statusBarItem.hide();
             }
-        }
-    }
-
-    showUpdateAvailableItemIfAvailable(): void {
-        const updateItem = this.statusBarItems.find(
-            (statusBarItem) => statusBarItem.getStatusBarItemType() === "update-available",
-        );
-
-        if (
-            updateItem !== undefined &&
-            updateItem.getText() !== undefined &&
-            updateItem.getText() !== ""
-        ) {
-            updateItem.show();
-        }
+        });
     }
 
     private async createStatusBarItems(): Promise<void> {
@@ -145,7 +142,7 @@ export default class StatusBarManager {
                         icon: "lucide-circle-arrow-up",
                         show: false,
                         hideIcon: false,
-                        text: "Spaced Repetition: new Update!",
+                        text: "",
                         tooltip: t("UPDATE_AVAILABLE"),
                         tooltipPosition: "top",
                     });

@@ -6,6 +6,7 @@ import { pathMatchesPattern } from "src/utils/fs";
 export interface SRSettings {
     // flashcards
     flashcardTags: string[];
+    flashcardTagsToIgnore: string[];
     convertFoldersToDecks: boolean;
     burySiblingCards: boolean;
     randomizeCardOrder: boolean | undefined;
@@ -26,6 +27,7 @@ export interface SRSettings {
     // notes
     enableNoteReviewPaneOnStartup: boolean;
     tagsToReview: string[];
+    noteTagsToIgnore: string[];
     noteFoldersToIgnore: string[];
     openRandomNote: boolean;
     autoNextNote: boolean;
@@ -37,6 +39,9 @@ export interface SRSettings {
     // UI preferences
     showRibbonIcon: boolean;
     showStatusBar: boolean;
+    showCardStatusBarItem: boolean;
+    showNoteStatusBarItem: boolean;
+    showUpdateAvailableStatusBarItem: boolean;
     initiallyExpandAllSubdecksInTree: boolean;
     showContextInCards: boolean;
     showIntervalInReviewButtons: boolean;
@@ -63,6 +68,7 @@ export interface SRSettings {
     loadBalance: boolean;
     maximumInterval: number;
     maxLinkFactor: number;
+    fsrsDesiredRetention: number;
     startOfDay: string;
 
     // storage
@@ -73,11 +79,14 @@ export interface SRSettings {
     // logging
     showSchedulingDebugMessages: boolean;
     showParserDebugMessages: boolean;
+
+    preferredDateFormatForNoteReviewQueue: string;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
     flashcardTags: ["#flashcards"],
+    flashcardTagsToIgnore: [],
     convertFoldersToDecks: false,
     burySiblingCards: false,
     flashcardCardOrder: "DueFirstRandom",
@@ -98,6 +107,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // notes
     enableNoteReviewPaneOnStartup: true,
     tagsToReview: ["#review"],
+    noteTagsToIgnore: [],
     noteFoldersToIgnore: ["**/*.excalidraw.md"],
     openRandomNote: false,
     autoNextNote: false,
@@ -109,6 +119,9 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // UI settings
     showRibbonIcon: true,
     showStatusBar: true,
+    showCardStatusBarItem: true,
+    showNoteStatusBarItem: true,
+    showUpdateAvailableStatusBarItem: true,
     initiallyExpandAllSubdecksInTree: true,
     showContextInCards: true,
     showIntervalInReviewButtons: true,
@@ -135,6 +148,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     loadBalance: true,
     maximumInterval: 36525,
     maxLinkFactor: 1.0,
+    fsrsDesiredRetention: 0.9,
     startOfDay: "00:00:00",
 
     // storage
@@ -145,6 +159,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // logging
     showSchedulingDebugMessages: false,
     showParserDebugMessages: false,
+    preferredDateFormatForNoteReviewQueue: "MMM DD YYYY",
 };
 
 export function upgradeSettings(settings: SRSettings) {
@@ -187,6 +202,10 @@ export function upgradeSettings(settings: SRSettings) {
     ) {
         settings.scheduleDataVaultLocation = DEFAULT_SETTINGS.scheduleDataVaultLocation;
     }
+  
+    if (settings.fsrsDesiredRetention === null || settings.fsrsDesiredRetention === undefined) {
+        settings.fsrsDesiredRetention = DEFAULT_SETTINGS.fsrsDesiredRetention;
+    }
 }
 
 export class SettingsUtil {
@@ -201,8 +220,8 @@ export class SettingsUtil {
     static isAnyTagANoteReviewTag(settings: SRSettings, tags: string[]): boolean {
         for (const tag of tags) {
             if (
-                settings.tagsToReview.some(
-                    (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/"),
+                settings.tagsToReview.some((tagToReview) =>
+                    this.isSubTagContainedInTag(tagToReview, tag),
                 )
             ) {
                 return true;
@@ -211,22 +230,67 @@ export class SettingsUtil {
         return false;
     }
 
+    static isAnyTagIgnoredForFlashcards(settings: SRSettings, tags: string[]): boolean {
+        return tags.some((tag) => SettingsUtil.isTagInList(settings.flashcardTagsToIgnore, tag));
+    }
+
+    static isAnyTagIgnoredForNotes(settings: SRSettings, tags: string[]): boolean {
+        return tags.some((tag) => SettingsUtil.isTagInList(settings.noteTagsToIgnore, tag));
+    }
+
     // Given a list of tags, return the subset that is in settings.tagsToReview
     static filterForNoteReviewTag(settings: SRSettings, tags: string[]): string[] {
         const result: string[] = [];
         for (const tagToReview of settings.tagsToReview) {
-            if (tags.some((tag) => tag === tagToReview || tag.startsWith(tagToReview + "/"))) {
+            if (tags.some((tag) => this.isSubTagContainedInTag(tagToReview, tag))) {
                 result.push(tagToReview);
             }
         }
         return result;
     }
 
-    private static isTagInList(tagList: string[], tag: string): boolean {
+    /**
+     * Checks if the tag is in the tagList.
+     *
+     * @param tagList - The list of tags to check.
+     * @param tag - The tag to check.
+     * @param exactMatch - Whether to match the tag exactly or if it should be a sub tag.
+     * @returns true if the tag is in the tagList, false otherwise.
+     */
+    public static isTagInList(
+        tagList: string[],
+        tag: string,
+        exactMatch: boolean = false,
+    ): boolean {
+        // This should be true, if the tag is fully contained in a tag from the list
         for (const tagFromList of tagList) {
-            if (tag === tagFromList || tag.startsWith(tagFromList + "/")) {
-                return true;
+            if (exactMatch) {
+                if (tagFromList === tag) {
+                    // The tag from the list is the same as the current tag, so it is contained in it
+                    return true;
+                }
+            } else {
+                // In this case we need to look more in detail to see if the tag is fully contained in the tag from the list
+                if (this.isSubTagContainedInTag(tagFromList, tag)) {
+                    // The tag from the list is contained in the current tag, so it is contained in it
+                    return true;
+                }
             }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the subTag is contained in the tag.
+     *
+     * @param tag - The tag to check.
+     * @param subTag - The subTag to check.
+     * @returns true if the subTag is contained in the tag, false otherwise.
+     */
+    public static isSubTagContainedInTag(tag: string, subTag: string): boolean {
+        if (tag === subTag || subTag.startsWith(tag + "/")) {
+            // The tag is the same as the sub tag, or the sub tag is contained in the tag
+            return true;
         }
         return false;
     }

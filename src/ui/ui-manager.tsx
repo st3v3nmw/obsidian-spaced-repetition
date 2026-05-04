@@ -95,26 +95,31 @@ export class UIManager {
 
     public destroy() {
         this.removeSRFocusListener();
-        // @ts-expect-error: The types are wrong, but it's fine, because we are just removing the listener
         this.plugin.app.workspace.off("file-menu", this.fileMenuHandler.bind(this));
         this.tabViewManager.closeAllTabViews();
     }
 
     public updateStatusBar() {
-        this.statusBarManager.showStatusBarItems(this.plugin.data.settings.showStatusBar);
+        this.statusBarManager.showStatusBarItems(
+            this.plugin.data.settings.showStatusBar,
+            this.plugin.data.settings.showCardStatusBarItem,
+            this.plugin.data.settings.showNoteStatusBarItem,
+            this.plugin.data.settings.showUpdateAvailableStatusBarItem,
+        );
 
         if (this.plugin.data.settings.showStatusBar) {
             this.statusBarManager.setCount(
                 this.plugin.osrAppCore.remainingDeckTree.getCardCount(CardListType.All, true),
-                this.plugin.data.settings.showStatusBar,
+                this.plugin.data.settings.showStatusBar &&
+                    this.plugin.data.settings.showCardStatusBarItem,
                 "card-review",
             );
             this.statusBarManager.setCount(
                 this.plugin.osrAppCore.noteReviewQueue.dueNotesCount,
-                this.plugin.data.settings.showStatusBar,
+                this.plugin.data.settings.showStatusBar &&
+                    this.plugin.data.settings.showNoteStatusBarItem,
                 "note-review",
             );
-            this.statusBarManager.showUpdateAvailableItemIfAvailable();
         }
     }
 
@@ -131,7 +136,6 @@ export class UIManager {
 
     public removeSRFocusListener() {
         this.setSRViewInFocus(false);
-        // @ts-expect-error: The types are wrong, but it's fine, because we are just removing the listener
         this.plugin.app.workspace.off("active-leaf-change", this.handleFocusChange.bind(this));
     }
 

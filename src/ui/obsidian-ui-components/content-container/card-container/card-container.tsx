@@ -1,6 +1,8 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/card-container.css";
+import moment from "moment";
 import { App, Platform } from "obsidian";
 
+import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { CardType } from "src/card/questions/question";
@@ -31,6 +33,8 @@ export class CardContainer {
 
     private scrollWrapper: HTMLDivElement;
     private content: HTMLDivElement;
+    private pendingClock: HTMLDivElement | null = null;
+    private pendingResumeTimeout: number | null = null;
 
     private response: ResponseSectionComponent;
 
@@ -131,8 +135,13 @@ export class CardContainer {
      */
     closeSession() {
         // Prevents the rest of code, from running if this was executed multiple times after one another
+
         if (this.view.hasClass("sr-is-hidden")) {
             return;
+        }
+        if (this.pendingResumeTimeout !== null) {
+            window.clearTimeout(this.pendingResumeTimeout);
+            this.pendingResumeTimeout = null;
         }
         this.cardState = CardState.Closed;
         document.removeEventListener("keydown", this._keydownHandler);
@@ -192,6 +201,7 @@ export class CardContainer {
 
         // Setup cloze input listeners
         this._setupClozeInputListeners();
+
         // auto-focus the first cloze input if this card is a cloze card
         if (sessionData.currentQuestion.questionType === CardType.Cloze) {
             const firstInput = document.querySelector(".cloze-input") as HTMLInputElement;
@@ -199,6 +209,39 @@ export class CardContainer {
                 firstInput.focus();
             }
         }
+    }
+
+    public drawPendingState(nextPendingDueUnix: number): void {
+        this.toolbar.setResetButtonDisabled(true);
+        this.cardState = CardState.Front;
+        this.content.empty();
+        this.response.hideAllButtons();
+        this.pendingClock = this.content.createDiv({
+            cls: "sr-centered",
+        });
+
+        const updatePendingClock = () => {
+            const startTime = moment();
+            const endTime = moment(nextPendingDueUnix);
+
+            // Calculate the difference in milliseconds
+            const duration = moment.duration(endTime.diff(startTime));
+
+            const hours = Math.floor(duration.asHours());
+            const minutes = duration.minutes();
+            const seconds = duration.seconds();
+
+            const formatted = `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+            this.pendingClock?.setText(
+                `Waiting for the next FSRS review step. Next card due in ${formatted} (HH:mm:ss).`,
+            );
+            this.pendingResumeTimeout = window.setTimeout(() => {
+                updatePendingClock();
+            }, 1000);
+        };
+
+        updatePendingClock();
     }
 
     // #region -> Deck Info
@@ -269,7 +312,7 @@ export class CardContainer {
         sessionData: SessionData,
         reviewMode: FlashcardReviewMode,
         settings: SRSettings,
-        determineButtonInterval: (response: ReviewResponse) => number,
+        determineButtonSchedule: (response: ReviewResponse) => RepItemScheduleInfo,
     ) {
         this.setCustomHotKeyState(settings.useCustomHotkeys);
         this.cardState = sessionData.cardData.currentCardState;
@@ -306,7 +349,7 @@ export class CardContainer {
             settings.flashcardGoodText,
             settings.flashcardEasyText,
             settings.showIntervalInReviewButtons,
-            determineButtonInterval,
+            determineButtonSchedule,
         );
         // NEW: restore keyboard focus after cloze confirmation
         this.plugin.uiManager.setSRViewInFocus(true);

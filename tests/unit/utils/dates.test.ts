@@ -1,6 +1,11 @@
 import moment from "moment";
 
-import { formatDate, globalDateProvider, IDayBoundary } from "src/utils/dates";
+import {
+    formatDate,
+    formatDateWithMoment,
+    globalDateProvider,
+    IDayBoundary,
+} from "src/utils/dates";
 
 describe("Format date", () => {
     test("Different input overloads", () => {
@@ -11,6 +16,12 @@ describe("Format date", () => {
 
     test("handles a leap year date", () => {
         expect(formatDate(2020, 2, 29)).toBe("2020-02-29");
+    });
+});
+
+describe("Format date with moment", () => {
+    test("Different input overloads", () => {
+        expect(formatDateWithMoment(1672531200000, "YYYY-MM-DD")).toBe("2023-01-01");
     });
 });
 

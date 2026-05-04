@@ -51,6 +51,23 @@ export class NotesPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
+                    .setName(t("NOTE_TAGS_TO_IGNORE"))
+                    .setDesc(t("NOTE_TAGS_TO_IGNORE_DESC"))
+                    .addTextArea((text) =>
+                        text
+                            .setValue(this.plugin.data.settings.noteTagsToIgnore.join(" "))
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    this.plugin.data.settings.noteTagsToIgnore = value
+                                        .split(/\s+/)
+                                        .filter((v) => v);
+                                    await this.plugin.savePluginData();
+                                });
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
                     .setName(t("FOLDERS_TO_IGNORE"))
                     .setDesc(t("FOLDERS_TO_IGNORE_DESC"))
                     .addTextArea((text) =>
@@ -63,8 +80,6 @@ export class NotesPage extends SettingsPage {
                                         .map((v) => v.trim())
                                         .filter((v) => v);
                                     await this.plugin.savePluginData();
-
-                                    this.display();
                                 });
                             }),
                     );
@@ -72,6 +87,42 @@ export class NotesPage extends SettingsPage {
 
         new SettingGroup(this.containerEl)
             .setHeading(t("NOTES_REVIEW_QUEUE"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE"))
+                    .addExtraButton((button) => {
+                        button
+                            .setIcon("reset")
+                            .setTooltip(t("RESET_DEFAULT"))
+                            .onClick(async () => {
+                                this.plugin.data.settings.preferredDateFormatForNoteReviewQueue =
+                                    DEFAULT_SETTINGS.preferredDateFormatForNoteReviewQueue;
+                                await this.plugin.savePluginData();
+
+                                this.display();
+                            });
+                    })
+                    .addText((text) =>
+                        text
+                            .setValue(
+                                this.plugin.data.settings.preferredDateFormatForNoteReviewQueue,
+                            )
+                            .onChange((value) => {
+                                this.applySettingsUpdate(async () => {
+                                    this.plugin.data.settings.preferredDateFormatForNoteReviewQueue =
+                                        value;
+                                    await this.plugin.savePluginData();
+                                });
+                            }),
+                    );
+
+                setting.descEl.insertAdjacentHTML(
+                    "beforeend",
+                    t("DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE_DESC", {
+                        docsUrl: "https://momentjs.com/docs/#/displaying/format/",
+                    }),
+                );
+            })
             .addSetting((setting: Setting) => {
                 setting.setName(t("AUTO_NEXT_NOTE")).addToggle((toggle) =>
                     toggle

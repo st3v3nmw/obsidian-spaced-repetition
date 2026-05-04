@@ -120,10 +120,12 @@ export class OsrCore {
         // (Performance note: This only requires accessing Obsidian's metadata cache and not loading the file)
         this.osrNoteGraph.processLinks(noteFile.path);
 
+        const tags = noteFile.getAllTagsFromCache();
+
         // Does the note contain any tags that are specified as flashcard tags in the settings
         // (Doing this check first saves us from loading and parsing the note if not necessary)
         const topicPath: TopicPath = this.findTopicPath(noteFile);
-        if (topicPath.hasPath) {
+        if (topicPath.hasPath && !SettingsUtil.isAnyTagIgnoredForFlashcards(this.settings, tags)) {
             note = await this.loadNote(noteFile, topicPath);
             if (note !== null) note.appendCardsToDeck(this.fullDeckTree);
         }
@@ -133,10 +135,12 @@ export class OsrCore {
         // TODO:  should this move to this.loadNote
         SrsAlgorithm.getInstance().noteOnLoadedNote(noteFile.path, note, schedule?.latestEase);
 
-        const tags = noteFile.getAllTagsFromCache();
-
         const matchedNoteTags = SettingsUtil.filterForNoteReviewTag(this.settings, tags);
         if (matchedNoteTags.length === 0) {
+            return;
+        }
+        
+        if (SettingsUtil.isAnyTagIgnoredForNotes(this.settings, tags)) {
             return;
         }
         const noteSchedule: RepItemScheduleInfo = await this.readNoteSchedule(noteFile);

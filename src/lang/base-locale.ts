@@ -96,6 +96,8 @@ export interface IBaseLocale {
     REVIEW_BUTTON_DELAY_DESC: string;
     FLASHCARD_TAGS: string;
     FLASHCARD_TAGS_DESC: string;
+    FLASHCARD_TAGS_TO_IGNORE: string;
+    FLASHCARD_TAGS_TO_IGNORE_DESC: string;
     CONVERT_FOLDERS_TO_DECKS: string;
     CONVERT_FOLDERS_TO_DECKS_DESC: string;
     INLINE_SCHEDULING_COMMENTS: string;
@@ -143,6 +145,8 @@ export interface IBaseLocale {
     REVIEW_PANE_ON_STARTUP: string;
     TAGS_TO_REVIEW: string;
     TAGS_TO_REVIEW_DESC: string;
+    NOTE_TAGS_TO_IGNORE: string;
+    NOTE_TAGS_TO_IGNORE_DESC: string;
     OPEN_RANDOM_NOTE: string;
     OPEN_RANDOM_NOTE_DESC: string;
     AUTO_NEXT_NOTE: string;
@@ -152,8 +156,15 @@ export interface IBaseLocale {
     UI: string;
     OPEN_IN_TAB: string;
     OPEN_IN_TAB_DESC: string;
+    STATUS_BAR_SETTINGS: string;
     SHOW_STATUS_BAR: string;
     SHOW_STATUS_BAR_DESC: string;
+    SHOW_CARD_STATUS_BAR_ITEM: string;
+    SHOW_CARD_STATUS_BAR_ITEM_DESC: string;
+    SHOW_NOTE_STATUS_BAR_ITEM: string;
+    SHOW_NOTE_STATUS_BAR_ITEM_DESC: string;
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM: string;
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM_DESC: string;
     SHOW_RIBBON_ICON: string;
     SHOW_RIBBON_ICON_DESC: string;
     ENABLE_FILE_MENU_REVIEW_OPTIONS: string;
@@ -163,6 +174,8 @@ export interface IBaseLocale {
     ALGORITHM: string;
     CHECK_ALGORITHM_WIKI: string;
     SM2_OSR_VARIANT: string;
+    SWITCH_TO_FSRS_ALGORITHM: string;
+    CONFIRM_FSRS_ALGORITHM_SWITCH: string;
     BASE_EASE: string;
     BASE_EASE_DESC: string;
     BASE_EASE_MIN_WARNING: string;
@@ -301,4 +314,6 @@ export interface IBaseLocale {
     RESET_SETTINGS: string;
     CONFIRM_RESET_SETTINGS: string;
     RESET_SETTINGS_CONFIRMATION: string;
+    DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE: string;
+    DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE_DESC: string;
 }
