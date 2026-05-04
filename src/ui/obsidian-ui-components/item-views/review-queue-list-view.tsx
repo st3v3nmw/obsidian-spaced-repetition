@@ -11,6 +11,7 @@ import { NoteReviewDeck } from "src/note/note-review-deck";
 import { NoteReviewQueue } from "src/note/note-review-queue";
 import { SRSettings } from "src/settings";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
+import { formatDateWithMoment } from "src/utils/dates";
 
 export const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
 
@@ -181,7 +182,10 @@ export class ReviewQueueListView extends ItemView {
                 } else if (nDays === 1) {
                     folderTitle = t("TOMORROW");
                 } else {
-                    folderTitle = new Date(sNote.dueUnix).toDateString();
+                    folderTitle = formatDateWithMoment(
+                        sNote.dueUnix,
+                        this.settings.preferredDateFormatForNoteReviewQueue,
+                    );
                 }
 
                 schedFolderEl = this.createFolder(

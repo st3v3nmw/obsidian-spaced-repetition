@@ -355,6 +355,9 @@ const en: IBaseLocale = {
     RESET_SETTINGS: "Reset settings",
     CONFIRM_RESET_SETTINGS: "Are you sure you want to reset all settings to their default values?",
     RESET_SETTINGS_CONFIRMATION: "Resetting all settings to their default values...",
+    DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE: "Date format for note review queue",
+    DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE_DESC:
+        'Date format for note review queue (see <a href="${docsUrl}">moment.js</a> for details). It only updates, once the note review queue is reopened.',
 };
 
 export default en;

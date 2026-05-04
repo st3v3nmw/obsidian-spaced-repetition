@@ -307,4 +307,6 @@ export interface IBaseLocale {
     RESET_SETTINGS: string;
     CONFIRM_RESET_SETTINGS: string;
     RESET_SETTINGS_CONFIRMATION: string;
+    DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE: string;
+    DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE_DESC: string;
 }
