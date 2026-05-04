@@ -230,7 +230,15 @@ export class SettingsUtil {
         return result;
     }
 
-    private static isTagInList(
+    /**
+     * Checks if the tag is in the tagList.
+     *
+     * @param tagList - The list of tags to check.
+     * @param tag - The tag to check.
+     * @param exactMatch - Whether to match the tag exactly or if it should be a sub tag.
+     * @returns true if the tag is in the tagList, false otherwise.
+     */
+    public static isTagInList(
         tagList: string[],
         tag: string,
         exactMatch: boolean = false,
@@ -253,7 +261,14 @@ export class SettingsUtil {
         return false;
     }
 
-    private static isSubTagContainedInTag(tag: string, subTag: string): boolean {
+    /**
+     * Checks if the subTag is contained in the tag.
+     *
+     * @param tag - The tag to check.
+     * @param subTag - The subTag to check.
+     * @returns true if the subTag is contained in the tag, false otherwise.
+     */
+    public static isSubTagContainedInTag(tag: string, subTag: string): boolean {
         if (tag === subTag || subTag.startsWith(tag + "/")) {
             // The tag is the same as the sub tag, or the sub tag is contained in the tag
             return true;

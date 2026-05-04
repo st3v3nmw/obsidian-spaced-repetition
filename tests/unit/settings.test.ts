@@ -108,6 +108,22 @@ describe("SettingsUtil", () => {
                 "#flashcards/Capitals/africa/test/test/test/test/test",
             ]),
         ).toEqual(true);
+
+        expect(
+            SettingsUtil.isTagInList(
+                complexDeckSettings.flashcardTagsToIgnore,
+                "#flashcards/Capitals/africa/test/test/test",
+                true,
+            ),
+        ).toEqual(true);
+
+        expect(
+            SettingsUtil.isTagInList(
+                complexDeckSettings.flashcardTagsToIgnore,
+                "#flashcards/Capitals/africa/test/test/test/test",
+                true,
+            ),
+        ).toEqual(false);
     });
 
     test("isAnyTagIgnoredForNotes", () => {
