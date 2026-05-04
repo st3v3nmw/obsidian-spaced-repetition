@@ -78,6 +78,8 @@ export interface SRSettings {
     // logging
     showSchedulingDebugMessages: boolean;
     showParserDebugMessages: boolean;
+
+    preferredDateFormatForNoteReviewQueue: string;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
@@ -155,6 +157,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // logging
     showSchedulingDebugMessages: false,
     showParserDebugMessages: false,
+    preferredDateFormatForNoteReviewQueue: "MMM DD YYYY",
 };
 
 export function upgradeSettings(settings: SRSettings) {

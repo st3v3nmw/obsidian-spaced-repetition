@@ -88,6 +88,42 @@ export class NotesPage extends SettingsPage {
         new SettingGroup(this.containerEl)
             .setHeading(t("NOTES_REVIEW_QUEUE"))
             .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE"))
+                    .addExtraButton((button) => {
+                        button
+                            .setIcon("reset")
+                            .setTooltip(t("RESET_DEFAULT"))
+                            .onClick(async () => {
+                                this.plugin.data.settings.preferredDateFormatForNoteReviewQueue =
+                                    DEFAULT_SETTINGS.preferredDateFormatForNoteReviewQueue;
+                                await this.plugin.savePluginData();
+
+                                this.display();
+                            });
+                    })
+                    .addText((text) =>
+                        text
+                            .setValue(
+                                this.plugin.data.settings.preferredDateFormatForNoteReviewQueue,
+                            )
+                            .onChange((value) => {
+                                this.applySettingsUpdate(async () => {
+                                    this.plugin.data.settings.preferredDateFormatForNoteReviewQueue =
+                                        value;
+                                    await this.plugin.savePluginData();
+                                });
+                            }),
+                    );
+
+                setting.descEl.insertAdjacentHTML(
+                    "beforeend",
+                    t("DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE_DESC", {
+                        docsUrl: "https://momentjs.com/docs/#/displaying/format/",
+                    }),
+                );
+            })
+            .addSetting((setting: Setting) => {
                 setting.setName(t("AUTO_NEXT_NOTE")).addToggle((toggle) =>
                     toggle
                         .setValue(this.plugin.data.settings.autoNextNote)
