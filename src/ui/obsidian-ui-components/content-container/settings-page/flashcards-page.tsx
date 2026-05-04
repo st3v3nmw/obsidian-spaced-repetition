@@ -80,6 +80,23 @@ export class FlashcardsPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
+                    .setName(t("FLASHCARD_TAGS_TO_IGNORE"))
+                    .setDesc(t("FLASHCARD_TAGS_TO_IGNORE_DESC"))
+                    .addTextArea((text) =>
+                        text
+                            .setValue(this.plugin.data.settings.flashcardTagsToIgnore.join(" "))
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    this.plugin.data.settings.flashcardTagsToIgnore = value
+                                        .split(/\s+/)
+                                        .filter((v) => v);
+                                    await this.plugin.savePluginData();
+                                });
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
                     .setName(t("FOLDERS_TO_IGNORE"))
                     .setDesc(t("FOLDERS_TO_IGNORE_DESC"))
                     .addTextArea((text) =>

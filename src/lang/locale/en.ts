@@ -103,6 +103,9 @@ const en: IBaseLocale = {
     FLASHCARD_TAGS: "Flashcard tags",
     FLASHCARD_TAGS_DESC:
         "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.",
+    FLASHCARD_TAGS_TO_IGNORE: "Tags to ignore",
+    FLASHCARD_TAGS_TO_IGNORE_DESC:
+        "Enter tags separated by spaces or newlines. Notes containing any of these tags will be excluded from flashcard review.",
     CONVERT_FOLDERS_TO_DECKS: "Convert folders to decks and subdecks",
     CONVERT_FOLDERS_TO_DECKS_DESC: "This is an alternative to the Flashcard tags option above.",
     INLINE_SCHEDULING_COMMENTS:
@@ -165,6 +168,9 @@ const en: IBaseLocale = {
     REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "Tags to review",
     TAGS_TO_REVIEW_DESC: "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.",
+    NOTE_TAGS_TO_IGNORE: "Tags to ignore",
+    NOTE_TAGS_TO_IGNORE_DESC:
+        "Enter tags separated by spaces or newlines. Notes containing any of these tags will be excluded from note review.",
     OPEN_RANDOM_NOTE: "Open a random note for review",
     OPEN_RANDOM_NOTE_DESC: "When you turn this off, notes are ordered by importance (PageRank).",
     AUTO_NEXT_NOTE: "Open next note automatically after a review",

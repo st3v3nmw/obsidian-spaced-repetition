@@ -89,6 +89,8 @@ export interface IBaseLocale {
     REVIEW_BUTTON_DELAY_DESC: string;
     FLASHCARD_TAGS: string;
     FLASHCARD_TAGS_DESC: string;
+    FLASHCARD_TAGS_TO_IGNORE: string;
+    FLASHCARD_TAGS_TO_IGNORE_DESC: string;
     CONVERT_FOLDERS_TO_DECKS: string;
     CONVERT_FOLDERS_TO_DECKS_DESC: string;
     INLINE_SCHEDULING_COMMENTS: string;
@@ -136,6 +138,8 @@ export interface IBaseLocale {
     REVIEW_PANE_ON_STARTUP: string;
     TAGS_TO_REVIEW: string;
     TAGS_TO_REVIEW_DESC: string;
+    NOTE_TAGS_TO_IGNORE: string;
+    NOTE_TAGS_TO_IGNORE_DESC: string;
     OPEN_RANDOM_NOTE: string;
     OPEN_RANDOM_NOTE_DESC: string;
     AUTO_NEXT_NOTE: string;
