@@ -1,5 +1,9 @@
+import { State } from "ts-fsrs";
+
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
+import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { MULTI_SCHEDULING_EXTRACTOR } from "src/constants";
 import { TICKS_PER_DAY } from "src/constants";
 import { DataStore } from "src/data-stores/base/data-store";
 import { DEFAULT_SETTINGS } from "src/settings";
@@ -39,6 +43,46 @@ test("Single schedule info for question (on same line)", () => {
     ]);
 });
 
+test("Legacy schedule comments without the bang prefix are still parsed", () => {
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+        "What symbol represents an electric field:: $\\large \\vec E$<!--SR:2023-09-02,4,270-->",
+        null,
+    );
+
+    expect(actual).toEqual([
+        RepItemScheduleInfoOsr.fromDueDateStr("2023-09-02", 4, 270, -4 * TICKS_PER_DAY),
+    ]);
+});
+
+test("Legacy fallback extractor loop still parses schedules", () => {
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+        {
+            match(): RegExpMatchArray | null {
+                return null;
+            },
+            matchAll(regex: RegExp): IterableIterator<RegExpMatchArray> {
+                const matches =
+                    regex === MULTI_SCHEDULING_EXTRACTOR
+                        ? []
+                        : [
+                              [
+                                  "<!--SR:2023-09-02,4,270-->",
+                                  "2023-09-02",
+                                  "4",
+                                  "270",
+                              ] as RegExpMatchArray,
+                          ];
+                return matches[Symbol.iterator]() as IterableIterator<RegExpMatchArray>;
+            },
+        } as never,
+        null,
+    );
+
+    expect(actual).toEqual([
+        RepItemScheduleInfoOsr.fromDueDateStr("2023-09-02", 4, 270, -4 * TICKS_PER_DAY),
+    ]);
+});
+
 test("Multiple schedule info for question (on separate line)", () => {
     const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
         `This is a really very ==interesting== and ==fascinating== and ==great== test
@@ -51,4 +95,46 @@ test("Multiple schedule info for question (on separate line)", () => {
         RepItemScheduleInfoOsr.fromDueDateStr("2023-09-05", 3, 250, -1 * TICKS_PER_DAY),
         RepItemScheduleInfoOsr.fromDueDateStr("2023-09-06", 4, 270, 0),
     ]);
+});
+
+test("Single FSRS schedule info for question", () => {
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+        "What symbol represents an electric field:: $\\large \\vec E$<!--SR:!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z-->",
+        null,
+    );
+
+    expect(actual).toHaveLength(1);
+    expect(actual[0]).toBeInstanceOf(RepItemScheduleInfoFsrs);
+    expect(actual[0]).toMatchObject({
+        interval: 0,
+        stability: 0.4,
+        difficulty: 5.5,
+        state: State.Learning,
+        reps: 1,
+        lapses: 0,
+        learningSteps: 1,
+    });
+    expect(actual[0].dueDate.toDate().toISOString()).toEqual("2023-09-06T00:10:00.000Z");
+});
+
+test("Mixed OSR and FSRS schedule info for question", () => {
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+        "What symbol represents an electric field:: $\\large \\vec E$<!--SR:!2023-09-02,4,270!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z-->",
+        null,
+    );
+
+    expect(actual).toHaveLength(2);
+    expect(actual[0]).toEqual(
+        RepItemScheduleInfoOsr.fromDueDateStr("2023-09-02", 4, 270, -4 * TICKS_PER_DAY),
+    );
+    expect(actual[1]).toBeInstanceOf(RepItemScheduleInfoFsrs);
+    expect(actual[1]).toMatchObject({
+        interval: 0,
+        stability: 0.4,
+        difficulty: 5.5,
+        state: State.Learning,
+        reps: 1,
+        lapses: 0,
+        learningSteps: 1,
+    });
 });

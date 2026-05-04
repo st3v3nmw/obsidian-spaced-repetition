@@ -205,6 +205,9 @@ const en: IBaseLocale = {
     CHECK_ALGORITHM_WIKI:
         'For more information, check the <a href="${algoUrl}">algorithm details</a>.',
     SM2_OSR_VARIANT: "OSR's variant of SM-2",
+    SWITCH_TO_FSRS_ALGORITHM: "Switch flashcard algorithm to FSRS?",
+    CONFIRM_FSRS_ALGORITHM_SWITCH:
+        "Switching to FSRS may cause unforseen data loss, as it is still not tested enough! Switching changes how flashcard scheduling data is formatted as cards are reviewed. this means that rewritten cards in the FSRS format, will require a lot more parameters and thus a longer, more intrusive, scheduling data comment. There is best effort backwards compatibility for the scheduling comments, in case you might want to switch back to OSR. This means your scheduling data will be rewritten to the OSR format once you review a card with OSR enabled.",
     BASE_EASE: "Base ease",
     BASE_EASE_DESC: "minimum = 130, preferrably approximately 250.",
     BASE_EASE_MIN_WARNING: "The base ease must be at least 130.",

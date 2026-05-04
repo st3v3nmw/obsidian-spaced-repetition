@@ -1,8 +1,9 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section.css";
 import { Platform } from "obsidian";
 
+import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { textInterval } from "src/algorithms/osr/note-scheduling";
+import { formatScheduleInterval } from "src/algorithms/schedule-display";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 import { SRSettings } from "src/settings";
@@ -69,7 +70,21 @@ export default class ResponseSectionComponent {
 
     public resetResponseButtons() {
         // Sets all buttons in to their default state
+        if (this.responseEl.hasClass("sr-is-hidden")) {
+            this.responseEl.removeClass("sr-is-hidden");
+        }
         this.answerButton.buttonEl.removeClass("sr-is-hidden");
+        this.againButton.buttonEl.addClass("sr-is-hidden");
+        this.hardButton.buttonEl.addClass("sr-is-hidden");
+        this.goodButton.buttonEl.addClass("sr-is-hidden");
+        this.easyButton.buttonEl.addClass("sr-is-hidden");
+    }
+
+    public hideAllButtons() {
+        if (!this.responseEl.hasClass("sr-is-hidden")) {
+            this.responseEl.addClass("sr-is-hidden");
+        }
+        this.answerButton.buttonEl.addClass("sr-is-hidden");
         this.againButton.buttonEl.addClass("sr-is-hidden");
         this.hardButton.buttonEl.addClass("sr-is-hidden");
         this.goodButton.buttonEl.addClass("sr-is-hidden");
@@ -83,8 +98,11 @@ export default class ResponseSectionComponent {
         goodButtonText: string,
         easyButtonText: string,
         showIntervalInReviewButtons: boolean,
-        determineButtonInterval: (response: ReviewResponse) => number,
+        determineButtonSchedule: (response: ReviewResponse) => RepItemScheduleInfo,
     ) {
+        if (this.responseEl.hasClass("sr-is-hidden")) {
+            this.responseEl.removeClass("sr-is-hidden");
+        }
         // Shows the rating buttons and hides the show answer button
         this.answerButton.buttonEl.addClass("sr-is-hidden");
 
@@ -115,25 +133,25 @@ export default class ResponseSectionComponent {
             this._setupEaseButton(
                 this.againButton,
                 againButtonText,
-                determineButtonInterval(ReviewResponse.Again),
+                determineButtonSchedule(ReviewResponse.Again),
                 showIntervalInReviewButtons,
             );
             this._setupEaseButton(
                 this.hardButton,
                 hardButtonText,
-                determineButtonInterval(ReviewResponse.Hard),
+                determineButtonSchedule(ReviewResponse.Hard),
                 showIntervalInReviewButtons,
             );
             this._setupEaseButton(
                 this.goodButton,
                 goodButtonText,
-                determineButtonInterval(ReviewResponse.Good),
+                determineButtonSchedule(ReviewResponse.Good),
                 showIntervalInReviewButtons,
             );
             this._setupEaseButton(
                 this.easyButton,
                 easyButtonText,
-                determineButtonInterval(ReviewResponse.Easy),
+                determineButtonSchedule(ReviewResponse.Easy),
                 showIntervalInReviewButtons,
             );
         }
@@ -142,12 +160,12 @@ export default class ResponseSectionComponent {
     private _setupEaseButton(
         button: SRResponseButtonComponent,
         buttonName: string,
-        interval: number,
+        schedule: RepItemScheduleInfo,
         showInterval: boolean,
     ) {
         if (showInterval) {
-            button.setSmallText(textInterval(interval, true));
-            button.setLargeText(`${buttonName} - ${textInterval(interval, false)}`);
+            button.setSmallText(formatScheduleInterval(schedule, true));
+            button.setLargeText(`${buttonName} - ${formatScheduleInterval(schedule, false)}`);
 
             if (EmulatedPlatform().isMobile || Platform.isMobile) {
                 if (button.buttonEl.hasClass("sr-show-large-text")) {
