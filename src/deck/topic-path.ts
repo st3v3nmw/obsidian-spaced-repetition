@@ -159,7 +159,22 @@ export class TopicPathList {
         return result;
     }
 
-    //
+    extend(other?: TopicPathList): void {
+        if (!other) return;
+        const newList: TopicPath[] = [...this.list];
+        for (const otherTopicPath of other.list) {
+            let foundMatch = false;
+            for (const thisTopicPath of this.list) {
+                if (thisTopicPath.isSameOrAncestorOf(otherTopicPath)) {
+                    foundMatch = true;
+                    break;
+                }
+            }
+            if (!foundMatch) newList.push(otherTopicPath);
+        }
+        this.list = newList;
+    }
+
     // tagList is a list of tags such as:
     //      ["#flashcards/computing", "#boring-stuff", "#news-worthy"]
     // validTopicPathList is a list of valid tags, such as those from settings.flashcardTags,E.g.
