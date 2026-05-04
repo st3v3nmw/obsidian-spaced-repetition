@@ -4,6 +4,7 @@ import { RepItemStorageInfo } from "src/data-stores/base/rep-item-storage-info";
 
 export enum DataStoreName {
     NOTES = "NOTES",
+    PLUGIN_DATA = "PLUGIN_DATA",
 }
 
 export interface IDataStore {

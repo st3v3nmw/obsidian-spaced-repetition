@@ -31,6 +31,7 @@ export class UnitTestOsrCore extends OsrCore {
             settings,
             () => {},
             new NoteReviewQueue(),
+            null,
         );
     }
 

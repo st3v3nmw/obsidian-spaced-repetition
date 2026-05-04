@@ -1,5 +1,17 @@
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 
+export interface SerializedScheduleInfo {
+    dueDate: string;
+    interval: number;
+    ease: number;
+}
+
+export interface PluginDataScheduleState {
+    version: number;
+    noteSchedules: Record<string, SerializedScheduleInfo | null>;
+    cardSchedules: Record<string, (SerializedScheduleInfo | null)[]>;
+}
+
 export interface PluginData {
     settings: SRSettings;
     buryDate: string;
@@ -8,6 +20,7 @@ export interface PluginData {
     // which covers most of the cases
     buryList: string[];
     historyDeck: string | null;
+    scheduleState: PluginDataScheduleState;
 }
 
 export const DEFAULT_DATA: PluginData = {
@@ -15,4 +28,9 @@ export const DEFAULT_DATA: PluginData = {
     buryDate: "",
     buryList: [],
     historyDeck: null,
+    scheduleState: {
+        version: 1,
+        noteSchedules: {},
+        cardSchedules: {},
+    },
 };

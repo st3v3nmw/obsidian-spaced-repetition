@@ -74,6 +74,7 @@ export interface SRSettings {
     // storage
     dataStore: string;
     cardCommentOnSameLine: boolean;
+    scheduleDataVaultLocation: string;
 
     // logging
     showSchedulingDebugMessages: boolean;
@@ -153,6 +154,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // storage
     dataStore: DataStoreName.NOTES,
     cardCommentOnSameLine: false,
+    scheduleDataVaultLocation: "/Spaced Repetition",
 
     // logging
     showSchedulingDebugMessages: false,
@@ -193,6 +195,14 @@ export function upgradeSettings(settings: SRSettings) {
         settings.disableFileMenuReviewOptions = undefined;
     }
 
+    if (
+        settings.scheduleDataVaultLocation === null ||
+        settings.scheduleDataVaultLocation === undefined ||
+        settings.scheduleDataVaultLocation.trim() === ""
+    ) {
+        settings.scheduleDataVaultLocation = DEFAULT_SETTINGS.scheduleDataVaultLocation;
+    }
+  
     if (settings.fsrsDesiredRetention === null || settings.fsrsDesiredRetention === undefined) {
         settings.fsrsDesiredRetention = DEFAULT_SETTINGS.fsrsDesiredRetention;
     }

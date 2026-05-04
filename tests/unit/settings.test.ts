@@ -190,6 +190,14 @@ describe("SettingsUtil", () => {
 
         settings = {
             ...DEFAULT_SETTINGS,
+            scheduleDataVaultLocation: "   ",
+        };
+        upgradeSettings(settings);
+        expect(settings.scheduleDataVaultLocation).toEqual(
+            DEFAULT_SETTINGS.scheduleDataVaultLocation,
+        );
+        settings = {
+            ...DEFAULT_SETTINGS,
             randomizeCardOrder: false,
             flashcardCardOrder: null,
             flashcardDeckOrder: null,

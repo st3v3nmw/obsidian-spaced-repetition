@@ -15,8 +15,13 @@ import { QuestionPostponementList } from "src/card/questions/question-postponeme
 import { OsrAppCore } from "src/core";
 import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
 import { DataStoreInNoteAlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
-import { DataStore } from "src/data-stores/base/data-store";
+import { DataStoreInPluginDataAlgorithmOsr } from "src/data-store-algorithm/data-store-in-plugin-data-algorithm-osr";
+import { DataStore, DataStoreName } from "src/data-stores/base/data-store";
+import { DataStoreMigrator } from "src/data-stores/data-store-migrator";
 import { StoreInNotes } from "src/data-stores/notes/notes";
+import { StoreInPluginData } from "src/data-stores/plugin-data/plugin-data";
+import { ScheduleDataMarkdownStorage } from "src/data-stores/plugin-data/schedule-data-markdown-storage";
+import { ScheduleDataRepository } from "src/data-stores/plugin-data/schedule-data-repository";
 import { Deck, DeckTreeFilter } from "src/deck/deck";
 import {
     CardOrder,
@@ -44,6 +49,7 @@ export default class SRPlugin extends Plugin {
     public data: PluginData;
     public osrAppCore: OsrAppCore;
     public uiManager: UIManager;
+    private scheduleDataRepository: ScheduleDataRepository;
 
     public nextNoteReviewHandler: NextNoteReviewHandler;
 
@@ -74,11 +80,23 @@ export default class SRPlugin extends Plugin {
             this.data.settings,
             this.onOsrVaultDataChanged.bind(this),
             noteReviewQueue,
+            this.scheduleDataRepository,
         );
 
         this.uiManager = new UIManager(this);
 
         this.addPluginCommands();
+
+        this.registerEvent(
+            this.app.vault.on("rename", (file, oldPath) => {
+                if (
+                    this.data.settings.dataStore === DataStoreName.PLUGIN_DATA &&
+                    file instanceof TFile
+                ) {
+                    this.scheduleDataRepository.renameFile(oldPath, file.path);
+                }
+            }),
+        );
     }
 
     public removeCustomHotkeys() {
@@ -567,19 +585,59 @@ export default class SRPlugin extends Plugin {
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
         setDebugParser(this.data.settings.showParserDebugMessages);
 
+        const scheduleStorage = new ScheduleDataMarkdownStorage(
+            this.app,
+            () => this.data.settings.scheduleDataVaultLocation,
+        );
+
+        this.scheduleDataRepository = new ScheduleDataRepository(
+            this.data,
+            this.savePluginData.bind(this),
+            scheduleStorage,
+        );
+        await this.scheduleDataRepository.initialize();
+
         this.setupDataStoreAndAlgorithmInstances(this.data.settings);
     }
 
     setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
-        // For now we can hardcode as we only support the one data store and one algorithm
-        DataStore.instance = new StoreInNotes(settings);
+        if (settings.dataStore === DataStoreName.PLUGIN_DATA) {
+            DataStore.instance = new StoreInPluginData(settings, this.scheduleDataRepository);
+            DataStoreAlgorithm.instance = new DataStoreInPluginDataAlgorithmOsr();
+        } else {
+            DataStore.instance = new StoreInNotes(settings);
+            DataStoreAlgorithm.instance = new DataStoreInNoteAlgorithmOsr(settings);
+        }
+      
         SrsAlgorithm.instance =
             settings.algorithm === Algorithm.FSRS
                 ? new SrsAlgorithmFsrs(settings)
                 : new SrsAlgorithmOsr(settings);
-        DataStoreAlgorithm.instance = new DataStoreInNoteAlgorithmOsr(settings);
     }
+    async migrateDataStore(oldMode: DataStoreName, newMode: DataStoreName): Promise<void> {
+        const textDirection = this.getObsidianRtlSetting();
+        if (newMode === DataStoreName.PLUGIN_DATA) {
+            await DataStoreMigrator.migrateToPluginData(
+                this.app,
+                this.data.settings,
+                textDirection,
+                this.scheduleDataRepository,
+            );
+        } else {
+            await DataStoreMigrator.migrateToNotes(
+                this.app,
+                this.data.settings,
+                textDirection,
+                this.scheduleDataRepository,
+            );
+        }
+    }
+
     async savePluginData(): Promise<void> {
         await this.saveData(this.data);
+    }
+
+    async persistScheduleDataNow(): Promise<void> {
+        await this.scheduleDataRepository.persistCurrentState();
     }
 }

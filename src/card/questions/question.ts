@@ -228,12 +228,18 @@ export class Question {
             result = result.trimEnd();
             const scheduleHtml =
                 DataStoreAlgorithm.getInstance().questionFormatScheduleAsHtmlComment(this);
-            if (blockId) {
-                if (this.isCardCommentsOnSameLine(settings))
-                    result += ` ${scheduleHtml} ${blockId}`;
-                else result += ` ${blockId}\n${scheduleHtml}`;
+            if (scheduleHtml) {
+                if (blockId) {
+                    if (this.isCardCommentsOnSameLine(settings))
+                        result += ` ${scheduleHtml} ${blockId}`;
+                    else result += ` ${blockId}\n${scheduleHtml}`;
+                } else {
+                    result += this.getHtmlCommentSeparator(settings) + scheduleHtml;
+                }
             } else {
-                result += this.getHtmlCommentSeparator(settings) + scheduleHtml;
+                if (blockId) {
+                    result += ` ${blockId}`;
+                }
             }
         } else {
             // No schedule, so the block ID always comes after the question text, without anything after it
