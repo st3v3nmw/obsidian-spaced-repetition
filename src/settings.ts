@@ -201,8 +201,8 @@ export class SettingsUtil {
     static isAnyTagANoteReviewTag(settings: SRSettings, tags: string[]): boolean {
         for (const tag of tags) {
             if (
-                settings.tagsToReview.some(
-                    (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/"),
+                settings.tagsToReview.some((tagToReview) =>
+                    this.isSubTagContainedInTag(tagToReview, tag),
                 )
             ) {
                 return true;
@@ -223,18 +223,40 @@ export class SettingsUtil {
     static filterForNoteReviewTag(settings: SRSettings, tags: string[]): string[] {
         const result: string[] = [];
         for (const tagToReview of settings.tagsToReview) {
-            if (tags.some((tag) => tag === tagToReview || tag.startsWith(tagToReview + "/"))) {
+            if (tags.some((tag) => this.isSubTagContainedInTag(tagToReview, tag))) {
                 result.push(tagToReview);
             }
         }
         return result;
     }
 
-    private static isTagInList(tagList: string[], tag: string): boolean {
+    private static isTagInList(
+        tagList: string[],
+        tag: string,
+        exactMatch: boolean = false,
+    ): boolean {
+        // This should be true, if the tag is fully contained in a tag from the list
         for (const tagFromList of tagList) {
-            if (tag === tagFromList || tag.startsWith(tagFromList + "/")) {
-                return true;
+            if (exactMatch) {
+                if (tagFromList === tag) {
+                    // The tag from the list is the same as the current tag, so it is contained in it
+                    return true;
+                }
+            } else {
+                // In this case we need to look more in detail to see if the tag is fully contained in the tag from the list
+                if (this.isSubTagContainedInTag(tagFromList, tag)) {
+                    // The tag from the list is contained in the current tag, so it is contained in it
+                    return true;
+                }
             }
+        }
+        return false;
+    }
+
+    private static isSubTagContainedInTag(tag: string, subTag: string): boolean {
+        if (tag === subTag || subTag.startsWith(tag + "/")) {
+            // The tag is the same as the sub tag, or the sub tag is contained in the tag
+            return true;
         }
         return false;
     }

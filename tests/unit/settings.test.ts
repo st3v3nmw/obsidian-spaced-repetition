@@ -15,22 +15,99 @@ describe("SettingsUtil", () => {
     });
 
     test("isAnyTagIgnoredForFlashcards", () => {
-        const settings: SRSettings = {
+        const simpleDeckSettings: SRSettings = {
             ...DEFAULT_SETTINGS,
             flashcardTagsToIgnore: ["#archived"],
         };
-        expect(SettingsUtil.isAnyTagIgnoredForFlashcards(settings, ["#archived"])).toEqual(true);
-        expect(SettingsUtil.isAnyTagIgnoredForFlashcards(settings, ["#archived/old"])).toEqual(
-            true,
-        );
-        expect(SettingsUtil.isAnyTagIgnoredForFlashcards(settings, ["#flashcards"])).toEqual(false);
         expect(
-            SettingsUtil.isAnyTagIgnoredForFlashcards(settings, ["#flashcards", "#archived"]),
+            SettingsUtil.isAnyTagIgnoredForFlashcards(simpleDeckSettings, ["#archived"]),
         ).toEqual(true);
+        expect(
+            SettingsUtil.isAnyTagIgnoredForFlashcards(simpleDeckSettings, ["#archived/old"]),
+        ).toEqual(true);
+        expect(
+            SettingsUtil.isAnyTagIgnoredForFlashcards(simpleDeckSettings, ["#flashcards"]),
+        ).toEqual(false);
+        expect(
+            SettingsUtil.isAnyTagIgnoredForFlashcards(simpleDeckSettings, [
+                "#flashcards",
+                "#archived",
+            ]),
+        ).toEqual(true);
+
         const settingsNoIgnore: SRSettings = { ...DEFAULT_SETTINGS, flashcardTagsToIgnore: [] };
         expect(SettingsUtil.isAnyTagIgnoredForFlashcards(settingsNoIgnore, ["#archived"])).toEqual(
             false,
         );
+
+        const complexDeckSettings: SRSettings = {
+            ...DEFAULT_SETTINGS,
+            flashcardTagsToIgnore: [
+                "#archived",
+                "#flashcards/Capitals/europa",
+                "#flashcards/Capitals/africa/test/test/test",
+            ],
+        };
+
+        expect(
+            SettingsUtil.isAnyTagIgnoredForFlashcards(complexDeckSettings, [
+                "#flashcards/Capitals",
+            ]),
+        ).toEqual(false);
+
+        expect(
+            SettingsUtil.isAnyTagIgnoredForFlashcards(complexDeckSettings, [
+                "#flashcards/Capitals/test",
+            ]),
+        ).toEqual(false);
+
+        expect(
+            SettingsUtil.isAnyTagIgnoredForFlashcards(complexDeckSettings, [
+                "#flashcards/Capitals/europa",
+            ]),
+        ).toEqual(true);
+
+        expect(
+            SettingsUtil.isAnyTagIgnoredForFlashcards(complexDeckSettings, [
+                "#flashcards/Capitals/europa/germany",
+            ]),
+        ).toEqual(true);
+
+        expect(
+            SettingsUtil.isAnyTagIgnoredForFlashcards(complexDeckSettings, [
+                "#flashcards/Capitals/eu",
+            ]),
+        ).toEqual(false);
+
+        expect(
+            SettingsUtil.isAnyTagIgnoredForFlashcards(complexDeckSettings, [
+                "#flashcards/Capitals/eu/germany",
+            ]),
+        ).toEqual(false);
+
+        expect(
+            SettingsUtil.isAnyTagIgnoredForFlashcards(complexDeckSettings, [
+                "#flashcards/Capitals/africa/test",
+            ]),
+        ).toEqual(false);
+
+        expect(
+            SettingsUtil.isAnyTagIgnoredForFlashcards(complexDeckSettings, [
+                "#flashcards/Capitals/africa/test/test",
+            ]),
+        ).toEqual(false);
+
+        expect(
+            SettingsUtil.isAnyTagIgnoredForFlashcards(complexDeckSettings, [
+                "#flashcards/Capitals/africa/test/test/test",
+            ]),
+        ).toEqual(true);
+
+        expect(
+            SettingsUtil.isAnyTagIgnoredForFlashcards(complexDeckSettings, [
+                "#flashcards/Capitals/africa/test/test/test/test/test",
+            ]),
+        ).toEqual(true);
     });
 
     test("isAnyTagIgnoredForNotes", () => {
