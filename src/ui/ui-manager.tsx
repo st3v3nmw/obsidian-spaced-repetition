@@ -1,19 +1,34 @@
-import { Menu, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
+import "src/ui/styles.css";
+import { Menu, MenuItem, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
-import { OsrAppCore } from "src/core";
-import { CardListType, Deck } from "src/deck/deck";
+import { CardListType } from "src/deck/deck";
+import {
+    deleteAllSchedulingDataOfCardsInNote,
+    deleteNoteSchedulingDataInNote,
+} from "src/delete-scheduling-data";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
+import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { SRModalView } from "src/ui/obsidian-ui-components/modals/sr-modal-view";
 import { SRSettingTab } from "src/ui/obsidian-ui-components/settings-tab";
+import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import { SidebarManager } from "src/ui/sidebar-manager";
 import StatusBarManager from "src/ui/status-bar-manager";
 import TabViewManager from "src/ui/tab-view-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
+
+export enum UIState {
+    Closed,
+    DeckList,
+    CardFront,
+    CardBack,
+    EditModal,
+}
 
 /**
  * Manages the UI elements of the Spaced Repetition plugin, including the status bar, sidebar, and tab views.
@@ -31,20 +46,17 @@ import EmulatedPlatform from "src/utils/platform-detector";
  * @method setSRViewInFocus - Sets the SR tab view in focus state.
  */
 export class UIManager {
-    private plugin: SRPlugin;
     public tabViewManager: TabViewManager;
     public sidebarManager: SidebarManager;
-    public statusBarManager: StatusBarManager | null = null;
-    private ribbonIcon: HTMLElement | null = null;
-    private isSRInFocus: boolean = false;
-    private externalModalObserver: MutationObserver;
+    public statusBarManager: StatusBarManager;
+    public uiState: UIState = UIState.Closed;
+    public isSRInFocus: boolean = false;
+    public contentManager: ContentManager | null = null;
 
-    private fileMenuHandler: (
-        menu: Menu,
-        file: TAbstractFile,
-        source: string,
-        leaf?: WorkspaceLeaf,
-    ) => void;
+    private plugin: SRPlugin;
+    private ribbonIcon: HTMLElement | null = null;
+    private externalModalObserver: MutationObserver | null = null;
+    private areFileMenuItemsShown: boolean = false;
 
     constructor(plugin: SRPlugin) {
         this.plugin = plugin;
@@ -74,36 +86,41 @@ export class UIManager {
         this.statusBarManager = new StatusBarManager(this.plugin);
 
         this.showRibbonIcon(this.plugin.data.settings.showRibbonIcon);
-        this.showFileMenuItems(this.plugin.data.settings.disableFileMenuReviewOptions);
+        this.plugin.registerEvent(
+            this.plugin.app.workspace.on("file-menu", this.fileMenuHandler.bind(this)),
+        );
         this.plugin.addSettingTab(new SRSettingTab(this.plugin.app, this.plugin));
         this.registerSRFocusListener();
     }
 
-    destroy() {
+    public destroy() {
         this.removeSRFocusListener();
-        this.plugin.app.workspace.off("file-menu", this.fileMenuHandler);
+        this.plugin.app.workspace.off("file-menu", this.fileMenuHandler.bind(this));
         this.tabViewManager.closeAllTabViews();
     }
 
     public updateStatusBar() {
+        this.statusBarManager.showStatusBarItems(
+            this.plugin.data.settings.showStatusBar,
+            this.plugin.data.settings.showCardStatusBarItem,
+            this.plugin.data.settings.showNoteStatusBarItem,
+            this.plugin.data.settings.showUpdateAvailableStatusBarItem,
+        );
+
         if (this.plugin.data.settings.showStatusBar) {
-            this.statusBarManager.setText(
-                `${this.plugin.osrAppCore.remainingDeckTree.getCardCount(
-                    CardListType.All,
-                    true,
-                )} card(s) due`,
-                this.plugin.data.settings.showStatusBar,
+            this.statusBarManager.setCount(
+                this.plugin.osrAppCore.remainingDeckTree.getCardCount(CardListType.All, true),
+                this.plugin.data.settings.showStatusBar &&
+                    this.plugin.data.settings.showCardStatusBarItem,
                 "card-review",
             );
-            this.statusBarManager.setText(
-                `${this.plugin.osrAppCore.noteReviewQueue.dueNotesCount} note(s) due`,
-                this.plugin.data.settings.showStatusBar,
+            this.statusBarManager.setCount(
+                this.plugin.osrAppCore.noteReviewQueue.dueNotesCount,
+                this.plugin.data.settings.showStatusBar &&
+                    this.plugin.data.settings.showNoteStatusBarItem,
                 "note-review",
             );
-            this.statusBarManager.showUpdateAvailableItemIfAvailable();
         }
-
-        this.statusBarManager.showStatusBarItems(this.plugin.data.settings.showStatusBar);
     }
 
     public registerSRFocusListener() {
@@ -148,6 +165,15 @@ export class UIManager {
         }
     }
 
+    public setUIState(state: UIState) {
+        this.uiState = state;
+    }
+
+    public setContentManager(contentManager: ContentManager) {
+        // TODO: Find a better way to do this, without having to pass the ContentManager around
+        this.contentManager = contentManager;
+    }
+
     public async openDeckContainer(mode: FlashcardReviewMode, singleNote?: TFile): Promise<void> {
         if (this.plugin.osrAppCore.syncLock) {
             return;
@@ -159,50 +185,27 @@ export class UIManager {
             (!isMobile && this.plugin.data.settings.openViewInNewTab) ||
             (isMobile && this.plugin.data.settings.openViewInNewTabMobile);
 
+        const reviewQueueLoader = new ReviewQueueLoader(
+            this.plugin,
+            this.plugin.osrAppCore,
+            singleNote ?? null,
+            mode,
+        );
+
         if (openInNewTab) {
-            this.tabViewManager.openSRTabView(this.plugin.osrAppCore, mode, singleNote);
+            this.tabViewManager.openSRTabView(reviewQueueLoader);
         } else {
-            this.openFlashcardModal(this.plugin.osrAppCore, mode, singleNote);
+            this.openFlashcardModal(reviewQueueLoader);
         }
     }
 
-    public async openFlashcardModal(
-        osrAppCore: OsrAppCore,
-        reviewMode: FlashcardReviewMode,
-        singleNote?: TFile,
-    ): Promise<void> {
-        let deckTree: Deck;
-        let remainingDeckTree: Deck;
-
-        if (singleNote) {
-            const singleNoteDeckData = await this.plugin.getPreparedDecksForSingleNoteReview(
-                singleNote,
-                reviewMode,
-            );
-
-            deckTree = singleNoteDeckData.deckTree;
-            remainingDeckTree = singleNoteDeckData.remainingDeckTree;
-        } else {
-            deckTree = osrAppCore.reviewableDeckTree;
-            remainingDeckTree =
-                reviewMode === FlashcardReviewMode.Cram
-                    ? osrAppCore.reviewableDeckTree
-                    : osrAppCore.remainingDeckTree;
-        }
-
-        const reviewSequencerData = this.plugin.getPreparedReviewSequencer(
-            deckTree,
-            remainingDeckTree,
-            reviewMode,
-        );
-
+    public async openFlashcardModal(reviewQueueLoader: ReviewQueueLoader): Promise<void> {
         this.setSRViewInFocus(true);
         new SRModalView(
             this.plugin.app,
             this.plugin,
             this.plugin.data.settings,
-            reviewSequencerData.reviewSequencer,
-            reviewSequencerData.mode,
+            reviewQueueLoader,
         ).open();
     }
 
@@ -232,56 +235,96 @@ export class UIManager {
         }
     }
 
-    showFileMenuItems(status: boolean) {
-        // define the handler if it was not defined yet
-        if (this.fileMenuHandler === undefined) {
-            this.fileMenuHandler = (menu, fileish: TAbstractFile) => {
-                if (fileish instanceof TFile && fileish.extension === "md") {
-                    menu.addItem((item) => {
-                        item.setTitle(
-                            t("REVIEW_DIFFICULTY_FILE_MENU", {
-                                difficulty: this.plugin.data.settings.flashcardEasyText,
-                            }),
-                        )
-                            .setIcon("SpacedRepIcon")
-                            .onClick(() => {
-                                this.plugin.saveNoteReviewResponse(fileish, ReviewResponse.Easy);
-                            });
-                    });
+    private fileMenuHandler(menu: Menu, file: TAbstractFile) {
+        if (!(file instanceof TFile && file.extension === "md")) return;
 
-                    menu.addItem((item) => {
-                        item.setTitle(
-                            t("REVIEW_DIFFICULTY_FILE_MENU", {
-                                difficulty: this.plugin.data.settings.flashcardGoodText,
-                            }),
-                        )
-                            .setIcon("SpacedRepIcon")
-                            .onClick(() => {
-                                this.plugin.saveNoteReviewResponse(fileish, ReviewResponse.Good);
-                            });
+        if (this.plugin.data.settings.showFileMenuReviewOptions) {
+            menu.addItem((item: MenuItem) => {
+                item.setTitle(
+                    t("REVIEW_DIFFICULTY_FILE_MENU", {
+                        difficulty: this.plugin.data.settings.flashcardEasyText,
+                    }),
+                )
+                    .setIcon("SpacedRepIcon")
+                    .onClick(() => {
+                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Easy);
                     });
+            });
 
-                    menu.addItem((item) => {
-                        item.setTitle(
-                            t("REVIEW_DIFFICULTY_FILE_MENU", {
-                                difficulty: this.plugin.data.settings.flashcardHardText,
-                            }),
-                        )
-                            .setIcon("SpacedRepIcon")
-                            .onClick(() => {
-                                this.plugin.saveNoteReviewResponse(fileish, ReviewResponse.Hard);
-                            });
+            menu.addItem((item) => {
+                item.setTitle(
+                    t("REVIEW_DIFFICULTY_FILE_MENU", {
+                        difficulty: this.plugin.data.settings.flashcardGoodText,
+                    }),
+                )
+                    .setIcon("SpacedRepIcon")
+                    .onClick(() => {
+                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Good);
                     });
-                }
-            };
+            });
+
+            menu.addItem((item) => {
+                item.setTitle(
+                    t("REVIEW_DIFFICULTY_FILE_MENU", {
+                        difficulty: this.plugin.data.settings.flashcardHardText,
+                    }),
+                )
+                    .setIcon("SpacedRepIcon")
+                    .onClick(() => {
+                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Hard);
+                    });
+            });
         }
 
-        if (status) {
-            this.plugin.registerEvent(
-                this.plugin.app.workspace.on("file-menu", this.fileMenuHandler),
-            );
-        } else {
-            this.plugin.app.workspace.off("file-menu", this.fileMenuHandler);
+        if (
+            this.plugin.data.settings.showFileMenuReviewOptions &&
+            this.plugin.data.settings.showDeleteButtonInFileMenu
+        ) {
+            menu.addSeparator();
+        }
+
+        if (this.plugin.data.settings.showDeleteButtonInFileMenu) {
+            menu.addItem((item) => {
+                item.setTitle(t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"))
+                    .setIcon("trash")
+                    .setWarning(true)
+                    .onClick(async () => {
+                        new ConfirmationModal(
+                            this.plugin.app,
+                            t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"),
+                            t("CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION"),
+                            t("NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS"),
+                            () => {
+                                deleteNoteSchedulingDataInNote(
+                                    file,
+                                    this.plugin.data.settings.deleteTagsOnSchedulingDataDeletion,
+                                    this.plugin.data.settings.tagsToReview,
+                                );
+                            },
+                        ).open();
+                    });
+            });
+
+            menu.addItem((item) => {
+                item.setTitle(t("DELETE_SCHEDULING_DATA_OF_CARDS_IN_NOTE"))
+                    .setIcon("trash")
+                    .setWarning(true)
+                    .onClick(async () => {
+                        new ConfirmationModal(
+                            this.plugin.app,
+                            t("DELETE_SCHEDULING_DATA_OF_CARDS_IN_NOTE"),
+                            t("CONFIRM_SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION"),
+                            t("SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION_IN_PROGRESS"),
+                            () => {
+                                deleteAllSchedulingDataOfCardsInNote(
+                                    file,
+                                    this.plugin.data.settings.deleteTagsOnSchedulingDataDeletion,
+                                    this.plugin.data.settings.flashcardTags,
+                                );
+                            },
+                        ).open();
+                    });
+            });
         }
     }
 }

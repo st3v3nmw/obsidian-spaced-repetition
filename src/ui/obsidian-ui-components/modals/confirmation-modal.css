@@ -1,0 +1,7 @@
+/* MARK: Confirmation Modal */
+
+.sr-confirmation-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}

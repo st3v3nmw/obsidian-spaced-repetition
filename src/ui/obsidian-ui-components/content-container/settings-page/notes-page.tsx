@@ -51,6 +51,23 @@ export class NotesPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
+                    .setName(t("NOTE_TAGS_TO_IGNORE"))
+                    .setDesc(t("NOTE_TAGS_TO_IGNORE_DESC"))
+                    .addTextArea((text) =>
+                        text
+                            .setValue(this.plugin.data.settings.noteTagsToIgnore.join(" "))
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    this.plugin.data.settings.noteTagsToIgnore = value
+                                        .split(/\s+/)
+                                        .filter((v) => v);
+                                    await this.plugin.savePluginData();
+                                });
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
                     .setName(t("FOLDERS_TO_IGNORE"))
                     .setDesc(t("FOLDERS_TO_IGNORE_DESC"))
                     .addTextArea((text) =>
@@ -63,8 +80,6 @@ export class NotesPage extends SettingsPage {
                                         .map((v) => v.trim())
                                         .filter((v) => v);
                                     await this.plugin.savePluginData();
-
-                                    this.display();
                                 });
                             }),
                     );

@@ -1,3 +1,4 @@
+import "src/ui/obsidian-ui-components/content-container/settings-page/settings-page.css";
 import { ButtonComponent, setIcon } from "obsidian";
 
 import SRPlugin from "src/main";

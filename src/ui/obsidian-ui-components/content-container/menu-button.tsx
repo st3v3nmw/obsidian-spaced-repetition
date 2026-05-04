@@ -1,6 +1,7 @@
+import { t } from "src/lang/helpers";
 import SRButtonComponent from "src/ui/sr-button";
 
-export default class MenuDotsButtonComponent extends SRButtonComponent {
+export default class MenuButtonComponent extends SRButtonComponent {
     public constructor(
         container: HTMLElement,
         openMenu: (evt: MouseEvent) => void,
@@ -9,7 +10,7 @@ export default class MenuDotsButtonComponent extends SRButtonComponent {
         super(container, {
             classNames: ["sr-menu-dots-button", ...(classNames ?? [])],
             icon: "ellipsis-vertical",
-            tooltip: "Open menu", // TODO: Translate
+            tooltip: t("OPEN_MENU"),
             onClick: (evt: MouseEvent) => {
                 openMenu(evt);
             },

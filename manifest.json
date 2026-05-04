@@ -1,9 +1,9 @@
 {
     "id": "obsidian-spaced-repetition",
     "name": "Spaced Repetition",
-    "version": "1.13.9",
+    "version": "1.14.1",
     "minAppVersion": "1.2.8",
-    "description": "Fight the forgetting curve by reviewing flashcards & entire notes.",
+    "description": "Fight the forgetting curve by reviewing flashcards & entire notes using spaced repetition. Organize your flashcards into decks and learn only the cards you need to recall.",
     "author": "Stephen Mwangi",
     "authorUrl": "https://github.com/st3v3nmw",
     "helpUrl": "https://stephenmwangi.com/obsidian-spaced-repetition/",

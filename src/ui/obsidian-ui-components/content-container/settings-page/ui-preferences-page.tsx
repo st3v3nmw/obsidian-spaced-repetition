@@ -56,13 +56,39 @@ export class UIPreferencesPage extends SettingsPage {
                                     this.plugin.uiManager.registerSRFocusListener();
                                 } else {
                                     this.plugin.uiManager.tabViewManager.closeAllTabViews();
+                                    this.plugin.data.settings.useCustomHotkeys = false;
 
                                     // Remove focus from SR and remove event listener for focus change
                                     this.plugin.uiManager.removeSRFocusListener();
                                 }
                                 await this.plugin.savePluginData();
+                                this.display();
                             });
                     });
+            })
+            .addSetting((setting: Setting) => {
+                const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
+                setting
+                    .setName(t("USE_CUSTOM_HOTKEYS"))
+                    .setDesc(t("USE_CUSTOM_HOTKEYS_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.useCustomHotkeys)
+                            .setDisabled(
+                                (isMobile && !this.plugin.data.settings.openViewInNewTabMobile) ||
+                                    (!isMobile && !this.plugin.data.settings.openViewInNewTab),
+                            )
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.useCustomHotkeys = value;
+                                if (this.plugin.data.settings.useCustomHotkeys) {
+                                    this.plugin.addCustomHotkeys();
+                                } else {
+                                    this.plugin.removeCustomHotkeys();
+                                }
+                                this.plugin.addCustomHotkeys();
+                                await this.plugin.savePluginData();
+                            }),
+                    );
             })
             .addSetting((setting: Setting) => {
                 setting
@@ -80,70 +106,39 @@ export class UIPreferencesPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
-                    .setName(t("SHOW_STATUS_BAR"))
-                    .setDesc(t("SHOW_STATUS_BAR_DESC"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.plugin.data.settings.showStatusBar)
-                            .onChange(async (value) => {
-                                this.plugin.data.settings.showStatusBar = value;
-                                await this.plugin.savePluginData();
-                                this.plugin.uiManager.updateStatusBar();
-                            }),
-                    );
-            })
-            .addSetting((setting: Setting) => {
-                setting
                     .setName(t("ENABLE_FILE_MENU_REVIEW_OPTIONS"))
                     .setDesc(t("ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(!this.plugin.data.settings.disableFileMenuReviewOptions)
+                            .setValue(this.plugin.data.settings.showFileMenuReviewOptions)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.disableFileMenuReviewOptions = !value;
-                                await this.plugin.savePluginData();
-                                this.plugin.uiManager.showFileMenuItems(value);
-                            }),
-                    );
-            });
-
-        new SettingGroup(this.containerEl)
-            .setHeading(t("FLASHCARDS"))
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE"))
-                    .setDesc(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.plugin.data.settings.initiallyExpandAllSubdecksInTree)
-                            .onChange(async (value) => {
-                                this.plugin.data.settings.initiallyExpandAllSubdecksInTree = value;
+                                this.plugin.data.settings.showFileMenuReviewOptions = value;
                                 await this.plugin.savePluginData();
                             }),
                     );
             })
             .addSetting((setting: Setting) => {
                 setting
-                    .setName(t("SHOW_CARD_CONTEXT"))
-                    .setDesc(t("SHOW_CARD_CONTEXT_DESC"))
+                    .setName(t("ENABLE_FILE_MENU_DELETE_BUTTON"))
+                    .setDesc(t("ENABLE_FILE_MENU_DELETE_BUTTON_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.showContextInCards)
+                            .setValue(this.plugin.data.settings.showDeleteButtonInFileMenu)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.showContextInCards = value;
+                                this.plugin.data.settings.showDeleteButtonInFileMenu = value;
                                 await this.plugin.savePluginData();
                             }),
                     );
             })
             .addSetting((setting: Setting) => {
                 setting
-                    .setName(t("SHOW_INTERVAL_IN_REVIEW_BUTTONS"))
-                    .setDesc(t("SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC"))
+                    .setName(t("SHOW_DELETE_BUTTON"))
+                    .setDesc(t("SHOW_DELETE_BUTTON_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.showIntervalInReviewButtons)
+                            .setValue(this.plugin.data.settings.showDeleteButtonInCardView)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.showIntervalInReviewButtons = value;
+                                this.plugin.data.settings.showDeleteButtonInCardView = value;
                                 await this.plugin.savePluginData();
                             }),
                     );
@@ -236,6 +231,122 @@ export class UIPreferencesPage extends SettingsPage {
             });
 
         new SettingGroup(this.containerEl)
+            .setHeading(t("STATUS_BAR_SETTINGS"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_STATUS_BAR"))
+                    .setDesc(t("SHOW_STATUS_BAR_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showStatusBar)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showStatusBar = value;
+                                await this.plugin.savePluginData();
+                                this.plugin.uiManager.updateStatusBar();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_CARD_STATUS_BAR_ITEM"))
+                    .setDesc(t("SHOW_CARD_STATUS_BAR_ITEM_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showCardStatusBarItem)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showCardStatusBarItem = value;
+                                await this.plugin.savePluginData();
+                                this.plugin.uiManager.updateStatusBar();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_NOTE_STATUS_BAR_ITEM"))
+                    .setDesc(t("SHOW_NOTE_STATUS_BAR_ITEM_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showNoteStatusBarItem)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showNoteStatusBarItem = value;
+                                await this.plugin.savePluginData();
+                                this.plugin.uiManager.updateStatusBar();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM"))
+                    .setDesc(t("SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showUpdateAvailableStatusBarItem)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showUpdateAvailableStatusBarItem = value;
+                                await this.plugin.savePluginData();
+                                this.plugin.uiManager.updateStatusBar();
+                            }),
+                    );
+            });
+
+        new SettingGroup(this.containerEl)
+            .setHeading(t("FLASHCARDS"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE"))
+                    .setDesc(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.initiallyExpandAllSubdecksInTree)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.initiallyExpandAllSubdecksInTree = value;
+                                await this.plugin.savePluginData();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_CARD_CONTEXT"))
+                    .setDesc(t("SHOW_CARD_CONTEXT_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showContextInCards)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showContextInCards = value;
+                                await this.plugin.savePluginData();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("CONVERT_CLOZE_PATTERNS_TO_INPUTS"))
+                    .setDesc(t("CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.convertClozePatternsToInputs)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.convertClozePatternsToInputs = value;
+                                await this.plugin.savePluginData();
+
+                                this.display();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHOW_INTERVAL_IN_REVIEW_BUTTONS"))
+                    .setDesc(t("SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.plugin.data.settings.showIntervalInReviewButtons)
+                            .onChange(async (value) => {
+                                this.plugin.data.settings.showIntervalInReviewButtons = value;
+                                await this.plugin.savePluginData();
+                            }),
+                    );
+            });
+
+        new SettingGroup(this.containerEl)
             .setHeading(t("GROUP_FLASHCARDS_NOTES"))
             .addSetting((setting: Setting) => {
                 setting
@@ -313,6 +424,33 @@ export class UIPreferencesPage extends SettingsPage {
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
                                     this.plugin.data.settings.flashcardHardText = value;
+                                    await this.plugin.savePluginData();
+                                });
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("FLASHCARD_AGAIN_LABEL"))
+                    .setDesc(t("FLASHCARD_AGAIN_DESC"))
+                    .addExtraButton((button) => {
+                        button
+                            .setIcon("reset")
+                            .setTooltip(t("RESET_DEFAULT"))
+                            .onClick(async () => {
+                                this.plugin.data.settings.flashcardAgainText =
+                                    DEFAULT_SETTINGS.flashcardAgainText;
+                                await this.plugin.savePluginData();
+
+                                this.display();
+                            });
+                    })
+                    .addText((text) =>
+                        text
+                            .setValue(this.plugin.data.settings.flashcardAgainText)
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    this.plugin.data.settings.flashcardAgainText = value;
                                     await this.plugin.savePluginData();
                                 });
                             }),

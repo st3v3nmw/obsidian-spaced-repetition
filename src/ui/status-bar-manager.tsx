@@ -3,17 +3,18 @@ import { request } from "obsidian";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
-import IconTextStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/icon-text-statusbar-item";
+import CounterStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/counter-statusbar-item";
+import TextStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/text-statusbar-item";
 
-export type StatusBarItemType = "card-review" | "note-review" | "update-available";
-export const StatusBarItemTypesArray: ReadonlyArray<StatusBarItemType> = [
+export type StatusBarItemPurpose = "card-review" | "note-review" | "update-available";
+export const StatusBarItemTypesArray: ReadonlyArray<StatusBarItemPurpose> = [
     "card-review",
     "note-review",
     "update-available",
 ];
 
 export default class StatusBarManager {
-    protected statusBarItems: IconTextStatusBarItem[];
+    protected statusBarItems: TextStatusBarItem[];
     protected plugin: SRPlugin;
 
     constructor(plugin: SRPlugin) {
@@ -23,67 +24,79 @@ export default class StatusBarManager {
         this.createStatusBarItems();
     }
 
-    setText(
-        text: string | string[],
-        showItems: boolean,
-        statusBarItemType: StatusBarItemType,
-    ): void {
+    setCount(count: number, showItems: boolean, statusBarItemType: StatusBarItemPurpose): void {
         const statusBarItem = this.statusBarItems.find(
             (statusBarItem) => statusBarItem.getStatusBarItemType() === statusBarItemType,
         );
-        if (statusBarItem !== undefined) {
-            statusBarItem.setText(text);
-            if (showItems) {
-                statusBarItem.show();
-            } else {
-                statusBarItem.hide();
-            }
-        }
-    }
 
-    showStatusBarItems(state: boolean): void {
-        if (state === true && this.statusBarItems.length === 0) {
-            this.createStatusBarItems();
-            this.statusBarItems.forEach((statusBarItem) => {
-                statusBarItem.show();
-            });
-        } else if (state === true && this.statusBarItems.length > 0) {
-            this.statusBarItems.forEach((statusBarItem) => {
-                if (statusBarItem.getStatusBarItemType() !== "update-available")
-                    statusBarItem.show();
-            });
+        if (statusBarItem === undefined) return;
+
+        (statusBarItem as CounterStatusBarItem).setCounter(count);
+        if (showItems && count > 0) {
+            statusBarItem.show();
         } else {
-            this.statusBarItems.forEach((statusBarItem) => {
-                statusBarItem.hide();
-            });
+            statusBarItem.hide();
         }
     }
 
-    showStatusBarItem(state: boolean, statusBarItemType: StatusBarItemType): void {
-        const statusBarItem = this.statusBarItems.find(
-            (statusBarItem) => statusBarItem.getStatusBarItemType() === statusBarItemType,
-        );
-        if (statusBarItem !== undefined) {
-            if (state) {
-                statusBarItem.show();
+    showStatusBarItems(
+        showItems: boolean, // Overrides all other settings
+        showCardStatusBarItem?: boolean,
+        showNoteStatusBarItem?: boolean,
+        showUpdateAvailableStatusBarItem?: boolean,
+    ): void {
+        if (this.statusBarItems.length === 0) {
+            this.createStatusBarItems();
+        }
+
+        const showCardItem =
+            showCardStatusBarItem === undefined ? showItems : showCardStatusBarItem;
+        const showNoteItem =
+            showNoteStatusBarItem === undefined ? showItems : showNoteStatusBarItem;
+        const showUpdateAvailableItem =
+            showUpdateAvailableStatusBarItem === undefined
+                ? showItems
+                : showUpdateAvailableStatusBarItem;
+
+        this.statusBarItems.forEach((statusBarItem) => {
+            if (showItems) {
+                if (
+                    statusBarItem.getStatusBarItemType() === "update-available" &&
+                    statusBarItem.getText() === ""
+                ) {
+                    statusBarItem.hide();
+                    return;
+                }
+
+                switch (statusBarItem.getStatusBarItemType()) {
+                    case "card-review":
+                        if (showItems && showCardItem) {
+                            statusBarItem.show();
+                        } else {
+                            statusBarItem.hide();
+                        }
+                        break;
+                    case "note-review":
+                        if (showItems && showNoteItem) {
+                            statusBarItem.show();
+                        } else {
+                            statusBarItem.hide();
+                        }
+                        break;
+                    case "update-available":
+                        if (showItems && showUpdateAvailableItem) {
+                            statusBarItem.show();
+                        } else {
+                            statusBarItem.hide();
+                        }
+                        break;
+                    default:
+                        statusBarItem.show();
+                }
             } else {
                 statusBarItem.hide();
             }
-        }
-    }
-
-    showUpdateAvailableItemIfAvailable(): void {
-        const updateItem = this.statusBarItems.find(
-            (statusBarItem) => statusBarItem.getStatusBarItemType() === "update-available",
-        );
-
-        if (
-            updateItem !== undefined &&
-            updateItem.getText() !== undefined &&
-            updateItem.getText() !== ""
-        ) {
-            updateItem.show();
-        }
+        });
     }
 
     private async createStatusBarItems(): Promise<void> {
@@ -92,9 +105,12 @@ export default class StatusBarManager {
 
             switch (statusBarItemType) {
                 case "card-review":
-                    statusBarItem = new IconTextStatusBarItem(this.plugin, statusBarItemType, {
+                    statusBarItem = new CounterStatusBarItem(this.plugin, statusBarItemType, {
                         icon: "SpacedRepIcon",
                         show: false,
+                        count: 0,
+                        hideIcon: false,
+                        text: " card(s) due",
                         tooltip: t("OPEN_DECK_FOR_REVIEW"),
                         tooltipPosition: "top",
                         onClick: async () => {
@@ -105,9 +121,12 @@ export default class StatusBarManager {
                     });
                     break;
                 case "note-review":
-                    statusBarItem = new IconTextStatusBarItem(this.plugin, statusBarItemType, {
+                    statusBarItem = new CounterStatusBarItem(this.plugin, statusBarItemType, {
                         icon: "lucide-file-clock",
                         show: false,
+                        text: " note(s) due",
+                        count: 0,
+                        hideIcon: false,
                         tooltip: t("OPEN_NOTE_FOR_REVIEW"),
                         tooltipPosition: "top",
                         onClick: async () => {
@@ -119,9 +138,11 @@ export default class StatusBarManager {
                     });
                     break;
                 case "update-available":
-                    statusBarItem = new IconTextStatusBarItem(this.plugin, statusBarItemType, {
+                    statusBarItem = new TextStatusBarItem(this.plugin, statusBarItemType, {
                         icon: "lucide-circle-arrow-up",
                         show: false,
+                        hideIcon: false,
+                        text: "",
                         tooltip: t("UPDATE_AVAILABLE"),
                         tooltipPosition: "top",
                     });
@@ -136,7 +157,9 @@ export default class StatusBarManager {
                 (statusBarItem) => statusBarItem.getStatusBarItemType() === "update-available",
             );
 
-            updateItem.setText("Spaced Repetition: new Update!");
+            if (updateItem !== undefined) {
+                updateItem.setText("Spaced Repetition: new Update!");
+            }
         }
     }
 

@@ -8,9 +8,10 @@ import {
 
 export class SRSettingTab extends PluginSettingTab {
     private plugin: SRPlugin;
-    private settingsPageManager: SettingsPageManager;
+    private settingsPageManager: SettingsPageManager | null = null;
     private lastPage: SettingsPageType = "main-page";
     private lastScrollPosition: number = 0;
+    private didReadMultilineEndMarkerWarning: boolean = false;
 
     constructor(app: App, plugin: SRPlugin) {
         super(app, plugin);
@@ -25,11 +26,16 @@ export class SRSettingTab extends PluginSettingTab {
             this.plugin,
             this.lastPage,
             this.lastScrollPosition,
+            this.didReadMultilineEndMarkerWarning,
             (lastPage, lastScrollPosition) => {
                 this.lastPage = lastPage;
                 this.lastScrollPosition = lastScrollPosition;
             },
             this.display.bind(this),
+            (state: boolean) => {
+                this.didReadMultilineEndMarkerWarning = state;
+                this.display();
+            },
         );
     }
 

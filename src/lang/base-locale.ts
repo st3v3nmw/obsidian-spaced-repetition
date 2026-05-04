@@ -1,9 +1,15 @@
 export interface IBaseLocale {
     // flashcard-modal.tsx
+    CRAM_MODE: string;
+    REVIEW_MODE: string;
     DECKS: string;
     DUE_CARDS: string;
+    DUE: string;
     NEW_CARDS: string;
+    SEEN_CARDS: string;
+    SEEN: string;
     TOTAL_CARDS: string;
+    TOTAL: string;
     BACK: string;
     SKIP: string;
     EDIT_CARD: string;
@@ -19,6 +25,9 @@ export interface IBaseLocale {
     CURRENT_EASE_HELP_TEXT: string;
     CURRENT_INTERVAL_HELP_TEXT: string;
     CARD_GENERATED_FROM: string;
+    JUMP_TO: string;
+    JUMP_TO_AND_CLOSE: string;
+    OPEN_IN_BACKGROUND: string;
     VIEW_CARD_INFO: string;
 
     // main.ts
@@ -26,6 +35,7 @@ export interface IBaseLocale {
     REVIEW_CARDS: string;
     REVIEW_DIFFICULTY_FILE_MENU: string;
     REVIEW_NOTE_DIFFICULTY_CMD: string;
+    REVIEW_CARD_DIFFICULTY_CMD: string;
     CRAM_ALL_CARDS: string;
     REVIEW_ALL_CARDS: string;
     REVIEW_CARDS_IN_NOTE: string;
@@ -70,13 +80,17 @@ export interface IBaseLocale {
     FLASHCARD_EASY_LABEL: string;
     FLASHCARD_GOOD_LABEL: string;
     FLASHCARD_HARD_LABEL: string;
+    FLASHCARD_AGAIN_LABEL: string;
     FLASHCARD_EASY_DESC: string;
     FLASHCARD_GOOD_DESC: string;
     FLASHCARD_HARD_DESC: string;
+    FLASHCARD_AGAIN_DESC: string;
     REVIEW_BUTTON_DELAY: string;
     REVIEW_BUTTON_DELAY_DESC: string;
     FLASHCARD_TAGS: string;
     FLASHCARD_TAGS_DESC: string;
+    FLASHCARD_TAGS_TO_IGNORE: string;
+    FLASHCARD_TAGS_TO_IGNORE_DESC: string;
     CONVERT_FOLDERS_TO_DECKS: string;
     CONVERT_FOLDERS_TO_DECKS_DESC: string;
     INLINE_SCHEDULING_COMMENTS: string;
@@ -124,6 +138,8 @@ export interface IBaseLocale {
     REVIEW_PANE_ON_STARTUP: string;
     TAGS_TO_REVIEW: string;
     TAGS_TO_REVIEW_DESC: string;
+    NOTE_TAGS_TO_IGNORE: string;
+    NOTE_TAGS_TO_IGNORE_DESC: string;
     OPEN_RANDOM_NOTE: string;
     OPEN_RANDOM_NOTE_DESC: string;
     AUTO_NEXT_NOTE: string;
@@ -133,8 +149,15 @@ export interface IBaseLocale {
     UI: string;
     OPEN_IN_TAB: string;
     OPEN_IN_TAB_DESC: string;
+    STATUS_BAR_SETTINGS: string;
     SHOW_STATUS_BAR: string;
     SHOW_STATUS_BAR_DESC: string;
+    SHOW_CARD_STATUS_BAR_ITEM: string;
+    SHOW_CARD_STATUS_BAR_ITEM_DESC: string;
+    SHOW_NOTE_STATUS_BAR_ITEM: string;
+    SHOW_NOTE_STATUS_BAR_ITEM_DESC: string;
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM: string;
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM_DESC: string;
     SHOW_RIBBON_ICON: string;
     SHOW_RIBBON_ICON_DESC: string;
     ENABLE_FILE_MENU_REVIEW_OPTIONS: string;
@@ -144,6 +167,8 @@ export interface IBaseLocale {
     ALGORITHM: string;
     CHECK_ALGORITHM_WIKI: string;
     SM2_OSR_VARIANT: string;
+    SWITCH_TO_FSRS_ALGORITHM: string;
+    CONFIRM_FSRS_ALGORITHM_SWITCH: string;
     BASE_EASE: string;
     BASE_EASE_DESC: string;
     BASE_EASE_MIN_WARNING: string;
@@ -175,6 +200,8 @@ export interface IBaseLocale {
     SCHEDULING_DATA_HAS_BEEN_DELETED: string;
     ALWAYS_INCLUDE_FRONTMATTER_TAGS: string;
     ALWAYS_INCLUDE_FRONTMATTER_TAGS_DESC: string;
+    USE_CUSTOM_HOTKEYS: string;
+    USE_CUSTOM_HOTKEYS_DESC: string;
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: string;
@@ -255,4 +282,31 @@ export interface IBaseLocale {
     // Settings > info
     CHECK_ROADMAP: string;
     CHECK_DEV_NEWS: string;
+    OPEN_MENU: string;
+    DELETE_CARD: string;
+    DELETE_CARD_CONFIRMATION: string;
+    SHOW_DELETE_BUTTON: string;
+    SHOW_DELETE_BUTTON_DESC: string;
+
+    DELETE_NOTE_SCHEDULING_DATA_IN_NOTE: string;
+    CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION: string;
+    NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS: string;
+
+    DELETE_SCHEDULING_DATA_OF_CARDS_IN_NOTE: string;
+    CONFIRM_SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION: string;
+    SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION_IN_PROGRESS: string;
+
+    DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA: string;
+    DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA_DESC: string;
+
+    ENABLE_FILE_MENU_DELETE_BUTTON: string;
+    ENABLE_FILE_MENU_DELETE_BUTTON_DESC: string;
+
+    DATA_PAGE_NAME: string;
+
+    GROUP_RESET_SETTINGS: string;
+    GROUP_RESET_SETTINGS_DESC: string;
+    RESET_SETTINGS: string;
+    CONFIRM_RESET_SETTINGS: string;
+    RESET_SETTINGS_CONFIRMATION: string;
 }

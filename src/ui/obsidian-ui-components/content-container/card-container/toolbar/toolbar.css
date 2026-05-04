@@ -1,0 +1,138 @@
+.sr-card-toolbar {
+    --deck-info-name-width: 20ch;
+    --tool-button-section-width: 218px;
+
+    height: 46px;
+
+    display: flex;
+    gap: var(--size-4-2);
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 var(--size-4-2);
+    border-bottom: 1px solid var(--background-modifier-border);
+
+    & > * {
+        margin: var(--size-4-2) 0;
+    }
+
+    & > .sr-divider {
+        --divider-height: 100%;
+        --divider-color: var(--background-modifier-border);
+        --divider-width: 1px;
+        margin: 0;
+    }
+
+    & .sr-extended-menu-button {
+        display: none;
+    }
+
+    & .sr-reset-button.mod-warning {
+        --interactive-warning-hover: #fdf6f6;
+        color: var(--text-error);
+        background-color: var(--interactive-normal);
+
+        &:hover {
+            background-color: var(--interactive-warning-hover);
+        }
+    }
+}
+
+.sr-card-toolbar .sr-flex-spacer.sr-center-spacer {
+    display: none;
+}
+
+.sr-tab-view .sr-card-toolbar {
+    border-top: 1px solid var(--background-modifier-border);
+}
+
+.is-mobile .sr-card-toolbar {
+    height: auto;
+}
+
+.is-phone .sr-tab-view .sr-card-toolbar {
+    --deck-info-name-width: 15ch;
+}
+
+.is-phone #sr-modal-view .sr-card-toolbar {
+    --deck-info-name-width: 10ch;
+}
+
+@media only screen and (orientation: landscape) {
+    .is-phone .sr-card-toolbar {
+        display: none;
+    }
+}
+
+.is-phone .sr-card-toolbar .sr-edit-button,
+.is-phone .sr-card-toolbar .sr-reset-button,
+.is-phone .sr-card-toolbar .sr-short-menu-button,
+.is-phone .sr-card-toolbar > .sr-divider,
+.is-phone .sr-card-toolbar .sr-skip-button {
+    display: none;
+}
+
+.is-phone .sr-card-toolbar .sr-extended-menu-button {
+    display: flex;
+}
+
+.is-phone .sr-card-toolbar .sr-current-deck-info,
+.is-phone .sr-card-toolbar .sr-deck-pointer {
+    display: none;
+}
+
+.is-phone .sr-card-toolbar .sr-flex-spacer.sr-center-spacer {
+    display: flex;
+}
+
+@container (width < 850px) {
+    .is-mobile .sr-card-toolbar .sr-edit-button,
+    .is-mobile .sr-card-toolbar .sr-reset-button,
+    .is-mobile .sr-card-toolbar .sr-short-menu-button,
+    .is-mobile .sr-card-toolbar > .sr-divider,
+    .is-mobile .sr-card-toolbar .sr-skip-button {
+        display: none;
+    }
+
+    .is-mobile .sr-card-toolbar .sr-extended-menu-button {
+        display: flex;
+    }
+
+    .is-mobile .sr-card-toolbar .sr-flex-spacer.sr-center-spacer {
+        display: flex;
+    }
+}
+
+@container (width < 730px) {
+    .sr-card-toolbar {
+        --deck-info-name-width: 15ch;
+    }
+}
+
+@container (width < 690px) {
+    .sr-card-toolbar {
+        --deck-info-name-width: 20ch;
+    }
+
+    .sr-card-toolbar .sr-edit-button,
+    .sr-card-toolbar .sr-reset-button,
+    .sr-card-toolbar .sr-short-menu-button,
+    .sr-card-toolbar > .sr-divider,
+    .sr-card-toolbar .sr-skip-button {
+        display: none;
+    }
+
+    .sr-card-toolbar .sr-extended-menu-button {
+        display: flex;
+    }
+
+    .sr-card-toolbar .sr-flex-spacer.sr-center-spacer {
+        display: flex;
+    }
+}
+
+@container (width < 580px) {
+    .sr-card-toolbar .sr-current-deck-info,
+    .sr-card-toolbar .sr-deck-pointer {
+        display: none;
+    }
+}

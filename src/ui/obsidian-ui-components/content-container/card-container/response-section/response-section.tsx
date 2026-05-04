@@ -1,13 +1,10 @@
-import { ButtonComponent, Platform } from "obsidian";
+import "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section.css";
+import { Platform } from "obsidian";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { textInterval } from "src/algorithms/osr/note-scheduling";
-import { Card } from "src/card/card";
-import {
-    FlashcardReviewMode,
-    IFlashcardReviewSequencer,
-} from "src/card/flashcard-review-sequencer";
+import { formatScheduleInterval } from "src/algorithms/schedule-display";
+import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 import { SRSettings } from "src/settings";
 import SRResponseButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/response-section/sr-response-button";
@@ -73,7 +70,21 @@ export default class ResponseSectionComponent {
 
     public resetResponseButtons() {
         // Sets all buttons in to their default state
+        if (this.responseEl.hasClass("sr-is-hidden")) {
+            this.responseEl.removeClass("sr-is-hidden");
+        }
         this.answerButton.buttonEl.removeClass("sr-is-hidden");
+        this.againButton.buttonEl.addClass("sr-is-hidden");
+        this.hardButton.buttonEl.addClass("sr-is-hidden");
+        this.goodButton.buttonEl.addClass("sr-is-hidden");
+        this.easyButton.buttonEl.addClass("sr-is-hidden");
+    }
+
+    public hideAllButtons() {
+        if (!this.responseEl.hasClass("sr-is-hidden")) {
+            this.responseEl.addClass("sr-is-hidden");
+        }
+        this.answerButton.buttonEl.addClass("sr-is-hidden");
         this.againButton.buttonEl.addClass("sr-is-hidden");
         this.hardButton.buttonEl.addClass("sr-is-hidden");
         this.goodButton.buttonEl.addClass("sr-is-hidden");
@@ -82,17 +93,23 @@ export default class ResponseSectionComponent {
 
     public showRatingButtons(
         reviewMode: FlashcardReviewMode,
-        settings: SRSettings,
-        reviewSequencer: IFlashcardReviewSequencer,
-        currentCard: Card,
+        againButtonText: string,
+        hardButtonText: string,
+        goodButtonText: string,
+        easyButtonText: string,
+        showIntervalInReviewButtons: boolean,
+        determineButtonSchedule: (response: ReviewResponse) => RepItemScheduleInfo,
     ) {
+        if (this.responseEl.hasClass("sr-is-hidden")) {
+            this.responseEl.removeClass("sr-is-hidden");
+        }
         // Shows the rating buttons and hides the show answer button
         this.answerButton.buttonEl.addClass("sr-is-hidden");
 
         if (reviewMode === FlashcardReviewMode.Cram) {
             this.responseEl.addClass("is-cram");
-            this.againButton.setButtonText(`${settings.flashcardAgainText}`);
-            this.easyButton.setButtonText(`${settings.flashcardEasyText}`);
+            this.againButton.setButtonText(`${againButtonText}`);
+            this.easyButton.setButtonText(`${easyButtonText}`);
 
             if (this.againButton.buttonEl.hasClass("sr-is-hidden")) {
                 this.againButton.buttonEl.removeClass("sr-is-hidden");
@@ -115,61 +132,64 @@ export default class ResponseSectionComponent {
             this.easyButton.buttonEl.removeClass("sr-is-hidden");
             this._setupEaseButton(
                 this.againButton,
-                settings.flashcardAgainText,
-                reviewSequencer,
-                currentCard,
-                settings,
-                ReviewResponse.Again,
+                againButtonText,
+                determineButtonSchedule(ReviewResponse.Again),
+                showIntervalInReviewButtons,
             );
             this._setupEaseButton(
                 this.hardButton,
-                settings.flashcardHardText,
-                reviewSequencer,
-                currentCard,
-                settings,
-                ReviewResponse.Hard,
+                hardButtonText,
+                determineButtonSchedule(ReviewResponse.Hard),
+                showIntervalInReviewButtons,
             );
             this._setupEaseButton(
                 this.goodButton,
-                settings.flashcardGoodText,
-                reviewSequencer,
-                currentCard,
-                settings,
-                ReviewResponse.Good,
+                goodButtonText,
+                determineButtonSchedule(ReviewResponse.Good),
+                showIntervalInReviewButtons,
             );
             this._setupEaseButton(
                 this.easyButton,
-                settings.flashcardEasyText,
-                reviewSequencer,
-                currentCard,
-                settings,
-                ReviewResponse.Easy,
+                easyButtonText,
+                determineButtonSchedule(ReviewResponse.Easy),
+                showIntervalInReviewButtons,
             );
         }
     }
 
     private _setupEaseButton(
-        button: ButtonComponent,
+        button: SRResponseButtonComponent,
         buttonName: string,
-        reviewSequencer: IFlashcardReviewSequencer,
-        currentCard: Card,
-        settings: SRSettings,
-        reviewResponse: ReviewResponse,
+        schedule: RepItemScheduleInfo,
+        showInterval: boolean,
     ) {
-        const schedule: RepItemScheduleInfo = reviewSequencer.determineCardSchedule(
-            reviewResponse,
-            currentCard,
-        );
-        const interval: number = schedule.interval;
+        if (showInterval) {
+            button.setSmallText(formatScheduleInterval(schedule, true));
+            button.setLargeText(`${buttonName} - ${formatScheduleInterval(schedule, false)}`);
 
-        if (settings.showIntervalInReviewButtons) {
             if (EmulatedPlatform().isMobile || Platform.isMobile) {
-                button.setButtonText(textInterval(interval, true));
+                if (button.buttonEl.hasClass("sr-show-large-text")) {
+                    button.buttonEl.removeClass("sr-show-large-text");
+                }
+                if (!button.buttonEl.hasClass("sr-show-small-text")) {
+                    button.buttonEl.addClass("sr-show-small-text");
+                }
             } else {
-                button.setButtonText(`${buttonName} - ${textInterval(interval, false)}`);
+                if (button.buttonEl.hasClass("sr-show-small-text")) {
+                    button.buttonEl.removeClass("sr-show-small-text");
+                }
+                if (!button.buttonEl.hasClass("sr-show-large-text")) {
+                    button.buttonEl.addClass("sr-show-large-text");
+                }
             }
         } else {
-            button.setButtonText(buttonName);
+            if (button.buttonEl.hasClass("sr-show-small-text")) {
+                button.buttonEl.removeClass("sr-show-small-text");
+            }
+            if (!button.buttonEl.hasClass("sr-show-large-text")) {
+                button.buttonEl.addClass("sr-show-large-text");
+            }
+            button.setLargeText(buttonName);
         }
     }
 }

@@ -4,10 +4,16 @@ import { IBaseLocale } from "src/lang/base-locale";
 
 const en: IBaseLocale = {
     // flashcard-modal.tsx
+    CRAM_MODE: "Cram Mode",
+    REVIEW_MODE: "Review Mode",
     DECKS: "Decks",
     DUE_CARDS: "Due Cards",
+    DUE: "Due",
     NEW_CARDS: "New Cards",
+    SEEN_CARDS: "Seen Cards",
+    SEEN: "Seen",
     TOTAL_CARDS: "Total Cards",
+    TOTAL: "Total",
     BACK: "Back",
     SKIP: "Skip",
     EDIT_CARD: "Edit Card",
@@ -23,13 +29,20 @@ const en: IBaseLocale = {
     CURRENT_EASE_HELP_TEXT: "Current Ease: ",
     CURRENT_INTERVAL_HELP_TEXT: "Current Interval: ",
     CARD_GENERATED_FROM: "Generated from: ${notePath}",
+    JUMP_TO: "Jump to card",
+    JUMP_TO_AND_CLOSE: "Close and jump to card",
+    OPEN_IN_BACKGROUND: "Open card in background",
     VIEW_CARD_INFO: "View Card Info",
+    DELETE_CARD: "Delete Card",
+    DELETE_CARD_CONFIRMATION:
+        "This action cannot be undone and might alter your notes in unwanted ways. Are you sure you want to delete this card?",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Open a note for review",
     REVIEW_CARDS: "Review flashcards",
     REVIEW_DIFFICULTY_FILE_MENU: "Review: ${difficulty}",
     REVIEW_NOTE_DIFFICULTY_CMD: "Review note as ${difficulty}",
+    REVIEW_CARD_DIFFICULTY_CMD: "Review card as ${difficulty}",
     CRAM_ALL_CARDS: "Select a deck to cram",
     REVIEW_ALL_CARDS: "Review flashcards from all notes",
     REVIEW_CARDS_IN_NOTE: "Review flashcards in this note",
@@ -80,14 +93,19 @@ const en: IBaseLocale = {
     FLASHCARD_EASY_LABEL: "Easy Button Text",
     FLASHCARD_GOOD_LABEL: "Good Button Text",
     FLASHCARD_HARD_LABEL: "Hard Button Text",
+    FLASHCARD_AGAIN_LABEL: "Again Button Text",
     FLASHCARD_EASY_DESC: 'Customize the label for the "Easy" Button',
     FLASHCARD_GOOD_DESC: 'Customize the label for the "Good" Button',
     FLASHCARD_HARD_DESC: 'Customize the label for the "Hard" Button',
+    FLASHCARD_AGAIN_DESC: 'Customize the label for the "Again" Button',
     REVIEW_BUTTON_DELAY: "Button Press Delay (ms)",
     REVIEW_BUTTON_DELAY_DESC: "Add a delay to the review buttons before they can be pressed again.",
     FLASHCARD_TAGS: "Flashcard tags",
     FLASHCARD_TAGS_DESC:
         "Enter tags separated by spaces or newlines i.e. #flashcards #deck2 #deck3.",
+    FLASHCARD_TAGS_TO_IGNORE: "Tags to ignore",
+    FLASHCARD_TAGS_TO_IGNORE_DESC:
+        "Enter tags separated by spaces or newlines. Notes containing any of these tags will be excluded from flashcard review.",
     CONVERT_FOLDERS_TO_DECKS: "Convert folders to decks and subdecks",
     CONVERT_FOLDERS_TO_DECKS_DESC: "This is an alternative to the Flashcard tags option above.",
     ALWAYS_INCLUDE_FRONTMATTER_TAGS: "Always include tags from frontmatter",
@@ -104,6 +122,8 @@ const en: IBaseLocale = {
     SHOW_INTERVAL_IN_REVIEW_BUTTONS: "Show next review time in the review buttons",
     SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
         "Useful to know how far in the future your cards are being pushed.",
+    SHOW_DELETE_BUTTON: "Show Delete button",
+    SHOW_DELETE_BUTTON_DESC: "Adds a delete button to the card review UI.",
     CARD_MODAL_HEIGHT_PERCENT: "Flashcard Height Percentage",
     CARD_MODAL_SIZE_PERCENT_DESC:
         "Should be set to 100% on mobile or if you have very large images",
@@ -150,6 +170,9 @@ const en: IBaseLocale = {
     REVIEW_PANE_ON_STARTUP: "Enable note review pane on startup",
     TAGS_TO_REVIEW: "Tags to review",
     TAGS_TO_REVIEW_DESC: "Enter tags separated by spaces or newlines i.e. #review #tag2 #tag3.",
+    NOTE_TAGS_TO_IGNORE: "Tags to ignore",
+    NOTE_TAGS_TO_IGNORE_DESC:
+        "Enter tags separated by spaces or newlines. Notes containing any of these tags will be excluded from note review.",
     OPEN_RANDOM_NOTE: "Open a random note for review",
     OPEN_RANDOM_NOTE_DESC: "When you turn this off, notes are ordered by importance (PageRank).",
     AUTO_NEXT_NOTE: "Open next note automatically after a review",
@@ -159,9 +182,18 @@ const en: IBaseLocale = {
     UI: "User Interface",
     OPEN_IN_TAB: "Open in new tab",
     OPEN_IN_TAB_DESC: "Turn this off to open the plugin in a modal window",
+    STATUS_BAR_SETTINGS: "Status Bar",
     SHOW_STATUS_BAR: "Show status bar",
-    SHOW_STATUS_BAR_DESC:
+    SHOW_STATUS_BAR_DESC: "Turn this off to hide all status messages in Obsidian's status bar",
+    SHOW_CARD_STATUS_BAR_ITEM: "Show card status bar item",
+    SHOW_CARD_STATUS_BAR_ITEM_DESC:
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
+    SHOW_NOTE_STATUS_BAR_ITEM: "Show note status bar item",
+    SHOW_NOTE_STATUS_BAR_ITEM_DESC:
+        "Turn this off to hide the note's review status in Obsidian's status bar",
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM: "Show update available status bar item",
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM_DESC:
+        "Turn this off to hide the update available status bar item",
     SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
     SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     ENABLE_FILE_MENU_REVIEW_OPTIONS:
@@ -175,6 +207,9 @@ const en: IBaseLocale = {
     CHECK_ALGORITHM_WIKI:
         'For more information, check the <a href="${algoUrl}">algorithm details</a>.',
     SM2_OSR_VARIANT: "OSR's variant of SM-2",
+    SWITCH_TO_FSRS_ALGORITHM: "Switch flashcard algorithm to FSRS?",
+    CONFIRM_FSRS_ALGORITHM_SWITCH:
+        "Switching to FSRS may cause unforseen data loss, as it is still not tested enough! Switching changes how flashcard scheduling data is formatted as cards are reviewed. this means that rewritten cards in the FSRS format, will require a lot more parameters and thus a longer, more intrusive, scheduling data comment. There is best effort backwards compatibility for the scheduling comments, in case you might want to switch back to OSR. This means your scheduling data will be rewritten to the OSR format once you review a card with OSR enabled.",
     BASE_EASE: "Base ease",
     BASE_EASE_DESC: "minimum = 130, preferrably approximately 250.",
     BASE_EASE_MIN_WARNING: "The base ease must be at least 130.",
@@ -211,6 +246,9 @@ const en: IBaseLocale = {
     SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS: "Scheduling data deletion in progress...",
     SCHEDULING_DATA_HAS_BEEN_DELETED:
         "Scheduling data has been deleted from all notes and flashcards.",
+    USE_CUSTOM_HOTKEYS: "Use custom hotkeys",
+    USE_CUSTOM_HOTKEYS_DESC:
+        "Enable custom hotkeys for the review cards commands. The default hotkeys wont be active after enabling this. Custom hotkeys can only be used when using the 'Open in new tab' option.",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Notes Review Queue",
@@ -294,6 +332,31 @@ const en: IBaseLocale = {
     CHECK_ROADMAP: 'Check out the <a href="${roadMapUrl}">roadmap</a> for upcoming features.',
     CHECK_DEV_NEWS:
         'Check out the <a href="${devNewsUrl}">dev news</a> for the latest development news.',
+
+    OPEN_MENU: "Open menu",
+    DELETE_NOTE_SCHEDULING_DATA_IN_NOTE: "Delete note scheduling data in note",
+    CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION:
+        "Are you sure you want to delete note scheduling data in this note?",
+    NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS: "Deleting note scheduling data in note...",
+    DELETE_SCHEDULING_DATA_OF_CARDS_IN_NOTE: "Delete scheduling data of cards in note",
+    CONFIRM_SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION:
+        "Are you sure you want to delete scheduling data of cards in note?",
+    SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION_IN_PROGRESS:
+        "Deleting scheduling data of cards in note...",
+
+    DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA: "Delete tags when deleting scheduling data",
+    DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA_DESC: "Delete tags when deleting scheduling data",
+
+    ENABLE_FILE_MENU_DELETE_BUTTON: "Enable file menu delete button",
+    ENABLE_FILE_MENU_DELETE_BUTTON_DESC:
+        "Enables the delete button in the file menu for scheduling data",
+
+    DATA_PAGE_NAME: "Data",
+    GROUP_RESET_SETTINGS: "Reset settings",
+    GROUP_RESET_SETTINGS_DESC: "Reset all settings to their default values",
+    RESET_SETTINGS: "Reset settings",
+    CONFIRM_RESET_SETTINGS: "Are you sure you want to reset all settings to their default values?",
+    RESET_SETTINGS_CONFIRMATION: "Resetting all settings to their default values...",
 };
 
 export default en;

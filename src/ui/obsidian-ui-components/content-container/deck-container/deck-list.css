@@ -1,0 +1,101 @@
+.sr-deck-container {
+    .sr-scroll-wrapper {
+        height: 100px;
+        /* Arbitrary height to force the content to scroll */
+        overflow: hidden;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+
+        & .sr-content {
+            overflow-x: hidden;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding: var(--size-4-2);
+            padding-right: var(--size-4-1);
+            padding-top: var(--size-4-4);
+        }
+    }
+
+    & .sr-tree-item-row {
+        padding-top: 2px;
+        padding-bottom: 2px;
+        margin-bottom: 0;
+
+        &.is-disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    }
+
+    & .sr-tree-stats-container {
+        display: flex;
+        gap: var(--size-4-1);
+    }
+
+    & .sr-tree-stats-count {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /* 32px = 5ch */
+        min-width: calc(32px + var(--size-2-1) * 2);
+        padding: var(--size-4-1) var(--size-2-1);
+        text-align: center;
+    }
+
+    & .sr-tree-stats-count:not(.sr-fg-green, .sr-fg-blue, .sr-fg-red, .sr-fg-yellow) {
+        color: #ffffff !important;
+    }
+}
+
+.sr-header-row .sr-tree-row-text,
+.sr-header-row .sr-tree-stats-count {
+    font-weight: bold;
+    font-size: small;
+}
+
+.sr-header-row {
+    & .tree-item-self {
+        border-bottom: 1px dashed var(--background-modifier-border);
+        border-radius: 0;
+        margin-bottom: var(--size-4-1);
+    }
+}
+
+.sr-deck-container .tag-pane-tag-self {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: keep-all;
+    display: block;
+}
+
+.is-phone .sr-deck-container .sr-content {
+    padding: 0;
+    padding-top: var(--size-4-4);
+}
+
+.is-phone .sr-deck-container .tree-item .tree-item-self {
+    padding-inline-end: 4px;
+}
+
+.is-mobile .sr-deck-container .sr-tree-stats-count {
+    border-radius: var(--tag-radius);
+    height: 21px;
+}
+
+.is-phone .sr-deck-container .sr-tree-stats-count {
+    /* 32px = 5ch */
+    min-width: 32px;
+    padding: var(--size-4-1) 0;
+}
+
+@media only screen and (orientation: landscape) {
+    .is-phone .sr-deck-container .sr-content {
+        padding-top: var(--size-2-1);
+    }
+
+    .is-phone .sr-deck-container .sr-header-row {
+        display: none;
+    }
+}

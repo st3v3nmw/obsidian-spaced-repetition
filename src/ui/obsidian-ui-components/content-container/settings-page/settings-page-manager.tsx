@@ -3,6 +3,7 @@ import h from "vhtml";
 
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { DataPage } from "src/ui/obsidian-ui-components/content-container/settings-page/data-page";
 import { FlashcardsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/flashcards-page";
 import { MainPage } from "src/ui/obsidian-ui-components/content-container/settings-page/main-page";
 import { NotesPage } from "src/ui/obsidian-ui-components/content-container/settings-page/notes-page";
@@ -22,6 +23,7 @@ export type SettingsPageType =
     | "notes-page"
     | "scheduling-page"
     | "ui-preferences-page"
+    | "data-page"
     | "statistics-page";
 
 /**
@@ -35,6 +37,7 @@ export const SettingsPageTypesArray: ReadonlyArray<SettingsPageType> = [
     "notes-page",
     "scheduling-page",
     "ui-preferences-page",
+    "data-page",
     "statistics-page",
 ];
 
@@ -56,6 +59,8 @@ export function getPageName(pageType: SettingsPageType): string {
             return t("SCHEDULING");
         case "ui-preferences-page":
             return t("UI");
+        case "data-page":
+            return t("DATA_PAGE_NAME");
         case "statistics-page":
             return t("STATS_TITLE");
     }
@@ -79,6 +84,8 @@ export function getPageIcon(pageType: SettingsPageType): string {
             return "calendar";
         case "ui-preferences-page":
             return "presentation";
+        case "data-page":
+            return "hard-drive";
         case "statistics-page":
             return "bar-chart-3";
     }
@@ -97,17 +104,25 @@ export class SettingsPageManager {
     private currentPage: SettingsPageType;
     private updateLastPageState: (lastPage: SettingsPageType, lastScrollPosition: number) => void;
     private display: () => void;
+    private didReadMultilineEndMarkerWarning: boolean;
+    private changeMultilineEndMarkerWarningState: (
+        didReadMultilineEndMarkerWarning: boolean,
+    ) => void;
 
     constructor(
         containerEl: HTMLElement,
         plugin: SRPlugin,
         lastPage: SettingsPageType,
         lastScrollPosition: number,
+        didReadMultilineEndMarkerWarning: boolean,
         updateLastPageState: (lastPage: SettingsPageType, lastScrollPosition: number) => void,
         display: () => void,
+        changeMultilineEndMarkerWarningState: (didReadMultilineEndMarkerWarning: boolean) => void,
     ) {
         this.containerEl = containerEl;
         this.plugin = plugin;
+        this.didReadMultilineEndMarkerWarning = didReadMultilineEndMarkerWarning;
+        this.changeMultilineEndMarkerWarningState = changeMultilineEndMarkerWarningState;
         this.updateLastPageState = updateLastPageState;
         this.display = display;
 
@@ -160,10 +175,12 @@ export class SettingsPageManager {
                             newPageContainerEl,
                             this.plugin,
                             pageType,
+                            this.didReadMultilineEndMarkerWarning,
                             this.applySettingsUpdate.bind(this),
                             this.display,
                             this.openPage.bind(this),
                             this.scrollListener.bind(this),
+                            this.changeMultilineEndMarkerWarningState.bind(this),
                         ),
                     );
                     break;
@@ -196,6 +213,19 @@ export class SettingsPageManager {
                 case "ui-preferences-page":
                     this.pages.push(
                         new UIPreferencesPage(
+                            newPageContainerEl,
+                            this.plugin,
+                            pageType,
+                            this.applySettingsUpdate.bind(this),
+                            this.display,
+                            this.openPage.bind(this),
+                            this.scrollListener.bind(this),
+                        ),
+                    );
+                    break;
+                case "data-page":
+                    this.pages.push(
+                        new DataPage(
                             newPageContainerEl,
                             this.plugin,
                             pageType,
