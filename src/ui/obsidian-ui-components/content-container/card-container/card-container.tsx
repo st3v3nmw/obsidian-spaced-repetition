@@ -1,9 +1,9 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/card-container.css";
+import moment from "moment";
 import { App, Platform } from "obsidian";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { formatPendingDueTime } from "src/algorithms/schedule-display";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { CardType } from "src/card/questions/question";
 import { escapeHtml } from "src/escape-html";
@@ -33,6 +33,8 @@ export class CardContainer {
 
     private scrollWrapper: HTMLDivElement;
     private content: HTMLDivElement;
+    private pendingClock: HTMLDivElement | null = null;
+    private pendingResumeTimeout: number | null = null;
 
     private response: ResponseSectionComponent;
 
@@ -133,8 +135,13 @@ export class CardContainer {
      */
     closeSession() {
         // Prevents the rest of code, from running if this was executed multiple times after one another
+
         if (this.view.hasClass("sr-is-hidden")) {
             return;
+        }
+        if (this.pendingResumeTimeout !== null) {
+            window.clearTimeout(this.pendingResumeTimeout);
+            this.pendingResumeTimeout = null;
         }
         this.cardState = CardState.Closed;
         document.removeEventListener("keydown", this._keydownHandler);
@@ -209,12 +216,32 @@ export class CardContainer {
         this.cardState = CardState.Front;
         this.content.empty();
         this.response.hideAllButtons();
-        this.content.createDiv({
+        this.pendingClock = this.content.createDiv({
             cls: "sr-centered",
-            text: `Waiting for the next FSRS review step. Next card due at ${formatPendingDueTime(
-                nextPendingDueUnix,
-            )}.`,
         });
+
+        const updatePendingClock = () => {
+            const startTime = moment();
+            const endTime = moment(nextPendingDueUnix);
+
+            // Calculate the difference in milliseconds
+            const duration = moment.duration(endTime.diff(startTime));
+
+            const hours = Math.floor(duration.asHours());
+            const minutes = duration.minutes();
+            const seconds = duration.seconds();
+
+            const formatted = `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+            this.pendingClock?.setText(
+                `Waiting for the next FSRS review step. Next card due in ${formatted} (HH:mm:ss).`,
+            );
+            this.pendingResumeTimeout = window.setTimeout(() => {
+                updatePendingClock();
+            }, 1000);
+        };
+
+        updatePendingClock();
     }
 
     // #region -> Deck Info

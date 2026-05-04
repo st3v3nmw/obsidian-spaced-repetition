@@ -141,127 +141,159 @@ export class SchedulingPage extends SettingsPage {
             });
         }
 
-        algorithmGroup.addSetting((setting: Setting) => {
-            setting
-                .setName(t("BASE_EASE"))
-                .setDesc(t("BASE_EASE_DESC"))
-                .addExtraButton((button) => {
-                    button
-                        .setIcon("reset")
-                        .setTooltip(t("RESET_DEFAULT"))
-                        .onClick(async () => {
-                            this.plugin.data.settings.baseEase = DEFAULT_SETTINGS.baseEase;
-                            await this.plugin.savePluginData();
-
-                            this.display();
-                        });
-                })
-                .addText((text) =>
-                    text
-                        .setValue(this.plugin.data.settings.baseEase.toString())
-                        .onChange((value) => {
-                            applySettingsUpdate(async () => {
-                                const numValue: number = Number.parseInt(value);
-                                if (!isNaN(numValue)) {
-                                    if (numValue < 130) {
-                                        new Notice(t("BASE_EASE_MIN_WARNING"));
-                                        text.setValue(
-                                            this.plugin.data.settings.baseEase.toString(),
-                                        );
-                                        return;
-                                    }
-
-                                    this.plugin.data.settings.baseEase = numValue;
+        if (this.plugin.data.settings.algorithm === Algorithm.SM_2_OSR) {
+            algorithmGroup
+                .addSetting((setting: Setting) => {
+                    setting
+                        .setName(t("BASE_EASE"))
+                        .setDesc(t("BASE_EASE_DESC"))
+                        .addExtraButton((button) => {
+                            button
+                                .setIcon("reset")
+                                .setTooltip(t("RESET_DEFAULT"))
+                                .onClick(async () => {
+                                    this.plugin.data.settings.baseEase = DEFAULT_SETTINGS.baseEase;
                                     await this.plugin.savePluginData();
-                                } else {
-                                    new Notice(t("VALID_NUMBER_WARNING"));
-                                }
-                            });
-                        }),
-                );
-        });
-        algorithmGroup
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("LAPSE_INTERVAL_CHANGE"))
-                    .setDesc(t("LAPSE_INTERVAL_CHANGE_DESC"))
-                    .addExtraButton((button) => {
-                        button
-                            .setIcon("reset")
-                            .setTooltip(t("RESET_DEFAULT"))
-                            .onClick(async () => {
-                                this.plugin.data.settings.lapsesIntervalChange =
-                                    DEFAULT_SETTINGS.lapsesIntervalChange;
-                                await this.plugin.savePluginData();
 
-                                this.display();
-                            });
-                    })
-                    .addSlider((slider) =>
-                        slider
-                            .setLimits(1, 99, 1)
-                            .setValue(this.plugin.data.settings.lapsesIntervalChange * 100)
-                            .setDynamicTooltip()
-                            .onChange(async (value: number) => {
-                                this.plugin.data.settings.lapsesIntervalChange = value / 100;
-                                await this.plugin.savePluginData();
-                            }),
-                    );
-            })
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("EASY_BONUS"))
-                    .setDesc(t("EASY_BONUS_DESC"))
-                    .addExtraButton((button) => {
-                        button
-                            .setIcon("reset")
-                            .setTooltip(t("RESET_DEFAULT"))
-                            .onClick(async () => {
-                                this.plugin.data.settings.easyBonus = DEFAULT_SETTINGS.easyBonus;
-                                await this.plugin.savePluginData();
-
-                                this.display();
-                            });
-                    })
-                    .addText((text) =>
-                        text
-                            .setValue((this.plugin.data.settings.easyBonus * 100).toString())
-                            .onChange((value) => {
-                                applySettingsUpdate(async () => {
-                                    const numValue: number = Number.parseInt(value) / 100;
-                                    if (!isNaN(numValue)) {
-                                        if (numValue < 1.0) {
-                                            new Notice(t("EASY_BONUS_MIN_WARNING"));
-                                            text.setValue(
-                                                (
-                                                    this.plugin.data.settings.easyBonus * 100
-                                                ).toString(),
-                                            );
-                                            return;
-                                        }
-
-                                        this.plugin.data.settings.easyBonus = numValue;
-                                        await this.plugin.savePluginData();
-                                    } else {
-                                        new Notice(t("VALID_NUMBER_WARNING"));
-                                    }
+                                    this.display();
                                 });
-                            }),
-                    );
-            })
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("LOAD_BALANCE"))
-                    .setDesc(t("LOAD_BALANCE_DESC"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.plugin.data.settings.loadBalance)
-                            .onChange(async (value) => {
-                                this.plugin.data.settings.loadBalance = value;
-                                await this.plugin.savePluginData();
-                            }),
-                    );
-            })
+                        })
+                        .addText((text) =>
+                            text
+                                .setValue(this.plugin.data.settings.baseEase.toString())
+                                .onChange((value) => {
+                                    applySettingsUpdate(async () => {
+                                        const numValue: number = Number.parseInt(value);
+                                        if (!isNaN(numValue)) {
+                                            if (numValue < 130) {
+                                                new Notice(t("BASE_EASE_MIN_WARNING"));
+                                                text.setValue(
+                                                    this.plugin.data.settings.baseEase.toString(),
+                                                );
+                                                return;
+                                            }
+
+                                            this.plugin.data.settings.baseEase = numValue;
+                                            await this.plugin.savePluginData();
+                                        } else {
+                                            new Notice(t("VALID_NUMBER_WARNING"));
+                                        }
+                                    });
+                                }),
+                        );
+                })
+                .addSetting((setting: Setting) => {
+                    setting
+                        .setName(t("MAX_LINK_CONTRIB"))
+                        .setDesc(t("MAX_LINK_CONTRIB_DESC"))
+                        .addExtraButton((button) => {
+                            button
+                                .setIcon("reset")
+                                .setTooltip(t("RESET_DEFAULT"))
+                                .onClick(async () => {
+                                    this.plugin.data.settings.maxLinkFactor =
+                                        DEFAULT_SETTINGS.maxLinkFactor;
+                                    await this.plugin.savePluginData();
+
+                                    this.display();
+                                });
+                        })
+                        .addSlider((slider) =>
+                            slider
+                                .setLimits(0, 100, 1)
+                                .setValue(this.plugin.data.settings.maxLinkFactor * 100)
+                                .setDynamicTooltip()
+                                .onChange(async (value: number) => {
+                                    this.plugin.data.settings.maxLinkFactor = value / 100;
+                                    await this.plugin.savePluginData();
+                                }),
+                        );
+                })
+                .addSetting((setting: Setting) => {
+                    setting
+                        .setName(t("LAPSE_INTERVAL_CHANGE"))
+                        .setDesc(t("LAPSE_INTERVAL_CHANGE_DESC"))
+                        .addExtraButton((button) => {
+                            button
+                                .setIcon("reset")
+                                .setTooltip(t("RESET_DEFAULT"))
+                                .onClick(async () => {
+                                    this.plugin.data.settings.lapsesIntervalChange =
+                                        DEFAULT_SETTINGS.lapsesIntervalChange;
+                                    await this.plugin.savePluginData();
+
+                                    this.display();
+                                });
+                        })
+                        .addSlider((slider) =>
+                            slider
+                                .setLimits(1, 99, 1)
+                                .setValue(this.plugin.data.settings.lapsesIntervalChange * 100)
+                                .setDynamicTooltip()
+                                .onChange(async (value: number) => {
+                                    this.plugin.data.settings.lapsesIntervalChange = value / 100;
+                                    await this.plugin.savePluginData();
+                                }),
+                        );
+                })
+                .addSetting((setting: Setting) => {
+                    setting
+                        .setName(t("EASY_BONUS"))
+                        .setDesc(t("EASY_BONUS_DESC"))
+                        .addExtraButton((button) => {
+                            button
+                                .setIcon("reset")
+                                .setTooltip(t("RESET_DEFAULT"))
+                                .onClick(async () => {
+                                    this.plugin.data.settings.easyBonus =
+                                        DEFAULT_SETTINGS.easyBonus;
+                                    await this.plugin.savePluginData();
+
+                                    this.display();
+                                });
+                        })
+                        .addText((text) =>
+                            text
+                                .setValue((this.plugin.data.settings.easyBonus * 100).toString())
+                                .onChange((value) => {
+                                    applySettingsUpdate(async () => {
+                                        const numValue: number = Number.parseInt(value) / 100;
+                                        if (!isNaN(numValue)) {
+                                            if (numValue < 1.0) {
+                                                new Notice(t("EASY_BONUS_MIN_WARNING"));
+                                                text.setValue(
+                                                    (
+                                                        this.plugin.data.settings.easyBonus * 100
+                                                    ).toString(),
+                                                );
+                                                return;
+                                            }
+
+                                            this.plugin.data.settings.easyBonus = numValue;
+                                            await this.plugin.savePluginData();
+                                        } else {
+                                            new Notice(t("VALID_NUMBER_WARNING"));
+                                        }
+                                    });
+                                }),
+                        );
+                })
+                .addSetting((setting: Setting) => {
+                    setting
+                        .setName(t("LOAD_BALANCE"))
+                        .setDesc(t("LOAD_BALANCE_DESC"))
+                        .addToggle((toggle) =>
+                            toggle
+                                .setValue(this.plugin.data.settings.loadBalance)
+                                .onChange(async (value) => {
+                                    this.plugin.data.settings.loadBalance = value;
+                                    await this.plugin.savePluginData();
+                                }),
+                        );
+                });
+        }
+
+        algorithmGroup
             .addSetting((setting: Setting) => {
                 setting
                     .setName(t("MAX_INTERVAL"))
@@ -332,33 +364,6 @@ export class SchedulingPage extends SettingsPage {
                                 }
                             });
                         }),
-                    );
-            })
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("MAX_LINK_CONTRIB"))
-                    .setDesc(t("MAX_LINK_CONTRIB_DESC"))
-                    .addExtraButton((button) => {
-                        button
-                            .setIcon("reset")
-                            .setTooltip(t("RESET_DEFAULT"))
-                            .onClick(async () => {
-                                this.plugin.data.settings.maxLinkFactor =
-                                    DEFAULT_SETTINGS.maxLinkFactor;
-                                await this.plugin.savePluginData();
-
-                                this.display();
-                            });
-                    })
-                    .addSlider((slider) =>
-                        slider
-                            .setLimits(0, 100, 1)
-                            .setValue(this.plugin.data.settings.maxLinkFactor * 100)
-                            .setDynamicTooltip()
-                            .onChange(async (value: number) => {
-                                this.plugin.data.settings.maxLinkFactor = value / 100;
-                                await this.plugin.savePluginData();
-                            }),
                     );
             });
     }

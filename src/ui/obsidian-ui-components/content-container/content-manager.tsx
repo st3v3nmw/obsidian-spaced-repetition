@@ -208,11 +208,13 @@ export default class ContentManager {
         }
 
         if (!this.reviewSequencer.hasCurrentCard) {
-            if (this.reviewSequencer.hasPendingCards) {
-                this._showPendingState();
-            } else {
-                this._showDecksList(true);
-            }
+            // TODO: Re-enable pending state, once it is more integrated with the rest of the ui & once data refreshing is better implemented
+            // if (this.reviewSequencer.hasPendingCards) {
+            //     this._showPendingState();
+            // } else {
+            //     this._showDecksList(true);
+            // }
+            this._showDecksList(true);
             return;
         }
 

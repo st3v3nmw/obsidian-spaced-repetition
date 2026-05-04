@@ -70,6 +70,9 @@ export default class ResponseSectionComponent {
 
     public resetResponseButtons() {
         // Sets all buttons in to their default state
+        if (this.responseEl.hasClass("sr-is-hidden")) {
+            this.responseEl.removeClass("sr-is-hidden");
+        }
         this.answerButton.buttonEl.removeClass("sr-is-hidden");
         this.againButton.buttonEl.addClass("sr-is-hidden");
         this.hardButton.buttonEl.addClass("sr-is-hidden");
@@ -78,6 +81,9 @@ export default class ResponseSectionComponent {
     }
 
     public hideAllButtons() {
+        if (!this.responseEl.hasClass("sr-is-hidden")) {
+            this.responseEl.addClass("sr-is-hidden");
+        }
         this.answerButton.buttonEl.addClass("sr-is-hidden");
         this.againButton.buttonEl.addClass("sr-is-hidden");
         this.hardButton.buttonEl.addClass("sr-is-hidden");
@@ -94,6 +100,9 @@ export default class ResponseSectionComponent {
         showIntervalInReviewButtons: boolean,
         determineButtonSchedule: (response: ReviewResponse) => RepItemScheduleInfo,
     ) {
+        if (this.responseEl.hasClass("sr-is-hidden")) {
+            this.responseEl.removeClass("sr-is-hidden");
+        }
         // Shows the rating buttons and hides the show answer button
         this.answerButton.buttonEl.addClass("sr-is-hidden");
 
