@@ -1,5 +1,5 @@
+import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { TopicPath, TopicPathList } from "src/deck/topic-path";
-import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
 

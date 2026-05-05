@@ -1,4 +1,4 @@
-import { SRSettings } from "src/settings";
+import { SRSettings } from "src/data/settings";
 
 export interface INoteEaseList {
     dict: Record<string, number>;

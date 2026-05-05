@@ -7,7 +7,7 @@ import { SrsAlgorithmFsrs } from "src/algorithms/fsrs/srs-algorithm-fsrs";
 import { ObsidianVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
 import { SrsAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
 import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
-import { OsrAppCore } from "src/core";
+import { OsrAppCore } from "src/data/core";
 import { DataStoreAlgorithm } from "src/data/data-store-algorithm/data-store-algorithm";
 import { DataStoreInNoteAlgorithmOsr } from "src/data/data-store-algorithm/data-store-in-note-algorithm-osr";
 import { DataStoreInPluginDataAlgorithmOsr } from "src/data/data-store-algorithm/data-store-in-plugin-data-algorithm-osr";
@@ -17,16 +17,16 @@ import { StoreInNotes } from "src/data/data-stores/notes/notes";
 import { StoreInPluginData } from "src/data/data-stores/plugin-data/plugin-data";
 // import { ScheduleDataMarkdownStorage } from "src/data/data-stores/plugin-data/schedule-data-markdown-storage";
 import { ScheduleDataRepository } from "src/data/data-stores/plugin-data/schedule-data-repository";
+import { ISRFile, SrTFile } from "src/data/file";
+import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
+import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/data/settings";
 import { TopicPath } from "src/deck/topic-path";
-import { ISRFile, SrTFile } from "src/file";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
 import { NoteFileLoader } from "src/note/note-file-loader";
 import { NoteReviewQueue } from "src/note/note-review-queue";
 import { setDebugParser } from "src/parser";
-import { DEFAULT_DATA, PluginData } from "src/plugin-data";
-import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
 
 /**
  * Manages the plugin data and handles loading/saving/migrating.

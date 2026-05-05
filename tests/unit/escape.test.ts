@@ -1,4 +1,4 @@
-import { escapeHtml } from "src/escape-html";
+import { escapeHtml } from "src/utils/escape-html";
 
 describe("Escape", () => {
     test("Escape Letters", () => {

@@ -9,16 +9,16 @@ import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
 import { DataStoreName } from "src/data/data-stores/base/data-store";
 import { ScheduleDataRepository } from "src/data/data-stores/plugin-data/schedule-data-repository";
+import { ISRFile, SrTFile } from "src/data/file";
+import { SettingsUtil, SRSettings } from "src/data/settings";
 import { Deck, DeckTreeFilter } from "src/deck/deck";
 import { DeckTreeStatsCalculator } from "src/deck/deck-tree-stats-calculator";
 import { Stats } from "src/deck/stats";
 import { TopicPath } from "src/deck/topic-path";
 import { CardDueDateHistogram, NoteDueDateHistogram } from "src/due-date-histogram";
-import { ISRFile, SrTFile } from "src/file";
 import { Note } from "src/note/note";
 import { NoteFileLoader } from "src/note/note-file-loader";
 import { NoteReviewQueue } from "src/note/note-review-queue";
-import { SettingsUtil, SRSettings } from "src/settings";
 import { globalDateProvider, IDayBoundary } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 

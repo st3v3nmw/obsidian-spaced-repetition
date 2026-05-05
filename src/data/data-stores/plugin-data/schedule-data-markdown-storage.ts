@@ -1,6 +1,6 @@
 import { App, TFile, TFolder } from "obsidian";
 
-import { PluginDataScheduleState, SerializedScheduleInfo } from "src/plugin-data";
+import { PluginDataScheduleState, SerializedScheduleInfo } from "src/data/plugin-data";
 
 type NoteScheduleMap = Record<string, SerializedScheduleInfo | null>;
 type CardScheduleMap = Record<string, (SerializedScheduleInfo | null)[]>;

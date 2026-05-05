@@ -4,7 +4,7 @@ import {
     CardFrontBackUtil,
     QuestionTypeClozeFormatter,
 } from "src/card/questions/question-type";
-import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
+import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 
 test("CardType.SingleLineBasic", () => {
     expect(CardFrontBackUtil.expand(CardType.SingleLineBasic, "A::B", DEFAULT_SETTINGS)).toEqual([

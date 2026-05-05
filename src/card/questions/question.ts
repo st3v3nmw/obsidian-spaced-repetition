@@ -2,13 +2,13 @@ import { Card } from "src/card/card";
 import {
     OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX,
     OBSIDIAN_TAG_AT_STARTOFLINE_REGEX,
-} from "src/constants";
+} from "src/data/constants";
 import { DataStoreAlgorithm } from "src/data/data-store-algorithm/data-store-algorithm";
 import { DataStore } from "src/data/data-stores/base/data-store";
+import { SRSettings } from "src/data/settings";
 import { TopicPath, TopicPathList, TopicPathWithWs } from "src/deck/topic-path";
 import { Note } from "src/note/note";
 import { ParsedQuestionInfo } from "src/parser";
-import { SRSettings } from "src/settings";
 import { cyrb53, MultiLineTextFinder, stringTrimStart, TextDirection } from "src/utils/strings";
 
 export enum CardType {

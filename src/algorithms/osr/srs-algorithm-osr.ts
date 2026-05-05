@@ -7,10 +7,10 @@ import { osrSchedule } from "src/algorithms/osr/note-scheduling";
 import { NoteLinkStat, OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { Question } from "src/card/questions/question";
+import { SRSettings } from "src/data/settings";
 import { DueDateHistogram } from "src/due-date-histogram";
 import { Note } from "src/note/note";
 import { INoteEaseList, NoteEaseList } from "src/note/note-ease-list";
-import { SRSettings } from "src/settings";
 import { globalDateProvider } from "src/utils/dates";
 
 export class SrsAlgorithmOsr implements ISrsAlgorithm {

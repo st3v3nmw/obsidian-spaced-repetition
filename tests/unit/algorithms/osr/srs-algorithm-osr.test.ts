@@ -6,8 +6,8 @@ import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { SrsAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
+import { DEFAULT_SETTINGS } from "src/data/settings";
 import { CardDueDateHistogram } from "src/due-date-histogram";
-import { DEFAULT_SETTINGS } from "src/settings";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
 import { unitTestSetupStandardDataStoreAlgorithm } from "../../helpers/unit-test-setup";

@@ -4,9 +4,9 @@ import { Question, QuestionText } from "src/card/questions/question";
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
 import { StoreInPluginData } from "src/data/data-stores/plugin-data/plugin-data";
 import { ScheduleDataRepository } from "src/data/data-stores/plugin-data/schedule-data-repository";
+import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
+import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { Note } from "src/note/note";
-import { DEFAULT_DATA, PluginData } from "src/plugin-data";
-import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 

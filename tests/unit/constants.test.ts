@@ -1,4 +1,4 @@
-import { YAML_FRONT_MATTER_REGEX } from "src/constants";
+import { YAML_FRONT_MATTER_REGEX } from "src/data/constants";
 
 describe("YAML_FRONT_MATTER_REGEX", () => {
     function createTestStr1(sep: string): string {

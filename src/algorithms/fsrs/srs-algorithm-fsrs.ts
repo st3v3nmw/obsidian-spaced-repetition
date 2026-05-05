@@ -11,10 +11,10 @@ import {
 import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { SrsAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
+import { SRSettings } from "src/data/settings";
 import { DueDateHistogram } from "src/due-date-histogram";
 import { Note } from "src/note/note";
 import { INoteEaseList } from "src/note/note-ease-list";
-import { SRSettings } from "src/settings";
 import { globalDateProvider } from "src/utils/dates";
 
 export class SrsAlgorithmFsrs implements ISrsAlgorithm {

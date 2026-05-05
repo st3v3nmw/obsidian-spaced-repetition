@@ -4,7 +4,7 @@ import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer,
 } from "src/card/flashcard-review-sequencer";
-import { OsrAppCore } from "src/core";
+import { OsrAppCore } from "src/data/core";
 import { Deck } from "src/deck/deck";
 import SRPlugin from "src/main";
 

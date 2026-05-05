@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
+import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 
 export interface SerializedScheduleInfo {
     dueDate: string;

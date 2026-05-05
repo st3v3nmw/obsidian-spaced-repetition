@@ -11,6 +11,7 @@ import {
     IFlashcardReviewSequencer,
 } from "src/card/flashcard-review-sequencer";
 import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
+import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { CardListType, Deck, DeckTreeFilter } from "src/deck/deck";
 import {
     CardOrder,
@@ -21,7 +22,6 @@ import {
 } from "src/deck/deck-tree-iterator";
 import { TopicPath } from "src/deck/topic-path";
 import { CardDueDateHistogram } from "src/due-date-histogram";
-import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import {
     setupStaticDateProvider20230906,
     setupStaticDateProviderOriginDatePlusDays,

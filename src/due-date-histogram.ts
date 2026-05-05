@@ -1,7 +1,7 @@
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { Card } from "src/card/card";
-import { TICKS_PER_DAY } from "src/constants";
+import { TICKS_PER_DAY } from "src/data/constants";
 import { Deck } from "src/deck/deck";
 import {
     CardOrder,

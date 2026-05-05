@@ -6,10 +6,9 @@ import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info"
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { CardType } from "src/card/questions/question";
-import { escapeHtml } from "src/escape-html";
+import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
-import { SRSettings } from "src/settings";
 import ContextSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/context-section/context-section";
 import ResponseSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section";
 import CardToolbarComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar";
@@ -18,6 +17,7 @@ import {
     SessionData,
 } from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
+import { escapeHtml } from "src/utils/escape-html";
 import EmulatedPlatform from "src/utils/platform-detector";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
 

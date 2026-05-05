@@ -1,8 +1,8 @@
 import "src/ui/obsidian-ui-components/modals/modal-view.css";
 import { App, Modal, Platform } from "obsidian";
 
+import { SRSettings } from "src/data/settings";
 import type SRPlugin from "src/main";
-import { SRSettings } from "src/settings";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import EmulatedPlatform from "src/utils/platform-detector";

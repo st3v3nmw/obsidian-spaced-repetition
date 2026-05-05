@@ -18,8 +18,8 @@ module.exports = {
         "node_modules/",
 
         // GUI & Obsidian coupled code
-        "src/core.ts",
-        "src/file.ts",
+        "src/data/core.ts",
+        "src/data/file.ts",
         "src/ui/",
         "src/icons/",
         "src/main.ts",
@@ -27,7 +27,7 @@ module.exports = {
         "src/data/data-manager.ts",
         "src/data/data-stores/data-store-migrator.ts",
         "src/note/next-note-review-handler.ts",
-        "src/plugin-data.ts",
+        "src/data/plugin-data.ts",
         "src/utils/renderers.ts",
 
         // debugging utils

@@ -1,7 +1,7 @@
 import moment from "moment";
 
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
-import { DEFAULT_SETTINGS } from "src/settings";
+import { DEFAULT_SETTINGS } from "src/data/settings";
 
 describe("formatCardScheduleForHtmlComment", () => {
     test("With due date", () => {

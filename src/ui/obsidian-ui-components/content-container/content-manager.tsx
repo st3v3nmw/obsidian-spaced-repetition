@@ -11,11 +11,11 @@ import {
 } from "src/card/flashcard-review-sequencer";
 import { Question } from "src/card/questions/question";
 import { DataManager } from "src/data/data-manager";
+import { SRSettings } from "src/data/settings";
 import { Deck } from "src/deck/deck";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
-import { SRSettings } from "src/settings";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
 import CardInfoNotice from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-info-notice";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";

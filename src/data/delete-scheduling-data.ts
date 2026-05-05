@@ -1,6 +1,6 @@
 import { Notice, TFile, Vault } from "obsidian";
 
-import { FLASHCARD_SCHEDULE_INFO } from "src/constants";
+import { FLASHCARD_SCHEDULE_INFO } from "src/data/constants";
 import { t } from "src/lang/helpers";
 
 /**

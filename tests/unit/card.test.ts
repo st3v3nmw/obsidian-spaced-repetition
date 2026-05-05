@@ -1,6 +1,6 @@
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { Card } from "src/card/card";
-import { TICKS_PER_DAY } from "src/constants";
+import { TICKS_PER_DAY } from "src/data/constants";
 
 describe("Card", () => {
     test("format Schedule", () => {

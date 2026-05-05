@@ -1,6 +1,6 @@
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
+import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { DueDateHistogram } from "src/due-date-histogram";
-import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { setupStaticDateProvider, setupStaticDateProvider20230906 } from "src/utils/dates";
 
 import { UnitTestOsrCore } from "./helpers/unit-test-core";

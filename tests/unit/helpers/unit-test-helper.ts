@@ -1,6 +1,6 @@
 import { TagCache } from "obsidian";
 
-import { frontmatterTagPseudoLineNum } from "src/file";
+import { frontmatterTagPseudoLineNum } from "src/data/file";
 import { splitNoteIntoFrontmatterAndContent, splitTextIntoLineArray } from "src/utils/strings";
 
 export function unitTestCreateTagCacheObj(tag: string, line: number): TagCache {

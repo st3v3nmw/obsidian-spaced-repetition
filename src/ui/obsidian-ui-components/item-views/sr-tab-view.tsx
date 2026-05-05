@@ -1,9 +1,9 @@
 import "src/ui/obsidian-ui-components/item-views/tab-view.css";
 import { ItemView, Platform, WorkspaceLeaf } from "obsidian";
 
-import { SR_TAB_VIEW } from "src/constants";
+import { SR_TAB_VIEW } from "src/data/constants";
+import { SRSettings } from "src/data/settings";
 import SRPlugin from "src/main";
-import { SRSettings } from "src/settings";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import EmulatedPlatform from "src/utils/platform-detector";

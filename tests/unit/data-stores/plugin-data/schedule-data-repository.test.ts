@@ -1,7 +1,7 @@
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { ScheduleDataMarkdownStorage } from "src/data/data-stores/plugin-data/schedule-data-markdown-storage";
 import { ScheduleDataRepository } from "src/data/data-stores/plugin-data/schedule-data-repository";
-import { DEFAULT_DATA, PluginData } from "src/plugin-data";
+import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
 beforeAll(() => {

@@ -1,7 +1,7 @@
 import { Moment } from "moment";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { SRSettings } from "src/settings";
+import { SRSettings } from "src/data/settings";
 import { DateUtil, globalDateProvider } from "src/utils/dates";
 
 export class RepItemScheduleInfoOsr extends RepItemScheduleInfo {

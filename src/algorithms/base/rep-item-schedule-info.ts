@@ -1,6 +1,6 @@
 import { Moment } from "moment";
 
-import { TICKS_PER_DAY } from "src/constants";
+import { TICKS_PER_DAY } from "src/data/constants";
 import { formatDateYYYYMMDD, globalDateProvider } from "src/utils/dates";
 
 export abstract class RepItemScheduleInfo {

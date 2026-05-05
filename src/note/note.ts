@@ -1,7 +1,7 @@
 import { Question } from "src/card/questions/question";
+import { ISRFile } from "src/data/file";
+import { SRSettings } from "src/data/settings";
 import { Deck } from "src/deck/deck";
-import { ISRFile } from "src/file";
-import { SRSettings } from "src/settings";
 
 export class Note {
     file: ISRFile;

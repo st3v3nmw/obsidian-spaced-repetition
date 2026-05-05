@@ -1,7 +1,7 @@
 import { Question } from "src/card/questions/question";
+import { PluginData } from "src/data/plugin-data";
+import { SRSettings } from "src/data/settings";
 import SRPlugin from "src/main";
-import { PluginData } from "src/plugin-data";
-import { SRSettings } from "src/settings";
 
 export interface IQuestionPostponementList {
     clear(): void;

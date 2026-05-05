@@ -12,7 +12,7 @@ import {
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
-import { ALLOWED_DATE_FORMATS } from "src/constants";
+import { ALLOWED_DATE_FORMATS } from "src/data/constants";
 import { formatDateYYYYMMDD } from "src/utils/dates";
 import { parseObsidianFrontmatterTag, TextDirection } from "src/utils/strings";
 

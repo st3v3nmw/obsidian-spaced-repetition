@@ -1,7 +1,7 @@
+import { DEFAULT_SETTINGS } from "src/data/settings";
 import { CardListType, Deck } from "src/deck/deck";
 import { CardOrder, DeckOrder, DeckTreeIterator } from "src/deck/deck-tree-iterator";
 import { TopicPath } from "src/deck/topic-path";
-import { DEFAULT_SETTINGS } from "src/settings";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 import { setupNextRandomNumber, setupStaticRandomNumberProvider } from "src/utils/numbers";
 

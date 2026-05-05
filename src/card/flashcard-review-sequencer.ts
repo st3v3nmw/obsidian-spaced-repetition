@@ -4,14 +4,14 @@ import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { Card } from "src/card/card";
 import { Question, QuestionText } from "src/card/questions/question";
 import { IQuestionPostponementList } from "src/card/questions/question-postponement-list";
-import { TICKS_PER_DAY } from "src/constants";
+import { TICKS_PER_DAY } from "src/data/constants";
 import { DataStore } from "src/data/data-stores/base/data-store";
+import { SRSettings } from "src/data/settings";
 import { CardListType, Deck } from "src/deck/deck";
 import { IDeckTreeIterator } from "src/deck/deck-tree-iterator";
 import { TopicPath } from "src/deck/topic-path";
 import { DueDateHistogram } from "src/due-date-histogram";
 import { Note } from "src/note/note";
-import { SRSettings } from "src/settings";
 import { globalDateProvider } from "src/utils/dates";
 
 export interface IFlashcardReviewSequencer {

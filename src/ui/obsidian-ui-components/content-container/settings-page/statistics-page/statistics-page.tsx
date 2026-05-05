@@ -18,7 +18,7 @@ import h from "vhtml";
 
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { textInterval } from "src/algorithms/osr/note-scheduling";
-import { OsrCore } from "src/core";
+import { OsrCore } from "src/data/core";
 import { DataManager } from "src/data/data-manager";
 import { CardListType } from "src/deck/deck";
 import { Stats } from "src/deck/stats";

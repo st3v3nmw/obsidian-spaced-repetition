@@ -1,6 +1,6 @@
 import { PaneType, WorkspaceLeaf } from "obsidian";
 
-import { SR_TAB_VIEW } from "src/constants";
+import { SR_TAB_VIEW } from "src/data/constants";
 import SRPlugin from "src/main";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";

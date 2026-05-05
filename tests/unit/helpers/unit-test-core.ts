@@ -2,9 +2,9 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
-import { OsrCore } from "src/core";
+import { OsrCore } from "src/data/core";
+import { SRSettings } from "src/data/settings";
 import { NoteReviewQueue } from "src/note/note-review-queue";
-import { SRSettings } from "src/settings";
 
 import { UnitTestSRFile } from "./unit-test-file";
 import { UnitTestLinkInfoFinder } from "./unit-test-link-info-finder";

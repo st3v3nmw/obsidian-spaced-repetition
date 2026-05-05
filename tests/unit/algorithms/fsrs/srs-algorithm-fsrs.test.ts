@@ -6,8 +6,8 @@ import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-i
 import { SrsAlgorithmFsrs } from "src/algorithms/fsrs/srs-algorithm-fsrs";
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { DEFAULT_SETTINGS } from "src/data/settings";
 import { CardDueDateHistogram } from "src/due-date-histogram";
-import { DEFAULT_SETTINGS } from "src/settings";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
 beforeAll(() => {

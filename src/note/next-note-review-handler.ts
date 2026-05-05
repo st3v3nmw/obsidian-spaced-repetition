@@ -1,8 +1,8 @@
 import { App, Notice, TFile } from "obsidian";
 
+import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import { NoteReviewQueue } from "src/note/note-review-queue";
-import { SRSettings } from "src/settings";
 import { ReviewDeckSelectionModal } from "src/ui/obsidian-ui-components/modals/review-deck-selection-modal";
 
 export class NextNoteReviewHandler {

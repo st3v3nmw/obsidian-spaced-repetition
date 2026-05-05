@@ -1,7 +1,7 @@
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { ScheduleDataMarkdownStorage } from "src/data/data-stores/plugin-data/schedule-data-markdown-storage";
-import { PluginData, SerializedScheduleInfo } from "src/plugin-data";
+import { PluginData, SerializedScheduleInfo } from "src/data/plugin-data";
 import { DateUtil, formatDateYYYYMMDD } from "src/utils/dates";
 
 export class ScheduleDataRepository {

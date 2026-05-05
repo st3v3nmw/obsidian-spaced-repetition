@@ -12,7 +12,7 @@ import {
     reviewResponseToFsrsGrade,
 } from "src/algorithms/fsrs/fsrs-helpers";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
-import { DEFAULT_SETTINGS } from "src/settings";
+import { DEFAULT_SETTINGS } from "src/data/settings";
 import { globalDateProvider, setupStaticDateProvider20230906 } from "src/utils/dates";
 
 beforeAll(() => {

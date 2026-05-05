@@ -1,6 +1,6 @@
-import { OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "src/constants";
-import { ISRFile } from "src/file";
-import { SRSettings } from "src/settings";
+import { OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "src/data/constants";
+import { ISRFile } from "src/data/file";
+import { SRSettings } from "src/data/settings";
 
 export class TopicPath {
     path: string[];

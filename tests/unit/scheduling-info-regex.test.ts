@@ -1,4 +1,4 @@
-import { FLASHCARD_SCHEDULE_INFO } from "src/constants";
+import { FLASHCARD_SCHEDULE_INFO } from "src/data/constants";
 
 describe("FLASHCARD_SCHEDULE_INFO", () => {
     test("SR comment without sibling cards", async () => {

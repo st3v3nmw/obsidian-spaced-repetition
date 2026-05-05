@@ -9,6 +9,7 @@ import {
 } from "src/card/flashcard-review-sequencer";
 import { DataManager } from "src/data/data-manager";
 import { DataStoreName } from "src/data/data-stores/base/data-store";
+import { SRSettings } from "src/data/settings";
 import { Deck, DeckTreeFilter } from "src/deck/deck";
 import {
     CardOrder,
@@ -21,7 +22,6 @@ import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { Note } from "src/note/note";
 import { NoteReviewQueue } from "src/note/note-review-queue";
-import { SRSettings } from "src/settings";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
 import { UIManager, UIState } from "src/ui/ui-manager";
 import EmulatedPlatform from "src/utils/platform-detector";

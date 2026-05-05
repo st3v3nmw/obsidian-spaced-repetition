@@ -1,4 +1,4 @@
-import { ISRFile } from "src/file";
+import { ISRFile } from "src/data/file";
 import { t } from "src/lang/helpers";
 import { globalDateProvider } from "src/utils/dates";
 import { globalRandomNumberProvider } from "src/utils/numbers";

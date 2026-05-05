@@ -4,7 +4,7 @@ import { DataStoreAlgorithm } from "src/data/data-store-algorithm/data-store-alg
 import { DataStoreInNoteAlgorithmOsr } from "src/data/data-store-algorithm/data-store-in-note-algorithm-osr";
 import { DataStore } from "src/data/data-stores/base/data-store";
 import { StoreInNotes } from "src/data/data-stores/notes/notes";
-import { SRSettings } from "src/settings";
+import { SRSettings } from "src/data/settings";
 
 export function unitTestSetupStandardDataStoreAlgorithm(settings: SRSettings) {
     DataStore.instance = new StoreInNotes(settings);

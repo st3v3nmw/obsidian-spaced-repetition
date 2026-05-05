@@ -3,10 +3,10 @@ import { State } from "ts-fsrs";
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
-import { MULTI_SCHEDULING_EXTRACTOR } from "src/constants";
-import { TICKS_PER_DAY } from "src/constants";
+import { MULTI_SCHEDULING_EXTRACTOR } from "src/data/constants";
+import { TICKS_PER_DAY } from "src/data/constants";
 import { DataStore } from "src/data/data-stores/base/data-store";
-import { DEFAULT_SETTINGS } from "src/settings";
+import { DEFAULT_SETTINGS } from "src/data/settings";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
 import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";

@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
+import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/data/settings";
 
 describe("SettingsUtil", () => {
     test("isPathInNoteIgnoreFolder", () => {

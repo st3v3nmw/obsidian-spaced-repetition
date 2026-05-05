@@ -1,6 +1,6 @@
 import moment, { Moment } from "moment";
 
-import { ALLOWED_DATE_FORMATS, PREFERRED_DATE_FORMAT } from "src/constants";
+import { ALLOWED_DATE_FORMATS, PREFERRED_DATE_FORMAT } from "src/data/constants";
 
 /**
  * Format as "YYYY-MM-DD"
