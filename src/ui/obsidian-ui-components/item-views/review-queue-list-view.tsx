@@ -309,42 +309,42 @@ export class ReviewQueueListView extends ItemView {
             fileMenu.addItem((item) => {
                 item.setTitle(
                     t("REVIEW_DIFFICULTY_FILE_MENU", {
-                        difficulty: this.plugin.data.settings.flashcardEasyText,
+                        difficulty: this.plugin.dataManager.data.settings.flashcardEasyText,
                     }),
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Easy);
+                        this.plugin.dataManager.saveNoteReviewResponse(file, ReviewResponse.Easy);
                     });
             });
 
             fileMenu.addItem((item) => {
                 item.setTitle(
                     t("REVIEW_DIFFICULTY_FILE_MENU", {
-                        difficulty: this.plugin.data.settings.flashcardGoodText,
+                        difficulty: this.plugin.dataManager.data.settings.flashcardGoodText,
                     }),
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Good);
+                        this.plugin.dataManager.saveNoteReviewResponse(file, ReviewResponse.Good);
                     });
             });
 
             fileMenu.addItem((item) => {
                 item.setTitle(
                     t("REVIEW_DIFFICULTY_FILE_MENU", {
-                        difficulty: this.plugin.data.settings.flashcardHardText,
+                        difficulty: this.plugin.dataManager.data.settings.flashcardHardText,
                     }),
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Hard);
+                        this.plugin.dataManager.saveNoteReviewResponse(file, ReviewResponse.Hard);
                     });
             });
 
             fileMenu.addSeparator();
 
-            if (this.plugin.data.settings.showDeleteButtonInFileMenu) {
+            if (this.plugin.dataManager.data.settings.showDeleteButtonInFileMenu) {
                 fileMenu.addItem((item) => {
                     item.setTitle(t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"))
                         .setIcon("trash")
@@ -358,9 +358,9 @@ export class ReviewQueueListView extends ItemView {
                                 () => {
                                     deleteNoteSchedulingDataInNote(
                                         file,
-                                        this.plugin.data.settings
+                                        this.plugin.dataManager.data.settings
                                             .deleteTagsOnSchedulingDataDeletion,
-                                        this.plugin.data.settings.tagsToReview,
+                                        this.plugin.dataManager.data.settings.tagsToReview,
                                     );
                                 },
                             ).open();

@@ -1,5 +1,6 @@
 import { Setting, SettingGroup } from "obsidian";
 
+import { DataManager } from "src/data/data-manager";
 import { DataStoreName } from "src/data-stores/base/data-store";
 import {
     deleteAllSchedulingData,
@@ -23,6 +24,7 @@ export class DataPage extends SettingsPage {
     constructor(
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
+        dataManager: DataManager,
         pageType: SettingsPageType,
         applySettingsUpdate: (callback: () => unknown) => void,
         display: () => void,
@@ -32,6 +34,7 @@ export class DataPage extends SettingsPage {
         super(
             pageContainerEl,
             plugin,
+            dataManager,
             pageType,
             applySettingsUpdate,
             display,
@@ -51,10 +54,9 @@ export class DataPage extends SettingsPage {
                                 [DataStoreName.NOTES]: t("STORE_IN_NOTES"),
                                 [DataStoreName.PLUGIN_DATA]: "Store in vault files (beta)",
                             })
-                            .setValue(this.plugin.data.settings.dataStore)
+                            .setValue(this.dataManager.data.settings.dataStore)
                             .onChange(async (value) => {
-                                const oldMode = this.plugin.data.settings
-                                    .dataStore as DataStoreName;
+                                const oldMode = this.dataManager.data.settings.dataStore as DataStoreName;
                                 const newMode = value as DataStoreName;
 
                                 // Revert the dropdown immediately; only apply after confirmation.
@@ -73,13 +75,13 @@ export class DataPage extends SettingsPage {
                                         ? t("MIGRATING_TO_PLUGIN_DATA")
                                         : t("MIGRATING_TO_NOTES"),
                                     async () => {
-                                        await this.plugin.migrateDataStore(oldMode, newMode);
+                                        await this.dataManager.migrateDataStore(oldMode, newMode);
                                         dropdown.setValue(newMode);
-                                        this.plugin.data.settings.dataStore = newMode;
-                                        this.plugin.setupDataStoreAndAlgorithmInstances(
-                                            this.plugin.data.settings,
+                                        this.dataManager.data.settings.dataStore = newMode;
+                                        this.dataManager.setupDataStoreAndAlgorithmInstances(
+                                            this.dataManager.data.settings,
                                         );
-                                        await this.plugin.savePluginData();
+                                        await this.dataManager.savePluginData();
                                     },
                                 ).open();
                             });
@@ -96,17 +98,17 @@ export class DataPage extends SettingsPage {
                     )
                     .addText((text) => {
                         const commitValue = async () => {
-                            this.plugin.data.settings.scheduleDataVaultLocation =
+                            this.dataManager.data.settings.scheduleDataVaultLocation =
                                 text.getValue().trim() ||
                                 DEFAULT_SETTINGS.scheduleDataVaultLocation;
-                            await this.plugin.persistScheduleDataNow();
-                            await this.plugin.savePluginData();
+                            await this.dataManager.persistScheduleDataNow();
+                            await this.dataManager.savePluginData();
                         };
 
                         text.setPlaceholder(DEFAULT_SETTINGS.scheduleDataVaultLocation)
-                            .setValue(this.plugin.data.settings.scheduleDataVaultLocation)
+                            .setValue(this.dataManager.data.settings.scheduleDataVaultLocation)
                             .onChange(() => {
-                                this.plugin.data.settings.scheduleDataVaultLocation =
+                                this.dataManager.data.settings.scheduleDataVaultLocation =
                                     text.getValue().trim() ||
                                     DEFAULT_SETTINGS.scheduleDataVaultLocation;
                             });
@@ -122,10 +124,10 @@ export class DataPage extends SettingsPage {
                     .setDesc(t("INLINE_SCHEDULING_COMMENTS_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.cardCommentOnSameLine)
+                            .setValue(this.dataManager.data.settings.cardCommentOnSameLine)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.cardCommentOnSameLine = value;
-                                await this.plugin.savePluginData();
+                                this.dataManager.data.settings.cardCommentOnSameLine = value;
+                                await this.dataManager.savePluginData();
                             }),
                     );
             });
@@ -138,11 +140,11 @@ export class DataPage extends SettingsPage {
                     .setDesc(t("DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.deleteTagsOnSchedulingDataDeletion)
+                            .setValue(this.dataManager.data.settings.deleteTagsOnSchedulingDataDeletion)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.deleteTagsOnSchedulingDataDeletion =
+                                this.dataManager.data.settings.deleteTagsOnSchedulingDataDeletion =
                                     value;
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
                             }),
                     );
             })
@@ -161,11 +163,12 @@ export class DataPage extends SettingsPage {
                                     t("CONFIRM_SCHEDULING_DATA_ALL_DELETION"),
                                     t("SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS"),
                                     () => {
+                                        const settings = this.dataManager.data.settings;
                                         deleteAllSchedulingData(
-                                            this.plugin.data.settings
+                                            settings
                                                 .deleteTagsOnSchedulingDataDeletion,
-                                            this.plugin.data.settings.flashcardTags,
-                                            this.plugin.data.settings.tagsToReview,
+                                            settings.flashcardTags,
+                                            settings.tagsToReview,
                                         );
                                     },
                                 ).open();
@@ -188,9 +191,9 @@ export class DataPage extends SettingsPage {
                                     t("SCHEDULING_DATA_IN_NOTES_DELETION_IN_PROGRESS"),
                                     () => {
                                         deleteAllSchedulingDataInNotes(
-                                            this.plugin.data.settings
+                                            this.dataManager.data.settings
                                                 .deleteTagsOnSchedulingDataDeletion,
-                                            this.plugin.data.settings.tagsToReview,
+                                            this.dataManager.data.settings.tagsToReview,
                                         );
                                     },
                                 ).open();
@@ -213,9 +216,9 @@ export class DataPage extends SettingsPage {
                                     t("SCHEDULING_DATA_IN_CARDS_DELETION_IN_PROGRESS"),
                                     () => {
                                         deleteAllSchedulingDataInCards(
-                                            this.plugin.data.settings
+                                            this.dataManager.data.settings
                                                 .deleteTagsOnSchedulingDataDeletion,
-                                            this.plugin.data.settings.flashcardTags,
+                                            this.dataManager.data.settings.flashcardTags,
                                         );
                                     },
                                 ).open();
@@ -240,8 +243,8 @@ export class DataPage extends SettingsPage {
                                     t("CONFIRM_RESET_SETTINGS"),
                                     t("RESET_SETTINGS_CONFIRMATION"),
                                     () => {
-                                        this.plugin.data.settings = DEFAULT_SETTINGS;
-                                        this.plugin.savePluginData();
+                                        this.dataManager.data.settings = DEFAULT_SETTINGS;
+                                        this.dataManager.savePluginData();
                                         this.display();
                                     },
                                 ).open();

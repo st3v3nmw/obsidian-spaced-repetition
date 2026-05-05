@@ -51,7 +51,6 @@ export class SRModalView extends Modal {
             this.contentEl,
             this.close.bind(this),
         );
-
         this.plugin.uiManager.setContentManager(this.contentManager);
     }
 
@@ -113,13 +112,14 @@ export class SRModalView extends Modal {
     ) {
         if (isNaN(heightPercent) || isNaN(widthPercent)) return;
 
+
         if (isMobile) {
-            this.plugin.data.settings.flashcardHeightPercentageMobile = heightPercent;
-            this.plugin.data.settings.flashcardWidthPercentageMobile = widthPercent;
+            this.plugin.dataManager.data.settings.flashcardHeightPercentageMobile = heightPercent;
+            this.plugin.dataManager.data.settings.flashcardWidthPercentageMobile = widthPercent;
         } else {
-            this.plugin.data.settings.flashcardHeightPercentage = heightPercent;
-            this.plugin.data.settings.flashcardWidthPercentage = widthPercent;
+            this.plugin.dataManager.data.settings.flashcardHeightPercentage = heightPercent;
+            this.plugin.dataManager.data.settings.flashcardWidthPercentage = widthPercent;
         }
-        await this.plugin.savePluginData();
+        await this.plugin.dataManager.savePluginData();
     }
 }

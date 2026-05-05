@@ -19,6 +19,7 @@ import h from "vhtml";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { textInterval } from "src/algorithms/osr/note-scheduling";
 import { OsrCore } from "src/core";
+import { DataManager } from "src/data/data-manager";
 import { CardListType } from "src/deck/deck";
 import { Stats } from "src/deck/stats";
 import { t } from "src/lang/helpers";
@@ -58,6 +59,7 @@ export class StatisticsPage extends SettingsPage {
     constructor(
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
+        dataManager: DataManager,
         pageType: SettingsPageType,
         openPage: (pageType: SettingsPageType) => void,
         scrollListener: (scrollPosition: number) => void,
@@ -65,9 +67,10 @@ export class StatisticsPage extends SettingsPage {
         super(
             pageContainerEl,
             plugin,
+            dataManager,
             pageType,
-            () => {},
-            () => {},
+            () => { },
+            () => { },
             openPage,
             scrollListener,
         );
@@ -87,7 +90,7 @@ export class StatisticsPage extends SettingsPage {
                 el.selectEl.setAttr("id", "sr-chart-period");
             });
 
-        this.renderCharts(this.plugin.osrAppCore);
+        this.renderCharts(this.dataManager.osrAppCore);
     }
 
     /**
@@ -106,7 +109,7 @@ export class StatisticsPage extends SettingsPage {
 
     private renderCharts(osrCore: OsrCore): void {
         if (!osrCore.cardStats) {
-            this.plugin.sync().then((_) => this.renderCharts(this.plugin.osrAppCore));
+            this.dataManager.sync().then((_) => this.renderCharts(this.dataManager.osrAppCore));
             return;
         }
 
@@ -156,7 +159,7 @@ export class StatisticsPage extends SettingsPage {
         // Add intervals
         const averageInterval: string = textInterval(
             Math.round((cardStats.intervals.getTotalOfValueMultiplyCount() / scheduledCount) * 10) /
-                10 || 0,
+            10 || 0,
             false,
         );
         const longestInterval: string = textInterval(cardStats.intervals.getMaxValue(), false);

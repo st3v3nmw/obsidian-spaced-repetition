@@ -10,6 +10,7 @@ import {
     IFlashcardReviewSequencer,
 } from "src/card/flashcard-review-sequencer";
 import { Question } from "src/card/questions/question";
+import { DataManager } from "src/data/data-manager";
 import { Deck } from "src/deck/deck";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
@@ -21,7 +22,7 @@ import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/d
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
-import { UIState } from "src/ui/ui-manager";
+import { UIManager, UIState } from "src/ui/ui-manager";
 import { globalDateProvider } from "src/utils/dates";
 import EmulatedPlatform from "src/utils/platform-detector";
 
@@ -75,6 +76,8 @@ export interface SessionData {
 export default class ContentManager {
     private app: App;
     private plugin: SRPlugin;
+    private uiManager: UIManager;
+    private dataManager: DataManager;
     private reviewSequencer: IFlashcardReviewSequencer | null = null;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
@@ -100,6 +103,9 @@ export default class ContentManager {
         this.reviewQueueLoader = reviewQueueLoader;
         this.settings = settings;
         this.reviewMode = reviewQueueLoader.getReviewMode();
+
+        this.uiManager = this.plugin.uiManager;
+        this.dataManager = this.plugin.dataManager;
 
         this.deckContainer = new DeckContainer(
             parentEl,
@@ -127,10 +133,10 @@ export default class ContentManager {
 
     public close() {
         this._clearPendingResumeTimeout();
-        this.plugin.uiManager.setSRViewInFocus(false);
+        this.uiManager.setSRViewInFocus(false);
         this.deckContainer.closeList();
         this.cardContainer.closeSession();
-        this.plugin.uiManager.setUIState(UIState.Closed);
+        this.uiManager.setUIState(UIState.Closed);
     }
 
     public async open() {
@@ -189,7 +195,7 @@ export default class ContentManager {
         }
         if (this.reviewSequencer === null) return;
         this.cardContainer.closeSession();
-        this.plugin.uiManager.setUIState(UIState.DeckList);
+        this.uiManager.setUIState(UIState.DeckList);
         this.deckContainer.showList(this.reviewSequencer, this.settings, this.reviewMode);
     }
 
@@ -197,7 +203,7 @@ export default class ContentManager {
         this.deckContainer.closeList();
         this.sessionData = this._getNewSessionData(deck);
         if (this.sessionData === null) return;
-        this.plugin.uiManager.setUIState(UIState.CardFront);
+        this.uiManager.setUIState(UIState.CardFront);
         this.cardContainer.openSession(this.sessionData, this.settings);
     }
 
@@ -247,7 +253,7 @@ export default class ContentManager {
         this.sessionData.currentQuestion = this.reviewSequencer.currentQuestion;
 
         this.sessionData.cardData.currentCard = this.reviewSequencer.currentCard;
-        this.plugin.uiManager.setUIState(UIState.CardFront);
+        this.uiManager.setUIState(UIState.CardFront);
         this.sessionData.cardData.currentCardState = CardState.Front;
 
         if (
@@ -269,7 +275,7 @@ export default class ContentManager {
             return;
         }
 
-        this.plugin.uiManager.setUIState(UIState.CardFront);
+        this.uiManager.setUIState(UIState.CardFront);
         this.cardContainer.drawPendingState(nextPendingDueUnix);
 
         const delayMs = Math.max(0, nextPendingDueUnix - Date.now());
@@ -317,11 +323,11 @@ export default class ContentManager {
     // MARK: Card button handlers
 
     public async _deleteCurrentCard() {
-        if (this.sessionData === null || this.reviewSequencer === null) return;
+        if (this.sessionData === null || this.reviewSequencer === null || this.dataManager.data === null) return;
         const timeNow = now();
         if (
             this.lastPressedOnProcessReview &&
-            timeNow - this.lastPressedOnProcessReview < this.plugin.data.settings.reviewButtonDelay
+            timeNow - this.lastPressedOnProcessReview < this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
@@ -346,13 +352,13 @@ export default class ContentManager {
         const timeNow = now();
         if (
             this.lastPressedOnProcessReview &&
-            timeNow - this.lastPressedOnProcessReview < this.plugin.data.settings.reviewButtonDelay
+            timeNow - this.lastPressedOnProcessReview < this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
         this.lastPressedOnProcessReview = timeNow;
 
-        this.plugin.uiManager.setUIState(UIState.CardBack);
+        this.uiManager.setUIState(UIState.CardBack);
         this.sessionData.cardData.currentCardState = CardState.Back;
 
         this.cardContainer.drawBack(
@@ -370,7 +376,7 @@ export default class ContentManager {
 
         // Just the question/answer text; without any preceding topic tag
         const textPrompt = currentQ.questionText.actualQuestion;
-        this.plugin.uiManager.setUIState(UIState.EditModal);
+        this.uiManager.setUIState(UIState.EditModal);
         const editModal = FlashcardEditModal.Prompt(
             this.app,
             this.settings,
@@ -382,7 +388,7 @@ export default class ContentManager {
             .then(async (modifiedCardText) => {
                 if (this.reviewSequencer === null) return;
                 this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
-                this.plugin.uiManager.setUIState(UIState.CardBack);
+                this.uiManager.setUIState(UIState.CardBack);
             })
             .catch((reason) => console.log(reason));
     }
@@ -456,7 +462,7 @@ export default class ContentManager {
         const timeNow = now();
         if (
             timeNow - this.lastPressedOnProcessReview <
-            this.plugin.data.settings.reviewButtonDelay
+            this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }

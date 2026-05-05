@@ -1,16 +1,21 @@
 import { Platform, Setting, SettingGroup } from "obsidian";
 
+import { DataManager } from "src/data/data-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
+import { UIManager } from "src/ui/ui-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 export class UIPreferencesPage extends SettingsPage {
+    private uiManager: UIManager;
     constructor(
         containerEl: HTMLElement,
         plugin: SRPlugin,
+        dataManager: DataManager,
+        uiManager: UIManager,
         pageType: SettingsPageType,
         applySettingsUpdate: (callback: () => unknown) => void,
         display: () => void,
@@ -20,12 +25,15 @@ export class UIPreferencesPage extends SettingsPage {
         super(
             containerEl,
             plugin,
+            dataManager,
             pageType,
             applySettingsUpdate,
             display,
             openPage,
             scrollListener,
         );
+
+        this.uiManager = uiManager;
 
         new SettingGroup(this.containerEl)
             .setHeading(t("OBSIDIAN_INTEGRATION"))
@@ -38,30 +46,30 @@ export class UIPreferencesPage extends SettingsPage {
                         toggle
                             .setValue(
                                 isMobile
-                                    ? this.plugin.data.settings.openViewInNewTabMobile
-                                    : this.plugin.data.settings.openViewInNewTab,
+                                    ? this.dataManager.data.settings.openViewInNewTabMobile
+                                    : this.dataManager.data.settings.openViewInNewTab,
                             )
                             .onChange(async (value) => {
                                 if (isMobile) {
-                                    this.plugin.data.settings.openViewInNewTabMobile = value;
-                                    this.plugin.data.settings.flashcardHeightPercentageMobile = 100;
-                                    this.plugin.data.settings.flashcardWidthPercentageMobile = 100;
+                                    this.dataManager.data.settings.openViewInNewTabMobile = value;
+                                    this.dataManager.data.settings.flashcardHeightPercentageMobile = 100;
+                                    this.dataManager.data.settings.flashcardWidthPercentageMobile = 100;
                                 } else {
-                                    this.plugin.data.settings.openViewInNewTab = value;
-                                    this.plugin.data.settings.flashcardHeightPercentage = 100;
-                                    this.plugin.data.settings.flashcardWidthPercentage = 100;
+                                    this.dataManager.data.settings.openViewInNewTab = value;
+                                    this.dataManager.data.settings.flashcardHeightPercentage = 100;
+                                    this.dataManager.data.settings.flashcardWidthPercentage = 100;
                                 }
 
                                 if (value) {
-                                    this.plugin.uiManager.registerSRFocusListener();
+                                    this.uiManager.registerSRFocusListener();
                                 } else {
-                                    this.plugin.uiManager.tabViewManager.closeAllTabViews();
-                                    this.plugin.data.settings.useCustomHotkeys = false;
+                                    this.uiManager.tabViewManager.closeAllTabViews();
+                                    this.dataManager.data.settings.useCustomHotkeys = false;
 
                                     // Remove focus from SR and remove event listener for focus change
-                                    this.plugin.uiManager.removeSRFocusListener();
+                                    this.uiManager.removeSRFocusListener();
                                 }
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
                                 this.display();
                             });
                     });
@@ -73,20 +81,20 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("USE_CUSTOM_HOTKEYS_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.useCustomHotkeys)
+                            .setValue(this.dataManager.data.settings.useCustomHotkeys)
                             .setDisabled(
-                                (isMobile && !this.plugin.data.settings.openViewInNewTabMobile) ||
-                                    (!isMobile && !this.plugin.data.settings.openViewInNewTab),
+                                (isMobile && !this.dataManager.data.settings.openViewInNewTabMobile) ||
+                                (!isMobile && !this.dataManager.data.settings.openViewInNewTab),
                             )
                             .onChange(async (value) => {
-                                this.plugin.data.settings.useCustomHotkeys = value;
-                                if (this.plugin.data.settings.useCustomHotkeys) {
+                                this.dataManager.data.settings.useCustomHotkeys = value;
+                                if (this.dataManager.data.settings.useCustomHotkeys) {
                                     this.plugin.addCustomHotkeys();
                                 } else {
                                     this.plugin.removeCustomHotkeys();
                                 }
                                 this.plugin.addCustomHotkeys();
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
                             }),
                     );
             })
@@ -96,11 +104,11 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("SHOW_RIBBON_ICON_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.showRibbonIcon)
+                            .setValue(this.dataManager.data.settings.showRibbonIcon)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.showRibbonIcon = value;
-                                await this.plugin.savePluginData();
-                                this.plugin.uiManager.showRibbonIcon(value);
+                                this.dataManager.data.settings.showRibbonIcon = value;
+                                await this.dataManager.savePluginData();
+                                this.uiManager.showRibbonIcon(value);
                             }),
                     );
             })
@@ -110,10 +118,10 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.showFileMenuReviewOptions)
+                            .setValue(this.dataManager.data.settings.showFileMenuReviewOptions)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.showFileMenuReviewOptions = value;
-                                await this.plugin.savePluginData();
+                                this.dataManager.data.settings.showFileMenuReviewOptions = value;
+                                await this.dataManager.savePluginData();
                             }),
                     );
             })
@@ -123,10 +131,10 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("ENABLE_FILE_MENU_DELETE_BUTTON_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.showDeleteButtonInFileMenu)
+                            .setValue(this.dataManager.data.settings.showDeleteButtonInFileMenu)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.showDeleteButtonInFileMenu = value;
-                                await this.plugin.savePluginData();
+                                this.dataManager.data.settings.showDeleteButtonInFileMenu = value;
+                                await this.dataManager.savePluginData();
                             }),
                     );
             })
@@ -136,10 +144,10 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("SHOW_DELETE_BUTTON_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.showDeleteButtonInCardView)
+                            .setValue(this.dataManager.data.settings.showDeleteButtonInCardView)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.showDeleteButtonInCardView = value;
-                                await this.plugin.savePluginData();
+                                this.dataManager.data.settings.showDeleteButtonInCardView = value;
+                                await this.dataManager.savePluginData();
                             }),
                     );
             })
@@ -154,13 +162,13 @@ export class UIPreferencesPage extends SettingsPage {
                             .onClick(async () => {
                                 const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
                                 if (isMobile) {
-                                    this.plugin.data.settings.flashcardHeightPercentageMobile =
+                                    this.dataManager.data.settings.flashcardHeightPercentageMobile =
                                         DEFAULT_SETTINGS.flashcardHeightPercentageMobile;
                                 } else {
-                                    this.plugin.data.settings.flashcardHeightPercentage =
+                                    this.dataManager.data.settings.flashcardHeightPercentage =
                                         DEFAULT_SETTINGS.flashcardHeightPercentage;
                                 }
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
 
                                 this.display();
                             });
@@ -171,18 +179,18 @@ export class UIPreferencesPage extends SettingsPage {
                             .setLimits(10, 100, 5)
                             .setValue(
                                 isMobile
-                                    ? this.plugin.data.settings.flashcardHeightPercentageMobile
-                                    : this.plugin.data.settings.flashcardHeightPercentage,
+                                    ? this.dataManager.data.settings.flashcardHeightPercentageMobile
+                                    : this.dataManager.data.settings.flashcardHeightPercentage,
                             )
                             .setDynamicTooltip()
                             .onChange(async (value) => {
                                 if (isMobile) {
-                                    this.plugin.data.settings.flashcardHeightPercentageMobile =
+                                    this.dataManager.data.settings.flashcardHeightPercentageMobile =
                                         value;
                                 } else {
-                                    this.plugin.data.settings.flashcardHeightPercentage = value;
+                                    this.dataManager.data.settings.flashcardHeightPercentage = value;
                                 }
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
                             });
                     });
             })
@@ -197,13 +205,13 @@ export class UIPreferencesPage extends SettingsPage {
                             .onClick(async () => {
                                 const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
                                 if (isMobile) {
-                                    this.plugin.data.settings.flashcardWidthPercentageMobile =
+                                    this.dataManager.data.settings.flashcardWidthPercentageMobile =
                                         DEFAULT_SETTINGS.flashcardWidthPercentageMobile;
                                 } else {
-                                    this.plugin.data.settings.flashcardWidthPercentage =
+                                    this.dataManager.data.settings.flashcardWidthPercentage =
                                         DEFAULT_SETTINGS.flashcardWidthPercentage;
                                 }
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
 
                                 this.display();
                             });
@@ -214,18 +222,18 @@ export class UIPreferencesPage extends SettingsPage {
                             .setLimits(10, 100, 5)
                             .setValue(
                                 isMobile
-                                    ? this.plugin.data.settings.flashcardWidthPercentageMobile
-                                    : this.plugin.data.settings.flashcardWidthPercentage,
+                                    ? this.dataManager.data.settings.flashcardWidthPercentageMobile
+                                    : this.dataManager.data.settings.flashcardWidthPercentage,
                             )
                             .setDynamicTooltip()
                             .onChange(async (value) => {
                                 if (isMobile) {
-                                    this.plugin.data.settings.flashcardWidthPercentageMobile =
+                                    this.dataManager.data.settings.flashcardWidthPercentageMobile =
                                         value;
                                 } else {
-                                    this.plugin.data.settings.flashcardWidthPercentage = value;
+                                    this.dataManager.data.settings.flashcardWidthPercentage = value;
                                 }
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
                             });
                     });
             });
@@ -238,11 +246,11 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("SHOW_STATUS_BAR_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.showStatusBar)
+                            .setValue(this.dataManager.data.settings.showStatusBar)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.showStatusBar = value;
-                                await this.plugin.savePluginData();
-                                this.plugin.uiManager.updateStatusBar();
+                                this.dataManager.data.settings.showStatusBar = value;
+                                await this.dataManager.savePluginData();
+                                this.uiManager.updateStatusBar();
                             }),
                     );
             })
@@ -252,11 +260,11 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("SHOW_CARD_STATUS_BAR_ITEM_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.showCardStatusBarItem)
+                            .setValue(this.dataManager.data.settings.showCardStatusBarItem)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.showCardStatusBarItem = value;
-                                await this.plugin.savePluginData();
-                                this.plugin.uiManager.updateStatusBar();
+                                this.dataManager.data.settings.showCardStatusBarItem = value;
+                                await this.dataManager.savePluginData();
+                                this.uiManager.updateStatusBar();
                             }),
                     );
             })
@@ -266,11 +274,11 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("SHOW_NOTE_STATUS_BAR_ITEM_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.showNoteStatusBarItem)
+                            .setValue(this.dataManager.data.settings.showNoteStatusBarItem)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.showNoteStatusBarItem = value;
-                                await this.plugin.savePluginData();
-                                this.plugin.uiManager.updateStatusBar();
+                                this.dataManager.data.settings.showNoteStatusBarItem = value;
+                                await this.dataManager.savePluginData();
+                                this.uiManager.updateStatusBar();
                             }),
                     );
             })
@@ -280,11 +288,11 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.showUpdateAvailableStatusBarItem)
+                            .setValue(this.dataManager.data.settings.showUpdateAvailableStatusBarItem)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.showUpdateAvailableStatusBarItem = value;
-                                await this.plugin.savePluginData();
-                                this.plugin.uiManager.updateStatusBar();
+                                this.dataManager.data.settings.showUpdateAvailableStatusBarItem = value;
+                                await this.dataManager.savePluginData();
+                                this.uiManager.updateStatusBar();
                             }),
                     );
             });
@@ -297,10 +305,10 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.initiallyExpandAllSubdecksInTree)
+                            .setValue(this.dataManager.data.settings.initiallyExpandAllSubdecksInTree)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.initiallyExpandAllSubdecksInTree = value;
-                                await this.plugin.savePluginData();
+                                this.dataManager.data.settings.initiallyExpandAllSubdecksInTree = value;
+                                await this.dataManager.savePluginData();
                             }),
                     );
             })
@@ -310,10 +318,10 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("SHOW_CARD_CONTEXT_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.showContextInCards)
+                            .setValue(this.dataManager.data.settings.showContextInCards)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.showContextInCards = value;
-                                await this.plugin.savePluginData();
+                                this.dataManager.data.settings.showContextInCards = value;
+                                await this.dataManager.savePluginData();
                             }),
                     );
             })
@@ -323,10 +331,10 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.convertClozePatternsToInputs)
+                            .setValue(this.dataManager.data.settings.convertClozePatternsToInputs)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.convertClozePatternsToInputs = value;
-                                await this.plugin.savePluginData();
+                                this.dataManager.data.settings.convertClozePatternsToInputs = value;
+                                await this.dataManager.savePluginData();
 
                                 this.display();
                             }),
@@ -338,10 +346,10 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.showIntervalInReviewButtons)
+                            .setValue(this.dataManager.data.settings.showIntervalInReviewButtons)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.showIntervalInReviewButtons = value;
-                                await this.plugin.savePluginData();
+                                this.dataManager.data.settings.showIntervalInReviewButtons = value;
+                                await this.dataManager.savePluginData();
                             }),
                     );
             });
@@ -357,20 +365,20 @@ export class UIPreferencesPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.plugin.data.settings.flashcardEasyText =
+                                this.dataManager.data.settings.flashcardEasyText =
                                     DEFAULT_SETTINGS.flashcardEasyText;
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
 
                                 this.display();
                             });
                     })
                     .addText((text) =>
                         text
-                            .setValue(this.plugin.data.settings.flashcardEasyText)
+                            .setValue(this.dataManager.data.settings.flashcardEasyText)
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.plugin.data.settings.flashcardEasyText = value;
-                                    await this.plugin.savePluginData();
+                                    this.dataManager.data.settings.flashcardEasyText = value;
+                                    await this.dataManager.savePluginData();
                                 });
                             }),
                     );
@@ -384,20 +392,20 @@ export class UIPreferencesPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.plugin.data.settings.flashcardGoodText =
+                                this.dataManager.data.settings.flashcardGoodText =
                                     DEFAULT_SETTINGS.flashcardGoodText;
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
 
                                 this.display();
                             });
                     })
                     .addText((text) =>
                         text
-                            .setValue(this.plugin.data.settings.flashcardGoodText)
+                            .setValue(this.dataManager.data.settings.flashcardGoodText)
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.plugin.data.settings.flashcardGoodText = value;
-                                    await this.plugin.savePluginData();
+                                    this.dataManager.data.settings.flashcardGoodText = value;
+                                    await this.dataManager.savePluginData();
                                 });
                             }),
                     );
@@ -411,20 +419,20 @@ export class UIPreferencesPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.plugin.data.settings.flashcardHardText =
+                                this.dataManager.data.settings.flashcardHardText =
                                     DEFAULT_SETTINGS.flashcardHardText;
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
 
                                 this.display();
                             });
                     })
                     .addText((text) =>
                         text
-                            .setValue(this.plugin.data.settings.flashcardHardText)
+                            .setValue(this.dataManager.data.settings.flashcardHardText)
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.plugin.data.settings.flashcardHardText = value;
-                                    await this.plugin.savePluginData();
+                                    this.dataManager.data.settings.flashcardHardText = value;
+                                    await this.dataManager.savePluginData();
                                 });
                             }),
                     );
@@ -438,20 +446,20 @@ export class UIPreferencesPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.plugin.data.settings.flashcardAgainText =
+                                this.dataManager.data.settings.flashcardAgainText =
                                     DEFAULT_SETTINGS.flashcardAgainText;
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
 
                                 this.display();
                             });
                     })
                     .addText((text) =>
                         text
-                            .setValue(this.plugin.data.settings.flashcardAgainText)
+                            .setValue(this.dataManager.data.settings.flashcardAgainText)
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.plugin.data.settings.flashcardAgainText = value;
-                                    await this.plugin.savePluginData();
+                                    this.dataManager.data.settings.flashcardAgainText = value;
+                                    await this.dataManager.savePluginData();
                                 });
                             }),
                     );
@@ -465,9 +473,9 @@ export class UIPreferencesPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.plugin.data.settings.reviewButtonDelay =
+                                this.dataManager.data.settings.reviewButtonDelay =
                                     DEFAULT_SETTINGS.reviewButtonDelay;
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
 
                                 this.display();
                             });
@@ -475,11 +483,11 @@ export class UIPreferencesPage extends SettingsPage {
                     .addSlider((slider) =>
                         slider
                             .setLimits(0, 5000, 100)
-                            .setValue(this.plugin.data.settings.reviewButtonDelay)
+                            .setValue(this.dataManager.data.settings.reviewButtonDelay)
                             .setDynamicTooltip()
                             .onChange(async (value) => {
-                                this.plugin.data.settings.reviewButtonDelay = value;
-                                await this.plugin.savePluginData();
+                                this.dataManager.data.settings.reviewButtonDelay = value;
+                                await this.dataManager.savePluginData();
                             }),
                     );
             });

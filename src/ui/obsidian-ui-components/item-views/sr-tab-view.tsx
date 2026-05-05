@@ -38,10 +38,11 @@ export class SRTabView extends ItemView {
         reviewQueueLoader: ReviewQueueLoader | null,
     ) {
         super(leaf);
+        if (plugin.dataManager === null || plugin.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
         // Init properties
         this.plugin = plugin;
         this.navigation = false;
-        this.settings = plugin.data.settings;
+        this.settings = plugin.dataManager.data.settings;
         this.reviewQueueLoader = reviewQueueLoader;
 
         // Build ui
@@ -143,7 +144,7 @@ export class SRTabView extends ItemView {
             this.settings,
             this.viewContentEl,
         );
-
+        if (this.plugin.uiManager === null) throw new Error("UI manager not initialized!!!");
         this.plugin.uiManager.setContentManager(this.contentManager);
 
         this.contentManager.open();

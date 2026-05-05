@@ -1,6 +1,7 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
 import { Algorithm } from "src/algorithms/base/isrs-algorithm";
+import { DataManager } from "src/data/data-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
@@ -17,15 +18,16 @@ import { DateUtil, globalDateProvider, IDayBoundary } from "src/utils/dates";
  */
 export class SchedulingPage extends SettingsPage {
     private async setAlgorithm(algorithm: Algorithm): Promise<void> {
-        this.plugin.data.settings.algorithm = algorithm;
-        await this.plugin.savePluginData();
-        this.plugin.setupDataStoreAndAlgorithmInstances(this.plugin.data.settings);
+        this.dataManager.data.settings.algorithm = algorithm;
+        await this.dataManager.savePluginData();
+        this.dataManager.setupDataStoreAndAlgorithmInstances(this.dataManager.data.settings);
         this.display();
     }
 
     constructor(
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
+        dataManager: DataManager,
         pageType: SettingsPageType,
         applySettingsUpdate: (callback: () => unknown) => void,
         display: () => void,
@@ -35,6 +37,7 @@ export class SchedulingPage extends SettingsPage {
         super(
             pageContainerEl,
             plugin,
+            dataManager,
             pageType,
             applySettingsUpdate,
             display,
@@ -54,10 +57,10 @@ export class SchedulingPage extends SettingsPage {
                             "SM-2-OSR": t("SM2_OSR_VARIANT"),
                             FSRS: "FSRS",
                         })
-                        .setValue(this.plugin.data.settings.algorithm)
+                        .setValue(this.dataManager.data.settings.algorithm)
                         .onChange(async (value) => {
                             const selectedAlgorithm = value as Algorithm;
-                            const currentAlgorithm = this.plugin.data.settings
+                            const currentAlgorithm = this.dataManager.data.settings
                                 .algorithm as Algorithm;
 
                             if (selectedAlgorithm === currentAlgorithm) {
@@ -101,7 +104,7 @@ export class SchedulingPage extends SettingsPage {
                 );
         });
 
-        if (this.plugin.data.settings.algorithm === Algorithm.FSRS) {
+        if (this.dataManager.data.settings.algorithm === Algorithm.FSRS) {
             algorithmGroup.addSetting((setting: Setting) => {
                 setting
                     .setName("FSRS desired retention")
@@ -111,15 +114,15 @@ export class SchedulingPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.plugin.data.settings.fsrsDesiredRetention =
+                                this.dataManager.data.settings.fsrsDesiredRetention =
                                     DEFAULT_SETTINGS.fsrsDesiredRetention;
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
                                 this.display();
                             });
                     })
                     .addText((text) =>
                         text
-                            .setValue(this.plugin.data.settings.fsrsDesiredRetention.toString())
+                            .setValue(this.dataManager.data.settings.fsrsDesiredRetention.toString())
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
                                     const numValue = Number.parseFloat(value);
@@ -128,20 +131,20 @@ export class SchedulingPage extends SettingsPage {
                                             "FSRS desired retention must be between 0 and 1.",
                                         );
                                         text.setValue(
-                                            this.plugin.data.settings.fsrsDesiredRetention.toString(),
+                                            this.dataManager.data.settings.fsrsDesiredRetention.toString(),
                                         );
                                         return;
                                     }
 
-                                    this.plugin.data.settings.fsrsDesiredRetention = numValue;
-                                    await this.plugin.savePluginData();
+                                    this.dataManager.data.settings.fsrsDesiredRetention = numValue;
+                                    await this.dataManager.savePluginData();
                                 });
                             }),
                     );
             });
         }
 
-        if (this.plugin.data.settings.algorithm === Algorithm.SM_2_OSR) {
+        if (this.dataManager.data.settings.algorithm === Algorithm.SM_2_OSR) {
             algorithmGroup
                 .addSetting((setting: Setting) => {
                     setting
@@ -152,15 +155,15 @@ export class SchedulingPage extends SettingsPage {
                                 .setIcon("reset")
                                 .setTooltip(t("RESET_DEFAULT"))
                                 .onClick(async () => {
-                                    this.plugin.data.settings.baseEase = DEFAULT_SETTINGS.baseEase;
-                                    await this.plugin.savePluginData();
+                                    this.dataManager.data.settings.baseEase = DEFAULT_SETTINGS.baseEase;
+                                    await this.dataManager.savePluginData();
 
                                     this.display();
                                 });
                         })
                         .addText((text) =>
                             text
-                                .setValue(this.plugin.data.settings.baseEase.toString())
+                                .setValue(this.dataManager.data.settings.baseEase.toString())
                                 .onChange((value) => {
                                     applySettingsUpdate(async () => {
                                         const numValue: number = Number.parseInt(value);
@@ -168,13 +171,13 @@ export class SchedulingPage extends SettingsPage {
                                             if (numValue < 130) {
                                                 new Notice(t("BASE_EASE_MIN_WARNING"));
                                                 text.setValue(
-                                                    this.plugin.data.settings.baseEase.toString(),
+                                                    this.dataManager.data.settings.baseEase.toString(),
                                                 );
                                                 return;
                                             }
 
-                                            this.plugin.data.settings.baseEase = numValue;
-                                            await this.plugin.savePluginData();
+                                            this.dataManager.data.settings.baseEase = numValue;
+                                            await this.dataManager.savePluginData();
                                         } else {
                                             new Notice(t("VALID_NUMBER_WARNING"));
                                         }
@@ -191,9 +194,9 @@ export class SchedulingPage extends SettingsPage {
                                 .setIcon("reset")
                                 .setTooltip(t("RESET_DEFAULT"))
                                 .onClick(async () => {
-                                    this.plugin.data.settings.maxLinkFactor =
+                                    this.dataManager.data.settings.maxLinkFactor =
                                         DEFAULT_SETTINGS.maxLinkFactor;
-                                    await this.plugin.savePluginData();
+                                    await this.dataManager.savePluginData();
 
                                     this.display();
                                 });
@@ -201,11 +204,11 @@ export class SchedulingPage extends SettingsPage {
                         .addSlider((slider) =>
                             slider
                                 .setLimits(0, 100, 1)
-                                .setValue(this.plugin.data.settings.maxLinkFactor * 100)
+                                .setValue(this.dataManager.data.settings.maxLinkFactor * 100)
                                 .setDynamicTooltip()
                                 .onChange(async (value: number) => {
-                                    this.plugin.data.settings.maxLinkFactor = value / 100;
-                                    await this.plugin.savePluginData();
+                                    this.dataManager.data.settings.maxLinkFactor = value / 100;
+                                    await this.dataManager.savePluginData();
                                 }),
                         );
                 })
@@ -218,9 +221,9 @@ export class SchedulingPage extends SettingsPage {
                                 .setIcon("reset")
                                 .setTooltip(t("RESET_DEFAULT"))
                                 .onClick(async () => {
-                                    this.plugin.data.settings.lapsesIntervalChange =
+                                    this.dataManager.data.settings.lapsesIntervalChange =
                                         DEFAULT_SETTINGS.lapsesIntervalChange;
-                                    await this.plugin.savePluginData();
+                                    await this.dataManager.savePluginData();
 
                                     this.display();
                                 });
@@ -228,11 +231,11 @@ export class SchedulingPage extends SettingsPage {
                         .addSlider((slider) =>
                             slider
                                 .setLimits(1, 99, 1)
-                                .setValue(this.plugin.data.settings.lapsesIntervalChange * 100)
+                                .setValue(this.dataManager.data.settings.lapsesIntervalChange * 100)
                                 .setDynamicTooltip()
                                 .onChange(async (value: number) => {
-                                    this.plugin.data.settings.lapsesIntervalChange = value / 100;
-                                    await this.plugin.savePluginData();
+                                    this.dataManager.data.settings.lapsesIntervalChange = value / 100;
+                                    await this.dataManager.savePluginData();
                                 }),
                         );
                 })
@@ -245,16 +248,16 @@ export class SchedulingPage extends SettingsPage {
                                 .setIcon("reset")
                                 .setTooltip(t("RESET_DEFAULT"))
                                 .onClick(async () => {
-                                    this.plugin.data.settings.easyBonus =
+                                    this.dataManager.data.settings.easyBonus =
                                         DEFAULT_SETTINGS.easyBonus;
-                                    await this.plugin.savePluginData();
+                                    await this.dataManager.savePluginData();
 
                                     this.display();
                                 });
                         })
                         .addText((text) =>
                             text
-                                .setValue((this.plugin.data.settings.easyBonus * 100).toString())
+                                .setValue((this.dataManager.data.settings.easyBonus * 100).toString())
                                 .onChange((value) => {
                                     applySettingsUpdate(async () => {
                                         const numValue: number = Number.parseInt(value) / 100;
@@ -263,14 +266,14 @@ export class SchedulingPage extends SettingsPage {
                                                 new Notice(t("EASY_BONUS_MIN_WARNING"));
                                                 text.setValue(
                                                     (
-                                                        this.plugin.data.settings.easyBonus * 100
+                                                        this.dataManager.data.settings.easyBonus * 100
                                                     ).toString(),
                                                 );
                                                 return;
                                             }
 
-                                            this.plugin.data.settings.easyBonus = numValue;
-                                            await this.plugin.savePluginData();
+                                            this.dataManager.data.settings.easyBonus = numValue;
+                                            await this.dataManager.savePluginData();
                                         } else {
                                             new Notice(t("VALID_NUMBER_WARNING"));
                                         }
@@ -284,10 +287,10 @@ export class SchedulingPage extends SettingsPage {
                         .setDesc(t("LOAD_BALANCE_DESC"))
                         .addToggle((toggle) =>
                             toggle
-                                .setValue(this.plugin.data.settings.loadBalance)
+                                .setValue(this.dataManager.data.settings.loadBalance)
                                 .onChange(async (value) => {
-                                    this.plugin.data.settings.loadBalance = value;
-                                    await this.plugin.savePluginData();
+                                    this.dataManager.data.settings.loadBalance = value;
+                                    await this.dataManager.savePluginData();
                                 }),
                         );
                 });
@@ -303,16 +306,16 @@ export class SchedulingPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.plugin.data.settings.maximumInterval =
+                                this.dataManager.data.settings.maximumInterval =
                                     DEFAULT_SETTINGS.maximumInterval;
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
 
                                 this.display();
                             });
                     })
                     .addText((text) =>
                         text
-                            .setValue(this.plugin.data.settings.maximumInterval.toString())
+                            .setValue(this.dataManager.data.settings.maximumInterval.toString())
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
                                     const numValue: number = Number.parseInt(value);
@@ -320,13 +323,13 @@ export class SchedulingPage extends SettingsPage {
                                         if (numValue < 1) {
                                             new Notice(t("MAX_INTERVAL_MIN_WARNING"));
                                             text.setValue(
-                                                this.plugin.data.settings.maximumInterval.toString(),
+                                                this.dataManager.data.settings.maximumInterval.toString(),
                                             );
                                             return;
                                         }
 
-                                        this.plugin.data.settings.maximumInterval = numValue;
-                                        await this.plugin.savePluginData();
+                                        this.dataManager.data.settings.maximumInterval = numValue;
+                                        await this.dataManager.savePluginData();
                                     } else {
                                         new Notice(t("VALID_NUMBER_WARNING"));
                                     }
@@ -343,14 +346,14 @@ export class SchedulingPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.plugin.data.settings.startOfDay = DEFAULT_SETTINGS.startOfDay;
-                                await this.plugin.savePluginData();
+                                this.dataManager.data.settings.startOfDay = DEFAULT_SETTINGS.startOfDay;
+                                await this.dataManager.savePluginData();
 
                                 this.display();
                             });
                     })
                     .addText((text) =>
-                        text.setValue(this.plugin.data.settings.startOfDay).onChange((value) => {
+                        text.setValue(this.dataManager.data.settings.startOfDay).onChange((value) => {
                             applySettingsUpdate(async () => {
                                 const dayBoundary: IDayBoundary | null =
                                     DateUtil.strToDayBoundary(value);
@@ -358,8 +361,8 @@ export class SchedulingPage extends SettingsPage {
                                     new Notice(t("INVALID_START_OF_DAY_WARNING"));
                                     return;
                                 } else {
-                                    this.plugin.data.settings.startOfDay = value;
-                                    await this.plugin.savePluginData();
+                                    this.dataManager.data.settings.startOfDay = value;
+                                    await this.dataManager.savePluginData();
                                     globalDateProvider.setDayBoundary(dayBoundary);
                                 }
                             });

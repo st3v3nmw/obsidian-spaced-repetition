@@ -1,5 +1,6 @@
 import { ButtonComponent, setIcon, Setting, SettingGroup } from "obsidian";
 
+import { DataManager } from "src/data/data-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { setDebugParser } from "src/parser";
@@ -21,12 +22,13 @@ export class MainPage extends SettingsPage {
     constructor(
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
+        dataManager: DataManager,
         pageType: SettingsPageType,
         display: () => void,
         openPage: (pageType: SettingsPageType) => void,
         scrollListener: (scrollPosition: number) => void,
     ) {
-        super(pageContainerEl, plugin, pageType, () => {}, display, openPage, scrollListener);
+        super(pageContainerEl, plugin, dataManager, pageType, () => { }, display, openPage, scrollListener);
 
         this.containerEl.addClass("sr-main-page");
 
@@ -157,21 +159,21 @@ export class MainPage extends SettingsPage {
             .addSetting((setting: Setting) => {
                 setting.setName(t("DISPLAY_SCHEDULING_DEBUG_INFO")).addToggle((toggle) =>
                     toggle
-                        .setValue(this.plugin.data.settings.showSchedulingDebugMessages)
+                        .setValue(this.dataManager.data.settings.showSchedulingDebugMessages)
                         .onChange(async (value) => {
-                            this.plugin.data.settings.showSchedulingDebugMessages = value;
-                            await this.plugin.savePluginData();
+                            this.dataManager.data.settings.showSchedulingDebugMessages = value;
+                            await this.dataManager.savePluginData();
                         }),
                 );
             })
             .addSetting((setting: Setting) => {
                 setting.setName(t("DISPLAY_PARSER_DEBUG_INFO")).addToggle((toggle) =>
                     toggle
-                        .setValue(this.plugin.data.settings.showParserDebugMessages)
+                        .setValue(this.dataManager.data.settings.showParserDebugMessages)
                         .onChange(async (value) => {
-                            this.plugin.data.settings.showParserDebugMessages = value;
-                            setDebugParser(this.plugin.data.settings.showParserDebugMessages);
-                            await this.plugin.savePluginData();
+                            this.dataManager.data.settings.showParserDebugMessages = value;
+                            setDebugParser(this.dataManager.data.settings.showParserDebugMessages);
+                            await this.dataManager.savePluginData();
                         }),
                 );
             });

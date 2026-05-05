@@ -1,27 +1,14 @@
-import { Notice, Platform, Plugin, TFile } from "obsidian";
+import { Platform, Plugin, TFile } from "obsidian";
 
-import { Algorithm } from "src/algorithms/base/isrs-algorithm";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
-import { SrsAlgorithmFsrs } from "src/algorithms/fsrs/srs-algorithm-fsrs";
-import { ObsidianVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
-import { SrsAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
 import {
     FlashcardReviewMode,
     FlashcardReviewSequencer,
     IFlashcardReviewSequencer,
 } from "src/card/flashcard-review-sequencer";
-import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
-import { OsrAppCore } from "src/core";
-import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
-import { DataStoreInNoteAlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
-import { DataStoreInPluginDataAlgorithmOsr } from "src/data-store-algorithm/data-store-in-plugin-data-algorithm-osr";
-import { DataStore, DataStoreName } from "src/data-stores/base/data-store";
-import { DataStoreMigrator } from "src/data-stores/data-store-migrator";
-import { StoreInNotes } from "src/data-stores/notes/notes";
-import { StoreInPluginData } from "src/data-stores/plugin-data/plugin-data";
-import { ScheduleDataMarkdownStorage } from "src/data-stores/plugin-data/schedule-data-markdown-storage";
-import { ScheduleDataRepository } from "src/data-stores/plugin-data/schedule-data-repository";
+import { DataManager } from "src/data/data-manager";
+import { DataStoreName } from "src/data-stores/base/data-store";
 import { Deck, DeckTreeFilter } from "src/deck/deck";
 import {
     CardOrder,
@@ -30,73 +17,76 @@ import {
     IDeckTreeIterator,
     IIteratorOrder,
 } from "src/deck/deck-tree-iterator";
-import { TopicPath } from "src/deck/topic-path";
-import { ISRFile, SrTFile } from "src/file";
 import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { Note } from "src/note/note";
-import { NoteFileLoader } from "src/note/note-file-loader";
 import { NoteReviewQueue } from "src/note/note-review-queue";
-import { setDebugParser } from "src/parser";
-import { DEFAULT_DATA, PluginData } from "src/plugin-data";
-import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
+import { SRSettings } from "src/settings";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
 import { UIManager, UIState } from "src/ui/ui-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
 
 export default class SRPlugin extends Plugin {
-    public data: PluginData;
-    public osrAppCore: OsrAppCore;
-    public uiManager: UIManager;
-    private scheduleDataRepository: ScheduleDataRepository;
+    public _uiManager: UIManager | null = null;
+    public _dataManager: DataManager | null = null;
 
-    public nextNoteReviewHandler: NextNoteReviewHandler;
+    public nextNoteReviewHandler: NextNoteReviewHandler | null = null;
 
     async onload(): Promise<void> {
-        await this.loadPluginData();
+        this.dataManager = new DataManager(this);
+        await this.dataManager.loadData();
 
         const noteReviewQueue = new NoteReviewQueue();
         this.nextNoteReviewHandler = new NextNoteReviewHandler(
             this.app,
-            this.data.settings,
+            this.dataManager.data.settings,
             noteReviewQueue,
         );
 
-        const questionPostponementList: QuestionPostponementList = new QuestionPostponementList(
-            this,
-            this.data.settings,
-            this.data.buryList,
-        );
-        await questionPostponementList.clearIfNewDay(this.data);
+        this.dataManager.initOSRAppCore(noteReviewQueue, this.onOsrVaultDataChanged.bind(this));
 
-        const osrNoteLinkInfoFinder: ObsidianVaultNoteLinkInfoFinder =
-            new ObsidianVaultNoteLinkInfoFinder(this.app.metadataCache);
-
-        this.osrAppCore = new OsrAppCore(this.app);
-        this.osrAppCore.init(
-            questionPostponementList,
-            osrNoteLinkInfoFinder,
-            this.data.settings,
-            this.onOsrVaultDataChanged.bind(this),
-            noteReviewQueue,
-            this.scheduleDataRepository,
-        );
-
-        this.uiManager = new UIManager(this);
+        this.uiManager = new UIManager(this, this.dataManager);
 
         this.addPluginCommands();
 
         this.registerEvent(
             this.app.vault.on("rename", (file, oldPath) => {
                 if (
-                    this.data.settings.dataStore === DataStoreName.PLUGIN_DATA &&
-                    file instanceof TFile
+                    this.dataManager.data.settings.dataStore === DataStoreName.PLUGIN_DATA &&
+                    file instanceof TFile &&
+                    this.dataManager.scheduleDataRepository !== null
                 ) {
-                    this.scheduleDataRepository.renameFile(oldPath, file.path);
+                    this.dataManager.scheduleDataRepository.renameFile(oldPath, file.path);
                 }
             }),
         );
+    }
+
+    get uiManager(): UIManager {
+        if (this._uiManager === null) throw new Error("UI manager not initialized!!!");
+        return this._uiManager;
+    }
+
+    set uiManager(uiManager: UIManager) {
+        this._uiManager = uiManager;
+    }
+
+    isUiManagerLoaded(): boolean {
+        return this._uiManager !== null;
+    }
+
+    get dataManager(): DataManager {
+        if (this._dataManager === null) throw new Error("Data manager not initialized!!!");
+        return this._dataManager;
+    }
+
+    set dataManager(dataManager: DataManager) {
+        this._dataManager = dataManager;
+    }
+
+    isDataManagerLoaded(): boolean {
+        return this._dataManager !== null;
     }
 
     public removeCustomHotkeys() {
@@ -113,7 +103,7 @@ export default class SRPlugin extends Plugin {
         this.addCommand({
             id: "srs-card-review-again",
             name: t("REVIEW_CARD_DIFFICULTY_CMD", {
-                difficulty: this.data.settings.flashcardAgainText,
+                difficulty: this.dataManager.data.settings.flashcardAgainText,
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
@@ -143,7 +133,7 @@ export default class SRPlugin extends Plugin {
         this.addCommand({
             id: "srs-card-review-hard",
             name: t("REVIEW_CARD_DIFFICULTY_CMD", {
-                difficulty: this.data.settings.flashcardHardText,
+                difficulty: this.dataManager.data.settings.flashcardHardText,
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
@@ -173,7 +163,7 @@ export default class SRPlugin extends Plugin {
         this.addCommand({
             id: "srs-card-review-good",
             name: t("REVIEW_CARD_DIFFICULTY_CMD", {
-                difficulty: this.data.settings.flashcardGoodText,
+                difficulty: this.dataManager.data.settings.flashcardGoodText,
             }),
             checkCallback: (checking: boolean) => {
                 if (
@@ -202,7 +192,7 @@ export default class SRPlugin extends Plugin {
         this.addCommand({
             id: "srs-card-review-easy",
             name: t("REVIEW_CARD_DIFFICULTY_CMD", {
-                difficulty: this.data.settings.flashcardEasyText,
+                difficulty: this.dataManager.data.settings.flashcardEasyText,
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
@@ -316,7 +306,9 @@ export default class SRPlugin extends Plugin {
     }
 
     private addPluginCommands() {
-        if (this.data.settings.useCustomHotkeys) {
+        if (
+            this.dataManager.data.settings.useCustomHotkeys
+        ) {
             this.addCustomHotkeys();
         }
 
@@ -324,8 +316,11 @@ export default class SRPlugin extends Plugin {
             id: "srs-note-review-open-note",
             name: t("OPEN_NOTE_FOR_REVIEW"),
             callback: async () => {
-                if (!this.osrAppCore.syncLock) {
-                    await this.sync();
+                if (
+                    !this.dataManager.osrAppCore.syncLock &&
+                    this.nextNoteReviewHandler !== null
+                ) {
+                    await this.dataManager.sync();
                     this.nextNoteReviewHandler.reviewNextNoteModal();
                 }
             },
@@ -334,7 +329,7 @@ export default class SRPlugin extends Plugin {
         this.addCommand({
             id: "srs-note-review-easy",
             name: t("REVIEW_NOTE_DIFFICULTY_CMD", {
-                difficulty: this.data.settings.flashcardEasyText,
+                difficulty: this.dataManager.data.settings.flashcardEasyText,
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
@@ -343,7 +338,7 @@ export default class SRPlugin extends Plugin {
                 if (openFile === null || openFile.extension !== "md") return false;
 
                 if (!checking) {
-                    this.saveNoteReviewResponse(openFile, ReviewResponse.Easy);
+                    this.dataManager.saveNoteReviewResponse(openFile, ReviewResponse.Easy);
                 }
                 return true;
             },
@@ -352,7 +347,7 @@ export default class SRPlugin extends Plugin {
         this.addCommand({
             id: "srs-note-review-good",
             name: t("REVIEW_NOTE_DIFFICULTY_CMD", {
-                difficulty: this.data.settings.flashcardGoodText,
+                difficulty: this.dataManager.data.settings.flashcardGoodText,
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
@@ -361,7 +356,7 @@ export default class SRPlugin extends Plugin {
                 if (openFile === null || openFile.extension !== "md") return false;
 
                 if (!checking) {
-                    this.saveNoteReviewResponse(openFile, ReviewResponse.Good);
+                    this.dataManager.saveNoteReviewResponse(openFile, ReviewResponse.Good);
                 }
                 return true;
             },
@@ -370,7 +365,7 @@ export default class SRPlugin extends Plugin {
         this.addCommand({
             id: "srs-note-review-hard",
             name: t("REVIEW_NOTE_DIFFICULTY_CMD", {
-                difficulty: this.data.settings.flashcardHardText,
+                difficulty: this.dataManager.data.settings.flashcardHardText,
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
@@ -379,7 +374,7 @@ export default class SRPlugin extends Plugin {
                 if (openFile === null || openFile.extension !== "md") return false;
 
                 if (!checking) {
-                    this.saveNoteReviewResponse(openFile, ReviewResponse.Hard);
+                    this.dataManager.saveNoteReviewResponse(openFile, ReviewResponse.Hard);
                 }
                 return true;
             },
@@ -452,15 +447,15 @@ export default class SRPlugin extends Plugin {
         remainingDeckTree: Deck,
         reviewMode: FlashcardReviewMode,
     ): { reviewSequencer: IFlashcardReviewSequencer; mode: FlashcardReviewMode } {
-        const deckIterator: IDeckTreeIterator = SRPlugin.createDeckTreeIterator(this.data.settings);
+        const deckIterator: IDeckTreeIterator = SRPlugin.createDeckTreeIterator(this.dataManager.data.settings);
 
         const reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(
             reviewMode,
             deckIterator,
-            this.data.settings,
+            this.dataManager.data.settings,
             SrsAlgorithm.getInstance(),
-            this.osrAppCore.questionPostponementList,
-            this.osrAppCore.dueDateFlashcardHistogram,
+            this.dataManager.osrAppCore.questionPostponementList,
+            this.dataManager.osrAppCore.dueDateFlashcardHistogram,
         );
 
         reviewSequencer.setDeckTree(fullDeckTree, remainingDeckTree);
@@ -471,17 +466,41 @@ export default class SRPlugin extends Plugin {
         file: TFile,
         mode: FlashcardReviewMode,
     ): Promise<{ deckTree: Deck; remainingDeckTree: Deck; mode: FlashcardReviewMode }> {
-        const note: Note = await this.loadNote(file);
+        const note: Note = await this.dataManager.loadNote(file);
 
         const deckTree = new Deck("root", null);
         note.appendCardsToDeck(deckTree);
         const remainingDeckTree = DeckTreeFilter.filterForRemainingCards(
-            this.osrAppCore.questionPostponementList,
+            this.dataManager.osrAppCore.questionPostponementList,
             deckTree,
             mode,
         );
 
         return { deckTree, remainingDeckTree, mode };
+    }
+
+    /**
+     * Gets the text direction setting for the current Obsidian instance.
+     */
+    public getObsidianRtlSetting(): TextDirection {
+        // Get the direction with Obsidian's own setting
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const v: any = (this.app.vault as any).getConfig("rightToLeft");
+        return convertToStringOrEmpty(v) === "true" ? TextDirection.Rtl : TextDirection.Ltr;
+    }
+
+    /**
+     * Called when the OSR app core's data has changed.
+     *
+     * Anything that needs to be updated in the UI because of this change should be done here.
+     */
+    private onOsrVaultDataChanged() {
+        this.uiManager.updateStatusBar();
+        if (
+            this.dataManager.data.settings.enableNoteReviewPaneOnStartup
+        ) {
+            this.uiManager.sidebarManager.redraw();
+        }
     }
 
     private static createDeckTreeIterator(settings: SRSettings): IDeckTreeIterator {
@@ -495,149 +514,5 @@ export default class SRPlugin extends Plugin {
             cardOrder,
         };
         return new DeckTreeIterator(iteratorOrder, null);
-    }
-
-    async sync(): Promise<void> {
-        if (this.osrAppCore.syncLock) {
-            return;
-        }
-
-        const now = window.moment(Date.now());
-        this.osrAppCore.defaultTextDirection = this.getObsidianRtlSetting();
-
-        await this.osrAppCore.loadVault();
-
-        if (this.data.settings.showSchedulingDebugMessages) {
-            console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
-            console.log(
-                "SR: " +
-                    t("SYNC_TIME_TAKEN", {
-                        t: Date.now() - now.valueOf(),
-                    }),
-            );
-        }
-    }
-
-    private onOsrVaultDataChanged() {
-        this.uiManager.updateStatusBar();
-        if (this.data.settings.enableNoteReviewPaneOnStartup)
-            this.uiManager.sidebarManager.redraw();
-    }
-
-    async loadNote(noteFile: TFile): Promise<Note> {
-        const loader: NoteFileLoader = new NoteFileLoader(this.data.settings);
-        const srFile: ISRFile = this.createSrTFile(noteFile);
-        const folderTopicPath: TopicPath = TopicPath.getFolderPathFromFilename(
-            srFile,
-            this.data.settings,
-        );
-
-        const note: Note = await loader.load(
-            this.createSrTFile(noteFile),
-            this.getObsidianRtlSetting(),
-            folderTopicPath,
-        );
-        if (note.hasChanged) {
-            note.writeNoteFile(this.data.settings);
-        }
-        return note;
-    }
-
-    private getObsidianRtlSetting(): TextDirection {
-        // Get the direction with Obsidian's own setting
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const v: any = (this.app.vault as any).getConfig("rightToLeft");
-        return convertToStringOrEmpty(v) === "true" ? TextDirection.Rtl : TextDirection.Ltr;
-    }
-
-    async saveNoteReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
-        const noteSrTFile: ISRFile = this.createSrTFile(note);
-
-        if (SettingsUtil.isPathInNoteIgnoreFolder(this.data.settings, note.path)) {
-            new Notice(t("NOTE_IN_IGNORED_FOLDER"));
-            return;
-        }
-
-        const tags = noteSrTFile.getAllTagsFromCache();
-        if (!SettingsUtil.isAnyTagANoteReviewTag(this.data.settings, tags)) {
-            new Notice(t("PLEASE_TAG_NOTE"));
-            return;
-        }
-
-        //
-        await this.osrAppCore.saveNoteReviewResponse(noteSrTFile, response, this.data.settings);
-
-        new Notice(t("RESPONSE_RECEIVED"));
-
-        if (this.data.settings.autoNextNote) {
-            this.nextNoteReviewHandler.autoReviewNextNote();
-        }
-    }
-
-    createSrTFile(note: TFile): SrTFile {
-        return new SrTFile(this.app.vault, this.app.metadataCache, this.app.fileManager, note);
-    }
-
-    async loadPluginData(): Promise<void> {
-        const loadedData: PluginData = await this.loadData();
-        if (loadedData?.settings) upgradeSettings(loadedData.settings);
-        this.data = Object.assign({}, DEFAULT_DATA, loadedData);
-        this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
-        setDebugParser(this.data.settings.showParserDebugMessages);
-
-        const scheduleStorage = new ScheduleDataMarkdownStorage(
-            this.app,
-            () => this.data.settings.scheduleDataVaultLocation,
-        );
-
-        this.scheduleDataRepository = new ScheduleDataRepository(
-            this.data,
-            this.savePluginData.bind(this),
-            scheduleStorage,
-        );
-        await this.scheduleDataRepository.initialize();
-
-        this.setupDataStoreAndAlgorithmInstances(this.data.settings);
-    }
-
-    setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
-        if (settings.dataStore === DataStoreName.PLUGIN_DATA) {
-            DataStore.instance = new StoreInPluginData(settings, this.scheduleDataRepository);
-            DataStoreAlgorithm.instance = new DataStoreInPluginDataAlgorithmOsr();
-        } else {
-            DataStore.instance = new StoreInNotes(settings);
-            DataStoreAlgorithm.instance = new DataStoreInNoteAlgorithmOsr(settings);
-        }
-      
-        SrsAlgorithm.instance =
-            settings.algorithm === Algorithm.FSRS
-                ? new SrsAlgorithmFsrs(settings)
-                : new SrsAlgorithmOsr(settings);
-    }
-    async migrateDataStore(oldMode: DataStoreName, newMode: DataStoreName): Promise<void> {
-        const textDirection = this.getObsidianRtlSetting();
-        if (newMode === DataStoreName.PLUGIN_DATA) {
-            await DataStoreMigrator.migrateToPluginData(
-                this.app,
-                this.data.settings,
-                textDirection,
-                this.scheduleDataRepository,
-            );
-        } else {
-            await DataStoreMigrator.migrateToNotes(
-                this.app,
-                this.data.settings,
-                textDirection,
-                this.scheduleDataRepository,
-            );
-        }
-    }
-
-    async savePluginData(): Promise<void> {
-        await this.saveData(this.data);
-    }
-
-    async persistScheduleDataNow(): Promise<void> {
-        await this.scheduleDataRepository.persistCurrentState();
     }
 }

@@ -114,6 +114,7 @@ export default class StatusBarManager {
                         tooltip: t("OPEN_DECK_FOR_REVIEW"),
                         tooltipPosition: "top",
                         onClick: async () => {
+                            if (this.plugin.uiManager === null) throw new Error("UI manager not initialized!!!");
                             await this.plugin.uiManager.openDeckContainer(
                                 FlashcardReviewMode.Review,
                             );
@@ -130,8 +131,11 @@ export default class StatusBarManager {
                         tooltip: t("OPEN_NOTE_FOR_REVIEW"),
                         tooltipPosition: "top",
                         onClick: async () => {
-                            if (!this.plugin.osrAppCore.syncLock) {
-                                await this.plugin.sync();
+                            if (this.plugin.dataManager === null || this.plugin.dataManager.osrAppCore === null) throw new Error("SR plugin or OSR app core not initialized!!!");
+                            if (this.plugin.nextNoteReviewHandler === null) throw new Error("Next note review handler not initialized!!!");
+
+                            if (!this.plugin.dataManager.osrAppCore.syncLock) {
+                                await this.plugin.dataManager.sync();
                                 this.plugin.nextNoteReviewHandler.reviewNextNoteModal();
                             }
                         },
