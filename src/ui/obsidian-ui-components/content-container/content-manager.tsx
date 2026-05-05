@@ -323,11 +323,17 @@ export default class ContentManager {
     // MARK: Card button handlers
 
     public async _deleteCurrentCard() {
-        if (this.sessionData === null || this.reviewSequencer === null || this.dataManager.data === null) return;
+        if (
+            this.sessionData === null ||
+            this.reviewSequencer === null ||
+            this.dataManager.data === null
+        )
+            return;
         const timeNow = now();
         if (
             this.lastPressedOnProcessReview &&
-            timeNow - this.lastPressedOnProcessReview < this.dataManager.data.settings.reviewButtonDelay
+            timeNow - this.lastPressedOnProcessReview <
+                this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
@@ -352,7 +358,8 @@ export default class ContentManager {
         const timeNow = now();
         if (
             this.lastPressedOnProcessReview &&
-            timeNow - this.lastPressedOnProcessReview < this.dataManager.data.settings.reviewButtonDelay
+            timeNow - this.lastPressedOnProcessReview <
+                this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }

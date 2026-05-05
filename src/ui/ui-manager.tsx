@@ -68,7 +68,8 @@ export class UIManager {
         // Closes all still open tab views when the plugin is loaded, because it causes bugs / empty windows otherwise
         this.tabViewManager = new TabViewManager(this.plugin);
 
-        if (this.plugin.nextNoteReviewHandler === null) throw new Error("Next note review handler not initialized!!!");
+        if (this.plugin.nextNoteReviewHandler === null)
+            throw new Error("Next note review handler not initialized!!!");
         if (this.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
 
         this.sidebarManager = new SidebarManager(
@@ -81,7 +82,8 @@ export class UIManager {
             this.tabViewManager.closeAllTabViews();
             await this.sidebarManager.activateReviewQueueViewPanel();
             setTimeout(async () => {
-                if (this.dataManager.osrAppCore === null) throw new Error("SR plugin or OSR app core not initialized!!!");
+                if (this.dataManager.osrAppCore === null)
+                    throw new Error("SR plugin or OSR app core not initialized!!!");
                 if (!this.dataManager.osrAppCore.syncLock) {
                     await this.dataManager.sync();
                 }
@@ -94,7 +96,9 @@ export class UIManager {
         this.plugin.registerEvent(
             this.plugin.app.workspace.on("file-menu", this.fileMenuHandler.bind(this)),
         );
-        this.plugin.addSettingTab(new SRSettingTab(this.plugin.app, this.plugin, this.dataManager, this));
+        this.plugin.addSettingTab(
+            new SRSettingTab(this.plugin.app, this.plugin, this.dataManager, this),
+        );
         this.registerSRFocusListener();
     }
 
@@ -107,7 +111,8 @@ export class UIManager {
 
     public updateStatusBar() {
         if (this.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
-        if (this.dataManager.osrAppCore === null) throw new Error("SR plugin or OSR app core not initialized!!!");
+        if (this.dataManager.osrAppCore === null)
+            throw new Error("SR plugin or OSR app core not initialized!!!");
 
         const settings = this.dataManager.data.settings;
 
@@ -121,14 +126,12 @@ export class UIManager {
         if (settings.showStatusBar) {
             this.statusBarManager.setCount(
                 this.dataManager.osrAppCore.remainingDeckTree.getCardCount(CardListType.All, true),
-                settings.showStatusBar &&
-                settings.showCardStatusBarItem,
+                settings.showStatusBar && settings.showCardStatusBarItem,
                 "card-review",
             );
             this.statusBarManager.setCount(
                 this.dataManager.osrAppCore.noteReviewQueue.dueNotesCount,
-                settings.showStatusBar &&
-                settings.showNoteStatusBarItem,
+                settings.showStatusBar && settings.showNoteStatusBarItem,
                 "note-review",
             );
         }
@@ -173,8 +176,8 @@ export class UIManager {
             // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
             this.setSRViewInFocus(
                 (modal === null || modal === undefined) &&
-                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
-                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
+                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
+                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
             );
         }
     }
@@ -189,7 +192,8 @@ export class UIManager {
     }
 
     public async openDeckContainer(mode: FlashcardReviewMode, singleNote?: TFile): Promise<void> {
-        if (this.dataManager.osrAppCore === null) throw new Error("SR plugin or OSR app core not initialized!!!");
+        if (this.dataManager.osrAppCore === null)
+            throw new Error("SR plugin or OSR app core not initialized!!!");
         if (this.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
 
         if (this.dataManager.osrAppCore.syncLock) {
@@ -220,7 +224,6 @@ export class UIManager {
 
     public async openFlashcardModal(reviewQueueLoader: ReviewQueueLoader): Promise<void> {
         if (this.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
-
 
         this.setSRViewInFocus(true);
         new SRModalView(
@@ -272,7 +275,8 @@ export class UIManager {
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        if (this.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
+                        if (this.dataManager.data === null)
+                            throw new Error("SR plugin or data not initialized!!!");
                         this.dataManager.saveNoteReviewResponse(file, ReviewResponse.Easy);
                     });
             });
@@ -285,7 +289,8 @@ export class UIManager {
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        if (this.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
+                        if (this.dataManager.data === null)
+                            throw new Error("SR plugin or data not initialized!!!");
                         this.dataManager.saveNoteReviewResponse(file, ReviewResponse.Good);
                     });
             });
@@ -298,16 +303,14 @@ export class UIManager {
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        if (this.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
+                        if (this.dataManager.data === null)
+                            throw new Error("SR plugin or data not initialized!!!");
                         this.dataManager.saveNoteReviewResponse(file, ReviewResponse.Hard);
                     });
             });
         }
 
-        if (
-            settings.showFileMenuReviewOptions &&
-            settings.showDeleteButtonInFileMenu
-        ) {
+        if (settings.showFileMenuReviewOptions && settings.showDeleteButtonInFileMenu) {
             menu.addSeparator();
         }
 
@@ -323,7 +326,8 @@ export class UIManager {
                             t("CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION"),
                             t("NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS"),
                             () => {
-                                if (this.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
+                                if (this.dataManager.data === null)
+                                    throw new Error("SR plugin or data not initialized!!!");
                                 const settings = this.dataManager.data.settings;
                                 deleteNoteSchedulingDataInNote(
                                     file,
@@ -346,7 +350,8 @@ export class UIManager {
                             t("CONFIRM_SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION"),
                             t("SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION_IN_PROGRESS"),
                             () => {
-                                if (this.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
+                                if (this.dataManager.data === null)
+                                    throw new Error("SR plugin or data not initialized!!!");
                                 const settings = this.dataManager.data.settings;
                                 deleteAllSchedulingDataOfCardsInNote(
                                     file,

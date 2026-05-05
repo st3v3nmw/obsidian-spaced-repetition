@@ -139,7 +139,7 @@ export class OsrCore {
         if (matchedNoteTags.length === 0) {
             return;
         }
-        
+
         if (SettingsUtil.isAnyTagIgnoredForNotes(this.settings, tags)) {
             return;
         }

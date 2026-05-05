@@ -358,7 +358,8 @@ export class CardContainer {
     }
 
     private _keydownHandler = (e: KeyboardEvent) => {
-        if (this.plugin.dataManager === null || this.plugin.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
+        if (this.plugin.dataManager === null || this.plugin.dataManager.data === null)
+            throw new Error("SR plugin or data not initialized!!!");
         if (this.plugin.uiManager === null) throw new Error("UI manager not initialized!!!");
         // Prevents any input, if the edit modal is open or if the view is not in focus
         if (

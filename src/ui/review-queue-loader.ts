@@ -39,7 +39,12 @@ export class ReviewQueueLoader {
     }
 
     public async loadReviewQueue(): Promise<IFlashcardReviewSequencer> {
-        if (this.plugin === null || this.plugin.dataManager === null || this.plugin.dataManager.osrAppCore === null) throw new Error("SR plugin or OSR app core not initialized!!!");
+        if (
+            this.plugin === null ||
+            this.plugin.dataManager === null ||
+            this.plugin.dataManager.osrAppCore === null
+        )
+            throw new Error("SR plugin or OSR app core not initialized!!!");
 
         if (!this.plugin.dataManager.osrAppCore.syncLock) {
             await this.plugin.dataManager.sync();

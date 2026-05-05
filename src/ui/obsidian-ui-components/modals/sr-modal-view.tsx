@@ -112,7 +112,6 @@ export class SRModalView extends Modal {
     ) {
         if (isNaN(heightPercent) || isNaN(widthPercent)) return;
 
-
         if (isMobile) {
             this.plugin.dataManager.data.settings.flashcardHeightPercentageMobile = heightPercent;
             this.plugin.dataManager.data.settings.flashcardWidthPercentageMobile = widthPercent;

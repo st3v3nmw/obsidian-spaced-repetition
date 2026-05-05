@@ -28,7 +28,16 @@ export class MainPage extends SettingsPage {
         openPage: (pageType: SettingsPageType) => void,
         scrollListener: (scrollPosition: number) => void,
     ) {
-        super(pageContainerEl, plugin, dataManager, pageType, () => { }, display, openPage, scrollListener);
+        super(
+            pageContainerEl,
+            plugin,
+            dataManager,
+            pageType,
+            () => {},
+            display,
+            openPage,
+            scrollListener,
+        );
 
         this.containerEl.addClass("sr-main-page");
 

@@ -56,7 +56,8 @@ export class DataPage extends SettingsPage {
                             })
                             .setValue(this.dataManager.data.settings.dataStore)
                             .onChange(async (value) => {
-                                const oldMode = this.dataManager.data.settings.dataStore as DataStoreName;
+                                const oldMode = this.dataManager.data.settings
+                                    .dataStore as DataStoreName;
                                 const newMode = value as DataStoreName;
 
                                 // Revert the dropdown immediately; only apply after confirmation.
@@ -140,7 +141,9 @@ export class DataPage extends SettingsPage {
                     .setDesc(t("DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.dataManager.data.settings.deleteTagsOnSchedulingDataDeletion)
+                            .setValue(
+                                this.dataManager.data.settings.deleteTagsOnSchedulingDataDeletion,
+                            )
                             .onChange(async (value) => {
                                 this.dataManager.data.settings.deleteTagsOnSchedulingDataDeletion =
                                     value;
@@ -165,8 +168,7 @@ export class DataPage extends SettingsPage {
                                     () => {
                                         const settings = this.dataManager.data.settings;
                                         deleteAllSchedulingData(
-                                            settings
-                                                .deleteTagsOnSchedulingDataDeletion,
+                                            settings.deleteTagsOnSchedulingDataDeletion,
                                             settings.flashcardTags,
                                             settings.tagsToReview,
                                         );

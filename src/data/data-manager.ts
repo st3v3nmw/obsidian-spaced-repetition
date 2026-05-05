@@ -62,7 +62,8 @@ export class DataManager {
     }
 
     get osrAppCore(): OsrAppCore {
-        if (this._osrAppCore === null) throw new Error("SR plugin or OSR app core not initialized!!!");
+        if (this._osrAppCore === null)
+            throw new Error("SR plugin or OSR app core not initialized!!!");
         return this._osrAppCore;
     }
 
@@ -101,7 +102,10 @@ export class DataManager {
         this.setupDataStoreAndAlgorithmInstances(this.data.settings);
     }
 
-    async initOSRAppCore(noteReviewQueue: NoteReviewQueue, onOsrVaultDataChanged: () => void): Promise<void> {
+    async initOSRAppCore(
+        noteReviewQueue: NoteReviewQueue,
+        onOsrVaultDataChanged: () => void,
+    ): Promise<void> {
         if (this.data === null) throw new Error("Data not loaded!!");
         const questionPostponementList: QuestionPostponementList = new QuestionPostponementList(
             this.plugin,
@@ -126,7 +130,8 @@ export class DataManager {
 
     setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
         if (settings.dataStore === DataStoreName.PLUGIN_DATA) {
-            if (this.scheduleDataRepository === null) throw new Error("Schedule data not initialized!!!");
+            if (this.scheduleDataRepository === null)
+                throw new Error("Schedule data not initialized!!!");
             DataStore.instance = new StoreInPluginData(settings, this.scheduleDataRepository);
             DataStoreAlgorithm.instance = new DataStoreInPluginDataAlgorithmOsr();
         } else {
@@ -144,7 +149,8 @@ export class DataManager {
         const textDirection = this.plugin.getObsidianRtlSetting();
         if (newMode === DataStoreName.PLUGIN_DATA) {
             if (this.data === null) throw new Error("Data not loaded!!");
-            if (this.scheduleDataRepository === null) throw new Error("Schedule data not initialized!!!");
+            if (this.scheduleDataRepository === null)
+                throw new Error("Schedule data not initialized!!!");
             await DataStoreMigrator.migrateToPluginData(
                 this.plugin.app,
                 this.data.settings,
@@ -153,7 +159,8 @@ export class DataManager {
             );
         } else {
             if (this.data === null) throw new Error("Data not loaded!!");
-            if (this.scheduleDataRepository === null) throw new Error("Schedule data not initialized!!!");
+            if (this.scheduleDataRepository === null)
+                throw new Error("Schedule data not initialized!!!");
             await DataStoreMigrator.migrateToNotes(
                 this.plugin.app,
                 this.data.settings,
@@ -180,9 +187,9 @@ export class DataManager {
             console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                t("SYNC_TIME_TAKEN", {
-                    t: Date.now() - now.valueOf(),
-                }),
+                    t("SYNC_TIME_TAKEN", {
+                        t: Date.now() - now.valueOf(),
+                    }),
             );
         }
     }
@@ -210,7 +217,8 @@ export class DataManager {
     async saveNoteReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
         if (this.data === null) throw new Error("Data not loaded!!");
         if (this.osrAppCore === null) throw new Error("OSR app core not initialized!!!");
-        if (this.plugin.nextNoteReviewHandler === null) throw new Error("Next note review handler not initialized!!!");
+        if (this.plugin.nextNoteReviewHandler === null)
+            throw new Error("Next note review handler not initialized!!!");
 
         const noteSrTFile: ISRFile = this.createSrTFile(note);
 
@@ -235,7 +243,12 @@ export class DataManager {
     }
 
     createSrTFile(note: TFile): SrTFile {
-        return new SrTFile(this.plugin.app.vault, this.plugin.app.metadataCache, this.plugin.app.fileManager, note);
+        return new SrTFile(
+            this.plugin.app.vault,
+            this.plugin.app.metadataCache,
+            this.plugin.app.fileManager,
+            note,
+        );
     }
 
     async savePluginData(): Promise<void> {
@@ -244,7 +257,8 @@ export class DataManager {
     }
 
     async persistScheduleDataNow(): Promise<void> {
-        if (this.scheduleDataRepository === null) throw new Error("Schedule data not initialized!!!");
+        if (this.scheduleDataRepository === null)
+            throw new Error("Schedule data not initialized!!!");
         await this.scheduleDataRepository.persistCurrentState();
     }
 }

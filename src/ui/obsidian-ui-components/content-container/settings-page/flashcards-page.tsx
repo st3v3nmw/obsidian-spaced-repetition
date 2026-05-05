@@ -49,7 +49,8 @@ export class FlashcardsPage extends SettingsPage {
                             .setValue(this.dataManager.data.settings.flashcardTags.join(" "))
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.dataManager.data.settings.flashcardTags = value.split(/\s+/);
+                                    this.dataManager.data.settings.flashcardTags =
+                                        value.split(/\s+/);
                                     await this.dataManager.savePluginData();
                                 });
                             }),
@@ -87,7 +88,9 @@ export class FlashcardsPage extends SettingsPage {
                     .setDesc(t("FLASHCARD_TAGS_TO_IGNORE_DESC"))
                     .addTextArea((text) =>
                         text
-                            .setValue(this.dataManager.data.settings.flashcardTagsToIgnore.join(" "))
+                            .setValue(
+                                this.dataManager.data.settings.flashcardTagsToIgnore.join(" "),
+                            )
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
                                     this.dataManager.data.settings.flashcardTagsToIgnore = value
@@ -152,26 +155,27 @@ export class FlashcardsPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 const deckOrderEnabled: boolean =
-                    this.dataManager.data.settings.flashcardCardOrder !== "EveryCardRandomDeckAndCard";
+                    this.dataManager.data.settings.flashcardCardOrder !==
+                    "EveryCardRandomDeckAndCard";
                 setting.setName(t("REVIEW_DECK_ORDER")).addDropdown((dropdown) =>
                     dropdown
                         .addOptions(
                             deckOrderEnabled
                                 ? {
-                                    // eslint-disable-next-line camelcase
-                                    PrevDeckComplete_Sequential: t(
-                                        "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
-                                    ),
-                                    // eslint-disable-next-line camelcase
-                                    PrevDeckComplete_Random: t(
-                                        "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
-                                    ),
-                                }
+                                      // eslint-disable-next-line camelcase
+                                      PrevDeckComplete_Sequential: t(
+                                          "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
+                                      ),
+                                      // eslint-disable-next-line camelcase
+                                      PrevDeckComplete_Random: t(
+                                          "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
+                                      ),
+                                  }
                                 : {
-                                    EveryCardRandomDeckAndCard: t(
-                                        "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
-                                    ),
-                                },
+                                      EveryCardRandomDeckAndCard: t(
+                                          "REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD",
+                                      ),
+                                  },
                         )
                         .setValue(
                             deckOrderEnabled
@@ -384,7 +388,9 @@ export class FlashcardsPage extends SettingsPage {
                     })
                     .addText((text) =>
                         text
-                            .setValue(this.dataManager.data.settings.singleLineReversedCardSeparator)
+                            .setValue(
+                                this.dataManager.data.settings.singleLineReversedCardSeparator,
+                            )
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
                                     this.dataManager.data.settings.singleLineReversedCardSeparator =
@@ -473,7 +479,8 @@ export class FlashcardsPage extends SettingsPage {
                                 .setValue(this.dataManager.data.settings.multilineCardEndMarker)
                                 .onChange((value) => {
                                     applySettingsUpdate(async () => {
-                                        this.dataManager.data.settings.multilineCardEndMarker = value;
+                                        this.dataManager.data.settings.multilineCardEndMarker =
+                                            value;
                                         await this.dataManager.savePluginData();
                                     });
                                 }),

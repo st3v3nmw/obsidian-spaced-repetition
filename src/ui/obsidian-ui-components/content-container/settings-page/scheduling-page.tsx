@@ -122,7 +122,9 @@ export class SchedulingPage extends SettingsPage {
                     })
                     .addText((text) =>
                         text
-                            .setValue(this.dataManager.data.settings.fsrsDesiredRetention.toString())
+                            .setValue(
+                                this.dataManager.data.settings.fsrsDesiredRetention.toString(),
+                            )
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
                                     const numValue = Number.parseFloat(value);
@@ -155,7 +157,8 @@ export class SchedulingPage extends SettingsPage {
                                 .setIcon("reset")
                                 .setTooltip(t("RESET_DEFAULT"))
                                 .onClick(async () => {
-                                    this.dataManager.data.settings.baseEase = DEFAULT_SETTINGS.baseEase;
+                                    this.dataManager.data.settings.baseEase =
+                                        DEFAULT_SETTINGS.baseEase;
                                     await this.dataManager.savePluginData();
 
                                     this.display();
@@ -234,7 +237,8 @@ export class SchedulingPage extends SettingsPage {
                                 .setValue(this.dataManager.data.settings.lapsesIntervalChange * 100)
                                 .setDynamicTooltip()
                                 .onChange(async (value: number) => {
-                                    this.dataManager.data.settings.lapsesIntervalChange = value / 100;
+                                    this.dataManager.data.settings.lapsesIntervalChange =
+                                        value / 100;
                                     await this.dataManager.savePluginData();
                                 }),
                         );
@@ -257,7 +261,9 @@ export class SchedulingPage extends SettingsPage {
                         })
                         .addText((text) =>
                             text
-                                .setValue((this.dataManager.data.settings.easyBonus * 100).toString())
+                                .setValue(
+                                    (this.dataManager.data.settings.easyBonus * 100).toString(),
+                                )
                                 .onChange((value) => {
                                     applySettingsUpdate(async () => {
                                         const numValue: number = Number.parseInt(value) / 100;
@@ -266,7 +272,8 @@ export class SchedulingPage extends SettingsPage {
                                                 new Notice(t("EASY_BONUS_MIN_WARNING"));
                                                 text.setValue(
                                                     (
-                                                        this.dataManager.data.settings.easyBonus * 100
+                                                        this.dataManager.data.settings.easyBonus *
+                                                        100
                                                     ).toString(),
                                                 );
                                                 return;
@@ -346,27 +353,30 @@ export class SchedulingPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.dataManager.data.settings.startOfDay = DEFAULT_SETTINGS.startOfDay;
+                                this.dataManager.data.settings.startOfDay =
+                                    DEFAULT_SETTINGS.startOfDay;
                                 await this.dataManager.savePluginData();
 
                                 this.display();
                             });
                     })
                     .addText((text) =>
-                        text.setValue(this.dataManager.data.settings.startOfDay).onChange((value) => {
-                            applySettingsUpdate(async () => {
-                                const dayBoundary: IDayBoundary | null =
-                                    DateUtil.strToDayBoundary(value);
-                                if (dayBoundary === null) {
-                                    new Notice(t("INVALID_START_OF_DAY_WARNING"));
-                                    return;
-                                } else {
-                                    this.dataManager.data.settings.startOfDay = value;
-                                    await this.dataManager.savePluginData();
-                                    globalDateProvider.setDayBoundary(dayBoundary);
-                                }
-                            });
-                        }),
+                        text
+                            .setValue(this.dataManager.data.settings.startOfDay)
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    const dayBoundary: IDayBoundary | null =
+                                        DateUtil.strToDayBoundary(value);
+                                    if (dayBoundary === null) {
+                                        new Notice(t("INVALID_START_OF_DAY_WARNING"));
+                                        return;
+                                    } else {
+                                        this.dataManager.data.settings.startOfDay = value;
+                                        await this.dataManager.savePluginData();
+                                        globalDateProvider.setDayBoundary(dayBoundary);
+                                    }
+                                });
+                            }),
                     );
             });
     }

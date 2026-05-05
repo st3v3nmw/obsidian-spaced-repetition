@@ -46,7 +46,8 @@ export class NotesPage extends SettingsPage {
                             .setValue(this.dataManager.data.settings.tagsToReview.join(" "))
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.dataManager.data.settings.tagsToReview = value.split(/\s+/);
+                                    this.dataManager.data.settings.tagsToReview =
+                                        value.split(/\s+/);
                                     await this.dataManager.savePluginData();
                                 });
                             }),
@@ -108,7 +109,8 @@ export class NotesPage extends SettingsPage {
                     .addText((text) =>
                         text
                             .setValue(
-                                this.dataManager.data.settings.preferredDateFormatForNoteReviewQueue,
+                                this.dataManager.data.settings
+                                    .preferredDateFormatForNoteReviewQueue,
                             )
                             .onChange((value) => {
                                 this.applySettingsUpdate(async () => {
@@ -176,7 +178,9 @@ export class NotesPage extends SettingsPage {
                     })
                     .addText((text) =>
                         text
-                            .setValue(this.dataManager.data.settings.maxNDaysNotesReviewQueue.toString())
+                            .setValue(
+                                this.dataManager.data.settings.maxNDaysNotesReviewQueue.toString(),
+                            )
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
                                     const numValue: number = Number.parseInt(value);

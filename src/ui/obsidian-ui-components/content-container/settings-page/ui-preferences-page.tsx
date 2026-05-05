@@ -83,8 +83,9 @@ export class UIPreferencesPage extends SettingsPage {
                         toggle
                             .setValue(this.dataManager.data.settings.useCustomHotkeys)
                             .setDisabled(
-                                (isMobile && !this.dataManager.data.settings.openViewInNewTabMobile) ||
-                                (!isMobile && !this.dataManager.data.settings.openViewInNewTab),
+                                (isMobile &&
+                                    !this.dataManager.data.settings.openViewInNewTabMobile) ||
+                                    (!isMobile && !this.dataManager.data.settings.openViewInNewTab),
                             )
                             .onChange(async (value) => {
                                 this.dataManager.data.settings.useCustomHotkeys = value;
@@ -188,7 +189,8 @@ export class UIPreferencesPage extends SettingsPage {
                                     this.dataManager.data.settings.flashcardHeightPercentageMobile =
                                         value;
                                 } else {
-                                    this.dataManager.data.settings.flashcardHeightPercentage = value;
+                                    this.dataManager.data.settings.flashcardHeightPercentage =
+                                        value;
                                 }
                                 await this.dataManager.savePluginData();
                             });
@@ -288,9 +290,12 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.dataManager.data.settings.showUpdateAvailableStatusBarItem)
+                            .setValue(
+                                this.dataManager.data.settings.showUpdateAvailableStatusBarItem,
+                            )
                             .onChange(async (value) => {
-                                this.dataManager.data.settings.showUpdateAvailableStatusBarItem = value;
+                                this.dataManager.data.settings.showUpdateAvailableStatusBarItem =
+                                    value;
                                 await this.dataManager.savePluginData();
                                 this.uiManager.updateStatusBar();
                             }),
@@ -305,9 +310,12 @@ export class UIPreferencesPage extends SettingsPage {
                     .setDesc(t("INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.dataManager.data.settings.initiallyExpandAllSubdecksInTree)
+                            .setValue(
+                                this.dataManager.data.settings.initiallyExpandAllSubdecksInTree,
+                            )
                             .onChange(async (value) => {
-                                this.dataManager.data.settings.initiallyExpandAllSubdecksInTree = value;
+                                this.dataManager.data.settings.initiallyExpandAllSubdecksInTree =
+                                    value;
                                 await this.dataManager.savePluginData();
                             }),
                     );

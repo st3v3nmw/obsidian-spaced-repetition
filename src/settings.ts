@@ -202,7 +202,7 @@ export function upgradeSettings(settings: SRSettings) {
     ) {
         settings.scheduleDataVaultLocation = DEFAULT_SETTINGS.scheduleDataVaultLocation;
     }
-  
+
     if (settings.fsrsDesiredRetention === null || settings.fsrsDesiredRetention === undefined) {
         settings.fsrsDesiredRetention = DEFAULT_SETTINGS.fsrsDesiredRetention;
     }

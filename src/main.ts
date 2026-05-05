@@ -306,9 +306,7 @@ export default class SRPlugin extends Plugin {
     }
 
     private addPluginCommands() {
-        if (
-            this.dataManager.data.settings.useCustomHotkeys
-        ) {
+        if (this.dataManager.data.settings.useCustomHotkeys) {
             this.addCustomHotkeys();
         }
 
@@ -316,10 +314,7 @@ export default class SRPlugin extends Plugin {
             id: "srs-note-review-open-note",
             name: t("OPEN_NOTE_FOR_REVIEW"),
             callback: async () => {
-                if (
-                    !this.dataManager.osrAppCore.syncLock &&
-                    this.nextNoteReviewHandler !== null
-                ) {
+                if (!this.dataManager.osrAppCore.syncLock && this.nextNoteReviewHandler !== null) {
                     await this.dataManager.sync();
                     this.nextNoteReviewHandler.reviewNextNoteModal();
                 }
@@ -447,7 +442,9 @@ export default class SRPlugin extends Plugin {
         remainingDeckTree: Deck,
         reviewMode: FlashcardReviewMode,
     ): { reviewSequencer: IFlashcardReviewSequencer; mode: FlashcardReviewMode } {
-        const deckIterator: IDeckTreeIterator = SRPlugin.createDeckTreeIterator(this.dataManager.data.settings);
+        const deckIterator: IDeckTreeIterator = SRPlugin.createDeckTreeIterator(
+            this.dataManager.data.settings,
+        );
 
         const reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(
             reviewMode,
@@ -496,9 +493,7 @@ export default class SRPlugin extends Plugin {
      */
     private onOsrVaultDataChanged() {
         this.uiManager.updateStatusBar();
-        if (
-            this.dataManager.data.settings.enableNoteReviewPaneOnStartup
-        ) {
+        if (this.dataManager.data.settings.enableNoteReviewPaneOnStartup) {
             this.uiManager.sidebarManager.redraw();
         }
     }
