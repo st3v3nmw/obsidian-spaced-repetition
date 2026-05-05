@@ -2,9 +2,9 @@ import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info"
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { Question } from "src/card/questions/question";
 import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR } from "src/constants";
-import { IDataStore } from "src/data-stores/base/data-store";
-import { RepItemStorageInfo } from "src/data-stores/base/rep-item-storage-info";
-import { ScheduleDataRepository } from "src/data-stores/plugin-data/schedule-data-repository";
+import { IDataStore } from "src/data/data-stores/base/data-store";
+import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
+import { ScheduleDataRepository } from "src/data/data-stores/plugin-data/schedule-data-repository";
 import { SRSettings } from "src/settings";
 import { DateUtil, formatDateYYYYMMDD, globalDateProvider } from "src/utils/dates";
 import { MultiLineTextFinder } from "src/utils/strings";

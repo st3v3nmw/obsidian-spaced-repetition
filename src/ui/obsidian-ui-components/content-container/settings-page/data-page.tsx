@@ -1,12 +1,12 @@
 import { Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
-import { DataStoreName } from "src/data-stores/base/data-store";
+import { DataStoreName } from "src/data/data-stores/base/data-store";
 import {
     deleteAllSchedulingData,
     deleteAllSchedulingDataInCards,
     deleteAllSchedulingDataInNotes,
-} from "src/delete-scheduling-data";
+} from "src/data/delete-scheduling-data";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";

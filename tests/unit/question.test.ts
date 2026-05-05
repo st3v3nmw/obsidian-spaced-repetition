@@ -1,7 +1,7 @@
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { Card } from "src/card/card";
 import { Question, QuestionText } from "src/card/questions/question";
-import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
+import { DataStoreAlgorithm } from "src/data/data-store-algorithm/data-store-algorithm";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { TextDirection } from "src/utils/strings";
 

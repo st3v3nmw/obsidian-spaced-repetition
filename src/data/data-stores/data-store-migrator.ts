@@ -1,9 +1,9 @@
 import { App, TFile } from "obsidian";
 
 import { FLASHCARD_SCHEDULE_INFO } from "src/constants";
-import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
-import { DataStoreInNoteAlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
-import { ScheduleDataRepository } from "src/data-stores/plugin-data/schedule-data-repository";
+import { DataStoreAlgorithm } from "src/data/data-store-algorithm/data-store-algorithm";
+import { DataStoreInNoteAlgorithmOsr } from "src/data/data-store-algorithm/data-store-in-note-algorithm-osr";
+import { ScheduleDataRepository } from "src/data/data-stores/plugin-data/schedule-data-repository";
 import { TopicPath } from "src/deck/topic-path";
 import { SrTFile } from "src/file";
 import { Note } from "src/note/note";

@@ -5,7 +5,7 @@ import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-i
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { MULTI_SCHEDULING_EXTRACTOR } from "src/constants";
 import { TICKS_PER_DAY } from "src/constants";
-import { DataStore } from "src/data-stores/base/data-store";
+import { DataStore } from "src/data/data-stores/base/data-store";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 

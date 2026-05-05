@@ -1,4 +1,4 @@
-import { IDataStoreAlgorithm } from "src/data-store-algorithm/idata-store-algorithm";
+import { IDataStoreAlgorithm } from "src/data/data-store-algorithm/idata-store-algorithm";
 
 export class DataStoreAlgorithm {
     static instance: IDataStoreAlgorithm;

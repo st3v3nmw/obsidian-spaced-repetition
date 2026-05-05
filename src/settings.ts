@@ -1,5 +1,5 @@
 import { Algorithm } from "src/algorithms/base/isrs-algorithm";
-import { DataStoreName } from "src/data-stores/base/data-store";
+import { DataStoreName } from "src/data/data-stores/base/data-store";
 import { t } from "src/lang/helpers";
 import { pathMatchesPattern } from "src/utils/fs";
 

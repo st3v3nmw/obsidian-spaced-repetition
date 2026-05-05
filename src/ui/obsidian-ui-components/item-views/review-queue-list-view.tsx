@@ -3,7 +3,7 @@ import { ItemView, Menu, setIcon, TFile, WorkspaceLeaf } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { COLLAPSE_ICON, TICKS_PER_DAY } from "src/constants";
-import { deleteNoteSchedulingDataInNote } from "src/delete-scheduling-data";
+import { deleteNoteSchedulingDataInNote } from "src/data/delete-scheduling-data";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";

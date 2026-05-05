@@ -1,5 +1,5 @@
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { RepItemStorageInfo } from "src/data-stores/base/rep-item-storage-info";
+import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
 
 export enum ReviewResponse {
     Easy,

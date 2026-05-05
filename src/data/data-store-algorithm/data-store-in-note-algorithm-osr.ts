@@ -2,7 +2,7 @@ import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-inf
 import { Card } from "src/card/card";
 import { Question } from "src/card/questions/question";
 import { SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END } from "src/constants";
-import { IDataStoreAlgorithm } from "src/data-store-algorithm/idata-store-algorithm";
+import { IDataStoreAlgorithm } from "src/data/data-store-algorithm/idata-store-algorithm";
 import { SRSettings } from "src/settings";
 
 // Algorithm: The original OSR algorithm

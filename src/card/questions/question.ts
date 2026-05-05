@@ -3,8 +3,8 @@ import {
     OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX,
     OBSIDIAN_TAG_AT_STARTOFLINE_REGEX,
 } from "src/constants";
-import { DataStoreAlgorithm } from "src/data-store-algorithm/data-store-algorithm";
-import { DataStore } from "src/data-stores/base/data-store";
+import { DataStoreAlgorithm } from "src/data/data-store-algorithm/data-store-algorithm";
+import { DataStore } from "src/data/data-stores/base/data-store";
 import { TopicPath, TopicPathList, TopicPathWithWs } from "src/deck/topic-path";
 import { Note } from "src/note/note";
 import { ParsedQuestionInfo } from "src/parser";

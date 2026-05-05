@@ -4,8 +4,8 @@ import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info"
 import { Card } from "src/card/card";
 import { Question, QuestionText } from "src/card/questions/question";
 import { CardFrontBack, CardFrontBackUtil } from "src/card/questions/question-type";
-import { DataStore } from "src/data-stores/base/data-store";
-import { RepItemStorageInfo } from "src/data-stores/base/rep-item-storage-info";
+import { DataStore } from "src/data/data-stores/base/data-store";
+import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
 import { TopicPath, TopicPathList } from "src/deck/topic-path";
 import { frontmatterTagPseudoLineNum, ISRFile } from "src/file";
 import { parse, ParsedQuestionInfo, ParserOptions } from "src/parser";

@@ -8,7 +8,7 @@ import {
     IFlashcardReviewSequencer,
 } from "src/card/flashcard-review-sequencer";
 import { DataManager } from "src/data/data-manager";
-import { DataStoreName } from "src/data-stores/base/data-store";
+import { DataStoreName } from "src/data/data-stores/base/data-store";
 import { Deck, DeckTreeFilter } from "src/deck/deck";
 import {
     CardOrder,

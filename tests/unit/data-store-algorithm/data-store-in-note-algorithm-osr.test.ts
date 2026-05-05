@@ -4,7 +4,7 @@ import { State } from "ts-fsrs";
 import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { Card } from "src/card/card";
-import { DataStoreInNoteAlgorithmOsr } from "src/data-store-algorithm/data-store-in-note-algorithm-osr";
+import { DataStoreInNoteAlgorithmOsr } from "src/data/data-store-algorithm/data-store-in-note-algorithm-osr";
 import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 

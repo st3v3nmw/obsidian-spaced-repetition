@@ -7,8 +7,8 @@ import { IOsrVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-n
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
-import { DataStoreName } from "src/data-stores/base/data-store";
-import { ScheduleDataRepository } from "src/data-stores/plugin-data/schedule-data-repository";
+import { DataStoreName } from "src/data/data-stores/base/data-store";
+import { ScheduleDataRepository } from "src/data/data-stores/plugin-data/schedule-data-repository";
 import { Deck, DeckTreeFilter } from "src/deck/deck";
 import { DeckTreeStatsCalculator } from "src/deck/deck-tree-stats-calculator";
 import { Stats } from "src/deck/stats";

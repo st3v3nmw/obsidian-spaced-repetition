@@ -4,11 +4,11 @@ import { Menu, MenuItem, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "o
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { DataManager } from "src/data/data-manager";
-import { CardListType } from "src/deck/deck";
 import {
     deleteAllSchedulingDataOfCardsInNote,
     deleteNoteSchedulingDataInNote,
-} from "src/delete-scheduling-data";
+} from "src/data/delete-scheduling-data";
+import { CardListType } from "src/deck/deck";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
