@@ -2,8 +2,8 @@ import "src/ui/obsidian-ui-components/content-container/deck-container/deck-cont
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
+import { Deck } from "src/data/data-structures/deck/deck";
 import { SRSettings } from "src/data/settings";
-import { Deck } from "src/deck/deck";
 import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,

@@ -5,8 +5,12 @@ import {
 import { DataStoreAlgorithm } from "src/data/data-store-algorithm/data-store-algorithm";
 import { DataStore } from "src/data/data-stores/base/data-store";
 import { Card } from "src/data/data-structures/card/card";
+import {
+    TopicPath,
+    TopicPathList,
+    TopicPathWithWs,
+} from "src/data/data-structures/deck/topic-path";
 import { SRSettings } from "src/data/settings";
-import { TopicPath, TopicPathList, TopicPathWithWs } from "src/deck/topic-path";
 import { Note } from "src/note/note";
 import { ParsedQuestionInfo } from "src/parser";
 import { cyrb53, MultiLineTextFinder, stringTrimStart, TextDirection } from "src/utils/strings";

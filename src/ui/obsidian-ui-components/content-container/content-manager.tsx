@@ -6,8 +6,8 @@ import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { DataManager } from "src/data/data-manager";
 import { Card } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
+import { Deck } from "src/data/data-structures/deck/deck";
 import { SRSettings } from "src/data/settings";
-import { Deck } from "src/deck/deck";
 import {
     DeckStats,
     FlashcardReviewMode,

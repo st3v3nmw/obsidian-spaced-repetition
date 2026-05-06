@@ -1,8 +1,8 @@
 import "src/ui/obsidian-ui-components/content-container/deck-container/deck-list.css";
 
 import { COLLAPSE_ICON } from "src/data/constants";
+import { Deck } from "src/data/data-structures/deck/deck";
 import { SRSettings } from "src/data/settings";
-import { Deck } from "src/deck/deck";
 import { DeckStats, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 

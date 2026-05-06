@@ -3,11 +3,11 @@ import { Menu, MenuItem, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "o
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { DataManager } from "src/data/data-manager";
+import { CardListType } from "src/data/data-structures/deck/deck";
 import {
     deleteAllSchedulingDataOfCardsInNote,
     deleteNoteSchedulingDataInNote,
 } from "src/data/delete-scheduling-data";
-import { CardListType } from "src/deck/deck";
 import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";

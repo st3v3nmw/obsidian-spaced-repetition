@@ -1,15 +1,15 @@
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
-import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
-import { Deck, DeckTreeFilter } from "src/deck/deck";
+import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import {
     CardOrder,
     DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
-} from "src/deck/deck-tree-iterator";
-import { TopicPath } from "src/deck/topic-path";
+} from "src/data/data-structures/deck/deck-tree-iterator";
+import { TopicPath } from "src/data/data-structures/deck/topic-path";
+import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { CardDueDateHistogram } from "src/due-date-histogram";
 import {
     FlashcardReviewMode,

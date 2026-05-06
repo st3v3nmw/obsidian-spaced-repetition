@@ -9,9 +9,9 @@ import {
     CardFrontBack,
     CardFrontBackUtil,
 } from "src/data/data-structures/card/questions/question-type";
+import { TopicPath, TopicPathList } from "src/data/data-structures/deck/topic-path";
 import { frontmatterTagPseudoLineNum, ISRFile } from "src/data/file";
 import { SettingsUtil, SRSettings } from "src/data/settings";
-import { TopicPath, TopicPathList } from "src/deck/topic-path";
 import { parse, ParsedQuestionInfo, ParserOptions } from "src/parser";
 import {
     splitNoteIntoFrontmatterAndContent,

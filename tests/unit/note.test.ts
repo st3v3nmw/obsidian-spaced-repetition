@@ -1,6 +1,6 @@
+import { Deck } from "src/data/data-structures/deck/deck";
+import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { DEFAULT_SETTINGS } from "src/data/settings";
-import { Deck } from "src/deck/deck";
-import { TopicPath } from "src/deck/topic-path";
 import { Note } from "src/note/note";
 import { NoteFileLoader } from "src/note/note-file-loader";
 import { NoteParser } from "src/note/note-parser";

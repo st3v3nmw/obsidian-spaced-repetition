@@ -1,5 +1,5 @@
+import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { DEFAULT_SETTINGS } from "src/data/settings";
-import { TopicPath } from "src/deck/topic-path";
 import { Note } from "src/note/note";
 import { NoteFileLoader } from "src/note/note-file-loader";
 import { TextDirection } from "src/utils/strings";

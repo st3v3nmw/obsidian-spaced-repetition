@@ -1,6 +1,6 @@
+import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { ISRFile } from "src/data/file";
 import { SRSettings } from "src/data/settings";
-import { TopicPath } from "src/deck/topic-path";
 import { Note } from "src/note/note";
 import { NoteQuestionParser } from "src/note/note-question-parser";
 import { TextDirection } from "src/utils/strings";

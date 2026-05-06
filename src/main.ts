@@ -4,15 +4,15 @@ import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { DataManager } from "src/data/data-manager";
 import { DataStoreName } from "src/data/data-stores/base/data-store";
-import { SRSettings } from "src/data/settings";
-import { Deck, DeckTreeFilter } from "src/deck/deck";
+import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import {
     CardOrder,
     DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
-} from "src/deck/deck-tree-iterator";
+} from "src/data/data-structures/deck/deck-tree-iterator";
+import { SRSettings } from "src/data/settings";
 import {
     FlashcardReviewMode,
     FlashcardReviewSequencer,

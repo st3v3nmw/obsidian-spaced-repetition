@@ -1,7 +1,7 @@
 import { Card } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { IQuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
-import { TopicPath, TopicPathList } from "src/deck/topic-path";
+import { TopicPath, TopicPathList } from "src/data/data-structures/deck/topic-path";
 import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
 
 export enum CardListType {

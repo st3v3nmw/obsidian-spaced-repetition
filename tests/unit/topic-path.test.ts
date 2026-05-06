@@ -1,5 +1,5 @@
+import { TopicPath, TopicPathList } from "src/data/data-structures/deck/topic-path";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
-import { TopicPath, TopicPathList } from "src/deck/topic-path";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
 

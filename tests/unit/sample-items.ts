@@ -1,7 +1,11 @@
+import { Deck } from "src/data/data-structures/deck/deck";
+import {
+    CardOrder,
+    DeckOrder,
+    DeckTreeIterator,
+} from "src/data/data-structures/deck/deck-tree-iterator";
+import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
-import { Deck } from "src/deck/deck";
-import { CardOrder, DeckOrder, DeckTreeIterator } from "src/deck/deck-tree-iterator";
-import { TopicPath } from "src/deck/topic-path";
 import { Note } from "src/note/note";
 import { NoteParser } from "src/note/note-parser";
 import { NoteQuestionParser } from "src/note/note-question-parser";

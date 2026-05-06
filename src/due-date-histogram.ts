@@ -2,15 +2,15 @@ import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info"
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { TICKS_PER_DAY } from "src/data/constants";
 import { Card } from "src/data/data-structures/card/card";
-import { Deck } from "src/deck/deck";
+import { Deck } from "src/data/data-structures/deck/deck";
 import {
     CardOrder,
     DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
-} from "src/deck/deck-tree-iterator";
-import { TopicPath } from "src/deck/topic-path";
+} from "src/data/data-structures/deck/deck-tree-iterator";
+import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { NoteReviewDeck, SchedNote } from "src/note/note-review-deck";
 import { globalDateProvider } from "src/utils/dates";
 

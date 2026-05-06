@@ -1,7 +1,7 @@
 import { TFile } from "obsidian";
 
 import { OsrCore } from "src/data/core";
-import { Deck } from "src/deck/deck";
+import { Deck } from "src/data/data-structures/deck/deck";
 import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
 import SRPlugin from "src/main";
 
