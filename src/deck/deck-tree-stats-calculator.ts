@@ -1,5 +1,5 @@
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { Card } from "src/card/card";
+import { Card } from "src/data/data-structures/card/card";
 import { Deck } from "src/deck/deck";
 import {
     CardOrder,

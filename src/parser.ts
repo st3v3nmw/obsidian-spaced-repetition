@@ -1,6 +1,6 @@
 import { ClozeCrafter } from "clozecraft";
 
-import { CardType } from "src/card/questions/question";
+import { CardType } from "src/data/data-structures/card/questions/question";
 
 export let debugParser = false;
 

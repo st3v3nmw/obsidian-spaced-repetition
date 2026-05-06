@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
 import { OsrCore } from "src/data/core";
+import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { SRSettings } from "src/data/settings";
 import { NoteReviewQueue } from "src/note/note-review-queue";
 

@@ -1,11 +1,14 @@
 import { TagCache } from "obsidian";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { Card } from "src/card/card";
-import { Question, QuestionText } from "src/card/questions/question";
-import { CardFrontBack, CardFrontBackUtil } from "src/card/questions/question-type";
 import { DataStore } from "src/data/data-stores/base/data-store";
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
+import { Card } from "src/data/data-structures/card/card";
+import { Question, QuestionText } from "src/data/data-structures/card/questions/question";
+import {
+    CardFrontBack,
+    CardFrontBackUtil,
+} from "src/data/data-structures/card/questions/question-type";
 import { frontmatterTagPseudoLineNum, ISRFile } from "src/data/file";
 import { SettingsUtil, SRSettings } from "src/data/settings";
 import { TopicPath, TopicPathList } from "src/deck/topic-path";

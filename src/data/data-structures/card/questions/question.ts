@@ -1,10 +1,10 @@
-import { Card } from "src/card/card";
 import {
     OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX,
     OBSIDIAN_TAG_AT_STARTOFLINE_REGEX,
 } from "src/data/constants";
 import { DataStoreAlgorithm } from "src/data/data-store-algorithm/data-store-algorithm";
 import { DataStore } from "src/data/data-stores/base/data-store";
+import { Card } from "src/data/data-structures/card/card";
 import { SRSettings } from "src/data/settings";
 import { TopicPath, TopicPathList, TopicPathWithWs } from "src/deck/topic-path";
 import { Note } from "src/note/note";

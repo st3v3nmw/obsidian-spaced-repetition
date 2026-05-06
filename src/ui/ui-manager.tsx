@@ -2,13 +2,13 @@ import "src/ui/styles.css";
 import { Menu, MenuItem, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { DataManager } from "src/data/data-manager";
 import {
     deleteAllSchedulingDataOfCardsInNote,
     deleteNoteSchedulingDataInNote,
 } from "src/data/delete-scheduling-data";
 import { CardListType } from "src/deck/deck";
+import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";

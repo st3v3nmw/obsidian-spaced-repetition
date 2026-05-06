@@ -1,8 +1,8 @@
 import "src/ui/obsidian-ui-components/modals/edit-modal.css";
 import { App, ButtonComponent, Modal } from "obsidian";
 
-import { Card } from "src/card/card";
-import { CardType } from "src/card/questions/question";
+import { Card } from "src/data/data-structures/card/card";
+import { CardType } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import { TextDirection } from "src/utils/strings";

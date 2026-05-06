@@ -1,4 +1,4 @@
-import { Card } from "src/card/card";
+import { Card } from "src/data/data-structures/card/card";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { CardListType, Deck } from "src/deck/deck";
 import { TopicPath } from "src/deck/topic-path";

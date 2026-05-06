@@ -1,9 +1,9 @@
-import { CardType } from "src/card/questions/question";
+import { CardType } from "src/data/data-structures/card/questions/question";
 import {
     CardFrontBack,
     CardFrontBackUtil,
     QuestionTypeClozeFormatter,
-} from "src/card/questions/question-type";
+} from "src/data/data-structures/card/questions/question-type";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 
 test("CardType.SingleLineBasic", () => {

@@ -3,16 +3,16 @@ import { App, MarkdownView, Notice, Platform } from "obsidian";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { Card } from "src/card/card";
+import { DataManager } from "src/data/data-manager";
+import { Card } from "src/data/data-structures/card/card";
+import { Question } from "src/data/data-structures/card/questions/question";
+import { SRSettings } from "src/data/settings";
+import { Deck } from "src/deck/deck";
 import {
     DeckStats,
     FlashcardReviewMode,
     IFlashcardReviewSequencer,
-} from "src/card/flashcard-review-sequencer";
-import { Question } from "src/card/questions/question";
-import { DataManager } from "src/data/data-manager";
-import { SRSettings } from "src/data/settings";
-import { Deck } from "src/deck/deck";
+} from "src/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";

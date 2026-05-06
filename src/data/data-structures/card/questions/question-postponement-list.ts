@@ -1,4 +1,4 @@
-import { Question } from "src/card/questions/question";
+import { Question } from "src/data/data-structures/card/questions/question";
 import { PluginData } from "src/data/plugin-data";
 import { SRSettings } from "src/data/settings";
 import SRPlugin from "src/main";

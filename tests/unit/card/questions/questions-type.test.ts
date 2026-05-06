@@ -1,4 +1,4 @@
-import { QuestionTypeClozeInputFormatter } from "src/card/questions/question-type";
+import { QuestionTypeClozeInputFormatter } from "src/data/data-structures/card/questions/question-type";
 
 describe("Questions Type", () => {
     test("Cloze input formatting", () => {

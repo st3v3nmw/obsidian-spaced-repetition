@@ -1,4 +1,4 @@
-import { CardType } from "src/card/questions/question";
+import { CardType } from "src/data/data-structures/card/questions/question";
 import { parse, ParsedQuestionInfo, setDebugParser } from "src/parser";
 import { ParserOptions } from "src/parser";
 

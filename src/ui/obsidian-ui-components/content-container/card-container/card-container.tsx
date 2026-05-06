@@ -4,9 +4,9 @@ import { App, Platform } from "obsidian";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
-import { CardType } from "src/card/questions/question";
+import { CardType } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
+import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import ContextSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/context-section/context-section";

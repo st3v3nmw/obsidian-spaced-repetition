@@ -1,5 +1,5 @@
 import { RepetitionItem } from "src/algorithms/base/repetition-item";
-import { Question } from "src/card/questions/question";
+import { Question } from "src/data/data-structures/card/questions/question";
 import { CardListType } from "src/deck/deck";
 
 export class Card extends RepetitionItem {

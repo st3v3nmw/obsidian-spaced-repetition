@@ -4,13 +4,7 @@ import { State } from "ts-fsrs";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
-import {
-    DeckStats,
-    FlashcardReviewMode,
-    FlashcardReviewSequencer,
-    IFlashcardReviewSequencer,
-} from "src/card/flashcard-review-sequencer";
-import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
+import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { CardListType, Deck, DeckTreeFilter } from "src/deck/deck";
 import {
@@ -22,6 +16,12 @@ import {
 } from "src/deck/deck-tree-iterator";
 import { TopicPath } from "src/deck/topic-path";
 import { CardDueDateHistogram } from "src/due-date-histogram";
+import {
+    DeckStats,
+    FlashcardReviewMode,
+    FlashcardReviewSequencer,
+    IFlashcardReviewSequencer,
+} from "src/flashcard-review-sequencer";
 import {
     setupStaticDateProvider20230906,
     setupStaticDateProviderOriginDatePlusDays,

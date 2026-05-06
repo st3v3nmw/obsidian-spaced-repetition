@@ -6,7 +6,7 @@ import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { osrSchedule } from "src/algorithms/osr/note-scheduling";
 import { NoteLinkStat, OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
-import { Question } from "src/card/questions/question";
+import { Question } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
 import { DueDateHistogram } from "src/due-date-histogram";
 import { Note } from "src/note/note";

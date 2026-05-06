@@ -2,11 +2,6 @@ import { Platform, Plugin, TFile } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
-import {
-    FlashcardReviewMode,
-    FlashcardReviewSequencer,
-    IFlashcardReviewSequencer,
-} from "src/card/flashcard-review-sequencer";
 import { DataManager } from "src/data/data-manager";
 import { DataStoreName } from "src/data/data-stores/base/data-store";
 import { SRSettings } from "src/data/settings";
@@ -18,6 +13,11 @@ import {
     IDeckTreeIterator,
     IIteratorOrder,
 } from "src/deck/deck-tree-iterator";
+import {
+    FlashcardReviewMode,
+    FlashcardReviewSequencer,
+    IFlashcardReviewSequencer,
+} from "src/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { Note } from "src/note/note";

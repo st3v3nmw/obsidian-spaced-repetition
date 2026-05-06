@@ -1,4 +1,4 @@
-import { Question } from "src/card/questions/question";
+import { Question } from "src/data/data-structures/card/questions/question";
 import { ISRFile } from "src/data/file";
 import { SRSettings } from "src/data/settings";
 import { TopicPath } from "src/deck/topic-path";
