@@ -1,5 +1,3 @@
-import { App, TFile } from "obsidian";
-
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
@@ -9,7 +7,7 @@ import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
 import { DataStoreName } from "src/data/data-stores/base/data-store";
 import { ScheduleDataRepository } from "src/data/data-stores/plugin-data/schedule-data-repository";
-import { ISRFile, SrTFile } from "src/data/file";
+import { ISRFile } from "src/data/file";
 import { SettingsUtil, SRSettings } from "src/data/settings";
 import { Deck, DeckTreeFilter } from "src/deck/deck";
 import { DeckTreeStatsCalculator } from "src/deck/deck-tree-stats-calculator";
@@ -26,6 +24,11 @@ export interface IOsrVaultEvents {
     dataChanged: () => void;
 }
 
+/**
+ * Manages the processing of notes and scheduling data in the Obsidian vault.
+ *
+ * @class OsrCore
+ */
 export class OsrCore {
     public defaultTextDirection: TextDirection;
     protected settings: SRSettings;
@@ -43,34 +46,80 @@ export class OsrCore {
     private _dueDateFlashcardHistogram: CardDueDateHistogram;
     private _dueDateNoteHistogram: NoteDueDateHistogram;
 
+    /**
+     * Gets the note review queue.
+     *
+     * @returns {NoteReviewQueue} - The note review queue.
+     */
     get noteReviewQueue(): NoteReviewQueue {
         return this._noteReviewQueue;
     }
 
+    /**
+     * Gets the remaining deck tree.
+     *
+     * @returns {Deck} - The remaining deck tree.
+     */
     get remainingDeckTree(): Deck {
         return this._remainingDeckTree;
     }
 
+    /**
+     * Gets the reviewable deck tree.
+     *
+     * @returns {Deck} - The reviewable deck tree.
+     */
     get reviewableDeckTree(): Deck {
         return this._reviewableDeckTree;
     }
 
+    /**
+     * Gets the question postponement list.
+     *
+     * @returns {QuestionPostponementList} - The question postponement list.
+     */
     get questionPostponementList(): QuestionPostponementList {
         return this._questionPostponementList;
     }
 
+    /**
+     * Gets the due date flashcard histogram.
+     *
+     * @returns {CardDueDateHistogram} - The due date flashcard histogram.
+     */
     get dueDateFlashcardHistogram(): CardDueDateHistogram {
         return this._dueDateFlashcardHistogram;
     }
 
+    /**
+     * Gets the due date note histogram.
+     *
+     * @returns {NoteDueDateHistogram} - The due date note histogram.
+     */
     get dueDateNoteHistogram(): NoteDueDateHistogram {
         return this._dueDateNoteHistogram;
     }
 
+    /**
+     * Gets the card stats.
+     *
+     * @returns {Stats} - The card stats.
+     */
     get cardStats(): Stats {
         return this._cardStats;
     }
 
+    /**
+     * Initializes the OSR core.
+     *
+     * @param {QuestionPostponementList} questionPostponementList - The question postponement list.
+     * @param {IOsrVaultNoteLinkInfoFinder} osrNoteLinkInfoFinder - The OSR vault note link info finder.
+     * @param {SRSettings} settings - The settings object.
+     * @param {() => void} dataChangedHandler - A callback function that is called when the data has changed.
+     * @param {NoteReviewQueue} noteReviewQueue - The note review queue.
+     * @param {ScheduleDataRepository | null} scheduleDataRepository - The schedule data repository.
+     * @returns {void}
+     */
     init(
         questionPostponementList: QuestionPostponementList,
         osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder,
@@ -103,7 +152,12 @@ export class OsrCore {
         }
     }
 
-    protected loadInit(): void {
+    /**
+     * Loads the initial state of the OSR core.
+     *
+     * @returns {void}
+     */
+    public loadInit(): void {
         // reset notes stuff
         this.osrNoteGraph = new OsrNoteGraph(this.osrNoteLinkInfoFinder);
         this._noteReviewQueue.init();
@@ -112,7 +166,13 @@ export class OsrCore {
         this.fullDeckTree = new Deck("root", null);
     }
 
-    protected async processFile(noteFile: ISRFile): Promise<void> {
+    /**
+     * Processes a note file.
+     *
+     * @param {ISRFile} noteFile - The note file.
+     * @returns {Promise<void>} - A promise that resolves when the note file is processed.
+     */
+    public async processFile(noteFile: ISRFile): Promise<void> {
         const schedule: RepItemScheduleInfo = await this.readNoteSchedule(noteFile);
         let note: Note | null = null;
 
@@ -147,6 +207,12 @@ export class OsrCore {
         this._noteReviewQueue.addNoteToQueue(noteFile, noteSchedule, matchedNoteTags);
     }
 
+    /**
+     * Reads the scheduling information for a note file.
+     *
+     * @param {ISRFile} noteFile - The note file.
+     * @returns {Promise<RepItemScheduleInfo>} - A promise that resolves with the scheduling information for the note file.
+     */
     private async readNoteSchedule(noteFile: ISRFile): Promise<RepItemScheduleInfo> {
         if (
             this.settings.dataStore !== DataStoreName.PLUGIN_DATA ||
@@ -179,6 +245,13 @@ export class OsrCore {
         return legacy;
     }
 
+    /**
+     * Writes the scheduling information for a note file.
+     *
+     * @param {ISRFile} noteFile - The note file.
+     * @param {RepItemScheduleInfo} noteSchedule - The scheduling information for the note file.
+     * @returns {Promise<void>} - A promise that resolves when the scheduling information is written.
+     */
     private async writeNoteSchedule(
         noteFile: ISRFile,
         noteSchedule: RepItemScheduleInfo,
@@ -195,7 +268,12 @@ export class OsrCore {
         await this.scheduleDataRepository.setNoteSchedule(noteId, noteSchedule);
     }
 
-    protected finalizeLoad(): void {
+    /**
+     * Finalizes the loading of the OSR core.
+     *
+     * @returns {void}
+     */
+    public finalizeLoad(): void {
         this.osrNoteGraph.generatePageRanks();
 
         // Reviewable cards are all except those with the "edit later" tag
@@ -219,6 +297,14 @@ export class OsrCore {
         if (this.dataChangedHandler) this.dataChangedHandler();
     }
 
+    /**
+     * Saves the review response for a note file.
+     *
+     * @param {ISRFile} noteFile - The note file.
+     * @param {ReviewResponse} response - The review response.
+     * @param {SRSettings} settings - The settings object.
+     * @returns {Promise<void>} - A promise that resolves when the review response is saved.
+     */
     async saveNoteReviewResponse(
         noteFile: ISRFile,
         response: ReviewResponse,
@@ -261,6 +347,11 @@ export class OsrCore {
         if (this.dataChangedHandler) this.dataChangedHandler();
     }
 
+    /**
+     * Calculates the derived information for the OSR core.
+     *
+     * @returns {void}
+     */
     private calculateDerivedInfo(): void {
         const todayUnix: number = globalDateProvider.today.valueOf();
         this.noteReviewQueue.calcDueNotesCount(todayUnix);
@@ -270,6 +361,13 @@ export class OsrCore {
         );
     }
 
+    /**
+     * Buries all cards in a note.
+     *
+     * @param {SRSettings} settings - The settings object.
+     * @param {ISRFile} noteFile - The note file.
+     * @returns {Promise<void>} - A promise that resolves when the cards are buried.
+     */
     private async buryAllCardsInNote(settings: SRSettings, noteFile: ISRFile): Promise<void> {
         if (settings.burySiblingCards) {
             const topicPath: TopicPath = this.findTopicPath(noteFile);
@@ -284,6 +382,13 @@ export class OsrCore {
         }
     }
 
+    /**
+     * Loads a note from the Obsidian vault.
+     *
+     * @param {ISRFile} noteFile - The note file.
+     * @param {TopicPath} topicPath - The topic path.
+     * @returns {Promise<Note | null>} - A promise that resolves with the loaded note.
+     */
     async loadNote(noteFile: ISRFile, topicPath: TopicPath): Promise<Note | null> {
         const loader: NoteFileLoader = new NoteFileLoader(this.settings);
         const note: Note | null = await loader.load(noteFile, this.defaultTextDirection, topicPath);
@@ -293,50 +398,13 @@ export class OsrCore {
         return note;
     }
 
+    /**
+     * Finds the topic path for a note.
+     *
+     * @param {ISRFile} note - The note file.
+     * @returns {TopicPath} - The topic path.
+     */
     private findTopicPath(note: ISRFile): TopicPath {
         return TopicPath.getTopicPathOfFile(note, this.settings);
-    }
-}
-
-export class OsrAppCore extends OsrCore {
-    private app: App;
-    private _syncLock = false;
-
-    get syncLock(): boolean {
-        return this._syncLock;
-    }
-
-    constructor(app: App) {
-        super();
-        this.app = app;
-    }
-
-    async loadVault(): Promise<void> {
-        if (this._syncLock) {
-            return;
-        }
-        this._syncLock = true;
-
-        try {
-            this.loadInit();
-
-            const notes: TFile[] = this.app.vault.getMarkdownFiles();
-            for (const noteFile of notes) {
-                if (SettingsUtil.isPathInNoteIgnoreFolder(this.settings, noteFile.path)) {
-                    continue;
-                }
-
-                const file: SrTFile = this.createSrTFile(noteFile);
-                await this.processFile(file);
-            }
-
-            this.finalizeLoad();
-        } finally {
-            this._syncLock = false;
-        }
-    }
-
-    createSrTFile(note: TFile): SrTFile {
-        return new SrTFile(this.app.vault, this.app.metadataCache, this.app.fileManager, note);
     }
 }

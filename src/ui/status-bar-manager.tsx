@@ -134,13 +134,13 @@ export default class StatusBarManager {
                         onClick: async () => {
                             if (
                                 this.plugin.dataManager === null ||
-                                this.plugin.dataManager.osrAppCore === null
+                                this.plugin.dataManager.osrCore === null
                             )
                                 throw new Error("SR plugin or OSR app core not initialized!!!");
                             if (this.plugin.nextNoteReviewHandler === null)
                                 throw new Error("Next note review handler not initialized!!!");
 
-                            if (!this.plugin.dataManager.osrAppCore.syncLock) {
+                            if (!this.plugin.dataManager.syncLock) {
                                 await this.plugin.dataManager.sync();
                                 this.plugin.nextNoteReviewHandler.reviewNextNoteModal();
                             }

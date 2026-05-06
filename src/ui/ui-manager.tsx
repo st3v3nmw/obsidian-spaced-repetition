@@ -23,6 +23,11 @@ import StatusBarManager from "src/ui/status-bar-manager";
 import TabViewManager from "src/ui/tab-view-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
 
+/**
+ * Represents the different states of the UI.
+ *
+ * @type {ReadonlyArray<UIState>}
+ */
 export enum UIState {
     Closed,
     DeckList,
@@ -32,7 +37,7 @@ export enum UIState {
 }
 
 /**
- * Manages the UI elements of the Spaced Repetition plugin, including the status bar, sidebar, and tab views.
+ * Manages all the UI systems of the Spaced Repetition plugin & exposes them to the other parts of the plugin.
  *
  * @property {SRPlugin} plugin - The main plugin instance.
  * @property {TabViewManager} tabViewManager - The tab view manager responsible for managing the SR tab view.
@@ -82,9 +87,9 @@ export class UIManager {
             this.tabViewManager.closeAllTabViews();
             await this.sidebarManager.activateReviewQueueViewPanel();
             setTimeout(async () => {
-                if (this.dataManager.osrAppCore === null)
+                if (this.dataManager.osrCore === null)
                     throw new Error("SR plugin or OSR app core not initialized!!!");
-                if (!this.dataManager.osrAppCore.syncLock) {
+                if (!this.dataManager.syncLock) {
                     await this.dataManager.sync();
                 }
             }, 2000);
@@ -111,7 +116,7 @@ export class UIManager {
 
     public updateStatusBar() {
         if (this.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
-        if (this.dataManager.osrAppCore === null)
+        if (this.dataManager.osrCore === null)
             throw new Error("SR plugin or OSR app core not initialized!!!");
 
         const settings = this.dataManager.data.settings;
@@ -125,12 +130,12 @@ export class UIManager {
 
         if (settings.showStatusBar) {
             this.statusBarManager.setCount(
-                this.dataManager.osrAppCore.remainingDeckTree.getCardCount(CardListType.All, true),
+                this.dataManager.osrCore.remainingDeckTree.getCardCount(CardListType.All, true),
                 settings.showStatusBar && settings.showCardStatusBarItem,
                 "card-review",
             );
             this.statusBarManager.setCount(
-                this.dataManager.osrAppCore.noteReviewQueue.dueNotesCount,
+                this.dataManager.osrCore.noteReviewQueue.dueNotesCount,
                 settings.showStatusBar && settings.showNoteStatusBarItem,
                 "note-review",
             );
@@ -192,11 +197,11 @@ export class UIManager {
     }
 
     public async openDeckContainer(mode: FlashcardReviewMode, singleNote?: TFile): Promise<void> {
-        if (this.dataManager.osrAppCore === null)
+        if (this.dataManager.osrCore === null)
             throw new Error("SR plugin or OSR app core not initialized!!!");
         if (this.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
 
-        if (this.dataManager.osrAppCore.syncLock) {
+        if (this.dataManager.syncLock) {
             return;
         }
         await this.dataManager.sync();
@@ -210,7 +215,7 @@ export class UIManager {
 
         const reviewQueueLoader = new ReviewQueueLoader(
             this.plugin,
-            this.dataManager.osrAppCore,
+            this.dataManager.osrCore,
             singleNote ?? null,
             mode,
         );

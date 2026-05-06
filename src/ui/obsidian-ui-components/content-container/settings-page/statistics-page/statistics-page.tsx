@@ -90,7 +90,7 @@ export class StatisticsPage extends SettingsPage {
                 el.selectEl.setAttr("id", "sr-chart-period");
             });
 
-        this.renderCharts(this.dataManager.osrAppCore);
+        this.renderCharts(this.dataManager.osrCore);
     }
 
     /**
@@ -109,7 +109,7 @@ export class StatisticsPage extends SettingsPage {
 
     private renderCharts(osrCore: OsrCore): void {
         if (!osrCore.cardStats) {
-            this.dataManager.sync().then((_) => this.renderCharts(this.dataManager.osrAppCore));
+            this.dataManager.sync().then((_) => this.renderCharts(this.dataManager.osrCore));
             return;
         }
 

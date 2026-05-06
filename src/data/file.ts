@@ -16,7 +16,13 @@ import { ALLOWED_DATE_FORMATS } from "src/data/constants";
 import { formatDateYYYYMMDD } from "src/utils/dates";
 import { parseObsidianFrontmatterTag, TextDirection } from "src/utils/strings";
 
-// NOTE: Line numbers are zero based
+/**
+ * Represents a file from the Obsidian vault with some additional functionality for scheduling data.
+ *
+ * IMPORTANT: Lines are zero based, not one based.
+ *
+ * @interface ISRFile
+ */
 export interface ISRFile {
     get path(): string;
     get basename(): string;
@@ -38,12 +44,19 @@ export interface ISRFile {
 // We define as -1 so that we can differentiate tags within the frontmatter and tags within the content
 export const frontmatterTagPseudoLineNum: number = -1;
 
-// NOTE: Line numbers are zero based
+/**
+ * Represents a file from the Obsidian vault with some additional functionality for scheduling data.
+ *
+ * IMPORTANT: Lines are zero based, not one based.
+ *
+ * @class SrTFile
+ * @implements {ISRFile}
+ */
 export class SrTFile implements ISRFile {
-    file: TFile;
-    fileManager: FileManager;
-    vault: Vault;
-    metadataCache: MetadataCache;
+    file: TFile; // Reference to the Obsidian TFile
+    fileManager: FileManager; // Reference to the FileManager
+    vault: Vault; // Reference to the Obsidian Vault
+    metadataCache: MetadataCache; // Reference to the Obsidian MetadataCache
 
     constructor(vault: Vault, metadataCache: MetadataCache, fileManager: FileManager, file: TFile) {
         this.vault = vault;
@@ -52,18 +65,38 @@ export class SrTFile implements ISRFile {
         this.fileManager = fileManager;
     }
 
+    /**
+     * Gets the path of the file.
+     *
+     * @returns {string} - The path of the file.
+     */
     get path(): string {
         return this.file.path;
     }
 
+    /**
+     * Gets the basename of the file.
+     *
+     * @returns {string} - The basename of the file.
+     */
     get basename(): string {
         return this.file.basename;
     }
 
+    /**
+     * Gets the Obsidian TFile.
+     *
+     * @returns {TFile} - The Obsidian TFile.
+     */
     get tfile(): TFile {
         return this.file;
     }
 
+    /**
+     * Gets the scheduling information for the note.
+     *
+     * @returns {Promise<RepItemScheduleInfo>} - A promise that resolves with the scheduling information for the note.
+     */
     async getNoteSchedule(): Promise<RepItemScheduleInfo> {
         let result: RepItemScheduleInfo = null;
         const frontmatter: Map<string, string> = await this.getFrontmatter();
@@ -82,6 +115,12 @@ export class SrTFile implements ISRFile {
         return result;
     }
 
+    /**
+     * Sets the scheduling information for the note.
+     *
+     * @param {RepItemScheduleInfo} repItemScheduleInfo - The scheduling information for the note.
+     * @returns {Promise<void>} - A promise that resolves when the scheduling information is set.
+     */
     async setNoteSchedule(repItemScheduleInfo: RepItemScheduleInfo): Promise<void> {
         const schedInfo: RepItemScheduleInfoOsr = repItemScheduleInfo as RepItemScheduleInfoOsr;
         const dueString: string = formatDateYYYYMMDD(schedInfo.dueDate);
@@ -96,11 +135,21 @@ export class SrTFile implements ISRFile {
         });
     }
 
+    /**
+     * Gets the note ID from the frontmatter.
+     *
+     * @returns {Promise<string | null>} - A promise that resolves with the note ID from the frontmatter, or null if not found.
+     */
     async getNoteId(): Promise<string | null> {
         const frontmatter = await this.getFrontmatter();
         return frontmatter?.get("sr-id") ?? null;
     }
 
+    /**
+     * Gets or creates the note ID from the frontmatter.
+     *
+     * @returns {Promise<string>} - A promise that resolves with the note ID from the frontmatter, or a new one if not found.
+     */
     async getOrCreateNoteId(): Promise<string> {
         const existing = await this.getNoteId();
         if (existing) return existing;
@@ -112,6 +161,11 @@ export class SrTFile implements ISRFile {
         return id;
     }
 
+    /**
+     * Gets the frontmatter from the file cache.
+     *
+     * @returns {Promise<Map<string, string>>} - A promise that resolves with the frontmatter from the file.
+     */
     async getFrontmatter(): Promise<Map<string, string>> {
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
 
@@ -127,12 +181,22 @@ export class SrTFile implements ISRFile {
         return result;
     }
 
+    /**
+     * Gets all tags from the file cache.
+     *
+     * @returns {string[]} - An array of all tags from the file cache.
+     */
     getAllTagsFromCache(): string[] {
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
         const result: string[] = ObsidianGetAllTags(fileCachedData) || [];
         return result;
     }
 
+    /**
+     * Gets all tags from the text.
+     *
+     * @returns {TagCache[]} - An array of all tags from the text.
+     */
     getAllTagsFromText(): TagCache[] {
         const result: TagCache[] = [] as TagCache[];
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
@@ -148,6 +212,12 @@ export class SrTFile implements ISRFile {
         return result;
     }
 
+    /**
+     * Gets the tags from the frontmatter.
+     *
+     * @param {FrontMatterCache} frontmatter - The frontmatter from the file cache.
+     * @returns {TagCache[]} - An array of tags from the frontmatter.
+     */
     private getFrontmatterTags(frontmatter: FrontMatterCache): TagCache[] {
         const result: TagCache[] = [] as TagCache[];
         const frontmatterTags: string =
@@ -177,6 +247,12 @@ export class SrTFile implements ISRFile {
         return result;
     }
 
+    /**
+     * Gets the question context for a given line number.
+     *
+     * @param {number} cardLine - The line number of the card.
+     * @returns {string[]} - An array of strings representing the question context.
+     */
     getQuestionContext(cardLine: number): string[] {
         const fileCachedData = this.metadataCache.getFileCache(this.file) || {};
         const headings: HeadingCache[] = fileCachedData.headings || [];
@@ -201,6 +277,11 @@ export class SrTFile implements ISRFile {
         return result;
     }
 
+    /**
+     * Gets the text direction from the frontmatter.
+     *
+     * @returns {TextDirection} - The text direction from the frontmatter.
+     */
     getTextDirection(): TextDirection {
         let result: TextDirection = TextDirection.Unspecified;
         const fileCache = this.metadataCache.getFileCache(this.file);
@@ -212,10 +293,21 @@ export class SrTFile implements ISRFile {
         return result;
     }
 
+    /**
+     * Reads the content of the file from the Obsidian vault.
+     *
+     * @returns {Promise<string>} - A promise that resolves with the content of the file.
+     */
     async read(): Promise<string> {
         return await this.vault.read(this.file);
     }
 
+    /**
+     * Writes the content to the file in the Obsidian vault.
+     *
+     * @param {string} content - The content to write to the file.
+     * @returns {Promise<void>} - A promise that resolves when the content is written to the file.
+     */
     async write(content: string): Promise<void> {
         await this.vault.modify(this.file, content);
     }

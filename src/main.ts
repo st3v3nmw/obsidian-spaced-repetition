@@ -314,7 +314,7 @@ export default class SRPlugin extends Plugin {
             id: "srs-note-review-open-note",
             name: t("OPEN_NOTE_FOR_REVIEW"),
             callback: async () => {
-                if (!this.dataManager.osrAppCore.syncLock && this.nextNoteReviewHandler !== null) {
+                if (!this.dataManager.syncLock && this.nextNoteReviewHandler !== null) {
                     await this.dataManager.sync();
                     this.nextNoteReviewHandler.reviewNextNoteModal();
                 }
@@ -451,8 +451,8 @@ export default class SRPlugin extends Plugin {
             deckIterator,
             this.dataManager.data.settings,
             SrsAlgorithm.getInstance(),
-            this.dataManager.osrAppCore.questionPostponementList,
-            this.dataManager.osrAppCore.dueDateFlashcardHistogram,
+            this.dataManager.osrCore.questionPostponementList,
+            this.dataManager.osrCore.dueDateFlashcardHistogram,
         );
 
         reviewSequencer.setDeckTree(fullDeckTree, remainingDeckTree);
@@ -468,7 +468,7 @@ export default class SRPlugin extends Plugin {
         const deckTree = new Deck("root", null);
         note.appendCardsToDeck(deckTree);
         const remainingDeckTree = DeckTreeFilter.filterForRemainingCards(
-            this.dataManager.osrAppCore.questionPostponementList,
+            this.dataManager.osrCore.questionPostponementList,
             deckTree,
             mode,
         );

@@ -7,7 +7,7 @@ import { SrsAlgorithmFsrs } from "src/algorithms/fsrs/srs-algorithm-fsrs";
 import { ObsidianVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
 import { SrsAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
 import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
-import { OsrAppCore } from "src/data/core";
+import { OsrCore } from "src/data/core";
 import { DataStoreAlgorithm } from "src/data/data-store-algorithm/data-store-algorithm";
 import { DataStoreInNoteAlgorithmOsr } from "src/data/data-store-algorithm/data-store-in-note-algorithm-osr";
 import { DataStoreInPluginDataAlgorithmOsr } from "src/data/data-store-algorithm/data-store-in-plugin-data-algorithm-osr";
@@ -29,12 +29,15 @@ import { NoteReviewQueue } from "src/note/note-review-queue";
 import { setDebugParser } from "src/parser";
 
 /**
- * Manages the plugin data and handles loading/saving/migrating.
+ * Manages all the data systems of the Spaced Repetition plugin and exposes them to the other parts of the plugin.
+ *
+ * This includes the plugin data, the OSR app core, and the scheduling data repository.
  */
 export class DataManager {
     private plugin: SRPlugin;
     private _data: PluginData | null = null;
-    private _osrAppCore: OsrAppCore | null = null;
+    private _osrCore: OsrCore | null = null;
+    private _syncLock = false;
     public scheduleDataRepository: ScheduleDataRepository | null = null;
 
     constructor(plugin: SRPlugin) {
@@ -48,8 +51,11 @@ export class DataManager {
         return this._data !== null;
     }
 
-    isOsrAppCoreLoaded(): boolean {
-        return this._osrAppCore !== null;
+    /**
+     * Checks if the OSR app core has been loaded.
+     */
+    isOsrCoreLoaded(): boolean {
+        return this._osrCore !== null;
     }
 
     get data(): PluginData {
@@ -61,18 +67,21 @@ export class DataManager {
         this._data = data;
     }
 
-    get osrAppCore(): OsrAppCore {
-        if (this._osrAppCore === null)
-            throw new Error("SR plugin or OSR app core not initialized!!!");
-        return this._osrAppCore;
+    get osrCore(): OsrCore {
+        if (this._osrCore === null) throw new Error("SR plugin or OSR core not initialized!!!");
+        return this._osrCore;
     }
 
-    set osrAppCore(osrAppCore: OsrAppCore) {
-        this._osrAppCore = osrAppCore;
+    set osrCore(osrCore: OsrCore) {
+        this._osrCore = osrCore;
+    }
+
+    get syncLock(): boolean {
+        return this._syncLock;
     }
 
     /**
-     * Loads the plugin data.
+     * Loads the plugin data from the data.json from the plugin's folder.
      */
     async loadData(): Promise<void> {
         const loadedData: PluginData = await this.plugin.loadData();
@@ -102,6 +111,13 @@ export class DataManager {
         this.setupDataStoreAndAlgorithmInstances(this.data.settings);
     }
 
+    /**
+     * Initializes the OSR app core.
+     *
+     * @param {NoteReviewQueue} noteReviewQueue - The note review queue.
+     * @param {() => void} onOsrVaultDataChanged - A callback function that is called when the OSR vault data changes.
+     * @returns {Promise<void>} - A promise that resolves when the OSR app core is initialized.
+     */
     async initOSRAppCore(
         noteReviewQueue: NoteReviewQueue,
         onOsrVaultDataChanged: () => void,
@@ -114,13 +130,10 @@ export class DataManager {
         );
         await questionPostponementList.clearIfNewDay(this.data);
 
-        const osrNoteLinkInfoFinder: ObsidianVaultNoteLinkInfoFinder =
-            new ObsidianVaultNoteLinkInfoFinder(this.plugin.app.metadataCache);
-
-        this.osrAppCore = new OsrAppCore(this.plugin.app);
-        this.osrAppCore.init(
+        this.osrCore = new OsrCore();
+        this.osrCore.init(
             questionPostponementList,
-            osrNoteLinkInfoFinder,
+            new ObsidianVaultNoteLinkInfoFinder(this.plugin.app.metadataCache),
             this.data.settings,
             onOsrVaultDataChanged,
             noteReviewQueue,
@@ -128,6 +141,51 @@ export class DataManager {
         );
     }
 
+    async loadVault(): Promise<void> {
+        if (this._syncLock) {
+            return;
+        }
+        this._syncLock = true;
+
+        try {
+            this.osrCore.loadInit();
+
+            const notes: TFile[] = this.plugin.app.vault.getMarkdownFiles();
+            for (const noteFile of notes) {
+                if (SettingsUtil.isPathInNoteIgnoreFolder(this.data.settings, noteFile.path)) {
+                    continue;
+                }
+
+                const file: SrTFile = this.createSrTFile(noteFile);
+                await this.osrCore.processFile(file);
+            }
+
+            this.osrCore.finalizeLoad();
+        } finally {
+            this._syncLock = false;
+        }
+    }
+
+    /**
+     * Creates a SrTFile object from a note file.
+     *
+     * @param {TFile} note - The note file.
+     * @returns {SrTFile} - The SrTFile object.
+     */
+    createSrTFile(note: TFile): SrTFile {
+        return new SrTFile(
+            this.plugin.app.vault,
+            this.plugin.app.metadataCache,
+            this.plugin.app.fileManager,
+            note,
+        );
+    }
+
+    /**
+     * Sets up the data store and algorithm instances based on the settings.
+     *
+     * @param {SRSettings} settings - The settings object.
+     */
     setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
         if (settings.dataStore === DataStoreName.PLUGIN_DATA) {
             if (this.scheduleDataRepository === null)
@@ -139,6 +197,7 @@ export class DataManager {
             DataStoreAlgorithm.instance = new DataStoreInNoteAlgorithmOsr(settings);
         }
 
+        // TODO: Move this to the scheduling manager once it is implemented
         SrsAlgorithm.instance =
             settings.algorithm === Algorithm.FSRS
                 ? new SrsAlgorithmFsrs(settings)
@@ -158,7 +217,6 @@ export class DataManager {
                 this.scheduleDataRepository,
             );
         } else {
-            if (this.data === null) throw new Error("Data not loaded!!");
             if (this.scheduleDataRepository === null)
                 throw new Error("Schedule data not initialized!!!");
             await DataStoreMigrator.migrateToNotes(
@@ -170,21 +228,26 @@ export class DataManager {
         }
     }
 
+    /**
+     * Synchronizes the data with the Obsidian vault.
+     *
+     * @returns {Promise<void>} - A promise that resolves when the synchronization is complete.
+     */
     async sync(): Promise<void> {
-        if (this.osrAppCore === null) throw new Error("OSR app core not initialized!!!");
+        if (this.osrCore === null) throw new Error("OSR app core not initialized!!!");
         if (this.data === null) throw new Error("Data not loaded!!");
 
-        if (this.osrAppCore.syncLock) {
+        if (this.syncLock) {
             return;
         }
 
         const now = window.moment(Date.now());
-        this.osrAppCore.defaultTextDirection = this.plugin.getObsidianRtlSetting();
+        this.osrCore.defaultTextDirection = this.plugin.getObsidianRtlSetting();
 
-        await this.osrAppCore.loadVault();
+        await this.loadVault();
 
         if (this.data.settings.showSchedulingDebugMessages) {
-            console.log(`SR: ${t("DECKS")}`, this.osrAppCore.reviewableDeckTree);
+            console.log(`SR: ${t("DECKS")}`, this.osrCore.reviewableDeckTree);
             console.log(
                 "SR: " +
                     t("SYNC_TIME_TAKEN", {
@@ -194,6 +257,12 @@ export class DataManager {
         }
     }
 
+    /**
+     * Loads a note from the Obsidian vault.
+     *
+     * @param {TFile} noteFile - The note file.
+     * @returns {Promise<Note>} - A promise that resolves with the loaded note.
+     */
     async loadNote(noteFile: TFile): Promise<Note> {
         if (this.data === null) throw new Error("Data not loaded!!");
         const loader: NoteFileLoader = new NoteFileLoader(this.data.settings);
@@ -214,9 +283,16 @@ export class DataManager {
         return note;
     }
 
+    /**
+     * Saves the review response for a note.
+     *
+     * @param {TFile} note - The note file.
+     * @param {ReviewResponse} response - The review response.
+     * @returns {Promise<void>} - A promise that resolves when the review response is saved.
+     */
     async saveNoteReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
         if (this.data === null) throw new Error("Data not loaded!!");
-        if (this.osrAppCore === null) throw new Error("OSR app core not initialized!!!");
+        if (this.osrCore === null) throw new Error("OSR app core not initialized!!!");
         if (this.plugin.nextNoteReviewHandler === null)
             throw new Error("Next note review handler not initialized!!!");
 
@@ -233,7 +309,7 @@ export class DataManager {
             return;
         }
 
-        await this.osrAppCore.saveNoteReviewResponse(noteSrTFile, response, this.data.settings);
+        await this.osrCore.saveNoteReviewResponse(noteSrTFile, response, this.data.settings);
 
         new Notice(t("RESPONSE_RECEIVED"));
 
@@ -242,20 +318,21 @@ export class DataManager {
         }
     }
 
-    createSrTFile(note: TFile): SrTFile {
-        return new SrTFile(
-            this.plugin.app.vault,
-            this.plugin.app.metadataCache,
-            this.plugin.app.fileManager,
-            note,
-        );
-    }
-
+    /**
+     * Saves the plugin data.
+     *
+     * @returns {Promise<void>} - A promise that resolves when the plugin data is saved.
+     */
     async savePluginData(): Promise<void> {
         if (this.data === null) throw new Error("Data not loaded!!");
         await this.plugin.saveData(this.data);
     }
 
+    /**
+     * Persists the scheduling data now.
+     *
+     * @returns {Promise<void>} - A promise that resolves when the scheduling data is persisted.
+     */
     async persistScheduleDataNow(): Promise<void> {
         if (this.scheduleDataRepository === null)
             throw new Error("Schedule data not initialized!!!");
