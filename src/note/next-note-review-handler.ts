@@ -9,9 +9,9 @@ export class NextNoteReviewHandler {
     private app: App;
     private settings: SRSettings;
     private _noteReviewQueue: NoteReviewQueue;
-    private _lastSelectedReviewDeck: string;
+    private _lastSelectedReviewDeck: string | null = null;
 
-    get lastSelectedReviewDeck(): string {
+    get lastSelectedReviewDeck(): string | null {
         return this._lastSelectedReviewDeck;
     }
 
@@ -61,6 +61,12 @@ export class NextNoteReviewHandler {
 
         this._lastSelectedReviewDeck = deckKey;
         const deck = this._noteReviewQueue.reviewDecks.get(deckKey);
+
+        if (!deck) {
+            new Notice(t("NO_DECK_EXISTS", { deckName: deckKey }));
+            return;
+        }
+
         const notefile = deck.determineNextNote(this.settings.openRandomNote);
 
         if (notefile) {

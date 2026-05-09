@@ -4,10 +4,6 @@ import { Menu, MenuItem, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "o
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { DataManager } from "src/data/data-manager";
 import { CardListType } from "src/data/data-structures/deck/deck";
-import {
-    deleteAllSchedulingDataOfCardsInNote,
-    deleteNoteSchedulingDataInNote,
-} from "src/data/delete-scheduling-data";
 import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
@@ -181,8 +177,8 @@ export class UIManager {
             // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
             this.setSRViewInFocus(
                 (modal === null || modal === undefined) &&
-                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
-                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
+                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
+                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
             );
         }
     }
@@ -334,7 +330,7 @@ export class UIManager {
                                 if (this.dataManager.data === null)
                                     throw new Error("SR plugin or data not initialized!!!");
                                 const settings = this.dataManager.data.settings;
-                                deleteNoteSchedulingDataInNote(
+                                this.dataManager.deleteNoteSchedulingDataInNote(
                                     file,
                                     settings.deleteTagsOnSchedulingDataDeletion,
                                     settings.tagsToReview,
@@ -358,7 +354,7 @@ export class UIManager {
                                 if (this.dataManager.data === null)
                                     throw new Error("SR plugin or data not initialized!!!");
                                 const settings = this.dataManager.data.settings;
-                                deleteAllSchedulingDataOfCardsInNote(
+                                this.dataManager.deleteAllSchedulingDataOfCardsInNote(
                                     file,
                                     settings.deleteTagsOnSchedulingDataDeletion,
                                     settings.flashcardTags,

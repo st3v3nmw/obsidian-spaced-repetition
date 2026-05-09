@@ -64,7 +64,7 @@ export class OsrNoteGraph {
             totalLinkCount = 0;
 
         for (const statObj of this.incomingLinks[notePath] || []) {
-            const ease: number = noteEaseList.getEaseByPath(statObj.sourcePath);
+            const ease: number | null = noteEaseList.getEaseByPath(statObj.sourcePath);
             if (ease) {
                 linkTotal += statObj.linkCount * this.pageranks[statObj.sourcePath] * ease;
                 linkPGTotal += this.pageranks[statObj.sourcePath] * statObj.linkCount;
@@ -75,7 +75,7 @@ export class OsrNoteGraph {
         const outgoingLinks =
             this.vaultNoteLinkInfoFinder.getResolvedTargetLinksForNotePath(notePath) || {};
         for (const outgoingLink in outgoingLinks) {
-            const ease: number = noteEaseList.getEaseByPath(outgoingLink);
+            const ease: number | null = noteEaseList.getEaseByPath(outgoingLink);
             const linkCount: number = outgoingLinks[outgoingLink];
             const pageRank: number = this.pageranks[outgoingLink];
             if (ease) {

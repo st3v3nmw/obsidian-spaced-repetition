@@ -4,7 +4,6 @@ import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
 import { IOsrVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { StorageType } from "src/data/data-stores/base/data-store";
-import { ScheduleDataRepository } from "src/data/data-stores/folder-data-store/schedule-data-repository";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import { DeckTreeStatsCalculator } from "src/data/data-structures/deck/deck-tree-stats-calculator";
@@ -37,7 +36,6 @@ export class OsrCore {
     private osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder;
     private _questionPostponementList: QuestionPostponementList;
     private _noteReviewQueue: NoteReviewQueue;
-    private scheduleDataRepository: ScheduleDataRepository | null = null;
 
     private fullDeckTree: Deck;
     private _reviewableDeckTree: Deck = new Deck("root", null);
@@ -117,7 +115,6 @@ export class OsrCore {
      * @param {SRSettings} settings - The settings object.
      * @param {() => void} dataChangedHandler - A callback function that is called when the data has changed.
      * @param {NoteReviewQueue} noteReviewQueue - The note review queue.
-     * @param {ScheduleDataRepository | null} scheduleDataRepository - The schedule data repository.
      * @returns {void}
      */
     init(
@@ -126,14 +123,12 @@ export class OsrCore {
         settings: SRSettings,
         dataChangedHandler: () => void,
         noteReviewQueue: NoteReviewQueue,
-        scheduleDataRepository: ScheduleDataRepository | null,
     ): void {
         this.settings = settings;
         this.osrNoteLinkInfoFinder = osrNoteLinkInfoFinder;
         this.dataChangedHandler = dataChangedHandler;
         this._noteReviewQueue = noteReviewQueue;
         this._questionPostponementList = questionPostponementList;
-        this.scheduleDataRepository = scheduleDataRepository;
         this._dueDateFlashcardHistogram = new CardDueDateHistogram();
         this._dueDateNoteHistogram = new NoteDueDateHistogram();
         try {
@@ -214,58 +209,7 @@ export class OsrCore {
      * @returns {Promise<RepItemScheduleInfo>} - A promise that resolves with the scheduling information for the note file.
      */
     private async readNoteSchedule(noteFile: ISRFile): Promise<RepItemScheduleInfo | null> {
-        if (
-            this.settings.dataStore !== StorageType.PLUGIN_DATA ||
-            this.scheduleDataRepository === null
-        ) {
-            return await noteFile.getNoteSchedule();
-        }
-
-        // UUID-based lookup (primary path for notes that have been stamped with sr-id).
-        const noteId = await noteFile.getNoteId();
-        if (noteId && this.scheduleDataRepository.hasNoteSchedule(noteId)) {
-            return this.scheduleDataRepository.getNoteSchedule(noteId);
-        }
-
-        // Path-based fallback for entries created before UUID support — migrate on read.
-        if (this.scheduleDataRepository.hasNoteSchedule(noteFile.path)) {
-            const schedule = this.scheduleDataRepository.getNoteSchedule(noteFile.path);
-            const newId = await noteFile.getOrCreateNoteId();
-            await this.scheduleDataRepository.setNoteSchedule(newId, schedule);
-            await this.scheduleDataRepository.deleteNoteSchedule(noteFile.path);
-            return schedule;
-        }
-
-        // Fallback to frontmatter to preserve schedules when switching from notes mode.
-        const legacy = await noteFile.getNoteSchedule();
-        if (legacy) {
-            const newId = await noteFile.getOrCreateNoteId();
-            await this.scheduleDataRepository.setNoteSchedule(newId, legacy);
-        }
-        return legacy;
-    }
-
-    /**
-     * Writes the scheduling information for a note file.
-     *
-     * @param {ISRFile} noteFile - The note file.
-     * @param {RepItemScheduleInfo} noteSchedule - The scheduling information for the note file.
-     * @returns {Promise<void>} - A promise that resolves when the scheduling information is written.
-     */
-    private async writeNoteSchedule(
-        noteFile: ISRFile,
-        noteSchedule: RepItemScheduleInfo,
-    ): Promise<void> {
-        if (
-            this.settings.dataStore !== StorageType.PLUGIN_DATA ||
-            this.scheduleDataRepository === null
-        ) {
-            await noteFile.setNoteSchedule(noteSchedule);
-            return;
-        }
-
-        const noteId = await noteFile.getOrCreateNoteId();
-        await this.scheduleDataRepository.setNoteSchedule(noteId, noteSchedule);
+        return await noteFile.getNoteSchedule();
     }
 
     /**
@@ -331,9 +275,6 @@ export class OsrCore {
                 this._dueDateNoteHistogram,
             );
         }
-
-        // Store away the new schedule info
-        await this.writeNoteSchedule(noteFile, noteSchedule);
 
         // Generate the histogram for the due dates for all the notes
         // (This could be optimized to make the small adjustments to the histogram, but simpler to implement

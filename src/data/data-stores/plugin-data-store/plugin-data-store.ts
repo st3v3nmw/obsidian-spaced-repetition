@@ -8,16 +8,19 @@ import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR } from "src/dat
 import { IDataStore, StorageType } from "src/data/data-stores/base/data-store";
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
 import { Question } from "src/data/data-structures/card/questions/question";
+import { PluginData } from "src/data/plugin-data";
 import { SRSettings } from "src/data/settings";
 import { DateUtil, formatDateYYYYMMDD, globalDateProvider } from "src/utils/dates";
 import { MultiLineTextFinder } from "src/utils/strings";
 
-export class NotesDataStore implements IDataStore {
-    public readonly storageType = StorageType.NOTES;
+export class PluginDataStore implements IDataStore {
+    public readonly storageType = StorageType.PLUGIN_DATA;
     private settings: SRSettings;
+    private pluginData: PluginData;
 
-    constructor(settings: SRSettings) {
+    constructor(settings: SRSettings, pluginData: PluginData) {
         this.settings = settings;
+        this.pluginData = pluginData;
     }
 
     /**
@@ -174,5 +177,17 @@ export class NotesDataStore implements IDataStore {
         const delayBeforeReviewTicks: number =
             dueDate.valueOf() - globalDateProvider.today.valueOf();
         return new RepItemScheduleInfoOsr(dueDate, interval, ease, delayBeforeReviewTicks);
+    }
+
+    ensurePluginDataStructure(): void {
+        const scheduleData = this.pluginData.scheduleData;
+
+        if (!scheduleData) { // Can be undefined if user is on older version of plugin and hasn't updated in a while
+            this.pluginData.scheduleData = {
+                version: 1,
+                noteSchedules: {},
+                cardSchedules: {},
+            };
+        }
     }
 }

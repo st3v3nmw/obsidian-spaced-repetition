@@ -1,7 +1,7 @@
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
 import { FolderDataStore } from "src/data/data-stores/folder-data-store/folder-data-store";
-import { ScheduleDataRepository } from "src/data/data-stores/folder-data-store/schedule-data-repository";
+import { ScheduleDataFolderRepository } from "src/data/data-stores/folder-data-store/schedule-data-folder-repository";
 import { Card } from "src/data/data-structures/card/card";
 import { Question, QuestionText } from "src/data/data-structures/card/questions/question";
 import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
@@ -20,14 +20,14 @@ beforeAll(() => {
     unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
 });
 
-function makeRepo(data: PluginData): ScheduleDataRepository {
-    return new ScheduleDataRepository(data, async () => {});
+function makeRepo(data: PluginData): ScheduleDataFolderRepository {
+    return new ScheduleDataFolderRepository(data, async () => { });
 }
 
 function makeStore(
     settings?: Partial<SRSettings>,
     data?: PluginData,
-): { store: FolderDataStore; repo: ScheduleDataRepository; data: PluginData } {
+): { store: FolderDataStore; repo: ScheduleDataFolderRepository; data: PluginData } {
     const pluginData = data ?? JSON.parse(JSON.stringify(DEFAULT_DATA));
     const repo = makeRepo(pluginData);
     const store = new FolderDataStore({ ...DEFAULT_SETTINGS, ...settings }, repo);

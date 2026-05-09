@@ -1,6 +1,6 @@
 jest.mock("obsidian", () => {
-    class MockTFile {}
-    class MockTFolder {}
+    class MockTFile { }
+    class MockTFolder { }
     return {
         TFile: MockTFile,
         TFolder: MockTFolder,
@@ -10,15 +10,15 @@ jest.mock("obsidian", () => {
 import { TFile, TFolder } from "obsidian";
 
 import { ScheduleDataMarkdownStorage } from "src/data/data-stores/folder-data-store/schedule-data-markdown-storage";
-import { PluginDataScheduleState } from "src/data/plugin-data";
+import { IPluginScheduleData } from "src/data/plugin-data";
 
 function makeTFile(path: string): TFile {
-    const file = new (TFile as unknown as { new (): TFile })();
+    const file = new (TFile as unknown as { new(): TFile })();
     return Object.assign(file, { path });
 }
 
 function makeTFolder(path: string): TFolder {
-    const folder = new (TFolder as unknown as { new (): TFolder })();
+    const folder = new (TFolder as unknown as { new(): TFolder })();
     return Object.assign(folder, { path });
 }
 
@@ -148,7 +148,7 @@ describe("ScheduleDataMarkdownStorage", () => {
         const { storage, contents, vault } = makeStorage();
         await storage.ensureFiles();
 
-        const state: PluginDataScheduleState = {
+        const state: IPluginScheduleData = {
             version: 1,
             noteSchedules: {
                 note: { dueDate: "2023-09-06", interval: 3, ease: 230 },
@@ -183,7 +183,7 @@ describe("ScheduleDataMarkdownStorage", () => {
         await storage.ensureFiles();
         files.set("Spaced Repetition/Schedule Data/note-schedule-data.sr.md", {} as never);
 
-        const state: PluginDataScheduleState = {
+        const state: IPluginScheduleData = {
             version: 1,
             noteSchedules: {},
             cardSchedules: {},

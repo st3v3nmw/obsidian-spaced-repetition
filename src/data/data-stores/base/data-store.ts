@@ -16,6 +16,7 @@ export enum StorageType {
  * This is the interface that all data stores must implement.
  */
 export interface IDataStore {
+    readonly storageType: StorageType;
     /**
      * Creates scheduling information from a question text and its storage info.
      *

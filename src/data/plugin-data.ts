@@ -6,7 +6,12 @@ export interface SerializedScheduleInfo {
     ease: number;
 }
 
-export interface PluginDataScheduleState {
+/**
+ * Represents the schedule data stored in the plugin data.
+ *
+ * @interface IPluginScheduleData
+ */
+export interface IPluginScheduleData {
     version: number;
     noteSchedules: Record<string, SerializedScheduleInfo | null>;
     cardSchedules: Record<string, (SerializedScheduleInfo | null)[]>;
@@ -20,7 +25,7 @@ export interface PluginData {
     // which covers most of the cases
     buryList: string[];
     historyDeck: string | null;
-    scheduleState: PluginDataScheduleState;
+    scheduleData: IPluginScheduleData;
 }
 
 export const DEFAULT_DATA: PluginData = {
@@ -28,7 +33,7 @@ export const DEFAULT_DATA: PluginData = {
     buryDate: "",
     buryList: [],
     historyDeck: null,
-    scheduleState: {
+    scheduleData: {
         version: 1,
         noteSchedules: {},
         cardSchedules: {},

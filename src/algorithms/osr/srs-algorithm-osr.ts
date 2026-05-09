@@ -72,13 +72,13 @@ export class SRAlgorithmOsr implements ISRAlgorithm {
         }
 
         // Don't know the due date until we know the calculated interval
-        const dueDate: Moment | null = null;
         const interval: number = SRAlgorithmOsr.initialInterval;
         ease = Math.round(ease);
-        const temp: RepItemScheduleInfoOsr = new RepItemScheduleInfoOsr(dueDate, interval, ease);
 
         const result: RepItemScheduleInfoOsr = this.calcSchedule(
-            temp,
+            interval,
+            ease,
+            0,
             response,
             dueDateNoteHistogram,
         );
@@ -97,20 +97,18 @@ export class SRAlgorithmOsr implements ISRAlgorithm {
      * @returns {void}
      */
     noteOnLoadedNote(path: string, note: Note | null, noteEase: number | null): void {
-        let flashcardsInNoteAvgEase: number | null = null;
-        if (note) {
-            flashcardsInNoteAvgEase = SRAlgorithmOsr.calculateFlashcardAvgEase(
+        const flashcardsInNoteAvgEase: number | null = note !== null
+            ? SRAlgorithmOsr.calculateFlashcardAvgEase(
                 note.questionList,
                 this.settings,
-            );
-        }
+            )
+            : null;
 
-        let ease: number;
-        if (flashcardsInNoteAvgEase && noteEase) {
-            ease = (flashcardsInNoteAvgEase + noteEase) / 2;
-        } else {
-            ease = flashcardsInNoteAvgEase ? flashcardsInNoteAvgEase : noteEase;
-        }
+        const ease: number | null = flashcardsInNoteAvgEase && noteEase
+            ? (flashcardsInNoteAvgEase + noteEase) / 2
+            : flashcardsInNoteAvgEase
+                ? flashcardsInNoteAvgEase
+                : noteEase;
 
         if (ease) {
             this.noteEaseList.setEaseForPath(path, ease);
@@ -132,8 +130,10 @@ export class SRAlgorithmOsr implements ISRAlgorithm {
             question.cards
                 .filter((card) => card.hasSchedule)
                 .forEach((card) => {
-                    totalEase += card.scheduleInfo.latestEase;
-                    scheduledCount++;
+                    if (card.scheduleInfo !== null) {
+                        totalEase += card.scheduleInfo.latestEase;
+                        scheduledCount++;
+                    }
                 });
         });
 
@@ -168,7 +168,9 @@ export class SRAlgorithmOsr implements ISRAlgorithm {
     ): RepItemScheduleInfo {
         const noteScheduleOsr: RepItemScheduleInfoOsr = noteSchedule as RepItemScheduleInfoOsr;
         const temp: RepItemScheduleInfoOsr = this.calcSchedule(
-            noteScheduleOsr,
+            noteScheduleOsr.interval,
+            noteScheduleOsr.latestEase,
+            noteScheduleOsr.delayedBeforeReviewTicks,
             response,
             dueDateNoteHistogram,
         );
@@ -189,15 +191,17 @@ export class SRAlgorithmOsr implements ISRAlgorithm {
      * @returns {RepItemScheduleInfoOsr} - The scheduling information for the note.
      */
     private calcSchedule(
-        schedule: RepItemScheduleInfoOsr,
+        interval: number,
+        latestEase: number,
+        delayedBeforeReview: number,
         response: ReviewResponse,
         dueDateHistogram: DueDateHistogram,
     ): RepItemScheduleInfoOsr {
         const temp: Record<string, number> = osrSchedule(
             response,
-            schedule.interval,
-            schedule.latestEase,
-            schedule.delayedBeforeReviewTicks,
+            interval,
+            latestEase,
+            delayedBeforeReview,
             this.settings,
             dueDateHistogram,
         );
@@ -231,8 +235,9 @@ export class SRAlgorithmOsr implements ISRAlgorithm {
         dueDateFlashcardHistogram: DueDateHistogram,
     ): RepItemScheduleInfo {
         let initialEase: number = this.settings.baseEase;
-        if (this.noteEaseList.hasEaseForPath(notePath)) {
-            initialEase = Math.round(this.noteEaseList.getEaseByPath(notePath));
+        const noteEase: number | null = this.noteEaseList.getEaseByPath(notePath);
+        if (this.noteEaseList.hasEaseForPath(notePath) && noteEase !== null) {
+            initialEase = Math.round(noteEase);
         }
         const delayBeforeReview = 0;
 

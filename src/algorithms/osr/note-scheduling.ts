@@ -61,8 +61,8 @@ export function osrSchedule(
     return { interval, ease };
 }
 
-export function textInterval(interval: number, isMobile: boolean): string {
-    if (interval === undefined) {
+export function textInterval(interval: number | null | undefined, isMobile: boolean): string {
+    if (interval === null || interval === undefined) {
         return t("NEW");
     }
 

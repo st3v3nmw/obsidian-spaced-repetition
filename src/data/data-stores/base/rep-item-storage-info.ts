@@ -1,9 +1,9 @@
 export class RepItemStorageInfo {
-    notePath: string;
-    questionHash: string;
+    notePath: string | null = null;
+    questionHash: string | null = null;
 
     constructor(notePath?: string, questionHash?: string) {
-        this.notePath = notePath;
-        this.questionHash = questionHash;
+        this.notePath = notePath || null;
+        this.questionHash = questionHash || null;
     }
 }

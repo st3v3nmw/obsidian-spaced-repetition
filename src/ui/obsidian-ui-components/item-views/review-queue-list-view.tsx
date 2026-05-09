@@ -3,7 +3,6 @@ import { ItemView, Menu, setIcon, TFile, WorkspaceLeaf } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { COLLAPSE_ICON, TICKS_PER_DAY } from "src/data/constants";
-import { deleteNoteSchedulingDataInNote } from "src/data/delete-scheduling-data";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
@@ -356,7 +355,7 @@ export class ReviewQueueListView extends ItemView {
                                 t("CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION"),
                                 t("NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS"),
                                 () => {
-                                    deleteNoteSchedulingDataInNote(
+                                    this.plugin.dataManager.deleteNoteSchedulingDataInNote(
                                         file,
                                         this.plugin.dataManager.data.settings
                                             .deleteTagsOnSchedulingDataDeletion,

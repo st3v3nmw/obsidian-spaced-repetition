@@ -1,4 +1,4 @@
-import { Notice, TFile } from "obsidian";
+import { Notice, TFile, Vault } from "obsidian";
 
 import { SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
@@ -6,16 +6,16 @@ import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
 import { SrsAlgorithmFsrs } from "src/algorithms/fsrs/sr-algorithm-fsrs";
 import { ObsidianVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
 import { SRAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
+import { FLASHCARD_SCHEDULE_INFO } from "src/data/constants";
 import { OsrCore } from "src/data/core";
 import { DataStoreAlgorithm } from "src/data/data-store-algorithm/base/data-store-algorithm";
 import { DataStoreInExternalNoteAlgorithmOsr } from "src/data/data-store-algorithm/store-in-external-note/data-store-in-external-note-algorithm-osr";
 import { DataStoreInNoteAlgorithmOsr } from "src/data/data-store-algorithm/store-in-note/data-store-in-note-algorithm-osr";
 import { DataStore, StorageType } from "src/data/data-stores/base/data-store";
-import { DataStoreMigrator } from "src/data/data-stores/data-store-migrator";
+import { DataStoreMigrator } from "src/data/data-stores/base/data-store-migrator";
 import { FolderDataStore } from "src/data/data-stores/folder-data-store/folder-data-store";
-// import { ScheduleDataMarkdownStorage } from "src/data/data-stores/plugin-data/schedule-data-markdown-storage";
-import { ScheduleDataRepository } from "src/data/data-stores/folder-data-store/schedule-data-repository";
 import { NotesDataStore } from "src/data/data-stores/notes-data-store/notes-data-store";
+import { PluginDataStore } from "src/data/data-stores/plugin-data-store/plugin-data-store";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { ISRFile, SrTFile } from "src/data/file";
@@ -38,7 +38,6 @@ export class DataManager {
     private _data: PluginData | null = null;
     private _osrCore: OsrCore | null = null;
     private _syncLock = false;
-    public scheduleDataRepository: ScheduleDataRepository | null = null;
 
     constructor(plugin: SRPlugin) {
         this.plugin = plugin;
@@ -90,24 +89,6 @@ export class DataManager {
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
 
         setDebugParser(this.data.settings.showParserDebugMessages);
-
-        // TODO: Uncomment when schedule data is implemented
-        // const scheduleStorage = new ScheduleDataMarkdownStorage(
-        //     this.plugin.app,
-        //     () => {
-        //         if (this.data === null) throw new Error("Data not loaded!!");
-        //         return this.data.settings.scheduleDataVaultLocation;
-        //     }
-        // );
-
-        // TODO: Uncomment when schedule data is implemented
-        // this.scheduleDataRepository = new ScheduleDataRepository(
-        //     this.data,
-        //     this.savePluginData.bind(this),
-        //     scheduleStorage,
-        // );
-        // await this.scheduleDataRepository.initialize();
-
         this.setupDataStoreAndAlgorithmInstances(this.data.settings);
     }
 
@@ -137,7 +118,6 @@ export class DataManager {
             this.data.settings,
             onOsrVaultDataChanged,
             noteReviewQueue,
-            this.scheduleDataRepository,
         );
     }
 
@@ -187,14 +167,19 @@ export class DataManager {
      * @param {SRSettings} settings - The settings object.
      */
     setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
-        if (settings.dataStore === StorageType.PLUGIN_DATA) {
-            if (this.scheduleDataRepository === null)
-                throw new Error("Schedule data not initialized!!!");
-            DataStore.instance = new FolderDataStore(settings, this.scheduleDataRepository);
-            DataStoreAlgorithm.instance = new DataStoreInExternalNoteAlgorithmOsr();
-        } else {
-            DataStore.instance = new NotesDataStore(settings);
-            DataStoreAlgorithm.instance = new DataStoreInNoteAlgorithmOsr(settings);
+        switch (settings.dataStore) {
+            case StorageType.PLUGIN_DATA:
+                DataStore.instance = new PluginDataStore(settings, this.plugin.dataManager.data);
+                DataStoreAlgorithm.instance = new DataStoreInExternalNoteAlgorithmOsr();
+                break;
+            case StorageType.FOLDER:
+                DataStore.instance = new FolderDataStore(settings, this.plugin.app);
+                DataStoreAlgorithm.instance = new DataStoreInExternalNoteAlgorithmOsr();
+                break;
+            case StorageType.NOTES:
+                DataStore.instance = new NotesDataStore(settings);
+                DataStoreAlgorithm.instance = new DataStoreInNoteAlgorithmOsr(settings);
+                break;
         }
 
         // TODO: Move this to the scheduling manager once it is implemented
@@ -206,26 +191,12 @@ export class DataManager {
 
     async migrateDataStore(oldMode: StorageType, newMode: StorageType): Promise<void> {
         const textDirection = this.plugin.getObsidianRtlSetting();
-        if (newMode === StorageType.PLUGIN_DATA) {
-            if (this.data === null) throw new Error("Data not loaded!!");
-            if (this.scheduleDataRepository === null)
-                throw new Error("Schedule data not initialized!!!");
-            await DataStoreMigrator.migrateToPluginData(
-                this.plugin.app,
-                this.data.settings,
-                textDirection,
-                this.scheduleDataRepository,
-            );
-        } else {
-            if (this.scheduleDataRepository === null)
-                throw new Error("Schedule data not initialized!!!");
-            await DataStoreMigrator.migrateToNotes(
-                this.plugin.app,
-                this.data.settings,
-                textDirection,
-                this.scheduleDataRepository,
-            );
-        }
+        await DataStoreMigrator.migrateDataStore(
+            this.plugin,
+            textDirection,
+            oldMode,
+            newMode,
+        );
     }
 
     /**
@@ -250,9 +221,9 @@ export class DataManager {
             console.log(`SR: ${t("DECKS")}`, this.osrCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                    t("SYNC_TIME_TAKEN", {
-                        t: Date.now() - now.valueOf(),
-                    }),
+                t("SYNC_TIME_TAKEN", {
+                    t: Date.now() - now.valueOf(),
+                }),
             );
         }
     }
@@ -261,9 +232,9 @@ export class DataManager {
      * Loads a note from the Obsidian vault.
      *
      * @param {TFile} noteFile - The note file.
-     * @returns {Promise<Note>} - A promise that resolves with the loaded note.
+     * @returns {Promise<Note | null>} - A promise that resolves with the loaded note or null if not found.
      */
-    async loadNote(noteFile: TFile): Promise<Note> {
+    async loadNote(noteFile: TFile): Promise<Note | null> {
         if (this.data === null) throw new Error("Data not loaded!!");
         const loader: NoteFileLoader = new NoteFileLoader(this.data.settings);
         const srFile: ISRFile = this.createSrTFile(noteFile);
@@ -272,12 +243,12 @@ export class DataManager {
             this.data.settings,
         );
 
-        const note: Note = await loader.load(
+        const note: Note | null = await loader.load(
             this.createSrTFile(noteFile),
             this.plugin.getObsidianRtlSetting(),
             folderTopicPath,
         );
-        if (note.hasChanged) {
+        if (note && note.hasChanged) {
             note.writeNoteFile(this.data.settings);
         }
         return note;
@@ -329,13 +300,169 @@ export class DataManager {
     }
 
     /**
-     * Persists the scheduling data now.
+     * Deletes all note scheduling data from a markdown file.
      *
-     * @returns {Promise<void>} - A promise that resolves when the scheduling data is persisted.
+     * @param {Vault} vault - The vault to delete the scheduling data from.
+     * @param {TFile} file - The file to delete the scheduling data from.
      */
-    async persistScheduleDataNow(): Promise<void> {
-        if (this.scheduleDataRepository === null)
-            throw new Error("Schedule data not initialized!!!");
-        await this.scheduleDataRepository.persistCurrentState();
+    async removeSchedulingInfoInNotes(
+        vault: Vault,
+        file: TFile,
+        deleteTags: boolean,
+        tagsToDelete: string[] = [],
+    ) {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await this.plugin.app.fileManager.processFrontMatter(file, (frontmatter: any) => {
+                delete frontmatter["sr-due"];
+                delete frontmatter["sr-interval"];
+                delete frontmatter["sr-ease"];
+            });
+        } catch (e) {
+            console.log({ filePath: file.path, error: e });
+        }
+
+        if (deleteTags) {
+            await this.removeTagsFromFile(vault, file, tagsToDelete);
+        }
+    }
+
+    async removeTagsFromFile(vault: Vault, file: TFile, tagsToDelete: string[]) {
+        await this.removeTagsFromFrontmatter(vault, file, tagsToDelete);
+        try {
+            await vault.process(file, (data) => {
+                let newData = data;
+                for (const tagToDelete of tagsToDelete.sort((a, b) => b.length - a.length)) {
+                    const regex = new RegExp(
+                        // eslint-disable-next-line no-useless-escape
+                        `(${tagToDelete}[\/[a-zA-z\-[0-9]*]*\/]*[a-zA-z\-[0-9]*]*)`,
+                        "gm",
+                    );
+                    newData = newData.replace(regex, "");
+                    newData = newData.replace(tagToDelete, "");
+                }
+                return newData;
+            });
+        } catch (e) {
+            console.log({ filePath: file.path, error: e });
+        }
+    }
+
+    async removeTagsFromFrontmatter(vault: Vault, file: TFile, tagsToDelete: string[]) {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await this.plugin.app.fileManager.processFrontMatter(file, (frontmatter: any) => {
+                frontmatter["tags"] = (frontmatter["tags"] as string[]).filter((tag: string) => {
+                    let deleteTag = false;
+                    for (const tagToDelete of tagsToDelete.sort((a, b) => b.length - a.length)) {
+                        if (tag.startsWith(tagToDelete.replace("#", ""))) {
+                            deleteTag = true;
+                            break;
+                        }
+                    }
+                    return !deleteTag;
+                });
+            });
+        } catch (e) {
+            console.log({ filePath: file.path, error: e });
+        }
+    }
+
+    /**
+     * Deletes all card scheduling data from a markdown file.
+     *
+     * @param {Vault} vault - The vault to delete the scheduling data from.
+     * @param {TFile} file - The file to delete the scheduling data from.
+     */
+    async removeSchedulingInfoInCards(
+        vault: Vault,
+        file: TFile,
+        deleteTags: boolean,
+        tagsToDelete: string[] = [],
+    ) {
+        try {
+            await vault.process(file, (data) => {
+                return data.replace(FLASHCARD_SCHEDULE_INFO, "");
+            });
+        } catch (e) {
+            console.log({ filePath: file.path, error: e });
+        }
+
+        if (deleteTags) {
+            await this.removeTagsFromFile(vault, file, tagsToDelete);
+        }
+    }
+
+    /**
+     * Deletes all scheduling data from all markdown files in the vault.
+     */
+    async deleteAllSchedulingData(
+        deleteTags: boolean,
+        deckTagsToDelete: string[] = [],
+        noteTagsToDelete: string[] = [],
+    ) {
+        const files = this.plugin.app.vault.getMarkdownFiles();
+
+        for (let i = 0; i < files.length; i++) {
+            await this.removeSchedulingInfoInNotes(this.plugin.app.vault, files[i], deleteTags, noteTagsToDelete);
+            await this.removeSchedulingInfoInCards(this.plugin.app.vault, files[i], deleteTags, deckTagsToDelete);
+        }
+
+        new Notice(t("SCHEDULING_DATA_HAS_BEEN_DELETED"));
+    }
+
+    /**
+     * Deletes all note scheduling data from all files in the vault.
+     */
+    async deleteAllSchedulingDataInNotes(
+        deleteTags: boolean,
+        tagsToDelete: string[] = [],
+    ) {
+        const files = this.plugin.app.vault.getMarkdownFiles();
+
+        for (let i = 0; i < files.length; i++) {
+            await this.removeSchedulingInfoInNotes(this.plugin.app.vault, files[i], deleteTags, tagsToDelete);
+        }
+
+        new Notice(t("SCHEDULING_DATA_HAS_BEEN_DELETED"));
+    }
+
+    /**
+     * Deletes all card scheduling data from all files in the vault.
+     */
+    async deleteAllSchedulingDataInCards(
+        deleteTags: boolean,
+        tagsToDelete: string[] = [],
+    ) {
+        const files = this.plugin.app.vault.getMarkdownFiles();
+
+        for (let i = 0; i < files.length; i++) {
+            await this.removeSchedulingInfoInCards(this.plugin.app.vault, files[i], deleteTags, tagsToDelete);
+        }
+
+        new Notice(t("SCHEDULING_DATA_HAS_BEEN_DELETED"));
+    }
+
+    async deleteAllSchedulingDataOfCardsInNote(
+        file: TFile,
+        deleteTags: boolean,
+        tagsToDelete: string[],
+    ) {
+        await this.removeSchedulingInfoInCards(this.plugin.app.vault, file, deleteTags, tagsToDelete);
+
+        new Notice(t("SCHEDULING_DATA_HAS_BEEN_DELETED"));
+    }
+
+    /**
+     * Deletes all note scheduling data from all files in the vault.
+     */
+    async deleteNoteSchedulingDataInNote(
+        file: TFile,
+        deleteTags: boolean,
+        tagsToDelete: string[],
+    ) {
+        await this.removeSchedulingInfoInNotes(this.plugin.app.vault, file, deleteTags, tagsToDelete);
+
+        new Notice(t("SCHEDULING_DATA_HAS_BEEN_DELETED"));
     }
 }
