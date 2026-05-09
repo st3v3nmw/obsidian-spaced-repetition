@@ -45,9 +45,11 @@ export class FolderDataStore implements IDataStore {
             ...originalQuestionText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
         ];
         if (legacyMultiScheduling.length > 0) {
-            return legacyMultiScheduling.map((match) =>
-                this.parseLegacySchedule(match[1], parseInt(match[2]), parseInt(match[3])),
-            ).filter((info): info is RepItemScheduleInfo => info !== null);
+            return legacyMultiScheduling
+                .map((match) =>
+                    this.parseLegacySchedule(match[1], parseInt(match[2]), parseInt(match[3])),
+                )
+                .filter((info): info is RepItemScheduleInfo => info !== null);
         }
 
         const result: RepItemScheduleInfo[] = [];
@@ -185,13 +187,11 @@ export class FolderDataStore implements IDataStore {
 
     async ensureFolderStructure(): Promise<void> {
         const srFolder = await this.ensureFolder(this.settings.scheduleDataVaultLocation);
-        const scheduleFolder = await this.ensureFolder(srFolder.path + "/" + FolderDataStore.SCHEDULE_DATA_FOLDER);
-        await this.ensureFile(
-            scheduleFolder.path + "/" + FolderDataStore.CARD_FILE_NAME,
+        const scheduleFolder = await this.ensureFolder(
+            srFolder.path + "/" + FolderDataStore.SCHEDULE_DATA_FOLDER,
         );
-        await this.ensureFile(
-            scheduleFolder.path + "/" + FolderDataStore.NOTE_FILE_NAME,
-        );
+        await this.ensureFile(scheduleFolder.path + "/" + FolderDataStore.CARD_FILE_NAME);
+        await this.ensureFile(scheduleFolder.path + "/" + FolderDataStore.NOTE_FILE_NAME);
     }
 
     async ensureFolder(path: string): Promise<TFolder> {

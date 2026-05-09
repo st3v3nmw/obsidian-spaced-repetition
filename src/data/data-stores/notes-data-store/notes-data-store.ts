@@ -38,9 +38,11 @@ export class NotesDataStore implements IDataStore {
             ...originalQuestionText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
         ];
         if (legacyMultiScheduling.length > 0) {
-            return legacyMultiScheduling.map((match) =>
-                this.parseLegacySchedule(match[1], parseInt(match[2]), parseInt(match[3])),
-            ).filter((info): info is RepItemScheduleInfo => info !== null);
+            return legacyMultiScheduling
+                .map((match) =>
+                    this.parseLegacySchedule(match[1], parseInt(match[2]), parseInt(match[3])),
+                )
+                .filter((info): info is RepItemScheduleInfo => info !== null);
         }
 
         const result: RepItemScheduleInfo[] = [];

@@ -1,6 +1,6 @@
 jest.mock("obsidian", () => {
-    class MockTFile { }
-    class MockTFolder { }
+    class MockTFile {}
+    class MockTFolder {}
     return {
         TFile: MockTFile,
         TFolder: MockTFolder,
@@ -13,12 +13,12 @@ import { ScheduleDataMarkdownStorage } from "src/data/data-stores/folder-data-st
 import { IPluginScheduleData } from "src/data/plugin-data";
 
 function makeTFile(path: string): TFile {
-    const file = new (TFile as unknown as { new(): TFile })();
+    const file = new (TFile as unknown as { new (): TFile })();
     return Object.assign(file, { path });
 }
 
 function makeTFolder(path: string): TFolder {
-    const folder = new (TFolder as unknown as { new(): TFolder })();
+    const folder = new (TFolder as unknown as { new (): TFolder })();
     return Object.assign(folder, { path });
 }
 

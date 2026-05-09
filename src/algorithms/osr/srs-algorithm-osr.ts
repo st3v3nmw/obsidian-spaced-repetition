@@ -97,18 +97,17 @@ export class SRAlgorithmOsr implements ISRAlgorithm {
      * @returns {void}
      */
     noteOnLoadedNote(path: string, note: Note | null, noteEase: number | null): void {
-        const flashcardsInNoteAvgEase: number | null = note !== null
-            ? SRAlgorithmOsr.calculateFlashcardAvgEase(
-                note.questionList,
-                this.settings,
-            )
-            : null;
+        const flashcardsInNoteAvgEase: number | null =
+            note !== null
+                ? SRAlgorithmOsr.calculateFlashcardAvgEase(note.questionList, this.settings)
+                : null;
 
-        const ease: number | null = flashcardsInNoteAvgEase && noteEase
-            ? (flashcardsInNoteAvgEase + noteEase) / 2
-            : flashcardsInNoteAvgEase
-                ? flashcardsInNoteAvgEase
-                : noteEase;
+        const ease: number | null =
+            flashcardsInNoteAvgEase && noteEase
+                ? (flashcardsInNoteAvgEase + noteEase) / 2
+                : flashcardsInNoteAvgEase
+                  ? flashcardsInNoteAvgEase
+                  : noteEase;
 
         if (ease) {
             this.noteEaseList.setEaseForPath(path, ease);

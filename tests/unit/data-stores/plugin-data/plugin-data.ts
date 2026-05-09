@@ -21,7 +21,7 @@ beforeAll(() => {
 });
 
 function makeRepo(data: PluginData): ScheduleDataFolderRepository {
-    return new ScheduleDataFolderRepository(data, async () => { });
+    return new ScheduleDataFolderRepository(data, async () => {});
 }
 
 function makeStore(

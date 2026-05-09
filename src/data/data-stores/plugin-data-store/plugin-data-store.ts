@@ -41,9 +41,11 @@ export class PluginDataStore implements IDataStore {
             ...originalQuestionText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
         ];
         if (legacyMultiScheduling.length > 0) {
-            return legacyMultiScheduling.map((match) =>
-                this.parseLegacySchedule(match[1], parseInt(match[2]), parseInt(match[3])),
-            ).filter((info): info is RepItemScheduleInfo => info !== null);
+            return legacyMultiScheduling
+                .map((match) =>
+                    this.parseLegacySchedule(match[1], parseInt(match[2]), parseInt(match[3])),
+                )
+                .filter((info): info is RepItemScheduleInfo => info !== null);
         }
 
         const result: RepItemScheduleInfo[] = [];
@@ -182,7 +184,8 @@ export class PluginDataStore implements IDataStore {
     ensurePluginDataStructure(): void {
         const scheduleData = this.pluginData.scheduleData;
 
-        if (!scheduleData) { // Can be undefined if user is on older version of plugin and hasn't updated in a while
+        if (!scheduleData) {
+            // Can be undefined if user is on older version of plugin and hasn't updated in a while
             this.pluginData.scheduleData = {
                 version: 1,
                 noteSchedules: {},

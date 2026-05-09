@@ -116,6 +116,7 @@ describe("Notes", () => {
 
             // Check note frontmatter - 4 days after the simulated test date of 2023-09-06
             const expectedDueDate: string = "2023-09-10";
+            console.log(file.content, file.path);
             unitTestCheckNoteFrontmatter(file.content, expectedDueDate, 4, 270);
         });
 

@@ -213,6 +213,20 @@ export class OsrCore {
     }
 
     /**
+     * Writes the scheduling information for a note file.
+     *
+     * @param {ISRFile} noteFile - The note file.
+     * @param {RepItemScheduleInfo} noteSchedule - The scheduling information for the note file.
+     * @returns {Promise<void>} - A promise that resolves when the scheduling information is written.
+     */
+    private async writeNoteSchedule(
+        noteFile: ISRFile,
+        noteSchedule: RepItemScheduleInfo,
+    ): Promise<void> {
+        await noteFile.setNoteSchedule(noteSchedule);
+    }
+
+    /**
      * Finalizes the loading of the OSR core.
      *
      * @returns {void}
@@ -275,6 +289,9 @@ export class OsrCore {
                 this._dueDateNoteHistogram,
             );
         }
+
+        // Store away the new schedule info
+        await this.writeNoteSchedule(noteFile, noteSchedule);
 
         // Generate the histogram for the due dates for all the notes
         // (This could be optimized to make the small adjustments to the histogram, but simpler to implement
