@@ -5,13 +5,14 @@ import { DueDateHistogram } from "src/due-date-histogram";
 import { Note } from "src/note/note";
 import { INoteEaseList } from "src/note/note-ease-list";
 
-export enum Algorithm {
+export enum SRAlgorithmType {
     SM_2_OSR = "SM-2-OSR",
     FSRS = "FSRS",
 }
 
-export interface ISrsAlgorithm {
-    noteOnLoadedNote(path: string, note: Note, noteEase: number): void;
+export interface ISRAlgorithm {
+    algorithmType: SRAlgorithmType;
+    noteOnLoadedNote(path: string, note: Note | null, noteEase: number | null): void;
     noteCalcNewSchedule(
         notePath: string,
         osrNoteGraph: OsrNoteGraph,

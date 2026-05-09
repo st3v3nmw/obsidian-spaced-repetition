@@ -125,8 +125,9 @@ export class NoteQuestionParser {
             );
 
             // And if the card has been reviewed, then scheduling info as well
+            // TODO: Replace question hash with a blockid -> read & write
             let cardScheduleInfoList: RepItemScheduleInfo[] =
-                DataStore.getInstance().questionCreateSchedule(
+                DataStore.getInstance().createSchedule(
                     question.questionText.original,
                     new RepItemStorageInfo(this.noteFile.path, question.questionText.textHash),
                 );

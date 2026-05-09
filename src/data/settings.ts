@@ -1,5 +1,5 @@
-import { Algorithm } from "src/algorithms/base/isrs-algorithm";
-import { DataStoreName } from "src/data/data-stores/base/data-store";
+import { SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
+import { StorageType } from "src/data/data-stores/base/data-store";
 import { t } from "src/lang/helpers";
 import { pathMatchesPattern } from "src/utils/fs";
 
@@ -141,7 +141,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     useCustomHotkeys: false,
 
     // algorithm
-    algorithm: Algorithm.SM_2_OSR,
+    algorithm: SRAlgorithmType.SM_2_OSR,
     baseEase: 250,
     lapsesIntervalChange: 0.5,
     easyBonus: 1.3,
@@ -152,7 +152,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     startOfDay: "00:00:00",
 
     // storage
-    dataStore: DataStoreName.NOTES,
+    dataStore: StorageType.NOTES,
     cardCommentOnSameLine: false,
     scheduleDataVaultLocation: "/Spaced Repetition",
 

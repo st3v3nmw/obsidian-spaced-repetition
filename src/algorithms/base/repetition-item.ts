@@ -1,6 +1,17 @@
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
 
+/**
+ * Represents the type of repetition item, which determines how the scheduling information is stored.
+ */
+export enum RepetitionItemType {
+    Card = "Card",
+    Note = "Note",
+}
+
+/**
+ * Represents the type of review response.
+ */
 export enum ReviewResponse {
     Easy,
     Good,
@@ -8,20 +19,45 @@ export enum ReviewResponse {
     Again,
     Reset,
 }
+
+/**
+ * Represents the phase of repetition.
+ */
 export enum RepetitionPhase {
     New,
     Review,
 }
 
-export class RepetitionItem {
+/**
+ * Represents a repetition item, which is either a card or a note.
+ *
+ * @class RepetitionItem
+ * @property {RepetitionPhase} repetitionPhase - The repetition phase of the item.
+ * @property {RepItemScheduleInfo} scheduleInfo - The scheduling information for the item.
+ * @property {RepItemStorageInfo} storageInfo - The storage information for the item.
+ */
+export abstract class RepetitionItem {
+    repItemType: RepetitionItemType;
     repetitionPhase: RepetitionPhase;
 
-    scheduleInfo: RepItemScheduleInfo;
+    scheduleInfo: RepItemScheduleInfo | null;
     storageInfo: RepItemStorageInfo;
+
+    constructor(
+        repetitionItemType: RepetitionItemType,
+        repetitionPhase: RepetitionPhase,
+        scheduleInfo: RepItemScheduleInfo | null,
+        storageInfo: RepItemStorageInfo,
+    ) {
+        this.repItemType = repetitionItemType;
+        this.repetitionPhase = repetitionPhase;
+        this.scheduleInfo = scheduleInfo;
+        this.storageInfo = storageInfo;
+    }
 
     // scheduling
     get hasSchedule(): boolean {
-        return this.scheduleInfo !== null && this.scheduleInfo !== undefined;
+        return this.scheduleInfo !== null;
     }
 
     get isNew(): boolean {
@@ -29,6 +65,6 @@ export class RepetitionItem {
     }
 
     get isDue(): boolean {
-        return this.hasSchedule && this.scheduleInfo.isDue();
+        return this.scheduleInfo !== null && this.scheduleInfo.isDue();
     }
 }

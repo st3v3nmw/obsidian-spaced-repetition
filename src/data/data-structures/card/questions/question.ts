@@ -2,7 +2,7 @@ import {
     OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX,
     OBSIDIAN_TAG_AT_STARTOFLINE_REGEX,
 } from "src/data/constants";
-import { DataStoreAlgorithm } from "src/data/data-store-algorithm/data-store-algorithm";
+import { DataStoreAlgorithm } from "src/data/data-store-algorithm/base/data-store-algorithm";
 import { DataStore } from "src/data/data-stores/base/data-store";
 import { Card } from "src/data/data-structures/card/card";
 import {
@@ -133,7 +133,7 @@ export class QuestionText {
     }
 
     static splitText(original: string, settings: SRSettings): [TopicPathWithWs, string, string] {
-        const originalWithoutSR = DataStore.getInstance().questionRemoveScheduleInfo(original);
+        const originalWithoutSR = DataStore.getInstance().removeScheduleInfo(original);
         let actualQuestion: string = originalWithoutSR.trimEnd();
 
         let topicPathWithWs: TopicPathWithWs;

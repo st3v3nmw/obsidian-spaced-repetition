@@ -1,6 +1,6 @@
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END } from "src/data/constants";
-import { IDataStoreAlgorithm } from "src/data/data-store-algorithm/idata-store-algorithm";
+import { IDataStoreAlgorithm } from "src/data/data-store-algorithm/base/idata-store-algorithm";
 import { Card } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
@@ -17,21 +17,32 @@ export class DataStoreInNoteAlgorithmOsr implements IDataStoreAlgorithm {
     }
 
     questionFormatScheduleAsHtmlComment(question: Question): string {
-        let result: string = SR_HTML_COMMENT_BEGIN;
+        let accumulatedSchedules: string = "";
 
+        // A question can have multiple cards, when it has multiple clozes in a single line.
+        // For each card, we format its schedule information and append it to the result string.
         for (let i = 0; i < question.cards.length; i++) {
             const card: Card = question.cards[i];
-            result += this.formatCardSchedule(card);
+            accumulatedSchedules += this.formatCardSchedule(card);
         }
-        result += SR_HTML_COMMENT_END;
-        return result;
+
+        return SR_HTML_COMMENT_BEGIN + accumulatedSchedules + SR_HTML_COMMENT_END;
     }
 
+    /**
+     * Formats a card's scheduling information as a comment.
+     *
+     * It will return either the existing scheduling information or a default value if the card has no scheduling information.
+     *
+     * @param {Card} card - The card.
+     * @returns {string} - The formatted card schedule.
+     */
     formatCardSchedule(card: Card) {
         if (card.hasSchedule) {
-            return card.scheduleInfo.formatCardScheduleForHtmlComment();
+            return card.scheduleInfo.formatScheduleAsSRHtmlComment();
         }
 
+        // TODO: Provide a default schedule for the FSRS algorithm
         return `!${RepItemScheduleInfoOsr.dummyDueDateForNewCard},${RepItemScheduleInfoOsr.initialInterval},${this.settings.baseEase}`;
     }
 }

@@ -1,5 +1,4 @@
 import { Moment } from "moment";
-import { App } from "obsidian";
 
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { FSRS_COMMENT_PREFIX, parseFsrsTimestamp } from "src/algorithms/fsrs/fsrs-helpers";
@@ -13,23 +12,27 @@ import { SRSettings } from "src/data/settings";
 import { DateUtil, formatDateYYYYMMDD, globalDateProvider } from "src/utils/dates";
 import { MultiLineTextFinder } from "src/utils/strings";
 
-export class StoreInNotes implements IDataStore {
+export class NotesDataStore implements IDataStore {
     private settings: SRSettings;
-    app: App;
 
     constructor(settings: SRSettings) {
         this.settings = settings;
     }
 
-    questionCreateSchedule(
-        originalQuestionText: string,
-        _: RepItemStorageInfo,
-    ): RepItemScheduleInfo[] {
+    /**
+     * Creates scheduling information from a question text and its storage info.
+     *
+     * @param originalQuestionText
+     * @param _
+     * @returns
+     */
+    createSchedule(originalQuestionText: string, _: RepItemStorageInfo): RepItemScheduleInfo[] {
         const schedulingComment = originalQuestionText.match(/<!--SR:(.+?)-->/m)?.[1];
         if (schedulingComment) {
             return this.parseMultiScheduleComment(schedulingComment);
         }
 
+        // Handle legacy scheduling comments for backward compatibility, but prefer the multi-scheduling format if both are present
         const legacyMultiScheduling = [
             ...originalQuestionText.matchAll(MULTI_SCHEDULING_EXTRACTOR),
         ];
@@ -50,15 +53,33 @@ export class StoreInNotes implements IDataStore {
         return result;
     }
 
-    questionRemoveScheduleInfo(questionText: string): string {
+    /**
+     * Removes scheduling information from a question text.
+     *
+     * @param questionText
+     * @returns
+     */
+    removeScheduleInfo(questionText: string): string {
         return questionText.replace(/<!--SR:.+-->/gm, "");
     }
 
-    async questionWriteSchedule(question: Question): Promise<void> {
-        await this.questionWrite(question);
+    /**
+     * Writes scheduling information to the data store.
+     *
+     * @param question
+     * @returns
+     */
+    async writeSchedule(question: Question): Promise<void> {
+        await this.write(question);
     }
 
-    async questionWrite(question: Question): Promise<void> {
+    /**
+     * Writes a question to the data store.
+     *
+     * @param question
+     * @returns
+     */
+    async write(question: Question): Promise<void> {
         const fileText: string = await question.note.file.read();
 
         const newText: string = question.updateQuestionWithinNoteText(fileText, this.settings);
@@ -66,7 +87,13 @@ export class StoreInNotes implements IDataStore {
         question.hasChanged = false;
     }
 
-    async questionDelete(question: Question): Promise<void> {
+    /**
+     * Deletes a question from the data store.
+     *
+     * @param question
+     * @returns
+     */
+    async delete(question: Question): Promise<void> {
         const fileText: string = await question.note.file.read();
         const originalText: string = question.questionText.original;
         const newText = MultiLineTextFinder.findAndReplace(fileText, originalText, "");

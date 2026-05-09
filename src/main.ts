@@ -1,9 +1,9 @@
 import { Platform, Plugin, TFile } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
+import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
 import { DataManager } from "src/data/data-manager";
-import { DataStoreName } from "src/data/data-stores/base/data-store";
+import { StorageType } from "src/data/data-stores/base/data-store";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import {
     CardOrder,
@@ -28,8 +28,8 @@ import EmulatedPlatform from "src/utils/platform-detector";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
 
 export default class SRPlugin extends Plugin {
-    public _uiManager: UIManager | null = null;
-    public _dataManager: DataManager | null = null;
+    private _uiManager: UIManager | null = null;
+    private _dataManager: DataManager | null = null;
 
     public nextNoteReviewHandler: NextNoteReviewHandler | null = null;
 
@@ -44,7 +44,7 @@ export default class SRPlugin extends Plugin {
             noteReviewQueue,
         );
 
-        this.dataManager.initOSRAppCore(noteReviewQueue, this.onOsrVaultDataChanged.bind(this));
+        this.dataManager.initOSRCore(noteReviewQueue, this.onOsrVaultDataChanged.bind(this));
 
         this.uiManager = new UIManager(this, this.dataManager);
 
@@ -53,7 +53,7 @@ export default class SRPlugin extends Plugin {
         this.registerEvent(
             this.app.vault.on("rename", (file, oldPath) => {
                 if (
-                    this.dataManager.data.settings.dataStore === DataStoreName.PLUGIN_DATA &&
+                    this.dataManager.data.settings.dataStore === StorageType.PLUGIN_DATA &&
                     file instanceof TFile &&
                     this.dataManager.scheduleDataRepository !== null
                 ) {
@@ -450,7 +450,7 @@ export default class SRPlugin extends Plugin {
             reviewMode,
             deckIterator,
             this.dataManager.data.settings,
-            SrsAlgorithm.getInstance(),
+            SRAlgorithm.getInstance(),
             this.dataManager.osrCore.questionPostponementList,
             this.dataManager.osrCore.dueDateFlashcardHistogram,
         );

@@ -1,6 +1,6 @@
 import moment, { Moment } from "moment";
 
-import { ISrsAlgorithm } from "src/algorithms/base/isrs-algorithm";
+import { ISRAlgorithm, SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { osrSchedule } from "src/algorithms/osr/note-scheduling";
@@ -13,7 +13,17 @@ import { Note } from "src/note/note";
 import { INoteEaseList, NoteEaseList } from "src/note/note-ease-list";
 import { globalDateProvider } from "src/utils/dates";
 
-export class SrsAlgorithmOsr implements ISrsAlgorithm {
+/**
+ * Represents a scheduling algorithm that uses the OSR algorithm.
+ *
+ * @class SrsAlgorithmOsr
+ * @extends {ISRAlgorithm}
+ * @property {SRAlgorithmType} algorithmType - The type of scheduling algorithm.
+ * @property {SRSettings} settings - The settings object.
+ * @property {INoteEaseList} noteEaseList - The note ease list.
+ */
+export class SRAlgorithmOsr implements ISRAlgorithm {
+    public readonly algorithmType: SRAlgorithmType = SRAlgorithmType.SM_2_OSR;
     private settings: SRSettings;
     private noteEaseList: INoteEaseList;
 
@@ -26,6 +36,15 @@ export class SrsAlgorithmOsr implements ISrsAlgorithm {
         return 1.0;
     }
 
+    /**
+     * Calculates the new schedule for a note.
+     *
+     * @param {string} notePath - The note path.
+     * @param {OsrNoteGraph} osrNoteGraph - The OSR note graph.
+     * @param {ReviewResponse} response - The review response.
+     * @param {DueDateHistogram} dueDateNoteHistogram - The due date note histogram.
+     * @returns {RepItemScheduleInfo} - The new schedule for the note.
+     */
     noteCalcNewSchedule(
         notePath: string,
         osrNoteGraph: OsrNoteGraph,
@@ -47,13 +66,14 @@ export class SrsAlgorithmOsr implements ISrsAlgorithm {
                 : linkContribution * this.settings.baseEase);
 
         // add note's average flashcard ease if available
-        if (this.noteEaseList.hasEaseForPath(notePath)) {
-            ease = (ease + this.noteEaseList.getEaseByPath(notePath)) / 2;
+        const easeByPath: number | null = this.noteEaseList.getEaseByPath(notePath);
+        if (this.noteEaseList.hasEaseForPath(notePath) && easeByPath) {
+            ease = (ease + easeByPath) / 2;
         }
 
         // Don't know the due date until we know the calculated interval
-        const dueDate: Moment = null;
-        const interval: number = SrsAlgorithmOsr.initialInterval;
+        const dueDate: Moment | null = null;
+        const interval: number = SRAlgorithmOsr.initialInterval;
         ease = Math.round(ease);
         const temp: RepItemScheduleInfoOsr = new RepItemScheduleInfoOsr(dueDate, interval, ease);
 
@@ -68,10 +88,18 @@ export class SrsAlgorithmOsr implements ISrsAlgorithm {
         return result;
     }
 
-    noteOnLoadedNote(path: string, note: Note, noteEase: number): void {
-        let flashcardsInNoteAvgEase: number = null;
+    /**
+     * Called when a note is loaded.
+     *
+     * @param {string} path - The note path.
+     * @param {Note} note - The note.
+     * @param {number} noteEase - The note ease.
+     * @returns {void}
+     */
+    noteOnLoadedNote(path: string, note: Note | null, noteEase: number | null): void {
+        let flashcardsInNoteAvgEase: number | null = null;
         if (note) {
-            flashcardsInNoteAvgEase = SrsAlgorithmOsr.calculateFlashcardAvgEase(
+            flashcardsInNoteAvgEase = SRAlgorithmOsr.calculateFlashcardAvgEase(
                 note.questionList,
                 this.settings,
             );
@@ -89,6 +117,13 @@ export class SrsAlgorithmOsr implements ISrsAlgorithm {
         }
     }
 
+    /**
+     * Calculates the average ease for a list of questions.
+     *
+     * @param {Question[]} questionList - The list of questions.
+     * @param {SRSettings} settings - The settings object.
+     * @returns {number} - The average ease for the list of questions.
+     */
     static calculateFlashcardAvgEase(questionList: Question[], settings: SRSettings): number {
         let totalEase: number = 0;
         let scheduledCount: number = 0;
@@ -116,6 +151,15 @@ export class SrsAlgorithmOsr implements ISrsAlgorithm {
         return result;
     }
 
+    /**
+     * Calculates the updated schedule for a note.
+     *
+     * @param {string} notePath - The note path.
+     * @param {RepItemScheduleInfo} noteSchedule - The note schedule.
+     * @param {ReviewResponse} response - The review response.
+     * @param {DueDateHistogram} dueDateNoteHistogram - The due date note histogram.
+     * @returns {RepItemScheduleInfo} - The updated schedule for the note.
+     */
     noteCalcUpdatedSchedule(
         notePath: string,
         noteSchedule: RepItemScheduleInfo,
@@ -136,6 +180,14 @@ export class SrsAlgorithmOsr implements ISrsAlgorithm {
         return new RepItemScheduleInfoOsr(dueDate, interval, ease);
     }
 
+    /**
+     * Calculates the scheduling information for a note.
+     *
+     * @param {RepItemScheduleInfoOsr} schedule - The scheduling information for the note.
+     * @param {ReviewResponse} response - The review response.
+     * @param {DueDateHistogram} dueDateHistogram - The due date histogram.
+     * @returns {RepItemScheduleInfoOsr} - The scheduling information for the note.
+     */
     private calcSchedule(
         schedule: RepItemScheduleInfoOsr,
         response: ReviewResponse,
@@ -153,13 +205,26 @@ export class SrsAlgorithmOsr implements ISrsAlgorithm {
         return new RepItemScheduleInfoOsr(globalDateProvider.today, temp.interval, temp.ease);
     }
 
+    /**
+     * Gets the reset schedule for a card.
+     *
+     * @returns {RepItemScheduleInfo} - The reset schedule for a card.
+     */
     cardGetResetSchedule(): RepItemScheduleInfo {
-        const interval = SrsAlgorithmOsr.initialInterval;
+        const interval = SRAlgorithmOsr.initialInterval;
         const ease = this.settings.baseEase;
         const dueDate = globalDateProvider.today;
         return new RepItemScheduleInfoOsr(dueDate, interval, ease);
     }
 
+    /**
+     * Gets the new schedule for a card.
+     *
+     * @param {ReviewResponse} response - The review response.
+     * @param {string} notePath - The note path.
+     * @param {DueDateHistogram} dueDateFlashcardHistogram - The due date flashcard histogram.
+     * @returns {RepItemScheduleInfo} - The new schedule for a card.
+     */
     cardGetNewSchedule(
         response: ReviewResponse,
         notePath: string,
@@ -173,7 +238,7 @@ export class SrsAlgorithmOsr implements ISrsAlgorithm {
 
         const schedObj: Record<string, number> = osrSchedule(
             response,
-            SrsAlgorithmOsr.initialInterval,
+            SRAlgorithmOsr.initialInterval,
             initialEase,
             delayBeforeReview,
             this.settings,
@@ -186,6 +251,14 @@ export class SrsAlgorithmOsr implements ISrsAlgorithm {
         return new RepItemScheduleInfoOsr(dueDate, interval, ease, delayBeforeReview);
     }
 
+    /**
+     * Calculates the updated schedule for a card.
+     *
+     * @param {ReviewResponse} response - The review response.
+     * @param {RepItemScheduleInfo} cardSchedule - The card schedule.
+     * @param {DueDateHistogram} dueDateFlashcardHistogram - The due date flashcard histogram.
+     * @returns {RepItemScheduleInfo} - The updated schedule for a card.
+     */
     cardCalcUpdatedSchedule(
         response: ReviewResponse,
         cardSchedule: RepItemScheduleInfo,
@@ -207,6 +280,11 @@ export class SrsAlgorithmOsr implements ISrsAlgorithm {
         return new RepItemScheduleInfoOsr(dueDate, interval, ease, delayBeforeReview);
     }
 
+    /**
+     * Gets the note stats.
+     *
+     * @returns {INoteEaseList} - The note stats.
+     */
     noteStats() {
         return this.noteEaseList;
     }

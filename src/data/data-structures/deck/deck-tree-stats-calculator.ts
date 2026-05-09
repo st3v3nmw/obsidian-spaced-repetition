@@ -20,21 +20,22 @@ export class DeckTreeStatsCalculator {
         };
         // Iteration is a destructive operation on the supplied tree, so we first take a copy
         const iterator: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, deckTree.clone());
-        const result = new Stats();
+        const stats: Stats = new Stats();
         iterator.setIteratorTopicPath(TopicPath.emptyPath);
         while (iterator.nextCard()) {
-            const card: Card = iterator.currentCard;
-            if (card.hasSchedule) {
+            const card: Card | null = iterator.currentCard;
+            if (card === null) continue;
+            if (card.scheduleInfo !== null) {
                 const schedule: RepItemScheduleInfo = card.scheduleInfo;
-                result.update(
+                stats.update(
                     schedule.delayedBeforeReviewDaysInt(),
                     schedule.interval,
                     schedule.latestEase,
                 );
             } else {
-                result.incrementNew();
+                stats.incrementNew();
             }
         }
-        return result;
+        return stats;
     }
 }

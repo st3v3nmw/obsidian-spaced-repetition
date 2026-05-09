@@ -1,8 +1,10 @@
 import { Moment } from "moment";
 
+import { SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
+import { PREFERRED_DATE_FORMAT } from "src/data/constants";
 import { SRSettings } from "src/data/settings";
-import { DateUtil, globalDateProvider } from "src/utils/dates";
+import { DateUtil, formatDate, globalDateProvider } from "src/utils/dates";
 
 export class RepItemScheduleInfoOsr extends RepItemScheduleInfo {
     // A question can have multiple cards. The schedule info for all sibling cards are formatted together
@@ -20,17 +22,27 @@ export class RepItemScheduleInfoOsr extends RepItemScheduleInfo {
         latestEase: number,
         delayedBeforeReviewTicks: number | null = null,
     ) {
-        super();
-        this.dueDate = dueDate;
-        this.interval = Math.round(interval);
-        this.latestEase = latestEase;
-        this.delayedBeforeReviewTicks = delayedBeforeReviewTicks;
-        if (dueDate && delayedBeforeReviewTicks === null) {
-            this.delayedBeforeReviewTicks = globalDateProvider.today.valueOf() - dueDate.valueOf();
-        }
+        super(
+            SRAlgorithmType.SM_2_OSR,
+            dueDate,
+            interval,
+            latestEase,
+            dueDate && delayedBeforeReviewTicks === null
+                ? globalDateProvider.today.valueOf() - dueDate.valueOf()
+                : delayedBeforeReviewTicks || 0,
+        );
     }
 
-    formatCardScheduleForHtmlComment(): string {
+    static get initialInterval(): number {
+        return 1.0;
+    }
+
+    /**
+     * Formats the scheduling information for the repetition item as a string for HTML comments.
+     *
+     * @returns {string} - The formatted scheduling information for the repetition item as a string for HTML comments.
+     */
+    formatScheduleAsSRHtmlComment(): string {
         // We always want the correct schedule format, so we use the dummy due date if there is no schedule for a card
         const dateStr: string = this.dueDate
             ? this.formatDueDate()
@@ -38,11 +50,13 @@ export class RepItemScheduleInfoOsr extends RepItemScheduleInfo {
         return `!${dateStr},${this.interval},${this.latestEase}`;
     }
 
-    static get initialInterval(): number {
-        return 1.0;
-    }
-
-    static getDummyScheduleForNewCard(settings: SRSettings): RepItemScheduleInfoOsr {
+    /**
+     * Gets a new schedule with the default values.
+     *
+     * @param {SRSettings} settings - The settings object.
+     * @returns {RepItemScheduleInfoOsr} - A new schedule with the default values.
+     */
+    static getNewSchedule(settings: SRSettings): RepItemScheduleInfoOsr {
         return RepItemScheduleInfoOsr.fromDueDateStr(
             RepItemScheduleInfoOsr.dummyDueDateForNewCard,
             RepItemScheduleInfoOsr.initialInterval,
@@ -50,6 +64,15 @@ export class RepItemScheduleInfoOsr extends RepItemScheduleInfo {
         );
     }
 
+    /**
+     * Creates a RepItemScheduleInfoOsr object from a due date string, interval, ease, and delayed before review ticks.
+     *
+     * @param {string} dueDateStr - The due date string.
+     * @param {number} interval - The interval.
+     * @param {number} ease - The ease.
+     * @param {number | null} [delayedBeforeReviewTicks=null] - The delayed before review ticks.
+     * @returns {RepItemScheduleInfoOsr} - The RepItemScheduleInfoOsr object.
+     */
     static fromDueDateStr(
         dueDateStr: string,
         interval: number,
@@ -58,5 +81,19 @@ export class RepItemScheduleInfoOsr extends RepItemScheduleInfo {
     ) {
         const dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
         return new RepItemScheduleInfoOsr(dueDate, interval, ease, delayedBeforeReviewTicks);
+    }
+
+    /**
+     * Formats the scheduling information for the repetition item as a JSON string.
+     *
+     * @returns {string} - The formatted scheduling information.
+     */
+    formatScheduleAsJsonString(): string {
+        return JSON.stringify({
+            dueDate: formatDate(this.dueDateAsUnix, PREFERRED_DATE_FORMAT),
+            interval: this.interval,
+            ease: this.latestEase,
+            delayedBeforeReviewTicks: this.delayedBeforeReviewTicks,
+        });
     }
 }

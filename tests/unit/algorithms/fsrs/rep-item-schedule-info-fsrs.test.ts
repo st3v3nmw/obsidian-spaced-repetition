@@ -21,7 +21,7 @@ test("formats FSRS card schedule for markdown comments", () => {
         moment("2023-09-06T00:00:00.000Z"),
     );
 
-    expect(schedule.formatCardScheduleForHtmlComment()).toEqual(
+    expect(schedule.formatScheduleAsSRHtmlComment()).toEqual(
         "!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z",
     );
     expect(schedule.isShortTerm()).toEqual(true);

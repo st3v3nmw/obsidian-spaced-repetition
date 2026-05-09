@@ -1,4 +1,4 @@
-import { ISrsAlgorithm } from "src/algorithms/base/isrs-algorithm";
+import { ISRAlgorithm } from "src/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { TICKS_PER_DAY } from "src/data/constants";
@@ -114,7 +114,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     private reviewMode: FlashcardReviewMode;
     private cardSequencer: IDeckTreeIterator;
     private settings: SRSettings;
-    private srsAlgorithm: ISrsAlgorithm;
+    private srsAlgorithm: ISRAlgorithm;
     private questionPostponementList: IQuestionPostponementList;
     private dueDateFlashcardHistogram: DueDateHistogram;
     private pendingCards: PendingCard[] = [];
@@ -124,7 +124,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         reviewMode: FlashcardReviewMode,
         cardSequencer: IDeckTreeIterator,
         settings: SRSettings,
-        srsAlgorithm: ISrsAlgorithm,
+        srsAlgorithm: ISRAlgorithm,
         questionPostponementList: IQuestionPostponementList,
         dueDateFlashcardHistogram: DueDateHistogram,
     ) {
@@ -284,7 +284,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             shortTermRequeue = this.getShortTermRequeueMode(this.currentCard.scheduleInfo);
 
             // Update the source file with the updated schedule
-            await DataStore.getInstance().questionWriteSchedule(this.currentQuestion);
+            await DataStore.getInstance().writeSchedule(this.currentQuestion);
 
             if (oldSchedule) {
                 const now: number = globalDateProvider.now.valueOf();
@@ -420,12 +420,12 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
         q.actualQuestion = text;
 
-        await DataStore.getInstance().questionWrite(this.currentQuestion);
+        await DataStore.getInstance().write(this.currentQuestion);
     }
 
     async deleteCurrentCardFromNote(): Promise<void> {
         const question = this.currentQuestion;
-        await DataStore.getInstance().questionDelete(question);
+        await DataStore.getInstance().delete(question);
         this._originalDeckTree.deleteQuestionFromAllDecks(question, false);
         this.cardSequencer.deleteCurrentQuestionFromAllDecks();
     }

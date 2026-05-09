@@ -9,7 +9,7 @@ jest.mock("obsidian", () => {
 
 import { TFile, TFolder } from "obsidian";
 
-import { ScheduleDataMarkdownStorage } from "src/data/data-stores/plugin-data/schedule-data-markdown-storage";
+import { ScheduleDataMarkdownStorage } from "src/data/data-stores/folder-data-store/schedule-data-markdown-storage";
 import { PluginDataScheduleState } from "src/data/plugin-data";
 
 function makeTFile(path: string): TFile {

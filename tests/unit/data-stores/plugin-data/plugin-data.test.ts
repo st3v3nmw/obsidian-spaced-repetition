@@ -1,7 +1,7 @@
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
-import { StoreInPluginData } from "src/data/data-stores/plugin-data/plugin-data";
-import { ScheduleDataRepository } from "src/data/data-stores/plugin-data/schedule-data-repository";
+import { FolderDataStore } from "src/data/data-stores/folder-data-store/folder-data-store";
+import { ScheduleDataRepository } from "src/data/data-stores/folder-data-store/schedule-data-repository";
 import { Card } from "src/data/data-structures/card/card";
 import { Question, QuestionText } from "src/data/data-structures/card/questions/question";
 import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
@@ -27,10 +27,10 @@ function makeRepo(data: PluginData): ScheduleDataRepository {
 function makeStore(
     settings?: Partial<SRSettings>,
     data?: PluginData,
-): { store: StoreInPluginData; repo: ScheduleDataRepository; data: PluginData } {
+): { store: FolderDataStore; repo: ScheduleDataRepository; data: PluginData } {
     const pluginData = data ?? JSON.parse(JSON.stringify(DEFAULT_DATA));
     const repo = makeRepo(pluginData);
-    const store = new StoreInPluginData({ ...DEFAULT_SETTINGS, ...settings }, repo);
+    const store = new FolderDataStore({ ...DEFAULT_SETTINGS, ...settings }, repo);
     return { store, repo, data: pluginData };
 }
 
@@ -65,26 +65,26 @@ describe("StoreInPluginData.questionRemoveScheduleInfo", () => {
     test("removes inline SR comment", () => {
         const { store } = makeStore();
         const input = "Q::A <!--SR:!2023-09-06,10,250-->";
-        expect(store.questionRemoveScheduleInfo(input)).toBe("Q::A ");
+        expect(store.removeScheduleInfo(input)).toBe("Q::A ");
     });
 
     test("removes multiline SR comment", () => {
         const { store } = makeStore();
         const input = "Q\n?\nA\n<!--SR:!2023-09-06,5,230!2023-09-07,3,210-->";
-        expect(store.questionRemoveScheduleInfo(input)).toBe("Q\n?\nA\n");
+        expect(store.removeScheduleInfo(input)).toBe("Q\n?\nA\n");
     });
 
     test("returns unchanged text when no comment present", () => {
         const { store } = makeStore();
         const input = "Q::A";
-        expect(store.questionRemoveScheduleInfo(input)).toBe("Q::A");
+        expect(store.removeScheduleInfo(input)).toBe("Q::A");
     });
 });
 
 describe("StoreInPluginData.questionCreateSchedule", () => {
     test("falls back to parsing text when storageInfo is null", () => {
         const { store } = makeStore();
-        const schedules = store.questionCreateSchedule("Q::A <!--SR:!2023-09-06,10,250-->", null);
+        const schedules = store.createSchedule("Q::A <!--SR:!2023-09-06,10,250-->", null);
         expect(schedules.length).toBe(1);
         expect((schedules[0] as RepItemScheduleInfoOsr).interval).toBe(10);
     });
@@ -92,17 +92,14 @@ describe("StoreInPluginData.questionCreateSchedule", () => {
     test("falls back to parsing text when storageInfo has no external data", () => {
         const { store } = makeStore();
         const storageInfo = new RepItemStorageInfo("notes/foo.md", "abc123");
-        const schedules = store.questionCreateSchedule(
-            "Q::A <!--SR:!2023-09-06,4,270-->",
-            storageInfo,
-        );
+        const schedules = store.createSchedule("Q::A <!--SR:!2023-09-06,4,270-->", storageInfo);
         expect(schedules.length).toBe(1);
         expect((schedules[0] as RepItemScheduleInfoOsr).interval).toBe(4);
     });
 
     test("returns null for dummy due date entries", () => {
         const { store } = makeStore();
-        const schedules = store.questionCreateSchedule(
+        const schedules = store.createSchedule(
             `Q::A <!--SR:!${RepItemScheduleInfoOsr.dummyDueDateForNewCard},1,250-->`,
             null,
         );
@@ -113,7 +110,7 @@ describe("StoreInPluginData.questionCreateSchedule", () => {
     test("returns empty array when no inline schedule and no external data", () => {
         const { store } = makeStore();
         const storageInfo = new RepItemStorageInfo("notes/foo.md", "abc123");
-        const schedules = store.questionCreateSchedule("Q::A", storageInfo);
+        const schedules = store.createSchedule("Q::A", storageInfo);
         expect(schedules).toEqual([]);
     });
 
@@ -123,7 +120,7 @@ describe("StoreInPluginData.questionCreateSchedule", () => {
         await repo.setCardSchedules("abc123", [s]);
 
         const storageInfo = new RepItemStorageInfo("notes/foo.md", "abc123");
-        const schedules = store.questionCreateSchedule("Q::A", storageInfo);
+        const schedules = store.createSchedule("Q::A", storageInfo);
         expect(schedules.length).toBe(1);
         expect((schedules[0] as RepItemScheduleInfoOsr).interval).toBe(7);
     });
@@ -135,10 +132,7 @@ describe("StoreInPluginData.questionCreateSchedule", () => {
 
         const storageInfo = new RepItemStorageInfo("notes/foo.md", "hash1");
         // Inline comment says interval=4 but external data says interval=20
-        const schedules = store.questionCreateSchedule(
-            "Q::A <!--SR:!2023-09-06,4,270-->",
-            storageInfo,
-        );
+        const schedules = store.createSchedule("Q::A <!--SR:!2023-09-06,4,270-->", storageInfo);
         expect((schedules[0] as RepItemScheduleInfoOsr).interval).toBe(20);
     });
 });
@@ -151,7 +145,7 @@ describe("StoreInPluginData.questionWriteSchedule", () => {
             RepItemScheduleInfoOsr.fromDueDateStr("2023-09-06", 5, 230),
         ]);
 
-        await store.questionWriteSchedule(question);
+        await store.writeSchedule(question);
 
         expect(repo.hasCardSchedules(question.questionText.textHash)).toBe(true);
         expect(question.hasChanged).toBe(false);
@@ -166,7 +160,7 @@ describe("StoreInPluginData.questionWrite", () => {
             RepItemScheduleInfoOsr.fromDueDateStr("2023-09-06", 5, 230),
         ]);
 
-        await store.questionWrite(question);
+        await store.write(question);
 
         expect(repo.hasCardSchedules(question.questionText.textHash)).toBe(true);
         expect(question.hasChanged).toBe(false);
@@ -177,7 +171,7 @@ describe("StoreInPluginData.questionWrite", () => {
         const { question } = makeQuestion("Q::A", "notes/test.md", "Q::A", [null]);
 
         question.hasChanged = true;
-        await store.questionWrite(question);
+        await store.write(question);
         expect(question.hasChanged).toBe(false);
     });
 });
@@ -192,7 +186,7 @@ describe("StoreInPluginData.questionDelete", () => {
         await repo.setCardSchedules(question.questionText.textHash, [s]);
         expect(repo.hasCardSchedules(question.questionText.textHash)).toBe(true);
 
-        await store.questionDelete(question);
+        await store.delete(question);
 
         expect(repo.hasCardSchedules(question.questionText.textHash)).toBe(false);
     });
@@ -202,7 +196,7 @@ describe("StoreInPluginData.questionDelete", () => {
         const noteText = "Q::A\nOther content";
         const { question, file } = makeQuestion("Q::A", "notes/test.md", noteText, [null]);
 
-        await store.questionDelete(question);
+        await store.delete(question);
 
         expect(file.content).not.toContain("Q::A");
         expect(file.content).toContain("Other content");

@@ -1,6 +1,6 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
-import { Algorithm } from "src/algorithms/base/isrs-algorithm";
+import { SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
 import { DataManager } from "src/data/data-manager";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { t } from "src/lang/helpers";
@@ -17,7 +17,7 @@ import { DateUtil, globalDateProvider, IDayBoundary } from "src/utils/dates";
  * @extends {SettingsPage}
  */
 export class SchedulingPage extends SettingsPage {
-    private async setAlgorithm(algorithm: Algorithm): Promise<void> {
+    private async setAlgorithm(algorithm: SRAlgorithmType): Promise<void> {
         this.dataManager.data.settings.algorithm = algorithm;
         await this.dataManager.savePluginData();
         this.dataManager.setupDataStoreAndAlgorithmInstances(this.dataManager.data.settings);
@@ -59,17 +59,17 @@ export class SchedulingPage extends SettingsPage {
                         })
                         .setValue(this.dataManager.data.settings.algorithm)
                         .onChange(async (value) => {
-                            const selectedAlgorithm = value as Algorithm;
+                            const selectedAlgorithm = value as SRAlgorithmType;
                             const currentAlgorithm = this.dataManager.data.settings
-                                .algorithm as Algorithm;
+                                .algorithm as SRAlgorithmType;
 
                             if (selectedAlgorithm === currentAlgorithm) {
                                 return;
                             }
 
                             if (
-                                currentAlgorithm === Algorithm.SM_2_OSR &&
-                                selectedAlgorithm === Algorithm.FSRS
+                                currentAlgorithm === SRAlgorithmType.SM_2_OSR &&
+                                selectedAlgorithm === SRAlgorithmType.FSRS
                             ) {
                                 dropdown.setValue(currentAlgorithm);
                                 new ConfirmationModal(
@@ -104,7 +104,7 @@ export class SchedulingPage extends SettingsPage {
                 );
         });
 
-        if (this.dataManager.data.settings.algorithm === Algorithm.FSRS) {
+        if (this.dataManager.data.settings.algorithm === SRAlgorithmType.FSRS) {
             algorithmGroup.addSetting((setting: Setting) => {
                 setting
                     .setName("FSRS desired retention")
@@ -146,7 +146,7 @@ export class SchedulingPage extends SettingsPage {
             });
         }
 
-        if (this.dataManager.data.settings.algorithm === Algorithm.SM_2_OSR) {
+        if (this.dataManager.data.settings.algorithm === SRAlgorithmType.SM_2_OSR) {
             algorithmGroup
                 .addSetting((setting: Setting) => {
                     setting

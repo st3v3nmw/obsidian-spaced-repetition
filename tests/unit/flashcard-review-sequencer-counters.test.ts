@@ -1,4 +1,4 @@
-import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
+import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import {
@@ -76,7 +76,7 @@ class TestContext {
             reviewMode,
             cardSequencer,
             settingsClone,
-            SrsAlgorithm.getInstance(),
+            SRAlgorithm.getInstance(),
             cardPostponementList,
             dueDateFlashcardHistogram,
         );

@@ -2,7 +2,7 @@ import moment from "moment";
 import { State } from "ts-fsrs";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
+import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
 import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { CardListType, Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
@@ -65,7 +65,7 @@ class TestContext {
             this.reviewMode,
             cardSequencer,
             this.settings,
-            SrsAlgorithm.getInstance(),
+            SRAlgorithm.getInstance(),
             this.questionPostponementList,
             this.dueDateFlashcardHistogram,
         );
@@ -118,7 +118,7 @@ class TestContext {
             reviewMode,
             cardSequencer,
             settingsClone,
-            SrsAlgorithm.getInstance(),
+            SRAlgorithm.getInstance(),
             cardPostponementList,
             dueDateFlashcardHistogram,
         );

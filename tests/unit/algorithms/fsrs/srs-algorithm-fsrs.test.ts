@@ -3,7 +3,7 @@ import { State } from "ts-fsrs";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
-import { SrsAlgorithmFsrs } from "src/algorithms/fsrs/srs-algorithm-fsrs";
+import { SrsAlgorithmFsrs } from "src/algorithms/fsrs/sr-algorithm-fsrs";
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { DEFAULT_SETTINGS } from "src/data/settings";

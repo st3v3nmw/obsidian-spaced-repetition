@@ -1,6 +1,6 @@
 import { CardInput, createEmptyCard, FSRS, fsrs, State } from "ts-fsrs";
 
-import { ISrsAlgorithm } from "src/algorithms/base/isrs-algorithm";
+import { ISRAlgorithm, SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import {
@@ -10,19 +10,29 @@ import {
 } from "src/algorithms/fsrs/fsrs-helpers";
 import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
-import { SrsAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
+import { SRAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
 import { SRSettings } from "src/data/settings";
 import { DueDateHistogram } from "src/due-date-histogram";
 import { Note } from "src/note/note";
 import { INoteEaseList } from "src/note/note-ease-list";
 import { globalDateProvider } from "src/utils/dates";
 
-export class SrsAlgorithmFsrs implements ISrsAlgorithm {
-    private noteDelegate: SrsAlgorithmOsr;
+/**
+ * Represents a scheduling algorithm that uses the FSRS algorithm.
+ *
+ * @class SrsAlgorithmFsrs
+ * @extends {ISRAlgorithm}
+ * @property {SRAlgorithmType} algorithmType - The type of scheduling algorithm.
+ * @property {SrsAlgorithmOsr} noteDelegate - The note scheduling algorithm.
+ * @property {FSRS} scheduler - The FSRS scheduler.
+ */
+export class SrsAlgorithmFsrs implements ISRAlgorithm {
+    public readonly algorithmType: SRAlgorithmType = SRAlgorithmType.FSRS;
+    private noteDelegate: SRAlgorithmOsr;
     private scheduler: FSRS;
 
     constructor(settings: SRSettings) {
-        this.noteDelegate = new SrsAlgorithmOsr(settings);
+        this.noteDelegate = new SRAlgorithmOsr(settings);
         this.scheduler = fsrs(buildFsrsParameters(settings));
     }
 
@@ -69,7 +79,7 @@ export class SrsAlgorithmFsrs implements ISrsAlgorithm {
         emptyCard["scheduled_days"] = 0;
         emptyCard["learning_steps"] = 0;
         emptyCard.due = now;
-        emptyCard["last_review"] = null;
+        emptyCard["last_review"] = undefined;
         return RepItemScheduleInfoFsrs.fromFsrsCard(emptyCard);
     }
 

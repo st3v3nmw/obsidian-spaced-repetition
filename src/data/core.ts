@@ -1,10 +1,10 @@
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
+import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
 import { IOsrVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
-import { DataStoreName } from "src/data/data-stores/base/data-store";
-import { ScheduleDataRepository } from "src/data/data-stores/plugin-data/schedule-data-repository";
+import { StorageType } from "src/data/data-stores/base/data-store";
+import { ScheduleDataRepository } from "src/data/data-stores/folder-data-store/schedule-data-repository";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import { DeckTreeStatsCalculator } from "src/data/data-structures/deck/deck-tree-stats-calculator";
@@ -193,7 +193,7 @@ export class OsrCore {
         // Give the algorithm a chance to do something with the loaded note
         // e.g. OSR - calculate the average ease across all the questions within the note
         // TODO:  should this move to this.loadNote
-        SrsAlgorithm.getInstance().noteOnLoadedNote(noteFile.path, note, schedule?.latestEase);
+        SRAlgorithm.getInstance().noteOnLoadedNote(noteFile.path, note, schedule?.latestEase);
 
         const matchedNoteTags = SettingsUtil.filterForNoteReviewTag(this.settings, tags);
         if (matchedNoteTags.length === 0) {
@@ -203,7 +203,7 @@ export class OsrCore {
         if (SettingsUtil.isAnyTagIgnoredForNotes(this.settings, tags)) {
             return;
         }
-        const noteSchedule: RepItemScheduleInfo = await this.readNoteSchedule(noteFile);
+        const noteSchedule: RepItemScheduleInfo | null = await this.readNoteSchedule(noteFile);
         this._noteReviewQueue.addNoteToQueue(noteFile, noteSchedule, matchedNoteTags);
     }
 
@@ -213,9 +213,9 @@ export class OsrCore {
      * @param {ISRFile} noteFile - The note file.
      * @returns {Promise<RepItemScheduleInfo>} - A promise that resolves with the scheduling information for the note file.
      */
-    private async readNoteSchedule(noteFile: ISRFile): Promise<RepItemScheduleInfo> {
+    private async readNoteSchedule(noteFile: ISRFile): Promise<RepItemScheduleInfo | null> {
         if (
-            this.settings.dataStore !== DataStoreName.PLUGIN_DATA ||
+            this.settings.dataStore !== StorageType.PLUGIN_DATA ||
             this.scheduleDataRepository === null
         ) {
             return await noteFile.getNoteSchedule();
@@ -257,7 +257,7 @@ export class OsrCore {
         noteSchedule: RepItemScheduleInfo,
     ): Promise<void> {
         if (
-            this.settings.dataStore !== DataStoreName.PLUGIN_DATA ||
+            this.settings.dataStore !== StorageType.PLUGIN_DATA ||
             this.scheduleDataRepository === null
         ) {
             await noteFile.setNoteSchedule(noteSchedule);
@@ -311,19 +311,20 @@ export class OsrCore {
         settings: SRSettings,
     ): Promise<void> {
         // Get the current schedule for the note (null if new note)
-        const originalNoteSchedule: RepItemScheduleInfo = await this.readNoteSchedule(noteFile);
+        const originalNoteSchedule: RepItemScheduleInfo | null =
+            await this.readNoteSchedule(noteFile);
 
         // Calculate the new/updated schedule
         let noteSchedule: RepItemScheduleInfo;
         if (originalNoteSchedule === null) {
-            noteSchedule = SrsAlgorithm.getInstance().noteCalcNewSchedule(
+            noteSchedule = SRAlgorithm.getInstance().noteCalcNewSchedule(
                 noteFile.path,
                 this.osrNoteGraph,
                 response,
                 this._dueDateNoteHistogram,
             );
         } else {
-            noteSchedule = SrsAlgorithm.getInstance().noteCalcUpdatedSchedule(
+            noteSchedule = SRAlgorithm.getInstance().noteCalcUpdatedSchedule(
                 noteFile.path,
                 originalNoteSchedule,
                 response,

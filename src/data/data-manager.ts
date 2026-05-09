@@ -1,21 +1,21 @@
 import { Notice, TFile } from "obsidian";
 
-import { Algorithm } from "src/algorithms/base/isrs-algorithm";
+import { SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
-import { SrsAlgorithmFsrs } from "src/algorithms/fsrs/srs-algorithm-fsrs";
+import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
+import { SrsAlgorithmFsrs } from "src/algorithms/fsrs/sr-algorithm-fsrs";
 import { ObsidianVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
-import { SrsAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
+import { SRAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
 import { OsrCore } from "src/data/core";
-import { DataStoreAlgorithm } from "src/data/data-store-algorithm/data-store-algorithm";
-import { DataStoreInNoteAlgorithmOsr } from "src/data/data-store-algorithm/data-store-in-note-algorithm-osr";
-import { DataStoreInPluginDataAlgorithmOsr } from "src/data/data-store-algorithm/data-store-in-plugin-data-algorithm-osr";
-import { DataStore, DataStoreName } from "src/data/data-stores/base/data-store";
+import { DataStoreAlgorithm } from "src/data/data-store-algorithm/base/data-store-algorithm";
+import { DataStoreInExternalNoteAlgorithmOsr } from "src/data/data-store-algorithm/store-in-external-note/data-store-in-external-note-algorithm-osr";
+import { DataStoreInNoteAlgorithmOsr } from "src/data/data-store-algorithm/store-in-note/data-store-in-note-algorithm-osr";
+import { DataStore, StorageType } from "src/data/data-stores/base/data-store";
 import { DataStoreMigrator } from "src/data/data-stores/data-store-migrator";
-import { StoreInNotes } from "src/data/data-stores/notes/notes";
-import { StoreInPluginData } from "src/data/data-stores/plugin-data/plugin-data";
+import { FolderDataStore } from "src/data/data-stores/folder-data-store/folder-data-store";
 // import { ScheduleDataMarkdownStorage } from "src/data/data-stores/plugin-data/schedule-data-markdown-storage";
-import { ScheduleDataRepository } from "src/data/data-stores/plugin-data/schedule-data-repository";
+import { ScheduleDataRepository } from "src/data/data-stores/folder-data-store/schedule-data-repository";
+import { NotesDataStore } from "src/data/data-stores/notes-data-store/notes-data-store";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { ISRFile, SrTFile } from "src/data/file";
@@ -29,7 +29,7 @@ import { NoteReviewQueue } from "src/note/note-review-queue";
 import { setDebugParser } from "src/parser";
 
 /**
- * Manages all the data systems of the Spaced Repetition plugin and exposes them to the other parts of the plugin.
+ * Manages all the data related systems of the Spaced Repetition plugin and exposes them to the other parts of the plugin.
  *
  * This includes the plugin data, the OSR app core, and the scheduling data repository.
  */
@@ -118,7 +118,7 @@ export class DataManager {
      * @param {() => void} onOsrVaultDataChanged - A callback function that is called when the OSR vault data changes.
      * @returns {Promise<void>} - A promise that resolves when the OSR app core is initialized.
      */
-    async initOSRAppCore(
+    async initOSRCore(
         noteReviewQueue: NoteReviewQueue,
         onOsrVaultDataChanged: () => void,
     ): Promise<void> {
@@ -187,26 +187,26 @@ export class DataManager {
      * @param {SRSettings} settings - The settings object.
      */
     setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
-        if (settings.dataStore === DataStoreName.PLUGIN_DATA) {
+        if (settings.dataStore === StorageType.PLUGIN_DATA) {
             if (this.scheduleDataRepository === null)
                 throw new Error("Schedule data not initialized!!!");
-            DataStore.instance = new StoreInPluginData(settings, this.scheduleDataRepository);
-            DataStoreAlgorithm.instance = new DataStoreInPluginDataAlgorithmOsr();
+            DataStore.instance = new FolderDataStore(settings, this.scheduleDataRepository);
+            DataStoreAlgorithm.instance = new DataStoreInExternalNoteAlgorithmOsr();
         } else {
-            DataStore.instance = new StoreInNotes(settings);
+            DataStore.instance = new NotesDataStore(settings);
             DataStoreAlgorithm.instance = new DataStoreInNoteAlgorithmOsr(settings);
         }
 
         // TODO: Move this to the scheduling manager once it is implemented
-        SrsAlgorithm.instance =
-            settings.algorithm === Algorithm.FSRS
+        SRAlgorithm.instance =
+            settings.algorithm === SRAlgorithmType.FSRS
                 ? new SrsAlgorithmFsrs(settings)
-                : new SrsAlgorithmOsr(settings);
+                : new SRAlgorithmOsr(settings);
     }
 
-    async migrateDataStore(oldMode: DataStoreName, newMode: DataStoreName): Promise<void> {
+    async migrateDataStore(oldMode: StorageType, newMode: StorageType): Promise<void> {
         const textDirection = this.plugin.getObsidianRtlSetting();
-        if (newMode === DataStoreName.PLUGIN_DATA) {
+        if (newMode === StorageType.PLUGIN_DATA) {
             if (this.data === null) throw new Error("Data not loaded!!");
             if (this.scheduleDataRepository === null)
                 throw new Error("Schedule data not initialized!!!");

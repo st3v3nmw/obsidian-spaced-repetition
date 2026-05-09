@@ -16,7 +16,7 @@ import { Setting, SettingGroup } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
-import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
+import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
 import { textInterval } from "src/algorithms/osr/note-scheduling";
 import { OsrCore } from "src/data/core";
 import { DataManager } from "src/data/data-manager";
@@ -242,7 +242,7 @@ export class StatisticsPage extends SettingsPage {
             });
 
         const noteEases = mapRecord(
-            SrsAlgorithm.getInstance().noteStats().dict,
+            SRAlgorithm.getInstance().noteStats().dict,
             (key: string, value: number): [string, number] => {
                 return [key.split(".")[0], Math.round(value)];
             },

@@ -17,11 +17,11 @@ beforeAll(() => {
 });
 
 test("No schedule info for question", () => {
-    expect(DataStore.getInstance().questionCreateSchedule("A::B", null)).toEqual([]);
+    expect(DataStore.getInstance().createSchedule("A::B", null)).toEqual([]);
 });
 
 test("Single schedule info for question (on separate line)", () => {
-    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
         `What symbol represents an electric field:: $\\large \\vec E$
 <!--SR:!2023-09-02,4,270-->`,
         null,
@@ -33,7 +33,7 @@ test("Single schedule info for question (on separate line)", () => {
 });
 
 test("Single schedule info for question (on same line)", () => {
-    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
         "What symbol represents an electric field:: $\\large \\vec E$<!--SR:!2023-09-02,4,270-->",
         null,
     );
@@ -44,7 +44,7 @@ test("Single schedule info for question (on same line)", () => {
 });
 
 test("Legacy schedule comments without the bang prefix are still parsed", () => {
-    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
         "What symbol represents an electric field:: $\\large \\vec E$<!--SR:2023-09-02,4,270-->",
         null,
     );
@@ -55,7 +55,7 @@ test("Legacy schedule comments without the bang prefix are still parsed", () => 
 });
 
 test("Legacy fallback extractor loop still parses schedules", () => {
-    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
         {
             match(): RegExpMatchArray | null {
                 return null;
@@ -84,7 +84,7 @@ test("Legacy fallback extractor loop still parses schedules", () => {
 });
 
 test("Multiple schedule info for question (on separate line)", () => {
-    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
         `This is a really very ==interesting== and ==fascinating== and ==great== test
     <!--SR:!2023-09-03,1,230!2023-09-05,3,250!2023-09-06,4,270-->`,
         null,
@@ -98,7 +98,7 @@ test("Multiple schedule info for question (on separate line)", () => {
 });
 
 test("Single FSRS schedule info for question", () => {
-    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
         "What symbol represents an electric field:: $\\large \\vec E$<!--SR:!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z-->",
         null,
     );
@@ -118,7 +118,7 @@ test("Single FSRS schedule info for question", () => {
 });
 
 test("Mixed OSR and FSRS schedule info for question", () => {
-    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
         "What symbol represents an electric field:: $\\large \\vec E$<!--SR:!2023-09-02,4,270!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z-->",
         null,
     );

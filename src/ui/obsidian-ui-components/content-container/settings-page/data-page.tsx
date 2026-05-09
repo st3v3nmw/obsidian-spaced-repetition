@@ -1,7 +1,7 @@
 import { Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
-import { DataStoreName } from "src/data/data-stores/base/data-store";
+import { StorageType } from "src/data/data-stores/base/data-store";
 import {
     deleteAllSchedulingData,
     deleteAllSchedulingDataInCards,
@@ -51,19 +51,19 @@ export class DataPage extends SettingsPage {
                     .addDropdown((dropdown) => {
                         dropdown
                             .addOptions({
-                                [DataStoreName.NOTES]: t("STORE_IN_NOTES"),
-                                [DataStoreName.PLUGIN_DATA]: "Store in vault files (beta)",
+                                [StorageType.NOTES]: t("STORE_IN_NOTES"),
+                                [StorageType.PLUGIN_DATA]: "Store in vault files (beta)",
                             })
                             .setValue(this.dataManager.data.settings.dataStore)
                             .onChange(async (value) => {
                                 const oldMode = this.dataManager.data.settings
-                                    .dataStore as DataStoreName;
-                                const newMode = value as DataStoreName;
+                                    .dataStore as StorageType;
+                                const newMode = value as StorageType;
 
                                 // Revert the dropdown immediately; only apply after confirmation.
                                 dropdown.setValue(oldMode);
 
-                                const isToPluginData = newMode === DataStoreName.PLUGIN_DATA;
+                                const isToPluginData = newMode === StorageType.PLUGIN_DATA;
                                 new ConfirmationModal(
                                     this.plugin.app,
                                     isToPluginData
