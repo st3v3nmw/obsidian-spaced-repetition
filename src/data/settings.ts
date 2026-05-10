@@ -213,7 +213,7 @@ export class SettingsUtil {
         return SettingsUtil.isTagInList(settings.flashcardTags, tag);
     }
 
-    static isPathInNoteIgnoreFolder(settings: SRSettings, path: string): boolean {
+    static isPathInFoldersToIgnore(settings: SRSettings, path: string): boolean {
         return settings.noteFoldersToIgnore.some((folder) => pathMatchesPattern(path, folder));
     }
 

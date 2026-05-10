@@ -3,7 +3,7 @@ import { State } from "ts-fsrs";
 
 import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
-import { DataStoreInNoteAlgorithmOsr } from "src/data/data-store-algorithm/store-in-note/data-store-in-note-algorithm-osr";
+import { NoteDataStoreAlgorithmOsr } from "src/data/data-store-algorithm/note-data-store/note-data-store-algorithm-osr";
 import { Card } from "src/data/data-structures/card/card";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
@@ -15,7 +15,7 @@ beforeAll(() => {
 describe("formatCardSchedule", () => {
     test("Has schedule, with due date", async () => {
         const settings: SRSettings = { ...DEFAULT_SETTINGS };
-        const instance: DataStoreInNoteAlgorithmOsr = new DataStoreInNoteAlgorithmOsr(settings);
+        const instance: NoteDataStoreAlgorithmOsr = new NoteDataStoreAlgorithmOsr(settings);
 
         const scheduleInfo: RepItemScheduleInfoOsr = RepItemScheduleInfoOsr.fromDueDateStr(
             "2023-10-06",
@@ -30,7 +30,7 @@ describe("formatCardSchedule", () => {
 
     test("Has schedule, but no due date", async () => {
         const settings: SRSettings = { ...DEFAULT_SETTINGS };
-        const instance: DataStoreInNoteAlgorithmOsr = new DataStoreInNoteAlgorithmOsr(settings);
+        const instance: NoteDataStoreAlgorithmOsr = new NoteDataStoreAlgorithmOsr(settings);
 
         const scheduleInfo: RepItemScheduleInfoOsr = new RepItemScheduleInfoOsr(
             null,
@@ -46,7 +46,7 @@ describe("formatCardSchedule", () => {
 
     test("Formats FSRS schedules", async () => {
         const settings: SRSettings = { ...DEFAULT_SETTINGS };
-        const instance: DataStoreInNoteAlgorithmOsr = new DataStoreInNoteAlgorithmOsr(settings);
+        const instance: NoteDataStoreAlgorithmOsr = new NoteDataStoreAlgorithmOsr(settings);
 
         const scheduleInfo = new RepItemScheduleInfoFsrs(
             moment("2023-09-06T00:10:00.000Z"),

@@ -5,13 +5,13 @@ import { TagCache, TFile } from "obsidian";
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
 import { ALLOWED_DATE_FORMATS } from "src/data/constants";
-import { ISRFile } from "src/data/file";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { formatDateYYYYMMDD } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 
 import { unitTestBasicFrontmatterParser, unitTestGetAllTagsFromTextEx } from "./unit-test-helper";
 
-export class UnitTestSRFile implements ISRFile {
+export class UnitTestSRFile implements ISRNoteTFile {
     content: string;
     _path: string;
 
@@ -60,7 +60,7 @@ export class UnitTestSRFile implements ISRFile {
             fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
                 `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
-                    `sr-ease: ${ease}\nsr-interval: ${interval}\n---`,
+                `sr-ease: ${ease}\nsr-interval: ${interval}\n---`,
             );
         } else {
             fileText =

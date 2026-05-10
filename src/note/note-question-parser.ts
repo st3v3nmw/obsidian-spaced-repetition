@@ -10,7 +10,8 @@ import {
     CardFrontBackUtil,
 } from "src/data/data-structures/card/questions/question-type";
 import { TopicPath, TopicPathList } from "src/data/data-structures/deck/topic-path";
-import { frontmatterTagPseudoLineNum, ISRFile } from "src/data/file";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
+import { frontmatterTagPseudoLineNum } from "src/data/data-structures/file/sr-file";
 import { SettingsUtil, SRSettings } from "src/data/settings";
 import { parse, ParsedQuestionInfo, ParserOptions } from "src/parser";
 import {
@@ -21,7 +22,7 @@ import {
 
 export class NoteQuestionParser {
     settings: SRSettings;
-    noteFile: ISRFile;
+    noteFile: ISRNoteTFile;
     folderTopicPath: TopicPath;
     noteText: string;
     frontmatterText: string;
@@ -49,7 +50,7 @@ export class NoteQuestionParser {
     }
 
     async createQuestionList(
-        noteFile: ISRFile,
+        noteFile: ISRNoteTFile,
         defaultTextDirection: TextDirection,
         folderTopicPath: TopicPath,
         onlyKeepQuestionsWithTopicPath: boolean,

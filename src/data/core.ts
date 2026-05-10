@@ -3,13 +3,12 @@ import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
 import { IOsrVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
 import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
-import { StorageType } from "src/data/data-stores/base/data-store";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import { DeckTreeStatsCalculator } from "src/data/data-structures/deck/deck-tree-stats-calculator";
 import { Stats } from "src/data/data-structures/deck/stats";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
-import { ISRFile } from "src/data/file";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { SettingsUtil, SRSettings } from "src/data/settings";
 import { CardDueDateHistogram, NoteDueDateHistogram } from "src/due-date-histogram";
 import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
@@ -32,17 +31,94 @@ export class OsrCore {
     public defaultTextDirection: TextDirection;
     protected settings: SRSettings;
     private dataChangedHandler: () => void;
-    protected osrNoteGraph: OsrNoteGraph;
+    protected osrNoteGraph: OsrNoteGraph | null = null;
     private osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder;
     private _questionPostponementList: QuestionPostponementList;
     private _noteReviewQueue: NoteReviewQueue;
 
-    private fullDeckTree: Deck;
+    private fullDeckTree: Deck | null = null;
     private _reviewableDeckTree: Deck = new Deck("root", null);
-    private _remainingDeckTree: Deck;
-    private _cardStats: Stats;
+    private _remainingDeckTree: Deck | null = null;
+    private _cardStats: Stats | null = null;
     private _dueDateFlashcardHistogram: CardDueDateHistogram;
     private _dueDateNoteHistogram: NoteDueDateHistogram;
+
+    constructor(
+        questionPostponementList: QuestionPostponementList,
+        osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder,
+        settings: SRSettings,
+        dataChangedHandler: () => void,
+        noteReviewQueue: NoteReviewQueue,
+        defaultTextDirection: TextDirection,
+    ) {
+        this.settings = settings;
+        this.osrNoteLinkInfoFinder = osrNoteLinkInfoFinder;
+        this.dataChangedHandler = dataChangedHandler;
+        this._noteReviewQueue = noteReviewQueue;
+        this._questionPostponementList = questionPostponementList;
+        this._dueDateFlashcardHistogram = new CardDueDateHistogram();
+        this._dueDateNoteHistogram = new NoteDueDateHistogram();
+        this.defaultTextDirection = defaultTextDirection;
+
+        try {
+            const startOfDayElements: string[] = this.settings.startOfDay.split(":");
+            if (startOfDayElements.length !== 3) {
+                throw new Error("Invalid format for start of day");
+            }
+            const dayBoundary: IDayBoundary = {
+                hour: parseInt(startOfDayElements[0]),
+                minute: parseInt(startOfDayElements[1]),
+                second: parseInt(startOfDayElements[2]),
+            };
+            globalDateProvider.setDayBoundary(dayBoundary);
+        } catch (e) {
+            console.error("Invalid format for start of day", e);
+        }
+    }
+
+    /**
+     * Initializes the OSR core for unit testing.
+     *
+     * @param {QuestionPostponementList} questionPostponementList - The question postponement list.
+     * @param {IOsrVaultNoteLinkInfoFinder} osrNoteLinkInfoFinder - The OSR vault note link info finder.
+     * @param {SRSettings} settings - The settings object.
+     * @param {() => void} dataChangedHandler - A callback function that is called when the data has changed.
+     * @param {NoteReviewQueue} noteReviewQueue - The note review queue.
+     * @param {TextDirection} defaultTextDirection - The default text direction.
+     * @returns {void}
+     */
+    initUnitTestCore(
+        questionPostponementList: QuestionPostponementList,
+        osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder,
+        settings: SRSettings,
+        dataChangedHandler: () => void,
+        noteReviewQueue: NoteReviewQueue,
+        defaultTextDirection: TextDirection
+    ) {
+        this.settings = settings;
+        this.osrNoteLinkInfoFinder = osrNoteLinkInfoFinder;
+        this.dataChangedHandler = dataChangedHandler;
+        this._noteReviewQueue = noteReviewQueue;
+        this._questionPostponementList = questionPostponementList;
+        this._dueDateFlashcardHistogram = new CardDueDateHistogram();
+        this._dueDateNoteHistogram = new NoteDueDateHistogram();
+        this.defaultTextDirection = defaultTextDirection;
+
+        try {
+            const startOfDayElements: string[] = this.settings.startOfDay.split(":");
+            if (startOfDayElements.length !== 3) {
+                throw new Error("Invalid format for start of day");
+            }
+            const dayBoundary: IDayBoundary = {
+                hour: parseInt(startOfDayElements[0]),
+                minute: parseInt(startOfDayElements[1]),
+                second: parseInt(startOfDayElements[2]),
+            };
+            globalDateProvider.setDayBoundary(dayBoundary);
+        } catch (e) {
+            console.error("Invalid format for start of day", e);
+        }
+    }
 
     /**
      * Gets the note review queue.
@@ -58,7 +134,7 @@ export class OsrCore {
      *
      * @returns {Deck} - The remaining deck tree.
      */
-    get remainingDeckTree(): Deck {
+    get remainingDeckTree(): Deck | null {
         return this._remainingDeckTree;
     }
 
@@ -103,48 +179,8 @@ export class OsrCore {
      *
      * @returns {Stats} - The card stats.
      */
-    get cardStats(): Stats {
+    get cardStats(): Stats | null {
         return this._cardStats;
-    }
-
-    /**
-     * Initializes the OSR core.
-     *
-     * @param {QuestionPostponementList} questionPostponementList - The question postponement list.
-     * @param {IOsrVaultNoteLinkInfoFinder} osrNoteLinkInfoFinder - The OSR vault note link info finder.
-     * @param {SRSettings} settings - The settings object.
-     * @param {() => void} dataChangedHandler - A callback function that is called when the data has changed.
-     * @param {NoteReviewQueue} noteReviewQueue - The note review queue.
-     * @returns {void}
-     */
-    init(
-        questionPostponementList: QuestionPostponementList,
-        osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder,
-        settings: SRSettings,
-        dataChangedHandler: () => void,
-        noteReviewQueue: NoteReviewQueue,
-    ): void {
-        this.settings = settings;
-        this.osrNoteLinkInfoFinder = osrNoteLinkInfoFinder;
-        this.dataChangedHandler = dataChangedHandler;
-        this._noteReviewQueue = noteReviewQueue;
-        this._questionPostponementList = questionPostponementList;
-        this._dueDateFlashcardHistogram = new CardDueDateHistogram();
-        this._dueDateNoteHistogram = new NoteDueDateHistogram();
-        try {
-            const startOfDayElements: string[] = this.settings.startOfDay.split(":");
-            if (startOfDayElements.length !== 3) {
-                throw new Error("Invalid format for start of day");
-            }
-            const dayBoundary: IDayBoundary = {
-                hour: parseInt(startOfDayElements[0]),
-                minute: parseInt(startOfDayElements[1]),
-                second: parseInt(startOfDayElements[2]),
-            };
-            globalDateProvider.setDayBoundary(dayBoundary);
-        } catch (e) {
-            console.error("Invalid format for start of day", e);
-        }
     }
 
     /**
@@ -152,7 +188,7 @@ export class OsrCore {
      *
      * @returns {void}
      */
-    public loadInit(): void {
+    public loadInitialStateOfCore(): void {
         // reset notes stuff
         this.osrNoteGraph = new OsrNoteGraph(this.osrNoteLinkInfoFinder);
         this._noteReviewQueue.init();
@@ -164,16 +200,16 @@ export class OsrCore {
     /**
      * Processes a note file.
      *
-     * @param {ISRFile} noteFile - The note file.
+     * @param {ISRNoteTFile} noteFile - The note file.
      * @returns {Promise<void>} - A promise that resolves when the note file is processed.
      */
-    public async processFile(noteFile: ISRFile): Promise<void> {
-        const schedule: RepItemScheduleInfo = await this.readNoteSchedule(noteFile);
+    public async processFile(noteFile: ISRNoteTFile): Promise<void> {
+        const schedule: RepItemScheduleInfo | null = await this.readNoteSchedule(noteFile);
         let note: Note | null = null;
 
         // Update the graph of links between notes
         // (Performance note: This only requires accessing Obsidian's metadata cache and not loading the file)
-        this.osrNoteGraph.processLinks(noteFile.path);
+        if (this.osrNoteGraph !== null) this.osrNoteGraph.processLinks(noteFile.path);
 
         const tags = noteFile.getAllTagsFromCache();
 
@@ -182,13 +218,15 @@ export class OsrCore {
         const topicPath: TopicPath = this.findTopicPath(noteFile);
         if (topicPath.hasPath && !SettingsUtil.isAnyTagIgnoredForFlashcards(this.settings, tags)) {
             note = await this.loadNote(noteFile, topicPath);
-            if (note !== null) note.appendCardsToDeck(this.fullDeckTree);
+            if (note !== null && this.fullDeckTree !== null) note.appendCardsToDeck(this.fullDeckTree);
         }
 
         // Give the algorithm a chance to do something with the loaded note
         // e.g. OSR - calculate the average ease across all the questions within the note
         // TODO:  should this move to this.loadNote
-        SRAlgorithm.getInstance().noteOnLoadedNote(noteFile.path, note, schedule?.latestEase);
+        if (schedule !== null) {
+            SRAlgorithm.getInstance().noteOnLoadedNote(noteFile.path, note, schedule.latestEase);
+        }
 
         const matchedNoteTags = SettingsUtil.filterForNoteReviewTag(this.settings, tags);
         if (matchedNoteTags.length === 0) {
@@ -205,22 +243,22 @@ export class OsrCore {
     /**
      * Reads the scheduling information for a note file.
      *
-     * @param {ISRFile} noteFile - The note file.
+     * @param {ISRNoteTFile} noteFile - The note file.
      * @returns {Promise<RepItemScheduleInfo>} - A promise that resolves with the scheduling information for the note file.
      */
-    private async readNoteSchedule(noteFile: ISRFile): Promise<RepItemScheduleInfo | null> {
+    private async readNoteSchedule(noteFile: ISRNoteTFile): Promise<RepItemScheduleInfo | null> {
         return await noteFile.getNoteSchedule();
     }
 
     /**
      * Writes the scheduling information for a note file.
      *
-     * @param {ISRFile} noteFile - The note file.
+     * @param {ISRNoteTFile} noteFile - The note file.
      * @param {RepItemScheduleInfo} noteSchedule - The scheduling information for the note file.
      * @returns {Promise<void>} - A promise that resolves when the scheduling information is written.
      */
     private async writeNoteSchedule(
-        noteFile: ISRFile,
+        noteFile: ISRNoteTFile,
         noteSchedule: RepItemScheduleInfo,
     ): Promise<void> {
         await noteFile.setNoteSchedule(noteSchedule);
@@ -258,13 +296,13 @@ export class OsrCore {
     /**
      * Saves the review response for a note file.
      *
-     * @param {ISRFile} noteFile - The note file.
+     * @param {ISRNoteTFile} noteFile - The note file.
      * @param {ReviewResponse} response - The review response.
      * @param {SRSettings} settings - The settings object.
      * @returns {Promise<void>} - A promise that resolves when the review response is saved.
      */
     async saveNoteReviewResponse(
-        noteFile: ISRFile,
+        noteFile: ISRNoteTFile,
         response: ReviewResponse,
         settings: SRSettings,
     ): Promise<void> {
@@ -324,10 +362,10 @@ export class OsrCore {
      * Buries all cards in a note.
      *
      * @param {SRSettings} settings - The settings object.
-     * @param {ISRFile} noteFile - The note file.
+     * @param {ISRNoteTFile} noteFile - The note file.
      * @returns {Promise<void>} - A promise that resolves when the cards are buried.
      */
-    private async buryAllCardsInNote(settings: SRSettings, noteFile: ISRFile): Promise<void> {
+    private async buryAllCardsInNote(settings: SRSettings, noteFile: ISRNoteTFile): Promise<void> {
         if (settings.burySiblingCards) {
             const topicPath: TopicPath = this.findTopicPath(noteFile);
             const noteX: Note | null = await this.loadNote(noteFile, topicPath);
@@ -344,11 +382,11 @@ export class OsrCore {
     /**
      * Loads a note from the Obsidian vault.
      *
-     * @param {ISRFile} noteFile - The note file.
+     * @param {ISRNoteTFile} noteFile - The note file.
      * @param {TopicPath} topicPath - The topic path.
      * @returns {Promise<Note | null>} - A promise that resolves with the loaded note.
      */
-    async loadNote(noteFile: ISRFile, topicPath: TopicPath): Promise<Note | null> {
+    async loadNote(noteFile: ISRNoteTFile, topicPath: TopicPath): Promise<Note | null> {
         const loader: NoteFileLoader = new NoteFileLoader(this.settings);
         const note: Note | null = await loader.load(noteFile, this.defaultTextDirection, topicPath);
         if (note !== null && note.hasChanged) {
@@ -360,10 +398,10 @@ export class OsrCore {
     /**
      * Finds the topic path for a note.
      *
-     * @param {ISRFile} note - The note file.
+     * @param {ISRNoteTFile} note - The note file.
      * @returns {TopicPath} - The topic path.
      */
-    private findTopicPath(note: ISRFile): TopicPath {
+    private findTopicPath(note: ISRNoteTFile): TopicPath {
         return TopicPath.getTopicPathOfFile(note, this.settings);
     }
 }

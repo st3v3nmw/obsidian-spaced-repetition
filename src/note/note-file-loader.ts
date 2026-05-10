@@ -1,6 +1,6 @@
 import { Question } from "src/data/data-structures/card/questions/question";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
-import { ISRFile } from "src/data/file";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { SRSettings } from "src/data/settings";
 import { Note } from "src/note/note";
 import { NoteQuestionParser } from "src/note/note-question-parser";
@@ -10,7 +10,7 @@ export class NoteFileLoader {
     fileText: string;
     fixesMade: boolean;
     noteTopicPath: TopicPath;
-    noteFile: ISRFile;
+    noteFile: ISRNoteTFile;
     settings: SRSettings;
 
     constructor(settings: SRSettings) {
@@ -18,7 +18,7 @@ export class NoteFileLoader {
     }
 
     async load(
-        noteFile: ISRFile,
+        noteFile: ISRNoteTFile,
         defaultTextDirection: TextDirection,
         folderTopicPath: TopicPath,
     ): Promise<Note | null> {

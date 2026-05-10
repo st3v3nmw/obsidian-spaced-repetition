@@ -2,7 +2,7 @@ import moment from "moment";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { CardListType } from "src/data/data-structures/deck/deck";
-import { ISRFile } from "src/data/file";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { NoteDueDateHistogram } from "src/due-date-histogram";
 import { NoteReviewDeck, SchedNote } from "src/note/note-review-deck";
@@ -325,7 +325,7 @@ describe("Note Due Date Histogram", () => {
         await osrCore.loadTestVault("notes4");
 
         // Review all the notes
-        let file: ISRFile = osrCore.getFileByNoteName("A");
+        let file: ISRNoteTFile = osrCore.getFileByNoteName("A");
         await osrCore.saveNoteReviewResponse(file, ReviewResponse.Good, settings);
         file = osrCore.getFileByNoteName("B");
         await osrCore.saveNoteReviewResponse(file, ReviewResponse.Hard, settings);

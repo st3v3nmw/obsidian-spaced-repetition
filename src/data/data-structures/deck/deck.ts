@@ -4,6 +4,8 @@ import { IQuestionPostponementList } from "src/data/data-structures/card/questio
 import { TopicPath, TopicPathList } from "src/data/data-structures/deck/topic-path";
 import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
 
+// TODO: Test data store switching first before overhauling the deck tree
+
 export enum CardListType {
     NewCard,
     DueCard,
@@ -127,7 +129,7 @@ export class Deck {
             }
         }
 
-        let result: Deck = null;
+        let result: Deck | null = null;
         if (createAllowed) {
             const subdeck: Deck = new Deck(deckName, this /* parent */);
             this.subdecks.push(subdeck);
@@ -139,7 +141,7 @@ export class Deck {
     getTopicPath(): TopicPath {
         const list: string[] = [];
         // eslint-disable-next-line  @typescript-eslint/no-this-alias
-        let deck: Deck = this;
+        let deck: Deck | null = this;
         // The root deck may have a dummy deck name, which we don't want
         // So we first check that this isn't the root deck
         while (!deck.isRootDeck) {

@@ -9,8 +9,8 @@ import { SRAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
 import { FLASHCARD_SCHEDULE_INFO } from "src/data/constants";
 import { OsrCore } from "src/data/core";
 import { DataStoreAlgorithm } from "src/data/data-store-algorithm/base/data-store-algorithm";
-import { DataStoreInExternalNoteAlgorithmOsr } from "src/data/data-store-algorithm/store-in-external-note/data-store-in-external-note-algorithm-osr";
-import { DataStoreInNoteAlgorithmOsr } from "src/data/data-store-algorithm/store-in-note/data-store-in-note-algorithm-osr";
+import { FolderDataStoreAlgorithmOsr } from "src/data/data-store-algorithm/folder-data-store/folder-data-store-algorithm-osr";
+import { NoteDataStoreAlgorithmOsr } from "src/data/data-store-algorithm/note-data-store/note-data-store-algorithm-osr";
 import { DataStore, StorageType } from "src/data/data-stores/base/data-store";
 import { DataStoreMigrator } from "src/data/data-stores/base/data-store-migrator";
 import { FolderDataStore } from "src/data/data-stores/folder-data-store/folder-data-store";
@@ -18,7 +18,7 @@ import { NotesDataStore } from "src/data/data-stores/notes-data-store/notes-data
 import { PluginDataStore } from "src/data/data-stores/plugin-data-store/plugin-data-store";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
-import { ISRFile, SrTFile } from "src/data/file";
+import { ISRNoteTFile, SRNoteTFile } from "src/data/data-structures/file/note-file";
 import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
@@ -111,13 +111,13 @@ export class DataManager {
         );
         await questionPostponementList.clearIfNewDay(this.data);
 
-        this.osrCore = new OsrCore();
-        this.osrCore.init(
+        this.osrCore = new OsrCore(
             questionPostponementList,
             new ObsidianVaultNoteLinkInfoFinder(this.plugin.app.metadataCache),
             this.data.settings,
             onOsrVaultDataChanged,
             noteReviewQueue,
+            this.plugin.getObsidianRtlSetting()
         );
     }
 
@@ -128,15 +128,14 @@ export class DataManager {
         this._syncLock = true;
 
         try {
-            this.osrCore.loadInit();
+            this.osrCore.loadInitialStateOfCore();
 
             const notes: TFile[] = this.plugin.app.vault.getMarkdownFiles();
             for (const noteFile of notes) {
-                if (SettingsUtil.isPathInNoteIgnoreFolder(this.data.settings, noteFile.path)) {
-                    continue;
-                }
+                // Skip files in the note ignore folder
+                if (SettingsUtil.isPathInFoldersToIgnore(this.data.settings, noteFile.path)) continue;
 
-                const file: SrTFile = this.createSrTFile(noteFile);
+                const file: SRNoteTFile = this.createSRNoteTFile(noteFile);
                 await this.osrCore.processFile(file);
             }
 
@@ -147,13 +146,13 @@ export class DataManager {
     }
 
     /**
-     * Creates a SrTFile object from a note file.
+     * Creates a SRNoteTFile object from a note file.
      *
      * @param {TFile} note - The note file.
-     * @returns {SrTFile} - The SrTFile object.
+     * @returns {SRNoteTFile} - The SRNoteTFile object.
      */
-    createSrTFile(note: TFile): SrTFile {
-        return new SrTFile(
+    createSRNoteTFile(note: TFile): SRNoteTFile {
+        return new SRNoteTFile(
             this.plugin.app.vault,
             this.plugin.app.metadataCache,
             this.plugin.app.fileManager,
@@ -170,17 +169,19 @@ export class DataManager {
         switch (settings.dataStore) {
             case StorageType.PLUGIN_DATA:
                 DataStore.instance = new PluginDataStore(settings, this.plugin.dataManager.data);
-                DataStoreAlgorithm.instance = new DataStoreInExternalNoteAlgorithmOsr();
+                DataStoreAlgorithm.instance = new FolderDataStoreAlgorithmOsr();
                 break;
             case StorageType.FOLDER:
                 DataStore.instance = new FolderDataStore(settings, this.plugin.app);
-                DataStoreAlgorithm.instance = new DataStoreInExternalNoteAlgorithmOsr();
+                DataStoreAlgorithm.instance = new FolderDataStoreAlgorithmOsr();
                 break;
             case StorageType.NOTES:
                 DataStore.instance = new NotesDataStore(settings);
-                DataStoreAlgorithm.instance = new DataStoreInNoteAlgorithmOsr(settings);
+                DataStoreAlgorithm.instance = new NoteDataStoreAlgorithmOsr(settings);
                 break;
         }
+
+        console.log("Current storage type:", DataStore.instance.storageType);
 
         // TODO: Move this to the scheduling manager once it is implemented
         SRAlgorithm.instance =
@@ -216,9 +217,9 @@ export class DataManager {
             console.log(`SR: ${t("DECKS")}`, this.osrCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                    t("SYNC_TIME_TAKEN", {
-                        t: Date.now() - now.valueOf(),
-                    }),
+                t("SYNC_TIME_TAKEN", {
+                    t: Date.now() - now.valueOf(),
+                }),
             );
         }
     }
@@ -232,14 +233,14 @@ export class DataManager {
     async loadNote(noteFile: TFile): Promise<Note | null> {
         if (this.data === null) throw new Error("Data not loaded!!");
         const loader: NoteFileLoader = new NoteFileLoader(this.data.settings);
-        const srFile: ISRFile = this.createSrTFile(noteFile);
+        const srFile: ISRNoteTFile = this.createSRNoteTFile(noteFile);
         const folderTopicPath: TopicPath = TopicPath.getFolderPathFromFilename(
             srFile,
             this.data.settings,
         );
 
         const note: Note | null = await loader.load(
-            this.createSrTFile(noteFile),
+            this.createSRNoteTFile(noteFile),
             this.plugin.getObsidianRtlSetting(),
             folderTopicPath,
         );
@@ -262,9 +263,9 @@ export class DataManager {
         if (this.plugin.nextNoteReviewHandler === null)
             throw new Error("Next note review handler not initialized!!!");
 
-        const noteSrTFile: ISRFile = this.createSrTFile(note);
+        const noteSrTFile: ISRNoteTFile = this.createSRNoteTFile(note);
 
-        if (SettingsUtil.isPathInNoteIgnoreFolder(this.data.settings, note.path)) {
+        if (SettingsUtil.isPathInFoldersToIgnore(this.data.settings, note.path)) {
             new Notice(t("NOTE_IN_IGNORED_FOLDER"));
             return;
         }

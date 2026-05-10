@@ -9,7 +9,7 @@ import { SRSettings } from "src/data/settings";
 //      (RZ: Perhaps not the original algorithm, but the only one available in 2023/early 2024)
 //
 // Data Store: With data stored in the note's markdown file
-export class DataStoreInNoteAlgorithmOsr implements IDataStoreAlgorithm {
+export class NoteDataStoreAlgorithmOsr implements IDataStoreAlgorithm {
     private settings: SRSettings;
 
     constructor(settings: SRSettings) {
@@ -38,7 +38,7 @@ export class DataStoreInNoteAlgorithmOsr implements IDataStoreAlgorithm {
      * @returns {string} - The formatted card schedule.
      */
     formatCardSchedule(card: Card) {
-        if (card.hasSchedule) {
+        if (card.hasSchedule && card.scheduleInfo) {
             return card.scheduleInfo.formatScheduleAsSRHtmlComment();
         }
 

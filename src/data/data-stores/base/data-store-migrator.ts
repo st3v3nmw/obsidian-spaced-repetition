@@ -1,6 +1,6 @@
 import { DataStoreAlgorithm } from "src/data/data-store-algorithm/base/data-store-algorithm";
-import { DataStoreInExternalNoteAlgorithmOsr } from "src/data/data-store-algorithm/store-in-external-note/data-store-in-external-note-algorithm-osr";
-import { DataStoreInNoteAlgorithmOsr } from "src/data/data-store-algorithm/store-in-note/data-store-in-note-algorithm-osr";
+import { FolderDataStoreAlgorithmOsr } from "src/data/data-store-algorithm/folder-data-store/folder-data-store-algorithm-osr";
+import { NoteDataStoreAlgorithmOsr } from "src/data/data-store-algorithm/note-data-store/note-data-store-algorithm-osr";
 import { DataStore, StorageType } from "src/data/data-stores/base/data-store";
 import { FolderDataStore } from "src/data/data-stores/folder-data-store/folder-data-store";
 import { NotesDataStore } from "src/data/data-stores/notes-data-store/notes-data-store";
@@ -8,7 +8,7 @@ import { PluginDataStore } from "src/data/data-stores/plugin-data-store/plugin-d
 import SRPlugin from "src/main";
 import { TextDirection } from "src/utils/strings";
 
-export interface IDataStoreTransitData {}
+export interface IDataStoreTransitData { }
 
 export class DataStoreMigrator {
     static async migrateDataStore(
@@ -27,22 +27,25 @@ export class DataStoreMigrator {
                     plugin.dataManager.data.settings,
                     plugin.dataManager.data,
                 );
-                DataStoreAlgorithm.instance = new DataStoreInExternalNoteAlgorithmOsr();
+                DataStoreAlgorithm.instance = new FolderDataStoreAlgorithmOsr();
                 break;
             case StorageType.FOLDER:
                 DataStore.instance = new FolderDataStore(
                     plugin.dataManager.data.settings,
                     plugin.app,
                 );
-                DataStoreAlgorithm.instance = new DataStoreInExternalNoteAlgorithmOsr();
+                DataStoreAlgorithm.instance = new FolderDataStoreAlgorithmOsr();
                 break;
             case StorageType.NOTES:
                 DataStore.instance = new NotesDataStore(plugin.dataManager.data.settings);
-                DataStoreAlgorithm.instance = new DataStoreInNoteAlgorithmOsr(
+                DataStoreAlgorithm.instance = new NoteDataStoreAlgorithmOsr(
                     plugin.dataManager.data.settings,
                 );
                 break;
         }
+
+        console.log(`Migrated data store from ${oldMode} to ${newMode}`);
+        console.log("Current storage type:", DataStore.instance.storageType);
 
         // Import the data store state from the transit data.
         await DataStoreMigrator.importTransitDataToDataStore(newMode, transitData);

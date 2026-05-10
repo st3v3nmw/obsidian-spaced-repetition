@@ -4,7 +4,7 @@ import { TICKS_PER_DAY } from "src/data/constants";
 import { Card } from "src/data/data-structures/card/card";
 import { CardType, Question } from "src/data/data-structures/card/questions/question";
 import { TopicPath, TopicPathList } from "src/data/data-structures/deck/topic-path";
-import { frontmatterTagPseudoLineNum, ISRFile } from "src/data/file";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { NoteQuestionParser } from "src/note/note-question-parser";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
@@ -13,6 +13,7 @@ import { TextDirection } from "src/utils/strings";
 import { UnitTestSRFile } from "./helpers/unit-test-file";
 import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 import { createTestNoteQuestionParser } from "./sample-items";
+import { frontmatterTagPseudoLineNum } from "src/data/data-structures/file/sr-file";
 
 const parserWithDefaultSettings: NoteQuestionParser =
     createTestNoteQuestionParser(DEFAULT_SETTINGS);
@@ -31,7 +32,7 @@ describe("No flashcard questions", () => {
     test("No questions in the text", async () => {
         const noteText: string = "An interesting note, but no questions";
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         expect(
             await parserWithDefaultSettings.createQuestionList(
@@ -46,7 +47,7 @@ describe("No flashcard questions", () => {
     test("A question in the text, but no flashcard tag", async () => {
         const noteText: string = "A::B";
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         expect(
             await parserWithDefaultSettings.createQuestionList(
@@ -64,7 +65,7 @@ describe("Single question in the text (without block identifier)", () => {
         const noteText: string = `#flashcards
 A::B
 `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const card1 = {
@@ -100,7 +101,7 @@ A::B
 A::B
 <!--SR:!2023-09-03,1,230-->
     `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const delayDays = 3 - 6;
@@ -140,7 +141,7 @@ A::B
         const noteText: string = `#flashcards/science #flashcards/poetry
 A::B
     `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const expected = [
@@ -177,7 +178,7 @@ tags:
 ?
 In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!
     `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const expected = [
@@ -203,7 +204,7 @@ describe("Single question in the text (with block identifier)", () => {
         const noteText: string = `#flashcards
 A::B ^d7cee0
 `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const card1 = {
@@ -246,7 +247,7 @@ A::B ^d7cee0
 A::B ^d7cee0
 <!--SR:!2023-09-03,1,230-->
     `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const delayDays = 3 - 6;
@@ -293,7 +294,7 @@ A::B ^d7cee0
         const noteText: string = `#flashcards/test
 A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
     `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const delayDays = 3 - 6;
@@ -338,7 +339,7 @@ A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
         const noteText: string = `
 #flashcards/test A::B <!--SR:!2023-09-03,1,230--> ^d7cee0
     `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const delayDays = 3 - 6;
@@ -385,7 +386,7 @@ describe("Multiple questions in the text", () => {
 Q1::A1
 Q2::A2
 `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const questionList: Question[] = await parserConvertFoldersToDecks.createQuestionList(
             noteFile,
@@ -402,7 +403,7 @@ Q1::A1
 Q2::A2
 Q3::A3
 `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         const folderTopicPath: TopicPath = new TopicPath(["flashcards", "science"]);
         const questionList: Question[] = await parserConvertFoldersToDecks.createQuestionList(
@@ -429,7 +430,7 @@ Q1::A1
 Q2::A2
 Q3::A3
 `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
@@ -460,7 +461,7 @@ Multiline question2
 Multiline answer2
 
 `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
         const questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
             noteFile,
             TextDirection.Ltr,
@@ -506,7 +507,7 @@ describe("Handling tags within note", () => {
     Q3::A3
     `;
 
-            const noteFile: ISRFile = new UnitTestSRFile(noteText);
+            const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
             const folderTopicPath: TopicPath = new TopicPath(["folder", "subfolder"]);
             const questionList: Question[] = await parser2.createQuestionList(
                 noteFile,
@@ -524,7 +525,7 @@ describe("Handling tags within note", () => {
 Q1::A1
     `;
 
-            const noteFile: ISRFile = new UnitTestSRFile(noteText);
+            const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
             const folderTopicPath: TopicPath = new TopicPath(["folder", "subfolder"]);
             const questionList: Question[] = await parser2.createQuestionList(
                 noteFile,
@@ -544,7 +545,7 @@ Q1::A1
 #flashcards/test Q1::A1
     `;
 
-            const noteFile: ISRFile = new UnitTestSRFile(noteText);
+            const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
             const folderTopicPath: TopicPath = new TopicPath(["folder", "subfolder"]);
             const questionList: Question[] = await parser2.createQuestionList(
                 noteFile,
@@ -566,7 +567,7 @@ Q1::A1
     Q2::A2
     Q3::A3
     `;
-            const noteFile: ISRFile = new UnitTestSRFile(noteText);
+            const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
             const expectedPath: string = "#flashcards/test";
             const folderTopicPath: TopicPath = TopicPath.emptyPath;
@@ -593,7 +594,7 @@ created: 2023-10-26T07:34
 
 Stop trying ==to milk the crowd== for sympathy. // доить толпу
 `;
-            const noteFile: ISRFile = new UnitTestSRFile(noteText);
+            const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
             const folderTopicPath: TopicPath = TopicPath.emptyPath;
             const expected = [
@@ -624,7 +625,7 @@ Stop trying ==to milk the crowd== for sympathy. // доить толпу
     #flashcards/examination Q2::A2
     Q3::This has the "flashcards/test" topic, not "flashcards/examination"
     `;
-            const noteFile: ISRFile = new UnitTestSRFile(noteText);
+            const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
             const folderTopicPath: TopicPath = TopicPath.emptyPath;
             const questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
@@ -646,7 +647,7 @@ Stop trying ==to milk the crowd== for sympathy. // доить толпу
     Q2::A2
     Q3::A3
     `;
-            const noteFile: ISRFile = new UnitTestSRFile(noteText);
+            const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
             const folderTopicPath: TopicPath = TopicPath.emptyPath;
             const questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
@@ -668,7 +669,7 @@ Stop trying ==to milk the crowd== for sympathy. // доить толпу
     #flashcards/examination
     Q3::This has the "flashcards/examination" topic, not "flashcards/test"
     `;
-            const noteFile: ISRFile = new UnitTestSRFile(noteText);
+            const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
             const folderTopicPath: TopicPath = TopicPath.emptyPath;
             const questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
@@ -691,7 +692,7 @@ Stop trying ==to milk the crowd== for sympathy. // доить толпу
             const noteText: string = `
             #flashcards/science Q5::A5 <!--SR:!2023-09-02,4,270-->
     `;
-            const noteFile: ISRFile = new UnitTestSRFile(noteText);
+            const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
             const folderTopicPath: TopicPath = TopicPath.emptyPath;
             const questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
@@ -722,7 +723,7 @@ Zotero Link: zotero://select/items/@AegonsConquest2BC1AC
 
 What year did Aegon's Conquest start?::2BC #flashcards
 `;
-            const noteFile: ISRFile = new UnitTestSRFile(noteText);
+            const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
             const folderTopicPath: TopicPath = TopicPath.emptyPath;
             const expected = [
@@ -763,7 +764,7 @@ tags:
 ?
 In computer-science, a *heap* is a tree-based data-structure, that satisfies the *heap property*. A heap is a complete *binary-tree*!
 `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const expected = [
@@ -803,7 +804,7 @@ Q2
 ?
 A2
     `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const expected = [
@@ -841,7 +842,7 @@ tags:
 In computer-science, a *heap* is::a tree-based data-structure
 A::B
     `;
-        const noteFile: ISRFile = new UnitTestSRFile(noteText);
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
 
         const folderTopicPath: TopicPath = TopicPath.emptyPath;
         const expected = [

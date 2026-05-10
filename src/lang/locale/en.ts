@@ -368,6 +368,9 @@ const en: IBaseLocale = {
     DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE: "Date format for note review queue",
     DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE_DESC:
         'Date format for note review queue (see <a href="${docsUrl}">moment.js</a> for details). It only updates, once the note review queue is reopened.',
+    MIGRATE_TO_FOLDER: "Migrate to folder",
+    CONFIRM_MIGRATE_TO_FOLDER: "Are you sure you want to migrate to folder storage?",
+    MIGRATING_TO_FOLDER: "Migrating to folder storage...",
 };
 
 export default en;

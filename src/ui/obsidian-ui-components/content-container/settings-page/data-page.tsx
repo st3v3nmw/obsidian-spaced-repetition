@@ -37,7 +37,7 @@ export class DataPage extends SettingsPage {
             scrollListener,
         );
 
-        new SettingGroup(this.containerEl)
+        const dataStorageGroup = new SettingGroup(this.containerEl)
             .setHeading(t("GROUP_DATA_STORAGE"))
             .addSetting((setting: Setting) => {
                 setting
@@ -47,7 +47,8 @@ export class DataPage extends SettingsPage {
                         dropdown
                             .addOptions({
                                 [StorageType.NOTES]: t("STORE_IN_NOTES"),
-                                [StorageType.PLUGIN_DATA]: "Store in vault files (beta)",
+                                [StorageType.FOLDER]: "Store in vault folder (beta)",
+                                [StorageType.PLUGIN_DATA]: "Store in plugin data (beta)",
                             })
                             .setValue(this.dataManager.data.settings.dataStore)
                             .onChange(async (value) => {
@@ -58,18 +59,33 @@ export class DataPage extends SettingsPage {
                                 // Revert the dropdown immediately; only apply after confirmation.
                                 dropdown.setValue(oldMode);
 
-                                const isToPluginData = newMode === StorageType.PLUGIN_DATA;
+                                let migrateMessage: string = "";
+                                let confirmMessage: string = "";
+                                let migratingMessage: string = "";
+
+                                switch (newMode) {
+                                    case StorageType.FOLDER:
+                                        migrateMessage = t("MIGRATE_TO_FOLDER");
+                                        confirmMessage = t("CONFIRM_MIGRATE_TO_FOLDER");
+                                        migratingMessage = t("MIGRATING_TO_FOLDER");
+                                        break;
+                                    case StorageType.PLUGIN_DATA:
+                                        migrateMessage = t("MIGRATE_TO_PLUGIN_DATA");
+                                        confirmMessage = t("CONFIRM_MIGRATE_TO_PLUGIN_DATA");
+                                        migratingMessage = t("MIGRATING_TO_PLUGIN_DATA");
+                                        break;
+                                    case StorageType.NOTES:
+                                        migrateMessage = t("MIGRATE_TO_NOTES");
+                                        confirmMessage = t("CONFIRM_MIGRATE_TO_NOTES");
+                                        migratingMessage = t("MIGRATING_TO_NOTES");
+                                        break;
+                                }
+
                                 new ConfirmationModal(
                                     this.plugin.app,
-                                    isToPluginData
-                                        ? t("MIGRATE_TO_PLUGIN_DATA")
-                                        : t("MIGRATE_TO_NOTES"),
-                                    isToPluginData
-                                        ? t("CONFIRM_MIGRATE_TO_PLUGIN_DATA")
-                                        : t("CONFIRM_MIGRATE_TO_NOTES"),
-                                    isToPluginData
-                                        ? t("MIGRATING_TO_PLUGIN_DATA")
-                                        : t("MIGRATING_TO_NOTES"),
+                                    migrateMessage,
+                                    confirmMessage,
+                                    migratingMessage,
                                     async () => {
                                         await this.dataManager.migrateDataStore(oldMode, newMode);
                                         dropdown.setValue(newMode);
@@ -82,11 +98,15 @@ export class DataPage extends SettingsPage {
                                 ).open();
                             });
                     });
-            })
-            .addSetting((setting: Setting) => {
-                setting.infoEl.insertAdjacentText("beforeend", t("PLUGIN_DATA_STORE_INFO"));
-            })
-            .addSetting((setting: Setting) => {
+            });
+
+        dataStorageGroup.addSetting((setting: Setting) => {
+            setting.infoEl.insertAdjacentText("beforeend", t("PLUGIN_DATA_STORE_INFO"));
+        });
+
+        if (this.dataManager.data.settings.dataStore === StorageType.FOLDER) {
+
+            dataStorageGroup.addSetting((setting: Setting) => {
                 setting
                     .setName("Schedule data location in vault")
                     .setDesc(
@@ -97,7 +117,6 @@ export class DataPage extends SettingsPage {
                             this.dataManager.data.settings.scheduleDataVaultLocation =
                                 text.getValue().trim() ||
                                 DEFAULT_SETTINGS.scheduleDataVaultLocation;
-                            await this.dataManager.persistScheduleDataNow();
                             await this.dataManager.savePluginData();
                         };
 
@@ -113,20 +132,22 @@ export class DataPage extends SettingsPage {
                             void commitValue();
                         });
                     });
-            })
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("INLINE_SCHEDULING_COMMENTS"))
-                    .setDesc(t("INLINE_SCHEDULING_COMMENTS_DESC"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.dataManager.data.settings.cardCommentOnSameLine)
-                            .onChange(async (value) => {
-                                this.dataManager.data.settings.cardCommentOnSameLine = value;
-                                await this.dataManager.savePluginData();
-                            }),
-                    );
             });
+        }
+
+        dataStorageGroup.addSetting((setting: Setting) => {
+            setting
+                .setName(t("INLINE_SCHEDULING_COMMENTS"))
+                .setDesc(t("INLINE_SCHEDULING_COMMENTS_DESC"))
+                .addToggle((toggle) =>
+                    toggle
+                        .setValue(this.dataManager.data.settings.cardCommentOnSameLine)
+                        .onChange(async (value) => {
+                            this.dataManager.data.settings.cardCommentOnSameLine = value;
+                            await this.dataManager.savePluginData();
+                        }),
+                );
+        });
 
         new SettingGroup(this.containerEl)
             .setHeading(t("DELETE_SCHEDULING_DATA_ALL"))
