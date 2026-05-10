@@ -1,7 +1,8 @@
+import process from "process";
 process.env.TZ = "UTC";
 
 /** @type {import('@ts-jest/dist/types').InitialOptionsTsJest} */
-module.exports = {
+export default {
     verbose: true,
     preset: "ts-jest",
     testEnvironment: "jsdom",
@@ -24,10 +25,11 @@ module.exports = {
         "src/icons/",
         "src/main.ts",
         "src/data/data-manager.ts",
-        "src/data/data-stores/data-store-migrator.ts",
+        "src/data/data-stores/base/data-store-migrator.ts",
         "src/note/next-note-review-handler.ts",
         "src/data/plugin-data.ts",
         "src/utils/renderers.ts",
+        "src/scheduling/algorithms/osr/obsidian-vault-notelink-info-finder.ts",
 
         // debugging utils
         "src/utils/debug.ts",

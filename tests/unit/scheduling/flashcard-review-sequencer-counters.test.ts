@@ -18,9 +18,9 @@ import {
 } from "src/scheduling/flashcard-review-sequencer";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
-import { UnitTestSRFile } from "./helpers/unit-test-file";
-import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
-import { SampleItemDecks } from "./sample-items";
+import { UnitTestSRFile } from "../helpers/unit-test-file";
+import { unitTestSetupStandardDataStoreAlgorithm } from "../helpers/unit-test-setup";
+import { SampleItemDecks } from "../sample-items";
 
 const orderDueFirstSequential: IIteratorOrder = {
     repItemOrder: RepItemOrder.DueFirstSequential,

@@ -10,7 +10,7 @@ import { SRAlgorithmOsr } from "src/scheduling/algorithms/osr/srs-algorithm-osr"
 import { CardDueDateHistogram } from "src/scheduling/due-date-histogram";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
-import { unitTestSetupStandardDataStoreAlgorithm } from "../../helpers/unit-test-setup";
+import { unitTestSetupStandardDataStoreAlgorithm } from "../../../helpers/unit-test-setup";
 
 beforeAll(() => {
     setupStaticDateProvider20230906();

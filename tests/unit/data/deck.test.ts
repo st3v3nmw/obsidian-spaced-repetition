@@ -4,8 +4,8 @@ import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 
-import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
-import { SampleItemDecks } from "./sample-items";
+import { unitTestSetupStandardDataStoreAlgorithm } from "../helpers/unit-test-setup";
+import { SampleItemDecks } from "../sample-items";
 
 beforeAll(() => {
     unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);

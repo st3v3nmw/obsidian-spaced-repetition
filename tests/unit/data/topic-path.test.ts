@@ -1,7 +1,7 @@
 import { TopicPath, TopicPathList } from "src/data/data-structures/deck/topic-path";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 
-import { UnitTestSRFile } from "./helpers/unit-test-file";
+import { UnitTestSRFile } from "../helpers/unit-test-file";
 
 describe("Constructor exception handling", () => {
     test("Constructor rejects null path", () => {

@@ -7,9 +7,9 @@ import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/rep
 import { NoteDueDateHistogram } from "src/scheduling/due-date-histogram";
 import { formatDateYYYYMMDD, setupStaticDateProvider20230906 } from "src/utils/dates";
 
-import { UnitTestOsrCore } from "./helpers/unit-test-core";
-import { unitTestCheckNoteFrontmatter } from "./helpers/unit-test-helper";
-import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
+import { UnitTestOsrCore } from "../helpers/unit-test-core";
+import { unitTestCheckNoteFrontmatter } from "../helpers/unit-test-helper";
+import { unitTestSetupStandardDataStoreAlgorithm } from "../helpers/unit-test-setup";
 
 function checkDeckTreeCounts(
     osrCore: UnitTestOsrCore,

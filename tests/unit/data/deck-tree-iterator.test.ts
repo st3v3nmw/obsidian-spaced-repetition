@@ -11,8 +11,8 @@ import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 import { setupNextRandomNumber, setupStaticRandomNumberProvider } from "src/utils/numbers";
 
-import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
-import { SampleItemDecks } from "./sample-items";
+import { unitTestSetupStandardDataStoreAlgorithm } from "../helpers/unit-test-setup";
+import { SampleItemDecks } from "../sample-items";
 
 beforeAll(() => {
     setupStaticDateProvider20230906();

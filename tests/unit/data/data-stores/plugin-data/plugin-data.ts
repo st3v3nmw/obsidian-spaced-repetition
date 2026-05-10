@@ -10,8 +10,8 @@ import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-s
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 
-import { UnitTestSRFile } from "../../helpers/unit-test-file";
-import { unitTestSetupStandardDataStoreAlgorithm } from "../../helpers/unit-test-setup";
+import { UnitTestSRFile } from "../../../helpers/unit-test-file";
+import { unitTestSetupStandardDataStoreAlgorithm } from "../../../helpers/unit-test-setup";
 
 beforeAll(() => {
     setupStaticDateProvider20230906();

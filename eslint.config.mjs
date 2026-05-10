@@ -1,6 +1,6 @@
 import eslint from "@eslint/js";
-import eslintPluginUnicorn from "eslint-plugin-unicorn";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
+import eslintPluginUnicorn from "eslint-plugin-unicorn";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
