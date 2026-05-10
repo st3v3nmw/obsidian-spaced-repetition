@@ -1,16 +1,16 @@
 import { CardInput, createEmptyCard, FSRS, fsrs, State } from "ts-fsrs";
 
-import { ISRAlgorithm, SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
+import { ISRAlgorithm, SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import {
     buildFsrsParameters,
     legacyScheduleToFsrsCard,
     reviewResponseToFsrsGrade,
-} from "src/algorithms/fsrs/fsrs-helpers";
-import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
-import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
-import { SRAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
+} from "src/scheduling/algorithms/fsrs/fsrs-helpers";
+import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { OsrNoteGraph } from "src/scheduling/algorithms/osr/osr-note-graph";
+import { SRAlgorithmOsr } from "src/scheduling/algorithms/osr/srs-algorithm-osr";
 import { SRSettings } from "src/data/settings";
 import { Note } from "src/note/note";
 import { INoteEaseList } from "src/note/note-ease-list";

@@ -1,6 +1,6 @@
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { OsrNoteGraph } from "src/scheduling/algorithms/osr/osr-note-graph";
 import { Note } from "src/note/note";
 import { INoteEaseList } from "src/note/note-ease-list";
 import { DueDateHistogram } from "src/scheduling/due-date-histogram";

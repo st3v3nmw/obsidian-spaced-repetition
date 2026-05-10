@@ -1,6 +1,6 @@
 import * as graph from "pagerank.js";
 
-import { IOsrVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
+import { IOsrVaultNoteLinkInfoFinder } from "src/scheduling/algorithms/osr/obsidian-vault-notelink-info-finder";
 import { INoteEaseList } from "src/note/note-ease-list";
 import { isSupportedFileType } from "src/utils/fs";
 

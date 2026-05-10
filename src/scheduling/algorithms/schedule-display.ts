@@ -1,7 +1,7 @@
 import moment from "moment";
 
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { textInterval } from "src/algorithms/osr/note-scheduling";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { textInterval } from "src/scheduling/algorithms/osr/note-scheduling";
 import { globalDateProvider } from "src/utils/dates";
 
 export function formatScheduleInterval(

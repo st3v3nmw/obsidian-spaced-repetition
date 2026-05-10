@@ -1,8 +1,8 @@
 import moment, { Moment } from "moment";
 import { CardInput, FSRSParameters, Grade, Rating, State } from "ts-fsrs";
 
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { SRSettings } from "src/data/settings";
 
 export const FSRS_COMMENT_PREFIX = "fsrs";

@@ -1,13 +1,13 @@
 import moment, { Moment } from "moment";
 import { Card, CardInput, State } from "ts-fsrs";
 
-import { SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {
     difficultyToEase,
     formatFsrsTimestamp,
     FSRS_COMMENT_PREFIX,
-} from "src/algorithms/fsrs/fsrs-helpers";
+} from "src/scheduling/algorithms/fsrs/fsrs-helpers";
 import { globalDateProvider } from "src/utils/dates";
 
 /**

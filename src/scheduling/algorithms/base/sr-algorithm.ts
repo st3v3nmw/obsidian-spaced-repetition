@@ -1,4 +1,4 @@
-import { ISRAlgorithm } from "src/algorithms/base/isr-algorithm";
+import { ISRAlgorithm } from "src/scheduling/algorithms/base/isr-algorithm";
 
 /**
  * Represents a scheduling algorithm.

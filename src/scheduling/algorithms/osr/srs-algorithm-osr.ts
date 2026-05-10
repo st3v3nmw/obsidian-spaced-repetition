@@ -1,11 +1,11 @@
 import moment, { Moment } from "moment";
 
-import { ISRAlgorithm, SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { osrSchedule } from "src/algorithms/osr/note-scheduling";
-import { NoteLinkStat, OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
-import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { ISRAlgorithm, SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { osrSchedule } from "src/scheduling/algorithms/osr/note-scheduling";
+import { NoteLinkStat, OsrNoteGraph } from "src/scheduling/algorithms/osr/osr-note-graph";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
 import { Note } from "src/note/note";

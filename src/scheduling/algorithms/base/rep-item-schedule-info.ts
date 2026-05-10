@@ -1,6 +1,6 @@
 import { Moment } from "moment";
 
-import { SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { PREFERRED_DATE_FORMAT, TICKS_PER_DAY } from "src/data/constants";
 import { formatDate, globalDateProvider } from "src/utils/dates";
 

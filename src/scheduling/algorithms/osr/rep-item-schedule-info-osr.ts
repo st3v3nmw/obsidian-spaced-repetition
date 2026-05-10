@@ -1,7 +1,7 @@
 import { Moment } from "moment";
 
-import { SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { PREFERRED_DATE_FORMAT } from "src/data/constants";
 import { SRSettings } from "src/data/settings";
 import { DateUtil, formatDate, globalDateProvider } from "src/utils/dates";

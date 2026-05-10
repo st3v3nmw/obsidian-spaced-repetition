@@ -1,4 +1,4 @@
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { TICKS_PER_DAY } from "src/data/constants";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
