@@ -1,4 +1,5 @@
 import { RepItemStorageInfo } from "src/data/data-store/data-store-instances/base/rep-item-storage-info";
+import { IScheduleDeleter } from "src/data/data-store/data-store-schedule-deleter/base/schedule-deleter";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 
@@ -17,6 +18,7 @@ export enum StorageType {
  */
 export interface IDataStore {
     readonly storageType: StorageType;
+    readonly scheduleDeleter: IScheduleDeleter;
     /**
      * Creates scheduling information from a question text and its storage info.
      *

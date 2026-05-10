@@ -3,6 +3,7 @@ import { Moment } from "moment";
 import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR } from "src/data/constants";
 import { IDataStore, StorageType } from "src/data/data-store/data-store-instances/base/data-store";
 import { RepItemStorageInfo } from "src/data/data-store/data-store-instances/base/rep-item-storage-info";
+import { IScheduleDeleter } from "src/data/data-store/data-store-schedule-deleter/base/schedule-deleter";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { PluginData } from "src/data/plugin-data";
 import { SRSettings } from "src/data/settings";
@@ -20,10 +21,12 @@ export class PluginDataStore implements IDataStore {
     public readonly storageType = StorageType.PLUGIN_DATA;
     private settings: SRSettings;
     private pluginData: PluginData;
+    public readonly scheduleDeleter: IScheduleDeleter;
 
-    constructor(settings: SRSettings, pluginData: PluginData) {
+    constructor(settings: SRSettings, scheduleDeleter: IScheduleDeleter, pluginData: PluginData) {
         this.settings = settings;
         this.pluginData = pluginData;
+        this.scheduleDeleter = scheduleDeleter;
     }
 
     /**

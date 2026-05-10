@@ -6,8 +6,10 @@ import { SRSettings } from "src/data/settings";
 import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
 import { SRAlgorithmOsr } from "src/scheduling/algorithms/osr/srs-algorithm-osr";
 
+import { UnitTestScheduleDeleter } from "./unit-test-schedule-deleter";
+
 export function unitTestSetupStandardDataStoreAlgorithm(settings: SRSettings) {
-    DataStore.instance = new NotesDataStore(settings);
+    DataStore.instance = new NotesDataStore(settings, new UnitTestScheduleDeleter());
     SRAlgorithm.instance = new SRAlgorithmOsr(settings);
     DataStoreAlgorithm.instance = new NoteDataStoreAlgorithmOsr(settings);
 }

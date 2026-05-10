@@ -4,6 +4,7 @@ import { App, TFile, TFolder } from "obsidian";
 import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR } from "src/data/constants";
 import { IDataStore, StorageType } from "src/data/data-store/data-store-instances/base/data-store";
 import { RepItemStorageInfo } from "src/data/data-store/data-store-instances/base/rep-item-storage-info";
+import { IScheduleDeleter } from "src/data/data-store/data-store-schedule-deleter/base/schedule-deleter";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
@@ -23,11 +24,13 @@ export class FolderDataStore implements IDataStore {
     public readonly storageType = StorageType.FOLDER;
     private settings: SRSettings;
     private app: App;
+    public readonly scheduleDeleter: IScheduleDeleter;
 
-    constructor(settings: SRSettings, app: App) {
+    constructor(settings: SRSettings, scheduleDeleter: IScheduleDeleter, app: App) {
         this.settings = settings;
         this.app = app;
         this.ensureFolderStructure();
+        this.scheduleDeleter = scheduleDeleter;
     }
 
     /**

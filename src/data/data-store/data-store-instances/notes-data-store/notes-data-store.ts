@@ -3,6 +3,7 @@ import { Moment } from "moment";
 import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR } from "src/data/constants";
 import { IDataStore, StorageType } from "src/data/data-store/data-store-instances/base/data-store";
 import { RepItemStorageInfo } from "src/data/data-store/data-store-instances/base/rep-item-storage-info";
+import { IScheduleDeleter } from "src/data/data-store/data-store-schedule-deleter/base/schedule-deleter";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
@@ -18,9 +19,11 @@ import { MultiLineTextFinder } from "src/utils/strings";
 export class NotesDataStore implements IDataStore {
     public readonly storageType = StorageType.NOTES;
     private settings: SRSettings;
+    public readonly scheduleDeleter: IScheduleDeleter;
 
-    constructor(settings: SRSettings) {
+    constructor(settings: SRSettings, scheduleDeleter: IScheduleDeleter) {
         this.settings = settings;
+        this.scheduleDeleter = scheduleDeleter;
     }
 
     /**

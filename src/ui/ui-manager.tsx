@@ -2,6 +2,7 @@ import "src/ui/styles.css";
 import { Menu, MenuItem, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
+import { DataStore } from "src/data/data-store/data-store-instances/base/data-store";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
@@ -332,7 +333,7 @@ export class UIManager {
                                 if (this.dataManager.data === null)
                                     throw new Error("SR plugin or data not initialized!!!");
                                 const settings = this.dataManager.data.settings;
-                                this.dataManager.deleteNoteSchedulingDataInNote(
+                                DataStore.instance.scheduleDeleter.deleteNoteSchedulingDataInNote(
                                     file,
                                     settings.deleteTagsOnSchedulingDataDeletion,
                                     settings.tagsToReview,
@@ -356,7 +357,7 @@ export class UIManager {
                                 if (this.dataManager.data === null)
                                     throw new Error("SR plugin or data not initialized!!!");
                                 const settings = this.dataManager.data.settings;
-                                this.dataManager.deleteAllSchedulingDataOfCardsInNote(
+                                DataStore.instance.scheduleDeleter.deleteAllSchedulingDataOfCardsInNote(
                                     file,
                                     settings.deleteTagsOnSchedulingDataDeletion,
                                     settings.flashcardTags,

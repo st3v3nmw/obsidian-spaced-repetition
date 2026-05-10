@@ -1,7 +1,7 @@
 import { Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
-import { StorageType } from "src/data/data-store/data-store-instances/base/data-store";
+import { DataStore, StorageType } from "src/data/data-store/data-store-instances/base/data-store";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
@@ -182,7 +182,7 @@ export class DataPage extends SettingsPage {
                                     t("SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS"),
                                     () => {
                                         const settings = this.dataManager.data.settings;
-                                        this.dataManager.deleteAllSchedulingData(
+                                        DataStore.instance.scheduleDeleter.deleteAllSchedulingData(
                                             settings.deleteTagsOnSchedulingDataDeletion,
                                             settings.flashcardTags,
                                             settings.tagsToReview,
@@ -207,7 +207,7 @@ export class DataPage extends SettingsPage {
                                     t("CONFIRM_SCHEDULING_DATA_IN_NOTES_DELETION"),
                                     t("SCHEDULING_DATA_IN_NOTES_DELETION_IN_PROGRESS"),
                                     () => {
-                                        this.dataManager.deleteAllSchedulingDataInNotes(
+                                        DataStore.instance.scheduleDeleter.deleteAllSchedulingDataInNotes(
                                             this.dataManager.data.settings
                                                 .deleteTagsOnSchedulingDataDeletion,
                                             this.dataManager.data.settings.tagsToReview,
@@ -232,7 +232,7 @@ export class DataPage extends SettingsPage {
                                     t("CONFIRM_SCHEDULING_DATA_IN_CARDS_DELETION"),
                                     t("SCHEDULING_DATA_IN_CARDS_DELETION_IN_PROGRESS"),
                                     () => {
-                                        this.dataManager.deleteAllSchedulingDataInCards(
+                                        DataStore.instance.scheduleDeleter.deleteAllSchedulingDataInCards(
                                             this.dataManager.data.settings
                                                 .deleteTagsOnSchedulingDataDeletion,
                                             this.dataManager.data.settings.flashcardTags,
