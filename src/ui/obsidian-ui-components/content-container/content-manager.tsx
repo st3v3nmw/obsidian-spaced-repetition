@@ -1,21 +1,21 @@
 import { now } from "moment";
 import { App, MarkdownView, Notice, Platform } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { DataManager } from "src/data/data-manager";
 import { Card } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { Deck } from "src/data/data-structures/deck/deck";
 import { SRSettings } from "src/data/settings";
+import { t } from "src/lang/helpers";
+import SRPlugin from "src/main";
+import { Note } from "src/note/note";
 import {
     DeckStats,
     FlashcardReviewMode,
     IFlashcardReviewSequencer,
-} from "src/flashcard-review-sequencer";
-import { t } from "src/lang/helpers";
-import SRPlugin from "src/main";
-import { Note } from "src/note/note";
+} from "src/scheduling/flashcard-review-sequencer";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
 import CardInfoNotice from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-info-notice";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";

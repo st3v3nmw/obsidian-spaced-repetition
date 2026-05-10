@@ -1,7 +1,7 @@
 import moment from "moment";
 import { State } from "ts-fsrs";
 
-import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
 beforeAll(() => {

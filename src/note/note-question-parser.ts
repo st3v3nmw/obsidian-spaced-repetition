@@ -1,6 +1,6 @@
 import { TagCache } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { DataStore } from "src/data/data-stores/base/data-store";
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
 import { Card } from "src/data/data-structures/card/card";

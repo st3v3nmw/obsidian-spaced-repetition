@@ -1,6 +1,6 @@
 import { Rating, State } from "ts-fsrs";
 
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import {
     buildFsrsParameters,
     difficultyToEase,
@@ -10,8 +10,8 @@ import {
     legacyScheduleToFsrsCard,
     parseFsrsTimestamp,
     reviewResponseToFsrsGrade,
-} from "src/algorithms/fsrs/fsrs-helpers";
-import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+} from "src/scheduling/algorithms/fsrs/fsrs-helpers";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { globalDateProvider, setupStaticDateProvider20230906 } from "src/utils/dates";
 

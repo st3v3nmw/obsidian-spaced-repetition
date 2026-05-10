@@ -1,8 +1,8 @@
 import moment from "moment";
 import { State } from "ts-fsrs";
 
-import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
-import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { NoteDataStoreAlgorithmOsr } from "src/data/data-store-algorithm/note-data-store/note-data-store-algorithm-osr";
 import { Card } from "src/data/data-structures/card/card";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";

@@ -1,13 +1,13 @@
 import moment from "moment";
 import { State } from "ts-fsrs";
 
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
-import { SrsAlgorithmFsrs } from "src/algorithms/fsrs/sr-algorithm-fsrs";
-import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
-import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { SrsAlgorithmFsrs } from "src/scheduling/algorithms/fsrs/sr-algorithm-fsrs";
+import { OsrNoteGraph } from "src/scheduling/algorithms/osr/osr-note-graph";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { DEFAULT_SETTINGS } from "src/data/settings";
-import { CardDueDateHistogram } from "src/due-date-histogram";
+import { CardDueDateHistogram } from "src/scheduling/due-date-histogram";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
 beforeAll(() => {

@@ -1,4 +1,4 @@
-import { RepetitionItem, RepItemState } from "src/algorithms/base/repetition-item";
+import { RepetitionItem, RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 import { Card } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { Deck } from "src/data/data-structures/deck/deck";

@@ -16,8 +16,8 @@ import { Setting, SettingGroup } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
-import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
-import { textInterval } from "src/algorithms/osr/note-scheduling";
+import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
+import { textInterval } from "src/scheduling/algorithms/osr/note-scheduling";
 import { OsrCore } from "src/data/core";
 import { DataManager } from "src/data/data-manager";
 import { Stats } from "src/data/data-structures/deck/stats";
@@ -28,7 +28,7 @@ import { SettingsPageType } from "src/ui/obsidian-ui-components/content-containe
 import ChartComponent from "src/ui/obsidian-ui-components/content-container/settings-page/statistics-page/chart-component";
 import NoteStatsComponent from "src/ui/obsidian-ui-components/content-container/settings-page/statistics-page/note-stats-component";
 import { getKeysPreserveType, getTypedObjectEntries, mapRecord } from "src/utils/types";
-import { RepItemState } from "src/algorithms/base/repetition-item";
+import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 
 Chart.register(
     BarElement,

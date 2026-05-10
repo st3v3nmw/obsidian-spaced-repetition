@@ -1,8 +1,8 @@
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
-import { IOsrVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
-import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
+import { IOsrVaultNoteLinkInfoFinder } from "src/scheduling/algorithms/osr/obsidian-vault-notelink-info-finder";
+import { OsrNoteGraph } from "src/scheduling/algorithms/osr/osr-note-graph";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import { DeckTreeStatsCalculator } from "src/data/data-structures/deck/deck-tree-stats-calculator";
@@ -10,11 +10,11 @@ import { Stats } from "src/data/data-structures/deck/stats";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { SettingsUtil, SRSettings } from "src/data/settings";
-import { CardDueDateHistogram, NoteDueDateHistogram } from "src/due-date-histogram";
-import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
 import { Note } from "src/note/note";
 import { NoteFileLoader } from "src/note/note-file-loader";
 import { NoteReviewQueue } from "src/note/note-review-queue";
+import { CardDueDateHistogram, NoteDueDateHistogram } from "src/scheduling/due-date-histogram";
+import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import { globalDateProvider, IDayBoundary } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 

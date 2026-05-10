@@ -1,10 +1,10 @@
 import { Moment } from "moment";
 import { App, TFile, TFolder } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { FSRS_COMMENT_PREFIX, parseFsrsTimestamp } from "src/algorithms/fsrs/fsrs-helpers";
-import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
-import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { FSRS_COMMENT_PREFIX, parseFsrsTimestamp } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
+import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR } from "src/data/constants";
 import { IDataStore, StorageType } from "src/data/data-stores/base/data-store";
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";

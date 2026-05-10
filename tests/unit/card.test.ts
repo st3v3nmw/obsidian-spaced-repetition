@@ -1,4 +1,4 @@
-import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { TICKS_PER_DAY } from "src/data/constants";
 import { Card } from "src/data/data-structures/card/card";
 

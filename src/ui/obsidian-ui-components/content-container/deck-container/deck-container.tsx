@@ -7,7 +7,7 @@ import { SRSettings } from "src/data/settings";
 import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
-} from "src/flashcard-review-sequencer";
+} from "src/scheduling/flashcard-review-sequencer";
 import DeckListComponent from "src/ui/obsidian-ui-components/content-container/deck-container/deck-list";
 import DeckListHeaderComponent from "src/ui/obsidian-ui-components/content-container/deck-container/deck-list-header";
 

@@ -1,4 +1,4 @@
-import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END } from "src/data/constants";
 import { IDataStoreAlgorithm } from "src/data/data-store-algorithm/base/idata-store-algorithm";
 import { Card } from "src/data/data-structures/card/card";

@@ -1,4 +1,4 @@
-import { RepItemState } from "src/algorithms/base/repetition-item";
+import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 import { Deck } from "src/data/data-structures/deck/deck";
 import {
     RepItemOrder,

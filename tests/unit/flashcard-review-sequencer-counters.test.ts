@@ -1,21 +1,21 @@
-import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
+import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import {
-    RepItemOrder,
     DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
+    RepItemOrder,
 } from "src/data/data-structures/deck/deck-tree-iterator";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
-import { CardDueDateHistogram } from "src/due-date-histogram";
+import { CardDueDateHistogram } from "src/scheduling/due-date-histogram";
 import {
     FlashcardReviewMode,
     FlashcardReviewSequencer,
     IFlashcardReviewSequencer,
-} from "src/flashcard-review-sequencer";
+} from "src/scheduling/flashcard-review-sequencer";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";

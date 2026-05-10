@@ -3,8 +3,8 @@ import "src/ui/obsidian-ui-components/content-container/deck-container/deck-list
 import { COLLAPSE_ICON } from "src/data/constants";
 import { Deck } from "src/data/data-structures/deck/deck";
 import { SRSettings } from "src/data/settings";
-import { DeckStats, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
+import { DeckStats, IFlashcardReviewSequencer } from "src/scheduling/flashcard-review-sequencer";
 
 export default class DeckListComponent {
     private scrollWrapper: HTMLDivElement;
@@ -177,7 +177,7 @@ export default class DeckListComponent {
         parentEl: HTMLDivElement,
         initiallyExpanded: boolean = false,
         deck: Deck | null = null,
-        startReviewOfDeck: (deck: Deck) => void = () => {},
+        startReviewOfDeck: (deck: Deck) => void = () => { },
     ): HTMLDivElement {
         const disableInteraction = deck === null;
         const treeRow = parentEl.createDiv();

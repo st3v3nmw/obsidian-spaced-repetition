@@ -1,8 +1,8 @@
 import { State } from "ts-fsrs";
 
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
-import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { MULTI_SCHEDULING_EXTRACTOR } from "src/data/constants";
 import { TICKS_PER_DAY } from "src/data/constants";
 import { DataStore } from "src/data/data-stores/base/data-store";
@@ -65,13 +65,13 @@ test("Legacy fallback extractor loop still parses schedules", () => {
                     regex === MULTI_SCHEDULING_EXTRACTOR
                         ? []
                         : [
-                              [
-                                  "<!--SR:2023-09-02,4,270-->",
-                                  "2023-09-02",
-                                  "4",
-                                  "270",
-                              ] as RegExpMatchArray,
-                          ];
+                            [
+                                "<!--SR:2023-09-02,4,270-->",
+                                "2023-09-02",
+                                "4",
+                                "270",
+                            ] as RegExpMatchArray,
+                        ];
                 return matches[Symbol.iterator]() as IterableIterator<RegExpMatchArray>;
             },
         } as never,

@@ -1,6 +1,6 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
-import { SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { DataManager } from "src/data/data-manager";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { t } from "src/lang/helpers";

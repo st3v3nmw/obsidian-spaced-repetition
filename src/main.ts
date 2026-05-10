@@ -1,26 +1,26 @@
 import { Platform, Plugin, TFile } from "obsidian";
 
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
 import { DataManager } from "src/data/data-manager";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import {
-    RepItemOrder,
     DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
+    RepItemOrder,
 } from "src/data/data-structures/deck/deck-tree-iterator";
 import { SRSettings } from "src/data/settings";
-import {
-    FlashcardReviewMode,
-    FlashcardReviewSequencer,
-    IFlashcardReviewSequencer,
-} from "src/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { Note } from "src/note/note";
 import { NoteReviewQueue } from "src/note/note-review-queue";
+import {
+    FlashcardReviewMode,
+    FlashcardReviewSequencer,
+    IFlashcardReviewSequencer,
+} from "src/scheduling/flashcard-review-sequencer";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
 import { UIManager, UIState } from "src/ui/ui-manager";
 import EmulatedPlatform from "src/utils/platform-detector";

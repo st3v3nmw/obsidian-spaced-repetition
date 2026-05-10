@@ -5,7 +5,7 @@ import { DEFAULT_SETTINGS } from "src/data/settings";
 
 import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 import { SampleItemDecks } from "./sample-items";
-import { RepItemState } from "src/algorithms/base/repetition-item";
+import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 
 beforeAll(() => {
     unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);

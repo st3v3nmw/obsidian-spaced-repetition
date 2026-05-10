@@ -1,4 +1,4 @@
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
 
 /**

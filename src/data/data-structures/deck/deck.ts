@@ -1,9 +1,9 @@
-import { RepItemState } from "src/algorithms/base/repetition-item";
+import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 import { Card, Card as RepetitionItem } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { IQuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { TopicPath, TopicPathList } from "src/data/data-structures/deck/topic-path";
-import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
+import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 
 
 // The same card can be added to multiple decks e.g.

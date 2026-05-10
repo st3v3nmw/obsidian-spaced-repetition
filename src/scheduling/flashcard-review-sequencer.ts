@@ -1,6 +1,6 @@
-import { ISRAlgorithm } from "src/algorithms/base/isr-algorithm";
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { RepItemState, ReviewResponse } from "src/algorithms/base/repetition-item";
+import { ISRAlgorithm } from "src/scheduling/algorithms/base/isr-algorithm";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { TICKS_PER_DAY } from "src/data/constants";
 import { DataStore } from "src/data/data-stores/base/data-store";
 import { Card } from "src/data/data-structures/card/card";
@@ -10,8 +10,8 @@ import { Deck } from "src/data/data-structures/deck/deck";
 import { IDeckTreeIterator } from "src/data/data-structures/deck/deck-tree-iterator";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { SRSettings } from "src/data/settings";
-import { DueDateHistogram } from "src/due-date-histogram";
 import { Note } from "src/note/note";
+import { DueDateHistogram } from "src/scheduling/due-date-histogram";
 import { globalDateProvider } from "src/utils/dates";
 
 export interface IFlashcardReviewSequencer {

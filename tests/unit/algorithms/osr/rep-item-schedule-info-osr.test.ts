@@ -1,6 +1,6 @@
 import moment from "moment";
 
-import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 
 describe("formatCardScheduleForHtmlComment", () => {

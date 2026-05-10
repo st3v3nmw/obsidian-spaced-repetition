@@ -1,8 +1,8 @@
 import { request } from "obsidian";
 
-import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import CounterStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/counter-statusbar-item";
 import TextStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/text-statusbar-item";
 

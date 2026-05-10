@@ -1,4 +1,4 @@
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { NoteReviewDeck, SchedNote } from "src/note/note-review-deck";
 

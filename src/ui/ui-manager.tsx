@@ -1,12 +1,12 @@
 import "src/ui/styles.css";
 import { Menu, MenuItem, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
-import { RepItemState, ReviewResponse } from "src/algorithms/base/repetition-item";
+import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { DataManager } from "src/data/data-manager";
-import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";

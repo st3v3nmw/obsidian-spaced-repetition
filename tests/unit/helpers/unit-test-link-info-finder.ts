@@ -1,6 +1,6 @@
 import path from "path";
 
-import { IOsrVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
+import { IOsrVaultNoteLinkInfoFinder } from "src/scheduling/algorithms/osr/obsidian-vault-notelink-info-finder";
 
 import { UnitTestSRFile } from "./unit-test-file";
 import { unitTestParseForOutgoingLinks } from "./unit-test-helper";

@@ -1,4 +1,4 @@
-import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
 import { FolderDataStore } from "src/data/data-stores/folder-data-store/folder-data-store";
 import { ScheduleDataFolderRepository } from "src/data/data-stores/folder-data-store/schedule-data-folder-repository";
@@ -21,7 +21,7 @@ beforeAll(() => {
 });
 
 function makeRepo(data: PluginData): ScheduleDataFolderRepository {
-    return new ScheduleDataFolderRepository(data, async () => {});
+    return new ScheduleDataFolderRepository(data, async () => { });
 }
 
 function makeStore(
