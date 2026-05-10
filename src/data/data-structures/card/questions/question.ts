@@ -2,8 +2,8 @@ import {
     OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX,
     OBSIDIAN_TAG_AT_STARTOFLINE_REGEX,
 } from "src/data/constants";
-import { DataStoreAlgorithm } from "src/data/data-store-algorithm/base/data-store-algorithm";
-import { DataStore } from "src/data/data-store-instances/base/data-store";
+import { DataStoreAlgorithm } from "src/data/data-store/data-store-algorithm/base/data-store-algorithm";
+import { DataStore } from "src/data/data-store/data-store-instances/base/data-store";
 import { Card } from "src/data/data-structures/card/card";
 import {
     TopicPath,

@@ -1,8 +1,8 @@
 import { Moment } from "moment";
 
 import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR } from "src/data/constants";
-import { IDataStore, StorageType } from "src/data/data-store-instances/base/data-store";
-import { RepItemStorageInfo } from "src/data/data-store-instances/base/rep-item-storage-info";
+import { IDataStore, StorageType } from "src/data/data-store/data-store-instances/base/data-store";
+import { RepItemStorageInfo } from "src/data/data-store/data-store-instances/base/rep-item-storage-info";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";

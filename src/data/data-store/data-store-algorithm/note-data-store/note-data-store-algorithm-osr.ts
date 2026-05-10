@@ -1,5 +1,5 @@
 import { SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END } from "src/data/constants";
-import { IDataStoreAlgorithm } from "src/data/data-store-algorithm/base/idata-store-algorithm";
+import { IDataStoreAlgorithm } from "src/data/data-store/data-store-algorithm/base/idata-store-algorithm";
 import { Card } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";

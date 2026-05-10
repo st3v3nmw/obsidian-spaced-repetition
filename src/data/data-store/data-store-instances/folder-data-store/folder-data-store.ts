@@ -1,10 +1,10 @@
 import { Moment } from "moment";
+import { App, TFile, TFolder } from "obsidian";
 
 import { LEGACY_SCHEDULING_EXTRACTOR, MULTI_SCHEDULING_EXTRACTOR } from "src/data/constants";
-import { IDataStore, StorageType } from "src/data/data-store-instances/base/data-store";
-import { RepItemStorageInfo } from "src/data/data-store-instances/base/rep-item-storage-info";
+import { IDataStore, StorageType } from "src/data/data-store/data-store-instances/base/data-store";
+import { RepItemStorageInfo } from "src/data/data-store/data-store-instances/base/rep-item-storage-info";
 import { Question } from "src/data/data-structures/card/questions/question";
-import { PluginData } from "src/data/plugin-data";
 import { SRSettings } from "src/data/settings";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {
@@ -16,14 +16,18 @@ import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-s
 import { DateUtil, formatDateYYYYMMDD, globalDateProvider } from "src/utils/dates";
 import { MultiLineTextFinder } from "src/utils/strings";
 
-export class PluginDataStore implements IDataStore {
-    public readonly storageType = StorageType.PLUGIN_DATA;
+export class FolderDataStore implements IDataStore {
+    public static readonly SCHEDULE_DATA_FOLDER = "Schedule Data";
+    public static readonly CARD_FILE_NAME = "card-schedule-data.sr.md";
+    public static readonly NOTE_FILE_NAME = "note-schedule-data.sr.md";
+    public readonly storageType = StorageType.FOLDER;
     private settings: SRSettings;
-    private pluginData: PluginData;
+    private app: App;
 
-    constructor(settings: SRSettings, pluginData: PluginData) {
+    constructor(settings: SRSettings, app: App) {
         this.settings = settings;
-        this.pluginData = pluginData;
+        this.app = app;
+        this.ensureFolderStructure();
     }
 
     /**
@@ -184,16 +188,32 @@ export class PluginDataStore implements IDataStore {
         return new RepItemScheduleInfoOsr(dueDate, interval, ease, delayBeforeReviewTicks);
     }
 
-    ensurePluginDataStructure(): void {
-        const scheduleData = this.pluginData.scheduleData;
+    async ensureFolderStructure(): Promise<void> {
+        const srFolder = await this.ensureFolder(this.settings.scheduleDataVaultLocation);
+        const scheduleFolder = await this.ensureFolder(
+            srFolder.path + "/" + FolderDataStore.SCHEDULE_DATA_FOLDER,
+        );
+        await this.ensureFile(scheduleFolder.path + "/" + FolderDataStore.CARD_FILE_NAME);
+        await this.ensureFile(scheduleFolder.path + "/" + FolderDataStore.NOTE_FILE_NAME);
+    }
 
-        if (!scheduleData) {
-            // Can be undefined if user is on older version of plugin and hasn't updated in a while
-            this.pluginData.scheduleData = {
-                version: 1,
-                noteSchedules: {},
-                cardSchedules: {},
-            };
+    async ensureFolder(path: string): Promise<TFolder> {
+        let folder: TFolder | null = this.app.vault.getFolderByPath(path);
+
+        if (folder === null) {
+            folder = await this.app.vault.createFolder(path);
         }
+
+        return folder;
+    }
+
+    async ensureFile(path: string): Promise<TFile> {
+        let file: TFile | null = this.app.vault.getFileByPath(path);
+
+        if (file === null) {
+            file = await this.app.vault.create(path, "");
+        }
+
+        return file;
     }
 }

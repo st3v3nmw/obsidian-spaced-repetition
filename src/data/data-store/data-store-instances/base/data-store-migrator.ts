@@ -1,10 +1,10 @@
-import { DataStoreAlgorithm } from "src/data/data-store-algorithm/base/data-store-algorithm";
-import { FolderDataStoreAlgorithmOsr } from "src/data/data-store-algorithm/folder-data-store/folder-data-store-algorithm-osr";
-import { NoteDataStoreAlgorithmOsr } from "src/data/data-store-algorithm/note-data-store/note-data-store-algorithm-osr";
-import { DataStore, StorageType } from "src/data/data-store-instances/base/data-store";
-import { FolderDataStore } from "src/data/data-store-instances/folder-data-store/folder-data-store";
-import { NotesDataStore } from "src/data/data-store-instances/notes-data-store/notes-data-store";
-import { PluginDataStore } from "src/data/data-store-instances/plugin-data-store/plugin-data-store";
+import { DataStoreAlgorithm } from "src/data/data-store/data-store-algorithm/base/data-store-algorithm";
+import { FolderDataStoreAlgorithmOsr } from "src/data/data-store/data-store-algorithm/folder-data-store/folder-data-store-algorithm-osr";
+import { NoteDataStoreAlgorithmOsr } from "src/data/data-store/data-store-algorithm/note-data-store/note-data-store-algorithm-osr";
+import { DataStore, StorageType } from "src/data/data-store/data-store-instances/base/data-store";
+import { FolderDataStore } from "src/data/data-store/data-store-instances/folder-data-store/folder-data-store";
+import { NotesDataStore } from "src/data/data-store/data-store-instances/notes-data-store/notes-data-store";
+import { PluginDataStore } from "src/data/data-store/data-store-instances/plugin-data-store/plugin-data-store";
 import SRPlugin from "src/main";
 import { TextDirection } from "src/utils/strings";
 
