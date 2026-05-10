@@ -1,6 +1,6 @@
-import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { NoteReviewDeck, SchedNote } from "src/note/note-review-deck";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 
 export class NoteReviewQueue {
     private _reviewDecks: Map<string, NoteReviewDeck>;
@@ -51,7 +51,9 @@ export class NoteReviewQueue {
             for (const matchedNoteTag of matchedNoteTags) {
                 const matchedDeck = this.reviewDecks.get(matchedNoteTag);
                 if (matchedDeck === undefined) continue;
-                matchedDeck.scheduledNotes.push(new SchedNote(noteFile, noteSchedule.dueDateAsUnix));
+                matchedDeck.scheduledNotes.push(
+                    new SchedNote(noteFile, noteSchedule.dueDateAsUnix),
+                );
             }
         }
     }
@@ -79,7 +81,8 @@ export class NoteReviewQueue {
                 const scheduledNote = reviewDeck.scheduledNotes.find(
                     (scheduledNote) => scheduledNote.note.path === note.path,
                 );
-                if (scheduledNote !== undefined) scheduledNote.dueUnix = scheduleInfo.dueDate.valueOf();
+                if (scheduledNote !== undefined)
+                    scheduledNote.dueUnix = scheduleInfo.dueDate.valueOf();
             }
 
             break;

@@ -1,12 +1,12 @@
 import moment from "moment";
 import { State } from "ts-fsrs";
 
+import { DEFAULT_SETTINGS } from "src/data/settings";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { SRAlgorithmOsr } from "src/scheduling/algorithms/osr/srs-algorithm-osr";
-import { DEFAULT_SETTINGS } from "src/data/settings";
 import { CardDueDateHistogram } from "src/scheduling/due-date-histogram";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 

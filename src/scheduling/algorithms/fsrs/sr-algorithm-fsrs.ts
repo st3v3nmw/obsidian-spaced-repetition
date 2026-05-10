@@ -1,5 +1,8 @@
 import { CardInput, createEmptyCard, FSRS, fsrs, State } from "ts-fsrs";
 
+import { SRSettings } from "src/data/settings";
+import { Note } from "src/note/note";
+import { INoteEaseList } from "src/note/note-ease-list";
 import { ISRAlgorithm, SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
@@ -11,9 +14,6 @@ import {
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { OsrNoteGraph } from "src/scheduling/algorithms/osr/osr-note-graph";
 import { SRAlgorithmOsr } from "src/scheduling/algorithms/osr/srs-algorithm-osr";
-import { SRSettings } from "src/data/settings";
-import { Note } from "src/note/note";
-import { INoteEaseList } from "src/note/note-ease-list";
 import { DueDateHistogram } from "src/scheduling/due-date-histogram";
 import { globalDateProvider } from "src/utils/dates";
 

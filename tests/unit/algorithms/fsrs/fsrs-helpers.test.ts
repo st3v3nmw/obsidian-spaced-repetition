@@ -1,5 +1,6 @@
 import { Rating, State } from "ts-fsrs";
 
+import { DEFAULT_SETTINGS } from "src/data/settings";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import {
     buildFsrsParameters,
@@ -12,7 +13,6 @@ import {
     reviewResponseToFsrsGrade,
 } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
-import { DEFAULT_SETTINGS } from "src/data/settings";
 import { globalDateProvider, setupStaticDateProvider20230906 } from "src/utils/dates";
 
 beforeAll(() => {

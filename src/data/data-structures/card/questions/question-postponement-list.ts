@@ -4,10 +4,10 @@ import { SRSettings } from "src/data/settings";
 import SRPlugin from "src/main";
 
 /**
-* Represents a list of postponed questions (i.e. questions buried siblings).
-*
-* @interface IQuestionPostponementList
-*/
+ * Represents a list of postponed questions (i.e. questions buried siblings).
+ *
+ * @interface IQuestionPostponementList
+ */
 export interface IQuestionPostponementList {
     /**
      * Clears the list of postponed questions.
@@ -20,17 +20,17 @@ export interface IQuestionPostponementList {
      */
     add(question: Question): void;
     /**
-    * Checks if a question is in the list of postponed questions.
-    *
-    * @param {Question} question - The question to check.
-    * @returns {boolean} - True if the question is in the list, false otherwise.
-    */
+     * Checks if a question is in the list of postponed questions.
+     *
+     * @param {Question} question - The question to check.
+     * @returns {boolean} - True if the question is in the list, false otherwise.
+     */
     includes(question: Question): boolean;
     /**
-    * Writes the list of postponed questions to the plugin data.
-    *
-    * @returns {Promise<void>} - A promise that resolves when the list is written.
-    */
+     * Writes the list of postponed questions to the plugin data.
+     *
+     * @returns {Promise<void>} - A promise that resolves when the list is written.
+     */
     write(): Promise<void>;
 }
 
@@ -86,20 +86,20 @@ export class QuestionPostponementList implements IQuestionPostponementList {
     }
 
     /**
-    * Checks if a question is in the list of postponed questions.
-    *
-    * @param {Question} question - The question to check.
-    * @returns {boolean} - True if the question is in the list, false otherwise.
-    */
+     * Checks if a question is in the list of postponed questions.
+     *
+     * @param {Question} question - The question to check.
+     * @returns {boolean} - True if the question is in the list, false otherwise.
+     */
     includes(question: Question): boolean {
         return this.list.includes(question.questionText.textHash);
     }
 
     /**
-    * Writes the list of postponed questions to the plugin data.
-    *
-    * @returns {Promise<void>} - A promise that resolves when the list is written.
-    */
+     * Writes the list of postponed questions to the plugin data.
+     *
+     * @returns {Promise<void>} - A promise that resolves when the list is written.
+     */
     async write(): Promise<void> {
         // This is null only whilst unit testing is being performed
         if (this.plugin === null || this.plugin.dataManager === null) return;

@@ -1,16 +1,10 @@
 import moment, { Moment } from "moment";
-import {
-    FileManager,
-    HeadingCache,
-    MetadataCache,
-    TFile,
-    Vault,
-} from "obsidian";
+import { FileManager, HeadingCache, MetadataCache, TFile, Vault } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
-import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { ALLOWED_DATE_FORMATS, PREFERRED_DATE_FORMAT } from "src/data/constants";
 import { ISRFile, SRTFile } from "src/data/data-structures/file/sr-file";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { formatDate } from "src/utils/dates";
 
 /**

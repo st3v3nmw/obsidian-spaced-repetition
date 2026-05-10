@@ -1,7 +1,6 @@
 import "src/ui/obsidian-ui-components/item-views/review-queue-list-view.css";
 import { ItemView, Menu, setIcon, TFile, WorkspaceLeaf } from "obsidian";
 
-import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { COLLAPSE_ICON, TICKS_PER_DAY } from "src/data/constants";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
@@ -9,6 +8,7 @@ import SRPlugin from "src/main";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { NoteReviewDeck } from "src/note/note-review-deck";
 import { NoteReviewQueue } from "src/note/note-review-queue";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { formatDateWithMoment } from "src/utils/dates";
 

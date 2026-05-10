@@ -1,15 +1,15 @@
-import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { Card } from "src/data/data-structures/card/card";
 import { Deck } from "src/data/data-structures/deck/deck";
 import {
-    RepItemOrder,
     DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
+    RepItemOrder,
 } from "src/data/data-structures/deck/deck-tree-iterator";
 import { Stats } from "src/data/data-structures/deck/stats";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 
 export class DeckTreeStatsCalculator {
     calculate(deckTree: Deck): Stats {

@@ -152,9 +152,10 @@ export abstract class SRTFile implements ISRFile {
      */
     protected getFrontmatterTags(frontmatter: FrontMatterCache): TagCache[] {
         const result: TagCache[] = [] as TagCache[];
-        const frontmatterTags: string | null = frontmatter !== null && frontmatter !== undefined
-            ? (frontmatter["tags"] as string) + "" // For some obscure reason, the tags don't have the split function so one needs to add a string to add those?
-            : null;
+        const frontmatterTags: string | null =
+            frontmatter !== null && frontmatter !== undefined
+                ? (frontmatter["tags"] as string) + "" // For some obscure reason, the tags don't have the split function so one needs to add a string to add those?
+                : null;
 
         if (!frontmatterTags) return result;
 

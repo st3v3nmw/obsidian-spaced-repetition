@@ -1,11 +1,11 @@
 import "src/ui/styles.css";
 import { Menu, MenuItem, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
-import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { DataManager } from "src/data/data-manager";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
@@ -125,7 +125,10 @@ export class UIManager {
 
         if (settings.showStatusBar) {
             this.statusBarManager.setCount(
-                this.dataManager.osrCore.remainingDeckTree.getRepItemCount(RepItemState.AnyItem, true),
+                this.dataManager.osrCore.remainingDeckTree.getRepItemCount(
+                    RepItemState.AnyItem,
+                    true,
+                ),
                 settings.showStatusBar && settings.showCardStatusBarItem,
                 "card-review",
             );
@@ -176,8 +179,8 @@ export class UIManager {
             // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
             this.setSRViewInFocus(
                 (modal === null || modal === undefined) &&
-                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
-                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
+                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
+                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
             );
         }
     }

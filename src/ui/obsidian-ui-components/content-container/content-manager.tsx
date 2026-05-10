@@ -1,8 +1,6 @@
 import { now } from "moment";
 import { App, MarkdownView, Notice, Platform } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { DataManager } from "src/data/data-manager";
 import { Card } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
@@ -11,6 +9,8 @@ import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import {
     DeckStats,
     FlashcardReviewMode,
@@ -333,7 +333,7 @@ export default class ContentManager {
         if (
             this.lastPressedOnProcessReview &&
             timeNow - this.lastPressedOnProcessReview <
-            this.dataManager.data.settings.reviewButtonDelay
+                this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
@@ -359,7 +359,7 @@ export default class ContentManager {
         if (
             this.lastPressedOnProcessReview &&
             timeNow - this.lastPressedOnProcessReview <
-            this.dataManager.data.settings.reviewButtonDelay
+                this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }

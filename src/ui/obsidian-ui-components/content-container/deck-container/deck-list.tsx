@@ -177,7 +177,7 @@ export default class DeckListComponent {
         parentEl: HTMLDivElement,
         initiallyExpanded: boolean = false,
         deck: Deck | null = null,
-        startReviewOfDeck: (deck: Deck) => void = () => { },
+        startReviewOfDeck: (deck: Deck) => void = () => {},
     ): HTMLDivElement {
         const disableInteraction = deck === null;
         const treeRow = parentEl.createDiv();

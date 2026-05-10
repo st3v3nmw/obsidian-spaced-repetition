@@ -1,5 +1,9 @@
-import { RepetitionItem, RepetitionItemType, RepetitionPhase } from "src/scheduling/algorithms/base/repetition-item";
 import { Question } from "src/data/data-structures/card/questions/question";
+import {
+    RepetitionItem,
+    RepetitionItemType,
+    RepetitionPhase,
+} from "src/scheduling/algorithms/base/repetition-item";
 
 export class Card extends RepetitionItem {
     question: Question;

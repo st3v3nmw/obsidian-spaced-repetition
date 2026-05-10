@@ -1,6 +1,10 @@
 import { TagCache } from "obsidian";
 
-import { frontmatterTagPseudoCol, frontmatterTagPseudoLineNum, frontmatterTagPseudoOffset } from "src/data/data-structures/file/sr-file";
+import {
+    frontmatterTagPseudoCol,
+    frontmatterTagPseudoLineNum,
+    frontmatterTagPseudoOffset,
+} from "src/data/data-structures/file/sr-file";
 import { splitNoteIntoFrontmatterAndContent, splitTextIntoLineArray } from "src/utils/strings";
 
 export function unitTestCreateTagCacheObj(tag: string, line: number): TagCache {
@@ -50,8 +54,16 @@ export function unitTestGetAllTagsFromTextEx(text: string): TagCache[] {
                 const tag: TagCache = {
                     tag: match,
                     position: {
-                        start: { line: i, col: frontmatterTagPseudoCol, offset: frontmatterTagPseudoOffset },
-                        end: { line: i, col: frontmatterTagPseudoCol, offset: frontmatterTagPseudoOffset },
+                        start: {
+                            line: i,
+                            col: frontmatterTagPseudoCol,
+                            offset: frontmatterTagPseudoOffset,
+                        },
+                        end: {
+                            line: i,
+                            col: frontmatterTagPseudoCol,
+                            offset: frontmatterTagPseudoOffset,
+                        },
                     },
                 };
                 result.push(tag);

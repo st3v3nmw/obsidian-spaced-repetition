@@ -4,7 +4,10 @@ import { State } from "ts-fsrs";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { textInterval } from "src/scheduling/algorithms/osr/note-scheduling";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
-import { formatPendingDueTime, formatScheduleInterval } from "src/scheduling/algorithms/schedule-display";
+import {
+    formatPendingDueTime,
+    formatScheduleInterval,
+} from "src/scheduling/algorithms/schedule-display";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
 beforeAll(() => {

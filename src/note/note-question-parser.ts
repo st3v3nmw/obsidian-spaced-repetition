@@ -1,6 +1,5 @@
 import { TagCache } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { DataStore } from "src/data/data-stores/base/data-store";
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
 import { Card } from "src/data/data-structures/card/card";
@@ -14,6 +13,7 @@ import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { frontmatterTagPseudoLineNum } from "src/data/data-structures/file/sr-file";
 import { SettingsUtil, SRSettings } from "src/data/settings";
 import { parse, ParsedQuestionInfo, ParserOptions } from "src/parser";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {
     splitNoteIntoFrontmatterAndContent,
     splitTextIntoLineArray,

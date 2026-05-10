@@ -1,10 +1,9 @@
-import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 import { Card, Card as RepetitionItem } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { IQuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { TopicPath, TopicPathList } from "src/data/data-structures/deck/topic-path";
+import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
-
 
 // The same card can be added to multiple decks e.g.
 //      #flashcards/language/words
@@ -65,8 +64,14 @@ export class Deck {
      * @param {boolean} includeSubdeckCounts - Whether to include the count of repetition items in subdecks.
      * @returns {number} - The number of distinct repetition items of the specified type in this deck and all its subdecks.
      */
-    public getDistinctRepItemCount(repItemListType: RepItemState, includeSubdeckCounts: boolean): number {
-        const repItemList: RepetitionItem[] = this.getFlattenedRepItemArray(repItemListType, includeSubdeckCounts);
+    public getDistinctRepItemCount(
+        repItemListType: RepItemState,
+        includeSubdeckCounts: boolean,
+    ): number {
+        const repItemList: RepetitionItem[] = this.getFlattenedRepItemArray(
+            repItemListType,
+            includeSubdeckCounts,
+        );
 
         // The following selects distinct cards from cardList (based on reference equality)
         const distinctCardSet = new Set(repItemList);
@@ -122,7 +127,10 @@ export class Deck {
      * @param {RepetitionItem[]} repItems - The repetition items.
      * @returns {number} - The number of repetition items of the specified type in the specified question.
      */
-    private getQuestionRepItemCountForRepItemListType(question: Question, repItems: RepetitionItem[]): number {
+    private getQuestionRepItemCountForRepItemListType(
+        question: Question,
+        repItems: RepetitionItem[],
+    ): number {
         let result: number = 0;
         for (let i = 0; i < repItems.length; i++) {
             if (repItems[i] instanceof Card && Object.is(question, repItems[i].question)) result++;
@@ -283,8 +291,8 @@ export class Deck {
     }
 
     /**
-    * Appends a RepetitionItem to the root deck.
-    *
+     * Appends a RepetitionItem to the root deck.
+     *
      * This is used for cards that don't have any topics, and also for postponing cards (e.g. when skipping a card, we move it to the root deck and remove its topic paths, so that it won't be seen until the next review session when we reassign it to decks based on its question's topic paths)
      *
      * @param {RepetitionItem} repItem - The RepetitionItem to append.
@@ -301,7 +309,9 @@ export class Deck {
      */
     appendRepItemSingleTopic(topicPath: TopicPath, repItem: RepetitionItem): void {
         const deck: Deck = this.getOrCreateDeck(topicPath);
-        const repItemList: RepetitionItem[] = deck.getRepItemListForRepItemState(repItem.repItemState);
+        const repItemList: RepetitionItem[] = deck.getRepItemListForRepItemState(
+            repItem.repItemState,
+        );
 
         repItemList.push(repItem);
     }
@@ -353,10 +363,10 @@ export class Deck {
     }
 
     /**
-    * Exports the deck and all its subdecks to an array.
-    *
-    * @returns {Deck[]} - An array containing the deck and all its subdecks.
-    */
+     * Exports the deck and all its subdecks to an array.
+     *
+     * @returns {Deck[]} - An array containing the deck and all its subdecks.
+     */
     toDeckArray(): Deck[] {
         const result: Deck[] = [];
         result.push(this);
@@ -440,7 +450,10 @@ export class Deck {
      * @param {Deck | null} parent - The parent deck.
      * @returns {Deck} - The copied deck and its subdecks with the filter applied.
      */
-    copyWithRepItemFilter(predicate: (value: RepetitionItem) => boolean, parent: Deck | null = null): Deck {
+    copyWithRepItemFilter(
+        predicate: (value: RepetitionItem) => boolean,
+        parent: Deck | null = null,
+    ): Deck {
         const result: Deck = new Deck(this.deckName, parent);
         result.newRepItems = [...this.newRepItems.filter((card) => predicate(card))];
         result.dueRepItems = [...this.dueRepItems.filter((card) => predicate(card))];

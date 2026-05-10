@@ -1,8 +1,8 @@
 import { Notice } from "obsidian";
 
+import { t } from "src/lang/helpers";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { formatScheduleInterval } from "src/scheduling/algorithms/schedule-display";
-import { t } from "src/lang/helpers";
 
 export default class CardInfoNotice extends Notice {
     public constructor(schedule: RepItemScheduleInfo, notePath: string) {

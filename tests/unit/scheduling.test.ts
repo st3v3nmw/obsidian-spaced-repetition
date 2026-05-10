@@ -1,6 +1,6 @@
+import { DEFAULT_SETTINGS } from "src/data/settings";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { osrSchedule, textInterval } from "src/scheduling/algorithms/osr/note-scheduling";
-import { DEFAULT_SETTINGS } from "src/data/settings";
 import { DueDateHistogram } from "src/scheduling/due-date-histogram";
 
 const emptyHistogram = new DueDateHistogram();

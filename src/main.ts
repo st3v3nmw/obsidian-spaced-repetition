@@ -1,7 +1,5 @@
 import { Platform, Plugin, TFile } from "obsidian";
 
-import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
-import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
 import { DataManager } from "src/data/data-manager";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import {
@@ -16,6 +14,8 @@ import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { Note } from "src/note/note";
 import { NoteReviewQueue } from "src/note/note-review-queue";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
 import {
     FlashcardReviewMode,
     FlashcardReviewSequencer,
@@ -488,7 +488,8 @@ export default class SRPlugin extends Plugin {
     }
 
     private static createDeckTreeIterator(settings: SRSettings): IDeckTreeIterator {
-        let cardOrder: RepItemOrder = RepItemOrder[settings.flashcardCardOrder as keyof typeof RepItemOrder];
+        let cardOrder: RepItemOrder =
+            RepItemOrder[settings.flashcardCardOrder as keyof typeof RepItemOrder];
         if (cardOrder === undefined) cardOrder = RepItemOrder.DueFirstSequential;
         let deckOrder: DeckOrder = DeckOrder[settings.flashcardDeckOrder as keyof typeof DeckOrder];
         if (deckOrder === undefined) deckOrder = DeckOrder.PrevDeckComplete_Sequential;

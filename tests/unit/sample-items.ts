@@ -1,8 +1,8 @@
 import { Deck } from "src/data/data-structures/deck/deck";
 import {
-    RepItemOrder,
     DeckOrder,
     DeckTreeIterator,
+    RepItemOrder,
 } from "src/data/data-structures/deck/deck-tree-iterator";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";

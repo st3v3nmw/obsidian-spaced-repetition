@@ -1,9 +1,6 @@
 import moment from "moment";
 import { State } from "ts-fsrs";
 
-import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
-import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
-import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import {
@@ -15,6 +12,9 @@ import {
 } from "src/data/data-structures/deck/deck-tree-iterator";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
+import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
+import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { CardDueDateHistogram } from "src/scheduling/due-date-histogram";
 import {
     DeckStats,
@@ -570,9 +570,9 @@ Q1::A1
                     text,
                 );
                 await c.setSequencerDeckTreeFromOriginalText();
-                expect(c.cardSequencer.currentDeck.getRepItemCount(RepItemState.AnyItem, false)).toEqual(
-                    4,
-                );
+                expect(
+                    c.cardSequencer.currentDeck.getRepItemCount(RepItemState.AnyItem, false),
+                ).toEqual(4);
 
                 expect(c.reviewSequencer.currentCard.front).toMatch(clozeQuestion1Card1);
 
@@ -610,9 +610,9 @@ Q1::A1
                     text,
                 );
                 await c.setSequencerDeckTreeFromOriginalText();
-                expect(c.cardSequencer.currentDeck.getRepItemCount(RepItemState.AnyItem, false)).toEqual(
-                    4,
-                );
+                expect(
+                    c.cardSequencer.currentDeck.getRepItemCount(RepItemState.AnyItem, false),
+                ).toEqual(4);
 
                 expect(c.reviewSequencer.currentCard.front).toMatch(clozeQuestion1Card1);
 

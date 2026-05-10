@@ -8,7 +8,7 @@ import { PluginDataStore } from "src/data/data-stores/plugin-data-store/plugin-d
 import SRPlugin from "src/main";
 import { TextDirection } from "src/utils/strings";
 
-export interface IDataStoreTransitData { }
+export interface IDataStoreTransitData {}
 
 export class DataStoreMigrator {
     static async migrateDataStore(

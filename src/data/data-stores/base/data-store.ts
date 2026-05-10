@@ -1,6 +1,6 @@
-import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
 import { Question } from "src/data/data-structures/card/questions/question";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 
 /**
  * All available data stores types.

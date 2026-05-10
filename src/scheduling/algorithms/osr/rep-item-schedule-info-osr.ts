@@ -1,9 +1,9 @@
 import { Moment } from "moment";
 
-import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
-import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { PREFERRED_DATE_FORMAT } from "src/data/constants";
 import { SRSettings } from "src/data/settings";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { DateUtil, formatDate, globalDateProvider } from "src/utils/dates";
 
 export class RepItemScheduleInfoOsr extends RepItemScheduleInfo {

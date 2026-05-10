@@ -1,4 +1,3 @@
-import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
 import { FolderDataStore } from "src/data/data-stores/folder-data-store/folder-data-store";
 import { ScheduleDataFolderRepository } from "src/data/data-stores/folder-data-store/schedule-data-folder-repository";
@@ -7,6 +6,7 @@ import { Question, QuestionText } from "src/data/data-structures/card/questions/
 import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { Note } from "src/note/note";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 
@@ -21,7 +21,7 @@ beforeAll(() => {
 });
 
 function makeRepo(data: PluginData): ScheduleDataFolderRepository {
-    return new ScheduleDataFolderRepository(data, async () => { });
+    return new ScheduleDataFolderRepository(data, async () => {});
 }
 
 function makeStore(

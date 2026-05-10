@@ -1,8 +1,3 @@
-import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
-import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
-import { IOsrVaultNoteLinkInfoFinder } from "src/scheduling/algorithms/osr/obsidian-vault-notelink-info-finder";
-import { OsrNoteGraph } from "src/scheduling/algorithms/osr/osr-note-graph";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import { DeckTreeStatsCalculator } from "src/data/data-structures/deck/deck-tree-stats-calculator";
@@ -13,6 +8,11 @@ import { SettingsUtil, SRSettings } from "src/data/settings";
 import { Note } from "src/note/note";
 import { NoteFileLoader } from "src/note/note-file-loader";
 import { NoteReviewQueue } from "src/note/note-review-queue";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
+import { IOsrVaultNoteLinkInfoFinder } from "src/scheduling/algorithms/osr/obsidian-vault-notelink-info-finder";
+import { OsrNoteGraph } from "src/scheduling/algorithms/osr/osr-note-graph";
 import { CardDueDateHistogram, NoteDueDateHistogram } from "src/scheduling/due-date-histogram";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import { globalDateProvider, IDayBoundary } from "src/utils/dates";
@@ -93,7 +93,7 @@ export class OsrCore {
         settings: SRSettings,
         dataChangedHandler: () => void,
         noteReviewQueue: NoteReviewQueue,
-        defaultTextDirection: TextDirection
+        defaultTextDirection: TextDirection,
     ) {
         this.settings = settings;
         this.osrNoteLinkInfoFinder = osrNoteLinkInfoFinder;
@@ -218,7 +218,8 @@ export class OsrCore {
         const topicPath: TopicPath = this.findTopicPath(noteFile);
         if (topicPath.hasPath && !SettingsUtil.isAnyTagIgnoredForFlashcards(this.settings, tags)) {
             note = await this.loadNote(noteFile, topicPath);
-            if (note !== null && this.fullDeckTree !== null) note.appendCardsToDeck(this.fullDeckTree);
+            if (note !== null && this.fullDeckTree !== null)
+                note.appendCardsToDeck(this.fullDeckTree);
         }
 
         // Give the algorithm a chance to do something with the loaded note
@@ -277,7 +278,9 @@ export class OsrCore {
         if (this.fullDeckTree === null) {
             return;
         }
-        this._reviewableDeckTree = this.fullDeckTree ? this.fullDeckTree.clone() : new Deck("root", null);
+        this._reviewableDeckTree = this.fullDeckTree
+            ? this.fullDeckTree.clone()
+            : new Deck("root", null);
 
         // sort the deck names
         this._reviewableDeckTree.sortSubdecksList();

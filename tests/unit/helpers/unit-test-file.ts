@@ -2,10 +2,10 @@ import * as fs from "fs";
 import moment, { Moment } from "moment";
 import { TagCache, TFile } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
-import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { ALLOWED_DATE_FORMATS } from "src/data/constants";
 import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { formatDateYYYYMMDD } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 
@@ -60,7 +60,7 @@ export class UnitTestSRFile implements ISRNoteTFile {
             fileText = fileText.replace(
                 YAML_FRONT_MATTER_REGEX,
                 `---\n${existingYaml[1]}sr-due: ${dueString}\n` +
-                `sr-ease: ${ease}\nsr-interval: ${interval}\n---`,
+                    `sr-ease: ${ease}\nsr-interval: ${interval}\n---`,
             );
         } else {
             fileText =

@@ -2,12 +2,12 @@ import "src/ui/obsidian-ui-components/content-container/card-container/card-cont
 import moment from "moment";
 import { App, Platform } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { CardType } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import ContextSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/context-section/context-section";
 import ResponseSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section";

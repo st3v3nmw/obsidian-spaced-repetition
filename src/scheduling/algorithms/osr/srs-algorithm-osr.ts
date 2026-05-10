@@ -1,15 +1,15 @@
 import moment, { Moment } from "moment";
 
+import { Question } from "src/data/data-structures/card/questions/question";
+import { SRSettings } from "src/data/settings";
+import { Note } from "src/note/note";
+import { INoteEaseList, NoteEaseList } from "src/note/note-ease-list";
 import { ISRAlgorithm, SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { osrSchedule } from "src/scheduling/algorithms/osr/note-scheduling";
 import { NoteLinkStat, OsrNoteGraph } from "src/scheduling/algorithms/osr/osr-note-graph";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
-import { Question } from "src/data/data-structures/card/questions/question";
-import { SRSettings } from "src/data/settings";
-import { Note } from "src/note/note";
-import { INoteEaseList, NoteEaseList } from "src/note/note-ease-list";
 import { DueDateHistogram } from "src/scheduling/due-date-histogram";
 import { globalDateProvider } from "src/utils/dates";
 
@@ -106,8 +106,8 @@ export class SRAlgorithmOsr implements ISRAlgorithm {
             flashcardsInNoteAvgEase && noteEase
                 ? (flashcardsInNoteAvgEase + noteEase) / 2
                 : flashcardsInNoteAvgEase
-                    ? flashcardsInNoteAvgEase
-                    : noteEase;
+                  ? flashcardsInNoteAvgEase
+                  : noteEase;
 
         if (ease) {
             this.noteEaseList.setEaseForPath(path, ease);

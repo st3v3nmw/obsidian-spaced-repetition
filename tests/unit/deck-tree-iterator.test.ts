@@ -1,18 +1,18 @@
-import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
+import { Card } from "src/data/data-structures/card/card";
 import { Deck } from "src/data/data-structures/deck/deck";
 import {
-    RepItemOrder,
     DeckOrder,
     DeckTreeIterator,
+    RepItemOrder,
 } from "src/data/data-structures/deck/deck-tree-iterator";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { DEFAULT_SETTINGS } from "src/data/settings";
+import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 import { setupNextRandomNumber, setupStaticRandomNumberProvider } from "src/utils/numbers";
 
 import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 import { SampleItemDecks } from "./sample-items";
-import { Card } from "src/data/data-structures/card/card";
 
 beforeAll(() => {
     setupStaticDateProvider20230906();

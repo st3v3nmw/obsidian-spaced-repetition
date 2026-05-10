@@ -1,5 +1,5 @@
-import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { DueDateHistogram } from "src/scheduling/due-date-histogram";
 import { setupStaticDateProvider, setupStaticDateProvider20230906 } from "src/utils/dates";
 

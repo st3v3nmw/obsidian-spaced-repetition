@@ -16,19 +16,19 @@ import { Setting, SettingGroup } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
-import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
-import { textInterval } from "src/scheduling/algorithms/osr/note-scheduling";
 import { OsrCore } from "src/data/core";
 import { DataManager } from "src/data/data-manager";
 import { Stats } from "src/data/data-structures/deck/stats";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
+import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
+import { textInterval } from "src/scheduling/algorithms/osr/note-scheduling";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
 import ChartComponent from "src/ui/obsidian-ui-components/content-container/settings-page/statistics-page/chart-component";
 import NoteStatsComponent from "src/ui/obsidian-ui-components/content-container/settings-page/statistics-page/note-stats-component";
 import { getKeysPreserveType, getTypedObjectEntries, mapRecord } from "src/utils/types";
-import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 
 Chart.register(
     BarElement,
@@ -69,8 +69,8 @@ export class StatisticsPage extends SettingsPage {
             plugin,
             dataManager,
             pageType,
-            () => { },
-            () => { },
+            () => {},
+            () => {},
             openPage,
             scrollListener,
         );
@@ -159,7 +159,7 @@ export class StatisticsPage extends SettingsPage {
         // Add intervals
         const averageInterval: string = textInterval(
             Math.round((cardStats.intervals.getTotalOfValueMultiplyCount() / scheduledCount) * 10) /
-            10 || 0,
+                10 || 0,
             false,
         );
         const longestInterval: string = textInterval(cardStats.intervals.getMaxValue(), false);

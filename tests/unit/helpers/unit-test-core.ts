@@ -5,10 +5,10 @@ import { OsrCore } from "src/data/core";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { SRSettings } from "src/data/settings";
 import { NoteReviewQueue } from "src/note/note-review-queue";
+import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./unit-test-file";
 import { UnitTestLinkInfoFinder } from "./unit-test-link-info-finder";
-import { TextDirection } from "src/utils/strings";
 
 export class UnitTestOsrCore extends OsrCore {
     private buryList: string[];
@@ -19,16 +19,12 @@ export class UnitTestOsrCore extends OsrCore {
 
     constructor(settings: SRSettings) {
         super(
-            new QuestionPostponementList(
-                null,
-                settings,
-                [] as string[],
-            ),
+            new QuestionPostponementList(null, settings, [] as string[]),
             null,
             settings,
-            () => { },
+            () => {},
             new NoteReviewQueue(),
-            TextDirection.Ltr
+            TextDirection.Ltr,
         );
         this.buryList = [] as string[];
         this.infoFinder = new UnitTestLinkInfoFinder();
@@ -41,9 +37,9 @@ export class UnitTestOsrCore extends OsrCore {
             questionPostponementList,
             this.infoFinder,
             settings,
-            () => { },
+            () => {},
             new NoteReviewQueue(),
-            TextDirection.Ltr
+            TextDirection.Ltr,
         );
     }
 

@@ -1,11 +1,5 @@
 import { Notice, TFile, Vault } from "obsidian";
 
-import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
-import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
-import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
-import { SrsAlgorithmFsrs } from "src/scheduling/algorithms/fsrs/sr-algorithm-fsrs";
-import { ObsidianVaultNoteLinkInfoFinder } from "src/scheduling/algorithms/osr/obsidian-vault-notelink-info-finder";
-import { SRAlgorithmOsr } from "src/scheduling/algorithms/osr/srs-algorithm-osr";
 import { FLASHCARD_SCHEDULE_INFO } from "src/data/constants";
 import { OsrCore } from "src/data/core";
 import { DataStoreAlgorithm } from "src/data/data-store-algorithm/base/data-store-algorithm";
@@ -27,6 +21,12 @@ import { Note } from "src/note/note";
 import { NoteFileLoader } from "src/note/note-file-loader";
 import { NoteReviewQueue } from "src/note/note-review-queue";
 import { setDebugParser } from "src/parser";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
+import { SrsAlgorithmFsrs } from "src/scheduling/algorithms/fsrs/sr-algorithm-fsrs";
+import { ObsidianVaultNoteLinkInfoFinder } from "src/scheduling/algorithms/osr/obsidian-vault-notelink-info-finder";
+import { SRAlgorithmOsr } from "src/scheduling/algorithms/osr/srs-algorithm-osr";
 
 /**
  * Manages all the data related systems of the Spaced Repetition plugin and exposes them to the other parts of the plugin.
@@ -117,7 +117,7 @@ export class DataManager {
             this.data.settings,
             onOsrVaultDataChanged,
             noteReviewQueue,
-            this.plugin.getObsidianRtlSetting()
+            this.plugin.getObsidianRtlSetting(),
         );
     }
 
@@ -133,7 +133,8 @@ export class DataManager {
             const notes: TFile[] = this.plugin.app.vault.getMarkdownFiles();
             for (const noteFile of notes) {
                 // Skip files in the note ignore folder
-                if (SettingsUtil.isPathInFoldersToIgnore(this.data.settings, noteFile.path)) continue;
+                if (SettingsUtil.isPathInFoldersToIgnore(this.data.settings, noteFile.path))
+                    continue;
 
                 const file: SRNoteTFile = this.createSRNoteTFile(noteFile);
                 await this.osrCore.processFile(file);
@@ -217,9 +218,9 @@ export class DataManager {
             console.log(`SR: ${t("DECKS")}`, this.osrCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                t("SYNC_TIME_TAKEN", {
-                    t: Date.now() - now.valueOf(),
-                }),
+                    t("SYNC_TIME_TAKEN", {
+                        t: Date.now() - now.valueOf(),
+                    }),
             );
         }
     }

@@ -2,10 +2,10 @@ import { Card } from "src/data/data-structures/card/card";
 import { Deck } from "src/data/data-structures/deck/deck";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { DEFAULT_SETTINGS } from "src/data/settings";
+import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 
 import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 import { SampleItemDecks } from "./sample-items";
-import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 
 beforeAll(() => {
     unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
@@ -331,11 +331,17 @@ Q3::A3 <!--SR:!2023-09-02,4,270-->`;
                 text,
                 new TopicPath(["Root"]),
             );
-            const originalCountPreCopy: number = original.getRepItemCount(RepItemState.AnyItem, true);
+            const originalCountPreCopy: number = original.getRepItemCount(
+                RepItemState.AnyItem,
+                true,
+            );
             expect(originalCountPreCopy).toEqual(6);
 
             original.copyWithRepItemFilter((card) => parseInt(card.front[1]) % 2 === 1);
-            const originalCountPostCopy: number = original.getRepItemCount(RepItemState.AnyItem, true);
+            const originalCountPostCopy: number = original.getRepItemCount(
+                RepItemState.AnyItem,
+                true,
+            );
             expect(originalCountPreCopy).toEqual(originalCountPostCopy);
         });
 

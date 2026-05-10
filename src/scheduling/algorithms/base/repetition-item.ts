@@ -1,13 +1,13 @@
-import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 
 /**
-* Represents the state of a repetition item, which can be new, due, or any item.
-*
-* It used to select the items based on their scheduling state. AnyItem is used to select all items, which means it shouldnt be used for anything else.
-*
-* @type {ReadonlyArray<RepItemState>}
-*/
+ * Represents the state of a repetition item, which can be new, due, or any item.
+ *
+ * It used to select the items based on their scheduling state. AnyItem is used to select all items, which means it shouldnt be used for anything else.
+ *
+ * @type {ReadonlyArray<RepItemState>}
+ */
 export enum RepItemState {
     NewItem,
     DueItem,

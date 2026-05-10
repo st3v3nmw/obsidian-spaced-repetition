@@ -105,7 +105,6 @@ export class DataPage extends SettingsPage {
         });
 
         if (this.dataManager.data.settings.dataStore === StorageType.FOLDER) {
-
             dataStorageGroup.addSetting((setting: Setting) => {
                 setting
                     .setName("Schedule data location in vault")

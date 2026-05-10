@@ -1,8 +1,8 @@
-import { RepetitionItem, RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 import { Card } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { Deck } from "src/data/data-structures/deck/deck";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
+import { RepetitionItem, RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 import { globalRandomNumberProvider, WeightedRandomNumber } from "src/utils/numbers";
 
 export enum RepItemOrder {
@@ -375,7 +375,10 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         // Make the chance of picking a specific deck proportional to the number of cards within
         const weights: Record<number, number> = {};
         for (let i = 0; i < this.deckArray.length; i++) {
-            const cardCount: number = this.deckArray[i].getRepItemCount(RepItemState.AnyItem, false);
+            const cardCount: number = this.deckArray[i].getRepItemCount(
+                RepItemState.AnyItem,
+                false,
+            );
             if (cardCount) {
                 weights[i] = cardCount;
             }

@@ -1,6 +1,3 @@
-import { ISRAlgorithm } from "src/scheduling/algorithms/base/isr-algorithm";
-import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
-import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { TICKS_PER_DAY } from "src/data/constants";
 import { DataStore } from "src/data/data-stores/base/data-store";
 import { Card } from "src/data/data-structures/card/card";
@@ -11,6 +8,9 @@ import { IDeckTreeIterator } from "src/data/data-structures/deck/deck-tree-itera
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { SRSettings } from "src/data/settings";
 import { Note } from "src/note/note";
+import { ISRAlgorithm } from "src/scheduling/algorithms/base/isr-algorithm";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { DueDateHistogram } from "src/scheduling/due-date-histogram";
 import { globalDateProvider } from "src/utils/dates";
 
@@ -138,7 +138,8 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
     get hasCurrentCard(): boolean {
         return (
-            this.cardSequencer.currentRepItem !== null && this.cardSequencer.currentRepItem !== undefined
+            this.cardSequencer.currentRepItem !== null &&
+            this.cardSequencer.currentRepItem !== undefined
         );
     }
 
