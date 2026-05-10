@@ -1,7 +1,7 @@
 import { TagCache } from "obsidian";
 
-import { DataStore } from "src/data/data-stores/base/data-store";
-import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
+import { DataStore } from "src/data/data-store-instances/base/data-store";
+import { RepItemStorageInfo } from "src/data/data-store-instances/base/rep-item-storage-info";
 import { Card } from "src/data/data-structures/card/card";
 import { Question, QuestionText } from "src/data/data-structures/card/questions/question";
 import {

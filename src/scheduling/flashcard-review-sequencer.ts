@@ -1,5 +1,5 @@
 import { TICKS_PER_DAY } from "src/data/constants";
-import { DataStore } from "src/data/data-stores/base/data-store";
+import { DataStore } from "src/data/data-store-instances/base/data-store";
 import { Card } from "src/data/data-structures/card/card";
 import { Question, QuestionText } from "src/data/data-structures/card/questions/question";
 import { IQuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";

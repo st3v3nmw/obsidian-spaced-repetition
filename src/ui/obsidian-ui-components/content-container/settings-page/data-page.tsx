@@ -1,7 +1,7 @@
 import { Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
-import { StorageType } from "src/data/data-stores/base/data-store";
+import { StorageType } from "src/data/data-store-instances/base/data-store";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";

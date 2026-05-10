@@ -1,4 +1,4 @@
-import { StorageType } from "src/data/data-stores/base/data-store";
+import { StorageType } from "src/data/data-store-instances/base/data-store";
 import { t } from "src/lang/helpers";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { pathMatchesPattern } from "src/utils/fs";

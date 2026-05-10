@@ -2,7 +2,7 @@ import { State } from "ts-fsrs";
 
 import { MULTI_SCHEDULING_EXTRACTOR } from "src/data/constants";
 import { TICKS_PER_DAY } from "src/data/constants";
-import { DataStore } from "src/data/data-stores/base/data-store";
+import { DataStore } from "src/data/data-store-instances/base/data-store";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";

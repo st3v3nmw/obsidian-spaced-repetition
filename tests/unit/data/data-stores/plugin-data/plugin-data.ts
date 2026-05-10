@@ -1,6 +1,6 @@
-import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
-import { FolderDataStore } from "src/data/data-stores/folder-data-store/folder-data-store";
-import { ScheduleDataFolderRepository } from "src/data/data-stores/folder-data-store/schedule-data-folder-repository";
+import { RepItemStorageInfo } from "src/data/data-store-instances/base/rep-item-storage-info";
+import { FolderDataStore } from "src/data/data-store-instances/folder-data-store/folder-data-store";
+import { ScheduleDataFolderRepository } from "src/data/data-store-instances/folder-data-store/schedule-data-folder-repository";
 import { Card } from "src/data/data-structures/card/card";
 import { Question, QuestionText } from "src/data/data-structures/card/questions/question";
 import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";

@@ -25,7 +25,7 @@ export default {
         "src/icons/",
         "src/main.ts",
         "src/data/data-manager.ts",
-        "src/data/data-stores/base/data-store-migrator.ts",
+        "src/data/data-store-instances/base/data-store-migrator.ts",
         "src/note/next-note-review-handler.ts",
         "src/data/plugin-data.ts",
         "src/utils/renderers.ts",
