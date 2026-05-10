@@ -1,6 +1,7 @@
-import { CardListType, Deck } from "src/data/data-structures/deck/deck";
+import { RepItemState } from "src/algorithms/base/repetition-item";
+import { Deck } from "src/data/data-structures/deck/deck";
 import {
-    CardOrder,
+    RepItemOrder,
     DeckOrder,
     DeckTreeIterator,
 } from "src/data/data-structures/deck/deck-tree-iterator";
@@ -11,6 +12,7 @@ import { setupNextRandomNumber, setupStaticRandomNumberProvider } from "src/util
 
 import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 import { SampleItemDecks } from "./sample-items";
+import { Card } from "src/data/data-structures/card/card";
 
 beforeAll(() => {
     setupStaticDateProvider20230906();
@@ -27,7 +29,7 @@ Q3::A3`;
         const deck: Deck = await SampleItemDecks.createDeckFromText(text, new TopicPath(["Root"]));
         const iterator: DeckTreeIterator = new DeckTreeIterator(
             {
-                cardOrder: CardOrder.NewFirstSequential,
+                repItemOrder: RepItemOrder.NewFirstSequential,
                 deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
             deck,
@@ -51,7 +53,7 @@ Q3::A3`;
                 );
                 const iterator = new DeckTreeIterator(
                     {
-                        cardOrder: CardOrder.DueFirstSequential,
+                        repItemOrder: RepItemOrder.DueFirstSequential,
                         deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
                     deck,
@@ -59,17 +61,17 @@ Q3::A3`;
                 iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
                 // No due cards, so expect the new ones immediately
-                expect(iterator.nextCard()).toEqual(true);
+                expect(iterator.nextRepItem()).toEqual(true);
                 expect(iterator.currentDeck.deckName).toEqual("flashcards");
-                expect(iterator.currentCard.front).toEqual("Q1");
+                expect((iterator.currentRepItem as Card).front).toEqual("Q1");
 
-                expect(iterator.nextCard()).toEqual(true);
-                expect(iterator.currentCard.front).toEqual("Q2");
+                expect(iterator.nextRepItem()).toEqual(true);
+                expect((iterator.currentRepItem as Card).front).toEqual("Q2");
 
-                expect(iterator.nextCard()).toEqual(true);
-                expect(iterator.currentCard.front).toEqual("Q3");
+                expect(iterator.nextRepItem()).toEqual(true);
+                expect((iterator.currentRepItem as Card).front).toEqual("Q3");
 
-                expect(iterator.nextCard()).toEqual(false);
+                expect(iterator.nextRepItem()).toEqual(false);
             });
 
             describe("Single topic, mixture of new and scheduled cards", () => {
@@ -87,7 +89,7 @@ Q6::A6`;
                     );
                     const iterator = new DeckTreeIterator(
                         {
-                            cardOrder: CardOrder.DueFirstSequential,
+                            repItemOrder: RepItemOrder.DueFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
                         deck,
@@ -105,7 +107,7 @@ Q6::A6`;
                     nextCardThenCheck(iterator, "Q6");
 
                     // Check no more
-                    expect(iterator.nextCard()).toEqual(false);
+                    expect(iterator.nextRepItem()).toEqual(false);
                 });
             });
 
@@ -130,7 +132,7 @@ Q6::A6`;
                     );
                     const iterator = new DeckTreeIterator(
                         {
-                            cardOrder: CardOrder.DueFirstSequential,
+                            repItemOrder: RepItemOrder.DueFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
                         deck,
@@ -156,7 +158,7 @@ Q6::A6`;
                     nextCardThenCheck(iterator, "Q8");
 
                     // Check no more
-                    expect(iterator.nextCard()).toEqual(false);
+                    expect(iterator.nextRepItem()).toEqual(false);
                 });
             });
         });
@@ -173,24 +175,24 @@ Q3::A3`;
                 );
                 const iterator: DeckTreeIterator = new DeckTreeIterator(
                     {
-                        cardOrder: CardOrder.NewFirstSequential,
+                        repItemOrder: RepItemOrder.NewFirstSequential,
                         deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
                     deck,
                 );
                 iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
-                expect(iterator.nextCard()).toEqual(true);
+                expect(iterator.nextRepItem()).toEqual(true);
                 expect(iterator.currentDeck.deckName).toEqual("flashcards");
-                expect(iterator.currentCard.front).toEqual("Q1");
+                expect((iterator.currentRepItem as Card).front).toEqual("Q1");
 
-                expect(iterator.nextCard()).toEqual(true);
-                expect(iterator.currentCard.front).toEqual("Q2");
+                expect(iterator.nextRepItem()).toEqual(true);
+                expect((iterator.currentRepItem as Card).front).toEqual("Q2");
 
-                expect(iterator.nextCard()).toEqual(true);
-                expect(iterator.currentCard.front).toEqual("Q3");
+                expect(iterator.nextRepItem()).toEqual(true);
+                expect((iterator.currentRepItem as Card).front).toEqual("Q3");
 
-                expect(iterator.nextCard()).toEqual(false);
+                expect(iterator.nextRepItem()).toEqual(false);
             });
 
             describe("Single topic, mixture of new and scheduled cards", () => {
@@ -208,7 +210,7 @@ Q6::A6`;
                     );
                     const iterator = new DeckTreeIterator(
                         {
-                            cardOrder: CardOrder.NewFirstSequential,
+                            repItemOrder: RepItemOrder.NewFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
                         deck,
@@ -226,7 +228,7 @@ Q6::A6`;
                     nextCardThenCheck(iterator, "Q5");
 
                     // Check no more
-                    expect(iterator.nextCard()).toEqual(false);
+                    expect(iterator.nextRepItem()).toEqual(false);
                 });
 
                 test("Get the scheduled cards first", async () => {
@@ -243,7 +245,7 @@ Q6::A6`;
                     );
                     const iterator = new DeckTreeIterator(
                         {
-                            cardOrder: CardOrder.DueFirstSequential,
+                            repItemOrder: RepItemOrder.DueFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
                         deck,
@@ -261,7 +263,7 @@ Q6::A6`;
                     nextCardThenCheck(iterator, "Q6");
 
                     // Check no more
-                    expect(iterator.nextCard()).toEqual(false);
+                    expect(iterator.nextRepItem()).toEqual(false);
                 });
             });
 
@@ -286,7 +288,7 @@ Q6::A6`;
                     );
                     const iterator = new DeckTreeIterator(
                         {
-                            cardOrder: CardOrder.NewFirstSequential,
+                            repItemOrder: RepItemOrder.NewFirstSequential,
                             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                         },
                         deck,
@@ -310,7 +312,7 @@ Q6::A6`;
                     nextCardThenCheck(iterator, "Q8");
 
                     // Check no more
-                    expect(iterator.nextCard()).toEqual(false);
+                    expect(iterator.nextRepItem()).toEqual(false);
                 });
             });
         });
@@ -333,7 +335,7 @@ Q6::A6`;
                 );
                 const iterator = new DeckTreeIterator(
                     {
-                        cardOrder: CardOrder.DueFirstRandom,
+                        repItemOrder: RepItemOrder.DueFirstRandom,
                         deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
                     deck,
@@ -363,7 +365,7 @@ Q6::A6`;
                 nextCardThenCheck(iterator, "Q0");
 
                 // Check no more
-                expect(iterator.nextCard()).toEqual(false);
+                expect(iterator.nextRepItem()).toEqual(false);
             });
 
             test("Mixture new/scheduled", async () => {
@@ -382,7 +384,7 @@ QS3::Q <!--SR:!2023-09-02,4,270-->`;
                 );
                 const iterator = new DeckTreeIterator(
                     {
-                        cardOrder: CardOrder.DueFirstRandom,
+                        repItemOrder: RepItemOrder.DueFirstRandom,
                         deckOrder: DeckOrder.PrevDeckComplete_Sequential,
                     },
                     deck,
@@ -424,7 +426,7 @@ QS3::Q <!--SR:!2023-09-02,4,270-->`;
                 nextCardThenCheck(iterator, "QN1");
 
                 // Check no more
-                expect(iterator.nextCard()).toEqual(false);
+                expect(iterator.nextRepItem()).toEqual(false);
             });
         });
     });
@@ -447,7 +449,7 @@ QS3::Q <!--SR:!2023-09-02,4,270-->`;
             const deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
             const iterator = new DeckTreeIterator(
                 {
-                    cardOrder: CardOrder.NewFirstSequential,
+                    repItemOrder: RepItemOrder.NewFirstSequential,
                     deckOrder: DeckOrder.PrevDeckComplete_Random,
                 },
                 deck,
@@ -480,7 +482,7 @@ QS3::Q <!--SR:!2023-09-02,4,270-->`;
             nextCardThenCheck(iterator, "Q4");
 
             // Check no more
-            expect(iterator.nextCard()).toEqual(false);
+            expect(iterator.nextRepItem()).toEqual(false);
         });
     });
 
@@ -502,7 +504,7 @@ QS3::Q <!--SR:!2023-09-02,4,270-->`;
             const deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
             const iterator = new DeckTreeIterator(
                 {
-                    cardOrder: CardOrder.EveryCardRandomDeckAndCard,
+                    repItemOrder: RepItemOrder.EveryCardRandomDeckAndCard,
                     deckOrder: null,
                 },
                 deck,
@@ -545,7 +547,7 @@ QS3::Q <!--SR:!2023-09-02,4,270-->`;
             nextCardThenCheck(iterator, "Q2");
 
             // Check no more
-            expect(iterator.nextCard()).toEqual(false);
+            expect(iterator.nextRepItem()).toEqual(false);
         });
     });
 });
@@ -569,31 +571,31 @@ Q12::A12
             const [_, iterator] = await SampleItemDecks.createDeckAndIteratorFromText(
                 text,
                 TopicPath.emptyPath,
-                CardOrder.DueFirstSequential,
+                RepItemOrder.DueFirstSequential,
                 DeckOrder.PrevDeckComplete_Sequential,
             );
             iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
             // Start off with cards in the top most deck, i.e. #flashcards
-            expect(iterator.nextCard()).toEqual(true);
+            expect(iterator.nextRepItem()).toEqual(true);
             expect(iterator.currentDeck.deckName).toEqual("flashcards");
-            expect(iterator.currentCard.front).toEqual("Q1");
+            expect((iterator.currentRepItem as Card).front).toEqual("Q1");
 
             // Now those in #flashcards/folder1
-            expect(iterator.nextCard()).toEqual(true);
-            expect(iterator.currentCard.front).toEqual("Q21"); // Specific to #flashcards/folder1
-            expect(iterator.nextCard()).toEqual(true);
-            expect(iterator.currentCard.front).toEqual("Q11"); // Common to #flashcards/folder1 & folder2
-            expect(iterator.nextCard()).toEqual(true);
-            expect(iterator.currentCard.front).toEqual("Q12"); // Common to #flashcards/folder1 & folder2
+            expect(iterator.nextRepItem()).toEqual(true);
+            expect((iterator.currentRepItem as Card).front).toEqual("Q21"); // Specific to #flashcards/folder1
+            expect(iterator.nextRepItem()).toEqual(true);
+            expect((iterator.currentRepItem as Card).front).toEqual("Q11"); // Common to #flashcards/folder1 & folder2
+            expect(iterator.nextRepItem()).toEqual(true);
+            expect((iterator.currentRepItem as Card).front).toEqual("Q12"); // Common to #flashcards/folder1 & folder2
 
             // Now those in #flashcards/folder2
-            expect(iterator.nextCard()).toEqual(true);
-            expect(iterator.currentCard.front).toEqual("Q31");
+            expect(iterator.nextRepItem()).toEqual(true);
+            expect((iterator.currentRepItem as Card).front).toEqual("Q31");
 
             // Ones common to both folder1 and folder2 are not returned for folder2
             // i.e. we don't see Q11 or Q12 again
-            expect(iterator.nextCard()).toEqual(false);
+            expect(iterator.nextRepItem()).toEqual(false);
         });
 
         test("Iterating over portion of deck tree still deletes hard-linked cards in non-iterated portion of the deck", async () => {
@@ -613,28 +615,28 @@ Q12::A12
             const [deck, iterator] = await SampleItemDecks.createDeckAndIteratorFromText(
                 text,
                 TopicPath.emptyPath,
-                CardOrder.DueFirstSequential,
+                RepItemOrder.DueFirstSequential,
                 DeckOrder.PrevDeckComplete_Sequential,
             );
 
             // Before iterating folder2, there are (1 + 2) cards in folder1
             let subdeck: Deck = deck.getDeckByTopicTag("#flashcards/folder1");
-            expect(subdeck.getCardCount(CardListType.All, false)).toEqual(3);
+            expect(subdeck.getRepItemCount(RepItemState.AnyItem, false)).toEqual(3);
 
             // Iterate cards in #flashcards/folder2
             iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards/folder2"));
 
-            expect(iterator.nextCard()).toEqual(true);
-            expect(iterator.currentCard.front).toEqual("Q31");
-            expect(iterator.nextCard()).toEqual(true);
-            expect(iterator.currentCard.front).toEqual("Q11");
-            expect(iterator.nextCard()).toEqual(true);
-            expect(iterator.currentCard.front).toEqual("Q12");
-            expect(iterator.nextCard()).toEqual(false);
+            expect(iterator.nextRepItem()).toEqual(true);
+            expect((iterator.currentRepItem as Card).front).toEqual("Q31");
+            expect(iterator.nextRepItem()).toEqual(true);
+            expect((iterator.currentRepItem as Card).front).toEqual("Q11");
+            expect(iterator.nextRepItem()).toEqual(true);
+            expect((iterator.currentRepItem as Card).front).toEqual("Q12");
+            expect(iterator.nextRepItem()).toEqual(false);
 
             // After iterating folder2, there are (1 + 0) cards in folder1
             subdeck = deck.getDeckByTopicTag("#flashcards/folder1");
-            expect(subdeck.getCardCount(CardListType.All, false)).toEqual(1);
+            expect(subdeck.getRepItemCount(RepItemState.AnyItem, false)).toEqual(1);
         });
     });
 });
@@ -648,7 +650,7 @@ describe("hasCurrentCard", () => {
         const deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
         const iterator: DeckTreeIterator = new DeckTreeIterator(
             {
-                cardOrder: CardOrder.NewFirstSequential,
+                repItemOrder: RepItemOrder.NewFirstSequential,
                 deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
             deck,
@@ -666,14 +668,14 @@ describe("hasCurrentCard", () => {
         const deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
         const iterator: DeckTreeIterator = new DeckTreeIterator(
             {
-                cardOrder: CardOrder.NewFirstSequential,
+                repItemOrder: RepItemOrder.NewFirstSequential,
                 deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
             deck,
         );
         iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
-        expect(iterator.nextCard()).toEqual(true);
+        expect(iterator.nextRepItem()).toEqual(true);
         expect(iterator.hasCurrentCard).toEqual(true);
     });
 });
@@ -687,20 +689,20 @@ Q3::A3`;
         const deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
         const iterator = new DeckTreeIterator(
             {
-                cardOrder: CardOrder.NewFirstSequential,
+                repItemOrder: RepItemOrder.NewFirstSequential,
                 deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
             deck,
         );
         iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
 
-        expect(iterator.nextCard()).toEqual(true);
-        expect(iterator.nextCard()).toEqual(true);
-        expect(iterator.nextCard()).toEqual(true);
-        expect(iterator.nextCard()).toEqual(false);
+        expect(iterator.nextRepItem()).toEqual(true);
+        expect(iterator.nextRepItem()).toEqual(true);
+        expect(iterator.nextRepItem()).toEqual(true);
+        expect(iterator.nextRepItem()).toEqual(false);
 
         const t = () => {
-            iterator.deleteCurrentCardFromAllDecks();
+            iterator.deleteCurrentRepItemFromAllDecks();
         };
         expect(t).toThrow();
     });
@@ -712,10 +714,10 @@ Q2::A2
 Q3::A3`;
         const deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
         const flashcardDeck: Deck = deck.getDeckByTopicTag("#flashcards");
-        expect(flashcardDeck.newFlashcards.length).toEqual(3);
+        expect(flashcardDeck.newRepItems.length).toEqual(3);
         const iterator = new DeckTreeIterator(
             {
-                cardOrder: CardOrder.NewFirstSequential,
+                repItemOrder: RepItemOrder.NewFirstSequential,
                 deckOrder: DeckOrder.PrevDeckComplete_Sequential,
             },
             deck,
@@ -724,13 +726,13 @@ Q3::A3`;
 
         nextCardThenCheck(iterator, "Q1");
         nextCardThenCheck(iterator, "Q2");
-        expect(iterator.deleteCurrentCardFromAllDecks()).toEqual(true);
-        expect(iterator.currentCard.front).toEqual("Q3");
-        expect(iterator.deleteCurrentCardFromAllDecks()).toEqual(false);
+        expect(iterator.deleteCurrentRepItemFromAllDecks()).toEqual(true);
+        expect((iterator.currentRepItem as Card).front).toEqual("Q3");
+        expect(iterator.deleteCurrentRepItemFromAllDecks()).toEqual(false);
     });
 });
 
 function nextCardThenCheck(iterator: DeckTreeIterator, expectedFront: string): void {
-    expect(iterator.nextCard()).toEqual(true);
-    expect(iterator.currentCard.front).toEqual(expectedFront);
+    expect(iterator.nextRepItem()).toEqual(true);
+    expect((iterator.currentRepItem as Card).front).toEqual(expectedFront);
 }

@@ -1,98 +1,131 @@
-import { Card } from "src/data/data-structures/card/card";
+import { RepItemState } from "src/algorithms/base/repetition-item";
+import { Card, Card as RepetitionItem } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { IQuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { TopicPath, TopicPathList } from "src/data/data-structures/deck/topic-path";
 import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
 
-// TODO: Test data store switching first before overhauling the deck tree
-
-export enum CardListType {
-    NewCard,
-    DueCard,
-    All,
-}
 
 // The same card can be added to multiple decks e.g.
 //      #flashcards/language/words
 //      #flashcards/trivia
 // To simplify certain functions (e.g. getDistinctCardCount), we explicitly use the same card object (and not a copy)
+
+/**
+ * Represents a deck of repetition items.
+ *
+ * @class Deck
+ * @property {string} deckName - The name of the deck.
+ * @property {RepetitionItem[]} newRepItems - An array of new repetition items.
+ * @property {RepetitionItem[]} dueRepItems - An array of due repetition items.
+ * @property {Deck[]} subdecks - An array of subdecks.
+ * @property {Deck | null} parent - The parent deck.
+ */
 export class Deck {
     public deckName: string;
-    public newFlashcards: Card[];
-    public dueFlashcards: Card[];
+    public newRepItems: RepetitionItem[];
+    public dueRepItems: RepetitionItem[];
     public subdecks: Deck[];
     public parent: Deck | null;
 
     constructor(deckName: string, parent: Deck | null) {
         this.deckName = deckName;
-        this.newFlashcards = [];
-        this.dueFlashcards = [];
+        this.newRepItems = [];
+        this.dueRepItems = [];
         this.subdecks = [];
         this.parent = parent;
     }
 
-    public getCardCount(cardListType: CardListType, includeSubdeckCounts: boolean): number {
+    /**
+     * Gets the number of repetition items of the specified type in this deck and all its subdecks.
+     *
+     * @param {RepItemState} repItemListType - The repetition item list type.
+     * @param {boolean} includeSubdeckCounts - Whether to include the count of repetition items in subdecks.
+     * @returns {number} - The number of repetition items of the specified type in this deck and all its subdecks.
+     */
+    public getRepItemCount(repItemListType: RepItemState, includeSubdeckCounts: boolean): number {
         let result: number = 0;
-        if (cardListType === CardListType.NewCard || cardListType === CardListType.All)
-            result += this.newFlashcards.length;
-        if (cardListType === CardListType.DueCard || cardListType === CardListType.All)
-            result += this.dueFlashcards.length;
+        if (repItemListType === RepItemState.NewItem || repItemListType === RepItemState.AnyItem)
+            result += this.newRepItems.length;
+        if (repItemListType === RepItemState.DueItem || repItemListType === RepItemState.AnyItem)
+            result += this.dueRepItems.length;
 
         if (includeSubdeckCounts) {
             for (const deck of this.subdecks) {
-                result += deck.getCardCount(cardListType, includeSubdeckCounts);
+                result += deck.getRepItemCount(repItemListType, includeSubdeckCounts);
             }
         }
         return result;
     }
 
-    public getDistinctCardCount(cardListType: CardListType, includeSubdeckCounts: boolean): number {
-        const cardList: Card[] = this.getFlattenedCardArray(cardListType, includeSubdeckCounts);
+    /**
+     * Gets the number of distinct repetition items of the specified type in this deck and all its subdecks.
+     *
+     * @param {RepItemState} repItemListType - The repetition item list type.
+     * @param {boolean} includeSubdeckCounts - Whether to include the count of repetition items in subdecks.
+     * @returns {number} - The number of distinct repetition items of the specified type in this deck and all its subdecks.
+     */
+    public getDistinctRepItemCount(repItemListType: RepItemState, includeSubdeckCounts: boolean): number {
+        const repItemList: RepetitionItem[] = this.getFlattenedRepItemArray(repItemListType, includeSubdeckCounts);
 
         // The following selects distinct cards from cardList (based on reference equality)
-        const distinctCardSet = new Set(cardList);
+        const distinctCardSet = new Set(repItemList);
         return distinctCardSet.size;
     }
 
-    public getFlattenedCardArray(
-        cardListType: CardListType,
+    /**
+     * Gets an array of repetition items of the specified type in this deck and all its subdecks.
+     *
+     * @param {RepItemState} repItemListType - The repetition item list type.
+     * @param {boolean} includeSubdeckCounts - Whether to include the count of repetition items in subdecks.
+     * @returns {RepetitionItem[]} - An array of repetition items of the specified type in this deck and all its subdecks.
+     */
+    public getFlattenedRepItemArray(
+        repItemListType: RepItemState,
         includeSubdeckCounts: boolean,
-    ): Card[] {
-        let result: Card[] = [] as Card[];
-        switch (cardListType) {
-            case CardListType.NewCard:
-                result = this.newFlashcards;
+    ): RepetitionItem[] {
+        let result: RepetitionItem[] = [] as RepetitionItem[];
+        switch (repItemListType) {
+            case RepItemState.NewItem:
+                result = this.newRepItems;
                 break;
-            case CardListType.DueCard:
-                result = this.dueFlashcards;
+            case RepItemState.DueItem:
+                result = this.dueRepItems;
                 break;
-            case CardListType.All:
-                result = this.newFlashcards.concat(this.dueFlashcards);
+            case RepItemState.AnyItem:
+                result = this.newRepItems.concat(this.dueRepItems);
         }
 
         if (includeSubdeckCounts) {
             for (const subdeck of this.subdecks) {
                 result = result.concat(
-                    subdeck.getFlattenedCardArray(cardListType, includeSubdeckCounts),
+                    subdeck.getFlattenedRepItemArray(repItemListType, includeSubdeckCounts),
                 );
             }
         }
         return result;
     }
 
-    // Returns a count of the number of this question's cards are present in this deck.
+    // Returns a count of the number of this question's repetition items are present in this deck.
     // (The returned value would be <= question.cards.length)
-    public getQuestionCardCount(question: Question): number {
+    public getQuestionRepItemCount(question: Question): number {
         let result: number = 0;
-        result += this.getQuestionCardCountForCardListType(question, this.newFlashcards);
-        result += this.getQuestionCardCountForCardListType(question, this.dueFlashcards);
+        result += this.getQuestionRepItemCountForRepItemListType(question, this.newRepItems);
+        result += this.getQuestionRepItemCountForRepItemListType(question, this.dueRepItems);
         return result;
     }
 
-    private getQuestionCardCountForCardListType(question: Question, cards: Card[]): number {
+    /**
+     * Gets the number of repetition items of the specified type in the specified question.
+     *
+     * @param {Question} question - The question.
+     * @param {RepetitionItem[]} repItems - The repetition items.
+     * @returns {number} - The number of repetition items of the specified type in the specified question.
+     */
+    private getQuestionRepItemCountForRepItemListType(question: Question, repItems: RepetitionItem[]): number {
         let result: number = 0;
-        for (let i = 0; i < cards.length; i++) {
-            if (Object.is(question, cards[i].question)) result++;
+        for (let i = 0; i < repItems.length; i++) {
+            if (repItems[i] instanceof Card && Object.is(question, repItems[i].question)) result++;
         }
         return result;
     }
@@ -105,19 +138,56 @@ export class Deck {
         return this.parent === null;
     }
 
-    getDeckByTopicTag(tag: string): Deck {
+    /**
+     * Gets the deck with the specified tag.
+     *
+     * @param {string} tag - The tag.
+     * @returns {Deck | null} - The deck with the specified tag, or null if not found.
+     */
+    getDeckByTopicTag(tag: string): Deck | null {
         return this.getDeck(TopicPath.getTopicPathFromTag(tag));
     }
 
-    getDeck(topicPath: TopicPath): Deck {
-        return this._getOrCreateDeck(topicPath, false);
+    /**
+     * Gets the deck with the specified topic path.
+     *
+     * @param {TopicPath} topicPath - The topic path.
+     * @returns {Deck | null} - The deck with the specified topic path, or null if not found.
+     */
+    getDeck(topicPath: TopicPath): Deck | null {
+        return this._findDeckByTopicPath(topicPath);
     }
 
+    /**
+     * Gets or creates a deck with the specified topic path.
+     *
+     * @param {TopicPath} topicPath - The topic path.
+     * @param {boolean} createAllowed - Whether to create the deck if it doesn't exist.
+     * @returns {Deck | null} - The deck with the specified topic path, or null if it doesn't exist and createAllowed is false.
+     */
+    private _findDeckByTopicPath(topicPath: TopicPath): Deck | null {
+        if (!topicPath.hasPath) {
+            return this;
+        }
+
+        const t: TopicPath = topicPath.clone();
+        const deckName: string = t.shift();
+        for (const subdeck of this.subdecks) {
+            if (deckName === subdeck.deckName) {
+                return subdeck._findDeckByTopicPath(t);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets or creates a deck with the specified topic path.
+     *
+     * @param {TopicPath} topicPath - The topic path.
+     * @returns {Deck} - The deck with the specified topic path
+     */
     getOrCreateDeck(topicPath: TopicPath): Deck {
-        return this._getOrCreateDeck(topicPath, true);
-    }
-
-    private _getOrCreateDeck(topicPath: TopicPath, createAllowed: boolean): Deck {
         if (!topicPath.hasPath) {
             return this;
         }
@@ -125,71 +195,115 @@ export class Deck {
         const deckName: string = t.shift();
         for (const subdeck of this.subdecks) {
             if (deckName === subdeck.deckName) {
-                return subdeck._getOrCreateDeck(t, createAllowed);
+                return subdeck.getOrCreateDeck(t);
             }
         }
 
-        let result: Deck | null = null;
-        if (createAllowed) {
-            const subdeck: Deck = new Deck(deckName, this /* parent */);
-            this.subdecks.push(subdeck);
-            result = subdeck._getOrCreateDeck(t, createAllowed);
-        }
-        return result;
+        const subdeck: Deck = new Deck(deckName, this /* parent */);
+        this.subdecks.push(subdeck);
+        return subdeck.getOrCreateDeck(t);
     }
 
+    /**
+     * Gets the topic path of the deck.
+     *
+     * @returns {TopicPath} - The topic path of the deck.
+     */
     getTopicPath(): TopicPath {
         const list: string[] = [];
         // eslint-disable-next-line  @typescript-eslint/no-this-alias
-        let deck: Deck | null = this;
+        let deck: Deck = this;
         // The root deck may have a dummy deck name, which we don't want
         // So we first check that this isn't the root deck
         while (!deck.isRootDeck) {
             list.push(deck.deckName);
+            if (deck.parent === null) {
+                break;
+            }
             deck = deck.parent;
         }
         return new TopicPath(list.reverse());
     }
 
+    /**
+     * Gets the root deck of the deck.
+     *
+     * @returns {Deck} - The root deck of the deck.
+     */
     getRootDeck(): Deck {
         // eslint-disable-next-line  @typescript-eslint/no-this-alias
         let deck: Deck = this;
         while (!deck.isRootDeck) {
+            if (deck.parent === null) {
+                break;
+            }
             deck = deck.parent;
         }
         return deck;
     }
 
-    getCard(index: number, cardListType: CardListType): Card {
-        const cardList: Card[] = this.getCardListForCardType(cardListType);
-        return cardList[index];
+    /**
+     * Gets the RepetitionItem with the specified index.
+     *
+     * @param {number} index - The index of the RepetitionItem.
+     * @param {RepItemState} state - The state of the RepetitionItem.
+     * @returns {RepetitionItem} - The RepetitionItem with the specified index.
+     */
+    getRepItem(index: number, repItemListType: RepItemState): RepetitionItem {
+        const repItemList: RepetitionItem[] = this.getRepItemListForRepItemState(repItemListType);
+        return repItemList[index];
     }
 
-    getCardListForCardType(cardListType: CardListType): Card[] {
-        return cardListType === CardListType.DueCard ? this.dueFlashcards : this.newFlashcards;
+    /**
+     * Gets the list of RepetitionItems for the specified state.
+     *
+     * @param {RepItemState} state - The state of the RepetitionItems.
+     * @returns {RepetitionItem[]} - The list of RepetitionItems for the specified state.
+     */
+    getRepItemListForRepItemState(state: RepItemState): RepetitionItem[] {
+        return state === RepItemState.DueItem ? this.dueRepItems : this.newRepItems;
     }
 
-    appendCard(topicPathList: TopicPathList, cardObj: Card): void {
+    /**
+     * Appends a RepetitionItem to the deck.
+     *
+     * @param {TopicPathList} topicPathList - The topic path list.
+     * @param {RepetitionItem} repItem - The RepetitionItem to append.
+     */
+    appendRepItem(topicPathList: TopicPathList, repItem: RepetitionItem): void {
         if (topicPathList.list.length === 0) {
-            this.appendCardToRootDeck(cardObj);
+            this.appendRepItemToRootDeck(repItem);
         } else {
             // We explicitly are adding the same card object to each of the specified decks
             // This is required by getDistinctCardCount()
             for (const topicPath of topicPathList.list) {
-                this.appendCardSingleTopic(topicPath, cardObj);
+                this.appendRepItemSingleTopic(topicPath, repItem);
             }
         }
     }
 
-    appendCardToRootDeck(cardObj: Card): void {
-        this.appendCardSingleTopic(TopicPath.emptyPath, cardObj);
+    /**
+    * Appends a RepetitionItem to the root deck.
+    *
+     * This is used for cards that don't have any topics, and also for postponing cards (e.g. when skipping a card, we move it to the root deck and remove its topic paths, so that it won't be seen until the next review session when we reassign it to decks based on its question's topic paths)
+     *
+     * @param {RepetitionItem} repItem - The RepetitionItem to append.
+     */
+    appendRepItemToRootDeck(repItem: RepetitionItem): void {
+        this.appendRepItemSingleTopic(TopicPath.emptyPath, repItem);
     }
 
-    appendCardSingleTopic(topicPath: TopicPath, cardObj: Card): void {
+    /**
+     * Appends a RepetitionItem to a deck with the specified topic path.
+     *
+     * @param {TopicPath} topicPath - The topic path.
+     * @param {RepetitionItem} repItem - The RepetitionItem to append.
+     */
+    appendRepItemSingleTopic(topicPath: TopicPath, repItem: RepetitionItem): void {
         const deck: Deck = this.getOrCreateDeck(topicPath);
-        const cardList: Card[] = deck.getCardListForCardType(cardObj.cardListType);
+        const repItemList: RepetitionItem[] = deck.getRepItemListForRepItemState(repItem.repItemState);
 
-        cardList.push(cardObj);
+        repItemList.push(repItem);
     }
 
     // The question lists all the topics in which this card is included.
@@ -208,28 +322,41 @@ export class Deck {
 
     // The card's question lists all the topics in which this card is included.
     // The topics are relative to the base deck, and this method must be called on that deck
-    deleteCardFromAllDecks(card: Card, exceptionIfMissing: boolean): void {
+    deleteCardFromAllDecks(card: RepetitionItem, exceptionIfMissing: boolean): void {
         for (const topicPath of card.question.topicPathList.list) {
-            const deck: Deck = this.getDeck(topicPath);
-            deck.deleteCardFromThisDeck(card, exceptionIfMissing);
+            const deck: Deck | null = this.getDeck(topicPath);
+            if (deck) {
+                deck.deleteCardFromThisDeck(card, exceptionIfMissing);
+            }
         }
     }
 
-    deleteCardFromThisDeck(card: Card, exceptionIfMissing: boolean): void {
-        const newIdx = this.newFlashcards.indexOf(card);
-        if (newIdx !== -1) this.newFlashcards.splice(newIdx, 1);
-        const dueIdx = this.dueFlashcards.indexOf(card);
-        if (dueIdx !== -1) this.dueFlashcards.splice(dueIdx, 1);
+    deleteCardFromThisDeck(card: RepetitionItem, exceptionIfMissing: boolean): void {
+        const newIdx = this.newRepItems.indexOf(card);
+        if (newIdx !== -1) this.newRepItems.splice(newIdx, 1);
+        const dueIdx = this.dueRepItems.indexOf(card);
+        if (dueIdx !== -1) this.dueRepItems.splice(dueIdx, 1);
         if (newIdx === -1 && dueIdx === -1 && exceptionIfMissing) {
             throw `deleteCardFromThisDeck: Card: ${card.front} not found in deck: ${this.deckName}`;
         }
     }
 
-    deleteCardAtIndex(index: number, cardListType: CardListType): void {
-        const cardList: Card[] = this.getCardListForCardType(cardListType);
-        cardList.splice(index, 1);
+    /**
+     * Deletes a RepetitionItem at the specified index.
+     *
+     * @param {number} index - The index of the RepetitionItem to delete.
+     * @param {RepItemState} repItemState - The state of the RepetitionItem.
+     */
+    deleteRepItemAtIndex(index: number, repItemState: RepItemState): void {
+        const repItemList: RepetitionItem[] = this.getRepItemListForRepItemState(repItemState);
+        repItemList.splice(index, 1);
     }
 
+    /**
+    * Exports the deck and all its subdecks to an array.
+    *
+    * @returns {Deck[]} - An array containing the deck and all its subdecks.
+    */
     toDeckArray(): Deck[] {
         const result: Deck[] = [];
         result.push(this);
@@ -239,6 +366,9 @@ export class Deck {
         return result;
     }
 
+    /**
+     * Sorts the subdecks list in ascending order by deck name.
+     */
     sortSubdecksList(): void {
         this.subdecks.sort((a, b) => {
             if (a.deckName < b.deckName) {
@@ -254,26 +384,38 @@ export class Deck {
         }
     }
 
-    debugLogToConsole(desc: string = null, indent: number = 0) {
+    /**
+     * Logs the deck and its subdecks to the console.
+     *
+     * @param {string | null} desc - The description to log.
+     * @param {number} indent - The indentation level.
+     */
+    debugLogToConsole(desc: string | null = null, indent: number = 0) {
         let str: string = desc !== null && desc !== undefined ? `${desc}: ` : "";
         str += this.toString(indent);
         console.log(str);
     }
 
+    /**
+     * Converts the deck and its subdecks to a string.
+     *
+     * @param {number} indent - The indentation level.
+     * @returns {string} - The string representation of the deck and its subdecks.
+     */
     toString(indent: number = 0): string {
         let result: string = "";
         let indentStr: string = " ".repeat(indent * 4);
 
         result += `${indentStr}${this.deckName}\r\n`;
         indentStr += "  ";
-        for (let i = 0; i < this.newFlashcards.length; i++) {
-            const card = this.newFlashcards[i];
-            result += `${indentStr}New: ${i}: ${card.front}::${card.back}\r\n`;
+        for (let i = 0; i < this.newRepItems.length; i++) {
+            const repItem = this.newRepItems[i];
+            result += `${indentStr}New: ${i}: ${repItem.toString()}\r\n`;
         }
-        for (let i = 0; i < this.dueFlashcards.length; i++) {
-            const card = this.dueFlashcards[i];
-            const s = card.isDue ? "Due" : "Not due";
-            result += `${indentStr}${s}: ${i}: ${card.front}::${card.back}\r\n`;
+        for (let i = 0; i < this.dueRepItems.length; i++) {
+            const repItem = this.dueRepItems[i];
+            const s = repItem.isDue ? "Due" : "Not due";
+            result += `${indentStr}${s}: ${i}: ${repItem.toString()}\r\n`;
         }
 
         for (const subdeck of this.subdecks) {
@@ -282,46 +424,71 @@ export class Deck {
         return result;
     }
 
+    /**
+     * Clones the deck and its subdecks.
+     *
+     * @returns {Deck} - The cloned deck and its subdecks.
+     */
     clone(): Deck {
-        return this.copyWithCardFilter(() => true);
+        return this.copyWithRepItemFilter(() => true);
     }
 
-    copyWithCardFilter(predicate: (value: Card) => boolean, parent: Deck = null): Deck {
+    /**
+     * Copies the deck and its subdecks with a filter.
+     *
+     * @param {(value: RepetitionItem) => boolean} predicate - The filter function.
+     * @param {Deck | null} parent - The parent deck.
+     * @returns {Deck} - The copied deck and its subdecks with the filter applied.
+     */
+    copyWithRepItemFilter(predicate: (value: RepetitionItem) => boolean, parent: Deck | null = null): Deck {
         const result: Deck = new Deck(this.deckName, parent);
-        result.newFlashcards = [...this.newFlashcards.filter((card) => predicate(card))];
-        result.dueFlashcards = [...this.dueFlashcards.filter((card) => predicate(card))];
+        result.newRepItems = [...this.newRepItems.filter((card) => predicate(card))];
+        result.dueRepItems = [...this.dueRepItems.filter((card) => predicate(card))];
 
         for (const s of this.subdecks) {
             const newParent = result;
-            const newDeck = s.copyWithCardFilter(predicate, newParent);
+            const newDeck = s.copyWithRepItemFilter(predicate, newParent);
             result.subdecks.push(newDeck);
         }
         return result;
     }
 
-    static otherListType(cardListType: CardListType): CardListType {
-        let result: CardListType;
-        if (cardListType === CardListType.NewCard) result = CardListType.DueCard;
-        else if (cardListType === CardListType.DueCard) result = CardListType.NewCard;
-        else throw "Invalid cardListType";
+    /**
+     * Gets the opposite state of the specified state.
+     *
+     * @param {RepItemState} repItemState - The state.
+     * @returns {RepItemState} - The opposite state.
+     */
+    static otherListType(repItemState: RepItemState): RepItemState {
+        let result: RepItemState;
+        if (repItemState === RepItemState.NewItem) result = RepItemState.DueItem;
+        else if (repItemState === RepItemState.DueItem) result = RepItemState.NewItem;
+        else throw "Invalid repItemState";
         return result;
     }
 }
 
+/**
+ * Filters the deck tree items
+ */
 export class DeckTreeFilter {
-    static filterForReviewableCards(reviewableDeckTree: Deck): Deck {
-        return reviewableDeckTree.copyWithCardFilter((card) => !card.question.hasEditLaterTag);
-    }
-
-    static filterForRemainingCards(
+    /**
+     * Filters the deck tree for the remaining repetition items.
+     *
+     * @param {IQuestionPostponementList} questionPostponementList - The question postponement list.
+     * @param {Deck} deckTree - The deck tree.
+     * @param {FlashcardReviewMode} reviewMode - The review mode.
+     * @returns {Deck} - The filtered deck tree.
+     */
+    static filterForRemainingRepItems(
         questionPostponementList: IQuestionPostponementList,
         deckTree: Deck,
         reviewMode: FlashcardReviewMode,
     ): Deck {
-        return deckTree.copyWithCardFilter(
-            (card) =>
-                (reviewMode === FlashcardReviewMode.Cram || card.isNew || card.isDue) &&
-                !questionPostponementList.includes(card.question),
+        return deckTree.copyWithRepItemFilter(
+            (repItem: RepetitionItem) =>
+                (reviewMode === FlashcardReviewMode.Cram || repItem.isNew || repItem.isDue) &&
+                !questionPostponementList.includes(repItem.question),
         );
     }
 }

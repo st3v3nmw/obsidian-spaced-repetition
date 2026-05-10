@@ -20,7 +20,6 @@ import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
 import { textInterval } from "src/algorithms/osr/note-scheduling";
 import { OsrCore } from "src/data/core";
 import { DataManager } from "src/data/data-manager";
-import { CardListType } from "src/data/data-structures/deck/deck";
 import { Stats } from "src/data/data-structures/deck/stats";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
@@ -29,6 +28,7 @@ import { SettingsPageType } from "src/ui/obsidian-ui-components/content-containe
 import ChartComponent from "src/ui/obsidian-ui-components/content-container/settings-page/statistics-page/chart-component";
 import NoteStatsComponent from "src/ui/obsidian-ui-components/content-container/settings-page/statistics-page/note-stats-component";
 import { getKeysPreserveType, getTypedObjectEntries, mapRecord } from "src/utils/types";
+import { RepItemState } from "src/algorithms/base/repetition-item";
 
 Chart.register(
     BarElement,
@@ -69,8 +69,8 @@ export class StatisticsPage extends SettingsPage {
             plugin,
             dataManager,
             pageType,
-            () => {},
-            () => {},
+            () => { },
+            () => { },
             openPage,
             scrollListener,
         );
@@ -159,7 +159,7 @@ export class StatisticsPage extends SettingsPage {
         // Add intervals
         const averageInterval: string = textInterval(
             Math.round((cardStats.intervals.getTotalOfValueMultiplyCount() / scheduledCount) * 10) /
-                10 || 0,
+            10 || 0,
             false,
         );
         const longestInterval: string = textInterval(cardStats.intervals.getMaxValue(), false);
@@ -211,8 +211,8 @@ export class StatisticsPage extends SettingsPage {
         });
 
         // Add card types
-        const totalCardsCount: number = osrCore.reviewableDeckTree.getDistinctCardCount(
-            CardListType.All,
+        const totalCardsCount: number = osrCore.reviewableDeckTree.getDistinctRepItemCount(
+            RepItemState.AnyItem,
             true,
         );
 

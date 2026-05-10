@@ -270,14 +270,18 @@ export class OsrCore {
      * @returns {void}
      */
     public finalizeLoad(): void {
-        this.osrNoteGraph.generatePageRanks();
+        if (this.osrNoteGraph !== null) {
+            this.osrNoteGraph.generatePageRanks();
+        }
 
-        // Reviewable cards are all except those with the "edit later" tag
-        this._reviewableDeckTree = DeckTreeFilter.filterForReviewableCards(this.fullDeckTree);
+        if (this.fullDeckTree === null) {
+            return;
+        }
+        this._reviewableDeckTree = this.fullDeckTree ? this.fullDeckTree.clone() : new Deck("root", null);
 
         // sort the deck names
         this._reviewableDeckTree.sortSubdecksList();
-        this._remainingDeckTree = DeckTreeFilter.filterForRemainingCards(
+        this._remainingDeckTree = DeckTreeFilter.filterForRemainingRepItems(
             this._questionPostponementList,
             this._reviewableDeckTree,
             FlashcardReviewMode.Review,

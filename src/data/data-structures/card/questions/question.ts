@@ -189,7 +189,6 @@ export class Question {
     parsedQuestionInfo: ParsedQuestionInfo;
     topicPathList: TopicPathList;
     questionText: QuestionText;
-    hasEditLaterTag: boolean;
     questionContext: string[];
     cards: Card[];
     hasChanged: boolean;
@@ -300,7 +299,6 @@ export class Question {
         textDirection: TextDirection,
         context: string[],
     ): Question {
-        const hasEditLaterTag = parsedQuestionInfo.text.includes(settings.editLaterTag);
         const questionText: QuestionText = QuestionText.create(
             parsedQuestionInfo.text,
             textDirection,
@@ -316,9 +314,8 @@ export class Question {
             parsedQuestionInfo,
             topicPathList,
             questionText,
-            hasEditLaterTag,
             questionContext: context,
-            cards: null,
+            cards: undefined,
             hasChanged: false,
         });
 

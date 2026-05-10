@@ -1,10 +1,11 @@
 import { Card } from "src/data/data-structures/card/card";
-import { CardListType, Deck } from "src/data/data-structures/deck/deck";
+import { Deck } from "src/data/data-structures/deck/deck";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 
 import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 import { SampleItemDecks } from "./sample-items";
+import { RepItemState } from "src/algorithms/base/repetition-item";
 
 beforeAll(() => {
     unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
@@ -109,9 +110,9 @@ Q3::A3
 Q4::A4 <!--SR:!2023-09-02,4,270-->`;
         const deck: Deck = await SampleItemDecks.createDeckFromText(text);
         const flashcardDeck: Deck = deck.getDeckByTopicTag("#flashcards");
-        expect(flashcardDeck.getDistinctCardCount(CardListType.NewCard, false)).toEqual(3);
-        expect(flashcardDeck.getDistinctCardCount(CardListType.DueCard, false)).toEqual(1);
-        expect(flashcardDeck.getDistinctCardCount(CardListType.All, false)).toEqual(4);
+        expect(flashcardDeck.getDistinctRepItemCount(RepItemState.NewItem, false)).toEqual(3);
+        expect(flashcardDeck.getDistinctRepItemCount(RepItemState.DueItem, false)).toEqual(1);
+        expect(flashcardDeck.getDistinctRepItemCount(RepItemState.AnyItem, false)).toEqual(4);
     });
 
     test("Deck hierarchy - no duplicate cards", async () => {
@@ -133,14 +134,14 @@ Q15::A15 <!--SR:!2023-09-02,4,270
         const deck: Deck = await SampleItemDecks.createDeckFromText(text);
         const flashcardDeck: Deck = deck.getDeckByTopicTag("#flashcards");
         // Just #flashcards, no subdeck
-        expect(flashcardDeck.getDistinctCardCount(CardListType.NewCard, false)).toEqual(3);
-        expect(flashcardDeck.getDistinctCardCount(CardListType.DueCard, false)).toEqual(1);
-        expect(flashcardDeck.getDistinctCardCount(CardListType.All, false)).toEqual(4);
+        expect(flashcardDeck.getDistinctRepItemCount(RepItemState.NewItem, false)).toEqual(3);
+        expect(flashcardDeck.getDistinctRepItemCount(RepItemState.DueItem, false)).toEqual(1);
+        expect(flashcardDeck.getDistinctRepItemCount(RepItemState.AnyItem, false)).toEqual(4);
 
         // #flashcards, and subdeck
-        expect(flashcardDeck.getDistinctCardCount(CardListType.NewCard, true)).toEqual(6);
-        expect(flashcardDeck.getDistinctCardCount(CardListType.DueCard, true)).toEqual(3);
-        expect(flashcardDeck.getDistinctCardCount(CardListType.All, true)).toEqual(9);
+        expect(flashcardDeck.getDistinctRepItemCount(RepItemState.NewItem, true)).toEqual(6);
+        expect(flashcardDeck.getDistinctRepItemCount(RepItemState.DueItem, true)).toEqual(3);
+        expect(flashcardDeck.getDistinctRepItemCount(RepItemState.AnyItem, true)).toEqual(9);
     });
 
     test("Deck hierarchy - with duplicate cards", async () => {
@@ -165,18 +166,18 @@ Q21::A21
 
         // #flashcards/folder1
         let subdeck: Deck = deck.getDeckByTopicTag("#flashcards/folder1");
-        expect(subdeck.getDistinctCardCount(CardListType.NewCard, true)).toEqual(3);
-        expect(subdeck.getDistinctCardCount(CardListType.DueCard, true)).toEqual(2);
+        expect(subdeck.getDistinctRepItemCount(RepItemState.NewItem, true)).toEqual(3);
+        expect(subdeck.getDistinctRepItemCount(RepItemState.DueItem, true)).toEqual(2);
 
         // #flashcards/folder2
         subdeck = deck.getDeckByTopicTag("#flashcards/folder2");
-        expect(subdeck.getDistinctCardCount(CardListType.NewCard, true)).toEqual(4);
-        expect(subdeck.getDistinctCardCount(CardListType.DueCard, true)).toEqual(2);
+        expect(subdeck.getDistinctRepItemCount(RepItemState.NewItem, true)).toEqual(4);
+        expect(subdeck.getDistinctRepItemCount(RepItemState.DueItem, true)).toEqual(2);
 
         // #flashcards and subdecks
         subdeck = deck.getDeckByTopicTag("#flashcards");
-        expect(subdeck.getDistinctCardCount(CardListType.NewCard, true)).toEqual(3 + 3 + 1);
-        expect(subdeck.getDistinctCardCount(CardListType.DueCard, true)).toEqual(1 + 2 + 0);
+        expect(subdeck.getDistinctRepItemCount(RepItemState.NewItem, true)).toEqual(3 + 3 + 1);
+        expect(subdeck.getDistinctRepItemCount(RepItemState.DueItem, true)).toEqual(1 + 2 + 0);
     });
 });
 
@@ -274,7 +275,7 @@ describe("copyWithCardFilter()", () => {
     describe("Single level tree", () => {
         test("No cards", () => {
             const original: Deck = new Deck("Root", null);
-            const copy: Deck = original.copyWithCardFilter((_) => true);
+            const copy: Deck = original.copyWithRepItemFilter((_) => true);
 
             original.deckName = "New deck name";
             expect(copy.deckName).toEqual("Root");
@@ -289,11 +290,11 @@ Q3::A3`;
                 text,
                 TopicPath.emptyPath,
             );
-            let copy: Deck = original.copyWithCardFilter((card) => card.front.includes("2"));
+            let copy: Deck = original.copyWithRepItemFilter((card) => card.front.includes("2"));
             copy = copy.getDeckByTopicTag("#flashcards");
 
-            expect(copy.newFlashcards.length).toEqual(1);
-            expect(copy.newFlashcards[0].front).toEqual("Q2");
+            expect(copy.newRepItems.length).toEqual(1);
+            expect(copy.newRepItems[0].front).toEqual("Q2");
         });
 
         test("With scheduled cards", async () => {
@@ -305,13 +306,13 @@ Q3::A3 <!--SR:!2023-09-02,4,270-->`;
                 text,
                 TopicPath.emptyPath,
             );
-            let copy: Deck = original.copyWithCardFilter((card) => !card.front.includes("2"));
+            let copy: Deck = original.copyWithRepItemFilter((card) => !card.front.includes("2"));
             copy = copy.getDeck(TopicPath.getTopicPathFromTag("#flashcards"));
 
-            expect(copy.newFlashcards.length).toEqual(0);
-            expect(copy.dueFlashcards.length).toEqual(2);
-            expect(copy.dueFlashcards[0].front).toEqual("Q1");
-            expect(copy.dueFlashcards[1].front).toEqual("Q3");
+            expect(copy.newRepItems.length).toEqual(0);
+            expect(copy.dueRepItems.length).toEqual(2);
+            expect(copy.dueRepItems[0].front).toEqual("Q1");
+            expect(copy.dueRepItems[1].front).toEqual("Q3");
         });
     });
 
@@ -330,11 +331,11 @@ Q3::A3 <!--SR:!2023-09-02,4,270-->`;
                 text,
                 new TopicPath(["Root"]),
             );
-            const originalCountPreCopy: number = original.getCardCount(CardListType.All, true);
+            const originalCountPreCopy: number = original.getRepItemCount(RepItemState.AnyItem, true);
             expect(originalCountPreCopy).toEqual(6);
 
-            original.copyWithCardFilter((card) => parseInt(card.front[1]) % 2 === 1);
-            const originalCountPostCopy: number = original.getCardCount(CardListType.All, true);
+            original.copyWithRepItemFilter((card) => parseInt(card.front[1]) % 2 === 1);
+            const originalCountPostCopy: number = original.getRepItemCount(RepItemState.AnyItem, true);
             expect(originalCountPreCopy).toEqual(originalCountPostCopy);
         });
 
@@ -353,21 +354,21 @@ Q3::A3 <!--SR:!2023-09-02,4,270-->`;
                 new TopicPath(["Root"]),
             );
 
-            const copy: Deck = original.copyWithCardFilter(
+            const copy: Deck = original.copyWithRepItemFilter(
                 (card) => parseInt(card.front[1]) % 2 === 1,
             );
 
             let subdeck: Deck = copy.getDeck(new TopicPath(["flashcards"]));
-            expect(subdeck.newFlashcards.length).toEqual(2);
-            expect(subdeck.newFlashcards[0].front).toEqual("Q1");
-            expect(subdeck.newFlashcards[1].front).toEqual("Q3");
+            expect(subdeck.newRepItems.length).toEqual(2);
+            expect(subdeck.newRepItems[0].front).toEqual("Q1");
+            expect(subdeck.newRepItems[1].front).toEqual("Q3");
 
             subdeck = copy.getDeck(new TopicPath(["flashcards", "science"]));
-            expect(subdeck.newFlashcards.length).toEqual(1);
-            expect(subdeck.newFlashcards[0].front).toEqual("Q5");
+            expect(subdeck.newRepItems.length).toEqual(1);
+            expect(subdeck.newRepItems[0].front).toEqual("Q5");
 
             subdeck = copy.getDeck(new TopicPath(["flashcards", "science", "physics"]));
-            expect(subdeck.newFlashcards.length).toEqual(0);
+            expect(subdeck.newRepItems.length).toEqual(0);
         });
     });
 });
@@ -381,14 +382,14 @@ Q3::A3
 Q4::A4 <!--SR:!2023-09-02,4,270-->`;
         const deck: Deck = await SampleItemDecks.createDeckFromText(text);
         const flashcardDeck: Deck = deck.getDeckByTopicTag("#flashcards");
-        expect(flashcardDeck.getCardCount(CardListType.All, false)).toEqual(4);
+        expect(flashcardDeck.getRepItemCount(RepItemState.AnyItem, false)).toEqual(4);
 
         // We have to call on the base deck (i.e. "deck", not "flashcardDeck")
-        deck.deleteCardFromAllDecks(flashcardDeck.newFlashcards[1], true);
-        expect(flashcardDeck.getCardCount(CardListType.All, false)).toEqual(3);
-        expect(flashcardDeck.newFlashcards[0].front).toEqual("Q1");
-        expect(flashcardDeck.newFlashcards[1].front).toEqual("Q3");
-        expect(flashcardDeck.dueFlashcards[0].front).toEqual("Q4");
+        deck.deleteCardFromAllDecks(flashcardDeck.newRepItems[1], true);
+        expect(flashcardDeck.getRepItemCount(RepItemState.AnyItem, false)).toEqual(3);
+        expect(flashcardDeck.newRepItems[0].front).toEqual("Q1");
+        expect(flashcardDeck.newRepItems[1].front).toEqual("Q3");
+        expect(flashcardDeck.dueRepItems[0].front).toEqual("Q4");
     });
 
     test("Deck hierarchy - with duplicate cards", async () => {
@@ -414,11 +415,11 @@ Q21::A21
         // Delete card from #flashcards/folder1, deletes from #flashcards/folder as well
         const folder1: Deck = deck.getDeckByTopicTag("#flashcards/folder1");
         const folder2: Deck = deck.getDeckByTopicTag("#flashcards/folder2");
-        const card: Card = folder1.newFlashcards[1];
-        expect(folder1.getCardCount(CardListType.NewCard, false)).toEqual(3);
-        expect(folder2.getCardCount(CardListType.NewCard, false)).toEqual(3 + 1);
+        const card: Card = folder1.newRepItems[1];
+        expect(folder1.getRepItemCount(RepItemState.NewItem, false)).toEqual(3);
+        expect(folder2.getRepItemCount(RepItemState.NewItem, false)).toEqual(3 + 1);
         deck.deleteCardFromAllDecks(card, true);
-        expect(folder1.getCardCount(CardListType.NewCard, false)).toEqual(2);
-        expect(folder2.getCardCount(CardListType.NewCard, false)).toEqual(2 + 1);
+        expect(folder1.getRepItemCount(RepItemState.NewItem, false)).toEqual(2);
+        expect(folder2.getRepItemCount(RepItemState.NewItem, false)).toEqual(2 + 1);
     });
 });

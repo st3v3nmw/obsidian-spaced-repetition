@@ -5,7 +5,7 @@ import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
 import { DataManager } from "src/data/data-manager";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import {
-    CardOrder,
+    RepItemOrder,
     DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
@@ -456,7 +456,7 @@ export default class SRPlugin extends Plugin {
         if (note) {
             note.appendCardsToDeck(deckTree);
         }
-        const remainingDeckTree = DeckTreeFilter.filterForRemainingCards(
+        const remainingDeckTree = DeckTreeFilter.filterForRemainingRepItems(
             this.dataManager.osrCore.questionPostponementList,
             deckTree,
             mode,
@@ -488,14 +488,14 @@ export default class SRPlugin extends Plugin {
     }
 
     private static createDeckTreeIterator(settings: SRSettings): IDeckTreeIterator {
-        let cardOrder: CardOrder = CardOrder[settings.flashcardCardOrder as keyof typeof CardOrder];
-        if (cardOrder === undefined) cardOrder = CardOrder.DueFirstSequential;
+        let cardOrder: RepItemOrder = RepItemOrder[settings.flashcardCardOrder as keyof typeof RepItemOrder];
+        if (cardOrder === undefined) cardOrder = RepItemOrder.DueFirstSequential;
         let deckOrder: DeckOrder = DeckOrder[settings.flashcardDeckOrder as keyof typeof DeckOrder];
         if (deckOrder === undefined) deckOrder = DeckOrder.PrevDeckComplete_Sequential;
 
         const iteratorOrder: IIteratorOrder = {
             deckOrder,
-            cardOrder,
+            repItemOrder: cardOrder,
         };
         return new DeckTreeIterator(iteratorOrder, null);
     }

@@ -153,11 +153,11 @@ export default class ContentManager {
 
         // Loop through all decks and determine if any have cards in queue
         for (const subdeck of subdecksWithCardsInQueue) {
-            const hasNewCards: boolean = subdeck.newFlashcards.length > 0;
-            const hasDueCards: boolean = subdeck.dueFlashcards.length > 0;
+            const hasNewCards: boolean = subdeck.newRepItems.length > 0;
+            const hasDueCards: boolean = subdeck.dueRepItems.length > 0;
             const hasDueCardsToday: boolean =
                 hasDueCards &&
-                subdeck.dueFlashcards.some((card) => {
+                subdeck.dueRepItems.some((card) => {
                     const dueDate: number = card.scheduleInfo.dueDateAsUnix;
                     const nowUnix: number = globalDateProvider.now.valueOf();
                     return dueDate <= nowUnix;
@@ -333,7 +333,7 @@ export default class ContentManager {
         if (
             this.lastPressedOnProcessReview &&
             timeNow - this.lastPressedOnProcessReview <
-                this.dataManager.data.settings.reviewButtonDelay
+            this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
@@ -359,7 +359,7 @@ export default class ContentManager {
         if (
             this.lastPressedOnProcessReview &&
             timeNow - this.lastPressedOnProcessReview <
-                this.dataManager.data.settings.reviewButtonDelay
+            this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }

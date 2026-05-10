@@ -1,12 +1,12 @@
 import { ISRAlgorithm } from "src/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
+import { RepItemState, ReviewResponse } from "src/algorithms/base/repetition-item";
 import { TICKS_PER_DAY } from "src/data/constants";
 import { DataStore } from "src/data/data-stores/base/data-store";
 import { Card } from "src/data/data-structures/card/card";
 import { Question, QuestionText } from "src/data/data-structures/card/questions/question";
 import { IQuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
-import { CardListType, Deck } from "src/data/data-structures/deck/deck";
+import { Deck } from "src/data/data-structures/deck/deck";
 import { IDeckTreeIterator } from "src/data/data-structures/deck/deck-tree-iterator";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { SRSettings } from "src/data/settings";
@@ -138,7 +138,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
     get hasCurrentCard(): boolean {
         return (
-            this.cardSequencer.currentCard !== null && this.cardSequencer.currentCard !== undefined
+            this.cardSequencer.currentRepItem !== null && this.cardSequencer.currentRepItem !== undefined
         );
     }
 
@@ -147,7 +147,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     get currentCard(): Card {
-        return this.cardSequencer.currentCard;
+        return this.cardSequencer.currentRepItem as Card;
     }
 
     get currentQuestion(): Question {
@@ -182,7 +182,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         this.currentTopicPath = topicPath;
         this.wakeDuePendingCards();
         this.cardSequencer.setIteratorTopicPath(topicPath);
-        this.cardSequencer.nextCard();
+        this.cardSequencer.nextRepItem();
     }
 
     refreshCurrentDeck(): void {
@@ -197,18 +197,18 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         this.wakeDuePendingCards();
         const totalCount: number = this._originalDeckTree
             .getDeck(topicPath)
-            .getDistinctCardCount(CardListType.All, true);
+            .getDistinctRepItemCount(RepItemState.AnyItem, true);
         const remainingDeck: Deck = this.remainingDeckTree.getDeck(topicPath);
-        const newCount: number = remainingDeck.getDistinctCardCount(CardListType.NewCard, true);
-        const dueCount: number = remainingDeck.getDistinctCardCount(CardListType.DueCard, true);
+        const newCount: number = remainingDeck.getDistinctRepItemCount(RepItemState.NewItem, true);
+        const dueCount: number = remainingDeck.getDistinctRepItemCount(RepItemState.DueItem, true);
 
         // Sry for the long variable names, but I needed all these distinct counts in the UI
-        const newCardsInQueueOfThisDeckCount = remainingDeck.getDistinctCardCount(
-            CardListType.NewCard,
+        const newCardsInQueueOfThisDeckCount = remainingDeck.getDistinctRepItemCount(
+            RepItemState.NewItem,
             false,
         );
-        const dueCardsInQueueOfThisDeckCount = remainingDeck.getDistinctCardCount(
-            CardListType.DueCard,
+        const dueCardsInQueueOfThisDeckCount = remainingDeck.getDistinctRepItemCount(
+            RepItemState.DueItem,
             false,
         );
         const cardsInQueueOfThisDeckCount =
@@ -243,8 +243,8 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
                 this.getSubDecksWithCardsInQueue(subDeck),
             );
 
-            const newCount: number = subDeck.getDistinctCardCount(CardListType.NewCard, false);
-            const dueCount: number = subDeck.getDistinctCardCount(CardListType.DueCard, false);
+            const newCount: number = subDeck.getDistinctRepItemCount(RepItemState.NewItem, false);
+            const dueCount: number = subDeck.getDistinctRepItemCount(RepItemState.DueItem, false);
             if (newCount + dueCount > 0) subDecksWithCardsInQueue.push(subDeck);
         });
 
@@ -256,7 +256,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     private deleteCurrentCard(): void {
-        this.cardSequencer.deleteCurrentCardFromAllDecks();
+        this.cardSequencer.deleteCurrentRepItemFromAllDecks();
     }
 
     async processReview(response: ReviewResponse): Promise<void> {
@@ -304,8 +304,8 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
                 await this.burySiblingCards();
                 this.deleteSiblingCardsFromAllDecks();
             }
-            this.cardSequencer.moveCurrentCardToEndOfList();
-            this.cardSequencer.nextCard();
+            this.cardSequencer.moveCurrentRepItemToEndOfList();
+            this.cardSequencer.nextRepItem();
         } else {
             if (this.settings.burySiblingCards) {
                 await this.burySiblingCards();
@@ -320,7 +320,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         // We check if there are any sibling cards still in the deck,
         // We do this because otherwise we would be adding every reviewed card to the postponement list, even for a
         // question with a single card. That isn't consistent with the 1.10.1 behavior
-        const remaining = this.currentDeck.getQuestionCardCount(this.currentQuestion);
+        const remaining = this.currentDeck.getQuestionRepItemCount(this.currentQuestion);
         if (remaining > 1) {
             this.questionPostponementList.add(this.currentQuestion);
             await this.questionPostponementList.write();
@@ -346,15 +346,15 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             this.deleteSiblingCardsFromAllDecks();
         }
 
-        this.cardSequencer.deleteCurrentCardFromAllDecks();
+        this.cardSequencer.deleteCurrentRepItemFromAllDecks();
         this.pendingCards.push({ card: pendingCard, dueUnix });
     }
 
     async processReviewCramMode(response: ReviewResponse): Promise<void> {
         if (response === ReviewResponse.Easy) this.deleteCurrentCard();
         else {
-            this.cardSequencer.moveCurrentCardToEndOfList();
-            this.cardSequencer.nextCard();
+            this.cardSequencer.moveCurrentRepItemToEndOfList();
+            this.cardSequencer.nextRepItem();
         }
     }
 
@@ -377,7 +377,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         const remainingPendingCards: PendingCard[] = [];
         for (const pendingCard of this.pendingCards) {
             if (pendingCard.dueUnix <= nowUnix) {
-                this.remainingDeckTree.appendCard(
+                this.remainingDeckTree.appendRepItem(
                     pendingCard.card.question.topicPathList,
                     pendingCard.card,
                 );

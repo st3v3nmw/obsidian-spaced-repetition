@@ -1,7 +1,6 @@
 import moment from "moment";
 
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { CardListType } from "src/data/data-structures/deck/deck";
+import { RepItemState, ReviewResponse } from "src/algorithms/base/repetition-item";
 import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { NoteDueDateHistogram } from "src/due-date-histogram";
@@ -17,10 +16,10 @@ function checkDeckTreeCounts(
     expectedReviewableCount: number,
     expectedRemainingCount: number,
 ): void {
-    expect(osrCore.reviewableDeckTree.getCardCount(CardListType.All, true)).toEqual(
+    expect(osrCore.reviewableDeckTree.getRepItemCount(RepItemState.AnyItem, true)).toEqual(
         expectedReviewableCount,
     );
-    expect(osrCore.remainingDeckTree.getCardCount(CardListType.All, true)).toEqual(
+    expect(osrCore.remainingDeckTree.getRepItemCount(RepItemState.AnyItem, true)).toEqual(
         expectedRemainingCount,
     );
 }

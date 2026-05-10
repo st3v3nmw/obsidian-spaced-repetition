@@ -2,6 +2,19 @@ import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info"
 import { RepItemStorageInfo } from "src/data/data-stores/base/rep-item-storage-info";
 
 /**
+* Represents the state of a repetition item, which can be new, due, or any item.
+*
+* It used to select the items based on their scheduling state. AnyItem is used to select all items, which means it shouldnt be used for anything else.
+*
+* @type {ReadonlyArray<RepItemState>}
+*/
+export enum RepItemState {
+    NewItem,
+    DueItem,
+    AnyItem,
+}
+
+/**
  * Represents the type of repetition item, which determines how the scheduling information is stored.
  */
 export enum RepetitionItemType {
@@ -67,4 +80,10 @@ export abstract class RepetitionItem {
     get isDue(): boolean {
         return this.scheduleInfo !== null && this.scheduleInfo.isDue();
     }
+
+    get repItemState(): RepItemState {
+        return this.isNew ? RepItemState.NewItem : RepItemState.DueItem;
+    }
+
+    abstract toString(): string;
 }

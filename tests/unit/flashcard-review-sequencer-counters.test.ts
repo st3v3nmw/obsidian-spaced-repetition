@@ -2,7 +2,7 @@ import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import {
-    CardOrder,
+    RepItemOrder,
     DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
@@ -23,7 +23,7 @@ import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-set
 import { SampleItemDecks } from "./sample-items";
 
 const orderDueFirstSequential: IIteratorOrder = {
-    cardOrder: CardOrder.DueFirstSequential,
+    repItemOrder: RepItemOrder.DueFirstSequential,
     deckOrder: DeckOrder.PrevDeckComplete_Sequential,
 };
 
@@ -48,7 +48,7 @@ class TestContext {
             this.file,
             new TopicPath(["Root"]),
         );
-        const remainingDeckTree = DeckTreeFilter.filterForRemainingCards(
+        const remainingDeckTree = DeckTreeFilter.filterForRemainingRepItems(
             this.questionPostponementList,
             deckTree,
             this.reviewMode,

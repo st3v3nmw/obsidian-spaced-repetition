@@ -4,7 +4,7 @@ import { TICKS_PER_DAY } from "src/data/constants";
 import { Card } from "src/data/data-structures/card/card";
 import { Deck } from "src/data/data-structures/deck/deck";
 import {
-    CardOrder,
+    RepItemOrder,
     DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
@@ -115,16 +115,16 @@ export class CardDueDateHistogram extends DueDateHistogram {
         // Order doesn't matter as long as we iterate over everything
         const iteratorOrder: IIteratorOrder = {
             deckOrder: DeckOrder.PrevDeckComplete_Sequential,
-            cardOrder: CardOrder.DueFirstSequential,
+            repItemOrder: RepItemOrder.DueFirstSequential,
         };
 
         // Iteration is a destructive operation on the supplied tree, so we first take a copy
         const now: number = globalDateProvider.now.valueOf();
         const iterator: IDeckTreeIterator = new DeckTreeIterator(iteratorOrder, deckTree.clone());
         iterator.setIteratorTopicPath(TopicPath.emptyPath);
-        while (iterator.nextCard()) {
-            const card: Card = iterator.currentCard;
-            if (card.hasSchedule) {
+        while (iterator.nextRepItem()) {
+            const card: Card = iterator.currentRepItem as Card;
+            if (card.scheduleInfo && card.hasSchedule) {
                 const scheduledCard: RepItemScheduleInfo = card.scheduleInfo;
 
                 const nDays: number = Math.ceil(

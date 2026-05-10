@@ -1,13 +1,13 @@
 import moment from "moment";
 import { State } from "ts-fsrs";
 
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
+import { RepItemState, ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
 import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
-import { CardListType, Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
+import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import {
-    CardOrder,
+    RepItemOrder,
     DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
@@ -32,7 +32,7 @@ import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-set
 import { SampleItemDecks } from "./sample-items";
 
 const orderDueFirstSequential: IIteratorOrder = {
-    cardOrder: CardOrder.DueFirstSequential,
+    repItemOrder: RepItemOrder.DueFirstSequential,
     deckOrder: DeckOrder.PrevDeckComplete_Sequential,
 };
 
@@ -85,7 +85,7 @@ class TestContext {
             this.file,
             new TopicPath(["Root"]),
         );
-        const remainingDeckTree = DeckTreeFilter.filterForRemainingCards(
+        const remainingDeckTree = DeckTreeFilter.filterForRemainingRepItems(
             this.questionPostponementList,
             deckTree,
             this.reviewMode,
@@ -321,9 +321,9 @@ Q3::A3`;
         );
         const deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
         const flashcardDeck: Deck = deck.getDeckByTopicTag("#flashcards");
-        expect(flashcardDeck.newFlashcards.length).toEqual(3);
+        expect(flashcardDeck.newRepItems.length).toEqual(3);
 
-        expect(c.reviewSequencer.currentDeck.newFlashcards.length).toEqual(3);
+        expect(c.reviewSequencer.currentDeck.newRepItems.length).toEqual(3);
         const expected = {
             front: "Q1",
             back: "A1",
@@ -570,7 +570,7 @@ Q1::A1
                     text,
                 );
                 await c.setSequencerDeckTreeFromOriginalText();
-                expect(c.cardSequencer.currentDeck.getCardCount(CardListType.All, false)).toEqual(
+                expect(c.cardSequencer.currentDeck.getRepItemCount(RepItemState.AnyItem, false)).toEqual(
                     4,
                 );
 
@@ -610,7 +610,7 @@ Q1::A1
                     text,
                 );
                 await c.setSequencerDeckTreeFromOriginalText();
-                expect(c.cardSequencer.currentDeck.getCardCount(CardListType.All, false)).toEqual(
+                expect(c.cardSequencer.currentDeck.getRepItemCount(RepItemState.AnyItem, false)).toEqual(
                     4,
                 );
 

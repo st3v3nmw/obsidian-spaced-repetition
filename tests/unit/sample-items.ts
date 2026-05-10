@@ -1,6 +1,6 @@
 import { Deck } from "src/data/data-structures/deck/deck";
 import {
-    CardOrder,
+    RepItemOrder,
     DeckOrder,
     DeckTreeIterator,
 } from "src/data/data-structures/deck/deck-tree-iterator";
@@ -53,13 +53,13 @@ Q3::A3`;
     static async createDeckAndIteratorFromText(
         text: string,
         folderTopicPath: TopicPath,
-        cardOrder: CardOrder,
+        cardOrder: RepItemOrder,
         deckOrder: DeckOrder,
     ): Promise<[Deck, DeckTreeIterator]> {
         const deck: Deck = await SampleItemDecks.createDeckFromText(text, folderTopicPath);
         const iterator: DeckTreeIterator = new DeckTreeIterator(
             {
-                cardOrder,
+                repItemOrder: cardOrder,
                 deckOrder,
             },
             deck,

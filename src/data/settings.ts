@@ -22,7 +22,7 @@ export interface SRSettings {
     multilineCardSeparator: string;
     multilineReversedCardSeparator: string;
     multilineCardEndMarker: string;
-    editLaterTag: string;
+    editLaterTag: string | undefined;
 
     // notes
     enableNoteReviewPaneOnStartup: boolean;
@@ -101,7 +101,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     multilineCardSeparator: "?",
     multilineReversedCardSeparator: "??",
     multilineCardEndMarker: "",
-    editLaterTag: "#edit-later",
+    editLaterTag: undefined,
     randomizeCardOrder: undefined,
 
     // notes
@@ -193,6 +193,10 @@ export function upgradeSettings(settings: SRSettings) {
 
     if (settings.disableFileMenuReviewOptions !== undefined) {
         settings.disableFileMenuReviewOptions = undefined;
+    }
+
+    if (settings.editLaterTag) {
+        settings.editLaterTag = undefined;
     }
 
     if (
