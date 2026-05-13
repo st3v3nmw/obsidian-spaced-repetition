@@ -30,6 +30,10 @@ export class RenderMarkdownWrapper {
             el.setAttribute("dir", "rtl");
         } else el = containerEl;
 
+        if (!el.hasClass("markdown-rendered")) {
+            el.addClass("markdown-rendered");
+        }
+
         const renderChild = new MarkdownRenderChild(el);
         this.plugin.addChild(renderChild);
         await MarkdownRenderer.render(this.app, markdownString, el, this.notePath, renderChild);
