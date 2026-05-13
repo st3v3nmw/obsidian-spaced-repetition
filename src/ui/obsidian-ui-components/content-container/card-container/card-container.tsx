@@ -312,7 +312,7 @@ export class CardContainer {
         sessionData: SessionData,
         reviewMode: FlashcardReviewMode,
         settings: SRSettings,
-        determineButtonSchedule: (response: ReviewResponse) => RepItemScheduleInfo,
+        determineButtonSchedule: (response: ReviewResponse) => RepItemScheduleInfo | null,
     ) {
         this.setCustomHotKeyState(settings.useCustomHotkeys);
         this.cardState = sessionData.cardData.currentCardState;
