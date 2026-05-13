@@ -24,8 +24,8 @@ export class FlashcardEditModal extends Modal {
     private textFront: string = "";
     private textBack: string = "";
     private separator: string | null;
-    private multilineSeparator: boolean = false;
     private currentCard: Card;
+    private cardType: CardType;
 
     public static Prompt(
         app: App,
@@ -59,14 +59,17 @@ export class FlashcardEditModal extends Modal {
         this.currentCard = currentCard;
 
         // Select the separator used
-        const cardType = this.currentCard.question.questionType;
-        this.separator = this.getSeparatorFromCardType(cardType, settings);
+        this.cardType = this.currentCard.question.questionType;
+        this.separator = this.getSeparatorFromCardType(this.cardType, settings);
 
         if (this.separator !== null) {
             this.textFront = this.currentCard.front;
             this.textBack = this.currentCard.back;
 
-            if (cardType === CardType.MultiLineBasic || cardType === CardType.MultiLineReversed) {
+            if (
+                this.cardType === CardType.MultiLineBasic ||
+                this.cardType === CardType.MultiLineReversed
+            ) {
                 this.textBack = this.textBack.trimStart();
                 this.textFront = this.textFront.trimEnd();
             }
@@ -188,12 +191,20 @@ export class FlashcardEditModal extends Modal {
         this.changedText = this.textAreaFront.value;
         if (this.separator) {
             // New line at end of Front
-            if (this.multilineSeparator && !this.textAreaFront.value.endsWith("\n")) {
+            if (
+                (this.cardType === CardType.MultiLineBasic ||
+                    this.cardType === CardType.MultiLineReversed) &&
+                !this.textAreaFront.value.endsWith("\n")
+            ) {
                 this.changedText += "\n";
             }
             this.changedText += this.separator;
             // New line at start of Back
-            if (this.multilineSeparator && !this.textAreaBack.value.startsWith("\n")) {
+            if (
+                (this.cardType === CardType.MultiLineBasic ||
+                    this.cardType === CardType.MultiLineReversed) &&
+                !this.textAreaBack.value.startsWith("\n")
+            ) {
                 this.changedText += "\n";
             }
             this.changedText += this.textAreaBack.value;
