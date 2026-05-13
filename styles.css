@@ -215,10 +215,6 @@
     & .sr-content p {
         margin-top: 0;
     }
-    & .sr-content > ul,
-    & .sr-content > ol {
-        padding-left: var(--size-4-6);
-    }
     & .sr-content hr {
         backdrop-filter: invert(40%);
         border-top-style: dashed;
