@@ -12,12 +12,8 @@ export class FlashcardEditModal extends Modal {
     public changedText: string;
     public waitForClose: Promise<string>;
 
-    public title: HTMLDivElement | null = null;
-    public textAreaFront: HTMLTextAreaElement | null = null;
-    public textAreaBack: HTMLTextAreaElement | null = null;
-    public response: HTMLDivElement | null = null;
-    public saveButton: ButtonComponent | null = null;
-    public cancelButton: ButtonComponent | null = null;
+    public textAreaFront: HTMLTextAreaElement;
+    public textAreaBack: HTMLTextAreaElement;
 
     private resolvePromise: ((input: string) => void) | null = null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,8 +24,8 @@ export class FlashcardEditModal extends Modal {
     private textFront: string = "";
     private textBack: string = "";
     private separator: string | null;
-    private multilineSeparator: boolean = false;
     private currentCard: Card;
+    private cardType: CardType;
 
     public static Prompt(
         app: App,
@@ -63,30 +59,17 @@ export class FlashcardEditModal extends Modal {
         this.currentCard = currentCard;
 
         // Select the separator used
-        const cardType = this.currentCard.question.questionType;
-        console.log(cardType);
-
-        switch (cardType) {
-            case CardType.SingleLineBasic:
-                this.separator = settings.singleLineCardSeparator;
-                break;
-            case CardType.SingleLineReversed:
-                this.separator = settings.singleLineReversedCardSeparator;
-                break;
-            case CardType.MultiLineBasic:
-                this.separator = settings.multilineCardSeparator;
-                break;
-            case CardType.MultiLineReversed:
-                this.separator = settings.multilineReversedCardSeparator;
-                break;
-            case CardType.Cloze:
-                this.separator = null;
-                break;
-        }
+        this.cardType = this.currentCard.question.questionType;
+        this.separator = this.getSeparatorFromCardType(this.cardType, settings);
 
         if (this.separator !== null) {
-            [this.textFront, this.textBack] = this.modalText.split(this.separator);
-            if (cardType === CardType.MultiLineBasic || cardType === CardType.MultiLineReversed) {
+            this.textFront = this.currentCard.front;
+            this.textBack = this.currentCard.back;
+
+            if (
+                this.cardType === CardType.MultiLineBasic ||
+                this.cardType === CardType.MultiLineReversed
+            ) {
                 this.textBack = this.textBack.trimStart();
                 this.textFront = this.textFront.trimEnd();
             }
@@ -102,21 +85,13 @@ export class FlashcardEditModal extends Modal {
 
         // Init static elements in ui
         this.modalEl.addClasses(["sr-modal", "sr-edit-modal"]);
-        this.init();
 
-        this.open();
-    }
-
-    /**
-     * Initializes all components of the EditModal
-     */
-    init() {
         this.contentEl.empty();
         this.contentEl.addClass("sr-edit-view");
 
-        this.title = this.contentEl.createDiv();
-        this.title.setText(t("EDIT_CARD"));
-        this.title.addClass("sr-title");
+        const title = this.contentEl.createDiv();
+        title.setText(t("EDIT_CARD"));
+        title.addClass("sr-title");
 
         this.textAreaFront = this.contentEl.createEl("textarea");
         this.textAreaFront.addClass("sr-input");
@@ -127,10 +102,11 @@ export class FlashcardEditModal extends Modal {
             this.textAreaFront.setAttribute("dir", "rtl");
         }
 
-        // Only for cards with separator
-        if (this.separator !== null) {
-            this.textAreaBack = this.contentEl.createEl("textarea");
-            this.textAreaBack.addClass("sr-input");
+        this.textAreaBack = this.contentEl.createEl("textarea");
+        this.textAreaBack.addClass("sr-input");
+        if (this.separator === null) {
+            this.textAreaBack.addClass("sr-is-hidden");
+        } else {
             this.textAreaBack.setText(this.textBack);
             this.textAreaBack.addEventListener("keydown", this.keyListenerCallback);
             if (this.textDirection === TextDirection.Rtl) {
@@ -138,7 +114,32 @@ export class FlashcardEditModal extends Modal {
             }
         }
 
-        this._createResponse(this.contentEl);
+        const response: HTMLDivElement = this.contentEl.createDiv();
+        response.addClass("sr-response");
+
+        const saveButton = new ButtonComponent(response);
+        saveButton.setClass("sr-response-button");
+        saveButton.setClass("sr-save-button");
+        saveButton.setClass("sr-bg-green");
+        saveButton.setButtonText(t("SAVE"));
+        saveButton.onClick((evt) => {
+            this.saveClickCallback(evt);
+        });
+
+        const button = response.createEl("button");
+        button.addClasses(["sr-response-button", "sr-dummy-button"]);
+        button.setText("");
+
+        const cancelButton = new ButtonComponent(response);
+        cancelButton.setClass("sr-response-button");
+        cancelButton.setClass("sr-cancel-button");
+        cancelButton.setClass("sr-bg-red");
+        cancelButton.setButtonText(t("CANCEL"));
+        cancelButton.onClick((evt) => {
+            this.cancelClickCallback(evt);
+        });
+
+        this.open();
     }
 
     /**
@@ -164,7 +165,7 @@ export class FlashcardEditModal extends Modal {
 
     private saveClickCallback = (_: MouseEvent) => this.save();
 
-    private cancelClickCallback = (_: MouseEvent) => this.cancel();
+    private cancelClickCallback = (_: MouseEvent) => this.close();
 
     private keyListenerCallback = (evt: KeyboardEvent) => {
         if (evt.key === "Tab") {
@@ -186,29 +187,28 @@ export class FlashcardEditModal extends Modal {
     };
 
     private save() {
-        if (this.textAreaFront === null || this.textAreaBack === null) {
-            this.close();
-            return;
-        }
-
         this.didSaveChanges = true;
         this.changedText = this.textAreaFront.value;
         if (this.separator) {
             // New line at end of Front
-            if (this.multilineSeparator && !this.textAreaFront.value.endsWith("\n")) {
+            if (
+                (this.cardType === CardType.MultiLineBasic ||
+                    this.cardType === CardType.MultiLineReversed) &&
+                !this.textAreaFront.value.endsWith("\n")
+            ) {
                 this.changedText += "\n";
             }
             this.changedText += this.separator;
             // New line at start of Back
-            if (this.multilineSeparator && !this.textAreaBack.value.startsWith("\n")) {
+            if (
+                (this.cardType === CardType.MultiLineBasic ||
+                    this.cardType === CardType.MultiLineReversed) &&
+                !this.textAreaBack.value.startsWith("\n")
+            ) {
                 this.changedText += "\n";
             }
             this.changedText += this.textAreaBack.value;
         }
-        this.close();
-    }
-
-    private cancel() {
         this.close();
     }
 
@@ -225,41 +225,18 @@ export class FlashcardEditModal extends Modal {
         }
     }
 
-    // MARK: Response section
-
-    private _createSaveButton(container: HTMLElement) {
-        this.saveButton = new ButtonComponent(container);
-        this.saveButton.setClass("sr-response-button");
-        this.saveButton.setClass("sr-save-button");
-        this.saveButton.setClass("sr-bg-green");
-        this.saveButton.setButtonText(t("SAVE"));
-        this.saveButton.onClick((evt) => {
-            this.saveClickCallback(evt);
-        });
-    }
-
-    private _createCancelButton(container: HTMLElement) {
-        this.cancelButton = new ButtonComponent(container);
-        this.cancelButton.setClass("sr-response-button");
-        this.cancelButton.setClass("sr-cancel-button");
-        this.cancelButton.setClass("sr-bg-red");
-        this.cancelButton.setButtonText(t("CANCEL"));
-        this.cancelButton.onClick((evt) => {
-            this.cancelClickCallback(evt);
-        });
-    }
-
-    private _createSpacerButton(container: HTMLElement) {
-        const button = container.createEl("button");
-        button.addClasses(["sr-response-button", "sr-dummy-button"]);
-        button.setText("");
-    }
-
-    private _createResponse(mainContentContainer: HTMLElement) {
-        const response: HTMLDivElement = mainContentContainer.createDiv();
-        response.addClass("sr-response");
-        this._createCancelButton(response);
-        this._createSpacerButton(response);
-        this._createSaveButton(response);
+    private getSeparatorFromCardType(cardType: CardType, settings: SRSettings): string | null {
+        switch (cardType) {
+            case CardType.SingleLineBasic:
+                return settings.singleLineCardSeparator;
+            case CardType.SingleLineReversed:
+                return settings.singleLineReversedCardSeparator;
+            case CardType.MultiLineBasic:
+                return settings.multilineCardSeparator;
+            case CardType.MultiLineReversed:
+                return settings.multilineReversedCardSeparator;
+            case CardType.Cloze:
+                return null;
+        }
     }
 }

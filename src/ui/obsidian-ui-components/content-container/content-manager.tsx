@@ -488,7 +488,7 @@ export default class ContentManager {
 
     // MARK: Utils
 
-    private _determineButtonSchedule(reviewResponse: ReviewResponse): RepItemScheduleInfo {
+    private _determineButtonSchedule(reviewResponse: ReviewResponse): RepItemScheduleInfo | null {
         if (this.sessionData === null) return null;
         if (this.reviewSequencer === null) return null;
         return this.reviewSequencer.determineCardSchedule(
