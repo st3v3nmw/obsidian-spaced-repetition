@@ -52,7 +52,7 @@ export class SchedulingPage extends SettingsPage {
                     dropdown
                         .addOptions({
                             "SM-2-OSR": t("SM2_OSR_VARIANT"),
-                            FSRS: "FSRS",
+                            // FSRS: "FSRS", // TODO: Re-enable when ready
                         })
                         .setValue(this.plugin.data.settings.algorithm)
                         .onChange(async (value) => {
