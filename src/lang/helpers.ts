@@ -2,6 +2,7 @@
 
 import { moment } from "obsidian";
 
+import { IBaseLocale } from "src/lang/base-locale";
 import af from "src/lang/locale/af";
 import ar from "src/lang/locale/ar";
 import bn from "src/lang/locale/bn";
@@ -36,7 +37,7 @@ import vi from "src/lang/locale/vi";
 import zhCN from "src/lang/locale/zh-cn";
 import zhTW from "src/lang/locale/zh-tw";
 
-export const localeMap: { [k: string]: Partial<typeof en> } = {
+export const localeMap: { [k: string]: IBaseLocale } = {
     af,
     ar,
     bn,
@@ -72,25 +73,61 @@ export const localeMap: { [k: string]: Partial<typeof en> } = {
     "zh-tw": zhTW,
 };
 
-const locale = localeMap[moment.locale()];
+// Load the current locale via moment
+const loadedLocale: string = moment.locale();
+// Get the translations from the locale map via the loaded locale
+const currentLocale: IBaseLocale = localeMap[loadedLocale];
 
-// https://stackoverflow.com/a/41015840/
-function interpolate(str: string, params: Record<string, unknown>): string {
+/**
+ * Inserts parameters into the translation string
+ *
+ * @param translation The translation string
+ * @param params Parameters to insert into the translation string
+ * @returns {string}
+ */
+function insertParameters(translation: string, params: Record<string, unknown>): string {
+    // https://stackoverflow.com/a/41015840/
+    // Retrieve names of parameters
     const names: string[] = Object.keys(params);
+    // Retrieve values of parameters
     const vals: unknown[] = Object.values(params);
-    return new Function(...names, `return \`${str}\`;`)(...vals);
+
+    console.log(names, vals);
+
+    function replaceNamesWithValues(translation: string, names: string[], vals: unknown[]): string {
+        let result: string = translation;
+
+        for (let i = 0; i < names.length; i++) {
+            const name: string = names[i];
+            const value: unknown = vals[i];
+
+            // Replace name with value
+            result = result.replace("${" + name + "}", value + ""); // Force string conversion of value
+        }
+
+        return result;
+    }
+
+    const testResult = replaceNamesWithValues(translation, names, vals);
+
+    console.log(testResult);
+    return testResult;
 }
 
-export function t(str: keyof typeof en, params?: Record<string, unknown>): string {
-    if (!locale) {
+/**
+ * Retrieves the translation via the current locale and inserts parameters into it
+ */
+export function t(str: keyof IBaseLocale, params?: Record<string, unknown>): string {
+    if (!currentLocale) {
         console.error(`SRS error: Locale ${moment.locale()} not found.`);
     }
 
-    const result = (locale && locale[str]) || en[str];
+    // Retrieve translation from locale. Fall back to english if something went wrong
+    const translation = (currentLocale && currentLocale[str]) || en[str];
 
     if (params) {
-        return interpolate(result, params);
+        return insertParameters(translation, params);
     }
 
-    return result;
+    return translation;
 }
