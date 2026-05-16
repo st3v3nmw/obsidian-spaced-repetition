@@ -1,7 +1,7 @@
-import builtins from "builtin-modules";
 import console from "console";
 import esbuild from "esbuild";
 import fs from "fs";
+import { builtinModules } from "node:module";
 import path from "path";
 import process from "process";
 
@@ -30,7 +30,7 @@ const moveToRootPlugin = {
 const context = await esbuild.context({
     entryPoints: ["src/main.ts"],
     bundle: true,
-    external: ["obsidian", "electron", ...builtins],
+    external: ["obsidian", "electron", ...builtinModules],
     format: "cjs",
     target: "es2018",
     logLevel: "info",
