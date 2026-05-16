@@ -1,7 +1,7 @@
 import "src/ui/obsidian-ui-components/content-container/deck-container/deck-list.css";
+import { setIcon } from "obsidian";
 
 import { DeckStats, IFlashcardReviewSequencer } from "src/card/flashcard-review-sequencer";
-import { COLLAPSE_ICON } from "src/constants";
 import { Deck } from "src/deck/deck";
 import { t } from "src/lang/helpers";
 import { SRSettings } from "src/settings";
@@ -194,9 +194,9 @@ export default class DeckListComponent {
 
         let collapsed = !initiallyExpanded;
         const collapseIconEl = treeRowSelf.createDiv("tree-item-icon collapse-icon");
-        collapseIconEl.innerHTML = COLLAPSE_ICON;
+        setIcon(collapseIconEl, "chevron-down");
         if (collapsed) collapseIconEl.addClass("is-collapsed");
-        if (numOfSubdecks === 0) collapseIconEl.style.display = "none";
+        if (numOfSubdecks === 0) collapseIconEl.setCssProps({ display: "none" });
 
         const treeRowInner: HTMLElement = treeRowSelf.createDiv("tree-item-inner");
         const treeRowInnerText: HTMLElement = treeRowInner.createDiv("tag-pane-tag-text");
@@ -207,7 +207,7 @@ export default class DeckListComponent {
         treeRowOuter.addClasses(["tree-item-flair-outer", "sr-tree-stats-container"]);
 
         const treeRowChildren: HTMLDivElement = treeRow.createDiv("tree-item-children");
-        treeRowChildren.style.display = collapsed ? "none" : "block";
+        treeRowChildren.setCssProps({ display: collapsed ? "none" : "block" });
 
         if (disableInteraction || (deckStats.dueCount === 0 && deckStats.newCount === 0)) {
             if (!disableInteraction) {
@@ -218,10 +218,10 @@ export default class DeckListComponent {
             collapseIconEl.addEventListener("click", (e) => {
                 if (collapsed) {
                     collapseIconEl.removeClass("is-collapsed");
-                    treeRowChildren.style.display = "block";
+                    treeRowChildren.setCssProps({ display: "block" });
                 } else {
                     collapseIconEl.addClass("is-collapsed");
-                    treeRowChildren.style.display = "none";
+                    treeRowChildren.setCssProps({ display: "none" });
                 }
 
                 // We stop the propagation of the event so that the click event for treeRowSelf doesn't get called
