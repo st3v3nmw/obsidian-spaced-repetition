@@ -28,9 +28,8 @@ jobs:
             - name: Build files
               id: build
               run: |
-                  npm install -g pnpm
-                  pnpm install
-                  pnpm build
+                  npm install
+                  npm run build
 
             - name: Verify Files Exist
               id: verify-files
