@@ -1,10 +1,6 @@
 import { Setting, SettingGroup } from "obsidian";
 
-import {
-    deleteAllSchedulingData,
-    deleteAllSchedulingDataInCards,
-    deleteAllSchedulingDataInNotes,
-} from "src/delete-scheduling-data";
+import { deleteAllSchedulingDataInCards } from "src/delete-scheduling-data";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
@@ -71,75 +67,10 @@ export class DataPage extends SettingsPage {
             });
 
         new SettingGroup(this.containerEl)
-            .setHeading(t("DELETE_SCHEDULING_DATA_ALL"))
+            .setHeading(t("DELETE_SCHEDULING_DATA"))
             .addSetting((setting: Setting) => {
                 setting
-                    .setName(t("DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA"))
-                    .setDesc(t("DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA_DESC"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.plugin.data.settings.deleteTagsOnSchedulingDataDeletion)
-                            .onChange(async (value) => {
-                                this.plugin.data.settings.deleteTagsOnSchedulingDataDeletion =
-                                    value;
-                                await this.plugin.savePluginData();
-                            }),
-                    );
-            })
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("DELETE_SCHEDULING_DATA_ALL"))
-                    .setDesc(t("DELETE_SCHEDULING_DATA_ALL_DESC"))
-                    .addButton((button) => {
-                        button
-                            .setButtonText(t("DELETE"))
-                            .setClass("mod-warning")
-                            .onClick(async () => {
-                                new ConfirmationModal(
-                                    this.plugin.app,
-                                    t("DELETE_SCHEDULING_DATA_ALL"),
-                                    t("CONFIRM_SCHEDULING_DATA_ALL_DELETION"),
-                                    t("SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS"),
-                                    () => {
-                                        deleteAllSchedulingData(
-                                            this.plugin.data.settings
-                                                .deleteTagsOnSchedulingDataDeletion,
-                                            this.plugin.data.settings.flashcardTags,
-                                            this.plugin.data.settings.tagsToReview,
-                                        );
-                                    },
-                                ).open();
-                            });
-                    });
-            })
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("DELETE_SCHEDULING_DATA_IN_NOTES"))
-                    .setDesc(t("DELETE_SCHEDULING_DATA_IN_NOTES_DESC"))
-                    .addButton((button) => {
-                        button
-                            .setButtonText(t("DELETE"))
-                            .setClass("mod-warning")
-                            .onClick(async () => {
-                                new ConfirmationModal(
-                                    this.plugin.app,
-                                    t("DELETE_SCHEDULING_DATA_IN_NOTES"),
-                                    t("CONFIRM_SCHEDULING_DATA_IN_NOTES_DELETION"),
-                                    t("SCHEDULING_DATA_IN_NOTES_DELETION_IN_PROGRESS"),
-                                    () => {
-                                        deleteAllSchedulingDataInNotes(
-                                            this.plugin.data.settings
-                                                .deleteTagsOnSchedulingDataDeletion,
-                                            this.plugin.data.settings.tagsToReview,
-                                        );
-                                    },
-                                ).open();
-                            });
-                    });
-            })
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("DELETE_SCHEDULING_DATA_IN_CARDS"))
+                    .setName(t("DELETE_SCHEDULING_DATA"))
                     .setDesc(t("DELETE_SCHEDULING_DATA_IN_CARDS_DESC"))
                     .addButton((button) => {
                         button
@@ -148,13 +79,13 @@ export class DataPage extends SettingsPage {
                             .onClick(async () => {
                                 new ConfirmationModal(
                                     this.plugin.app,
-                                    t("DELETE_SCHEDULING_DATA_IN_CARDS"),
+                                    t("DELETE_SCHEDULING_DATA"),
                                     t("CONFIRM_SCHEDULING_DATA_IN_CARDS_DELETION"),
                                     t("SCHEDULING_DATA_IN_CARDS_DELETION_IN_PROGRESS"),
                                     () => {
                                         deleteAllSchedulingDataInCards(
-                                            this.plugin.data.settings
-                                                .deleteTagsOnSchedulingDataDeletion,
+                                            this.plugin.app,
+                                            false,
                                             this.plugin.data.settings.flashcardTags,
                                         );
                                     },

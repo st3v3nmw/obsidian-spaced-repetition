@@ -25,23 +25,14 @@ export interface SRSettings {
     editLaterTag: string;
 
     // notes
-    enableNoteReviewPaneOnStartup: boolean;
-    tagsToReview: string[];
-    noteTagsToIgnore: string[];
     noteFoldersToIgnore: string[];
-    openRandomNote: boolean;
-    autoNextNote: boolean;
-    disableFileMenuReviewOptions: boolean | undefined;
-    showFileMenuReviewOptions: boolean;
-    deleteTagsOnSchedulingDataDeletion: boolean;
-    maxNDaysNotesReviewQueue: number;
 
     // UI preferences
     showRibbonIcon: boolean;
     showStatusBar: boolean;
     showCardStatusBarItem: boolean;
-    showNoteStatusBarItem: boolean;
     showUpdateAvailableStatusBarItem: boolean;
+
     initiallyExpandAllSubdecksInTree: boolean;
     showContextInCards: boolean;
     showIntervalInReviewButtons: boolean;
@@ -67,7 +58,6 @@ export interface SRSettings {
     easyBonus: number;
     loadBalance: boolean;
     maximumInterval: number;
-    maxLinkFactor: number;
     fsrsDesiredRetention: number;
     startOfDay: string;
 
@@ -78,8 +68,6 @@ export interface SRSettings {
     // logging
     showSchedulingDebugMessages: boolean;
     showParserDebugMessages: boolean;
-
-    preferredDateFormatForNoteReviewQueue: string;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
@@ -104,22 +92,12 @@ export const DEFAULT_SETTINGS: SRSettings = {
     randomizeCardOrder: undefined,
 
     // notes
-    enableNoteReviewPaneOnStartup: true,
-    tagsToReview: ["#review"],
-    noteTagsToIgnore: [],
     noteFoldersToIgnore: ["**/*.excalidraw.md"],
-    openRandomNote: false,
-    autoNextNote: false,
-    disableFileMenuReviewOptions: undefined,
-    showFileMenuReviewOptions: true,
-    deleteTagsOnSchedulingDataDeletion: false,
-    maxNDaysNotesReviewQueue: 365,
 
     // UI settings
     showRibbonIcon: true,
     showStatusBar: true,
     showCardStatusBarItem: true,
-    showNoteStatusBarItem: true,
     showUpdateAvailableStatusBarItem: true,
     initiallyExpandAllSubdecksInTree: true,
     showContextInCards: true,
@@ -146,7 +124,6 @@ export const DEFAULT_SETTINGS: SRSettings = {
     easyBonus: 1.3,
     loadBalance: true,
     maximumInterval: 36525,
-    maxLinkFactor: 1.0,
     fsrsDesiredRetention: 0.9,
     startOfDay: "00:00:00",
 
@@ -157,7 +134,6 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // logging
     showSchedulingDebugMessages: false,
     showParserDebugMessages: false,
-    preferredDateFormatForNoteReviewQueue: "MMM DD YYYY",
 };
 
 export function upgradeSettings(settings: SRSettings) {
@@ -189,10 +165,6 @@ export function upgradeSettings(settings: SRSettings) {
             settings.clozePatterns.push("{{[123;;]answer[;;hint]}}");
     }
 
-    if (settings.disableFileMenuReviewOptions !== undefined) {
-        settings.disableFileMenuReviewOptions = undefined;
-    }
-
     if (settings.fsrsDesiredRetention === null || settings.fsrsDesiredRetention === undefined) {
         settings.fsrsDesiredRetention = DEFAULT_SETTINGS.fsrsDesiredRetention;
     }
@@ -207,36 +179,8 @@ export class SettingsUtil {
         return settings.noteFoldersToIgnore.some((folder) => pathMatchesPattern(path, folder));
     }
 
-    static isAnyTagANoteReviewTag(settings: SRSettings, tags: string[]): boolean {
-        for (const tag of tags) {
-            if (
-                settings.tagsToReview.some((tagToReview) =>
-                    this.isSubTagContainedInTag(tagToReview, tag),
-                )
-            ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     static isAnyTagIgnoredForFlashcards(settings: SRSettings, tags: string[]): boolean {
         return tags.some((tag) => SettingsUtil.isTagInList(settings.flashcardTagsToIgnore, tag));
-    }
-
-    static isAnyTagIgnoredForNotes(settings: SRSettings, tags: string[]): boolean {
-        return tags.some((tag) => SettingsUtil.isTagInList(settings.noteTagsToIgnore, tag));
-    }
-
-    // Given a list of tags, return the subset that is in settings.tagsToReview
-    static filterForNoteReviewTag(settings: SRSettings, tags: string[]): string[] {
-        const result: string[] = [];
-        for (const tagToReview of settings.tagsToReview) {
-            if (tags.some((tag) => this.isSubTagContainedInTag(tagToReview, tag))) {
-                result.push(tagToReview);
-            }
-        }
-        return result;
     }
 
     /**

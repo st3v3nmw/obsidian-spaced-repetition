@@ -1,5 +1,4 @@
 import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
 import { Card } from "src/card/card";
 import { TICKS_PER_DAY } from "src/constants";
 import { Deck } from "src/deck/deck";
@@ -11,7 +10,6 @@ import {
     IIteratorOrder,
 } from "src/deck/deck-tree-iterator";
 import { TopicPath } from "src/deck/topic-path";
-import { NoteReviewDeck, SchedNote } from "src/note/note-review-deck";
 import { globalDateProvider } from "src/utils/dates";
 
 export class DueDateHistogram {
@@ -20,7 +18,7 @@ export class DueDateHistogram {
     public static dueNowNDays: number = 0;
 
     // Key - # of days in future
-    // Value - Count of notes due
+    // Value - Count of items due
     dueDatesMap: Map<number, number> = new Map<number, number>();
 
     constructor(rec: Record<number, number> = null) {
@@ -86,25 +84,6 @@ export class DueDateHistogram {
             }
         }
         return interval;
-    }
-}
-
-export class NoteDueDateHistogram extends DueDateHistogram {
-    calculateFromReviewDecksAndSort(
-        reviewDecks: Map<string, NoteReviewDeck>,
-        osrNoteGraph: OsrNoteGraph,
-    ): void {
-        this.dueDatesMap = new Map<number, number>();
-
-        const today: number = globalDateProvider.today.valueOf();
-        reviewDecks.forEach((reviewDeck: NoteReviewDeck) => {
-            reviewDeck.scheduledNotes.forEach((scheduledNote: SchedNote) => {
-                const nDays: number = Math.ceil((scheduledNote.dueUnix - today) / TICKS_PER_DAY);
-                this.increment(nDays);
-            });
-
-            reviewDeck.sortNotesByDateAndImportance(osrNoteGraph.pageranks);
-        });
     }
 }
 

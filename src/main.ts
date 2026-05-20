@@ -1,10 +1,9 @@
-import { Notice, Platform, Plugin, TFile } from "obsidian";
+import { Platform, Plugin, TFile } from "obsidian";
 
 import { Algorithm } from "src/algorithms/base/isrs-algorithm";
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
 import { SrsAlgorithmFsrs } from "src/algorithms/fsrs/srs-algorithm-fsrs";
-import { ObsidianVaultNoteLinkInfoFinder } from "src/algorithms/osr/obsidian-vault-notelink-info-finder";
 import { SrsAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
 import {
     FlashcardReviewMode,
@@ -28,14 +27,11 @@ import {
 import { TopicPath } from "src/deck/topic-path";
 import { ISRFile, SrTFile } from "src/file";
 import { t } from "src/lang/helpers";
-import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { Note } from "src/note/note";
 import { NoteFileLoader } from "src/note/note-file-loader";
-import { NoteReviewQueue } from "src/note/note-review-queue";
 import { setDebugParser } from "src/parser";
 import { DEFAULT_DATA, PluginData } from "src/plugin-data";
-import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/settings";
-import { REVIEW_QUEUE_VIEW_TYPE } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
+import { DEFAULT_SETTINGS, SRSettings, upgradeSettings } from "src/settings";
 import { UIManager, UIState } from "src/ui/ui-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
 import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
@@ -45,17 +41,8 @@ export default class SRPlugin extends Plugin {
     public osrAppCore: OsrAppCore;
     public uiManager: UIManager;
 
-    public nextNoteReviewHandler: NextNoteReviewHandler;
-
     async onload(): Promise<void> {
         await this.loadPluginData();
-
-        const noteReviewQueue = new NoteReviewQueue();
-        this.nextNoteReviewHandler = new NextNoteReviewHandler(
-            this.app,
-            this.data.settings,
-            noteReviewQueue,
-        );
 
         const questionPostponementList: QuestionPostponementList = new QuestionPostponementList(
             this,
@@ -64,16 +51,11 @@ export default class SRPlugin extends Plugin {
         );
         await questionPostponementList.clearIfNewDay(this.data);
 
-        const osrNoteLinkInfoFinder: ObsidianVaultNoteLinkInfoFinder =
-            new ObsidianVaultNoteLinkInfoFinder(this.app.metadataCache);
-
         this.osrAppCore = new OsrAppCore(this.app);
         this.osrAppCore.init(
             questionPostponementList,
-            osrNoteLinkInfoFinder,
             this.data.settings,
             this.onOsrVaultDataChanged.bind(this),
-            noteReviewQueue,
         );
 
         this.uiManager = new UIManager(this);
@@ -303,71 +285,6 @@ export default class SRPlugin extends Plugin {
         }
 
         this.addCommand({
-            id: "srs-note-review-open-note",
-            name: t("OPEN_NOTE_FOR_REVIEW"),
-            callback: async () => {
-                if (!this.osrAppCore.syncLock) {
-                    await this.sync();
-                    this.nextNoteReviewHandler.reviewNextNoteModal();
-                }
-            },
-        });
-
-        this.addCommand({
-            id: "srs-note-review-easy",
-            name: t("REVIEW_NOTE_DIFFICULTY_CMD", {
-                difficulty: this.data.settings.flashcardEasyText,
-            }),
-            repeatable: false,
-            checkCallback: (checking: boolean) => {
-                const openFile: TFile | null = this.app.workspace.getActiveFile();
-
-                if (openFile === null || openFile.extension !== "md") return false;
-
-                if (!checking) {
-                    this.saveNoteReviewResponse(openFile, ReviewResponse.Easy);
-                }
-                return true;
-            },
-        });
-
-        this.addCommand({
-            id: "srs-note-review-good",
-            name: t("REVIEW_NOTE_DIFFICULTY_CMD", {
-                difficulty: this.data.settings.flashcardGoodText,
-            }),
-            repeatable: false,
-            checkCallback: (checking: boolean) => {
-                const openFile: TFile | null = this.app.workspace.getActiveFile();
-
-                if (openFile === null || openFile.extension !== "md") return false;
-
-                if (!checking) {
-                    this.saveNoteReviewResponse(openFile, ReviewResponse.Good);
-                }
-                return true;
-            },
-        });
-
-        this.addCommand({
-            id: "srs-note-review-hard",
-            name: t("REVIEW_NOTE_DIFFICULTY_CMD", {
-                difficulty: this.data.settings.flashcardHardText,
-            }),
-            repeatable: false,
-            checkCallback: (checking: boolean) => {
-                const openFile: TFile | null = this.app.workspace.getActiveFile();
-
-                if (openFile === null || openFile.extension !== "md") return false;
-
-                if (!checking) {
-                    this.saveNoteReviewResponse(openFile, ReviewResponse.Hard);
-                }
-                return true;
-            },
-        });
-
-        this.addCommand({
             id: "srs-review-flashcards",
             name: t("REVIEW_ALL_CARDS"),
             callback: async () => {
@@ -414,18 +331,9 @@ export default class SRPlugin extends Plugin {
                 return true;
             },
         });
-
-        this.addCommand({
-            id: "srs-open-review-queue-view",
-            name: t("OPEN_REVIEW_QUEUE_VIEW"),
-            callback: async () => {
-                await this.uiManager.sidebarManager.openReviewQueueView();
-            },
-        });
     }
 
     onunload(): void {
-        this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).forEach((leaf) => leaf.detach());
         this.uiManager.destroy();
     }
 
@@ -502,8 +410,6 @@ export default class SRPlugin extends Plugin {
 
     private onOsrVaultDataChanged() {
         this.uiManager.updateStatusBar();
-        if (this.data.settings.enableNoteReviewPaneOnStartup)
-            this.uiManager.sidebarManager.redraw();
     }
 
     async loadNote(noteFile: TFile): Promise<Note> {
@@ -530,30 +436,6 @@ export default class SRPlugin extends Plugin {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const v: any = (this.app.vault as any).getConfig("rightToLeft");
         return convertToStringOrEmpty(v) === "true" ? TextDirection.Rtl : TextDirection.Ltr;
-    }
-
-    async saveNoteReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
-        const noteSrTFile: ISRFile = this.createSrTFile(note);
-
-        if (SettingsUtil.isPathInNoteIgnoreFolder(this.data.settings, note.path)) {
-            new Notice(t("NOTE_IN_IGNORED_FOLDER"));
-            return;
-        }
-
-        const tags = noteSrTFile.getAllTagsFromCache();
-        if (!SettingsUtil.isAnyTagANoteReviewTag(this.data.settings, tags)) {
-            new Notice(t("PLEASE_TAG_NOTE"));
-            return;
-        }
-
-        //
-        await this.osrAppCore.saveNoteReviewResponse(noteSrTFile, response, this.data.settings);
-
-        new Notice(t("RESPONSE_RECEIVED"));
-
-        if (this.data.settings.autoNextNote) {
-            this.nextNoteReviewHandler.autoReviewNextNote();
-        }
     }
 
     createSrTFile(note: TFile): SrTFile {

@@ -96,14 +96,6 @@ export class SchedulingPage extends SettingsPage {
             }
         });
 
-        algorithmGroup.addSetting((setting: Setting) => {
-            setting
-                .setName("Flashcard algorithm scope")
-                .setDesc(
-                    "The selected algorithm applies to flashcards and clozes only. Whole-note review continues to use the existing OSR scheduler.",
-                );
-        });
-
         if (this.plugin.data.settings.algorithm === Algorithm.FSRS) {
             algorithmGroup.addSetting((setting: Setting) => {
                 setting
@@ -182,33 +174,6 @@ export class SchedulingPage extends SettingsPage {
                                             new Notice(t("VALID_NUMBER_WARNING"));
                                         }
                                     });
-                                }),
-                        );
-                })
-                .addSetting((setting: Setting) => {
-                    setting
-                        .setName(t("MAX_LINK_CONTRIB"))
-                        .setDesc(t("MAX_LINK_CONTRIB_DESC"))
-                        .addExtraButton((button) => {
-                            button
-                                .setIcon("reset")
-                                .setTooltip(t("RESET_DEFAULT"))
-                                .onClick(async () => {
-                                    this.plugin.data.settings.maxLinkFactor =
-                                        DEFAULT_SETTINGS.maxLinkFactor;
-                                    await this.plugin.savePluginData();
-
-                                    this.display();
-                                });
-                        })
-                        .addSlider((slider) =>
-                            slider
-                                .setLimits(0, 100, 1)
-                                .setValue(this.plugin.data.settings.maxLinkFactor * 100)
-                                .setDynamicTooltip()
-                                .onChange(async (value: number) => {
-                                    this.plugin.data.settings.maxLinkFactor = value / 100;
-                                    await this.plugin.savePluginData();
                                 }),
                         );
                 })

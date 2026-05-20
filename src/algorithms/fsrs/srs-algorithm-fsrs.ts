@@ -9,57 +9,15 @@ import {
     reviewResponseToFsrsGrade,
 } from "src/algorithms/fsrs/fsrs-helpers";
 import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
-import { OsrNoteGraph } from "src/algorithms/osr/osr-note-graph";
-import { SrsAlgorithmOsr } from "src/algorithms/osr/srs-algorithm-osr";
 import { DueDateHistogram } from "src/due-date-histogram";
-import { Note } from "src/note/note";
-import { INoteEaseList } from "src/note/note-ease-list";
 import { SRSettings } from "src/settings";
 import { globalDateProvider } from "src/utils/dates";
 
 export class SrsAlgorithmFsrs implements ISrsAlgorithm {
-    private noteDelegate: SrsAlgorithmOsr;
     private scheduler: FSRS;
 
     constructor(settings: SRSettings) {
-        this.noteDelegate = new SrsAlgorithmOsr(settings);
         this.scheduler = fsrs(buildFsrsParameters(settings));
-    }
-
-    noteOnLoadedNote(path: string, note: Note, noteEase: number): void {
-        this.noteDelegate.noteOnLoadedNote(path, note, noteEase);
-    }
-
-    noteCalcNewSchedule(
-        notePath: string,
-        osrNoteGraph: OsrNoteGraph,
-        response: ReviewResponse,
-        dueDateNoteHistogram: DueDateHistogram,
-    ): RepItemScheduleInfo {
-        return this.noteDelegate.noteCalcNewSchedule(
-            notePath,
-            osrNoteGraph,
-            response,
-            dueDateNoteHistogram,
-        );
-    }
-
-    noteCalcUpdatedSchedule(
-        notePath: string,
-        noteSchedule: RepItemScheduleInfo,
-        response: ReviewResponse,
-        dueDateNoteHistogram: DueDateHistogram,
-    ): RepItemScheduleInfo {
-        return this.noteDelegate.noteCalcUpdatedSchedule(
-            notePath,
-            noteSchedule,
-            response,
-            dueDateNoteHistogram,
-        );
-    }
-
-    noteStats(): INoteEaseList {
-        return this.noteDelegate.noteStats();
     }
 
     cardGetResetSchedule(): RepItemScheduleInfo {

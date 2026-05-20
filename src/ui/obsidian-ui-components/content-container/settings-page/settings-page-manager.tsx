@@ -6,7 +6,6 @@ import SRPlugin from "src/main";
 import { DataPage } from "src/ui/obsidian-ui-components/content-container/settings-page/data-page";
 import { FlashcardsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/flashcards-page";
 import { MainPage } from "src/ui/obsidian-ui-components/content-container/settings-page/main-page";
-import { NotesPage } from "src/ui/obsidian-ui-components/content-container/settings-page/notes-page";
 import { SchedulingPage } from "src/ui/obsidian-ui-components/content-container/settings-page/scheduling-page";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { StatisticsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/statistics-page/statistics-page";
@@ -20,7 +19,6 @@ import { UIPreferencesPage } from "src/ui/obsidian-ui-components/content-contain
 export type SettingsPageType =
     | "main-page"
     | "flashcards-page"
-    | "notes-page"
     | "scheduling-page"
     | "ui-preferences-page"
     | "data-page"
@@ -34,7 +32,6 @@ export type SettingsPageType =
 export const SettingsPageTypesArray: ReadonlyArray<SettingsPageType> = [
     "main-page",
     "flashcards-page",
-    "notes-page",
     "scheduling-page",
     "ui-preferences-page",
     "data-page",
@@ -53,8 +50,6 @@ export function getPageName(pageType: SettingsPageType): string {
             return t("MAIN_SETTINGS_PAGE");
         case "flashcards-page":
             return t("FLASHCARDS");
-        case "notes-page":
-            return t("NOTES");
         case "scheduling-page":
             return t("SCHEDULING");
         case "ui-preferences-page":
@@ -78,8 +73,6 @@ export function getPageIcon(pageType: SettingsPageType): string {
             return "Settings";
         case "flashcards-page":
             return "SpacedRepIcon";
-        case "notes-page":
-            return "book-text";
         case "scheduling-page":
             return "calendar";
         case "ui-preferences-page":
@@ -181,19 +174,6 @@ export class SettingsPageManager {
                             this.openPage.bind(this),
                             this.scrollListener.bind(this),
                             this.changeMultilineEndMarkerWarningState.bind(this),
-                        ),
-                    );
-                    break;
-                case "notes-page":
-                    this.pages.push(
-                        new NotesPage(
-                            newPageContainerEl,
-                            this.plugin,
-                            pageType,
-                            this.applySettingsUpdate.bind(this),
-                            this.display,
-                            this.openPage.bind(this),
-                            this.scrollListener.bind(this),
                         ),
                     );
                     break;

@@ -1,13 +1,9 @@
 import "src/ui/styles.css";
-import { Menu, MenuItem, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
+import { Menu, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { CardListType } from "src/deck/deck";
-import {
-    deleteAllSchedulingDataOfCardsInNote,
-    deleteNoteSchedulingDataInNote,
-} from "src/delete-scheduling-data";
+import { deleteAllSchedulingDataOfCardsInNote } from "src/delete-scheduling-data";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
@@ -68,11 +64,7 @@ export class UIManager {
             this.tabViewManager.closeAllTabViews();
         });
 
-        this.sidebarManager = new SidebarManager(
-            this.plugin,
-            this.plugin.data.settings,
-            this.plugin.nextNoteReviewHandler,
-        );
+        this.sidebarManager = new SidebarManager(this.plugin, this.plugin.data.settings);
         this.sidebarManager.init();
         this.plugin.app.workspace.onLayoutReady(async () => {
             await this.sidebarManager.activateReviewQueueViewPanel();
@@ -103,7 +95,6 @@ export class UIManager {
         this.statusBarManager.showStatusBarItems(
             this.plugin.data.settings.showStatusBar,
             this.plugin.data.settings.showCardStatusBarItem,
-            this.plugin.data.settings.showNoteStatusBarItem,
             this.plugin.data.settings.showUpdateAvailableStatusBarItem,
         );
 
@@ -113,12 +104,6 @@ export class UIManager {
                 this.plugin.data.settings.showStatusBar &&
                     this.plugin.data.settings.showCardStatusBarItem,
                 "card-review",
-            );
-            this.statusBarManager.setCount(
-                this.plugin.osrAppCore.noteReviewQueue.dueNotesCount,
-                this.plugin.data.settings.showStatusBar &&
-                    this.plugin.data.settings.showNoteStatusBarItem,
-                "note-review",
             );
         }
     }
@@ -235,73 +220,7 @@ export class UIManager {
     private fileMenuHandler(menu: Menu, file: TAbstractFile) {
         if (!(file instanceof TFile && file.extension === "md")) return;
 
-        if (this.plugin.data.settings.showFileMenuReviewOptions) {
-            menu.addItem((item: MenuItem) => {
-                item.setTitle(
-                    t("REVIEW_DIFFICULTY_FILE_MENU", {
-                        difficulty: this.plugin.data.settings.flashcardEasyText,
-                    }),
-                )
-                    .setIcon("SpacedRepIcon")
-                    .onClick(() => {
-                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Easy);
-                    });
-            });
-
-            menu.addItem((item) => {
-                item.setTitle(
-                    t("REVIEW_DIFFICULTY_FILE_MENU", {
-                        difficulty: this.plugin.data.settings.flashcardGoodText,
-                    }),
-                )
-                    .setIcon("SpacedRepIcon")
-                    .onClick(() => {
-                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Good);
-                    });
-            });
-
-            menu.addItem((item) => {
-                item.setTitle(
-                    t("REVIEW_DIFFICULTY_FILE_MENU", {
-                        difficulty: this.plugin.data.settings.flashcardHardText,
-                    }),
-                )
-                    .setIcon("SpacedRepIcon")
-                    .onClick(() => {
-                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Hard);
-                    });
-            });
-        }
-
-        if (
-            this.plugin.data.settings.showFileMenuReviewOptions &&
-            this.plugin.data.settings.showDeleteButtonInFileMenu
-        ) {
-            menu.addSeparator();
-        }
-
         if (this.plugin.data.settings.showDeleteButtonInFileMenu) {
-            menu.addItem((item) => {
-                item.setTitle(t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"))
-                    .setIcon("trash")
-                    .setWarning(true)
-                    .onClick(async () => {
-                        new ConfirmationModal(
-                            this.plugin.app,
-                            t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"),
-                            t("CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION"),
-                            t("NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS"),
-                            () => {
-                                deleteNoteSchedulingDataInNote(
-                                    file,
-                                    this.plugin.data.settings.deleteTagsOnSchedulingDataDeletion,
-                                    this.plugin.data.settings.tagsToReview,
-                                );
-                            },
-                        ).open();
-                    });
-            });
-
             menu.addItem((item) => {
                 item.setTitle(t("DELETE_SCHEDULING_DATA_OF_CARDS_IN_NOTE"))
                     .setIcon("trash")
@@ -314,8 +233,9 @@ export class UIManager {
                             t("SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION_IN_PROGRESS"),
                             () => {
                                 deleteAllSchedulingDataOfCardsInNote(
+                                    this.plugin.app,
                                     file,
-                                    this.plugin.data.settings.deleteTagsOnSchedulingDataDeletion,
+                                    false,
                                     this.plugin.data.settings.flashcardTags,
                                 );
                             },

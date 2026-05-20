@@ -16,8 +16,6 @@ import { Setting, SettingGroup } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
-import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
-import { textInterval } from "src/algorithms/osr/note-scheduling";
 import { OsrCore } from "src/core";
 import { CardListType } from "src/deck/deck";
 import { Stats } from "src/deck/stats";
@@ -26,8 +24,7 @@ import SRPlugin from "src/main";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
 import ChartComponent from "src/ui/obsidian-ui-components/content-container/settings-page/statistics-page/chart-component";
-import NoteStatsComponent from "src/ui/obsidian-ui-components/content-container/settings-page/statistics-page/note-stats-component";
-import { getKeysPreserveType, getTypedObjectEntries, mapRecord } from "src/utils/types";
+import { getKeysPreserveType, getTypedObjectEntries } from "src/utils/types";
 
 Chart.register(
     BarElement,
@@ -53,7 +50,6 @@ export class StatisticsPage extends SettingsPage {
     private intervalsChart: ChartComponent;
     private easesChart: ChartComponent;
     private cardTypesChart: ChartComponent;
-    private noteStatsGrid: NoteStatsComponent;
 
     constructor(
         pageContainerEl: HTMLElement,
@@ -98,7 +94,6 @@ export class StatisticsPage extends SettingsPage {
         if (this.intervalsChart) this.intervalsChart.destroy();
         if (this.easesChart) this.easesChart.destroy();
         if (this.cardTypesChart) this.cardTypesChart.destroy();
-        if (this.noteStatsGrid) this.noteStatsGrid.destroy();
         this.containerEl.removeEventListener("scroll", (_) => {
             this.scrollListener(this.containerEl.scrollTop);
         });
@@ -237,17 +232,5 @@ export class StatisticsPage extends SettingsPage {
                 );
                 return this.cardTypesChart;
             });
-
-        const noteEases = mapRecord(
-            SrsAlgorithm.getInstance().noteStats().dict,
-            (key: string, value: number): [string, number] => {
-                return [key.split(".")[0], Math.round(value)];
-            },
-        );
-
-        new SettingGroup(this.containerEl).setHeading(t("NOTES")).addSetting((setting: Setting) => {
-            this.noteStatsGrid = new NoteStatsComponent(setting.settingEl, noteEases);
-            return this.noteStatsGrid;
-        });
     }
 }

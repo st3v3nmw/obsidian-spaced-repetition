@@ -6,10 +6,9 @@ import SRPlugin from "src/main";
 import CounterStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/counter-statusbar-item";
 import TextStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/text-statusbar-item";
 
-export type StatusBarItemPurpose = "card-review" | "note-review" | "update-available";
+export type StatusBarItemPurpose = "card-review" | "update-available";
 export const StatusBarItemTypesArray: ReadonlyArray<StatusBarItemPurpose> = [
     "card-review",
-    "note-review",
     "update-available",
 ];
 
@@ -42,7 +41,6 @@ export default class StatusBarManager {
     showStatusBarItems(
         showItems: boolean, // Overrides all other settings
         showCardStatusBarItem?: boolean,
-        showNoteStatusBarItem?: boolean,
         showUpdateAvailableStatusBarItem?: boolean,
     ): void {
         if (this.statusBarItems.length === 0) {
@@ -51,8 +49,6 @@ export default class StatusBarManager {
 
         const showCardItem =
             showCardStatusBarItem === undefined ? showItems : showCardStatusBarItem;
-        const showNoteItem =
-            showNoteStatusBarItem === undefined ? showItems : showNoteStatusBarItem;
         const showUpdateAvailableItem =
             showUpdateAvailableStatusBarItem === undefined
                 ? showItems
@@ -71,13 +67,6 @@ export default class StatusBarManager {
                 switch (statusBarItem.getStatusBarItemType()) {
                     case "card-review":
                         if (showItems && showCardItem) {
-                            statusBarItem.show();
-                        } else {
-                            statusBarItem.hide();
-                        }
-                        break;
-                    case "note-review":
-                        if (showItems && showNoteItem) {
                             statusBarItem.show();
                         } else {
                             statusBarItem.hide();
@@ -120,23 +109,6 @@ export default class StatusBarManager {
                             await this.plugin.uiManager.openDeckContainer(
                                 FlashcardReviewMode.Review,
                             );
-                        },
-                    });
-                    break;
-                case "note-review":
-                    statusBarItem = new CounterStatusBarItem(this.plugin, statusBarItemType, {
-                        icon: "lucide-file-clock",
-                        show: false,
-                        text: " note(s) due",
-                        count: 0,
-                        hideIcon: false,
-                        tooltip: t("OPEN_NOTE_FOR_REVIEW"),
-                        tooltipPosition: "top",
-                        onClick: async () => {
-                            if (!this.plugin.osrAppCore.syncLock) {
-                                await this.plugin.sync();
-                                this.plugin.nextNoteReviewHandler.reviewNextNoteModal();
-                            }
                         },
                     });
                     break;
