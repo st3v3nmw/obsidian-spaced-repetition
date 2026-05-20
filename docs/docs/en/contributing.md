@@ -247,7 +247,7 @@ The roadmap is a great way to keep track of what the status of any feature is. T
         - `MINOR` version when you add functionality in a backwards compatible manner
         - `PATCH` version when you make backwards compatible bug fixes
     - If the new version uses new Obsidian APIs, update `minAppVersion` and `versions.json` to reflect this.
-3. Run `pnpm changelog` to update the CHANGELOG.
+3. Run `npm run changelog` to update the CHANGELOG.
 4. Commit and push the changes:
 
     ```bash
@@ -260,3 +260,4 @@ The roadmap is a great way to keep track of what the status of any feature is. T
 6. Locally, switch back to `main` and pull the changes: `git switch main && git pull`
 7. Create a git tag with the version: `git tag -a 1.9.2 -m "1.9.2"`
 8. Push the tag: `git push --tags`. <br> You're all set! [This GitHub action](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/main/.github/workflows/release.yml) should pick it up, create a release, publish it, and update the live documentation.
+   n.

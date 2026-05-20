@@ -181,7 +181,7 @@ export default {
         - `MINOR`（次版本号），当添加向后兼容的新功能
         - `PATCH`（修订版本号），当进行向后兼容的 bug 修复
     - 如果新版本使用新的 Obsidian APIs，请更新`minAppVersion`和`versions.json`以反映这一点。
-3. 运行 `pnpm changelog` 以更新 CHANGELOG。
+3. 运行 `npm run changelog` 以更新 CHANGELOG。
 4. 提交并推送您的修改:
 
     ```bash
@@ -194,3 +194,4 @@ export default {
 6. 在本地，切换到 `main` 分支并拉取修改： `git switch main && git pull`
 7. 以版本号创建 git 标签： `git tag -a 1.9.2 -m "1.9.2"`
 8. 推送标签: `git push --tags`. <br> 您已经完成了所有流程！ [这个 GitHub action](https://github.com/st3v3nmw/obsidian-spaced-repetition/blob/main/.github/workflows/release.yml) 会自动触发，创建一个发行版并发布，同时更新在线文档。
+   ��
