@@ -84,8 +84,11 @@ export default class StatusBarManager {
                         }
                         break;
                     case "update-available":
+                        // Disable the fetching of the version number if the statusbar items are disabled
                         if (showItems && showUpdateAvailableItem) {
-                            statusBarItem.show();
+                            this.checkAndUpdatePluginVersion().then((_) => {
+                                statusBarItem.show();
+                            });
                         } else {
                             statusBarItem.hide();
                         }
@@ -152,14 +155,27 @@ export default class StatusBarManager {
             this.statusBarItems.push(statusBarItem);
         });
 
-        if (this.plugin.manifest.version !== (await this.getNewestVersion())) {
-            const updateItem = this.statusBarItems.find(
-                (statusBarItem) => statusBarItem.getStatusBarItemType() === "update-available",
-            );
+        // Disable the fetching of the version number if the statusbar items are disabled
+        if (
+            this.plugin.data.settings.showStatusBar &&
+            this.plugin.data.settings.showUpdateAvailableStatusBarItem
+        ) {
+            await this.checkAndUpdatePluginVersion();
+        }
+    }
 
-            if (updateItem !== undefined) {
-                updateItem.setText("Spaced Repetition: new Update!");
-            }
+    private async checkAndUpdatePluginVersion() {
+        // Set update statusbar item, if the versions miss match
+        const newestVersion: string = await this.getNewestVersion();
+
+        if (this.plugin.manifest.version === newestVersion) return;
+
+        const updateItem = this.statusBarItems.find(
+            (statusBarItem) => statusBarItem.getStatusBarItemType() === "update-available",
+        );
+
+        if (updateItem !== undefined) {
+            updateItem.setText("Spaced Repetition: new Update!");
         }
     }
 

@@ -1,6 +1,6 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
-import { t } from "src/lang/helpers";
+import { t, tHTML } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
@@ -116,12 +116,18 @@ export class NotesPage extends SettingsPage {
                             }),
                     );
 
-                setting.descEl.insertAdjacentHTML(
-                    "beforeend",
-                    t("DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE_DESC", {
+                const elements: (HTMLElement | Text)[] = tHTML(
+                    "DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE_DESC",
+                    {
                         docsUrl: "https://momentjs.com/docs/#/displaying/format/",
-                    }),
+                    },
                 );
+
+                setting.descEl.empty();
+
+                for (let i = 0; i < elements.length; i++) {
+                    setting.descEl.append(elements[i]);
+                }
             })
             .addSetting((setting: Setting) => {
                 setting.setName(t("AUTO_NEXT_NOTE")).addToggle((toggle) =>

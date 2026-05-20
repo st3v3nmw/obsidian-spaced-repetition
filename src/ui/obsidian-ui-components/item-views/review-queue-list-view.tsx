@@ -2,7 +2,7 @@ import "src/ui/obsidian-ui-components/item-views/review-queue-list-view.css";
 import { ItemView, Menu, setIcon, TFile, WorkspaceLeaf } from "obsidian";
 
 import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { COLLAPSE_ICON, TICKS_PER_DAY } from "src/constants";
+import { TICKS_PER_DAY } from "src/constants";
 import { deleteNoteSchedulingDataInNote } from "src/delete-scheduling-data";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
@@ -232,8 +232,8 @@ export class ReviewQueueListView extends ItemView {
         const collapseIconEl: HTMLDivElement = folderTitleEl.createDiv(
             "tree-item-icon collapse-icon nav-folder-collapse-indicator",
         );
+        setIcon(collapseIconEl, "chevron-down");
 
-        collapseIconEl.innerHTML = COLLAPSE_ICON;
         folderTitleEl.createDiv("tree-item-inner nav-folder-title-content").setText(folderTitle);
 
         if (collapsed && !folderEl.hasClass("is-collapsed")) {
@@ -246,12 +246,14 @@ export class ReviewQueueListView extends ItemView {
         }
 
         if (hidden) {
-            folderEl.style.display = "none";
+            folderEl.setCssProps({ display: "none" });
         }
 
         folderTitleEl.onClickEvent(() => {
             this.changeFolderFolding(folderEl, !folderEl.hasClass("is-collapsed"));
-            childrenEl.style.display = !folderEl.hasClass("is-collapsed") ? "block" : "none";
+            childrenEl.setCssProps({
+                display: !folderEl.hasClass("is-collapsed") ? "block" : "none",
+            });
 
             if (!folderEl.hasClass("is-collapsed")) {
                 deck.activeFolders.delete(folderTitle);
@@ -275,7 +277,9 @@ export class ReviewQueueListView extends ItemView {
         )[0] as HTMLElement;
         const navFileEl: HTMLElement = childrenEl.createDiv("nav-file");
         if (hidden) {
-            childrenEl.style.display = "none";
+            childrenEl.setCssProps({
+                display: "none",
+            });
         }
 
         const navFileTitle: HTMLElement = navFileEl.createDiv("tree-item-self nav-file-title");

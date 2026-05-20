@@ -37,7 +37,7 @@ export default class ChartComponent extends SettingsItemOverrideComponent {
         this.summaryEl = this.containerEl.createDiv();
         this.summaryEl.id = summaryId;
 
-        const style = getComputedStyle(document.body);
+        const style = getComputedStyle(activeDocument.body);
         const textColor = style.getPropertyValue("--text-normal");
 
         let scales = {};
@@ -66,7 +66,7 @@ export default class ChartComponent extends SettingsItemOverrideComponent {
 
         const shouldFilter = canvasId === "forecastChart" || canvasId === "intervalsChart";
 
-        const statsChart = new Chart(document.getElementById(canvasId) as HTMLCanvasElement, {
+        const statsChart = new Chart(activeDocument.getElementById(canvasId) as HTMLCanvasElement, {
             type,
             data: {
                 labels: shouldFilter ? labels.slice(0, 31) : labels,
@@ -113,7 +113,9 @@ export default class ChartComponent extends SettingsItemOverrideComponent {
         });
 
         if (shouldFilter) {
-            const chartPeriodEl = document.getElementById("sr-chart-period") as HTMLSelectElement;
+            const chartPeriodEl = activeDocument.getElementById(
+                "sr-chart-period",
+            ) as HTMLSelectElement;
             chartPeriodEl.addEventListener("change", () => {
                 let filteredLabels, filteredData;
                 const chartPeriod = chartPeriodEl.value;
@@ -142,10 +144,16 @@ export default class ChartComponent extends SettingsItemOverrideComponent {
             });
         }
 
-        document.getElementById(`${canvasId}Summary`).innerText = summary;
-        document.getElementById(`${canvasId}Summary`).style.textAlign =
-            canvasId === "cardTypesChart" ? "right" : "center";
+        const canvasSummary: HTMLElement | null = activeDocument.getElementById(
+            `${canvasId}Summary`,
+        );
 
+        if (canvasSummary) {
+            canvasSummary.setText(summary);
+            canvasSummary.setCssProps({
+                "text-align": canvasId === "cardTypesChart" ? "right" : "center",
+            });
+        }
         this.chart = statsChart;
     }
 

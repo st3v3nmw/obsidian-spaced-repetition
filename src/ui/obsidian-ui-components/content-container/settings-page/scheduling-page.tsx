@@ -1,7 +1,7 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
 import { Algorithm } from "src/algorithms/base/isrs-algorithm";
-import { t } from "src/lang/helpers";
+import { t, tHTML } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DEFAULT_SETTINGS } from "src/settings";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
@@ -85,12 +85,15 @@ export class SchedulingPage extends SettingsPage {
                         }),
                 );
 
-            algoSettingEl.descEl.insertAdjacentHTML(
-                "beforeend",
-                t("CHECK_ALGORITHM_WIKI", {
-                    algoUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
-                }),
-            );
+            const elements: (HTMLElement | Text)[] = tHTML("CHECK_ALGORITHM_WIKI", {
+                algoUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
+            });
+
+            algoSettingEl.descEl.empty();
+
+            for (let i = 0; i < elements.length; i++) {
+                algoSettingEl.descEl.append(elements[i]);
+            }
         });
 
         algorithmGroup.addSetting((setting: Setting) => {
