@@ -76,7 +76,7 @@ export class UIManager {
         this.sidebarManager.init();
         this.plugin.app.workspace.onLayoutReady(async () => {
             await this.sidebarManager.activateReviewQueueViewPanel();
-            setTimeout(async () => {
+            window.setTimeout(async () => {
                 if (!this.plugin.osrAppCore.syncLock) {
                     await this.plugin.sync();
                 }
