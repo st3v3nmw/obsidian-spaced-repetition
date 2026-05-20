@@ -156,7 +156,7 @@ export class SettingsPageManager {
 
     // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
     private applySettingsUpdate(callback: () => void): void {
-        clearTimeout(this.applyDebounceTimer);
+        window.clearTimeout(this.applyDebounceTimer);
         this.applyDebounceTimer = window.setTimeout(callback, 512);
     }
 

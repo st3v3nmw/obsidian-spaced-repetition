@@ -56,24 +56,18 @@ export class SRTabView extends ItemView {
         this.viewContainerEl.addClass("sr-view");
 
         this.viewContentEl = this.viewContainerEl.createDiv("sr-tab-view-content");
+        const isMobile: boolean = Platform.isMobile || EmulatedPlatform().isMobile;
+        const heightPercent: number = isMobile
+            ? this.settings.flashcardHeightPercentageMobile
+            : this.settings.flashcardHeightPercentage;
 
-        if (Platform.isMobile || EmulatedPlatform().isMobile) {
-            this.viewContentEl.style.height = this.settings.flashcardHeightPercentageMobile + "%";
-            this.viewContentEl.style.maxHeight =
-                this.settings.flashcardHeightPercentageMobile + "%";
-            this.viewContentEl.style.width = this.settings.flashcardWidthPercentageMobile + "%";
-            this.viewContentEl.style.maxWidth = this.settings.flashcardWidthPercentageMobile + "%";
-        } else {
-            this.viewContentEl.style.height = this.settings.flashcardHeightPercentage + "%";
-            this.viewContentEl.style.maxHeight = this.settings.flashcardHeightPercentage + "%";
-            this.viewContentEl.style.width = this.settings.flashcardWidthPercentage + "%";
-            this.viewContentEl.style.maxWidth = this.settings.flashcardWidthPercentage + "%";
-        }
+        const widthPercent: number = isMobile
+            ? this.settings.flashcardWidthPercentageMobile
+            : this.settings.flashcardWidthPercentage;
 
-        if (
-            this.settings.flashcardHeightPercentage < 100 ||
-            this.settings.flashcardWidthPercentage < 100
-        ) {
+        this.setSize(widthPercent, heightPercent);
+
+        if (heightPercent < 100 || widthPercent < 100) {
             this.viewContentEl.addClass("sr-center-view");
         }
     }
@@ -120,19 +114,19 @@ export class SRTabView extends ItemView {
             return;
 
         // Reposition the navbar if it's mobile, because lese it overlaps the buttons in the tab view
-        if (document.body.classList.contains("is-mobile")) {
-            const mobileNavbar = document.getElementsByClassName("mobile-navbar")[0];
+        if (activeDocument.body.classList.contains("is-mobile")) {
+            const mobileNavbar = activeDocument.getElementsByClassName("mobile-navbar")[0];
             if (mobileNavbar) {
-                (mobileNavbar as HTMLElement).style.position = "relative";
+                (mobileNavbar as HTMLElement).setCssProps({ position: "relative" });
             }
         }
 
         // Removes the bottom fade mask if it's mobile and floating nav, because else it overlaps the bottom part of the flashcard and makes it hard to read
         if (
-            document.body.classList.contains("is-phone") &&
-            document.body.classList.contains("is-floating-nav")
+            activeDocument.body.classList.contains("is-phone") &&
+            activeDocument.body.classList.contains("is-floating-nav")
         ) {
-            document.body.style.setProperty(
+            activeDocument.body.style.setProperty(
                 "--view-bottom-fade-mask",
                 "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(16px - 0px))",
             );
@@ -157,24 +151,34 @@ export class SRTabView extends ItemView {
      */
     async onClose() {
         // Resets the changes made in onOpen
-        if (document.body.classList.contains("is-mobile")) {
-            const mobileNavbar = document.getElementsByClassName("mobile-navbar")[0];
+        if (activeDocument.body.classList.contains("is-mobile")) {
+            const mobileNavbar = activeDocument.getElementsByClassName("mobile-navbar")[0];
             if (mobileNavbar) {
-                (mobileNavbar as HTMLElement).style.position = "unset";
+                (mobileNavbar as HTMLElement).setCssProps({ position: "unset" });
             }
         }
 
         // Resets the changes made in onOpen
         if (
-            document.body.classList.contains("is-phone") &&
-            document.body.classList.contains("is-floating-nav")
+            activeDocument.body.classList.contains("is-phone") &&
+            activeDocument.body.classList.contains("is-floating-nav")
         ) {
-            document.body.style.setProperty(
+            activeDocument.body.style.setProperty(
                 "--view-bottom-fade-mask",
                 "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(34px - 0px + 12px))",
             );
         }
 
         if (this.contentManager) this.contentManager.close();
+    }
+
+    private setSize(widthPercent: number, heightPercent: number) {
+        if (!this.viewContentEl) return;
+        this.viewContentEl.setCssProps({
+            width: widthPercent + "%",
+            "max-width": widthPercent + "%",
+            height: heightPercent + "%",
+            "max-height": heightPercent + "%",
+        });
     }
 }

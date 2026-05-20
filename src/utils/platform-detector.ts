@@ -15,16 +15,16 @@ export interface EmulatedPlatform {
  */
 export default function EmulatedPlatform(): EmulatedPlatform {
     return {
-        isDesktop: DEBUG_MODE_ENABLED && !document.body.hasClass("emulate-mobile"),
-        isMobile: DEBUG_MODE_ENABLED && document.body.hasClass("emulate-mobile"),
+        isDesktop: DEBUG_MODE_ENABLED && !activeDocument.body.hasClass("emulate-mobile"),
+        isMobile: DEBUG_MODE_ENABLED && activeDocument.body.hasClass("emulate-mobile"),
         isPhone:
             DEBUG_MODE_ENABLED &&
-            document.body.hasClass("emulate-mobile") &&
-            document.body.hasClass("is-phone"),
+            activeDocument.body.hasClass("emulate-mobile") &&
+            activeDocument.body.hasClass("is-phone"),
         isTablet:
             DEBUG_MODE_ENABLED &&
-            document.body.hasClass("emulate-mobile") &&
-            document.body.hasClass("is-tablet"),
-        isEmulated: DEBUG_MODE_ENABLED && document.body.hasClass("emulate-mobile"),
+            activeDocument.body.hasClass("emulate-mobile") &&
+            activeDocument.body.hasClass("is-tablet"),
+        isEmulated: DEBUG_MODE_ENABLED && activeDocument.body.hasClass("emulate-mobile"),
     };
 }

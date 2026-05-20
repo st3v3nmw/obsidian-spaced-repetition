@@ -3,7 +3,7 @@ import { Notice, Setting, SettingGroup } from "obsidian";
 import { SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
 import { DataManager } from "src/data/data-manager";
 import { DEFAULT_SETTINGS } from "src/data/settings";
-import { t } from "src/lang/helpers";
+import { t, tHTML } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
@@ -55,7 +55,7 @@ export class SchedulingPage extends SettingsPage {
                     dropdown
                         .addOptions({
                             "SM-2-OSR": t("SM2_OSR_VARIANT"),
-                            FSRS: "FSRS",
+                            // FSRS: "FSRS", // TODO: Re-enable when ready
                         })
                         .setValue(this.dataManager.data.settings.algorithm)
                         .onChange(async (value) => {
@@ -88,12 +88,15 @@ export class SchedulingPage extends SettingsPage {
                         }),
                 );
 
-            algoSettingEl.descEl.insertAdjacentHTML(
-                "beforeend",
-                t("CHECK_ALGORITHM_WIKI", {
-                    algoUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
-                }),
-            );
+            const elements: (HTMLElement | Text)[] = tHTML("CHECK_ALGORITHM_WIKI", {
+                algoUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
+            });
+
+            algoSettingEl.descEl.empty();
+
+            for (let i = 0; i < elements.length; i++) {
+                algoSettingEl.descEl.append(elements[i]);
+            }
         });
 
         algorithmGroup.addSetting((setting: Setting) => {

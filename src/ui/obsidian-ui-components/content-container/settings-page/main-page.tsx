@@ -1,7 +1,7 @@
 import { ButtonComponent, setIcon, Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
-import { t } from "src/lang/helpers";
+import { t, tHTML } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { setDebugParser } from "src/parser";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
@@ -55,7 +55,7 @@ export class MainPage extends SettingsPage {
 
                     button.buttonEl.addClass("clickable-icon");
                 });
-                const iconEl = document.createElement("div");
+                const iconEl = activeDocument.createElement("div");
                 iconEl.addClass("sr-settings-page-title-icon");
                 setIcon(iconEl, getPageIcon(pageType));
 
@@ -80,7 +80,7 @@ export class MainPage extends SettingsPage {
 
                         button.buttonEl.addClass("clickable-icon");
                     });
-                const iconEl = document.createElement("div");
+                const iconEl = activeDocument.createElement("div");
                 iconEl.addClass("sr-settings-page-title-icon");
                 setIcon(iconEl, getPageIcon("statistics-page"));
 
@@ -92,75 +92,99 @@ export class MainPage extends SettingsPage {
                 });
             })
             .addSetting((setting: Setting) => {
-                setting.infoEl.insertAdjacentHTML(
-                    "beforeend",
-                    t("CHECK_WIKI", {
-                        wikiUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/",
-                    }),
-                );
+                const elements: (HTMLElement | Text)[] = tHTML("CHECK_WIKI", {
+                    wikiUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/",
+                });
+
+                setting.infoEl.empty();
+
+                for (let i = 0; i < elements.length; i++) {
+                    setting.infoEl.append(elements[i]);
+                }
             })
             .addSetting((setting: Setting) => {
-                setting.infoEl.insertAdjacentHTML(
-                    "beforeend",
-                    t("CHECK_ROADMAP", {
-                        roadMapUrl: "https://github.com/users/st3v3nmw/projects/6",
-                    }),
-                );
+                const elements: (HTMLElement | Text)[] = tHTML("CHECK_ROADMAP", {
+                    roadMapUrl: "https://github.com/users/st3v3nmw/projects/6",
+                });
+
+                setting.infoEl.empty();
+
+                for (let i = 0; i < elements.length; i++) {
+                    setting.infoEl.append(elements[i]);
+                }
             })
             .addSetting((setting: Setting) => {
-                setting.infoEl.insertAdjacentHTML(
-                    "beforeend",
-                    t("CHECK_DEV_NEWS", {
-                        devNewsUrl:
-                            "https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/categories/development-news",
-                    }),
-                );
+                const elements: (HTMLElement | Text)[] = tHTML("CHECK_DEV_NEWS", {
+                    devNewsUrl:
+                        "https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/categories/development-news",
+                });
+
+                setting.infoEl.empty();
+
+                for (let i = 0; i < elements.length; i++) {
+                    setting.infoEl.append(elements[i]);
+                }
             });
 
         new SettingGroup(this.containerEl)
             .setHeading(t("HELP") + " & " + t("GROUP_CONTRIBUTING"))
             .addSetting((setting: Setting) => {
-                setting.infoEl.insertAdjacentHTML(
-                    "beforeend",
-                    t("GITHUB_DISCUSSIONS", {
-                        discussionsUrl:
-                            "https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/",
-                    }),
-                );
+                const elements: (HTMLElement | Text)[] = tHTML("GITHUB_DISCUSSIONS", {
+                    discussionsUrl:
+                        "https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/",
+                });
+
+                setting.infoEl.empty();
+
+                for (let i = 0; i < elements.length; i++) {
+                    setting.infoEl.append(elements[i]);
+                }
             })
             .addSetting((setting: Setting) => {
-                setting.infoEl.insertAdjacentHTML(
-                    "beforeend",
-                    t("GITHUB_ISSUES", {
-                        issuesUrl: "https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/",
-                    }),
-                );
+                const elements: (HTMLElement | Text)[] = tHTML("GITHUB_ISSUES", {
+                    issuesUrl: "https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/",
+                });
+
+                setting.infoEl.empty();
+
+                for (let i = 0; i < elements.length; i++) {
+                    setting.infoEl.append(elements[i]);
+                }
             })
             .addSetting((setting: Setting) => {
-                setting.infoEl.insertAdjacentHTML(
-                    "beforeend",
-                    t("GITHUB_SOURCE_CODE", {
-                        githubProjectUrl: "https://github.com/st3v3nmw/obsidian-spaced-repetition",
-                    }),
-                );
+                const elements: (HTMLElement | Text)[] = tHTML("GITHUB_SOURCE_CODE", {
+                    githubProjectUrl: "https://github.com/st3v3nmw/obsidian-spaced-repetition",
+                });
+
+                setting.infoEl.empty();
+
+                for (let i = 0; i < elements.length; i++) {
+                    setting.infoEl.append(elements[i]);
+                }
             })
             .addSetting((setting: Setting) => {
-                setting.infoEl.insertAdjacentHTML(
-                    "beforeend",
-                    t("CODE_CONTRIBUTION_INFO", {
-                        codeContributionUrl:
-                            "https://stephenmwangi.com/obsidian-spaced-repetition/contributing/#code",
-                    }),
-                );
+                const elements: (HTMLElement | Text)[] = tHTML("CODE_CONTRIBUTION_INFO", {
+                    codeContributionUrl:
+                        "https://stephenmwangi.com/obsidian-spaced-repetition/contributing/#code",
+                });
+
+                setting.infoEl.empty();
+
+                for (let i = 0; i < elements.length; i++) {
+                    setting.infoEl.append(elements[i]);
+                }
             })
             .addSetting((setting: Setting) => {
-                setting.infoEl.insertAdjacentHTML(
-                    "beforeend",
-                    t("TRANSLATION_CONTRIBUTION_INFO", {
-                        translationContributionUrl:
-                            "https://stephenmwangi.com/obsidian-spaced-repetition/contributing/#translating",
-                    }),
-                );
+                const elements: (HTMLElement | Text)[] = tHTML("TRANSLATION_CONTRIBUTION_INFO", {
+                    translationContributionUrl:
+                        "https://stephenmwangi.com/obsidian-spaced-repetition/contributing/#translating",
+                });
+
+                setting.infoEl.empty();
+
+                for (let i = 0; i < elements.length; i++) {
+                    setting.infoEl.append(elements[i]);
+                }
             });
 
         new SettingGroup(this.containerEl)

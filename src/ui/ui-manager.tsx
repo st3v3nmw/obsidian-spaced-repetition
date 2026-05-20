@@ -86,7 +86,7 @@ export class UIManager {
         this.plugin.app.workspace.onLayoutReady(async () => {
             this.tabViewManager.closeAllTabViews();
             await this.sidebarManager.activateReviewQueueViewPanel();
-            setTimeout(async () => {
+            window.setTimeout(async () => {
                 if (this.dataManager.osrCore === null)
                     throw new Error("SR plugin or OSR app core not initialized!!!");
                 if (!this.dataManager.syncLock) {
@@ -147,7 +147,7 @@ export class UIManager {
             this.plugin.app.workspace.on("active-leaf-change", this.handleFocusChange.bind(this)),
         );
         this.externalModalObserver = new MutationObserver(this.handleExternalModalOpen.bind(this));
-        this.externalModalObserver.observe(document.body, {
+        this.externalModalObserver.observe(activeDocument.body, {
             childList: true,
             subtree: true,
         });
@@ -177,7 +177,7 @@ export class UIManager {
                     (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0),
             ).length > 0
         ) {
-            const modal = document.querySelector(".modal-container"); // Check your modal selector
+            const modal = activeDocument.querySelector(".modal-container"); // Check your modal selector
             // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
             this.setSRViewInFocus(
                 (modal === null || modal === undefined) &&
@@ -258,11 +258,8 @@ export class UIManager {
                 },
             );
         }
-        if (status) {
-            this.ribbonIcon.style.display = "";
-        } else {
-            this.ribbonIcon.style.display = "none";
-        }
+
+        this.ribbonIcon.setCssProps({ display: status ? "" : "none" });
     }
 
     private fileMenuHandler(menu: Menu, file: TAbstractFile) {

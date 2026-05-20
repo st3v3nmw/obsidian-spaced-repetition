@@ -201,7 +201,7 @@ const en: IBaseLocale = {
         "Turn this off to hide the note's review status in Obsidian's status bar",
     SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM: "Show update available status bar item",
     SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM_DESC:
-        "Turn this off to hide the update available status bar item",
+        "Turn this off to hide the update available status bar item & to stop the fetching of the newest version number",
     SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
     SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
     ENABLE_FILE_MENU_REVIEW_OPTIONS:

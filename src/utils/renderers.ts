@@ -1,6 +1,7 @@
 import { App, MarkdownRenderChild, MarkdownRenderer } from "obsidian";
 
 import SRPlugin from "src/main";
+// import { CardState } from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { TextDirection } from "src/utils/strings";
 
 export class RenderMarkdownWrapper {
@@ -14,12 +15,11 @@ export class RenderMarkdownWrapper {
         this.plugin = plugin;
     }
 
-    // slightly modified version of the renderMarkdown function in
-    // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/KanbanView.tsx
     async renderMarkdownWrapper(
         markdownString: string,
         containerEl: HTMLElement,
         textDirection: TextDirection,
+        // cardState: CardState, // TODO: Enable once you are working on rendering clozes in here
         recursiveDepth = 0,
     ): Promise<void> {
         if (recursiveDepth > 4) return;
@@ -29,6 +29,10 @@ export class RenderMarkdownWrapper {
             el = containerEl.createDiv();
             el.setAttribute("dir", "rtl");
         } else el = containerEl;
+
+        if (!el.hasClass("markdown-rendered")) {
+            el.addClass("markdown-rendered");
+        }
 
         const renderChild = new MarkdownRenderChild(el);
         this.plugin.addChild(renderChild);

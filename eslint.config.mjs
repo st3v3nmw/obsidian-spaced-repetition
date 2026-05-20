@@ -1,6 +1,6 @@
 import eslint from "@eslint/js";
-import eslintPluginUnicorn from "eslint-plugin-unicorn";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
+import eslintPluginUnicorn from "eslint-plugin-unicorn";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
@@ -49,6 +49,33 @@ export default tseslint.config(
                             message: "Relative imports are not allowed in src/.",
                         },
                     ],
+                },
+            ],
+            "no-restricted-syntax": [
+                "error",
+                {
+                    selector: "CallExpression[callee.property.name=/^insertAdjacent/]",
+                    message:
+                        "insertAdjacent methods are not allowed. Use alternative DOM manipulation methods instead.",
+                },
+                {
+                    selector: 'AssignmentExpression[left.property.name="innerHTML"]',
+                    message:
+                        "innerHTML assignment is not allowed. Use alternative DOM manipulation methods instead.",
+                },
+                {
+                    selector: 'NewExpression[callee.name="Function"]',
+                    message:
+                        "new Function() is not allowed due to security risks. Use alternative approaches instead.",
+                },
+                {
+                    selector: 'Identifier[name="document"]',
+                    message: "Use activeDocument instead of document.",
+                },
+                {
+                    selector: 'AssignmentExpression[left.object.property.name="style"]',
+                    message:
+                        "Avoid setting styles directly via element.style. Use CSS classes for better theming and maintainability. Use the setCssProps function if the CSS properties need to change dynamically.",
                 },
             ],
         },

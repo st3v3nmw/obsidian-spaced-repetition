@@ -77,7 +77,7 @@ export abstract class SettingsPage {
 
         this.titleEl = this.titleWrapperEl.createDiv();
         this.titleEl.addClass("sr-settings-page-title");
-        this.titleEl.insertAdjacentHTML("beforeend", getPageName(pageType));
+        this.titleEl.setText(getPageName(pageType));
 
         this.containerEl = this.pageContainerEl.createDiv();
         this.containerEl.addClass("sr-settings-page-content");

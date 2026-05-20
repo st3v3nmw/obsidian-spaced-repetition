@@ -116,9 +116,9 @@ export default class SRPlugin extends Plugin {
                         EmulatedPlatform().isMobile
                     ) &&
                     !(
-                        document.activeElement !== null &&
-                        (document.activeElement.nodeName === "TEXTAREA" ||
-                            document.activeElement.nodeName === "INPUT")
+                        activeDocument.activeElement !== null &&
+                        (activeDocument.activeElement.nodeName === "TEXTAREA" ||
+                            activeDocument.activeElement.nodeName === "INPUT")
                     )
                 ) {
                     if (!checking) {
@@ -146,9 +146,9 @@ export default class SRPlugin extends Plugin {
                         EmulatedPlatform().isMobile
                     ) &&
                     !(
-                        document.activeElement !== null &&
-                        (document.activeElement.nodeName === "TEXTAREA" ||
-                            document.activeElement.nodeName === "INPUT")
+                        activeDocument.activeElement !== null &&
+                        (activeDocument.activeElement.nodeName === "TEXTAREA" ||
+                            activeDocument.activeElement.nodeName === "INPUT")
                     )
                 ) {
                     if (!checking) {
@@ -175,9 +175,9 @@ export default class SRPlugin extends Plugin {
                         EmulatedPlatform().isMobile
                     ) &&
                     !(
-                        document.activeElement !== null &&
-                        (document.activeElement.nodeName === "TEXTAREA" ||
-                            document.activeElement.nodeName === "INPUT")
+                        activeDocument.activeElement !== null &&
+                        (activeDocument.activeElement.nodeName === "TEXTAREA" ||
+                            activeDocument.activeElement.nodeName === "INPUT")
                     )
                 ) {
                     if (!checking) {
@@ -205,9 +205,9 @@ export default class SRPlugin extends Plugin {
                         EmulatedPlatform().isMobile
                     ) &&
                     !(
-                        document.activeElement !== null &&
-                        (document.activeElement.nodeName === "TEXTAREA" ||
-                            document.activeElement.nodeName === "INPUT")
+                        activeDocument.activeElement !== null &&
+                        (activeDocument.activeElement.nodeName === "TEXTAREA" ||
+                            activeDocument.activeElement.nodeName === "INPUT")
                     )
                 ) {
                     if (!checking) {
@@ -233,9 +233,9 @@ export default class SRPlugin extends Plugin {
                         EmulatedPlatform().isMobile
                     ) &&
                     !(
-                        document.activeElement !== null &&
-                        (document.activeElement.nodeName === "TEXTAREA" ||
-                            document.activeElement.nodeName === "INPUT")
+                        activeDocument.activeElement !== null &&
+                        (activeDocument.activeElement.nodeName === "TEXTAREA" ||
+                            activeDocument.activeElement.nodeName === "INPUT")
                     )
                 ) {
                     if (!checking) {
@@ -262,9 +262,9 @@ export default class SRPlugin extends Plugin {
                         EmulatedPlatform().isMobile
                     ) &&
                     !(
-                        document.activeElement !== null &&
-                        (document.activeElement.nodeName === "TEXTAREA" ||
-                            document.activeElement.nodeName === "INPUT")
+                        activeDocument.activeElement !== null &&
+                        (activeDocument.activeElement.nodeName === "TEXTAREA" ||
+                            activeDocument.activeElement.nodeName === "INPUT")
                     )
                 ) {
                     if (!checking) {
@@ -290,9 +290,9 @@ export default class SRPlugin extends Plugin {
                         EmulatedPlatform().isMobile
                     ) &&
                     !(
-                        document.activeElement !== null &&
-                        (document.activeElement.nodeName === "TEXTAREA" ||
-                            document.activeElement.nodeName === "INPUT")
+                        activeDocument.activeElement !== null &&
+                        (activeDocument.activeElement.nodeName === "TEXTAREA" ||
+                            activeDocument.activeElement.nodeName === "INPUT")
                     )
                 ) {
                     if (!checking) {

@@ -32,7 +32,7 @@ export default class IconStatusBarItem extends StatusBarItem {
         this.icon = icon;
 
         if (this.iconEl === null || !this.statusBarItem.hasChildNodes()) {
-            this.iconEl = document.createElement("span");
+            this.iconEl = activeDocument.createElement("span");
             this.iconEl.addClass("status-bar-item-icon");
             this.addSegment(this.iconEl);
         } else {

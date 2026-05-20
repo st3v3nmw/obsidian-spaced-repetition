@@ -86,21 +86,17 @@ export class SRModalView extends Modal {
     }
 
     private setRoundedModalCorners(rounded: boolean) {
-        if (rounded) {
-            this.modalEl.style.borderRadius = "var(--modal-radius)";
-        } else {
-            this.modalEl.style.borderRadius = "0";
-        }
+        this.modalEl.setCssProps({ "border-Radius": rounded ? "var(--modal-radius)" : "0" });
     }
 
     private setModalSize(heightPercent: number, widthPercent: number) {
-        this.modalEl.style.height = heightPercent + "%";
-        this.modalEl.style.width = widthPercent + "%";
+        this.modalEl.setCssProps({ height: heightPercent + "%" });
+        this.modalEl.setCssProps({ width: widthPercent + "%" });
 
         this.setRoundedModalCorners(
             !(
-                parseInt(this.modalEl.style.height.split("%")[0]) >= 100 ||
-                parseInt(this.modalEl.style.width.split("%")[0]) >= 100
+                parseInt(this.modalEl.getCssPropertyValue("height").split("%")[0]) >= 100 ||
+                parseInt(this.modalEl.getCssPropertyValue("width").split("%")[0]) >= 100
             ),
         );
     }

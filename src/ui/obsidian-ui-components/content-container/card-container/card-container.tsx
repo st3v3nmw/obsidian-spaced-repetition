@@ -21,6 +21,7 @@ import { escapeHtml } from "src/utils/escape-html";
 import EmulatedPlatform from "src/utils/platform-detector";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
 
+// TODO: Refactor cloze rendering into the renderers file
 export class CardContainer {
     private app: App;
     private plugin: SRPlugin;
@@ -127,7 +128,7 @@ export class CardContainer {
         await this.drawCardFront(sessionData, settings);
 
         this.view.removeClass("sr-is-hidden");
-        document.addEventListener("keydown", this._keydownHandler);
+        activeDocument.addEventListener("keydown", this._keydownHandler);
     }
 
     /**
@@ -144,7 +145,7 @@ export class CardContainer {
             this.pendingResumeTimeout = null;
         }
         this.cardState = CardState.Closed;
-        document.removeEventListener("keydown", this._keydownHandler);
+        activeDocument.removeEventListener("keydown", this._keydownHandler);
         this.view.addClass("sr-is-hidden");
     }
 
@@ -155,9 +156,9 @@ export class CardContainer {
      */
     blockKeyInput(block: boolean) {
         if (block) {
-            document.addEventListener("keydown", this._keydownHandler);
+            activeDocument.addEventListener("keydown", this._keydownHandler);
         } else {
-            document.removeEventListener("keydown", this._keydownHandler);
+            activeDocument.removeEventListener("keydown", this._keydownHandler);
         }
     }
 
@@ -192,6 +193,7 @@ export class CardContainer {
             sessionData.cardData.currentCard.front.trimStart(),
             this.content,
             sessionData.currentQuestion.questionText.textDirection,
+            // sessionData.cardData.currentCardState
         );
         // Set scroll position back to top
         this.content.scrollTop = 0;
@@ -204,7 +206,7 @@ export class CardContainer {
 
         // auto-focus the first cloze input if this card is a cloze card
         if (sessionData.currentQuestion.questionType === CardType.Cloze) {
-            const firstInput = document.querySelector(".cloze-input") as HTMLInputElement;
+            const firstInput = activeDocument.querySelector(".cloze-input") as HTMLInputElement;
             if (firstInput) {
                 firstInput.focus();
             }
@@ -275,7 +277,7 @@ export class CardContainer {
     }
 
     private _setupClozeInputListeners(): void {
-        this.clozeInputs = document.querySelectorAll(".cloze-input");
+        this.clozeInputs = activeDocument.querySelectorAll(".cloze-input");
 
         this.clozeInputs.forEach((input) => {
             input.addEventListener("keydown", (e: KeyboardEvent) => {
@@ -289,7 +291,7 @@ export class CardContainer {
         });
     }
     private _evaluateClozeAnswers(): void {
-        this.clozeAnswers = document.querySelectorAll(".cloze-answer");
+        this.clozeAnswers = activeDocument.querySelectorAll(".cloze-answer");
 
         if (this.clozeInputs !== null && this.clozeAnswers.length === this.clozeInputs.length) {
             for (let i = 0; i < this.clozeAnswers.length; i++) {
@@ -299,11 +301,28 @@ export class CardContainer {
                 const inputText = clozeInput.value.trim();
                 const answerText = clozeAnswer.innerText.trim();
 
-                const answerElement =
-                    inputText === answerText
-                        ? `<span style="color: green">${escapeHtml(inputText)}</span>`
-                        : `[<span style="color: red; text-decoration: line-through;">${escapeHtml(inputText)}</span><span style="color: green">${answerText}</span>]`;
-                clozeAnswer.innerHTML = answerElement;
+                clozeAnswer.empty();
+
+                const answerElement = clozeAnswer.createSpan({
+                    text: escapeHtml(inputText),
+                    cls: "cloze-answer",
+                });
+
+                answerElement.setCssProps({
+                    color: inputText === answerText ? "green" : "red",
+                    "text-Decoration": inputText === answerText ? "none" : "line-through",
+                });
+
+                if (inputText !== answerText) {
+                    const span = clozeAnswer.createSpan({
+                        text: escapeHtml(answerText),
+                        cls: "cloze-answer-wrong",
+                    });
+                    span.setCssProps({
+                        color: "green",
+                        "text-decoration": "none",
+                    });
+                }
             }
         }
     }
@@ -312,7 +331,7 @@ export class CardContainer {
         sessionData: SessionData,
         reviewMode: FlashcardReviewMode,
         settings: SRSettings,
-        determineButtonSchedule: (response: ReviewResponse) => RepItemScheduleInfo,
+        determineButtonSchedule: (response: ReviewResponse) => RepItemScheduleInfo | null,
     ) {
         this.setCustomHotKeyState(settings.useCustomHotkeys);
         this.cardState = sessionData.cardData.currentCardState;
@@ -321,7 +340,7 @@ export class CardContainer {
 
         // Show answer text
         if (sessionData.currentQuestion.questionType !== CardType.Cloze) {
-            const hr: HTMLElement = document.createElement("hr");
+            const hr: HTMLElement = activeDocument.createElement("hr");
             this.content.appendChild(hr);
         } else {
             this.content.empty();
@@ -336,6 +355,7 @@ export class CardContainer {
             sessionData.cardData.currentCard.back,
             this.content,
             sessionData.currentQuestion.questionText.textDirection,
+            // sessionData.cardData.currentCardState,
         );
 
         // Evaluate cloze answers
@@ -364,9 +384,9 @@ export class CardContainer {
         // Prevents any input, if the edit modal is open or if the view is not in focus
         if (
             this.plugin.dataManager.data.settings.useCustomHotkeys ||
-            (document.activeElement !== null &&
-                (document.activeElement.nodeName === "TEXTAREA" ||
-                    document.activeElement.nodeName === "INPUT")) ||
+            (activeDocument.activeElement !== null &&
+                (activeDocument.activeElement.nodeName === "TEXTAREA" ||
+                    activeDocument.activeElement.nodeName === "INPUT")) ||
             this.cardState === CardState.Closed ||
             !this.plugin.uiManager.getSRInFocusState() ||
             Platform.isMobile || // No keyboard events on mobile

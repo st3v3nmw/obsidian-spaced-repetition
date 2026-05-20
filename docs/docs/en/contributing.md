@@ -8,6 +8,8 @@ First off, thanks for wanting to contribute to the Spaced Repetition plugin!
 - Raise an issue [here](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug report.
 - Visit the [discussions](https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/) section for Q&A help, feedback, and general discussion.
 
+<br/>
+
 ## Translating
 
 The plugin has been translated into the following languages by the Obsidian community 😄.
@@ -80,7 +82,9 @@ Please note that:
 1. Only the strings(templates) on the right of the key should be translated.
 2. Text inside `${}` isn't translated. This is used to replace variables in code. For instance, if interval = 4, it becomes `4 days` in English & `Siku 4` in Swahili. Quite nifty if you ask me.
 
----
+<br/>
+<br/>
+<br/>
 
 ## Code
 
@@ -126,6 +130,8 @@ Please note that:
     this.app.emulateMobile(false); // to switch to desktop view
 
     this.app.emulateMobile(true); // to switch to mobile view
+
+    this.app.emulateMobile(!this.app.isMobile); // to toggle between desktop and mobile view
     ```
 
 - Test your changes in all arrangements that the ui can be in:
@@ -139,7 +145,28 @@ Please note that:
     8. All the above, but with tab view option disabled
     9. All the above, but with tab view option disabled and different flashcard height/width percentages
 
----
+### General tips for developers
+
+Please use all capabilities of typescript & the obsidian api to make the code more readable & maintainable.
+
+- use `const` instead of `let`
+- use `let` instead of `var` (don't use `var` unless you have a **REALLY** good reason to)
+- don't use null or undefined without declaring that the variable can be null/undefined (`| null` or `| undefined`), as it is a common source of bugs.
+- always use `===` instead of `==` when comparing values
+- always use `!==` instead of `!=` when comparing values
+- Have a look at the [TypeScript cheatsheet](https://devhints.io/typescript) for more info.
+
+- Have a look at the [Obsidian docs for developers](https://docs.obsidian.md/Home) to see how to use the Obsidian APIs.
+- Make yourself a bit familiar with object-oriented programming, as it is how most of the code is structured.
+
+Make the code testable, by using [Jest](https://jestjs.io/) for unit tests.
+
+- You can use interfaces to decouple ui code/obsidian api code from the rest of the code. This way it gets easier to implement mock code for testing.
+- Put css in a css file next to the ui component file, and import it in the ui component file to. This way it gets easier to find the relevant css for a specific ui component.
+
+<br/>
+<br/>
+<br/>
 
 ## Documentation
 
@@ -176,13 +203,42 @@ For larger diffs, it's important that you check how your docs look like as expla
 3. Copy the files from the English (`en`) folder into the new folder.
 4. Translate then open a pull request.
 
----
+<br/>
+<br/>
+<br/>
 
 ## Maintenance
 
-### Releases
+### Tips for maintainers
 
-Example using `v1.9.2`:
+#### Use different branches for different releases
+
+Being a maintainer will be far less stressful if you use 3 different branches for preparing a new release. Huge changes should merge into `next-major-version` branch, while small changes can be merged into `next-minor-version` branch. Bugs fixes & patches should be merged into `next-patch-version` branch.
+
+Then once you want to release a new version you can create a PR from one of these branches into `main` branch. Then follow the steps in releasing a new version section.
+
+That way you can easily and without rushing release a small patch/fix, while you are still preparing the next big version.
+
+#### Only do minor/major releases once you updated the documentation
+
+Please only do minor/major releases once you updated the documentation. It is very easy to disregard the documentation as developer, but it really important for any user to be able to understand how to use the plugin.
+
+This is especially important for users who are not familiar with the plugin, or who are just starting to use it.
+
+So always make sure to update the documentation page and the usage section in the readme before doing a release.
+
+#### Mark issues & PRs where you think they should be implemented
+
+Quite often, you will find that it will get a bit messy with so many open/active issues & PRs.
+So in order to track which ones are important/relevant I would recommend to mark them with the `coming soon` lable, so that you can easily filter for those in the search bar.
+
+#### Keep the roadmap up to date
+
+The roadmap is a great way to keep track of what the status of any feature is. This is also quite nice for the users to see what's coming next.
+
+### Releasing a new version
+
+**The example is using `v1.9.2`, so insert your version instead:**
 
 1. Create a new branch: `git switch -c release-v1.9.2`
 2. Bump the plugin version in `manifest.json` and `package.json` (following [Semantic Versioning](https://semver.org/spec/v2.0.0.html)).

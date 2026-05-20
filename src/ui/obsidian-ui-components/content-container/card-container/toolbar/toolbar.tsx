@@ -140,7 +140,7 @@ export default class CardToolbarComponent {
     ) {
         this.infoSection.updateInfo(
             chosenDeck.deckName,
-            chosenDeckStats.cardsInQueueCount,
+            totalCardsInSession,
             totalCardsInSession - chosenDeckStats.cardsInQueueCount,
             totalDecksInSession,
             totalDecksInSession - chosenDeckStats.decksInQueueOfThisDeckCount,

@@ -98,7 +98,7 @@ export default class ResponseSectionComponent {
         goodButtonText: string,
         easyButtonText: string,
         showIntervalInReviewButtons: boolean,
-        determineButtonSchedule: (response: ReviewResponse) => RepItemScheduleInfo,
+        determineButtonSchedule: (response: ReviewResponse) => RepItemScheduleInfo | null,
     ) {
         if (this.responseEl.hasClass("sr-is-hidden")) {
             this.responseEl.removeClass("sr-is-hidden");
@@ -160,7 +160,7 @@ export default class ResponseSectionComponent {
     private _setupEaseButton(
         button: SRResponseButtonComponent,
         buttonName: string,
-        schedule: RepItemScheduleInfo,
+        schedule: RepItemScheduleInfo | null,
         showInterval: boolean,
     ) {
         if (showInterval) {

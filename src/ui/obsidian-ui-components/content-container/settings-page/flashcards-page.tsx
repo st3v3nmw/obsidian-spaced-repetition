@@ -2,7 +2,7 @@ import { Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
 import { DEFAULT_SETTINGS } from "src/data/settings";
-import { t } from "src/lang/helpers";
+import { t, tHTML } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
@@ -196,12 +196,20 @@ export class FlashcardsPage extends SettingsPage {
                 const convertHighlightsToClozesEl = setting.setName(
                     t("CONVERT_HIGHLIGHTS_TO_CLOZES"),
                 );
-                convertHighlightsToClozesEl.descEl.insertAdjacentHTML(
-                    "beforeend",
-                    t("CONVERT_HIGHLIGHTS_TO_CLOZES_DESC", {
+
+                const elements: (HTMLElement | Text)[] = tHTML(
+                    "CONVERT_HIGHLIGHTS_TO_CLOZES_DESC",
+                    {
                         defaultPattern: "==[123;;]answer[;;hint]==",
-                    }),
+                    },
                 );
+
+                setting.descEl.empty();
+
+                for (let i = 0; i < elements.length; i++) {
+                    setting.descEl.append(elements[i]);
+                }
+
                 convertHighlightsToClozesEl.addToggle((toggle) =>
                     toggle
                         .setValue(this.dataManager.data.settings.convertHighlightsToClozes)
@@ -227,12 +235,16 @@ export class FlashcardsPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 const convertBoldTextToClozesEl = setting.setName(t("CONVERT_BOLD_TEXT_TO_CLOZES"));
-                convertBoldTextToClozesEl.descEl.insertAdjacentHTML(
-                    "beforeend",
-                    t("CONVERT_BOLD_TEXT_TO_CLOZES_DESC", {
-                        defaultPattern: "**[123;;]answer[;;hint]**",
-                    }),
-                );
+                const elements: (HTMLElement | Text)[] = tHTML("CONVERT_BOLD_TEXT_TO_CLOZES_DESC", {
+                    defaultPattern: "**[123;;]answer[;;hint]**",
+                });
+
+                setting.descEl.empty();
+
+                for (let i = 0; i < elements.length; i++) {
+                    setting.descEl.append(elements[i]);
+                }
+
                 convertBoldTextToClozesEl.addToggle((toggle) =>
                     toggle
                         .setValue(this.dataManager.data.settings.convertBoldTextToClozes)
@@ -260,12 +272,20 @@ export class FlashcardsPage extends SettingsPage {
                 const convertCurlyBracketsToClozesEl = setting.setName(
                     t("CONVERT_CURLY_BRACKETS_TO_CLOZES"),
                 );
-                convertCurlyBracketsToClozesEl.descEl.insertAdjacentHTML(
-                    "beforeend",
-                    t("CONVERT_CURLY_BRACKETS_TO_CLOZES_DESC", {
+
+                const elements: (HTMLElement | Text)[] = tHTML(
+                    "CONVERT_CURLY_BRACKETS_TO_CLOZES_DESC",
+                    {
                         defaultPattern: "{{[123;;]answer[;;hint]}}",
-                    }),
+                    },
                 );
+
+                setting.descEl.empty();
+
+                for (let i = 0; i < elements.length; i++) {
+                    setting.descEl.append(elements[i]);
+                }
+
                 convertCurlyBracketsToClozesEl.addToggle((toggle) =>
                     toggle
                         .setValue(this.dataManager.data.settings.convertCurlyBracketsToClozes)
@@ -291,14 +311,16 @@ export class FlashcardsPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 const clozePatterns = setting.setName(t("CLOZE_PATTERNS"));
+                const elements: (HTMLElement | Text)[] = tHTML("CLOZE_PATTERNS_DESC", {
+                    docsUrl:
+                        "https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/cloze-cards/#cloze-types",
+                });
 
-                clozePatterns.descEl.insertAdjacentHTML(
-                    "beforeend",
-                    t("CLOZE_PATTERNS_DESC", {
-                        docsUrl:
-                            "https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/cloze-cards/#cloze-types",
-                    }),
-                );
+                setting.descEl.empty();
+
+                for (let i = 0; i < elements.length; i++) {
+                    setting.descEl.append(elements[i]);
+                }
 
                 clozePatterns.addTextArea((text) =>
                     text
