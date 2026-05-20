@@ -11,6 +11,11 @@ env:
 jobs:
     release:
         runs-on: ubuntu-latest
+        permissions:
+            id-token: write
+            contents: write
+            attestations: write
+            artifact-metadata: write
 
         steps:
             - uses: actions/checkout@v6
@@ -20,12 +25,23 @@ jobs:
               with:
                   node-version: "24"
 
-            - name: Build
+            - name: Build files
               id: build
               run: |
                   npm install -g pnpm
                   pnpm install
                   pnpm build
+
+            - name: Generate artifact attestation
+              uses: actions/attest@v4
+              with:
+                  subject-path: |
+                      build/main.js
+                      styles.css
+
+            - name: Package files
+              id: package
+              run: |
                   mkdir ${{ env.PLUGIN_NAME }}
                   cp build/main.js manifest.json styles.css ${{ env.PLUGIN_NAME }}
                   zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
