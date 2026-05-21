@@ -1,7 +1,7 @@
 import { Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
-import { DataStore, StorageType } from "src/data/data-store/data-store-instances/base/data-store";
+import { DataStore, StorageType } from "src/data/data-store/base/data-store";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
@@ -87,13 +87,21 @@ export class DataPage extends SettingsPage {
                                     confirmMessage,
                                     migratingMessage,
                                     async () => {
-                                        await this.dataManager.migrateDataStore(oldMode, newMode);
                                         dropdown.setValue(newMode);
                                         this.dataManager.data.settings.dataStore = newMode;
                                         this.dataManager.setupDataStoreAndAlgorithmInstances(
                                             this.dataManager.data.settings,
                                         );
-                                        await this.dataManager.savePluginData();
+                                        await DataStore.instance.isStructureInitialized.then(
+                                            async (isInitialized) => {
+                                                if (!isInitialized) {
+                                                    await DataStore.instance.isStructureInitialized;
+                                                }
+                                                await DataStore.instance.migrateDataStore(oldMode);
+                                                await this.dataManager.savePluginData();
+                                                this.display();
+                                            },
+                                        );
                                     },
                                 ).open();
                             });
@@ -182,7 +190,7 @@ export class DataPage extends SettingsPage {
                                     t("SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS"),
                                     () => {
                                         const settings = this.dataManager.data.settings;
-                                        DataStore.instance.scheduleDeleter.deleteAllSchedulingData(
+                                        DataStore.instance.fileModifier.deleteAllSchedulingData(
                                             settings.deleteTagsOnSchedulingDataDeletion,
                                             settings.flashcardTags,
                                             settings.tagsToReview,
@@ -207,7 +215,7 @@ export class DataPage extends SettingsPage {
                                     t("CONFIRM_SCHEDULING_DATA_IN_NOTES_DELETION"),
                                     t("SCHEDULING_DATA_IN_NOTES_DELETION_IN_PROGRESS"),
                                     () => {
-                                        DataStore.instance.scheduleDeleter.deleteAllSchedulingDataInNotes(
+                                        DataStore.instance.fileModifier.deleteAllSchedulingDataInNotes(
                                             this.dataManager.data.settings
                                                 .deleteTagsOnSchedulingDataDeletion,
                                             this.dataManager.data.settings.tagsToReview,
@@ -232,7 +240,7 @@ export class DataPage extends SettingsPage {
                                     t("CONFIRM_SCHEDULING_DATA_IN_CARDS_DELETION"),
                                     t("SCHEDULING_DATA_IN_CARDS_DELETION_IN_PROGRESS"),
                                     () => {
-                                        DataStore.instance.scheduleDeleter.deleteAllSchedulingDataInCards(
+                                        DataStore.instance.fileModifier.deleteAllSchedulingDataInCards(
                                             this.dataManager.data.settings
                                                 .deleteTagsOnSchedulingDataDeletion,
                                             this.dataManager.data.settings.flashcardTags,

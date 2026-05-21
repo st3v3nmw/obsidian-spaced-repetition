@@ -80,7 +80,7 @@ export function difficultyToEase(difficulty: number): number {
  * @param {Moment} now - The current time.
  * @returns {CardInput} - The FSRS card.
  */
-export function legacyScheduleToFsrsCard(schedule: RepItemScheduleInfo, now: Moment): CardInput {
+export function sm2ScheduleToFsrsCard(schedule: RepItemScheduleInfo, now: Moment): CardInput {
     const interval = Math.max(1, Math.round(schedule?.interval ?? 1));
     const due = schedule?.dueDate ? schedule.dueDate.clone() : now.clone();
     const lastReview = due.clone().subtract(interval, "d");

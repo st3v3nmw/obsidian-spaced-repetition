@@ -1,4 +1,4 @@
-import { StorageType } from "src/data/data-store/data-store-instances/base/data-store";
+import { StorageType } from "src/data/data-store/base/data-store";
 import { t } from "src/lang/helpers";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { pathMatchesPattern } from "src/utils/fs";
@@ -61,7 +61,7 @@ export interface SRSettings {
     useCustomHotkeys: boolean;
 
     // algorithm
-    algorithm: string;
+    algorithm: SRAlgorithmType;
     baseEase: number;
     lapsesIntervalChange: number;
     easyBonus: number;
@@ -154,7 +154,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // storage
     dataStore: StorageType.NOTES,
     cardCommentOnSameLine: false,
-    scheduleDataVaultLocation: "/Spaced Repetition",
+    scheduleDataVaultLocation: "Spaced Repetition",
 
     // logging
     showSchedulingDebugMessages: false,

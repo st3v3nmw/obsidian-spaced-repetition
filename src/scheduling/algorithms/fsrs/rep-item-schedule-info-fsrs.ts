@@ -1,6 +1,7 @@
 import moment, { Moment } from "moment";
 import { Card, CardInput, State } from "ts-fsrs";
 
+import { ISerializedScheduleEntry } from "src/data/plugin-data";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {
@@ -8,6 +9,7 @@ import {
     formatFsrsTimestamp,
     FSRS_COMMENT_PREFIX,
 } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
+import { ISerializedFSRSScheduleData } from "src/scheduling/algorithms/fsrs/serialized-schedule-data";
 import { globalDateProvider } from "src/utils/dates";
 
 /**
@@ -128,8 +130,8 @@ export class RepItemScheduleInfoFsrs extends RepItemScheduleInfo {
      *
      * @returns {string} - The formatted scheduling information.
      */
-    formatScheduleAsJsonString(): string {
-        return JSON.stringify({
+    serializeSchedule(): ISerializedScheduleEntry {
+        const serializedData: ISerializedFSRSScheduleData = {
             dueDate: formatFsrsTimestamp(this.dueDate),
             interval: this.interval,
             stability: this.stability,
@@ -139,6 +141,11 @@ export class RepItemScheduleInfoFsrs extends RepItemScheduleInfo {
             lapses: this.lapses,
             learningSteps: this.learningSteps,
             lastReview: formatFsrsTimestamp(this.lastReview),
-        });
+        };
+
+        return {
+            algorithm: SRAlgorithmType.FSRS,
+            scheduleData: serializedData,
+        };
     }
 }

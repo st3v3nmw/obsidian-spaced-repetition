@@ -1,4 +1,4 @@
-import { RepItemStorageInfo } from "src/data/data-store/data-store-instances/base/rep-item-storage-info";
+import { RepItemStorageInfo } from "src/data/data-store/base/rep-item-storage-info";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 
 /**

@@ -8,9 +8,9 @@ import {
     easeToDifficulty,
     formatFsrsTimestamp,
     FSRS_COMMENT_PREFIX,
-    legacyScheduleToFsrsCard,
     parseFsrsTimestamp,
     reviewResponseToFsrsGrade,
+    sm2ScheduleToFsrsCard,
 } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { globalDateProvider, setupStaticDateProvider20230906 } from "src/utils/dates";
@@ -44,7 +44,7 @@ test("difficulty and ease conversion are inverse enough for legacy migration", (
 
 test("legacyScheduleToFsrsCard keeps due date and derives review state", () => {
     const legacySchedule = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-10", 4, 270);
-    const actual = legacyScheduleToFsrsCard(legacySchedule, globalDateProvider.now);
+    const actual = sm2ScheduleToFsrsCard(legacySchedule, globalDateProvider.now);
 
     expect(actual).toMatchObject({
         state: State.Review,
@@ -73,7 +73,7 @@ test("FSRS helpers handle unsupported responses and missing legacy values", () =
     expect(easeToDifficulty(undefined as never)).toEqual(5.5);
     expect(formatFsrsTimestamp(null)).toEqual("-");
 
-    const migrated = legacyScheduleToFsrsCard(null as never, globalDateProvider.now);
+    const migrated = sm2ScheduleToFsrsCard(null as never, globalDateProvider.now);
     expect(migrated).toMatchObject({
         ["scheduled_days"]: 1,
         difficulty: 5.5,

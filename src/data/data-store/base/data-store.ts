@@ -1,5 +1,5 @@
-import { RepItemStorageInfo } from "src/data/data-store/data-store-instances/base/rep-item-storage-info";
-import { IScheduleDeleter } from "src/data/data-store/data-store-schedule-deleter/base/schedule-deleter";
+import { IFileModifier } from "src/data/data-store/base/file-modifier";
+import { RepItemStorageInfo } from "src/data/data-store/base/rep-item-storage-info";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 
@@ -18,7 +18,16 @@ export enum StorageType {
  */
 export interface IDataStore {
     readonly storageType: StorageType;
-    readonly scheduleDeleter: IScheduleDeleter;
+    readonly fileModifier: IFileModifier;
+    isStructureInitialized: Promise<boolean>;
+
+    /**
+     * Migrates the data store from the previous store to the new store.
+     *
+     * @param previousType The previousType of the data store.
+     */
+    migrateDataStore(previousType: StorageType): Promise<void>;
+
     /**
      * Creates scheduling information from a question text and its storage info.
      *
@@ -29,7 +38,7 @@ export interface IDataStore {
     createSchedule(
         originalQuestionText: string,
         storageInfo: RepItemStorageInfo,
-    ): RepItemScheduleInfo[];
+    ): Promise<RepItemScheduleInfo[]>;
 
     /**
      * Removes scheduling information from a question text.
@@ -37,7 +46,7 @@ export interface IDataStore {
      * @param questionText
      * @returns
      */
-    removeScheduleInfo(questionText: string): string;
+    removeScheduleInfo(questionText: string): Promise<string>;
 
     /**
      * Writes a question to the data store.

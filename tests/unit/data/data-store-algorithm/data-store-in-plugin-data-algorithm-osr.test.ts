@@ -1,4 +1,4 @@
-import { FolderDataStoreAlgorithmOsr } from "src/data/data-store/data-store-algorithm/folder-data-store/folder-data-store-algorithm-osr";
+import { FolderDataStoreAlgorithmOsr } from "src/data/data-store/folder-data-store/folder-data-store-algorithm-osr";
 
 describe("DataStoreInPluginDataAlgorithmOsr", () => {
     test("questionFormatScheduleAsHtmlComment returns empty string", () => {

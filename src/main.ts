@@ -33,21 +33,24 @@ export default class SRPlugin extends Plugin {
     public nextNoteReviewHandler: NextNoteReviewHandler | null = null;
 
     async onload(): Promise<void> {
-        this.dataManager = new DataManager(this);
-        await this.dataManager.loadData();
+        // Wait for the workspace to be ready before loading the data and initializing the UI with it
+        this.app.workspace.onLayoutReady(async () => {
+            this.dataManager = new DataManager(this);
+            await this.dataManager.loadData();
 
-        const noteReviewQueue = new NoteReviewQueue();
-        this.nextNoteReviewHandler = new NextNoteReviewHandler(
-            this.app,
-            this.dataManager.data.settings,
-            noteReviewQueue,
-        );
+            const noteReviewQueue = new NoteReviewQueue();
+            this.nextNoteReviewHandler = new NextNoteReviewHandler(
+                this.app,
+                this.dataManager.data.settings,
+                noteReviewQueue,
+            );
 
-        this.dataManager.initOSRCore(noteReviewQueue, this.onOsrVaultDataChanged.bind(this));
+            this.dataManager.initOSRCore(noteReviewQueue, this.onOsrVaultDataChanged.bind(this));
 
-        this.uiManager = new UIManager(this, this.dataManager);
+            this.uiManager = new UIManager(this, this.dataManager);
 
-        this.addPluginCommands();
+            this.addPluginCommands();
+        });
     }
 
     get uiManager(): UIManager {

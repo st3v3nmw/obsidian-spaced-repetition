@@ -1,7 +1,7 @@
 import { TagCache } from "obsidian";
 
-import { DataStore } from "src/data/data-store/data-store-instances/base/data-store";
-import { RepItemStorageInfo } from "src/data/data-store/data-store-instances/base/rep-item-storage-info";
+import { DataStore } from "src/data/data-store/base/data-store";
+import { RepItemStorageInfo } from "src/data/data-store/base/rep-item-storage-info";
 import { Card } from "src/data/data-structures/card/card";
 import { Question, QuestionText } from "src/data/data-structures/card/questions/question";
 import {
@@ -78,7 +78,7 @@ export class NoteQuestionParser {
             // Create the question list
             let textDirection: TextDirection = noteFile.getTextDirection();
             if (textDirection === TextDirection.Unspecified) textDirection = defaultTextDirection;
-            this.questionList = this.doCreateQuestionList(
+            this.questionList = await this.doCreateQuestionList(
                 noteText,
                 textDirection,
                 folderTopicPath,
@@ -102,12 +102,12 @@ export class NoteQuestionParser {
         return this.questionList;
     }
 
-    private doCreateQuestionList(
+    private async doCreateQuestionList(
         noteText: string,
         textDirection: TextDirection,
         folderTopicPath: TopicPath,
         tagCacheList: TagCache[],
-    ): Question[] {
+    ): Promise<Question[]> {
         this.noteText = noteText;
         this.noteLines = splitTextIntoLineArray(noteText);
         this.folderTopicPath = folderTopicPath;
@@ -116,7 +116,10 @@ export class NoteQuestionParser {
         const result: Question[] = [];
         const parsedQuestionInfoList: ParsedQuestionInfo[] = this.parseQuestions();
         for (const parsedQuestionInfo of parsedQuestionInfoList) {
-            const question: Question = this.createQuestionObject(parsedQuestionInfo, textDirection);
+            const question: Question = await this.createQuestionObject(
+                parsedQuestionInfo,
+                textDirection,
+            );
 
             // Each rawCardText can turn into multiple CardFrontBack's (e.g. CardType.Cloze, CardType.SingleLineReversed)
             const cardFrontBackList: CardFrontBack[] = CardFrontBackUtil.expand(
@@ -128,7 +131,7 @@ export class NoteQuestionParser {
             // And if the card has been reviewed, then scheduling info as well
             // TODO: Replace question hash with a blockid -> read & write
             let cardScheduleInfoList: RepItemScheduleInfo[] =
-                DataStore.getInstance().createSchedule(
+                await DataStore.getInstance().createSchedule(
                     question.questionText.original,
                     new RepItemStorageInfo(this.noteFile.path, question.questionText.textHash),
                 );
@@ -163,14 +166,14 @@ export class NoteQuestionParser {
         return parse(this.contentText, parserOptions);
     }
 
-    private createQuestionObject(
+    private async createQuestionObject(
         parsedQuestionInfo: ParsedQuestionInfo,
         textDirection: TextDirection,
-    ): Question {
+    ): Promise<Question> {
         const questionContext: string[] = this.noteFile.getQuestionContext(
             parsedQuestionInfo.firstLineNum,
         );
-        const result = Question.Create(
+        const result = await Question.Create(
             this.settings,
             parsedQuestionInfo,
             null, // We haven't worked out the TopicPathList yet
@@ -247,7 +250,7 @@ export class NoteQuestionParser {
         flashcardTagList: TagCache[],
         frontmatterLineCount: number,
     ): TopicPathList {
-        let result: TopicPathList = null;
+        let result: TopicPathList | null = null;
 
         // Filter for tags that are:
         //      1. specified in the user settings as flashcardTags, and

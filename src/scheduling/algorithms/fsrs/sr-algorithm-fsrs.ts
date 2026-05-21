@@ -8,8 +8,8 @@ import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-sch
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import {
     buildFsrsParameters,
-    legacyScheduleToFsrsCard,
     reviewResponseToFsrsGrade,
+    sm2ScheduleToFsrsCard,
 } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { OsrNoteGraph } from "src/scheduling/algorithms/osr/osr-note-graph";
@@ -106,7 +106,7 @@ export class SrsAlgorithmFsrs implements ISRAlgorithm {
         const card: CardInput =
             schedule instanceof RepItemScheduleInfoFsrs
                 ? schedule.toFsrsCardInput(now)
-                : legacyScheduleToFsrsCard(schedule, now);
+                : sm2ScheduleToFsrsCard(schedule, now);
 
         const recordLog = this.scheduler.next(
             card,

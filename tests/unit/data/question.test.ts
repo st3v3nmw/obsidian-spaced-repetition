@@ -1,4 +1,4 @@
-import { DataStoreAlgorithm } from "src/data/data-store/data-store-algorithm/base/data-store-algorithm";
+import { DataStoreAlgorithm } from "src/data/data-store/base/data-store-algorithm";
 import { Card } from "src/data/data-structures/card/card";
 import { Question, QuestionText } from "src/data/data-structures/card/questions/question";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";

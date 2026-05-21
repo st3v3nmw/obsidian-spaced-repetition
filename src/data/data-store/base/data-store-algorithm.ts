@@ -1,4 +1,4 @@
-import { IDataStoreAlgorithm } from "src/data/data-store/data-store-algorithm/base/idata-store-algorithm";
+import { IDataStoreAlgorithm } from "src/data/data-store/base/idata-store-algorithm";
 
 /**
  * DataStoreAlgorithm is a singleton that provides the algorithm for how scheduling data is stored and read.

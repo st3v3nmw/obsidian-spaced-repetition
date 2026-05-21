@@ -1,15 +1,16 @@
 import { Notice, TFile } from "obsidian";
 
 import { OsrCore } from "src/data/core";
-import { DataStoreAlgorithm } from "src/data/data-store/data-store-algorithm/base/data-store-algorithm";
-import { FolderDataStoreAlgorithmOsr } from "src/data/data-store/data-store-algorithm/folder-data-store/folder-data-store-algorithm-osr";
-import { NoteDataStoreAlgorithmOsr } from "src/data/data-store/data-store-algorithm/note-data-store/note-data-store-algorithm-osr";
-import { DataStore, StorageType } from "src/data/data-store/data-store-instances/base/data-store";
-import { DataStoreMigrator } from "src/data/data-store/data-store-instances/base/data-store-migrator";
-import { FolderDataStore } from "src/data/data-store/data-store-instances/folder-data-store/folder-data-store";
-import { NotesDataStore } from "src/data/data-store/data-store-instances/notes-data-store/notes-data-store";
-import { PluginDataStore } from "src/data/data-store/data-store-instances/plugin-data-store/plugin-data-store";
-import { ScheduleDeleter } from "src/data/data-store/data-store-schedule-deleter/notes-data-store/schedule-deleter";
+import { DataStore, StorageType } from "src/data/data-store/base/data-store";
+import { DataStoreAlgorithm } from "src/data/data-store/base/data-store-algorithm";
+import { FolderDataFileModifier } from "src/data/data-store/folder-data-store/folder-data-file-modifier";
+import { FolderDataStore } from "src/data/data-store/folder-data-store/folder-data-store";
+import { FolderDataStoreAlgorithmOsr } from "src/data/data-store/folder-data-store/folder-data-store-algorithm-osr";
+import { NoteDataFileModifier } from "src/data/data-store/notes-data-store/note-data-file-modifier";
+import { NoteDataStoreAlgorithmOsr } from "src/data/data-store/notes-data-store/note-data-store-algorithm-osr";
+import { NotesDataStore } from "src/data/data-store/notes-data-store/notes-data-store";
+import { PluginDataFileModifier } from "src/data/data-store/plugin-data-store/plugin-data-file-modifier";
+import { PluginDataStore } from "src/data/data-store/plugin-data-store/plugin-data-store";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { ISRNoteTFile, SRNoteTFile } from "src/data/data-structures/file/note-file";
@@ -167,12 +168,11 @@ export class DataManager {
      * @param {SRSettings} settings - The settings object.
      */
     setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
-        // TODO: Implement the scheduling data deleter for each data store
         switch (settings.dataStore) {
             case StorageType.PLUGIN_DATA:
                 DataStore.instance = new PluginDataStore(
                     settings,
-                    new ScheduleDeleter(this.plugin),
+                    new PluginDataFileModifier(this.plugin, this.plugin.app),
                     this.plugin.dataManager.data,
                 );
                 DataStoreAlgorithm.instance = new FolderDataStoreAlgorithmOsr();
@@ -180,13 +180,15 @@ export class DataManager {
             case StorageType.FOLDER:
                 DataStore.instance = new FolderDataStore(
                     settings,
-                    new ScheduleDeleter(this.plugin),
-                    this.plugin.app,
+                    new FolderDataFileModifier(this.plugin, this.plugin.app),
                 );
                 DataStoreAlgorithm.instance = new FolderDataStoreAlgorithmOsr();
                 break;
             case StorageType.NOTES:
-                DataStore.instance = new NotesDataStore(settings, new ScheduleDeleter(this.plugin));
+                DataStore.instance = new NotesDataStore(
+                    settings,
+                    new NoteDataFileModifier(this.plugin),
+                );
                 DataStoreAlgorithm.instance = new NoteDataStoreAlgorithmOsr(settings);
                 break;
         }
@@ -198,11 +200,6 @@ export class DataManager {
             settings.algorithm === SRAlgorithmType.FSRS
                 ? new SrsAlgorithmFsrs(settings)
                 : new SRAlgorithmOsr(settings);
-    }
-
-    async migrateDataStore(oldMode: StorageType, newMode: StorageType): Promise<void> {
-        const textDirection = this.plugin.getObsidianRtlSetting();
-        await DataStoreMigrator.migrateDataStore(this.plugin, textDirection, oldMode, newMode);
     }
 
     /**
@@ -227,9 +224,9 @@ export class DataManager {
             console.log(`SR: ${t("DECKS")}`, this.osrCore.reviewableDeckTree);
             console.log(
                 "SR: " +
-                t("SYNC_TIME_TAKEN", {
-                    t: Date.now() - now.valueOf(),
-                }),
+                    t("SYNC_TIME_TAKEN", {
+                        t: Date.now() - now.valueOf(),
+                    }),
             );
         }
     }

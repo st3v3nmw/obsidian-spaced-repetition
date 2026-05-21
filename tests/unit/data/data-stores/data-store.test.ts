@@ -1,4 +1,4 @@
-import { DataStore } from "src/data/data-store/data-store-instances/base/data-store";
+import { DataStore } from "src/data/data-store/base/data-store";
 
 test("getInstance() not initialised exception", () => {
     const t = () => {

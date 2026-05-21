@@ -1,18 +1,78 @@
-import { Notice, TFile, Vault } from "obsidian";
+import { App, Notice, TFile, Vault } from "obsidian";
 
-import { FLASHCARD_SCHEDULE_INFO } from "src/data/constants";
-import { IScheduleDeleter } from "src/data/data-store/data-store-schedule-deleter/base/schedule-deleter";
+import { SR_COMMENT_AND_WHITESPACE_FINDER } from "src/data/constants";
+import { StorageType } from "src/data/data-store/base/data-store";
+import { ExternalDataFileModifier } from "src/data/data-store/base/file-modifier";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 
-// TODO: Implement this for each data store
-
-export class ScheduleDeleter implements IScheduleDeleter {
-    private plugin: SRPlugin;
-
-    constructor(plugin: SRPlugin) {
-        this.plugin = plugin;
+export class PluginDataFileModifier extends ExternalDataFileModifier {
+    constructor(plugin: SRPlugin, app: App) {
+        super(plugin, app);
     }
+
+    async updateCardSchedule(dataId: string, schedule: RepItemScheduleInfo[]): Promise<void> {
+        const scheduleData = this.plugin.dataManager.data.scheduleData;
+
+        scheduleData.cardSchedules[dataId] = schedule.map((s) => s.serializeSchedule());
+
+        this.plugin.dataManager.data.scheduleData = scheduleData;
+        await this.plugin.dataManager.savePluginData();
+    }
+
+    async deleteCardSchedule(dataId: string): Promise<void> {
+        const scheduleData = this.plugin.dataManager.data.scheduleData;
+
+        delete scheduleData.cardSchedules[dataId];
+
+        this.plugin.dataManager.data.scheduleData = scheduleData;
+        await this.plugin.dataManager.savePluginData();
+    }
+
+    async readCardSchedule(dataId: string): Promise<RepItemScheduleInfo[] | null> {
+        const scheduleData = this.plugin.dataManager.data.scheduleData;
+
+        if (scheduleData.cardSchedules[dataId]) {
+            // Filter out null entries
+            const entries = scheduleData.cardSchedules[dataId].filter((s) => s !== null);
+
+            return entries.length === 0
+                ? null
+                : entries.map((s) => RepItemScheduleInfo.fromSerializedSchedule(s)); // Deserialize schedules
+        }
+        return null;
+    }
+
+    migrateDataStore(oldMode: StorageType): Promise<void> {
+        // TODO: Implement this
+        switch (oldMode) {
+            case StorageType.NOTES:
+            case StorageType.FOLDER:
+            default:
+                // We don't need to migrate the data store if it is the same as the new mode
+                return Promise.resolve();
+        }
+    }
+
+    /**
+     * Replaces all card scheduling data from a markdown file with.
+     *
+     * @param {Vault} vault - The vault to delete the scheduling data from.
+     * @param {TFile} file - The file to delete the scheduling data from.
+     */
+    async replaceAllSchedulingCommentsWithDataIds(vault: Vault) {
+        const files = this.plugin.app.vault.getMarkdownFiles();
+
+        for (let i = 0; i < files.length; i++) {
+            await this.replaceSchedulingCommentWithDataId(
+                vault,
+                files[i],
+                this.updateCardSchedule.bind(this),
+            );
+        }
+    }
+
     /**
      * Deletes all note scheduling data from a markdown file.
      *
@@ -96,7 +156,7 @@ export class ScheduleDeleter implements IScheduleDeleter {
     ) {
         try {
             await vault.process(file, (data) => {
-                return data.replace(FLASHCARD_SCHEDULE_INFO, "");
+                return data.replace(SR_COMMENT_AND_WHITESPACE_FINDER, "");
             });
         } catch (e) {
             console.log({ filePath: file.path, error: e });

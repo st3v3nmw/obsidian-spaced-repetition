@@ -1,6 +1,7 @@
 import { Moment } from "moment";
 
 import { PREFERRED_DATE_FORMAT, TICKS_PER_DAY } from "src/data/constants";
+import { ISerializedScheduleEntry } from "src/data/plugin-data";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { formatDate, globalDateProvider } from "src/utils/dates";
 
@@ -78,5 +79,5 @@ export abstract class RepItemScheduleInfo {
      *
      * @returns {string} - The formatted scheduling information.
      */
-    abstract formatScheduleAsJsonString(): string;
+    abstract serializeSchedule(): ISerializedScheduleEntry;
 }

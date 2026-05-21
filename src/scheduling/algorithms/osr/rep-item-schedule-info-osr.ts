@@ -1,9 +1,11 @@
 import { Moment } from "moment";
 
 import { PREFERRED_DATE_FORMAT } from "src/data/constants";
+import { ISerializedScheduleEntry } from "src/data/plugin-data";
 import { SRSettings } from "src/data/settings";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { ISerializedSM2ScheduleData } from "src/scheduling/algorithms/osr/serialized-schedule-data";
 import { DateUtil, formatDate, globalDateProvider } from "src/utils/dates";
 
 export class RepItemScheduleInfoOsr extends RepItemScheduleInfo {
@@ -88,12 +90,17 @@ export class RepItemScheduleInfoOsr extends RepItemScheduleInfo {
      *
      * @returns {string} - The formatted scheduling information.
      */
-    formatScheduleAsJsonString(): string {
-        return JSON.stringify({
+    serializeSchedule(): ISerializedScheduleEntry {
+        const serializedData: ISerializedSM2ScheduleData = {
             dueDate: formatDate(this.dueDateAsUnix, PREFERRED_DATE_FORMAT),
             interval: this.interval,
             ease: this.latestEase,
             delayedBeforeReviewTicks: this.delayedBeforeReviewTicks,
-        });
+        };
+
+        return {
+            algorithm: SRAlgorithmType.SM_2_OSR,
+            scheduleData: serializedData,
+        };
     }
 }
