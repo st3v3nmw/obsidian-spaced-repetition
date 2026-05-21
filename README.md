@@ -4,7 +4,7 @@
 
 <img src="https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/total" /> <img src="https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/latest/total?style=flat-square" /> <img src="https://img.shields.io/github/manifest-json/v/st3v3nmw/obsidian-spaced-repetition?style=flat-square" /> <img alt="Codecov" src="https://img.shields.io/codecov/c/gh/st3v3nmw/obsidian-spaced-repetition">
 
-Fight the forgetting curve by reviewing flashcards & notes using [spaced repetition](https://en.wikipedia.org/wiki/Spaced_repetition).
+Fight the forgetting curve by reviewing flashcards & notes using [spaced repetition](https://en.wikipedia.org/wiki/Spaced_repetition). Features support for both the default algorithm (SM-2) and the modern **FSRS (Free Spaced Repetition Scheduler)** algorithm.
 
 - For more information on how to use the plugin, check either the TL;DR on this page or the [documentation](https://stephenmwangi.com/obsidian-spaced-repetition/).
 - Raise an [issue](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug report.
@@ -32,6 +32,7 @@ Fight the forgetting curve by reviewing flashcards & notes using [spaced repetit
         - Footnotes
 - [Organize Decks](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/decks/) (Using Obsidian's hierarchical tags or folder structure)
 - [Card context - automatic titles based on headings](https://stephenmwangi.com/obsidian-spaced-repetition/flashcards/reviewing/#context) (i.e. `Note title > Heading 1 > Subheading`)
+- Scheduling Algorithms: Choose between the default SM-2 algorithm or the newer FSRS (Free Spaced Repetition Scheduler).
 
 #### Reviewing Notes📄
 
