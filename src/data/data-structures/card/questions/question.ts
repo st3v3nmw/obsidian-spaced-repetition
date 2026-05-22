@@ -234,8 +234,9 @@ export class Question {
 
             const scheduleHtml =
                 DataStoreAlgorithm.getInstance().questionFormatScheduleAsHtmlComment(this);
-            console.log(scheduleHtml, result);
+
             if (scheduleHtml) {
+                // Check if the schedule is in the metadata callout and adjust the separator accordingly
                 const isScheduleInSRMetadataCallout = result.includes(SR_METADATA_CALLOUT);
                 if (blockId) {
                     if (this.isCardCommentsOnSameLine(settings) || isScheduleInSRMetadataCallout)
