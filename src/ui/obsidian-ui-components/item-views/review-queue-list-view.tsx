@@ -1,15 +1,15 @@
 import "src/ui/obsidian-ui-components/item-views/review-queue-list-view.css";
 import { ItemView, Menu, setIcon, TFile, WorkspaceLeaf } from "obsidian";
 
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { TICKS_PER_DAY } from "src/constants";
-import { deleteNoteSchedulingDataInNote } from "src/delete-scheduling-data";
+import { TICKS_PER_DAY } from "src/data/constants";
+import { DataStore } from "src/data/data-store/base/data-store";
+import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { NoteReviewDeck } from "src/note/note-review-deck";
 import { NoteReviewQueue } from "src/note/note-review-queue";
-import { SRSettings } from "src/settings";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { formatDateWithMoment } from "src/utils/dates";
 
@@ -313,42 +313,42 @@ export class ReviewQueueListView extends ItemView {
             fileMenu.addItem((item) => {
                 item.setTitle(
                     t("REVIEW_DIFFICULTY_FILE_MENU", {
-                        difficulty: this.plugin.data.settings.flashcardEasyText,
+                        difficulty: this.plugin.dataManager.data.settings.flashcardEasyText,
                     }),
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Easy);
+                        this.plugin.dataManager.saveNoteReviewResponse(file, ReviewResponse.Easy);
                     });
             });
 
             fileMenu.addItem((item) => {
                 item.setTitle(
                     t("REVIEW_DIFFICULTY_FILE_MENU", {
-                        difficulty: this.plugin.data.settings.flashcardGoodText,
+                        difficulty: this.plugin.dataManager.data.settings.flashcardGoodText,
                     }),
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Good);
+                        this.plugin.dataManager.saveNoteReviewResponse(file, ReviewResponse.Good);
                     });
             });
 
             fileMenu.addItem((item) => {
                 item.setTitle(
                     t("REVIEW_DIFFICULTY_FILE_MENU", {
-                        difficulty: this.plugin.data.settings.flashcardHardText,
+                        difficulty: this.plugin.dataManager.data.settings.flashcardHardText,
                     }),
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Hard);
+                        this.plugin.dataManager.saveNoteReviewResponse(file, ReviewResponse.Hard);
                     });
             });
 
             fileMenu.addSeparator();
 
-            if (this.plugin.data.settings.showDeleteButtonInFileMenu) {
+            if (this.plugin.dataManager.data.settings.showDeleteButtonInFileMenu) {
                 fileMenu.addItem((item) => {
                     item.setTitle(t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"))
                         .setIcon("trash")
@@ -360,11 +360,11 @@ export class ReviewQueueListView extends ItemView {
                                 t("CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION"),
                                 t("NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS"),
                                 () => {
-                                    deleteNoteSchedulingDataInNote(
+                                    DataStore.instance.fileModifier.deleteNoteSchedulingDataInNote(
                                         file,
-                                        this.plugin.data.settings
+                                        this.plugin.dataManager.data.settings
                                             .deleteTagsOnSchedulingDataDeletion,
-                                        this.plugin.data.settings.tagsToReview,
+                                        this.plugin.dataManager.data.settings.tagsToReview,
                                     );
                                 },
                             ).open();

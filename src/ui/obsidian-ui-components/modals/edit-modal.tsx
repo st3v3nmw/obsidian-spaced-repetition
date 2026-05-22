@@ -1,10 +1,10 @@
 import "src/ui/obsidian-ui-components/modals/edit-modal.css";
 import { App, ButtonComponent, Modal } from "obsidian";
 
-import { Card } from "src/card/card";
-import { CardType } from "src/card/questions/question";
+import { Card } from "src/data/data-structures/card/card";
+import { CardType } from "src/data/data-structures/card/questions/question";
+import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
-import { SRSettings } from "src/settings";
 import { TextDirection } from "src/utils/strings";
 
 // from https://github.com/chhoumann/quickadd/blob/bce0b4cdac44b867854d6233796e3406dfd163c6/src/gui/GenericInputPrompt/GenericInputPrompt.ts#L5

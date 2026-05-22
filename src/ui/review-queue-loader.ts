@@ -1,26 +1,26 @@
 import { TFile } from "obsidian";
 
+import { OsrCore } from "src/data/core";
+import { Deck } from "src/data/data-structures/deck/deck";
+import SRPlugin from "src/main";
 import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer,
-} from "src/card/flashcard-review-sequencer";
-import { OsrAppCore } from "src/core";
-import { Deck } from "src/deck/deck";
-import SRPlugin from "src/main";
+} from "src/scheduling/flashcard-review-sequencer";
 
 export class ReviewQueueLoader {
     private plugin: SRPlugin;
-    private osrAppCore: OsrAppCore;
+    private osrCore: OsrCore;
     private singleNote: TFile | null = null;
     private reviewMode: FlashcardReviewMode;
 
     constructor(
         plugin: SRPlugin,
-        osrAppCore: OsrAppCore,
+        osrCore: OsrCore,
         singleNote: TFile | null,
         reviewMode: FlashcardReviewMode,
     ) {
-        this.osrAppCore = osrAppCore;
+        this.osrCore = osrCore;
         this.singleNote = singleNote;
         this.reviewMode = reviewMode;
         this.plugin = plugin;
@@ -39,8 +39,15 @@ export class ReviewQueueLoader {
     }
 
     public async loadReviewQueue(): Promise<IFlashcardReviewSequencer> {
-        if (!this.plugin.osrAppCore.syncLock) {
-            await this.plugin.sync();
+        if (
+            this.plugin === null ||
+            this.plugin.dataManager === null ||
+            this.plugin.dataManager.osrCore === null
+        )
+            throw new Error("SR plugin or OSR app core not initialized!!!");
+
+        if (!this.plugin.dataManager.syncLock) {
+            await this.plugin.dataManager.sync();
         }
 
         let deckTree: Deck;
@@ -55,11 +62,11 @@ export class ReviewQueueLoader {
             deckTree = singleNoteDeckData.deckTree;
             remainingDeckTree = singleNoteDeckData.remainingDeckTree;
         } else {
-            deckTree = this.osrAppCore.reviewableDeckTree;
+            deckTree = this.osrCore.reviewableDeckTree;
             remainingDeckTree =
                 this.reviewMode === FlashcardReviewMode.Cram
-                    ? this.osrAppCore.reviewableDeckTree
-                    : this.osrAppCore.remainingDeckTree;
+                    ? this.osrCore.reviewableDeckTree
+                    : this.osrCore.remainingDeckTree;
         }
 
         const reviewSequencerData = this.plugin.getPreparedReviewSequencer(

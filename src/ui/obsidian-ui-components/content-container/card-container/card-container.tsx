@@ -2,14 +2,13 @@ import "src/ui/obsidian-ui-components/content-container/card-container/card-cont
 import moment from "moment";
 import { App, Platform } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
-import { CardType } from "src/card/questions/question";
-import { escapeHtml } from "src/escape-html";
+import { CardType } from "src/data/data-structures/card/questions/question";
+import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
-import { SRSettings } from "src/settings";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import ContextSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/context-section/context-section";
 import ResponseSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section";
 import CardToolbarComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar";
@@ -18,6 +17,7 @@ import {
     SessionData,
 } from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
+import { escapeHtml } from "src/utils/escape-html";
 import EmulatedPlatform from "src/utils/platform-detector";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
 
@@ -206,7 +206,7 @@ export class CardContainer {
 
         // auto-focus the first cloze input if this card is a cloze card
         if (sessionData.currentQuestion.questionType === CardType.Cloze) {
-            const firstInput = activeDocument.querySelector(".cloze-input") as HTMLInputElement;
+            const firstInput = activeDocument.querySelector(".cloze-input");
             if (firstInput) {
                 firstInput.focus();
             }
@@ -295,7 +295,7 @@ export class CardContainer {
 
         if (this.clozeInputs !== null && this.clozeAnswers.length === this.clozeInputs.length) {
             for (let i = 0; i < this.clozeAnswers.length; i++) {
-                const clozeInput = this.clozeInputs[i] as HTMLInputElement;
+                const clozeInput = this.clozeInputs[i];
                 const clozeAnswer = this.clozeAnswers[i] as HTMLElement;
 
                 const inputText = clozeInput.value.trim();
@@ -372,14 +372,18 @@ export class CardContainer {
             determineButtonSchedule,
         );
         // NEW: restore keyboard focus after cloze confirmation
+        if (this.plugin.uiManager === null) throw new Error("UI manager not initialized!!!");
         this.plugin.uiManager.setSRViewInFocus(true);
         this.response.againButton.buttonEl.focus();
     }
 
     private _keydownHandler = (e: KeyboardEvent) => {
+        if (this.plugin.dataManager === null || this.plugin.dataManager.data === null)
+            throw new Error("SR plugin or data not initialized!!!");
+        if (this.plugin.uiManager === null) throw new Error("UI manager not initialized!!!");
         // Prevents any input, if the edit modal is open or if the view is not in focus
         if (
-            this.plugin.data.settings.useCustomHotkeys ||
+            this.plugin.dataManager.data.settings.useCustomHotkeys ||
             (activeDocument.activeElement !== null &&
                 (activeDocument.activeElement.nodeName === "TEXTAREA" ||
                     activeDocument.activeElement.nodeName === "INPUT")) ||

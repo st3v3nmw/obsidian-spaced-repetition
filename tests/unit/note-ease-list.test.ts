@@ -1,5 +1,5 @@
+import { DEFAULT_SETTINGS } from "src/data/settings";
 import { NoteEaseList } from "src/note/note-ease-list";
-import { DEFAULT_SETTINGS } from "src/settings";
 
 test("baseEase", async () => {
     const list: NoteEaseList = new NoteEaseList(DEFAULT_SETTINGS);

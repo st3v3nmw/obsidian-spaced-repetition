@@ -1,0 +1,49 @@
+import moment from "moment";
+import { State } from "ts-fsrs";
+
+import { DEFAULT_SETTINGS } from "src/data/settings";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
+import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
+import { SRAlgorithmOsr } from "src/scheduling/algorithms/osr/srs-algorithm-osr";
+import { CardDueDateHistogram } from "src/scheduling/due-date-histogram";
+import { setupStaticDateProvider20230906 } from "src/utils/dates";
+
+import { unitTestSetupStandardDataStoreAlgorithm } from "../../../helpers/unit-test-setup";
+
+beforeAll(() => {
+    setupStaticDateProvider20230906();
+    unitTestSetupStandardDataStoreAlgorithm(DEFAULT_SETTINGS);
+});
+
+test("SrsAlgorithmOsr should return note stats", () => {
+    const noteStats = SRAlgorithm.getInstance().noteStats();
+    expect(noteStats.dict).toEqual({});
+});
+
+test("SrsAlgorithmOsr should update FSRS schedules after switching back", () => {
+    const algorithm = new SRAlgorithmOsr(DEFAULT_SETTINGS);
+    const fsrsSchedule = new RepItemScheduleInfoFsrs(
+        moment("2023-09-06T00:10:00.000Z"),
+        0,
+        5.5,
+        0.4,
+        State.Learning,
+        1,
+        0,
+        1,
+        moment("2023-09-06T00:00:00.000Z"),
+    );
+
+    const result = algorithm.cardCalcUpdatedSchedule(
+        ReviewResponse.Good,
+        fsrsSchedule,
+        new CardDueDateHistogram(),
+    );
+
+    expect(result).toBeInstanceOf(RepItemScheduleInfoOsr);
+    expect(result.interval).toBeGreaterThanOrEqual(1);
+    expect(result.latestEase).toBeGreaterThanOrEqual(130);
+    expect(result.formatScheduleAsSRHtmlComment()).not.toContain("fsrs");
+});

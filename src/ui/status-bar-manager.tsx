@@ -1,8 +1,8 @@
 import { request } from "obsidian";
 
-import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import CounterStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/counter-statusbar-item";
 import TextStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/text-statusbar-item";
 
@@ -117,6 +117,8 @@ export default class StatusBarManager {
                         tooltip: t("OPEN_DECK_FOR_REVIEW"),
                         tooltipPosition: "top",
                         onClick: async () => {
+                            if (this.plugin.uiManager === null)
+                                throw new Error("UI manager not initialized!!!");
                             await this.plugin.uiManager.openDeckContainer(
                                 FlashcardReviewMode.Review,
                             );
@@ -133,8 +135,16 @@ export default class StatusBarManager {
                         tooltip: t("OPEN_NOTE_FOR_REVIEW"),
                         tooltipPosition: "top",
                         onClick: async () => {
-                            if (!this.plugin.osrAppCore.syncLock) {
-                                await this.plugin.sync();
+                            if (
+                                this.plugin.dataManager === null ||
+                                this.plugin.dataManager.osrCore === null
+                            )
+                                throw new Error("SR plugin or OSR app core not initialized!!!");
+                            if (this.plugin.nextNoteReviewHandler === null)
+                                throw new Error("Next note review handler not initialized!!!");
+
+                            if (!this.plugin.dataManager.syncLock) {
+                                await this.plugin.dataManager.sync();
                                 this.plugin.nextNoteReviewHandler.reviewNextNoteModal();
                             }
                         },
@@ -157,8 +167,8 @@ export default class StatusBarManager {
 
         // Disable the fetching of the version number if the statusbar items are disabled
         if (
-            this.plugin.data.settings.showStatusBar &&
-            this.plugin.data.settings.showUpdateAvailableStatusBarItem
+            this.plugin.dataManager.data.settings.showStatusBar &&
+            this.plugin.dataManager.data.settings.showUpdateAvailableStatusBarItem
         ) {
             await this.checkAndUpdatePluginVersion();
         }

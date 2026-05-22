@@ -1,8 +1,8 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar.css";
 import { Platform } from "obsidian";
 
-import { DeckStats } from "src/card/flashcard-review-sequencer";
-import { Deck } from "src/deck/deck";
+import { Deck } from "src/data/data-structures/deck/deck";
+import { DeckStats } from "src/scheduling/flashcard-review-sequencer";
 import DeckInfoComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/deck-info/deck-info";
 import BackButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/back-button";
 import CardMenuButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-menu-button";

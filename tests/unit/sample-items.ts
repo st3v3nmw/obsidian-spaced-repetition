@@ -1,10 +1,14 @@
-import { Deck } from "src/deck/deck";
-import { CardOrder, DeckOrder, DeckTreeIterator } from "src/deck/deck-tree-iterator";
-import { TopicPath } from "src/deck/topic-path";
+import { Deck } from "src/data/data-structures/deck/deck";
+import {
+    DeckOrder,
+    DeckTreeIterator,
+    RepItemOrder,
+} from "src/data/data-structures/deck/deck-tree-iterator";
+import { TopicPath } from "src/data/data-structures/deck/topic-path";
+import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { Note } from "src/note/note";
 import { NoteParser } from "src/note/note-parser";
 import { NoteQuestionParser } from "src/note/note-question-parser";
-import { DEFAULT_SETTINGS, SRSettings } from "src/settings";
 import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
@@ -49,13 +53,13 @@ Q3::A3`;
     static async createDeckAndIteratorFromText(
         text: string,
         folderTopicPath: TopicPath,
-        cardOrder: CardOrder,
+        cardOrder: RepItemOrder,
         deckOrder: DeckOrder,
     ): Promise<[Deck, DeckTreeIterator]> {
         const deck: Deck = await SampleItemDecks.createDeckFromText(text, folderTopicPath);
         const iterator: DeckTreeIterator = new DeckTreeIterator(
             {
-                cardOrder,
+                repItemOrder: cardOrder,
                 deckOrder,
             },
             deck,

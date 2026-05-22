@@ -1,8 +1,8 @@
 import "src/ui/obsidian-ui-components/content-container/deck-container/deck-list-header.css";
 import { DropdownComponent, Platform, setIcon } from "obsidian";
 
-import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
+import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import ModalCloseButtonComponent from "src/ui/obsidian-ui-components/content-container/modal-close-button";
 import EmulatedPlatform from "src/utils/platform-detector";
 

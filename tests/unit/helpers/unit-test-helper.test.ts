@@ -1,6 +1,6 @@
 import { TagCache } from "obsidian";
 
-import { DEFAULT_SETTINGS } from "src/settings";
+import { DEFAULT_SETTINGS } from "src/data/settings";
 
 import { UnitTestOsrCore } from "./unit-test-core";
 import {

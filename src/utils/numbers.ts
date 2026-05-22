@@ -80,7 +80,7 @@ export class WeightedRandomNumber {
         const v: number = this.provider.getInteger(0, total - 1);
         let x: number = 0;
         for (const kvp in weights) {
-            const [value, count] = [Number(kvp), weights[kvp] as number];
+            const [value, count] = [Number(kvp), weights[kvp]];
             if (v < x + count) {
                 // x <= v < x + count
                 const index: number = v - x;

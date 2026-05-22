@@ -1,8 +1,8 @@
 import { App, Plugin, WorkspaceLeaf } from "obsidian";
 
+import { SRSettings } from "src/data/settings";
 import SRPlugin from "src/main";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
-import { SRSettings } from "src/settings";
 import {
     REVIEW_QUEUE_VIEW_TYPE,
     ReviewQueueListView,
