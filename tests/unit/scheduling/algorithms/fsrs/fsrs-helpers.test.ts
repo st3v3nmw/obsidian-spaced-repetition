@@ -69,11 +69,11 @@ test("FSRS helpers handle unsupported responses and missing legacy values", () =
     expect(() => reviewResponseToFsrsGrade(ReviewResponse.Reset)).toThrow(
         "Unsupported FSRS response: 4",
     );
-    expect(easeToDifficulty(null as never)).toEqual(5.5);
+    expect(easeToDifficulty(null)).toEqual(5.5);
     expect(easeToDifficulty(undefined as never)).toEqual(5.5);
     expect(formatFsrsTimestamp(null)).toEqual("-");
 
-    const migrated = sm2ScheduleToFsrsCard(null as never, globalDateProvider.now);
+    const migrated = sm2ScheduleToFsrsCard(null, globalDateProvider.now);
     expect(migrated).toMatchObject({
         ["scheduled_days"]: 1,
         difficulty: 5.5,

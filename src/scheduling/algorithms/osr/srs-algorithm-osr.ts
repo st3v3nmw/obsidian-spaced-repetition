@@ -165,7 +165,7 @@ export class SRAlgorithmOsr implements ISRAlgorithm {
         response: ReviewResponse,
         dueDateNoteHistogram: DueDateHistogram,
     ): RepItemScheduleInfo {
-        const noteScheduleOsr: RepItemScheduleInfoOsr = noteSchedule as RepItemScheduleInfoOsr;
+        const noteScheduleOsr: RepItemScheduleInfoOsr = noteSchedule;
         const temp: RepItemScheduleInfoOsr = this.calcSchedule(
             noteScheduleOsr.interval,
             noteScheduleOsr.latestEase,
@@ -268,7 +268,7 @@ export class SRAlgorithmOsr implements ISRAlgorithm {
         cardSchedule: RepItemScheduleInfo,
         dueDateFlashcardHistogram: DueDateHistogram,
     ): RepItemScheduleInfo {
-        const cardScheduleOsr: RepItemScheduleInfoOsr = cardSchedule as RepItemScheduleInfoOsr;
+        const cardScheduleOsr: RepItemScheduleInfoOsr = cardSchedule;
         const schedObj: Record<string, number> = osrSchedule(
             response,
             cardScheduleOsr.interval,

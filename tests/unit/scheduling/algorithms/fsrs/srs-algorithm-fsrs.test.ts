@@ -52,12 +52,12 @@ test("reset schedule returns an immediate FSRS reset state", () => {
 
 test("delegates note scheduling to OSR and keeps existing FSRS schedules in FSRS", () => {
     const algorithm = new SrsAlgorithmFsrs(DEFAULT_SETTINGS);
-    algorithm.noteOnLoadedNote("note.md", null as never, 260);
+    algorithm.noteOnLoadedNote("note.md", null, 260);
     expect(algorithm.noteStats().getEaseByPath("note.md")).toEqual(260);
 
     const noteGraph = new OsrNoteGraph({
         getResolvedTargetLinksForNotePath: () => ({}),
-    } as never);
+    });
     expect(
         algorithm.noteCalcNewSchedule(
             "note.md",

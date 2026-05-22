@@ -1,7 +1,6 @@
 import "src/ui/obsidian-ui-components/content-container/deck-container/deck-list.css";
 import { setIcon } from "obsidian";
 
-import { COLLAPSE_ICON } from "src/data/constants";
 import { Deck } from "src/data/data-structures/deck/deck";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";

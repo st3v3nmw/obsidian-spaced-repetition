@@ -167,8 +167,8 @@ export default class StatusBarManager {
 
         // Disable the fetching of the version number if the statusbar items are disabled
         if (
-            this.plugin.data.settings.showStatusBar &&
-            this.plugin.data.settings.showUpdateAvailableStatusBarItem
+            this.plugin.dataManager.data.settings.showStatusBar &&
+            this.plugin.dataManager.data.settings.showUpdateAvailableStatusBarItem
         ) {
             await this.checkAndUpdatePluginVersion();
         }

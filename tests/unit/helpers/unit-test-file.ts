@@ -22,7 +22,7 @@ export class UnitTestSRFile implements ISRNoteTFile {
 
     async setNoteSchedule(repItemScheduleInfo: RepItemScheduleInfo): Promise<void> {
         let fileText: string = await this.read();
-        const schedInfo: RepItemScheduleInfoOsr = repItemScheduleInfo as RepItemScheduleInfoOsr;
+        const schedInfo: RepItemScheduleInfoOsr = repItemScheduleInfo;
         const dueString: string = formatDateYYYYMMDD(schedInfo.dueDate);
         const interval: number = schedInfo.interval;
         const ease: number = schedInfo.latestEase;

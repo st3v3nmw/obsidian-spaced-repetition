@@ -60,8 +60,7 @@ export class SchedulingPage extends SettingsPage {
                         .setValue(this.dataManager.data.settings.algorithm)
                         .onChange(async (value) => {
                             const selectedAlgorithm = value as SRAlgorithmType;
-                            const currentAlgorithm = this.dataManager.data.settings
-                                .algorithm as SRAlgorithmType;
+                            const currentAlgorithm = this.dataManager.data.settings.algorithm;
 
                             if (selectedAlgorithm === currentAlgorithm) {
                                 return;

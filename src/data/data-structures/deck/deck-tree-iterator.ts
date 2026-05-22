@@ -272,7 +272,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
     }
 
     get currentQuestion(): Question | null {
-        return (this.currentRepItem as Card | null)?.question || null;
+        return this.currentRepItem?.question || null;
     }
 
     constructor(iteratorOrder: IIteratorOrder, baseDeckTree: Deck) {
@@ -316,7 +316,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
 
         // Delete the current card so we don't return it again
         if (this.hasCurrentCard) {
-            this.baseDeckTree.deleteCardFromAllDecks(this.currentRepItem as Card, true);
+            this.baseDeckTree.deleteCardFromAllDecks(this.currentRepItem, true);
         }
 
         if (this.iteratorOrder.repItemOrder === RepItemOrder.EveryCardRandomDeckAndCard) {
@@ -403,7 +403,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
 
     deleteCurrentRepItemFromAllDecks(): boolean {
         this.singleDeckIterator.ensureCurrentCard();
-        this.baseDeckTree.deleteCardFromAllDecks(this.currentRepItem as Card, true);
+        this.baseDeckTree.deleteCardFromAllDecks(this.currentRepItem, true);
         this.singleDeckIterator.setNoCurrentCard();
         return this.nextRepItem();
     }

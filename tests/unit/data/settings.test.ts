@@ -201,7 +201,7 @@ describe("SettingsUtil", () => {
             randomizeCardOrder: false,
             flashcardCardOrder: null,
             flashcardDeckOrder: null,
-            fsrsDesiredRetention: undefined as never,
+            fsrsDesiredRetention: undefined,
         };
         upgradeSettings(settings);
         expect(settings).toMatchObject({
@@ -214,8 +214,8 @@ describe("SettingsUtil", () => {
         settings = {
             ...DEFAULT_SETTINGS,
             randomizeCardOrder: false,
-            flashcardCardOrder: undefined as never,
-            flashcardDeckOrder: undefined as never,
+            flashcardCardOrder: undefined,
+            flashcardDeckOrder: undefined,
         };
         upgradeSettings(settings);
         expect(settings).toMatchObject({

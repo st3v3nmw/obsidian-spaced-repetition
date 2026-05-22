@@ -62,7 +62,7 @@ export class SRNoteTFile extends SRTFile implements ISRNoteTFile {
      * @returns {Promise<void>} - A promise that resolves when the scheduling information is set.
      */
     async setNoteSchedule(repItemScheduleInfo: RepItemScheduleInfo): Promise<void> {
-        const scheduleInfo: RepItemScheduleInfoOsr = repItemScheduleInfo as RepItemScheduleInfoOsr;
+        const scheduleInfo: RepItemScheduleInfoOsr = repItemScheduleInfo;
         const dueString: string = formatDate(scheduleInfo.dueDateAsUnix, PREFERRED_DATE_FORMAT);
         const interval: number = scheduleInfo.interval;
         const ease: number = scheduleInfo.latestEase;

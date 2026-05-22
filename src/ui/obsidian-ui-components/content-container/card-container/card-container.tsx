@@ -206,7 +206,7 @@ export class CardContainer {
 
         // auto-focus the first cloze input if this card is a cloze card
         if (sessionData.currentQuestion.questionType === CardType.Cloze) {
-            const firstInput = activeDocument.querySelector(".cloze-input") as HTMLInputElement;
+            const firstInput = activeDocument.querySelector(".cloze-input");
             if (firstInput) {
                 firstInput.focus();
             }
@@ -295,7 +295,7 @@ export class CardContainer {
 
         if (this.clozeInputs !== null && this.clozeAnswers.length === this.clozeInputs.length) {
             for (let i = 0; i < this.clozeAnswers.length; i++) {
-                const clozeInput = this.clozeInputs[i] as HTMLInputElement;
+                const clozeInput = this.clozeInputs[i];
                 const clozeAnswer = this.clozeAnswers[i] as HTMLElement;
 
                 const inputText = clozeInput.value.trim();

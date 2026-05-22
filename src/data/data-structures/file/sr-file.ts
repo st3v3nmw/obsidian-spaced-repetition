@@ -98,8 +98,7 @@ export abstract class SRTFile implements ISRFile {
         const frontmatter: FrontMatterCache = fileCachedData.frontmatter;
         const result: Map<string, string> = new Map<string, string>();
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        for (const [key, value] of Object.entries(frontmatter) as [string, any][]) {
+        for (const [key, value] of Object.entries(frontmatter)) {
             const v = Array.isArray(value) && value.length > 0 ? value[0] : value;
             const vStr: string = v + "";
             result.set(key, vStr);

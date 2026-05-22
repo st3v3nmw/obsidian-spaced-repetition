@@ -786,7 +786,7 @@ Q1::A1
             await internalSequencer.handlePendingRequeue();
 
             expect(reviewSequencer.hasPendingCards).toEqual(true);
-            expect(Number.isNaN(reviewSequencer.nextPendingDueUnix as number)).toEqual(true);
+            expect(Number.isNaN(reviewSequencer.nextPendingDueUnix)).toEqual(true);
         });
 
         test("Answer includes MathJax within $$", async () => {

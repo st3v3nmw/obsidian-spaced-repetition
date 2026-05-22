@@ -6,6 +6,15 @@ import tseslint from "typescript-eslint";
 export default tseslint.config(
     eslint.configs.recommended,
     ...tseslint.configs.recommended,
+    // TODO: Enable this once we have a proper code base
+    // tseslint.configs.recommendedTypeChecked,
+    // {
+    //     languageOptions: {
+    //         parserOptions: {
+    //             projectService: true,
+    //         },
+    //     },
+    // },
     {
         plugins: {
             "simple-import-sort": simpleImportSort,

@@ -91,7 +91,7 @@ test("converts to and from ts-fsrs card structures", () => {
 
 test("handles missing due dates and review timestamps", () => {
     const noDueSchedule = new RepItemScheduleInfoFsrs(
-        null as never,
+        null,
         0,
         5.5,
         0.4,

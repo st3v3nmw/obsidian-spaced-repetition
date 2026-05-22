@@ -59,7 +59,7 @@ describe("Question", () => {
 
             DataStoreAlgorithm.instance = {
                 questionFormatScheduleAsHtmlComment: jest.fn(() => "<!--SR:!2023-09-06,1,250-->"),
-            } as never;
+            };
 
             expect(question.formatForNote(settingsCardCommentOnSameLine)).toBe(
                 "Q1::A1 <!--SR:!2023-09-06,1,250--> ^abc123",
@@ -85,7 +85,7 @@ describe("Question", () => {
 
             DataStoreAlgorithm.instance = {
                 questionFormatScheduleAsHtmlComment: jest.fn(() => "<!--SR:!2023-09-06,1,250-->"),
-            } as never;
+            };
 
             expect(question.formatForNote(DEFAULT_SETTINGS)).toBe(
                 "Q1::A1 ^abc123\n<!--SR:!2023-09-06,1,250-->",
@@ -111,7 +111,7 @@ describe("Question", () => {
 
             DataStoreAlgorithm.instance = {
                 questionFormatScheduleAsHtmlComment: jest.fn(() => ""),
-            } as never;
+            };
 
             expect(question.formatForNote(DEFAULT_SETTINGS)).toBe("Q1::A1 ^abc123");
         });

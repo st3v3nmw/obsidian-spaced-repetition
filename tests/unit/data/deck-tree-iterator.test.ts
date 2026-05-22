@@ -1,4 +1,3 @@
-import { Card } from "src/data/data-structures/card/card";
 import { Deck } from "src/data/data-structures/deck/deck";
 import {
     DeckOrder,
@@ -63,13 +62,13 @@ Q3::A3`;
                 // No due cards, so expect the new ones immediately
                 expect(iterator.nextRepItem()).toEqual(true);
                 expect(iterator.currentDeck.deckName).toEqual("flashcards");
-                expect((iterator.currentRepItem as Card).front).toEqual("Q1");
+                expect(iterator.currentRepItem.front).toEqual("Q1");
 
                 expect(iterator.nextRepItem()).toEqual(true);
-                expect((iterator.currentRepItem as Card).front).toEqual("Q2");
+                expect(iterator.currentRepItem.front).toEqual("Q2");
 
                 expect(iterator.nextRepItem()).toEqual(true);
-                expect((iterator.currentRepItem as Card).front).toEqual("Q3");
+                expect(iterator.currentRepItem.front).toEqual("Q3");
 
                 expect(iterator.nextRepItem()).toEqual(false);
             });
@@ -184,13 +183,13 @@ Q3::A3`;
 
                 expect(iterator.nextRepItem()).toEqual(true);
                 expect(iterator.currentDeck.deckName).toEqual("flashcards");
-                expect((iterator.currentRepItem as Card).front).toEqual("Q1");
+                expect(iterator.currentRepItem.front).toEqual("Q1");
 
                 expect(iterator.nextRepItem()).toEqual(true);
-                expect((iterator.currentRepItem as Card).front).toEqual("Q2");
+                expect(iterator.currentRepItem.front).toEqual("Q2");
 
                 expect(iterator.nextRepItem()).toEqual(true);
-                expect((iterator.currentRepItem as Card).front).toEqual("Q3");
+                expect(iterator.currentRepItem.front).toEqual("Q3");
 
                 expect(iterator.nextRepItem()).toEqual(false);
             });
@@ -579,19 +578,19 @@ Q12::A12
             // Start off with cards in the top most deck, i.e. #flashcards
             expect(iterator.nextRepItem()).toEqual(true);
             expect(iterator.currentDeck.deckName).toEqual("flashcards");
-            expect((iterator.currentRepItem as Card).front).toEqual("Q1");
+            expect(iterator.currentRepItem.front).toEqual("Q1");
 
             // Now those in #flashcards/folder1
             expect(iterator.nextRepItem()).toEqual(true);
-            expect((iterator.currentRepItem as Card).front).toEqual("Q21"); // Specific to #flashcards/folder1
+            expect(iterator.currentRepItem.front).toEqual("Q21"); // Specific to #flashcards/folder1
             expect(iterator.nextRepItem()).toEqual(true);
-            expect((iterator.currentRepItem as Card).front).toEqual("Q11"); // Common to #flashcards/folder1 & folder2
+            expect(iterator.currentRepItem.front).toEqual("Q11"); // Common to #flashcards/folder1 & folder2
             expect(iterator.nextRepItem()).toEqual(true);
-            expect((iterator.currentRepItem as Card).front).toEqual("Q12"); // Common to #flashcards/folder1 & folder2
+            expect(iterator.currentRepItem.front).toEqual("Q12"); // Common to #flashcards/folder1 & folder2
 
             // Now those in #flashcards/folder2
             expect(iterator.nextRepItem()).toEqual(true);
-            expect((iterator.currentRepItem as Card).front).toEqual("Q31");
+            expect(iterator.currentRepItem.front).toEqual("Q31");
 
             // Ones common to both folder1 and folder2 are not returned for folder2
             // i.e. we don't see Q11 or Q12 again
@@ -627,11 +626,11 @@ Q12::A12
             iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards/folder2"));
 
             expect(iterator.nextRepItem()).toEqual(true);
-            expect((iterator.currentRepItem as Card).front).toEqual("Q31");
+            expect(iterator.currentRepItem.front).toEqual("Q31");
             expect(iterator.nextRepItem()).toEqual(true);
-            expect((iterator.currentRepItem as Card).front).toEqual("Q11");
+            expect(iterator.currentRepItem.front).toEqual("Q11");
             expect(iterator.nextRepItem()).toEqual(true);
-            expect((iterator.currentRepItem as Card).front).toEqual("Q12");
+            expect(iterator.currentRepItem.front).toEqual("Q12");
             expect(iterator.nextRepItem()).toEqual(false);
 
             // After iterating folder2, there are (1 + 0) cards in folder1
@@ -727,12 +726,12 @@ Q3::A3`;
         nextCardThenCheck(iterator, "Q1");
         nextCardThenCheck(iterator, "Q2");
         expect(iterator.deleteCurrentRepItemFromAllDecks()).toEqual(true);
-        expect((iterator.currentRepItem as Card).front).toEqual("Q3");
+        expect(iterator.currentRepItem.front).toEqual("Q3");
         expect(iterator.deleteCurrentRepItemFromAllDecks()).toEqual(false);
     });
 });
 
 function nextCardThenCheck(iterator: DeckTreeIterator, expectedFront: string): void {
     expect(iterator.nextRepItem()).toEqual(true);
-    expect((iterator.currentRepItem as Card).front).toEqual(expectedFront);
+    expect(iterator.currentRepItem.front).toEqual(expectedFront);
 }
