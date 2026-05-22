@@ -38,7 +38,7 @@ export interface IDataStore {
     createSchedule(
         originalQuestionText: string,
         storageInfo: RepItemStorageInfo,
-    ): Promise<RepItemScheduleInfo[]>;
+    ): RepItemScheduleInfo[];
 
     /**
      * Removes scheduling information from a question text.
@@ -46,7 +46,7 @@ export interface IDataStore {
      * @param questionText
      * @returns
      */
-    removeScheduleInfo(questionText: string): Promise<string>;
+    removeScheduleInfo(questionText: string): string;
 
     /**
      * Writes a question to the data store.

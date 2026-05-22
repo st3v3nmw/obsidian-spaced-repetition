@@ -36,10 +36,7 @@ export class NotesDataStore implements IDataStore {
      * @param _
      * @returns
      */
-    async createSchedule(
-        originalQuestionText: string,
-        _: RepItemStorageInfo,
-    ): Promise<RepItemScheduleInfo[]> {
+    createSchedule(originalQuestionText: string, _: RepItemStorageInfo): RepItemScheduleInfo[] {
         const schedulingComment = originalQuestionText.match(/<!--SR:(.+?)-->/m)?.[1];
         if (schedulingComment) {
             return CommentParser.parseMultiScheduleComment(schedulingComment) ?? [];
@@ -79,7 +76,7 @@ export class NotesDataStore implements IDataStore {
      * @param questionText
      * @returns
      */
-    async removeScheduleInfo(questionText: string): Promise<string> {
+    removeScheduleInfo(questionText: string): string {
         return questionText.replace(/<!--SR:.+-->/gm, "");
     }
 

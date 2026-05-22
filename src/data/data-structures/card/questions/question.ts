@@ -122,21 +122,18 @@ export class QuestionText {
         return this.actualQuestion.endsWith("```");
     }
 
-    static async create(
+    static create(
         original: string,
         textDirection: TextDirection,
         settings: SRSettings,
-    ): Promise<QuestionText> {
-        const [topicPathWithWs, actualQuestion, blockId] = await this.splitText(original, settings);
+    ): QuestionText {
+        const [topicPathWithWs, actualQuestion, blockId] = this.splitText(original, settings);
 
         return new QuestionText(original, topicPathWithWs, actualQuestion, textDirection, blockId);
     }
 
-    static async splitText(
-        original: string,
-        settings: SRSettings,
-    ): Promise<[TopicPathWithWs, string, string]> {
-        const originalWithoutSR = await DataStore.getInstance().removeScheduleInfo(original);
+    static splitText(original: string, settings: SRSettings): [TopicPathWithWs, string, string] {
+        const originalWithoutSR = DataStore.getInstance().removeScheduleInfo(original);
         let actualQuestion: string = originalWithoutSR.trimEnd();
 
         let topicPathWithWs: TopicPathWithWs;
@@ -295,14 +292,14 @@ export class Question {
         return this.topicPathList.format("|");
     }
 
-    static async Create(
+    static Create(
         settings: SRSettings,
         parsedQuestionInfo: ParsedQuestionInfo,
         noteTopicPathList: TopicPathList,
         textDirection: TextDirection,
         context: string[],
-    ): Promise<Question> {
-        const questionText: QuestionText = await QuestionText.create(
+    ): Question {
+        const questionText: QuestionText = QuestionText.create(
             parsedQuestionInfo.text,
             textDirection,
             settings,
