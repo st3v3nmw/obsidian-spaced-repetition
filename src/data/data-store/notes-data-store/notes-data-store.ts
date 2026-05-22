@@ -98,11 +98,12 @@ export class NotesDataStore implements IDataStore {
      */
     async write(question: Question): Promise<void> {
         const fileText: string = await question.note.file.read();
-
+        console.log(fileText);
         const newText: string = await question.updateQuestionWithinNoteText(
             fileText,
             this.settings,
         );
+        console.log(newText);
         await question.note.file.write(newText);
         question.hasChanged = false;
     }

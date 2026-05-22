@@ -55,7 +55,7 @@ export class SchedulingPage extends SettingsPage {
                     dropdown
                         .addOptions({
                             "SM-2-OSR": t("SM2_OSR_VARIANT"),
-                            // FSRS: "FSRS", // TODO: Re-enable when ready
+                            FSRS: "FSRS",
                         })
                         .setValue(this.dataManager.data.settings.algorithm)
                         .onChange(async (value) => {

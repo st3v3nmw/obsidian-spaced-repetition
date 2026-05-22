@@ -1,6 +1,7 @@
 import {
     OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX,
     OBSIDIAN_TAG_AT_STARTOFLINE_REGEX,
+    SR_METADATA_CALLOUT as SR_METADATA_CALLOUT,
 } from "src/data/constants";
 import { DataStore } from "src/data/data-store/base/data-store";
 import { DataStoreAlgorithm } from "src/data/data-store/base/data-store-algorithm";
@@ -204,8 +205,9 @@ export class Question {
         Object.assign(this, init);
     }
 
-    getHtmlCommentSeparator(settings: SRSettings): string {
-        const sep: string = this.isCardCommentsOnSameLine(settings) ? " " : "\n";
+    getHtmlCommentSeparator(settings: SRSettings, hasMetadataCallout: boolean): string {
+        const sep: string =
+            this.isCardCommentsOnSameLine(settings) || hasMetadataCallout ? " " : "\n";
         return sep;
     }
 
@@ -229,15 +231,20 @@ export class Question {
         const hasSchedule: boolean = this.cards.some((card) => card.hasSchedule);
         if (hasSchedule) {
             result = result.trimEnd();
+
             const scheduleHtml =
                 DataStoreAlgorithm.getInstance().questionFormatScheduleAsHtmlComment(this);
+            console.log(scheduleHtml, result);
             if (scheduleHtml) {
+                const isScheduleInSRMetadataCallout = result.includes(SR_METADATA_CALLOUT);
                 if (blockId) {
-                    if (this.isCardCommentsOnSameLine(settings))
+                    if (this.isCardCommentsOnSameLine(settings) || isScheduleInSRMetadataCallout)
                         result += ` ${scheduleHtml} ${blockId}`;
                     else result += ` ${blockId}\n${scheduleHtml}`;
                 } else {
-                    result += this.getHtmlCommentSeparator(settings) + scheduleHtml;
+                    result +=
+                        this.getHtmlCommentSeparator(settings, isScheduleInSRMetadataCallout) +
+                        scheduleHtml;
                 }
             } else {
                 if (blockId) {
