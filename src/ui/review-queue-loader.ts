@@ -2,8 +2,11 @@ import { TFile } from "obsidian";
 
 import { OsrCore } from "src/data/core";
 import { Deck } from "src/data/data-structures/deck/deck";
-import { FlashcardReviewMode, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
 import SRPlugin from "src/main";
+import {
+    FlashcardReviewMode,
+    IFlashcardReviewSequencer,
+} from "src/scheduling/flashcard-review-sequencer";
 
 export class ReviewQueueLoader {
     private plugin: SRPlugin;

@@ -1,17 +1,13 @@
 import "src/ui/styles.css";
 import { Menu, MenuItem, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { DataManager } from "src/data/data-manager";
-import { CardListType } from "src/data/data-structures/deck/deck";
-import {
-    deleteAllSchedulingDataOfCardsInNote,
-    deleteNoteSchedulingDataInNote,
-} from "src/data/delete-scheduling-data";
-import { FlashcardReviewMode } from "src/flashcard-review-sequencer";
+import { DataStore } from "src/data/data-store/base/data-store";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
@@ -130,7 +126,10 @@ export class UIManager {
 
         if (settings.showStatusBar) {
             this.statusBarManager.setCount(
-                this.dataManager.osrCore.remainingDeckTree.getCardCount(CardListType.All, true),
+                this.dataManager.osrCore.remainingDeckTree.getRepItemCount(
+                    RepItemState.AnyItem,
+                    true,
+                ),
                 settings.showStatusBar && settings.showCardStatusBarItem,
                 "card-review",
             );
@@ -331,7 +330,7 @@ export class UIManager {
                                 if (this.dataManager.data === null)
                                     throw new Error("SR plugin or data not initialized!!!");
                                 const settings = this.dataManager.data.settings;
-                                deleteNoteSchedulingDataInNote(
+                                DataStore.instance.fileModifier.deleteNoteSchedulingDataInNote(
                                     file,
                                     settings.deleteTagsOnSchedulingDataDeletion,
                                     settings.tagsToReview,
@@ -355,7 +354,7 @@ export class UIManager {
                                 if (this.dataManager.data === null)
                                     throw new Error("SR plugin or data not initialized!!!");
                                 const settings = this.dataManager.data.settings;
-                                deleteAllSchedulingDataOfCardsInNote(
+                                DataStore.instance.fileModifier.deleteAllSchedulingDataOfCardsInNote(
                                     file,
                                     settings.deleteTagsOnSchedulingDataDeletion,
                                     settings.flashcardTags,

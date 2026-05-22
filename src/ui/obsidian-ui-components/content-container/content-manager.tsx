@@ -1,21 +1,21 @@
 import { now } from "moment";
 import { App, MarkdownView, Notice, Platform } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { DataManager } from "src/data/data-manager";
 import { Card } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { Deck } from "src/data/data-structures/deck/deck";
 import { SRSettings } from "src/data/settings";
+import { t } from "src/lang/helpers";
+import SRPlugin from "src/main";
+import { Note } from "src/note/note";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import {
     DeckStats,
     FlashcardReviewMode,
     IFlashcardReviewSequencer,
-} from "src/flashcard-review-sequencer";
-import { t } from "src/lang/helpers";
-import SRPlugin from "src/main";
-import { Note } from "src/note/note";
+} from "src/scheduling/flashcard-review-sequencer";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
 import CardInfoNotice from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-info-notice";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
@@ -153,11 +153,11 @@ export default class ContentManager {
 
         // Loop through all decks and determine if any have cards in queue
         for (const subdeck of subdecksWithCardsInQueue) {
-            const hasNewCards: boolean = subdeck.newFlashcards.length > 0;
-            const hasDueCards: boolean = subdeck.dueFlashcards.length > 0;
+            const hasNewCards: boolean = subdeck.newRepItems.length > 0;
+            const hasDueCards: boolean = subdeck.dueRepItems.length > 0;
             const hasDueCardsToday: boolean =
                 hasDueCards &&
-                subdeck.dueFlashcards.some((card) => {
+                subdeck.dueRepItems.some((card) => {
                     const dueDate: number = card.scheduleInfo.dueDateAsUnix;
                     const nowUnix: number = globalDateProvider.now.valueOf();
                     return dueDate <= nowUnix;

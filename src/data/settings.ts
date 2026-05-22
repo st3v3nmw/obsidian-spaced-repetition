@@ -1,6 +1,6 @@
-import { SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
-import { StorageType } from "src/data/data-stores/base/data-store";
+import { StorageType } from "src/data/data-store/base/data-store";
 import { t } from "src/lang/helpers";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { pathMatchesPattern } from "src/utils/fs";
 
 export interface SRSettings {
@@ -22,7 +22,7 @@ export interface SRSettings {
     multilineCardSeparator: string;
     multilineReversedCardSeparator: string;
     multilineCardEndMarker: string;
-    editLaterTag: string;
+    editLaterTag: string | undefined;
 
     // notes
     enableNoteReviewPaneOnStartup: boolean;
@@ -61,7 +61,7 @@ export interface SRSettings {
     useCustomHotkeys: boolean;
 
     // algorithm
-    algorithm: string;
+    algorithm: SRAlgorithmType;
     baseEase: number;
     lapsesIntervalChange: number;
     easyBonus: number;
@@ -101,7 +101,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     multilineCardSeparator: "?",
     multilineReversedCardSeparator: "??",
     multilineCardEndMarker: "",
-    editLaterTag: "#edit-later",
+    editLaterTag: undefined,
     randomizeCardOrder: undefined,
 
     // notes
@@ -154,7 +154,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // storage
     dataStore: StorageType.NOTES,
     cardCommentOnSameLine: false,
-    scheduleDataVaultLocation: "/Spaced Repetition",
+    scheduleDataVaultLocation: "Spaced Repetition",
 
     // logging
     showSchedulingDebugMessages: false,
@@ -195,6 +195,10 @@ export function upgradeSettings(settings: SRSettings) {
         settings.disableFileMenuReviewOptions = undefined;
     }
 
+    if (settings.editLaterTag) {
+        settings.editLaterTag = undefined;
+    }
+
     if (
         settings.scheduleDataVaultLocation === null ||
         settings.scheduleDataVaultLocation === undefined ||
@@ -213,7 +217,7 @@ export class SettingsUtil {
         return SettingsUtil.isTagInList(settings.flashcardTags, tag);
     }
 
-    static isPathInNoteIgnoreFolder(settings: SRSettings, path: string): boolean {
+    static isPathInFoldersToIgnore(settings: SRSettings, path: string): boolean {
         return settings.noteFoldersToIgnore.some((folder) => pathMatchesPattern(path, folder));
     }
 

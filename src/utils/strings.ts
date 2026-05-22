@@ -203,10 +203,11 @@ CachedMetadata.frontmatter["tags"]: tags are comma separated. They may or may no
 Any double quotes in the frontmatter are stripped by Obsidian and not present in this variable.
 
 */
-export function parseObsidianFrontmatterTag(tagStr: string): string[] {
+export function parseObsidianFrontmatterTag(tagStr: string | null): string[] {
     const result: string[] = [] as string[];
-    if (tagStr) {
-        const tagStrList: string[] = tagStr.split(",");
+    if (tagStr !== null) {
+        // For some obscure reason, the tags don't have the split function so one needs to add a string to add those?
+        const tagStrList: string[] = (tagStr + "").split(",");
         for (const tag of tagStrList) {
             if (tag !== "") {
                 result.push(tag.startsWith("#") ? tag : "#" + tag);

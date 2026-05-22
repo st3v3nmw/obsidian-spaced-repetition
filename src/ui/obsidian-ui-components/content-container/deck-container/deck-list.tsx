@@ -4,8 +4,8 @@ import { setIcon } from "obsidian";
 import { COLLAPSE_ICON } from "src/data/constants";
 import { Deck } from "src/data/data-structures/deck/deck";
 import { SRSettings } from "src/data/settings";
-import { DeckStats, IFlashcardReviewSequencer } from "src/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
+import { DeckStats, IFlashcardReviewSequencer } from "src/scheduling/flashcard-review-sequencer";
 
 export default class DeckListComponent {
     private scrollWrapper: HTMLDivElement;

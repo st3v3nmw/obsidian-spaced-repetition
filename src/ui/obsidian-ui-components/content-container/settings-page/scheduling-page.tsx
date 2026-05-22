@@ -1,10 +1,10 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
-import { SRAlgorithmType } from "src/algorithms/base/isr-algorithm";
 import { DataManager } from "src/data/data-manager";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { t, tHTML } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";

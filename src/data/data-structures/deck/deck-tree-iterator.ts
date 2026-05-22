@@ -1,10 +1,11 @@
 import { Card } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
-import { CardListType, Deck } from "src/data/data-structures/deck/deck";
+import { Deck } from "src/data/data-structures/deck/deck";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
+import { RepetitionItem, RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 import { globalRandomNumberProvider, WeightedRandomNumber } from "src/utils/numbers";
 
-export enum CardOrder {
+export enum RepItemOrder {
     NewFirstSequential,
     NewFirstRandom,
     DueFirstSequential,
@@ -19,30 +20,63 @@ export enum DeckOrder {
 export interface IIteratorOrder {
     // Within a deck this specifies the order the cards should be reviewed
     // e.g. new first, going sequentially
-    cardOrder: CardOrder;
+    repItemOrder: RepItemOrder;
 
     // Choose decks in sequential order, or randomly
     deckOrder: DeckOrder;
 }
 
+/**
+ * Represents the DeckTree iterator.
+ *
+ * @interface IDeckTreeIterator
+ */
 export interface IDeckTreeIterator {
     get currentDeck(): Deck | null;
-    get currentCard(): Card | null;
+    get currentRepItem(): RepetitionItem | null;
     get hasCurrentCard(): boolean;
+    /**
+     * Sets the base deck.
+     *
+     * @param {Deck} baseDeck - The base deck.
+     */
     setBaseDeck(baseDeck: Deck): void;
+    /**
+     * Sets the iterator topic path.
+     *
+     * @param {TopicPath} topicPath - The topic path.
+     */
     setIteratorTopicPath(topicPath: TopicPath): void;
-    deleteCurrentCardFromAllDecks(): boolean;
+    /**
+     * Deletes the current repetition item from all decks.
+     *
+     * @returns {boolean} - True if the repetition item was deleted, false otherwise.
+     */
+    deleteCurrentRepItemFromAllDecks(): boolean;
+    /**
+     * Deletes the current question from all decks.
+     *
+     * @returns {boolean} - True if the question was deleted, false otherwise.
+     */
     deleteCurrentQuestionFromAllDecks(): boolean;
-    moveCurrentCardToEndOfList(): void;
-    nextCard(): boolean;
+    /**
+     * Moves the current repetition item to the end of the list.
+     */
+    moveCurrentRepItemToEndOfList(): void;
+    /**
+     * Moves to the next repetition item.
+     *
+     * @returns {boolean} - True if there is a next repetition item, false otherwise.
+     */
+    nextRepItem(): boolean;
 }
 
 class SingleDeckIterator {
     deck: Deck | null = null;
     iteratorOrder: IIteratorOrder;
-    preferredCardListType: CardListType;
+    preferredCardListType: RepItemState;
     cardIdx?: number;
-    cardListType?: CardListType;
+    cardListType?: RepItemState;
     weightedRandomNumber: WeightedRandomNumber;
 
     get hasCurrentCard(): boolean {
@@ -52,7 +86,7 @@ class SingleDeckIterator {
     get currentCard(): Card | null {
         let result: Card | null = null;
         if (this.cardIdx !== null && this.cardIdx !== undefined && this.deck !== null)
-            result = this.deck.getCard(this.cardIdx, this.cardListType);
+            result = this.deck.getRepItem(this.cardIdx, this.cardListType);
         return result;
     }
 
@@ -73,22 +107,22 @@ class SingleDeckIterator {
     // 0 <= cardIndex < newFlashcards.length + dueFlashcards.length
     //
     setNewOrDueCardIdx(cardIndex: number): void {
-        let cardListType: CardListType = CardListType.NewCard;
+        let cardListType: RepItemState = RepItemState.NewItem;
         let index: number = cardIndex;
-        if (cardIndex >= this.deck.newFlashcards.length) {
-            cardListType = CardListType.DueCard;
-            index = cardIndex - this.deck.newFlashcards.length;
+        if (cardIndex >= this.deck.newRepItems.length) {
+            cardListType = RepItemState.DueItem;
+            index = cardIndex - this.deck.newRepItems.length;
         }
         this.setCardListType(cardListType, index);
     }
 
-    private setCardListType(cardListType?: CardListType, cardIdx: number = null): void {
+    private setCardListType(cardListType?: RepItemState, cardIdx: number = null): void {
         this.cardListType = cardListType;
         this.cardIdx = cardIdx;
     }
 
     nextCard(): boolean {
-        if (this.iteratorOrder.cardOrder === CardOrder.EveryCardRandomDeckAndCard) {
+        if (this.iteratorOrder.repItemOrder === RepItemOrder.EveryCardRandomDeckAndCard) {
             this.nextRandomCard();
         } else {
             // First return cards in the preferred list
@@ -113,15 +147,15 @@ class SingleDeckIterator {
     }
 
     private nextRandomCard(): void {
-        const newCount: number = this.deck.newFlashcards.length;
-        const dueCount: number = this.deck.dueFlashcards.length;
+        const newCount: number = this.deck.newRepItems.length;
+        const dueCount: number = this.deck.dueRepItems.length;
         if (newCount + dueCount > 0) {
             // Generate a random number such that the probability of picking an individual card is the same
             // regardless of whether the card is in the new/due list, or which list has more cards
             // I.e. we don't pick the new/due list first at 50/50 and then a random card within it
-            const weights: Partial<Record<CardListType, number>> = {};
-            if (newCount > 0) weights[CardListType.NewCard] = newCount;
-            if (dueCount > 0) weights[CardListType.DueCard] = dueCount;
+            const weights: Partial<Record<RepItemState, number>> = {};
+            if (newCount > 0) weights[RepItemState.NewItem] = newCount;
+            if (dueCount > 0) weights[RepItemState.DueItem] = dueCount;
             const [cardListType, index] = this.weightedRandomNumber.getRandomValues(weights);
             this.setCardListType(cardListType, index);
         } else {
@@ -130,20 +164,20 @@ class SingleDeckIterator {
     }
 
     private nextCardWithinCurrentList(): boolean {
-        const cardList: Card[] = this.deck.getCardListForCardType(this.cardListType);
+        const cardList: Card[] = this.deck.getRepItemListForRepItemState(this.cardListType);
 
         const result: boolean = cardList.length > 0;
         if (result) {
-            switch (this.iteratorOrder.cardOrder) {
-                case CardOrder.DueFirstSequential:
-                case CardOrder.NewFirstSequential:
+            switch (this.iteratorOrder.repItemOrder) {
+                case RepItemOrder.DueFirstSequential:
+                case RepItemOrder.NewFirstSequential:
                     // We always pick the card with index 0
                     // Sequential retrieval occurs by the caller deleting the card at this index after it is used
                     this.cardIdx = 0;
                     break;
 
-                case CardOrder.DueFirstRandom:
-                case CardOrder.NewFirstRandom:
+                case RepItemOrder.DueFirstRandom:
+                case RepItemOrder.NewFirstRandom:
                     this.cardIdx = globalRandomNumberProvider.getInteger(0, cardList.length - 1);
                     break;
             }
@@ -154,8 +188,8 @@ class SingleDeckIterator {
     moveCurrentCardToEndOfList(): void {
         this.ensureCurrentCard();
         const card = this.currentCard;
-        this.deck.deleteCardAtIndex(this.cardIdx, this.cardListType);
-        this.deck.appendCardToRootDeck(card);
+        this.deck.deleteRepItemAtIndex(this.cardIdx, this.cardListType);
+        this.deck.appendRepItemToRootDeck(card);
         this.setNoCurrentCard();
     }
 
@@ -167,17 +201,17 @@ class SingleDeckIterator {
         if (this.cardIdx === null || this.cardListType === null) throw "no current card";
     }
 
-    private static getCardListTypeForIterator(iteratorOrder: IIteratorOrder): CardListType | null {
-        let result: CardListType = null;
-        switch (iteratorOrder.cardOrder) {
-            case CardOrder.DueFirstRandom:
-            case CardOrder.DueFirstSequential:
-                result = CardListType.DueCard;
+    private static getCardListTypeForIterator(iteratorOrder: IIteratorOrder): RepItemState | null {
+        let result: RepItemState = null;
+        switch (iteratorOrder.repItemOrder) {
+            case RepItemOrder.DueFirstRandom:
+            case RepItemOrder.DueFirstSequential:
+                result = RepItemState.DueItem;
                 break;
 
-            case CardOrder.NewFirstRandom:
-            case CardOrder.NewFirstSequential:
-                result = CardListType.NewCard;
+            case RepItemOrder.NewFirstRandom:
+            case RepItemOrder.NewFirstSequential:
+                result = RepItemState.NewItem;
                 break;
         }
         return result;
@@ -226,7 +260,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         return this.deckArray[this.deckIdx];
     }
 
-    get currentCard(): Card | null {
+    get currentRepItem(): Card | null {
         let result: Card | null = null;
         if (
             this.deckIdx !== null &&
@@ -237,8 +271,8 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         return result;
     }
 
-    get currentQuestion(): Question {
-        return this.currentCard?.question;
+    get currentQuestion(): Question | null {
+        return (this.currentRepItem as Card | null)?.question || null;
     }
 
     constructor(iteratorOrder: IIteratorOrder, baseDeckTree: Deck) {
@@ -263,7 +297,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         const result: Deck[] = [];
         for (let idx = 0; idx < sourceArray.length; idx++) {
             const deck: Deck = sourceArray[idx];
-            const hasAnyCards = deck.getCardCount(CardListType.All, false) > 0;
+            const hasAnyCards = deck.getRepItemCount(RepItemState.AnyItem, false) > 0;
             if (hasAnyCards) {
                 result.push(deck);
             }
@@ -277,15 +311,15 @@ export class DeckTreeIterator implements IDeckTreeIterator {
             this.singleDeckIterator.setDeck(this.deckArray[deckIdx]);
     }
 
-    nextCard(): boolean {
+    nextRepItem(): boolean {
         let result: boolean = false;
 
         // Delete the current card so we don't return it again
         if (this.hasCurrentCard) {
-            this.baseDeckTree.deleteCardFromAllDecks(this.currentCard, true);
+            this.baseDeckTree.deleteCardFromAllDecks(this.currentRepItem as Card, true);
         }
 
-        if (this.iteratorOrder.cardOrder === CardOrder.EveryCardRandomDeckAndCard) {
+        if (this.iteratorOrder.repItemOrder === RepItemOrder.EveryCardRandomDeckAndCard) {
             result = this.nextCardEveryCardRandomDeck();
         } else {
             // If we are just starting, then depending on settings we want to either start from the first deck,
@@ -316,7 +350,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
                 const weights: Record<number, number> = {};
                 let hasDeck: boolean = false;
                 for (let i = 0; i < this.deckArray.length; i++) {
-                    if (this.deckArray[i].getCardCount(CardListType.All, false)) {
+                    if (this.deckArray[i].getRepItemCount(RepItemState.AnyItem, false)) {
                         weights[i] = 1;
                         hasDeck = true;
                     }
@@ -341,7 +375,10 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         // Make the chance of picking a specific deck proportional to the number of cards within
         const weights: Record<number, number> = {};
         for (let i = 0; i < this.deckArray.length; i++) {
-            const cardCount: number = this.deckArray[i].getCardCount(CardListType.All, false);
+            const cardCount: number = this.deckArray[i].getRepItemCount(
+                RepItemState.AnyItem,
+                false,
+            );
             if (cardCount) {
                 weights[i] = cardCount;
             }
@@ -361,22 +398,22 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         // Note that not every card will necessarily be present, so we pass false to the following
         this.baseDeckTree.deleteQuestionFromAllDecks(this.currentQuestion, false);
         this.singleDeckIterator.setNoCurrentCard();
-        return this.nextCard();
+        return this.nextRepItem();
     }
 
-    deleteCurrentCardFromAllDecks(): boolean {
+    deleteCurrentRepItemFromAllDecks(): boolean {
         this.singleDeckIterator.ensureCurrentCard();
-        this.baseDeckTree.deleteCardFromAllDecks(this.currentCard, true);
+        this.baseDeckTree.deleteCardFromAllDecks(this.currentRepItem as Card, true);
         this.singleDeckIterator.setNoCurrentCard();
-        return this.nextCard();
+        return this.nextRepItem();
     }
 
-    moveCurrentCardToEndOfList(): void {
+    moveCurrentRepItemToEndOfList(): void {
         this.singleDeckIterator.moveCurrentCardToEndOfList();
     }
 
     private removeCurrentDeckIfEmpty(): void {
-        if (this.currentDeck.getCardCount(CardListType.All, false) === 0) {
+        if (this.currentDeck.getRepItemCount(RepItemState.AnyItem, false) === 0) {
             this.deckArray.splice(this.deckIdx, 1);
 
             // There is no change to deckIdx, but this now is a different deck

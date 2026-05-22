@@ -1,14 +1,18 @@
 import { TagCache } from "obsidian";
 
-import { frontmatterTagPseudoLineNum } from "src/data/file";
+import {
+    frontmatterTagPseudoCol,
+    frontmatterTagPseudoLineNum,
+    frontmatterTagPseudoOffset,
+} from "src/data/data-structures/file/sr-file";
 import { splitNoteIntoFrontmatterAndContent, splitTextIntoLineArray } from "src/utils/strings";
 
 export function unitTestCreateTagCacheObj(tag: string, line: number): TagCache {
     return {
         tag: tag,
         position: {
-            start: { line: line, col: null, offset: null },
-            end: { line: line, col: null, offset: null },
+            start: { line: line, col: frontmatterTagPseudoCol, offset: frontmatterTagPseudoOffset },
+            end: { line: line, col: frontmatterTagPseudoCol, offset: frontmatterTagPseudoOffset },
         },
     };
 }
@@ -44,14 +48,22 @@ export function unitTestGetAllTagsFromTextEx(text: string): TagCache[] {
     lines = splitTextIntoLineArray(text);
     for (let i = 0; i < lines.length; i++) {
         const tagRegex = /#[^\s#]+/gi;
-        const matchList: RegExpMatchArray = lines[i].match(tagRegex);
+        const matchList: RegExpMatchArray | null = lines[i].match(tagRegex);
         if (matchList) {
             for (const match of matchList) {
                 const tag: TagCache = {
                     tag: match,
                     position: {
-                        start: { line: i, col: null, offset: null },
-                        end: { line: i, col: null, offset: null },
+                        start: {
+                            line: i,
+                            col: frontmatterTagPseudoCol,
+                            offset: frontmatterTagPseudoOffset,
+                        },
+                        end: {
+                            line: i,
+                            col: frontmatterTagPseudoCol,
+                            offset: frontmatterTagPseudoOffset,
+                        },
                     },
                 };
                 result.push(tag);
@@ -63,7 +75,7 @@ export function unitTestGetAllTagsFromTextEx(text: string): TagCache[] {
 
 export function unitTestGetAllTagsFromText(text: string): string[] {
     const tagRegex = /#[^\s#]+/gi;
-    const result: RegExpMatchArray = text.match(tagRegex);
+    const result: RegExpMatchArray | null = text.match(tagRegex);
     if (!result) return [];
     return result;
 }
@@ -86,14 +98,14 @@ export function unitTestBasicFrontmatterParserEx(text: string): Map<string, stri
     const keyRegex = /^([A-Za-z0-9_-]+):(.*)$/;
     const dataRegex = /^(\s+)-\s+(.+)$/;
     const lines: string[] = splitTextIntoLineArray(frontmatter);
-    let keyName: string = null;
+    let keyName: string | null = null;
     let valueList: string[] = [] as string[];
 
     for (let i = 0; i < lines.length; i++) {
         const line: string = lines[i];
 
         // Is there a key, and optional value?
-        const keyMatch: RegExpMatchArray = line.match(keyRegex);
+        const keyMatch: RegExpMatchArray | null = line.match(keyRegex);
         if (keyMatch) {
             if (keyName) {
                 result.set(keyName, valueList);
@@ -106,7 +118,7 @@ export function unitTestBasicFrontmatterParserEx(text: string): Map<string, stri
             }
         } else {
             // Just a value, related to the last key
-            const dataMatch: RegExpMatchArray = line.match(dataRegex);
+            const dataMatch: RegExpMatchArray | null = line.match(dataRegex);
             if (keyName && dataMatch) {
                 const value = dataMatch[1].trim();
                 if (value) {

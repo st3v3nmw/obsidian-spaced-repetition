@@ -1,5 +1,5 @@
 import { OBSIDIAN_TAG_AT_STARTOFLINE_REGEX } from "src/data/constants";
-import { ISRFile } from "src/data/file";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { SRSettings } from "src/data/settings";
 
 export class TopicPath {
@@ -38,7 +38,7 @@ export class TopicPath {
         return result;
     }
 
-    static getTopicPathOfFile(noteFile: ISRFile, settings: SRSettings): TopicPath {
+    static getTopicPathOfFile(noteFile: ISRNoteTFile, settings: SRSettings): TopicPath {
         let result: TopicPath = TopicPath.emptyPath;
         if (settings.convertFoldersToDecks) {
             const deckPath = noteFile.path.split("/");
@@ -108,7 +108,7 @@ export class TopicPath {
         return new TopicPath(path);
     }
 
-    static getFolderPathFromFilename(noteFile: ISRFile, settings: SRSettings): TopicPath {
+    static getFolderPathFromFilename(noteFile: ISRNoteTFile, settings: SRSettings): TopicPath {
         let result: TopicPath = TopicPath.emptyPath;
 
         if (settings.convertFoldersToDecks) {

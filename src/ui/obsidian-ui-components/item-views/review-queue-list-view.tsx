@@ -1,15 +1,15 @@
 import "src/ui/obsidian-ui-components/item-views/review-queue-list-view.css";
 import { ItemView, Menu, setIcon, TFile, WorkspaceLeaf } from "obsidian";
 
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
 import { TICKS_PER_DAY } from "src/data/constants";
-import { deleteNoteSchedulingDataInNote } from "src/data/delete-scheduling-data";
+import { DataStore } from "src/data/data-store/base/data-store";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { NoteReviewDeck } from "src/note/note-review-deck";
 import { NoteReviewQueue } from "src/note/note-review-queue";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { formatDateWithMoment } from "src/utils/dates";
 
@@ -360,7 +360,7 @@ export class ReviewQueueListView extends ItemView {
                                 t("CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION"),
                                 t("NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS"),
                                 () => {
-                                    deleteNoteSchedulingDataInNote(
+                                    DataStore.instance.fileModifier.deleteNoteSchedulingDataInNote(
                                         file,
                                         this.plugin.dataManager.data.settings
                                             .deleteTagsOnSchedulingDataDeletion,

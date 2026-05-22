@@ -316,4 +316,7 @@ export interface IBaseLocale {
     RESET_SETTINGS_CONFIRMATION: string;
     DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE: string;
     DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE_DESC: string;
+    MIGRATE_TO_FOLDER: string;
+    CONFIRM_MIGRATE_TO_FOLDER: string;
+    MIGRATING_TO_FOLDER: string;
 }

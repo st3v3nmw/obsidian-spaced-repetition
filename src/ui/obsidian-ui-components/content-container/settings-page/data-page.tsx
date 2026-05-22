@@ -1,12 +1,7 @@
 import { Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
-import { StorageType } from "src/data/data-stores/base/data-store";
-import {
-    deleteAllSchedulingData,
-    deleteAllSchedulingDataInCards,
-    deleteAllSchedulingDataInNotes,
-} from "src/data/delete-scheduling-data";
+import { DataStore } from "src/data/data-store/base/data-store";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
@@ -42,96 +37,127 @@ export class DataPage extends SettingsPage {
             scrollListener,
         );
 
-        new SettingGroup(this.containerEl)
-            .setHeading(t("GROUP_DATA_STORAGE"))
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("GROUP_DATA_STORAGE"))
-                    .setDesc(t("GROUP_DATA_STORAGE_DESC"))
-                    .addDropdown((dropdown) => {
-                        dropdown
-                            .addOptions({
-                                [StorageType.NOTES]: t("STORE_IN_NOTES"),
-                                [StorageType.PLUGIN_DATA]: "Store in vault files (beta)",
-                            })
-                            .setValue(this.dataManager.data.settings.dataStore)
-                            .onChange(async (value) => {
-                                const oldMode = this.dataManager.data.settings
-                                    .dataStore as StorageType;
-                                const newMode = value as StorageType;
+        // TODO: Implement this when the other data stores are implemented
 
-                                // Revert the dropdown immediately; only apply after confirmation.
-                                dropdown.setValue(oldMode);
+        const dataStorageGroup = new SettingGroup(this.containerEl).setHeading(
+            t("GROUP_DATA_STORAGE"),
+        );
+        //     .addSetting((setting: Setting) => {
+        //         setting
+        //             .setName(t("GROUP_DATA_STORAGE"))
+        //             .setDesc(t("GROUP_DATA_STORAGE_DESC"))
+        //             .addDropdown((dropdown) => {
+        //                 dropdown
+        //                     .addOptions({
+        //                         [StorageType.NOTES]: t("STORE_IN_NOTES"),
+        //                         // [StorageType.FOLDER]: "Store in vault folder (beta)",
+        //                         // [StorageType.PLUGIN_DATA]: "Store in plugin data (beta)",
+        //                     })
+        //                     .setValue(this.dataManager.data.settings.dataStore)
+        //                     .onChange(async (value) => {
+        //                         const oldMode = this.dataManager.data.settings
+        //                             .dataStore as StorageType;
+        //                         const newMode = value as StorageType;
 
-                                const isToPluginData = newMode === StorageType.PLUGIN_DATA;
-                                new ConfirmationModal(
-                                    this.plugin.app,
-                                    isToPluginData
-                                        ? t("MIGRATE_TO_PLUGIN_DATA")
-                                        : t("MIGRATE_TO_NOTES"),
-                                    isToPluginData
-                                        ? t("CONFIRM_MIGRATE_TO_PLUGIN_DATA")
-                                        : t("CONFIRM_MIGRATE_TO_NOTES"),
-                                    isToPluginData
-                                        ? t("MIGRATING_TO_PLUGIN_DATA")
-                                        : t("MIGRATING_TO_NOTES"),
-                                    async () => {
-                                        await this.dataManager.migrateDataStore(oldMode, newMode);
-                                        dropdown.setValue(newMode);
-                                        this.dataManager.data.settings.dataStore = newMode;
-                                        this.dataManager.setupDataStoreAndAlgorithmInstances(
-                                            this.dataManager.data.settings,
-                                        );
-                                        await this.dataManager.savePluginData();
-                                    },
-                                ).open();
-                            });
-                    });
-            })
-            .addSetting((setting: Setting) => {
-                setting.infoEl.insertAdjacentText("beforeend", t("PLUGIN_DATA_STORE_INFO"));
-            })
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName("Schedule data location in vault")
-                    .setDesc(
-                        'Root folder for schedule files. Data is stored in "Schedule Data" as markdown files.',
-                    )
-                    .addText((text) => {
-                        const commitValue = async () => {
-                            this.dataManager.data.settings.scheduleDataVaultLocation =
-                                text.getValue().trim() ||
-                                DEFAULT_SETTINGS.scheduleDataVaultLocation;
-                            await this.dataManager.persistScheduleDataNow();
+        //                         // Revert the dropdown immediately; only apply after confirmation.
+        //                         dropdown.setValue(oldMode);
+
+        //                         let migrateMessage: string = "";
+        //                         let confirmMessage: string = "";
+        //                         let migratingMessage: string = "";
+
+        //                         switch (newMode) {
+        //                             // case StorageType.FOLDER:
+        //                             //     migrateMessage = t("MIGRATE_TO_FOLDER");
+        //                             //     confirmMessage = t("CONFIRM_MIGRATE_TO_FOLDER");
+        //                             //     migratingMessage = t("MIGRATING_TO_FOLDER");
+        //                             //     break;
+        //                             // case StorageType.PLUGIN_DATA:
+        //                             //     migrateMessage = t("MIGRATE_TO_PLUGIN_DATA");
+        //                             //     confirmMessage = t("CONFIRM_MIGRATE_TO_PLUGIN_DATA");
+        //                             //     migratingMessage = t("MIGRATING_TO_PLUGIN_DATA");
+        //                             //     break;
+        //                             case StorageType.NOTES:
+        //                                 migrateMessage = t("MIGRATE_TO_NOTES");
+        //                                 confirmMessage = t("CONFIRM_MIGRATE_TO_NOTES");
+        //                                 migratingMessage = t("MIGRATING_TO_NOTES");
+        //                                 break;
+        //                         }
+
+        //                         new ConfirmationModal(
+        //                             this.plugin.app,
+        //                             migrateMessage,
+        //                             confirmMessage,
+        //                             migratingMessage,
+        //                             async () => {
+        //                                 dropdown.setValue(newMode);
+        //                                 this.dataManager.data.settings.dataStore = newMode;
+        //                                 this.dataManager.setupDataStoreAndAlgorithmInstances(
+        //                                     this.dataManager.data.settings,
+        //                                 );
+        //                                 await DataStore.instance.isStructureInitialized.then(
+        //                                     async (isInitialized) => {
+        //                                         if (!isInitialized) {
+        //                                             await DataStore.instance.isStructureInitialized;
+        //                                         }
+        //                                         await DataStore.instance.migrateDataStore(oldMode);
+        //                                         await this.dataManager.savePluginData();
+        //                                         this.display();
+        //                                     },
+        //                                 );
+        //                             },
+        //                         ).open();
+        //                     });
+        //             });
+        //     });
+
+        // dataStorageGroup.addSetting((setting: Setting) => {
+        //     setting.infoEl.insertAdjacentText("beforeend", t("PLUGIN_DATA_STORE_INFO"));
+        // });
+
+        // if (this.dataManager.data.settings.dataStore === StorageType.FOLDER) {
+        //     dataStorageGroup.addSetting((setting: Setting) => {
+        //         setting
+        //             .setName("Schedule data location in vault")
+        //             .setDesc(
+        //                 'Root folder for schedule files. Data is stored in "Schedule Data" as markdown files.',
+        //             )
+        //             .addText((text) => {
+        //                 const commitValue = async () => {
+        //                     this.dataManager.data.settings.scheduleDataVaultLocation =
+        //                         text.getValue().trim() ||
+        //                         DEFAULT_SETTINGS.scheduleDataVaultLocation;
+        //                     await this.dataManager.savePluginData();
+        //                 };
+
+        //                 text.setPlaceholder(DEFAULT_SETTINGS.scheduleDataVaultLocation)
+        //                     .setValue(this.dataManager.data.settings.scheduleDataVaultLocation)
+        //                     .onChange(() => {
+        //                         this.dataManager.data.settings.scheduleDataVaultLocation =
+        //                             text.getValue().trim() ||
+        //                             DEFAULT_SETTINGS.scheduleDataVaultLocation;
+        //                     });
+
+        //                 text.inputEl.addEventListener("blur", () => {
+        //                     void commitValue();
+        //                 });
+        //             });
+        //     });
+        // }
+
+        dataStorageGroup.addSetting((setting: Setting) => {
+            setting
+                .setName(t("INLINE_SCHEDULING_COMMENTS"))
+                .setDesc(t("INLINE_SCHEDULING_COMMENTS_DESC"))
+                .addToggle((toggle) =>
+                    toggle
+                        .setValue(this.dataManager.data.settings.cardCommentOnSameLine)
+                        .onChange(async (value) => {
+                            this.dataManager.data.settings.cardCommentOnSameLine = value;
                             await this.dataManager.savePluginData();
-                        };
-
-                        text.setPlaceholder(DEFAULT_SETTINGS.scheduleDataVaultLocation)
-                            .setValue(this.dataManager.data.settings.scheduleDataVaultLocation)
-                            .onChange(() => {
-                                this.dataManager.data.settings.scheduleDataVaultLocation =
-                                    text.getValue().trim() ||
-                                    DEFAULT_SETTINGS.scheduleDataVaultLocation;
-                            });
-
-                        text.inputEl.addEventListener("blur", () => {
-                            void commitValue();
-                        });
-                    });
-            })
-            .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("INLINE_SCHEDULING_COMMENTS"))
-                    .setDesc(t("INLINE_SCHEDULING_COMMENTS_DESC"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.dataManager.data.settings.cardCommentOnSameLine)
-                            .onChange(async (value) => {
-                                this.dataManager.data.settings.cardCommentOnSameLine = value;
-                                await this.dataManager.savePluginData();
-                            }),
-                    );
-            });
+                        }),
+                );
+        });
 
         new SettingGroup(this.containerEl)
             .setHeading(t("DELETE_SCHEDULING_DATA_ALL"))
@@ -167,7 +193,7 @@ export class DataPage extends SettingsPage {
                                     t("SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS"),
                                     () => {
                                         const settings = this.dataManager.data.settings;
-                                        deleteAllSchedulingData(
+                                        DataStore.instance.fileModifier.deleteAllSchedulingData(
                                             settings.deleteTagsOnSchedulingDataDeletion,
                                             settings.flashcardTags,
                                             settings.tagsToReview,
@@ -192,7 +218,7 @@ export class DataPage extends SettingsPage {
                                     t("CONFIRM_SCHEDULING_DATA_IN_NOTES_DELETION"),
                                     t("SCHEDULING_DATA_IN_NOTES_DELETION_IN_PROGRESS"),
                                     () => {
-                                        deleteAllSchedulingDataInNotes(
+                                        DataStore.instance.fileModifier.deleteAllSchedulingDataInNotes(
                                             this.dataManager.data.settings
                                                 .deleteTagsOnSchedulingDataDeletion,
                                             this.dataManager.data.settings.tagsToReview,
@@ -217,7 +243,7 @@ export class DataPage extends SettingsPage {
                                     t("CONFIRM_SCHEDULING_DATA_IN_CARDS_DELETION"),
                                     t("SCHEDULING_DATA_IN_CARDS_DELETION_IN_PROGRESS"),
                                     () => {
-                                        deleteAllSchedulingDataInCards(
+                                        DataStore.instance.fileModifier.deleteAllSchedulingDataInCards(
                                             this.dataManager.data.settings
                                                 .deleteTagsOnSchedulingDataDeletion,
                                             this.dataManager.data.settings.flashcardTags,

@@ -1,27 +1,26 @@
 import { Platform, Plugin, TFile } from "obsidian";
 
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { SRAlgorithm } from "src/algorithms/base/sr-algorithm";
 import { DataManager } from "src/data/data-manager";
-import { StorageType } from "src/data/data-stores/base/data-store";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import {
-    CardOrder,
     DeckOrder,
     DeckTreeIterator,
     IDeckTreeIterator,
     IIteratorOrder,
+    RepItemOrder,
 } from "src/data/data-structures/deck/deck-tree-iterator";
 import { SRSettings } from "src/data/settings";
-import {
-    FlashcardReviewMode,
-    FlashcardReviewSequencer,
-    IFlashcardReviewSequencer,
-} from "src/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { Note } from "src/note/note";
 import { NoteReviewQueue } from "src/note/note-review-queue";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
+import {
+    FlashcardReviewMode,
+    FlashcardReviewSequencer,
+    IFlashcardReviewSequencer,
+} from "src/scheduling/flashcard-review-sequencer";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
 import { UIManager, UIState } from "src/ui/ui-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
@@ -34,33 +33,24 @@ export default class SRPlugin extends Plugin {
     public nextNoteReviewHandler: NextNoteReviewHandler | null = null;
 
     async onload(): Promise<void> {
-        this.dataManager = new DataManager(this);
-        await this.dataManager.loadData();
+        // Wait for the workspace to be ready before loading the data and initializing the UI with it
+        this.app.workspace.onLayoutReady(async () => {
+            this.dataManager = new DataManager(this);
+            await this.dataManager.loadData();
 
-        const noteReviewQueue = new NoteReviewQueue();
-        this.nextNoteReviewHandler = new NextNoteReviewHandler(
-            this.app,
-            this.dataManager.data.settings,
-            noteReviewQueue,
-        );
+            const noteReviewQueue = new NoteReviewQueue();
+            this.nextNoteReviewHandler = new NextNoteReviewHandler(
+                this.app,
+                this.dataManager.data.settings,
+                noteReviewQueue,
+            );
 
-        this.dataManager.initOSRCore(noteReviewQueue, this.onOsrVaultDataChanged.bind(this));
+            this.dataManager.initOSRCore(noteReviewQueue, this.onOsrVaultDataChanged.bind(this));
 
-        this.uiManager = new UIManager(this, this.dataManager);
+            this.uiManager = new UIManager(this, this.dataManager);
 
-        this.addPluginCommands();
-
-        this.registerEvent(
-            this.app.vault.on("rename", (file, oldPath) => {
-                if (
-                    this.dataManager.data.settings.dataStore === StorageType.PLUGIN_DATA &&
-                    file instanceof TFile &&
-                    this.dataManager.scheduleDataRepository !== null
-                ) {
-                    this.dataManager.scheduleDataRepository.renameFile(oldPath, file.path);
-                }
-            }),
-        );
+            this.addPluginCommands();
+        });
     }
 
     get uiManager(): UIManager {
@@ -463,11 +453,13 @@ export default class SRPlugin extends Plugin {
         file: TFile,
         mode: FlashcardReviewMode,
     ): Promise<{ deckTree: Deck; remainingDeckTree: Deck; mode: FlashcardReviewMode }> {
-        const note: Note = await this.dataManager.loadNote(file);
+        const note: Note | null = await this.dataManager.loadNote(file);
 
         const deckTree = new Deck("root", null);
-        note.appendCardsToDeck(deckTree);
-        const remainingDeckTree = DeckTreeFilter.filterForRemainingCards(
+        if (note) {
+            note.appendCardsToDeck(deckTree);
+        }
+        const remainingDeckTree = DeckTreeFilter.filterForRemainingRepItems(
             this.dataManager.osrCore.questionPostponementList,
             deckTree,
             mode,
@@ -499,14 +491,15 @@ export default class SRPlugin extends Plugin {
     }
 
     private static createDeckTreeIterator(settings: SRSettings): IDeckTreeIterator {
-        let cardOrder: CardOrder = CardOrder[settings.flashcardCardOrder as keyof typeof CardOrder];
-        if (cardOrder === undefined) cardOrder = CardOrder.DueFirstSequential;
+        let cardOrder: RepItemOrder =
+            RepItemOrder[settings.flashcardCardOrder as keyof typeof RepItemOrder];
+        if (cardOrder === undefined) cardOrder = RepItemOrder.DueFirstSequential;
         let deckOrder: DeckOrder = DeckOrder[settings.flashcardDeckOrder as keyof typeof DeckOrder];
         if (deckOrder === undefined) deckOrder = DeckOrder.PrevDeckComplete_Sequential;
 
         const iteratorOrder: IIteratorOrder = {
             deckOrder,
-            cardOrder,
+            repItemOrder: cardOrder,
         };
         return new DeckTreeIterator(iteratorOrder, null);
     }

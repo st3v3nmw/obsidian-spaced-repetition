@@ -2,8 +2,8 @@ import {
     OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX,
     OBSIDIAN_TAG_AT_STARTOFLINE_REGEX,
 } from "src/data/constants";
-import { DataStoreAlgorithm } from "src/data/data-store-algorithm/base/data-store-algorithm";
-import { DataStore } from "src/data/data-stores/base/data-store";
+import { DataStore } from "src/data/data-store/base/data-store";
+import { DataStoreAlgorithm } from "src/data/data-store/base/data-store-algorithm";
 import { Card } from "src/data/data-structures/card/card";
 import {
     TopicPath,
@@ -122,18 +122,21 @@ export class QuestionText {
         return this.actualQuestion.endsWith("```");
     }
 
-    static create(
+    static async create(
         original: string,
         textDirection: TextDirection,
         settings: SRSettings,
-    ): QuestionText {
-        const [topicPathWithWs, actualQuestion, blockId] = this.splitText(original, settings);
+    ): Promise<QuestionText> {
+        const [topicPathWithWs, actualQuestion, blockId] = await this.splitText(original, settings);
 
         return new QuestionText(original, topicPathWithWs, actualQuestion, textDirection, blockId);
     }
 
-    static splitText(original: string, settings: SRSettings): [TopicPathWithWs, string, string] {
-        const originalWithoutSR = DataStore.getInstance().removeScheduleInfo(original);
+    static async splitText(
+        original: string,
+        settings: SRSettings,
+    ): Promise<[TopicPathWithWs, string, string]> {
+        const originalWithoutSR = await DataStore.getInstance().removeScheduleInfo(original);
         let actualQuestion: string = originalWithoutSR.trimEnd();
 
         let topicPathWithWs: TopicPathWithWs;
@@ -189,7 +192,6 @@ export class Question {
     parsedQuestionInfo: ParsedQuestionInfo;
     topicPathList: TopicPathList;
     questionText: QuestionText;
-    hasEditLaterTag: boolean;
     questionContext: string[];
     cards: Card[];
     hasChanged: boolean;
@@ -252,7 +254,7 @@ export class Question {
         return result;
     }
 
-    updateQuestionWithinNoteText(noteText: string, settings: SRSettings): string {
+    async updateQuestionWithinNoteText(noteText: string, settings: SRSettings): Promise<string> {
         const originalText: string = this.questionText.original;
 
         // Get the entire text for the question including:
@@ -264,7 +266,7 @@ export class Question {
         let newText = MultiLineTextFinder.findAndReplace(noteText, originalText, replacementText);
         if (newText) {
             // Don't support changing the textDirection setting
-            this.questionText = QuestionText.create(
+            this.questionText = await QuestionText.create(
                 replacementText,
                 this.questionText.textDirection,
                 settings,
@@ -284,7 +286,7 @@ export class Question {
     async writeQuestion(settings: SRSettings): Promise<void> {
         const fileText: string = await this.note.file.read();
 
-        const newText: string = this.updateQuestionWithinNoteText(fileText, settings);
+        const newText: string = await this.updateQuestionWithinNoteText(fileText, settings);
         await this.note.file.write(newText);
         this.hasChanged = false;
     }
@@ -293,15 +295,14 @@ export class Question {
         return this.topicPathList.format("|");
     }
 
-    static Create(
+    static async Create(
         settings: SRSettings,
         parsedQuestionInfo: ParsedQuestionInfo,
         noteTopicPathList: TopicPathList,
         textDirection: TextDirection,
         context: string[],
-    ): Question {
-        const hasEditLaterTag = parsedQuestionInfo.text.includes(settings.editLaterTag);
-        const questionText: QuestionText = QuestionText.create(
+    ): Promise<Question> {
+        const questionText: QuestionText = await QuestionText.create(
             parsedQuestionInfo.text,
             textDirection,
             settings,
@@ -316,9 +317,8 @@ export class Question {
             parsedQuestionInfo,
             topicPathList,
             questionText,
-            hasEditLaterTag,
             questionContext: context,
-            cards: null,
+            cards: undefined,
             hasChanged: false,
         });
 

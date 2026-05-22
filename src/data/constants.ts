@@ -1,14 +1,13 @@
-// To cater for both LF and CR-LF line ending styles, "\r?\n" is used to match the newline character sequence
-// https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/776
-export const SCHEDULING_INFO_REGEX =
-    /^---\r?\n((?:.*\r?\n)*)sr-due: (.+)\r?\nsr-interval: (\d+)\r?\nsr-ease: (\d+)\r?\n((?:.*\r?\n)?)---/;
-
-export const FLASHCARD_SCHEDULE_INFO = /\s?<!--SR:!.+?-->/g;
+export const SR_COMMENT_AND_WHITESPACE_FINDER = /\s?<!--SR:!.+?-->/g;
+export const ALL_SR_COMMENT_FINDER = /<!--SR:!.+?-->/g;
+export const ONE_SR_COMMENT_FINDER = /<!--SR:!.+?-->/;
+export const FSRS_SCHEDULE_EXTRACTOR =
+    /<!--SR:!fsrs,(.+?),(\d+),(\d+),(\d+),(\d+),(\d+),(\d+),(.+?)-->/gm;
+export const SM2_SCHEDULE_INFO_EXTRACTOR = /<!--SR:!(.+?),(\d+),(\d+),*(\d+)*-->/gm;
 
 export const YAML_FRONT_MATTER_REGEX = /^---\r?\n((?:.*\r?\n)*?)---/;
 
 export const MULTI_SCHEDULING_EXTRACTOR = /!([\d-]+),(\d+),(\d+)/gm;
-export const LEGACY_SCHEDULING_EXTRACTOR = /<!--SR:([\d-]+),(\d+),(\d+)-->/gm;
 
 export const OBSIDIAN_TAG_AT_STARTOFLINE_REGEX = /^#[^\s#]+/gi;
 
@@ -17,26 +16,10 @@ export const OBSIDIAN_TAG_AT_STARTOFLINE_REGEX = /^#[^\s#]+/gi;
 // RZ: 2024-01-01 Empirically determined that obsidian only recognizes a block identifier if the
 // "^" is preceded by a space
 export const OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX = / (\^[a-zA-Z0-9-]+)$/;
+export const SR_DATA_ID_TAG = "^sr-data-id-";
 
 export const PREFERRED_DATE_FORMAT = "YYYY-MM-DD";
 export const ALLOWED_DATE_FORMATS = [PREFERRED_DATE_FORMAT, "DD-MM-YYYY", "ddd MMM DD YYYY"];
-
-export const IMAGE_FORMATS = [
-    "jpg",
-    "jpeg",
-    "gif",
-    "png",
-    "svg",
-    "webp",
-    "apng",
-    "avif",
-    "jfif",
-    "pjpeg",
-    "pjp",
-    "bmp",
-];
-export const AUDIO_FORMATS = ["mp3", "webm", "m4a", "wav", "ogg"];
-export const VIDEO_FORMATS = ["mp4", "mkv", "avi", "mov"];
 
 export const COLLAPSE_ICON =
     '<svg viewBox="0 0 100 100" width="8" height="8" class="svg-icon right-triangle"><path fill="currentColor" stroke="currentColor" d="M94.9,20.8c-1.4-2.5-4.1-4.1-7.1-4.1H12.2c-3,0-5.7,1.6-7.1,4.1c-1.3,2.4-1.2,5.2,0.2,7.6L43.1,88c1.5,2.3,4,3.7,6.9,3.7 s5.4-1.4,6.9-3.7l37.8-59.6C96.1,26,96.2,23.2,94.9,20.8L94.9,20.8z"></path></svg>';
