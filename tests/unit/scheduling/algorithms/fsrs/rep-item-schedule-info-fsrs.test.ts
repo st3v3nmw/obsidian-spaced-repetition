@@ -1,6 +1,7 @@
 import moment from "moment";
 import { State } from "ts-fsrs";
 
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
@@ -26,6 +27,37 @@ test("formats FSRS card schedule for markdown comments", () => {
     );
     expect(schedule.isShortTerm()).toEqual(true);
     expect(schedule.isDue()).toEqual(false);
+});
+
+test("Serializes FSRS card schedule for JSON", () => {
+    const schedule = new RepItemScheduleInfoFsrs(
+        moment("2023-09-06T00:10:00.000Z"),
+        0,
+        5.5,
+        0.4,
+        State.Learning,
+        1,
+        0,
+        1,
+        moment("2023-09-06T00:00:00.000Z"),
+    );
+
+    const serialized = schedule.serializeSchedule();
+
+    expect(serialized).toMatchObject({
+        algorithm: SRAlgorithmType.FSRS,
+        scheduleData: {
+            dueDate: "2023-09-06T00:10:00.000Z",
+            interval: 0,
+            stability: 0.4,
+            difficulty: 5.5,
+            state: State.Learning,
+            reps: 1,
+            lapses: 0,
+            learningSteps: 1,
+            lastReview: "2023-09-06T00:00:00.000Z",
+        },
+    });
 });
 
 test("converts to and from ts-fsrs card structures", () => {

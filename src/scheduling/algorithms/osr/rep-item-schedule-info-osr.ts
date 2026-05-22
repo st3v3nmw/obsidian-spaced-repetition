@@ -92,7 +92,9 @@ export class RepItemScheduleInfoOsr extends RepItemScheduleInfo {
      */
     serializeSchedule(): ISerializedScheduleEntry {
         const serializedData: ISerializedSM2ScheduleData = {
-            dueDate: formatDate(this.dueDateAsUnix, PREFERRED_DATE_FORMAT),
+            dueDate: this.dueDate
+                ? formatDate(this.dueDateAsUnix, PREFERRED_DATE_FORMAT)
+                : RepItemScheduleInfoOsr.dummyDueDateForNewCard,
             interval: this.interval,
             ease: this.latestEase,
             delayedBeforeReviewTicks: this.delayedBeforeReviewTicks,

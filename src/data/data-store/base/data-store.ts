@@ -9,8 +9,8 @@ import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-sch
  */
 export enum StorageType {
     NOTES = "NOTES",
-    FOLDER = "FOLDER",
-    PLUGIN_DATA = "PLUGIN_DATA",
+    // FOLDER = "FOLDER",
+    // PLUGIN_DATA = "PLUGIN_DATA",
 }
 
 /**

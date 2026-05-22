@@ -3,14 +3,9 @@ import { Notice, TFile } from "obsidian";
 import { OsrCore } from "src/data/core";
 import { DataStore, StorageType } from "src/data/data-store/base/data-store";
 import { DataStoreAlgorithm } from "src/data/data-store/base/data-store-algorithm";
-import { FolderDataFileModifier } from "src/data/data-store/folder-data-store/folder-data-file-modifier";
-import { FolderDataStore } from "src/data/data-store/folder-data-store/folder-data-store";
-import { FolderDataStoreAlgorithmOsr } from "src/data/data-store/folder-data-store/folder-data-store-algorithm-osr";
 import { NoteDataFileModifier } from "src/data/data-store/notes-data-store/note-data-file-modifier";
 import { NoteDataStoreAlgorithmOsr } from "src/data/data-store/notes-data-store/note-data-store-algorithm-osr";
 import { NotesDataStore } from "src/data/data-store/notes-data-store/notes-data-store";
-import { PluginDataFileModifier } from "src/data/data-store/plugin-data-store/plugin-data-file-modifier";
-import { PluginDataStore } from "src/data/data-store/plugin-data-store/plugin-data-store";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { ISRNoteTFile, SRNoteTFile } from "src/data/data-structures/file/note-file";
@@ -169,21 +164,6 @@ export class DataManager {
      */
     setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
         switch (settings.dataStore) {
-            case StorageType.PLUGIN_DATA:
-                DataStore.instance = new PluginDataStore(
-                    settings,
-                    new PluginDataFileModifier(this.plugin, this.plugin.app),
-                    this.plugin.dataManager.data,
-                );
-                DataStoreAlgorithm.instance = new FolderDataStoreAlgorithmOsr();
-                break;
-            case StorageType.FOLDER:
-                DataStore.instance = new FolderDataStore(
-                    settings,
-                    new FolderDataFileModifier(this.plugin, this.plugin.app),
-                );
-                DataStoreAlgorithm.instance = new FolderDataStoreAlgorithmOsr();
-                break;
             case StorageType.NOTES:
                 DataStore.instance = new NotesDataStore(
                     settings,
@@ -192,8 +172,6 @@ export class DataManager {
                 DataStoreAlgorithm.instance = new NoteDataStoreAlgorithmOsr(settings);
                 break;
         }
-
-        console.log("Current storage type:", DataStore.instance.storageType);
 
         // TODO: Move this to the scheduling manager once it is implemented
         SRAlgorithm.instance =

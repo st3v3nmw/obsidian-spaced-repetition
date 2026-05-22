@@ -15,15 +15,17 @@ export class NoteDataFileModifier implements IFileModifier {
         this.plugin = plugin;
     }
 
-    migrateDataStore(oldMode: StorageType): Promise<void> {
+    migrateDataStore(_: StorageType): Promise<void> {
         // TODO: Implement this
-        switch (oldMode) {
-            case StorageType.FOLDER:
-            case StorageType.PLUGIN_DATA:
-            default:
-                // We don't need to migrate the data store if it is the same as the new mode
-                return Promise.resolve();
-        }
+        // switch (oldMode) {
+        //     case StorageType.FOLDER:
+        //     case StorageType.PLUGIN_DATA:
+        //     default:
+
+        //         // We don't need to migrate the data store if it is the same as the new mode
+        // return Promise.resolve();
+        // }
+        return Promise.resolve();
     }
 
     /**

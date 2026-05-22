@@ -26,10 +26,14 @@ export default {
         "src/main.ts",
         "src/data/data-manager.ts",
         "src/data/data-store/.*/.*-file-modifier.ts",
+        "src/data/data-store/.*/.*file-modifier.ts",
         "src/note/next-note-review-handler.ts",
         "src/data/plugin-data.ts",
         "src/utils/renderers.ts",
         "src/scheduling/algorithms/osr/obsidian-vault-notelink-info-finder.ts",
+        "src/scheduling/algorithms/osr/serialized-schedule-data.ts",
+        "src/scheduling/algorithms/fsrs/serialized-schedule-data.ts",
+        "src/data/data-store/base/idata-store-algorithm.ts",
 
         // debugging utils
         "src/utils/debug.ts",
