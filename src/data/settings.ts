@@ -59,6 +59,7 @@ export interface SRSettings {
     showDeleteButtonInFileMenu: boolean;
     openViewInNewTab: boolean;
     useCustomHotkeys: boolean;
+    useCalloutsForSchedulingComments: boolean;
 
     // algorithm
     algorithm: SRAlgorithmType;
@@ -139,6 +140,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     openViewInNewTab: false,
     openViewInNewTabMobile: false,
     useCustomHotkeys: false,
+    useCalloutsForSchedulingComments: true,
 
     // algorithm
     algorithm: SRAlgorithmType.SM_2_OSR,

@@ -8,6 +8,8 @@ import { StorageType } from "src/data/data-store/base/data-store";
 export interface IFileModifier {
     migrateDataStore(oldMode: StorageType): Promise<void>;
 
+    migrateCommentsToCallouts(): Promise<void>;
+
     /**
      * Deletes all note scheduling data from a markdown file.
      *

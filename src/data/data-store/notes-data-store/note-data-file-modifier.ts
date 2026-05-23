@@ -1,6 +1,6 @@
 import { Notice, TFile, Vault } from "obsidian";
 
-import { SR_COMMENT_AND_WHITESPACE_FINDER } from "src/data/constants";
+import { SR_COMMENT_AND_WHITESPACE_FINDER, SR_METADATA_CALLOUT } from "src/data/constants";
 import { StorageType } from "src/data/data-store/base/data-store";
 import { IFileModifier as IFileModifier } from "src/data/data-store/base/file-modifier";
 import { t } from "src/lang/helpers";
@@ -14,6 +14,51 @@ export class NoteDataFileModifier implements IFileModifier {
     constructor(plugin: SRPlugin) {
         this.plugin = plugin;
     }
+
+    async migrateCommentsToCallouts(): Promise<void> {
+
+        const files = this.plugin.app.vault.getMarkdownFiles();
+
+        for (let i = 0; i < files.length; i++) {
+            await this.migrateCommentsToCalloutsInFile(files[i], this.plugin.app.vault);
+        }
+    }
+
+    async migrateCommentsToCalloutsInFile(file: TFile, vault: Vault): Promise<void> {
+        try {
+            await vault.process(file, (data) => {
+                let newData = "";
+
+                const srCommentWithinMetadataRegex = /.*<!--SR:!.*-->/gm;
+                const matches = data.matchAll(srCommentWithinMetadataRegex);
+                let index = 0;
+
+                for (const match of matches) {
+                    if (!match[0].startsWith("> <!--SR:")) {
+                        const srComment = match[0];
+                        const newText = `${match.index !== 0 && data[match.index - 1] === "\n" ? "" : "\n"}${SR_METADATA_CALLOUT}\n> ${srComment}`;
+
+                        if (match.index > index) {
+                            newData += data.substring(index, match.index);
+                        }
+
+                        newData += newText;
+
+                        index = match.index + srComment.length;
+                    }
+                }
+
+                if (index < data.length) {
+                    newData += data.substring(index);
+                }
+
+                return newData;
+            });
+        } catch (e) {
+            console.log({ filePath: file.path, error: e });
+        }
+    }
+
 
     migrateDataStore(_: StorageType): Promise<void> {
         // TODO: Implement this

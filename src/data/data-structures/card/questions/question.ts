@@ -236,16 +236,22 @@ export class Question {
                 DataStoreAlgorithm.getInstance().questionFormatScheduleAsHtmlComment(this);
 
             if (scheduleHtml) {
+
                 // Check if the schedule is in the metadata callout and adjust the separator accordingly
                 const isScheduleInSRMetadataCallout = result.includes(SR_METADATA_CALLOUT);
+
+                // Add the callout if the schedule is not in the metadata callout
+                if (settings.useCalloutsForSchedulingComments && !isScheduleInSRMetadataCallout) {
+                    result += `${result.endsWith("\n") ? "" : "\n"}${SR_METADATA_CALLOUT} \n> `;
+                }
+
                 if (blockId) {
-                    if (this.isCardCommentsOnSameLine(settings) || isScheduleInSRMetadataCallout)
+                    if (this.isCardCommentsOnSameLine(settings) || isScheduleInSRMetadataCallout || settings.useCalloutsForSchedulingComments)
                         result += ` ${scheduleHtml} ${blockId}`;
                     else result += ` ${blockId}\n${scheduleHtml}`;
                 } else {
                     result +=
-                        this.getHtmlCommentSeparator(settings, isScheduleInSRMetadataCallout) +
-                        scheduleHtml;
+                        this.getHtmlCommentSeparator(settings, isScheduleInSRMetadataCallout || settings.useCalloutsForSchedulingComments) + scheduleHtml;
                 }
             } else {
                 if (blockId) {

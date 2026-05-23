@@ -71,6 +71,8 @@ export interface IDataStore {
      * @returns
      */
     delete(question: Question): Promise<void>;
+
+    migrateSRCommentsToCallouts(): Promise<void>;
 }
 
 /**

@@ -180,8 +180,8 @@ export class UIManager {
             // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
             this.setSRViewInFocus(
                 (modal === null || modal === undefined) &&
-                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
-                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
+                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
+                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
             );
         }
     }

@@ -33,24 +33,22 @@ export default class SRPlugin extends Plugin {
     public nextNoteReviewHandler: NextNoteReviewHandler | null = null;
 
     async onload(): Promise<void> {
-        // Wait for the workspace to be ready before loading the data and initializing the UI with it
-        this.app.workspace.onLayoutReady(async () => {
-            this.dataManager = new DataManager(this);
-            await this.dataManager.loadData();
+        this.dataManager = new DataManager(this);
+        await this.dataManager.loadData();
 
-            const noteReviewQueue = new NoteReviewQueue();
-            this.nextNoteReviewHandler = new NextNoteReviewHandler(
-                this.app,
-                this.dataManager.data.settings,
-                noteReviewQueue,
-            );
+        const noteReviewQueue = new NoteReviewQueue();
+        this.nextNoteReviewHandler = new NextNoteReviewHandler(
+            this.app,
+            this.dataManager.data.settings,
+            noteReviewQueue,
+        );
 
-            this.dataManager.initOSRCore(noteReviewQueue, this.onOsrVaultDataChanged.bind(this));
+        this.dataManager.initOSRCore(noteReviewQueue, this.onOsrVaultDataChanged.bind(this));
+        // TODO: Move this to on layout ready and then -->
+        // TODO: Fix that the settings are only registered after the data is loaded -> Makes the app crash if one clicks on the settings tab before the data is loaded
+        this.uiManager = new UIManager(this, this.dataManager);
 
-            this.uiManager = new UIManager(this, this.dataManager);
-
-            this.addPluginCommands();
-        });
+        this.addPluginCommands();
     }
 
     get uiManager(): UIManager {
@@ -97,6 +95,9 @@ export default class SRPlugin extends Plugin {
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
+                // Return if not yet ready
+                if (this.app.workspace.layoutReady) return false;
+
                 if (
                     this.uiManager.uiState === UIState.CardBack &&
                     this.uiManager.isSRInFocus &&
@@ -127,6 +128,8 @@ export default class SRPlugin extends Plugin {
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
+                // Return if not yet ready
+                if (this.app.workspace.layoutReady) return false;
                 if (
                     this.uiManager.uiState === UIState.CardBack &&
                     this.uiManager.isSRInFocus &&
@@ -156,6 +159,8 @@ export default class SRPlugin extends Plugin {
                 difficulty: this.dataManager.data.settings.flashcardGoodText,
             }),
             checkCallback: (checking: boolean) => {
+                // Return if not yet ready
+                if (this.app.workspace.layoutReady) return false;
                 if (
                     this.uiManager.uiState === UIState.CardBack &&
                     this.uiManager.isSRInFocus &&
@@ -186,6 +191,8 @@ export default class SRPlugin extends Plugin {
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
+                // Return if not yet ready
+                if (this.app.workspace.layoutReady) return false;
                 if (
                     this.uiManager.uiState === UIState.CardBack &&
                     this.uiManager.isSRInFocus &&
@@ -214,6 +221,8 @@ export default class SRPlugin extends Plugin {
             name: t("SHOW_ANSWER"),
             repeatable: false,
             checkCallback: (checking: boolean) => {
+                // Return if not yet ready
+                if (this.app.workspace.layoutReady) return false;
                 if (
                     this.uiManager.uiState === UIState.CardFront &&
                     this.uiManager.isSRInFocus &&
@@ -242,6 +251,8 @@ export default class SRPlugin extends Plugin {
             name: t("SKIP"),
             repeatable: false,
             checkCallback: (checking: boolean) => {
+                // Return if not yet ready
+                if (this.app.workspace.layoutReady) return false;
                 if (
                     (this.uiManager.uiState === UIState.CardBack ||
                         this.uiManager.uiState === UIState.CardFront) &&
@@ -271,6 +282,8 @@ export default class SRPlugin extends Plugin {
             name: t("RESET_CARD_PROGRESS"),
             repeatable: false,
             checkCallback: (checking: boolean) => {
+                // Return if not yet ready
+                if (this.app.workspace.layoutReady) return false;
                 if (
                     this.uiManager.uiState === UIState.CardBack &&
                     this.uiManager.isSRInFocus &&
@@ -304,6 +317,8 @@ export default class SRPlugin extends Plugin {
             id: "srs-note-review-open-note",
             name: t("OPEN_NOTE_FOR_REVIEW"),
             callback: async () => {
+                // Return if not yet ready
+                if (this.app.workspace.layoutReady) return false;
                 if (!this.dataManager.syncLock && this.nextNoteReviewHandler !== null) {
                     await this.dataManager.sync();
                     this.nextNoteReviewHandler.reviewNextNoteModal();
@@ -318,6 +333,8 @@ export default class SRPlugin extends Plugin {
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
+                // Return if not yet ready
+                if (this.app.workspace.layoutReady) return false;
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
 
                 if (openFile === null || openFile.extension !== "md") return false;
@@ -336,6 +353,8 @@ export default class SRPlugin extends Plugin {
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
+                // Return if not yet ready
+                if (this.app.workspace.layoutReady) return false;
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
 
                 if (openFile === null || openFile.extension !== "md") return false;
@@ -354,6 +373,8 @@ export default class SRPlugin extends Plugin {
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
+                // Return if not yet ready
+                if (this.app.workspace.layoutReady) return false;
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
 
                 if (openFile === null || openFile.extension !== "md") return false;
@@ -369,6 +390,8 @@ export default class SRPlugin extends Plugin {
             id: "srs-review-flashcards",
             name: t("REVIEW_ALL_CARDS"),
             callback: async () => {
+                // Return if not yet ready
+                if (this.app.workspace.layoutReady) return false;
                 await this.uiManager.openDeckContainer(FlashcardReviewMode.Review);
             },
         });
@@ -386,6 +409,8 @@ export default class SRPlugin extends Plugin {
             name: t("REVIEW_CARDS_IN_NOTE"),
             repeatable: false,
             checkCallback: (checking: boolean) => {
+                // Return if not yet ready
+                if (this.app.workspace.layoutReady) return false;
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
 
                 if (openFile === null || openFile.extension !== "md") return false;
@@ -402,6 +427,8 @@ export default class SRPlugin extends Plugin {
             name: t("CRAM_CARDS_IN_NOTE"),
             repeatable: false,
             checkCallback: (checking: boolean) => {
+                // Return if not yet ready
+                if (this.app.workspace.layoutReady) return false;
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
 
                 if (openFile === null || openFile.extension !== "md") return false;
