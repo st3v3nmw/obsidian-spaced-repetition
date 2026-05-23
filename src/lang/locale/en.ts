@@ -375,10 +375,12 @@ const en: IBaseLocale = {
     USE_CALLOUTS_FOR_SCHEDULING_COMMENTS_DESC:
         "Use the sr metadata callout for scheduling comments instead of regular comments by default. This will hide away the scheduling comments in a callout which looks like an empty line in the editor.",
     MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_BUTTON: "Migrate",
-    MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_DESC: "Migrating will put the scheduling comments into a sr metadata callout. This callout is designed to hide away the scheduling comments.",
+    MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_DESC:
+        "Migrating will put the scheduling comments into a sr metadata callout. This callout is designed to hide away the scheduling comments.",
     CONFIRM_MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT:
         "Migrating will modify all your cards. Please back them up first in case you want to revert the migration later or in case it breaks your cards because of a bug. Are you sure you want to migrate scheduling comments to sr metadata callouts?",
-    MIGRATING_SCHEDULING_COMMENTS_TO_CALLOUT: "Migrating scheduling comments to sr metadata callouts...",
+    MIGRATING_SCHEDULING_COMMENTS_TO_CALLOUT:
+        "Migrating scheduling comments to sr metadata callouts...",
     MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT: "Migrate scheduling comments to sr metadata callout",
 };
 

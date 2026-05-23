@@ -236,7 +236,6 @@ export class Question {
                 DataStoreAlgorithm.getInstance().questionFormatScheduleAsHtmlComment(this);
 
             if (scheduleHtml) {
-
                 // Check if the schedule is in the metadata callout and adjust the separator accordingly
                 const isScheduleInSRMetadataCallout = result.includes(SR_METADATA_CALLOUT);
 
@@ -246,12 +245,20 @@ export class Question {
                 }
 
                 if (blockId) {
-                    if (this.isCardCommentsOnSameLine(settings) || isScheduleInSRMetadataCallout || settings.useCalloutsForSchedulingComments)
+                    if (
+                        this.isCardCommentsOnSameLine(settings) ||
+                        isScheduleInSRMetadataCallout ||
+                        settings.useCalloutsForSchedulingComments
+                    )
                         result += ` ${scheduleHtml} ${blockId}`;
                     else result += ` ${blockId}\n${scheduleHtml}`;
                 } else {
                     result +=
-                        this.getHtmlCommentSeparator(settings, isScheduleInSRMetadataCallout || settings.useCalloutsForSchedulingComments) + scheduleHtml;
+                        this.getHtmlCommentSeparator(
+                            settings,
+                            isScheduleInSRMetadataCallout ||
+                                settings.useCalloutsForSchedulingComments,
+                        ) + scheduleHtml;
                 }
             } else {
                 if (blockId) {

@@ -145,53 +145,58 @@ export class DataPage extends SettingsPage {
         //     });
         // }
 
-        dataStorageGroup.addSetting((setting: Setting) => {
-            setting
-                .setName(t("INLINE_SCHEDULING_COMMENTS"))
-                .setDesc(t("INLINE_SCHEDULING_COMMENTS_DESC"))
-                .addToggle((toggle) =>
-                    toggle
-                        .setValue(this.dataManager.data.settings.cardCommentOnSameLine)
-                        .onChange(async (value) => {
-                            this.dataManager.data.settings.cardCommentOnSameLine = value;
-                            await this.dataManager.savePluginData();
-                        }),
-                );
-        }).addSetting((setting: Setting) => {
-            setting
-                .setName(t("USE_CALLOUTS_FOR_SCHEDULING_COMMENTS"))
-                .setDesc(t("USE_CALLOUTS_FOR_SCHEDULING_COMMENTS_DESC"))
-                .addToggle((toggle) =>
-                    toggle
-                        .setValue(this.dataManager.data.settings.useCalloutsForSchedulingComments)
-                        .onChange(async (value) => {
-                            this.dataManager.data.settings.useCalloutsForSchedulingComments = value;
-                            await this.dataManager.savePluginData();
-                        }),
-                );
-        }).addSetting((setting: Setting) => {
-            setting
-                .setName(t("MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT"))
-                .setDesc(t("MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_DESC"))
-                .addButton((button) => {
-                    button
-                        .setButtonText(t("MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_BUTTON"))
-                        .setClass("mod-warning")
-                        .onClick(async () => {
-
-                            new ConfirmationModal(
-                                this.plugin.app,
-                                t("MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT"),
-                                t("CONFIRM_MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT"),
-                                t("MIGRATING_SCHEDULING_COMMENTS_TO_CALLOUT"),
-                                async () => {
-                                    await DataStore.instance.migrateSRCommentsToCallouts();
-                                    this.display();
-                                },
-                            ).open();
-                        });
-                });
-        });
+        dataStorageGroup
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("INLINE_SCHEDULING_COMMENTS"))
+                    .setDesc(t("INLINE_SCHEDULING_COMMENTS_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.dataManager.data.settings.cardCommentOnSameLine)
+                            .onChange(async (value) => {
+                                this.dataManager.data.settings.cardCommentOnSameLine = value;
+                                await this.dataManager.savePluginData();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("USE_CALLOUTS_FOR_SCHEDULING_COMMENTS"))
+                    .setDesc(t("USE_CALLOUTS_FOR_SCHEDULING_COMMENTS_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(
+                                this.dataManager.data.settings.useCalloutsForSchedulingComments,
+                            )
+                            .onChange(async (value) => {
+                                this.dataManager.data.settings.useCalloutsForSchedulingComments =
+                                    value;
+                                await this.dataManager.savePluginData();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT"))
+                    .setDesc(t("MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_DESC"))
+                    .addButton((button) => {
+                        button
+                            .setButtonText(t("MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_BUTTON"))
+                            .setClass("mod-warning")
+                            .onClick(async () => {
+                                new ConfirmationModal(
+                                    this.plugin.app,
+                                    t("MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT"),
+                                    t("CONFIRM_MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT"),
+                                    t("MIGRATING_SCHEDULING_COMMENTS_TO_CALLOUT"),
+                                    async () => {
+                                        await DataStore.instance.migrateSRCommentsToCallouts();
+                                        this.display();
+                                    },
+                                ).open();
+                            });
+                    });
+            });
 
         new SettingGroup(this.containerEl)
             .setHeading(t("DELETE_SCHEDULING_DATA_ALL"))

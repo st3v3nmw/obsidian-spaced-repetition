@@ -95,8 +95,6 @@ export default class SRPlugin extends Plugin {
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
-
-
                 if (
                     this.uiManager.uiState === UIState.CardBack &&
                     this.uiManager.isSRInFocus &&
@@ -127,7 +125,6 @@ export default class SRPlugin extends Plugin {
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
-
                 if (
                     this.uiManager.uiState === UIState.CardBack &&
                     this.uiManager.isSRInFocus &&
@@ -157,7 +154,6 @@ export default class SRPlugin extends Plugin {
                 difficulty: this.dataManager.data.settings.flashcardGoodText,
             }),
             checkCallback: (checking: boolean) => {
-
                 if (
                     this.uiManager.uiState === UIState.CardBack &&
                     this.uiManager.isSRInFocus &&
@@ -188,7 +184,6 @@ export default class SRPlugin extends Plugin {
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
-
                 if (
                     this.uiManager.uiState === UIState.CardBack &&
                     this.uiManager.isSRInFocus &&
@@ -217,7 +212,6 @@ export default class SRPlugin extends Plugin {
             name: t("SHOW_ANSWER"),
             repeatable: false,
             checkCallback: (checking: boolean) => {
-
                 if (
                     this.uiManager.uiState === UIState.CardFront &&
                     this.uiManager.isSRInFocus &&
@@ -246,7 +240,6 @@ export default class SRPlugin extends Plugin {
             name: t("SKIP"),
             repeatable: false,
             checkCallback: (checking: boolean) => {
-
                 if (
                     (this.uiManager.uiState === UIState.CardBack ||
                         this.uiManager.uiState === UIState.CardFront) &&
@@ -276,7 +269,6 @@ export default class SRPlugin extends Plugin {
             name: t("RESET_CARD_PROGRESS"),
             repeatable: false,
             checkCallback: (checking: boolean) => {
-
                 if (
                     this.uiManager.uiState === UIState.CardBack &&
                     this.uiManager.isSRInFocus &&
@@ -310,7 +302,6 @@ export default class SRPlugin extends Plugin {
             id: "srs-note-review-open-note",
             name: t("OPEN_NOTE_FOR_REVIEW"),
             callback: async () => {
-
                 if (!this.dataManager.syncLock && this.nextNoteReviewHandler !== null) {
                     await this.dataManager.sync();
                     this.nextNoteReviewHandler.reviewNextNoteModal();
@@ -325,7 +316,6 @@ export default class SRPlugin extends Plugin {
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
-
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
 
                 if (openFile === null || openFile.extension !== "md") return false;
@@ -344,7 +334,6 @@ export default class SRPlugin extends Plugin {
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
-
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
 
                 if (openFile === null || openFile.extension !== "md") return false;
@@ -363,7 +352,6 @@ export default class SRPlugin extends Plugin {
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
-
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
 
                 if (openFile === null || openFile.extension !== "md") return false;
@@ -396,7 +384,6 @@ export default class SRPlugin extends Plugin {
             name: t("REVIEW_CARDS_IN_NOTE"),
             repeatable: false,
             checkCallback: (checking: boolean) => {
-
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
 
                 if (openFile === null || openFile.extension !== "md") return false;
@@ -413,7 +400,6 @@ export default class SRPlugin extends Plugin {
             name: t("CRAM_CARDS_IN_NOTE"),
             repeatable: false,
             checkCallback: (checking: boolean) => {
-
                 const openFile: TFile | null = this.app.workspace.getActiveFile();
 
                 if (openFile === null || openFile.extension !== "md") return false;

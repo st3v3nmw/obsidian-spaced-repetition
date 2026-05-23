@@ -16,7 +16,6 @@ export class NoteDataFileModifier implements IFileModifier {
     }
 
     async migrateCommentsToCallouts(): Promise<void> {
-
         const files = this.plugin.app.vault.getMarkdownFiles();
 
         for (let i = 0; i < files.length; i++) {
@@ -58,7 +57,6 @@ export class NoteDataFileModifier implements IFileModifier {
             console.log({ filePath: file.path, error: e });
         }
     }
-
 
     migrateDataStore(_: StorageType): Promise<void> {
         // TODO: Implement this
