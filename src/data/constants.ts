@@ -17,6 +17,7 @@ export const OBSIDIAN_TAG_AT_STARTOFLINE_REGEX = /^#[^\s#]+/gi;
 // "^" is preceded by a space
 export const OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX = / (\^[a-zA-Z0-9-]+)$/;
 export const SR_DATA_ID_TAG = "^sr-data-id-";
+export const SR_METADATA_CALLOUT = "> [!sr|card-metadata]";
 
 export const PREFERRED_DATE_FORMAT = "YYYY-MM-DD";
 export const ALLOWED_DATE_FORMATS = [PREFERRED_DATE_FORMAT, "DD-MM-YYYY", "ddd MMM DD YYYY"];

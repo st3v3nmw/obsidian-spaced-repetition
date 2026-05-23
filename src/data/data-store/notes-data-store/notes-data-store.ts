@@ -21,25 +21,13 @@ export class NotesDataStore implements IDataStore {
     }
 
     /**
-     * Migrates the data store from the previous store to the new store.
-     *
-     * @param previousType The previousType of the data store.
-     */
-    async migrateDataStore(previousType: StorageType): Promise<void> {
-        await this.fileModifier.migrateDataStore(previousType);
-    }
-
-    /**
      * Creates scheduling information from a question text and its storage info.
      *
      * @param originalQuestionText
      * @param _
      * @returns
      */
-    async createSchedule(
-        originalQuestionText: string,
-        _: RepItemStorageInfo,
-    ): Promise<RepItemScheduleInfo[]> {
+    createSchedule(originalQuestionText: string, _: RepItemStorageInfo): RepItemScheduleInfo[] {
         const schedulingComment = originalQuestionText.match(/<!--SR:(.+?)-->/m)?.[1];
         if (schedulingComment) {
             return CommentParser.parseMultiScheduleComment(schedulingComment) ?? [];
@@ -79,7 +67,7 @@ export class NotesDataStore implements IDataStore {
      * @param questionText
      * @returns
      */
-    async removeScheduleInfo(questionText: string): Promise<string> {
+    removeScheduleInfo(questionText: string): string {
         return questionText.replace(/<!--SR:.+-->/gm, "");
     }
 
@@ -101,7 +89,6 @@ export class NotesDataStore implements IDataStore {
      */
     async write(question: Question): Promise<void> {
         const fileText: string = await question.note.file.read();
-
         const newText: string = await question.updateQuestionWithinNoteText(
             fileText,
             this.settings,

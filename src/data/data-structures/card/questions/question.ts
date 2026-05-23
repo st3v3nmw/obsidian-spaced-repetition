@@ -1,6 +1,7 @@
 import {
     OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX,
     OBSIDIAN_TAG_AT_STARTOFLINE_REGEX,
+    SR_METADATA_CALLOUT as SR_METADATA_CALLOUT,
 } from "src/data/constants";
 import { DataStore } from "src/data/data-store/base/data-store";
 import { DataStoreAlgorithm } from "src/data/data-store/base/data-store-algorithm";
@@ -122,21 +123,18 @@ export class QuestionText {
         return this.actualQuestion.endsWith("```");
     }
 
-    static async create(
+    static create(
         original: string,
         textDirection: TextDirection,
         settings: SRSettings,
-    ): Promise<QuestionText> {
-        const [topicPathWithWs, actualQuestion, blockId] = await this.splitText(original, settings);
+    ): QuestionText {
+        const [topicPathWithWs, actualQuestion, blockId] = this.splitText(original, settings);
 
         return new QuestionText(original, topicPathWithWs, actualQuestion, textDirection, blockId);
     }
 
-    static async splitText(
-        original: string,
-        settings: SRSettings,
-    ): Promise<[TopicPathWithWs, string, string]> {
-        const originalWithoutSR = await DataStore.getInstance().removeScheduleInfo(original);
+    static splitText(original: string, settings: SRSettings): [TopicPathWithWs, string, string] {
+        const originalWithoutSR = DataStore.getInstance().removeScheduleInfo(original);
         let actualQuestion: string = originalWithoutSR.trimEnd();
 
         let topicPathWithWs: TopicPathWithWs;
@@ -207,8 +205,9 @@ export class Question {
         Object.assign(this, init);
     }
 
-    getHtmlCommentSeparator(settings: SRSettings): string {
-        const sep: string = this.isCardCommentsOnSameLine(settings) ? " " : "\n";
+    getHtmlCommentSeparator(settings: SRSettings, hasMetadataCallout: boolean): string {
+        const sep: string =
+            this.isCardCommentsOnSameLine(settings) || hasMetadataCallout ? " " : "\n";
         return sep;
     }
 
@@ -232,15 +231,34 @@ export class Question {
         const hasSchedule: boolean = this.cards.some((card) => card.hasSchedule);
         if (hasSchedule) {
             result = result.trimEnd();
+
             const scheduleHtml =
                 DataStoreAlgorithm.getInstance().questionFormatScheduleAsHtmlComment(this);
+
             if (scheduleHtml) {
+                // Check if the schedule is in the metadata callout and adjust the separator accordingly
+                const isScheduleInSRMetadataCallout = result.includes(SR_METADATA_CALLOUT);
+
+                // Add the callout if the schedule is not in the metadata callout
+                if (settings.useCalloutsForSchedulingComments && !isScheduleInSRMetadataCallout) {
+                    result += `${result.endsWith("\n") ? "" : "\n"}${SR_METADATA_CALLOUT} \n> `;
+                }
+
                 if (blockId) {
-                    if (this.isCardCommentsOnSameLine(settings))
+                    if (
+                        this.isCardCommentsOnSameLine(settings) ||
+                        isScheduleInSRMetadataCallout ||
+                        settings.useCalloutsForSchedulingComments
+                    )
                         result += ` ${scheduleHtml} ${blockId}`;
                     else result += ` ${blockId}\n${scheduleHtml}`;
                 } else {
-                    result += this.getHtmlCommentSeparator(settings) + scheduleHtml;
+                    result +=
+                        this.getHtmlCommentSeparator(
+                            settings,
+                            isScheduleInSRMetadataCallout ||
+                                settings.useCalloutsForSchedulingComments,
+                        ) + scheduleHtml;
                 }
             } else {
                 if (blockId) {
@@ -295,14 +313,14 @@ export class Question {
         return this.topicPathList.format("|");
     }
 
-    static async Create(
+    static Create(
         settings: SRSettings,
         parsedQuestionInfo: ParsedQuestionInfo,
         noteTopicPathList: TopicPathList,
         textDirection: TextDirection,
         context: string[],
-    ): Promise<Question> {
-        const questionText: QuestionText = await QuestionText.create(
+    ): Question {
+        const questionText: QuestionText = QuestionText.create(
             parsedQuestionInfo.text,
             textDirection,
             settings,

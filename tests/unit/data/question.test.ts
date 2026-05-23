@@ -23,8 +23,10 @@ describe("Question", () => {
                 questionText: new QuestionText(text, null, text, TextDirection.Ltr, null),
             });
 
-            expect(question.getHtmlCommentSeparator(DEFAULT_SETTINGS)).toEqual("\n");
-            expect(question.getHtmlCommentSeparator(settingsCardCommentOnSameLine)).toEqual("\n");
+            expect(question.getHtmlCommentSeparator(DEFAULT_SETTINGS, false)).toEqual("\n");
+            expect(question.getHtmlCommentSeparator(settingsCardCommentOnSameLine, false)).toEqual(
+                "\n",
+            );
         });
 
         test("Doesn't end with a code block", async () => {
@@ -34,12 +36,37 @@ describe("Question", () => {
                 questionText: new QuestionText(text, null, text, TextDirection.Ltr, null),
             });
 
-            expect(question.getHtmlCommentSeparator(DEFAULT_SETTINGS)).toEqual("\n");
-            expect(question.getHtmlCommentSeparator(settingsCardCommentOnSameLine)).toEqual(" ");
+            expect(question.getHtmlCommentSeparator(DEFAULT_SETTINGS, false)).toEqual("\n");
+            expect(question.getHtmlCommentSeparator(settingsCardCommentOnSameLine, false)).toEqual(
+                " ",
+            );
         });
     });
 
     describe("formatForNote", () => {
+        test("puts schedule in a metadata callout when enabled", async () => {
+            const questionText = new QuestionText("Q1::A1", null, "Q1::A1", TextDirection.Ltr, "");
+            const question = new Question({
+                questionText,
+                cards: [
+                    new Card({
+                        scheduleInfo: RepItemScheduleInfoOsr.fromDueDateStr("2023-09-06", 1, 250),
+                    }),
+                ],
+            });
+
+            DataStoreAlgorithm.instance = {
+                questionFormatScheduleAsHtmlComment: jest.fn(() => "<!--SR:!2023-09-06,1,250-->"),
+            };
+
+            expect(
+                question.formatForNote({
+                    ...settingsCardCommentOnSameLine,
+                    useCalloutsForSchedulingComments: true,
+                }),
+            ).toBe("Q1::A1\n> [!sr|card-metadata] \n>  <!--SR:!2023-09-06,1,250-->");
+        });
+
         test("puts schedule and block id on the same line when enabled", () => {
             const questionText = new QuestionText(
                 "Q1::A1 ^abc123",

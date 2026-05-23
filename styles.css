@@ -68,6 +68,16 @@
 }
 
 /* src/ui/styles.css */
+[data-callout="sr"][data-callout-metadata="card-metadata"] {
+    display: inline-block;
+    background-color: transparent;
+    & > .callout-title {
+        display: none;
+    }
+    & > .callout-content {
+        display: none;
+    }
+}
 .sr-bg-blue,
 .sr-bg-yellow,
 .sr-bg-green,

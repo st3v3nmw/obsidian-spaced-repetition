@@ -22,13 +22,6 @@ export interface IDataStore {
     isStructureInitialized: Promise<boolean>;
 
     /**
-     * Migrates the data store from the previous store to the new store.
-     *
-     * @param previousType The previousType of the data store.
-     */
-    migrateDataStore(previousType: StorageType): Promise<void>;
-
-    /**
      * Creates scheduling information from a question text and its storage info.
      *
      * @param originalQuestionText
@@ -38,7 +31,7 @@ export interface IDataStore {
     createSchedule(
         originalQuestionText: string,
         storageInfo: RepItemStorageInfo,
-    ): Promise<RepItemScheduleInfo[]>;
+    ): RepItemScheduleInfo[];
 
     /**
      * Removes scheduling information from a question text.
@@ -46,7 +39,7 @@ export interface IDataStore {
      * @param questionText
      * @returns
      */
-    removeScheduleInfo(questionText: string): Promise<string>;
+    removeScheduleInfo(questionText: string): string;
 
     /**
      * Writes a question to the data store.

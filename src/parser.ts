@@ -1,5 +1,6 @@
 import { ClozeCrafter } from "clozecraft";
 
+import { SR_METADATA_CALLOUT } from "src/data/constants";
 import { CardType } from "src/data/data-structures/card/questions/question";
 
 export let debugParser = false;
@@ -159,6 +160,14 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
             if (i + 1 < lines.length && lines[i + 1].startsWith("<!--SR:")) {
                 cardText += "\n" + lines[i + 1];
                 i++;
+            } else if (i + 1 < lines.length && lines[i + 1].startsWith(SR_METADATA_CALLOUT)) {
+                for (let j = i + 1; j < lines.length; j++) {
+                    cardText += "\n" + lines[j];
+                    i++;
+                    if (lines[j].includes("<!--SR:")) {
+                        break;
+                    }
+                }
             }
 
             lastLineNo = i;

@@ -59,7 +59,6 @@ export class UIManager {
     private plugin: SRPlugin;
     private ribbonIcon: HTMLElement | null = null;
     private externalModalObserver: MutationObserver | null = null;
-    private areFileMenuItemsShown: boolean = false;
 
     constructor(plugin: SRPlugin, dataManager: DataManager) {
         this.plugin = plugin;
@@ -100,6 +99,7 @@ export class UIManager {
         this.plugin.addSettingTab(
             new SRSettingTab(this.plugin.app, this.plugin, this.dataManager, this),
         );
+
         this.registerSRFocusListener();
     }
 

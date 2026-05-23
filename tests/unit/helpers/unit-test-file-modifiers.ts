@@ -4,6 +4,9 @@ import { StorageType } from "src/data/data-store/base/data-store";
 import { IFileModifier } from "src/data/data-store/base/file-modifier";
 
 export class UnitTestFileModifier implements IFileModifier {
+    migrateCommentsToCallouts(): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
     migrateDataStore(_: StorageType): Promise<void> {
         throw new Error("Method not implemented.");
     }
