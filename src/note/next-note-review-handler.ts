@@ -36,7 +36,7 @@ export class NextNoteReviewHandler {
                     return;
                 }
             }
-            this.reviewNextNote(this._lastSelectedReviewDeck);
+            await this.reviewNextNote(this._lastSelectedReviewDeck);
         }
     }
 
@@ -45,10 +45,12 @@ export class NextNoteReviewHandler {
 
         if (reviewDeckNames.length === 1) {
             // There is only one deck, so no need to ask the user to make a selection
-            this.reviewNextNote(reviewDeckNames[0]);
+            await this.reviewNextNote(reviewDeckNames[0]);
         } else {
             const deckSelectionModal = new ReviewDeckSelectionModal(this.app, reviewDeckNames);
-            deckSelectionModal.submitCallback = (deckKey: string) => this.reviewNextNote(deckKey);
+            deckSelectionModal.submitCallback = (deckKey: string) => {
+                void this.reviewNextNote(deckKey);
+            };
             deckSelectionModal.open();
         }
     }

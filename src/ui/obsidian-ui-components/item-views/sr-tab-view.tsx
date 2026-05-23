@@ -142,13 +142,14 @@ export class SRTabView extends ItemView {
         if (this.plugin.uiManager === null) throw new Error("UI manager not initialized!!!");
         this.plugin.uiManager.setContentManager(this.contentManager);
 
-        this.contentManager.open();
+        await this.contentManager.open();
     }
 
     /**
      * Closes the SRTabView by shutting down any active deck or flashcard views.
      * Ensures that resources associated with these views are properly released.
      */
+     
     async onClose() {
         // Resets the changes made in onOpen
         if (activeDocument.body.classList.contains("is-mobile")) {

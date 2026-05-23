@@ -81,19 +81,14 @@ export class UIManager {
         this.plugin.app.workspace.onLayoutReady(async () => {
             this.tabViewManager.closeAllTabViews();
             await this.sidebarManager.activateReviewQueueViewPanel();
-            window.setTimeout(async () => {
-                if (this.dataManager.osrCore === null)
-                    throw new Error("SR plugin or OSR app core not initialized!!!");
-                if (!this.dataManager.syncLock) {
-                    await this.dataManager.sync();
-                }
-            }, 2000);
+            await this.dataManager.sync();
         });
 
         this.statusBarManager = new StatusBarManager(this.plugin);
 
         this.showRibbonIcon(this.dataManager.data.settings.showRibbonIcon);
         this.plugin.registerEvent(
+             
             this.plugin.app.workspace.on("file-menu", this.fileMenuHandler.bind(this)),
         );
         this.plugin.addSettingTab(
@@ -126,10 +121,12 @@ export class UIManager {
 
         if (settings.showStatusBar) {
             this.statusBarManager.setCount(
-                this.dataManager.osrCore.remainingDeckTree.getRepItemCount(
-                    RepItemState.AnyItem,
-                    true,
-                ),
+                this.dataManager.osrCore.remainingDeckTree
+                    ? this.dataManager.osrCore.remainingDeckTree.getRepItemCount(
+                          RepItemState.AnyItem,
+                          true,
+                      )
+                    : 0,
                 settings.showStatusBar && settings.showCardStatusBarItem,
                 "card-review",
             );
@@ -143,8 +140,10 @@ export class UIManager {
 
     public registerSRFocusListener() {
         this.plugin.registerEvent(
+             
             this.plugin.app.workspace.on("active-leaf-change", this.handleFocusChange.bind(this)),
         );
+         
         this.externalModalObserver = new MutationObserver(this.handleExternalModalOpen.bind(this));
         this.externalModalObserver.observe(activeDocument.body, {
             childList: true,
@@ -220,13 +219,13 @@ export class UIManager {
         );
 
         if (openInNewTab) {
-            this.tabViewManager.openSRTabView(reviewQueueLoader);
+            await this.tabViewManager.openSRTabView(reviewQueueLoader);
         } else {
             this.openFlashcardModal(reviewQueueLoader);
         }
     }
 
-    public async openFlashcardModal(reviewQueueLoader: ReviewQueueLoader): Promise<void> {
+    public openFlashcardModal(reviewQueueLoader: ReviewQueueLoader): void {
         if (this.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
 
         this.setSRViewInFocus(true);
@@ -278,7 +277,7 @@ export class UIManager {
                     .onClick(() => {
                         if (this.dataManager.data === null)
                             throw new Error("SR plugin or data not initialized!!!");
-                        this.dataManager.saveNoteReviewResponse(file, ReviewResponse.Easy);
+                        void this.dataManager.saveNoteReviewResponse(file, ReviewResponse.Easy);
                     });
             });
 
@@ -292,7 +291,7 @@ export class UIManager {
                     .onClick(() => {
                         if (this.dataManager.data === null)
                             throw new Error("SR plugin or data not initialized!!!");
-                        this.dataManager.saveNoteReviewResponse(file, ReviewResponse.Good);
+                        void this.dataManager.saveNoteReviewResponse(file, ReviewResponse.Good);
                     });
             });
 
@@ -306,7 +305,7 @@ export class UIManager {
                     .onClick(() => {
                         if (this.dataManager.data === null)
                             throw new Error("SR plugin or data not initialized!!!");
-                        this.dataManager.saveNoteReviewResponse(file, ReviewResponse.Hard);
+                        void this.dataManager.saveNoteReviewResponse(file, ReviewResponse.Hard);
                     });
             });
         }
@@ -320,17 +319,17 @@ export class UIManager {
                 item.setTitle(t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"))
                     .setIcon("trash")
                     .setWarning(true)
-                    .onClick(async () => {
+                    .onClick(() => {
                         new ConfirmationModal(
                             this.plugin.app,
                             t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"),
                             t("CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION"),
                             t("NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS"),
-                            () => {
+                            async () => {
                                 if (this.dataManager.data === null)
                                     throw new Error("SR plugin or data not initialized!!!");
                                 const settings = this.dataManager.data.settings;
-                                DataStore.instance.fileModifier.deleteNoteSchedulingDataInNote(
+                                await DataStore.instance.fileModifier.deleteNoteSchedulingDataInNote(
                                     file,
                                     settings.deleteTagsOnSchedulingDataDeletion,
                                     settings.tagsToReview,
@@ -344,17 +343,17 @@ export class UIManager {
                 item.setTitle(t("DELETE_SCHEDULING_DATA_OF_CARDS_IN_NOTE"))
                     .setIcon("trash")
                     .setWarning(true)
-                    .onClick(async () => {
+                    .onClick(() => {
                         new ConfirmationModal(
                             this.plugin.app,
                             t("DELETE_SCHEDULING_DATA_OF_CARDS_IN_NOTE"),
                             t("CONFIRM_SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION"),
                             t("SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION_IN_PROGRESS"),
-                            () => {
+                            async () => {
                                 if (this.dataManager.data === null)
                                     throw new Error("SR plugin or data not initialized!!!");
                                 const settings = this.dataManager.data.settings;
-                                DataStore.instance.fileModifier.deleteAllSchedulingDataOfCardsInNote(
+                                await DataStore.instance.fileModifier.deleteAllSchedulingDataOfCardsInNote(
                                     file,
                                     settings.deleteTagsOnSchedulingDataDeletion,
                                     settings.flashcardTags,

@@ -79,6 +79,7 @@ export class DataManager {
      * Loads the plugin data from the data.json from the plugin's folder.
      */
     async loadData(): Promise<void> {
+         
         const loadedData: PluginData = await this.plugin.loadData();
         if (loadedData?.settings) upgradeSettings(loadedData.settings);
         this.data = Object.assign({}, DEFAULT_DATA, loadedData);
@@ -230,7 +231,7 @@ export class DataManager {
             folderTopicPath,
         );
         if (note && note.hasChanged) {
-            note.writeNoteFile(this.data.settings);
+            await note.writeNoteFile(this.data.settings);
         }
         return note;
     }
@@ -266,7 +267,7 @@ export class DataManager {
         new Notice(t("RESPONSE_RECEIVED"));
 
         if (this.data.settings.autoNextNote) {
-            this.plugin.nextNoteReviewHandler.autoReviewNextNote();
+            await this.plugin.nextNoteReviewHandler.autoReviewNextNote();
         }
     }
 

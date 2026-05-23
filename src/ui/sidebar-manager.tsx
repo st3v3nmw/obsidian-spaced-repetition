@@ -12,7 +12,7 @@ export class SidebarManager {
     private plugin: Plugin;
     private settings: SRSettings;
     private nextNoteReviewHandler: NextNoteReviewHandler;
-    private reviewQueueListView: ReviewQueueListView;
+    private reviewQueueListView: ReviewQueueListView | null = null;
 
     private get app(): App {
         return this.plugin.app;
@@ -29,6 +29,7 @@ export class SidebarManager {
     }
 
     redraw(): void {
+        if (this.reviewQueueListView === null) return;
         this.reviewQueueListView.redraw();
     }
 
@@ -54,7 +55,10 @@ export class SidebarManager {
 
     async activateReviewQueueViewPanel(): Promise<void> {
         if (this.settings.enableNoteReviewPaneOnStartup) {
-            await this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE).setViewState({
+            const activeLeaf = this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE);
+            if (!activeLeaf) return;
+
+            await activeLeaf.setViewState({
                 type: REVIEW_QUEUE_VIEW_TYPE,
                 active: true,
             });
@@ -63,6 +67,7 @@ export class SidebarManager {
 
     async openReviewQueueView(): Promise<void> {
         const reviewQueueLeaf = this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE);
-        this.app.workspace.revealLeaf(reviewQueueLeaf);
+        if (!reviewQueueLeaf) return;
+        await this.app.workspace.revealLeaf(reviewQueueLeaf);
     }
 }

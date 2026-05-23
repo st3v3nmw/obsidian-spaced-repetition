@@ -24,38 +24,34 @@ export class NoteDataFileModifier implements IFileModifier {
     }
 
     async migrateCommentsToCalloutsInFile(file: TFile, vault: Vault): Promise<void> {
-        try {
-            await vault.process(file, (data) => {
-                let newData = "";
+        await vault.process(file, (data) => {
+            let newData = "";
 
-                const srCommentWithinMetadataRegex = /.*<!--SR:!.*-->/gm;
-                const matches = data.matchAll(srCommentWithinMetadataRegex);
-                let index = 0;
+            const srCommentWithinMetadataRegex = /.*<!--SR:!.*-->/gm;
+            const matches = data.matchAll(srCommentWithinMetadataRegex);
+            let index = 0;
 
-                for (const match of matches) {
-                    if (!match[0].startsWith("> <!--SR:")) {
-                        const srComment = match[0];
-                        const newText = `${match.index !== 0 && data[match.index - 1] === "\n" ? "" : "\n"}${SR_METADATA_CALLOUT}\n> ${srComment}`;
+            for (const match of matches) {
+                if (!match[0].startsWith("> <!--SR:")) {
+                    const srComment = match[0];
+                    const newText = `${match.index !== 0 && data[match.index - 1] === "\n" ? "" : "\n"}${SR_METADATA_CALLOUT}\n> ${srComment}`;
 
-                        if (match.index > index) {
-                            newData += data.substring(index, match.index);
-                        }
-
-                        newData += newText;
-
-                        index = match.index + srComment.length;
+                    if (match.index > index) {
+                        newData += data.substring(index, match.index);
                     }
-                }
 
-                if (index < data.length) {
-                    newData += data.substring(index);
-                }
+                    newData += newText;
 
-                return newData;
-            });
-        } catch (e) {
-            console.log({ filePath: file.path, error: e });
-        }
+                    index = match.index + srComment.length;
+                }
+            }
+
+            if (index < data.length) {
+                newData += data.substring(index);
+            }
+
+            return newData;
+        });
     }
 
     migrateDataStore(_: StorageType): Promise<void> {
@@ -83,16 +79,15 @@ export class NoteDataFileModifier implements IFileModifier {
         deleteTags: boolean,
         tagsToDelete: string[] = [],
     ) {
-        try {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await this.plugin.app.fileManager.processFrontMatter(file, (frontmatter: any) => {
-                delete frontmatter["sr-due"];
-                delete frontmatter["sr-interval"];
-                delete frontmatter["sr-ease"];
-            });
-        } catch (e) {
-            console.log({ filePath: file.path, error: e });
-        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await this.plugin.app.fileManager.processFrontMatter(file, (frontmatter: any) => {
+             
+            delete frontmatter["sr-due"];
+             
+            delete frontmatter["sr-interval"];
+             
+            delete frontmatter["sr-ease"];
+        });
 
         if (deleteTags) {
             await this.removeTagsFromFile(vault, file, tagsToDelete);
@@ -101,43 +96,36 @@ export class NoteDataFileModifier implements IFileModifier {
 
     async removeTagsFromFile(vault: Vault, file: TFile, tagsToDelete: string[]) {
         await this.removeTagsFromFrontmatter(vault, file, tagsToDelete);
-        try {
-            await vault.process(file, (data) => {
-                let newData = data;
-                for (const tagToDelete of tagsToDelete.sort((a, b) => b.length - a.length)) {
-                    const regex = new RegExp(
-                        // eslint-disable-next-line no-useless-escape
-                        `(${tagToDelete}[\/[a-zA-z\-[0-9]*]*\/]*[a-zA-z\-[0-9]*]*)`,
-                        "gm",
-                    );
-                    newData = newData.replace(regex, "");
-                    newData = newData.replace(tagToDelete, "");
-                }
-                return newData;
-            });
-        } catch (e) {
-            console.log({ filePath: file.path, error: e });
-        }
+        await vault.process(file, (data) => {
+            let newData = data;
+            for (const tagToDelete of tagsToDelete.sort((a, b) => b.length - a.length)) {
+                const regex = new RegExp(
+                    // eslint-disable-next-line no-useless-escape
+                    `(${tagToDelete}[\/[a-zA-z\-[0-9]*]*\/]*[a-zA-z\-[0-9]*]*)`,
+                    "gm",
+                );
+                newData = newData.replace(regex, "");
+                newData = newData.replace(tagToDelete, "");
+            }
+            return newData;
+        });
     }
 
     async removeTagsFromFrontmatter(vault: Vault, file: TFile, tagsToDelete: string[]) {
-        try {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await this.plugin.app.fileManager.processFrontMatter(file, (frontmatter: any) => {
-                frontmatter["tags"] = (frontmatter["tags"] as string[]).filter((tag: string) => {
-                    let deleteTag = false;
-                    for (const tagToDelete of tagsToDelete.sort((a, b) => b.length - a.length)) {
-                        if (tag.startsWith(tagToDelete.replace("#", ""))) {
-                            deleteTag = true;
-                            break;
-                        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await this.plugin.app.fileManager.processFrontMatter(file, (frontmatter: any) => {
+             
+            frontmatter["tags"] = (frontmatter["tags"] as string[]).filter((tag: string) => {
+                let deleteTag = false;
+                for (const tagToDelete of tagsToDelete.sort((a, b) => b.length - a.length)) {
+                    if (tag.startsWith(tagToDelete.replace("#", ""))) {
+                        deleteTag = true;
+                        break;
                     }
-                    return !deleteTag;
-                });
+                }
+                return !deleteTag;
             });
-        } catch (e) {
-            console.log({ filePath: file.path, error: e });
-        }
+        });
     }
 
     /**
@@ -152,13 +140,9 @@ export class NoteDataFileModifier implements IFileModifier {
         deleteTags: boolean,
         tagsToDelete: string[] = [],
     ) {
-        try {
-            await vault.process(file, (data) => {
-                return data.replace(SR_COMMENT_AND_WHITESPACE_FINDER, "");
-            });
-        } catch (e) {
-            console.log({ filePath: file.path, error: e });
-        }
+        await vault.process(file, (data) => {
+            return data.replace(SR_COMMENT_AND_WHITESPACE_FINDER, "");
+        });
 
         if (deleteTags) {
             await this.removeTagsFromFile(vault, file, tagsToDelete);

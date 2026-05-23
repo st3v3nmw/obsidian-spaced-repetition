@@ -73,7 +73,7 @@ export interface SRSettings {
     startOfDay: string;
 
     // storage
-    dataStore: string;
+    dataStore: StorageType;
     cardCommentOnSameLine: boolean;
     scheduleDataVaultLocation: string;
 
