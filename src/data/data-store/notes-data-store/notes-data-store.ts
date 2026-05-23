@@ -21,19 +21,6 @@ export class NotesDataStore implements IDataStore {
     }
 
     /**
-     * Migrates the data store from the previous store to the new store.
-     *
-     * @param previousType The previousType of the data store.
-     */
-    async migrateDataStore(previousType: StorageType): Promise<void> {
-        await this.fileModifier.migrateDataStore(previousType);
-    }
-
-    async migrateSRCommentsToCallouts(): Promise<void> {
-        await this.fileModifier.migrateCommentsToCallouts();
-    }
-
-    /**
      * Creates scheduling information from a question text and its storage info.
      *
      * @param originalQuestionText

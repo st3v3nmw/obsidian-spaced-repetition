@@ -190,7 +190,7 @@ export class DataPage extends SettingsPage {
                                     t("CONFIRM_MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT"),
                                     t("MIGRATING_SCHEDULING_COMMENTS_TO_CALLOUT"),
                                     async () => {
-                                        await DataStore.instance.migrateSRCommentsToCallouts();
+                                        await DataStore.instance.fileModifier.migrateCommentsToCallouts();
                                         this.display();
                                     },
                                 ).open();

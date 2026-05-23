@@ -41,6 +41,19 @@ test("Test parsing of single line basic cards", () => {
     expect(parseT("Question::Answer <!--SR:2021-08-11,4,270-->", parserOptions)).toEqual([
         [CardType.SingleLineBasic, "Question::Answer <!--SR:2021-08-11,4,270-->", 0, 0],
     ]);
+    expect(
+        parseT(
+            "Question::Answer\n> [!sr|card-metadata] \n> <!--SR:!2021-08-11,4,270-->",
+            parserOptions,
+        ),
+    ).toEqual([
+        [
+            CardType.SingleLineBasic,
+            "Question::Answer\n> [!sr|card-metadata] \n> <!--SR:!2021-08-11,4,270-->",
+            0,
+            2,
+        ],
+    ]);
     expect(parseT("Some text before\nQuestion ::Answer", parserOptions)).toEqual([
         [CardType.SingleLineBasic, "Question ::Answer", 1, 1],
     ]);
