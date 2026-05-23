@@ -140,7 +140,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     openViewInNewTab: false,
     openViewInNewTabMobile: false,
     useCustomHotkeys: false,
-    useCalloutsForSchedulingComments: true,
+    useCalloutsForSchedulingComments: false,
 
     // algorithm
     algorithm: SRAlgorithmType.SM_2_OSR,

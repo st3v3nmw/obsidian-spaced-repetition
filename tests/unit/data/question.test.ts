@@ -23,8 +23,10 @@ describe("Question", () => {
                 questionText: new QuestionText(text, null, text, TextDirection.Ltr, null),
             });
 
-            expect(question.getHtmlCommentSeparator(DEFAULT_SETTINGS)).toEqual("\n");
-            expect(question.getHtmlCommentSeparator(settingsCardCommentOnSameLine)).toEqual("\n");
+            expect(question.getHtmlCommentSeparator(DEFAULT_SETTINGS, false)).toEqual("\n");
+            expect(question.getHtmlCommentSeparator(settingsCardCommentOnSameLine, false)).toEqual(
+                "\n",
+            );
         });
 
         test("Doesn't end with a code block", async () => {
@@ -34,8 +36,10 @@ describe("Question", () => {
                 questionText: new QuestionText(text, null, text, TextDirection.Ltr, null),
             });
 
-            expect(question.getHtmlCommentSeparator(DEFAULT_SETTINGS)).toEqual("\n");
-            expect(question.getHtmlCommentSeparator(settingsCardCommentOnSameLine)).toEqual(" ");
+            expect(question.getHtmlCommentSeparator(DEFAULT_SETTINGS, false)).toEqual("\n");
+            expect(question.getHtmlCommentSeparator(settingsCardCommentOnSameLine, false)).toEqual(
+                " ",
+            );
         });
     });
 
