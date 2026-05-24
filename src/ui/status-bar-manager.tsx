@@ -14,14 +14,12 @@ export const StatusBarItemTypesArray: ReadonlyArray<StatusBarItemPurpose> = [
 ];
 
 export default class StatusBarManager {
-    protected statusBarItems: TextStatusBarItem[];
+    private statusBarItems: TextStatusBarItem[];
     protected plugin: SRPlugin;
 
     constructor(plugin: SRPlugin) {
         this.plugin = plugin;
         this.statusBarItems = [];
-
-        void this.createStatusBarItems();
     }
 
     setCount(count: number, showItems: boolean, statusBarItemType: StatusBarItemPurpose): void {
@@ -102,7 +100,9 @@ export default class StatusBarManager {
         }
     }
 
-    private async createStatusBarItems(): Promise<void> {
+    async createStatusBarItems(): Promise<void> {
+        if (this.statusBarItems.length > 0) return;
+
         for (const statusBarItemType of StatusBarItemTypesArray) {
             let statusBarItem = undefined;
 

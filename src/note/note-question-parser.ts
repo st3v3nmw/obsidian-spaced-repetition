@@ -87,6 +87,7 @@ export class NoteQuestionParser {
             // For each question, determine it's TopicPathList
             [this.frontmatterTopicPathList, this.contentTopicPathInfo] =
                 this.analyseTagCacheList(tagCompleteList);
+
             for (const question of this.questionList) {
                 question.topicPathList = this.determineQuestionTopicPathList(question);
             }
@@ -255,7 +256,6 @@ export class NoteQuestionParser {
                 item.position.start.line === frontmatterTagPseudoLineNum &&
                 this.isNoteLevelFlashcardTag(item),
         );
-        console.log("Note level tag list", noteLevelTagList);
         if (noteLevelTagList.length > 0) {
             // Treat the frontmatter slightly differently (all tags grouped together even if on separate lines)
             if (this.frontmatterText) {

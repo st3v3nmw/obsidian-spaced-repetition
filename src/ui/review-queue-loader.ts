@@ -47,8 +47,6 @@ export class ReviewQueueLoader {
             throw new Error("SR plugin or OSR app core not initialized!!!");
 
         if (!this.plugin.dataManager.syncLock) {
-            // TODO: FIx bug reload
-            console.log("syncing");
             await this.plugin.dataManager.sync();
         }
 

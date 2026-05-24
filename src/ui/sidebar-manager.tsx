@@ -1,31 +1,21 @@
-import { App, Plugin, WorkspaceLeaf } from "obsidian";
+import { App, WorkspaceLeaf } from "obsidian";
 
-import { SRSettings } from "src/data/settings";
 import SRPlugin from "src/main";
-import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import {
     REVIEW_QUEUE_VIEW_TYPE,
     ReviewQueueListView,
 } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
 
 export class SidebarManager {
-    private plugin: Plugin;
-    private settings: SRSettings;
-    private nextNoteReviewHandler: NextNoteReviewHandler;
+    private plugin: SRPlugin;
     private reviewQueueListView: ReviewQueueListView | null = null;
 
     private get app(): App {
         return this.plugin.app;
     }
 
-    constructor(
-        plugin: Plugin,
-        settings: SRSettings,
-        nextNoteReviewHandler: NextNoteReviewHandler,
-    ) {
+    constructor(plugin: SRPlugin) {
         this.plugin = plugin;
-        this.settings = settings;
-        this.nextNoteReviewHandler = nextNoteReviewHandler;
     }
 
     redraw(): void {
@@ -46,15 +36,15 @@ export class SidebarManager {
         this.plugin.registerView(REVIEW_QUEUE_VIEW_TYPE, (leaf) => {
             return (this.reviewQueueListView = new ReviewQueueListView(
                 leaf,
-                this.nextNoteReviewHandler,
-                this.settings,
-                this.plugin as SRPlugin,
+                this.plugin.nextNoteReviewHandler,
+                this.plugin.dataManager.data.settings,
+                this.plugin,
             ));
         });
     }
 
     async activateReviewQueueViewPanel(): Promise<void> {
-        if (this.settings.enableNoteReviewPaneOnStartup) {
+        if (this.plugin.dataManager.data.settings.enableNoteReviewPaneOnStartup) {
             const activeLeaf = this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE);
             if (!activeLeaf) return;
 

@@ -113,9 +113,8 @@ export abstract class SRTFile implements ISRFile {
      * @returns {string[]} - An array of all tags from the file cache.
      */
     getAllTagsFromCache(): string[] {
-        // TODO: Fix bug where tags are not being read from the cache here
+        // WARNING: tags are sometimes not being read from the cache here, as the cache is empty
         const fileCachedData = this.metadataCache.getFileCache(this.file);
-
         if (!fileCachedData) {
             return [];
         }
@@ -142,6 +141,11 @@ export abstract class SRTFile implements ISRFile {
         // frontmatter.
         if (fileCachedData && fileCachedData.frontmatter) {
             result.push(...this.getFrontmatterTags(fileCachedData.frontmatter));
+        }
+
+        if (result.length === 0) {
+            // TODO: Fix bug where tags are not being read from the cache here, as the cache is empty
+            // Read the file content directly
         }
 
         return result;

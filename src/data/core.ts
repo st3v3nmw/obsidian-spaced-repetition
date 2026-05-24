@@ -212,7 +212,6 @@ export class OsrCore {
         if (this.osrNoteGraph !== null) this.osrNoteGraph.processLinks(noteFile.path);
 
         const tags = noteFile.getAllTagsFromCache();
-
         // Does the note contain any tags that are specified as flashcard tags in the settings
         // (Doing this check first saves us from loading and parsing the note if not necessary)
         const topicPath: TopicPath = this.findTopicPath(noteFile);
