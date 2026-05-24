@@ -92,16 +92,16 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
             cardMenu.addItem((item) => {
                 item.setTitle(t("OPEN_IN_BACKGROUND"))
                     .setIcon("send-to-back")
-                    .onClick(() => {
+                    .onClick(async () => {
                         // Doesn't close modal, just opens in background and focuses
-                        jumpToCurrentCard();
+                        await jumpToCurrentCard();
                     });
             });
             cardMenu.addItem((item) => {
                 item.setTitle(t("JUMP_TO_AND_CLOSE"))
                     .setIcon("arrow-up-right")
-                    .onClick(() => {
-                        jumpToCurrentCard();
+                    .onClick(async () => {
+                        await jumpToCurrentCard();
                         if (closeModal) {
                             closeModal();
                         }
@@ -111,8 +111,8 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
             cardMenu.addItem((item) => {
                 item.setTitle(t("JUMP_TO"))
                     .setIcon("arrow-up-right")
-                    .onClick(() => {
-                        jumpToCurrentCard();
+                    .onClick(async () => {
+                        await jumpToCurrentCard();
                     });
             });
         }

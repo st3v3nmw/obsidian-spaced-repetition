@@ -1,10 +1,10 @@
-import { Question } from "src/card/questions/question";
-import { Deck } from "src/deck/deck";
-import { ISRFile } from "src/file";
-import { SRSettings } from "src/settings";
+import { Question } from "src/data/data-structures/card/questions/question";
+import { Deck } from "src/data/data-structures/deck/deck";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
+import { SRSettings } from "src/data/settings";
 
 export class Note {
-    file: ISRFile;
+    file: ISRNoteTFile;
     questionList: Question[];
 
     get hasChanged(): boolean {
@@ -15,7 +15,7 @@ export class Note {
         return this.file.path;
     }
 
-    constructor(file: ISRFile, questionList: Question[]) {
+    constructor(file: ISRNoteTFile, questionList: Question[]) {
         this.file = file;
         this.questionList = questionList;
         questionList.forEach((question) => (question.note = this));
@@ -24,7 +24,7 @@ export class Note {
     appendCardsToDeck(deck: Deck): void {
         for (const question of this.questionList) {
             for (const card of question.cards) {
-                deck.appendCard(question.topicPathList, card);
+                deck.appendRepItem(question.topicPathList, card);
             }
         }
     }

@@ -1,9 +1,9 @@
-import { Deck } from "src/deck/deck";
-import { TopicPath } from "src/deck/topic-path";
+import { Deck } from "src/data/data-structures/deck/deck";
+import { TopicPath } from "src/data/data-structures/deck/topic-path";
+import { DEFAULT_SETTINGS } from "src/data/settings";
 import { Note } from "src/note/note";
 import { NoteFileLoader } from "src/note/note-file-loader";
 import { NoteParser } from "src/note/note-parser";
-import { DEFAULT_SETTINGS } from "src/settings";
 import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
@@ -29,10 +29,10 @@ Q3::A3
         const deck: Deck = Deck.emptyDeck;
         note.appendCardsToDeck(deck);
         const subdeck: Deck = deck.getDeck(new TopicPath(["flashcards", "test"]));
-        expect(subdeck.newFlashcards[0].front).toEqual("Q1");
-        expect(subdeck.newFlashcards[1].front).toEqual("Q2");
-        expect(subdeck.newFlashcards[2].front).toEqual("Q3");
-        expect(subdeck.dueFlashcards.length).toEqual(0);
+        expect(subdeck.newRepItems[0].front).toEqual("Q1");
+        expect(subdeck.newRepItems[1].front).toEqual("Q2");
+        expect(subdeck.newRepItems[2].front).toEqual("Q3");
+        expect(subdeck.dueRepItems.length).toEqual(0);
     });
 
     test("Multiple questions, multiple cards per question", async () => {
@@ -47,11 +47,11 @@ Q3:::A3
         const deck: Deck = Deck.emptyDeck;
         note.appendCardsToDeck(deck);
         const subdeck: Deck = deck.getDeck(new TopicPath(["flashcards", "test"]));
-        expect(subdeck.newFlashcards.length).toEqual(6);
-        const frontList = subdeck.newFlashcards.map((card) => card.front);
+        expect(subdeck.newRepItems.length).toEqual(6);
+        const frontList = subdeck.newRepItems.map((card) => card.front);
 
         expect(frontList).toEqual(["Q1", "A1", "Q2", "A2", "Q3", "A3"]);
-        expect(subdeck.dueFlashcards.length).toEqual(0);
+        expect(subdeck.dueRepItems.length).toEqual(0);
     });
 });
 

@@ -2,12 +2,12 @@ import "src/ui/obsidian-ui-components/content-container/deck-container/deck-cont
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
+import { Deck } from "src/data/data-structures/deck/deck";
+import { SRSettings } from "src/data/settings";
 import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
-} from "src/card/flashcard-review-sequencer";
-import { Deck } from "src/deck/deck";
-import { SRSettings } from "src/settings";
+} from "src/scheduling/flashcard-review-sequencer";
 import DeckListComponent from "src/ui/obsidian-ui-components/content-container/deck-container/deck-list";
 import DeckListHeaderComponent from "src/ui/obsidian-ui-components/content-container/deck-container/deck-list-header";
 
@@ -45,6 +45,7 @@ export class DeckContainer {
     ) {
         // Redraw in case the stats have changed
         this.deckListHeader.updateReviewMode(reviewMode);
+
         this.deckList.redraw(reviewSequencer, settings);
 
         if (this.containerEl.hasClass("sr-is-hidden")) {

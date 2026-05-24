@@ -5,17 +5,20 @@ import {
     SettingsPageManager,
     SettingsPageType,
 } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
+import { UIManager } from "src/ui/ui-manager";
 
 export class SRSettingTab extends PluginSettingTab {
     private plugin: SRPlugin;
+    private uiManager: UIManager;
     private settingsPageManager: SettingsPageManager | null = null;
     private lastPage: SettingsPageType = "main-page";
     private lastScrollPosition: number = 0;
     private didReadMultilineEndMarkerWarning: boolean = false;
 
-    constructor(app: App, plugin: SRPlugin) {
+    constructor(app: App, plugin: SRPlugin, uiManager: UIManager) {
         super(app, plugin);
         this.plugin = plugin;
+        this.uiManager = uiManager;
         this.icon = "SpacedRepIcon";
         this.containerEl.addClass("sr-settings-tab");
     }
@@ -24,6 +27,8 @@ export class SRSettingTab extends PluginSettingTab {
         this.settingsPageManager = new SettingsPageManager(
             this.containerEl,
             this.plugin,
+            this.plugin.dataManager,
+            this.uiManager,
             this.lastPage,
             this.lastScrollPosition,
             this.didReadMultilineEndMarkerWarning,

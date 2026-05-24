@@ -38,7 +38,7 @@ describe("escapeRegexString", () => {
 });
 
 describe("literalStringReplace", () => {
-    test("Replacement string doesn't have any dollar signs", async () => {
+    test("Replacement string doesn't have any dollar signs", () => {
         const actual: string = literalStringReplace(
             "Original string without dollar signs",
             "dollar",
@@ -47,7 +47,7 @@ describe("literalStringReplace", () => {
         expect(actual).toEqual("Original string without pound signs");
     });
 
-    test("Replacement string has double dollar signs", async () => {
+    test("Replacement string has double dollar signs", () => {
         const actual: string = literalStringReplace(
             "Original string without dollar signs",
             "dollar",
@@ -56,7 +56,7 @@ describe("literalStringReplace", () => {
         expect(actual).toEqual("Original string without $ signs");
     });
 
-    test("Original and search strings has double dollar signs at the end", async () => {
+    test("Original and search strings has double dollar signs at the end", () => {
         const originalStr: string = `Some stuff at the start
 
 Something
@@ -83,7 +83,7 @@ $$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$
         expect(actual).toEqual(expectedStr);
     });
 
-    test("Original and search strings has double dollar signs at the end", async () => {
+    test("Original and search strings has double dollar signs at the end", () => {
         const originalStr: string = "Some stuff at the start $$";
 
         const searchStr: string = "start $$";
@@ -96,7 +96,7 @@ $$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$
         expect(actual).toEqual(expectedStr);
     });
 
-    test("Search string not found", async () => {
+    test("Search string not found", () => {
         const originalStr: string = "A very boring string";
 
         const searchStr: string = "missing";
@@ -719,7 +719,7 @@ Some Stuff 7 More Stuff`;
         const replacementStr: string = `Replacement line 1
 Replacement line 2`;
 
-        const expectedResult: string = null;
+        const expectedResult: string | null = null;
         checkFindAndReplaceResult(text10, searchStr, replacementStr, expectedResult);
     });
 });
@@ -728,16 +728,20 @@ function checkFindAndReplaceResult(
     text: string,
     searchStr: string,
     replacementStr: string,
-    expectedResult: string,
+    expectedResult: string | null,
 ) {
-    const result: string = MultiLineTextFinder.findAndReplace(text, searchStr, replacementStr);
+    const result: string | null = MultiLineTextFinder.findAndReplace(
+        text,
+        searchStr,
+        replacementStr,
+    );
     expect(result).toEqual(expectedResult);
 }
 
-function checkFindResult(text: string, searchStr: string, expectedResult: number) {
+function checkFindResult(text: string, searchStr: string, expectedResult: number | null) {
     const textArray = splitTextIntoLineArray(text);
     const searchArray = splitTextIntoLineArray(searchStr);
-    const result: number = MultiLineTextFinder.find(textArray, searchArray);
+    const result: number | null = MultiLineTextFinder.find(textArray, searchArray);
     expect(result).toEqual(expectedResult);
 }
 

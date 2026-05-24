@@ -1,12 +1,12 @@
 import { State } from "ts-fsrs";
 
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { RepItemScheduleInfoFsrs } from "src/algorithms/fsrs/rep-item-schedule-info-fsrs";
-import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
-import { MULTI_SCHEDULING_EXTRACTOR } from "src/constants";
-import { TICKS_PER_DAY } from "src/constants";
-import { DataStore } from "src/data-stores/base/data-store";
-import { DEFAULT_SETTINGS } from "src/settings";
+import { MULTI_SCHEDULING_EXTRACTOR } from "src/data/constants";
+import { TICKS_PER_DAY } from "src/data/constants";
+import { DataStore } from "src/data/data-store/base/data-store";
+import { DEFAULT_SETTINGS } from "src/data/settings";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
 import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
@@ -17,11 +17,11 @@ beforeAll(() => {
 });
 
 test("No schedule info for question", () => {
-    expect(DataStore.getInstance().questionCreateSchedule("A::B", null)).toEqual([]);
+    expect(DataStore.getInstance().createSchedule("A::B", null)).toEqual([]);
 });
 
 test("Single schedule info for question (on separate line)", () => {
-    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
         `What symbol represents an electric field:: $\\large \\vec E$
 <!--SR:!2023-09-02,4,270-->`,
         null,
@@ -33,7 +33,7 @@ test("Single schedule info for question (on separate line)", () => {
 });
 
 test("Single schedule info for question (on same line)", () => {
-    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
         "What symbol represents an electric field:: $\\large \\vec E$<!--SR:!2023-09-02,4,270-->",
         null,
     );
@@ -44,7 +44,7 @@ test("Single schedule info for question (on same line)", () => {
 });
 
 test("Legacy schedule comments without the bang prefix are still parsed", () => {
-    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
         "What symbol represents an electric field:: $\\large \\vec E$<!--SR:2023-09-02,4,270-->",
         null,
     );
@@ -55,7 +55,7 @@ test("Legacy schedule comments without the bang prefix are still parsed", () => 
 });
 
 test("Legacy fallback extractor loop still parses schedules", () => {
-    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
         {
             match(): RegExpMatchArray | null {
                 return null;
@@ -84,7 +84,7 @@ test("Legacy fallback extractor loop still parses schedules", () => {
 });
 
 test("Multiple schedule info for question (on separate line)", () => {
-    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
         `This is a really very ==interesting== and ==fascinating== and ==great== test
     <!--SR:!2023-09-03,1,230!2023-09-05,3,250!2023-09-06,4,270-->`,
         null,
@@ -98,7 +98,7 @@ test("Multiple schedule info for question (on separate line)", () => {
 });
 
 test("Single FSRS schedule info for question", () => {
-    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
         "What symbol represents an electric field:: $\\large \\vec E$<!--SR:!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z-->",
         null,
     );
@@ -118,7 +118,7 @@ test("Single FSRS schedule info for question", () => {
 });
 
 test("Mixed OSR and FSRS schedule info for question", () => {
-    const actual: RepItemScheduleInfo[] = DataStore.getInstance().questionCreateSchedule(
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
         "What symbol represents an electric field:: $\\large \\vec E$<!--SR:!2023-09-02,4,270!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z-->",
         null,
     );

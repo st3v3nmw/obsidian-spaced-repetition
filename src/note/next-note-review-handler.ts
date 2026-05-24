@@ -1,17 +1,17 @@
 import { App, Notice, TFile } from "obsidian";
 
+import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import { NoteReviewQueue } from "src/note/note-review-queue";
-import { SRSettings } from "src/settings";
 import { ReviewDeckSelectionModal } from "src/ui/obsidian-ui-components/modals/review-deck-selection-modal";
 
 export class NextNoteReviewHandler {
     private app: App;
     private settings: SRSettings;
     private _noteReviewQueue: NoteReviewQueue;
-    private _lastSelectedReviewDeck: string;
+    private _lastSelectedReviewDeck: string | null = null;
 
-    get lastSelectedReviewDeck(): string {
+    get lastSelectedReviewDeck(): string | null {
         return this._lastSelectedReviewDeck;
     }
 
@@ -36,7 +36,7 @@ export class NextNoteReviewHandler {
                     return;
                 }
             }
-            this.reviewNextNote(this._lastSelectedReviewDeck);
+            await this.reviewNextNote(this._lastSelectedReviewDeck);
         }
     }
 
@@ -45,10 +45,12 @@ export class NextNoteReviewHandler {
 
         if (reviewDeckNames.length === 1) {
             // There is only one deck, so no need to ask the user to make a selection
-            this.reviewNextNote(reviewDeckNames[0]);
+            await this.reviewNextNote(reviewDeckNames[0]);
         } else {
             const deckSelectionModal = new ReviewDeckSelectionModal(this.app, reviewDeckNames);
-            deckSelectionModal.submitCallback = (deckKey: string) => this.reviewNextNote(deckKey);
+            deckSelectionModal.submitCallback = (deckKey: string) => {
+                void this.reviewNextNote(deckKey);
+            };
             deckSelectionModal.open();
         }
     }
@@ -61,6 +63,12 @@ export class NextNoteReviewHandler {
 
         this._lastSelectedReviewDeck = deckKey;
         const deck = this._noteReviewQueue.reviewDecks.get(deckKey);
+
+        if (!deck) {
+            new Notice(t("NO_DECK_EXISTS", { deckName: deckKey }));
+            return;
+        }
+
         const notefile = deck.determineNextNote(this.settings.openRandomNote);
 
         if (notefile) {

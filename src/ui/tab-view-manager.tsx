@@ -1,6 +1,6 @@
 import { PaneType, WorkspaceLeaf } from "obsidian";
 
-import { SR_TAB_VIEW } from "src/constants";
+import { SR_TAB_VIEW } from "src/data/constants";
 import SRPlugin from "src/main";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
@@ -100,7 +100,7 @@ export default class TabViewManager {
 
         // "Reveal" the leaf in case it is in a collapsed sidebar
         if (leaf !== null && leaf !== undefined) {
-            workspace.revealLeaf(leaf);
+            await workspace.revealLeaf(leaf);
         }
     }
 }
