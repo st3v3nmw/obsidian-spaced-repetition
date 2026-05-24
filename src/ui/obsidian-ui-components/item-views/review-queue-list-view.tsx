@@ -1,15 +1,15 @@
 import "src/ui/obsidian-ui-components/item-views/review-queue-list-view.css";
 import { ItemView, Menu, setIcon, TFile, WorkspaceLeaf } from "obsidian";
 
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { TICKS_PER_DAY } from "src/constants";
-import { deleteNoteSchedulingDataInNote } from "src/delete-scheduling-data";
+import { TICKS_PER_DAY } from "src/data/constants";
+import { DataStore } from "src/data/data-store/base/data-store";
+import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { NoteReviewDeck } from "src/note/note-review-deck";
 import { NoteReviewQueue } from "src/note/note-review-queue";
-import { SRSettings } from "src/settings";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { formatDateWithMoment } from "src/utils/dates";
 
@@ -21,8 +21,8 @@ export class ReviewQueueListView extends ItemView {
     }
     private settings: SRSettings;
     private nextNoteReviewHandler: NextNoteReviewHandler;
-    private headerEl: HTMLElement;
-    private treeEl: HTMLElement;
+    private headerEl: HTMLElement | null = null;
+    private treeEl: HTMLElement | null = null;
     private plugin: SRPlugin;
 
     constructor(
@@ -163,7 +163,7 @@ export class ReviewQueueListView extends ItemView {
         const activeFile: TFile | null = this.app.workspace.getActiveFile();
         const now: number = Date.now();
         let currUnix = -1;
-        let schedFolderEl: HTMLElement | null = null,
+        let scheduleFolderEl: HTMLElement | null = null,
             folderTitle = "";
         const maxDaysToRender: number = this.settings.maxNDaysNotesReviewQueue;
 
@@ -188,7 +188,7 @@ export class ReviewQueueListView extends ItemView {
                     );
                 }
 
-                schedFolderEl = this.createFolder(
+                scheduleFolderEl = this.createFolder(
                     parentEl,
                     folderTitle,
                     !deck.activeFolders.has(folderTitle),
@@ -198,21 +198,24 @@ export class ReviewQueueListView extends ItemView {
                 currUnix = sNote.dueUnix;
             }
 
-            const fileIsOpen = activeFile && sNote.note.path === activeFile.path;
+            const fileIsOpen = activeFile !== null && sNote.note.path === activeFile.path;
+
             if (fileIsOpen) {
                 deck.activeFolders.add(deck.deckName);
                 deck.activeFolders.add(folderTitle);
-                this.changeFolderFolding(schedFolderEl);
+                if (scheduleFolderEl) this.changeFolderFolding(scheduleFolderEl);
                 this.changeFolderFolding(parentEl);
             }
 
-            this.createFile(
-                schedFolderEl,
-                sNote.note.tfile,
-                fileIsOpen,
-                !deck.activeFolders.has(folderTitle),
-                deck,
-            );
+            if (scheduleFolderEl) {
+                this.createFile(
+                    scheduleFolderEl,
+                    sNote.note.tfile,
+                    fileIsOpen,
+                    !deck.activeFolders.has(folderTitle),
+                    deck,
+                );
+            }
         }
     }
 
@@ -295,9 +298,9 @@ export class ReviewQueueListView extends ItemView {
         navFileTitleInner.setText(file.basename);
         navFileTitleInner.addEventListener(
             "click",
-            async (event: MouseEvent) => {
+            (event: MouseEvent) => {
                 event.preventDefault();
-                await this.nextNoteReviewHandler.openNote(deck.deckName, file);
+                void this.nextNoteReviewHandler.openNote(deck.deckName, file);
                 return false;
             },
             false,
@@ -307,64 +310,73 @@ export class ReviewQueueListView extends ItemView {
             "sr-review-context-btn clickable-icon",
         );
         setIcon(navFileContextBtn, "ellipsis-vertical");
-        navFileContextBtn.addEventListener("click", async (event: MouseEvent) => {
+        navFileContextBtn.addEventListener("click", (event: MouseEvent) => {
             event.preventDefault();
             const fileMenu: Menu = new Menu();
             fileMenu.addItem((item) => {
                 item.setTitle(
                     t("REVIEW_DIFFICULTY_FILE_MENU", {
-                        difficulty: this.plugin.data.settings.flashcardEasyText,
+                        difficulty: this.plugin.dataManager.data.settings.flashcardEasyText,
                     }),
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Easy);
+                        void this.plugin.dataManager.saveNoteReviewResponse(
+                            file,
+                            ReviewResponse.Easy,
+                        );
                     });
             });
 
             fileMenu.addItem((item) => {
                 item.setTitle(
                     t("REVIEW_DIFFICULTY_FILE_MENU", {
-                        difficulty: this.plugin.data.settings.flashcardGoodText,
+                        difficulty: this.plugin.dataManager.data.settings.flashcardGoodText,
                     }),
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Good);
+                        void this.plugin.dataManager.saveNoteReviewResponse(
+                            file,
+                            ReviewResponse.Good,
+                        );
                     });
             });
 
             fileMenu.addItem((item) => {
                 item.setTitle(
                     t("REVIEW_DIFFICULTY_FILE_MENU", {
-                        difficulty: this.plugin.data.settings.flashcardHardText,
+                        difficulty: this.plugin.dataManager.data.settings.flashcardHardText,
                     }),
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        this.plugin.saveNoteReviewResponse(file, ReviewResponse.Hard);
+                        void this.plugin.dataManager.saveNoteReviewResponse(
+                            file,
+                            ReviewResponse.Hard,
+                        );
                     });
             });
 
             fileMenu.addSeparator();
 
-            if (this.plugin.data.settings.showDeleteButtonInFileMenu) {
+            if (this.plugin.dataManager.data.settings.showDeleteButtonInFileMenu) {
                 fileMenu.addItem((item) => {
                     item.setTitle(t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"))
                         .setIcon("trash")
                         .setWarning(true)
-                        .onClick(async () => {
+                        .onClick(() => {
                             new ConfirmationModal(
                                 this.plugin.app,
                                 t("DELETE_NOTE_SCHEDULING_DATA_IN_NOTE"),
                                 t("CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION"),
                                 t("NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS"),
-                                () => {
-                                    deleteNoteSchedulingDataInNote(
+                                async () => {
+                                    await DataStore.instance.fileModifier.deleteNoteSchedulingDataInNote(
                                         file,
-                                        this.plugin.data.settings
+                                        this.plugin.dataManager.data.settings
                                             .deleteTagsOnSchedulingDataDeletion,
-                                        this.plugin.data.settings.tagsToReview,
+                                        this.plugin.dataManager.data.settings.tagsToReview,
                                     );
                                 },
                             ).open();
@@ -383,12 +395,13 @@ export class ReviewQueueListView extends ItemView {
     }
 
     private changeFolderFolding(folderEl: HTMLElement, collapsed = false): void {
+        const childEl = folderEl.firstElementChild?.firstElementChild || null;
         if (collapsed && !folderEl.hasClass("is-collapsed")) {
             folderEl.addClass("is-collapsed");
-            folderEl.firstElementChild.firstElementChild.classList.add("is-collapsed");
+            if (childEl) childEl.classList.add("is-collapsed");
         } else {
             folderEl.removeClass("is-collapsed");
-            folderEl.firstElementChild.firstElementChild.classList.remove("is-collapsed");
+            if (childEl) childEl.classList.remove("is-collapsed");
         }
     }
 }

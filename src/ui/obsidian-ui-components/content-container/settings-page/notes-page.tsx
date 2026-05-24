@@ -1,8 +1,9 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
+import { DataManager } from "src/data/data-manager";
+import { DEFAULT_SETTINGS } from "src/data/settings";
 import { t, tHTML } from "src/lang/helpers";
 import SRPlugin from "src/main";
-import { DEFAULT_SETTINGS } from "src/settings";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
 
@@ -16,6 +17,7 @@ export class NotesPage extends SettingsPage {
     constructor(
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
+        dataManager: DataManager,
         pageType: SettingsPageType,
         applySettingsUpdate: (callback: () => unknown) => void,
         display: () => void,
@@ -25,6 +27,7 @@ export class NotesPage extends SettingsPage {
         super(
             pageContainerEl,
             plugin,
+            dataManager,
             pageType,
             applySettingsUpdate,
             display,
@@ -40,11 +43,12 @@ export class NotesPage extends SettingsPage {
                     .setDesc(t("TAGS_TO_REVIEW_DESC"))
                     .addTextArea((text) =>
                         text
-                            .setValue(this.plugin.data.settings.tagsToReview.join(" "))
+                            .setValue(this.dataManager.data.settings.tagsToReview.join(" "))
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.plugin.data.settings.tagsToReview = value.split(/\s+/);
-                                    await this.plugin.savePluginData();
+                                    this.dataManager.data.settings.tagsToReview =
+                                        value.split(/\s+/);
+                                    await this.dataManager.savePluginData();
                                 });
                             }),
                     );
@@ -55,13 +59,13 @@ export class NotesPage extends SettingsPage {
                     .setDesc(t("NOTE_TAGS_TO_IGNORE_DESC"))
                     .addTextArea((text) =>
                         text
-                            .setValue(this.plugin.data.settings.noteTagsToIgnore.join(" "))
+                            .setValue(this.dataManager.data.settings.noteTagsToIgnore.join(" "))
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.plugin.data.settings.noteTagsToIgnore = value
+                                    this.dataManager.data.settings.noteTagsToIgnore = value
                                         .split(/\s+/)
                                         .filter((v) => v);
-                                    await this.plugin.savePluginData();
+                                    await this.dataManager.savePluginData();
                                 });
                             }),
                     );
@@ -72,14 +76,14 @@ export class NotesPage extends SettingsPage {
                     .setDesc(t("FOLDERS_TO_IGNORE_DESC"))
                     .addTextArea((text) =>
                         text
-                            .setValue(this.plugin.data.settings.noteFoldersToIgnore.join("\n"))
+                            .setValue(this.dataManager.data.settings.noteFoldersToIgnore.join("\n"))
                             .onChange((value) => {
                                 this.applySettingsUpdate(async () => {
-                                    this.plugin.data.settings.noteFoldersToIgnore = value
+                                    this.dataManager.data.settings.noteFoldersToIgnore = value
                                         .split(/\n+/)
                                         .map((v) => v.trim())
                                         .filter((v) => v);
-                                    await this.plugin.savePluginData();
+                                    await this.dataManager.savePluginData();
                                 });
                             }),
                     );
@@ -95,9 +99,9 @@ export class NotesPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.plugin.data.settings.preferredDateFormatForNoteReviewQueue =
+                                this.dataManager.data.settings.preferredDateFormatForNoteReviewQueue =
                                     DEFAULT_SETTINGS.preferredDateFormatForNoteReviewQueue;
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
 
                                 this.display();
                             });
@@ -105,13 +109,14 @@ export class NotesPage extends SettingsPage {
                     .addText((text) =>
                         text
                             .setValue(
-                                this.plugin.data.settings.preferredDateFormatForNoteReviewQueue,
+                                this.dataManager.data.settings
+                                    .preferredDateFormatForNoteReviewQueue,
                             )
                             .onChange((value) => {
                                 this.applySettingsUpdate(async () => {
-                                    this.plugin.data.settings.preferredDateFormatForNoteReviewQueue =
+                                    this.dataManager.data.settings.preferredDateFormatForNoteReviewQueue =
                                         value;
-                                    await this.plugin.savePluginData();
+                                    await this.dataManager.savePluginData();
                                 });
                             }),
                     );
@@ -132,10 +137,10 @@ export class NotesPage extends SettingsPage {
             .addSetting((setting: Setting) => {
                 setting.setName(t("AUTO_NEXT_NOTE")).addToggle((toggle) =>
                     toggle
-                        .setValue(this.plugin.data.settings.autoNextNote)
+                        .setValue(this.dataManager.data.settings.autoNextNote)
                         .onChange(async (value) => {
-                            this.plugin.data.settings.autoNextNote = value;
-                            await this.plugin.savePluginData();
+                            this.dataManager.data.settings.autoNextNote = value;
+                            await this.dataManager.savePluginData();
                         }),
                 );
             })
@@ -145,20 +150,20 @@ export class NotesPage extends SettingsPage {
                     .setDesc(t("OPEN_RANDOM_NOTE_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.plugin.data.settings.openRandomNote)
+                            .setValue(this.dataManager.data.settings.openRandomNote)
                             .onChange(async (value) => {
-                                this.plugin.data.settings.openRandomNote = value;
-                                await this.plugin.savePluginData();
+                                this.dataManager.data.settings.openRandomNote = value;
+                                await this.dataManager.savePluginData();
                             }),
                     );
             })
             .addSetting((setting: Setting) => {
                 setting.setName(t("REVIEW_PANE_ON_STARTUP")).addToggle((toggle) =>
                     toggle
-                        .setValue(this.plugin.data.settings.enableNoteReviewPaneOnStartup)
+                        .setValue(this.dataManager.data.settings.enableNoteReviewPaneOnStartup)
                         .onChange(async (value) => {
-                            this.plugin.data.settings.enableNoteReviewPaneOnStartup = value;
-                            await this.plugin.savePluginData();
+                            this.dataManager.data.settings.enableNoteReviewPaneOnStartup = value;
+                            await this.dataManager.savePluginData();
                         }),
                 );
             })
@@ -170,16 +175,18 @@ export class NotesPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.plugin.data.settings.maxNDaysNotesReviewQueue =
+                                this.dataManager.data.settings.maxNDaysNotesReviewQueue =
                                     DEFAULT_SETTINGS.maxNDaysNotesReviewQueue;
-                                await this.plugin.savePluginData();
+                                await this.dataManager.savePluginData();
 
                                 this.display();
                             });
                     })
                     .addText((text) =>
                         text
-                            .setValue(this.plugin.data.settings.maxNDaysNotesReviewQueue.toString())
+                            .setValue(
+                                this.dataManager.data.settings.maxNDaysNotesReviewQueue.toString(),
+                            )
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
                                     const numValue: number = Number.parseInt(value);
@@ -187,14 +194,14 @@ export class NotesPage extends SettingsPage {
                                         if (numValue < 1) {
                                             new Notice(t("MIN_ONE_DAY"));
                                             text.setValue(
-                                                this.plugin.data.settings.maxNDaysNotesReviewQueue.toString(),
+                                                this.dataManager.data.settings.maxNDaysNotesReviewQueue.toString(),
                                             );
                                             return;
                                         }
 
-                                        this.plugin.data.settings.maxNDaysNotesReviewQueue =
+                                        this.dataManager.data.settings.maxNDaysNotesReviewQueue =
                                             numValue;
-                                        await this.plugin.savePluginData();
+                                        await this.dataManager.savePluginData();
                                     } else {
                                         new Notice(t("VALID_NUMBER_WARNING"));
                                     }

@@ -97,10 +97,10 @@ function insertParameters(translation: string, params: Record<string, unknown>):
 
         for (let i = 0; i < names.length; i++) {
             const name: string = names[i];
-            const value: unknown = vals[i];
+            const value: string = `${vals[i]}`; // Force string conversion of value
 
             // Replace name with value
-            result = result.replace("${" + name + "}", value + ""); // Force string conversion of value
+            result = result.replace("${" + name + "}", value);
         }
 
         return result;

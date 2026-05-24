@@ -16,13 +16,14 @@ import { Setting, SettingGroup } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
-import { SrsAlgorithm } from "src/algorithms/base/srs-algorithm";
-import { textInterval } from "src/algorithms/osr/note-scheduling";
-import { OsrCore } from "src/core";
-import { CardListType } from "src/deck/deck";
-import { Stats } from "src/deck/stats";
+import { OsrCore } from "src/data/core";
+import { DataManager } from "src/data/data-manager";
+import { Stats } from "src/data/data-structures/deck/stats";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
+import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
+import { textInterval } from "src/scheduling/algorithms/osr/note-scheduling";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
 import ChartComponent from "src/ui/obsidian-ui-components/content-container/settings-page/statistics-page/chart-component";
@@ -58,6 +59,7 @@ export class StatisticsPage extends SettingsPage {
     constructor(
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
+        dataManager: DataManager,
         pageType: SettingsPageType,
         openPage: (pageType: SettingsPageType) => void,
         scrollListener: (scrollPosition: number) => void,
@@ -65,6 +67,7 @@ export class StatisticsPage extends SettingsPage {
         super(
             pageContainerEl,
             plugin,
+            dataManager,
             pageType,
             () => {},
             () => {},
@@ -87,7 +90,7 @@ export class StatisticsPage extends SettingsPage {
                 el.selectEl.setAttr("id", "sr-chart-period");
             });
 
-        this.renderCharts(this.plugin.osrAppCore);
+        this.renderCharts(this.dataManager.osrCore);
     }
 
     /**
@@ -106,7 +109,7 @@ export class StatisticsPage extends SettingsPage {
 
     private renderCharts(osrCore: OsrCore): void {
         if (!osrCore.cardStats) {
-            this.plugin.sync().then((_) => this.renderCharts(this.plugin.osrAppCore));
+            this.dataManager.sync().then((_) => this.renderCharts(this.dataManager.osrCore));
             return;
         }
 
@@ -208,8 +211,8 @@ export class StatisticsPage extends SettingsPage {
         });
 
         // Add card types
-        const totalCardsCount: number = osrCore.reviewableDeckTree.getDistinctCardCount(
-            CardListType.All,
+        const totalCardsCount: number = osrCore.reviewableDeckTree.getDistinctRepItemCount(
+            RepItemState.AnyItem,
             true,
         );
 
@@ -239,7 +242,7 @@ export class StatisticsPage extends SettingsPage {
             });
 
         const noteEases = mapRecord(
-            SrsAlgorithm.getInstance().noteStats().dict,
+            SRAlgorithm.getInstance().noteStats().dict,
             (key: string, value: number): [string, number] => {
                 return [key.split(".")[0], Math.round(value)];
             },

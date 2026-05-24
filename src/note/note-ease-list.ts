@@ -1,4 +1,4 @@
-import { SRSettings } from "src/settings";
+import { SRSettings } from "src/data/settings";
 
 export interface INoteEaseList {
     dict: Record<string, number>;
@@ -25,7 +25,7 @@ export class NoteEaseList implements INoteEaseList {
     }
 
     getEaseByPath(path: string): number | null {
-        let ease: number = null;
+        let ease: number | null = null;
         if (this.hasEaseForPath(path)) {
             ease = Math.round(this.dict[path]);
         }

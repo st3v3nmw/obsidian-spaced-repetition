@@ -2,16 +2,16 @@ import * as fs from "fs";
 import moment, { Moment } from "moment";
 import { TagCache, TFile } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { RepItemScheduleInfoOsr } from "src/algorithms/osr/rep-item-schedule-info-osr";
-import { ALLOWED_DATE_FORMATS } from "src/constants";
-import { ISRFile } from "src/file";
+import { ALLOWED_DATE_FORMATS } from "src/data/constants";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { formatDateYYYYMMDD } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
 
 import { unitTestBasicFrontmatterParser, unitTestGetAllTagsFromTextEx } from "./unit-test-helper";
 
-export class UnitTestSRFile implements ISRFile {
+export class UnitTestSRFile implements ISRNoteTFile {
     content: string;
     _path: string;
 
@@ -22,7 +22,7 @@ export class UnitTestSRFile implements ISRFile {
 
     async setNoteSchedule(repItemScheduleInfo: RepItemScheduleInfo): Promise<void> {
         let fileText: string = await this.read();
-        const schedInfo: RepItemScheduleInfoOsr = repItemScheduleInfo as RepItemScheduleInfoOsr;
+        const schedInfo: RepItemScheduleInfoOsr = repItemScheduleInfo;
         const dueString: string = formatDateYYYYMMDD(schedInfo.dueDate);
         const interval: number = schedInfo.interval;
         const ease: number = schedInfo.latestEase;
@@ -89,6 +89,30 @@ export class UnitTestSRFile implements ISRFile {
         return result;
     }
 
+    async getNoteId(): Promise<string | null> {
+        const frontmatter = await this.getFrontmatter();
+        return frontmatter?.get("sr-id") ?? null;
+    }
+
+    async getOrCreateNoteId(): Promise<string> {
+        const existing = await this.getNoteId();
+        if (existing) return existing;
+        const id = "test-" + Math.random().toString(36).slice(2, 10);
+        const YAML_FRONT_MATTER_REGEX = /^---\r?\n((?:.*\r?\n)*)---/;
+        let fileText = await this.read();
+        if (YAML_FRONT_MATTER_REGEX.test(fileText)) {
+            const match = YAML_FRONT_MATTER_REGEX.exec(fileText);
+            fileText = fileText.replace(
+                YAML_FRONT_MATTER_REGEX,
+                `---\n${match[1]}sr-id: ${id}\n---`,
+            );
+        } else {
+            fileText = `---\nsr-id: ${id}\n---\n\n${fileText}`;
+        }
+        await this.write(fileText);
+        return id;
+    }
+
     get path(): string {
         return this._path;
     }
@@ -122,11 +146,16 @@ export class UnitTestSRFile implements ISRFile {
     }
 
     async read(): Promise<string> {
-        return this.content;
+        return new Promise((resolve) => {
+            resolve(this.content);
+        });
     }
 
     async write(content: string): Promise<void> {
-        this.content = content;
+        return new Promise((resolve) => {
+            this.content = content;
+            resolve();
+        });
     }
 
     static CreateFromFsFile(path: string): UnitTestSRFile {

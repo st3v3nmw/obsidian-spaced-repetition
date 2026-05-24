@@ -1,8 +1,8 @@
-import { TopicPath } from "src/deck/topic-path";
-import { ISRFile } from "src/file";
+import { TopicPath } from "src/data/data-structures/deck/topic-path";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
+import { SRSettings } from "src/data/settings";
 import { Note } from "src/note/note";
 import { NoteQuestionParser } from "src/note/note-question-parser";
-import { SRSettings } from "src/settings";
 import { TextDirection } from "src/utils/strings";
 
 export class NoteParser {
@@ -14,7 +14,7 @@ export class NoteParser {
     }
 
     async parse(
-        noteFile: ISRFile,
+        noteFile: ISRNoteTFile,
         defaultTextDirection: TextDirection,
         folderTopicPath: TopicPath,
     ): Promise<Note> {

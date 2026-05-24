@@ -1,8 +1,8 @@
 import "src/ui/obsidian-ui-components/modals/modal-view.css";
 import { App, Modal, Platform } from "obsidian";
 
+import { SRSettings } from "src/data/settings";
 import type SRPlugin from "src/main";
-import { SRSettings } from "src/settings";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import EmulatedPlatform from "src/utils/platform-detector";
@@ -51,19 +51,18 @@ export class SRModalView extends Modal {
             this.contentEl,
             this.close.bind(this),
         );
-
         this.plugin.uiManager.setContentManager(this.contentManager);
     }
 
     onOpen(): void {
-        this.contentManager.open();
+        void this.contentManager.open();
     }
 
     onClose(): void {
         this.contentManager.close();
     }
 
-    private onResize(entries: ResizeObserverEntry[]) {
+    private async onResize(entries: ResizeObserverEntry[]) {
         const modalEl = entries[0].target as HTMLElement;
         const parent = modalEl.parentElement;
 
@@ -79,7 +78,7 @@ export class SRModalView extends Modal {
 
         this.setRoundedModalCorners(!(heightPercent >= 100 || widthPercent >= 100));
 
-        this.saveSizeToSettings(
+        await this.saveSizeToSettings(
             heightPercent,
             widthPercent,
             Platform.isMobile || EmulatedPlatform().isMobile,
@@ -110,12 +109,12 @@ export class SRModalView extends Modal {
         if (isNaN(heightPercent) || isNaN(widthPercent)) return;
 
         if (isMobile) {
-            this.plugin.data.settings.flashcardHeightPercentageMobile = heightPercent;
-            this.plugin.data.settings.flashcardWidthPercentageMobile = widthPercent;
+            this.plugin.dataManager.data.settings.flashcardHeightPercentageMobile = heightPercent;
+            this.plugin.dataManager.data.settings.flashcardWidthPercentageMobile = widthPercent;
         } else {
-            this.plugin.data.settings.flashcardHeightPercentage = heightPercent;
-            this.plugin.data.settings.flashcardWidthPercentage = widthPercent;
+            this.plugin.dataManager.data.settings.flashcardHeightPercentage = heightPercent;
+            this.plugin.dataManager.data.settings.flashcardWidthPercentage = widthPercent;
         }
-        await this.plugin.savePluginData();
+        await this.plugin.dataManager.savePluginData();
     }
 }

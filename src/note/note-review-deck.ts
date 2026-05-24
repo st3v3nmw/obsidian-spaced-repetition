@@ -1,13 +1,13 @@
-import { ISRFile } from "src/file";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { t } from "src/lang/helpers";
 import { globalDateProvider } from "src/utils/dates";
 import { globalRandomNumberProvider } from "src/utils/numbers";
 
 export class SchedNote {
-    note: ISRFile;
+    note: ISRNoteTFile;
     dueUnix: number;
 
-    constructor(note: ISRFile, dueUnix: number) {
+    constructor(note: ISRNoteTFile, dueUnix: number) {
         this.note = note;
         this.dueUnix = dueUnix;
     }
@@ -21,7 +21,7 @@ export class NoteReviewDeck {
     // Deck name such as the default "#review"
     private _deckName: string;
 
-    private _newNotes: ISRFile[] = [];
+    private _newNotes: ISRNoteTFile[] = [];
     private _scheduledNotes: SchedNote[] = [];
     private _dueNotesCount = 0;
 
@@ -33,7 +33,7 @@ export class NoteReviewDeck {
         return this._deckName;
     }
 
-    get newNotes(): ISRFile[] {
+    get newNotes(): ISRNoteTFile[] {
         return this._newNotes;
     }
 
@@ -66,7 +66,8 @@ export class NoteReviewDeck {
     public sortNotesByDateAndImportance(pageranks: Record<string, number>): void {
         // sort new notes by importance
         this._newNotes = this.newNotes.sort(
-            (a: ISRFile, b: ISRFile) => (pageranks[b.path] || 0) - (pageranks[a.path] || 0),
+            (a: ISRNoteTFile, b: ISRNoteTFile) =>
+                (pageranks[b.path] || 0) - (pageranks[a.path] || 0),
         );
 
         // sort scheduled notes by date & within those days, sort them by importance
@@ -79,7 +80,7 @@ export class NoteReviewDeck {
         });
     }
 
-    determineNextNote(openRandomNote: boolean): ISRFile {
+    determineNextNote(openRandomNote: boolean): ISRNoteTFile {
         // Review due notes before new ones
         const todayUnix: number = globalDateProvider.today.valueOf();
         const dueNotes = this.scheduledNotes.filter((note) => note.isDue(todayUnix));

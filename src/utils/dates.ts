@@ -1,6 +1,8 @@
 import moment, { Moment } from "moment";
 
-import { ALLOWED_DATE_FORMATS, PREFERRED_DATE_FORMAT } from "src/constants";
+import { ALLOWED_DATE_FORMATS, PREFERRED_DATE_FORMAT } from "src/data/constants";
+
+// TODO: Remove moment & use the obsidian one -> Check docs
 
 /**
  * Format as "YYYY-MM-DD"
@@ -61,7 +63,7 @@ export function formatDate(
     arg3?: unknown,
     format: string = PREFERRED_DATE_FORMAT,
 ): string {
-    let _date: Date;
+    let _date: Date | null = null;
     if (typeof arg1 === "number" && typeof arg2 === "number" && typeof arg3 === "number") {
         _date = new Date(arg1, arg2 - 1, arg3);
     } else if (typeof arg1 === "number") {
@@ -69,6 +71,8 @@ export function formatDate(
     } else if (typeof arg1 === typeof new Date()) {
         _date = arg1 as Date;
     }
+
+    if (!_date) return "";
 
     let result: string = format;
 
@@ -79,6 +83,13 @@ export function formatDate(
     return result;
 }
 
+/**
+ *
+ *
+ * @param ticks Ticks in unix format
+ * @param format Any format that is valid with moment
+ * @returns {string} The formatted date as a string
+ */
 export function formatDateWithMoment(ticks: number, format: string): string {
     return moment(ticks).format(format);
 }

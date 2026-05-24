@@ -1,6 +1,6 @@
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { ISRFile } from "src/file";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { NoteReviewDeck, SchedNote } from "src/note/note-review-deck";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 
 export class NoteReviewQueue {
     private _reviewDecks: Map<string, NoteReviewDeck>;
@@ -31,8 +31,8 @@ export class NoteReviewQueue {
     }
 
     addNoteToQueue(
-        noteFile: ISRFile,
-        noteSchedule: RepItemScheduleInfo,
+        noteFile: ISRNoteTFile,
+        noteSchedule: RepItemScheduleInfo | null,
         matchedNoteTags: string[],
     ): void {
         for (const matchedNoteTag of matchedNoteTags) {
@@ -42,19 +42,23 @@ export class NoteReviewQueue {
         }
         if (noteSchedule === null) {
             for (const matchedNoteTag of matchedNoteTags) {
-                this.reviewDecks.get(matchedNoteTag).newNotes.push(noteFile);
+                const matchedDeck = this.reviewDecks.get(matchedNoteTag);
+                if (matchedDeck === undefined) continue;
+                matchedDeck.newNotes.push(noteFile);
             }
         } else {
             // schedule the note
             for (const matchedNoteTag of matchedNoteTags) {
-                this.reviewDecks
-                    .get(matchedNoteTag)
-                    .scheduledNotes.push(new SchedNote(noteFile, noteSchedule.dueDateAsUnix));
+                const matchedDeck = this.reviewDecks.get(matchedNoteTag);
+                if (matchedDeck === undefined) continue;
+                matchedDeck.scheduledNotes.push(
+                    new SchedNote(noteFile, noteSchedule.dueDateAsUnix),
+                );
             }
         }
     }
 
-    updateScheduleInfo(note: ISRFile, scheduleInfo: RepItemScheduleInfo): void {
+    updateScheduleInfo(note: ISRNoteTFile, scheduleInfo: RepItemScheduleInfo): void {
         for (const reviewDeck of this.reviewDecks.values()) {
             const isNewNoteInDeck = reviewDeck.newNotes.some(
                 (newNote) => newNote.path === note.path,
@@ -77,7 +81,8 @@ export class NoteReviewQueue {
                 const scheduledNote = reviewDeck.scheduledNotes.find(
                     (scheduledNote) => scheduledNote.note.path === note.path,
                 );
-                scheduledNote.dueUnix = scheduleInfo.dueDate.valueOf();
+                if (scheduledNote !== undefined)
+                    scheduledNote.dueUnix = scheduleInfo.dueDate.valueOf();
             }
 
             break;

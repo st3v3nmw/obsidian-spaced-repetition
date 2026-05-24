@@ -1,6 +1,6 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/context-section/context-section.css";
 
-import { Question } from "src/card/questions/question";
+import { Question } from "src/data/data-structures/card/questions/question";
 import { Note } from "src/note/note";
 
 export default class ContextSectionComponent {

@@ -1,7 +1,8 @@
+import process from "process";
 process.env.TZ = "UTC";
 
 /** @type {import('@ts-jest/dist/types').InitialOptionsTsJest} */
-module.exports = {
+export default {
     verbose: true,
     preset: "ts-jest",
     testEnvironment: "jsdom",
@@ -18,15 +19,22 @@ module.exports = {
         "node_modules/",
 
         // GUI & Obsidian coupled code
-        "src/core.ts",
-        "src/file.ts",
+        "src/data/core.ts",
+        "src/data/data-structures/file/",
         "src/ui/",
         "src/icons/",
         "src/main.ts",
-        "src/delete-scheduling-data.ts",
+        "src/command-manager.ts",
+        "src/data/data-manager.ts",
+        "src/data/data-store/.*/.*-file-modifier.ts",
+        "src/data/data-store/.*/.*file-modifier.ts",
         "src/note/next-note-review-handler.ts",
-        "src/plugin-data.ts",
+        "src/data/plugin-data.ts",
         "src/utils/renderers.ts",
+        "src/scheduling/algorithms/osr/obsidian-vault-notelink-info-finder.ts",
+        "src/scheduling/algorithms/osr/serialized-schedule-data.ts",
+        "src/scheduling/algorithms/fsrs/serialized-schedule-data.ts",
+        "src/data/data-store/base/idata-store-algorithm.ts",
 
         // debugging utils
         "src/utils/debug.ts",

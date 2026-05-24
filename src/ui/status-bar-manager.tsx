@@ -1,8 +1,8 @@
 import { request } from "obsidian";
 
-import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import CounterStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/counter-statusbar-item";
 import TextStatusBarItem from "src/ui/obsidian-ui-components/statusbar-items/text-statusbar-item";
 
@@ -14,14 +14,12 @@ export const StatusBarItemTypesArray: ReadonlyArray<StatusBarItemPurpose> = [
 ];
 
 export default class StatusBarManager {
-    protected statusBarItems: TextStatusBarItem[];
+    private statusBarItems: TextStatusBarItem[];
     protected plugin: SRPlugin;
 
     constructor(plugin: SRPlugin) {
         this.plugin = plugin;
         this.statusBarItems = [];
-
-        this.createStatusBarItems();
     }
 
     setCount(count: number, showItems: boolean, statusBarItemType: StatusBarItemPurpose): void {
@@ -39,14 +37,14 @@ export default class StatusBarManager {
         }
     }
 
-    showStatusBarItems(
+    async showStatusBarItems(
         showItems: boolean, // Overrides all other settings
         showCardStatusBarItem?: boolean,
         showNoteStatusBarItem?: boolean,
         showUpdateAvailableStatusBarItem?: boolean,
-    ): void {
+    ): Promise<void> {
         if (this.statusBarItems.length === 0) {
-            this.createStatusBarItems();
+            await this.createStatusBarItems();
         }
 
         const showCardItem =
@@ -58,7 +56,7 @@ export default class StatusBarManager {
                 ? showItems
                 : showUpdateAvailableStatusBarItem;
 
-        this.statusBarItems.forEach((statusBarItem) => {
+        for (const statusBarItem of this.statusBarItems) {
             if (showItems) {
                 if (
                     statusBarItem.getStatusBarItemType() === "update-available" &&
@@ -86,7 +84,7 @@ export default class StatusBarManager {
                     case "update-available":
                         // Disable the fetching of the version number if the statusbar items are disabled
                         if (showItems && showUpdateAvailableItem) {
-                            this.checkAndUpdatePluginVersion().then((_) => {
+                            await this.checkAndUpdatePluginVersion().then((_) => {
                                 statusBarItem.show();
                             });
                         } else {
@@ -99,11 +97,13 @@ export default class StatusBarManager {
             } else {
                 statusBarItem.hide();
             }
-        });
+        }
     }
 
-    private async createStatusBarItems(): Promise<void> {
-        StatusBarItemTypesArray.forEach((statusBarItemType) => {
+    async createStatusBarItems(): Promise<void> {
+        if (this.statusBarItems.length > 0) return;
+
+        for (const statusBarItemType of StatusBarItemTypesArray) {
             let statusBarItem = undefined;
 
             switch (statusBarItemType) {
@@ -117,6 +117,8 @@ export default class StatusBarManager {
                         tooltip: t("OPEN_DECK_FOR_REVIEW"),
                         tooltipPosition: "top",
                         onClick: async () => {
+                            if (this.plugin.uiManager === null)
+                                throw new Error("UI manager not initialized!!!");
                             await this.plugin.uiManager.openDeckContainer(
                                 FlashcardReviewMode.Review,
                             );
@@ -133,9 +135,17 @@ export default class StatusBarManager {
                         tooltip: t("OPEN_NOTE_FOR_REVIEW"),
                         tooltipPosition: "top",
                         onClick: async () => {
-                            if (!this.plugin.osrAppCore.syncLock) {
-                                await this.plugin.sync();
-                                this.plugin.nextNoteReviewHandler.reviewNextNoteModal();
+                            if (
+                                this.plugin.dataManager === null ||
+                                this.plugin.dataManager.osrCore === null
+                            )
+                                throw new Error("SR plugin or OSR app core not initialized!!!");
+                            if (this.plugin.nextNoteReviewHandler === null)
+                                throw new Error("Next note review handler not initialized!!!");
+
+                            if (!this.plugin.dataManager.syncLock) {
+                                await this.plugin.dataManager.sync();
+                                await this.plugin.nextNoteReviewHandler.reviewNextNoteModal();
                             }
                         },
                     });
@@ -153,12 +163,12 @@ export default class StatusBarManager {
             }
 
             this.statusBarItems.push(statusBarItem);
-        });
+        }
 
         // Disable the fetching of the version number if the statusbar items are disabled
         if (
-            this.plugin.data.settings.showStatusBar &&
-            this.plugin.data.settings.showUpdateAvailableStatusBarItem
+            this.plugin.dataManager.data.settings.showStatusBar &&
+            this.plugin.dataManager.data.settings.showUpdateAvailableStatusBarItem
         ) {
             await this.checkAndUpdatePluginVersion();
         }
@@ -180,34 +190,13 @@ export default class StatusBarManager {
     }
 
     private async getNewestVersion(): Promise<string> {
-        // Copied from https://github.com/zsviczian/obsidian-excalidraw-plugin/blob/master/src/utils/utils.ts
         try {
-            const gitAPIrequest = async () => {
-                return JSON.parse(
-                    await request({
-                        url: "https://api.github.com/repos/st3v3nmw/obsidian-spaced-repetition/releases?per_page=15&page=1",
-                    }),
-                );
-            };
-
-            const latestVersion = (await gitAPIrequest())
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .filter((el: any) => !el.draft && !el.prerelease)
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .map((el: any) => {
-                    return {
-                        version: el.tag_name,
-                        published: new Date(el.published_at),
-                    };
-                })
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .filter((el: any) => el.version.match(/^\d+\.\d+\.\d+$/))
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .sort((el1: any, el2: any) => el2.published - el1.published)[0].version as string;
-
-            return latestVersion;
+            const response: string = await request({
+                url: "https://api.github.com/repos/st3v3nmw/obsidian-spaced-repetition/releases/latest",
+            });
+            return (await JSON.parse(response)).tag_name as string;
         } catch (e) {
-            console.log({ error: e });
+            console.error(e);
             return this.plugin.manifest.version;
         }
     }
