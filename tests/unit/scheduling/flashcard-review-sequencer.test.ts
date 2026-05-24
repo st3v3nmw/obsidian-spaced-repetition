@@ -181,7 +181,7 @@ async function checkReviewResponseReviewMode(
     // Schedule for the reviewed card has been updated
     expect(card.scheduleInfo.latestEase).toEqual(info.cardQ2PostReviewEase);
     expect(card.scheduleInfo.interval).toEqual(info.cardQ2PostReviewInterval);
-    expect(card.scheduleInfo.dueDate.unix).toEqual(moment(info.cardQ2PostReviewDueDate).unix);
+    expect(card.scheduleInfo.dueDate.unix()).toEqual(moment(info.cardQ2PostReviewDueDate).unix());
 
     // Note text has been updated
     const expectedText: string = c.originalText.replace(
@@ -223,7 +223,7 @@ async function checkReviewResponseCramMode(reviewResponse: ReviewResponse): Prom
 
     // No change to schedule for reviewed card in cram mode
     expect(card.scheduleInfo).toMatchObject(expectInfo);
-    expect(card.scheduleInfo.dueDate.unix).toEqual(moment("2023-09-02").unix);
+    expect(card.scheduleInfo.dueDate.unix()).toEqual(moment("2023-09-02").unix());
 
     // Note text remains the same
     const expectedText: string = c.originalText;
@@ -283,14 +283,14 @@ beforeEach(() => {
 });
 
 describe("setDeckTree", () => {
-    test("Empty deck", () => {
+    test("Empty deck", async () => {
         const c: TestContext = TestContext.Create(
             orderDueFirstSequential,
             FlashcardReviewMode.Review,
             DEFAULT_SETTINGS,
             "",
         );
-        c.setSequencerDeckTreeFromOriginalText();
+        await c.setSequencerDeckTreeFromOriginalText();
         c.reviewSequencer.setDeckTree(Deck.emptyDeck, Deck.emptyDeck);
         expect(c.reviewSequencer.currentDeck).toEqual(null);
         expect(c.reviewSequencer.currentCard).toEqual(null);
@@ -320,7 +320,7 @@ Q3::A3`;
             text,
         );
         const deck: Deck = await c.setSequencerDeckTreeFromOriginalText();
-        const flashcardDeck: Deck = deck.getDeckByTopicTag("#flashcards");
+        const flashcardDeck: Deck | null = deck.getDeckByTopicTag("#flashcards");
         expect(flashcardDeck.newRepItems.length).toEqual(3);
 
         expect(c.reviewSequencer.currentDeck.newRepItems.length).toEqual(3);
@@ -402,18 +402,18 @@ describe("skipCurrentCard", () => {
     describe("Checking postponement list (skipped cards)", () => {
         describe("FlashcardReviewMode.Review", () => {
             test("burySiblingCards=false - skipped question not added to postponement list", async () => {
-                checkEmptyPostponementList(false, FlashcardReviewMode.Review);
+                await checkEmptyPostponementList(false, FlashcardReviewMode.Review);
             });
 
             // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/760
             test("burySiblingCards=true - skipped question not added to postponement list", async () => {
-                checkEmptyPostponementList(true, FlashcardReviewMode.Review);
+                await checkEmptyPostponementList(true, FlashcardReviewMode.Review);
             });
         });
 
         describe("FlashcardReviewMode.Cram", () => {
             test("Cram mode - skipped question not added to postponement list", async () => {
-                checkEmptyPostponementList(false, FlashcardReviewMode.Cram);
+                await checkEmptyPostponementList(false, FlashcardReviewMode.Cram);
             });
         });
     });

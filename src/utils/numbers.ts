@@ -8,7 +8,7 @@ export class ValueCountDict {
     }
 
     hasValue(value: number): boolean {
-        return Object.prototype.hasOwnProperty.call(this.dict, value);
+        return this.dict[value] !== undefined && this.dict[value] !== null;
     }
 
     incrementCount(value: number): void {

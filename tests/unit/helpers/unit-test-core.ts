@@ -22,7 +22,11 @@ export class UnitTestOsrCore extends OsrCore {
             new QuestionPostponementList(null, settings, [] as string[]),
             null,
             settings,
-            () => {},
+            async () => {
+                await new Promise<void>((resolve) => {
+                    resolve();
+                });
+            },
             new NoteReviewQueue(),
             TextDirection.Ltr,
         );
@@ -37,7 +41,11 @@ export class UnitTestOsrCore extends OsrCore {
             questionPostponementList,
             this.infoFinder,
             settings,
-            () => {},
+            async () => {
+                await new Promise<void>((resolve) => {
+                    resolve();
+                });
+            },
             new NoteReviewQueue(),
             TextDirection.Ltr,
         );

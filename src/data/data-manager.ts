@@ -79,8 +79,7 @@ export class DataManager {
      * Loads the plugin data from the data.json from the plugin's folder.
      */
     async loadData(): Promise<void> {
-         
-        const loadedData: PluginData = await this.plugin.loadData();
+        const loadedData: PluginData = (await this.plugin.loadData()) as PluginData;
         if (loadedData?.settings) upgradeSettings(loadedData.settings);
         this.data = Object.assign({}, DEFAULT_DATA, loadedData);
         this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
@@ -98,7 +97,7 @@ export class DataManager {
      */
     async initOSRCore(
         noteReviewQueue: NoteReviewQueue,
-        onOsrVaultDataChanged: () => void,
+        onOsrVaultDataChanged: () => Promise<void>,
     ): Promise<void> {
         if (this.data === null) throw new Error("Data not loaded!!");
         const questionPostponementList: QuestionPostponementList = new QuestionPostponementList(
@@ -137,7 +136,7 @@ export class DataManager {
                 await this.osrCore.processFile(file);
             }
 
-            this.osrCore.finalizeLoad();
+            await this.osrCore.finalizeLoad();
         } finally {
             this._syncLock = false;
         }

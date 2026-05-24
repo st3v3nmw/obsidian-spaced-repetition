@@ -8,7 +8,7 @@ export default class SRButtonComponent extends ButtonComponent {
             icon?: IconName;
             tooltip?: string;
             text?: string;
-            onClick?: (evt: MouseEvent) => void;
+            onClick?: (evt: MouseEvent) => void | Promise<void>;
         },
     ) {
         super(container);

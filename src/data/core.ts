@@ -30,7 +30,7 @@ export interface IOsrVaultEvents {
 export class OsrCore {
     public defaultTextDirection: TextDirection;
     protected settings: SRSettings;
-    private dataChangedHandler: () => void;
+    private dataChangedHandler: () => Promise<void>;
     protected osrNoteGraph: OsrNoteGraph | null = null;
     private osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder;
     private _questionPostponementList: QuestionPostponementList;
@@ -47,7 +47,7 @@ export class OsrCore {
         questionPostponementList: QuestionPostponementList,
         osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder,
         settings: SRSettings,
-        dataChangedHandler: () => void,
+        dataChangedHandler: () => Promise<void>,
         noteReviewQueue: NoteReviewQueue,
         defaultTextDirection: TextDirection,
     ) {
@@ -91,7 +91,7 @@ export class OsrCore {
         questionPostponementList: QuestionPostponementList,
         osrNoteLinkInfoFinder: IOsrVaultNoteLinkInfoFinder,
         settings: SRSettings,
-        dataChangedHandler: () => void,
+        dataChangedHandler: () => Promise<void>,
         noteReviewQueue: NoteReviewQueue,
         defaultTextDirection: TextDirection,
     ) {
@@ -270,7 +270,7 @@ export class OsrCore {
      *
      * @returns {void}
      */
-    public finalizeLoad(): void {
+    public async finalizeLoad(): Promise<void> {
         if (this.osrNoteGraph !== null) {
             this.osrNoteGraph.generatePageRanks();
         }
@@ -289,6 +289,7 @@ export class OsrCore {
             this._reviewableDeckTree,
             FlashcardReviewMode.Review,
         );
+
         const calc: DeckTreeStatsCalculator = new DeckTreeStatsCalculator();
         this._cardStats = calc.calculate(this._reviewableDeckTree);
 
@@ -297,7 +298,7 @@ export class OsrCore {
         this._dueDateFlashcardHistogram.calculateFromDeckTree(this._reviewableDeckTree);
 
         // Tell the interested party that the data has changed
-        if (this.dataChangedHandler) this.dataChangedHandler();
+        if (this.dataChangedHandler) await this.dataChangedHandler();
     }
 
     /**
@@ -348,7 +349,7 @@ export class OsrCore {
         await this.buryAllCardsInNote(settings, noteFile);
 
         // Tell the interested party that the data has changed
-        if (this.dataChangedHandler) this.dataChangedHandler();
+        if (this.dataChangedHandler) await this.dataChangedHandler();
     }
 
     /**

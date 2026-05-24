@@ -81,11 +81,10 @@ export class NoteDataFileModifier implements IFileModifier {
     ) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await this.plugin.app.fileManager.processFrontMatter(file, (frontmatter: any) => {
-             
             delete frontmatter["sr-due"];
-             
+
             delete frontmatter["sr-interval"];
-             
+
             delete frontmatter["sr-ease"];
         });
 
@@ -114,7 +113,6 @@ export class NoteDataFileModifier implements IFileModifier {
     async removeTagsFromFrontmatter(vault: Vault, file: TFile, tagsToDelete: string[]) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await this.plugin.app.fileManager.processFrontMatter(file, (frontmatter: any) => {
-             
             frontmatter["tags"] = (frontmatter["tags"] as string[]).filter((tag: string) => {
                 let deleteTag = false;
                 for (const tagToDelete of tagsToDelete.sort((a, b) => b.length - a.length)) {

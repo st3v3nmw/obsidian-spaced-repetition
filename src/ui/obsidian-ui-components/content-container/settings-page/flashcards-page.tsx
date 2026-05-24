@@ -512,7 +512,7 @@ export class FlashcardsPage extends SettingsPage {
                         button
                             .setButtonText("Unlock Setting")
                             .setClass("mod-warning")
-                            .onClick(async () => {
+                            .onClick(() => {
                                 new ConfirmationModal(
                                     this.plugin.app,
                                     "Please read!",

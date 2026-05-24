@@ -5,13 +5,13 @@ describe("YAML_FRONT_MATTER_REGEX", () => {
         return `---${sep}sr-due: 2024-08-10${sep}sr-interval: 273${sep}sr-ease: 309${sep}---`;
     }
 
-    test("New line is line feed", async () => {
+    test("New line is line feed", () => {
         const sep: string = String.fromCharCode(10);
         const text: string = createTestStr1(sep);
         expect(YAML_FRONT_MATTER_REGEX.test(text)).toEqual(true);
     });
 
-    test("New line is carriage return line feed", async () => {
+    test("New line is carriage return line feed", () => {
         const sep: string = String.fromCharCode(13, 10);
         const text: string = createTestStr1(sep);
         expect(YAML_FRONT_MATTER_REGEX.test(text)).toEqual(true);

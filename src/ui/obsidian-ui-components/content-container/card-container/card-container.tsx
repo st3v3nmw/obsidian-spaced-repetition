@@ -45,7 +45,6 @@ export class CardContainer {
     private processReviewHandler: (response: ReviewResponse) => Promise<void>;
     private skipCardHandler: () => void;
     private showAnswerHandler: () => void;
-    private backToDeckHandler: () => void;
 
     constructor(
         app: App,
@@ -53,7 +52,7 @@ export class CardContainer {
         settings: SRSettings,
         parentEl: HTMLElement,
         deleteCurrentCard: () => void,
-        backToDeckHandler: () => void,
+        backToDeckHandler: () => Promise<void>,
         editCardHandler: () => void,
         processReviewHandler: (response: ReviewResponse) => Promise<void>,
         skipCardHandler: () => void,
@@ -69,7 +68,6 @@ export class CardContainer {
         this.processReviewHandler = processReviewHandler;
         this.skipCardHandler = skipCardHandler;
         this.showAnswerHandler = showAnswerHandler;
-        this.backToDeckHandler = backToDeckHandler;
 
         // Build ui
         this.view = parentEl.createDiv();
@@ -206,7 +204,8 @@ export class CardContainer {
 
         // auto-focus the first cloze input if this card is a cloze card
         if (sessionData.currentQuestion.questionType === CardType.Cloze) {
-            const firstInput = activeDocument.querySelector(".cloze-input");
+            const firstInput: HTMLInputElement | null =
+                activeDocument.querySelector(".cloze-input");
             if (firstInput) {
                 firstInput.focus();
             }
@@ -327,7 +326,7 @@ export class CardContainer {
         }
     }
 
-    public drawBack(
+    public async drawBack(
         sessionData: SessionData,
         reviewMode: FlashcardReviewMode,
         settings: SRSettings,
@@ -351,7 +350,7 @@ export class CardContainer {
             this.plugin,
             sessionData.currentNote.filePath,
         );
-        wrapper.renderMarkdownWrapper(
+        await wrapper.renderMarkdownWrapper(
             sessionData.cardData.currentCard.back,
             this.content,
             sessionData.currentQuestion.questionText.textDirection,
@@ -412,7 +411,7 @@ export class CardContainer {
                     this.showAnswerHandler();
                     consumeKeyEvent();
                 } else if (this.cardState === CardState.Back) {
-                    this.processReviewHandler(ReviewResponse.Good);
+                    void this.processReviewHandler(ReviewResponse.Good);
                     consumeKeyEvent();
                 }
                 break;
@@ -421,7 +420,7 @@ export class CardContainer {
                 if (this.cardState !== CardState.Back) {
                     break;
                 }
-                this.processReviewHandler(ReviewResponse.Hard);
+                void this.processReviewHandler(ReviewResponse.Hard);
                 consumeKeyEvent();
                 break;
             case "Numpad2":
@@ -429,7 +428,7 @@ export class CardContainer {
                 if (this.cardState !== CardState.Back) {
                     break;
                 }
-                this.processReviewHandler(ReviewResponse.Good);
+                void this.processReviewHandler(ReviewResponse.Good);
                 consumeKeyEvent();
                 break;
             case "Numpad3":
@@ -437,7 +436,7 @@ export class CardContainer {
                 if (this.cardState !== CardState.Back) {
                     break;
                 }
-                this.processReviewHandler(ReviewResponse.Easy);
+                void this.processReviewHandler(ReviewResponse.Easy);
                 consumeKeyEvent();
                 break;
             case "Numpad0":
@@ -445,7 +444,7 @@ export class CardContainer {
                 if (this.cardState !== CardState.Back) {
                     break;
                 }
-                this.processReviewHandler(ReviewResponse.Reset);
+                void this.processReviewHandler(ReviewResponse.Reset);
                 consumeKeyEvent();
                 break;
             default:

@@ -24,13 +24,14 @@ import {
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
 import { UIManager, UIState } from "src/ui/ui-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
-import { convertToStringOrEmpty, TextDirection } from "src/utils/strings";
+import { TextDirection } from "src/utils/strings";
 
 export default class SRPlugin extends Plugin {
     private _uiManager: UIManager | null = null;
     private _dataManager: DataManager | null = null;
 
     public nextNoteReviewHandler: NextNoteReviewHandler | null = null;
+    public isInitialized: boolean = false;
 
     async onload(): Promise<void> {
         // TODO: Move this to on layout ready and then -->
@@ -45,10 +46,13 @@ export default class SRPlugin extends Plugin {
             noteReviewQueue,
         );
 
-        this.dataManager.initOSRCore(noteReviewQueue, this.onOsrVaultDataChanged.bind(this));
+        await this.dataManager.initOSRCore(noteReviewQueue, async () => {
+            await this.onOsrVaultDataChanged();
+        });
         this.uiManager = new UIManager(this, this.dataManager);
 
         this.addPluginCommands();
+        this.isInitialized = true;
     }
 
     get uiManager(): UIManager {
@@ -110,7 +114,7 @@ export default class SRPlugin extends Plugin {
                     )
                 ) {
                     if (!checking) {
-                        this.uiManager.contentManager._processReview(ReviewResponse.Again);
+                        void this.uiManager.contentManager._processReview(ReviewResponse.Again);
                     }
                     return true;
                 }
@@ -140,7 +144,7 @@ export default class SRPlugin extends Plugin {
                     )
                 ) {
                     if (!checking) {
-                        this.uiManager.contentManager._processReview(ReviewResponse.Hard);
+                        void this.uiManager.contentManager._processReview(ReviewResponse.Hard);
                     }
                     return true;
                 }
@@ -169,7 +173,7 @@ export default class SRPlugin extends Plugin {
                     )
                 ) {
                     if (!checking) {
-                        this.uiManager.contentManager._processReview(ReviewResponse.Good);
+                        void this.uiManager.contentManager._processReview(ReviewResponse.Good);
                     }
                     return true;
                 }
@@ -199,7 +203,7 @@ export default class SRPlugin extends Plugin {
                     )
                 ) {
                     if (!checking) {
-                        this.uiManager.contentManager._processReview(ReviewResponse.Easy);
+                        void this.uiManager.contentManager._processReview(ReviewResponse.Easy);
                     }
                     return true;
                 }
@@ -227,7 +231,7 @@ export default class SRPlugin extends Plugin {
                     )
                 ) {
                     if (!checking) {
-                        this.uiManager.contentManager._showAnswer();
+                        void this.uiManager.contentManager._showAnswer();
                     }
                     return true;
                 }
@@ -256,7 +260,7 @@ export default class SRPlugin extends Plugin {
                     )
                 ) {
                     if (!checking) {
-                        this.uiManager.contentManager._skipCurrentCard();
+                        void this.uiManager.contentManager._skipCurrentCard();
                     }
                     return true;
                 }
@@ -284,7 +288,7 @@ export default class SRPlugin extends Plugin {
                     )
                 ) {
                     if (!checking) {
-                        this.uiManager.contentManager._processReview(ReviewResponse.Reset);
+                        void this.uiManager.contentManager._processReview(ReviewResponse.Reset);
                     }
                     return true;
                 }
@@ -304,7 +308,7 @@ export default class SRPlugin extends Plugin {
             callback: async () => {
                 if (!this.dataManager.syncLock && this.nextNoteReviewHandler !== null) {
                     await this.dataManager.sync();
-                    this.nextNoteReviewHandler.reviewNextNoteModal();
+                    await this.nextNoteReviewHandler.reviewNextNoteModal();
                 }
             },
         });
@@ -321,7 +325,7 @@ export default class SRPlugin extends Plugin {
                 if (openFile === null || openFile.extension !== "md") return false;
 
                 if (!checking) {
-                    this.dataManager.saveNoteReviewResponse(openFile, ReviewResponse.Easy);
+                    void this.dataManager.saveNoteReviewResponse(openFile, ReviewResponse.Easy);
                 }
                 return true;
             },
@@ -339,7 +343,7 @@ export default class SRPlugin extends Plugin {
                 if (openFile === null || openFile.extension !== "md") return false;
 
                 if (!checking) {
-                    this.dataManager.saveNoteReviewResponse(openFile, ReviewResponse.Good);
+                    void this.dataManager.saveNoteReviewResponse(openFile, ReviewResponse.Good);
                 }
                 return true;
             },
@@ -357,7 +361,7 @@ export default class SRPlugin extends Plugin {
                 if (openFile === null || openFile.extension !== "md") return false;
 
                 if (!checking) {
-                    this.dataManager.saveNoteReviewResponse(openFile, ReviewResponse.Hard);
+                    void this.dataManager.saveNoteReviewResponse(openFile, ReviewResponse.Hard);
                 }
                 return true;
             },
@@ -389,7 +393,7 @@ export default class SRPlugin extends Plugin {
                 if (openFile === null || openFile.extension !== "md") return false;
 
                 if (!checking) {
-                    this.uiManager.openDeckContainer(FlashcardReviewMode.Review, openFile);
+                    void this.uiManager.openDeckContainer(FlashcardReviewMode.Review, openFile);
                 }
                 return true;
             },
@@ -405,7 +409,7 @@ export default class SRPlugin extends Plugin {
                 if (openFile === null || openFile.extension !== "md") return false;
 
                 if (!checking) {
-                    this.uiManager.openDeckContainer(FlashcardReviewMode.Cram, openFile);
+                    void this.uiManager.openDeckContainer(FlashcardReviewMode.Cram, openFile);
                 }
                 return true;
             },
@@ -470,10 +474,7 @@ export default class SRPlugin extends Plugin {
      * Gets the text direction setting for the current Obsidian instance.
      */
     public getObsidianRtlSetting(): TextDirection {
-        // Get the direction with Obsidian's own setting
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const v: any = (this.app.vault as any).getConfig("rightToLeft");
-        return convertToStringOrEmpty(v) === "true" ? TextDirection.Rtl : TextDirection.Ltr;
+        return activeDocument.body.hasClass("mod-rtl") ? TextDirection.Rtl : TextDirection.Ltr;
     }
 
     /**
@@ -481,8 +482,8 @@ export default class SRPlugin extends Plugin {
      *
      * Anything that needs to be updated in the UI because of this change should be done here.
      */
-    private onOsrVaultDataChanged() {
-        this.uiManager.updateStatusBar();
+    private async onOsrVaultDataChanged() {
+        await this.uiManager.updateStatusBar();
         if (this.dataManager.data.settings.enableNoteReviewPaneOnStartup) {
             this.uiManager.sidebarManager.redraw();
         }

@@ -100,7 +100,7 @@ export default class TabViewManager {
 
         // "Reveal" the leaf in case it is in a collapsed sidebar
         if (leaf !== null && leaf !== undefined) {
-            workspace.revealLeaf(leaf);
+            await workspace.revealLeaf(leaf);
         }
     }
 }

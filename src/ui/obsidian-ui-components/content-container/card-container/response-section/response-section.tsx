@@ -22,7 +22,7 @@ export default class ResponseSectionComponent {
         container: HTMLElement,
         settings: SRSettings,
         showAnswer: () => void,
-        processReview: (response: ReviewResponse) => void,
+        processReview: (response: ReviewResponse) => Promise<void>,
     ) {
         this.responseEl = container.createDiv();
         this.responseEl.addClass("sr-response");
@@ -38,32 +38,32 @@ export default class ResponseSectionComponent {
         this.againButton = new SRResponseButtonComponent(this.responseEl, {
             classNames: ["sr-bg-red", "sr-again-button", "sr-is-hidden"],
             text: settings.flashcardAgainText,
-            onClick: () => {
-                processReview(ReviewResponse.Again);
+            onClick: async () => {
+                await processReview(ReviewResponse.Again);
             },
         });
 
         this.hardButton = new SRResponseButtonComponent(this.responseEl, {
             classNames: ["sr-bg-yellow", "sr-hard-button", "sr-is-hidden"],
             text: settings.flashcardHardText,
-            onClick: () => {
-                processReview(ReviewResponse.Hard);
+            onClick: async () => {
+                await processReview(ReviewResponse.Hard);
             },
         });
 
         this.goodButton = new SRResponseButtonComponent(this.responseEl, {
             classNames: ["sr-bg-blue", "sr-good-button", "sr-is-hidden"],
             text: settings.flashcardGoodText,
-            onClick: () => {
-                processReview(ReviewResponse.Good);
+            onClick: async () => {
+                await processReview(ReviewResponse.Good);
             },
         });
 
         this.easyButton = new SRResponseButtonComponent(this.responseEl, {
             classNames: ["sr-bg-green", "sr-easy-button", "sr-is-hidden"],
             text: settings.flashcardEasyText,
-            onClick: () => {
-                processReview(ReviewResponse.Easy);
+            onClick: async () => {
+                await processReview(ReviewResponse.Easy);
             },
         });
     }

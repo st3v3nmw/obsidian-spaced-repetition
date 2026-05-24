@@ -88,7 +88,6 @@ export class UIManager {
 
         this.showRibbonIcon(this.dataManager.data.settings.showRibbonIcon);
         this.plugin.registerEvent(
-             
             this.plugin.app.workspace.on("file-menu", this.fileMenuHandler.bind(this)),
         );
         this.plugin.addSettingTab(
@@ -105,14 +104,14 @@ export class UIManager {
         this.tabViewManager.closeAllTabViews();
     }
 
-    public updateStatusBar() {
+    public async updateStatusBar() {
         if (this.dataManager.data === null) throw new Error("SR plugin or data not initialized!!!");
         if (this.dataManager.osrCore === null)
             throw new Error("SR plugin or OSR app core not initialized!!!");
 
         const settings = this.dataManager.data.settings;
 
-        this.statusBarManager.showStatusBarItems(
+        await this.statusBarManager.showStatusBarItems(
             settings.showStatusBar,
             settings.showCardStatusBarItem,
             settings.showNoteStatusBarItem,
@@ -140,10 +139,9 @@ export class UIManager {
 
     public registerSRFocusListener() {
         this.plugin.registerEvent(
-             
             this.plugin.app.workspace.on("active-leaf-change", this.handleFocusChange.bind(this)),
         );
-         
+
         this.externalModalObserver = new MutationObserver(this.handleExternalModalOpen.bind(this));
         this.externalModalObserver.observe(activeDocument.body, {
             childList: true,

@@ -104,6 +104,8 @@ class QuestionTypeCloze implements IQuestionTypeHandler {
 
         let front: string, back: string;
         const result: CardFrontBack[] = [];
+        if (clozeNote === null) return result;
+
         for (let i = 0; i < clozeNote.numCards; i++) {
             front = clozeNote.getCardFront(i, clozeFormatter);
             back = clozeNote.getCardBack(i, clozeFormatter);
@@ -115,15 +117,15 @@ class QuestionTypeCloze implements IQuestionTypeHandler {
 }
 
 export class QuestionTypeClozeFormatter implements IClozeFormatter {
-    asking(answer?: string, hint?: string): string {
+    asking(_?: string, hint?: string): string {
         return `<span style='color:#2196f3'>${!hint ? "[...]" : `[${hint}]`}</span>`;
     }
 
-    showingAnswer(answer: string, _hint?: string): string {
+    showingAnswer(answer: string, _?: string): string {
         return `<span style='color:#2196f3'>${answer}</span>`;
     }
 
-    hiding(answer?: string, hint?: string): string {
+    hiding(_?: string, hint?: string): string {
         return `<span style='color:var(--code-comment)'>${!hint ? "[...]" : `[${hint}]`}</span>`;
     }
 }
@@ -133,11 +135,11 @@ export class QuestionTypeClozeInputFormatter implements IClozeFormatter {
         return `<span style='color:#2196f3'><input class="cloze-input" type="text" size="${!answer ? 1 : answer.length}" />${!hint ? "" : `[${hint}]`}</span>`;
     }
 
-    showingAnswer(answer: string, _hint?: string): string {
+    showingAnswer(answer: string, _?: string): string {
         return `<span class="cloze-answer" style='color:#2196f3'>${answer}</span>`;
     }
 
-    hiding(answer?: string, hint?: string): string {
+    hiding(_?: string, hint?: string): string {
         return `<span style='color:var(--code-comment)'>${!hint ? "[...]" : `[${hint}]`}</span>`;
     }
 }

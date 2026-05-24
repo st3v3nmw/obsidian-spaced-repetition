@@ -113,12 +113,16 @@ export abstract class SRTFile implements ISRFile {
      * @returns {string[]} - An array of all tags from the file cache.
      */
     getAllTagsFromCache(): string[] {
+        // TODO: Fix bug where tags are not being read from the cache here
         const fileCachedData = this.metadataCache.getFileCache(this.file);
+
         if (!fileCachedData) {
             return [];
         }
 
-        return ObsidianGetAllTags(fileCachedData) || [];
+        const tags: string[] = ObsidianGetAllTags(fileCachedData) || [];
+
+        return tags;
     }
 
     /**

@@ -133,11 +133,14 @@ export class QuestionText {
         return new QuestionText(original, topicPathWithWs, actualQuestion, textDirection, blockId);
     }
 
-    static splitText(original: string, settings: SRSettings): [TopicPathWithWs, string, string] {
+    static splitText(
+        original: string,
+        settings: SRSettings,
+    ): [TopicPathWithWs | null, string, string] {
         const originalWithoutSR = DataStore.getInstance().removeScheduleInfo(original);
         let actualQuestion: string = originalWithoutSR.trimEnd();
 
-        let topicPathWithWs: TopicPathWithWs;
+        let topicPathWithWs: TopicPathWithWs | null = null;
 
         // originalWithoutSR - [[preTopicPathWs] TopicPath [postTopicPathWs]] Question [whitespace blockId]
         const topicPath = TopicPath.getTopicPathFromCardText(originalWithoutSR);
@@ -163,7 +166,7 @@ export class QuestionText {
 
     static extractObsidianBlockId(text: string): [string, string] {
         let question: string = text;
-        let blockId: string = null;
+        let blockId: string | null = null;
         const match = text.match(OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX);
         if (match) {
             blockId = match[0].trim();
@@ -272,7 +275,7 @@ export class Question {
         return result;
     }
 
-    async updateQuestionWithinNoteText(noteText: string, settings: SRSettings): Promise<string> {
+    updateQuestionWithinNoteText(noteText: string, settings: SRSettings): string {
         const originalText: string = this.questionText.original;
 
         // Get the entire text for the question including:
@@ -284,7 +287,7 @@ export class Question {
         let newText = MultiLineTextFinder.findAndReplace(noteText, originalText, replacementText);
         if (newText) {
             // Don't support changing the textDirection setting
-            this.questionText = await QuestionText.create(
+            this.questionText = QuestionText.create(
                 replacementText,
                 this.questionText.textDirection,
                 settings,
@@ -304,7 +307,7 @@ export class Question {
     async writeQuestion(settings: SRSettings): Promise<void> {
         const fileText: string = await this.note.file.read();
 
-        const newText: string = await this.updateQuestionWithinNoteText(fileText, settings);
+        const newText: string = this.updateQuestionWithinNoteText(fileText, settings);
         await this.note.file.write(newText);
         this.hasChanged = false;
     }

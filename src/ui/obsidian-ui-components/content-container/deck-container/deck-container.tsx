@@ -45,6 +45,7 @@ export class DeckContainer {
     ) {
         // Redraw in case the stats have changed
         this.deckListHeader.updateReviewMode(reviewMode);
+
         this.deckList.redraw(reviewSequencer, settings);
 
         if (this.containerEl.hasClass("sr-is-hidden")) {

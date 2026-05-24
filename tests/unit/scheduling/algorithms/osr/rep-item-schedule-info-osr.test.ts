@@ -56,5 +56,5 @@ test("getDummyScheduleForNewCard", () => {
     const repItem: RepItemScheduleInfoOsr = RepItemScheduleInfoOsr.getNewSchedule(DEFAULT_SETTINGS);
     expect(repItem.interval).toEqual(1);
     expect(repItem.latestEase).toEqual(250);
-    expect(repItem.dueDate.valueOf).toEqual(moment("2000-01-01").valueOf);
+    expect(repItem.dueDate.valueOf()).toEqual(moment("2000-01-01").valueOf());
 });
