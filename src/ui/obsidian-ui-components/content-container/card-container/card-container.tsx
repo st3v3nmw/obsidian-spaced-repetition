@@ -45,6 +45,7 @@ export class CardContainer {
     private processReviewHandler: (response: ReviewResponse) => Promise<void>;
     private skipCardHandler: () => void;
     private showAnswerHandler: () => void;
+    private jumpToCardHandler: () => Promise<void>;
 
     constructor(
         app: App,
@@ -68,6 +69,7 @@ export class CardContainer {
         this.processReviewHandler = processReviewHandler;
         this.skipCardHandler = skipCardHandler;
         this.showAnswerHandler = showAnswerHandler;
+        this.jumpToCardHandler = jumpToCurrentCardHandler;
 
         // Build ui
         this.view = parentEl.createDiv();
@@ -402,6 +404,10 @@ export class CardContainer {
         switch (e.code) {
             case "KeyS":
                 this.skipCardHandler();
+                consumeKeyEvent();
+                break;
+            case "KeyJ":
+                this.jumpToCardHandler();
                 consumeKeyEvent();
                 break;
             case "Enter":
