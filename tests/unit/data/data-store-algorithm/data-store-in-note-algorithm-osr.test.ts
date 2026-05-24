@@ -13,7 +13,7 @@ beforeAll(() => {
 });
 
 describe("formatCardSchedule", () => {
-    test("Has schedule, with due date", async () => {
+    test("Has schedule, with due date", () => {
         const settings: SRSettings = { ...DEFAULT_SETTINGS };
         const instance: NoteDataStoreAlgorithmOsr = new NoteDataStoreAlgorithmOsr(settings);
 
@@ -28,7 +28,7 @@ describe("formatCardSchedule", () => {
         expect(instance.formatCardSchedule(card)).toEqual("!2023-10-06,25,263");
     });
 
-    test("Has schedule, but no due date", async () => {
+    test("Has schedule, but no due date", () => {
         const settings: SRSettings = { ...DEFAULT_SETTINGS };
         const instance: NoteDataStoreAlgorithmOsr = new NoteDataStoreAlgorithmOsr(settings);
 
@@ -44,7 +44,7 @@ describe("formatCardSchedule", () => {
         expect(instance.formatCardSchedule(card)).toEqual("!2000-01-01,25,303");
     });
 
-    test("Formats FSRS schedules", async () => {
+    test("Formats FSRS schedules", () => {
         const settings: SRSettings = { ...DEFAULT_SETTINGS };
         const instance: NoteDataStoreAlgorithmOsr = new NoteDataStoreAlgorithmOsr(settings);
 

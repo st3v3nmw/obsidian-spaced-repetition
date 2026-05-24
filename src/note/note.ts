@@ -44,7 +44,7 @@ export class Note {
         let fileText: string = await this.file.read();
         for (const question of this.questionList) {
             if (question.hasChanged) {
-                fileText = await question.updateQuestionWithinNoteText(fileText, settings);
+                fileText = question.updateQuestionWithinNoteText(fileText, settings);
             }
         }
         await this.file.write(fileText);

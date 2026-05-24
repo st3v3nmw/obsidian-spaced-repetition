@@ -23,7 +23,7 @@ export default class CardToolbarComponent {
         parentEl: HTMLElement,
         showDeleteButton: boolean,
         deleteCurrentCard: () => void,
-        backToDeckHandler: () => void,
+        backToDeckHandler: () => Promise<void>,
         editClickHandler: () => void,
         jumpToCurrentCard: () => Promise<void>,
         displayCurrentCardInfoNotice: () => void,
@@ -36,7 +36,7 @@ export default class CardToolbarComponent {
         this.toolbar.addClass("sr-card-toolbar");
         const isModal = closeModal !== undefined;
 
-        new BackButtonComponent(this.toolbar, () => backToDeckHandler(), [
+        new BackButtonComponent(this.toolbar, async () => await backToDeckHandler(), [
             (EmulatedPlatform().isPhone || Platform.isPhone) && isModal
                 ? "mod-raised"
                 : "clickable-icon",

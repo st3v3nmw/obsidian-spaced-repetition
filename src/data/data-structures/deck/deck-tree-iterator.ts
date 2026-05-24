@@ -75,7 +75,7 @@ class SingleDeckIterator {
     deck: Deck | null = null;
     iteratorOrder: IIteratorOrder;
     preferredCardListType: RepItemState;
-    cardIdx?: number;
+    cardIdx?: number | null;
     cardListType?: RepItemState;
     weightedRandomNumber: WeightedRandomNumber;
 
@@ -116,7 +116,7 @@ class SingleDeckIterator {
         this.setCardListType(cardListType, index);
     }
 
-    private setCardListType(cardListType?: RepItemState, cardIdx: number = null): void {
+    private setCardListType(cardListType?: RepItemState, cardIdx: number | null = null): void {
         this.cardListType = cardListType;
         this.cardIdx = cardIdx;
     }
@@ -336,6 +336,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
             }
         }
         if (!result) this.deckIdx = null;
+
         return result;
     }
 

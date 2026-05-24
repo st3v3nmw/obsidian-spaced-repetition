@@ -146,11 +146,16 @@ export class UnitTestSRFile implements ISRNoteTFile {
     }
 
     async read(): Promise<string> {
-        return this.content;
+        return new Promise((resolve) => {
+            resolve(this.content);
+        });
     }
 
     async write(content: string): Promise<void> {
-        this.content = content;
+        return new Promise((resolve) => {
+            this.content = content;
+            resolve();
+        });
     }
 
     static CreateFromFsFile(path: string): UnitTestSRFile {

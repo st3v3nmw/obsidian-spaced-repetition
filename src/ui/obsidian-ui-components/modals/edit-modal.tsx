@@ -145,8 +145,8 @@ export class FlashcardEditModal extends Modal {
     /**
      * Opens the EditModal
      */
-    onOpen() {
-        super.onOpen();
+    async onOpen() {
+        await super.onOpen();
         if (this.textAreaFront !== null) {
             this.textAreaFront.focus();
         }

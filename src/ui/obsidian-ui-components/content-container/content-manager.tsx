@@ -180,9 +180,9 @@ export default class ContentManager {
         }
 
         if (openImmediately && deckWithCards !== null) {
-            this._reviewDeck(deckWithCards);
+            await this._reviewDeck(deckWithCards);
         } else {
-            this._showDecksList();
+            await this._showDecksList();
         }
     }
 
@@ -199,33 +199,33 @@ export default class ContentManager {
         this.deckContainer.showList(this.reviewSequencer, this.settings, this.reviewMode);
     }
 
-    private _reviewDeck(deck: Deck): void {
+    private async _reviewDeck(deck: Deck): Promise<void> {
         this.deckContainer.closeList();
         this.sessionData = this._getNewSessionData(deck);
         if (this.sessionData === null) return;
         this.uiManager.setUIState(UIState.CardFront);
-        this.cardContainer.openSession(this.sessionData, this.settings);
+        await this.cardContainer.openSession(this.sessionData, this.settings);
     }
 
     private async _showNextCard(): Promise<void> {
         if (this.sessionData === null || this.reviewSequencer === null) {
-            this._showDecksList(true);
+            await this._showDecksList(true);
             return;
         }
 
         if (!this.reviewSequencer.hasCurrentCard) {
             // TODO: Re-enable pending state, once it is more integrated with the rest of the ui & once data refreshing is better implemented
             // if (this.reviewSequencer.hasPendingCards) {
-            //     this._showPendingState();
+            //     await this._showPendingState();
             // } else {
-            //     this._showDecksList(true);
+            //     await this._showDecksList(true);
             // }
-            this._showDecksList(true);
+            await this._showDecksList(true);
             return;
         }
 
         if (this.reviewSequencer.currentDeck === null) {
-            this._showDecksList(true);
+            await this._showDecksList(true);
             return;
         }
 
@@ -262,16 +262,16 @@ export default class ContentManager {
         ) {
             await this.cardContainer.drawCardFront(this.sessionData, this.settings);
         } else {
-            this._showDecksList(true);
+            await this._showDecksList(true);
         }
     }
 
-    private _showPendingState(): void {
+    private async _showPendingState(): Promise<void> {
         if (this.reviewSequencer === null) return;
         this._clearPendingResumeTimeout();
         const nextPendingDueUnix = this.reviewSequencer.nextPendingDueUnix;
         if (nextPendingDueUnix === null) {
-            this._showDecksList(true);
+            await this._showDecksList(true);
             return;
         }
 
@@ -279,10 +279,10 @@ export default class ContentManager {
         this.cardContainer.drawPendingState(nextPendingDueUnix);
 
         const delayMs = Math.max(0, nextPendingDueUnix - Date.now());
-        this.pendingResumeTimeout = window.setTimeout(async () => {
+        this.pendingResumeTimeout = window.setTimeout(() => {
             if (this.reviewSequencer === null) return;
             this.reviewSequencer.refreshCurrentDeck();
-            await this._showNextCard();
+            void this._showNextCard();
         }, delayMs + 50);
     }
 
@@ -322,7 +322,7 @@ export default class ContentManager {
 
     // MARK: Card button handlers
 
-    public async _deleteCurrentCard() {
+    public _deleteCurrentCard() {
         if (
             this.sessionData === null ||
             this.reviewSequencer === null ||
@@ -352,7 +352,7 @@ export default class ContentManager {
         ).open();
     }
 
-    public _showAnswer() {
+    public async _showAnswer() {
         if (this.sessionData === null) return;
 
         const timeNow = now();
@@ -368,7 +368,7 @@ export default class ContentManager {
         this.uiManager.setUIState(UIState.CardBack);
         this.sessionData.cardData.currentCardState = CardState.Back;
 
-        this.cardContainer.drawBack(
+        await this.cardContainer.drawBack(
             this.sessionData,
             this.reviewMode,
             this.settings,
@@ -391,10 +391,10 @@ export default class ContentManager {
             textPrompt,
             currentQ.questionText.textDirection,
         );
-        editModal
+        await editModal
             .then(async (modifiedCardText) => {
                 if (this.reviewSequencer === null) return;
-                this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
+                await this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
                 this.uiManager.setUIState(UIState.CardBack);
             })
             .catch((reason) => console.log(reason));
@@ -450,10 +450,10 @@ export default class ContentManager {
         }
     }
 
-    public _skipCurrentCard() {
+    public async _skipCurrentCard() {
         if (this.reviewSequencer === null) return;
         this.reviewSequencer.skipCurrentCard();
-        this._showNextCard();
+        await this._showNextCard();
     }
 
     private _displayCurrentCardInfoNotice() {
@@ -481,13 +481,13 @@ export default class ContentManager {
 
     // MARK: Deck button handlers
 
-    private _startReviewOfDeck(deck: Deck) {
+    private async _startReviewOfDeck(deck: Deck) {
         if (this.reviewSequencer === null) return;
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         if (this.reviewSequencer.hasCurrentCard) {
-            this._reviewDeck(deck);
+            await this._reviewDeck(deck);
         } else {
-            this._showDecksList();
+            await this._showDecksList();
         }
     }
 
@@ -496,7 +496,7 @@ export default class ContentManager {
         this.reviewMode = reviewMode;
         this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue();
         this.deckContainer.closeList();
-        this._showDecksList();
+        await this._showDecksList();
     }
 
     // MARK: Utils

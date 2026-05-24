@@ -55,14 +55,14 @@ export class SRModalView extends Modal {
     }
 
     onOpen(): void {
-        this.contentManager.open();
+        void this.contentManager.open();
     }
 
     onClose(): void {
         this.contentManager.close();
     }
 
-    private onResize(entries: ResizeObserverEntry[]) {
+    private async onResize(entries: ResizeObserverEntry[]) {
         const modalEl = entries[0].target as HTMLElement;
         const parent = modalEl.parentElement;
 
@@ -78,7 +78,7 @@ export class SRModalView extends Modal {
 
         this.setRoundedModalCorners(!(heightPercent >= 100 || widthPercent >= 100));
 
-        this.saveSizeToSettings(
+        await this.saveSizeToSettings(
             heightPercent,
             widthPercent,
             Platform.isMobile || EmulatedPlatform().isMobile,

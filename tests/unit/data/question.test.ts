@@ -14,7 +14,7 @@ describe("Question", () => {
     });
 
     describe("getHtmlCommentSeparator", () => {
-        test("Ends with a code block", async () => {
+        test("Ends with a code block", () => {
             const text: string =
                 "How do you ... Python?\n?\n" +
                 "```\nprint('Hello World!')\nprint('Howdy?')\nlambda x: x[0]\n```";
@@ -29,7 +29,7 @@ describe("Question", () => {
             );
         });
 
-        test("Doesn't end with a code block", async () => {
+        test("Doesn't end with a code block", () => {
             const text: string = "Q1::A1";
 
             const question: Question = new Question({
@@ -44,7 +44,7 @@ describe("Question", () => {
     });
 
     describe("formatForNote", () => {
-        test("puts schedule in a metadata callout when enabled", async () => {
+        test("puts schedule in a metadata callout when enabled", () => {
             const questionText = new QuestionText("Q1::A1", null, "Q1::A1", TextDirection.Ltr, "");
             const question = new Question({
                 questionText,

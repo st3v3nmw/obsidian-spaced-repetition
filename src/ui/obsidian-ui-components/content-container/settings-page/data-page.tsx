@@ -183,7 +183,7 @@ export class DataPage extends SettingsPage {
                         button
                             .setButtonText(t("MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_BUTTON"))
                             .setClass("mod-warning")
-                            .onClick(async () => {
+                            .onClick(() => {
                                 new ConfirmationModal(
                                     this.plugin.app,
                                     t("MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT"),
@@ -224,15 +224,15 @@ export class DataPage extends SettingsPage {
                         button
                             .setButtonText(t("DELETE"))
                             .setClass("mod-warning")
-                            .onClick(async () => {
+                            .onClick(() => {
                                 new ConfirmationModal(
                                     this.plugin.app,
                                     t("DELETE_SCHEDULING_DATA_ALL"),
                                     t("CONFIRM_SCHEDULING_DATA_ALL_DELETION"),
                                     t("SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS"),
-                                    () => {
+                                    async () => {
                                         const settings = this.dataManager.data.settings;
-                                        DataStore.instance.fileModifier.deleteAllSchedulingData(
+                                        await DataStore.instance.fileModifier.deleteAllSchedulingData(
                                             settings.deleteTagsOnSchedulingDataDeletion,
                                             settings.flashcardTags,
                                             settings.tagsToReview,
@@ -250,14 +250,14 @@ export class DataPage extends SettingsPage {
                         button
                             .setButtonText(t("DELETE"))
                             .setClass("mod-warning")
-                            .onClick(async () => {
+                            .onClick(() => {
                                 new ConfirmationModal(
                                     this.plugin.app,
                                     t("DELETE_SCHEDULING_DATA_IN_NOTES"),
                                     t("CONFIRM_SCHEDULING_DATA_IN_NOTES_DELETION"),
                                     t("SCHEDULING_DATA_IN_NOTES_DELETION_IN_PROGRESS"),
-                                    () => {
-                                        DataStore.instance.fileModifier.deleteAllSchedulingDataInNotes(
+                                    async () => {
+                                        await DataStore.instance.fileModifier.deleteAllSchedulingDataInNotes(
                                             this.dataManager.data.settings
                                                 .deleteTagsOnSchedulingDataDeletion,
                                             this.dataManager.data.settings.tagsToReview,
@@ -275,14 +275,14 @@ export class DataPage extends SettingsPage {
                         button
                             .setButtonText(t("DELETE"))
                             .setClass("mod-warning")
-                            .onClick(async () => {
+                            .onClick(() => {
                                 new ConfirmationModal(
                                     this.plugin.app,
                                     t("DELETE_SCHEDULING_DATA_IN_CARDS"),
                                     t("CONFIRM_SCHEDULING_DATA_IN_CARDS_DELETION"),
                                     t("SCHEDULING_DATA_IN_CARDS_DELETION_IN_PROGRESS"),
-                                    () => {
-                                        DataStore.instance.fileModifier.deleteAllSchedulingDataInCards(
+                                    async () => {
+                                        await DataStore.instance.fileModifier.deleteAllSchedulingDataInCards(
                                             this.dataManager.data.settings
                                                 .deleteTagsOnSchedulingDataDeletion,
                                             this.dataManager.data.settings.flashcardTags,
@@ -303,15 +303,15 @@ export class DataPage extends SettingsPage {
                         button
                             .setButtonText(t("RESET_SETTINGS"))
                             .setClass("mod-warning")
-                            .onClick(async () => {
+                            .onClick(() => {
                                 new ConfirmationModal(
                                     this.plugin.app,
                                     t("RESET_SETTINGS"),
                                     t("CONFIRM_RESET_SETTINGS"),
                                     t("RESET_SETTINGS_CONFIRMATION"),
-                                    () => {
+                                    async () => {
                                         this.dataManager.data.settings = DEFAULT_SETTINGS;
-                                        this.dataManager.savePluginData();
+                                        await this.dataManager.savePluginData();
                                         this.display();
                                     },
                                 ).open();

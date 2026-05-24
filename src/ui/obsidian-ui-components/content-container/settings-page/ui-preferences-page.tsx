@@ -252,7 +252,7 @@ export class UIPreferencesPage extends SettingsPage {
                             .onChange(async (value) => {
                                 this.dataManager.data.settings.showStatusBar = value;
                                 await this.dataManager.savePluginData();
-                                this.uiManager.updateStatusBar();
+                                await this.uiManager.updateStatusBar();
                             }),
                     );
             })
@@ -266,7 +266,7 @@ export class UIPreferencesPage extends SettingsPage {
                             .onChange(async (value) => {
                                 this.dataManager.data.settings.showCardStatusBarItem = value;
                                 await this.dataManager.savePluginData();
-                                this.uiManager.updateStatusBar();
+                                await this.uiManager.updateStatusBar();
                             }),
                     );
             })
@@ -280,7 +280,7 @@ export class UIPreferencesPage extends SettingsPage {
                             .onChange(async (value) => {
                                 this.dataManager.data.settings.showNoteStatusBarItem = value;
                                 await this.dataManager.savePluginData();
-                                this.uiManager.updateStatusBar();
+                                await this.uiManager.updateStatusBar();
                             }),
                     );
             })
@@ -297,7 +297,7 @@ export class UIPreferencesPage extends SettingsPage {
                                 this.dataManager.data.settings.showUpdateAvailableStatusBarItem =
                                     value;
                                 await this.dataManager.savePluginData();
-                                this.uiManager.updateStatusBar();
+                                await this.uiManager.updateStatusBar();
                             }),
                     );
             });

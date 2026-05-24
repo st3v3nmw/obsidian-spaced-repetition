@@ -24,6 +24,7 @@ export default {
         "src/ui/",
         "src/icons/",
         "src/main.ts",
+        "src/command-manager.ts",
         "src/data/data-manager.ts",
         "src/data/data-store/.*/.*-file-modifier.ts",
         "src/data/data-store/.*/.*file-modifier.ts",

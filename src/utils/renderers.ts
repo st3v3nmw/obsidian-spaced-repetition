@@ -46,7 +46,7 @@ export class RenderMarkdownWrapper {
                 const href = el.getAttr("href") || el.getAttr("data-href");
 
                 if (href) {
-                    this.app.workspace.openLinkText(href, this.notePath, true);
+                    void this.app.workspace.openLinkText(href, this.notePath, true);
                     return true;
                 }
                 return false;

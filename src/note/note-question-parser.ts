@@ -38,7 +38,7 @@ export class NoteQuestionParser {
     flashcardTagList: TagCache[];
 
     // flashcardTagList filtered to those within the frontmatter
-    frontmatterTopicPathList: TopicPathList;
+    frontmatterTopicPathList: TopicPathList | null;
 
     // flashcardTagList filtered to those within the note's content and are note-level tags (i.e. not question specific)
     contentTopicPathInfo: TopicPathList[];
@@ -62,7 +62,6 @@ export class NoteQuestionParser {
         const hasTopicPaths: boolean =
             tagCacheList.some((item) => SettingsUtil.isFlashcardTag(this.settings, item)) ||
             folderTopicPath.hasPath;
-
         if (hasTopicPaths) {
             // Reading the file is relatively an expensive operation, so we only do this when needed
             const noteText: string = await noteFile.read();
@@ -78,7 +77,7 @@ export class NoteQuestionParser {
             // Create the question list
             let textDirection: TextDirection = noteFile.getTextDirection();
             if (textDirection === TextDirection.Unspecified) textDirection = defaultTextDirection;
-            this.questionList = await this.doCreateQuestionList(
+            this.questionList = this.doCreateQuestionList(
                 noteText,
                 textDirection,
                 folderTopicPath,
@@ -88,6 +87,7 @@ export class NoteQuestionParser {
             // For each question, determine it's TopicPathList
             [this.frontmatterTopicPathList, this.contentTopicPathInfo] =
                 this.analyseTagCacheList(tagCompleteList);
+
             for (const question of this.questionList) {
                 question.topicPathList = this.determineQuestionTopicPathList(question);
             }
@@ -216,7 +216,7 @@ export class NoteQuestionParser {
     //      - All tags within frontmatter grouped together (note that multiple tags
     //      within frontmatter appear on separate lines)
     //
-    private analyseTagCacheList(tagCacheList: TagCache[]): [TopicPathList, TopicPathList[]] {
+    private analyseTagCacheList(tagCacheList: TagCache[]): [TopicPathList | null, TopicPathList[]] {
         // The tag (e.g. "#flashcards") must be a valid flashcard tag as per the user settings
         this.flashcardTagList = tagCacheList.filter((item) =>
             SettingsUtil.isFlashcardTag(this.settings, item.tag),
@@ -231,10 +231,9 @@ export class NoteQuestionParser {
             frontmatterLineCount = splitTextIntoLineArray(this.frontmatterText).length;
         }
 
-        const frontmatterTopicPathList: TopicPathList = this.determineFrontmatterTopicPathList(
-            this.flashcardTagList,
-            frontmatterLineCount,
-        );
+        const frontmatterTopicPathList: TopicPathList | null =
+            this.determineFrontmatterTopicPathList(this.flashcardTagList, frontmatterLineCount);
+
         const contentTopicPathList: TopicPathList[] = this.determineContentTopicPathList(
             this.flashcardTagList,
             frontmatterLineCount,
@@ -337,7 +336,7 @@ export class NoteQuestionParser {
     // Else the first TopicPathList prior to the question (in the order present in the file) is returned.
     // That could be either the tags within the note's frontmatter, or tags on lines within the note's content.
     private determineQuestionTopicPathList(question: Question): TopicPathList {
-        let result: TopicPathList;
+        let result: TopicPathList | null;
         if (this.settings.convertFoldersToDecks) {
             result = new TopicPathList([this.folderTopicPath]);
         } else {
@@ -369,6 +368,14 @@ export class NoteQuestionParser {
                 }
             }
         }
+
+        if (result === null) {
+            // TODO: Remove this warning once the issue is fixed
+            console.log(
+                "WARNING: No topic path list found. Please reload the deck list by closing and reopening the view",
+            );
+        }
+
         return result;
     }
 }

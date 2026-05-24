@@ -267,7 +267,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
                 break;
 
             case FlashcardReviewMode.Cram:
-                await this.processReviewCramMode(response);
+                this.processReviewCramMode(response);
                 break;
         }
     }
@@ -351,7 +351,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         this.pendingCards.push({ card: pendingCard, dueUnix });
     }
 
-    async processReviewCramMode(response: ReviewResponse): Promise<void> {
+    processReviewCramMode(response: ReviewResponse): void {
         if (response === ReviewResponse.Easy) this.deleteCurrentCard();
         else {
             this.cardSequencer.moveCurrentRepItemToEndOfList();

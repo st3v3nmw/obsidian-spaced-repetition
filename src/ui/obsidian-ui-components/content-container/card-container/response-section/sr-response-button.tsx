@@ -11,7 +11,7 @@ export default class SRResponseButtonComponent extends SRButtonComponent {
             icon?: string;
             tooltip?: string;
             text?: string;
-            onClick: () => void;
+            onClick: () => void | Promise<void>;
         },
     ) {
         super(container, {
@@ -19,9 +19,7 @@ export default class SRResponseButtonComponent extends SRButtonComponent {
             icon: props.icon,
             tooltip: props.tooltip,
             text: props.text,
-            onClick: () => {
-                props.onClick();
-            },
+            onClick: props.onClick,
         });
 
         this.buttonEl.setText("");
