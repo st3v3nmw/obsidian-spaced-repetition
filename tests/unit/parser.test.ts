@@ -357,6 +357,39 @@ Line 5
             clozePatterns: [],
         }),
     ).toEqual([]);
+
+    // multi-line question with blank space and multiple tags
+    expect(
+        parseT(
+            `some text
+some text
+
+#flashcards/tag1 #flashcards/tag2
+QL1
+??
+AL1
+
+AL2
++++
+some text
+`,
+            {
+                singleLineCardSeparator: "::",
+                singleLineReversedCardSeparator: ":::",
+                multilineCardSeparator: "?",
+                multilineReversedCardSeparator: "??",
+                multilineCardEndMarker: "+++",
+                clozePatterns: [],
+            },
+        ),
+    ).toEqual([
+        [
+            CardType.MultiLineReversed,
+            "#flashcards/tag1 #flashcards/tag2\nQL1\n??\nAL1\n\nAL2",
+            3,
+            8,
+        ],
+    ]);
 });
 
 test("Test parsing of cloze cards", () => {

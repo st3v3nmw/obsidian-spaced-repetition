@@ -8,6 +8,7 @@ export interface SRSettings {
     flashcardTags: string[];
     flashcardTagsToIgnore: string[];
     convertFoldersToDecks: boolean;
+    alwaysIncludeFrontmatterTags: boolean;
     burySiblingCards: boolean;
     randomizeCardOrder: boolean | undefined;
     flashcardCardOrder: string;
@@ -87,6 +88,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardTags: ["#flashcards"],
     flashcardTagsToIgnore: [],
     convertFoldersToDecks: false,
+    alwaysIncludeFrontmatterTags: false,
     burySiblingCards: false,
     flashcardCardOrder: "DueFirstRandom",
     flashcardDeckOrder: "PrevDeckComplete_Sequential",
