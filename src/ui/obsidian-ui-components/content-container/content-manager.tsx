@@ -400,7 +400,7 @@ export default class ContentManager {
             .catch((reason) => console.log(reason));
     }
 
-    private async _jumpToCurrentCard(): Promise<void> {
+    public async _jumpToCurrentCard(): Promise<void> {
         if (this.reviewSequencer === null) return;
         const currentQuestion = this.reviewSequencer.currentQuestion;
         if (!currentQuestion) return;

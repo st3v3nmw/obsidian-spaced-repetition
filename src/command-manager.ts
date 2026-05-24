@@ -269,6 +269,35 @@ export class CommandManager {
                 return false;
             },
         });
+
+        this.plugin.addCommand({
+            id: "srs-card-review-reset",
+            name: t("OPEN_IN_BACKGROUND"),
+            repeatable: false,
+            checkCallback: (checking: boolean) => {
+                if (
+                    this.plugin.isInitialized &&
+                    this.plugin.uiManager.uiState === UIState.CardBack &&
+                    this.plugin.uiManager.isSRInFocus &&
+                    this.plugin.uiManager.contentManager !== null &&
+                    !(
+                        Platform.isMobile || // No keyboard events on mobile
+                        EmulatedPlatform().isMobile
+                    ) &&
+                    !(
+                        activeDocument.activeElement !== null &&
+                        (activeDocument.activeElement.nodeName === "TEXTAREA" ||
+                            activeDocument.activeElement.nodeName === "INPUT")
+                    )
+                ) {
+                    if (!checking) {
+                        void this.plugin.uiManager.contentManager._jumpToCurrentCard();
+                    }
+                    return true;
+                }
+                return false;
+            },
+        });
     }
 
     /**
