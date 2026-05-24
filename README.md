@@ -2,9 +2,9 @@
 
 ![SR_Banner](./docs/media/en/SR_Banner.jpg)
 
-<img src="https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/total" /> <img src="https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/latest/total?style=flat-square" /> <img src="https://img.shields.io/github/manifest-json/v/st3v3nmw/obsidian-spaced-repetition?style=flat-square" /> <img alt="Codecov" src="https://img.shields.io/codecov/c/gh/st3v3nmw/obsidian-spaced-repetition">
+<img src="https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/total" /> <img src="https://img.shields.io/github/downloads/st3v3nmw/obsidian-spaced-repetition/latest/total" /> <img src="https://img.shields.io/github/manifest-json/v/st3v3nmw/obsidian-spaced-repetition" /> <img alt="Codecov" src="https://img.shields.io/codecov/c/gh/st3v3nmw/obsidian-spaced-repetition">
 
-Fight the forgetting curve by reviewing flashcards & notes using [spaced repetition](https://en.wikipedia.org/wiki/Spaced_repetition).
+Fight the forgetting curve by reviewing flashcards & notes using the FSRS or the SM-2 [spaced repetition](https://en.wikipedia.org/wiki/Spaced_repetition) algorithms.
 
 - For more information on how to use the plugin, check either the TL;DR on this page or the [documentation](https://stephenmwangi.com/obsidian-spaced-repetition/).
 - Raise an [issue](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/) if you have a feature request or a bug report.
@@ -140,12 +140,12 @@ This is where marking a note for review comes in handy.
     <tbody>
   <tr>
     <td align="center">
-        <a href='https://ko-fi.com/M4M44DEN6' target='_blank'>
+        <a href='https://ko-fi.com/M4M44DEN6' target='_blank' style="text-decoration: none;">
             <img height='30' style='border:0px;height:30px;' src='https://cdn.ko-fi.com/cdn/kofi3.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' />
         </a>
     </td>
     <td align="center">
-      <a href="https://github.com/KyleKlus">
+      <a href="https://github.com/KyleKlus" style="text-decoration: none;">
         <img src="https://img.shields.io/badge/Kyle%20Klus-darkgreen?style=flat&logo=github&label=Github&link=https%3A%2F%2Fgithub.com%2FKyleKlus
         " alt="Github">
       </a>
