@@ -1,4 +1,4 @@
-import { DEBUG_MODE_ENABLED } from "src/constants";
+import { DEBUG_MODE_ENABLED } from "src/data/constants";
 
 export interface EmulatedPlatform {
     isDesktop: boolean;

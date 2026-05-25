@@ -1,14 +1,19 @@
 import { TagCache } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { Card } from "src/card/card";
-import { Question, QuestionText } from "src/card/questions/question";
-import { CardFrontBack, CardFrontBackUtil } from "src/card/questions/question-type";
-import { DataStore } from "src/data-stores/base/data-store";
-import { TopicPath, TopicPathList } from "src/deck/topic-path";
-import { frontmatterTagPseudoLineNum, ISRFile } from "src/file";
+import { DataStore } from "src/data/data-store/base/data-store";
+import { RepItemStorageInfo } from "src/data/data-store/base/rep-item-storage-info";
+import { Card } from "src/data/data-structures/card/card";
+import { Question, QuestionText } from "src/data/data-structures/card/questions/question";
+import {
+    CardFrontBack,
+    CardFrontBackUtil,
+} from "src/data/data-structures/card/questions/question-type";
+import { TopicPath, TopicPathList } from "src/data/data-structures/deck/topic-path";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
+import { frontmatterTagPseudoLineNum } from "src/data/data-structures/file/sr-file";
+import { SettingsUtil, SRSettings } from "src/data/settings";
 import { parse, ParsedQuestionInfo, ParserOptions } from "src/parser";
-import { SettingsUtil, SRSettings } from "src/settings";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {
     splitNoteIntoFrontmatterAndContent,
     splitTextIntoLineArray,
@@ -17,7 +22,7 @@ import {
 
 export class NoteQuestionParser {
     settings: SRSettings;
-    noteFile: ISRFile;
+    noteFile: ISRNoteTFile;
     folderTopicPath: TopicPath;
     noteText: string;
     frontmatterText: string;
@@ -33,7 +38,7 @@ export class NoteQuestionParser {
     flashcardTagList: TagCache[];
 
     // flashcardTagList filtered to those within the frontmatter
-    frontmatterTopicPathList: TopicPathList;
+    frontmatterTopicPathList: TopicPathList | null;
 
     // flashcardTagList filtered to those within the note's content and are note-level tags (i.e. not question specific)
     contentTopicPathInfo: TopicPathList[];
@@ -45,7 +50,7 @@ export class NoteQuestionParser {
     }
 
     async createQuestionList(
-        noteFile: ISRFile,
+        noteFile: ISRNoteTFile,
         defaultTextDirection: TextDirection,
         folderTopicPath: TopicPath,
         onlyKeepQuestionsWithTopicPath: boolean,
@@ -57,7 +62,6 @@ export class NoteQuestionParser {
         const hasTopicPaths: boolean =
             tagCacheList.some((item) => SettingsUtil.isFlashcardTag(this.settings, item)) ||
             folderTopicPath.hasPath;
-
         if (hasTopicPaths) {
             // Reading the file is relatively an expensive operation, so we only do this when needed
             const noteText: string = await noteFile.read();
@@ -83,6 +87,7 @@ export class NoteQuestionParser {
             // For each question, determine it's TopicPathList
             [this.frontmatterTopicPathList, this.contentTopicPathInfo] =
                 this.analyseTagCacheList(tagCompleteList);
+
             for (const question of this.questionList) {
                 question.topicPathList = this.determineQuestionTopicPathList(question);
             }
@@ -121,10 +126,11 @@ export class NoteQuestionParser {
             );
 
             // And if the card has been reviewed, then scheduling info as well
+            // TODO: Replace question hash with a blockid -> read & write
             let cardScheduleInfoList: RepItemScheduleInfo[] =
-                DataStore.getInstance().questionCreateSchedule(
+                DataStore.getInstance().createSchedule(
                     question.questionText.original,
-                    null,
+                    new RepItemStorageInfo(this.noteFile.path, question.questionText.textHash),
                 );
 
             // we have some extra scheduling dates to delete
@@ -210,7 +216,7 @@ export class NoteQuestionParser {
     //      - All tags within frontmatter grouped together (note that multiple tags
     //      within frontmatter appear on separate lines)
     //
-    private analyseTagCacheList(tagCacheList: TagCache[]): [TopicPathList, TopicPathList[]] {
+    private analyseTagCacheList(tagCacheList: TagCache[]): [TopicPathList | null, TopicPathList[]] {
         // The tag (e.g. "#flashcards") must be a valid flashcard tag as per the user settings
         this.flashcardTagList = tagCacheList.filter((item) =>
             SettingsUtil.isFlashcardTag(this.settings, item.tag),
@@ -225,10 +231,9 @@ export class NoteQuestionParser {
             frontmatterLineCount = splitTextIntoLineArray(this.frontmatterText).length;
         }
 
-        const frontmatterTopicPathList: TopicPathList = this.determineFrontmatterTopicPathList(
-            this.flashcardTagList,
-            frontmatterLineCount,
-        );
+        const frontmatterTopicPathList: TopicPathList | null =
+            this.determineFrontmatterTopicPathList(this.flashcardTagList, frontmatterLineCount);
+
         const contentTopicPathList: TopicPathList[] = this.determineContentTopicPathList(
             this.flashcardTagList,
             frontmatterLineCount,
@@ -240,8 +245,8 @@ export class NoteQuestionParser {
     private determineFrontmatterTopicPathList(
         flashcardTagList: TagCache[],
         frontmatterLineCount: number,
-    ): TopicPathList {
-        let result: TopicPathList = null;
+    ): TopicPathList | null {
+        let result: TopicPathList | null = null;
 
         // Filter for tags that are:
         //      1. specified in the user settings as flashcardTags, and
@@ -331,7 +336,7 @@ export class NoteQuestionParser {
     // Else the first TopicPathList prior to the question (in the order present in the file) is returned.
     // That could be either the tags within the note's frontmatter, or tags on lines within the note's content.
     private determineQuestionTopicPathList(question: Question): TopicPathList {
-        let result: TopicPathList;
+        let result: TopicPathList | null;
         if (this.settings.convertFoldersToDecks) {
             result = new TopicPathList([this.folderTopicPath]);
         } else {
@@ -363,6 +368,14 @@ export class NoteQuestionParser {
                 }
             }
         }
+
+        if (result === null) {
+            // TODO: Remove this warning once the issue is fixed
+            console.log(
+                "WARNING: No topic path list found. Please reload the deck list by closing and reopening the view",
+            );
+        }
+
         return result;
     }
 }

@@ -1,4 +1,14 @@
 /* src/ui/styles.css */
+[data-callout="sr"][data-callout-metadata="card-metadata"] {
+    display: inline-block;
+    background-color: transparent;
+    & > .callout-title {
+        display: none;
+    }
+    & > .callout-content {
+        display: none;
+    }
+}
 .sr-bg-blue,
 .sr-bg-yellow,
 .sr-bg-green,
@@ -245,6 +255,15 @@
         padding-top: var(--size-2-1);
         padding-bottom: 0;
     }
+}
+body:not(.is-mobile)
+    .sr-card-container:not(.sr-custom-hotkeys)
+    .sr-response-button.mod-loading::after {
+    animation: none;
+    top: unset;
+    left: unset;
+    border: none;
+    width: unset;
 }
 body:not(.is-mobile)
     .sr-card-container:not(.sr-custom-hotkeys)

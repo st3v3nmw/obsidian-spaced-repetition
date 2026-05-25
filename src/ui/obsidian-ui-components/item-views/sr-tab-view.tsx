@@ -1,9 +1,9 @@
 import "src/ui/obsidian-ui-components/item-views/tab-view.css";
 import { ItemView, Platform, WorkspaceLeaf } from "obsidian";
 
-import { SR_TAB_VIEW } from "src/constants";
+import { SR_TAB_VIEW } from "src/data/constants";
+import { SRSettings } from "src/data/settings";
 import SRPlugin from "src/main";
-import { SRSettings } from "src/settings";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import EmulatedPlatform from "src/utils/platform-detector";
@@ -38,10 +38,12 @@ export class SRTabView extends ItemView {
         reviewQueueLoader: ReviewQueueLoader | null,
     ) {
         super(leaf);
+        if (plugin.dataManager === null || plugin.dataManager.data === null)
+            throw new Error("SR plugin or data not initialized!!!");
         // Init properties
         this.plugin = plugin;
         this.navigation = false;
-        this.settings = plugin.data.settings;
+        this.settings = plugin.dataManager.data.settings;
         this.reviewQueueLoader = reviewQueueLoader;
 
         // Build ui
@@ -137,16 +139,17 @@ export class SRTabView extends ItemView {
             this.settings,
             this.viewContentEl,
         );
-
+        if (this.plugin.uiManager === null) throw new Error("UI manager not initialized!!!");
         this.plugin.uiManager.setContentManager(this.contentManager);
 
-        this.contentManager.open();
+        await this.contentManager.open();
     }
 
     /**
      * Closes the SRTabView by shutting down any active deck or flashcard views.
      * Ensures that resources associated with these views are properly released.
      */
+
     async onClose() {
         // Resets the changes made in onOpen
         if (activeDocument.body.classList.contains("is-mobile")) {

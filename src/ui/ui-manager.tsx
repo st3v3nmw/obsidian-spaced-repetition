@@ -1,12 +1,12 @@
 import "src/ui/styles.css";
 import { Menu, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
-import { FlashcardReviewMode } from "src/card/flashcard-review-sequencer";
-import { CardListType } from "src/deck/deck";
-import { deleteAllSchedulingDataOfCardsInNote } from "src/delete-scheduling-data";
+import { DataStore } from "src/data/data-store/base/data-store";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
+import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
@@ -18,6 +18,11 @@ import StatusBarManager from "src/ui/status-bar-manager";
 import TabViewManager from "src/ui/tab-view-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
 
+/**
+ * Represents the different states of the UI.
+ *
+ * @type {ReadonlyArray<UIState>}
+ */
 export enum UIState {
     Closed,
     DeckList,
@@ -27,19 +32,7 @@ export enum UIState {
 }
 
 /**
- * Manages the UI elements of the Spaced Repetition plugin, including the status bar, sidebar, and tab views.
- *
- * @property {SRPlugin} plugin - The main plugin instance.
- * @property {TabViewManager} tabViewManager - The tab view manager responsible for managing the SR tab view.
- * @property {SidebarManager} sidebarManager - The sidebar manager responsible for managing the sidebar.
- * @property {StatusBarManager} statusBarManager - The status bar manager responsible for managing the status bar.
- * @property {HTMLElement} ribbonIcon - The ribbon icon element.
- * @property {boolean} isSRInFocus - A flag indicating whether the SR tab view is currently in focus.
- * @property {MutationObserver} externalModalObserver - The mutation observer responsible for monitoring external modals.
- *
- * @method openDeckContainer - Opens the deck container for the specified review mode and optional single note.
- * @method openFlashcardModal - Opens the flashcard modal for the specified review mode and optional single note.
- * @method setSRViewInFocus - Sets the SR tab view in focus state.
+ * Manages all the UI systems of the Spaced Repetition plugin & exposes them to the other parts of the plugin.
  */
 export class UIManager {
     public tabViewManager: TabViewManager;
@@ -52,57 +45,63 @@ export class UIManager {
     private plugin: SRPlugin;
     private ribbonIcon: HTMLElement | null = null;
     private externalModalObserver: MutationObserver | null = null;
-    private areFileMenuItemsShown: boolean = false;
 
     constructor(plugin: SRPlugin) {
         this.plugin = plugin;
         appIcon();
 
-        // Closes all still open tab views when the plugin is loaded, because it causes bugs / empty windows otherwise
+        // Closes all still open tab views when the plugin is loaded
         this.tabViewManager = new TabViewManager(this.plugin);
-        this.plugin.app.workspace.onLayoutReady(async () => {
-            this.tabViewManager.closeAllTabViews();
-        });
 
-        this.sidebarManager = new SidebarManager(this.plugin, this.plugin.data.settings);
-        this.sidebarManager.init();
-        this.plugin.app.workspace.onLayoutReady(async () => {
-            await this.sidebarManager.activateReviewQueueViewPanel();
-            window.setTimeout(async () => {
-                if (!this.plugin.osrAppCore.syncLock) {
-                    await this.plugin.sync();
-                }
-            }, 2000);
-        });
+        this.sidebarManager = new SidebarManager(this.plugin);
 
         this.statusBarManager = new StatusBarManager(this.plugin);
 
-        this.showRibbonIcon(this.plugin.data.settings.showRibbonIcon);
         this.plugin.registerEvent(
             this.plugin.app.workspace.on("file-menu", this.fileMenuHandler.bind(this)),
         );
-        this.plugin.addSettingTab(new SRSettingTab(this.plugin.app, this.plugin));
+        this.plugin.addSettingTab(new SRSettingTab(this.plugin.app, this.plugin, this));
+    }
+
+    public async onLayoutReady() {
+        this.tabViewManager.closeAllTabViews();
+        await this.sidebarManager.activateReviewQueueViewPanel();
+        await this.plugin.dataManager.sync();
+
+        await this.statusBarManager.createStatusBarItems();
+
+        this.sidebarManager.init();
+
+        this.showRibbonIcon(this.plugin.dataManager.data.settings.showRibbonIcon);
         this.registerSRFocusListener();
     }
 
     public destroy() {
         this.removeSRFocusListener();
         this.plugin.app.workspace.off("file-menu", this.fileMenuHandler.bind(this));
-        this.tabViewManager.closeAllTabViews();
     }
 
-    public updateStatusBar() {
-        this.statusBarManager.showStatusBarItems(
-            this.plugin.data.settings.showStatusBar,
-            this.plugin.data.settings.showCardStatusBarItem,
-            this.plugin.data.settings.showUpdateAvailableStatusBarItem,
+    public async updateStatusBar() {
+        if (this.plugin.dataManager.data === null)
+            throw new Error("SR plugin or data not initialized!!!");
+        if (this.plugin.dataManager.osrCore === null)
+            throw new Error("SR plugin or OSR app core not initialized!!!");
+
+        const settings = this.plugin.dataManager.data.settings;
+
+        await this.statusBarManager.showStatusBarItems(
+            settings.showStatusBar,
+            settings.showCardStatusBarItem,
+            settings.showUpdateAvailableStatusBarItem,
         );
 
-        if (this.plugin.data.settings.showStatusBar) {
+        if (settings.showStatusBar) {
             this.statusBarManager.setCount(
-                this.plugin.osrAppCore.remainingDeckTree.getCardCount(CardListType.All, true),
-                this.plugin.data.settings.showStatusBar &&
-                    this.plugin.data.settings.showCardStatusBarItem,
+                this.plugin.dataManager.osrCore.remainingDeckTree.getRepItemCount(
+                    RepItemState.AnyItem,
+                    true,
+                ),
+                settings.showStatusBar && settings.showCardStatusBarItem,
                 "card-review",
             );
         }
@@ -112,6 +111,7 @@ export class UIManager {
         this.plugin.registerEvent(
             this.plugin.app.workspace.on("active-leaf-change", this.handleFocusChange.bind(this)),
         );
+
         this.externalModalObserver = new MutationObserver(this.handleExternalModalOpen.bind(this));
         this.externalModalObserver.observe(activeDocument.body, {
             childList: true,
@@ -131,8 +131,11 @@ export class UIManager {
     }
 
     public handleExternalModalOpen(mutationList: MutationRecord[]) {
+        if (this.plugin.dataManager.data === null)
+            throw new Error("SR plugin or data not initialized!!!");
+
         if (
-            this.plugin.data.settings.openViewInNewTab && // Is a modal opening relevant for focus?
+            this.plugin.dataManager.data.settings.openViewInNewTab &&
             mutationList.length > 0 &&
             mutationList.filter(
                 (mutation) =>
@@ -140,8 +143,7 @@ export class UIManager {
                     (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0),
             ).length > 0
         ) {
-            const modal = activeDocument.querySelector(".modal-container"); // Check your modal selector
-            // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
+            const modal = activeDocument.querySelector(".modal-container");
             this.setSRViewInFocus(
                 (modal === null || modal === undefined) &&
                     this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
@@ -155,41 +157,50 @@ export class UIManager {
     }
 
     public setContentManager(contentManager: ContentManager) {
-        // TODO: Find a better way to do this, without having to pass the ContentManager around
         this.contentManager = contentManager;
     }
 
     public async openDeckContainer(mode: FlashcardReviewMode, singleNote?: TFile): Promise<void> {
-        if (this.plugin.osrAppCore.syncLock) {
+        if (this.plugin.dataManager.osrCore === null)
+            throw new Error("SR plugin or OSR app core not initialized!!!");
+        if (this.plugin.dataManager.data === null)
+            throw new Error("SR plugin or data not initialized!!!");
+
+        if (this.plugin.dataManager.syncLock) {
             return;
         }
-        await this.plugin.sync();
+        await this.plugin.dataManager.sync();
+
+        const settings = this.plugin.dataManager.data.settings;
 
         const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
         const openInNewTab =
-            (!isMobile && this.plugin.data.settings.openViewInNewTab) ||
-            (isMobile && this.plugin.data.settings.openViewInNewTabMobile);
+            (!isMobile && settings.openViewInNewTab) ||
+            (isMobile && settings.openViewInNewTabMobile);
 
         const reviewQueueLoader = new ReviewQueueLoader(
             this.plugin,
-            this.plugin.osrAppCore,
+            this.plugin.dataManager.osrCore,
             singleNote ?? null,
             mode,
         );
 
         if (openInNewTab) {
-            this.tabViewManager.openSRTabView(reviewQueueLoader);
+            await this.tabViewManager.openSRTabView(reviewQueueLoader);
         } else {
             this.openFlashcardModal(reviewQueueLoader);
         }
     }
 
-    public async openFlashcardModal(reviewQueueLoader: ReviewQueueLoader): Promise<void> {
+    public openFlashcardModal(reviewQueueLoader: ReviewQueueLoader): void {
+        if (this.plugin.dataManager.data === null)
+            throw new Error("SR plugin or data not initialized!!!");
+
         this.setSRViewInFocus(true);
         new SRModalView(
             this.plugin.app,
             this.plugin,
-            this.plugin.data.settings,
+            this.plugin.dataManager.data.settings,
             reviewQueueLoader,
         ).open();
     }
@@ -203,7 +214,6 @@ export class UIManager {
     }
 
     showRibbonIcon(status: boolean) {
-        // if it does not exist, we create it
         if (!this.ribbonIcon) {
             this.ribbonIcon = this.plugin.addRibbonIcon(
                 "SpacedRepIcon",
@@ -218,25 +228,31 @@ export class UIManager {
     }
 
     private fileMenuHandler(menu: Menu, file: TAbstractFile) {
+        if (this.plugin.dataManager.data === null)
+            throw new Error("SR plugin or data not initialized!!!");
         if (!(file instanceof TFile && file.extension === "md")) return;
 
-        if (this.plugin.data.settings.showDeleteButtonInFileMenu) {
+        const settings = this.plugin.dataManager.data.settings;
+
+        if (settings.showDeleteButtonInFileMenu) {
             menu.addItem((item) => {
                 item.setTitle(t("DELETE_SCHEDULING_DATA_OF_CARDS_IN_NOTE"))
                     .setIcon("trash")
                     .setWarning(true)
-                    .onClick(async () => {
+                    .onClick(() => {
                         new ConfirmationModal(
                             this.plugin.app,
                             t("DELETE_SCHEDULING_DATA_OF_CARDS_IN_NOTE"),
                             t("CONFIRM_SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION"),
                             t("SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION_IN_PROGRESS"),
-                            () => {
-                                deleteAllSchedulingDataOfCardsInNote(
-                                    this.plugin.app,
+                            async () => {
+                                if (this.plugin.dataManager.data === null)
+                                    throw new Error("SR plugin or data not initialized!!!");
+                                const settings = this.plugin.dataManager.data.settings;
+                                await DataStore.instance.fileModifier.deleteAllSchedulingDataOfCardsInNote(
                                     file,
-                                    false,
-                                    this.plugin.data.settings.flashcardTags,
+                                    settings.deleteTagsOnSchedulingDataDeletion,
+                                    settings.flashcardTags,
                                 );
                             },
                         ).open();

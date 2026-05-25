@@ -69,6 +69,15 @@
 }
 
 /* MARK: Shortcut in buttons */
+body:not(.is-mobile)
+    .sr-card-container:not(.sr-custom-hotkeys)
+    .sr-response-button.mod-loading::after {
+    animation: none;
+    top: unset;
+    left: unset;
+    border: none;
+    width: unset;
+}
 
 body:not(.is-mobile)
     .sr-card-container:not(.sr-custom-hotkeys)

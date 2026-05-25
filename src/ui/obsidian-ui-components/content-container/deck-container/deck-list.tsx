@@ -1,10 +1,10 @@
 import "src/ui/obsidian-ui-components/content-container/deck-container/deck-list.css";
 import { setIcon } from "obsidian";
 
-import { DeckStats, IFlashcardReviewSequencer } from "src/card/flashcard-review-sequencer";
-import { Deck } from "src/deck/deck";
+import { Deck } from "src/data/data-structures/deck/deck";
+import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
-import { SRSettings } from "src/settings";
+import { DeckStats, IFlashcardReviewSequencer } from "src/scheduling/flashcard-review-sequencer";
 
 export default class DeckListComponent {
     private scrollWrapper: HTMLDivElement;

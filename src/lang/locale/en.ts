@@ -72,6 +72,16 @@ const en: IBaseLocale = {
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
     GROUP_DATA_STORAGE: "Storage of Scheduling Data",
     GROUP_DATA_STORAGE_DESC: "Choose where to store the scheduling data",
+    PLUGIN_DATA_STORE_INFO:
+        "Schedule data is stored in markdown files inside your vault (in the configured folder under Schedule Data). Note schedules are identified by a unique ID (sr-id) added to each note's frontmatter, so they survive renames and moves inside or outside Obsidian. Card schedules are keyed by a hash of the card text - editing a card's front side will reset its schedule.",
+    MIGRATE_TO_PLUGIN_DATA: "Migrate scheduling data to plugin data?",
+    CONFIRM_MIGRATE_TO_PLUGIN_DATA:
+        "All <!--SR:...--> comments and sr-* frontmatter fields will be moved to markdown schedule files in the vault, and an sr-id field will be added to each note's frontmatter as a stable identifier. This may take a moment on large vaults. Do not edit notes until migration is complete.",
+    MIGRATING_TO_PLUGIN_DATA: "Migrating scheduling data to plugin data...",
+    MIGRATE_TO_NOTES: "Migrate scheduling data back to notes?",
+    CONFIRM_MIGRATE_TO_NOTES:
+        "All scheduling data will be written back as <!--SR:...--> comments and sr-* frontmatter fields. This may take a moment on large vaults. Do not edit notes until migration is complete.",
+    MIGRATING_TO_NOTES: "Migrating scheduling data to notes...",
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
     GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: 'For more information, check the <a href="${wikiUrl}">wiki</a>.',
@@ -358,6 +368,20 @@ const en: IBaseLocale = {
     DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE: "Date format for note review queue",
     DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE_DESC:
         'Date format for note review queue (see <a href="${docsUrl}">moment.js</a> for details). It only updates, once the note review queue is reopened.',
+    MIGRATE_TO_FOLDER: "Migrate to folder",
+    CONFIRM_MIGRATE_TO_FOLDER: "Are you sure you want to migrate to folder storage?",
+    MIGRATING_TO_FOLDER: "Migrating to folder storage...",
+    USE_CALLOUTS_FOR_SCHEDULING_COMMENTS: "Use callouts for scheduling comments",
+    USE_CALLOUTS_FOR_SCHEDULING_COMMENTS_DESC:
+        "Use the sr metadata callout for scheduling comments instead of regular comments by default. This will hide away the scheduling comments in a callout which looks like an empty line in the editor.",
+    MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_BUTTON: "Migrate",
+    MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_DESC:
+        "Migrating will put the scheduling comments into a sr metadata callout. This callout is designed to hide away the scheduling comments.",
+    CONFIRM_MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT:
+        "Migrating will modify all your cards. Please back them up first in case you want to revert the migration later or in case it breaks your cards because of a bug. Are you sure you want to migrate scheduling comments to sr metadata callouts?",
+    MIGRATING_SCHEDULING_COMMENTS_TO_CALLOUT:
+        "Migrating scheduling comments to sr metadata callouts...",
+    MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT: "Migrate scheduling comments to sr metadata callout",
 };
 
 export default en;

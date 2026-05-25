@@ -1,27 +1,28 @@
 import { now } from "moment";
 import { App, MarkdownView, Notice, Platform } from "obsidian";
 
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { Card } from "src/card/card";
+import { DataManager } from "src/data/data-manager";
+import { Card } from "src/data/data-structures/card/card";
+import { Question } from "src/data/data-structures/card/questions/question";
+import { Deck } from "src/data/data-structures/deck/deck";
+import { SRSettings } from "src/data/settings";
+import { t } from "src/lang/helpers";
+import SRPlugin from "src/main";
+import { Note } from "src/note/note";
+import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import {
     DeckStats,
     FlashcardReviewMode,
     IFlashcardReviewSequencer,
-} from "src/card/flashcard-review-sequencer";
-import { Question } from "src/card/questions/question";
-import { Deck } from "src/deck/deck";
-import { t } from "src/lang/helpers";
-import SRPlugin from "src/main";
-import { Note } from "src/note/note";
-import { SRSettings } from "src/settings";
+} from "src/scheduling/flashcard-review-sequencer";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
 import CardInfoNotice from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-info-notice";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
-import { UIState } from "src/ui/ui-manager";
+import { UIManager, UIState } from "src/ui/ui-manager";
 import { globalDateProvider } from "src/utils/dates";
 import EmulatedPlatform from "src/utils/platform-detector";
 
@@ -75,6 +76,8 @@ export interface SessionData {
 export default class ContentManager {
     private app: App;
     private plugin: SRPlugin;
+    private uiManager: UIManager;
+    private dataManager: DataManager;
     private reviewSequencer: IFlashcardReviewSequencer | null = null;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
@@ -100,6 +103,9 @@ export default class ContentManager {
         this.reviewQueueLoader = reviewQueueLoader;
         this.settings = settings;
         this.reviewMode = reviewQueueLoader.getReviewMode();
+
+        this.uiManager = this.plugin.uiManager;
+        this.dataManager = this.plugin.dataManager;
 
         this.deckContainer = new DeckContainer(
             parentEl,
@@ -127,10 +133,10 @@ export default class ContentManager {
 
     public close() {
         this._clearPendingResumeTimeout();
-        this.plugin.uiManager.setSRViewInFocus(false);
+        this.uiManager.setSRViewInFocus(false);
         this.deckContainer.closeList();
         this.cardContainer.closeSession();
-        this.plugin.uiManager.setUIState(UIState.Closed);
+        this.uiManager.setUIState(UIState.Closed);
     }
 
     public async open() {
@@ -147,11 +153,11 @@ export default class ContentManager {
 
         // Loop through all decks and determine if any have cards in queue
         for (const subdeck of subdecksWithCardsInQueue) {
-            const hasNewCards: boolean = subdeck.newFlashcards.length > 0;
-            const hasDueCards: boolean = subdeck.dueFlashcards.length > 0;
+            const hasNewCards: boolean = subdeck.newRepItems.length > 0;
+            const hasDueCards: boolean = subdeck.dueRepItems.length > 0;
             const hasDueCardsToday: boolean =
                 hasDueCards &&
-                subdeck.dueFlashcards.some((card) => {
+                subdeck.dueRepItems.some((card) => {
                     const dueDate: number = card.scheduleInfo.dueDateAsUnix;
                     const nowUnix: number = globalDateProvider.now.valueOf();
                     return dueDate <= nowUnix;
@@ -174,9 +180,9 @@ export default class ContentManager {
         }
 
         if (openImmediately && deckWithCards !== null) {
-            this._reviewDeck(deckWithCards);
+            await this._reviewDeck(deckWithCards);
         } else {
-            this._showDecksList();
+            await this._showDecksList();
         }
     }
 
@@ -189,37 +195,37 @@ export default class ContentManager {
         }
         if (this.reviewSequencer === null) return;
         this.cardContainer.closeSession();
-        this.plugin.uiManager.setUIState(UIState.DeckList);
+        this.uiManager.setUIState(UIState.DeckList);
         this.deckContainer.showList(this.reviewSequencer, this.settings, this.reviewMode);
     }
 
-    private _reviewDeck(deck: Deck): void {
+    private async _reviewDeck(deck: Deck): Promise<void> {
         this.deckContainer.closeList();
         this.sessionData = this._getNewSessionData(deck);
         if (this.sessionData === null) return;
-        this.plugin.uiManager.setUIState(UIState.CardFront);
-        this.cardContainer.openSession(this.sessionData, this.settings);
+        this.uiManager.setUIState(UIState.CardFront);
+        await this.cardContainer.openSession(this.sessionData, this.settings);
     }
 
     private async _showNextCard(): Promise<void> {
         if (this.sessionData === null || this.reviewSequencer === null) {
-            this._showDecksList(true);
+            await this._showDecksList(true);
             return;
         }
 
         if (!this.reviewSequencer.hasCurrentCard) {
             // TODO: Re-enable pending state, once it is more integrated with the rest of the ui & once data refreshing is better implemented
             // if (this.reviewSequencer.hasPendingCards) {
-            //     this._showPendingState();
+            //     await this._showPendingState();
             // } else {
-            //     this._showDecksList(true);
+            //     await this._showDecksList(true);
             // }
-            this._showDecksList(true);
+            await this._showDecksList(true);
             return;
         }
 
         if (this.reviewSequencer.currentDeck === null) {
-            this._showDecksList(true);
+            await this._showDecksList(true);
             return;
         }
 
@@ -247,7 +253,7 @@ export default class ContentManager {
         this.sessionData.currentQuestion = this.reviewSequencer.currentQuestion;
 
         this.sessionData.cardData.currentCard = this.reviewSequencer.currentCard;
-        this.plugin.uiManager.setUIState(UIState.CardFront);
+        this.uiManager.setUIState(UIState.CardFront);
         this.sessionData.cardData.currentCardState = CardState.Front;
 
         if (
@@ -256,27 +262,27 @@ export default class ContentManager {
         ) {
             await this.cardContainer.drawCardFront(this.sessionData, this.settings);
         } else {
-            this._showDecksList(true);
+            await this._showDecksList(true);
         }
     }
 
-    private _showPendingState(): void {
+    private async _showPendingState(): Promise<void> {
         if (this.reviewSequencer === null) return;
         this._clearPendingResumeTimeout();
         const nextPendingDueUnix = this.reviewSequencer.nextPendingDueUnix;
         if (nextPendingDueUnix === null) {
-            this._showDecksList(true);
+            await this._showDecksList(true);
             return;
         }
 
-        this.plugin.uiManager.setUIState(UIState.CardFront);
+        this.uiManager.setUIState(UIState.CardFront);
         this.cardContainer.drawPendingState(nextPendingDueUnix);
 
         const delayMs = Math.max(0, nextPendingDueUnix - Date.now());
-        this.pendingResumeTimeout = window.setTimeout(async () => {
+        this.pendingResumeTimeout = window.setTimeout(() => {
             if (this.reviewSequencer === null) return;
             this.reviewSequencer.refreshCurrentDeck();
-            await this._showNextCard();
+            void this._showNextCard();
         }, delayMs + 50);
     }
 
@@ -316,12 +322,18 @@ export default class ContentManager {
 
     // MARK: Card button handlers
 
-    public async _deleteCurrentCard() {
-        if (this.sessionData === null || this.reviewSequencer === null) return;
+    public _deleteCurrentCard() {
+        if (
+            this.sessionData === null ||
+            this.reviewSequencer === null ||
+            this.dataManager.data === null
+        )
+            return;
         const timeNow = now();
         if (
             this.lastPressedOnProcessReview &&
-            timeNow - this.lastPressedOnProcessReview < this.plugin.data.settings.reviewButtonDelay
+            timeNow - this.lastPressedOnProcessReview <
+                this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
@@ -340,22 +352,23 @@ export default class ContentManager {
         ).open();
     }
 
-    public _showAnswer() {
+    public async _showAnswer() {
         if (this.sessionData === null) return;
 
         const timeNow = now();
         if (
             this.lastPressedOnProcessReview &&
-            timeNow - this.lastPressedOnProcessReview < this.plugin.data.settings.reviewButtonDelay
+            timeNow - this.lastPressedOnProcessReview <
+                this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
         this.lastPressedOnProcessReview = timeNow;
 
-        this.plugin.uiManager.setUIState(UIState.CardBack);
+        this.uiManager.setUIState(UIState.CardBack);
         this.sessionData.cardData.currentCardState = CardState.Back;
 
-        this.cardContainer.drawBack(
+        await this.cardContainer.drawBack(
             this.sessionData,
             this.reviewMode,
             this.settings,
@@ -370,7 +383,7 @@ export default class ContentManager {
 
         // Just the question/answer text; without any preceding topic tag
         const textPrompt = currentQ.questionText.actualQuestion;
-        this.plugin.uiManager.setUIState(UIState.EditModal);
+        this.uiManager.setUIState(UIState.EditModal);
         const editModal = FlashcardEditModal.Prompt(
             this.app,
             this.settings,
@@ -378,16 +391,16 @@ export default class ContentManager {
             textPrompt,
             currentQ.questionText.textDirection,
         );
-        editModal
+        await editModal
             .then(async (modifiedCardText) => {
                 if (this.reviewSequencer === null) return;
-                this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
-                this.plugin.uiManager.setUIState(UIState.CardBack);
+                await this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
+                this.uiManager.setUIState(UIState.CardBack);
             })
             .catch((reason) => console.log(reason));
     }
 
-    private async _jumpToCurrentCard(): Promise<void> {
+    public async _jumpToCurrentCard(): Promise<void> {
         if (this.reviewSequencer === null) return;
         const currentQuestion = this.reviewSequencer.currentQuestion;
         if (!currentQuestion) return;
@@ -437,10 +450,10 @@ export default class ContentManager {
         }
     }
 
-    public _skipCurrentCard() {
+    public async _skipCurrentCard() {
         if (this.reviewSequencer === null) return;
         this.reviewSequencer.skipCurrentCard();
-        this._showNextCard();
+        await this._showNextCard();
     }
 
     private _displayCurrentCardInfoNotice() {
@@ -456,7 +469,7 @@ export default class ContentManager {
         const timeNow = now();
         if (
             timeNow - this.lastPressedOnProcessReview <
-            this.plugin.data.settings.reviewButtonDelay
+            this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
@@ -468,13 +481,13 @@ export default class ContentManager {
 
     // MARK: Deck button handlers
 
-    private _startReviewOfDeck(deck: Deck) {
+    private async _startReviewOfDeck(deck: Deck) {
         if (this.reviewSequencer === null) return;
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         if (this.reviewSequencer.hasCurrentCard) {
-            this._reviewDeck(deck);
+            await this._reviewDeck(deck);
         } else {
-            this._showDecksList();
+            await this._showDecksList();
         }
     }
 
@@ -483,7 +496,7 @@ export default class ContentManager {
         this.reviewMode = reviewMode;
         this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue();
         this.deckContainer.closeList();
-        this._showDecksList();
+        await this._showDecksList();
     }
 
     // MARK: Utils

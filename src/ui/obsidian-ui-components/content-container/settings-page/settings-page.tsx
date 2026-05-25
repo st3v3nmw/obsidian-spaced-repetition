@@ -1,6 +1,7 @@
 import "src/ui/obsidian-ui-components/content-container/settings-page/settings-page.css";
 import { ButtonComponent, setIcon } from "obsidian";
 
+import { DataManager } from "src/data/data-manager";
 import SRPlugin from "src/main";
 import {
     getPageIcon,
@@ -23,6 +24,7 @@ export abstract class SettingsPage {
 
     protected containerEl: HTMLElement;
     protected plugin: SRPlugin;
+    protected dataManager: DataManager;
     protected pageType: SettingsPageType;
     protected applySettingsUpdate: (callback: () => unknown) => void;
     protected display: () => void; // Needed for some pages. TODO: Refactor this into some unified way.
@@ -32,6 +34,7 @@ export abstract class SettingsPage {
     constructor(
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
+        dataManager: DataManager,
         pageType: SettingsPageType,
         applySettingsUpdate: (callback: () => unknown) => void,
         display: () => void,
@@ -39,6 +42,7 @@ export abstract class SettingsPage {
         scrollListener: (scrollPosition: number) => void,
     ) {
         this.plugin = plugin;
+        this.dataManager = dataManager;
         this.pageType = pageType;
         this.display = display;
         this.applySettingsUpdate = applySettingsUpdate;

@@ -118,7 +118,7 @@ Please note that:
 
 - All UI changes should be made in the `src/ui/` folder.
 
-- Enable the debug mode by setting `ENABLE_DEBUG_MODE` to `true` in `src/constants.ts`(Don't forget to revert it back to `false` after you're done).
+- Enable the debug mode by setting `ENABLE_DEBUG_MODE` to `true` in `src/data/constants.ts`(Don't forget to revert it back to `false` after you're done).
 
 - Put your changes under the right section (see "MARK:" or "#region" comments in the code).
 

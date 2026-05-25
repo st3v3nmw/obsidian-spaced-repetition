@@ -12,10 +12,13 @@
         "moduleResolution": "bundler",
         "esModuleInterop": true,
         "importHelpers": true,
+        "types": ["node", "jest"],
         "lib": ["dom", "dom.Iterable", "scripthost", "ES5", "ES6", "ES7", "ES2021"],
         "jsx": "react",
-        "jsxFactory": "h"
+        "jsxFactory": "h",
+        "noEmit": true
     },
-    "include": ["**/*.ts", "**/*.tsx"],
-    "files": ["node_modules/jest-expect-message/types/index.d.ts"]
+    "include": ["src/**/*", "tests/**/*"],
+    "exclude": ["build", "coverage", "node_modules"],
+    "files": ["node_modules/jest-expect-message/types/index.d.ts", "eslint.config.mjs"]
 }

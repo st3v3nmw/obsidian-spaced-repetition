@@ -1,14 +1,10 @@
-import { Plugin } from "obsidian";
-
-import { SRSettings } from "src/settings";
+import SRPlugin from "src/main";
 
 export class SidebarManager {
-    private plugin: Plugin;
-    private settings: SRSettings;
+    private plugin: SRPlugin;
 
-    constructor(plugin: Plugin, settings: SRSettings) {
+    constructor(plugin: SRPlugin) {
         this.plugin = plugin;
-        this.settings = settings;
     }
 
     redraw(): void {

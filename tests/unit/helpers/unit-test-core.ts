@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import { QuestionPostponementList } from "src/card/questions/question-postponement-list";
-import { OsrCore } from "src/core";
-import { NoteReviewQueue } from "src/note/note-review-queue";
-import { SRSettings } from "src/settings";
+import { OsrCore } from "src/data/core";
+import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
+import { SRSettings } from "src/data/settings";
+import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./unit-test-file";
 import { UnitTestLinkInfoFinder } from "./unit-test-link-info-finder";
@@ -17,7 +17,16 @@ export class UnitTestOsrCore extends OsrCore {
     private infoFinder: UnitTestLinkInfoFinder;
 
     constructor(settings: SRSettings) {
-        super();
+        super(
+            new QuestionPostponementList(null, settings, [] as string[]),
+            settings,
+            async () => {
+                await new Promise<void>((resolve) => {
+                    resolve();
+                });
+            },
+            TextDirection.Ltr,
+        );
         this.buryList = [] as string[];
         this.infoFinder = new UnitTestLinkInfoFinder();
         const questionPostponementList = new QuestionPostponementList(
@@ -25,12 +34,15 @@ export class UnitTestOsrCore extends OsrCore {
             settings,
             this.buryList,
         );
-        this.init(
+        this.initUnitTestCore(
             questionPostponementList,
-            this.infoFinder,
             settings,
-            () => {},
-            new NoteReviewQueue(),
+            async () => {
+                await new Promise<void>((resolve) => {
+                    resolve();
+                });
+            },
+            TextDirection.Ltr,
         );
     }
 
@@ -49,7 +61,7 @@ export class UnitTestOsrCore extends OsrCore {
     }
 
     async loadTestVault(vaultSubfolder: string): Promise<void> {
-        this.loadInit();
+        this.loadInitialStateOfCore();
 
         const dir: string = path.join(__dirname, "..", "..", "vaults", vaultSubfolder);
         const files: string[] = fs.readdirSync(dir).filter((f) => f !== ".obsidian");

@@ -1,0 +1,248 @@
+import { StorageType } from "src/data/data-store/base/data-store";
+import { t } from "src/lang/helpers";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
+import { pathMatchesPattern } from "src/utils/fs";
+
+export interface SRSettings {
+    // flashcards
+    flashcardTags: string[];
+    flashcardTagsToIgnore: string[];
+    convertFoldersToDecks: boolean;
+    burySiblingCards: boolean;
+    randomizeCardOrder: boolean | undefined;
+    flashcardCardOrder: string;
+    flashcardDeckOrder: string;
+    convertClozePatternsToInputs: boolean;
+    convertHighlightsToClozes: boolean;
+    convertBoldTextToClozes: boolean;
+    convertCurlyBracketsToClozes: boolean;
+    clozePatterns: string[];
+    singleLineCardSeparator: string;
+    singleLineReversedCardSeparator: string;
+    multilineCardSeparator: string;
+    multilineReversedCardSeparator: string;
+    multilineCardEndMarker: string;
+    editLaterTag: string | undefined;
+
+    // notes
+    noteFoldersToIgnore: string[];
+
+    // UI preferences
+    showRibbonIcon: boolean;
+    showStatusBar: boolean;
+    showCardStatusBarItem: boolean;
+    showUpdateAvailableStatusBarItem: boolean;
+
+    initiallyExpandAllSubdecksInTree: boolean;
+    showContextInCards: boolean;
+    showIntervalInReviewButtons: boolean;
+    flashcardHeightPercentage: number;
+    flashcardWidthPercentage: number;
+    flashcardHeightPercentageMobile: number;
+    flashcardWidthPercentageMobile: number;
+    flashcardAgainText: string;
+    flashcardEasyText: string;
+    flashcardGoodText: string;
+    flashcardHardText: string;
+    reviewButtonDelay: number;
+    openViewInNewTabMobile: boolean;
+    showDeleteButtonInCardView: boolean;
+    showDeleteButtonInFileMenu: boolean;
+    openViewInNewTab: boolean;
+    useCustomHotkeys: boolean;
+    useCalloutsForSchedulingComments: boolean;
+
+    // algorithm
+    algorithm: SRAlgorithmType;
+    baseEase: number;
+    lapsesIntervalChange: number;
+    easyBonus: number;
+    loadBalance: boolean;
+    maximumInterval: number;
+    fsrsDesiredRetention: number;
+    startOfDay: string;
+
+    // storage
+    dataStore: StorageType;
+    cardCommentOnSameLine: boolean;
+    scheduleDataVaultLocation: string;
+    deleteTagsOnSchedulingDataDeletion: boolean;
+
+    // logging
+    showSchedulingDebugMessages: boolean;
+    showParserDebugMessages: boolean;
+}
+
+export const DEFAULT_SETTINGS: SRSettings = {
+    // flashcards
+    flashcardTags: ["#flashcards"],
+    flashcardTagsToIgnore: [],
+    convertFoldersToDecks: false,
+    burySiblingCards: false,
+    flashcardCardOrder: "DueFirstRandom",
+    flashcardDeckOrder: "PrevDeckComplete_Sequential",
+    convertClozePatternsToInputs: false,
+    convertHighlightsToClozes: true,
+    convertBoldTextToClozes: false,
+    convertCurlyBracketsToClozes: false,
+    clozePatterns: ["==[123;;]answer[;;hint]=="],
+    singleLineCardSeparator: "::",
+    singleLineReversedCardSeparator: ":::",
+    multilineCardSeparator: "?",
+    multilineReversedCardSeparator: "??",
+    multilineCardEndMarker: "",
+    editLaterTag: undefined,
+    randomizeCardOrder: undefined,
+
+    // notes
+    noteFoldersToIgnore: ["**/*.excalidraw.md"],
+
+    // UI settings
+    showRibbonIcon: true,
+    showStatusBar: true,
+    showCardStatusBarItem: true,
+    showUpdateAvailableStatusBarItem: true,
+    initiallyExpandAllSubdecksInTree: true,
+    showContextInCards: true,
+    showIntervalInReviewButtons: true,
+    flashcardHeightPercentage: 60,
+    flashcardWidthPercentage: 60,
+    flashcardHeightPercentageMobile: 100,
+    flashcardWidthPercentageMobile: 100,
+    flashcardAgainText: t("AGAIN"),
+    flashcardEasyText: t("EASY"),
+    flashcardGoodText: t("GOOD"),
+    flashcardHardText: t("HARD"),
+    reviewButtonDelay: 0,
+    showDeleteButtonInCardView: false,
+    showDeleteButtonInFileMenu: false,
+    openViewInNewTab: false,
+    openViewInNewTabMobile: false,
+    useCustomHotkeys: false,
+    useCalloutsForSchedulingComments: false,
+
+    // algorithm
+    algorithm: SRAlgorithmType.SM_2_OSR,
+    baseEase: 250,
+    lapsesIntervalChange: 0.5,
+    easyBonus: 1.3,
+    loadBalance: true,
+    maximumInterval: 36525,
+    fsrsDesiredRetention: 0.9,
+    startOfDay: "00:00:00",
+
+    // storage
+    dataStore: StorageType.NOTES,
+    cardCommentOnSameLine: false,
+    scheduleDataVaultLocation: "Spaced Repetition",
+    deleteTagsOnSchedulingDataDeletion: false,
+
+    // logging
+    showSchedulingDebugMessages: false,
+    showParserDebugMessages: false,
+};
+
+export function upgradeSettings(settings: SRSettings) {
+    if (
+        settings.randomizeCardOrder !== null &&
+        settings.randomizeCardOrder !== undefined &&
+        (settings.flashcardCardOrder === null || settings.flashcardCardOrder === undefined) &&
+        (settings.flashcardDeckOrder === null || settings.flashcardDeckOrder === undefined)
+    ) {
+        settings.flashcardCardOrder = settings.randomizeCardOrder
+            ? "DueFirstRandom"
+            : "DueFirstSequential";
+        settings.flashcardDeckOrder = "PrevDeckComplete_Sequential";
+
+        // After the upgrade, we don't need the old attribute any more
+        settings.randomizeCardOrder = undefined;
+    }
+
+    if (settings.clozePatterns === null || settings.clozePatterns === undefined) {
+        settings.clozePatterns = [];
+
+        if (settings.convertHighlightsToClozes)
+            settings.clozePatterns.push("==[123;;]answer[;;hint]==");
+
+        if (settings.convertBoldTextToClozes)
+            settings.clozePatterns.push("**[123;;]answer[;;hint]**");
+
+        if (settings.convertCurlyBracketsToClozes)
+            settings.clozePatterns.push("{{[123;;]answer[;;hint]}}");
+    }
+
+    if (settings.editLaterTag) {
+        settings.editLaterTag = undefined;
+    }
+
+    if (
+        settings.scheduleDataVaultLocation === null ||
+        settings.scheduleDataVaultLocation === undefined ||
+        settings.scheduleDataVaultLocation.trim() === ""
+    ) {
+        settings.scheduleDataVaultLocation = DEFAULT_SETTINGS.scheduleDataVaultLocation;
+    }
+    if (settings.fsrsDesiredRetention === null || settings.fsrsDesiredRetention === undefined) {
+        settings.fsrsDesiredRetention = DEFAULT_SETTINGS.fsrsDesiredRetention;
+    }
+}
+
+export class SettingsUtil {
+    static isFlashcardTag(settings: SRSettings, tag: string): boolean {
+        return SettingsUtil.isTagInList(settings.flashcardTags, tag);
+    }
+
+    static isPathInFoldersToIgnore(settings: SRSettings, path: string): boolean {
+        return settings.noteFoldersToIgnore.some((folder) => pathMatchesPattern(path, folder));
+    }
+
+    static isAnyTagIgnoredForFlashcards(settings: SRSettings, tags: string[]): boolean {
+        return tags.some((tag) => SettingsUtil.isTagInList(settings.flashcardTagsToIgnore, tag));
+    }
+
+    /**
+     * Checks if the tag is in the tagList.
+     *
+     * @param tagList - The list of tags to check.
+     * @param tag - The tag to check.
+     * @param exactMatch - Whether to match the tag exactly or if it should be a sub tag.
+     * @returns true if the tag is in the tagList, false otherwise.
+     */
+    public static isTagInList(
+        tagList: string[],
+        tag: string,
+        exactMatch: boolean = false,
+    ): boolean {
+        // This should be true, if the tag is fully contained in a tag from the list
+        for (const tagFromList of tagList) {
+            if (exactMatch) {
+                if (tagFromList === tag) {
+                    // The tag from the list is the same as the current tag, so it is contained in it
+                    return true;
+                }
+            } else {
+                // In this case we need to look more in detail to see if the tag is fully contained in the tag from the list
+                if (this.isSubTagContainedInTag(tagFromList, tag)) {
+                    // The tag from the list is contained in the current tag, so it is contained in it
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the subTag is contained in the tag.
+     *
+     * @param tag - The tag to check.
+     * @param subTag - The subTag to check.
+     * @returns true if the subTag is contained in the tag, false otherwise.
+     */
+    public static isSubTagContainedInTag(tag: string, subTag: string): boolean {
+        if (tag === subTag || subTag.startsWith(tag + "/")) {
+            // The tag is the same as the sub tag, or the sub tag is contained in the tag
+            return true;
+        }
+        return false;
+    }
+}
