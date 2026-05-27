@@ -45,6 +45,163 @@ export class SchedulingPage extends SettingsPage {
             scrollListener,
         );
 
+        // These controls live under Scheduling because they govern when review is surfaced to the
+        // user, not how flashcards are parsed or reviewed once a session is already open.
+        new SettingGroup(this.containerEl)
+            .setHeading(t("REVIEW_REMINDERS"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("REVIEW_REMINDERS"))
+                    .setDesc(t("REVIEW_REMINDERS_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.dataManager.data.settings.enableReviewReminders)
+                            .onChange(async (value) => {
+                                this.dataManager.data.settings.enableReviewReminders = value;
+                                await this.dataManager.savePluginData();
+                                // The interval loop is stateful, so settings changes must be
+                                // applied immediately instead of waiting for the next reload.
+                                this.plugin.restartReviewReminders();
+                                this.display();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("REVIEW_REMINDER_CHECK_ON_STARTUP"))
+                    .setDesc(t("REVIEW_REMINDER_CHECK_ON_STARTUP_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.dataManager.data.settings.reviewReminderCheckOnStartup)
+                            .setDisabled(!this.dataManager.data.settings.enableReviewReminders)
+                            .onChange(async (value) => {
+                                this.dataManager.data.settings.reviewReminderCheckOnStartup = value;
+                                await this.dataManager.savePluginData();
+                                this.plugin.restartReviewReminders();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("REVIEW_REMINDER_INTERVAL"))
+                    .setDesc(t("REVIEW_REMINDER_INTERVAL_DESC"))
+                    .addText((text) => {
+                        text.setValue(
+                            this.dataManager.data.settings.reviewReminderIntervalMinutes.toString(),
+                        );
+                        text.inputEl.type = "number";
+                        text.inputEl.min = "1";
+                        text.inputEl.max = "1440";
+                        text.inputEl.step = "1";
+                        text.setDisabled(!this.dataManager.data.settings.enableReviewReminders);
+
+                        const commitIntervalValue = (value: string) => {
+                            this.applySettingsUpdate(async () => {
+                                const parsedValue = Number.parseInt(value);
+                                if (
+                                    Number.isNaN(parsedValue) ||
+                                    parsedValue < 1 ||
+                                    parsedValue > 1440
+                                ) {
+                                    new Notice(t("REVIEW_REMINDER_INTERVAL_MIN_WARNING"));
+                                    text.setValue(
+                                        this.dataManager.data.settings.reviewReminderIntervalMinutes.toString(),
+                                    );
+                                    return;
+                                }
+
+                                this.dataManager.data.settings.reviewReminderIntervalMinutes =
+                                    parsedValue;
+                                await this.dataManager.savePluginData();
+                                // Interval changes only take effect once the existing timer is
+                                // rebuilt with the new cadence.
+                                this.plugin.restartReviewReminders();
+                            });
+                        };
+
+                        text.inputEl.addEventListener("blur", () => {
+                            commitIntervalValue(text.getValue());
+                        });
+                        text.inputEl.addEventListener("keydown", (event) => {
+                            if (event.key === "Enter") {
+                                commitIntervalValue(text.getValue());
+                            }
+                        });
+                    });
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("REVIEW_REMINDER_MESSAGE"))
+                    .setDesc(t("REVIEW_REMINDER_MESSAGE_DESC"))
+                    .addTextArea((text) =>
+                        text
+                            .setValue(this.dataManager.data.settings.reviewReminderMessage)
+                            .setDisabled(!this.dataManager.data.settings.enableReviewReminders)
+                            .onChange((value) => {
+                                this.applySettingsUpdate(async () => {
+                                    this.dataManager.data.settings.reviewReminderMessage = value;
+                                    await this.dataManager.savePluginData();
+                                });
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("REVIEW_REMINDER_AUTO_OPEN"))
+                    .setDesc(t("REVIEW_REMINDER_AUTO_OPEN_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.dataManager.data.settings.reviewReminderAutoOpen)
+                            .setDisabled(!this.dataManager.data.settings.enableReviewReminders)
+                            .onChange(async (value) => {
+                                this.dataManager.data.settings.reviewReminderAutoOpen = value;
+                                await this.dataManager.savePluginData();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("REVIEW_REMINDER_SHOW_NOTICE"))
+                    .setDesc(t("REVIEW_REMINDER_SHOW_NOTICE_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.dataManager.data.settings.reviewReminderShowNotice)
+                            .setDisabled(!this.dataManager.data.settings.enableReviewReminders)
+                            .onChange(async (value) => {
+                                this.dataManager.data.settings.reviewReminderShowNotice = value;
+                                await this.dataManager.savePluginData();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("REVIEW_REMINDER_PLAY_SOUND"))
+                    .setDesc(t("REVIEW_REMINDER_PLAY_SOUND_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.dataManager.data.settings.reviewReminderPlaySound)
+                            .setDisabled(!this.dataManager.data.settings.enableReviewReminders)
+                            .onChange(async (value) => {
+                                this.dataManager.data.settings.reviewReminderPlaySound = value;
+                                await this.dataManager.savePluginData();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("REVIEW_REMINDER_BOUNCE_DOCK"))
+                    .setDesc(t("REVIEW_REMINDER_BOUNCE_DOCK_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.dataManager.data.settings.reviewReminderBounceDock)
+                            .setDisabled(!this.dataManager.data.settings.enableReviewReminders)
+                            .onChange(async (value) => {
+                                this.dataManager.data.settings.reviewReminderBounceDock = value;
+                                await this.dataManager.savePluginData();
+                            }),
+                    );
+            });
+
         const algorithmGroup = new SettingGroup(this.containerEl).setHeading(t("ALGORITHM"));
 
         algorithmGroup.addSetting((setting: Setting) => {
