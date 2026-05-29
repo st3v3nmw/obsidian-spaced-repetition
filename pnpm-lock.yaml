@@ -51,9 +51,6 @@ importers:
       auto-changelog:
         specifier: ^2.5.0
         version: 2.5.0
-      builtin-modules:
-        specifier: ^5.1.0
-        version: 5.1.0
       concurrently:
         specifier: ^9.2.1
         version: 9.2.1
