@@ -90,11 +90,11 @@ export class UIPreferencesPage extends SettingsPage {
                             .onChange(async (value) => {
                                 this.dataManager.data.settings.useCustomHotkeys = value;
                                 if (this.dataManager.data.settings.useCustomHotkeys) {
-                                    this.plugin.addCustomHotkeys();
+                                    this.plugin.commandManager.addCustomHotkeys();
                                 } else {
-                                    this.plugin.removeCustomHotkeys();
+                                    this.plugin.commandManager.removeCustomHotkeys();
                                 }
-                                this.plugin.addCustomHotkeys();
+                                this.plugin.commandManager.addCustomHotkeys();
                                 await this.dataManager.savePluginData();
                             }),
                     );

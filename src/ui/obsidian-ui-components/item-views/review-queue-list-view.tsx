@@ -55,6 +55,12 @@ export class ReviewQueueListView extends ItemView {
         return "SpacedRepIcon";
     }
 
+    protected onOpen(): Promise<void> {
+        this.redraw();
+
+        return Promise.resolve();
+    }
+
     public onHeaderMenu(menu: Menu): void {
         menu.addItem((item) => {
             item.setTitle(t("CLOSE"))
@@ -66,7 +72,6 @@ export class ReviewQueueListView extends ItemView {
     }
 
     public redraw(): void {
-        if (!this.noteReviewQueue.reviewDecks) return;
         this.contentEl.empty();
         this.contentEl.addClass("sr-note-review-page");
 
@@ -81,10 +86,15 @@ export class ReviewQueueListView extends ItemView {
         const subTitleWrapper = this.contentEl.createDiv("sr-note-review-header-subtitle-wrapper");
         subTitleWrapper
             .createDiv("sr-note-review-header-subtitle")
-            .setText(t("NOTE_REVIEW_QUEUE_HINT"));
+            .setText(
+                !this.noteReviewQueue.reviewDecks || this.noteReviewQueue.reviewDecks.size === 0
+                    ? t("NOTE_REVIEW_QUEUE_EMPTY_HINT")
+                    : t("NOTE_REVIEW_QUEUE_HINT"),
+            );
 
         this.treeEl = this.contentEl.createDiv("tree-item nav-folder mod-root");
 
+        if (!this.noteReviewQueue.reviewDecks) return;
         this.createTree(this.treeEl);
     }
 

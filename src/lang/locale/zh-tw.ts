@@ -4,6 +4,8 @@ import en from "src/lang/locale/en";
 
 const zhTW: IBaseLocale = {
     ...en,
+    language: "zh-tw",
+    languageName: "繁體中文",
     // flashcard-modal.tsx
     DECKS: "牌組",
     DUE_CARDS: "到期卡片",

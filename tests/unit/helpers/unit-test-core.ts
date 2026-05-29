@@ -81,7 +81,7 @@ export class UnitTestOsrCore extends OsrCore {
             await this.processFile(f);
         }
 
-        this.finalizeLoad();
+        await this.finalizeLoad();
     }
 
     getFileByNoteName(noteName: string): UnitTestSRFile {
