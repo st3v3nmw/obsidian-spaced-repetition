@@ -24,9 +24,12 @@ export class SRSettingTab extends PluginSettingTab {
     }
 
     display(): void {
+        // TODO: Make the settings tab work with search settings plugin
         if (!this.plugin.isInitialized) {
             const infoDiv = this.containerEl.createDiv();
-            infoDiv.setText("I am sry, but please come back in a few seconds. The spaced repetition plugin is still initializing...");
+            infoDiv.setText(
+                "I am sry, but please come back in a few seconds. The spaced repetition plugin is still initializing...",
+            );
             return;
         }
 

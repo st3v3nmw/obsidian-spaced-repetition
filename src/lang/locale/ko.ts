@@ -5,6 +5,8 @@ import en from "src/lang/locale/en";
 
 const ko: IBaseLocale = {
     ...en,
+    language: "ko",
+    languageName: "한국어",
     // flashcard-modal.tsx
     DECKS: "덱",
     DUE_CARDS: "다시 볼 카드들",

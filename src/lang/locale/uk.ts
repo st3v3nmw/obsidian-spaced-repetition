@@ -8,6 +8,8 @@ import en from "src/lang/locale/en";
 
 const uk: IBaseLocale = {
     ...en,
+    language: "uk",
+    languageName: "Українська",
     // flashcard-modal.tsx
     DECKS: "Колоди карток",
     DUE_CARDS: "Картки до повторення",

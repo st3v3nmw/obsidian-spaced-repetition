@@ -85,7 +85,7 @@ export class UIPreferencesPage extends SettingsPage {
                             .setDisabled(
                                 (isMobile &&
                                     !this.dataManager.data.settings.openViewInNewTabMobile) ||
-                                (!isMobile && !this.dataManager.data.settings.openViewInNewTab),
+                                    (!isMobile && !this.dataManager.data.settings.openViewInNewTab),
                             )
                             .onChange(async (value) => {
                                 this.dataManager.data.settings.useCustomHotkeys = value;

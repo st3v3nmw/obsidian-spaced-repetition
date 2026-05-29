@@ -68,8 +68,8 @@ export class StatisticsPage extends SettingsPage {
             plugin,
             dataManager,
             pageType,
-            () => { },
-            () => { },
+            () => {},
+            () => {},
             openPage,
             scrollListener,
         );
@@ -176,7 +176,7 @@ export class StatisticsPage extends SettingsPage {
         // Add intervals
         const averageInterval: string = textInterval(
             Math.round((cardStats.intervals.getTotalOfValueMultiplyCount() / scheduledCount) * 10) /
-            10 || 0,
+                10 || 0,
             false,
         );
         const longestInterval: string = textInterval(cardStats.intervals.getMaxValue(), false);
@@ -226,10 +226,11 @@ export class StatisticsPage extends SettingsPage {
         });
 
         // Add card types
-        const totalCardsCount: number = this.dataManager.osrCore.reviewableDeckTree.getDistinctRepItemCount(
-            RepItemState.AnyItem,
-            true,
-        );
+        const totalCardsCount: number =
+            this.dataManager.osrCore.reviewableDeckTree.getDistinctRepItemCount(
+                RepItemState.AnyItem,
+                true,
+            );
 
         new SettingGroup(this.containerEl)
             .setHeading(t("CARD_TYPES"))

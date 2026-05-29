@@ -13,6 +13,8 @@ import en from "src/lang/locale/en";
 
 const ru: IBaseLocale = {
     ...en,
+    language: "ru",
+    languageName: "Русский",
     // flashcard-modal.tsx
     DECKS: "Колоды",
     DUE_CARDS: "Повторяемые карточки",
