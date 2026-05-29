@@ -133,7 +133,9 @@ export class UIManager {
             }),
         );
 
-        this.externalModalObserver = new MutationObserver(this.handleExternalModalOpen.bind(this));
+        this.externalModalObserver = new MutationObserver((mutationList: MutationRecord[]) => {
+            this.handleExternalModalOpen(mutationList);
+        });
         this.externalModalObserver.observe(activeDocument.body, {
             childList: true,
             subtree: true,
