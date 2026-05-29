@@ -85,16 +85,16 @@ export class UIPreferencesPage extends SettingsPage {
                             .setDisabled(
                                 (isMobile &&
                                     !this.dataManager.data.settings.openViewInNewTabMobile) ||
-                                    (!isMobile && !this.dataManager.data.settings.openViewInNewTab),
+                                (!isMobile && !this.dataManager.data.settings.openViewInNewTab),
                             )
                             .onChange(async (value) => {
                                 this.dataManager.data.settings.useCustomHotkeys = value;
                                 if (this.dataManager.data.settings.useCustomHotkeys) {
-                                    this.plugin.addCustomHotkeys();
+                                    this.plugin.commandManager.addCustomHotkeys();
                                 } else {
-                                    this.plugin.removeCustomHotkeys();
+                                    this.plugin.commandManager.removeCustomHotkeys();
                                 }
-                                this.plugin.addCustomHotkeys();
+                                this.plugin.commandManager.addCustomHotkeys();
                                 await this.dataManager.savePluginData();
                             }),
                     );
