@@ -140,6 +140,7 @@ export abstract class SettingsPage {
         if (this.pageContainerEl.hasClass("sr-is-hidden")) {
             this.pageContainerEl.removeClass("sr-is-hidden");
             this.addScrollListener();
+            if (this.render) this.render();
         }
     }
 

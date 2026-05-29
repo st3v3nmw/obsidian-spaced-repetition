@@ -16,7 +16,6 @@ import { Setting, SettingGroup } from "obsidian";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import h from "vhtml";
 
-import { OsrCore } from "src/data/core";
 import { DataManager } from "src/data/data-manager";
 import { Stats } from "src/data/data-structures/deck/stats";
 import { t } from "src/lang/helpers";
@@ -50,11 +49,11 @@ Chart.register(
  * @extends {SettingsPage}
  */
 export class StatisticsPage extends SettingsPage {
-    private forecastChart: ChartComponent;
-    private intervalsChart: ChartComponent;
-    private easesChart: ChartComponent;
-    private cardTypesChart: ChartComponent;
-    private noteStatsGrid: NoteStatsComponent;
+    private forecastChart: ChartComponent | null = null;
+    private intervalsChart: ChartComponent | null = null;
+    private easesChart: ChartComponent | null = null;
+    private cardTypesChart: ChartComponent | null = null;
+    private noteStatsGrid: NoteStatsComponent | null = null;
 
     constructor(
         pageContainerEl: HTMLElement,
@@ -69,52 +68,57 @@ export class StatisticsPage extends SettingsPage {
             plugin,
             dataManager,
             pageType,
-            () => {},
-            () => {},
+            () => { },
+            () => { },
             openPage,
             scrollListener,
         );
         this.containerEl.addClass("sr-statistics-page");
         this.plugin = plugin;
+    }
 
-        new Setting(this.containerEl)
-            .setName(t("PERIOD_TITLE"))
-            .setDesc(t("PERIOD_DESC"))
-            .addDropdown((el) => {
-                el.addOption("month", t("MONTH"))
-                    .addOption("quarter", t("QUARTER"))
-                    .addOption("year", t("YEAR"))
-                    .addOption("lifetime", t("LIFETIME"))
-                    .setValue("month");
-
-                el.selectEl.setAttr("id", "sr-chart-period");
-            });
-
-        this.renderCharts(this.dataManager.osrCore);
+    render(): void {
+        this.destroyCharts();
+        void this.renderCharts();
     }
 
     /**
      * Destroys the StatisticsPagea and all its components.
      */
     destroy(): void {
-        if (this.forecastChart) this.forecastChart.destroy();
-        if (this.intervalsChart) this.intervalsChart.destroy();
-        if (this.easesChart) this.easesChart.destroy();
-        if (this.cardTypesChart) this.cardTypesChart.destroy();
-        if (this.noteStatsGrid) this.noteStatsGrid.destroy();
+        this.destroyCharts();
         this.containerEl.removeEventListener("scroll", (_) => {
             this.scrollListener(this.containerEl.scrollTop);
         });
     }
 
-    private renderCharts(osrCore: OsrCore): void {
-        if (!osrCore.cardStats) {
-            this.dataManager.sync().then((_) => this.renderCharts(this.dataManager.osrCore));
+    destroyCharts(): void {
+        if (this.forecastChart !== null) this.forecastChart.destroy();
+        if (this.intervalsChart !== null) this.intervalsChart.destroy();
+        if (this.easesChart !== null) this.easesChart.destroy();
+        if (this.cardTypesChart !== null) this.cardTypesChart.destroy();
+        if (this.noteStatsGrid !== null) this.noteStatsGrid.destroy();
+
+        this.forecastChart = null;
+        this.intervalsChart = null;
+        this.easesChart = null;
+        this.cardTypesChart = null;
+        this.noteStatsGrid = null;
+
+        this.containerEl.empty();
+    }
+
+    private async renderCharts(): Promise<void> {
+        await this.dataManager.sync();
+
+        // TODO: Add a loading screen while it syncs
+
+        // Add forecast
+        const cardStats: Stats | null = this.dataManager.osrCore.cardStats;
+        if (cardStats === null) {
             return;
         }
 
-        // Add forecast
-        const cardStats: Stats = osrCore.cardStats;
         let maxN: number = cardStats.delayedDays.getMaxValue();
         for (let dueOffset = 0; dueOffset <= maxN; dueOffset++) {
             cardStats.delayedDays.clearCountIfMissing(dueOffset);
@@ -131,6 +135,19 @@ export class StatisticsPage extends SettingsPage {
 
         const scheduledCount: number = cardStats.youngCount + cardStats.matureCount;
         maxN = Math.max(maxN, 1);
+
+        new Setting(this.containerEl)
+            .setName(t("PERIOD_TITLE"))
+            .setDesc(t("PERIOD_DESC"))
+            .addDropdown((el) => {
+                el.addOption("month", t("MONTH"))
+                    .addOption("quarter", t("QUARTER"))
+                    .addOption("year", t("YEAR"))
+                    .addOption("lifetime", t("LIFETIME"))
+                    .setValue("month");
+
+                el.selectEl.setAttr("id", "sr-chart-period");
+            });
 
         new SettingGroup(this.containerEl)
             .setHeading(t("FORECAST"))
@@ -159,7 +176,7 @@ export class StatisticsPage extends SettingsPage {
         // Add intervals
         const averageInterval: string = textInterval(
             Math.round((cardStats.intervals.getTotalOfValueMultiplyCount() / scheduledCount) * 10) /
-                10 || 0,
+            10 || 0,
             false,
         );
         const longestInterval: string = textInterval(cardStats.intervals.getMaxValue(), false);
@@ -181,7 +198,6 @@ export class StatisticsPage extends SettingsPage {
                     t("DAYS"),
                     t("NUMBER_OF_CARDS"),
                 );
-                return this.intervalsChart;
             });
 
         // Add eases
@@ -207,11 +223,10 @@ export class StatisticsPage extends SettingsPage {
                 t("EASES"),
                 t("NUMBER_OF_CARDS"),
             );
-            return this.easesChart;
         });
 
         // Add card types
-        const totalCardsCount: number = osrCore.reviewableDeckTree.getDistinctRepItemCount(
+        const totalCardsCount: number = this.dataManager.osrCore.reviewableDeckTree.getDistinctRepItemCount(
             RepItemState.AnyItem,
             true,
         );
@@ -238,7 +253,6 @@ export class StatisticsPage extends SettingsPage {
                     [cardStats.newCount, cardStats.youngCount, cardStats.matureCount],
                     t("CARD_TYPES_SUMMARY", { totalCardsCount }),
                 );
-                return this.cardTypesChart;
             });
 
         const noteEases = mapRecord(
@@ -250,7 +264,6 @@ export class StatisticsPage extends SettingsPage {
 
         new SettingGroup(this.containerEl).setHeading(t("NOTES")).addSetting((setting: Setting) => {
             this.noteStatsGrid = new NoteStatsComponent(setting.settingEl, noteEases);
-            return this.noteStatsGrid;
         });
     }
 }
