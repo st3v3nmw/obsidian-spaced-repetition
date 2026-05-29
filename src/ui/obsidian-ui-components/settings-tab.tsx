@@ -24,6 +24,14 @@ export class SRSettingTab extends PluginSettingTab {
     }
 
     display(): void {
+        if (!this.plugin.isInitialized) {
+            const infoDiv = this.containerEl.createDiv();
+            infoDiv.setText("I am sry, but please come back in a few seconds. The spaced repetition plugin is still initializing...");
+            return;
+        }
+
+        this.containerEl.empty();
+
         this.settingsPageManager = new SettingsPageManager(
             this.containerEl,
             this.plugin,
