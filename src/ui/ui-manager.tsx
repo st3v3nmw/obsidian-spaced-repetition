@@ -70,7 +70,9 @@ export class UIManager {
         this.statusBarManager = new StatusBarManager(this.plugin);
 
         this.plugin.registerEvent(
-            this.plugin.app.workspace.on("file-menu", this.fileMenuHandler.bind(this)),
+            this.plugin.app.workspace.on("file-menu", (menu: Menu, file: TAbstractFile) => {
+                this.fileMenuHandler(menu, file);
+            }),
         );
         this.plugin.addSettingTab(new SRSettingTab(this.plugin.app, this.plugin, this));
     }
@@ -90,8 +92,6 @@ export class UIManager {
 
     public destroy() {
         this.removeSRFocusListener();
-        // @ts-expect-error - TS2339: Property 'fileMenuHandler' does not exist on type 'UIManager'.
-        this.plugin.app.workspace.off("file-menu", this.fileMenuHandler.bind(this));
     }
 
     public async updateStatusBar() {
@@ -128,10 +128,14 @@ export class UIManager {
 
     public registerSRFocusListener() {
         this.plugin.registerEvent(
-            this.plugin.app.workspace.on("active-leaf-change", this.handleFocusChange.bind(this)),
+            this.plugin.app.workspace.on("active-leaf-change", (leaf: WorkspaceLeaf | null) => {
+                this.handleFocusChange(leaf);
+            }),
         );
 
-        this.externalModalObserver = new MutationObserver(this.handleExternalModalOpen.bind(this));
+        this.externalModalObserver = new MutationObserver((mutationList: MutationRecord[]) => {
+            this.handleExternalModalOpen(mutationList);
+        });
         this.externalModalObserver.observe(activeDocument.body, {
             childList: true,
             subtree: true,
@@ -140,8 +144,6 @@ export class UIManager {
 
     public removeSRFocusListener() {
         this.setSRViewInFocus(false);
-        // @ts-expect-error - TS2339: Property 'handleFocusChange' does not exist on type 'UIManager'.
-        this.plugin.app.workspace.off("active-leaf-change", this.handleFocusChange.bind(this));
     }
 
     public handleFocusChange(leaf: WorkspaceLeaf | null) {

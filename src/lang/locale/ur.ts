@@ -5,6 +5,8 @@ import en from "src/lang/locale/en";
 
 const ur: IBaseLocale = {
     ...en,
+    language: "ur",
+    languageName: "اردو",
 };
 
 export default ur;

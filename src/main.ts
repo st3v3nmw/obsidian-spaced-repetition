@@ -11,6 +11,7 @@ import {
     RepItemOrder,
 } from "src/data/data-structures/deck/deck-tree-iterator";
 import { SRSettings } from "src/data/settings";
+import { LocaleManagerInstance } from "src/lang/locale-manager";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { Note } from "src/note/note";
 import { NoteReviewQueue } from "src/note/note-review-queue";
@@ -39,6 +40,12 @@ export default class SRPlugin extends Plugin {
         this.app.workspace.onLayoutReady(async () => {
             this.dataManager = new DataManager(this);
             await this.dataManager.loadData();
+
+            // Set the preferred locale if it is not the default
+            if (this.dataManager.data.settings.preferredLocale !== "-") {
+                LocaleManagerInstance.getInstance().currentLocale =
+                    this.dataManager.data.settings.preferredLocale;
+            }
 
             const noteReviewQueue = new NoteReviewQueue();
             this._nextNoteReviewHandler = new NextNoteReviewHandler(

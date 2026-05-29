@@ -1,5 +1,10 @@
 /* MARK: Utils */
 
+/* Code to enable the plugin icon in the settings tab */
+/* .vertical-tab-header-group-items[data-section="community-plugins"] [data-setting-id^="obsidian-spaced-repetition"] .vertical-tab-nav-item-icon {
+    display: flex;
+} */
+
 [data-callout="sr"][data-callout-metadata="card-metadata"] {
     display: inline-block;
     background-color: transparent;
