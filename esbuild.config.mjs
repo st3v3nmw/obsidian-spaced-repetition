@@ -3,14 +3,18 @@ import esbuild from "esbuild";
 import fs from "fs";
 import { builtinModules } from "node:module";
 import path from "path";
+import prettier from "prettier";
 import process from "process";
 
 const prod = process.argv[2] === "production";
 
+// The published plugin expects CSS at the repository root, not under build/.
+// We also normalize the generated stylesheet through Prettier so CI does not
+// fail on formatting differences introduced by the bundler output.
 const moveToRootPlugin = {
     name: "move-to-root",
     setup(build) {
-        build.onEnd((_) => {
+        build.onEnd(async (_) => {
             const cssFile = path.join("build", "main.css");
             const targetFile = "styles.css";
 
@@ -18,6 +22,7 @@ const moveToRootPlugin = {
                 let contents = fs.readFileSync(cssFile, "utf8");
                 // Remove source map comment
                 contents = contents.replace(/\/\*#\s*sourceMappingURL=.*?\*\/\s*$/s, "");
+                contents = await prettier.format(contents, { filepath: targetFile });
                 fs.writeFileSync(targetFile, contents);
                 fs.rmSync(cssFile);
 
@@ -45,8 +50,15 @@ const context = await esbuild.context({
 });
 
 if (prod) {
-    context.rebuild().catch(() => process.exit(1));
-    context.dispose();
+    try {
+        // Production mode must await rebuild/dispose so async post-processing of
+        // styles.css has finished before the process exits.
+        await context.rebuild();
+    } catch {
+        process.exit(1);
+    } finally {
+        await context.dispose();
+    }
 } else {
     context.watch().catch(() => process.exit(1));
 }
