@@ -70,7 +70,9 @@ export class UIManager {
         this.statusBarManager = new StatusBarManager(this.plugin);
 
         this.plugin.registerEvent(
-            this.plugin.app.workspace.on("file-menu", this.fileMenuHandler.bind(this)),
+            this.plugin.app.workspace.on("file-menu", (menu: Menu, file: TAbstractFile) => {
+                this.fileMenuHandler(menu, file);
+            }),
         );
         this.plugin.addSettingTab(new SRSettingTab(this.plugin.app, this.plugin, this));
     }
@@ -90,7 +92,6 @@ export class UIManager {
 
     public destroy() {
         this.removeSRFocusListener();
-        this.plugin.app.workspace.off("file-menu", this.fileMenuHandler.bind(this));
     }
 
     public async updateStatusBar() {
@@ -127,10 +128,14 @@ export class UIManager {
 
     public registerSRFocusListener() {
         this.plugin.registerEvent(
-            this.plugin.app.workspace.on("active-leaf-change", this.handleFocusChange.bind(this)),
+            this.plugin.app.workspace.on("active-leaf-change", (leaf: WorkspaceLeaf | null) => {
+                this.handleFocusChange(leaf);
+            }),
         );
 
-        this.externalModalObserver = new MutationObserver(this.handleExternalModalOpen.bind(this));
+        this.externalModalObserver = new MutationObserver((mutationList: MutationRecord[]) => {
+            this.handleExternalModalOpen(mutationList);
+        });
         this.externalModalObserver.observe(activeDocument.body, {
             childList: true,
             subtree: true,
@@ -139,7 +144,6 @@ export class UIManager {
 
     public removeSRFocusListener() {
         this.setSRViewInFocus(false);
-        this.plugin.app.workspace.off("active-leaf-change", this.handleFocusChange.bind(this));
     }
 
     public handleFocusChange(leaf: WorkspaceLeaf | null) {
@@ -165,8 +169,8 @@ export class UIManager {
             // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
             this.setSRViewInFocus(
                 (modal === null || modal === undefined) &&
-                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
-                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
+                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
+                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
             );
         }
     }
@@ -306,9 +310,9 @@ export class UIManager {
 
         const windowObject = activeDocument.defaultView as
             | (Window & {
-                  AudioContext?: typeof AudioContext;
-                  webkitAudioContext?: typeof AudioContext;
-              })
+                AudioContext?: typeof AudioContext;
+                webkitAudioContext?: typeof AudioContext;
+            })
             | null;
         const AudioContextCtor =
             windowObject?.AudioContext ?? windowObject?.webkitAudioContext ?? null;
@@ -365,10 +369,10 @@ export class UIManager {
         type ElectronApp = { dock?: DockApi };
         const requireFn = (
             activeDocument.defaultView as
-                | (Window & {
-                      require?: (moduleName: string) => unknown;
-                  })
-                | null
+            | (Window & {
+                require?: (moduleName: string) => unknown;
+            })
+            | null
         )?.require;
         if (requireFn === undefined) {
             return;

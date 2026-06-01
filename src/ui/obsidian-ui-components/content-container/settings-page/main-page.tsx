@@ -2,6 +2,7 @@ import { ButtonComponent, setIcon, Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
 import { t, tHTML } from "src/lang/helpers";
+import { LocaleManagerInstance } from "src/lang/locale-manager";
 import SRPlugin from "src/main";
 import { setDebugParser } from "src/parser";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
@@ -66,6 +67,36 @@ export class MainPage extends SettingsPage {
                     this.openPage(pageType);
                 });
             });
+        });
+
+        mainSettingsGroup.addSetting((setting: Setting) => {
+            setting
+                .setName(t("LANGUAGE_SETTINGS"))
+                .setDesc(t("LANGUAGE_SETTINGS_DESC"))
+                .addDropdown((dropdown) => {
+                    dropdown.addOption("-", t("DEFAULT_LOCALE_NAME"));
+
+                    LocaleManagerInstance.getInstance()
+                        .getLocaleOptionsList()
+                        .forEach((option) => {
+                            dropdown.addOption(option.language, option.languageName);
+                        });
+
+                    dropdown.setValue(this.plugin.dataManager.data.settings.preferredLocale);
+
+                    dropdown.onChange(async (value) => {
+                        if (value === "-") {
+                            const loadedLocale: string =
+                                LocaleManagerInstance.getInstance().loadedLocale;
+                            LocaleManagerInstance.getInstance().currentLocale = loadedLocale;
+                        } else {
+                            LocaleManagerInstance.getInstance().currentLocale = value;
+                        }
+                        this.plugin.dataManager.data.settings.preferredLocale = value;
+                        await this.plugin.dataManager.savePluginData();
+                        this.display();
+                    });
+                });
         });
 
         new SettingGroup(this.containerEl)

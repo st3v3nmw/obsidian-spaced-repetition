@@ -3,6 +3,8 @@
 import { IBaseLocale } from "src/lang/base-locale";
 
 const en: IBaseLocale = {
+    language: "en",
+    languageName: "English",
     // flashcard-modal.tsx
     CRAM_MODE: "Cram Mode",
     REVIEW_MODE: "Review Mode",
@@ -38,7 +40,7 @@ const en: IBaseLocale = {
         "This action cannot be undone and might alter your notes in unwanted ways. Are you sure you want to delete this card?",
 
     // main.ts
-    OPEN_NOTE_FOR_REVIEW: "Open a note for review",
+    OPEN_NOTE_FOR_REVIEW: "Review a note",
     REVIEW_CARDS: "Review flashcards",
     REVIEW_DIFFICULTY_FILE_MENU: "Review: ${difficulty}",
     REVIEW_NOTE_DIFFICULTY_CMD: "Review note as ${difficulty}",
@@ -325,7 +327,10 @@ const en: IBaseLocale = {
     MAIN_SETTINGS_PAGE: "MAIN_SETTINGS",
 
     // NoteReviewQueue.ts
-    NOTE_REVIEW_QUEUE_HINT: "Click on the 3 dots next to the note to open the review menu.",
+    NOTE_REVIEW_QUEUE_HINT:
+        "Click on any note to open it for review. To rate a review click on the 3 dots next to the note.",
+    NOTE_REVIEW_QUEUE_EMPTY_HINT:
+        "There are no notes to review. To add some notes, add the tag 'review' in one of your notes.",
 
     // StatusBarManager.ts
     OPEN_DECK_FOR_REVIEW: "Open deck for review",
@@ -407,6 +412,10 @@ const en: IBaseLocale = {
     MIGRATING_SCHEDULING_COMMENTS_TO_CALLOUT:
         "Migrating scheduling comments to sr metadata callouts...",
     MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT: "Migrate scheduling comments to sr metadata callout",
+    DEFAULT_LOCALE_NAME: "- Obsidian's Default -",
+    LANGUAGE_SETTINGS: "Language Settings",
+    LANGUAGE_SETTINGS_DESC:
+        "Select the language you want to use for the plugin interface. This will only fully take effect after restarting Obsidian.",
 };
 
 export default en;

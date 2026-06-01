@@ -1,4 +1,6 @@
 export interface IBaseLocale {
+    language: string;
+    languageName: string;
     // flashcard-modal.tsx
     CRAM_MODE: string;
     REVIEW_MODE: string;
@@ -269,6 +271,7 @@ export interface IBaseLocale {
 
     // NoteReviewQueue.ts
     NOTE_REVIEW_QUEUE_HINT: string;
+    NOTE_REVIEW_QUEUE_EMPTY_HINT: string;
 
     // StatusBarManager.ts
     OPEN_DECK_FOR_REVIEW: string;
@@ -344,4 +347,7 @@ export interface IBaseLocale {
     MIGRATING_SCHEDULING_COMMENTS_TO_CALLOUT: string;
     MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_DESC: string;
     MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT: string;
+    DEFAULT_LOCALE_NAME: string;
+    LANGUAGE_SETTINGS: string;
+    LANGUAGE_SETTINGS_DESC: string;
 }

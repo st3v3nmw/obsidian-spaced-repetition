@@ -4,6 +4,8 @@ import en from "src/lang/locale/en";
 
 const cz: IBaseLocale = {
     ...en,
+    language: "cz",
+    languageName: "Čeština",
     // flashcard-modal.tsx
     DECKS: "Balíčky",
     DUE_CARDS: "Kartičky po termínu",

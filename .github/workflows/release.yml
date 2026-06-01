@@ -29,7 +29,6 @@ jobs:
               id: build
               run: |
                   npm install -g pnpm
-                  pnpm install
                   pnpm build
 
             - name: Verify Files Exist

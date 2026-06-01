@@ -4,7 +4,8 @@ import en from "src/lang/locale/en";
 
 const fr: IBaseLocale = {
     ...en,
-
+    language: "fr",
+    languageName: "Français",
     // flashcard-modal.tsx
     DECKS: "Paquets",
     DUE_CARDS: "Cartes dues",

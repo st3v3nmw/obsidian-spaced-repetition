@@ -4,6 +4,8 @@ import en from "src/lang/locale/en";
 
 const ja: IBaseLocale = {
     ...en,
+    language: "ja",
+    languageName: "日本語",
     // flashcard-modal.tsx
     DECKS: "デッキ",
     DUE_CARDS: "期日のカード",

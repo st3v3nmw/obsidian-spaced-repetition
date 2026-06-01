@@ -32,9 +32,10 @@ export default class StatusBarItem {
 
         if (props.onClick !== undefined) {
             this.statusBarItem.addClass("mod-clickable");
-            this.statusBarItem.addEventListener("click", async () => {
+
+            this.statusBarItem.addEventListener("click", () => {
                 if (props.onClick === undefined) return;
-                await props.onClick();
+                void props.onClick();
             });
         }
 

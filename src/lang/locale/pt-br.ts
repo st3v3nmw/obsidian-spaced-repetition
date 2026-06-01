@@ -6,6 +6,8 @@ import en from "src/lang/locale/en";
 
 const ptBR: IBaseLocale = {
     ...en,
+    language: "pt-br",
+    languageName: "Português do Brasil",
     // flashcard-modal.tsx
     DECKS: "Baralhos",
     DUE_CARDS: "Cartas para Colocar em Dia",
