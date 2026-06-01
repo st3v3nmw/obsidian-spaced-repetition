@@ -61,9 +61,8 @@ export class UIManager {
     constructor(plugin: SRPlugin) {
         this.plugin = plugin;
         appIcon();
-
-        // Closes all still open tab views when the plugin is loaded, because it causes bugs / empty windows otherwise
         this.tabViewManager = new TabViewManager(this.plugin);
+        this.tabViewManager.registerAllTabViews();
 
         this.sidebarManager = new SidebarManager(this.plugin);
 
@@ -78,6 +77,7 @@ export class UIManager {
     }
 
     public async onLayoutReady() {
+        // Closes all still open tab views when the plugin is loaded, because it causes bugs / empty windows otherwise
         this.tabViewManager.closeAllTabViews();
         await this.sidebarManager.activateReviewQueueViewPanel();
         await this.plugin.dataManager.sync();
@@ -110,14 +110,17 @@ export class UIManager {
         );
 
         if (settings.showStatusBar) {
-            this.statusBarManager.setCount(
-                this.plugin.dataManager.osrCore.remainingDeckTree.getRepItemCount(
-                    RepItemState.AnyItem,
-                    true,
-                ),
-                settings.showStatusBar && settings.showCardStatusBarItem,
-                "card-review",
-            );
+            if (this.plugin.dataManager.osrCore.remainingDeckTree !== null) {
+                this.statusBarManager.setCount(
+                    this.plugin.dataManager.osrCore.remainingDeckTree.getRepItemCount(
+                        RepItemState.AnyItem,
+                        true,
+                    ),
+                    settings.showStatusBar && settings.showCardStatusBarItem,
+                    "card-review",
+                );
+            }
+
             this.statusBarManager.setCount(
                 this.plugin.dataManager.osrCore.noteReviewQueue.dueNotesCount,
                 settings.showStatusBar && settings.showNoteStatusBarItem,
@@ -169,8 +172,8 @@ export class UIManager {
             // Only set focus if it was already in focus, as that is the only case where the tab would be covered by the modal
             this.setSRViewInFocus(
                 (modal === null || modal === undefined) &&
-                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
-                this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
+                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== null &&
+                    this.plugin.app.workspace.getActiveViewOfType(SRTabView) !== undefined,
             );
         }
     }
@@ -241,13 +244,7 @@ export class UIManager {
             };
             const currentWindow = remoteModule?.getCurrentWindow?.();
             if (currentWindow !== null && currentWindow !== undefined) {
-                return currentWindow as {
-                    isMinimized?: () => boolean;
-                    restore?: () => void;
-                    show?: () => void;
-                    focus?: () => void;
-                    moveTop?: () => void;
-                };
+                return currentWindow;
             }
         } catch {
             // ignore
@@ -259,13 +256,7 @@ export class UIManager {
             };
             const currentWindow = electronModule?.remote?.getCurrentWindow?.();
             if (currentWindow !== null && currentWindow !== undefined) {
-                return currentWindow as {
-                    isMinimized?: () => boolean;
-                    restore?: () => void;
-                    show?: () => void;
-                    focus?: () => void;
-                    moveTop?: () => void;
-                };
+                return currentWindow;
             }
         } catch {
             // ignore
@@ -310,9 +301,9 @@ export class UIManager {
 
         const windowObject = activeDocument.defaultView as
             | (Window & {
-                AudioContext?: typeof AudioContext;
-                webkitAudioContext?: typeof AudioContext;
-            })
+                  AudioContext?: typeof AudioContext;
+                  webkitAudioContext?: typeof AudioContext;
+              })
             | null;
         const AudioContextCtor =
             windowObject?.AudioContext ?? windowObject?.webkitAudioContext ?? null;
@@ -369,10 +360,10 @@ export class UIManager {
         type ElectronApp = { dock?: DockApi };
         const requireFn = (
             activeDocument.defaultView as
-            | (Window & {
-                require?: (moduleName: string) => unknown;
-            })
-            | null
+                | (Window & {
+                      require?: (moduleName: string) => unknown;
+                  })
+                | null
         )?.require;
         if (requireFn === undefined) {
             return;
