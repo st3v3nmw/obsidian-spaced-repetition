@@ -56,6 +56,8 @@ const en: IBaseLocale = {
     RESPONSE_RECEIVED: "Response received.",
     NO_DECK_EXISTS: "No deck exists for ${deckName}",
     ALL_CAUGHT_UP: "You're all caught up now :D.",
+    REVIEW_REMINDER_NOTICE:
+        "Flashcards are ready to review. Return to Obsidian to continue learning.",
 
     // scheduling.ts
     DAYS_STR_IVL: "${interval} day(s)",
@@ -150,6 +152,29 @@ const en: IBaseLocale = {
     REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM:
         "Randomly (once all cards in previous deck reviewed)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
+    REVIEW_REMINDERS: "Review reminders",
+    REVIEW_REMINDERS_DESC:
+        "Periodically checks for new or due flashcards and reminds you when cards are ready to review.",
+    REVIEW_REMINDER_CHECK_ON_STARTUP: "Check immediately on startup",
+    REVIEW_REMINDER_CHECK_ON_STARTUP_DESC:
+        "Runs one check when Obsidian startup layout is ready, without waiting for the first interval.",
+    REVIEW_REMINDER_INTERVAL: "Reminder interval (minutes)",
+    REVIEW_REMINDER_INTERVAL_DESC:
+        "Checks every N minutes. Minimum 1 minute, maximum 1440 minutes.",
+    REVIEW_REMINDER_INTERVAL_MIN_WARNING: "Reminder interval must be a number between 1 and 1440.",
+    REVIEW_REMINDER_MESSAGE: "Reminder message",
+    REVIEW_REMINDER_MESSAGE_DESC:
+        "Optional custom message shown in the reminder notice. Leave empty to use the default message.",
+    REVIEW_REMINDER_AUTO_OPEN: "Automatically open review",
+    REVIEW_REMINDER_AUTO_OPEN_DESC:
+        "When enabled, reminders open the existing flashcard review session directly.",
+    REVIEW_REMINDER_SHOW_NOTICE: "Show notice when reminding",
+    REVIEW_REMINDER_SHOW_NOTICE_DESC: "Displays a temporary notice when a review reminder fires.",
+    REVIEW_REMINDER_PLAY_SOUND: "Play sound when reminding",
+    REVIEW_REMINDER_PLAY_SOUND_DESC: "Plays a short alert sound when a review reminder fires.",
+    REVIEW_REMINDER_BOUNCE_DOCK: "Bounce dock icon when reminding",
+    REVIEW_REMINDER_BOUNCE_DOCK_DESC:
+        "On desktop, bounces the dock icon when a review reminder fires.",
     DISABLE_CLOZE_CARDS: "Disable cloze cards?",
     CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Convert cloze patterns to input fields",
     CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:

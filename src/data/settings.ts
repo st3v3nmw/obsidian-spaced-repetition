@@ -23,6 +23,16 @@ export interface SRSettings {
     multilineReversedCardSeparator: string;
     multilineCardEndMarker: string;
     editLaterTag: string | undefined;
+    // Reminder settings are intentionally limited to "when and how to nudge the user back
+    // into review". They do not model richer calendar-style scheduling for reminder delivery.
+    enableReviewReminders: boolean;
+    reviewReminderIntervalMinutes: number;
+    reviewReminderCheckOnStartup: boolean;
+    reviewReminderMessage: string;
+    reviewReminderAutoOpen: boolean;
+    reviewReminderShowNotice: boolean;
+    reviewReminderPlaySound: boolean;
+    reviewReminderBounceDock: boolean;
 
     // notes
     enableNoteReviewPaneOnStartup: boolean;
@@ -103,6 +113,14 @@ export const DEFAULT_SETTINGS: SRSettings = {
     multilineReversedCardSeparator: "??",
     multilineCardEndMarker: "",
     editLaterTag: undefined,
+    enableReviewReminders: false,
+    reviewReminderIntervalMinutes: 5,
+    reviewReminderCheckOnStartup: false,
+    reviewReminderMessage: "",
+    reviewReminderAutoOpen: true,
+    reviewReminderShowNotice: true,
+    reviewReminderPlaySound: true,
+    reviewReminderBounceDock: true,
     randomizeCardOrder: undefined,
 
     // notes
@@ -211,6 +229,56 @@ export function upgradeSettings(settings: SRSettings) {
 
     if (settings.fsrsDesiredRetention === null || settings.fsrsDesiredRetention === undefined) {
         settings.fsrsDesiredRetention = DEFAULT_SETTINGS.fsrsDesiredRetention;
+    }
+
+    // Only published reminder settings are upgraded here. We deliberately do not preserve
+    // unpublished draft field names from this feature branch, so the shipped schema stays clean.
+    if (settings.enableReviewReminders === null || settings.enableReviewReminders === undefined) {
+        settings.enableReviewReminders = DEFAULT_SETTINGS.enableReviewReminders;
+    }
+
+    if (
+        settings.reviewReminderIntervalMinutes === null ||
+        settings.reviewReminderIntervalMinutes === undefined ||
+        settings.reviewReminderIntervalMinutes < 1
+    ) {
+        settings.reviewReminderIntervalMinutes = DEFAULT_SETTINGS.reviewReminderIntervalMinutes;
+    }
+
+    if (
+        settings.reviewReminderCheckOnStartup === null ||
+        settings.reviewReminderCheckOnStartup === undefined
+    ) {
+        settings.reviewReminderCheckOnStartup = DEFAULT_SETTINGS.reviewReminderCheckOnStartup;
+    }
+
+    if (settings.reviewReminderMessage === null || settings.reviewReminderMessage === undefined) {
+        settings.reviewReminderMessage = DEFAULT_SETTINGS.reviewReminderMessage;
+    }
+
+    if (settings.reviewReminderAutoOpen === null || settings.reviewReminderAutoOpen === undefined) {
+        settings.reviewReminderAutoOpen = DEFAULT_SETTINGS.reviewReminderAutoOpen;
+    }
+
+    if (
+        settings.reviewReminderShowNotice === null ||
+        settings.reviewReminderShowNotice === undefined
+    ) {
+        settings.reviewReminderShowNotice = DEFAULT_SETTINGS.reviewReminderShowNotice;
+    }
+
+    if (
+        settings.reviewReminderPlaySound === null ||
+        settings.reviewReminderPlaySound === undefined
+    ) {
+        settings.reviewReminderPlaySound = DEFAULT_SETTINGS.reviewReminderPlaySound;
+    }
+
+    if (
+        settings.reviewReminderBounceDock === null ||
+        settings.reviewReminderBounceDock === undefined
+    ) {
+        settings.reviewReminderBounceDock = DEFAULT_SETTINGS.reviewReminderBounceDock;
     }
 }
 
