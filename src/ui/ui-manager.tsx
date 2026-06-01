@@ -1,5 +1,5 @@
 import "src/ui/styles.css";
-import { Menu, MenuItem, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
+import { Menu, MenuItem, Notice, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
 import { DataStore } from "src/data/data-store/base/data-store";
 import { appIcon } from "src/icons/app-icon";
@@ -61,9 +61,8 @@ export class UIManager {
     constructor(plugin: SRPlugin) {
         this.plugin = plugin;
         appIcon();
-
-        // Closes all still open tab views when the plugin is loaded, because it causes bugs / empty windows otherwise
         this.tabViewManager = new TabViewManager(this.plugin);
+        this.tabViewManager.registerAllTabViews();
 
         this.sidebarManager = new SidebarManager(this.plugin);
 
@@ -78,6 +77,7 @@ export class UIManager {
     }
 
     public async onLayoutReady() {
+        // Closes all still open tab views when the plugin is loaded, because it causes bugs / empty windows otherwise
         this.tabViewManager.closeAllTabViews();
         await this.sidebarManager.activateReviewQueueViewPanel();
         await this.plugin.dataManager.sync();
@@ -110,14 +110,17 @@ export class UIManager {
         );
 
         if (settings.showStatusBar) {
-            this.statusBarManager.setCount(
-                this.plugin.dataManager.osrCore.remainingDeckTree.getRepItemCount(
-                    RepItemState.AnyItem,
-                    true,
-                ),
-                settings.showStatusBar && settings.showCardStatusBarItem,
-                "card-review",
-            );
+            if (this.plugin.dataManager.osrCore.remainingDeckTree !== null) {
+                this.statusBarManager.setCount(
+                    this.plugin.dataManager.osrCore.remainingDeckTree.getRepItemCount(
+                        RepItemState.AnyItem,
+                        true,
+                    ),
+                    settings.showStatusBar && settings.showCardStatusBarItem,
+                    "card-review",
+                );
+            }
+
             this.statusBarManager.setCount(
                 this.plugin.dataManager.osrCore.noteReviewQueue.dueNotesCount,
                 settings.showStatusBar && settings.showNoteStatusBarItem,
@@ -184,6 +187,208 @@ export class UIManager {
         this.contentManager = contentManager;
     }
 
+    /**
+     * Brings the current Obsidian window to the foreground on desktop.
+     *
+     * Reminders can optionally auto-open review, so we try to focus the existing app window
+     * instead of spawning a detached-looking modal behind another application.
+     */
+    public focusObsidianWindow(): void {
+        if (!Platform.isDesktopApp) {
+            return;
+        }
+
+        const activeLeaf = this.plugin.app.workspace.activeLeaf;
+        if (activeLeaf !== null) {
+            this.plugin.app.workspace.setActiveLeaf(activeLeaf, { focus: true });
+            activeLeaf.getContainer()?.win?.focus();
+        }
+        activeDocument.defaultView?.focus();
+
+        const electronWindow = this.getElectronWindow();
+        if (electronWindow !== null) {
+            if (electronWindow.isMinimized?.()) {
+                electronWindow.restore?.();
+            }
+            electronWindow.show?.();
+            electronWindow.focus?.();
+            electronWindow.moveTop?.();
+        }
+    }
+
+    /**
+     * Resolves the current Electron window using either the modern or legacy remote bridge.
+     *
+     * Different Obsidian/Electron combinations expose window APIs through `@electron/remote`
+     * or `electron.remote`, so the reminder feature probes both paths and degrades quietly.
+     */
+    private getElectronWindow(): {
+        isMinimized?: () => boolean;
+        restore?: () => void;
+        show?: () => void;
+        focus?: () => void;
+        moveTop?: () => void;
+    } | null {
+        type RequireFn = (moduleName: string) => unknown;
+        const requireFn: RequireFn | undefined = (
+            activeDocument.defaultView as (Window & { require?: RequireFn }) | null
+        )?.require;
+
+        if (requireFn === undefined) {
+            return null;
+        }
+
+        try {
+            const remoteModule = requireFn("@electron/remote") as {
+                getCurrentWindow?: () => unknown;
+            };
+            const currentWindow = remoteModule?.getCurrentWindow?.();
+            if (currentWindow !== null && currentWindow !== undefined) {
+                return currentWindow;
+            }
+        } catch {
+            // ignore
+        }
+
+        try {
+            const electronModule = requireFn("electron") as {
+                remote?: { getCurrentWindow?: () => unknown };
+            };
+            const currentWindow = electronModule?.remote?.getCurrentWindow?.();
+            if (currentWindow !== null && currentWindow !== undefined) {
+                return currentWindow;
+            }
+        } catch {
+            // ignore
+        }
+
+        return null;
+    }
+
+    /**
+     * Dispatches the configured reminder attention signals.
+     *
+     * Notice, sound, dock bounce, and optional auto-open are deliberately separated so users can
+     * enable only the channels that make sense for their workflow.
+     */
+    public async notifyReviewReminder(): Promise<void> {
+        const settings = this.plugin.dataManager.data.settings;
+        const reminderMessage =
+            settings.reviewReminderMessage.trim() || t("REVIEW_REMINDER_NOTICE");
+        // This method only dispatches reminder channels. The decision to auto-open review remains
+        // in the scheduler layer so the UI manager is not responsible for reminder policy.
+        if (settings.reviewReminderShowNotice) {
+            new Notice(reminderMessage, 5000);
+        }
+        if (settings.reviewReminderPlaySound) {
+            await this.playReviewReminderBeep();
+        }
+        if (settings.reviewReminderBounceDock) {
+            this.bounceDockIcon();
+        }
+    }
+
+    /**
+     * Plays a short synthesized alert tone for desktop reminders.
+     *
+     * Web Audio availability differs across Electron environments, so this stays best-effort and
+     * exits silently when audio cannot be initialized or resumed.
+     */
+    private async playReviewReminderBeep(): Promise<void> {
+        if (!Platform.isDesktopApp) {
+            return;
+        }
+
+        const windowObject = activeDocument.defaultView as
+            | (Window & {
+                  AudioContext?: typeof AudioContext;
+                  webkitAudioContext?: typeof AudioContext;
+              })
+            | null;
+        const AudioContextCtor =
+            windowObject?.AudioContext ?? windowObject?.webkitAudioContext ?? null;
+        if (AudioContextCtor === null) {
+            return;
+        }
+
+        let context: AudioContext | null = null;
+        try {
+            context = new AudioContextCtor();
+            if (context.state === "suspended") {
+                await context.resume();
+            }
+            if (context.state !== "running") {
+                return;
+            }
+            const oscillator = context.createOscillator();
+            const gainNode = context.createGain();
+            oscillator.type = "sine";
+            oscillator.frequency.value = 880;
+            gainNode.gain.setValueAtTime(0.0001, context.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.08, context.currentTime + 0.02);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.35);
+            oscillator.connect(gainNode);
+            gainNode.connect(context.destination);
+            oscillator.start();
+            oscillator.stop(context.currentTime + 0.35);
+            await new Promise<void>((resolve) => {
+                oscillator.onended = () => resolve();
+            });
+        } catch {
+            // ignore
+        } finally {
+            if (context !== null && context.state !== "closed") {
+                void context.close().catch(() => {
+                    // ignore
+                });
+            }
+        }
+    }
+
+    /**
+     * Requests a dock bounce on desktop when reminders fire.
+     *
+     * As with window focusing, we support both remote APIs because plugin hosts may expose either
+     * `@electron/remote` or the legacy `electron.remote` bridge.
+     */
+    private bounceDockIcon(): void {
+        if (!Platform.isDesktopApp) {
+            return;
+        }
+
+        type DockApi = { bounce?: (type?: "critical" | "informational") => number };
+        type ElectronApp = { dock?: DockApi };
+        const requireFn = (
+            activeDocument.defaultView as
+                | (Window & {
+                      require?: (moduleName: string) => unknown;
+                  })
+                | null
+        )?.require;
+        if (requireFn === undefined) {
+            return;
+        }
+
+        let electronApp: ElectronApp | null = null;
+        try {
+            const remoteModule = requireFn("@electron/remote") as { app?: ElectronApp };
+            electronApp = remoteModule?.app ?? null;
+        } catch {
+            // ignore
+        }
+
+        if (electronApp === null) {
+            try {
+                const electronModule = requireFn("electron") as { remote?: { app?: ElectronApp } };
+                electronApp = electronModule?.remote?.app ?? null;
+            } catch {
+                // ignore
+            }
+        }
+
+        electronApp?.dock?.bounce?.("informational");
+    }
+
     public async openDeckContainer(mode: FlashcardReviewMode, singleNote?: TFile): Promise<void> {
         if (this.plugin.dataManager.osrCore === null)
             throw new Error("SR plugin or OSR app core not initialized!!!");
@@ -193,6 +398,9 @@ export class UIManager {
         if (this.plugin.dataManager.syncLock) {
             return;
         }
+        // We foreground Obsidian before and after opening review so reminder-driven auto-open is
+        // less likely to leave the tab or modal hidden behind another desktop app.
+        this.focusObsidianWindow();
         await this.plugin.dataManager.sync();
 
         const settings = this.plugin.dataManager.data.settings;
@@ -214,6 +422,7 @@ export class UIManager {
         } else {
             this.openFlashcardModal(reviewQueueLoader);
         }
+        this.focusObsidianWindow();
     }
 
     public openFlashcardModal(reviewQueueLoader: ReviewQueueLoader): void {
@@ -221,6 +430,7 @@ export class UIManager {
             throw new Error("SR plugin or data not initialized!!!");
 
         this.setSRViewInFocus(true);
+        this.focusObsidianWindow();
         new SRModalView(
             this.plugin.app,
             this.plugin,

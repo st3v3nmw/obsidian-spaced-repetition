@@ -46,6 +46,7 @@ const zhCN: IBaseLocale = {
     RESPONSE_RECEIVED: "反馈已收到",
     NO_DECK_EXISTS: "没有 ${deckName} 卡组",
     ALL_CAUGHT_UP: "都复习完啦，你真棒！",
+    REVIEW_REMINDER_NOTICE: "闪卡已经可以复习了。回到 Obsidian 继续学习。",
 
     // scheduling.ts
     DAYS_STR_IVL: "${interval}天",
@@ -115,6 +116,24 @@ const zhCN: IBaseLocale = {
     REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL: "顺序 (在前一卡片组内卡片都复习完后)",
     REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM: "乱序 (在前一卡片组内卡片都复习完后)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "卡片组及卡片都乱序",
+    REVIEW_REMINDERS: "复习提醒",
+    REVIEW_REMINDERS_DESC: "定期检查是否有新的或到期的闪卡，并在可以复习时提醒你。",
+    REVIEW_REMINDER_CHECK_ON_STARTUP: "启动后立即检查",
+    REVIEW_REMINDER_CHECK_ON_STARTUP_DESC:
+        "在 Obsidian 布局就绪后立即执行一次检查，不等待首次周期触发。",
+    REVIEW_REMINDER_INTERVAL: "提醒间隔（分钟）",
+    REVIEW_REMINDER_INTERVAL_DESC: "每 N 分钟检查一次。最小 1 分钟，最大 1440 分钟。",
+    REVIEW_REMINDER_INTERVAL_MIN_WARNING: "提醒间隔必须是 1 到 1440 之间的数字。",
+    REVIEW_REMINDER_MESSAGE: "提醒消息",
+    REVIEW_REMINDER_MESSAGE_DESC: "可选的自定义提醒文案。留空时使用默认消息。",
+    REVIEW_REMINDER_AUTO_OPEN: "自动打开复习",
+    REVIEW_REMINDER_AUTO_OPEN_DESC: "启用后，提醒触发时会直接打开现有的闪卡复习界面。",
+    REVIEW_REMINDER_SHOW_NOTICE: "提醒时显示通知",
+    REVIEW_REMINDER_SHOW_NOTICE_DESC: "提醒触发时显示一个临时通知。",
+    REVIEW_REMINDER_PLAY_SOUND: "提醒时播放声音",
+    REVIEW_REMINDER_PLAY_SOUND_DESC: "提醒触发时播放一段简短提示音。",
+    REVIEW_REMINDER_BOUNCE_DOCK: "提醒时弹跳 Dock 图标",
+    REVIEW_REMINDER_BOUNCE_DOCK_DESC: "在桌面端，提醒触发时弹跳 Dock 图标。",
     DISABLE_CLOZE_CARDS: "不进行完形填空",
     CONVERT_CLOZE_PATTERNS_TO_INPUTS: "Convert cloze patterns to input fields",
     CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:

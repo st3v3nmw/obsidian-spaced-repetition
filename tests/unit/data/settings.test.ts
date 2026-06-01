@@ -144,6 +144,8 @@ describe("SettingsUtil", () => {
     });
 
     test("upgradeSettings", () => {
+        expect(DEFAULT_SETTINGS.reviewReminderMessage).toEqual("");
+
         let settings: SRSettings = { ...DEFAULT_SETTINGS };
         upgradeSettings(settings);
         expect(settings).toEqual(DEFAULT_SETTINGS);
@@ -235,6 +237,31 @@ describe("SettingsUtil", () => {
             flashcardCardOrder: "ExistingCardOrder",
             flashcardDeckOrder: "ExistingDeckOrder",
             fsrsDesiredRetention: 0.87,
+        });
+
+        settings = {
+            ...DEFAULT_SETTINGS,
+            enableReviewReminders: undefined,
+            reviewReminderIntervalMinutes: 0,
+            reviewReminderCheckOnStartup: undefined,
+            reviewReminderMessage: undefined,
+            reviewReminderAutoOpen: undefined,
+            reviewReminderShowNotice: undefined,
+            reviewReminderPlaySound: undefined,
+            reviewReminderBounceDock: undefined,
+        };
+        // This verifies fallback behavior for the shipped reminder schema only. We intentionally
+        // do not encode compatibility expectations for unpublished draft field names here.
+        upgradeSettings(settings);
+        expect(settings).toMatchObject({
+            enableReviewReminders: DEFAULT_SETTINGS.enableReviewReminders,
+            reviewReminderIntervalMinutes: DEFAULT_SETTINGS.reviewReminderIntervalMinutes,
+            reviewReminderCheckOnStartup: DEFAULT_SETTINGS.reviewReminderCheckOnStartup,
+            reviewReminderMessage: DEFAULT_SETTINGS.reviewReminderMessage,
+            reviewReminderAutoOpen: DEFAULT_SETTINGS.reviewReminderAutoOpen,
+            reviewReminderShowNotice: DEFAULT_SETTINGS.reviewReminderShowNotice,
+            reviewReminderPlaySound: DEFAULT_SETTINGS.reviewReminderPlaySound,
+            reviewReminderBounceDock: DEFAULT_SETTINGS.reviewReminderBounceDock,
         });
     });
 });

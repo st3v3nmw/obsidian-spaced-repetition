@@ -31,11 +31,9 @@ export default class TabViewManager {
         },
     ];
 
-    // Add any needed resourced
+    // Add any needed resource
     constructor(plugin: SRPlugin) {
         this.plugin = plugin;
-
-        this.registerAllTabViews();
     }
 
     /**

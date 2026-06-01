@@ -1,6 +1,7 @@
 build
 coverage
 node_modules
+styles.css
 pnpm-lock.yaml
 docs/vaults/
 tests/vaults/

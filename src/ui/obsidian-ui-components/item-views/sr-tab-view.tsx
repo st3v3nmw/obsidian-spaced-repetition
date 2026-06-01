@@ -27,10 +27,10 @@ export class SRTabView extends ItemView {
     private reviewQueueLoader: ReviewQueueLoader | null = null;
     private contentManager: ContentManager | null = null;
 
-    private plugin: SRPlugin;
+    private plugin: SRPlugin | null = null;
     private viewContainerEl: HTMLElement | null = null;
     private viewContentEl: HTMLElement | null = null;
-    private settings: SRSettings;
+    private settings: SRSettings | null = null;
 
     constructor(
         leaf: WorkspaceLeaf,
@@ -38,8 +38,13 @@ export class SRTabView extends ItemView {
         reviewQueueLoader: ReviewQueueLoader | null,
     ) {
         super(leaf);
-        if (plugin.dataManager === null || plugin.dataManager.data === null)
-            throw new Error("SR plugin or data not initialized!!!");
+
+        if (!plugin.isDataManagerLoaded()) {
+            this.leaf.detach();
+            return;
+        }
+
+        // throw new Error("SR plugin or data not initialized!!!");
         // Init properties
         this.plugin = plugin;
         this.navigation = false;
@@ -130,6 +135,11 @@ export class SRTabView extends ItemView {
                 "--view-bottom-fade-mask",
                 "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(16px - 0px))",
             );
+        }
+
+        if (this.settings === null || this.plugin === null) {
+            this.leaf.detach();
+            return;
         }
 
         this.contentManager = new ContentManager(
