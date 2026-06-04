@@ -1,29 +1,14 @@
-import { Plugin, TFile } from "obsidian";
+import { Plugin } from "obsidian";
 
 import { CommandManager } from "src/command-manager";
 import { DataManager } from "src/data/data-manager";
-import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
-import {
-    DeckOrder,
-    DeckTreeIterator,
-    IDeckTreeIterator,
-    IIteratorOrder,
-    RepItemOrder,
-} from "src/data/data-structures/deck/deck-tree-iterator";
 import { DebugLoggerInstance } from "src/data/debug-logger";
 import { PluginDataError, PluginDataManager } from "src/data/plugin-data-manager";
 import { SRSettings } from "src/data/settings";
 import { SettingsManager } from "src/data/settings-manager";
 import { LocaleManagerInstance } from "src/lang/locale-manager";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
-import { Note } from "src/note/note";
 import { NoteReviewQueue } from "src/note/note-review-queue";
-import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
-import {
-    FlashcardReviewMode,
-    FlashcardReviewSequencer,
-    IFlashcardReviewSequencer,
-} from "src/scheduling/flashcard-review-sequencer";
 import { ReminderManager } from "src/scheduling/reminder-manager";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
 import { UIManager } from "src/ui/ui-manager";
@@ -158,47 +143,6 @@ export default class SRPlugin extends Plugin {
         this.commandManager.removeCustomHotkeys();
     }
 
-    public getPreparedReviewSequencer(
-        fullDeckTree: Deck,
-        remainingDeckTree: Deck,
-        reviewMode: FlashcardReviewMode,
-    ): { reviewSequencer: IFlashcardReviewSequencer; mode: FlashcardReviewMode } {
-        const deckIterator: IDeckTreeIterator = SRPlugin.createDeckTreeIterator(
-            this.dataManager.data.settings,
-        );
-
-        const reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(
-            reviewMode,
-            deckIterator,
-            this.dataManager.data.settings,
-            SRAlgorithm.getInstance(),
-            this.dataManager.osrCore.questionPostponementList,
-            this.dataManager.osrCore.dueDateFlashcardHistogram,
-        );
-
-        reviewSequencer.setDeckTree(fullDeckTree, remainingDeckTree);
-        return { reviewSequencer, mode: reviewMode };
-    }
-
-    public async getPreparedDecksForSingleNoteReview(
-        file: TFile,
-        mode: FlashcardReviewMode,
-    ): Promise<{ deckTree: Deck; remainingDeckTree: Deck; mode: FlashcardReviewMode }> {
-        const note: Note | null = await this.dataManager.loadNote(file);
-
-        const deckTree = new Deck("root", null);
-        if (note) {
-            note.appendCardsToDeck(deckTree);
-        }
-        const remainingDeckTree = DeckTreeFilter.filterForRemainingRepItems(
-            this.dataManager.osrCore.questionPostponementList,
-            deckTree,
-            mode,
-        );
-
-        return { deckTree, remainingDeckTree, mode };
-    }
-
     /**
      * Gets the text direction setting for the current Obsidian instance.
      */
@@ -216,19 +160,5 @@ export default class SRPlugin extends Plugin {
         if (this.dataManager.data.settings.enableNoteReviewPaneOnStartup) {
             this.uiManager.sidebarManager.redraw();
         }
-    }
-
-    private static createDeckTreeIterator(settings: SRSettings): IDeckTreeIterator {
-        let cardOrder: RepItemOrder =
-            RepItemOrder[settings.flashcardCardOrder as keyof typeof RepItemOrder];
-        if (cardOrder === undefined) cardOrder = RepItemOrder.DueFirstSequential;
-        let deckOrder: DeckOrder = DeckOrder[settings.flashcardDeckOrder as keyof typeof DeckOrder];
-        if (deckOrder === undefined) deckOrder = DeckOrder.PrevDeckComplete_Sequential;
-
-        const iteratorOrder: IIteratorOrder = {
-            deckOrder,
-            repItemOrder: cardOrder,
-        };
-        return new DeckTreeIterator(iteratorOrder, null);
     }
 }

@@ -1,10 +1,21 @@
 import { TFile } from "obsidian";
 
 import { OsrCore } from "src/data/core";
-import { Deck } from "src/data/data-structures/deck/deck";
+import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
+import {
+    DeckOrder,
+    DeckTreeIterator,
+    IDeckTreeIterator,
+    IIteratorOrder,
+    RepItemOrder,
+} from "src/data/data-structures/deck/deck-tree-iterator";
+import { SRSettings } from "src/data/settings";
 import SRPlugin from "src/main";
+import { Note } from "src/note/note";
+import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
 import {
     FlashcardReviewMode,
+    FlashcardReviewSequencer,
     IFlashcardReviewSequencer,
 } from "src/scheduling/flashcard-review-sequencer";
 
@@ -39,11 +50,7 @@ export class ReviewQueueLoader {
     }
 
     public async loadReviewQueue(): Promise<IFlashcardReviewSequencer> {
-        if (
-            this.plugin === null ||
-            this.plugin.dataManager === null ||
-            this.plugin.dataManager.osrCore === null
-        )
+        if (this.plugin === null || this.plugin.dataManager.osrCore === null)
             throw new Error("SR plugin or OSR app core not initialized!!!");
 
         if (!this.plugin.dataManager.syncLock) {
@@ -54,7 +61,7 @@ export class ReviewQueueLoader {
         let remainingDeckTree: Deck;
 
         if (this.singleNote) {
-            const singleNoteDeckData = await this.plugin.getPreparedDecksForSingleNoteReview(
+            const singleNoteDeckData = await this.getPreparedDecksForSingleNoteReview(
                 this.singleNote,
                 this.reviewMode,
             );
@@ -69,12 +76,67 @@ export class ReviewQueueLoader {
                     : this.osrCore.remainingDeckTree;
         }
 
-        const reviewSequencerData = this.plugin.getPreparedReviewSequencer(
+        const reviewSequencerData = this.getPreparedReviewSequencer(
             deckTree,
             remainingDeckTree,
             this.reviewMode,
         );
 
         return reviewSequencerData.reviewSequencer;
+    }
+
+    public getPreparedReviewSequencer(
+        fullDeckTree: Deck,
+        remainingDeckTree: Deck,
+        reviewMode: FlashcardReviewMode,
+    ): { reviewSequencer: IFlashcardReviewSequencer; mode: FlashcardReviewMode } {
+        const deckIterator: IDeckTreeIterator = this.createDeckTreeIterator(
+            this.plugin.dataManager.data.settings,
+        );
+
+        const reviewSequencer: IFlashcardReviewSequencer = new FlashcardReviewSequencer(
+            reviewMode,
+            deckIterator,
+            this.plugin.dataManager.data.settings,
+            SRAlgorithm.getInstance(),
+            this.plugin.dataManager.osrCore.questionPostponementList,
+            this.plugin.dataManager.osrCore.dueDateFlashcardHistogram,
+        );
+
+        reviewSequencer.setDeckTree(fullDeckTree, remainingDeckTree);
+        return { reviewSequencer, mode: reviewMode };
+    }
+
+    public async getPreparedDecksForSingleNoteReview(
+        file: TFile,
+        mode: FlashcardReviewMode,
+    ): Promise<{ deckTree: Deck; remainingDeckTree: Deck; mode: FlashcardReviewMode }> {
+        const note: Note | null = await this.plugin.dataManager.loadNote(file);
+
+        const deckTree = new Deck("root", null);
+        if (note) {
+            note.appendCardsToDeck(deckTree);
+        }
+        const remainingDeckTree = DeckTreeFilter.filterForRemainingRepItems(
+            this.plugin.dataManager.osrCore.questionPostponementList,
+            deckTree,
+            mode,
+        );
+
+        return { deckTree, remainingDeckTree, mode };
+    }
+
+    private createDeckTreeIterator(settings: SRSettings): IDeckTreeIterator {
+        let cardOrder: RepItemOrder =
+            RepItemOrder[settings.flashcardCardOrder as keyof typeof RepItemOrder];
+        if (cardOrder === undefined) cardOrder = RepItemOrder.DueFirstSequential;
+        let deckOrder: DeckOrder = DeckOrder[settings.flashcardDeckOrder as keyof typeof DeckOrder];
+        if (deckOrder === undefined) deckOrder = DeckOrder.PrevDeckComplete_Sequential;
+
+        const iteratorOrder: IIteratorOrder = {
+            deckOrder,
+            repItemOrder: cardOrder,
+        };
+        return new DeckTreeIterator(iteratorOrder, null);
     }
 }
