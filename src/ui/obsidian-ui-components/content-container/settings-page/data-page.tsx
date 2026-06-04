@@ -3,6 +3,7 @@ import { Setting, SettingGroup } from "obsidian";
 import { DataManager } from "src/data/data-manager";
 import { DataStore } from "src/data/data-store/base/data-store";
 import { DEFAULT_SETTINGS } from "src/data/settings";
+import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
@@ -19,6 +20,7 @@ export class DataPage extends SettingsPage {
     constructor(
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
+        settingsManager: SettingsManager,
         dataManager: DataManager,
         pageType: SettingsPageType,
         applySettingsUpdate: (callback: () => unknown) => void,
@@ -29,6 +31,7 @@ export class DataPage extends SettingsPage {
         super(
             pageContainerEl,
             plugin,
+            settingsManager,
             dataManager,
             pageType,
             applySettingsUpdate,
@@ -53,9 +56,9 @@ export class DataPage extends SettingsPage {
         //                         // [StorageType.FOLDER]: "Store in vault folder (beta)",
         //                         // [StorageType.PLUGIN_DATA]: "Store in plugin data (beta)",
         //                     })
-        //                     .setValue(this.dataManager.data.settings.dataStore)
+        //                     .setValue(this.settingsManager.settings.dataStore)
         //                     .onChange(async (value) => {
-        //                         const oldMode = this.dataManager.data.settings
+        //                         const oldMode = this.settingsManager.settings
         //                             .dataStore as StorageType;
         //                         const newMode = value as StorageType;
 
@@ -91,9 +94,9 @@ export class DataPage extends SettingsPage {
         //                             migratingMessage,
         //                             async () => {
         //                                 dropdown.setValue(newMode);
-        //                                 this.dataManager.data.settings.dataStore = newMode;
+        //                                 this.settingsManager.settings.dataStore = newMode;
         //                                 this.dataManager.setupDataStoreAndAlgorithmInstances(
-        //                                     this.dataManager.data.settings,
+        //                                     this.settingsManager.settings,
         //                                 );
         //                                 await DataStore.instance.isStructureInitialized.then(
         //                                     async (isInitialized) => {
@@ -101,7 +104,7 @@ export class DataPage extends SettingsPage {
         //                                             await DataStore.instance.isStructureInitialized;
         //                                         }
         //                                         await DataStore.instance.migrateDataStore(oldMode);
-        //                                         await this.dataManager.savePluginData();
+        //                                         await this.settingsManager.save();
         //                                         this.display();
         //                                     },
         //                                 );
@@ -115,7 +118,7 @@ export class DataPage extends SettingsPage {
         //     setting.infoEl.insertAdjacentText("beforeend", t("PLUGIN_DATA_STORE_INFO"));
         // });
 
-        // if (this.dataManager.data.settings.dataStore === StorageType.FOLDER) {
+        // if (this.settingsManager.settings.dataStore === StorageType.FOLDER) {
         //     dataStorageGroup.addSetting((setting: Setting) => {
         //         setting
         //             .setName("Schedule data location in vault")
@@ -124,16 +127,16 @@ export class DataPage extends SettingsPage {
         //             )
         //             .addText((text) => {
         //                 const commitValue = async () => {
-        //                     this.dataManager.data.settings.scheduleDataVaultLocation =
+        //                     this.settingsManager.settings.scheduleDataVaultLocation =
         //                         text.getValue().trim() ||
         //                         DEFAULT_SETTINGS.scheduleDataVaultLocation;
-        //                     await this.dataManager.savePluginData();
+        //                     await this.settingsManager.save();
         //                 };
 
         //                 text.setPlaceholder(DEFAULT_SETTINGS.scheduleDataVaultLocation)
-        //                     .setValue(this.dataManager.data.settings.scheduleDataVaultLocation)
+        //                     .setValue(this.settingsManager.settings.scheduleDataVaultLocation)
         //                     .onChange(() => {
-        //                         this.dataManager.data.settings.scheduleDataVaultLocation =
+        //                         this.settingsManager.settings.scheduleDataVaultLocation =
         //                             text.getValue().trim() ||
         //                             DEFAULT_SETTINGS.scheduleDataVaultLocation;
         //                     });
@@ -152,10 +155,10 @@ export class DataPage extends SettingsPage {
                     .setDesc(t("INLINE_SCHEDULING_COMMENTS_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.dataManager.data.settings.cardCommentOnSameLine)
+                            .setValue(this.settingsManager.settings.cardCommentOnSameLine)
                             .onChange(async (value) => {
-                                this.dataManager.data.settings.cardCommentOnSameLine = value;
-                                await this.dataManager.savePluginData();
+                                this.settingsManager.settings.cardCommentOnSameLine = value;
+                                await this.settingsManager.save();
                             }),
                     );
             })
@@ -166,12 +169,12 @@ export class DataPage extends SettingsPage {
                     .addToggle((toggle) =>
                         toggle
                             .setValue(
-                                this.dataManager.data.settings.useCalloutsForSchedulingComments,
+                                this.settingsManager.settings.useCalloutsForSchedulingComments,
                             )
                             .onChange(async (value) => {
-                                this.dataManager.data.settings.useCalloutsForSchedulingComments =
+                                this.settingsManager.settings.useCalloutsForSchedulingComments =
                                     value;
-                                await this.dataManager.savePluginData();
+                                await this.settingsManager.save();
                             }),
                     );
             })
@@ -207,12 +210,12 @@ export class DataPage extends SettingsPage {
                     .addToggle((toggle) =>
                         toggle
                             .setValue(
-                                this.dataManager.data.settings.deleteTagsOnSchedulingDataDeletion,
+                                this.settingsManager.settings.deleteTagsOnSchedulingDataDeletion,
                             )
                             .onChange(async (value) => {
-                                this.dataManager.data.settings.deleteTagsOnSchedulingDataDeletion =
+                                this.settingsManager.settings.deleteTagsOnSchedulingDataDeletion =
                                     value;
-                                await this.dataManager.savePluginData();
+                                await this.settingsManager.save();
                             }),
                     );
             })
@@ -231,7 +234,7 @@ export class DataPage extends SettingsPage {
                                     t("CONFIRM_SCHEDULING_DATA_ALL_DELETION"),
                                     t("SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS"),
                                     async () => {
-                                        const settings = this.dataManager.data.settings;
+                                        const settings = this.settingsManager.settings;
                                         await DataStore.instance.fileModifier.deleteAllSchedulingData(
                                             settings.deleteTagsOnSchedulingDataDeletion,
                                             settings.flashcardTags,
@@ -258,9 +261,9 @@ export class DataPage extends SettingsPage {
                                     t("SCHEDULING_DATA_IN_NOTES_DELETION_IN_PROGRESS"),
                                     async () => {
                                         await DataStore.instance.fileModifier.deleteAllSchedulingDataInNotes(
-                                            this.dataManager.data.settings
+                                            this.settingsManager.settings
                                                 .deleteTagsOnSchedulingDataDeletion,
-                                            this.dataManager.data.settings.tagsToReview,
+                                            this.settingsManager.settings.tagsToReview,
                                         );
                                     },
                                 ).open();
@@ -283,9 +286,9 @@ export class DataPage extends SettingsPage {
                                     t("SCHEDULING_DATA_IN_CARDS_DELETION_IN_PROGRESS"),
                                     async () => {
                                         await DataStore.instance.fileModifier.deleteAllSchedulingDataInCards(
-                                            this.dataManager.data.settings
+                                            this.settingsManager.settings
                                                 .deleteTagsOnSchedulingDataDeletion,
-                                            this.dataManager.data.settings.flashcardTags,
+                                            this.settingsManager.settings.flashcardTags,
                                         );
                                     },
                                 ).open();
@@ -310,8 +313,7 @@ export class DataPage extends SettingsPage {
                                     t("CONFIRM_RESET_SETTINGS"),
                                     t("RESET_SETTINGS_CONFIRMATION"),
                                     async () => {
-                                        this.dataManager.data.settings = DEFAULT_SETTINGS;
-                                        await this.dataManager.savePluginData();
+                                        await this.settingsManager.saveSettings(DEFAULT_SETTINGS);
                                         this.display();
                                     },
                                 ).open();

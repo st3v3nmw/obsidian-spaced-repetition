@@ -75,7 +75,7 @@ export class WeightedRandomNumber {
     getRandomValues(weights: Record<number, number>): [number, number] {
         const total: number = WeightedRandomNumber.calcTotalOfCount(weights);
         if (Object.values(weights).some((i) => !Number.isInteger(i) || i < 0))
-            throw "All weights must be positive integers";
+            throw new Error("Weights must be positive integers");
 
         const v: number = this.provider.getInteger(0, total - 1);
         let x: number = 0;
@@ -88,7 +88,7 @@ export class WeightedRandomNumber {
             }
             x += count;
         }
-        throw "";
+        throw new Error("Should not reach here if weights are valid and provider is correct");
     }
 
     private static calcTotalOfCount(weights: Record<number, number>): number {

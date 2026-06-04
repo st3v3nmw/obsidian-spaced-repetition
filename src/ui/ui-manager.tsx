@@ -2,6 +2,7 @@ import "src/ui/styles.css";
 import { Menu, MenuItem, Notice, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
 import { DataStore } from "src/data/data-store/base/data-store";
+import { SettingsManager } from "src/data/settings-manager";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
@@ -55,25 +56,29 @@ export class UIManager {
     public contentManager: ContentManager | null = null;
 
     private plugin: SRPlugin;
+    private settingsManager: SettingsManager;
     private ribbonIcon: HTMLElement | null = null;
     private externalModalObserver: MutationObserver | null = null;
 
-    constructor(plugin: SRPlugin) {
+    constructor(plugin: SRPlugin, settingsManager: SettingsManager) {
         this.plugin = plugin;
+        this.settingsManager = settingsManager;
         appIcon();
-        this.tabViewManager = new TabViewManager(this.plugin);
+        this.tabViewManager = new TabViewManager(this.plugin, this.settingsManager);
         this.tabViewManager.registerAllTabViews();
 
-        this.sidebarManager = new SidebarManager(this.plugin);
+        this.sidebarManager = new SidebarManager(this.plugin, this.settingsManager);
 
-        this.statusBarManager = new StatusBarManager(this.plugin);
+        this.statusBarManager = new StatusBarManager(this.plugin, this.settingsManager);
 
         this.plugin.registerEvent(
             this.plugin.app.workspace.on("file-menu", (menu: Menu, file: TAbstractFile) => {
                 this.fileMenuHandler(menu, file);
             }),
         );
-        this.plugin.addSettingTab(new SRSettingTab(this.plugin.app, this.plugin, this));
+
+        const settingsTab = new SRSettingTab(this.plugin.app, this.plugin, this, settingsManager);
+        this.plugin.addSettingTab(settingsTab);
     }
 
     public async onLayoutReady() {
@@ -86,7 +91,7 @@ export class UIManager {
 
         this.sidebarManager.init();
 
-        this.showRibbonIcon(this.plugin.dataManager.data.settings.showRibbonIcon);
+        this.showRibbonIcon(this.settingsManager.settings.showRibbonIcon);
         this.registerSRFocusListener();
     }
 
@@ -95,12 +100,10 @@ export class UIManager {
     }
 
     public async updateStatusBar() {
-        if (this.plugin.dataManager.data === null)
-            throw new Error("SR plugin or data not initialized!!!");
         if (this.plugin.dataManager.osrCore === null)
             throw new Error("SR plugin or OSR app core not initialized!!!");
 
-        const settings = this.plugin.dataManager.data.settings;
+        const settings = this.settingsManager.settings;
 
         await this.statusBarManager.showStatusBarItems(
             settings.showStatusBar,
@@ -156,11 +159,8 @@ export class UIManager {
     }
 
     public handleExternalModalOpen(mutationList: MutationRecord[]) {
-        if (this.plugin.dataManager.data === null)
-            throw new Error("SR plugin or data not initialized!!!");
-
         if (
-            this.plugin.dataManager.data.settings.openViewInNewTab && // Is a modal opening relevant for focus?
+            this.settingsManager.settings.openViewInNewTab && // Is a modal opening relevant for focus?
             mutationList.length > 0 &&
             mutationList.filter(
                 (mutation) =>
@@ -272,7 +272,7 @@ export class UIManager {
      * enable only the channels that make sense for their workflow.
      */
     public async notifyReviewReminder(): Promise<void> {
-        const settings = this.plugin.dataManager.data.settings;
+        const settings = this.settingsManager.settings;
         const reminderMessage =
             settings.reviewReminderMessage.trim() || t("REVIEW_REMINDER_NOTICE");
         // This method only dispatches reminder channels. The decision to auto-open review remains
@@ -392,8 +392,6 @@ export class UIManager {
     public async openDeckContainer(mode: FlashcardReviewMode, singleNote?: TFile): Promise<void> {
         if (this.plugin.dataManager.osrCore === null)
             throw new Error("SR plugin or OSR app core not initialized!!!");
-        if (this.plugin.dataManager.data === null)
-            throw new Error("SR plugin or data not initialized!!!");
 
         if (this.plugin.dataManager.syncLock) {
             return;
@@ -403,7 +401,7 @@ export class UIManager {
         this.focusObsidianWindow();
         await this.plugin.dataManager.sync();
 
-        const settings = this.plugin.dataManager.data.settings;
+        const settings = this.settingsManager.settings;
 
         const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
         const openInNewTab =
@@ -426,15 +424,12 @@ export class UIManager {
     }
 
     public openFlashcardModal(reviewQueueLoader: ReviewQueueLoader): void {
-        if (this.plugin.dataManager.data === null)
-            throw new Error("SR plugin or data not initialized!!!");
-
         this.setSRViewInFocus(true);
         this.focusObsidianWindow();
         new SRModalView(
             this.plugin.app,
             this.plugin,
-            this.plugin.dataManager.data.settings,
+            this.settingsManager,
             reviewQueueLoader,
         ).open();
     }
@@ -463,11 +458,9 @@ export class UIManager {
     }
 
     private fileMenuHandler(menu: Menu, file: TAbstractFile) {
-        if (this.plugin.dataManager.data === null)
-            throw new Error("SR plugin or data not initialized!!!");
         if (!(file instanceof TFile && file.extension === "md")) return;
 
-        const settings = this.plugin.dataManager.data.settings;
+        const settings = this.settingsManager.settings;
 
         if (settings.showFileMenuReviewOptions) {
             menu.addItem((item: MenuItem) => {
@@ -478,8 +471,6 @@ export class UIManager {
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        if (this.plugin.dataManager.data === null)
-                            throw new Error("SR plugin or data not initialized!!!");
                         void this.plugin.dataManager.saveNoteReviewResponse(
                             file,
                             ReviewResponse.Easy,
@@ -495,8 +486,6 @@ export class UIManager {
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        if (this.plugin.dataManager.data === null)
-                            throw new Error("SR plugin or data not initialized!!!");
                         void this.plugin.dataManager.saveNoteReviewResponse(
                             file,
                             ReviewResponse.Good,
@@ -512,8 +501,6 @@ export class UIManager {
                 )
                     .setIcon("SpacedRepIcon")
                     .onClick(() => {
-                        if (this.plugin.dataManager.data === null)
-                            throw new Error("SR plugin or data not initialized!!!");
                         void this.plugin.dataManager.saveNoteReviewResponse(
                             file,
                             ReviewResponse.Hard,
@@ -538,9 +525,7 @@ export class UIManager {
                             t("CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION"),
                             t("NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS"),
                             async () => {
-                                if (this.plugin.dataManager.data === null)
-                                    throw new Error("SR plugin or data not initialized!!!");
-                                const settings = this.plugin.dataManager.data.settings;
+                                const settings = this.settingsManager.settings;
                                 await DataStore.instance.fileModifier.deleteNoteSchedulingDataInNote(
                                     file,
                                     settings.deleteTagsOnSchedulingDataDeletion,
@@ -562,9 +547,7 @@ export class UIManager {
                             t("CONFIRM_SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION"),
                             t("SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION_IN_PROGRESS"),
                             async () => {
-                                if (this.plugin.dataManager.data === null)
-                                    throw new Error("SR plugin or data not initialized!!!");
-                                const settings = this.plugin.dataManager.data.settings;
+                                const settings = this.settingsManager.settings;
                                 await DataStore.instance.fileModifier.deleteAllSchedulingDataOfCardsInNote(
                                     file,
                                     settings.deleteTagsOnSchedulingDataDeletion,

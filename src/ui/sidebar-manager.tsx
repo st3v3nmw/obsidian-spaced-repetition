@@ -1,5 +1,6 @@
 import { App, WorkspaceLeaf } from "obsidian";
 
+import { SettingsManager } from "src/data/settings-manager";
 import SRPlugin from "src/main";
 import {
     REVIEW_QUEUE_VIEW_TYPE,
@@ -8,14 +9,16 @@ import {
 
 export class SidebarManager {
     private plugin: SRPlugin;
+    private settingsManager: SettingsManager;
     private reviewQueueListView: ReviewQueueListView | null = null;
 
     private get app(): App {
         return this.plugin.app;
     }
 
-    constructor(plugin: SRPlugin) {
+    constructor(plugin: SRPlugin, settingsManager: SettingsManager) {
         this.plugin = plugin;
+        this.settingsManager = settingsManager;
     }
 
     redraw(): void {
@@ -37,14 +40,14 @@ export class SidebarManager {
             return (this.reviewQueueListView = new ReviewQueueListView(
                 leaf,
                 this.plugin.nextNoteReviewHandler,
-                this.plugin.dataManager.data.settings,
+                this.settingsManager.settings,
                 this.plugin,
             ));
         });
     }
 
     async activateReviewQueueViewPanel(): Promise<void> {
-        if (this.plugin.dataManager.data.settings.enableNoteReviewPaneOnStartup) {
+        if (this.settingsManager.settings.enableNoteReviewPaneOnStartup) {
             const activeLeaf = this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE);
             if (!activeLeaf) return;
 

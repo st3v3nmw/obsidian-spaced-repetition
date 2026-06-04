@@ -10,7 +10,10 @@ import {
     IIteratorOrder,
     RepItemOrder,
 } from "src/data/data-structures/deck/deck-tree-iterator";
+import { DebugLoggerInstance } from "src/data/debug-logger";
+import { PluginDataError, PluginDataManager } from "src/data/plugin-data-manager";
 import { SRSettings } from "src/data/settings";
+import { SettingsManager } from "src/data/settings-manager";
 import { LocaleManagerInstance } from "src/lang/locale-manager";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { Note } from "src/note/note";
@@ -36,37 +39,62 @@ export default class SRPlugin extends Plugin {
     private reviewReminderTimer: number | null = null;
     private isReviewReminderChecking: boolean = false;
 
-    onload(): void {
-        this.uiManager = new UIManager(this);
-        this.commandManager = new CommandManager(this);
+    async onload(): Promise<void> {
+        try {
+            // Load the plugin data and settings first, as other components depend on it being available during their initialization.
+            const pluginDataManager = new PluginDataManager(this);
+            await pluginDataManager.loadData();
 
-        this.app.workspace.onLayoutReady(async () => {
-            this.dataManager = new DataManager(this);
-            await this.dataManager.loadData();
-
-            // Set the preferred locale if it is not the default
-            if (this.dataManager.data.settings.preferredLocale !== "-") {
-                LocaleManagerInstance.getInstance().currentLocale =
-                    this.dataManager.data.settings.preferredLocale;
-            }
-
-            const noteReviewQueue = new NoteReviewQueue();
-            this._nextNoteReviewHandler = new NextNoteReviewHandler(
-                this.app,
-                this.dataManager.data.settings,
-                noteReviewQueue,
+            const settingsManager = new SettingsManager(
+                pluginDataManager.pluginData.settings,
+                async (settings: SRSettings) => {
+                    await pluginDataManager.writeSettings(settings);
+                },
             );
 
-            await this.dataManager.initOSRCore(noteReviewQueue, async () => {
-                await this.onOsrVaultDataChanged();
+            this.dataManager = new DataManager(this, pluginDataManager, settingsManager);
+            const uiManager = new UIManager(this, settingsManager);
+            this.uiManager = uiManager;
+            this.commandManager = new CommandManager(this, settingsManager, uiManager);
+
+            this.app.workspace.onLayoutReady(async () => {
+                this.dataManager.loadData();
+
+                // Set the preferred locale if it is not the default
+                if (settingsManager.settings.preferredLocale !== "-") {
+                    LocaleManagerInstance.getInstance().currentLocale =
+                        settingsManager.settings.preferredLocale;
+                }
+
+                const noteReviewQueue = new NoteReviewQueue();
+                this._nextNoteReviewHandler = new NextNoteReviewHandler(
+                    this.app,
+                    settingsManager.settings,
+                    noteReviewQueue,
+                );
+
+                await this.dataManager.initOSRCore(noteReviewQueue, async () => {
+                    await this.onOsrVaultDataChanged();
+                });
+
+                await this.uiManager.onLayoutReady();
+                this.commandManager.onLayoutReady();
+
+                this.isInitialized = true;
+                this.restartReviewReminders();
             });
-
-            await this.uiManager.onLayoutReady();
-            this.commandManager.onLayoutReady();
-
-            this.isInitialized = true;
-            this.restartReviewReminders();
-        });
+        } catch (error) {
+            if (error instanceof PluginDataError || error instanceof Error) {
+                console.warn("SRPlugin: Error in onLoad", error.message);
+                DebugLoggerInstance.getInstance().log(
+                    "SRPlugin: Error in onLoad: " + error.message,
+                    "error",
+                );
+            } else {
+                console.warn("SRPlugin: Error in onLoad");
+                DebugLoggerInstance.getInstance().log("SRPlugin: Error in onLoad", "error");
+            }
+        }
     }
 
     get uiManager(): UIManager {
@@ -306,13 +334,13 @@ export default class SRPlugin extends Plugin {
         }
 
         if (
-            activeElement instanceof HTMLTextAreaElement ||
-            activeElement instanceof HTMLInputElement
+            activeElement.instanceOf(HTMLTextAreaElement) ||
+            activeElement.instanceOf(HTMLInputElement)
         ) {
             return true;
         }
 
-        if (activeElement instanceof HTMLElement) {
+        if (activeElement.instanceOf(HTMLElement)) {
             return (
                 activeElement.isContentEditable ||
                 activeElement.closest(".cm-editor, .markdown-source-view") !== null

@@ -1,6 +1,7 @@
 import { PaneType, WorkspaceLeaf } from "obsidian";
 
 import { SR_TAB_VIEW } from "src/data/constants";
+import { SettingsManager } from "src/data/settings-manager";
 import SRPlugin from "src/main";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
@@ -19,6 +20,7 @@ import { TabViewType } from "src/utils/types";
  */
 export default class TabViewManager {
     private plugin: SRPlugin;
+    private settingsManager: SettingsManager;
     private reviewQueueLoader: ReviewQueueLoader | null = null;
 
     // Add any new other tab view types to this, then they'll be automatically registered
@@ -26,13 +28,19 @@ export default class TabViewManager {
         {
             type: SR_TAB_VIEW,
             viewCreator: (leaf) => {
-                return new SRTabView(leaf, this.plugin, this.reviewQueueLoader);
+                return new SRTabView(
+                    leaf,
+                    this.plugin,
+                    this.settingsManager.settings,
+                    this.reviewQueueLoader,
+                );
             },
         },
     ];
 
     // Add any needed resource
-    constructor(plugin: SRPlugin) {
+    constructor(plugin: SRPlugin, settingsManager: SettingsManager) {
+        this.settingsManager = settingsManager;
         this.plugin = plugin;
     }
 

@@ -2,6 +2,7 @@ import { Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
 import { DEFAULT_SETTINGS } from "src/data/settings";
+import { SettingsManager } from "src/data/settings-manager";
 import { t, tHTML } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
@@ -18,6 +19,7 @@ export class FlashcardsPage extends SettingsPage {
     constructor(
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
+        settingsManager: SettingsManager,
         dataManager: DataManager,
         pageType: SettingsPageType,
         didReadMultilineEndMarkerWarning: boolean,
@@ -30,6 +32,7 @@ export class FlashcardsPage extends SettingsPage {
         super(
             pageContainerEl,
             plugin,
+            settingsManager,
             dataManager,
             pageType,
             applySettingsUpdate,
@@ -46,12 +49,12 @@ export class FlashcardsPage extends SettingsPage {
                     .setDesc(t("FLASHCARD_TAGS_DESC"))
                     .addTextArea((text) =>
                         text
-                            .setValue(this.dataManager.data.settings.flashcardTags.join(" "))
+                            .setValue(this.settingsManager.settings.flashcardTags.join(" "))
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.dataManager.data.settings.flashcardTags =
+                                    this.settingsManager.settings.flashcardTags =
                                         value.split(/\s+/);
-                                    await this.dataManager.savePluginData();
+                                    await this.settingsManager.save();
                                 });
                             }),
                     );
@@ -62,10 +65,10 @@ export class FlashcardsPage extends SettingsPage {
                     .setDesc(t("CONVERT_FOLDERS_TO_DECKS_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.dataManager.data.settings.convertFoldersToDecks)
+                            .setValue(this.settingsManager.settings.convertFoldersToDecks)
                             .onChange(async (value) => {
-                                this.dataManager.data.settings.convertFoldersToDecks = value;
-                                await this.dataManager.savePluginData();
+                                this.settingsManager.settings.convertFoldersToDecks = value;
+                                await this.settingsManager.save();
                             }),
                     );
             })
@@ -75,10 +78,10 @@ export class FlashcardsPage extends SettingsPage {
                     .setDesc(t("BURY_SIBLINGS_TILL_NEXT_DAY_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.dataManager.data.settings.burySiblingCards)
+                            .setValue(this.settingsManager.settings.burySiblingCards)
                             .onChange(async (value) => {
-                                this.dataManager.data.settings.burySiblingCards = value;
-                                await this.dataManager.savePluginData();
+                                this.settingsManager.settings.burySiblingCards = value;
+                                await this.settingsManager.save();
                             }),
                     );
             })
@@ -88,15 +91,13 @@ export class FlashcardsPage extends SettingsPage {
                     .setDesc(t("FLASHCARD_TAGS_TO_IGNORE_DESC"))
                     .addTextArea((text) =>
                         text
-                            .setValue(
-                                this.dataManager.data.settings.flashcardTagsToIgnore.join(" "),
-                            )
+                            .setValue(this.settingsManager.settings.flashcardTagsToIgnore.join(" "))
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.dataManager.data.settings.flashcardTagsToIgnore = value
+                                    this.settingsManager.settings.flashcardTagsToIgnore = value
                                         .split(/\s+/)
                                         .filter((v) => v);
-                                    await this.dataManager.savePluginData();
+                                    await this.settingsManager.save();
                                 });
                             }),
                     );
@@ -107,14 +108,14 @@ export class FlashcardsPage extends SettingsPage {
                     .setDesc(t("FOLDERS_TO_IGNORE_DESC"))
                     .addTextArea((text) =>
                         text
-                            .setValue(this.dataManager.data.settings.noteFoldersToIgnore.join("\n"))
+                            .setValue(this.settingsManager.settings.noteFoldersToIgnore.join("\n"))
                             .onChange((value) => {
                                 this.applySettingsUpdate(async () => {
-                                    this.dataManager.data.settings.noteFoldersToIgnore = value
+                                    this.settingsManager.settings.noteFoldersToIgnore = value
                                         .split(/\n+/)
                                         .map((v) => v.trim())
                                         .filter((v) => v);
-                                    await this.dataManager.savePluginData();
+                                    await this.settingsManager.save();
                                 });
                             }),
                     );
@@ -128,10 +129,10 @@ export class FlashcardsPage extends SettingsPage {
                     .setDesc(t("BURY_SIBLINGS_TILL_NEXT_DAY_DESC"))
                     .addToggle((toggle) =>
                         toggle
-                            .setValue(this.dataManager.data.settings.burySiblingCards)
+                            .setValue(this.settingsManager.settings.burySiblingCards)
                             .onChange(async (value) => {
-                                this.dataManager.data.settings.burySiblingCards = value;
-                                await this.dataManager.savePluginData();
+                                this.settingsManager.settings.burySiblingCards = value;
+                                await this.settingsManager.save();
                             }),
                     );
             })
@@ -145,17 +146,17 @@ export class FlashcardsPage extends SettingsPage {
                             DueFirstRandom: t("REVIEW_CARD_ORDER_DUE_FIRST_RANDOM"),
                             EveryCardRandomDeckAndCard: t("REVIEW_CARD_ORDER_RANDOM_DECK_AND_CARD"),
                         })
-                        .setValue(this.dataManager.data.settings.flashcardCardOrder)
+                        .setValue(this.settingsManager.settings.flashcardCardOrder)
                         .onChange(async (value) => {
-                            this.dataManager.data.settings.flashcardCardOrder = value;
-                            await this.dataManager.savePluginData();
+                            this.settingsManager.settings.flashcardCardOrder = value;
+                            await this.settingsManager.save();
                             this.display();
                         }),
                 );
             })
             .addSetting((setting: Setting) => {
                 const deckOrderEnabled: boolean =
-                    this.dataManager.data.settings.flashcardCardOrder !==
+                    this.settingsManager.settings.flashcardCardOrder !==
                     "EveryCardRandomDeckAndCard";
                 setting.setName(t("REVIEW_DECK_ORDER")).addDropdown((dropdown) =>
                     dropdown
@@ -179,13 +180,13 @@ export class FlashcardsPage extends SettingsPage {
                         )
                         .setValue(
                             deckOrderEnabled
-                                ? this.dataManager.data.settings.flashcardDeckOrder
+                                ? this.settingsManager.settings.flashcardDeckOrder
                                 : "EveryCardRandomDeckAndCard",
                         )
                         .setDisabled(!deckOrderEnabled)
                         .onChange(async (value) => {
-                            this.dataManager.data.settings.flashcardDeckOrder = value;
-                            await this.dataManager.savePluginData();
+                            this.settingsManager.settings.flashcardDeckOrder = value;
+                            await this.settingsManager.save();
                         }),
                 );
             });
@@ -212,11 +213,11 @@ export class FlashcardsPage extends SettingsPage {
 
                 convertHighlightsToClozesEl.addToggle((toggle) =>
                     toggle
-                        .setValue(this.dataManager.data.settings.convertHighlightsToClozes)
+                        .setValue(this.settingsManager.settings.convertHighlightsToClozes)
                         .onChange(async (value) => {
                             const defaultHightlightPattern = "==[123;;]answer[;;hint]==";
                             const clozePatternSet = new Set(
-                                this.dataManager.data.settings.clozePatterns,
+                                this.settingsManager.settings.clozePatterns,
                             );
 
                             if (value) {
@@ -225,9 +226,9 @@ export class FlashcardsPage extends SettingsPage {
                                 clozePatternSet.delete(defaultHightlightPattern);
                             }
 
-                            this.dataManager.data.settings.clozePatterns = [...clozePatternSet];
-                            this.dataManager.data.settings.convertHighlightsToClozes = value;
-                            await this.dataManager.savePluginData();
+                            this.settingsManager.settings.clozePatterns = [...clozePatternSet];
+                            this.settingsManager.settings.convertHighlightsToClozes = value;
+                            await this.settingsManager.save();
 
                             this.display();
                         }),
@@ -247,11 +248,11 @@ export class FlashcardsPage extends SettingsPage {
 
                 convertBoldTextToClozesEl.addToggle((toggle) =>
                     toggle
-                        .setValue(this.dataManager.data.settings.convertBoldTextToClozes)
+                        .setValue(this.settingsManager.settings.convertBoldTextToClozes)
                         .onChange(async (value) => {
                             const defaultBoldPattern = "**[123;;]answer[;;hint]**";
                             const clozePatternSet = new Set(
-                                this.dataManager.data.settings.clozePatterns,
+                                this.settingsManager.settings.clozePatterns,
                             );
 
                             if (value) {
@@ -260,9 +261,9 @@ export class FlashcardsPage extends SettingsPage {
                                 clozePatternSet.delete(defaultBoldPattern);
                             }
 
-                            this.dataManager.data.settings.clozePatterns = [...clozePatternSet];
-                            this.dataManager.data.settings.convertBoldTextToClozes = value;
-                            await this.dataManager.savePluginData();
+                            this.settingsManager.settings.clozePatterns = [...clozePatternSet];
+                            this.settingsManager.settings.convertBoldTextToClozes = value;
+                            await this.settingsManager.save();
 
                             this.display();
                         }),
@@ -288,11 +289,11 @@ export class FlashcardsPage extends SettingsPage {
 
                 convertCurlyBracketsToClozesEl.addToggle((toggle) =>
                     toggle
-                        .setValue(this.dataManager.data.settings.convertCurlyBracketsToClozes)
+                        .setValue(this.settingsManager.settings.convertCurlyBracketsToClozes)
                         .onChange(async (value) => {
                             const defaultCurlyBracketsPattern = "{{[123;;]answer[;;hint]}}";
                             const clozePatternSet = new Set(
-                                this.dataManager.data.settings.clozePatterns,
+                                this.settingsManager.settings.clozePatterns,
                             );
 
                             if (value) {
@@ -301,9 +302,9 @@ export class FlashcardsPage extends SettingsPage {
                                 clozePatternSet.delete(defaultCurlyBracketsPattern);
                             }
 
-                            this.dataManager.data.settings.clozePatterns = [...clozePatternSet];
-                            this.dataManager.data.settings.convertCurlyBracketsToClozes = value;
-                            await this.dataManager.savePluginData();
+                            this.settingsManager.settings.clozePatterns = [...clozePatternSet];
+                            this.settingsManager.settings.convertCurlyBracketsToClozes = value;
+                            await this.settingsManager.save();
 
                             this.display();
                         }),
@@ -327,7 +328,7 @@ export class FlashcardsPage extends SettingsPage {
                         .setPlaceholder(
                             "Example:\n==[123;;]answer[;;hint]==\n**[123;;]answer[;;hint]**\n{{[123;;]answer[;;hint]}}",
                         )
-                        .setValue(this.dataManager.data.settings.clozePatterns.join("\n"))
+                        .setValue(this.settingsManager.settings.clozePatterns.join("\n"))
                         .onChange((value) => {
                             applySettingsUpdate(async () => {
                                 const defaultHightlightPattern = "==[123;;]answer[;;hint]==";
@@ -342,25 +343,25 @@ export class FlashcardsPage extends SettingsPage {
                                 );
 
                                 if (clozePatternSet.has(defaultHightlightPattern)) {
-                                    this.dataManager.data.settings.convertHighlightsToClozes = true;
+                                    this.settingsManager.settings.convertHighlightsToClozes = true;
                                 } else {
-                                    this.dataManager.data.settings.convertHighlightsToClozes = false;
+                                    this.settingsManager.settings.convertHighlightsToClozes = false;
                                 }
 
                                 if (clozePatternSet.has(defaultBoldPattern)) {
-                                    this.dataManager.data.settings.convertBoldTextToClozes = true;
+                                    this.settingsManager.settings.convertBoldTextToClozes = true;
                                 } else {
-                                    this.dataManager.data.settings.convertBoldTextToClozes = false;
+                                    this.settingsManager.settings.convertBoldTextToClozes = false;
                                 }
 
                                 if (clozePatternSet.has(defaultCurlyBracketsPattern)) {
-                                    this.dataManager.data.settings.convertCurlyBracketsToClozes = true;
+                                    this.settingsManager.settings.convertCurlyBracketsToClozes = true;
                                 } else {
-                                    this.dataManager.data.settings.convertCurlyBracketsToClozes = false;
+                                    this.settingsManager.settings.convertCurlyBracketsToClozes = false;
                                 }
 
-                                this.dataManager.data.settings.clozePatterns = [...clozePatternSet];
-                                await this.dataManager.savePluginData();
+                                this.settingsManager.settings.clozePatterns = [...clozePatternSet];
+                                await this.settingsManager.save();
                             });
                         }),
                 );
@@ -374,20 +375,20 @@ export class FlashcardsPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.dataManager.data.settings.singleLineCardSeparator =
+                                this.settingsManager.settings.singleLineCardSeparator =
                                     DEFAULT_SETTINGS.singleLineCardSeparator;
-                                await this.dataManager.savePluginData();
+                                await this.settingsManager.save();
 
                                 this.display();
                             });
                     })
                     .addText((text) =>
                         text
-                            .setValue(this.dataManager.data.settings.singleLineCardSeparator)
+                            .setValue(this.settingsManager.settings.singleLineCardSeparator)
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.dataManager.data.settings.singleLineCardSeparator = value;
-                                    await this.dataManager.savePluginData();
+                                    this.settingsManager.settings.singleLineCardSeparator = value;
+                                    await this.settingsManager.save();
                                 });
                             }),
                     );
@@ -401,23 +402,21 @@ export class FlashcardsPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.dataManager.data.settings.singleLineReversedCardSeparator =
+                                this.settingsManager.settings.singleLineReversedCardSeparator =
                                     DEFAULT_SETTINGS.singleLineReversedCardSeparator;
-                                await this.dataManager.savePluginData();
+                                await this.settingsManager.save();
 
                                 this.display();
                             });
                     })
                     .addText((text) =>
                         text
-                            .setValue(
-                                this.dataManager.data.settings.singleLineReversedCardSeparator,
-                            )
+                            .setValue(this.settingsManager.settings.singleLineReversedCardSeparator)
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.dataManager.data.settings.singleLineReversedCardSeparator =
+                                    this.settingsManager.settings.singleLineReversedCardSeparator =
                                         value;
-                                    await this.dataManager.savePluginData();
+                                    await this.settingsManager.save();
                                 });
                             }),
                     );
@@ -431,20 +430,20 @@ export class FlashcardsPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.dataManager.data.settings.multilineCardSeparator =
+                                this.settingsManager.settings.multilineCardSeparator =
                                     DEFAULT_SETTINGS.multilineCardSeparator;
-                                await this.dataManager.savePluginData();
+                                await this.settingsManager.save();
 
                                 this.display();
                             });
                     })
                     .addText((text) =>
                         text
-                            .setValue(this.dataManager.data.settings.multilineCardSeparator)
+                            .setValue(this.settingsManager.settings.multilineCardSeparator)
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.dataManager.data.settings.multilineCardSeparator = value;
-                                    await this.dataManager.savePluginData();
+                                    this.settingsManager.settings.multilineCardSeparator = value;
+                                    await this.settingsManager.save();
                                 });
                             }),
                     );
@@ -458,21 +457,21 @@ export class FlashcardsPage extends SettingsPage {
                             .setIcon("reset")
                             .setTooltip(t("RESET_DEFAULT"))
                             .onClick(async () => {
-                                this.dataManager.data.settings.multilineReversedCardSeparator =
+                                this.settingsManager.settings.multilineReversedCardSeparator =
                                     DEFAULT_SETTINGS.multilineReversedCardSeparator;
-                                await this.dataManager.savePluginData();
+                                await this.settingsManager.save();
 
                                 this.display();
                             });
                     })
                     .addText((text) =>
                         text
-                            .setValue(this.dataManager.data.settings.multilineReversedCardSeparator)
+                            .setValue(this.settingsManager.settings.multilineReversedCardSeparator)
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
-                                    this.dataManager.data.settings.multilineReversedCardSeparator =
+                                    this.settingsManager.settings.multilineReversedCardSeparator =
                                         value;
-                                    await this.dataManager.savePluginData();
+                                    await this.settingsManager.save();
                                 });
                             }),
                     );
@@ -489,21 +488,21 @@ export class FlashcardsPage extends SettingsPage {
                                 .setIcon("reset")
                                 .setTooltip(t("RESET_DEFAULT"))
                                 .onClick(async () => {
-                                    this.dataManager.data.settings.multilineCardEndMarker =
+                                    this.settingsManager.settings.multilineCardEndMarker =
                                         DEFAULT_SETTINGS.multilineCardEndMarker;
-                                    await this.dataManager.savePluginData();
+                                    await this.settingsManager.save();
 
                                     this.display();
                                 });
                         })
                         .addText((text) =>
                             text
-                                .setValue(this.dataManager.data.settings.multilineCardEndMarker)
+                                .setValue(this.settingsManager.settings.multilineCardEndMarker)
                                 .onChange((value) => {
                                     applySettingsUpdate(async () => {
-                                        this.dataManager.data.settings.multilineCardEndMarker =
+                                        this.settingsManager.settings.multilineCardEndMarker =
                                             value;
-                                        await this.dataManager.savePluginData();
+                                        await this.settingsManager.save();
                                     });
                                 }),
                         );

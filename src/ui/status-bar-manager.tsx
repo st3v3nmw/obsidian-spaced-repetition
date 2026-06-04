@@ -1,5 +1,6 @@
 import { request } from "obsidian";
 
+import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
@@ -16,9 +17,11 @@ export const StatusBarItemTypesArray: ReadonlyArray<StatusBarItemPurpose> = [
 export default class StatusBarManager {
     private statusBarItems: TextStatusBarItem[];
     protected plugin: SRPlugin;
+    private settingsManager: SettingsManager;
 
-    constructor(plugin: SRPlugin) {
+    constructor(plugin: SRPlugin, settingsManager: SettingsManager) {
         this.plugin = plugin;
+        this.settingsManager = settingsManager;
         this.statusBarItems = [];
     }
 
@@ -167,8 +170,8 @@ export default class StatusBarManager {
 
         // Disable the fetching of the version number if the statusbar items are disabled
         if (
-            this.plugin.dataManager.data.settings.showStatusBar &&
-            this.plugin.dataManager.data.settings.showUpdateAvailableStatusBarItem
+            this.settingsManager.settings.showStatusBar &&
+            this.settingsManager.settings.showUpdateAvailableStatusBarItem
         ) {
             await this.checkAndUpdatePluginVersion();
         }
@@ -194,9 +197,10 @@ export default class StatusBarManager {
             const response: string = await request({
                 url: "https://api.github.com/repos/st3v3nmw/obsidian-spaced-repetition/releases/latest",
             });
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             return (await JSON.parse(response)).tag_name as string;
         } catch (e) {
-            console.error(e);
+            console.warn(e);
             return this.plugin.manifest.version;
         }
     }

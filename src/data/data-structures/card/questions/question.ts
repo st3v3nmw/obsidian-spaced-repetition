@@ -293,7 +293,7 @@ export class Question {
                 settings,
             );
         } else {
-            console.error(
+            console.warn(
                 `updateQuestionText: Text not found: ${originalText.substring(
                     0,
                     100,

@@ -198,7 +198,7 @@ class SingleDeckIterator {
     }
 
     ensureCurrentCard() {
-        if (this.cardIdx === null || this.cardListType === null) throw "no current card";
+        if (this.cardIdx === null || this.cardListType === null) throw new Error("no current card");
     }
 
     private static getCardListTypeForIterator(iteratorOrder: IIteratorOrder): RepItemState | null {
@@ -234,7 +234,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
     private iteratorOrder: IIteratorOrder;
 
     private singleDeckIterator: SingleDeckIterator;
-    private baseDeckTree: Deck;
+    private baseDeckTree: Deck | null = null;
 
     // The subset of baseDeckTree over which we are iterating
     // Each item is treated as a single deck, i.e. any subdecks are ignored
@@ -275,14 +275,15 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         return this.currentRepItem?.question || null;
     }
 
-    constructor(iteratorOrder: IIteratorOrder, baseDeckTree: Deck) {
+    constructor(iteratorOrder: IIteratorOrder, baseDeckTree: Deck | null) {
         this.singleDeckIterator = new SingleDeckIterator(iteratorOrder);
         this.iteratorOrder = iteratorOrder;
         this.weightedRandomNumber = WeightedRandomNumber.create();
+
         this.setBaseDeck(baseDeckTree);
     }
 
-    setBaseDeck(baseDeck: Deck): void {
+    setBaseDeck(baseDeck: Deck | null): void {
         this.baseDeckTree = baseDeck;
         this.singleDeckIterator.setNoCurrentCard();
     }

@@ -6,8 +6,9 @@ export class TopicPath {
     path: string[];
 
     constructor(path: string[]) {
-        if (path === null) throw "null path";
-        if (path.some((str) => str.includes("/"))) throw "path entries must not contain '/'";
+        if (path === null) throw new Error("path is null");
+        if (path.some((str) => str.includes("/")))
+            throw new Error("path entries must not contain '/'");
         this.path = path;
     }
 
@@ -24,7 +25,7 @@ export class TopicPath {
     }
 
     shift(): string {
-        if (this.isEmptyPath) throw "can't shift an empty path";
+        if (this.isEmptyPath) throw new Error("can't shift an empty path");
         return this.path.shift();
     }
 
@@ -33,7 +34,7 @@ export class TopicPath {
     }
 
     formatAsTag(): string {
-        if (this.isEmptyPath) throw "Empty path";
+        if (this.isEmptyPath) throw new Error("Empty path");
         const result = "#" + this.path.join("/");
         return result;
     }
@@ -97,9 +98,9 @@ export class TopicPath {
     }
 
     static getTopicPathFromTag(tag: string): TopicPath {
-        if (tag === null || tag.length === 0) throw "Null/empty tag";
-        if (tag[0] !== "#") throw "Tag must start with #";
-        if (tag.length === 1) throw "Invalid tag";
+        if (tag === null || tag.length === 0) throw new Error("Null/empty tag");
+        if (tag[0] !== "#") throw new Error("Tag must start with #");
+        if (tag.length === 1) throw new Error("Invalid tag");
 
         const path: string[] = tag
             .replace("#", "")
@@ -128,7 +129,7 @@ export class TopicPathList {
     lineNum: number;
 
     constructor(list: TopicPath[], lineNum: number = null) {
-        if (list === null) throw "TopicPathList null";
+        if (list === null) throw new Error("TopicPathList null");
         this.list = list;
         this.lineNum = lineNum;
     }
@@ -204,7 +205,7 @@ export class TopicPathWithWs {
     postWhitespace: string;
 
     constructor(topicPath: TopicPath, preWhitespace: string, postWhitespace: string) {
-        if (!topicPath || topicPath.isEmptyPath) throw "topicPath null";
+        if (!topicPath || topicPath.isEmptyPath) throw new Error("topicPath null");
 
         this.topicPath = topicPath;
         this.preWhitespace = preWhitespace;

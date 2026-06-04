@@ -1,6 +1,8 @@
 import { ButtonComponent, setIcon, Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
+import { DebugLoggerInstance } from "src/data/debug-logger";
+import { SettingsManager } from "src/data/settings-manager";
 import { t, tHTML } from "src/lang/helpers";
 import { LocaleManagerInstance } from "src/lang/locale-manager";
 import SRPlugin from "src/main";
@@ -23,6 +25,7 @@ export class MainPage extends SettingsPage {
     constructor(
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
+        settingsManager: SettingsManager,
         dataManager: DataManager,
         pageType: SettingsPageType,
         display: () => void,
@@ -32,6 +35,7 @@ export class MainPage extends SettingsPage {
         super(
             pageContainerEl,
             plugin,
+            settingsManager,
             dataManager,
             pageType,
             () => {},
@@ -82,7 +86,7 @@ export class MainPage extends SettingsPage {
                             dropdown.addOption(option.language, option.languageName);
                         });
 
-                    dropdown.setValue(this.plugin.dataManager.data.settings.preferredLocale);
+                    dropdown.setValue(this.settingsManager.settings.preferredLocale);
 
                     dropdown.onChange(async (value) => {
                         if (value === "-") {
@@ -92,7 +96,7 @@ export class MainPage extends SettingsPage {
                         } else {
                             LocaleManagerInstance.getInstance().currentLocale = value;
                         }
-                        this.plugin.dataManager.data.settings.preferredLocale = value;
+                        this.settingsManager.settings.preferredLocale = value;
                         await this.plugin.dataManager.savePluginData();
                         this.display();
                     });
@@ -223,23 +227,40 @@ export class MainPage extends SettingsPage {
             .addSetting((setting: Setting) => {
                 setting.setName(t("DISPLAY_SCHEDULING_DEBUG_INFO")).addToggle((toggle) =>
                     toggle
-                        .setValue(this.dataManager.data.settings.showSchedulingDebugMessages)
+                        .setValue(this.settingsManager.settings.showSchedulingDebugMessages)
                         .onChange(async (value) => {
-                            this.dataManager.data.settings.showSchedulingDebugMessages = value;
-                            await this.dataManager.savePluginData();
+                            this.settingsManager.settings.showSchedulingDebugMessages = value;
+                            await this.settingsManager.save();
                         }),
                 );
             })
             .addSetting((setting: Setting) => {
                 setting.setName(t("DISPLAY_PARSER_DEBUG_INFO")).addToggle((toggle) =>
                     toggle
-                        .setValue(this.dataManager.data.settings.showParserDebugMessages)
+                        .setValue(this.settingsManager.settings.showParserDebugMessages)
                         .onChange(async (value) => {
-                            this.dataManager.data.settings.showParserDebugMessages = value;
-                            setDebugParser(this.dataManager.data.settings.showParserDebugMessages);
-                            await this.dataManager.savePluginData();
+                            this.settingsManager.settings.showParserDebugMessages = value;
+                            setDebugParser(this.settingsManager.settings.showParserDebugMessages);
+                            await this.settingsManager.save();
                         }),
                 );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("DEBUG_LOG"))
+                    .addTextArea((text) =>
+                        text.setValue(DebugLoggerInstance.getInstance().getLog("info")),
+                    )
+                    .addExtraButton((button) => {
+                        button
+                            .setIcon("copy")
+                            .setTooltip(t("COPY"))
+                            .onClick(async () => {
+                                await navigator.clipboard.writeText(
+                                    DebugLoggerInstance.getInstance().getLog("info"),
+                                );
+                            });
+                    });
             });
     }
 }

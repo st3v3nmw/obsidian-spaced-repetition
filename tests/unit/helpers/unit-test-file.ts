@@ -122,6 +122,7 @@ export class UnitTestSRFile implements ISRNoteTFile {
     }
 
     get tfile(): TFile {
+        // eslint-disable-next-line @typescript-eslint/only-throw-error
         throw "Not supported";
     }
 

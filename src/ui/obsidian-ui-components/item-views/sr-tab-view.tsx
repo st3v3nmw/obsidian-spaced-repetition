@@ -35,6 +35,7 @@ export class SRTabView extends ItemView {
     constructor(
         leaf: WorkspaceLeaf,
         plugin: SRPlugin,
+        settings: SRSettings,
         reviewQueueLoader: ReviewQueueLoader | null,
     ) {
         super(leaf);
@@ -48,7 +49,7 @@ export class SRTabView extends ItemView {
         // Init properties
         this.plugin = plugin;
         this.navigation = false;
-        this.settings = plugin.dataManager.data.settings;
+        this.settings = settings;
         this.reviewQueueLoader = reviewQueueLoader;
 
         // Build ui
@@ -160,6 +161,7 @@ export class SRTabView extends ItemView {
      * Ensures that resources associated with these views are properly released.
      */
 
+    // eslint-disable-next-line @typescript-eslint/require-await
     async onClose() {
         // Resets the changes made in onOpen
         if (activeDocument.body.classList.contains("is-mobile")) {
