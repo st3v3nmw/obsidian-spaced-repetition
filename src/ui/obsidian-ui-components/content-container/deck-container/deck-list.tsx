@@ -111,9 +111,17 @@ export default class DeckListComponent {
      */
     redraw(reviewSequencer: IFlashcardReviewSequencer, settings: SRSettings) {
         this.treeContainer.empty();
+
         const originDeckStats = reviewSequencer.getDeckStats(
             reviewSequencer.originalDeckTree.getTopicPath(),
         );
+
+        if (originDeckStats.totalCount === 0) {
+            const noDecksToReviewEl = this.treeContainer.createDiv();
+            noDecksToReviewEl.addClass("sr-no-decks-to-review");
+            noDecksToReviewEl.setText(t("NO_DECKS_TO_REVIEW"));
+            return;
+        }
 
         // Creates the "All Decks" row
         this._crateTreeRow(

@@ -1,4 +1,9 @@
 .sr-deck-container {
+    .sr-no-decks-to-review {
+        padding: var(--size-4-8);
+        font-style: italic;
+    }
+
     .sr-scroll-wrapper {
         height: 100px;
         /* Arbitrary height to force the content to scroll */

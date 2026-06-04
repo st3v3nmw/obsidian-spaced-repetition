@@ -352,4 +352,5 @@ export interface IBaseLocale {
     LANGUAGE_SETTINGS_DESC: string;
     DEBUG_LOG: string;
     COPY: string;
+    NO_DECKS_TO_REVIEW: string;
 }
