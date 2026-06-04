@@ -1,12 +1,16 @@
 import eslint from "@eslint/js";
+// import obsidianmd from "eslint-plugin-obsidianmd";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
 import tseslint from "typescript-eslint";
+
+// console.log(...obsidianmd.configs.recommended);
 
 export default tseslint.config(
     eslint.configs.recommended,
     ...tseslint.configs.recommended,
     tseslint.configs.recommendedTypeChecked,
+    // ...obsidianmd.configs.recommended, // TODO: Enable this once we have a proper code base
     {
         languageOptions: {
             parserOptions: {

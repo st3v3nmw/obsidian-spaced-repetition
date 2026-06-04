@@ -72,7 +72,7 @@ export class OsrCore {
             };
             globalDateProvider.setDayBoundary(dayBoundary);
         } catch (e) {
-            console.error("Invalid format for start of day", e);
+            console.warn("Invalid format for start of day", e);
         }
     }
 
@@ -116,7 +116,7 @@ export class OsrCore {
             };
             globalDateProvider.setDayBoundary(dayBoundary);
         } catch (e) {
-            console.error("Invalid format for start of day", e);
+            console.warn("Invalid format for start of day", e);
         }
     }
 

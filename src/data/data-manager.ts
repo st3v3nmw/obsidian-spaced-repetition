@@ -9,14 +9,15 @@ import { NotesDataStore } from "src/data/data-store/notes-data-store/notes-data-
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { ISRNoteTFile, SRNoteTFile } from "src/data/data-structures/file/note-file";
-import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
-import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/data/settings";
+import { PluginData } from "src/data/plugin-data";
+import { PluginDataManager } from "src/data/plugin-data-manager";
+import { SettingsUtil, SRSettings } from "src/data/settings";
+import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
 import { NoteFileLoader } from "src/note/note-file-loader";
 import { NoteReviewQueue } from "src/note/note-review-queue";
-import { setDebugParser } from "src/parser";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
@@ -31,19 +32,26 @@ import { SRAlgorithmOsr } from "src/scheduling/algorithms/osr/srs-algorithm-osr"
  */
 export class DataManager {
     private plugin: SRPlugin;
-    private _data: PluginData | null = null;
+    public pluginDataManager: PluginDataManager; // TODO: Refactor so that the plugin data manager and the settings manager are separate from the data manager
+    public settingsManager: SettingsManager; // TODO: Refactor so that the plugin data manager and the settings manager are separate from the data manager
     private _osrCore: OsrCore | null = null;
     private _syncLock = false;
 
-    constructor(plugin: SRPlugin) {
+    constructor(
+        plugin: SRPlugin,
+        pluginDataManager: PluginDataManager,
+        settingsManager: SettingsManager,
+    ) {
         this.plugin = plugin;
+        this.pluginDataManager = pluginDataManager;
+        this.settingsManager = settingsManager;
     }
 
     /**
      * Checks if the data has been loaded.
      */
     isDataLoaded(): boolean {
-        return this._data !== null;
+        return this.pluginDataManager.isLoaded;
     }
 
     /**
@@ -53,13 +61,13 @@ export class DataManager {
         return this._osrCore !== null;
     }
 
+    // TODO: Remove once everything is migrated to the settings manager and plugin data manager
     get data(): PluginData {
-        if (this._data === null) throw new Error("Data not loaded!!");
-        return this._data;
+        return this.pluginDataManager.pluginData;
     }
 
     set data(data: PluginData) {
-        this._data = data;
+        this.pluginDataManager.pluginData = data;
     }
 
     get osrCore(): OsrCore {
@@ -78,14 +86,8 @@ export class DataManager {
     /**
      * Loads the plugin data from the data.json from the plugin's folder.
      */
-    async loadData(): Promise<void> {
-        const loadedData: PluginData = (await this.plugin.loadData()) as PluginData;
-        if (loadedData?.settings) upgradeSettings(loadedData.settings);
-        this.data = Object.assign({}, DEFAULT_DATA, loadedData);
-        this.data.settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
-
-        setDebugParser(this.data.settings.showParserDebugMessages);
-        this.setupDataStoreAndAlgorithmInstances(this.data.settings);
+    loadData(): void {
+        this.setupDataStoreAndAlgorithmInstances(this.settingsManager.settings);
     }
 
     /**
@@ -99,18 +101,17 @@ export class DataManager {
         noteReviewQueue: NoteReviewQueue,
         onOsrVaultDataChanged: () => Promise<void>,
     ): Promise<void> {
-        if (this.data === null) throw new Error("Data not loaded!!");
         const questionPostponementList: QuestionPostponementList = new QuestionPostponementList(
-            this.plugin,
-            this.data.settings,
-            this.data.buryList,
+            this.pluginDataManager,
+            this.settingsManager.settings,
+            this.pluginDataManager.pluginData.buryList,
         );
-        await questionPostponementList.clearIfNewDay(this.data);
+        await questionPostponementList.clearIfNewDay(this.pluginDataManager.pluginData);
 
         this.osrCore = new OsrCore(
             questionPostponementList,
             new ObsidianVaultNoteLinkInfoFinder(this.plugin.app.metadataCache),
-            this.data.settings,
+            this.settingsManager.settings,
             onOsrVaultDataChanged,
             noteReviewQueue,
             this.plugin.getObsidianRtlSetting(),
@@ -129,7 +130,12 @@ export class DataManager {
             const notes: TFile[] = this.plugin.app.vault.getMarkdownFiles();
             for (const noteFile of notes) {
                 // Skip files in the note ignore folder
-                if (SettingsUtil.isPathInFoldersToIgnore(this.data.settings, noteFile.path))
+                if (
+                    SettingsUtil.isPathInFoldersToIgnore(
+                        this.settingsManager.settings,
+                        noteFile.path,
+                    )
+                )
                     continue;
 
                 const file: SRNoteTFile = this.createSRNoteTFile(noteFile);
@@ -187,8 +193,6 @@ export class DataManager {
      */
     async sync(): Promise<void> {
         if (this.osrCore === null) throw new Error("OSR app core not initialized!!!");
-        if (this.data === null) throw new Error("Data not loaded!!");
-
         if (this.syncLock) {
             return;
         }
@@ -198,7 +202,7 @@ export class DataManager {
 
         await this.loadVault();
 
-        if (this.data.settings.showSchedulingDebugMessages) {
+        if (this.settingsManager.settings.showSchedulingDebugMessages) {
             console.log(`SR: ${t("DECKS")}`, this.osrCore.reviewableDeckTree);
             console.log(
                 "SR: " +
@@ -216,12 +220,11 @@ export class DataManager {
      * @returns {Promise<Note | null>} - A promise that resolves with the loaded note or null if not found.
      */
     async loadNote(noteFile: TFile): Promise<Note | null> {
-        if (this.data === null) throw new Error("Data not loaded!!");
-        const loader: NoteFileLoader = new NoteFileLoader(this.data.settings);
+        const loader: NoteFileLoader = new NoteFileLoader(this.settingsManager.settings);
         const srFile: ISRNoteTFile = this.createSRNoteTFile(noteFile);
         const folderTopicPath: TopicPath = TopicPath.getFolderPathFromFilename(
             srFile,
-            this.data.settings,
+            this.settingsManager.settings,
         );
 
         const note: Note | null = await loader.load(
@@ -230,7 +233,7 @@ export class DataManager {
             folderTopicPath,
         );
         if (note && note.hasChanged) {
-            await note.writeNoteFile(this.data.settings);
+            await note.writeNoteFile(this.settingsManager.settings);
         }
         return note;
     }
@@ -243,29 +246,32 @@ export class DataManager {
      * @returns {Promise<void>} - A promise that resolves when the review response is saved.
      */
     async saveNoteReviewResponse(note: TFile, response: ReviewResponse): Promise<void> {
-        if (this.data === null) throw new Error("Data not loaded!!");
         if (this.osrCore === null) throw new Error("OSR app core not initialized!!!");
         if (this.plugin.nextNoteReviewHandler === null)
             throw new Error("Next note review handler not initialized!!!");
 
         const noteSrTFile: ISRNoteTFile = this.createSRNoteTFile(note);
 
-        if (SettingsUtil.isPathInFoldersToIgnore(this.data.settings, note.path)) {
+        if (SettingsUtil.isPathInFoldersToIgnore(this.settingsManager.settings, note.path)) {
             new Notice(t("NOTE_IN_IGNORED_FOLDER"));
             return;
         }
 
         const tags = noteSrTFile.getAllTagsFromCache();
-        if (!SettingsUtil.isAnyTagANoteReviewTag(this.data.settings, tags)) {
+        if (!SettingsUtil.isAnyTagANoteReviewTag(this.settingsManager.settings, tags)) {
             new Notice(t("PLEASE_TAG_NOTE"));
             return;
         }
 
-        await this.osrCore.saveNoteReviewResponse(noteSrTFile, response, this.data.settings);
+        await this.osrCore.saveNoteReviewResponse(
+            noteSrTFile,
+            response,
+            this.settingsManager.settings,
+        );
 
         new Notice(t("RESPONSE_RECEIVED"));
 
-        if (this.data.settings.autoNextNote) {
+        if (this.settingsManager.settings.autoNextNote) {
             await this.plugin.nextNoteReviewHandler.autoReviewNextNote();
         }
     }
@@ -276,7 +282,10 @@ export class DataManager {
      * @returns {Promise<void>} - A promise that resolves when the plugin data is saved.
      */
     async savePluginData(): Promise<void> {
-        if (this.data === null) throw new Error("Data not loaded!!");
-        await this.plugin.saveData(this.data);
+        try {
+            await this.pluginDataManager.savePluginData();
+        } catch (error) {
+            console.warn("DataManager: Error saving plugin data", error);
+        }
     }
 }

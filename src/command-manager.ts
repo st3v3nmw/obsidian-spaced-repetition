@@ -1,24 +1,29 @@
 import { Platform, TFile } from "obsidian";
 
+import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
-import { UIState } from "src/ui/ui-manager";
+import { UIManager, UIState } from "src/ui/ui-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 export class CommandManager {
     private plugin: SRPlugin;
+    private settingsManager: SettingsManager;
+    private uiManager: UIManager;
 
-    constructor(plugin: SRPlugin) {
+    constructor(plugin: SRPlugin, settingsManager: SettingsManager, uiManager: UIManager) {
         this.plugin = plugin;
+        this.settingsManager = settingsManager;
+        this.uiManager = uiManager;
     }
 
     /**
      * register all the plugin commands once the plugin is loaded
      */
     public onLayoutReady() {
-        if (this.plugin.dataManager.data.settings.useCustomHotkeys) {
+        if (this.settingsManager.settings.useCustomHotkeys) {
             this.addCustomHotkeys();
         }
 
@@ -52,15 +57,15 @@ export class CommandManager {
         this.plugin.addCommand({
             id: "srs-card-review-again",
             name: t("REVIEW_CARD_DIFFICULTY_CMD", {
-                difficulty: this.plugin.dataManager.data.settings.flashcardAgainText,
+                difficulty: this.settingsManager.settings.flashcardAgainText,
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
                 if (
                     this.plugin.isInitialized &&
-                    this.plugin.uiManager.uiState === UIState.CardBack &&
-                    this.plugin.uiManager.isSRInFocus &&
-                    this.plugin.uiManager.contentManager !== null &&
+                    this.uiManager.uiState === UIState.CardBack &&
+                    this.uiManager.isSRInFocus &&
+                    this.uiManager.contentManager !== null &&
                     !(
                         Platform.isMobile || // No keyboard events on mobile
                         EmulatedPlatform().isMobile
@@ -72,9 +77,7 @@ export class CommandManager {
                     )
                 ) {
                     if (!checking) {
-                        void this.plugin.uiManager.contentManager._processReview(
-                            ReviewResponse.Again,
-                        );
+                        void this.uiManager.contentManager._processReview(ReviewResponse.Again);
                     }
                     return true;
                 }
@@ -85,15 +88,15 @@ export class CommandManager {
         this.plugin.addCommand({
             id: "srs-card-review-hard",
             name: t("REVIEW_CARD_DIFFICULTY_CMD", {
-                difficulty: this.plugin.dataManager.data.settings.flashcardHardText,
+                difficulty: this.settingsManager.settings.flashcardHardText,
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
                 if (
                     this.plugin.isInitialized &&
-                    this.plugin.uiManager.uiState === UIState.CardBack &&
-                    this.plugin.uiManager.isSRInFocus &&
-                    this.plugin.uiManager.contentManager !== null &&
+                    this.uiManager.uiState === UIState.CardBack &&
+                    this.uiManager.isSRInFocus &&
+                    this.uiManager.contentManager !== null &&
                     !(
                         Platform.isMobile || // No keyboard events on mobile
                         EmulatedPlatform().isMobile
@@ -105,9 +108,7 @@ export class CommandManager {
                     )
                 ) {
                     if (!checking) {
-                        void this.plugin.uiManager.contentManager._processReview(
-                            ReviewResponse.Hard,
-                        );
+                        void this.uiManager.contentManager._processReview(ReviewResponse.Hard);
                     }
                     return true;
                 }
@@ -118,14 +119,14 @@ export class CommandManager {
         this.plugin.addCommand({
             id: "srs-card-review-good",
             name: t("REVIEW_CARD_DIFFICULTY_CMD", {
-                difficulty: this.plugin.dataManager.data.settings.flashcardGoodText,
+                difficulty: this.settingsManager.settings.flashcardGoodText,
             }),
             checkCallback: (checking: boolean) => {
                 if (
                     this.plugin.isInitialized &&
-                    this.plugin.uiManager.uiState === UIState.CardBack &&
-                    this.plugin.uiManager.isSRInFocus &&
-                    this.plugin.uiManager.contentManager !== null &&
+                    this.uiManager.uiState === UIState.CardBack &&
+                    this.uiManager.isSRInFocus &&
+                    this.uiManager.contentManager !== null &&
                     !(
                         Platform.isMobile || // No keyboard events on mobile
                         EmulatedPlatform().isMobile
@@ -137,9 +138,7 @@ export class CommandManager {
                     )
                 ) {
                     if (!checking) {
-                        void this.plugin.uiManager.contentManager._processReview(
-                            ReviewResponse.Good,
-                        );
+                        void this.uiManager.contentManager._processReview(ReviewResponse.Good);
                     }
                     return true;
                 }
@@ -150,15 +149,15 @@ export class CommandManager {
         this.plugin.addCommand({
             id: "srs-card-review-easy",
             name: t("REVIEW_CARD_DIFFICULTY_CMD", {
-                difficulty: this.plugin.dataManager.data.settings.flashcardEasyText,
+                difficulty: this.settingsManager.settings.flashcardEasyText,
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
                 if (
                     this.plugin.isInitialized &&
-                    this.plugin.uiManager.uiState === UIState.CardBack &&
-                    this.plugin.uiManager.isSRInFocus &&
-                    this.plugin.uiManager.contentManager !== null &&
+                    this.uiManager.uiState === UIState.CardBack &&
+                    this.uiManager.isSRInFocus &&
+                    this.uiManager.contentManager !== null &&
                     !(
                         Platform.isMobile || // No keyboard events on mobile
                         EmulatedPlatform().isMobile
@@ -170,9 +169,7 @@ export class CommandManager {
                     )
                 ) {
                     if (!checking) {
-                        void this.plugin.uiManager.contentManager._processReview(
-                            ReviewResponse.Easy,
-                        );
+                        void this.uiManager.contentManager._processReview(ReviewResponse.Easy);
                     }
                     return true;
                 }
@@ -187,9 +184,9 @@ export class CommandManager {
             checkCallback: (checking: boolean) => {
                 if (
                     this.plugin.isInitialized &&
-                    this.plugin.uiManager.uiState === UIState.CardFront &&
-                    this.plugin.uiManager.isSRInFocus &&
-                    this.plugin.uiManager.contentManager !== null &&
+                    this.uiManager.uiState === UIState.CardFront &&
+                    this.uiManager.isSRInFocus &&
+                    this.uiManager.contentManager !== null &&
                     !(
                         Platform.isMobile || // No keyboard events on mobile
                         EmulatedPlatform().isMobile
@@ -201,7 +198,7 @@ export class CommandManager {
                     )
                 ) {
                     if (!checking) {
-                        void this.plugin.uiManager.contentManager._showAnswer();
+                        void this.uiManager.contentManager._showAnswer();
                     }
                     return true;
                 }
@@ -216,10 +213,10 @@ export class CommandManager {
             checkCallback: (checking: boolean) => {
                 if (
                     this.plugin.isInitialized &&
-                    (this.plugin.uiManager.uiState === UIState.CardBack ||
-                        this.plugin.uiManager.uiState === UIState.CardFront) &&
-                    this.plugin.uiManager.isSRInFocus &&
-                    this.plugin.uiManager.contentManager !== null &&
+                    (this.uiManager.uiState === UIState.CardBack ||
+                        this.uiManager.uiState === UIState.CardFront) &&
+                    this.uiManager.isSRInFocus &&
+                    this.uiManager.contentManager !== null &&
                     !(
                         Platform.isMobile || // No keyboard events on mobile
                         EmulatedPlatform().isMobile
@@ -231,7 +228,7 @@ export class CommandManager {
                     )
                 ) {
                     if (!checking) {
-                        void this.plugin.uiManager.contentManager._skipCurrentCard();
+                        void this.uiManager.contentManager._skipCurrentCard();
                     }
                     return true;
                 }
@@ -246,9 +243,9 @@ export class CommandManager {
             checkCallback: (checking: boolean) => {
                 if (
                     this.plugin.isInitialized &&
-                    this.plugin.uiManager.uiState === UIState.CardBack &&
-                    this.plugin.uiManager.isSRInFocus &&
-                    this.plugin.uiManager.contentManager !== null &&
+                    this.uiManager.uiState === UIState.CardBack &&
+                    this.uiManager.isSRInFocus &&
+                    this.uiManager.contentManager !== null &&
                     !(
                         Platform.isMobile || // No keyboard events on mobile
                         EmulatedPlatform().isMobile
@@ -260,9 +257,7 @@ export class CommandManager {
                     )
                 ) {
                     if (!checking) {
-                        void this.plugin.uiManager.contentManager._processReview(
-                            ReviewResponse.Reset,
-                        );
+                        void this.uiManager.contentManager._processReview(ReviewResponse.Reset);
                     }
                     return true;
                 }
@@ -277,9 +272,9 @@ export class CommandManager {
             checkCallback: (checking: boolean) => {
                 if (
                     this.plugin.isInitialized &&
-                    this.plugin.uiManager.uiState === UIState.CardBack &&
-                    this.plugin.uiManager.isSRInFocus &&
-                    this.plugin.uiManager.contentManager !== null &&
+                    this.uiManager.uiState === UIState.CardBack &&
+                    this.uiManager.isSRInFocus &&
+                    this.uiManager.contentManager !== null &&
                     !(
                         Platform.isMobile || // No keyboard events on mobile
                         EmulatedPlatform().isMobile
@@ -291,7 +286,7 @@ export class CommandManager {
                     )
                 ) {
                     if (!checking) {
-                        void this.plugin.uiManager.contentManager._jumpToCurrentCard();
+                        void this.uiManager.contentManager._jumpToCurrentCard();
                     }
                     return true;
                 }
@@ -322,7 +317,7 @@ export class CommandManager {
         this.plugin.addCommand({
             id: "srs-note-review-easy",
             name: t("REVIEW_NOTE_DIFFICULTY_CMD", {
-                difficulty: this.plugin.dataManager.data.settings.flashcardEasyText,
+                difficulty: this.settingsManager.settings.flashcardEasyText,
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
@@ -344,7 +339,7 @@ export class CommandManager {
         this.plugin.addCommand({
             id: "srs-note-review-good",
             name: t("REVIEW_NOTE_DIFFICULTY_CMD", {
-                difficulty: this.plugin.dataManager.data.settings.flashcardGoodText,
+                difficulty: this.settingsManager.settings.flashcardGoodText,
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
@@ -366,7 +361,7 @@ export class CommandManager {
         this.plugin.addCommand({
             id: "srs-note-review-hard",
             name: t("REVIEW_NOTE_DIFFICULTY_CMD", {
-                difficulty: this.plugin.dataManager.data.settings.flashcardHardText,
+                difficulty: this.settingsManager.settings.flashcardHardText,
             }),
             repeatable: false,
             checkCallback: (checking: boolean) => {
@@ -390,7 +385,7 @@ export class CommandManager {
             name: t("REVIEW_ALL_CARDS"),
             callback: async () => {
                 if (!this.plugin.isInitialized) return;
-                await this.plugin.uiManager.openDeckContainer(FlashcardReviewMode.Review);
+                await this.uiManager.openDeckContainer(FlashcardReviewMode.Review);
             },
         });
 
@@ -399,7 +394,7 @@ export class CommandManager {
             name: t("CRAM_ALL_CARDS"),
             callback: async () => {
                 if (!this.plugin.isInitialized) return;
-                await this.plugin.uiManager.openDeckContainer(FlashcardReviewMode.Cram);
+                await this.uiManager.openDeckContainer(FlashcardReviewMode.Cram);
             },
         });
 
@@ -414,10 +409,7 @@ export class CommandManager {
                     return false;
 
                 if (!checking) {
-                    void this.plugin.uiManager.openDeckContainer(
-                        FlashcardReviewMode.Review,
-                        openFile,
-                    );
+                    void this.uiManager.openDeckContainer(FlashcardReviewMode.Review, openFile);
                 }
                 return true;
             },
@@ -434,10 +426,7 @@ export class CommandManager {
                     return false;
 
                 if (!checking) {
-                    void this.plugin.uiManager.openDeckContainer(
-                        FlashcardReviewMode.Cram,
-                        openFile,
-                    );
+                    void this.uiManager.openDeckContainer(FlashcardReviewMode.Cram, openFile);
                 }
                 return true;
             },
@@ -448,7 +437,7 @@ export class CommandManager {
             name: t("OPEN_REVIEW_QUEUE_VIEW"),
             callback: async () => {
                 if (!this.plugin.isInitialized) return;
-                await this.plugin.uiManager.sidebarManager.openReviewQueueView();
+                await this.uiManager.sidebarManager.openReviewQueueView();
             },
         });
     }

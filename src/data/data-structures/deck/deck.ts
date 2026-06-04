@@ -347,7 +347,9 @@ export class Deck {
         const dueIdx = this.dueRepItems.indexOf(card);
         if (dueIdx !== -1) this.dueRepItems.splice(dueIdx, 1);
         if (newIdx === -1 && dueIdx === -1 && exceptionIfMissing) {
-            throw `deleteCardFromThisDeck: Card: ${card.front} not found in deck: ${this.deckName}`;
+            throw new Error(
+                `deleteCardFromThisDeck: Card: ${card.front} not found in deck: ${this.deckName}`,
+            );
         }
     }
 
@@ -476,7 +478,7 @@ export class Deck {
         let result: RepItemState;
         if (repItemState === RepItemState.NewItem) result = RepItemState.DueItem;
         else if (repItemState === RepItemState.DueItem) result = RepItemState.NewItem;
-        else throw "Invalid repItemState";
+        else throw new Error("Invalid repItemState");
         return result;
     }
 }

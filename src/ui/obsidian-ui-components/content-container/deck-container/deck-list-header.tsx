@@ -38,7 +38,7 @@ export default class DeckListHeaderComponent {
         this.reviewModeDropdown.addOptions(reviewModeOptions);
         this.reviewModeDropdown.setValue("Review");
 
-        this.reviewModeDropdown.onChange(async (value) => {
+        this.reviewModeDropdown.onChange((value) => {
             if (value === undefined) return;
             if (value === "Review") changeReviewMode(FlashcardReviewMode.Review);
             if (value === "Cram") changeReviewMode(FlashcardReviewMode.Cram);

@@ -416,6 +416,8 @@ const en: IBaseLocale = {
     LANGUAGE_SETTINGS: "Language Settings",
     LANGUAGE_SETTINGS_DESC:
         "Select the language you want to use for the plugin interface. This will only fully take effect after restarting Obsidian.",
+    DEBUG_LOG: "Debug Log",
+    COPY: "Copy",
 };
 
 export default en;
