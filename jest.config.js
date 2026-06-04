@@ -26,6 +26,7 @@ export default {
         "src/main.ts",
         "src/lang/locale-manager.ts",
         "src/command-manager.ts",
+        "src/scheduling/reminder-manager.ts",
         "src/data/data-manager.ts",
         "src/data/debug-logger.ts",
         "src/data/plugin-data-manager.ts",
