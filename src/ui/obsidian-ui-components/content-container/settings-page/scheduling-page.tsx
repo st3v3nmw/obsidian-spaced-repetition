@@ -64,7 +64,7 @@ export class SchedulingPage extends SettingsPage {
                                 await this.settingsManager.save();
                                 // The interval loop is stateful, so settings changes must be
                                 // applied immediately instead of waiting for the next reload.
-                                this.plugin.restartReviewReminders();
+                                this.plugin.reminderManager.restartReviewReminders();
                                 this.display();
                             }),
                     );
@@ -80,7 +80,7 @@ export class SchedulingPage extends SettingsPage {
                             .onChange(async (value) => {
                                 this.settingsManager.settings.reviewReminderCheckOnStartup = value;
                                 await this.settingsManager.save();
-                                this.plugin.restartReviewReminders();
+                                this.plugin.reminderManager.restartReviewReminders();
                             }),
                     );
             })
@@ -118,7 +118,7 @@ export class SchedulingPage extends SettingsPage {
                                 await this.settingsManager.save();
                                 // Interval changes only take effect once the existing timer is
                                 // rebuilt with the new cadence.
-                                this.plugin.restartReviewReminders();
+                                this.plugin.reminderManager.restartReviewReminders();
                             });
                         };
 
