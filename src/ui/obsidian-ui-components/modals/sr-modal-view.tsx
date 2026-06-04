@@ -1,7 +1,7 @@
 import "src/ui/obsidian-ui-components/modals/modal-view.css";
 import { App, Modal, Platform } from "obsidian";
 
-import { SRSettings } from "src/data/settings";
+import { SettingsManager } from "src/data/settings-manager";
 import type SRPlugin from "src/main";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
@@ -10,30 +10,34 @@ import EmulatedPlatform from "src/utils/platform-detector";
 export class SRModalView extends Modal {
     private contentManager: ContentManager;
     private plugin: SRPlugin;
+    private settingsManager: SettingsManager;
     private resizeObserver: ResizeObserver | null = null;
 
     constructor(
         app: App,
         plugin: SRPlugin,
-        settings: SRSettings,
+        settingsManager: SettingsManager,
         reviewQueueLoader: ReviewQueueLoader,
     ) {
         super(app);
         this.plugin = plugin;
+        this.settingsManager = settingsManager;
 
         // Setup base containers
         if (Platform.isMobile || EmulatedPlatform().isMobile) {
             this.setModalSize(
-                settings.flashcardHeightPercentageMobile,
-                settings.flashcardWidthPercentageMobile,
+                this.settingsManager.settings.flashcardHeightPercentageMobile,
+                this.settingsManager.settings.flashcardWidthPercentageMobile,
             );
         } else {
             this.setModalSize(
-                settings.flashcardHeightPercentage,
-                settings.flashcardWidthPercentage,
+                this.settingsManager.settings.flashcardHeightPercentage,
+                this.settingsManager.settings.flashcardWidthPercentage,
             );
 
-            this.resizeObserver = new ResizeObserver(this.onResize.bind(this));
+            this.resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+                void this.onResize(entries);
+            });
             this.resizeObserver.observe(this.modalEl);
         }
 
@@ -47,9 +51,11 @@ export class SRModalView extends Modal {
             app,
             plugin,
             reviewQueueLoader,
-            settings,
+            this.settingsManager.settings,
             this.contentEl,
-            this.close.bind(this),
+            () => {
+                this.close();
+            },
         );
         this.plugin.uiManager.setContentManager(this.contentManager);
     }
@@ -109,11 +115,11 @@ export class SRModalView extends Modal {
         if (isNaN(heightPercent) || isNaN(widthPercent)) return;
 
         if (isMobile) {
-            this.plugin.dataManager.data.settings.flashcardHeightPercentageMobile = heightPercent;
-            this.plugin.dataManager.data.settings.flashcardWidthPercentageMobile = widthPercent;
+            this.settingsManager.settings.flashcardHeightPercentageMobile = heightPercent;
+            this.settingsManager.settings.flashcardWidthPercentageMobile = widthPercent;
         } else {
-            this.plugin.dataManager.data.settings.flashcardHeightPercentage = heightPercent;
-            this.plugin.dataManager.data.settings.flashcardWidthPercentage = widthPercent;
+            this.settingsManager.settings.flashcardHeightPercentage = heightPercent;
+            this.settingsManager.settings.flashcardWidthPercentage = widthPercent;
         }
         await this.plugin.dataManager.savePluginData();
     }

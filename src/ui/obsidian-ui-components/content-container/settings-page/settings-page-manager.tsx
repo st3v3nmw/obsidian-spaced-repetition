@@ -2,6 +2,7 @@
 import h from "vhtml";
 
 import { DataManager } from "src/data/data-manager";
+import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { DataPage } from "src/ui/obsidian-ui-components/content-container/settings-page/data-page";
@@ -101,6 +102,7 @@ export function getPageIcon(pageType: SettingsPageType): string {
 export class SettingsPageManager {
     private containerEl: HTMLElement;
     private plugin: SRPlugin;
+    private settingsManager: SettingsManager;
     private dataManager: DataManager;
     private uiManager: UIManager;
     private pages: SettingsPage[] = [];
@@ -116,8 +118,8 @@ export class SettingsPageManager {
     constructor(
         containerEl: HTMLElement,
         plugin: SRPlugin,
-        dataManager: DataManager,
         uiManager: UIManager,
+        settingsManager: SettingsManager,
         lastPage: SettingsPageType,
         lastScrollPosition: number,
         didReadMultilineEndMarkerWarning: boolean,
@@ -127,8 +129,9 @@ export class SettingsPageManager {
     ) {
         this.containerEl = containerEl;
         this.plugin = plugin;
-        this.dataManager = dataManager;
+        this.dataManager = plugin.dataManager;
         this.uiManager = uiManager;
+        this.settingsManager = settingsManager;
         this.didReadMultilineEndMarkerWarning = didReadMultilineEndMarkerWarning;
         this.changeMultilineEndMarkerWarningState = changeMultilineEndMarkerWarningState;
         this.updateLastPageState = updateLastPageState;
@@ -170,6 +173,7 @@ export class SettingsPageManager {
                         new MainPage(
                             newPageContainerEl,
                             this.plugin,
+                            this.settingsManager,
                             this.dataManager,
                             pageType,
                             this.display,
@@ -183,6 +187,7 @@ export class SettingsPageManager {
                         new FlashcardsPage(
                             newPageContainerEl,
                             this.plugin,
+                            this.settingsManager,
                             this.dataManager,
                             pageType,
                             this.didReadMultilineEndMarkerWarning,
@@ -199,6 +204,7 @@ export class SettingsPageManager {
                         new NotesPage(
                             newPageContainerEl,
                             this.plugin,
+                            this.settingsManager,
                             this.dataManager,
                             pageType,
                             this.applySettingsUpdate.bind(this),
@@ -213,11 +219,16 @@ export class SettingsPageManager {
                         new SchedulingPage(
                             newPageContainerEl,
                             this.plugin,
+                            this.settingsManager,
                             this.dataManager,
                             pageType,
-                            this.applySettingsUpdate.bind(this),
+                            (callback: () => unknown) => {
+                                this.applySettingsUpdate(callback);
+                            },
                             this.display,
-                            this.openPage.bind(this),
+                            (pageType: SettingsPageType) => {
+                                this.openPage(pageType);
+                            },
                             this.scrollListener.bind(this),
                         ),
                     );
@@ -227,6 +238,7 @@ export class SettingsPageManager {
                         new UIPreferencesPage(
                             newPageContainerEl,
                             this.plugin,
+                            this.settingsManager,
                             this.dataManager,
                             this.uiManager,
                             pageType,
@@ -242,6 +254,7 @@ export class SettingsPageManager {
                         new DataPage(
                             newPageContainerEl,
                             this.plugin,
+                            this.settingsManager,
                             this.dataManager,
                             pageType,
                             this.applySettingsUpdate.bind(this),
@@ -256,6 +269,7 @@ export class SettingsPageManager {
                         new StatisticsPage(
                             newPageContainerEl,
                             this.plugin,
+                            this.settingsManager,
                             this.dataManager,
                             pageType,
                             this.openPage.bind(this),

@@ -502,6 +502,10 @@ body:not(.is-mobile)
 
 /* src/ui/obsidian-ui-components/content-container/deck-container/deck-list.css */
 .sr-deck-container {
+  .sr-no-decks-to-review {
+    padding: var(--size-4-8);
+    font-style: italic;
+  }
   .sr-scroll-wrapper {
     height: 100px;
     overflow: hidden;

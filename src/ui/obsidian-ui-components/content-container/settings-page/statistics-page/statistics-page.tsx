@@ -18,6 +18,7 @@ import h from "vhtml";
 
 import { DataManager } from "src/data/data-manager";
 import { Stats } from "src/data/data-structures/deck/stats";
+import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
@@ -58,6 +59,7 @@ export class StatisticsPage extends SettingsPage {
     constructor(
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
+        settingsManager: SettingsManager,
         dataManager: DataManager,
         pageType: SettingsPageType,
         openPage: (pageType: SettingsPageType) => void,
@@ -66,6 +68,7 @@ export class StatisticsPage extends SettingsPage {
         super(
             pageContainerEl,
             plugin,
+            settingsManager,
             dataManager,
             pageType,
             () => {},

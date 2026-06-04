@@ -329,6 +329,7 @@ export default class ContentManager {
             this.dataManager.data === null
         )
             return;
+
         const timeNow = now();
         if (
             this.lastPressedOnProcessReview &&

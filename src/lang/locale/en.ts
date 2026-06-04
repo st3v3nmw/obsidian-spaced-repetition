@@ -416,6 +416,10 @@ const en: IBaseLocale = {
     LANGUAGE_SETTINGS: "Language Settings",
     LANGUAGE_SETTINGS_DESC:
         "Select the language you want to use for the plugin interface. This will only fully take effect after restarting Obsidian.",
+    DEBUG_LOG: "Debug Log",
+    COPY: "Copy",
+    NO_DECKS_TO_REVIEW:
+        "There are no decks with cards to review. Make sure you have created some flashcards by adding the tag 'flashcards' to a note and then add cards to it (see plugin page for details on that). In case you did all that and still don't see any decks here, then it will probably caused by a bug in the plugin. There is a known bug that happens when one reviews the cards very fast, then the system bugs out and the decks are not shown. Please try again to open the deck list after a few seconds.",
 };
 
 export default en;

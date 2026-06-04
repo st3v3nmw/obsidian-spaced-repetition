@@ -1,7 +1,7 @@
 import { Question } from "src/data/data-structures/card/questions/question";
 import { PluginData } from "src/data/plugin-data";
+import { PluginDataManager } from "src/data/plugin-data-manager";
 import { SRSettings } from "src/data/settings";
-import SRPlugin from "src/main";
 
 /**
  * Represents a list of postponed questions (i.e. questions buried siblings).
@@ -41,11 +41,11 @@ export interface IQuestionPostponementList {
  */
 export class QuestionPostponementList implements IQuestionPostponementList {
     list: string[];
-    plugin: SRPlugin;
+    private pluginDataManager: PluginDataManager;
     settings: SRSettings;
 
-    constructor(plugin: SRPlugin, settings: SRSettings, list: string[]) {
-        this.plugin = plugin;
+    constructor(pluginDataManager: PluginDataManager, settings: SRSettings, list: string[]) {
+        this.pluginDataManager = pluginDataManager;
         this.settings = settings;
         this.list = list;
     }
@@ -65,6 +65,7 @@ export class QuestionPostponementList implements IQuestionPostponementList {
         if (isNewDay) {
             data.buryDate = todayDate;
             this.clear();
+
             await this.write();
         }
     }
@@ -102,8 +103,8 @@ export class QuestionPostponementList implements IQuestionPostponementList {
      */
     async write(): Promise<void> {
         // This is null only whilst unit testing is being performed
-        if (this.plugin === null || this.plugin.dataManager === null) return;
+        if (this.pluginDataManager === null) return;
 
-        await this.plugin.dataManager.savePluginData();
+        await this.pluginDataManager.savePluginData();
     }
 }

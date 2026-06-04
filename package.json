@@ -34,6 +34,7 @@
         "auto-changelog": "^2.6.0",
         "concurrently": "^9.2.1",
         "esbuild": "^0.28.0",
+        "eslint-plugin-obsidianmd": "^0.3.0",
         "eslint": "^10.4.1",
         "eslint-plugin-simple-import-sort": "^12.1.1",
         "eslint-plugin-unicorn": "^64.0.0",
@@ -51,6 +52,7 @@
         "vhtml": "^2.2.0"
     },
     "dependencies": {
+        "@jest/globals": "^30.4.1",
         "chart.js": "^4.5.1",
         "clozecraft": "^0.4.0",
         "gridjs": "^6.2.0",

@@ -350,4 +350,7 @@ export interface IBaseLocale {
     DEFAULT_LOCALE_NAME: string;
     LANGUAGE_SETTINGS: string;
     LANGUAGE_SETTINGS_DESC: string;
+    DEBUG_LOG: string;
+    COPY: string;
+    NO_DECKS_TO_REVIEW: string;
 }

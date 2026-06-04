@@ -118,7 +118,7 @@ export class LocaleManager implements ILocaleManager {
         const currentLocaleMap: IBaseLocale = this.localeMap[currentLocale];
 
         if (!currentLocaleMap) {
-            console.error(`SRS error: Locale ${currentLocale} not found.`);
+            console.warn(`SRS error: Locale ${currentLocale} not found.`);
         }
 
         return currentLocaleMap;
