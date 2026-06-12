@@ -26,6 +26,7 @@ import {
     setupStaticDateProvider20230906,
     setupStaticDateProviderOriginDatePlusDays,
 } from "src/utils/dates";
+import { setupNextRandomNumber, setupStaticRandomNumberProvider } from "src/utils/numbers";
 
 import { UnitTestSRFile } from "../helpers/unit-test-file";
 import { unitTestSetupStandardDataStoreAlgorithm } from "../helpers/unit-test-setup";
@@ -787,6 +788,46 @@ Q1::A1
 
             expect(reviewSequencer.hasPendingCards).toEqual(true);
             expect(Number.isNaN(reviewSequencer.nextPendingDueUnix)).toEqual(true);
+        });
+
+        test("Pending reversed cards can be buried when random order shows the back first", async () => {
+            setupStaticRandomNumberProvider();
+            setupNextRandomNumber({ lower: 0, upper: 1, next: 1 });
+
+            const settings: SRSettings = { ...DEFAULT_SETTINGS, burySiblingCards: true };
+            const randomOrder: IIteratorOrder = {
+                repItemOrder: RepItemOrder.NewFirstRandom,
+                deckOrder: DeckOrder.PrevDeckComplete_Sequential,
+            };
+            const c: TestContext = TestContext.Create(
+                randomOrder,
+                FlashcardReviewMode.Review,
+                settings,
+                "#flashcards A:::B",
+            );
+            await c.setSequencerDeckTreeFromOriginalText();
+            const reviewSequencer = c.reviewSequencer as FlashcardReviewSequencer;
+            const pendingSchedule = new RepItemScheduleInfoFsrs(
+                moment("2023-09-06T00:10:00.000Z"),
+                0,
+                5.5,
+                0.4,
+                State.Learning,
+                1,
+                0,
+                1,
+                moment("2023-09-06T00:00:00.000Z"),
+            );
+            jest.spyOn(reviewSequencer, "determineCardSchedule").mockReturnValue(pendingSchedule);
+
+            expect(reviewSequencer.currentCard.front).toEqual("B");
+            await expect(
+                reviewSequencer.processReviewReviewMode(ReviewResponse.Good),
+            ).resolves.toBeUndefined();
+
+            expect(reviewSequencer.hasPendingCards).toEqual(true);
+            expect(reviewSequencer.hasCurrentCard).toEqual(false);
+            checkQuestionPostponementListCount(c, 1);
         });
 
         test("Answer includes MathJax within $$", async () => {

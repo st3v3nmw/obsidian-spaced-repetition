@@ -344,10 +344,11 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
         if (this.settings.burySiblingCards) {
             await this.burySiblingCards();
-            this.deleteSiblingCardsFromAllDecks();
+            this.cardSequencer.deleteCurrentQuestionFromAllDecks();
+        } else {
+            this.cardSequencer.deleteCurrentRepItemFromAllDecks();
         }
 
-        this.cardSequencer.deleteCurrentRepItemFromAllDecks();
         this.pendingCards.push({ card: pendingCard, dueUnix });
     }
 
