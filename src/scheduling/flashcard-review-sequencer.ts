@@ -1,4 +1,5 @@
 import { Notice } from "obsidian";
+
 import { TICKS_PER_DAY } from "src/data/constants";
 import { DataStore } from "src/data/data-store/base/data-store";
 import { Card } from "src/data/data-structures/card/card";
