@@ -7,6 +7,7 @@ import { frontmatterTagPseudoLineNum } from "src/data/data-structures/file/sr-fi
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { NoteQuestionParser } from "src/note/note-question-parser";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 import { TextDirection } from "src/utils/strings";
@@ -194,6 +195,60 @@ In computer-science, a *heap* is a tree-based data-structure, that satisfies the
                 true,
             ),
         ).toMatchObject(expected);
+    });
+});
+
+describe("Reversed cards with FSRS sibling schedules", () => {
+    test("SingleLineReversed: Placeholder before FSRS keeps reverse sibling scheduled", async () => {
+        const noteText: string = `#flashcards
+A:::B
+<!--SR:!2000-01-01,1,250!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z-->
+`;
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
+
+        const questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
+            noteFile,
+            TextDirection.Ltr,
+            TopicPath.emptyPath,
+            true,
+        );
+
+        expect(questionList).toHaveLength(1);
+        expect(questionList[0].cards).toHaveLength(2);
+        expect(questionList[0].cards[0]).toMatchObject({
+            front: "A",
+            back: "B",
+            scheduleInfo: null,
+        });
+        expect(questionList[0].cards[1]).toMatchObject({
+            front: "B",
+            back: "A",
+        });
+        expect(questionList[0].cards[1].scheduleInfo).toBeInstanceOf(RepItemScheduleInfoFsrs);
+    });
+
+    test("SingleLineReversed: Placeholder after FSRS keeps reverse sibling new", async () => {
+        const noteText: string = `#flashcards
+A:::B
+<!--SR:!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z!2000-01-01,1,250-->
+`;
+        const noteFile: ISRNoteTFile = new UnitTestSRFile(noteText);
+
+        const questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
+            noteFile,
+            TextDirection.Ltr,
+            TopicPath.emptyPath,
+            true,
+        );
+
+        expect(questionList).toHaveLength(1);
+        expect(questionList[0].cards).toHaveLength(2);
+        expect(questionList[0].cards[0].scheduleInfo).toBeInstanceOf(RepItemScheduleInfoFsrs);
+        expect(questionList[0].cards[1]).toMatchObject({
+            front: "B",
+            back: "A",
+            scheduleInfo: null,
+        });
     });
 });
 
