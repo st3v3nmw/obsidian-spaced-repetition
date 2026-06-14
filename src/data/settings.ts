@@ -47,7 +47,7 @@ export interface SRSettings {
     maxNDaysNotesReviewQueue: number;
 
     // UI preferences
-    showRibbonIcon: boolean;
+    showRibbonIcon: undefined | boolean;
     showStatusBar: boolean;
     showCardStatusBarItem: boolean;
     showNoteStatusBarItem: boolean;
@@ -137,7 +137,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     maxNDaysNotesReviewQueue: 365,
 
     // UI settings
-    showRibbonIcon: true,
+    showRibbonIcon: undefined,
     showStatusBar: true,
     showCardStatusBarItem: true,
     showNoteStatusBarItem: true,
@@ -185,6 +185,10 @@ export const DEFAULT_SETTINGS: SRSettings = {
 };
 
 export function upgradeSettings(settings: SRSettings) {
+    if (settings.showRibbonIcon) {
+        settings.showRibbonIcon = DEFAULT_SETTINGS.showRibbonIcon;
+    }
+
     if (
         settings.randomizeCardOrder !== null &&
         settings.randomizeCardOrder !== undefined &&
