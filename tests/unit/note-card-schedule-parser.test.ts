@@ -138,3 +138,46 @@ test("Mixed OSR and FSRS schedule info for question", () => {
         learningSteps: 1,
     });
 });
+
+test("Placeholder schedules parse as empty card slots", () => {
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
+        "What symbol represents an electric field:: $\\large \\vec E$<!--SR:!2000-01-01,1,250-->",
+        null,
+    );
+
+    expect(actual).toEqual([null]);
+});
+
+test("Placeholder schedules preserve sibling indexes before FSRS schedules", () => {
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
+        "What symbol represents an electric field:: $\\large \\vec E$<!--SR:!2000-01-01,1,250!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z-->",
+        null,
+    );
+
+    expect(actual).toHaveLength(2);
+    expect(actual[0]).toBeNull();
+    expect(actual[1]).toBeInstanceOf(RepItemScheduleInfoFsrs);
+});
+
+test("Placeholder schedules preserve sibling indexes after FSRS schedules", () => {
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
+        "What symbol represents an electric field:: $\\large \\vec E$<!--SR:!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z!2000-01-01,1,250-->",
+        null,
+    );
+
+    expect(actual).toHaveLength(2);
+    expect(actual[0]).toBeInstanceOf(RepItemScheduleInfoFsrs);
+    expect(actual[1]).toBeNull();
+});
+
+test("Placeholder schedules preserve middle FSRS sibling indexes", () => {
+    const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
+        "What symbol represents an electric field:: $\\large \\vec E$<!--SR:!2000-01-01,1,250!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z!2000-01-01,1,250-->",
+        null,
+    );
+
+    expect(actual).toHaveLength(3);
+    expect(actual[0]).toBeNull();
+    expect(actual[1]).toBeInstanceOf(RepItemScheduleInfoFsrs);
+    expect(actual[2]).toBeNull();
+});

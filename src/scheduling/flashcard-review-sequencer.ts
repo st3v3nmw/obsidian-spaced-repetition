@@ -1,8 +1,14 @@
+import { Notice } from "obsidian";
+
 import { TICKS_PER_DAY } from "src/data/constants";
 import { DataStore } from "src/data/data-store/base/data-store";
 import { Card } from "src/data/data-structures/card/card";
 import { Question, QuestionText } from "src/data/data-structures/card/questions/question";
 import { IQuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
+import {
+    CardFrontBack,
+    CardFrontBackUtil,
+} from "src/data/data-structures/card/questions/question-type";
 import { Deck } from "src/data/data-structures/deck/deck";
 import { IDeckTreeIterator } from "src/data/data-structures/deck/deck-tree-iterator";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
@@ -17,10 +23,10 @@ import { globalDateProvider } from "src/utils/dates";
 export interface IFlashcardReviewSequencer {
     get hasCurrentCard(): boolean;
     get hasPendingCards(): boolean;
-    get currentCard(): Card;
+    get currentCard(): Card | null;
     get currentQuestion(): Question;
     get currentNote(): Note;
-    get currentDeck(): Deck;
+    get currentDeck(): Deck | null;
     get nextPendingDueUnix(): number | null;
     get originalDeckTree(): Deck;
 
@@ -32,7 +38,7 @@ export interface IFlashcardReviewSequencer {
     skipCurrentCard(): void;
     determineCardSchedule(response: ReviewResponse, card: Card): RepItemScheduleInfo;
     processReview(response: ReviewResponse): Promise<void>;
-    updateCurrentQuestionText(text: string): Promise<void>;
+    updateCurrentQuestionTextAndCards(text: string): Promise<void>;
     deleteCurrentCardFromNote(): Promise<void>;
 }
 
@@ -147,7 +153,9 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         return this.pendingCards.length > 0;
     }
 
-    get currentCard(): Card {
+    get currentCard(): Card | null {
+        if (this.cardSequencer.currentRepItem === null) return null;
+
         return this.cardSequencer.currentRepItem as Card;
     }
 
@@ -155,7 +163,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         return this.currentCard?.question;
     }
 
-    get currentDeck(): Deck {
+    get currentDeck(): Deck | null {
         return this.cardSequencer.currentDeck;
     }
 
@@ -344,10 +352,11 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
         if (this.settings.burySiblingCards) {
             await this.burySiblingCards();
-            this.deleteSiblingCardsFromAllDecks();
+            this.cardSequencer.deleteCurrentQuestionFromAllDecks();
+        } else {
+            this.cardSequencer.deleteCurrentRepItemFromAllDecks();
         }
 
-        this.cardSequencer.deleteCurrentRepItemFromAllDecks();
         this.pendingCards.push({ card: pendingCard, dueUnix });
     }
 
@@ -416,12 +425,31 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         return result;
     }
 
-    async updateCurrentQuestionText(text: string): Promise<void> {
-        const q: QuestionText = this.currentQuestion.questionText;
+    async updateCurrentQuestionTextAndCards(text: string): Promise<void> {
+        const question = this.currentQuestion;
+        const q: QuestionText = question.questionText;
+
+        // Update front/back properties of all cards which question is linked to
+        const cardFrontBackList: CardFrontBack[] = CardFrontBackUtil.expand(
+            question.questionType,
+            text,
+            this.settings,
+        );
 
         q.actualQuestion = text;
 
-        await DataStore.getInstance().write(this.currentQuestion);
+        await this.currentQuestion.writeQuestion(this.settings);
+
+        if (cardFrontBackList.length !== question.cards.length) {
+            console.warn("SR: Cards count does not match question text. Skipping redraw.");
+            new Notice("Cards count does not match cards from question text. Skipping redraw.");
+            return;
+        }
+        question.cards.forEach((card, i) => {
+            const { front, back } = cardFrontBackList[i];
+            card.front = front;
+            card.back = back;
+        });
     }
 
     async deleteCurrentCardFromNote(): Promise<void> {

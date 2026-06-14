@@ -6,7 +6,7 @@ import {
 } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
-import { DateUtil, formatDate, globalDateProvider } from "src/utils/dates";
+import { DateUtil, globalDateProvider } from "src/utils/dates";
 
 export class CommentParser {
     static parseMultiScheduleComment(comment: string): RepItemScheduleInfo[] {
@@ -14,8 +14,7 @@ export class CommentParser {
             .split("!")
             .map((segment) => segment.trim())
             .filter((segment) => segment.length > 0)
-            .map((segment) => this.parseScheduleSegment(segment))
-            .filter((info): info is RepItemScheduleInfo => info !== null);
+            .map((segment) => this.parseScheduleSegment(segment));
 
         return segments;
     }
@@ -67,8 +66,7 @@ export class CommentParser {
         const dueDate: moment.Moment = DateUtil.dateStrToMoment(dueDateStr);
         if (
             dueDate === null ||
-            formatDate(dueDate.unix(), PREFERRED_DATE_FORMAT) ===
-                RepItemScheduleInfoOsr.dummyDueDateForNewCard
+            dueDate.format(PREFERRED_DATE_FORMAT) === RepItemScheduleInfoOsr.dummyDueDateForNewCard
         ) {
             return null;
         }

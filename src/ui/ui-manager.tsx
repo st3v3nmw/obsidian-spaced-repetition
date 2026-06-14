@@ -71,6 +71,16 @@ export class UIManager {
 
         this.statusBarManager = new StatusBarManager(this.plugin, this.settingsManager);
 
+        this.ribbonIcon = this.plugin.addRibbonIcon(
+            "SpacedRepIcon",
+            t("REVIEW_CARDS"),
+            async () => {
+                if (this.plugin.isDataManagerLoaded()) {
+                    await this.openDeckContainer(FlashcardReviewMode.Review);
+                }
+            },
+        );
+
         this.plugin.registerEvent(
             this.plugin.app.workspace.on("file-menu", (menu: Menu, file: TAbstractFile) => {
                 this.fileMenuHandler(menu, file);
@@ -91,7 +101,6 @@ export class UIManager {
 
         this.sidebarManager.init();
 
-        this.showRibbonIcon(this.settingsManager.settings.showRibbonIcon);
         this.registerSRFocusListener();
     }
 
@@ -440,21 +449,6 @@ export class UIManager {
 
     public getSRInFocusState(): boolean {
         return this.isSRInFocus;
-    }
-
-    showRibbonIcon(status: boolean) {
-        // if it does not exist, we create it
-        if (!this.ribbonIcon) {
-            this.ribbonIcon = this.plugin.addRibbonIcon(
-                "SpacedRepIcon",
-                t("REVIEW_CARDS"),
-                async () => {
-                    await this.openDeckContainer(FlashcardReviewMode.Review);
-                },
-            );
-        }
-
-        this.ribbonIcon.setCssProps({ display: status ? "" : "none" });
     }
 
     private fileMenuHandler(menu: Menu, file: TAbstractFile) {

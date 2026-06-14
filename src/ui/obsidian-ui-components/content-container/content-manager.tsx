@@ -23,7 +23,6 @@ import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirma
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import { UIManager, UIState } from "src/ui/ui-manager";
-import { globalDateProvider } from "src/utils/dates";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 export enum ContentState {
@@ -40,7 +39,7 @@ export enum CardState {
 }
 
 export interface CardData {
-    currentCard: Card;
+    currentCard: Card | null;
     currentCardState: CardState;
 }
 
@@ -49,7 +48,7 @@ export interface DeckData {
     currentDeck: Deck | null;
     previousDeck: Deck | null;
     currentDeckTotalCardsInQueue: number;
-    currentDeckStats: DeckStats;
+    currentDeckStats: DeckStats | null;
     previousDeckStats: DeckStats | null;
     chosenDeckStats: DeckStats;
 }
@@ -153,27 +152,21 @@ export default class ContentManager {
 
         // Loop through all decks and determine if any have cards in queue
         for (const subdeck of subdecksWithCardsInQueue) {
-            const hasNewCards: boolean = subdeck.newRepItems.length > 0;
-            const hasDueCards: boolean = subdeck.dueRepItems.length > 0;
-            const hasDueCardsToday: boolean =
-                hasDueCards &&
-                subdeck.dueRepItems.some((card) => {
-                    const dueDate: number = card.scheduleInfo.dueDateAsUnix;
-                    const nowUnix: number = globalDateProvider.now.valueOf();
-                    return dueDate <= nowUnix;
-                });
-
-            const hasCardsToday: boolean = hasNewCards || hasDueCardsToday;
+            const subdeckStats = this.reviewSequencer.getDeckStats(subdeck.getTopicPath());
 
             if (
                 openImmediately &&
-                (hasCardsToday || this.reviewMode === FlashcardReviewMode.Cram)
+                (subdeckStats.cardsInQueueOfThisDeckCount ||
+                    this.reviewMode === FlashcardReviewMode.Cram)
             ) {
                 openImmediately = false;
                 break;
             }
 
-            if (hasCardsToday || this.reviewMode === FlashcardReviewMode.Cram) {
+            if (
+                subdeckStats.cardsInQueueOfThisDeckCount ||
+                this.reviewMode === FlashcardReviewMode.Cram
+            ) {
                 openImmediately = true;
                 deckWithCards = subdeck;
             }
@@ -288,16 +281,17 @@ export default class ContentManager {
 
     private _getNewSessionData(deck: Deck): SessionData | null {
         if (this.reviewSequencer === null) return null;
-        const deckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
-        const totalCardsInSession: number = deckStats.cardsInQueueCount;
-        const totalDecksInSession: number = deckStats.decksInQueueOfThisDeckCount;
+        const chosenDeckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
+        const totalCardsInSession: number = chosenDeckStats.cardsInQueueCount;
+        const totalDecksInSession: number = chosenDeckStats.decksInQueueOfThisDeckCount;
         const currentCardState: CardState = CardState.Front;
 
-        const currentDeckStats = this.reviewSequencer.getDeckStats(
-            this.reviewSequencer.currentDeck.getTopicPath(),
-        );
-
-        const chosenDeckStats = this.reviewSequencer.getDeckStats(deck.getTopicPath());
+        const currentDeckStats =
+            this.reviewSequencer.currentDeck === null
+                ? null
+                : this.reviewSequencer.getDeckStats(
+                      this.reviewSequencer.currentDeck.getTopicPath(),
+                  );
 
         return {
             cardData: {
@@ -308,7 +302,8 @@ export default class ContentManager {
                 chosenDeck: deck,
                 currentDeck: this.reviewSequencer.currentDeck,
                 previousDeck: null,
-                currentDeckTotalCardsInQueue: currentDeckStats.cardsInQueueOfThisDeckCount,
+                currentDeckTotalCardsInQueue:
+                    currentDeckStats === null ? 0 : currentDeckStats.cardsInQueueOfThisDeckCount,
                 currentDeckStats: currentDeckStats,
                 previousDeckStats: null,
                 chosenDeckStats: chosenDeckStats,
@@ -379,11 +374,12 @@ export default class ContentManager {
 
     private async _doEditQuestionText(): Promise<void> {
         if (this.reviewSequencer === null) return;
-        const currentCard: Card = this.reviewSequencer.currentCard;
+        const currentCard: Card | null = this.reviewSequencer.currentCard;
         const currentQ: Question = this.reviewSequencer.currentQuestion;
 
         // Just the question/answer text; without any preceding topic tag
         const textPrompt = currentQ.questionText.actualQuestion;
+        const currentUIState = this.uiManager.uiState;
         this.uiManager.setUIState(UIState.EditModal);
         const editModal = FlashcardEditModal.Prompt(
             this.app,
@@ -395,8 +391,23 @@ export default class ContentManager {
         await editModal
             .then(async (modifiedCardText) => {
                 if (this.reviewSequencer === null) return;
-                await this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
-                this.uiManager.setUIState(UIState.CardBack);
+                await this.reviewSequencer.updateCurrentQuestionTextAndCards(modifiedCardText);
+                this.uiManager.setUIState(currentUIState);
+
+                if (this.sessionData !== null) {
+                    if (this.uiManager.uiState === UIState.CardFront) {
+                        await this.cardContainer.drawCardFront(this.sessionData, this.settings);
+                    }
+
+                    if (this.uiManager.uiState === UIState.CardBack) {
+                        await this.cardContainer.drawBack(
+                            this.sessionData,
+                            this.reviewMode,
+                            this.settings,
+                            this._determineButtonSchedule.bind(this),
+                        );
+                    }
+                }
             })
             .catch((reason) => console.log(reason));
     }
