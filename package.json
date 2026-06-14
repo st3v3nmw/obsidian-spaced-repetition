@@ -65,9 +65,9 @@
         "precommit-msg",
         "validate"
     ],
-    "packageManager": "pnpm@9.10.0",
+    "packageManager": "pnpm@11.6.0",
     "engines": {
-        "pnpm": ">=9.10.0"
+        "pnpm": ">=11.6.0"
     },
     "engineStrict": true
 }
