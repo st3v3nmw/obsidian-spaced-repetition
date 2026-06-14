@@ -1,3 +1,4 @@
+import { Notice } from "obsidian";
 import { TICKS_PER_DAY } from "src/data/constants";
 import { DataStore } from "src/data/data-store/base/data-store";
 import { Card } from "src/data/data-structures/card/card";
@@ -435,14 +436,18 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         );
 
         if (cardFrontBackList.length !== question.cards.length) {
-            console.warn("SR: Cards count does not match question text. Skipping update.");
-            return;
+            // return;
         }
 
         q.actualQuestion = text;
 
         await this.currentQuestion.writeQuestion(this.settings);
 
+        if (cardFrontBackList.length !== question.cards.length) {
+            console.warn("SR: Cards count does not match question text. Skipping redraw.");
+            new Notice("Cards count does not match cards from question text. Skipping redraw.");
+            return;
+        }
         question.cards.forEach((card, i) => {
             const { front, back } = cardFrontBackList[i];
             card.front = front;

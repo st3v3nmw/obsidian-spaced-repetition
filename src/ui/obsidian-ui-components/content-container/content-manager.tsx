@@ -394,9 +394,6 @@ export default class ContentManager {
                 await this.reviewSequencer.updateCurrentQuestionTextAndCards(modifiedCardText);
                 this.uiManager.setUIState(currentUIState);
 
-                console.log(currentUIState);
-                console.log(this.uiManager.uiState);
-
                 if (this.sessionData !== null) {
                     if (this.uiManager.uiState === UIState.CardFront) {
                         await this.cardContainer.drawCardFront(this.sessionData, this.settings);
