@@ -14,6 +14,7 @@ export class FlashcardEditModal extends Modal {
 
     public textAreaFront: HTMLTextAreaElement;
     public textAreaBack: HTMLTextAreaElement;
+    private saveButton: ButtonComponent;
 
     private resolvePromise: ((input: string) => void) | null = null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -97,6 +98,7 @@ export class FlashcardEditModal extends Modal {
         this.textAreaFront.addClass("sr-input");
         this.textAreaFront.setText(this.textFront);
         this.textAreaFront.addEventListener("keydown", this.keyListenerCallback);
+        this.textAreaFront.addEventListener("input", this.emptyListenerCallback);
 
         if (this.textDirection === TextDirection.Rtl) {
             this.textAreaFront.setAttribute("dir", "rtl");
@@ -109,6 +111,8 @@ export class FlashcardEditModal extends Modal {
         } else {
             this.textAreaBack.setText(this.textBack);
             this.textAreaBack.addEventListener("keydown", this.keyListenerCallback);
+            this.textAreaBack.addEventListener("input", this.emptyListenerCallback);
+
             if (this.textDirection === TextDirection.Rtl) {
                 this.textAreaBack.setAttribute("dir", "rtl");
             }
@@ -125,6 +129,8 @@ export class FlashcardEditModal extends Modal {
         saveButton.onClick((evt) => {
             this.saveClickCallback(evt);
         });
+
+        this.saveButton = saveButton;
 
         const button = response.createEl("button");
         button.addClasses(["sr-response-button", "sr-dummy-button"]);
@@ -166,6 +172,13 @@ export class FlashcardEditModal extends Modal {
     private saveClickCallback = (_: MouseEvent) => this.save();
 
     private cancelClickCallback = (_: MouseEvent) => this.close();
+
+    private emptyListenerCallback = (_: Event) => {
+        const isBackEmpty = this.textAreaBack === null || this.separator === null ? false : this.textAreaBack.value.length === 0;
+        const isFrontEmpty = this.textAreaFront !== null && this.textAreaFront.value.length === 0;
+
+        this.saveButton.setDisabled(isBackEmpty || isFrontEmpty);
+    };
 
     private keyListenerCallback = (evt: KeyboardEvent) => {
         if (evt.key === "Tab") {
@@ -222,6 +235,12 @@ export class FlashcardEditModal extends Modal {
     private removeInputListener() {
         if (this.textAreaFront !== null) {
             this.textAreaFront.removeEventListener("keydown", this.keyListenerCallback);
+            this.textAreaFront.removeEventListener("input", this.emptyListenerCallback);
+        }
+
+        if (this.textAreaBack !== null) {
+            this.textAreaBack.removeEventListener("keydown", this.keyListenerCallback);
+            this.textAreaBack.removeEventListener("input", this.emptyListenerCallback);
         }
     }
 
