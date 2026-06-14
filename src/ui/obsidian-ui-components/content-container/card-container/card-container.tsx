@@ -170,9 +170,25 @@ export class CardContainer {
         this._updateInfoBar(sessionData, settings.flashcardCardOrder);
 
         // Update card content
-        this.content.empty();
+        await this.drawCardFrontContent(sessionData, settings);
 
-        // Create context section
+        // Update response buttons
+        this.response.resetResponseButtons();
+
+        // Setup cloze input listeners
+        this._setupClozeInputListeners();
+
+        // auto-focus the first cloze input if this card is a cloze card
+        if (sessionData.currentQuestion.questionType === CardType.Cloze) {
+            const firstInput: HTMLInputElement | null =
+                activeDocument.querySelector(".cloze-input");
+            if (firstInput) {
+                firstInput.focus();
+            }
+        }
+    }
+
+    private drawCardContext(sessionData: SessionData, settings: SRSettings) {
         if (settings.showContextInCards) {
             this.contextSection = new ContextSectionComponent(this.content);
             this.contextSection.updateCardContext(
@@ -181,6 +197,14 @@ export class CardContainer {
                 sessionData.currentNote,
             );
         }
+    }
+
+    private async drawCardFrontContent(sessionData: SessionData, settings: SRSettings) {
+        // Update card content
+        this.content.empty();
+
+        // Create context section
+        this.drawCardContext(sessionData, settings);
 
         // Build card content
         const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
@@ -197,21 +221,6 @@ export class CardContainer {
         );
         // Set scroll position back to top
         this.content.scrollTop = 0;
-
-        // Update response buttons
-        this.response.resetResponseButtons();
-
-        // Setup cloze input listeners
-        this._setupClozeInputListeners();
-
-        // auto-focus the first cloze input if this card is a cloze card
-        if (sessionData.currentQuestion.questionType === CardType.Cloze) {
-            const firstInput: HTMLInputElement | null =
-                activeDocument.querySelector(".cloze-input");
-            if (firstInput) {
-                firstInput.focus();
-            }
-        }
     }
 
     public drawPendingState(nextPendingDueUnix: number): void {
@@ -341,10 +350,12 @@ export class CardContainer {
 
         // Show answer text
         if (sessionData.currentQuestion.questionType !== CardType.Cloze) {
+            await this.drawCardFrontContent(sessionData, settings);
             const hr: HTMLElement = activeDocument.createElement("hr");
             this.content.appendChild(hr);
         } else {
             this.content.empty();
+            this.drawCardContext(sessionData, settings);
         }
 
         const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(

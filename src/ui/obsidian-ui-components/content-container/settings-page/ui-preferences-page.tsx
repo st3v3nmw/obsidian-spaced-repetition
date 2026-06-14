@@ -104,20 +104,6 @@ export class UIPreferencesPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
-                    .setName(t("SHOW_RIBBON_ICON"))
-                    .setDesc(t("SHOW_RIBBON_ICON_DESC"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.settingsManager.settings.showRibbonIcon)
-                            .onChange(async (value) => {
-                                this.settingsManager.settings.showRibbonIcon = value;
-                                await this.settingsManager.save();
-                                this.uiManager.showRibbonIcon(value);
-                            }),
-                    );
-            })
-            .addSetting((setting: Setting) => {
-                setting
                     .setName(t("ENABLE_FILE_MENU_REVIEW_OPTIONS"))
                     .setDesc(t("ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC"))
                     .addToggle((toggle) =>

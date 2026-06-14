@@ -379,6 +379,7 @@ export default class ContentManager {
 
         // Just the question/answer text; without any preceding topic tag
         const textPrompt = currentQ.questionText.actualQuestion;
+        const currentUIState = this.uiManager.uiState;
         this.uiManager.setUIState(UIState.EditModal);
         const editModal = FlashcardEditModal.Prompt(
             this.app,
@@ -390,8 +391,23 @@ export default class ContentManager {
         await editModal
             .then(async (modifiedCardText) => {
                 if (this.reviewSequencer === null) return;
-                await this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
-                this.uiManager.setUIState(UIState.CardBack);
+                await this.reviewSequencer.updateCurrentQuestionTextAndCards(modifiedCardText);
+                this.uiManager.setUIState(currentUIState);
+
+                if (this.sessionData !== null) {
+                    if (this.uiManager.uiState === UIState.CardFront) {
+                        await this.cardContainer.drawCardFront(this.sessionData, this.settings);
+                    }
+
+                    if (this.uiManager.uiState === UIState.CardBack) {
+                        await this.cardContainer.drawBack(
+                            this.sessionData,
+                            this.reviewMode,
+                            this.settings,
+                            this._determineButtonSchedule.bind(this),
+                        );
+                    }
+                }
             })
             .catch((reason) => console.log(reason));
     }
