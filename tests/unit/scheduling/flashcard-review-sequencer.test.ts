@@ -915,7 +915,7 @@ ${indent}- bar?::baz
     });
 });
 
-describe("updateCurrentQuestionText", () => {
+describe("updateCurrentQuestionTextAndCards", () => {
     const space: string = " ";
 
     describe("Checking update to file", () => {
@@ -935,7 +935,7 @@ describe("updateCurrentQuestionText", () => {
 <!--SR:!2023-09-02,4,270-->`;
                 const updatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
 <!--SR:!2023-09-02,4,270-->`;
-                await checkUpdateCurrentQuestionText(
+                await checkupdateCurrentQuestionTextAndCards(
                     text,
                     updatedQ,
                     originalStr,
@@ -957,7 +957,7 @@ describe("updateCurrentQuestionText", () => {
                 const originalStr: string = "#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->";
                 const expectedUpdatedStr: string = `#flashcards A much more in depth question::A much more detailed answer
 <!--SR:!2023-09-02,4,270-->`;
-                await checkUpdateCurrentQuestionText(
+                await checkupdateCurrentQuestionTextAndCards(
                     text,
                     updatedQ,
                     originalStr,
@@ -984,7 +984,7 @@ describe("updateCurrentQuestionText", () => {
                 const originalStr: string = "#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->";
                 const updatedStr: string =
                     "#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->";
-                await checkUpdateCurrentQuestionText(
+                await checkupdateCurrentQuestionTextAndCards(
                     text1,
                     updatedQ,
                     originalStr,
@@ -1008,7 +1008,7 @@ describe("updateCurrentQuestionText", () => {
 <!--SR:!2023-09-02,4,270-->`;
                 const updatedStr: string =
                     "#flashcards A much more in depth question::A much more detailed answer <!--SR:!2023-09-02,4,270-->";
-                await checkUpdateCurrentQuestionText(
+                await checkupdateCurrentQuestionTextAndCards(
                     text,
                     updatedQ,
                     originalStr,
@@ -1045,7 +1045,7 @@ A2 (answer now includes more detail)
 extra answer line 2
 <!--SR:!2023-09-02,4,270-->`;
 
-                await checkUpdateCurrentQuestionText(
+                await checkupdateCurrentQuestionTextAndCards(
                     text,
                     updatedQ,
                     originalStr,
@@ -1080,7 +1080,7 @@ A2 (answer now includes more detail)
 extra answer line 2
 <!--SR:!2023-09-02,4,270-->`;
 
-                await checkUpdateCurrentQuestionText(
+                await checkupdateCurrentQuestionTextAndCards(
                     text,
                     updatedQ,
                     originalStr,
@@ -1117,7 +1117,7 @@ A2 (answer now includes more detail)
 extra answer line 2
 <!--SR:!2023-09-02,4,270-->`;
 
-                await checkUpdateCurrentQuestionText(
+                await checkupdateCurrentQuestionTextAndCards(
                     text,
                     updatedQ,
                     originalStr,
@@ -1148,7 +1148,7 @@ extra answer line 2`;
                 const expectedUpdatedStr: string = `#flashcards
 ${updatedQuestionText}`;
 
-                await checkUpdateCurrentQuestionText(
+                await checkupdateCurrentQuestionTextAndCards(
                     fileText,
                     updatedQuestionText,
                     originalQuestionStr,
@@ -1272,7 +1272,7 @@ describe("Sequences", () => {
         const updatedStr: string =
             "#flashcards A much more in depth question::A much more detailed answer";
 
-        const c: TestContext = await checkUpdateCurrentQuestionText(
+        const c: TestContext = await checkupdateCurrentQuestionTextAndCards(
             text1,
             updatedQ,
             originalStr,
@@ -1303,7 +1303,7 @@ function skipAndCheckNoRemainingCards(c: TestContext) {
     expect(c.reviewSequencer.hasCurrentCard).toEqual(false);
 }
 
-async function checkUpdateCurrentQuestionText(
+async function checkupdateCurrentQuestionTextAndCards(
     noteText: string,
     updatedQ: string,
     originalStr: string,
@@ -1319,7 +1319,7 @@ async function checkUpdateCurrentQuestionText(
     await c.setSequencerDeckTreeFromOriginalText();
     expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
 
-    await c.reviewSequencer.updateCurrentQuestionText(updatedQ);
+    await c.reviewSequencer.updateCurrentQuestionTextAndCards(updatedQ);
 
     // originalText should remain the same except for the specific substring change from originalStr => updatedStr
     if (!c.originalText.includes(originalStr)) {

@@ -64,8 +64,12 @@ export class FlashcardEditModal extends Modal {
         this.separator = this.getSeparatorFromCardType(this.cardType, settings);
 
         if (this.separator !== null) {
-            this.textFront = this.currentCard.question.questionText.actualQuestion.split(this.separator)[0];
-            this.textBack = this.currentCard.question.questionText.actualQuestion.split(this.separator)[1];
+            this.textFront = this.currentCard.question.questionText.actualQuestion.split(
+                this.separator,
+            )[0];
+            this.textBack = this.currentCard.question.questionText.actualQuestion.split(
+                this.separator,
+            )[1];
 
             if (
                 this.cardType === CardType.MultiLineBasic ||
@@ -174,7 +178,10 @@ export class FlashcardEditModal extends Modal {
     private cancelClickCallback = (_: MouseEvent) => this.close();
 
     private emptyListenerCallback = (_: Event) => {
-        const isBackEmpty = this.textAreaBack === null || this.separator === null ? false : this.textAreaBack.value.length === 0;
+        const isBackEmpty =
+            this.textAreaBack === null || this.separator === null
+                ? false
+                : this.textAreaBack.value.length === 0;
         const isFrontEmpty = this.textAreaFront !== null && this.textAreaFront.value.length === 0;
 
         this.saveButton.setDisabled(isBackEmpty || isFrontEmpty);

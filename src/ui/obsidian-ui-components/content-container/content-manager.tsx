@@ -290,8 +290,8 @@ export default class ContentManager {
             this.reviewSequencer.currentDeck === null
                 ? null
                 : this.reviewSequencer.getDeckStats(
-                    this.reviewSequencer.currentDeck.getTopicPath(),
-                );
+                      this.reviewSequencer.currentDeck.getTopicPath(),
+                  );
 
         return {
             cardData: {
@@ -329,7 +329,7 @@ export default class ContentManager {
         if (
             this.lastPressedOnProcessReview &&
             timeNow - this.lastPressedOnProcessReview <
-            this.dataManager.data.settings.reviewButtonDelay
+                this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
@@ -355,7 +355,7 @@ export default class ContentManager {
         if (
             this.lastPressedOnProcessReview &&
             timeNow - this.lastPressedOnProcessReview <
-            this.dataManager.data.settings.reviewButtonDelay
+                this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
@@ -391,8 +391,26 @@ export default class ContentManager {
         await editModal
             .then(async (modifiedCardText) => {
                 if (this.reviewSequencer === null) return;
-                await this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
+                await this.reviewSequencer.updateCurrentQuestionTextAndCards(modifiedCardText);
                 this.uiManager.setUIState(currentUIState);
+
+                console.log(currentUIState);
+                console.log(this.uiManager.uiState);
+
+                if (this.sessionData !== null) {
+                    if (this.uiManager.uiState === UIState.CardFront) {
+                        await this.cardContainer.drawCardFront(this.sessionData, this.settings);
+                    }
+
+                    if (this.uiManager.uiState === UIState.CardBack) {
+                        await this.cardContainer.drawBack(
+                            this.sessionData,
+                            this.reviewMode,
+                            this.settings,
+                            this._determineButtonSchedule.bind(this),
+                        );
+                    }
+                }
             })
             .catch((reason) => console.log(reason));
     }
