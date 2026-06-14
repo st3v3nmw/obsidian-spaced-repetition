@@ -290,8 +290,8 @@ export default class ContentManager {
             this.reviewSequencer.currentDeck === null
                 ? null
                 : this.reviewSequencer.getDeckStats(
-                      this.reviewSequencer.currentDeck.getTopicPath(),
-                  );
+                    this.reviewSequencer.currentDeck.getTopicPath(),
+                );
 
         return {
             cardData: {
@@ -329,7 +329,7 @@ export default class ContentManager {
         if (
             this.lastPressedOnProcessReview &&
             timeNow - this.lastPressedOnProcessReview <
-                this.dataManager.data.settings.reviewButtonDelay
+            this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
@@ -355,7 +355,7 @@ export default class ContentManager {
         if (
             this.lastPressedOnProcessReview &&
             timeNow - this.lastPressedOnProcessReview <
-                this.dataManager.data.settings.reviewButtonDelay
+            this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
@@ -379,6 +379,7 @@ export default class ContentManager {
 
         // Just the question/answer text; without any preceding topic tag
         const textPrompt = currentQ.questionText.actualQuestion;
+        const currentUIState = this.uiManager.uiState;
         this.uiManager.setUIState(UIState.EditModal);
         const editModal = FlashcardEditModal.Prompt(
             this.app,
@@ -391,7 +392,7 @@ export default class ContentManager {
             .then(async (modifiedCardText) => {
                 if (this.reviewSequencer === null) return;
                 await this.reviewSequencer.updateCurrentQuestionText(modifiedCardText);
-                this.uiManager.setUIState(UIState.CardBack);
+                this.uiManager.setUIState(currentUIState);
             })
             .catch((reason) => console.log(reason));
     }

@@ -63,8 +63,8 @@ export class FlashcardEditModal extends Modal {
         this.separator = this.getSeparatorFromCardType(this.cardType, settings);
 
         if (this.separator !== null) {
-            this.textFront = this.currentCard.front;
-            this.textBack = this.currentCard.back;
+            this.textFront = this.currentCard.question.questionText.actualQuestion.split(this.separator)[0];
+            this.textBack = this.currentCard.question.questionText.actualQuestion.split(this.separator)[1];
 
             if (
                 this.cardType === CardType.MultiLineBasic ||
