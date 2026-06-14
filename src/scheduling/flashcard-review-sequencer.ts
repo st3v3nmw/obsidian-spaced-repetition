@@ -17,10 +17,10 @@ import { globalDateProvider } from "src/utils/dates";
 export interface IFlashcardReviewSequencer {
     get hasCurrentCard(): boolean;
     get hasPendingCards(): boolean;
-    get currentCard(): Card;
+    get currentCard(): Card | null;
     get currentQuestion(): Question;
     get currentNote(): Note;
-    get currentDeck(): Deck;
+    get currentDeck(): Deck | null;
     get nextPendingDueUnix(): number | null;
     get originalDeckTree(): Deck;
 
@@ -147,7 +147,9 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         return this.pendingCards.length > 0;
     }
 
-    get currentCard(): Card {
+    get currentCard(): Card | null {
+        if (this.cardSequencer.currentRepItem === null) return null;
+
         return this.cardSequencer.currentRepItem as Card;
     }
 
@@ -155,7 +157,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         return this.currentCard?.question;
     }
 
-    get currentDeck(): Deck {
+    get currentDeck(): Deck | null {
         return this.cardSequencer.currentDeck;
     }
 
