@@ -436,10 +436,6 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             this.settings,
         );
 
-        if (cardFrontBackList.length !== question.cards.length) {
-            // return;
-        }
-
         q.actualQuestion = text;
 
         await this.currentQuestion.writeQuestion(this.settings);

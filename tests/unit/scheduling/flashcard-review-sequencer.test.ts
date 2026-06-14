@@ -919,6 +919,27 @@ describe("updateCurrentQuestionTextAndCards", () => {
     const space: string = " ";
 
     describe("Checking update to file", () => {
+        describe("Cloze card type", () => {
+            test("Question has schedule on following line before/after update", async () => {
+                const text: string = `
+
+#flashcards This single ==question== turns into ==3 separate== ==cards==`;
+
+                const updatedQ: string = "This single ==question== turns into 2 separate ==cards==";
+                const originalStr: string =
+                    "#flashcards This single ==question== turns into ==3 separate== ==cards==";
+                const updatedStr: string =
+                    "#flashcards This single ==question== turns into 2 separate ==cards==";
+                await checkupdateClozeCurrentQuestionTextAndCards(
+                    text,
+                    updatedQ,
+                    originalStr,
+                    updatedStr,
+                    DEFAULT_SETTINGS,
+                );
+            });
+        });
+
         describe("Single line card type; Settings - schedule on following line", () => {
             test("Question has schedule on following line before/after update", async () => {
                 const text: string = `
@@ -1318,6 +1339,35 @@ async function checkupdateCurrentQuestionTextAndCards(
     );
     await c.setSequencerDeckTreeFromOriginalText();
     expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
+
+    await c.reviewSequencer.updateCurrentQuestionTextAndCards(updatedQ);
+
+    // originalText should remain the same except for the specific substring change from originalStr => updatedStr
+    if (!c.originalText.includes(originalStr)) {
+        console.warn(`Text not found: ${originalStr}`);
+    }
+    const expectedFileText: string = c.originalText.replace(originalStr, updatedStr);
+    expect(await c.file.read()).toEqual(expectedFileText);
+    return c;
+}
+
+async function checkupdateClozeCurrentQuestionTextAndCards(
+    noteText: string,
+    updatedQ: string,
+    originalStr: string,
+    updatedStr: string,
+    settings: SRSettings,
+): Promise<TestContext> {
+    const c: TestContext = TestContext.Create(
+        orderDueFirstSequential,
+        FlashcardReviewMode.Review,
+        settings,
+        noteText,
+    );
+    await c.setSequencerDeckTreeFromOriginalText();
+    expect(c.reviewSequencer.currentCard.front).toEqual(
+        "This single <span style='color:#2196f3'>[...]</span> turns into 3 separate cards",
+    );
 
     await c.reviewSequencer.updateCurrentQuestionTextAndCards(updatedQ);
 

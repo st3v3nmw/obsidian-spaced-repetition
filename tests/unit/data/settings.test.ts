@@ -153,6 +153,7 @@ describe("SettingsUtil", () => {
         settings = {
             ...DEFAULT_SETTINGS,
             randomizeCardOrder: true,
+            showRibbonIcon: true,
             flashcardCardOrder: null,
             flashcardDeckOrder: null,
             disableFileMenuReviewOptions: true,

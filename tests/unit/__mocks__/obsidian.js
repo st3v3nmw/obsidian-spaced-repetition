@@ -11,4 +11,6 @@ module.exports = {
             jest.fn(() => false);
         },
     },
+
+    Notice: jest.fn().mockImplementation(),
 };
