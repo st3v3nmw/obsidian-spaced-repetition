@@ -6,6 +6,10 @@ import { DataStoreAlgorithm } from "src/data/data-store/base/data-store-algorith
 import { NoteDataFileModifier } from "src/data/data-store/notes-data-store/note-data-file-modifier";
 import { NoteDataStoreAlgorithmOsr } from "src/data/data-store/notes-data-store/note-data-store-algorithm-osr";
 import { NotesDataStore } from "src/data/data-store/notes-data-store/notes-data-store";
+import { ScheduleDataFileRepository } from "src/data/data-store/sr-md-data-store/schedule-data-file-repository";
+import { SrMdDataFileModifier } from "src/data/data-store/sr-md-data-store/sr-md-data-file-modifier";
+import { SrMdDataStore } from "src/data/data-store/sr-md-data-store/sr-md-data-store";
+import { SrMdDataStoreAlgorithmOsr } from "src/data/data-store/sr-md-data-store/sr-md-data-store-algorithm-osr";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { ISRNoteTFile, SRNoteTFile } from "src/data/data-structures/file/note-file";
@@ -36,6 +40,9 @@ export class DataManager {
     public settingsManager: SettingsManager; // TODO: Refactor so that the plugin data manager and the settings manager are separate from the data manager
     private _osrCore: OsrCore | null = null;
     private _syncLock = false;
+    // Repository backing the SR_MD store; null when another store is active. Exposed so the
+    // settings UI can build a ScheduleDataMigrator that shares the active store's in-memory data.
+    public scheduleDataRepository: ScheduleDataFileRepository | null = null;
 
     constructor(
         plugin: SRPlugin,
@@ -127,6 +134,12 @@ export class DataManager {
         try {
             this.osrCore.loadInitialStateOfCore();
 
+            // Stores that keep schedule data outside notes (SR_MD) refresh their in-memory copy
+            // here so the synchronous read path during parsing sees current data.
+            if (DataStore.instance.preload) {
+                await DataStore.instance.preload();
+            }
+
             const notes: TFile[] = this.plugin.app.vault.getMarkdownFiles();
             for (const noteFile of notes) {
                 // Skip files in the note ignore folder
@@ -171,12 +184,24 @@ export class DataManager {
     setupDataStoreAndAlgorithmInstances(settings: SRSettings) {
         switch (settings.dataStore) {
             case StorageType.NOTES:
+                this.scheduleDataRepository = null;
                 DataStore.instance = new NotesDataStore(
                     settings,
                     new NoteDataFileModifier(this.plugin),
                 );
                 DataStoreAlgorithm.instance = new NoteDataStoreAlgorithmOsr(settings);
                 break;
+            case StorageType.SR_MD: {
+                const repository = new ScheduleDataFileRepository(this.plugin.app.vault, settings);
+                this.scheduleDataRepository = repository;
+                DataStore.instance = new SrMdDataStore(
+                    settings,
+                    new SrMdDataFileModifier(this.plugin, repository),
+                    repository,
+                );
+                DataStoreAlgorithm.instance = new SrMdDataStoreAlgorithmOsr();
+                break;
+            }
         }
 
         // TODO: Move this to the scheduling manager once it is implemented

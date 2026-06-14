@@ -19,6 +19,17 @@ export const OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX = / (\^[a-zA-Z0-9-]+)$/;
 export const SR_DATA_ID_TAG = "^sr-data-id-";
 export const SR_METADATA_CALLOUT = "> [!sr|card-metadata]";
 
+// External "SR markdown file" data store (StorageType.SR_MD)
+// Schedule data is stored in this file inside the user-configurable vault folder
+// (settings.scheduleDataVaultLocation, default "Spaced Repetition"). It is a markdown
+// file so that Obsidian Sync picks it up by default, with the data held as JSON inside
+// a fenced code block.
+export const SCHEDULE_DATA_FILENAME = "schedule-data.sr.md";
+
+// Each reviewable card gets an Obsidian block id of the form "^sr-id-<short-uuid>" that
+// links it to its entry in the schedule data file.
+export const SR_CARD_BLOCK_ID_PREFIX = "sr-id-";
+
 export const PREFERRED_DATE_FORMAT = "YYYY-MM-DD";
 export const ALLOWED_DATE_FORMATS = [PREFERRED_DATE_FORMAT, "DD-MM-YYYY", "ddd MMM DD YYYY"];
 

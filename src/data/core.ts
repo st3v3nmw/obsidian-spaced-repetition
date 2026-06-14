@@ -1,3 +1,4 @@
+import { DataStore } from "src/data/data-store/base/data-store";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import { DeckTreeStatsCalculator } from "src/data/data-structures/deck/deck-tree-stats-calculator";
@@ -247,7 +248,7 @@ export class OsrCore {
      * @returns {Promise<RepItemScheduleInfo>} - A promise that resolves with the scheduling information for the note file.
      */
     private async readNoteSchedule(noteFile: ISRNoteTFile): Promise<RepItemScheduleInfo | null> {
-        return await noteFile.getNoteSchedule();
+        return await DataStore.getInstance().readNoteSchedule(noteFile);
     }
 
     /**
@@ -261,7 +262,7 @@ export class OsrCore {
         noteFile: ISRNoteTFile,
         noteSchedule: RepItemScheduleInfo,
     ): Promise<void> {
-        await noteFile.setNoteSchedule(noteSchedule);
+        await DataStore.getInstance().writeNoteSchedule(noteFile, noteSchedule);
     }
 
     /**
