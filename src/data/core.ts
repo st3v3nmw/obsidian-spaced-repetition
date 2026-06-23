@@ -236,8 +236,8 @@ export class OsrCore {
         if (SettingsUtil.isAnyTagIgnoredForNotes(this.settings, tags)) {
             return;
         }
-        const noteSchedule: RepItemScheduleInfo | null = await this.readNoteSchedule(noteFile);
-        this._noteReviewQueue.addNoteToQueue(noteFile, noteSchedule, matchedNoteTags);
+        // Reuse the schedule already read at the top of this method rather than reading it again.
+        this._noteReviewQueue.addNoteToQueue(noteFile, schedule, matchedNoteTags);
     }
 
     /**

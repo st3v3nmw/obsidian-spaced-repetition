@@ -152,6 +152,10 @@ export class UnitTestSRFile implements ISRNoteTFile {
         });
     }
 
+    async cachedRead(): Promise<string> {
+        return this.read();
+    }
+
     async write(content: string): Promise<void> {
         return new Promise((resolve) => {
             this.content = content;
