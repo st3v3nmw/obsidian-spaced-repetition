@@ -26,6 +26,15 @@ export interface ISRFile {
     getAllTagsFromText(): TagCache[];
     getTextDirection(): TextDirection;
     read(): Promise<string>;
+    /**
+     * Reads the file via Obsidian's in-memory cache.
+     *
+     * Use this for read-only parsing (e.g. extracting flashcards during a sync) so that
+     * the full vault scan doesn't trigger a fresh disk read for every note on every review.
+     * Do NOT use it when about to modify-and-write the file (a stale cached copy could clobber
+     * a recent change) — use {@link read} for read-modify-write paths.
+     */
+    cachedRead(): Promise<string>;
     write(content: string): Promise<void>;
 }
 
@@ -212,6 +221,16 @@ export abstract class SRTFile implements ISRFile {
      */
     async read(): Promise<string> {
         return await this.vault.read(this.file);
+    }
+
+    /**
+     * Reads the file content from Obsidian's in-memory cache (no disk read when the
+     * file is unchanged). See {@link ISRFile.cachedRead} for when to use this vs. {@link read}.
+     *
+     * @returns {Promise<string>} - A promise that resolves with the content of the file.
+     */
+    async cachedRead(): Promise<string> {
+        return await this.vault.cachedRead(this.file);
     }
 
     /**

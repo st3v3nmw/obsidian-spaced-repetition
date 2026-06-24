@@ -63,8 +63,10 @@ export class NoteQuestionParser {
             tagCacheList.some((item) => SettingsUtil.isFlashcardTag(this.settings, item)) ||
             folderTopicPath.hasPath;
         if (hasTopicPaths) {
-            // Reading the file is relatively an expensive operation, so we only do this when needed
-            const noteText: string = await noteFile.read();
+            // Reading the file is relatively an expensive operation, so we only do this when needed.
+            // Use the cached read: parsing is read-only, and a full vault scan would otherwise do a
+            // fresh disk read for every flashcard note on every review/sync.
+            const noteText: string = await noteFile.cachedRead();
 
             // Now that we know there are relevant flashcard tags in the file, we can get the more detailed info
             // that includes the line numbers of each tag
