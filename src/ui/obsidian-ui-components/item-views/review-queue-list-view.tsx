@@ -150,7 +150,7 @@ export class ReviewQueueListView extends ItemView {
             deckCollapsed,
             deck,
             {
-                treeItem: ["sr-folder", "sr-folder--schedule", "sr-folder--schedule--new"],
+                treeItem: ["sr-folder", "sr-folder--schedule"],
             },
         );
 
@@ -170,7 +170,7 @@ export class ReviewQueueListView extends ItemView {
                 !deck.activeFolders.has(t("NEW")),
                 deck,
                 {
-                    treeItemSelf: ["sr-file--new"],
+                    treeItemSelf: ["sr-file", "sr-file--new"],
                 },
             );
         }
@@ -209,26 +209,13 @@ export class ReviewQueueListView extends ItemView {
                     );
                 }
 
-                let dueStatusClassName;
-                switch (this.getDueStatus(nDays)) {
-                    case "DUE_TODAY":
-                        dueStatusClassName = "sr-folder--schedule--due-today";
-                        break;
-                    case "DUE_OVER":
-                        dueStatusClassName = "sr-folder--schedule--due-over";
-                        break;
-                    case "DUE_NONE":
-                        dueStatusClassName = "sr-folder--schedule--due-none";
-                        break;
-                }
-
                 scheduleFolderEl = this.createFolder(
                     parentEl,
                     folderTitle,
                     !deck.activeFolders.has(folderTitle),
                     deckCollapsed,
                     deck,
-                    { treeItem: ["sr-folder", "sr-folder--schedule", dueStatusClassName] },
+                    { treeItem: ["sr-folder", "sr-folder--schedule"] },
                 );
                 currUnix = sNote.dueUnix;
             }
@@ -264,7 +251,7 @@ export class ReviewQueueListView extends ItemView {
                     !deck.activeFolders.has(folderTitle),
                     deck,
                     {
-                        treeItemSelf: [fileDueStatusClassName],
+                        treeItemSelf: ["sr-file", fileDueStatusClassName],
                     },
                 );
             }
