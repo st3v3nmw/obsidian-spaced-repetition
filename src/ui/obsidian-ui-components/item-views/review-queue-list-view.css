@@ -23,7 +23,7 @@
     }
 
     .sr-folder.is-collapsed {
-        /* Priority priority: Overdue > Due-today > New */
+        /* Priority order: Overdue > Due-today > New */
 
         /* New */
         &:has(.sr-file--new) > .tree-item-self::after {
