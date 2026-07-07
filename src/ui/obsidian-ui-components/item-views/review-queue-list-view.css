@@ -22,109 +22,57 @@
         justify-content: space-between;
     }
 
-    /* Select deck folders which has descendant :
-      .sr-file--due-over AND (.sr-file--due-today OR .sr-file--new)
+    .sr-folder.is-collapsed {
+        /* Priority priority: Overdue > Due-today > New */
 
-      Add red-green indicator
-    */
-    .sr-folder--deck.is-collapsed:has(.sr-file--due-over) {
-        &:has(.sr-file--due-today),
-        &:has(.sr-file--new) {
-            & > .tree-item-self::after {
-                margin-left: auto;
-                content: "";
-                width: var(--size-4-3);
-                height: var(--size-4-3);
-                border-radius: 50% 50%;
-                background: linear-gradient(
-                    90deg,
-                    var(--sr-color-red) 40%,
-                    var(--sr-color-green) 60%
-                );
-            }
-        }
-    }
-
-    /* Select deck folders which has descendant :
-      .sr-file--due-over AND (NOT .sr-file--due-today) AND (NOT sr-file--new)
-      
-      Add reddish indicator
-    */
-    .sr-folder--deck.is-collapsed:has(.sr-file--due-over):not(:has(.sr-file--due-today)):not(
-            :has(.sr-file--new)
-        ) {
-        & > .tree-item-self::after {
+        /* New */
+        &:has(.sr-file--new) > .tree-item-self::after {
             margin-left: auto;
             content: "";
             width: var(--size-4-3);
             height: var(--size-4-3);
-            border-radius: 50% 50%;
-            background: var(--sr-color-red);
+            border-radius: 50%;
+            background: var(--sr-color-blue);
         }
-    }
 
-    /* Select deck folders which has descendant :
-      NOT .sr-file--due-over AND (.sr-file--due-today OR .sr-file--new)
-      
-      Add greenish indicator
-    */
-    .sr-folder--deck.is-collapsed:not(:has(.sr-file--due-over)) {
-        &:has(.sr-file--due-today),
-        &:has(.sr-file--new) {
-            & > .tree-item-self::after {
-                margin-left: auto;
-                content: "";
-                width: var(--size-4-3);
-                height: var(--size-4-3);
-                border-radius: 50% 50%;
-                background: var(--sr-color-green);
-            }
-        }
-    }
-
-    /* Select 'New' and 'Today' folders
-      
-      Add greenish indicator
-    */
-    .sr-folder--schedule--new,
-    .sr-folder--schedule--due-today {
-        &.is-collapsed > .tree-item-self::after {
+        /* Overrides New */
+        &:has(.sr-file--due-today) > .tree-item-self::after {
             margin-left: auto;
             content: "";
             width: var(--size-4-3);
             height: var(--size-4-3);
-            border-radius: 50% 50%;
+            border-radius: 50%;
             background: var(--sr-color-green);
         }
-    }
 
-    /* Select 'Overdue' folder
-      
-      Add reddish indicator
-    */
-    .sr-folder--schedule--due-over {
-        &.is-collapsed > .tree-item-self::after {
+        /* Overrides New and Due-today */
+        &:has(.sr-file--due-over) > .tree-item-self::after {
             margin-left: auto;
             content: "";
             width: var(--size-4-3);
             height: var(--size-4-3);
-            border-radius: 50% 50%;
+            border-radius: 50%;
             background: var(--sr-color-red);
         }
     }
 
-    /* Select files which are either new or due-today
+    /* Select files which are new,
+        Add blueish left border
+     */
+    .sr-file--new {
+        border-left: var(--size-4-1) solid var(--sr-color-blue);
+    }
+
+    /* Select files which are due-today,
         Add greenish left border
      */
-    .sr-file--due-today,
-    .sr-file--new {
+    .sr-file--due-today {
         border-left: var(--size-4-1) solid var(--sr-color-green);
     }
 
     /* Select files which are either over-due
         Add reddish left border
      */
-
     .sr-file--due-over {
         border-left: var(--size-4-1) solid var(--sr-color-red);
     }

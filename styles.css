@@ -1152,71 +1152,36 @@ th.gridjs-th:last-child {
     align-items: center;
     justify-content: space-between;
   }
-  .sr-folder--deck.is-collapsed:has(.sr-file--due-over) {
-    &:has(.sr-file--due-today),
-    &:has(.sr-file--new) {
-      & > .tree-item-self::after {
-        margin-left: auto;
-        content: "";
-        width: var(--size-4-3);
-        height: var(--size-4-3);
-        border-radius: 50% 50%;
-        background: linear-gradient(
-          90deg,
-          var(--sr-color-red) 40%,
-          var(--sr-color-green) 60%
-        );
-      }
-    }
-  }
-  .sr-folder--deck.is-collapsed:has(.sr-file--due-over):not(
-      :has(.sr-file--due-today)
-    ):not(:has(.sr-file--new)) {
-    & > .tree-item-self::after {
+  .sr-folder.is-collapsed {
+    &:has(.sr-file--new) > .tree-item-self::after {
       margin-left: auto;
       content: "";
       width: var(--size-4-3);
       height: var(--size-4-3);
-      border-radius: 50% 50%;
-      background: var(--sr-color-red);
+      border-radius: 50%;
+      background: var(--sr-color-blue);
     }
-  }
-  .sr-folder--deck.is-collapsed:not(:has(.sr-file--due-over)) {
-    &:has(.sr-file--due-today),
-    &:has(.sr-file--new) {
-      & > .tree-item-self::after {
-        margin-left: auto;
-        content: "";
-        width: var(--size-4-3);
-        height: var(--size-4-3);
-        border-radius: 50% 50%;
-        background: var(--sr-color-green);
-      }
-    }
-  }
-  .sr-folder--schedule--new,
-  .sr-folder--schedule--due-today {
-    &.is-collapsed > .tree-item-self::after {
+    &:has(.sr-file--due-today) > .tree-item-self::after {
       margin-left: auto;
       content: "";
       width: var(--size-4-3);
       height: var(--size-4-3);
-      border-radius: 50% 50%;
+      border-radius: 50%;
       background: var(--sr-color-green);
     }
-  }
-  .sr-folder--schedule--due-over {
-    &.is-collapsed > .tree-item-self::after {
+    &:has(.sr-file--due-over) > .tree-item-self::after {
       margin-left: auto;
       content: "";
       width: var(--size-4-3);
       height: var(--size-4-3);
-      border-radius: 50% 50%;
+      border-radius: 50%;
       background: var(--sr-color-red);
     }
   }
-  .sr-file--due-today,
   .sr-file--new {
+    border-left: var(--size-4-1) solid var(--sr-color-blue);
+  }
+  .sr-file--due-today {
     border-left: var(--size-4-1) solid var(--sr-color-green);
   }
   .sr-file--due-over {

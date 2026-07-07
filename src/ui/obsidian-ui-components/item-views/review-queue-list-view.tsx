@@ -125,7 +125,7 @@ export class ReviewQueueListView extends ItemView {
             false,
             deck,
             {
-                treeItem: ["sr-folder--deck"],
+                treeItem: ["sr-folder", "sr-folder--deck"],
             },
         ).getElementsByClassName("tree-item-children nav-folder-children")[0] as HTMLElement;
 
@@ -150,7 +150,7 @@ export class ReviewQueueListView extends ItemView {
             deckCollapsed,
             deck,
             {
-                treeItem: ["sr-folder--schedule--new"],
+                treeItem: ["sr-folder", "sr-folder--schedule", "sr-folder--schedule--new"],
             },
         );
 
@@ -228,7 +228,7 @@ export class ReviewQueueListView extends ItemView {
                     !deck.activeFolders.has(folderTitle),
                     deckCollapsed,
                     deck,
-                    { treeItem: ["sr-folder--schedule", dueStatusClassName] },
+                    { treeItem: ["sr-folder", "sr-folder--schedule", dueStatusClassName] },
                 );
                 currUnix = sNote.dueUnix;
             }
