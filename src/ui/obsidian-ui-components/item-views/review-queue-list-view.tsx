@@ -15,6 +15,8 @@ import { formatDateWithMoment } from "src/utils/dates";
 
 export const REVIEW_QUEUE_VIEW_TYPE = "review-queue-list-view";
 
+type DueStatus = "DUE_OVER" | "DUE_TODAY" | "DUE_NONE";
+
 export class ReviewQueueListView extends ItemView {
     private get noteReviewQueue(): NoteReviewQueue {
         return this.nextNoteReviewHandler.noteReviewQueue;
@@ -122,6 +124,9 @@ export class ReviewQueueListView extends ItemView {
             deckCollapsed,
             false,
             deck,
+            {
+                treeItem: ["sr-folder", "sr-folder--deck"],
+            },
         ).getElementsByClassName("tree-item-children nav-folder-children")[0] as HTMLElement;
 
         if (deck.newNotes.length > 0) {
@@ -144,6 +149,9 @@ export class ReviewQueueListView extends ItemView {
             !deck.activeFolders.has(t("NEW")),
             deckCollapsed,
             deck,
+            {
+                treeItem: ["sr-folder", "sr-folder--schedule"],
+            },
         );
 
         for (const newFile of deck.newNotes) {
@@ -161,6 +169,9 @@ export class ReviewQueueListView extends ItemView {
                 fileIsOpen,
                 !deck.activeFolders.has(t("NEW")),
                 deck,
+                {
+                    treeItemSelf: ["sr-file", "sr-file--new"],
+                },
             );
         }
     }
@@ -178,9 +189,9 @@ export class ReviewQueueListView extends ItemView {
         const maxDaysToRender: number = this.settings.maxNDaysNotesReviewQueue;
 
         for (const sNote of deck.scheduledNotes) {
-            if (sNote.dueUnix !== currUnix) {
-                const nDays: number = Math.ceil((sNote.dueUnix - now) / TICKS_PER_DAY);
+            const nDays: number = Math.ceil((sNote.dueUnix - now) / TICKS_PER_DAY);
 
+            if (sNote.dueUnix !== currUnix) {
                 if (nDays > maxDaysToRender) {
                     break;
                 }
@@ -204,6 +215,7 @@ export class ReviewQueueListView extends ItemView {
                     !deck.activeFolders.has(folderTitle),
                     deckCollapsed,
                     deck,
+                    { treeItem: ["sr-folder", "sr-folder--schedule"] },
                 );
                 currUnix = sNote.dueUnix;
             }
@@ -218,12 +230,29 @@ export class ReviewQueueListView extends ItemView {
             }
 
             if (scheduleFolderEl) {
+                let fileDueStatusClassName;
+
+                switch (this.getDueStatus(nDays)) {
+                    case "DUE_TODAY":
+                        fileDueStatusClassName = "sr-file--due-today";
+                        break;
+                    case "DUE_OVER":
+                        fileDueStatusClassName = "sr-file--due-over";
+                        break;
+                    case "DUE_NONE":
+                        fileDueStatusClassName = "sr-file--due-none";
+                        break;
+                }
+
                 this.createFile(
                     scheduleFolderEl,
                     sNote.note.tfile,
                     fileIsOpen,
                     !deck.activeFolders.has(folderTitle),
                     deck,
+                    {
+                        treeItemSelf: ["sr-file", fileDueStatusClassName],
+                    },
                 );
             }
         }
@@ -235,8 +264,14 @@ export class ReviewQueueListView extends ItemView {
         collapsed: boolean,
         hidden: boolean,
         deck: NoteReviewDeck,
+        classes?: {
+            treeItem?: string[];
+        },
     ): HTMLElement {
         const folderEl: HTMLDivElement = parentEl.createDiv("tree-item nav-folder");
+        if (classes?.treeItem) {
+            folderEl.classList.add(...classes.treeItem);
+        }
         const folderTitleEl: HTMLDivElement = folderEl.createDiv("tree-item-self nav-folder-title");
         folderTitleEl.classList.add("is-clickable");
         const childrenEl: HTMLDivElement = folderEl.createDiv(
@@ -284,6 +319,9 @@ export class ReviewQueueListView extends ItemView {
         fileElActive: boolean,
         hidden: boolean,
         deck: NoteReviewDeck,
+        classes?: {
+            treeItemSelf: string[];
+        },
     ): void {
         const childrenEl: HTMLElement = folderEl.getElementsByClassName(
             "tree-item-children nav-folder-children",
@@ -301,7 +339,9 @@ export class ReviewQueueListView extends ItemView {
         if (fileElActive) {
             navFileTitle.addClass("is-active");
         }
-
+        if (classes?.treeItemSelf) {
+            navFileTitle.classList.add(...classes.treeItemSelf);
+        }
         const navFileTitleInner: HTMLElement = navFileTitle.createDiv(
             "tree-item-inner nav-file-title-content",
         );
@@ -413,5 +453,9 @@ export class ReviewQueueListView extends ItemView {
             folderEl.removeClass("is-collapsed");
             if (childEl) childEl.classList.remove("is-collapsed");
         }
+    }
+
+    private getDueStatus(nDays: number): DueStatus {
+        return nDays < 0 ? "DUE_OVER" : nDays === 0 ? "DUE_TODAY" : "DUE_NONE";
     }
 }

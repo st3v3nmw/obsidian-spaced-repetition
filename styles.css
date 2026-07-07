@@ -118,6 +118,11 @@
   width: 100%;
   height: 100%;
 }
+:root {
+  --sr-color-blue: #3591dd;
+  --sr-color-red: #f25d50;
+  --sr-color-green: #47a84a;
+}
 
 /* src/ui/obsidian-ui-components/item-views/tab-view.css */
 .sr-tab-view {
@@ -1146,6 +1151,41 @@ th.gridjs-th:last-child {
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+  .sr-folder.is-collapsed {
+    &:has(.sr-file--new) > .tree-item-self::after {
+      margin-left: auto;
+      content: "";
+      width: var(--size-4-3);
+      height: var(--size-4-3);
+      border-radius: 50%;
+      background: var(--sr-color-blue);
+    }
+    &:has(.sr-file--due-today) > .tree-item-self::after {
+      margin-left: auto;
+      content: "";
+      width: var(--size-4-3);
+      height: var(--size-4-3);
+      border-radius: 50%;
+      background: var(--sr-color-green);
+    }
+    &:has(.sr-file--due-over) > .tree-item-self::after {
+      margin-left: auto;
+      content: "";
+      width: var(--size-4-3);
+      height: var(--size-4-3);
+      border-radius: 50%;
+      background: var(--sr-color-red);
+    }
+  }
+  .sr-file--new {
+    border-left: var(--size-4-1) solid var(--sr-color-blue);
+  }
+  .sr-file--due-today {
+    border-left: var(--size-4-1) solid var(--sr-color-green);
+  }
+  .sr-file--due-over {
+    border-left: var(--size-4-1) solid var(--sr-color-red);
   }
   .nav-file-title-content {
     display: flex;
