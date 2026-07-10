@@ -207,13 +207,11 @@ export default class ContentManager {
         }
 
         if (!this.reviewSequencer.hasCurrentCard) {
-            // TODO: Re-enable pending state, once it is more integrated with the rest of the ui & once data refreshing is better implemented
-            // if (this.reviewSequencer.hasPendingCards) {
-            //     await this._showPendingState();
-            // } else {
-            //     await this._showDecksList(true);
-            // }
-            await this._showDecksList(true);
+            if (this.reviewSequencer.hasPendingCards) {
+                await this._showPendingState();
+            } else {
+                await this._showDecksList(true);
+            }
             return;
         }
 
@@ -290,8 +288,8 @@ export default class ContentManager {
             this.reviewSequencer.currentDeck === null
                 ? null
                 : this.reviewSequencer.getDeckStats(
-                      this.reviewSequencer.currentDeck.getTopicPath(),
-                  );
+                    this.reviewSequencer.currentDeck.getTopicPath(),
+                );
 
         return {
             cardData: {
@@ -329,7 +327,7 @@ export default class ContentManager {
         if (
             this.lastPressedOnProcessReview &&
             timeNow - this.lastPressedOnProcessReview <
-                this.dataManager.data.settings.reviewButtonDelay
+            this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
@@ -355,7 +353,7 @@ export default class ContentManager {
         if (
             this.lastPressedOnProcessReview &&
             timeNow - this.lastPressedOnProcessReview <
-                this.dataManager.data.settings.reviewButtonDelay
+            this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
