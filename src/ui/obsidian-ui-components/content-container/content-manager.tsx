@@ -206,6 +206,14 @@ export default class ContentManager {
             return;
         }
 
+        // Если короткий интервал уже истёк, возвращаем карточки
+        // из pendingCards и полностью обновляем текущий итератор.
+        const nextPendingDueUnix = this.reviewSequencer.nextPendingDueUnix;
+
+        if (nextPendingDueUnix !== null && nextPendingDueUnix <= Date.now()) {
+            this.reviewSequencer.refreshCurrentDeck();
+        }
+
         if (!this.reviewSequencer.hasCurrentCard) {
             if (this.reviewSequencer.hasPendingCards) {
                 await this._showPendingState();
