@@ -1,17 +1,23 @@
 import { ClozeCrafter, IClozeFormatter } from "clozecraft";
 
+import {
+    extractProgressiveHints,
+    renderProgressiveHints,
+} from "src/data/data-structures/card/questions/progressive-hints";
 import { CardType } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
 import { findLineIndexOfSearchStringIgnoringWs } from "src/utils/strings";
 
 export class CardFrontBack {
     front: string;
+    hintFronts: string[];
     back: string;
 
     // The caller is responsible for any required trimming of leading/trailing spaces
-    constructor(front: string, back: string) {
+    constructor(front: string, back: string, hintFronts: string[] = []) {
         this.front = front;
         this.back = back;
+        this.hintFronts = hintFronts;
     }
 }
 
@@ -94,8 +100,9 @@ class QuestionTypeMultiLineReversed implements IQuestionTypeHandler {
 
 class QuestionTypeCloze implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
+        const progressiveHints = extractProgressiveHints(questionText);
         const clozecrafter = new ClozeCrafter(settings.clozePatterns);
-        const clozeNote = clozecrafter.createClozeNote(questionText);
+        const clozeNote = clozecrafter.createClozeNote(progressiveHints.text);
 
         // Determine which question formatter to use based on settings (Cloze patterns as inputs or not).
         const clozeFormatter = settings.convertClozePatternsToInputs
@@ -107,9 +114,20 @@ class QuestionTypeCloze implements IQuestionTypeHandler {
         if (clozeNote === null) return result;
 
         for (let i = 0; i < clozeNote.numCards; i++) {
-            front = clozeNote.getCardFront(i, clozeFormatter);
-            back = clozeNote.getCardBack(i, clozeFormatter);
-            result.push(new CardFrontBack(front, back));
+            const rawFront = clozeNote.getCardFront(i, clozeFormatter);
+            const rawBack = clozeNote.getCardBack(i, clozeFormatter);
+            front = renderProgressiveHints(rawFront, progressiveHints.hints, null);
+            const hintFronts = progressiveHints.levels.map((level) =>
+                renderProgressiveHints(rawFront, progressiveHints.hints, level),
+            );
+            back = renderProgressiveHints(
+                rawBack,
+                progressiveHints.hints,
+                progressiveHints.levels.length > 0
+                    ? progressiveHints.levels[progressiveHints.levels.length - 1]
+                    : null,
+            );
+            result.push(new CardFrontBack(front, back, hintFronts));
         }
 
         return result;
