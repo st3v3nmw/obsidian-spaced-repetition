@@ -291,6 +291,30 @@ export class Deck {
     }
 
     /**
+     * Inserts a repetition item at the front of every deck it belongs to.
+     * Used when a short-term FSRS step becomes due during an active session,
+     * so the sequential iterator can select it at the next card boundary.
+     */
+    prependRepItem(topicPathList: TopicPathList, repItem: RepetitionItem): void {
+        if (topicPathList.list.length === 0) {
+            this.prependRepItemSingleTopic(TopicPath.emptyPath, repItem);
+        } else {
+            for (const topicPath of topicPathList.list) {
+                this.prependRepItemSingleTopic(topicPath, repItem);
+            }
+        }
+    }
+
+    private prependRepItemSingleTopic(topicPath: TopicPath, repItem: RepetitionItem): void {
+        const deck: Deck = this.getOrCreateDeck(topicPath);
+        const repItemList: RepetitionItem[] = deck.getRepItemListForRepItemState(
+            repItem.repItemState,
+        );
+
+        repItemList.unshift(repItem);
+    }
+
+    /**
      * Appends a RepetitionItem to the root deck.
      *
      * This is used for cards that don't have any topics, and also for postponing cards (e.g. when skipping a card, we move it to the root deck and remove its topic paths, so that it won't be seen until the next review session when we reassign it to decks based on its question's topic paths)

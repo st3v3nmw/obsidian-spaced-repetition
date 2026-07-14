@@ -1,12 +1,12 @@
-// Перевод на русский язык
+// Russian translation
 
-// @ytatichno Сафронов Максим
+// @ytatichno Maxim Safronov
 // https://github.com/ytatichno
 
-// Микко Ведру
+// Mikko Vedru
 // https://github.com/mikkovedru
 
-// Калашников Иван
+// Ivan Kalashnikov
 // https://github.com/Steindvart
 import { IBaseLocale } from "src/lang/base-locale";
 import en from "src/lang/locale/en";

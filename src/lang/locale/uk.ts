@@ -2,7 +2,7 @@
 
 // https://github.com/kratiuk
 
-// Слава захисникам та захисницям України! 🇺🇦
+// Glory to Ukraine's defenders! 🇺🇦
 import { IBaseLocale } from "src/lang/base-locale";
 import en from "src/lang/locale/en";
 

@@ -206,11 +206,9 @@ export default class ContentManager {
             return;
         }
 
-        // Если короткий интервал уже истёк, возвращаем карточки
-        // из pendingCards и полностью обновляем текущий итератор.
-        const nextPendingDueUnix = this.reviewSequencer.nextPendingDueUnix;
-
-        if (nextPendingDueUnix !== null && nextPendingDueUnix <= Date.now()) {
+        // Rebuild the current iterator only at a card boundary, after a
+        // short-term interval has elapsed.
+        if (this.reviewSequencer.hasDuePendingCards) {
             this.reviewSequencer.refreshCurrentDeck();
         }
 
@@ -296,8 +294,8 @@ export default class ContentManager {
             this.reviewSequencer.currentDeck === null
                 ? null
                 : this.reviewSequencer.getDeckStats(
-                    this.reviewSequencer.currentDeck.getTopicPath(),
-                );
+                      this.reviewSequencer.currentDeck.getTopicPath(),
+                  );
 
         return {
             cardData: {
@@ -335,7 +333,7 @@ export default class ContentManager {
         if (
             this.lastPressedOnProcessReview &&
             timeNow - this.lastPressedOnProcessReview <
-            this.dataManager.data.settings.reviewButtonDelay
+                this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }
@@ -361,7 +359,7 @@ export default class ContentManager {
         if (
             this.lastPressedOnProcessReview &&
             timeNow - this.lastPressedOnProcessReview <
-            this.dataManager.data.settings.reviewButtonDelay
+                this.dataManager.data.settings.reviewButtonDelay
         ) {
             return;
         }

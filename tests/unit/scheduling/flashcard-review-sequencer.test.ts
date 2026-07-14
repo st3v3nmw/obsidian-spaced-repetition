@@ -771,6 +771,76 @@ Q1::A1
             expect(reviewSequencer.currentCard.front).toMatch(clozeQuestion1Card1);
         });
 
+        test("Reading queue statistics does not wake pending cards before the next card boundary", async () => {
+            const c: TestContext = TestContext.Create(
+                orderDueFirstSequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                "#flashcards Q1::A1",
+            );
+            await c.setSequencerDeckTreeFromOriginalText();
+            const reviewSequencer = c.reviewSequencer as FlashcardReviewSequencer;
+            const pendingSchedule = new RepItemScheduleInfoFsrs(
+                moment("2023-09-06T00:10:00.000Z"),
+                0,
+                5.5,
+                0.4,
+                State.Learning,
+                1,
+                0,
+                1,
+                moment("2023-09-06T00:00:00.000Z"),
+            );
+            jest.spyOn(reviewSequencer, "determineCardSchedule").mockReturnValue(pendingSchedule);
+
+            await reviewSequencer.processReviewReviewMode(ReviewResponse.Good);
+            setupStaticDateProviderOriginDatePlusDays(1);
+
+            expect(reviewSequencer.hasDuePendingCards).toEqual(true);
+            reviewSequencer.getDeckStats(TopicPath.emptyPath);
+            expect(reviewSequencer.hasPendingCards).toEqual(true);
+
+            reviewSequencer.refreshCurrentDeck();
+            expect(reviewSequencer.hasPendingCards).toEqual(false);
+            expect(reviewSequencer.currentCard.front).toEqual("Q1");
+        });
+
+        test("A due pending card is shown before the untouched sequential due queue", async () => {
+            const text = `#flashcards A::a <!--SR:!2023-09-02,4,270-->
+#flashcards B::b <!--SR:!2023-09-02,4,270-->
+#flashcards C::c <!--SR:!2023-09-02,4,270-->`;
+            const c: TestContext = TestContext.Create(
+                orderDueFirstSequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                text,
+            );
+            await c.setSequencerDeckTreeFromOriginalText();
+            const reviewSequencer = c.reviewSequencer as FlashcardReviewSequencer;
+            const pendingSchedule = new RepItemScheduleInfoFsrs(
+                moment("2023-09-06T00:10:00.000Z"),
+                0,
+                5.5,
+                0.4,
+                State.Learning,
+                1,
+                0,
+                1,
+                moment("2023-09-06T00:00:00.000Z"),
+            );
+            jest.spyOn(reviewSequencer, "determineCardSchedule").mockReturnValue(pendingSchedule);
+
+            expect(reviewSequencer.currentCard.front).toEqual("A");
+            await reviewSequencer.processReviewReviewMode(ReviewResponse.Again);
+            expect(reviewSequencer.currentCard.front).toEqual("B");
+
+            setupStaticDateProviderOriginDatePlusDays(1);
+            reviewSequencer.refreshCurrentDeck();
+
+            expect(reviewSequencer.currentCard.front).toEqual("A");
+            expect(reviewSequencer.hasPendingCards).toEqual(false);
+        });
+
         test("Pending cards without stored due dates keep an undefined pending timestamp", async () => {
             const c: TestContext = TestContext.Create(
                 orderDueFirstSequential,
