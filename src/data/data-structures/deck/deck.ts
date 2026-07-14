@@ -294,6 +294,8 @@ export class Deck {
      * Inserts a repetition item at the front of every deck it belongs to.
      * Used when a short-term FSRS step becomes due during an active session,
      * so the sequential iterator can select it at the next card boundary.
+     * Random iterator modes keep the card eligible but preserve their configured
+     * random selection policy.
      */
     prependRepItem(topicPathList: TopicPathList, repItem: RepetitionItem): void {
         if (topicPathList.list.length === 0) {
