@@ -102,15 +102,16 @@ export class AIPage extends SettingsPage {
             new Setting(this.containerEl)
                 .setName("TTS API Key")
                 .setDesc("API key if required by your TTS server (leave blank if not needed).")
-                .addText((text) =>
-                    text
+                .addText((text) => {
+                    text.inputEl.type = "password";
+                    return text
                         .setPlaceholder("API Key")
                         .setValue(settings.ttsApiKey)
                         .onChange(async (value) => {
                             settings.ttsApiKey = value.trim();
                             await this.settingsManager.save();
-                        }),
-                );
+                        });
+                });
 
             new Setting(this.containerEl)
                 .setName("TTS Model")
