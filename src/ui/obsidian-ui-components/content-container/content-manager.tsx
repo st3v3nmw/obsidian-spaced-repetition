@@ -206,14 +206,18 @@ export default class ContentManager {
             return;
         }
 
+        // Rebuild the current iterator only at a card boundary, after a
+        // short-term interval has elapsed.
+        if (this.reviewSequencer.hasDuePendingCards) {
+            this.reviewSequencer.refreshCurrentDeck();
+        }
+
         if (!this.reviewSequencer.hasCurrentCard) {
-            // TODO: Re-enable pending state, once it is more integrated with the rest of the ui & once data refreshing is better implemented
-            // if (this.reviewSequencer.hasPendingCards) {
-            //     await this._showPendingState();
-            // } else {
-            //     await this._showDecksList(true);
-            // }
-            await this._showDecksList(true);
+            if (this.reviewSequencer.hasPendingCards) {
+                await this._showPendingState();
+            } else {
+                await this._showDecksList(true);
+            }
             return;
         }
 
