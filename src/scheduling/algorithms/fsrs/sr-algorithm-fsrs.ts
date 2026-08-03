@@ -36,6 +36,17 @@ export class SrsAlgorithmFsrs implements ISRAlgorithm {
         this.scheduler = fsrs(buildFsrsParameters(settings));
     }
 
+    /**
+     * Rebuilds the scheduler from the current settings. ts-fsrs freezes its parameters at
+     * construction time, so changing desired retention or the maximum interval has no
+     * effect until this is called.
+     *
+     * @param {SRSettings} settings - The settings object.
+     */
+    updateParameters(settings: SRSettings): void {
+        this.scheduler = fsrs(buildFsrsParameters(settings));
+    }
+
     noteOnLoadedNote(path: string, note: Note, noteEase: number): void {
         this.noteDelegate.noteOnLoadedNote(path, note, noteEase);
     }

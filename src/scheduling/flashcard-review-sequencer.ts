@@ -110,6 +110,18 @@ interface PendingCard {
     dueUnix: number;
 }
 
+/**
+ * Whole days until a schedule falls due, matching the key space that
+ * CardDueDateHistogram.calculateFromDeckTree builds the histogram with.
+ *
+ * Note that this is not the same as the scheduled interval: an FSRS short-term step has an
+ * interval of 0 but a real sub-day due time.
+ */
+function dueDateHistogramKey(schedule: RepItemScheduleInfo): number {
+    const now: number = globalDateProvider.now.valueOf();
+    return Math.ceil((schedule.dueDateAsUnix - now) / TICKS_PER_DAY);
+}
+
 export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     // We need the original deck tree so that we can still provide the total cards in each deck
     private _originalDeckTree: Deck;
@@ -296,12 +308,11 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             await DataStore.getInstance().writeSchedule(this.currentQuestion);
 
             if (oldSchedule) {
-                const now: number = globalDateProvider.now.valueOf();
-                const nDays: number = Math.ceil((oldSchedule.dueDateAsUnix - now) / TICKS_PER_DAY);
-
-                this.dueDateFlashcardHistogram.decrement(nDays);
+                this.dueDateFlashcardHistogram.decrement(dueDateHistogramKey(oldSchedule));
             }
-            this.dueDateFlashcardHistogram.increment(this.currentCard.scheduleInfo.interval);
+            this.dueDateFlashcardHistogram.increment(
+                dueDateHistogramKey(this.currentCard.scheduleInfo),
+            );
         } else if (response === ReviewResponse.Reset) {
             shortTermRequeue = "immediate";
         }

@@ -8,6 +8,7 @@ import {
     easeToDifficulty,
     formatFsrsTimestamp,
     FSRS_COMMENT_PREFIX,
+    FSRS_EMPTY_SCHEDULE_COMMENT,
     parseFsrsTimestamp,
     reviewResponseToFsrsGrade,
     sm2ScheduleToFsrsCard,
@@ -63,6 +64,7 @@ test("FSRS timestamp helpers", () => {
     expect(parseFsrsTimestamp(timestamp).toDate().toISOString()).toEqual(timestamp);
     expect(parseFsrsTimestamp("-")).toBeNull();
     expect(FSRS_COMMENT_PREFIX).toEqual("fsrs");
+    expect(FSRS_EMPTY_SCHEDULE_COMMENT).toEqual("!fsrs,-,0,0,0,0,0,0,0,-");
 });
 
 test("FSRS helpers handle unsupported responses and missing legacy values", () => {
