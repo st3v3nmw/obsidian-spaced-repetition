@@ -59,8 +59,7 @@ const he: IBaseLocale = {
     RESPONSE_RECEIVED: "התקבלה תגובה.",
     NO_DECK_EXISTS: "לא קיימת חפיסה עבור ${deckName}",
     ALL_CAUGHT_UP: "סיימת הכול! 😃",
-    REVIEW_REMINDER_NOTICE:
-        "הכרטיסים מוכנים לחזרה. חזור ל-Obsidian כדי להמשיך ללמוד.",
+    REVIEW_REMINDER_NOTICE: "הכרטיסים מוכנים לחזרה. חזור ל-Obsidian כדי להמשיך ללמוד.",
 
     // scheduling.ts
     DAYS_STR_IVL: "${interval} ימים",
@@ -92,12 +91,9 @@ const he: IBaseLocale = {
     CHECK_WIKI: 'למידע נוסף, עיין ב<a href="${wikiUrl}">ויקי</a>.',
     GITHUB_DISCUSSIONS:
         'בקר בקטע ה<a href="${discussionsUrl}">דיונים</a> לעזרה, משוב ושאלות ותשובות.',
-    GITHUB_ISSUES:
-        'פתח <a href="${issuesUrl}">כאן</a> issue אם יש לך בקשת תכונה או דיווח על באג.',
-    GITHUB_SOURCE_CODE:
-        'קוד המקור של הפרויקט זמין ב<a href="${githubProjectUrl}">GitHub</a>.',
-    CODE_CONTRIBUTION_INFO:
-        '<a href="${codeContributionUrl}">כך</a> ניתן לתרום קוד לתוסף.',
+    GITHUB_ISSUES: 'פתח <a href="${issuesUrl}">כאן</a> issue אם יש לך בקשת תכונה או דיווח על באג.',
+    GITHUB_SOURCE_CODE: 'קוד המקור של הפרויקט זמין ב<a href="${githubProjectUrl}">GitHub</a>.',
+    CODE_CONTRIBUTION_INFO: '<a href="${codeContributionUrl}">כך</a> ניתן לתרום קוד לתוסף.',
     TRANSLATION_CONTRIBUTION_INFO:
         '<a href="${translationContributionUrl}">כך</a> ניתן לתרגם את התוסף לשפה נוספת.',
     FOLDERS_TO_IGNORE: "תיקיות שיש להתעלם מהן",
@@ -105,10 +101,10 @@ const he: IBaseLocale = {
         "הזן נתיבי תיקיות או תבניות glob בשורות נפרדות, למשל Templates/Scripts או ‎**/*.excalidraw.md. הגדרה זו משותפת לכרטיסים ולפתקים כאחד.",
     OBSIDIAN_INTEGRATION: "שילוב בתוך Obsidian",
     FLASHCARDS: "כרטיסיות",
-    FLASHCARD_EASY_LABEL: "טקסט לחצן \"קל\"",
-    FLASHCARD_GOOD_LABEL: "טקסט לחצן \"טוב\"",
-    FLASHCARD_HARD_LABEL: "טקסט לחצן \"קשה\"",
-    FLASHCARD_AGAIN_LABEL: "טקסט לחצן \"שוב\"",
+    FLASHCARD_EASY_LABEL: 'טקסט לחצן "קל"',
+    FLASHCARD_GOOD_LABEL: 'טקסט לחצן "טוב"',
+    FLASHCARD_HARD_LABEL: 'טקסט לחצן "קשה"',
+    FLASHCARD_AGAIN_LABEL: 'טקסט לחצן "שוב"',
     FLASHCARD_EASY_DESC: 'התאמה אישית של התווית ללחצן "קל"',
     FLASHCARD_GOOD_DESC: 'התאמה אישית של התווית ללחצן "טוב"',
     FLASHCARD_HARD_DESC: 'התאמה אישית של התווית ללחצן "קשה"',
@@ -123,18 +119,15 @@ const he: IBaseLocale = {
         "הזן תגיות מופרדות ברווחים או בשורות חדשות. פתקים הכוללים אחת מתגיות אלו יוחרגו מחזרת הכרטיסים.",
     CONVERT_FOLDERS_TO_DECKS: "המרת תיקיות לחפיסות ותת-חפיסות",
     CONVERT_FOLDERS_TO_DECKS_DESC: "זוהי חלופה לאפשרות תגיות הכרטיסים שלמעלה.",
-    INLINE_SCHEDULING_COMMENTS:
-        "לשמור את הערת התזמון באותה שורה כמו השורה האחרונה של הכרטיס?",
-    INLINE_SCHEDULING_COMMENTS_DESC:
-        "הפעלת אפשרות זו תמנע מהערות ה-HTML לשבור את עיצוב הרשימות.",
+    INLINE_SCHEDULING_COMMENTS: "לשמור את הערת התזמון באותה שורה כמו השורה האחרונה של הכרטיס?",
+    INLINE_SCHEDULING_COMMENTS_DESC: "הפעלת אפשרות זו תמנע מהערות ה-HTML לשבור את עיצוב הרשימות.",
     BURY_SIBLINGS_TILL_NEXT_DAY: "קבירת כרטיסים אחים עד היום הבא",
     BURY_SIBLINGS_TILL_NEXT_DAY_DESC:
         "כרטיסים אחים הם כרטיסים שנוצרו מאותו טקסט כרטיס, למשל השמטות (cloze deletions)",
     SHOW_CARD_CONTEXT: "הצגת הקשר בכרטיסים",
     SHOW_CARD_CONTEXT_DESC: "למשל: כותרת > כותרת 1 > תת-כותרת > ... > תת-כותרת",
     SHOW_INTERVAL_IN_REVIEW_BUTTONS: "הצגת מועד החזרה הבא בלחצני החזרה",
-    SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC:
-        "שימושי כדי לדעת עד כמה רחוק בעתיד הכרטיסים שלך נדחים.",
+    SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC: "שימושי כדי לדעת עד כמה רחוק בעתיד הכרטיסים שלך נדחים.",
     SHOW_DELETE_BUTTON: "הצגת לחצן המחיקה",
     SHOW_DELETE_BUTTON_DESC: "מוסיף לחצן מחיקה לממשק חזרת הכרטיסים.",
     CARD_MODAL_HEIGHT_PERCENT: "אחוז גובה הכרטיס",
@@ -152,8 +145,7 @@ const he: IBaseLocale = {
     REVIEW_DECK_ORDER: "סדר הצגת החפיסות במהלך החזרה",
     REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL:
         "לפי הסדר (לאחר שכל הכרטיסים בחפיסה הקודמת נבדקו)",
-    REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM:
-        "באקראי (לאחר שכל הכרטיסים בחפיסה הקודמת נבדקו)",
+    REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM: "באקראי (לאחר שכל הכרטיסים בחפיסה הקודמת נבדקו)",
     REVIEW_DECK_ORDER_RANDOM_DECK_AND_CARD: "כרטיס אקראי מחפיסה אקראית",
     REVIEW_REMINDERS: "תזכורות חזרה",
     REVIEW_REMINDERS_DESC:
@@ -162,8 +154,7 @@ const he: IBaseLocale = {
     REVIEW_REMINDER_CHECK_ON_STARTUP_DESC:
         "מריץ בדיקה אחת כאשר פריסת ההפעלה של Obsidian מוכנה, ללא המתנה למרווח הראשון.",
     REVIEW_REMINDER_INTERVAL: "מרווח התזכורת (דקות)",
-    REVIEW_REMINDER_INTERVAL_DESC:
-        "בודק כל N דקות. מינימום דקה אחת, מקסימום 1440 דקות.",
+    REVIEW_REMINDER_INTERVAL_DESC: "בודק כל N דקות. מינימום דקה אחת, מקסימום 1440 דקות.",
     REVIEW_REMINDER_INTERVAL_MIN_WARNING: "מרווח התזכורת חייב להיות מספר בין 1 ל-1440.",
     REVIEW_REMINDER_MESSAGE: "הודעת התזכורת",
     REVIEW_REMINDER_MESSAGE_DESC:
@@ -176,12 +167,10 @@ const he: IBaseLocale = {
     REVIEW_REMINDER_PLAY_SOUND: "השמעת צליל בעת התזכורת",
     REVIEW_REMINDER_PLAY_SOUND_DESC: "משמיע צליל התראה קצר כאשר מופעלת תזכורת חזרה.",
     REVIEW_REMINDER_BOUNCE_DOCK: "הקפצת סמל ה-Dock בעת התזכורת",
-    REVIEW_REMINDER_BOUNCE_DOCK_DESC:
-        "במחשב שולחני, מקפיץ את סמל ה-Dock כאשר מופעלת תזכורת חזרה.",
+    REVIEW_REMINDER_BOUNCE_DOCK_DESC: "במחשב שולחני, מקפיץ את סמל ה-Dock כאשר מופעלת תזכורת חזרה.",
     DISABLE_CLOZE_CARDS: "להשבית כרטיסי השמטה?",
     CONVERT_CLOZE_PATTERNS_TO_INPUTS: "המרת תבניות השמטה לשדות קלט",
-    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC:
-        "החלף תבניות השמטה בשדות קלט בעת חזרה על כרטיסי השמטה.",
+    CONVERT_CLOZE_PATTERNS_TO_INPUTS_DESC: "החלף תבניות השמטה בשדות קלט בעת חזרה על כרטיסי השמטה.",
     CONVERT_HIGHLIGHTS_TO_CLOZES: "להמיר ==הדגשות== להשמטות",
     CONVERT_HIGHLIGHTS_TO_CLOZES_DESC:
         'הוסף/הסר את <code>${defaultPattern}</code> מ"תבניות ההשמטה" שלך',
@@ -195,8 +184,7 @@ const he: IBaseLocale = {
     CLOZE_PATTERNS_DESC:
         'הזן תבניות השמטה מופרדות בשורות חדשות. עיין ב<a href="${docsUrl}">ויקי</a> להנחיות.',
     INLINE_CARDS_SEPARATOR: "מפריד לכרטיסים בשורה אחת",
-    FIX_SEPARATORS_MANUALLY_WARNING:
-        "שים לב שלאחר שינוי זה עליך לערוך ידנית כל כרטיס קיים.",
+    FIX_SEPARATORS_MANUALLY_WARNING: "שים לב שלאחר שינוי זה עליך לערוך ידנית כל כרטיס קיים.",
     INLINE_REVERSED_CARDS_SEPARATOR: "מפריד לכרטיסים הפוכים בשורה אחת",
     MULTILINE_CARDS_SEPARATOR: "מפריד לכרטיסים מרובי-שורות",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "מפריד לכרטיסים הפוכים מרובי-שורות",
@@ -227,21 +215,19 @@ const he: IBaseLocale = {
     SHOW_NOTE_STATUS_BAR_ITEM: "הצגת פריט הפתק בשורת המצב",
     SHOW_NOTE_STATUS_BAR_ITEM_DESC:
         "כבה אפשרות זו כדי להסתיר את מצב חזרת הפתק בשורת המצב של Obsidian",
-    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM: "הצגת פריט \"עדכון זמין\" בשורת המצב",
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM: 'הצגת פריט "עדכון זמין" בשורת המצב',
     SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM_DESC:
-        "כבה אפשרות זו כדי להסתיר את פריט \"עדכון זמין\" ולהפסיק את שליפת מספר הגרסה החדש ביותר",
+        'כבה אפשרות זו כדי להסתיר את פריט "עדכון זמין" ולהפסיק את שליפת מספר הגרסה החדש ביותר',
     SHOW_RIBBON_ICON: "הצגת סמל בסרגל הצד",
     SHOW_RIBBON_ICON_DESC: "כבה אפשרות זו כדי להסתיר את סמל התוסף מסרגל הצד של Obsidian",
-    ENABLE_FILE_MENU_REVIEW_OPTIONS:
-        "הפעלת אפשרויות החזרה בתפריט הקובץ (למשל חזרה: קל, טוב, קשה)",
+    ENABLE_FILE_MENU_REVIEW_OPTIONS: "הפעלת אפשרויות החזרה בתפריט הקובץ (למשל חזרה: קל, טוב, קשה)",
     ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
         "אם תשבית את אפשרויות החזרה בתפריט הקובץ, תוכל לחזור על הפתקים באמצעות פקודות התוסף, ואם הגדרת אותם, קיצורי המקלדת המשויכים.",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "עצי החפיסות יוצגו בתחילה במצב מורחב",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "כבה אפשרות זו כדי לכווץ חפיסות מקוננות באותו כרטיס. שימושי אם יש לך כרטיסים השייכים לחפיסות רבות באותו קובץ.",
     ALGORITHM: "אלגוריתם",
-    CHECK_ALGORITHM_WIKI:
-        'למידע נוסף, עיין ב<a href="${algoUrl}">פרטי האלגוריתם</a>.',
+    CHECK_ALGORITHM_WIKI: 'למידע נוסף, עיין ב<a href="${algoUrl}">פרטי האלגוריתם</a>.',
     SM2_OSR_VARIANT: "וריאנט SM-2 של OSR",
     SWITCH_TO_FSRS_ALGORITHM: "להחליף את אלגוריתם הכרטיסים ל-FSRS?",
     CONFIRM_FSRS_ALGORITHM_SWITCH:
@@ -249,11 +235,11 @@ const he: IBaseLocale = {
     BASE_EASE: "קלוּת בסיס",
     BASE_EASE_DESC: "המינימום הוא 130, רצוי בסביבות 250.",
     BASE_EASE_MIN_WARNING: "קלוּת הבסיס חייבת להיות לפחות 130.",
-    LAPSE_INTERVAL_CHANGE: "שינוי המרווח כאשר חוזרים על כרטיס/פתק כ\"קשה\"",
+    LAPSE_INTERVAL_CHANGE: 'שינוי המרווח כאשר חוזרים על כרטיס/פתק כ"קשה"',
     LAPSE_INTERVAL_CHANGE_DESC: "מרווחחדש = מרווחישן * שינויהמרווח / 100.",
     EASY_BONUS: "בונוס קלוּת",
     EASY_BONUS_DESC:
-        "בונוס הקלוּת מאפשר לך לקבוע את ההבדל במרווחים בין מענה \"טוב\" ל\"קל\" על כרטיס/פתק (מינימום = 100%).",
+        'בונוס הקלוּת מאפשר לך לקבוע את ההבדל במרווחים בין מענה "טוב" ל"קל" על כרטיס/פתק (מינימום = 100%).',
     EASY_BONUS_MIN_WARNING: "בונוס הקלוּת חייב להיות לפחות 100.",
     LOAD_BALANCE: "הפעלת מאזן העומסים",
     LOAD_BALANCE_DESC: `מכוונן מעט את המרווח כך שמספר החזרות ביום יהיה עקבי יותר.
@@ -263,11 +249,9 @@ const he: IBaseLocale = {
     MAX_INTERVAL_DESC: "מאפשר לך לקבוע גבול עליון למרווח (ברירת מחדל = 100 שנים).",
     MAX_INTERVAL_MIN_WARNING: "המרווח המרבי חייב להיות לפחות יום אחד.",
     MAX_LINK_CONTRIB: "תרומת קישורים מרבית",
-    MAX_LINK_CONTRIB_DESC:
-        "התרומה המרבית של הקלוּת המשוקללת של פתקים מקושרים לקלוּת ההתחלתית.",
+    MAX_LINK_CONTRIB_DESC: "התרומה המרבית של הקלוּת המשוקללת של פתקים מקושרים לקלוּת ההתחלתית.",
     LOGGING: "רישום ביומן",
-    DISPLAY_SCHEDULING_DEBUG_INFO:
-        "הצגת מידע ניפוי הבאגים של המתזמן במסוף המפתחים",
+    DISPLAY_SCHEDULING_DEBUG_INFO: "הצגת מידע ניפוי הבאגים של המתזמן במסוף המפתחים",
     DISPLAY_PARSER_DEBUG_INFO: "הצגת מידע ניפוי הבאגים של המנתח במסוף המפתחים",
     SCHEDULING: "תזמון",
     EXPERIMENTAL: "ניסיוני",
@@ -280,8 +264,7 @@ const he: IBaseLocale = {
         "האם אתה בטוח שברצונך למחוק את כל נתוני התזמון מהפתקים והכרטיסים שלך? לא ניתן לבטל פעולה זו.",
     CONFIRM: "אישור",
     SCHEDULING_DATA_ALL_DELETION_IN_PROGRESS: "מחיקת נתוני התזמון בעיצומה...",
-    SCHEDULING_DATA_HAS_BEEN_DELETED:
-        "נתוני התזמון נמחקו מכל הפתקים והכרטיסים.",
+    SCHEDULING_DATA_HAS_BEEN_DELETED: "נתוני התזמון נמחקו מכל הפתקים והכרטיסים.",
     USE_CUSTOM_HOTKEYS: "שימוש בקיצורי מקלדת מותאמים אישית",
     USE_CUSTOM_HOTKEYS_DESC:
         "הפעלת קיצורי מקלדת מותאמים אישית לפקודות חזרת הכרטיסים. קיצורי ברירת המחדל לא יהיו פעילים לאחר הפעלת אפשרות זו. ניתן להשתמש בקיצורים המותאמים רק בעת שימוש באפשרות 'פתיחה בכרטיסייה חדשה'.",
@@ -369,8 +352,7 @@ const he: IBaseLocale = {
     AGAIN: "שוב",
     // Settings > info
     CHECK_ROADMAP: 'עיין ב<a href="${roadMapUrl}">מפת הדרכים</a> לתכונות עתידיות.',
-    CHECK_DEV_NEWS:
-        'עיין ב<a href="${devNewsUrl}">חדשות הפיתוח</a> לעדכוני הפיתוח האחרונים.',
+    CHECK_DEV_NEWS: 'עיין ב<a href="${devNewsUrl}">חדשות הפיתוח</a> לעדכוני הפיתוח האחרונים.',
 
     OPEN_MENU: "פתיחת תפריט",
     DELETE_NOTE_SCHEDULING_DATA_IN_NOTE: "מחיקת נתוני תזמון הפתק בתוך הפתק",
@@ -387,8 +369,7 @@ const he: IBaseLocale = {
     DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA_DESC: "מחיקת תגיות בעת מחיקת נתוני תזמון",
 
     ENABLE_FILE_MENU_DELETE_BUTTON: "הפעלת לחצן המחיקה בתפריט הקובץ",
-    ENABLE_FILE_MENU_DELETE_BUTTON_DESC:
-        "מפעיל את לחצן המחיקה בתפריט הקובץ עבור נתוני תזמון",
+    ENABLE_FILE_MENU_DELETE_BUTTON_DESC: "מפעיל את לחצן המחיקה בתפריט הקובץ עבור נתוני תזמון",
 
     DATA_PAGE_NAME: "נתונים",
     GROUP_RESET_SETTINGS: "איפוס הגדרות",
@@ -410,8 +391,7 @@ const he: IBaseLocale = {
         "ההעברה תכניס את הערות התזמון לתוך callout של מטא-נתוני sr. callout זה נועד להסתיר את הערות התזמון.",
     CONFIRM_MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT:
         "ההעברה תשנה את כל הכרטיסים שלך. אנא גבה אותם תחילה למקרה שתרצה לבטל את ההעברה מאוחר יותר או למקרה שהיא תשבור את הכרטיסים שלך עקב באג. האם אתה בטוח שברצונך להעביר את הערות התזמון ל-callouts של מטא-נתוני sr?",
-    MIGRATING_SCHEDULING_COMMENTS_TO_CALLOUT:
-        "מעביר את הערות התזמון ל-callouts של מטא-נתוני sr...",
+    MIGRATING_SCHEDULING_COMMENTS_TO_CALLOUT: "מעביר את הערות התזמון ל-callouts של מטא-נתוני sr...",
     MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT: "העברת הערות התזמון ל-callout של מטא-נתוני sr",
     DEFAULT_LOCALE_NAME: "- ברירת המחדל של Obsidian -",
     LANGUAGE_SETTINGS: "הגדרות שפה",
