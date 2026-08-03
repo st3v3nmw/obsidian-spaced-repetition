@@ -41,6 +41,7 @@ export class CardContainer {
 
     private clozeInputs: NodeListOf<HTMLInputElement> | null = null;
     private clozeAnswers: NodeListOf<Element> | null = null;
+    private selectedMcqIndex: number | null = null;
 
     private processReviewHandler: (response: ReviewResponse) => Promise<void>;
     private skipCardHandler: () => void;
@@ -163,6 +164,7 @@ export class CardContainer {
     }
 
     public async drawCardFront(sessionData: SessionData, settings: SRSettings) {
+        this.selectedMcqIndex = null;
         this.toolbar.setResetButtonDisabled(true);
         // Update current deck info
         this.cardState = sessionData.cardData.currentCardState;
@@ -221,6 +223,35 @@ export class CardContainer {
         );
         // Set scroll position back to top
         this.content.scrollTop = 0;
+
+        // Process MCQ (Multiple Choice Questions) checkboxes
+        const listItems = this.content.findAll("li.task-list-item");
+        listItems.forEach((li, index) => {
+            li.addClass("sr-mcq-option");
+            
+            const checkbox = li.querySelector("input[type='checkbox']") as HTMLInputElement | null;
+            if (checkbox) {
+                checkbox.style.display = "none";
+                
+                if (this.cardState === CardState.Back) {
+                    if (checkbox.checked) {
+                        li.addClass("sr-mcq-correct");
+                    } else if (this.selectedMcqIndex === index) {
+                        li.addClass("sr-mcq-wrong");
+                    }
+                }
+            }
+
+            if (this.cardState === CardState.Front) {
+                li.addEventListener("click", (e: Event) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.selectedMcqIndex = index;
+                    li.addClass("sr-mcq-selected");
+                    this.showAnswerHandler();
+                });
+            }
+        });
     }
 
     public drawPendingState(nextPendingDueUnix: number): void {
