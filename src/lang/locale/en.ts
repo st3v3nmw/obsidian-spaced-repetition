@@ -24,6 +24,8 @@ const en: IBaseLocale = {
     GOOD: "Good",
     EASY: "Easy",
     SHOW_ANSWER: "Show Answer",
+    REVEAL_HINT: "Reveal Hint",
+    PROGRESSIVE_HINT_PLACEHOLDER: "Level ${level} hint",
     CARD_PROGRESS_RESET: "Card's progress has been reset.",
     SAVE: "Save",
     CANCEL: "Cancel",

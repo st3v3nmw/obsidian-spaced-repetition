@@ -82,6 +82,9 @@ body:not(.is-mobile)
 body:not(.is-mobile)
     .sr-card-container:not(.sr-custom-hotkeys)
     .sr-response-button.sr-show-answer-button,
+body:not(.is-mobile)
+    .sr-card-container:not(.sr-custom-hotkeys)
+    .sr-response-button.sr-reveal-hint-button,
 body:not(.is-mobile) .sr-card-container:not(.sr-custom-hotkeys) .sr-response-button.sr-again-button,
 body:not(.is-mobile) .sr-card-container:not(.sr-custom-hotkeys) .sr-response-button.sr-hard-button,
 body:not(.is-mobile) .sr-card-container:not(.sr-custom-hotkeys) .sr-response-button.sr-good-button,
@@ -111,6 +114,12 @@ body:not(.is-mobile)
     .sr-card-container:not(.sr-custom-hotkeys)
     .sr-response-button.sr-show-answer-button::after {
     content: "Space";
+}
+
+body:not(.is-mobile)
+    .sr-card-container:not(.sr-custom-hotkeys)
+    .sr-response-button.sr-reveal-hint-button::after {
+    content: "H";
 }
 
 body:not(.is-mobile)

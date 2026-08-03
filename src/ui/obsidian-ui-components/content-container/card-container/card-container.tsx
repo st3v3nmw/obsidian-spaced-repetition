@@ -41,6 +41,9 @@ export class CardContainer {
 
     private clozeInputs: NodeListOf<HTMLInputElement> | null = null;
     private clozeAnswers: NodeListOf<Element> | null = null;
+    private currentSessionData: SessionData | null = null;
+    private currentSettings: SRSettings | null = null;
+    private revealedHintIndex: number = 0;
 
     private processReviewHandler: (response: ReviewResponse) => Promise<void>;
     private skipCardHandler: () => void;
@@ -109,6 +112,7 @@ export class CardContainer {
         this.response = new ResponseSectionComponent(
             this.view,
             settings,
+            () => this._revealNextHint(),
             this.showAnswerHandler,
             this.processReviewHandler,
         );
@@ -163,6 +167,9 @@ export class CardContainer {
     }
 
     public async drawCardFront(sessionData: SessionData, settings: SRSettings) {
+        this.currentSessionData = sessionData;
+        this.currentSettings = settings;
+        this.revealedHintIndex = 0;
         this.toolbar.setResetButtonDisabled(true);
         // Update current deck info
         this.cardState = sessionData.cardData.currentCardState;
@@ -173,7 +180,7 @@ export class CardContainer {
         await this.drawCardFrontContent(sessionData, settings);
 
         // Update response buttons
-        this.response.resetResponseButtons();
+        this.response.resetResponseButtons(sessionData.cardData.currentCard.hintFronts.length > 0);
 
         // Setup cloze input listeners
         this._setupClozeInputListeners();
@@ -199,7 +206,11 @@ export class CardContainer {
         }
     }
 
-    private async drawCardFrontContent(sessionData: SessionData, settings: SRSettings) {
+    private async drawCardFrontContent(
+        sessionData: SessionData,
+        settings: SRSettings,
+        frontText: string = sessionData.cardData.currentCard.front,
+    ) {
         // Update card content
         this.content.empty();
 
@@ -214,7 +225,7 @@ export class CardContainer {
         );
 
         await wrapper.renderMarkdownWrapper(
-            sessionData.cardData.currentCard.front.trimStart(),
+            frontText.trimStart(),
             this.content,
             sessionData.currentQuestion.questionText.textDirection,
             // sessionData.cardData.currentCardState
@@ -299,6 +310,25 @@ export class CardContainer {
                 }
             });
         });
+    }
+
+    /** Reveals the next available hint level without changing the card's review state. */
+    private async _revealNextHint(): Promise<void> {
+        if (this.currentSessionData === null || this.currentSettings === null) return;
+
+        const hintFronts = this.currentSessionData.cardData.currentCard.hintFronts;
+        if (this.revealedHintIndex >= hintFronts.length) return;
+
+        const inputValues = [...(this.clozeInputs ?? [])].map((input) => input.value);
+        const nextFront = hintFronts[this.revealedHintIndex];
+        this.revealedHintIndex++;
+
+        await this.drawCardFrontContent(this.currentSessionData, this.currentSettings, nextFront);
+        this._setupClozeInputListeners();
+        this.clozeInputs?.forEach((input, index) => {
+            input.value = inputValues[index] ?? "";
+        });
+        this.response.setRevealHintVisible(this.revealedHintIndex < hintFronts.length);
     }
     private _evaluateClozeAnswers(): void {
         this.clozeAnswers = activeDocument.querySelectorAll(".cloze-answer");
@@ -419,6 +449,12 @@ export class CardContainer {
             case "KeyJ":
                 void this.jumpToCardHandler();
                 consumeKeyEvent();
+                break;
+            case "KeyH":
+                if (this.cardState === CardState.Front) {
+                    void this._revealNextHint();
+                    consumeKeyEvent();
+                }
                 break;
             case "Enter":
             case "NumpadEnter":
