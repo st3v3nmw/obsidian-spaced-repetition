@@ -47,3 +47,4 @@ env.sh
 # AI Tooling
 .claude/
 .sourcerer/
+.pi/

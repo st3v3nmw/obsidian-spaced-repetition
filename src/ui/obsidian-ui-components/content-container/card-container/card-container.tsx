@@ -20,6 +20,7 @@ import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirma
 import { escapeHtml } from "src/utils/escape-html";
 import EmulatedPlatform from "src/utils/platform-detector";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
+import { TTSUtil } from "src/utils/tts";
 
 // TODO: Refactor cloze rendering into the renderers file
 export class CardContainer {
@@ -39,6 +40,7 @@ export class CardContainer {
 
     private response: ResponseSectionComponent;
 
+    private currentSessionData: SessionData | null = null;
     private clozeInputs: NodeListOf<HTMLInputElement> | null = null;
     private clozeAnswers: NodeListOf<Element> | null = null;
 
@@ -78,6 +80,7 @@ export class CardContainer {
         this.setCustomHotKeyState(settings.useCustomHotkeys);
 
         this.toolbar = new CardToolbarComponent(
+            app,
             this.view,
             settings.showDeleteButtonInCardView,
             deleteCurrentCard,
@@ -97,6 +100,8 @@ export class CardContainer {
                     },
                 ).open();
             },
+            settings,
+            () => this.currentSessionData?.cardData.currentCard?.front.trim() || "",
             closeModal,
         );
 
@@ -163,7 +168,12 @@ export class CardContainer {
     }
 
     public async drawCardFront(sessionData: SessionData, settings: SRSettings) {
+        this.currentSessionData = sessionData;
         this.toolbar.setResetButtonDisabled(true);
+
+        const frontText = sessionData.cardData.currentCard?.front.trim() || "";
+        const cached = await TTSUtil.isCached(this.app, frontText, settings);
+        this.toolbar.setTTSCached(cached);
         // Update current deck info
         this.cardState = sessionData.cardData.currentCardState;
 
@@ -343,6 +353,7 @@ export class CardContainer {
         settings: SRSettings,
         determineButtonSchedule: (response: ReviewResponse) => RepItemScheduleInfo | null,
     ) {
+        this.currentSessionData = sessionData;
         this.setCustomHotKeyState(settings.useCustomHotkeys);
         this.cardState = sessionData.cardData.currentCardState;
 

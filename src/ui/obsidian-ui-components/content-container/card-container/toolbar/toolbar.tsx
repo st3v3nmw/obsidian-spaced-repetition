@@ -1,8 +1,10 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar.css";
-import { Platform } from "obsidian";
+import { Platform, App } from "obsidian";
 
+import TTSButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/tts-button";
+import { TTSUtil } from "src/utils/tts";
+import { SRSettings } from "src/data/settings";
 import { Deck } from "src/data/data-structures/deck/deck";
-import { DeckStats } from "src/scheduling/flashcard-review-sequencer";
 import DeckInfoComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/deck-info/deck-info";
 import BackButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/back-button";
 import CardMenuButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-menu-button";
@@ -16,10 +18,12 @@ export default class CardToolbarComponent {
     private toolbar: HTMLDivElement;
     private infoSection: DeckInfoComponent;
     private resetButton: ResetButtonComponent;
+    private ttsButton: TTSButtonComponent | null = null;
     private extendedMenuButton: CardMenuButtonComponent;
     private shortMenuButton: CardMenuButtonComponent;
 
     public constructor(
+        app: App,
         parentEl: HTMLElement,
         showDeleteButton: boolean,
         deleteCurrentCard: () => void,
@@ -29,6 +33,8 @@ export default class CardToolbarComponent {
         displayCurrentCardInfoNotice: () => void,
         skipCurrentCard: () => void,
         onOpenResetModalClick: () => void,
+        settings: SRSettings,
+        getCardText: () => string,
         closeModal?: () => void,
     ) {
         // Build ui
@@ -70,6 +76,47 @@ export default class CardToolbarComponent {
         );
 
         this.toolbar.createDiv("sr-divider");
+
+        if (settings.enableTTS) {
+            const detectLang = (text: string): string => {
+                // Japanese (Hiragana / Katakana)
+                if (/[\u3040-\u30ff]/.test(text)) {
+                    return "ja-JP";
+                }
+                // Korean (Hangul)
+                if (/[\uac00-\ud7af]/.test(text)) {
+                    return "ko-KR";
+                }
+                // Mandarin Chinese (Han characters)
+                if (/[\u4e00-\u9fa5]/.test(text)) {
+                    return "zh-CN";
+                }
+                // Cyrillic (Russian, etc.)
+                if (/[\u0400-\u04ff]/.test(text)) {
+                    return "ru-RU";
+                }
+                // Arabic
+                if (/[\u0600-\u06ff]/.test(text)) {
+                    return "ar-SA";
+                }
+                // Hebrew
+                if (/[\u0590-\u05ff]/.test(text)) {
+                    return "he-IL";
+                }
+                // Default fallback (Portuguese)
+                return "pt-BR";
+            };
+
+            this.ttsButton = new TTSButtonComponent(
+                this.toolbar,
+                async () => {
+                    const text = getCardText();
+                    await TTSUtil.speak(app, text, settings, detectLang(text));
+                    this.ttsButton?.setCached(true);
+                },
+                EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"]
+            );
+        }
 
         this.shortMenuButton = new CardMenuButtonComponent(
             this.toolbar,
@@ -117,6 +164,10 @@ export default class CardToolbarComponent {
         new ModalCloseButtonComponent(this.toolbar, closeModal, closeButtonClasses);
     }
 
+    public setTTSCached(cached: boolean) {
+        this.ttsButton?.setCached(cached);
+    }
+
     /**
      * Updates the deck info section
      * @param chosenDeck - The chosen deck
@@ -128,11 +179,12 @@ export default class CardToolbarComponent {
      * @param currentDeckTotalCardsInQueue - The total number of cards in the current deck
      * @param settings - The settings object
      */
+    // @ts-ignore
     public updateInfo(
-        chosenDeck: Deck,
-        currentDeck: Deck,
-        chosenDeckStats: DeckStats,
-        currentDeckStats: DeckStats,
+        chosenDeck: any,
+        currentDeck: any,
+        chosenDeckStats: any,
+        currentDeckStats: any,
         totalCardsInSession: number,
         totalDecksInSession: number,
         currentDeckTotalCardsInQueue: number,

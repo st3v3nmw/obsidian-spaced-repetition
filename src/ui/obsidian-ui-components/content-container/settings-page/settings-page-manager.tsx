@@ -5,6 +5,7 @@ import { DataManager } from "src/data/data-manager";
 import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { AIPage } from "src/ui/obsidian-ui-components/content-container/settings-page/ai-page";
 import { DataPage } from "src/ui/obsidian-ui-components/content-container/settings-page/data-page";
 import { FlashcardsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/flashcards-page";
 import { MainPage } from "src/ui/obsidian-ui-components/content-container/settings-page/main-page";
@@ -27,7 +28,8 @@ export type SettingsPageType =
     | "scheduling-page"
     | "ui-preferences-page"
     | "data-page"
-    | "statistics-page";
+    | "statistics-page"
+    | "ai-page";
 
 /**
  * Represents an array of all available settings page types.
@@ -42,6 +44,7 @@ export const SettingsPageTypesArray: ReadonlyArray<SettingsPageType> = [
     "ui-preferences-page",
     "data-page",
     "statistics-page",
+    "ai-page",
 ];
 
 /**
@@ -66,6 +69,8 @@ export function getPageName(pageType: SettingsPageType): string {
             return t("DATA_PAGE_NAME");
         case "statistics-page":
             return t("STATS_TITLE");
+        case "ai-page":
+            return "AI & TTS";
     }
 }
 
@@ -91,6 +96,8 @@ export function getPageIcon(pageType: SettingsPageType): string {
             return "hard-drive";
         case "statistics-page":
             return "bar-chart-3";
+        case "ai-page":
+            return "bot";
     }
 }
 
@@ -272,6 +279,21 @@ export class SettingsPageManager {
                             this.settingsManager,
                             this.dataManager,
                             pageType,
+                            this.openPage.bind(this),
+                            this.scrollListener.bind(this),
+                        ),
+                    );
+                    break;
+                case "ai-page":
+                    this.pages.push(
+                        new AIPage(
+                            newPageContainerEl,
+                            this.plugin,
+                            this.settingsManager,
+                            this.dataManager,
+                            pageType,
+                            this.applySettingsUpdate.bind(this),
+                            this.display,
                             this.openPage.bind(this),
                             this.scrollListener.bind(this),
                         ),
