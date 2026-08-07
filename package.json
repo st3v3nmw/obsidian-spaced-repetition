@@ -8,7 +8,7 @@
         "dev": "node esbuild.config.mjs",
         "format": "pnpm prettier --write . && pnpm eslint src/ tests/ --fix",
         "lint": "pnpm prettier --check . && pnpm eslint src/ tests/",
-        "test": "pnpm jest",
+        "test": "pnpm jest --reporters=jest-junit",
         "validate": "concurrently --kill-others-on-fail -g -p \"[{name}]\" -n \"format,lint,test\" \"pnpm:format\" \"pnpm:lint\" \"pnpm:test\"",
         "precommit-msg": "echo 'Pre-commit checks...'",
         "changelog": "pnpm auto-changelog --template=compact --package --output docs/docs/changelog.md && pnpm prettier --write docs/docs/changelog.md"
@@ -41,6 +41,7 @@
         "jest": "^30.4.2",
         "jest-environment-jsdom": "^30.4.1",
         "jest-expect-message": "^1.1.3",
+        "jest-junit": "^17.0.0",
         "moment": "^2.30.1",
         "obsidian": "^1.13.1",
         "pre-commit": "^1.2.2",

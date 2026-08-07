@@ -32,6 +32,7 @@ data.json
 # testing
 coverage
 tests/vaults/*/.obsidian
+junit.xml
 
 # mkdocs
 site/
