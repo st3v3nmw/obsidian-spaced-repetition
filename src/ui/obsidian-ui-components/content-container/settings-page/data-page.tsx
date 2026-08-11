@@ -1,7 +1,9 @@
 import { Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
-import { DataStore } from "src/data/data-store/base/data-store";
+import { DataStore, StorageType } from "src/data/data-store/base/data-store";
+import { ScheduleDataFileRepository } from "src/data/data-store/sr-md-data-store/schedule-data-file-repository";
+import { ScheduleDataMigrator } from "src/data/data-store/sr-md-data-store/schedule-data-migrator";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
@@ -40,113 +42,67 @@ export class DataPage extends SettingsPage {
             scrollListener,
         );
 
-        // TODO: Implement this when the other data stores are implemented
-
         const dataStorageGroup = new SettingGroup(this.containerEl).setHeading(
             t("GROUP_DATA_STORAGE"),
         );
-        //     .addSetting((setting: Setting) => {
-        //         setting
-        //             .setName(t("GROUP_DATA_STORAGE"))
-        //             .setDesc(t("GROUP_DATA_STORAGE_DESC"))
-        //             .addDropdown((dropdown) => {
-        //                 dropdown
-        //                     .addOptions({
-        //                         [StorageType.NOTES]: t("STORE_IN_NOTES"),
-        //                         // [StorageType.FOLDER]: "Store in vault folder (beta)",
-        //                         // [StorageType.PLUGIN_DATA]: "Store in plugin data (beta)",
-        //                     })
-        //                     .setValue(this.settingsManager.settings.dataStore)
-        //                     .onChange(async (value) => {
-        //                         const oldMode = this.settingsManager.settings
-        //                             .dataStore as StorageType;
-        //                         const newMode = value as StorageType;
 
-        //                         // Revert the dropdown immediately; only apply after confirmation.
-        //                         dropdown.setValue(oldMode);
+        dataStorageGroup.addSetting((setting: Setting) => {
+            setting
+                .setName(t("GROUP_DATA_STORAGE"))
+                .setDesc(t("GROUP_DATA_STORAGE_DESC"))
+                .addDropdown((dropdown) => {
+                    dropdown
+                        .addOptions({
+                            [StorageType.NOTES]: t("STORE_IN_NOTES"),
+                            [StorageType.SR_MD]: t("STORE_IN_SR_MD"),
+                        })
+                        .setValue(this.settingsManager.settings.dataStore)
+                        .onChange((value) => {
+                            const oldMode = this.settingsManager.settings.dataStore;
+                            const newMode = value as StorageType;
+                            if (oldMode === newMode) return;
 
-        //                         let migrateMessage: string = "";
-        //                         let confirmMessage: string = "";
-        //                         let migratingMessage: string = "";
+                            // Revert the dropdown immediately; only apply after confirmation.
+                            dropdown.setValue(oldMode);
 
-        //                         switch (newMode) {
-        //                             // case StorageType.FOLDER:
-        //                             //     migrateMessage = t("MIGRATE_TO_FOLDER");
-        //                             //     confirmMessage = t("CONFIRM_MIGRATE_TO_FOLDER");
-        //                             //     migratingMessage = t("MIGRATING_TO_FOLDER");
-        //                             //     break;
-        //                             // case StorageType.PLUGIN_DATA:
-        //                             //     migrateMessage = t("MIGRATE_TO_PLUGIN_DATA");
-        //                             //     confirmMessage = t("CONFIRM_MIGRATE_TO_PLUGIN_DATA");
-        //                             //     migratingMessage = t("MIGRATING_TO_PLUGIN_DATA");
-        //                             //     break;
-        //                             case StorageType.NOTES:
-        //                                 migrateMessage = t("MIGRATE_TO_NOTES");
-        //                                 confirmMessage = t("CONFIRM_MIGRATE_TO_NOTES");
-        //                                 migratingMessage = t("MIGRATING_TO_NOTES");
-        //                                 break;
-        //                         }
+                            const messages = this.migrationMessages(newMode);
+                            new ConfirmationModal(
+                                this.plugin.app,
+                                messages.title,
+                                messages.confirm,
+                                messages.inProgress,
+                                async () => {
+                                    await this.switchDataStore(oldMode, newMode);
+                                    this.display();
+                                },
+                            ).open();
+                        });
+                });
+        });
 
-        //                         new ConfirmationModal(
-        //                             this.plugin.app,
-        //                             migrateMessage,
-        //                             confirmMessage,
-        //                             migratingMessage,
-        //                             async () => {
-        //                                 dropdown.setValue(newMode);
-        //                                 this.settingsManager.settings.dataStore = newMode;
-        //                                 this.dataManager.setupDataStoreAndAlgorithmInstances(
-        //                                     this.settingsManager.settings,
-        //                                 );
-        //                                 await DataStore.instance.isStructureInitialized.then(
-        //                                     async (isInitialized) => {
-        //                                         if (!isInitialized) {
-        //                                             await DataStore.instance.isStructureInitialized;
-        //                                         }
-        //                                         await DataStore.instance.migrateDataStore(oldMode);
-        //                                         await this.settingsManager.save();
-        //                                         this.display();
-        //                                     },
-        //                                 );
-        //                             },
-        //                         ).open();
-        //                     });
-        //             });
-        //     });
+        if (this.settingsManager.settings.dataStore === StorageType.SR_MD) {
+            dataStorageGroup
+                .addSetting((setting: Setting) => {
+                    setting.setDesc(t("SR_MD_STORE_INFO"));
+                })
+                .addSetting((setting: Setting) => {
+                    setting
+                        .setName(t("SCHEDULE_DATA_LOCATION"))
+                        .setDesc(t("SCHEDULE_DATA_LOCATION_DESC"))
+                        .addText((text) => {
+                            text.setPlaceholder(DEFAULT_SETTINGS.scheduleDataVaultLocation)
+                                .setValue(this.settingsManager.settings.scheduleDataVaultLocation)
+                                .onChange((value) => {
+                                    this.settingsManager.settings.scheduleDataVaultLocation =
+                                        value.trim() || DEFAULT_SETTINGS.scheduleDataVaultLocation;
+                                });
 
-        // dataStorageGroup.addSetting((setting: Setting) => {
-        //     setting.infoEl.insertAdjacentText("beforeend", t("PLUGIN_DATA_STORE_INFO"));
-        // });
-
-        // if (this.settingsManager.settings.dataStore === StorageType.FOLDER) {
-        //     dataStorageGroup.addSetting((setting: Setting) => {
-        //         setting
-        //             .setName("Schedule data location in vault")
-        //             .setDesc(
-        //                 'Root folder for schedule files. Data is stored in "Schedule Data" as markdown files.',
-        //             )
-        //             .addText((text) => {
-        //                 const commitValue = async () => {
-        //                     this.settingsManager.settings.scheduleDataVaultLocation =
-        //                         text.getValue().trim() ||
-        //                         DEFAULT_SETTINGS.scheduleDataVaultLocation;
-        //                     await this.settingsManager.save();
-        //                 };
-
-        //                 text.setPlaceholder(DEFAULT_SETTINGS.scheduleDataVaultLocation)
-        //                     .setValue(this.settingsManager.settings.scheduleDataVaultLocation)
-        //                     .onChange(() => {
-        //                         this.settingsManager.settings.scheduleDataVaultLocation =
-        //                             text.getValue().trim() ||
-        //                             DEFAULT_SETTINGS.scheduleDataVaultLocation;
-        //                     });
-
-        //                 text.inputEl.addEventListener("blur", () => {
-        //                     void commitValue();
-        //                 });
-        //             });
-        //     });
-        // }
+                            text.inputEl.addEventListener("blur", () => {
+                                void this.settingsManager.save();
+                            });
+                        });
+                });
+        }
 
         dataStorageGroup
             .addSetting((setting: Setting) => {
@@ -320,5 +276,48 @@ export class DataPage extends SettingsPage {
                             });
                     });
             });
+    }
+
+    /**
+     * Returns the confirmation-modal copy for migrating to `newMode`.
+     */
+    private migrationMessages(newMode: StorageType): {
+        title: string;
+        confirm: string;
+        inProgress: string;
+    } {
+        if (newMode === StorageType.SR_MD) {
+            return {
+                title: t("MIGRATE_TO_SR_MD"),
+                confirm: t("CONFIRM_MIGRATE_TO_SR_MD"),
+                inProgress: t("MIGRATING_TO_SR_MD"),
+            };
+        }
+        return {
+            title: t("MIGRATE_TO_NOTES"),
+            confirm: t("CONFIRM_MIGRATE_TO_NOTES"),
+            inProgress: t("MIGRATING_TO_NOTES"),
+        };
+    }
+
+    /**
+     * Activates `newMode`, migrates the existing scheduling data into it, and persists settings.
+     */
+    private async switchDataStore(oldMode: StorageType, newMode: StorageType): Promise<void> {
+        this.settingsManager.settings.dataStore = newMode;
+        this.dataManager.setupDataStoreAndAlgorithmInstances(this.settingsManager.settings);
+        await DataStore.instance.isStructureInitialized;
+
+        const repository =
+            this.dataManager.scheduleDataRepository ??
+            new ScheduleDataFileRepository(this.plugin.app.vault, this.settingsManager.settings);
+        const migrator = new ScheduleDataMigrator(
+            this.plugin,
+            this.settingsManager.settings,
+            repository,
+        );
+        await migrator.migrate(oldMode, newMode);
+
+        await this.settingsManager.save();
     }
 }

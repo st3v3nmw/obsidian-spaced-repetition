@@ -74,6 +74,13 @@ export interface IBaseLocale {
     MIGRATE_TO_NOTES: string;
     CONFIRM_MIGRATE_TO_NOTES: string;
     MIGRATING_TO_NOTES: string;
+    STORE_IN_SR_MD: string;
+    SR_MD_STORE_INFO: string;
+    MIGRATE_TO_SR_MD: string;
+    CONFIRM_MIGRATE_TO_SR_MD: string;
+    MIGRATING_TO_SR_MD: string;
+    SCHEDULE_DATA_LOCATION: string;
+    SCHEDULE_DATA_LOCATION_DESC: string;
     GROUP_FLASHCARDS_NOTES: string;
     GROUP_CONTRIBUTING: string;
     CHECK_WIKI: string;

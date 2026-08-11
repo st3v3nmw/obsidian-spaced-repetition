@@ -86,6 +86,16 @@ const en: IBaseLocale = {
     CONFIRM_MIGRATE_TO_NOTES:
         "All scheduling data will be written back as <!--SR:...--> comments and sr-* frontmatter fields. This may take a moment on large vaults. Do not edit notes until migration is complete.",
     MIGRATING_TO_NOTES: "Migrating scheduling data to notes...",
+    STORE_IN_SR_MD: "In a single file in the vault (beta)",
+    SR_MD_STORE_INFO:
+        "Schedule data is stored in a single markdown file (schedule-data.sr.md) inside the configured vault folder, as JSON. Because it lives in the vault (not the plugin folder), it is synced by Obsidian Sync by default and works on mobile. Cards are linked by an Obsidian block id (^sr-id-...) added next to each card; notes by a unique sr-id added to the note's frontmatter. Both survive renames and moves.",
+    MIGRATE_TO_SR_MD: "Migrate scheduling data to a single vault file?",
+    CONFIRM_MIGRATE_TO_SR_MD:
+        "All <!--SR:...--> comments and sr-* frontmatter fields will be moved into the schedule-data.sr.md file in the vault. A block id (^sr-id-...) will be added next to each card, and an sr-id field to each note's frontmatter, as stable identifiers. This may take a moment on large vaults. Do not edit notes until migration is complete.",
+    MIGRATING_TO_SR_MD: "Migrating scheduling data to a single vault file...",
+    SCHEDULE_DATA_LOCATION: "Schedule data location in vault",
+    SCHEDULE_DATA_LOCATION_DESC:
+        'Folder where the schedule-data.sr.md file is stored. Defaults to "Spaced Repetition".',
     GROUP_FLASHCARDS_NOTES: "Flashcards & Notes",
     GROUP_CONTRIBUTING: "Contributing",
     CHECK_WIKI: 'For more information, check the <a href="${wikiUrl}">wiki</a>.',

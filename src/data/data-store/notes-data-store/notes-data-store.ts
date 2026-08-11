@@ -3,6 +3,7 @@ import { IDataStore, StorageType } from "src/data/data-store/base/data-store";
 import { IFileModifier } from "src/data/data-store/base/file-modifier";
 import { RepItemStorageInfo } from "src/data/data-store/base/rep-item-storage-info";
 import { Question } from "src/data/data-structures/card/questions/question";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { SRSettings } from "src/data/settings";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { CommentParser } from "src/utils/comment-parser";
@@ -18,6 +19,25 @@ export class NotesDataStore implements IDataStore {
         this.settings = settings;
         this.fileModifier = scheduleDeleter;
         this.isStructureInitialized = Promise.resolve(true);
+    }
+
+    /**
+     * Migrating into the notes store is handled by the file modifier (see
+     * {@link IFileModifier.migrateDataStore}); nothing else is required here.
+     */
+    async migrateDataStore(oldMode: StorageType): Promise<void> {
+        await this.fileModifier.migrateDataStore(oldMode);
+    }
+
+    /**
+     * Note schedules are stored inline in each note's frontmatter.
+     */
+    async readNoteSchedule(noteFile: ISRNoteTFile): Promise<RepItemScheduleInfo | null> {
+        return await noteFile.getNoteSchedule();
+    }
+
+    async writeNoteSchedule(noteFile: ISRNoteTFile, schedule: RepItemScheduleInfo): Promise<void> {
+        await noteFile.setNoteSchedule(schedule);
     }
 
     /**

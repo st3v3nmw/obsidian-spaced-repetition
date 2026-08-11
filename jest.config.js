@@ -8,7 +8,10 @@ export default {
     testEnvironment: "jsdom",
     setupFilesAfterEnv: ["jest-expect-message"],
     moduleNameMapper: {
-        "src/(.*)": "<rootDir>/src/$1",
+        // Anchored to the start so it only rewrites the project's own "src/..." imports and
+        // not third-party modules whose internal requires happen to contain "src/"
+        // (e.g. short-uuid's "./src/converter").
+        "^src/(.*)": "<rootDir>/src/$1",
     },
     moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node", "d.ts"],
     roots: ["<rootDir>/src/", "<rootDir>/tests/unit/"],
@@ -40,6 +43,8 @@ export default {
         "src/scheduling/algorithms/osr/serialized-schedule-data.ts",
         "src/scheduling/algorithms/fsrs/serialized-schedule-data.ts",
         "src/data/data-store/base/idata-store-algorithm.ts",
+        // Obsidian-coupled migration driver (uses NoteFileLoader/vault/fileManager), like data-manager.ts
+        "src/data/data-store/sr-md-data-store/schedule-data-migrator.ts",
 
         // debugging utils
         "src/utils/debug.ts",

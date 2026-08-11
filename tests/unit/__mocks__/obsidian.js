@@ -13,4 +13,19 @@ module.exports = {
     },
 
     Notice: jest.fn().mockImplementation(),
+
+    TFile: class TFile {
+        constructor() {
+            this.path = "";
+            this.basename = "";
+            this.extension = "md";
+        }
+    },
+
+    normalizePath: (path) =>
+        path
+            .replace(/\\/g, "/")
+            .replace(/\/{2,}/g, "/")
+            .replace(/^\/+/, "")
+            .replace(/\/+$/, ""),
 };

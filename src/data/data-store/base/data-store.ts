@@ -1,6 +1,7 @@
 import { IFileModifier } from "src/data/data-store/base/file-modifier";
 import { RepItemStorageInfo } from "src/data/data-store/base/rep-item-storage-info";
 import { Question } from "src/data/data-structures/card/questions/question";
+import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 
 /**
@@ -9,6 +10,9 @@ import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-sch
  */
 export enum StorageType {
     NOTES = "NOTES",
+    // Schedule data stored outside of notes, in a single markdown file in the vault
+    // (so Obsidian Sync picks it up). See SrMdDataStore.
+    SR_MD = "SR_MD",
     // FOLDER = "FOLDER",
     // PLUGIN_DATA = "PLUGIN_DATA",
 }
@@ -20,6 +24,37 @@ export interface IDataStore {
     readonly storageType: StorageType;
     readonly fileModifier: IFileModifier;
     isStructureInitialized: Promise<boolean>;
+
+    /**
+     * Optionally preloads any external state the store needs before the vault is scanned.
+     *
+     * Stores that keep schedule data outside of notes (e.g. {@link StorageType.SR_MD})
+     * read that file once here so that the synchronous {@link createSchedule} read path
+     * can look schedules up from memory. Stores that read inline from notes don't need this.
+     */
+    preload?(): Promise<void>;
+
+    /**
+     * Migrates all scheduling data from the previous store into this store.
+     *
+     * @param oldMode The storage type the data is currently stored in.
+     */
+    migrateDataStore(oldMode: StorageType): Promise<void>;
+
+    /**
+     * Reads the scheduling information for a whole note (note-level review).
+     *
+     * @param noteFile The note file.
+     */
+    readNoteSchedule(noteFile: ISRNoteTFile): Promise<RepItemScheduleInfo | null>;
+
+    /**
+     * Writes the scheduling information for a whole note (note-level review).
+     *
+     * @param noteFile The note file.
+     * @param schedule The scheduling information to store.
+     */
+    writeNoteSchedule(noteFile: ISRNoteTFile, schedule: RepItemScheduleInfo): Promise<void>;
 
     /**
      * Creates scheduling information from a question text and its storage info.
