@@ -110,3 +110,56 @@ describe("load tolerance", () => {
         expect(repo.getCardSchedule("^sr-id-y")).toEqual("!2023-10-06,1,250");
     });
 });
+
+describe("deleteNoteSchedule", () => {
+    test("removes a stored note schedule", async () => {
+        const { repo } = setup();
+        await repo.ensureStructure();
+        await repo.setNoteSchedule("note-1", "!2023-10-06,4,270");
+        await repo.setNoteSchedule("note-2", "!2023-10-07,5,270");
+
+        await repo.deleteNoteSchedule("note-1");
+        expect(repo.getNoteSchedule("note-1")).toBeUndefined();
+        expect(repo.getNoteSchedule("note-2")).toEqual("!2023-10-07,5,270");
+    });
+});
+
+describe("resilience", () => {
+    test("ensureStructure continues when creating the folder throws", async () => {
+        const { vault, settings } = setup();
+        // A folder that already exists (or a case/race difference) makes createFolder throw.
+        vault.createFolder = () => Promise.reject(new Error("Folder already exists"));
+
+        const repo = new ScheduleDataFileRepository(vault as unknown as Vault, settings);
+        await expect(repo.ensureStructure()).resolves.toBe(true);
+        expect(vault.rawContent("Spaced Repetition/schedule-data.sr.md")).toBeDefined();
+    });
+
+    test("load yields empty data when reading the file throws", async () => {
+        const { vault, settings, repo } = setup();
+        await repo.ensureStructure();
+        await repo.setCardSchedule("^sr-id-a", "!2023-10-06,1,250");
+
+        const repo2 = new ScheduleDataFileRepository(vault as unknown as Vault, settings);
+        vault.read = () => Promise.reject(new Error("I/O error"));
+        await expect(repo2.load()).resolves.toBeUndefined();
+        expect(repo2.getCardSchedule("^sr-id-a")).toBeUndefined();
+    });
+
+    test("valid JSON that is not an object yields empty data", async () => {
+        const { vault, settings } = setup();
+        await vault.createFolder("Spaced Repetition");
+        // "null" and a bare number both parse successfully but are not a data object.
+        await vault.create("Spaced Repetition/schedule-data.sr.md", "```json\nnull\n```");
+        const repoNull = new ScheduleDataFileRepository(vault as unknown as Vault, settings);
+        await repoNull.load();
+        expect(repoNull.getCardSchedule("^sr-id-a")).toBeUndefined();
+
+        const vault2 = new UnitTestVault();
+        await vault2.createFolder("Spaced Repetition");
+        await vault2.create("Spaced Repetition/schedule-data.sr.md", "```json\n123\n```");
+        const repoNumber = new ScheduleDataFileRepository(vault2 as unknown as Vault, settings);
+        await repoNumber.load();
+        expect(repoNumber.getCardSchedule("^sr-id-a")).toBeUndefined();
+    });
+});

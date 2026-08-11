@@ -167,3 +167,20 @@ describe("SrMdDataStore - card schedules (integration via parser)", () => {
         expect(await noteFile.read()).not.toContain("Q1::A1");
     });
 });
+
+describe("preload", () => {
+    test("refreshes the in-memory copy from the schedule-data file", async () => {
+        const settings: SRSettings = { ...DEFAULT_SETTINGS };
+        const { vault, repo, store } = setupStore(settings);
+        await repo.ensureStructure();
+
+        // Write via a second repository over the same vault, so our repo's in-memory copy is stale.
+        const other = new ScheduleDataFileRepository(vault as unknown as Vault, settings);
+        await other.load();
+        await other.setCardSchedule("^sr-id-preload", "!2023-10-06,7,270");
+
+        expect(repo.getCardSchedule("^sr-id-preload")).toBeUndefined();
+        await store.preload();
+        expect(repo.getCardSchedule("^sr-id-preload")).toEqual("!2023-10-06,7,270");
+    });
+});
