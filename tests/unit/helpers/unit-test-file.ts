@@ -14,10 +14,21 @@ import { unitTestBasicFrontmatterParser, unitTestGetAllTagsFromTextEx } from "./
 export class UnitTestSRFile implements ISRNoteTFile {
     content: string;
     _path: string;
+    // Defaults to null so the incremental-sync cache is disabled for tests that don't opt in
+    // (a null mtime means "always re-parse", preserving the original behaviour).
+    _mtime: number | null = null;
 
     constructor(content: string, path: string = null) {
         this.content = content;
         this._path = path;
+    }
+
+    getMtime(): number | null {
+        return this._mtime;
+    }
+
+    setMtime(mtime: number | null): void {
+        this._mtime = mtime;
     }
 
     async setNoteSchedule(repItemScheduleInfo: RepItemScheduleInfo): Promise<void> {

@@ -25,6 +25,12 @@ export interface ISRFile {
     getAllTagsFromCache(): string[];
     getAllTagsFromText(): TagCache[];
     getTextDirection(): TextDirection;
+    /**
+     * The file's last-modified time (epoch millis), used by the incremental sync to detect whether
+     * a note changed since it was last parsed. Returns null when unavailable (e.g. test doubles),
+     * in which case the caller must treat the note as always-changed and never cache it.
+     */
+    getMtime(): number | null;
     read(): Promise<string>;
     /**
      * Reads the file via Obsidian's in-memory cache.
@@ -72,6 +78,15 @@ export abstract class SRTFile implements ISRFile {
      */
     get path(): string {
         return this.file.path;
+    }
+
+    /**
+     * The file's last-modified time (epoch millis) from Obsidian's TFile stat.
+     *
+     * @returns {number | null} - The mtime, or null if unavailable.
+     */
+    getMtime(): number | null {
+        return this.file?.stat?.mtime ?? null;
     }
 
     /**

@@ -84,6 +84,22 @@ export class UnitTestOsrCore extends OsrCore {
         await this.finalizeLoad();
     }
 
+    // Runs a full sync (loadInitialStateOfCore -> processFile per file -> finalizeLoad) over
+    // caller-supplied in-memory files, so incremental-sync tests can control each file's content
+    // and mtime across successive syncs (loadTestVault re-reads from disk and can't do that).
+    async loadFiles(files: UnitTestSRFile[]): Promise<void> {
+        this.loadInitialStateOfCore();
+        this.fileMap = new Map<string, UnitTestSRFile>();
+        for (const f of files) {
+            this.fileMap.set(f.path, f);
+        }
+        this.infoFinder.init(this.fileMap);
+        for (const f of files) {
+            await this.processFile(f);
+        }
+        await this.finalizeLoad();
+    }
+
     getFileByNoteName(noteName: string): UnitTestSRFile {
         const filename: string = this.infoFinder.getFilenameForLink(noteName);
         return this.fileMap.get(filename);
