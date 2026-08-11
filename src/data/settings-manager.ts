@@ -1,3 +1,4 @@
+import { VaultChangeTracker } from "src/data/data-store/base/vault-change-tracker";
 import { SRSettings } from "src/data/settings";
 
 /**
@@ -24,6 +25,9 @@ export class SettingsManager {
      */
     async saveSettings(settings: SRSettings): Promise<void> {
         this._settings = settings;
+        // Settings affect parsing and scheduling, so the next sync must run. OsrCore invalidates
+        // the note parse cache via its own settings snapshot.
+        VaultChangeTracker.instance.markDirty();
         try {
             await this.writeSettings(this._settings);
         } catch (error) {

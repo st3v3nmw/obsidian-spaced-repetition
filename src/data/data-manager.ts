@@ -3,6 +3,7 @@ import { Notice, TFile } from "obsidian";
 import { OsrCore } from "src/data/core";
 import { DataStore, StorageType } from "src/data/data-store/base/data-store";
 import { DataStoreAlgorithm } from "src/data/data-store/base/data-store-algorithm";
+import { VaultChangeTracker } from "src/data/data-store/base/vault-change-tracker";
 import { NoteDataFileModifier } from "src/data/data-store/notes-data-store/note-data-file-modifier";
 import { NoteDataStoreAlgorithmOsr } from "src/data/data-store/notes-data-store/note-data-store-algorithm-osr";
 import { NotesDataStore } from "src/data/data-store/notes-data-store/notes-data-store";
@@ -184,6 +185,9 @@ export class DataManager {
             settings.algorithm === SRAlgorithmType.FSRS
                 ? new SrsAlgorithmFsrs(settings)
                 : new SRAlgorithmOsr(settings);
+
+        // The data store and/or algorithm changed, so the next sync must run.
+        VaultChangeTracker.instance.markDirty();
     }
 
     /**
@@ -194,6 +198,16 @@ export class DataManager {
     async sync(): Promise<void> {
         if (this.osrCore === null) throw new Error("OSR app core not initialized!!!");
         if (this.syncLock) {
+            return;
+        }
+
+        // Once the initial load has completed, skip the full vault rescan when nothing has changed
+        // since the last sync (no vault/metadata events, settings change, store swap, or write).
+        // The in-memory model is still valid.
+        if (
+            this.osrCore.hasCompletedInitialLoad &&
+            !VaultChangeTracker.instance.hasPendingChanges()
+        ) {
             return;
         }
 

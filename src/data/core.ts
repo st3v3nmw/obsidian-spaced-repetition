@@ -1,3 +1,4 @@
+import { VaultChangeTracker } from "src/data/data-store/base/vault-change-tracker";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { Deck, DeckTreeFilter } from "src/data/data-structures/deck/deck";
 import { DeckTreeStatsCalculator } from "src/data/data-structures/deck/deck-tree-stats-calculator";
@@ -42,6 +43,19 @@ export class OsrCore {
     private _cardStats: Stats | null = null;
     private _dueDateFlashcardHistogram: CardDueDateHistogram;
     private _dueDateNoteHistogram: NoteDueDateHistogram;
+
+    // --- Incremental sync ---
+    // Parsed notes keyed by path, validated by the file's mtime. Persists across syncs so an
+    // unchanged flashcard note isn't re-read and re-parsed on every review.
+    private noteParseCache: Map<string, { mtime: number; note: Note | null }> = new Map();
+    // Flashcard-note paths seen during the current sync, used to prune stale entries.
+    private parseCacheSeenPaths: Set<string> = new Set<string>();
+    // JSON snapshot of the settings the cache was populated under. Parsing depends on the settings
+    // (separators, cloze patterns, tags, folders-to-decks, data store, ...), so when they change
+    // every cached parse is stale.
+    private parseCacheSettingsSnapshot: string | null = null;
+    // Whether a full sync has completed, so sync() only short-circuits after an initial load.
+    private _hasCompletedInitialLoad = false;
 
     constructor(
         questionPostponementList: QuestionPostponementList,
@@ -157,6 +171,13 @@ export class OsrCore {
     }
 
     /**
+     * Whether a full sync has completed at least once, so that the very first sync always runs.
+     */
+    get hasCompletedInitialLoad(): boolean {
+        return this._hasCompletedInitialLoad;
+    }
+
+    /**
      * Gets the due date flashcard histogram.
      *
      * @returns {CardDueDateHistogram} - The due date flashcard histogram.
@@ -195,6 +216,24 @@ export class OsrCore {
 
         // reset flashcards stuff
         this.fullDeckTree = new Deck("root", null);
+
+        // --- Incremental sync: decide what to drop from the note parse cache ---
+
+        // Settings affect how a note is parsed, so a cached parse made under different settings is
+        // stale. This also covers a data store change, since that is a setting too.
+        const settingsSnapshot: string = JSON.stringify(this.settings);
+        if (this.parseCacheSettingsSnapshot !== settingsSnapshot) {
+            this.noteParseCache.clear();
+            this.parseCacheSettingsSnapshot = settingsSnapshot;
+        }
+
+        // Drop the entries for notes that changed or were removed since the last sync.
+        const pending = VaultChangeTracker.instance.consume();
+        for (const path of pending.changedPaths) this.noteParseCache.delete(path);
+        for (const path of pending.removedPaths) this.noteParseCache.delete(path);
+
+        // Track which notes are seen this sync so stale entries can be pruned in finalizeLoad().
+        this.parseCacheSeenPaths = new Set<string>();
     }
 
     /**
@@ -216,7 +255,7 @@ export class OsrCore {
         // (Doing this check first saves us from loading and parsing the note if not necessary)
         const topicPath: TopicPath = this.findTopicPath(noteFile);
         if (topicPath.hasPath && !SettingsUtil.isAnyTagIgnoredForFlashcards(this.settings, tags)) {
-            note = await this.loadNote(noteFile, topicPath);
+            note = await this.loadNoteCached(noteFile, topicPath);
             if (note !== null && this.fullDeckTree !== null)
                 note.appendCardsToDeck(this.fullDeckTree);
         }
@@ -236,8 +275,8 @@ export class OsrCore {
         if (SettingsUtil.isAnyTagIgnoredForNotes(this.settings, tags)) {
             return;
         }
-        const noteSchedule: RepItemScheduleInfo | null = await this.readNoteSchedule(noteFile);
-        this._noteReviewQueue.addNoteToQueue(noteFile, noteSchedule, matchedNoteTags);
+        // Reuse the schedule already read at the top of this method rather than reading it again.
+        this._noteReviewQueue.addNoteToQueue(noteFile, schedule, matchedNoteTags);
     }
 
     /**
@@ -262,6 +301,9 @@ export class OsrCore {
         noteSchedule: RepItemScheduleInfo,
     ): Promise<void> {
         await noteFile.setNoteSchedule(noteSchedule);
+        // Reviewing a note rewrites its frontmatter. Obsidian's metadata event will report that,
+        // but it is asynchronous, so mark the tracker now to be sure the next sync runs.
+        VaultChangeTracker.instance.markDirty();
     }
 
     /**
@@ -270,6 +312,17 @@ export class OsrCore {
      * @returns {void}
      */
     public async finalizeLoad(): Promise<void> {
+        // Incremental sync: prune cache entries for notes not seen this sync (deleted, renamed, or
+        // no longer flashcard tagged) so the cache can't grow without bound.
+        for (const path of this.noteParseCache.keys()) {
+            if (!this.parseCacheSeenPaths.has(path)) {
+                this.noteParseCache.delete(path);
+            }
+        }
+
+        // A full sync has now run at least once, so sync() may short-circuit no-op syncs.
+        this._hasCompletedInitialLoad = true;
+
         if (this.osrNoteGraph !== null) {
             this.osrNoteGraph.generatePageRanks();
         }
@@ -398,6 +451,45 @@ export class OsrCore {
         const note: Note | null = await loader.load(noteFile, this.defaultTextDirection, topicPath);
         if (note !== null && note.hasChanged) {
             await note.writeNoteFile(this.settings);
+        }
+        return note;
+    }
+
+    /**
+     * Loads a note during a sync, reusing the previously parsed result when the note is unchanged.
+     *
+     * A cache hit requires a known mtime (test doubles may return null, in which case the note is
+     * never cached) that matches the mtime recorded when the note was parsed. Because schedules are
+     * stored inline in the note, a review also changes the note's mtime, so this covers scheduling
+     * updates as well as content edits. Notes reported changed by {@link VaultChangeTracker} have
+     * already been evicted in {@link loadInitialStateOfCore}.
+     *
+     * @param {ISRNoteTFile} noteFile - The note file.
+     * @param {TopicPath} topicPath - The topic path.
+     * @returns {Promise<Note | null>} - A promise that resolves with the loaded note.
+     */
+    private async loadNoteCached(
+        noteFile: ISRNoteTFile,
+        topicPath: TopicPath,
+    ): Promise<Note | null> {
+        const path: string = noteFile.path;
+        this.parseCacheSeenPaths.add(path);
+
+        const mtime: number | null = noteFile.getMtime();
+        const cached = this.noteParseCache.get(path);
+        if (mtime !== null && cached !== undefined && cached.mtime === mtime) {
+            return cached.note;
+        }
+
+        const note: Note | null = await this.loadNote(noteFile, topicPath);
+
+        if (mtime !== null) {
+            // Re-read the mtime: loadNote may have written to the file (e.g. to fix up schedule
+            // comments), and the cache must be keyed on the post-write mtime so the next sync hits.
+            this.noteParseCache.set(path, { mtime: noteFile.getMtime() ?? mtime, note });
+        } else {
+            // Without an mtime the cache can't be validated, so never serve a stale copy.
+            this.noteParseCache.delete(path);
         }
         return note;
     }

@@ -1,7 +1,8 @@
-import { Plugin } from "obsidian";
+import { Plugin, TAbstractFile, TFile } from "obsidian";
 
 import { CommandManager } from "src/command-manager";
 import { DataManager } from "src/data/data-manager";
+import { VaultChangeTracker } from "src/data/data-store/base/vault-change-tracker";
 import { DebugLoggerInstance } from "src/data/debug-logger";
 import { PluginDataError, PluginDataManager } from "src/data/plugin-data-manager";
 import { SRSettings } from "src/data/settings";
@@ -65,6 +66,8 @@ export default class SRPlugin extends Plugin {
                 this.commandManager.onLayoutReady();
                 this._reminderManager = new ReminderManager(this, this.uiManager, this.dataManager);
 
+                this.registerVaultChangeEvents();
+
                 this.isInitialized = true;
                 this._reminderManager.restartReviewReminders();
             });
@@ -126,6 +129,41 @@ export default class SRPlugin extends Plugin {
 
     isDataManagerLoaded(): boolean {
         return this._dataManager !== null;
+    }
+
+    /**
+     * Wires Obsidian's vault and metadata change events into the {@link VaultChangeTracker}, so the
+     * incremental sync can skip a rescan when nothing changed and invalidate only the notes that
+     * did. Events also catch changes made outside this plugin (another pane, an external editor,
+     * a file arriving via sync).
+     *
+     * registerEvent detaches the listeners automatically on unload.
+     */
+    private registerVaultChangeEvents(): void {
+        const isMarkdown = (file: TAbstractFile): file is TFile =>
+            file instanceof TFile && file.extension === "md";
+
+        this.registerEvent(
+            this.app.metadataCache.on("changed", (file) => {
+                if (isMarkdown(file)) VaultChangeTracker.instance.markChanged(file.path);
+            }),
+        );
+        this.registerEvent(
+            this.app.vault.on("create", (file) => {
+                if (isMarkdown(file)) VaultChangeTracker.instance.markChanged(file.path);
+            }),
+        );
+        this.registerEvent(
+            this.app.vault.on("delete", (file) => {
+                if (isMarkdown(file)) VaultChangeTracker.instance.markRemoved(file.path);
+            }),
+        );
+        this.registerEvent(
+            this.app.vault.on("rename", (file, oldPath) => {
+                VaultChangeTracker.instance.markRemoved(oldPath);
+                if (isMarkdown(file)) VaultChangeTracker.instance.markChanged(file.path);
+            }),
+        );
     }
 
     onunload(): void {
