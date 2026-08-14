@@ -124,19 +124,6 @@ export class FlashcardsPage extends SettingsPage {
         new SettingGroup(this.containerEl)
             .setHeading(t("GROUP_FLASHCARD_REVIEW"))
             .addSetting((setting: Setting) => {
-                setting
-                    .setName(t("BURY_SIBLINGS_TILL_NEXT_DAY"))
-                    .setDesc(t("BURY_SIBLINGS_TILL_NEXT_DAY_DESC"))
-                    .addToggle((toggle) =>
-                        toggle
-                            .setValue(this.settingsManager.settings.burySiblingCards)
-                            .onChange(async (value) => {
-                                this.settingsManager.settings.burySiblingCards = value;
-                                await this.settingsManager.save();
-                            }),
-                    );
-            })
-            .addSetting((setting: Setting) => {
                 setting.setName(t("REVIEW_CARD_ORDER_WITHIN_DECK")).addDropdown((dropdown) =>
                     dropdown
                         .addOptions({
