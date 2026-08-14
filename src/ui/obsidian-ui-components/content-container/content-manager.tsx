@@ -417,12 +417,13 @@ export default class ContentManager {
         const currentQuestion = this.reviewSequencer.currentQuestion;
         if (!currentQuestion) return;
 
-        if (
+        const isModal =
             (!this.settings.openViewInNewTab &&
                 !(Platform.isMobile || EmulatedPlatform().isMobile)) ||
             (!this.settings.openViewInNewTabMobile &&
-                (Platform.isMobile || EmulatedPlatform().isMobile))
-        ) {
+                (Platform.isMobile || EmulatedPlatform().isMobile));
+
+        if (isModal) {
             new Notice("Note was opened in new tab in the background");
         }
 
@@ -432,6 +433,9 @@ export default class ContentManager {
 
         if (blockId) {
             await this.app.workspace.openLinkText(`${file.path}#${blockId}`, file.path, false);
+            if (isModal) {
+                this.uiManager.focusModal();
+            }
             return;
         }
 
@@ -449,6 +453,9 @@ export default class ContentManager {
                 markdownView.editor.setCursor({ line, ch: 0 });
                 markdownView.editor.scrollIntoView({ from: { line, ch: 0 }, to: { line, ch: 0 } });
             }
+            if (isModal) {
+                this.uiManager.focusModal();
+            }
             return;
         }
 
@@ -459,6 +466,10 @@ export default class ContentManager {
         if (markdownView?.editor) {
             markdownView.editor.setCursor({ line, ch: 0 });
             markdownView.editor.scrollIntoView({ from: { line, ch: 0 }, to: { line, ch: 0 } });
+        }
+
+        if (isModal) {
+            this.uiManager.focusModal();
         }
     }
 

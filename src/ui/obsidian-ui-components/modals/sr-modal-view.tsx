@@ -43,6 +43,8 @@ export class SRModalView extends Modal {
 
         this.modalEl.setAttribute("id", "sr-modal-view");
         this.modalEl.addClass("sr-view");
+        // allows the modal to be focused
+        this.modalEl.setAttribute("tabindex", "-1");
 
         this.contentEl.addClass("sr-modal-content");
 
@@ -60,11 +62,21 @@ export class SRModalView extends Modal {
         this.plugin.uiManager.setContentManager(this.contentManager);
     }
 
+    public focus(): void {
+        if (!this.modalEl.contains(activeDocument.activeElement)) {
+            this.modalEl.focus();
+        }
+    }
+
     onOpen(): void {
+        this.focus();
         void this.contentManager.open();
     }
 
     onClose(): void {
+        if (this.plugin.uiManager.modalView === this) {
+            this.plugin.uiManager.modalView = null;
+        }
         this.contentManager.close();
     }
 
