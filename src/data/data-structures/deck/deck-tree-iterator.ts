@@ -195,6 +195,11 @@ class SingleDeckIterator {
 
     setNoCurrentCard() {
         this.cardIdx = null;
+        // cardListType must be reset alongside cardIdx: nextCard() uses it to decide whether it has
+        // already fallen back from the preferred list, so a stale value (e.g. after
+        // moveCurrentCardToEndOfList() re-adds the card under a different list type) can make it stop
+        // searching before it ever checks the list the card actually landed in.
+        this.cardListType = null;
     }
 
     ensureCurrentCard() {

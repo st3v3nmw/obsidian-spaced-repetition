@@ -536,6 +536,37 @@ describe("processReview", () => {
 
                 expect(card.scheduleInfo.dueDate.format("YYYY-MM-DD")).toEqual(againCardDueDate);
             });
+
+            // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/1568
+            //
+            // With a "due first" card order, a brand-new card (no existing schedule) is only found via
+            // the iterator's non-preferred-list fallback. Answering "Again" gives it a short-term
+            // schedule and requeues it via moveCurrentRepItemToEndOfList(), which re-adds it as a due
+            // item. The iterator must then resurface it - previously it didn't, because it never
+            // rechecked the due list after having fallen back to it once already.
+            test("New card (no existing schedule) is resurfaced, same as a due card would be", async () => {
+                const text: string = "#flashcards Q1::A1";
+
+                const c: TestContext = TestContext.Create(
+                    orderDueFirstSequential,
+                    FlashcardReviewMode.Review,
+                    DEFAULT_SETTINGS,
+                    text,
+                );
+                await c.setSequencerDeckTreeFromOriginalText();
+
+                const card = c.reviewSequencer.currentCard;
+                expect(card.front).toEqual("Q1");
+                expect(card.hasSchedule).toEqual(false);
+
+                await c.reviewSequencer.processReview(ReviewResponse.Again);
+
+                expect(c.reviewSequencer.hasCurrentCard).toEqual(true);
+                expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
+                expect(c.reviewSequencer.currentCard.scheduleInfo).toMatchObject({
+                    interval: 0,
+                });
+            });
         });
 
         describe("ReviewResponse.Easy", () => {
