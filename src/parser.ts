@@ -72,6 +72,24 @@ function hasInlineMarker(text: string, marker: string): boolean {
 }
 
 /**
+ * Determines whether a multiline card has no answer, i.e. there is nothing
+ * after the separator line. Such cards are ignored, mirroring how a multiline
+ * separator with an empty front is ignored.
+ */
+function hasEmptyAnswer(cardType: CardType, cardText: string, options: ParserOptions): boolean {
+    if (cardType !== CardType.MultiLineBasic && cardType !== CardType.MultiLineReversed) {
+        return false;
+    }
+    const separator: string =
+        cardType === CardType.MultiLineBasic
+            ? options.multilineCardSeparator
+            : options.multilineReversedCardSeparator;
+    const textLines: string[] = cardText.split("\n");
+    const separatorIdx: number = textLines.findIndex((line) => line.trim() === separator);
+    return textLines.slice(separatorIdx + 1).every((line) => line.trim().length === 0);
+}
+
+/**
  * Returns flashcards found in `text`
  *
  * It is best that the text does not contain frontmatter, see extractFrontmatter for reasoning
@@ -106,8 +124,13 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
 
         // Skip everything in HTML comments
         if (currentLine.startsWith("<!--") && !currentLine.startsWith("<!--SR:")) {
-            while (i + 1 < lines.length && !currentLine.includes("-->")) i++;
-            i++;
+            // Advance to the line closing the comment (may be the current line itself)
+            while (i < lines.length && !lines[i].includes("-->")) i++;
+            // If no card is being accumulated, the next card starts after the comment
+            if (cardText.length === 0) {
+                firstLineNo = i + 1;
+            }
+            // The for-loop's own i++ then moves past the comment's closing line
             continue;
         }
 
@@ -125,11 +148,18 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
             hasMultilineCardEndMarker
         ) {
             if (cardType) {
-                // Create a new card
-                lastLineNo = i - 1;
-                cards.push(
-                    new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo),
-                );
+                // Create a new card, unless it's a multiline card with no answer
+                if (!hasEmptyAnswer(cardType, cardText, options)) {
+                    lastLineNo = i - 1;
+                    cards.push(
+                        new ParsedQuestionInfo(
+                            cardType,
+                            cardText.trimEnd(),
+                            firstLineNo,
+                            lastLineNo,
+                        ),
+                    );
+                }
                 cardType = null;
             }
 
@@ -144,11 +174,15 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
         }
         cardText += currentLine.trimEnd();
 
-        // Pick up inline cards
-        for (const { separator, type } of inlineSeparators) {
-            if (hasInlineMarker(currentLine, separator)) {
-                cardType = type;
-                break;
+        // Pick up inline cards, but only while the card hasn't been given a
+        // type yet — otherwise a "::" inside a multiline card's answer would
+        // hijack (and discard) the card built up so far
+        if (cardType === null) {
+            for (const { separator, type } of inlineSeparators) {
+                if (hasInlineMarker(currentLine, separator)) {
+                    cardType = type;
+                    break;
+                }
             }
         }
 
@@ -203,7 +237,7 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
     }
 
     // Do we have a card left in the queue?
-    if (cardType && cardText) {
+    if (cardType && cardText && !hasEmptyAnswer(cardType, cardText, options)) {
         lastLineNo = lines.length - 1;
         cards.push(new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo));
     }

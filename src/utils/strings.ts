@@ -244,6 +244,8 @@ export class MultiLineTextFinder {
     }
 
     static find(sourceText: string[], searchText: string[]): number | null {
+        if (searchText.length === 0) return null;
+
         let result: number = null;
         let searchIdx: number = 0;
         const maxSearchIdx: number = searchText.length - 1;
@@ -258,6 +260,12 @@ export class MultiLineTextFinder {
                 searchIdx++;
             } else {
                 searchIdx = 0;
+                // The mismatching line may itself be the start of a new match,
+                // e.g. searching ["A", "?", "B"] within ["A", "A", "?", "B"],
+                // so re-test it against the first search line
+                if (maxSearchIdx > 0 && searchText[0].trim() === sourceLine) {
+                    searchIdx = 1;
+                }
             }
         }
         return result;

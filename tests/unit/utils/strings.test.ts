@@ -670,6 +670,22 @@ describe("find", () => {
             checkFindResult(text20, searchStr, null);
         });
     });
+
+    describe("Multi line search string - overlapping partial matches", () => {
+        test("Failed partial match doesn't prevent the mismatching line from starting a new match", () => {
+            // Regression: searching ["Card Front", "?", "Card Back"] within
+            // ["Card Front", "Card Front", "?", "Card Back"] must find the
+            // match at line 1, not fail entirely
+            const text: string = `Card Front
+Card Front
+?
+Card Back`;
+            const searchStr: string = `Card Front
+?
+Card Back`;
+            checkFindResult(text, searchStr, 1);
+        });
+    });
 });
 
 describe("findAndReplace", () => {
