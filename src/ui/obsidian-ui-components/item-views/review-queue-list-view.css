@@ -35,6 +35,21 @@
             cursor: pointer;
         }
     }
+
+    .sr-note-review-load-more {
+        justify-content: center;
+        gap: var(--size-4-2);
+        color: var(--text-muted);
+    }
+
+    .sr-note-review-load-more-icon {
+        display: flex;
+        align-items: center;
+    }
+
+    .sr-note-review-load-more-count {
+        flex-grow: 0;
+    }
 }
 
 .sr-note-review-header {
