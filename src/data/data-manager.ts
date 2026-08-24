@@ -129,15 +129,6 @@ export class DataManager {
 
             const notes: TFile[] = this.plugin.app.vault.getMarkdownFiles();
             for (const noteFile of notes) {
-                // Skip files in the note ignore folder
-                if (
-                    SettingsUtil.isPathInFoldersToIgnore(
-                        this.settingsManager.settings,
-                        noteFile.path,
-                    )
-                )
-                    continue;
-
                 const file: SRNoteTFile = this.createSRNoteTFile(noteFile);
                 await this.osrCore.processFile(file);
             }
@@ -252,7 +243,7 @@ export class DataManager {
 
         const noteSrTFile: ISRNoteTFile = this.createSRNoteTFile(note);
 
-        if (SettingsUtil.isPathInFoldersToIgnore(this.settingsManager.settings, note.path)) {
+        if (SettingsUtil.isPathInNoteFoldersToIgnore(this.settingsManager.settings, note.path)) {
             new Notice(t("NOTE_IN_IGNORED_FOLDER"));
             return;
         }

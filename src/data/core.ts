@@ -204,6 +204,18 @@ export class OsrCore {
      * @returns {Promise<void>} - A promise that resolves when the note file is processed.
      */
     public async processFile(noteFile: ISRNoteTFile): Promise<void> {
+        const isFlashcardFolderIgnored = SettingsUtil.isPathInFlashcardFoldersToIgnore(
+            this.settings,
+            noteFile.path,
+        );
+        const isNoteFolderIgnored = SettingsUtil.isPathInNoteFoldersToIgnore(
+            this.settings,
+            noteFile.path,
+        );
+        if (isFlashcardFolderIgnored && isNoteFolderIgnored) {
+            return;
+        }
+
         const schedule: RepItemScheduleInfo | null = await this.readNoteSchedule(noteFile);
         let note: Note | null = null;
 
@@ -215,7 +227,11 @@ export class OsrCore {
         // Does the note contain any tags that are specified as flashcard tags in the settings
         // (Doing this check first saves us from loading and parsing the note if not necessary)
         const topicPath: TopicPath = this.findTopicPath(noteFile);
-        if (topicPath.hasPath && !SettingsUtil.isAnyTagIgnoredForFlashcards(this.settings, tags)) {
+        if (
+            topicPath.hasPath &&
+            !isFlashcardFolderIgnored &&
+            !SettingsUtil.isAnyTagIgnoredForFlashcards(this.settings, tags)
+        ) {
             note = await this.loadNote(noteFile, topicPath);
             if (note !== null && this.fullDeckTree !== null)
                 note.appendCardsToDeck(this.fullDeckTree);
@@ -226,6 +242,10 @@ export class OsrCore {
         // TODO:  should this move to this.loadNote
         if (schedule !== null) {
             SRAlgorithm.getInstance().noteOnLoadedNote(noteFile.path, note, schedule.latestEase);
+        }
+
+        if (isNoteFolderIgnored) {
+            return;
         }
 
         const matchedNoteTags = SettingsUtil.filterForNoteReviewTag(this.settings, tags);

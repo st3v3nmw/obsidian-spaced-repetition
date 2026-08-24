@@ -78,7 +78,7 @@ const zhCN: IBaseLocale = {
         '<a href="${translationContributionUrl}">Here\'s</a> how to translate the plugin to another language.',
     FOLDERS_TO_IGNORE: "忽略此文件夹",
     FOLDERS_TO_IGNORE_DESC:
-        "在单独一行中输入文件夹路径或全局模式，例如 Templates/Scripts 或 .excalidraw.md。此设置对闪存卡和笔记都通用。",
+        "在单独一行中输入文件夹路径或全局模式，例如 Templates/Scripts 或 .excalidraw.md。",
     OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "卡片",
     FLASHCARD_EASY_LABEL: "“简单”按钮文本",
