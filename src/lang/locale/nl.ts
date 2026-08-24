@@ -79,7 +79,7 @@ const nl: IBaseLocale = {
         '<a href="${translationContributionUrl}">Hier</a> lees je hoe je de plugin in een andere taal kunt vertalen.',
     FOLDERS_TO_IGNORE: "Mappen om te negeren",
     FOLDERS_TO_IGNORE_DESC:
-        "Voer mappaden of globpatronen in op aparte regels, bijvoorbeeld Templates/Scripts of **/*.excalidraw.md. Deze instelling is gemeenschappelijk voor zowel flitskaarten als notities.",
+        "Voer mappaden of globpatronen in op aparte regels, bijvoorbeeld Templates/Scripts of **/*.excalidraw.md.",
     OBSIDIAN_INTEGRATION: "Integratie in Obsidian",
     FLASHCARDS: "Flitskaarten",
     FLASHCARD_EASY_LABEL: "Gemakkelijk-knoptekst",

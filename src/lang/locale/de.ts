@@ -83,7 +83,7 @@ const de: IBaseLocale = {
         '<a href="${translationContributionUrl}">Here\'s</a> how to translate the plugin to another language.',
     FOLDERS_TO_IGNORE: "Ausgeschlossene Ordner",
     FOLDERS_TO_IGNORE_DESC:
-        "Geben Sie Pfad- oder Globalemuster in separaten Zeilen an, z.B. Templates/Scripts oder **/*.excalidraw.md. Diese Einstellung gilt für Flashcards und Notizen.",
+        "Geben Sie Pfad- oder Globalemuster in separaten Zeilen an, z.B. Templates/Scripts oder **/*.excalidraw.md.",
     OBSIDIAN_INTEGRATION: "Integration into Obsidian",
     FLASHCARDS: "Lernkarten",
     FLASHCARD_EASY_LABEL: "Einfach Knopf Text",

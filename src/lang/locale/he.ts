@@ -98,7 +98,7 @@ const he: IBaseLocale = {
         '<a href="${translationContributionUrl}">כך</a> ניתן לתרגם את התוסף לשפה נוספת.',
     FOLDERS_TO_IGNORE: "תיקיות שיש להתעלם מהן",
     FOLDERS_TO_IGNORE_DESC:
-        "הזן נתיבי תיקיות או תבניות glob בשורות נפרדות, למשל Templates/Scripts או ‎**/*.excalidraw.md. הגדרה זו משותפת לכרטיסים ולפתקים כאחד.",
+        "הזן נתיבי תיקיות או תבניות glob בשורות נפרדות, למשל Templates/Scripts או ‎**/*.excalidraw.md.",
     OBSIDIAN_INTEGRATION: "שילוב בתוך Obsidian",
     FLASHCARDS: "כרטיסיות",
     FLASHCARD_EASY_LABEL: 'טקסט לחצן "קל"',
