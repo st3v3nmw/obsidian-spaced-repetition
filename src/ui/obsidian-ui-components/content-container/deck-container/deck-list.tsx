@@ -24,9 +24,15 @@ export default class DeckListComponent {
     private totalCardsText: HTMLDivElement;
 
     private startReviewOfDeck: (deck: Deck) => void;
+    private onDeckTreeStateChange: (deckPath: string, collapsed: boolean) => void;
 
-    public constructor(parentEl: HTMLElement, startReviewOfDeck: (deck: Deck) => void) {
+    public constructor(
+        parentEl: HTMLElement,
+        startReviewOfDeck: (deck: Deck) => void,
+        onDeckTreeStateChange: (deckPath: string, collapsed: boolean) => void,
+    ) {
         this.startReviewOfDeck = startReviewOfDeck;
+        this.onDeckTreeStateChange = onDeckTreeStateChange;
         // Prep main container
         this.scrollWrapper = parentEl.createDiv();
         this.scrollWrapper.addClass("sr-scroll-wrapper");
@@ -154,6 +160,7 @@ export default class DeckListComponent {
         startReviewOfDeck: (deck: Deck) => void,
     ) {
         const deckStats = reviewSequencer.getDeckStats(deck.getTopicPath());
+        const deckKey: string = deck.getTopicPath().formatAsTag();
 
         // Create the tree row for the deck
         const treeRowChildren = this._crateTreeRow(
@@ -161,9 +168,10 @@ export default class DeckListComponent {
             deckStats,
             deck.subdecks.length,
             parentEl,
-            settings.initiallyExpandAllSubdecksInTree,
+            this._getInitiallyExpanded(settings, deckKey),
             deck,
             startReviewOfDeck,
+            deckKey,
         );
 
         for (const subdeck of deck.subdecks) {
@@ -178,6 +186,16 @@ export default class DeckListComponent {
         }
     }
 
+    private _getInitiallyExpanded(settings: SRSettings, deckKey: string): boolean {
+        if (settings.rememberDeckTreeState) {
+            const collapsed = settings.deckTreeCollapsedState?.[deckKey];
+            if (collapsed !== undefined) {
+                return !collapsed;
+            }
+        }
+        return settings.initiallyExpandAllSubdecksInTree;
+    }
+
     private _crateTreeRow(
         deckName: string,
         deckStats: DeckStats,
@@ -186,6 +204,7 @@ export default class DeckListComponent {
         initiallyExpanded: boolean = false,
         deck: Deck | null = null,
         startReviewOfDeck: (deck: Deck) => void = () => {},
+        deckKey: string | null = null,
     ): HTMLDivElement {
         const disableInteraction = deck === null;
         const treeRow = parentEl.createDiv();
@@ -236,6 +255,9 @@ export default class DeckListComponent {
                 // if the user clicks on the collapse icon
                 e.stopPropagation();
                 collapsed = !collapsed;
+                if (deckKey !== null) {
+                    this.onDeckTreeStateChange(deckKey, collapsed);
+                }
             });
         }
 

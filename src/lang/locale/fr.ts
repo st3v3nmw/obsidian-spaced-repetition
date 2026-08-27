@@ -173,6 +173,8 @@ const fr: IBaseLocale = {
         "Enable the review options in the file menu (e.g. Review: Easy, Good, Hard)",
     ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
         "If you disable the review options in the file menu, you can review your notes using the plugin commands and, if you defined them, the associated command hotkeys.",
+    REMEMBER_DECK_TREE_STATE: "",
+    REMEMBER_DECK_TREE_STATE_DESC: "",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE:
         "Les dossiers de paquets devraient initialement tous être ouverts",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:

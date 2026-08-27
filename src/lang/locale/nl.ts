@@ -180,6 +180,8 @@ const nl: IBaseLocale = {
         "Schakel de beoordelingsopties in het bestandsmenu in (bijv. Beoordelen: Gemakkelijk, Goed, Moeilijk)",
     ENABLE_FILE_MENU_REVIEW_OPTIONS_DESC:
         "Schakel deze optie uit om uw notities te beoordelen met behulp van de plugin-opdrachten en, indien gedefinieerd, de bijbehorende sneltoetsen voor opdrachten.",
+    REMEMBER_DECK_TREE_STATE: "",
+    REMEMBER_DECK_TREE_STATE_DESC: "",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Stapelstructuren: Vouw substapels aanvankelijk uit",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "Schakel dit uit om geneste stapels in dezelfde kaart samen te vouwen. Handig als je kaarten hebt die tot meerdere stapels in hetzelfde bestand behoren.",

@@ -111,6 +111,7 @@ export default class ContentManager {
             this._changeReviewMode.bind(this),
             this._startReviewOfDeck.bind(this),
             closeModal,
+            this._onDeckTreeStateChange.bind(this),
         );
 
         this.cardContainer = new CardContainer(
@@ -509,6 +510,14 @@ export default class ContentManager {
         this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue();
         this.deckContainer.closeList();
         await this._showDecksList();
+    }
+
+    private _onDeckTreeStateChange(deckPath: string, collapsed: boolean): void {
+        this.settings.deckTreeCollapsedState = {
+            ...this.settings.deckTreeCollapsedState,
+            [deckPath]: collapsed,
+        };
+        void this.dataManager.savePluginData();
     }
 
     // MARK: Utils

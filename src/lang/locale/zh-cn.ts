@@ -177,6 +177,8 @@ const zhCN: IBaseLocale = {
     SHOW_STATUS_BAR_DESC: "将此关闭以隐藏 Obsidian 状态栏中的卡片复习状态。",
     SHOW_RIBBON_ICON: "在功能区中显示图标",
     SHOW_RIBBON_ICON_DESC: "关闭此选项可隐藏 Obsidian 功能区栏中的插件图标",
+    REMEMBER_DECK_TREE_STATE: "",
+    REMEMBER_DECK_TREE_STATE_DESC: "",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "默认在列表中展开嵌套子牌组",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "关闭此选项可折叠同一张卡片中的嵌套牌组。如果您的卡片属于同一文件中的许多套牌，则很有用。",
