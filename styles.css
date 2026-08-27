@@ -669,6 +669,7 @@ body:not(.is-mobile)
   padding: 0;
 }
 #sr-modal-view .modal-close-button,
+#sr-modal-view .modal-header-button,
 #sr-modal-view .modal-header {
   display: none;
 }
