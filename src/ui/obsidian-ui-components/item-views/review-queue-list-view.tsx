@@ -61,6 +61,7 @@ export class ReviewQueueListView extends ItemView {
         return Promise.resolve();
     }
 
+    //DEAD  CODE ?
     public onHeaderMenu(menu: Menu): void {
         menu.addItem((item) => {
             item.setTitle(t("CLOSE"))
@@ -103,11 +104,77 @@ export class ReviewQueueListView extends ItemView {
             "tree-item-children nav-folder-children",
         );
 
+        this.revealActiveNote();
+
         for (const [deckKey, deck] of this.noteReviewQueue.reviewDecks) {
+            this.restoreDeckFoldingState(deckKey, deck);
+
             const deckCollapsed = !deck.activeFolders.has(deck.deckName);
 
             this.createDeckTreeItem(childrenEl, deckKey, deck, deckCollapsed);
         }
+    }
+
+    private revealActiveNote(): void {
+        const activeFile: TFile | null = this.app.workspace.getActiveFile();
+        if (activeFile === null) return;
+
+        for (const deck of this.noteReviewQueue.reviewDecks.values()) {
+            let folderTitle: string | null = null;
+
+            if (deck.newNotes.some((newNote) => newNote.path === activeFile.path)) {
+                folderTitle = t("NEW");
+            } else {
+                const scheduledNote = deck.scheduledNotes.find(
+                    (note) => note.note.path === activeFile.path,
+                );
+                if (scheduledNote !== undefined) {
+                    folderTitle = this.getScheduledFolderTitle(scheduledNote.dueUnix);
+                }
+            }
+
+            if (folderTitle !== null) {
+                deck.activeFolders.add(deck.deckName);
+                deck.activeFolders.add(folderTitle);
+            }
+        }
+    }
+
+    private getScheduledFolderTitle(dueUnix: number): string | null {
+        const now: number = Date.now();
+        const nDays: number = Math.ceil((dueUnix - now) / TICKS_PER_DAY);
+
+        if (nDays > this.settings.maxNDaysNotesReviewQueue) {
+            return null;
+        }
+        if (nDays === -1) {
+            return t("YESTERDAY");
+        } else if (nDays === 0) {
+            return t("TODAY");
+        } else if (nDays === 1) {
+            return t("TOMORROW");
+        }
+        return formatDateWithMoment(dueUnix, this.settings.preferredDateFormatForNoteReviewQueue);
+    }
+
+    private restoreDeckFoldingState(deckKey: string, deck: NoteReviewDeck): void {
+        if (!this.settings.rememberDeckTreeState) return;
+
+        const savedFolders = this.settings.noteReviewTreeExpandedState?.[deckKey];
+        if (savedFolders !== undefined) {
+            deck.setActiveFolders(savedFolders);
+        }
+    }
+
+    private saveDeckTreeState(): void {
+        if (!this.settings.rememberDeckTreeState) return;
+
+        const state: Record<string, string[]> = {};
+        for (const [deckKey, deck] of this.noteReviewQueue.reviewDecks) {
+            state[deckKey] = [...deck.activeFolders];
+        }
+        this.settings.noteReviewTreeExpandedState = state;
+        void this.plugin.dataManager.savePluginData();
     }
 
     private createDeckTreeItem(
@@ -120,89 +187,49 @@ export class ReviewQueueListView extends ItemView {
             parentEl,
             deckKey,
             deckCollapsed,
-            false,
             deck,
         ).getElementsByClassName("tree-item-children nav-folder-children")[0] as HTMLElement;
 
         if (deck.newNotes.length > 0) {
-            this.createNewNotesFolder(deckFolderEl, deck, deckCollapsed);
+            this.createNewNotesFolder(deckFolderEl, deck);
         }
         if (deck.scheduledNotes.length > 0) {
-            this.createScheduledNotesFolder(deckFolderEl, deck, deckCollapsed);
+            this.createScheduledNotesFolder(deckFolderEl, deck);
         }
     }
 
-    private createNewNotesFolder(
-        parentEl: HTMLElement,
-        deck: NoteReviewDeck,
-        deckCollapsed: boolean,
-    ) {
-        const activeFile: TFile | null = this.app.workspace.getActiveFile();
+    private createNewNotesFolder(parentEl: HTMLElement, deck: NoteReviewDeck) {
         const newNotesFolderEl: HTMLElement = this.createFolder(
             parentEl,
             t("NEW"),
             !deck.activeFolders.has(t("NEW")),
-            deckCollapsed,
             deck,
         );
 
+        const activeFile: TFile | null = this.app.workspace.getActiveFile();
         for (const newFile of deck.newNotes) {
             const fileIsOpen =
                 activeFile !== undefined && activeFile !== null && newFile.path === activeFile.path;
-            if (fileIsOpen) {
-                deck.activeFolders.add(deck.deckName);
-                deck.activeFolders.add(t("NEW"));
-                this.changeFolderFolding(newNotesFolderEl);
-                this.changeFolderFolding(parentEl);
-            }
-            this.createFile(
-                newNotesFolderEl,
-                newFile.tfile,
-                fileIsOpen,
-                !deck.activeFolders.has(t("NEW")),
-                deck,
-            );
+            this.createFile(newNotesFolderEl, newFile.tfile, fileIsOpen, deck);
         }
     }
 
-    private createScheduledNotesFolder(
-        parentEl: HTMLElement,
-        deck: NoteReviewDeck,
-        deckCollapsed: boolean,
-    ) {
+    private createScheduledNotesFolder(parentEl: HTMLElement, deck: NoteReviewDeck) {
         const activeFile: TFile | null = this.app.workspace.getActiveFile();
-        const now: number = Date.now();
         let currUnix = -1;
-        let scheduleFolderEl: HTMLElement | null = null,
-            folderTitle = "";
-        const maxDaysToRender: number = this.settings.maxNDaysNotesReviewQueue;
+        let scheduleFolderEl: HTMLElement | null = null;
 
         for (const sNote of deck.scheduledNotes) {
             if (sNote.dueUnix !== currUnix) {
-                const nDays: number = Math.ceil((sNote.dueUnix - now) / TICKS_PER_DAY);
-
-                if (nDays > maxDaysToRender) {
+                const folderTitle = this.getScheduledFolderTitle(sNote.dueUnix) ?? "";
+                if (folderTitle === "") {
                     break;
-                }
-
-                if (nDays === -1) {
-                    folderTitle = t("YESTERDAY");
-                } else if (nDays === 0) {
-                    folderTitle = t("TODAY");
-                } else if (nDays === 1) {
-                    folderTitle = t("TOMORROW");
-                } else {
-                    folderTitle = formatDateWithMoment(
-                        sNote.dueUnix,
-                        this.settings.preferredDateFormatForNoteReviewQueue,
-                    );
                 }
 
                 scheduleFolderEl = this.createFolder(
                     parentEl,
                     folderTitle,
                     !deck.activeFolders.has(folderTitle),
-                    deckCollapsed,
                     deck,
                 );
                 currUnix = sNote.dueUnix;
@@ -210,21 +237,8 @@ export class ReviewQueueListView extends ItemView {
 
             const fileIsOpen = activeFile !== null && sNote.note.path === activeFile.path;
 
-            if (fileIsOpen) {
-                deck.activeFolders.add(deck.deckName);
-                deck.activeFolders.add(folderTitle);
-                if (scheduleFolderEl) this.changeFolderFolding(scheduleFolderEl);
-                this.changeFolderFolding(parentEl);
-            }
-
             if (scheduleFolderEl) {
-                this.createFile(
-                    scheduleFolderEl,
-                    sNote.note.tfile,
-                    fileIsOpen,
-                    !deck.activeFolders.has(folderTitle),
-                    deck,
-                );
+                this.createFile(scheduleFolderEl, sNote.note.tfile, fileIsOpen, deck);
             }
         }
     }
@@ -233,7 +247,6 @@ export class ReviewQueueListView extends ItemView {
         parentEl: HTMLElement,
         folderTitle: string,
         collapsed: boolean,
-        hidden: boolean,
         deck: NoteReviewDeck,
     ): HTMLElement {
         const folderEl: HTMLDivElement = parentEl.createDiv("tree-item nav-folder");
@@ -246,33 +259,32 @@ export class ReviewQueueListView extends ItemView {
             "tree-item-icon collapse-icon nav-folder-collapse-indicator",
         );
         setIcon(collapseIconEl, "chevron-down");
-
         folderTitleEl.createDiv("tree-item-inner nav-folder-title-content").setText(folderTitle);
 
-        if (collapsed && !folderEl.hasClass("is-collapsed")) {
-            folderEl.addClass("is-collapsed");
-            collapseIconEl.addClass("is-collapsed");
-        } else {
-            folderEl.removeClass("is-collapsed");
-            const collapseIconEl = folderEl.find("div.nav-folder-collapse-indicator");
-            collapseIconEl.removeClass("is-collapsed");
-        }
+        const applyCollapsed = (value: boolean) => {
+            if (value) {
+                folderEl.addClass("is-collapsed");
+                collapseIconEl.addClass("is-collapsed");
+            } else {
+                folderEl.removeClass("is-collapsed");
+                collapseIconEl.removeClass("is-collapsed");
+            }
+            childrenEl.setCssProps({ display: value ? "none" : "block" });
+        };
 
-        if (hidden) {
-            folderEl.setCssProps({ display: "none" });
-        }
+        applyCollapsed(collapsed);
 
         folderTitleEl.onClickEvent(() => {
-            this.changeFolderFolding(folderEl, !folderEl.hasClass("is-collapsed"));
-            childrenEl.setCssProps({
-                display: !folderEl.hasClass("is-collapsed") ? "block" : "none",
-            });
+            const nextCollapsed = !folderEl.hasClass("is-collapsed");
+            applyCollapsed(nextCollapsed);
 
-            if (!folderEl.hasClass("is-collapsed")) {
+            if (nextCollapsed) {
                 deck.activeFolders.delete(folderTitle);
             } else {
                 deck.activeFolders.add(folderTitle);
             }
+
+            this.saveDeckTreeState();
         });
 
         return folderEl;
@@ -282,18 +294,12 @@ export class ReviewQueueListView extends ItemView {
         folderEl: HTMLElement,
         file: TFile,
         fileElActive: boolean,
-        hidden: boolean,
         deck: NoteReviewDeck,
     ): void {
         const childrenEl: HTMLElement = folderEl.getElementsByClassName(
             "tree-item-children nav-folder-children",
         )[0] as HTMLElement;
         const navFileEl: HTMLElement = childrenEl.createDiv("nav-file");
-        if (hidden) {
-            childrenEl.setCssProps({
-                display: "none",
-            });
-        }
 
         const navFileTitle: HTMLElement = navFileEl.createDiv("tree-item-self nav-file-title");
         navFileTitle.addClass("is-clickable");
@@ -402,16 +408,5 @@ export class ReviewQueueListView extends ItemView {
 
             return false;
         });
-    }
-
-    private changeFolderFolding(folderEl: HTMLElement, collapsed = false): void {
-        const childEl = folderEl.firstElementChild?.firstElementChild || null;
-        if (collapsed && !folderEl.hasClass("is-collapsed")) {
-            folderEl.addClass("is-collapsed");
-            if (childEl) childEl.classList.add("is-collapsed");
-        } else {
-            folderEl.removeClass("is-collapsed");
-            if (childEl) childEl.classList.remove("is-collapsed");
-        }
     }
 }
