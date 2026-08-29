@@ -49,6 +49,10 @@ export class NoteReviewDeck {
         return this._activeFolders;
     }
 
+    setActiveFolders(folders: string[]): void {
+        this._activeFolders = new Set(folders);
+    }
+
     constructor(name: string) {
         this._deckName = name;
         this._activeFolders = new Set([this._deckName, t("TODAY")]);
