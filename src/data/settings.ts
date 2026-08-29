@@ -53,6 +53,8 @@ export interface SRSettings {
     showNoteStatusBarItem: boolean;
     showUpdateAvailableStatusBarItem: boolean;
     initiallyExpandAllSubdecksInTree: boolean;
+    rememberDeckTreeState: boolean;
+    deckTreeCollapsedState: Record<string, boolean>;
     showContextInCards: boolean;
     showIntervalInReviewButtons: boolean;
     flashcardHeightPercentage: number;
@@ -143,6 +145,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     showNoteStatusBarItem: true,
     showUpdateAvailableStatusBarItem: true,
     initiallyExpandAllSubdecksInTree: true,
+    rememberDeckTreeState: false,
+    deckTreeCollapsedState: {},
     showContextInCards: true,
     showIntervalInReviewButtons: true,
     flashcardHeightPercentage: 60,
@@ -285,6 +289,14 @@ export function upgradeSettings(settings: SRSettings) {
         settings.reviewReminderBounceDock === undefined
     ) {
         settings.reviewReminderBounceDock = DEFAULT_SETTINGS.reviewReminderBounceDock;
+    }
+
+    if (settings.rememberDeckTreeState === null || settings.rememberDeckTreeState === undefined) {
+        settings.rememberDeckTreeState = DEFAULT_SETTINGS.rememberDeckTreeState;
+    }
+
+    if (settings.deckTreeCollapsedState === null || settings.deckTreeCollapsedState === undefined) {
+        settings.deckTreeCollapsedState = {};
     }
 }
 

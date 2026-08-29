@@ -174,6 +174,8 @@ const es: IBaseLocale = {
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
     SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
     SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
+    REMEMBER_DECK_TREE_STATE: "",
+    REMEMBER_DECK_TREE_STATE_DESC: "",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Los árboles de mazos deberían ser expandidos al inicio.",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "Desactiva esto para contraer mazos anidados en la misma tarjeta. Útil si tienes tarjetas que pertenecen a muchos mazos en el mismo archivo.",

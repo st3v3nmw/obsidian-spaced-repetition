@@ -238,6 +238,9 @@ const en: IBaseLocale = {
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Deck trees should be initially displayed as expanded",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "Turn this off to collapse nested decks in the same card. Useful if you have cards which belong to many decks in the same file.",
+    REMEMBER_DECK_TREE_STATE: "Remember the last collapsed/expanded state of decks",
+    REMEMBER_DECK_TREE_STATE_DESC:
+        "When enabled, the deck tree will reopen in the state you last left it in, instead of always expanding or collapsing all decks.",
     ALGORITHM: "Algorithm",
     CHECK_ALGORITHM_WIKI:
         'For more information, check the <a href="${algoUrl}">algorithm details</a>.',

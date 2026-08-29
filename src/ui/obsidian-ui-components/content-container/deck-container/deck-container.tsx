@@ -21,6 +21,7 @@ export class DeckContainer {
         changeReviewMode: (reviewMode: FlashcardReviewMode) => void,
         startReviewOfDeck: (deck: Deck) => void,
         closeModal?: () => void,
+        onDeckTreeStateChange?: (deckPath: string, collapsed: boolean) => void,
     ) {
         // Build ui
         this.containerEl = parentEl.createDiv();
@@ -32,7 +33,11 @@ export class DeckContainer {
             closeModal,
         );
 
-        this.deckList = new DeckListComponent(this.containerEl, startReviewOfDeck);
+        this.deckList = new DeckListComponent(
+            this.containerEl,
+            startReviewOfDeck,
+            onDeckTreeStateChange ?? (() => {}),
+        );
     }
 
     /**

@@ -310,6 +310,19 @@ export class UIPreferencesPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
+                    .setName(t("REMEMBER_DECK_TREE_STATE"))
+                    .setDesc(t("REMEMBER_DECK_TREE_STATE_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.settingsManager.settings.rememberDeckTreeState)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.rememberDeckTreeState = value;
+                                await this.settingsManager.save();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
                     .setName(t("SHOW_CARD_CONTEXT"))
                     .setDesc(t("SHOW_CARD_CONTEXT_DESC"))
                     .addToggle((toggle) =>

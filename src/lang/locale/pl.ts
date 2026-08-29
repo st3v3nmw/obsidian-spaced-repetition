@@ -176,6 +176,8 @@ const pl: IBaseLocale = {
         "Turn this off to hide the flashcard's review status in Obsidian's status bar",
     SHOW_RIBBON_ICON: "Show icon in the ribbon bar",
     SHOW_RIBBON_ICON_DESC: "Turn this off to hide the plugin icon from Obsidian's ribbon bar",
+    REMEMBER_DECK_TREE_STATE: "",
+    REMEMBER_DECK_TREE_STATE_DESC: "",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE: "Podtalie powinny być początkowo wyświetlane rozszerzone",
     INITIALLY_EXPAND_SUBDECKS_IN_TREE_DESC:
         "Wyłącz to, aby zwinąć zagnieżdżone talie w tej samej karcie. Przydatne, jeśli karty należą do wielu talii w tym samym pliku.",
