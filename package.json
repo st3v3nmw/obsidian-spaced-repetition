@@ -25,6 +25,8 @@
     ],
     "license": "MIT",
     "devDependencies": {
+        "@codemirror/state": "6.5.0",
+        "@codemirror/view": "6.38.6",
         "@eslint/js": "^10.0.1",
         "@types/jest": "^30.0.0",
         "@types/node": "^25.9.5",

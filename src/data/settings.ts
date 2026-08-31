@@ -70,6 +70,7 @@ export interface SRSettings {
     openViewInNewTab: boolean;
     useCustomHotkeys: boolean;
     useCalloutsForSchedulingComments: boolean;
+    hideSchedulingCommentsInLivePreview: boolean;
 
     // algorithm
     algorithm: SRAlgorithmType;
@@ -160,6 +161,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     openViewInNewTabMobile: false,
     useCustomHotkeys: false,
     useCalloutsForSchedulingComments: false,
+    hideSchedulingCommentsInLivePreview: true,
 
     // algorithm
     algorithm: SRAlgorithmType.SM_2_OSR,

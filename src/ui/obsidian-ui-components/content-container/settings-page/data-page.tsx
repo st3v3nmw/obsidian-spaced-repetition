@@ -164,6 +164,22 @@ export class DataPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
+                    .setName(t("HIDE_SCHEDULING_COMMENTS_IN_LIVE_PREVIEW"))
+                    .setDesc(t("HIDE_SCHEDULING_COMMENTS_IN_LIVE_PREVIEW_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(
+                                this.settingsManager.settings.hideSchedulingCommentsInLivePreview,
+                            )
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.hideSchedulingCommentsInLivePreview =
+                                    value;
+                                await this.settingsManager.save();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
                     .setName(t("USE_CALLOUTS_FOR_SCHEDULING_COMMENTS"))
                     .setDesc(t("USE_CALLOUTS_FOR_SCHEDULING_COMMENTS_DESC"))
                     .addToggle((toggle) =>
