@@ -147,6 +147,7 @@ const ko: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "인라인 반전 플래시카드 구분자",
     MULTILINE_CARDS_SEPARATOR: "여러 줄 플래시카드 구분자",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "여러 줄 반전 플래시카드 구분자",
+    MULTILINE_CARDS_START_MARKER: "클로즈와 다중 행 플래시카드의 시작을 나타내는 문자",
     MULTILINE_CARDS_END_MARKER: "클로즈와 다중 행 플래시카드의 끝을 나타내는 문자",
     NOTES: "노트",
     NOTE: "Note",

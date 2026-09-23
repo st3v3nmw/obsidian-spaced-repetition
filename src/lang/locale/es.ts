@@ -147,6 +147,8 @@ const es: IBaseLocale = {
     MULTILINE_CARDS_SEPARATOR: "Separador para tarjetas de memorización multilínea",
     MULTILINE_REVERSED_CARDS_SEPARATOR:
         "Separador para tarjetas de memorización multilínea invertidas",
+    MULTILINE_CARDS_START_MARKER:
+        "Caracteres que denotan el inicio de los clozes y tarjetas didácticas de varias líneas",
     MULTILINE_CARDS_END_MARKER:
         "Caracteres que denotan el fin de los clozes y tarjetas didácticas de varias líneas",
     NOTES: "Notes",

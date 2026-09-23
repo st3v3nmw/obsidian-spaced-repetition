@@ -10,6 +10,11 @@ needs to be changed.
 
 For example, it could be changed to `+++`.
 
+To also keep blank lines **before** a cloze, or on the **question side** of a multiline card
+(for example a GFM table that needs surrounding blank lines), also set
+`Characters denoting the start of clozes and multiline flashcards`.
+Start and end may be the same string (e.g. both `+++`).
+
 !!! warning "Global Edit Required"
 
     Note that after changing this you have to manually edit any flashcards you already have.
@@ -54,8 +59,48 @@ And after `Show Answer` is clicked, the following is displayed:
 
 ![cloze-with-blank-lines-answer](https://github.com/user-attachments/assets/225abd90-20a4-4e29-abb3-36beb61388d7)
 
-## Limitation
+## Blank Lines Before a Cloze or on the Question Side
+
+With only an end marker, blank lines that appear **before** the cloze (or on the question side
+of a multiline card) are still discarded: the card type is unknown until a separator or cloze
+is seen, and an empty line resets the buffer.
+
+Set both start and end markers (they may be the same, e.g. `+++`) and wrap the card:
+
+````md
++++
+help sb (to) do sth
+
+| verb | pattern | example |
+| ---- | ------- | ------- |
+| help | to optional | help me (to) write |
+
+> Can you ==help me (to) write== a newspaper ad?
++++
+````
+
+Or a multiline Q/A with a table on the question side:
+
+````md
++++
+Patterns:
+
+| verb | pattern |
+| ---- | ------- |
+| help | help sb (to) do |
+
+Prompt: Can you ______ a newspaper ad?
+?
+Can you help me (to) write a newspaper ad?
++++
+````
+
+Single-line `::` / `:::` cards do not require start/end markers.
+
+## Limitation (End Marker Only)
 
 ### Blank Lines in Answer Side Only
 
-Blank lines are only supported in the answer side of a multiline flashcard, and not in the question side.
+If you configure only the end marker (and leave the start marker empty), blank lines are only
+supported in the answer side of a multiline flashcard, and not in the question side.
+Use a start marker as shown above when you need blank lines before a cloze or on the question side.

@@ -110,7 +110,11 @@ export class SettingsPageManager {
     private currentPage: SettingsPageType;
     private updateLastPageState: (lastPage: SettingsPageType, lastScrollPosition: number) => void;
     private display: () => void;
+    private didReadMultilineStartMarkerWarning: boolean;
     private didReadMultilineEndMarkerWarning: boolean;
+    private changeMultilineStartMarkerWarningState: (
+        didReadMultilineStartMarkerWarning: boolean,
+    ) => void;
     private changeMultilineEndMarkerWarningState: (
         didReadMultilineEndMarkerWarning: boolean,
     ) => void;
@@ -122,9 +126,13 @@ export class SettingsPageManager {
         settingsManager: SettingsManager,
         lastPage: SettingsPageType,
         lastScrollPosition: number,
+        didReadMultilineStartMarkerWarning: boolean,
         didReadMultilineEndMarkerWarning: boolean,
         updateLastPageState: (lastPage: SettingsPageType, lastScrollPosition: number) => void,
         display: () => void,
+        changeMultilineStartMarkerWarningState: (
+            didReadMultilineStartMarkerWarning: boolean,
+        ) => void,
         changeMultilineEndMarkerWarningState: (didReadMultilineEndMarkerWarning: boolean) => void,
     ) {
         this.containerEl = containerEl;
@@ -132,7 +140,9 @@ export class SettingsPageManager {
         this.dataManager = plugin.dataManager;
         this.uiManager = uiManager;
         this.settingsManager = settingsManager;
+        this.didReadMultilineStartMarkerWarning = didReadMultilineStartMarkerWarning;
         this.didReadMultilineEndMarkerWarning = didReadMultilineEndMarkerWarning;
+        this.changeMultilineStartMarkerWarningState = changeMultilineStartMarkerWarningState;
         this.changeMultilineEndMarkerWarningState = changeMultilineEndMarkerWarningState;
         this.updateLastPageState = updateLastPageState;
         this.display = display;
@@ -190,11 +200,13 @@ export class SettingsPageManager {
                             this.settingsManager,
                             this.dataManager,
                             pageType,
+                            this.didReadMultilineStartMarkerWarning,
                             this.didReadMultilineEndMarkerWarning,
                             this.applySettingsUpdate.bind(this),
                             this.display,
                             this.openPage.bind(this),
                             this.scrollListener.bind(this),
+                            this.changeMultilineStartMarkerWarningState.bind(this),
                             this.changeMultilineEndMarkerWarningState.bind(this),
                         ),
                     );

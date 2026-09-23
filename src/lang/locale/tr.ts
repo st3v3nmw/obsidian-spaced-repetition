@@ -146,6 +146,8 @@ const tr: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "Satır içi ters flash kartlar için ayırıcı",
     MULTILINE_CARDS_SEPARATOR: "Çok satırlı flash kartlar için ayırıcı",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Çok satırlı ters flash kartlar için ayırıcı",
+    MULTILINE_CARDS_START_MARKER:
+        "Gizli kartlar ve çok satırlı flash kartların başlangıcını belirten karakterler",
     MULTILINE_CARDS_END_MARKER:
         "Gizli kartlar ve çok satırlı flash kartların sonunu belirten karakterler",
     NOTES: "Notlar",

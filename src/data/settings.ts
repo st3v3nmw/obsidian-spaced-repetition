@@ -21,6 +21,7 @@ export interface SRSettings {
     singleLineReversedCardSeparator: string;
     multilineCardSeparator: string;
     multilineReversedCardSeparator: string;
+    multilineCardStartMarker: string;
     multilineCardEndMarker: string;
     editLaterTag: string | undefined;
     // Reminder settings are intentionally limited to "when and how to nudge the user back
@@ -112,6 +113,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     singleLineReversedCardSeparator: ":::",
     multilineCardSeparator: "?",
     multilineReversedCardSeparator: "??",
+    multilineCardStartMarker: "",
     multilineCardEndMarker: "",
     editLaterTag: undefined,
     enableReviewReminders: false,
