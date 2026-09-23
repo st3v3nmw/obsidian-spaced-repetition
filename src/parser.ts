@@ -10,6 +10,7 @@ export interface ParserOptions {
     singleLineReversedCardSeparator: string;
     multilineCardSeparator: string;
     multilineReversedCardSeparator: string;
+    multilineCardStartMarker: string;
     multilineCardEndMarker: string;
     clozePatterns: string[];
 }
@@ -97,9 +98,69 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
     let cardType: CardType | null = null;
     let firstLineNo = 0,
         lastLineNo: number;
+    // When start marker is empty, behave as always "in region" (legacy)
+    const startMarkerMode = !!options.multilineCardStartMarker;
+    let inCardRegion = !startMarkerMode;
 
     const clozecrafter = new ClozeCrafter(options.clozePatterns);
     const lines: string[] = text.replaceAll("\r\n", "\n").split("\n");
+
+    const isStartMarker = (s: string) =>
+        !!options.multilineCardStartMarker && s === options.multilineCardStartMarker;
+    const isEndMarker = (s: string) =>
+        !!options.multilineCardEndMarker && s === options.multilineCardEndMarker;
+    const markersAreSame =
+        startMarkerMode &&
+        !!options.multilineCardEndMarker &&
+        options.multilineCardStartMarker === options.multilineCardEndMarker;
+
+    const commit = (endLineNo: number) => {
+        if (cardType && cardText) {
+            cards.push(
+                new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, endLineNo),
+            );
+        }
+        cardType = null;
+        cardText = "";
+    };
+
+    const tryParseSingleLineCard = (i: number, currentLine: string): number | null => {
+        let matchedType: CardType | null = null;
+        for (const { separator, type } of inlineSeparators) {
+            if (hasInlineMarker(currentLine, separator)) {
+                matchedType = type;
+                break;
+            }
+        }
+        if (
+            matchedType !== CardType.SingleLineBasic &&
+            matchedType !== CardType.SingleLineReversed
+        ) {
+            return null;
+        }
+
+        let text = currentLine;
+        let lineIndex = i;
+        firstLineNo = i;
+
+        // Pick up scheduling information if present
+        if (i + 1 < lines.length && lines[i + 1].startsWith("<!--SR:")) {
+            text += "\n" + lines[i + 1];
+            lineIndex++;
+        } else if (i + 1 < lines.length && lines[i + 1].startsWith(SR_METADATA_CALLOUT)) {
+            for (let j = i + 1; j < lines.length; j++) {
+                text += "\n" + lines[j];
+                lineIndex = j;
+                if (lines[j].includes("<!--SR:")) {
+                    break;
+                }
+            }
+        }
+
+        cards.push(new ParsedQuestionInfo(matchedType, text, firstLineNo, lineIndex));
+        return lineIndex;
+    };
+
     for (let i = 0; i < lines.length; i++) {
         const currentLine = lines[i],
             currentTrimmed = lines[i].trim();
@@ -111,31 +172,62 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
             continue;
         }
 
-        // Have we reached the end of a card?
-        const isEmptyLine = currentTrimmed.length === 0;
-        const hasMultilineCardEndMarker =
-            options.multilineCardEndMarker && currentTrimmed === options.multilineCardEndMarker;
-        if (
-            // We've probably reached the end of a card
-            (isEmptyLine && !options.multilineCardEndMarker) ||
-            // Empty line & we're not picking up any card
-            (isEmptyLine && cardType === null) ||
-            // We've reached the end of a multi line card &
-            //  we're using custom end markers
-            hasMultilineCardEndMarker
-        ) {
-            if (cardType) {
-                // Create a new card
-                lastLineNo = i - 1;
-                cards.push(
-                    new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo),
-                );
-                cardType = null;
+        // Explicit start boundary
+        if (isStartMarker(currentTrimmed)) {
+            if (inCardRegion) {
+                if (markersAreSame) {
+                    // Same start/end marker: toggle closed
+                    commit(i - 1);
+                    inCardRegion = false;
+                    firstLineNo = i + 1;
+                    continue;
+                }
+                // Different markers: close previous (if any) then reopen
+                commit(i - 1);
             }
-
+            inCardRegion = true;
             cardText = "";
+            cardType = null;
             firstLineNo = i + 1;
             continue;
+        }
+
+        // Explicit end boundary
+        if (isEndMarker(currentTrimmed)) {
+            if (inCardRegion) {
+                commit(i - 1);
+                if (startMarkerMode) {
+                    inCardRegion = false;
+                }
+                firstLineNo = i + 1;
+            }
+            continue;
+        }
+
+        // Outside an explicit region: only single-line cards are allowed
+        if (startMarkerMode && !inCardRegion) {
+            const consumedUntil = tryParseSingleLineCard(i, currentLine);
+            if (consumedUntil !== null) {
+                i = consumedUntil;
+            }
+            continue;
+        }
+
+        // Legacy / region blank-line handling
+        const isEmptyLine = currentTrimmed.length === 0;
+        if (isEmptyLine) {
+            const endOnBlank =
+                // Classic mode: blank line ends the card when no end marker
+                (!options.multilineCardEndMarker && !startMarkerMode) ||
+                // End-marker-only mode: blank line resets while type not yet known
+                (!startMarkerMode && cardType === null);
+
+            if (endOnBlank) {
+                commit(i - 1);
+                firstLineNo = i + 1;
+                continue;
+            }
+            // Start-marker mode (or typed card with end marker): keep blank line in buffer
         }
 
         // Update card text
@@ -203,9 +295,8 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
     }
 
     // Do we have a card left in the queue?
-    if (cardType && cardText) {
-        lastLineNo = lines.length - 1;
-        cards.push(new ParsedQuestionInfo(cardType, cardText.trimEnd(), firstLineNo, lastLineNo));
+    if (inCardRegion) {
+        commit(lines.length - 1);
     }
 
     if (debugParser) {

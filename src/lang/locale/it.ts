@@ -150,6 +150,8 @@ const it: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "Separatore per schede all'incontrario sulla stessa riga",
     MULTILINE_CARDS_SEPARATOR: "Separatore per schede su più righe",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Separatore per schede all'incontrario su più righe",
+    MULTILINE_CARDS_START_MARKER:
+        "Caratteri che denotano l'inizio di carte con spazi da riempiere e carte multilinea",
     MULTILINE_CARDS_END_MARKER:
         "Caratteri che denotano la fine di carte con spazi da riempiere e carte multilinea",
     NOTES: "Note",

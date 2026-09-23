@@ -199,6 +199,7 @@ const en: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "Separator for inline reversed flashcards",
     MULTILINE_CARDS_SEPARATOR: "Separator for multiline flashcards",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Separator for multiline reversed flashcards",
+    MULTILINE_CARDS_START_MARKER: "Characters denoting the start of clozes and multiline flashcards",
     MULTILINE_CARDS_END_MARKER: "Characters denoting the end of clozes and multiline flashcards",
     NOTES: "Notes",
     NOTE: "Note",

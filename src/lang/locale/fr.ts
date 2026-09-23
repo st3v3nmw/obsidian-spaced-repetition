@@ -146,6 +146,8 @@ const fr: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "Séparateur pour flashcards inversées en une ligne",
     MULTILINE_CARDS_SEPARATOR: "Séparateur pour flashcards en plusieurs lignes",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Séparateur pour flashcards inversées en plusieurs lignes",
+    MULTILINE_CARDS_START_MARKER:
+        "Caractères de début de textes à trous ou de flashcards en plusieurs lignes",
     MULTILINE_CARDS_END_MARKER:
         "Caractères de fin de textes à trous ou de flashcards en plusieurs lignes",
     NOTES: "Notes",

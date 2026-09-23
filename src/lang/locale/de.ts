@@ -158,6 +158,8 @@ const de: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "Trennzeichen für einzeilige beidseitige Lernkarten",
     MULTILINE_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige Lernkarten",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Trennzeichen für mehrzeilige beidseitige Lernkarten",
+    MULTILINE_CARDS_START_MARKER:
+        "Zeichen, die den Anfang von Lückentexten und mehrzeiligen Flashcards kennzeichnen",
     MULTILINE_CARDS_END_MARKER:
         "Zeichen, die das Ende von Lückentexten und mehrzeiligen Flashcards kennzeichnen",
     NOTES: "Notizen",

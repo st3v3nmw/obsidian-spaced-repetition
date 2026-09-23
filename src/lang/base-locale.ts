@@ -159,6 +159,7 @@ export interface IBaseLocale {
     INLINE_REVERSED_CARDS_SEPARATOR: string;
     MULTILINE_CARDS_SEPARATOR: string;
     MULTILINE_REVERSED_CARDS_SEPARATOR: string;
+    MULTILINE_CARDS_START_MARKER: string;
     MULTILINE_CARDS_END_MARKER: string;
     NOTES: string;
     NOTE: string;

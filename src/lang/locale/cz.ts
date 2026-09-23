@@ -145,6 +145,7 @@ const cz: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "Oddělovač pro otočené inline kartičky",
     MULTILINE_CARDS_SEPARATOR: "Oddělovač pro víceřádkové kartičky",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Oddělovač pro víceřádkove otočené kartičky",
+    MULTILINE_CARDS_START_MARKER: "Znaky označující začátek clozes a víceřádkových flash karet",
     MULTILINE_CARDS_END_MARKER: "Znaky označující konec clozes a víceřádkových flash karet",
     NOTES: "Poznámky",
     NOTE: "Note",

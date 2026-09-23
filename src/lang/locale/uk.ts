@@ -152,6 +152,7 @@ const uk: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "Роздільник для рядкових двобічних карток",
     MULTILINE_CARDS_SEPARATOR: "Роздільник для багаторядкових карток",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Роздільник для багаторядкових двобічних карток",
+    MULTILINE_CARDS_START_MARKER: "Символи, що позначають початок cloze та багаторядкових карток",
     MULTILINE_CARDS_END_MARKER: "Символи, що позначають кінець cloze та багаторядкових карток",
     NOTES: "Нотатки",
     NOTE: "Нотатка",

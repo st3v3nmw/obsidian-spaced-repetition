@@ -7,6 +7,7 @@ const parserOptions: ParserOptions = {
     singleLineReversedCardSeparator: ":::",
     multilineCardSeparator: "?",
     multilineReversedCardSeparator: "??",
+    multilineCardStartMarker: "",
     multilineCardEndMarker: "",
     clozePatterns: [
         "==[123;;]answer[;;hint]==",
@@ -72,6 +73,7 @@ test("Test parsing of single line basic cards", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "---",
             clozePatterns: [],
         }),
@@ -82,6 +84,7 @@ test("Test parsing of single line basic cards", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "---",
             clozePatterns: [],
         }),
@@ -94,6 +97,7 @@ test("Test parsing of single line basic cards", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "---",
             clozePatterns: [],
         }),
@@ -120,6 +124,7 @@ test("Test parsing of single line reversed cards", () => {
             singleLineReversedCardSeparator: "&&&",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "---",
             clozePatterns: [],
         }),
@@ -130,6 +135,7 @@ test("Test parsing of single line reversed cards", () => {
             singleLineReversedCardSeparator: "::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "---",
             clozePatterns: [],
         }),
@@ -140,6 +146,7 @@ test("Test parsing of single line reversed cards", () => {
             singleLineReversedCardSeparator: "<:>",
             multilineCardSeparator: ";>",
             multilineReversedCardSeparator: "<;>",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "---",
             clozePatterns: [],
         }),
@@ -155,6 +162,7 @@ test("Test parsing of single line reversed cards", () => {
             singleLineReversedCardSeparator: "  ",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "---",
             clozePatterns: [],
         }),
@@ -194,6 +202,7 @@ test("Test parsing of multi line basic cards", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "---",
             clozePatterns: ["**[123;;]answer[;;hint]**"],
         }),
@@ -206,6 +215,7 @@ test("Test parsing of multi line basic cards", () => {
                 singleLineReversedCardSeparator: ":::",
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
+                multilineCardStartMarker: "",
                 multilineCardEndMarker: "---",
                 clozePatterns: ["**[123;;]answer[;;hint]**"],
             },
@@ -222,6 +232,7 @@ test("Test parsing of multi line basic cards", () => {
                 singleLineReversedCardSeparator: ":::",
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
+                multilineCardStartMarker: "",
                 multilineCardEndMarker: "---",
                 clozePatterns: ["**[123;;]answer[;;hint]**"],
             },
@@ -243,6 +254,7 @@ test("Test parsing of multi line basic cards", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "@@",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "",
             clozePatterns: [],
         }),
@@ -255,6 +267,7 @@ test("Test parsing of multi line basic cards", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "---",
             clozePatterns: [],
         }),
@@ -284,6 +297,7 @@ test("Test parsing of multi line reversed cards", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "---",
             clozePatterns: [
                 "==[123;;]answer[;;hint]==",
@@ -300,6 +314,7 @@ test("Test parsing of multi line reversed cards", () => {
                 singleLineReversedCardSeparator: ":::",
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
+                multilineCardStartMarker: "",
                 multilineCardEndMarker: "---",
                 clozePatterns: [
                     "==[123;;]answer[;;hint]==",
@@ -320,6 +335,7 @@ test("Test parsing of multi line reversed cards", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "@@",
             multilineReversedCardSeparator: "@@@",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "---",
             clozePatterns: [],
         }),
@@ -350,6 +366,7 @@ Line 5
                 singleLineReversedCardSeparator: "::::",
                 multilineCardSeparator: "??",
                 multilineReversedCardSeparator: "???",
+                multilineCardStartMarker: "",
                 multilineCardEndMarker: "????",
                 clozePatterns: [],
             },
@@ -366,6 +383,7 @@ Line 5
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "\t",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "---",
             clozePatterns: [],
         }),
@@ -407,6 +425,7 @@ test("Test parsing of cloze cards", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "",
             clozePatterns: ["**[123;;]answer[;;hint]**", "{{[123;;]answer[;;hint]}}"],
         }),
@@ -446,6 +465,7 @@ test("Test parsing of cloze cards", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "",
             clozePatterns: ["==[123;;]answer[;;hint]==", "{{[123;;]answer[;;hint]}}"],
         }),
@@ -486,6 +506,7 @@ test("Test parsing of cloze cards", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "",
             clozePatterns: ["==[123;;]answer[;;hint]==", "**[123;;]answer[;;hint]**"],
         }),
@@ -500,6 +521,7 @@ test("Test parsing of cloze cards", () => {
             singleLineReversedCardSeparator: "==",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "",
             clozePatterns: ["{{[123::]answer[::hint]}}"],
         }),
@@ -512,6 +534,7 @@ test("Test parsing of cloze cards", () => {
                 singleLineReversedCardSeparator: "==",
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
+                multilineCardStartMarker: "",
                 multilineCardEndMarker: "",
                 clozePatterns: ["{{[123::]answer[::hint]}}"],
             },
@@ -528,6 +551,7 @@ test("Test parsing of cloze cards", () => {
                 singleLineReversedCardSeparator: "==",
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
+                multilineCardStartMarker: "",
                 multilineCardEndMarker: "",
                 clozePatterns: ["{{[123::]answer[::hint]}}"],
             },
@@ -544,6 +568,7 @@ test("Test parsing of cloze cards", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "",
             clozePatterns: ["==answer==[^\\[hint\\]][\\[^123\\]]"],
         }),
@@ -559,6 +584,7 @@ test("Test parsing of cloze cards", () => {
                 singleLineReversedCardSeparator: ":::",
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
+                multilineCardStartMarker: "",
                 multilineCardEndMarker: "",
                 clozePatterns: ["==answer==[^\\[hint\\]][\\[^123\\]]"],
             },
@@ -575,6 +601,7 @@ test("Test parsing of cloze cards", () => {
                 singleLineReversedCardSeparator: ":::",
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
+                multilineCardStartMarker: "",
                 multilineCardEndMarker: "",
                 clozePatterns: ["==answer==[^\\[hint\\]][\\[^123\\]]"],
             },
@@ -596,6 +623,7 @@ test("Test parsing of cloze cards", () => {
                 singleLineReversedCardSeparator: ":::",
                 multilineCardSeparator: "?",
                 multilineReversedCardSeparator: "??",
+                multilineCardStartMarker: "",
                 multilineCardEndMarker: "---",
                 clozePatterns: ["==[123;;]answer[;;hint]=="],
             },
@@ -622,6 +650,7 @@ test("Test parsing of cloze cards", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "",
             clozePatterns: [],
         }),
@@ -786,6 +815,7 @@ test("Test not parsing 'cards' in codeblocks", () => {
             singleLineReversedCardSeparator: ":::",
             multilineCardSeparator: "?",
             multilineReversedCardSeparator: "??",
+            multilineCardStartMarker: "",
             multilineCardEndMarker: "",
             clozePatterns: [
                 "==[123;;]answer[;;hint]==",
@@ -802,6 +832,101 @@ test("Test not parsing 'cards' in codeblocks", () => {
             parserOptions,
         ),
     ).toEqual([[CardType.SingleLineBasic, "Question::Answer", 0, 0]]);
+});
+
+test("Test parsing with multiline card start marker", () => {
+    const startEndOptions: ParserOptions = {
+        singleLineCardSeparator: "::",
+        singleLineReversedCardSeparator: ":::",
+        multilineCardSeparator: "?",
+        multilineReversedCardSeparator: "??",
+        multilineCardStartMarker: "+++",
+        multilineCardEndMarker: "+++",
+        clozePatterns: ["==[123;;]answer[;;hint]=="],
+    };
+
+    // start+end same marker: cloze with GFM table and blank lines keeps full context
+    expect(
+        parseT(
+            "+++\nhelp sb (to) do sth\n\n| verb | pattern | example |\n| ---- | ------- | ------- |\n| help | to optional | help me (to) write |\n\n> Can you ==help me (to) write== a newspaper ad?\n+++",
+            startEndOptions,
+        ),
+    ).toEqual([
+        [
+            CardType.Cloze,
+            "help sb (to) do sth\n\n| verb | pattern | example |\n| ---- | ------- | ------- |\n| help | to optional | help me (to) write |\n\n> Can you ==help me (to) write== a newspaper ad?",
+            1,
+            7,
+        ],
+    ]);
+
+    // multiline ? card with blank lines / table on question side
+    expect(
+        parseT(
+            "+++\nPatterns:\n\n| verb | pattern |\n| ---- | ------- |\n| help | help sb (to) do |\n\nPrompt: Can you ______ a newspaper ad?\n?\nCan you help me (to) write a newspaper ad?\n+++",
+            startEndOptions,
+        ),
+    ).toEqual([
+        [
+            CardType.MultiLineBasic,
+            "Patterns:\n\n| verb | pattern |\n| ---- | ------- |\n| help | help sb (to) do |\n\nPrompt: Can you ______ a newspaper ad?\n?\nCan you help me (to) write a newspaper ad?",
+            1,
+            9,
+        ],
+    ]);
+
+    // two consecutive regions
+    expect(
+        parseT(
+            "+++\nFirst ==cloze== here\n+++\n\n+++\nSecond ==cloze== here\n+++",
+            startEndOptions,
+        ),
+    ).toEqual([
+        [CardType.Cloze, "First ==cloze== here", 1, 1],
+        [CardType.Cloze, "Second ==cloze== here", 5, 5],
+    ]);
+
+    // open region without type → no card
+    expect(parseT("+++\njust some prose\n\nwith blank lines\n+++", startEndOptions)).toEqual([]);
+
+    // different start and end markers; start while open closes then reopens
+    const differentMarkers: ParserOptions = {
+        ...startEndOptions,
+        multilineCardStartMarker: "<<<",
+        multilineCardEndMarker: ">>>",
+    };
+    expect(
+        parseT(
+            "<<<\nContext\n\n==cloze one==\n<<<\nContext two\n\n==cloze two==\n>>>",
+            differentMarkers,
+        ),
+    ).toEqual([
+        [CardType.Cloze, "Context\n\n==cloze one==", 1, 3],
+        [CardType.Cloze, "Context two\n\n==cloze two==", 5, 7],
+    ]);
+
+    // start marker empty → legacy blank-line behavior unchanged
+    expect(
+        parseT(
+            "help sb (to) do sth\n\n| verb | pattern |\n| ---- | ------- |\n\n> Can you ==help me== write?\n+++",
+            {
+                ...startEndOptions,
+                multilineCardStartMarker: "",
+                multilineCardEndMarker: "+++",
+            },
+        ),
+    ).toEqual([[CardType.Cloze, "> Can you ==help me== write?", 5, 5]]);
+
+    // outside region: single-line :: still parsed; cloze outside ignored
+    expect(
+        parseT(
+            "Outside::still works\n\nIgnored ==cloze== outside\n\n+++\nInside ==cloze== kept\n+++",
+            startEndOptions,
+        ),
+    ).toEqual([
+        [CardType.SingleLineBasic, "Outside::still works", 0, 0],
+        [CardType.Cloze, "Inside ==cloze== kept", 5, 5],
+    ]);
 });
 
 describe("Parser debug messages", () => {

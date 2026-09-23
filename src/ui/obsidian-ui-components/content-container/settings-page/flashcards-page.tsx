@@ -22,11 +22,15 @@ export class FlashcardsPage extends SettingsPage {
         settingsManager: SettingsManager,
         dataManager: DataManager,
         pageType: SettingsPageType,
+        didReadMultilineStartMarkerWarning: boolean,
         didReadMultilineEndMarkerWarning: boolean,
         applySettingsUpdate: (callback: () => unknown) => void,
         display: () => void,
         openPage: (pageType: SettingsPageType) => void,
         scrollListener: (scrollPosition: number) => void,
+        changeMultilineStartMarkerWarningState: (
+            didReadMultilineStartMarkerWarning: boolean,
+        ) => void,
         changeMultilineEndMarkerWarningState: (didReadMultilineEndMarkerWarning: boolean) => void,
     ) {
         super(
@@ -475,6 +479,55 @@ export class FlashcardsPage extends SettingsPage {
                                 });
                             }),
                     );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("MULTILINE_CARDS_START_MARKER"))
+                    .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"));
+
+                if (didReadMultilineStartMarkerWarning) {
+                    setting
+                        .addExtraButton((button) => {
+                            button
+                                .setIcon("reset")
+                                .setTooltip(t("RESET_DEFAULT"))
+                                .onClick(async () => {
+                                    this.settingsManager.settings.multilineCardStartMarker =
+                                        DEFAULT_SETTINGS.multilineCardStartMarker;
+                                    await this.settingsManager.save();
+
+                                    this.display();
+                                });
+                        })
+                        .addText((text) =>
+                            text
+                                .setValue(this.settingsManager.settings.multilineCardStartMarker)
+                                .onChange((value) => {
+                                    applySettingsUpdate(async () => {
+                                        this.settingsManager.settings.multilineCardStartMarker =
+                                            value;
+                                        await this.settingsManager.save();
+                                    });
+                                }),
+                        );
+                } else {
+                    setting.addButton((button) => {
+                        button
+                            .setButtonText("Unlock Setting")
+                            .setClass("mod-warning")
+                            .onClick(() => {
+                                new ConfirmationModal(
+                                    this.plugin.app,
+                                    "Please read!",
+                                    "Please only change this setting if you already added the characters denoting the start marker to all your multiline / cloze cards. Else you might loose your scheduling data!",
+                                    "Unlocking setting.",
+                                    () => {
+                                        changeMultilineStartMarkerWarningState(true);
+                                    },
+                                ).open();
+                            });
+                    });
+                }
             })
             .addSetting((setting: Setting) => {
                 setting

@@ -188,6 +188,7 @@ const he: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "מפריד לכרטיסים הפוכים בשורה אחת",
     MULTILINE_CARDS_SEPARATOR: "מפריד לכרטיסים מרובי-שורות",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "מפריד לכרטיסים הפוכים מרובי-שורות",
+    MULTILINE_CARDS_START_MARKER: "תווים המסמנים את תחילת ההשמטות והכרטיסים מרובי-השורות",
     MULTILINE_CARDS_END_MARKER: "תווים המסמנים את סוף ההשמטות והכרטיסים מרובי-השורות",
     NOTES: "פתקים",
     NOTE: "פתק",
