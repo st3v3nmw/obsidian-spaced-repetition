@@ -11,6 +11,21 @@ export enum RepItemOrder {
     DueFirstSequential,
     DueFirstRandom,
     EveryCardRandomDeckAndCard,
+    DueFirstRandomDeckAndCard,
+}
+
+/**
+ * Whether `order` draws a single card at random from the whole deck tree, rather than working
+ * through one deck at a time. These orders ignore {@link DeckOrder}.
+ *
+ * @param order - The repetition item order
+ * @returns True for the orders that pick a random card from a random deck
+ */
+export function isRandomDeckAndCardOrder(order: RepItemOrder): boolean {
+    return (
+        order === RepItemOrder.EveryCardRandomDeckAndCard ||
+        order === RepItemOrder.DueFirstRandomDeckAndCard
+    );
 }
 export enum DeckOrder {
     PrevDeckComplete_Sequential,
@@ -116,13 +131,26 @@ class SingleDeckIterator {
         this.setCardListType(cardListType, index);
     }
 
+    /**
+     * Selects the card at `cardIndex` within the list for `cardListType`.
+     *
+     * Unlike {@link setNewOrDueCardIdx}, the index is relative to that one list, which is what a
+     * draw restricted to new-only or due-only cards produces.
+     *
+     * @param cardListType - Which list the index refers to
+     * @param cardIndex - Index within that list
+     */
+    setRepItemIdx(cardListType: RepItemState, cardIndex: number): void {
+        this.setCardListType(cardListType, cardIndex);
+    }
+
     private setCardListType(cardListType?: RepItemState, cardIdx: number | null = null): void {
         this.cardListType = cardListType;
         this.cardIdx = cardIdx;
     }
 
     nextCard(): boolean {
-        if (this.iteratorOrder.repItemOrder === RepItemOrder.EveryCardRandomDeckAndCard) {
+        if (isRandomDeckAndCardOrder(this.iteratorOrder.repItemOrder)) {
             this.nextRandomCard();
         } else {
             // First return cards in the preferred list
@@ -154,8 +182,12 @@ class SingleDeckIterator {
             // regardless of whether the card is in the new/due list, or which list has more cards
             // I.e. we don't pick the new/due list first at 50/50 and then a random card within it
             const weights: Partial<Record<RepItemState, number>> = {};
-            if (newCount > 0) weights[RepItemState.NewItem] = newCount;
+            const dueFirst: boolean =
+                this.iteratorOrder.repItemOrder === RepItemOrder.DueFirstRandomDeckAndCard;
             if (dueCount > 0) weights[RepItemState.DueItem] = dueCount;
+            // Due-first only falls back to new cards once no due card is left
+            if (newCount > 0 && !(dueFirst && dueCount > 0))
+                weights[RepItemState.NewItem] = newCount;
             const [cardListType, index] = this.weightedRandomNumber.getRandomValues(weights);
             this.setCardListType(cardListType, index);
         } else {
@@ -320,7 +352,7 @@ export class DeckTreeIterator implements IDeckTreeIterator {
             this.baseDeckTree.deleteCardFromAllDecks(this.currentRepItem, true);
         }
 
-        if (this.iteratorOrder.repItemOrder === RepItemOrder.EveryCardRandomDeckAndCard) {
+        if (isRandomDeckAndCardOrder(this.iteratorOrder.repItemOrder)) {
             result = this.nextCardEveryCardRandomDeck();
         } else {
             // If we are just starting, then depending on settings we want to either start from the first deck,
@@ -374,23 +406,35 @@ export class DeckTreeIterator implements IDeckTreeIterator {
     }
 
     private nextCardEveryCardRandomDeck(): boolean {
-        // Make the chance of picking a specific deck proportional to the number of cards within
-        const weights: Record<number, number> = {};
-        for (let i = 0; i < this.deckArray.length; i++) {
-            const cardCount: number = this.deckArray[i].getRepItemCount(
-                RepItemState.AnyItem,
-                false,
-            );
-            if (cardCount) {
-                weights[i] = cardCount;
-            }
-        }
-        if (Object.keys(weights).length === 0) return false;
+        // DueFirstRandomDeckAndCard exhausts the due cards of the whole subtree before touching any
+        // new card; EveryCardRandomDeckAndCard treats both as one pool. Within whichever pool is
+        // active, every card is equally likely regardless of which deck holds it.
+        const states: RepItemState[] =
+            this.iteratorOrder.repItemOrder === RepItemOrder.DueFirstRandomDeckAndCard
+                ? [RepItemState.DueItem, RepItemState.NewItem]
+                : [RepItemState.AnyItem];
 
-        const [deckIdx, cardIdx] = this.weightedRandomNumber.getRandomValues(weights);
-        this.setDeckIdx(deckIdx);
-        this.singleDeckIterator.setNewOrDueCardIdx(cardIdx);
-        return true;
+        for (const state of states) {
+            // Make the chance of picking a specific deck proportional to the number of cards within
+            const weights: Record<number, number> = {};
+            for (let i = 0; i < this.deckArray.length; i++) {
+                const cardCount: number = this.deckArray[i].getRepItemCount(state, false);
+                if (cardCount) {
+                    weights[i] = cardCount;
+                }
+            }
+            if (Object.keys(weights).length === 0) continue;
+
+            const [deckIdx, cardIdx] = this.weightedRandomNumber.getRandomValues(weights);
+            this.setDeckIdx(deckIdx);
+            if (state === RepItemState.AnyItem) {
+                this.singleDeckIterator.setNewOrDueCardIdx(cardIdx);
+            } else {
+                this.singleDeckIterator.setRepItemIdx(state, cardIdx);
+            }
+            return true;
+        }
+        return false;
     }
 
     deleteCurrentQuestionFromAllDecks(): boolean {

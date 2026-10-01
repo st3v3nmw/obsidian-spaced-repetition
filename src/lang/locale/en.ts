@@ -148,6 +148,8 @@ const en: IBaseLocale = {
     REVIEW_CARD_ORDER_NEW_FIRST_RANDOM: "Randomly within a deck (All new cards first)",
     REVIEW_CARD_ORDER_DUE_FIRST_RANDOM: "Randomly within a deck (All due cards first)",
     REVIEW_CARD_ORDER_RANDOM_DECK_AND_CARD: "Random card from random deck",
+    REVIEW_CARD_ORDER_DUE_FIRST_RANDOM_DECK_AND_CARD:
+        "Random card from random deck (All due cards first)",
     REVIEW_DECK_ORDER: "Order decks are displayed during review",
     REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL:
         "Sequentially (once all cards in previous deck reviewed)",
