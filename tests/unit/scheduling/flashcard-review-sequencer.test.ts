@@ -1379,3 +1379,45 @@ async function checkupdateClozeCurrentQuestionTextAndCards(
     expect(await c.file.read()).toEqual(expectedFileText);
     return c;
 }
+
+describe("\\cloze{answer}{hint} math cloze cards (end-to-end)", () => {
+    test("registers as a cloze card and places the SR comment after the $$ block", async () => {
+        const text = "#flashcards\n\n$$\n\\cloze{E}{} = mc^2\n$$\n";
+        const c: TestContext = TestContext.Create(
+            orderDueFirstSequential,
+            FlashcardReviewMode.Review,
+            DEFAULT_SETTINGS,
+            text,
+        );
+        await c.setSequencerDeckTreeFromOriginalText();
+
+        // Registered as one cloze card: front occludes the answer, back reveals it (both in $$).
+        expect(c.cardSequencer.currentDeck.getRepItemCount(RepItemState.AnyItem, false)).toEqual(1);
+        expect(c.reviewSequencer.currentCard.front).toBe(
+            "$$\n{\\color{#2196f3}{[\\ldots]}} = mc^2\n$$",
+        );
+        expect(c.reviewSequencer.currentCard.back).toBe("$$\n{\\color{#2196f3}{E}} = mc^2\n$$");
+
+        await c.reviewSequencer.processReview(ReviewResponse.Easy);
+        const out: string = c.file.content;
+
+        // The math block is preserved verbatim (nothing injected inside it) ...
+        expect(out).toContain("$$\n\\cloze{E}{} = mc^2\n$$");
+        // ... and the SR comment sits AFTER the closing $$, i.e. outside the math.
+        expect(out).toMatch(/\$\$\n<!--SR:!/);
+        expect(out.indexOf("<!--SR:")).toBeGreaterThan(out.lastIndexOf("$$"));
+    });
+
+    test("multiple \\cloze in one block become sibling cards", async () => {
+        const text = "#flashcards\n\n$$\n\\cloze{a^2}{} + \\cloze{b^2}{} = c^2\n$$\n";
+        const c: TestContext = TestContext.Create(
+            orderDueFirstSequential,
+            FlashcardReviewMode.Review,
+            DEFAULT_SETTINGS,
+            text,
+        );
+        await c.setSequencerDeckTreeFromOriginalText();
+
+        expect(c.cardSequencer.currentDeck.getRepItemCount(RepItemState.AnyItem, false)).toEqual(2);
+    });
+});

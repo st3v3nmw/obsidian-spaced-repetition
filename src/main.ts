@@ -10,6 +10,7 @@ import { LocaleManagerInstance } from "src/lang/locale-manager";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { NoteReviewQueue } from "src/note/note-review-queue";
 import { ReminderManager } from "src/scheduling/reminder-manager";
+import { registerClozeMathMacro } from "src/ui/cloze-math-macro";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
 import { UIManager } from "src/ui/ui-manager";
 import { TextDirection } from "src/utils/strings";
@@ -42,6 +43,9 @@ export default class SRPlugin extends Plugin {
             this.commandManager = new CommandManager(this, settingsManager, uiManager);
 
             this.app.workspace.onLayoutReady(async () => {
+                // Teach MathJax the \cloze macro so \cloze{answer}{hint} renders in note preview.
+                void registerClozeMathMacro();
+
                 this.dataManager.loadData();
 
                 // Set the preferred locale if it is not the default

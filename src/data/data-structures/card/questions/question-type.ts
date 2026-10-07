@@ -1,7 +1,15 @@
 import { ClozeCrafter, IClozeFormatter } from "clozecraft";
 
+import {
+    MATH_CLOZE_PATTERN,
+    MATH_CLOZE_TOKEN,
+    MathClozeFormatter,
+    restoreMathClozes,
+    tokenizeMathClozes,
+} from "src/data/data-structures/card/questions/math-cloze";
 import { CardType } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
+import { maskMath } from "src/utils/math-spans";
 import { findLineIndexOfSearchStringIgnoringWs } from "src/utils/strings";
 
 export class CardFrontBack {
@@ -94,21 +102,37 @@ class QuestionTypeMultiLineReversed implements IQuestionTypeHandler {
 
 class QuestionTypeCloze implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
-        const clozecrafter = new ClozeCrafter(settings.clozePatterns);
-        const clozeNote = clozecrafter.createClozeNote(questionText);
+        // `\cloze[seq]{answer}{hint}` macros become tokens for an extra clozecraft pattern, so the
+        // math clozes and the user's `{{...}}` / `==...==` deletions are expanded together: one
+        // card per deletion, or grouped by sequence number, or by overlapping strings, with the
+        // same rules for both syntaxes. The math pattern goes first, so in a note of simple clozes
+        // the math deletions come first, then the text ones.
+        //
+        // Inside math, braces belong to LaTeX: the rest of each formula is masked (only the math
+        // cloze tokens stay visible), so the user's patterns cannot match there, and is put back
+        // into every rendered side.
+        const { text: tokenized, clozes } = tokenizeMathClozes(questionText);
+        const { masked: text, restore: restoreMath } = maskMath(tokenized, MATH_CLOZE_TOKEN);
+        const patterns: string[] =
+            clozes.length > 0
+                ? [MATH_CLOZE_PATTERN, ...settings.clozePatterns]
+                : settings.clozePatterns;
+        const clozeNote = new ClozeCrafter(patterns).createClozeNote(text);
 
         // Determine which question formatter to use based on settings (Cloze patterns as inputs or not).
-        const clozeFormatter = settings.convertClozePatternsToInputs
+        const textFormatter: IClozeFormatter = settings.convertClozePatternsToInputs
             ? new QuestionTypeClozeInputFormatter()
             : new QuestionTypeClozeFormatter();
+        const clozeFormatter = new MathClozeFormatter(textFormatter, clozes);
 
-        let front: string, back: string;
         const result: CardFrontBack[] = [];
         if (clozeNote === null) return result;
 
         for (let i = 0; i < clozeNote.numCards; i++) {
-            front = clozeNote.getCardFront(i, clozeFormatter);
-            back = clozeNote.getCardBack(i, clozeFormatter);
+            // The formula goes back first, so a restored cloze sees the commands next to it
+            const render = (side: string) => restoreMathClozes(restoreMath(side), clozes);
+            const front = render(clozeNote.getCardFront(i, clozeFormatter));
+            const back = render(clozeNote.getCardBack(i, clozeFormatter));
             result.push(new CardFrontBack(front, back));
         }
 

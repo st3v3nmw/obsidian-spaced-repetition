@@ -63,6 +63,81 @@ The first female ==prime minister== of Australia was ==Julia Gillard==
 These two cards are considered sibling cards. See [sibling cards](flashcards-overview.md#sibling-cards) regarding the
 [Bury sibling cards until the next day](../user-options.md#flashcard-review) scheduling option.
 
+## Clozes in Math (LaTeX)
+
+Inside inline (`$...$`) or block (`$$...$$`) math, mark a cloze deletion with the `\cloze{answer}{hint}` macro.
+The other cloze delimiters are unsuitable inside math: `==` and `**` change the LaTeX rendering, and `{{...}}` collides with LaTeX's own use of braces. So inside `$...$` and `$$...$$` your cloze patterns are not looked for at all: braces there belong to LaTeX (e.g. `\frac{{a}}{b}` or `{{n} \choose {k}}` stay ordinary formulas), and `\cloze` is the only way to make a deletion.
+
+The hint is the second argument, and it is optional: `\cloze{answer}` works too. A brace group written right after the answer is always read as the hint (as in TeX, spaces in between are skipped), so if a formula continues with a group, give the hint explicitly, even empty: `\cloze{f}{}{(x)}`.
+
+When you **read** a note, `\cloze{answer}{hint}` renders as just the `answer`, so the formula looks normal.
+When you **review**, the answer is hidden on the front (shown as `[hint]`, or `[…]` when no hint is given) and revealed on the back.
+
+For instance, the following note:
+
+```
+$$
+\cloze{c^2}{} = \cloze{a^2 + b^2}{Pythagoras}
+$$
+```
+
+Generates two sibling cards, with the following fronts:
+
+!!! note ""
+
+    <div class="grid" markdown>
+
+    !!! tip "Card 1 Initial View"
+
+        $$ [\ldots] = a^2 + b^2 $$
+
+    !!! tip "Card 2 Initial View"
+
+        $$ c^2 = [\text{Pythagoras}] $$
+
+    </div>
+
+!!! tip "After `Show Answer` Clicked (same for both cards)"
+
+    $$ c^2 = a^2 + b^2 $$
+
+The answer may contain braces, fractions, roots, and other nested LaTeX — for example `\cloze{\frac{-b \pm \sqrt{b^2 - 4ac}}{2a}}{}` — and is parsed correctly.
+
+### Sequence numbers and overlapping in math
+
+Like the other cloze syntaxes, `\cloze` supports [Classic Clozes](#classic-clozes) and [Generalized Cloze Overlapping](#generalized-cloze-overlapping), through an optional first argument in square brackets, as in LaTeX:
+
+- `\cloze[1]{answer}{hint}`: a sequence number. Deletions with the same number are asked on the same card, and cards follow the numbers.
+- `\cloze[ash]{answer}{hint}`: an overlapping string. The i-th letter says what the deletion does on card i: `a` ask, `h` hide, `s` show.
+
+For instance:
+
+```
+$$
+\cloze[1]{(a+b)^2}{} = \cloze[2]{a^2 + 2ab + b^2}{} \quad \text{and} \quad \cloze[1]{(a-b)^2}{} = a^2 - 2ab + b^2
+$$
+```
+
+asks both squares on card 1 and the expansion on card 2. Without the brackets, `\cloze{answer}{hint}` works as before: one card per deletion.
+
+!!! note
+
+    `\cloze` works inside math regardless of the cloze patterns configured in your settings. It does not need to be added to [Custom Cloze Patterns](#custom-cloze-patterns).
+
+!!! note
+
+    A note may mix `\cloze` with the other cloze syntaxes; all its deletions are expanded together, following the same rules. Without sequence numbers each deletion becomes its own card (the `\cloze` ones first):
+
+    ```
+    $E = \cloze{mc^2}{}$ was published in ==1905==
+    ```
+
+    gives two cards — one hiding `mc^2`, one hiding `1905`. Sequence numbers are shared between the syntaxes, so `\cloze[1]{mc^2}{}` and `==1;;1905==` are asked on the same card.
+
+!!! warning
+
+    A note that is already open when the plugin loads may show `\cloze` unrendered until its view is rebuilt: switch to another note and back, or reopen the note. Notes opened afterwards render correctly straight away.
+
 ## Cloze Types
 
 ### Simplified Clozes
