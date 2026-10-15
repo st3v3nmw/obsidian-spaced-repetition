@@ -22,7 +22,7 @@ export default class CardToolbarComponent {
     public constructor(
         parentEl: HTMLElement,
         showDeleteButton: boolean,
-        deleteCurrentCard: () => void,
+        deleteCurrentCard: () => Promise<void>,
         backToDeckHandler: () => Promise<void>,
         editClickHandler: () => void,
         jumpToCurrentCard: () => Promise<void>,

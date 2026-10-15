@@ -52,7 +52,7 @@ export class CardContainer {
         plugin: SRPlugin,
         settings: SRSettings,
         parentEl: HTMLElement,
-        deleteCurrentCard: () => void,
+        deleteCurrentCard: () => Promise<void>,
         backToDeckHandler: () => Promise<void>,
         editCardHandler: () => void,
         processReviewHandler: (response: ReviewResponse) => Promise<void>,
@@ -60,6 +60,7 @@ export class CardContainer {
         showAnswerHandler: () => void,
         jumpToCurrentCardHandler: () => Promise<void>,
         displayCurrentCardInfoNoticeHandler: () => void,
+        canProcessCard: () => boolean,
         closeModal?: () => void,
     ) {
         // Init properties
@@ -87,6 +88,7 @@ export class CardContainer {
             displayCurrentCardInfoNoticeHandler,
             this.skipCardHandler,
             () => {
+                if (!canProcessCard()) return;
                 new ConfirmationModal(
                     app,
                     t("DELETE_SCHEDULING_DATA_OF_CURRENT_CARD"),

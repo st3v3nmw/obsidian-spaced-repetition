@@ -6,7 +6,6 @@ import { Card } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { Deck } from "src/data/data-structures/deck/deck";
 import { SRSettings } from "src/data/settings";
-import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
@@ -19,7 +18,6 @@ import {
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
 import CardInfoNotice from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-info-notice";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
-import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import { UIManager, UIState } from "src/ui/ui-manager";
@@ -87,6 +85,9 @@ export default class ContentManager {
     private sessionData: SessionData | null = null;
 
     private lastPressedOnProcessReview: number = 0;
+    // Keep the current question stable while its deletion or review is being saved.
+    private isProcessingCard: boolean = false;
+    private isClosed: boolean = false;
     private pendingResumeTimeout: number | null = null;
 
     constructor(
@@ -119,18 +120,22 @@ export default class ContentManager {
             this.settings,
             parentEl,
             this._deleteCurrentCard.bind(this),
-            this._showDecksList.bind(this),
+            async () => {
+                if (!this.isProcessingCard) await this._showDecksList();
+            },
             this._doEditQuestionText.bind(this),
             this._processReview.bind(this),
             this._skipCurrentCard.bind(this),
             this._showAnswer.bind(this),
             this._jumpToCurrentCard.bind(this),
             this._displayCurrentCardInfoNotice.bind(this),
+            () => !this.isProcessingCard && !this.isClosed,
             closeModal,
         );
     }
 
     public close() {
+        this.isClosed = true;
         this._clearPendingResumeTimeout();
         this.uiManager.setSRViewInFocus(false);
         this.deckContainer.closeList();
@@ -139,6 +144,8 @@ export default class ContentManager {
     }
 
     public async open() {
+        if (this.isProcessingCard) return;
+        this.isClosed = false;
         // Prepare a review queue to display
         this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue();
 
@@ -186,7 +193,7 @@ export default class ContentManager {
         if (reloadReviewQueue) {
             this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue();
         }
-        if (this.reviewSequencer === null) return;
+        if (this.isClosed || this.reviewSequencer === null) return;
         this.cardContainer.closeSession();
         this.uiManager.setUIState(UIState.DeckList);
         this.deckContainer.showList(this.reviewSequencer, this.settings, this.reviewMode);
@@ -317,8 +324,10 @@ export default class ContentManager {
 
     // MARK: Card button handlers
 
-    public _deleteCurrentCard() {
+    public async _deleteCurrentCard(): Promise<void> {
         if (
+            this.isProcessingCard ||
+            this.isClosed ||
             this.sessionData === null ||
             this.reviewSequencer === null ||
             this.dataManager.data === null
@@ -335,21 +344,18 @@ export default class ContentManager {
         }
         this.lastPressedOnProcessReview = timeNow;
 
-        new ConfirmationModal(
-            this.app,
-            t("DELETE_CARD"),
-            t("DELETE_CARD_CONFIRMATION"),
-            t("CANCEL"),
-            async () => {
-                if (this.sessionData === null || this.reviewSequencer === null) return;
-                await this.reviewSequencer.deleteCurrentCardFromNote();
-                await this._showNextCard();
-            },
-        ).open();
+        this.isProcessingCard = true;
+        this._clearPendingResumeTimeout();
+        try {
+            await this.reviewSequencer.deleteCurrentCardFromNote();
+            if (!this.isClosed) await this._showNextCard();
+        } finally {
+            this.isProcessingCard = false;
+        }
     }
 
     public async _showAnswer() {
-        if (this.sessionData === null) return;
+        if (this.isProcessingCard || this.sessionData === null) return;
 
         const timeNow = now();
         if (
@@ -373,7 +379,7 @@ export default class ContentManager {
     }
 
     private async _doEditQuestionText(): Promise<void> {
-        if (this.reviewSequencer === null) return;
+        if (this.isProcessingCard || this.reviewSequencer === null) return;
         const currentCard: Card | null = this.reviewSequencer.currentCard;
         const currentQ: Question = this.reviewSequencer.currentQuestion;
 
@@ -463,7 +469,7 @@ export default class ContentManager {
     }
 
     public async _skipCurrentCard() {
-        if (this.reviewSequencer === null) return;
+        if (this.isProcessingCard || this.reviewSequencer === null) return;
         this.reviewSequencer.skipCurrentCard();
         await this._showNextCard();
     }
@@ -477,7 +483,7 @@ export default class ContentManager {
     }
 
     public async _processReview(response: ReviewResponse): Promise<void> {
-        if (this.reviewSequencer === null) return;
+        if (this.isProcessingCard || this.isClosed || this.reviewSequencer === null) return;
         const timeNow = now();
         if (
             timeNow - this.lastPressedOnProcessReview <
@@ -487,14 +493,19 @@ export default class ContentManager {
         }
         this.lastPressedOnProcessReview = timeNow;
 
-        await this.reviewSequencer.processReview(response);
-        await this._showNextCard();
+        this.isProcessingCard = true;
+        try {
+            await this.reviewSequencer.processReview(response);
+            if (!this.isClosed) await this._showNextCard();
+        } finally {
+            this.isProcessingCard = false;
+        }
     }
 
     // MARK: Deck button handlers
 
     private async _startReviewOfDeck(deck: Deck) {
-        if (this.reviewSequencer === null) return;
+        if (this.isProcessingCard || this.reviewSequencer === null) return;
         this.reviewSequencer.setCurrentDeck(deck.getTopicPath());
         if (this.reviewSequencer.hasCurrentCard) {
             await this._reviewDeck(deck);
@@ -504,6 +515,7 @@ export default class ContentManager {
     }
 
     private async _changeReviewMode(reviewMode: FlashcardReviewMode) {
+        if (this.isProcessingCard) return;
         this.reviewQueueLoader.setReviewMode(reviewMode);
         this.reviewMode = reviewMode;
         this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue();

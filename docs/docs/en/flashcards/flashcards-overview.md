@@ -93,7 +93,9 @@ Note that there is no current support for cards with different text directions w
 
 ### Deleting cards
 
-To delete a card, simply delete the scheduling information & the card text.
+Enable **Show Delete button** under **Settings → Spaced Repetition → UI preferences**, then choose **Delete Card** from the review menu. This immediately removes the question text and scheduling information from the note, including any reversed or cloze sibling cards, and advances to the next card without a confirmation dialog.
+
+You can also delete the scheduling information and card text directly in the note.
 
 ### Ignoring cards
 

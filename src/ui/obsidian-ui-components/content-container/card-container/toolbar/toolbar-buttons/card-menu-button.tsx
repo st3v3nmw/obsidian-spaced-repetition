@@ -11,7 +11,7 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
         showDeleteButton: boolean,
         isModal: boolean,
         isResetButtonDisabled: boolean,
-        deleteCurrentCard: () => void,
+        deleteCurrentCard: () => Promise<void>,
         editClickHandler: () => void,
         jumpToCurrentCard: () => Promise<void>,
         displayCurrentCardInfoNotice: () => void,
@@ -60,7 +60,7 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
         skipCurrentCard: () => void,
         jumpToCurrentCard: () => Promise<void>,
         displayCurrentCardInfoNotice: () => void,
-        deleteCurrentCard: () => void,
+        deleteCurrentCard: () => Promise<void>,
         closeModal?: () => void,
     ) {
         if (isExtended) {
@@ -127,8 +127,8 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
             cardMenu.addItem((item) => {
                 item.setTitle(t("DELETE_CARD"))
                     .setIcon("trash")
-                    .onClick(() => {
-                        deleteCurrentCard();
+                    .onClick(async () => {
+                        await deleteCurrentCard();
                     });
             });
         }
