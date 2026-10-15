@@ -1,10 +1,25 @@
 import { Menu } from "obsidian";
 
 import { t } from "src/lang/helpers";
+import {
+    getTableSurfaceNames,
+    TableSurface,
+} from "src/ui/obsidian-ui-components/content-container/card-container/card-3d-view/card-3d-view";
 import MenuButtonComponent from "src/ui/obsidian-ui-components/content-container/menu-button";
+
+/**
+ * Lets the card menu offer a choice of table surface for the 3D card view
+ */
+export interface TableSurfaceMenuOptions {
+    /** Whether to offer the choice, i.e. whether the 3D card view is on */
+    isAvailable: () => boolean;
+    current: () => string;
+    choose: (surface: TableSurface) => void;
+}
 
 export default class CardMenuButtonComponent extends MenuButtonComponent {
     private isResetButtonDisabled: boolean;
+    private tableSurfaceMenu: TableSurfaceMenuOptions | undefined;
     public constructor(
         container: HTMLElement,
         isExtended: boolean,
@@ -19,6 +34,7 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
         onOpenResetModalClick: () => void,
         closeModal?: () => void,
         classNames?: string[],
+        tableSurfaceMenu?: TableSurfaceMenuOptions,
     ) {
         super(
             container,
@@ -44,10 +60,39 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
             classNames,
         );
         this.isResetButtonDisabled = isResetButtonDisabled;
+        this.tableSurfaceMenu = tableSurfaceMenu;
     }
 
     public setResetButtonDisabled(disabled: boolean) {
         this.isResetButtonDisabled = disabled;
+    }
+
+    /**
+     * Opens a second menu listing the table surfaces, with the current one ticked.
+     * Obsidian has no public API for submenus, so it opens where the first menu was.
+     */
+    private showTableSurfaceMenu(
+        options: TableSurfaceMenuOptions,
+        evt: MouseEvent | KeyboardEvent,
+    ) {
+        const surfaceMenu = new Menu();
+        const current = options.current();
+        for (const [surface, name] of Object.entries(getTableSurfaceNames())) {
+            surfaceMenu.addItem((item) => {
+                item.setTitle(name)
+                    .setChecked(surface === current)
+                    .onClick(() => {
+                        options.choose(surface as TableSurface);
+                    });
+            });
+        }
+
+        if (evt instanceof MouseEvent) {
+            surfaceMenu.showAtMouseEvent(evt);
+        } else {
+            const rect = this.buttonEl.getBoundingClientRect();
+            surfaceMenu.showAtPosition({ x: rect.left, y: rect.bottom });
+        }
     }
 
     private buildMenu(
@@ -123,6 +168,16 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
                     displayCurrentCardInfoNotice();
                 });
         });
+        const tableSurfaceMenu = this.tableSurfaceMenu;
+        if (tableSurfaceMenu !== undefined && tableSurfaceMenu.isAvailable()) {
+            cardMenu.addItem((item) => {
+                item.setTitle(t("TABLE_SURFACE"))
+                    .setIcon("palette")
+                    .onClick((evt) => {
+                        this.showTableSurfaceMenu(tableSurfaceMenu, evt);
+                    });
+            });
+        }
         if (showDeleteButton) {
             cardMenu.addItem((item) => {
                 item.setTitle(t("DELETE_CARD"))

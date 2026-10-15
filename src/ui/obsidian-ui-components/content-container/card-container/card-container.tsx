@@ -9,6 +9,11 @@ import type SRPlugin from "src/main";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
+import Card3DView, {
+    DEFAULT_TABLE_SURFACE,
+    isTableSurface,
+    TableSurface,
+} from "src/ui/obsidian-ui-components/content-container/card-container/card-3d-view/card-3d-view";
 import ContextSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/context-section/context-section";
 import ResponseSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section";
 import CardToolbarComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar";
@@ -25,9 +30,12 @@ import { RenderMarkdownWrapper } from "src/utils/renderers";
 export class CardContainer {
     private app: App;
     private plugin: SRPlugin;
+    private settings: SRSettings;
     private cardState: CardState;
+    private sessionData: SessionData | null = null;
 
     private view: HTMLDivElement;
+    private card3DView: Card3DView | null = null;
 
     private toolbar: CardToolbarComponent;
     private contextSection: ContextSectionComponent | null = null;
@@ -61,10 +69,12 @@ export class CardContainer {
         jumpToCurrentCardHandler: () => Promise<void>,
         displayCurrentCardInfoNoticeHandler: () => void,
         closeModal?: () => void,
+        toggleMaximized?: () => boolean,
     ) {
         // Init properties
         this.app = app;
         this.plugin = plugin;
+        this.settings = settings;
         this.cardState = CardState.Closed;
         this.processReviewHandler = processReviewHandler;
         this.skipCardHandler = skipCardHandler;
@@ -97,7 +107,15 @@ export class CardContainer {
                     },
                 ).open();
             },
+            () => void this.toggle3DView(),
+            settings.flashcard3DView,
+            {
+                isAvailable: () => this.settings.flashcard3DView,
+                current: () => this.settings.flashcard3DTableSurface,
+                choose: (surface: TableSurface) => void this.setTableSurface(surface),
+            },
             closeModal,
+            toggleMaximized,
         );
 
         this.scrollWrapper = this.view.createDiv();
@@ -164,7 +182,9 @@ export class CardContainer {
 
     public async drawCardFront(sessionData: SessionData, settings: SRSettings) {
         this.toolbar.setResetButtonDisabled(true);
+        this.toolbar.set3DViewActive(settings.flashcard3DView);
         // Update current deck info
+        this.sessionData = sessionData;
         this.cardState = sessionData.cardData.currentCardState;
 
         this._updateInfoBar(sessionData, settings.flashcardCardOrder);
@@ -188,9 +208,13 @@ export class CardContainer {
         }
     }
 
-    private drawCardContext(sessionData: SessionData, settings: SRSettings) {
+    private drawCardContext(
+        sessionData: SessionData,
+        settings: SRSettings,
+        containerEl: HTMLDivElement = this.content,
+    ) {
         if (settings.showContextInCards) {
-            this.contextSection = new ContextSectionComponent(this.content);
+            this.contextSection = new ContextSectionComponent(containerEl);
             this.contextSection.updateCardContext(
                 settings.showContextInCards,
                 sessionData.currentQuestion,
@@ -200,6 +224,16 @@ export class CardContainer {
     }
 
     private async drawCardFrontContent(sessionData: SessionData, settings: SRSettings) {
+        if (settings.flashcard3DView) {
+            await this.draw3DCard(sessionData, settings);
+        } else {
+            await this.drawFlatFrontContent(sessionData, settings);
+        }
+    }
+
+    private async drawFlatFrontContent(sessionData: SessionData, settings: SRSettings) {
+        this.show3DView(false);
+
         // Update card content
         this.content.empty();
 
@@ -223,7 +257,129 @@ export class CardContainer {
         this.content.scrollTop = 0;
     }
 
+    // #region -> 3D card view
+
+    private get3DView(settings: SRSettings): Card3DView {
+        if (this.card3DView === null) {
+            this.card3DView = new Card3DView(
+                this.scrollWrapper,
+                { front: t("CARD_3D_QUESTION_SIDE"), back: t("CARD_3D_ANSWER_SIDE") },
+                () => {
+                    // Turning the card over by hand counts as "show answer"
+                    if (this.cardState === CardState.Front) this.showAnswerHandler();
+                },
+            );
+        }
+        const surface = settings.flashcard3DTableSurface;
+        this.card3DView.setSurface(isTableSurface(surface) ? surface : DEFAULT_TABLE_SURFACE);
+        return this.card3DView;
+    }
+
+    private show3DView(visible: boolean) {
+        this.view.toggleClass("sr-3d-mode", visible);
+        this.card3DView?.setVisible(visible);
+    }
+
+    /**
+     * Renders the current card onto both faces of the 3D card.
+     * @param options.animate - Slide the previous card off and this one on
+     * @param options.showBack - Leave the card resting on its back, e.g. when switching views
+     */
+    private async draw3DCard(
+        sessionData: SessionData,
+        settings: SRSettings,
+        options: { animate?: boolean; showBack?: boolean } = {},
+    ) {
+        const view = this.get3DView(settings);
+        this.show3DView(true);
+        view.beginNextCard(options.animate ?? true);
+
+        await this.draw3DCardFace(view, sessionData, settings, CardState.Front);
+        await this.draw3DCardFace(view, sessionData, settings, CardState.Back);
+        view.fitText();
+
+        if (options.showBack) view.turnToBack(false);
+    }
+
+    private async draw3DCardFace(
+        view: Card3DView,
+        sessionData: SessionData,
+        settings: SRSettings,
+        side: CardState.Front | CardState.Back,
+    ) {
+        const isFront = side === CardState.Front;
+        const contextEl = isFront ? view.frontContextEl : view.backContextEl;
+        const contentEl = isFront ? view.frontContentEl : view.backContentEl;
+        contextEl.empty();
+        contentEl.empty();
+        this.drawCardContext(sessionData, settings, contextEl);
+        // The context may be cut short, so show all of it on hover
+        const contextText = contextEl.getText().trim();
+        if (contextText) contextEl.setAttribute("aria-label", contextText);
+        else contextEl.removeAttribute("aria-label");
+
+        const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
+            this.app,
+            this.plugin,
+            sessionData.currentNote.filePath,
+        );
+        const textDirection = sessionData.currentQuestion.questionText.textDirection;
+        const card = sessionData.cardData.currentCard;
+
+        if (isFront) {
+            await wrapper.renderMarkdownWrapper(card.front.trimStart(), contentEl, textDirection);
+            return;
+        }
+
+        // The answer side repeats the question in smaller grey text above the answer,
+        // except for cloze cards, whose back already contains the whole text
+        if (sessionData.currentQuestion.questionType !== CardType.Cloze) {
+            const recapEl = contentEl.createDiv("sr-3d-question-recap");
+            await wrapper.renderMarkdownWrapper(card.front.trimStart(), recapEl, textDirection);
+        }
+        await wrapper.renderMarkdownWrapper(card.back, contentEl, textDirection);
+    }
+
+    /**
+     * Switches between the 3D and the flat card view, and redraws the current card in place.
+     */
+    private async toggle3DView() {
+        const enabled = !this.settings.flashcard3DView;
+        const settingsManager = this.plugin.dataManager.settingsManager;
+        this.settings.flashcard3DView = enabled;
+        settingsManager.settings.flashcard3DView = enabled;
+        this.toolbar.set3DViewActive(enabled);
+        await settingsManager.save();
+
+        const sessionData = this.sessionData;
+        if (sessionData === null || this.cardState === CardState.Closed) return;
+
+        if (enabled) {
+            await this.draw3DCard(sessionData, this.settings, {
+                animate: false,
+                showBack: this.cardState === CardState.Back,
+            });
+        } else if (this.cardState === CardState.Back) {
+            await this.drawFlatBackContent(sessionData, this.settings);
+        } else {
+            await this.drawFlatFrontContent(sessionData, this.settings);
+        }
+        this._setupClozeInputListeners();
+    }
+
+    /**
+     * Changes the table surface of the 3D card view right away and saves the choice.
+     */
+    private async setTableSurface(surface: TableSurface) {
+        const settingsManager = this.plugin.dataManager.settingsManager;
+        this.settings.flashcard3DTableSurface = surface;
+        settingsManager.settings.flashcard3DTableSurface = surface;
+        this.card3DView?.setSurface(surface);
+        await settingsManager.save();
+    }
+
     public drawPendingState(nextPendingDueUnix: number): void {
+        this.show3DView(false);
         this.toolbar.setResetButtonDisabled(true);
         this.cardState = CardState.Front;
         this.content.empty();
@@ -347,28 +503,19 @@ export class CardContainer {
         this.cardState = sessionData.cardData.currentCardState;
 
         this.toolbar.setResetButtonDisabled(false);
+        this.sessionData = sessionData;
 
         // Show answer text
-        if (sessionData.currentQuestion.questionType !== CardType.Cloze) {
-            await this.drawCardFrontContent(sessionData, settings);
-            const hr: HTMLElement = activeDocument.createElement("hr");
-            this.content.appendChild(hr);
+        if (settings.flashcard3DView) {
+            const view = this.get3DView(settings);
+            this.show3DView(true);
+            // Redrawn so edits made while the card was open show up on its back
+            await this.draw3DCardFace(view, sessionData, settings, CardState.Back);
+            view.fitText();
+            view.turnToBack();
         } else {
-            this.content.empty();
-            this.drawCardContext(sessionData, settings);
+            await this.drawFlatBackContent(sessionData, settings);
         }
-
-        const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
-            this.app,
-            this.plugin,
-            sessionData.currentNote.filePath,
-        );
-        await wrapper.renderMarkdownWrapper(
-            sessionData.cardData.currentCard.back,
-            this.content,
-            sessionData.currentQuestion.questionText.textDirection,
-            // sessionData.cardData.currentCardState,
-        );
 
         // Evaluate cloze answers
         this._evaluateClozeAnswers();
@@ -387,6 +534,30 @@ export class CardContainer {
         if (this.plugin.uiManager === null) throw new Error("UI manager not initialized!!!");
         this.plugin.uiManager.setSRViewInFocus(true);
         this.response.againButton.buttonEl.focus();
+    }
+
+    private async drawFlatBackContent(sessionData: SessionData, settings: SRSettings) {
+        if (sessionData.currentQuestion.questionType !== CardType.Cloze) {
+            await this.drawFlatFrontContent(sessionData, settings);
+            const hr: HTMLElement = activeDocument.createElement("hr");
+            this.content.appendChild(hr);
+        } else {
+            this.show3DView(false);
+            this.content.empty();
+            this.drawCardContext(sessionData, settings);
+        }
+
+        const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
+            this.app,
+            this.plugin,
+            sessionData.currentNote.filePath,
+        );
+        await wrapper.renderMarkdownWrapper(
+            sessionData.cardData.currentCard.back,
+            this.content,
+            sessionData.currentQuestion.questionText.textDirection,
+            // sessionData.cardData.currentCardState,
+        );
     }
 
     private _keydownHandler = (e: KeyboardEvent) => {
@@ -461,6 +632,19 @@ export class CardContainer {
                     break;
                 }
                 void this.processReviewHandler(ReviewResponse.Reset);
+                consumeKeyEvent();
+                break;
+            case "ArrowLeft":
+            case "ArrowRight":
+                // Turn the 3D card over; the first turn shows the answer
+                if (!this.settings.flashcard3DView || this.card3DView === null) {
+                    break;
+                }
+                if (this.cardState === CardState.Front) {
+                    this.showAnswerHandler();
+                } else if (this.cardState === CardState.Back) {
+                    this.card3DView.turnOver(e.code === "ArrowLeft" ? -1 : 1);
+                }
                 consumeKeyEvent();
                 break;
             default:

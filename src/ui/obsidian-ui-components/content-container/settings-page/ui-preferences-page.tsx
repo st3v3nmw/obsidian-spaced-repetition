@@ -5,6 +5,7 @@ import { DEFAULT_SETTINGS } from "src/data/settings";
 import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { getTableSurfaceNames } from "src/ui/obsidian-ui-components/content-container/card-container/card-3d-view/card-3d-view";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
 import { UIManager } from "src/ui/ui-manager";
@@ -317,6 +318,33 @@ export class UIPreferencesPage extends SettingsPage {
                             .setValue(this.settingsManager.settings.showContextInCards)
                             .onChange(async (value) => {
                                 this.settingsManager.settings.showContextInCards = value;
+                                await this.settingsManager.save();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("CARD_3D_VIEW"))
+                    .setDesc(t("CARD_3D_VIEW_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.settingsManager.settings.flashcard3DView)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.flashcard3DView = value;
+                                await this.settingsManager.save();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("CARD_3D_TABLE_SURFACE"))
+                    .setDesc(t("CARD_3D_TABLE_SURFACE_DESC"))
+                    .addDropdown((dropdown) =>
+                        dropdown
+                            .addOptions(getTableSurfaceNames())
+                            .setValue(this.settingsManager.settings.flashcard3DTableSurface)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.flashcard3DTableSurface = value;
                                 await this.settingsManager.save();
                             }),
                     );

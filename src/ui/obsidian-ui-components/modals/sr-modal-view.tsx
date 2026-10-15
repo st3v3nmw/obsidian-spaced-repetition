@@ -12,6 +12,7 @@ export class SRModalView extends Modal {
     private plugin: SRPlugin;
     private settingsManager: SettingsManager;
     private resizeObserver: ResizeObserver | null = null;
+    private isMaximized = false;
 
     constructor(
         app: App,
@@ -56,6 +57,7 @@ export class SRModalView extends Modal {
             () => {
                 this.close();
             },
+            () => this.toggleMaximized(),
         );
         this.plugin.uiManager.setContentManager(this.contentManager);
     }
@@ -68,7 +70,21 @@ export class SRModalView extends Modal {
         this.contentManager.close();
     }
 
+    /**
+     * Makes the modal fill the Obsidian window, or restores its previous size.
+     * The saved size settings are left untouched, so restoring returns to them.
+     * @returns Whether the modal is now maximized
+     */
+    private toggleMaximized(): boolean {
+        this.isMaximized = !this.isMaximized;
+        this.modalEl.toggleClass("sr-is-maximized", this.isMaximized);
+        return this.isMaximized;
+    }
+
     private async onResize(entries: ResizeObserverEntry[]) {
+        // A maximized modal is a temporary state, not a size to remember
+        if (this.isMaximized) return;
+
         const modalEl = entries[0].target as HTMLElement;
         const parent = modalEl.parentElement;
 

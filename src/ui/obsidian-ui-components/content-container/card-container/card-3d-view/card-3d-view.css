@@ -1,0 +1,248 @@
+/* MARK: 3D Card View */
+
+.sr-3d-scene {
+    --sr-3d-table-tilt: 28deg;
+    --sr-3d-paper: #fbfaf5;
+    --sr-3d-paper-edge: #e2ddcf;
+    --sr-3d-ink: #1e2330;
+    --sr-3d-ink-muted: #5d6272;
+    --sr-3d-rule-blue: rgba(66, 118, 190, 0.22);
+    --sr-3d-rule-red: rgba(204, 68, 68, 0.5);
+
+    position: relative;
+    flex-grow: 1;
+    min-height: 0;
+    overflow: hidden;
+    container-type: size;
+    perspective: 1200px;
+    perspective-origin: 50% 0%;
+    user-select: none;
+    -webkit-user-select: none;
+
+    &.sr-is-hidden {
+        display: none;
+    }
+}
+
+.theme-dark .sr-3d-scene {
+    --sr-3d-paper: #e9e3d5;
+    --sr-3d-paper-edge: #bdb6a6;
+}
+
+.sr-3d-table {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--sr-3d-table-tilt));
+    transform-origin: 50% 55%;
+}
+
+.sr-3d-tabletop {
+    position: absolute;
+    left: 4%;
+    right: 4%;
+    top: 3%;
+    bottom: 9%;
+    border-radius: 3px;
+    transform-style: preserve-3d;
+    transform: translateZ(-3px);
+    background:
+        radial-gradient(ellipse 55% 45% at 50% 55%, rgba(255, 255, 255, 0.14), transparent 70%),
+        var(--sr-3d-surface-image, none) center / 100% 100%,
+        linear-gradient(180deg, var(--sr-3d-surface-dark), var(--sr-3d-surface-light));
+    /* Smooths the jagged edge Chromium draws on 3D-transformed boxes */
+    outline: 1px solid transparent;
+}
+
+.sr-3d-tabletop-edge {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 22px;
+    border-radius: 0 0 3px 3px;
+    transform-origin: top;
+    transform: rotateX(-90deg);
+    background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)),
+        var(--sr-3d-surface-image, none) center bottom / 100% 900%,
+        var(--sr-3d-surface-dark);
+    outline: 1px solid transparent;
+}
+
+/* An index card is 5 by 3 inches. It fills as much of the table as fits. */
+.sr-3d-card,
+.sr-3d-card-shadow {
+    position: absolute;
+    left: 50%;
+    top: 52%;
+    width: min(86cqw, 128cqh, 1200px);
+    aspect-ratio: 5 / 3;
+}
+
+.sr-3d-card-shadow {
+    border-radius: 10px;
+    background: rgba(20, 12, 4, 0.55);
+    pointer-events: none;
+}
+
+.sr-3d-card {
+    transform-style: preserve-3d;
+    cursor: grab;
+    touch-action: pan-y;
+
+    &.is-dragging {
+        cursor: grabbing;
+    }
+}
+
+.sr-3d-card-ghost {
+    pointer-events: none;
+
+    &.is-leaving {
+        transition:
+            transform 0.45s cubic-bezier(0.4, 0, 0.6, 1),
+            opacity 0.45s ease-in;
+        opacity: 0;
+    }
+}
+
+.sr-3d-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 5px;
+    overflow: hidden;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: var(--sr-3d-paper);
+    border: 1px solid var(--sr-3d-paper-edge);
+    display: flex;
+    flex-direction: column;
+    font-size: calc(var(--font-text-size) * 1.1);
+
+    /* Rendered markdown uses the theme's colours; the card is paper whatever the theme */
+    --text-normal: var(--sr-3d-ink);
+    --text-muted: var(--sr-3d-ink-muted);
+    --text-faint: var(--sr-3d-ink-muted);
+    --text-accent: #2a5db0;
+    --link-color: #2a5db0;
+    --link-external-color: #2a5db0;
+    --link-unresolved-color: #2a5db0;
+    --code-normal: var(--sr-3d-ink);
+    --code-background: rgba(0, 0, 0, 0.05);
+    --background-primary: var(--sr-3d-paper);
+    --background-primary-alt: rgba(0, 0, 0, 0.04);
+    --background-secondary: rgba(0, 0, 0, 0.05);
+    --background-modifier-border: rgba(0, 0, 0, 0.15);
+    color: var(--sr-3d-ink);
+}
+
+.sr-3d-face-back {
+    transform: rotateY(180deg);
+}
+
+/* The band above the red line, like the heading line of an index card */
+.sr-3d-face-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    min-height: 2.2em;
+    padding: 0.35em 6% 0.2em;
+    border-bottom: 1.5px solid var(--sr-3d-rule-red);
+    /* Grows with the card (the view sets the unit), so it stays in proportion when maximized */
+    font-size: calc(0.72em * clamp(1, var(--sr-3d-card-unit, 1) * 0.75, 1.8));
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sr-3d-ink-muted);
+}
+
+.sr-3d-face-context {
+    flex: 1;
+    min-width: 0;
+
+    /* Long contexts wrap onto a second line, then end in an ellipsis */
+    & .sr-context {
+        font-style: normal;
+        color: inherit;
+        padding: 0;
+        line-height: 1.35;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        overflow: hidden;
+    }
+}
+
+.sr-3d-face-side {
+    flex-shrink: 0;
+    font-weight: 600;
+}
+
+.sr-3d-face-back .sr-3d-face-side {
+    color: var(--sr-3d-rule-red);
+}
+
+.sr-3d-face-content {
+    --sr-3d-rule-gap: 1.75em;
+
+    flex-grow: 1;
+    min-height: 0;
+    min-width: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
+    padding: 0.8rem 6% 1rem;
+    /* Set by the view: as large as fits on the card, see Card3DView.fitText() */
+    font-size: calc(1em * var(--sr-3d-text-scale, 1));
+    line-height: 1.5;
+    word-break: break-word;
+    /* Pale blue ruling that scrolls with the text, like a real card */
+    background: repeating-linear-gradient(
+            to bottom,
+            transparent 0 calc(var(--sr-3d-rule-gap) - 1px),
+            var(--sr-3d-rule-blue) calc(var(--sr-3d-rule-gap) - 1px) var(--sr-3d-rule-gap)
+        )
+        local;
+
+    /* On the answer side, the question is repeated above the answer in smaller grey text */
+    & .sr-3d-question-recap {
+        --text-normal: var(--sr-3d-ink-muted);
+        font-size: 0.8em;
+        color: var(--sr-3d-ink-muted);
+        margin-bottom: 0.9em;
+
+        & p:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    & p {
+        margin-top: 0;
+    }
+
+    & hr {
+        border-top-style: dashed;
+        border-color: var(--sr-3d-ink-muted);
+        margin: 0.75rem 0;
+    }
+
+    & img {
+        max-height: 60cqh;
+        object-fit: contain;
+    }
+}
+
+.sr-card-container.sr-3d-mode .sr-scroll-wrapper > .sr-content {
+    display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sr-3d-card-ghost.is-leaving {
+        transition: none;
+    }
+}
