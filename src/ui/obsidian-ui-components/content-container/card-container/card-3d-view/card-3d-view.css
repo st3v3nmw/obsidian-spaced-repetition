@@ -119,21 +119,6 @@
     display: flex;
     flex-direction: column;
     font-size: calc(var(--font-text-size) * 1.1);
-
-    /* Rendered markdown uses the theme's colours; the card is paper whatever the theme */
-    --text-normal: var(--sr-3d-ink);
-    --text-muted: var(--sr-3d-ink-muted);
-    --text-faint: var(--sr-3d-ink-muted);
-    --text-accent: #2a5db0;
-    --link-color: #2a5db0;
-    --link-external-color: #2a5db0;
-    --link-unresolved-color: #2a5db0;
-    --code-normal: var(--sr-3d-ink);
-    --code-background: rgba(0, 0, 0, 0.05);
-    --background-primary: var(--sr-3d-paper);
-    --background-primary-alt: rgba(0, 0, 0, 0.04);
-    --background-secondary: rgba(0, 0, 0, 0.05);
-    --background-modifier-border: rgba(0, 0, 0, 0.15);
     color: var(--sr-3d-ink);
 }
 
@@ -186,6 +171,20 @@
 
 .sr-3d-face-content {
     --sr-3d-rule-gap: 1.75em;
+
+    /* The face switches to the light theme (see Card3DView.createFace); these tune it to
+       the paper. They sit here, below the face, so the theme variables set there on the
+       face itself cannot override them. */
+    --text-normal: var(--sr-3d-ink);
+    --text-muted: var(--sr-3d-ink-muted);
+    --text-faint: var(--sr-3d-ink-muted);
+    --code-normal: var(--sr-3d-ink);
+    --code-background: rgba(0, 0, 0, 0.05);
+    --background-primary: var(--sr-3d-paper);
+    --background-primary-alt: rgba(0, 0, 0, 0.04);
+    --background-secondary: rgba(0, 0, 0, 0.05);
+    --background-modifier-border: rgba(0, 0, 0, 0.15);
+    color: var(--sr-3d-ink);
 
     flex-grow: 1;
     min-height: 0;

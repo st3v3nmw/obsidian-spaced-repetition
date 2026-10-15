@@ -151,10 +151,21 @@ export default class Card3DView {
         this.shadowEl = this.tableEl.createDiv("sr-3d-card-shadow");
         this.cardEl = this.tableEl.createDiv("sr-3d-card");
 
-        const front = Card3DView.createFace(this.cardEl, "sr-3d-face-front", sideLabels.front);
+        const themeVariables = Card3DView.collectDerivedThemeVariables(parentEl.doc);
+        const front = Card3DView.createFace(
+            this.cardEl,
+            "sr-3d-face-front",
+            sideLabels.front,
+            themeVariables,
+        );
         this.frontContextEl = front.contextEl;
         this.frontContentEl = front.contentEl;
-        const back = Card3DView.createFace(this.cardEl, "sr-3d-face-back", sideLabels.back);
+        const back = Card3DView.createFace(
+            this.cardEl,
+            "sr-3d-face-back",
+            sideLabels.back,
+            themeVariables,
+        );
         this.backContextEl = back.contextEl;
         this.backContentEl = back.contentEl;
 
@@ -575,15 +586,50 @@ export default class Card3DView {
         return this.sceneEl.win.matchMedia("(prefers-reduced-motion: reduce)").matches;
     }
 
+    /**
+     * Collects the theme variables declared on <body> that are built from other variables,
+     * e.g. `--callout-info: var(--color-blue)` or `--callout-blend-mode`. Browsers resolve
+     * these where they are declared, so on <body> they keep the app theme's values even
+     * inside an element that switches to the light theme.
+     */
+    private static collectDerivedThemeVariables(doc: Document): Record<string, string> {
+        const variables: Record<string, string> = {};
+        for (const sheet of Array.from(doc.styleSheets)) {
+            let rules: CSSRuleList;
+            try {
+                rules = sheet.cssRules;
+            } catch {
+                continue; // Stylesheets from other origins cannot be read
+            }
+            for (const rule of Array.from(rules)) {
+                if (!("selectorText" in rule) || (rule as CSSStyleRule).selectorText !== "body") {
+                    continue;
+                }
+                const style = (rule as CSSStyleRule).style;
+                for (const name of Array.from(style)) {
+                    if (!name.startsWith("--")) continue;
+                    const value = style.getPropertyValue(name).trim();
+                    // Later rules win, as they do in the cascade
+                    if (value.includes("var(")) variables[name] = value;
+                }
+            }
+        }
+        return variables;
+    }
+
     private static createFace(
         cardEl: HTMLDivElement,
         sideClass: string,
         sideLabel: string,
+        themeVariables: Record<string, string>,
     ): { contextEl: HTMLDivElement; contentEl: HTMLDivElement } {
         // The card is paper whatever the app theme, so everything rendered on it (callouts,
         // code highlighting, tables) uses the light theme's colours. Obsidian and community
         // themes define those colours on the .theme-light class, so it works on any element.
         const faceEl = cardEl.createDiv({ cls: ["sr-3d-face", sideClass, "theme-light"] });
+        // Variables derived from those colours are worked out once on <body>, in the app's
+        // theme; declaring them again here makes them use the light colours instead
+        faceEl.setCssProps(themeVariables);
         const headerEl = faceEl.createDiv("sr-3d-face-header");
         const contextEl = headerEl.createDiv("sr-3d-face-context");
         headerEl.createDiv({ cls: "sr-3d-face-side", text: sideLabel });
