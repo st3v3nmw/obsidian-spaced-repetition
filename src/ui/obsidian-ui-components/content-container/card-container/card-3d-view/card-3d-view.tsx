@@ -530,11 +530,14 @@ export default class Card3DView {
         });
     }
 
-    private cardTransform(): string {
+    /**
+     * @param extraSlide - Additional sideways offset (px), used to send a card off the table
+     */
+    private cardTransform(extraSlide: number = 0): string {
         const turn = this.flip.value + this.hoverX.value;
         const tilt = this.tiltDegrees();
         return (
-            `translate(-50%, -50%) translateX(${this.slide.value}px) ` +
+            `translate(-50%, -50%) translateX(${this.slide.value + extraSlide}px) ` +
             `translateZ(${this.cardHeightAboveTable()}px) rotateX(${tilt}deg) rotateY(${turn}deg)`
         );
     }
@@ -572,13 +575,19 @@ export default class Card3DView {
         ghost.setAttribute("aria-hidden", "true");
         this.tableEl.appendChild(ghost);
 
-        const distance = (this.sceneEl.clientWidth || 600) * 0.9;
+        // Both ends use the same list of transform functions, differing only in the sideways
+        // offset, so the browser animates just the slide. (With different lists it blends the
+        // whole matrix instead, which can swing a turned-over card upside down on the way.)
+        // Both are worked out now, before the springs are reset for the next card.
+        const distance = (this.sceneEl.clientWidth || 600) * 1.1;
         const start = this.cardTransform();
+        const end = this.cardTransform(distance);
         ghost.setCssProps({ transform: start });
-        this.sceneEl.win.requestAnimationFrame(() => {
-            ghost.addClass("is-leaving");
-            ghost.setCssProps({ transform: `translateX(${distance}px) ${start}` });
-        });
+        // Make the browser register the start position, so the change below animates
+        // instead of jumping straight to the end
+        void this.sceneEl.win.getComputedStyle(ghost).transform;
+        ghost.addClass("is-leaving");
+        ghost.setCssProps({ transform: end });
         this.sceneEl.win.setTimeout(() => ghost.detach(), 500);
     }
 

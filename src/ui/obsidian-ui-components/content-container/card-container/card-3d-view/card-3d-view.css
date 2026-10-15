@@ -100,9 +100,13 @@
     pointer-events: none;
 
     &.is-leaving {
-        transition:
-            transform 0.45s cubic-bezier(0.4, 0, 0.6, 1),
-            opacity 0.45s ease-in;
+        transition: transform 0.45s cubic-bezier(0.4, 0, 0.6, 1);
+    }
+
+    /* Fade each face, never the card itself: opacity below 1 on the card would flatten its
+       3D, showing the front face mirrored while a turned-over card leaves */
+    &.is-leaving .sr-3d-face {
+        transition: opacity 0.45s ease-in;
         opacity: 0;
     }
 }
@@ -256,7 +260,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .sr-3d-card-ghost.is-leaving {
+    .sr-3d-card-ghost.is-leaving,
+    .sr-3d-card-ghost.is-leaving .sr-3d-face {
         transition: none;
     }
 }
