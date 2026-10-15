@@ -312,11 +312,15 @@ export default class Card3DView {
         if (!(normalFontSize > 0)) return;
         const maxScale = Math.max(MIN_TEXT_SCALE, maxFontSize / normalFontSize);
 
+        // Code blocks and tables scroll sideways on their own, so their overflow does not
+        // show up on the face; check them separately so long lines bring the size down too
+        const sideScrollers = Array.from(contentEl.querySelectorAll<HTMLElement>("pre, table"));
         const fitsAt = (scale: number): boolean => {
             contentEl.setCssProps({ "--sr-3d-text-scale": String(scale) });
             return (
                 contentEl.scrollHeight <= contentEl.clientHeight + 1 &&
-                contentEl.scrollWidth <= contentEl.clientWidth + 1
+                contentEl.scrollWidth <= contentEl.clientWidth + 1 &&
+                sideScrollers.every((el) => el.scrollWidth <= el.clientWidth + 1)
             );
         };
 

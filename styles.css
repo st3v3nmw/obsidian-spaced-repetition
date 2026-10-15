@@ -361,9 +361,18 @@
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
+  overflow-anchor: none;
   display: flex;
   flex-direction: column;
   justify-content: safe center;
+  & > * {
+    flex-shrink: 0;
+  }
+  & pre,
+  & pre code {
+    word-break: normal;
+    overflow-wrap: normal;
+  }
   padding: 0.8rem 6% 1rem;
   font-size: calc(1em * var(--sr-3d-text-scale, 1));
   line-height: 1.5;

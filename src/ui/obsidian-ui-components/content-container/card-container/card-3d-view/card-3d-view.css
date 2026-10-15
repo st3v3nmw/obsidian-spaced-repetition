@@ -193,9 +193,24 @@
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
+    /* The text size changes while fitting; keep long content scrolled to its start */
+    overflow-anchor: none;
     display: flex;
     flex-direction: column;
     justify-content: safe center;
+
+    /* Content must not shrink to fit: a code block would otherwise scroll inside itself,
+       hiding its first lines and hiding the overflow from the text fitting */
+    & > * {
+        flex-shrink: 0;
+    }
+
+    /* Never split code mid-token; long lines scroll sideways and shrink the text instead */
+    & pre,
+    & pre code {
+        word-break: normal;
+        overflow-wrap: normal;
+    }
     padding: 0.8rem 6% 1rem;
     /* Set by the view: as large as fits on the card, see Card3DView.fitText() */
     font-size: calc(1em * var(--sr-3d-text-scale, 1));
