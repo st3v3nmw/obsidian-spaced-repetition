@@ -96,6 +96,7 @@ export default class ContentManager {
         settings: SRSettings,
         parentEl: HTMLElement,
         closeModal?: () => void,
+        toggleMaximized?: () => boolean,
     ) {
         this.app = app;
         this.plugin = plugin;
@@ -127,6 +128,7 @@ export default class ContentManager {
             this._jumpToCurrentCard.bind(this),
             this._displayCurrentCardInfoNotice.bind(this),
             closeModal,
+            toggleMaximized,
         );
     }
 

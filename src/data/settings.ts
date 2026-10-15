@@ -54,6 +54,8 @@ export interface SRSettings {
     showUpdateAvailableStatusBarItem: boolean;
     initiallyExpandAllSubdecksInTree: boolean;
     showContextInCards: boolean;
+    flashcard3DView: boolean;
+    flashcard3DTableSurface: string;
     showIntervalInReviewButtons: boolean;
     flashcardHeightPercentage: number;
     flashcardWidthPercentage: number;
@@ -144,6 +146,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     showUpdateAvailableStatusBarItem: true,
     initiallyExpandAllSubdecksInTree: true,
     showContextInCards: true,
+    flashcard3DView: false,
+    flashcard3DTableSurface: "honey",
     showIntervalInReviewButtons: true,
     flashcardHeightPercentage: 60,
     flashcardWidthPercentage: 60,
