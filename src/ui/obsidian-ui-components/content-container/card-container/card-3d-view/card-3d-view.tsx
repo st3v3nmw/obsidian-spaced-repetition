@@ -580,7 +580,10 @@ export default class Card3DView {
         sideClass: string,
         sideLabel: string,
     ): { contextEl: HTMLDivElement; contentEl: HTMLDivElement } {
-        const faceEl = cardEl.createDiv({ cls: ["sr-3d-face", sideClass] });
+        // The card is paper whatever the app theme, so everything rendered on it (callouts,
+        // code highlighting, tables) uses the light theme's colours. Obsidian and community
+        // themes define those colours on the .theme-light class, so it works on any element.
+        const faceEl = cardEl.createDiv({ cls: ["sr-3d-face", sideClass, "theme-light"] });
         const headerEl = faceEl.createDiv("sr-3d-face-header");
         const contextEl = headerEl.createDiv("sr-3d-face-context");
         headerEl.createDiv({ cls: "sr-3d-face-side", text: sideLabel });
