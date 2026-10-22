@@ -20,6 +20,7 @@ export interface SRSettings {
     singleLineCardSeparator: string;
     singleLineReversedCardSeparator: string;
     multilineCardSeparator: string;
+    multilineCardTag: string;
     multilineReversedCardSeparator: string;
     multilineCardEndMarker: string;
     editLaterTag: string | undefined;
@@ -111,6 +112,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     singleLineCardSeparator: "::",
     singleLineReversedCardSeparator: ":::",
     multilineCardSeparator: "?",
+    multilineCardTag: "",
     multilineReversedCardSeparator: "??",
     multilineCardEndMarker: "",
     editLaterTag: undefined,

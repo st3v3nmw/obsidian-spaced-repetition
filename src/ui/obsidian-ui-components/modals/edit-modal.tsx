@@ -3,6 +3,7 @@ import { App, ButtonComponent, Modal } from "obsidian";
 
 import { Card } from "src/data/data-structures/card/card";
 import { CardType } from "src/data/data-structures/card/questions/question";
+import { splitMultiLineBasic } from "src/data/data-structures/card/questions/question-type";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import { TextDirection } from "src/utils/strings";
@@ -25,6 +26,7 @@ export class FlashcardEditModal extends Modal {
     private textFront: string = "";
     private textBack: string = "";
     private separator: string | null;
+    private usesTag = false;
     private currentCard: Card;
     private cardType: CardType;
 
@@ -63,7 +65,21 @@ export class FlashcardEditModal extends Modal {
         this.cardType = this.currentCard.question.questionType;
         this.separator = this.getSeparatorFromCardType(this.cardType, settings);
 
-        if (this.separator !== null) {
+        const multiLineBasicSplit =
+            this.cardType === CardType.MultiLineBasic
+                ? splitMultiLineBasic(
+                      this.currentCard.question.questionText.actualQuestion,
+                      settings,
+                  )
+                : null;
+
+        if (multiLineBasicSplit?.usesTag) {
+            // Card written as "Question #card", keep that format when saving
+            this.separator = settings.multilineCardTag;
+            this.usesTag = true;
+            this.textFront = multiLineBasicSplit.front;
+            this.textBack = multiLineBasicSplit.back.trimStart();
+        } else if (this.separator !== null) {
             this.textFront = this.currentCard.question.questionText.actualQuestion.split(
                 this.separator,
             )[0];
@@ -209,7 +225,15 @@ export class FlashcardEditModal extends Modal {
     private save() {
         this.didSaveChanges = true;
         this.changedText = this.textAreaFront.value;
-        if (this.separator) {
+        if (this.usesTag) {
+            // "Question #card" followed by the answer on the next lines
+            this.changedText =
+                this.textAreaFront.value.trimEnd() +
+                " " +
+                this.separator +
+                "\n" +
+                this.textAreaBack.value;
+        } else if (this.separator) {
             // New line at end of Front
             if (
                 (this.cardType === CardType.MultiLineBasic ||

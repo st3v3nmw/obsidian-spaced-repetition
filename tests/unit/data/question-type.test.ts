@@ -28,6 +28,24 @@ describe("CardType.MultiLineBasic", () => {
             ),
         ).toEqual([new CardFrontBack("A1\nA2", "B1\nB2")]);
     });
+
+    test("Question line ends with tag", () => {
+        expect(
+            CardFrontBackUtil.expand(CardType.MultiLineBasic, "A1\nA2 #card\nB1\nB2", {
+                ...DEFAULT_SETTINGS,
+                multilineCardTag: "#card",
+            }),
+        ).toEqual([new CardFrontBack("A1\nA2", "B1\nB2")]);
+    });
+
+    test("Tag appearing after the separator line stays in the answer", () => {
+        expect(
+            CardFrontBackUtil.expand(CardType.MultiLineBasic, "A1\n?\nB1 #card\nB2", {
+                ...DEFAULT_SETTINGS,
+                multilineCardTag: "#card",
+            }),
+        ).toEqual([new CardFrontBack("A1", "B1 #card\nB2")]);
+    });
 });
 
 test("CardType.MultiLineReversed", () => {

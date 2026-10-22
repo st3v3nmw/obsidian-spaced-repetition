@@ -108,6 +108,25 @@ These can also span over multiple lines as long as both sides "touch" the `?`.
 
 See [Cards with Blank Lines](cards-with-blank-lines.md) if blank lines need to be included.
 
+### Marking the question with a tag
+
+Instead of a separator line, the last line of the question can end with a tag
+(for example `#card`), set in [settings](../user-options.md#flashcard-separators).
+This is disabled by default; it is enabled by entering a tag in the setting.
+
+```markdown
+As per the definition
+of "multiline" the prompt #card
+same goes for
+the answer
+```
+
+The card is displayed exactly as in the example above, the tag is not shown on the front of the card.
+
+- The tag must be preceded by a space and some text, so a tag on a line of its own isn't recognised.
+- Only the exact tag counts, e.g. `#cards` or `#mycard` don't match `#card`.
+- Cards using the `?` separator continue to work.
+
 ---
 
 ## Multi-line Bidirectional

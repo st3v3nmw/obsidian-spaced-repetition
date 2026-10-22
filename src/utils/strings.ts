@@ -132,6 +132,30 @@ export function splitNoteIntoFrontmatterAndContent(str: string): [string, string
     return [frontmatter, content];
 }
 
+// Returns true if the line ends with the tag, e.g. "What is X? #card" for the tag "#card".
+//
+// The tag must be preceded by whitespace and some other text, so "#mycard", "#cards"
+// or a line consisting only of "#card" do not count
+//
+export function lineEndsWithTag(line: string, tag: string | undefined): boolean {
+    if (!tag) return false;
+    const trimmed = line.trim();
+    if (!trimmed.endsWith(tag)) return false;
+    const beforeTag = trimmed.substring(0, trimmed.length - tag.length);
+    return beforeTag.trim().length > 0 && /\s$/.test(beforeTag);
+}
+
+// Returns the index of the first line that ends with the tag (see lineEndsWithTag), or -1
+export function findLineIndexEndingWithTag(lines: string[], tag: string | undefined): number {
+    return lines.findIndex((line) => lineEndsWithTag(line, tag));
+}
+
+// Removes the tag (and the whitespace before it) from the end of the line
+export function removeTrailingTag(line: string, tag: string): string {
+    const trimmed = line.trimEnd();
+    return trimmed.substring(0, trimmed.length - tag.length).trimEnd();
+}
+
 // Returns the index of the line that consists of the search string.
 //
 // A line is considered a match if it is identical to the search string, (ignoring leading and

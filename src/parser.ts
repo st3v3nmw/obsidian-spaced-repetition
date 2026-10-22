@@ -2,6 +2,7 @@ import { ClozeCrafter } from "clozecraft";
 
 import { SR_METADATA_CALLOUT } from "src/data/constants";
 import { CardType } from "src/data/data-structures/card/questions/question";
+import { lineEndsWithTag } from "src/utils/strings";
 
 export let debugParser = false;
 
@@ -9,6 +10,7 @@ export interface ParserOptions {
     singleLineCardSeparator: string;
     singleLineReversedCardSeparator: string;
     multilineCardSeparator: string;
+    multilineCardTag?: string;
     multilineReversedCardSeparator: string;
     multilineCardEndMarker: string;
     clozePatterns: string[];
@@ -175,6 +177,9 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
 
             cardType = null;
             cardText = "";
+        } else if (cardType === null && lineEndsWithTag(currentTrimmed, options.multilineCardTag)) {
+            // Pick up multiline basic cards whose question line ends with the tag, e.g. "Question #card"
+            cardType = CardType.MultiLineBasic;
         } else if (currentTrimmed === options.multilineCardSeparator) {
             // Ignore card if the front of the card is empty
             if (cardText.length > 1) {
