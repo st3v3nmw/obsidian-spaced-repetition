@@ -198,6 +198,8 @@ const en: IBaseLocale = {
         "Note that after changing this you have to manually edit any flashcards you already have.",
     INLINE_REVERSED_CARDS_SEPARATOR: "Separator for inline reversed flashcards",
     MULTILINE_CARDS_SEPARATOR: "Separator for multiline flashcards",
+    MULTILINE_CARDS_TAG:
+        "Tag that marks the question line of a multiline flashcard (e.g. #card). Leave empty to disable.",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Separator for multiline reversed flashcards",
     MULTILINE_CARDS_END_MARKER: "Characters denoting the end of clozes and multiline flashcards",
     NOTES: "Notes",

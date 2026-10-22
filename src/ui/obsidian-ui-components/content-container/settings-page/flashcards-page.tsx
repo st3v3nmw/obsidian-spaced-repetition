@@ -450,6 +450,33 @@ export class FlashcardsPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 setting
+                    .setName(t("MULTILINE_CARDS_TAG"))
+                    .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
+                    .addExtraButton((button) => {
+                        button
+                            .setIcon("reset")
+                            .setTooltip(t("RESET_DEFAULT"))
+                            .onClick(async () => {
+                                this.settingsManager.settings.multilineCardTag =
+                                    DEFAULT_SETTINGS.multilineCardTag;
+                                await this.settingsManager.save();
+
+                                this.display();
+                            });
+                    })
+                    .addText((text) =>
+                        text
+                            .setValue(this.settingsManager.settings.multilineCardTag)
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    this.settingsManager.settings.multilineCardTag = value.trim();
+                                    await this.settingsManager.save();
+                                });
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
                     .setName(t("MULTILINE_REVERSED_CARDS_SEPARATOR"))
                     .setDesc(t("FIX_SEPARATORS_MANUALLY_WARNING"))
                     .addExtraButton((button) => {

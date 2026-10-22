@@ -14,6 +14,10 @@
 
 ![flashcard-settings-separators](https://github.com/user-attachments/assets/744aea85-fdb3-4508-b532-7a551253f97d)
 
+- **Tag that marks the question line of a multiline flashcard**: when set (e.g. `#card`), a line ending with this
+  tag marks the end of the question of a [multi-line basic card](flashcards/q-and-a-cards.md#marking-the-question-with-a-tag),
+  and the following lines are the answer. Empty by default (disabled).
+
 ### Storage of Scheduling Data
 
 ![flashcard-settings-scheduling-data](https://github.com/user-attachments/assets/200bb976-c631-4d73-82a5-12ba7e140339)

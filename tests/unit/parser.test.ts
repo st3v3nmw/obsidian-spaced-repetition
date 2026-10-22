@@ -261,6 +261,38 @@ test("Test parsing of multi line basic cards", () => {
     ).toEqual([]);
 });
 
+test("Test parsing of multi line basic cards marked with a tag", () => {
+    const tagOptions: ParserOptions = { ...parserOptions, multilineCardTag: "#card" };
+
+    expect(parseT("Question #card\nAnswer line 1\nAnswer line 2", tagOptions)).toEqual([
+        [CardType.MultiLineBasic, "Question #card\nAnswer line 1\nAnswer line 2", 0, 2],
+    ]);
+    // question spanning several lines, ended by a blank line, followed by other text
+    expect(
+        parseT(
+            "Some text\n\nQuestion line 1\nQuestion line 2 #card\nAnswer\n<!--SR:!2021-08-11,4,270-->\n\nOther text",
+            tagOptions,
+        ),
+    ).toEqual([
+        [
+            CardType.MultiLineBasic,
+            "Question line 1\nQuestion line 2 #card\nAnswer\n<!--SR:!2021-08-11,4,270-->",
+            2,
+            5,
+        ],
+    ]);
+    // similar tags and a lone tag don't count
+    expect(parseT("Question #cards\nAnswer", tagOptions)).toEqual([]);
+    expect(parseT("Question #mycard\nAnswer", tagOptions)).toEqual([]);
+    expect(parseT("#card\nAnswer", tagOptions)).toEqual([]);
+    // the old separator format still works
+    expect(parseT("Question\n?\nAnswer", tagOptions)).toEqual([
+        [CardType.MultiLineBasic, "Question\n?\nAnswer", 0, 2],
+    ]);
+    // no tag configured
+    expect(parseT("Question #card\nAnswer", parserOptions)).toEqual([]);
+});
+
 test("Test parsing of multi line reversed cards", () => {
     // standard symbols
     expect(parseT("Question\n??\nAnswer", parserOptions)).toEqual([
