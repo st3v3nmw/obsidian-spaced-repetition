@@ -1,28 +1,14 @@
 import moment, { Moment } from "moment";
-import { CardInput, FSRSParameters, Grade, Rating, State } from "ts-fsrs";
+import { Grade, Rating, State } from "ts-fsrs";
 
-import { SRSettings } from "src/data/settings";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { Fsrs6Card, fsrs6Schema } from "src/scheduling/algorithms/fsrs/fsrs-scheduler";
 
 export const FSRS_COMMENT_PREFIX = "fsrs";
 
 const LEGACY_MIN_EASE = 130;
 const LEGACY_MAX_EASE = 370;
-
-/**
- * Builds the FSRS parameters object.
- *
- * @param {SRSettings} settings - The settings object.
- * @returns {Partial<FSRSParameters>} - The FSRS parameters object.
- */
-export function buildFsrsParameters(settings: SRSettings): Partial<FSRSParameters> {
-    return {
-        ["request_retention"]: settings.fsrsDesiredRetention,
-        ["maximum_interval"]: settings.maximumInterval,
-        ["enable_short_term"]: true,
-    };
-}
 
 /**
  * Converts a review response to a FSRS grade.
@@ -48,10 +34,10 @@ export function reviewResponseToFsrsGrade(response: ReviewResponse): Grade {
 /**
  * Converts an ease to a difficulty.
  *
- * @param {number} ease - The ease.
+ * @param {number | null | undefined} ease - The ease.
  * @returns {number} - The difficulty.
  */
-export function easeToDifficulty(ease: number): number {
+export function easeToDifficulty(ease: number | null | undefined): number {
     if (ease === null || ease === undefined) {
         return 5.5;
     }
@@ -76,27 +62,30 @@ export function difficultyToEase(difficulty: number): number {
 /**
  * Converts a legacy schedule to an FSRS card.
  *
- * @param {RepItemScheduleInfo} schedule - The legacy schedule.
+ * @param {RepItemScheduleInfo | null} schedule - The legacy schedule.
  * @param {Moment} now - The current time.
- * @returns {CardInput} - The FSRS card.
+ * @returns {Fsrs6Card} - The FSRS card.
  */
-export function sm2ScheduleToFsrsCard(schedule: RepItemScheduleInfo, now: Moment): CardInput {
+export function sm2ScheduleToFsrsCard(
+    schedule: RepItemScheduleInfo | null,
+    now: Moment,
+): Fsrs6Card {
     const interval = Math.max(1, Math.round(schedule?.interval ?? 1));
     const due = schedule?.dueDate ? schedule.dueDate.clone() : now.clone();
     const lastReview = due.clone().subtract(interval, "d");
 
-    return {
-        due: due.toDate(),
+    return fsrs6Schema.card.parse({
+        dueAt: due.toDate(),
         stability: Math.max(0.1, interval),
         difficulty: easeToDifficulty(schedule?.latestEase),
-        ["elapsed_days"]: Math.max(0, now.diff(lastReview, "days")),
-        ["scheduled_days"]: interval,
-        ["learning_steps"]: 0,
+        scheduledDays: interval,
+        learningStep: 0,
         reps: Math.max(1, Math.round(Math.log2(interval + 1))),
         lapses: 0,
         state: State.Review,
-        ["last_review"]: lastReview.toDate(),
-    };
+        scheduleStatus: "review",
+        lastReviewAt: lastReview.toDate(),
+    });
 }
 
 /**

@@ -1,6 +1,41 @@
 import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/data/settings";
+import { SrsAlgorithmFsrs } from "src/scheduling/algorithms/fsrs/sr-algorithm-fsrs";
 
 describe("SettingsUtil", () => {
+    test("upgrades legacy 100% retention without preventing FSRS initialization", () => {
+        const settings = { ...DEFAULT_SETTINGS, fsrsDesiredRetention: 1 };
+
+        upgradeSettings(settings);
+
+        expect(settings.fsrsDesiredRetention).toBe(1 - Number.EPSILON);
+        expect(() => new SrsAlgorithmFsrs(settings)).not.toThrow();
+        upgradeSettings(settings);
+        expect(settings.fsrsDesiredRetention).toBe(1 - Number.EPSILON);
+    });
+
+    test.each([null, undefined, NaN, Infinity, -Infinity])(
+        "replaces invalid FSRS retention %s with the default",
+        (fsrsDesiredRetention) => {
+            const settings = { ...DEFAULT_SETTINGS, fsrsDesiredRetention };
+            upgradeSettings(settings);
+            expect(settings.fsrsDesiredRetention).toBe(DEFAULT_SETTINGS.fsrsDesiredRetention);
+        },
+    );
+
+    test.each([
+        [-0.1, 0.3],
+        [0, 0.3],
+        [0.29, 0.3],
+        [0.3, 0.3],
+        [0.87, 0.87],
+        [1, 1 - Number.EPSILON],
+        [1.1, 1 - Number.EPSILON],
+    ])("clamps FSRS retention %s to %s", (fsrsDesiredRetention, expected) => {
+        const settings = { ...DEFAULT_SETTINGS, fsrsDesiredRetention };
+        upgradeSettings(settings);
+        expect(settings.fsrsDesiredRetention).toBe(expected);
+    });
+
     test("isPathInNoteIgnoreFolder", () => {
         const settings: SRSettings = { ...DEFAULT_SETTINGS, noteFoldersToIgnore: ["/test"] };
         expect(SettingsUtil.isPathInFoldersToIgnore(settings, "/test/test")).toEqual(true);

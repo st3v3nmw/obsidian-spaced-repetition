@@ -288,9 +288,13 @@ export class SchedulingPage extends SettingsPage {
                             .onChange((value) => {
                                 applySettingsUpdate(async () => {
                                     const numValue = Number.parseFloat(value);
-                                    if (Number.isNaN(numValue) || numValue <= 0 || numValue > 1) {
+                                    if (
+                                        !Number.isFinite(numValue) ||
+                                        numValue < 0.3 ||
+                                        numValue >= 1
+                                    ) {
                                         new Notice(
-                                            "FSRS desired retention must be between 0 and 1.",
+                                            "FSRS desired retention must be at least 0.3 and less than 1.",
                                         );
                                         text.setValue(
                                             this.settingsManager.settings.fsrsDesiredRetention.toString(),

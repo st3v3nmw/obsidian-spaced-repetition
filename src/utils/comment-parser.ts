@@ -1,3 +1,5 @@
+import { stateSchema } from "ts-fsrs";
+
 import { PREFERRED_DATE_FORMAT } from "src/data/constants";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {
@@ -46,7 +48,7 @@ export class CommentParser {
                 parseFloat(intervalStr),
                 parseFloat(difficultyStr),
                 parseFloat(stabilityStr),
-                parseInt(stateStr),
+                stateSchema.parse(parseInt(stateStr)),
                 parseInt(repsStr),
                 parseInt(lapsesStr),
                 parseInt(learningStepsStr),

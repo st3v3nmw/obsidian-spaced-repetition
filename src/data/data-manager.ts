@@ -138,8 +138,16 @@ export class DataManager {
                 )
                     continue;
 
-                const file: SRNoteTFile = this.createSRNoteTFile(noteFile);
-                await this.osrCore.processFile(file);
+                try {
+                    const file: SRNoteTFile = this.createSRNoteTFile(noteFile);
+                    await this.osrCore.processFile(file);
+                } catch (error) {
+                    console.warn(`SR: Failed to load note "${noteFile.path}"`, error);
+                    new Notice(
+                        `Spaced Repetition: Could not load "${noteFile.path}". This note was skipped; see the console for details.`,
+                        10000,
+                    );
+                }
             }
 
             await this.osrCore.finalizeLoad();

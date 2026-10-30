@@ -59,7 +59,7 @@
         "minimatch": "^10.2.6",
         "pagerank.js": "^1.0.2",
         "short-uuid": "^6.0.3",
-        "ts-fsrs": "5.4.1"
+        "ts-fsrs": "^6.0.0"
     },
     "pre-commit": [
         "precommit-msg",
