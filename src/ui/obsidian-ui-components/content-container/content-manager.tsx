@@ -123,6 +123,7 @@ export default class ContentManager {
             this._doEditQuestionText.bind(this),
             this._processReview.bind(this),
             this._skipCurrentCard.bind(this),
+            () => this._suspendCurrentCard(),
             this._showAnswer.bind(this),
             this._jumpToCurrentCard.bind(this),
             this._displayCurrentCardInfoNotice.bind(this),
@@ -465,6 +466,24 @@ export default class ContentManager {
     public async _skipCurrentCard() {
         if (this.reviewSequencer === null) return;
         this.reviewSequencer.skipCurrentCard();
+        await this._showNextCard();
+    }
+
+    public async _suspendCurrentCard(): Promise<void> {
+        if (this.reviewSequencer === null)
+            throw new Error("Cannot suspend card: no review session is open");
+
+        const timeNow = now();
+        if (
+            timeNow - this.lastPressedOnProcessReview <
+            this.dataManager.data.settings.reviewButtonDelay
+        ) {
+            return;
+        }
+        this.lastPressedOnProcessReview = timeNow;
+
+        await this.reviewSequencer.suspendCurrentCard();
+        new Notice(t("CARD_SUSPENDED"));
         await this._showNextCard();
     }
 

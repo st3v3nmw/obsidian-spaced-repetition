@@ -239,6 +239,24 @@ export class DataManager {
     }
 
     /**
+     * Unsuspends all suspended flashcards in a note and resyncs, so that they show up for review again.
+     *
+     * @param {TFile} noteFile - The note file.
+     * @returns {Promise<number>} - The number of cards that were unsuspended.
+     */
+    async unsuspendCardsInNote(noteFile: TFile): Promise<number> {
+        const note: Note | null = await this.loadNote(noteFile);
+        if (note === null) throw new Error(`Could not load note: ${noteFile.path}`);
+
+        const unsuspendedCount: number = note.unsuspendAllCards();
+        if (unsuspendedCount > 0) {
+            await note.writeNoteFile(this.settingsManager.settings);
+            await this.sync();
+        }
+        return unsuspendedCount;
+    }
+
+    /**
      * Saves the review response for a note.
      *
      * @param {TFile} note - The note file.

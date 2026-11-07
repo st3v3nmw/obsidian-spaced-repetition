@@ -140,8 +140,16 @@ export class NoteQuestionParser {
                 cardScheduleInfoList = cardScheduleInfoList.slice(0, correctLength);
             }
 
+            const cardSuspendedList: boolean[] = DataStore.getInstance().createSuspendedList(
+                question.questionText.original,
+            );
+
             // Create the list of card objects, and attach to the question
-            const cardList: Card[] = this.createCardList(cardFrontBackList, cardScheduleInfoList);
+            const cardList: Card[] = this.createCardList(
+                cardFrontBackList,
+                cardScheduleInfoList,
+                cardSuspendedList,
+            );
             question.setCardList(cardList);
             result.push(question);
         }
@@ -183,6 +191,7 @@ export class NoteQuestionParser {
     private createCardList(
         cardFrontBackList: CardFrontBack[],
         cardScheduleInfoList: RepItemScheduleInfo[],
+        cardSuspendedList: boolean[],
     ): Card[] {
         const siblings: Card[] = [];
 
@@ -200,6 +209,7 @@ export class NoteQuestionParser {
             });
 
             cardObj.scheduleInfo = hasScheduleInfo ? schedule : null;
+            cardObj.isSuspended = i < cardSuspendedList.length && cardSuspendedList[i];
 
             siblings.push(cardObj);
         }

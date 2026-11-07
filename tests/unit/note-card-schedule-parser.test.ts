@@ -181,3 +181,52 @@ test("Placeholder schedules preserve middle FSRS sibling indexes", () => {
     expect(actual[1]).toBeInstanceOf(RepItemScheduleInfoFsrs);
     expect(actual[2]).toBeNull();
 });
+
+describe("Suspended cards", () => {
+    test("No schedule info means no suspended cards", () => {
+        expect(DataStore.getInstance().createSuspendedList("A::B")).toEqual([]);
+    });
+
+    test("Schedule without suspended flag", () => {
+        expect(
+            DataStore.getInstance().createSuspendedList("A::B <!--SR:!2023-09-02,4,270-->"),
+        ).toEqual([false]);
+    });
+
+    test("Suspended flag does not change the parsed schedule", () => {
+        const text: string = "A::B <!--SR:!2023-09-02,4,270,suspended-->";
+
+        expect(DataStore.getInstance().createSchedule(text, null)).toEqual([
+            RepItemScheduleInfoOsr.fromDueDateStr("2023-09-02", 4, 270, -4 * TICKS_PER_DAY),
+        ]);
+        expect(DataStore.getInstance().createSuspendedList(text)).toEqual([true]);
+    });
+
+    test("Suspended flag on new, SM-2 and FSRS sibling cards", () => {
+        const text: string =
+            "A::B <!--SR:!2000-01-01,1,250,suspended!2023-09-02,4,270!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z,suspended-->";
+
+        const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(text, null);
+        expect(actual).toHaveLength(3);
+        expect(actual[0]).toBeNull();
+        expect(actual[1]).toEqual(
+            RepItemScheduleInfoOsr.fromDueDateStr("2023-09-02", 4, 270, -4 * TICKS_PER_DAY),
+        );
+        expect(actual[2]).toBeInstanceOf(RepItemScheduleInfoFsrs);
+        expect(actual[2]).toMatchObject({
+            interval: 0,
+            stability: 0.4,
+            difficulty: 5.5,
+            state: State.Learning,
+            reps: 1,
+            lapses: 0,
+            learningSteps: 1,
+        });
+        expect(actual[2].dueDate.toDate().toISOString()).toEqual("2023-09-06T00:10:00.000Z");
+        expect((actual[2] as RepItemScheduleInfoFsrs).lastReview.toDate().toISOString()).toEqual(
+            "2023-09-06T00:00:00.000Z",
+        );
+
+        expect(DataStore.getInstance().createSuspendedList(text)).toEqual([true, false, true]);
+    });
+});

@@ -9,6 +9,9 @@ export class Card extends RepetitionItem {
     question: Question;
     cardIdx: number;
 
+    // Suspended cards are excluded from all decks, and therefore from review and cram sessions
+    isSuspended: boolean = false;
+
     // visuals
     front: string = "";
     back: string = "";

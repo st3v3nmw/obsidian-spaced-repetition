@@ -420,6 +420,109 @@ describe("skipCurrentCard", () => {
     });
 });
 
+describe("suspendCurrentCard", () => {
+    test("Suspending a due card writes the flag and moves on to the next card", async () => {
+        const c: TestContext = await setupSample1(FlashcardReviewMode.Review, DEFAULT_SETTINGS);
+        expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
+        expect(c.getDeckStats("#flashcards").totalCount).toEqual(6);
+
+        await c.reviewSequencer.suspendCurrentCard();
+
+        expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
+        expect(c.getDeckStats("#flashcards").totalCount).toEqual(5);
+        // Only the first occurrence is Q2's comment; Q4 & Q5 have identical comments further down
+        expect(await c.file.read()).toEqual(
+            c.originalText.replace(
+                "<!--SR:!2023-09-02,4,270-->",
+                "<!--SR:!2023-09-02,4,270,suspended-->",
+            ),
+        );
+
+        // After reloading the note, the suspended card is no longer part of any deck
+        await c.setSequencerDeckTreeFromOriginalText();
+        expect(c.getDeckStats("#flashcards").totalCount).toEqual(5);
+        const remainingFronts: string[] = [];
+        while (c.reviewSequencer.hasCurrentCard) {
+            remainingFronts.push(c.reviewSequencer.currentCard.front);
+            c.reviewSequencer.skipCurrentCard();
+        }
+        expect(remainingFronts.sort()).toEqual(["Q1", "Q3", "Q4", "Q5", "Q6"]);
+    });
+
+    test("Suspending a new card adds a scheduling comment with the flag", async () => {
+        const text: string = `#flashcards Q1::A1
+#flashcards Q2::A2`;
+        const c: TestContext = TestContext.Create(
+            orderDueFirstSequential,
+            FlashcardReviewMode.Review,
+            DEFAULT_SETTINGS,
+            text,
+        );
+        await c.setSequencerDeckTreeFromOriginalText();
+        expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
+
+        await c.reviewSequencer.suspendCurrentCard();
+
+        expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
+        expect(await c.file.read()).toEqual(`#flashcards Q1::A1
+<!--SR:!2000-01-01,1,250,suspended-->
+#flashcards Q2::A2`);
+    });
+
+    test("Suspending a card does not suspend its siblings", async () => {
+        const text: string = `#flashcards ${clozeQuestion1}
+<!--SR:!2023-09-02,4,270!2023-09-02,5,270!2023-09-02,6,270-->`;
+        const c: TestContext = TestContext.Create(
+            orderDueFirstSequential,
+            FlashcardReviewMode.Review,
+            DEFAULT_SETTINGS,
+            text,
+        );
+        await c.setSequencerDeckTreeFromOriginalText();
+        expect(c.reviewSequencer.currentCard.front).toMatch(clozeQuestion1Card1);
+
+        await c.reviewSequencer.suspendCurrentCard();
+
+        expect(c.reviewSequencer.currentCard.front).toMatch(clozeQuestion1Card2);
+        expect(c.reviewSequencer.currentQuestion.cards.map((card) => card.isSuspended)).toEqual([
+            true,
+            false,
+            false,
+        ]);
+        expect(await c.file.read()).toEqual(`#flashcards ${clozeQuestion1}
+<!--SR:!2023-09-02,4,270,suspended!2023-09-02,5,270!2023-09-02,6,270-->`);
+    });
+
+    test("Cram mode, with the same deck tree as original and remaining tree", async () => {
+        const text: string = `#flashcards Q1::A1
+<!--SR:!2023-09-02,4,270-->
+#flashcards Q2::A2
+<!--SR:!2023-09-02,3,270-->`;
+        const c: TestContext = TestContext.Create(
+            orderDueFirstSequential,
+            FlashcardReviewMode.Cram,
+            DEFAULT_SETTINGS,
+            text,
+        );
+        // This is how a full vault cram session is set up (see ReviewQueueLoader.loadReviewQueue)
+        const deckTree: Deck = await SampleItemDecks.createDeckFromFile(
+            c.file,
+            new TopicPath(["Root"]),
+        );
+        c.reviewSequencer.setDeckTree(deckTree, deckTree);
+        expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
+
+        await c.reviewSequencer.suspendCurrentCard();
+
+        expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
+        expect(c.getDeckStats("#flashcards").totalCount).toEqual(1);
+        expect(await c.file.read()).toEqual(`#flashcards Q1::A1
+<!--SR:!2023-09-02,4,270,suspended-->
+#flashcards Q2::A2
+<!--SR:!2023-09-02,3,270-->`);
+    });
+});
+
 describe("processReview", () => {
     describe("FlashcardReviewMode.Review", () => {
         describe("ReviewResponse.Reset", () => {
