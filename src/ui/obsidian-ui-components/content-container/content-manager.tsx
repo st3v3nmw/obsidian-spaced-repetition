@@ -671,6 +671,10 @@ export default class ContentManager {
                 ? { redoneEventId: redo.originalEvent.id }
                 : {};
 
+        // Predicted before the review changes the schedule
+        const recallProbability: number | null =
+            action.type === "card_reviewed" ? sequencer.currentCardRecallProbability() : null;
+
         const snapshot: ReviewUndoSnapshot = sequencer.createUndoSnapshot();
         switch (action.type) {
             case "card_reviewed":
@@ -696,6 +700,7 @@ export default class ContentManager {
                     isNew,
                     scheduleBefore: serializeSchedule(scheduleBefore),
                     scheduleAfter: serializeSchedule(card.scheduleInfo),
+                    recallProbability,
                     msSinceCardShown,
                     msSinceAnswerShown,
                     ...redone,

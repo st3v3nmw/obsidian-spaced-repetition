@@ -1,11 +1,14 @@
 import moment, { Moment } from "moment";
 import { State } from "ts-fsrs";
+import { curve, FSRS7_MODEL_BOUNDS } from "ts-fsrs/models/fsrs-7";
 
 import { ISerializedScheduleEntry } from "src/data/plugin-data";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {
+    clamp,
     difficultyToEase,
+    easeToDifficulty,
     formatFsrsTimestamp,
     FSRS7_COMMENT_PREFIX,
     fsrsScheduleStatus,
@@ -13,11 +16,70 @@ import {
 } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
 import {
     FSRS_SCHEDULER_CARD_ID,
+    FSRS7_WEIGHTS,
     Fsrs7Card,
     parseFsrs7Card,
 } from "src/scheduling/algorithms/fsrs/fsrs-schedulers";
 import { ISerializedFSRS7ScheduleData } from "src/scheduling/algorithms/fsrs/serialized-schedule-data";
 import { globalDateProvider } from "src/utils/dates";
+
+// The recall probability at the due date of an SM-2 card, see RepItemScheduleInfoFsrs7.fromSm2Schedule()
+const SM2_RECALL_AT_DUE_DATE = 0.9;
+// The ratio between the fast and the slow stability that FSRS-7 uses for new cards
+const SM2_FAST_STABILITY_RATIO = 0.8;
+const SM2_SOLVER_ITERATIONS = 100;
+const SM2_SOLVER_TOLERANCE = 1e-6;
+
+function sm2FastStability(stability: number): number {
+    return roundFsrsNumber(
+        clamp(
+            SM2_FAST_STABILITY_RATIO * stability,
+            FSRS7_MODEL_BOUNDS.stabilityFastMin,
+            FSRS7_MODEL_BOUNDS.stabilityFastMax,
+        ),
+    );
+}
+
+function fsrs7Recall(elapsedDays: number, stability: number, difficulty: number): number {
+    return curve(FSRS7_WEIGHTS, elapsedDays, {
+        stability,
+        stabilityFast: sm2FastStability(stability),
+        difficulty,
+    }).retrievability;
+}
+
+/**
+ * Finds the slow stability for which FSRS-7 predicts 90% recall after the SM-2 interval, by bisection.
+ * The recall at a given time increases with the stability.
+ */
+function solveSm2SlowStability(interval: number, difficulty: number): number {
+    let low = Math.log(FSRS7_MODEL_BOUNDS.sMin);
+    let high = Math.log(FSRS7_MODEL_BOUNDS.sMax);
+    if (
+        fsrs7Recall(interval, Math.exp(low), difficulty) > SM2_RECALL_AT_DUE_DATE ||
+        fsrs7Recall(interval, Math.exp(high), difficulty) < SM2_RECALL_AT_DUE_DATE
+    ) {
+        throw new Error(`No FSRS-7 stability fits the SM-2 interval of ${interval} days`);
+    }
+
+    for (let i = 0; i < SM2_SOLVER_ITERATIONS; i++) {
+        const middle = (low + high) / 2;
+        if (fsrs7Recall(interval, Math.exp(middle), difficulty) < SM2_RECALL_AT_DUE_DATE) {
+            low = middle;
+        } else {
+            high = middle;
+        }
+    }
+
+    const stability = roundFsrsNumber(Math.exp((low + high) / 2));
+    const recall = fsrs7Recall(interval, stability, difficulty);
+    if (Math.abs(recall - SM2_RECALL_AT_DUE_DATE) > SM2_SOLVER_TOLERANCE) {
+        throw new Error(
+            `FSRS-7 stability ${stability} for the SM-2 interval of ${interval} days predicts a recall of ${recall}`,
+        );
+    }
+    return stability;
+}
 
 /**
  * Represents scheduling information for a repetition item using the FSRS-7 algorithm.
@@ -93,6 +155,39 @@ export class RepItemScheduleInfoFsrs7 extends RepItemScheduleInfo {
             card.lapses,
             card.learningStep,
             card.lastReviewAt === null ? null : moment(card.lastReviewAt),
+        );
+    }
+
+    /**
+     * Converts an SM-2 schedule into an FSRS-7 schedule in the review state, keeping its due date.
+     *
+     * An SM-2 card has no FSRS memory state, so it is estimated: the SM-2 due date is taken as the moment the
+     * recall probability drops to 90%, the same assumption as for FSRS-6 (where the stability is the number of days
+     * until recall drops to 90%, so it becomes the SM-2 interval). The fast stability can't be known, it is set to
+     * 80% of the slow stability, the ratio FSRS-7 uses for new cards. The slow stability is then chosen so that the
+     * FSRS-7 forgetting curve predicts 90% recall at the due date. The difficulty is derived from the SM-2 ease.
+     *
+     * @param {RepItemScheduleInfo} schedule - The SM-2 schedule.
+     * @returns {RepItemScheduleInfoFsrs7} - The FSRS-7 schedule.
+     */
+    static fromSm2Schedule(schedule: RepItemScheduleInfo): RepItemScheduleInfoFsrs7 {
+        const interval = Math.max(1, Math.round(schedule.interval));
+        const dueDate = schedule.dueDate.clone();
+        const lastReview = dueDate.clone().subtract(interval, "d");
+        const difficulty = easeToDifficulty(schedule.latestEase);
+        const stability = solveSm2SlowStability(interval, difficulty);
+
+        return new RepItemScheduleInfoFsrs7(
+            dueDate,
+            interval,
+            difficulty,
+            stability,
+            sm2FastStability(stability),
+            State.Review,
+            Math.max(1, Math.round(Math.log2(interval + 1))),
+            0,
+            0,
+            lastReview,
         );
     }
 

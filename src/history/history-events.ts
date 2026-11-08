@@ -133,6 +133,10 @@ export interface CardReviewedPayload extends CardRef {
     scheduleBefore: ISerializedScheduleEntry | null;
     // In cram mode the schedule doesn't change, so scheduleAfter equals scheduleBefore
     scheduleAfter: ISerializedScheduleEntry | null;
+    // The probability of recall right before this review, as predicted by the FSRS model of scheduleBefore with the
+    // weights in use at the time. null for new cards and SM-2 schedules, which have no prediction.
+    // Missing in events written before 2026-11-08.
+    recallProbability?: number | null;
     msSinceCardShown: number;
     // null if the answer wasn't shown before responding (e.g. "reset" from the front of the card)
     msSinceAnswerShown: number | null;

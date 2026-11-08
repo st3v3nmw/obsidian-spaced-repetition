@@ -13,8 +13,6 @@ import {
     reviewResponseToFsrsGrade,
     roundFsrsNumber,
 } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
-import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
-import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { globalDateProvider, setupStaticDateProvider20230906 } from "src/utils/dates";
 
 beforeAll(() => {
@@ -34,22 +32,6 @@ test("difficulty and ease conversion are inverse enough for legacy migration", (
     expect(difficultyToEase(10)).toEqual(130);
     expect(difficultyToEase(1)).toEqual(370);
     expect(difficultyToEase(easeToDifficulty(250))).toBeGreaterThanOrEqual(240);
-});
-
-test("SM-2 schedules convert to FSRS-6 review schedules with the same due date", () => {
-    const legacySchedule = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-10", 4, 270);
-    const actual = RepItemScheduleInfoFsrs.fromSm2Schedule(legacySchedule);
-
-    expect(actual).toMatchObject({
-        state: State.Review,
-        interval: 4,
-        stability: 4,
-        reps: 2,
-        lapses: 0,
-        learningSteps: 0,
-    });
-    expect(actual.dueDate.toISOString()).toContain("2023-09-10");
-    expect(actual.lastReview.toISOString()).toContain("2023-09-06");
 });
 
 test("FSRS timestamp helpers", () => {

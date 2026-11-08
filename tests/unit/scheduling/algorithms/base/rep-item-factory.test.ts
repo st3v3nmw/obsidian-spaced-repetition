@@ -72,7 +72,7 @@ test("FSRS-7 entries become SM-2 schedules with whole-day intervals with the SM-
     expect(item.formatScheduleAsSRHtmlComment()).toEqual("!2023-09-16,10,303");
 });
 
-test("SM-2 entries become FSRS-6 schedules with the FSRS setting", () => {
+test("SM-2 entries become FSRS-7 schedules with the FSRS setting", () => {
     const item = RepItemScheduleFactory.create(SRAlgorithmType.FSRS, {
         algorithm: SRAlgorithmType.SM_2_OSR,
         scheduleData: {
@@ -83,8 +83,9 @@ test("SM-2 entries become FSRS-6 schedules with the FSRS setting", () => {
         },
     });
 
-    expect(item).toBeInstanceOf(RepItemScheduleInfoFsrs);
-    expect((item as RepItemScheduleInfoFsrs).state).toEqual(State.Review);
+    expect(item).toBeInstanceOf(RepItemScheduleInfoFsrs7);
+    expect((item as RepItemScheduleInfoFsrs7).state).toEqual(State.Review);
+    expect(item.dueDate.format("YYYY-MM-DD")).toEqual("2023-09-10");
 });
 
 test("FSRS-7 isn't an algorithm setting", () => {

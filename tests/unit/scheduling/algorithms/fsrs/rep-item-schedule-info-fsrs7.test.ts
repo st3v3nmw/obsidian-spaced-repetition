@@ -1,8 +1,12 @@
 import moment from "moment";
 import { State } from "ts-fsrs";
+import { curve } from "ts-fsrs/models/fsrs-7";
 
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
+import { easeToDifficulty } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
+import { FSRS7_WEIGHTS } from "src/scheduling/algorithms/fsrs/fsrs-schedulers";
 import { RepItemScheduleInfoFsrs7 } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs7";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
 beforeAll(() => {
@@ -91,4 +95,56 @@ test("refuses to convert an invalid schedule to a ts-fsrs card", () => {
     schedule.stabilityFast = Number.NaN;
 
     expect(() => schedule.toFsrs7Card()).toThrow();
+});
+
+describe("SM-2 schedules converted to FSRS-7", () => {
+    const recallAt = (schedule: RepItemScheduleInfoFsrs7, elapsedDays: number) =>
+        curve(FSRS7_WEIGHTS, elapsedDays, schedule).retrievability;
+
+    test("keep their due date and are predicted to be recalled with 90% on it", () => {
+        const sm2 = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-10", 4, 270);
+        const actual = RepItemScheduleInfoFsrs7.fromSm2Schedule(sm2);
+
+        expect(actual).toBeInstanceOf(RepItemScheduleInfoFsrs7);
+        expect(actual).toMatchObject({
+            interval: 4,
+            difficulty: easeToDifficulty(270),
+            state: State.Review,
+            reps: 2,
+            lapses: 0,
+            learningSteps: 0,
+        });
+        expect(actual.dueDate.format("YYYY-MM-DD")).toEqual("2023-09-10");
+        expect(actual.lastReview.format("YYYY-MM-DD")).toEqual("2023-09-06");
+        expect(actual.stabilityFast).toBeCloseTo(0.8 * actual.stability, 6);
+        expect(recallAt(actual, 4)).toBeCloseTo(0.9, 6);
+        expect(recallAt(actual, 2)).toBeGreaterThan(0.9);
+        expect(recallAt(actual, 8)).toBeLessThan(0.9);
+        expect(() => actual.toFsrs7Card()).not.toThrow();
+    });
+
+    test.each([
+        [1, 130],
+        [5, 250],
+        [25, 250],
+        [76, 370],
+        [36525, 250],
+    ])("work for an interval of %i days and an ease of %i", (interval, ease) => {
+        const sm2 = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-10", interval, ease);
+        const actual = RepItemScheduleInfoFsrs7.fromSm2Schedule(sm2);
+
+        expect(actual.interval).toEqual(interval);
+        expect(recallAt(actual, interval)).toBeCloseTo(0.9, 6);
+        expect(actual.stabilityFast).toBeCloseTo(0.8 * actual.stability, 6);
+        expect(() => actual.toFsrs7Card()).not.toThrow();
+    });
+
+    test("treat an SM-2 interval of 0 days as 1 day", () => {
+        const actual = RepItemScheduleInfoFsrs7.fromSm2Schedule(
+            RepItemScheduleInfoOsr.fromDueDateStr("2023-09-10", 0, 250),
+        );
+
+        expect(actual.interval).toEqual(1);
+        expect(actual.lastReview.format("YYYY-MM-DD")).toEqual("2023-09-09");
+    });
 });

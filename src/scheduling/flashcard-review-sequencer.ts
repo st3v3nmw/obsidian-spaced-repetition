@@ -37,6 +37,7 @@ export interface IFlashcardReviewSequencer {
     getDeckStats(topicPath: TopicPath): DeckStats;
     getSubDecksWithCardsInQueue(deck: Deck): Deck[];
     skipCurrentCard(): void;
+    currentCardRecallProbability(): number | null;
     suspendCurrentCard(): Promise<void>;
     determineCardSchedule(response: ReviewResponse, card: Card): RepItemScheduleInfo;
     processReview(response: ReviewResponse): Promise<void>;
@@ -394,6 +395,20 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
     skipCurrentCard(): void {
         this.cardSequencer.deleteCurrentQuestionFromAllDecks();
+    }
+
+    /**
+     * The probability that the current card is recalled now, as predicted by the scheduling algorithm.
+     *
+     * @returns {number | null} - null for new cards, and for schedules without a prediction (e.g. SM-2).
+     */
+    currentCardRecallProbability(): number | null {
+        const card: Card | null = this.currentCard;
+        if (card === null)
+            throw new Error("currentCardRecallProbability: There is no current card");
+        return card.scheduleInfo === null
+            ? null
+            : this.srsAlgorithm.cardRecallProbability(card.scheduleInfo);
     }
 
     /**

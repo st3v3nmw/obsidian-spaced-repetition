@@ -43,4 +43,9 @@ export interface ISRAlgorithm {
         schedule: RepItemScheduleInfo,
         dueDateFlashcardHistogram: DueDateHistogram,
     ): RepItemScheduleInfo;
+    /**
+     * The probability that the card is recalled now, as predicted by the algorithm, or null if the algorithm
+     * doesn't predict it for this schedule.
+     */
+    cardRecallProbability(schedule: RepItemScheduleInfo): number | null;
 }

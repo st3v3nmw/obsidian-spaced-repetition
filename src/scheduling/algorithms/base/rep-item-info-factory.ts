@@ -17,7 +17,7 @@ export class RepItemScheduleFactory {
     /**
      * Creates the schedule of a serialized entry for the given algorithm setting.
      *
-     * With the FSRS setting, FSRS-6 and FSRS-7 schedules keep their model and SM-2 schedules become FSRS-6 schedules.
+     * With the FSRS setting, FSRS-6 and FSRS-7 schedules keep their model and SM-2 schedules become FSRS-7 schedules.
      * With the SM-2 setting, FSRS-6 and FSRS-7 schedules become SM-2 schedules.
      */
     static create(
@@ -70,8 +70,8 @@ export class RepItemScheduleFactory {
                 );
             }
             case SRAlgorithmType.SM_2_OSR:
-                // SM-2 schedules move to FSRS-6
-                return RepItemScheduleInfoFsrs.fromSm2Schedule(
+                // SM-2 schedules move to FSRS-7
+                return RepItemScheduleInfoFsrs7.fromSm2Schedule(
                     this.createSM2RepItemSchedule(serializedScheduleEntry),
                 );
         }

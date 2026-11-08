@@ -55,12 +55,22 @@ Two versions of FSRS are in use side by side:
 | ------------------------------------------- | ------------ |
 | New card                                    | FSRS-7       |
 | Card that you reset                         | FSRS-7       |
+| SM-2 card, when you review it the next time | FSRS-7       |
 | Card that is already scheduled with FSRS-6  | FSRS-6       |
-| SM-2 card, when you review it the next time | FSRS-6       |
 
 A card doesn't move from FSRS-6 to FSRS-7. FSRS-7 keeps a second memory value per card (a fast memory trace next to the slow one),
-which can only be calculated from the complete review history of the card.
+which can only be calculated from the complete review history of the card. Moving the card would replace the memory
+state it built up with FSRS-6 by a guess.
 When you reset a card, its memory starts over, so it continues with FSRS-7. The usage history keeps all its earlier reviews.
+
+An SM-2 card has no FSRS memory state at all, so its FSRS-7 state is estimated when you review it the next time:
+
+- Its due date is taken as the moment the probability of recall drops to 90%. The SM-2 card keeps its due date.
+- The fast stability is set to 80% of the slow stability, the ratio FSRS-7 uses for new cards.
+- The slow stability is chosen so that FSRS-7 predicts 90% recall on the due date.
+- The difficulty is derived from the SM-2 ease.
+
+Your following reviews of the card correct this estimate.
 
 FSRS-7 intervals are fractional days, so a card can become due at any time of the day.
 

@@ -271,7 +271,7 @@ export class SchedulingPage extends SettingsPage {
                 setting
                     .setName("FSRS versions")
                     .setDesc(
-                        "New cards, and cards you reset, are scheduled with FSRS-7. Cards that are already scheduled with FSRS-6 stay on FSRS-6, and SM-2 cards move to FSRS-6 when you review them.",
+                        "New cards and cards you reset are scheduled with FSRS-7. SM-2 cards move to FSRS-7 when you review them, keeping their due date. Cards that are already scheduled with FSRS-6 stay on FSRS-6.",
                     );
             });
 

@@ -35,7 +35,7 @@ The time spent is the time between your actions in a review session (showing a c
 
 ### What is recorded
 
-When `Record usage history` is on (the default), the plugin logs every action in review sessions with a timestamp, for example "card shown", "answer shown", "card reviewed as Good" (with the schedule before and after), "card skipped", "card suspended", "action undone", and also note reviews. Undone actions are not counted in the statistics.
+When `Record usage history` is on (the default), the plugin logs every action in review sessions with a timestamp, for example "card shown", "answer shown", "card reviewed as Good" (with the schedule before and after, and for FSRS cards the probability of recall that FSRS predicted right before the review), "card skipped", "card suspended", "action undone", and also note reviews. Undone actions are not counted in the statistics.
 
 To tell cards apart in the history, each card gets a permanent id in its scheduling comment the first time it is shown in a review session:
 

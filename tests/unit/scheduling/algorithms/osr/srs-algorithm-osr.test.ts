@@ -74,3 +74,12 @@ test("SrsAlgorithmOsr uses whole-day intervals for FSRS-7 schedules after switch
     expect(Number.isInteger(result.interval)).toEqual(true);
     expect(result.formatScheduleAsSRHtmlComment()).toMatch(/^!\d{4}-\d{2}-\d{2},\d+,\d+$/);
 });
+
+test("SrsAlgorithmOsr doesn't predict recall probabilities", () => {
+    const algorithm = new SRAlgorithmOsr(DEFAULT_SETTINGS);
+    expect(
+        algorithm.cardRecallProbability(
+            RepItemScheduleInfoOsr.fromDueDateStr("2023-09-10", 4, 270),
+        ),
+    ).toBeNull();
+});

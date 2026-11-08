@@ -15,11 +15,14 @@ import { SRSettings } from "src/data/settings";
 
 /*
  * Two FSRS models are in use side by side:
- *  - FSRS-7 for cards that start fresh (new cards and reset cards).
- *  - FSRS-6 for cards that were already scheduled with FSRS-6, and for SM-2 cards that move to FSRS.
+ *  - FSRS-7 for new cards, reset cards, and SM-2 cards that move to FSRS.
+ *  - FSRS-6 for cards that were already scheduled with FSRS-6.
  *
- * A card can't move from FSRS-6 to FSRS-7: FSRS-7 has a second memory value (the fast stability) that can only be
- * rebuilt from the card's complete review history, which the plugin doesn't have for older cards.
+ * A card doesn't move from FSRS-6 to FSRS-7: that would replace the FSRS memory state the card built up from its
+ * reviews with a guess, because the second memory value of FSRS-7 (the fast stability) can only be rebuilt from the
+ * card's complete review history, which the plugin doesn't have for older cards.
+ * SM-2 cards have no FSRS memory state to lose, any FSRS state for them is a guess (see
+ * RepItemScheduleInfoFsrs7.fromSm2Schedule()).
  *
  * Both schedulers use the same scheduling policies, in the order of the ts-fsrs standard preset.
  */
@@ -47,6 +50,9 @@ const fsrs7Definition = defineScheduler({ model: FSRS7Model, chrono: dateChrono 
 const LEARNING_STEPS = ["1m", "10m"] as const;
 const RELEARNING_STEPS = ["10m"] as const;
 
+// The 34 FSRS-7 weights, the same for all cards
+export const FSRS7_WEIGHTS: readonly number[] = FSRS7_DEFAULT_WEIGHTS;
+
 // ts-fsrs uses the card id only to seed the fuzzing of intervals, which is disabled.
 // The schedule of a card doesn't know the card's id, so all cards share this one.
 export const FSRS_SCHEDULER_CARD_ID = "osr-card";
@@ -71,7 +77,7 @@ export function createFsrs6Scheduler(settings: SRSettings) {
 export function createFsrs7Scheduler(settings: SRSettings) {
     return fsrs7Definition.create({
         config: {
-            weights: FSRS7_DEFAULT_WEIGHTS,
+            weights: FSRS7_WEIGHTS,
             fractionalDays: true,
             enableShortTerm: true,
             desiredRetention: settings.fsrsDesiredRetention,

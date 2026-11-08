@@ -6,7 +6,6 @@ import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {
     difficultyToEase,
-    easeToDifficulty,
     formatFsrsTimestamp,
     FSRS_COMMENT_PREFIX,
     fsrsScheduleStatus,
@@ -87,31 +86,6 @@ export class RepItemScheduleInfoFsrs extends RepItemScheduleInfo {
             card.lapses,
             card.learningStep,
             card.lastReviewAt === null ? null : moment(card.lastReviewAt),
-        );
-    }
-
-    /**
-     * Converts an SM-2 schedule into an FSRS-6 schedule in the review state, keeping its due date.
-     * The stability becomes the SM-2 interval and the difficulty is derived from the SM-2 ease.
-     *
-     * @param {RepItemScheduleInfo} schedule - The SM-2 schedule.
-     * @returns {RepItemScheduleInfoFsrs} - The FSRS-6 schedule.
-     */
-    static fromSm2Schedule(schedule: RepItemScheduleInfo): RepItemScheduleInfoFsrs {
-        const interval = Math.max(1, Math.round(schedule.interval));
-        const dueDate = schedule.dueDate.clone();
-        const lastReview = dueDate.clone().subtract(interval, "d");
-
-        return new RepItemScheduleInfoFsrs(
-            dueDate,
-            interval,
-            easeToDifficulty(schedule.latestEase),
-            Math.max(0.1, interval),
-            State.Review,
-            Math.max(1, Math.round(Math.log2(interval + 1))),
-            0,
-            0,
-            lastReview,
         );
     }
 

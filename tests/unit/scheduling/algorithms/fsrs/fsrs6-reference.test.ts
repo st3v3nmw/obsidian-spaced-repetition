@@ -6,19 +6,18 @@ import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-sch
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { SrsAlgorithmFsrs } from "src/scheduling/algorithms/fsrs/sr-algorithm-fsrs";
-import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { CardDueDateHistogram } from "src/scheduling/due-date-histogram";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
 // FSRS-6 results recorded with ts-fsrs 5.4.1 (the version before the upgrade to ts-fsrs 6).
-// Cards that are already on FSRS-6 (and SM-2 cards moving to FSRS-6) must keep this behaviour.
+// Cards that are already on FSRS-6 must keep this behaviour.
 // "Now" is 2023-09-06T00:00:00Z for every case.
 //
 // Deliberate differences to ts-fsrs 5.4.1, which are bug fixes of ts-fsrs 6:
 //  - "learning step 1, 10 min ago, hard" is due after 5.5 minutes instead of 6 (learning steps keep second precision)
 //  - "retention 0.8 max 60, overdue review, good/easy" are capped at the maximum interval of 60 days, instead of 61/62
 //
-// New and reset cards are scheduled with FSRS-7, see srs-algorithm-fsrs.test.ts.
+// New cards, reset cards and SM-2 cards are scheduled with FSRS-7, see srs-algorithm-fsrs.test.ts.
 
 const NOW: Moment = moment("2023-09-06T00:00:00.000Z");
 const RESPONSES: [string, ReviewResponse][] = [
@@ -77,14 +76,6 @@ const UPDATE_CASES: [string, () => RepItemScheduleInfo][] = [
     [
         "review reviewed at 18:30, 4 days",
         () => fsrs6Card(moment("2023-09-01T18:30:00.000Z"), 4, 4.4, 6.0, 2, 4, 0, 0),
-    ],
-    [
-        "imported SM-2, 4 days, ease 270",
-        () => RepItemScheduleInfoOsr.fromDueDateStr("2023-09-10", 4, 270),
-    ],
-    [
-        "imported SM-2 overdue, 30 days, ease 130",
-        () => RepItemScheduleInfoOsr.fromDueDateStr("2023-09-01", 30, 130),
     ],
 ];
 
@@ -173,22 +164,6 @@ const EXPECTED: Record<string, string> = {
         "!fsrs,2023-09-21T00:00:00.000Z,15,14.53234471,5.98922837,2,5,0,0,2023-09-06T00:00:00.000Z",
     "review reviewed at 18:30, 4 days, easy":
         "!fsrs,2023-09-29T00:00:00.000Z,23,23.37686841,4.64861476,2,5,0,0,2023-09-06T00:00:00.000Z",
-    "imported SM-2, 4 days, ease 270, again":
-        "!fsrs,2023-09-06T00:10:00.000Z,0,1.29634944,8.25958907,3,3,1,0,2023-09-06T00:00:00.000Z",
-    "imported SM-2, 4 days, ease 270, hard":
-        "!fsrs,2023-09-10T00:00:00.000Z,4,4,6.50003372,2,3,0,0,2023-09-06T00:00:00.000Z",
-    "imported SM-2, 4 days, ease 270, good":
-        "!fsrs,2023-09-11T00:00:00.000Z,5,4,4.74047837,2,3,0,0,2023-09-06T00:00:00.000Z",
-    "imported SM-2, 4 days, ease 270, easy":
-        "!fsrs,2023-09-13T00:00:00.000Z,7,6.59988479,2.98092302,2,3,0,0,2023-09-06T00:00:00.000Z",
-    "imported SM-2 overdue, 30 days, ease 130, again":
-        "!fsrs,2023-09-06T00:10:00.000Z,0,2.26766473,9.98522837,3,6,1,0,2023-09-06T00:00:00.000Z",
-    "imported SM-2 overdue, 30 days, ease 130, hard":
-        "!fsrs,2023-10-12T00:00:00.000Z,36,36.14584573,9.98522837,2,6,0,0,2023-09-06T00:00:00.000Z",
-    "imported SM-2 overdue, 30 days, ease 130, good":
-        "!fsrs,2023-10-16T00:00:00.000Z,40,40.21923135,9.98522837,2,6,0,0,2023-09-06T00:00:00.000Z",
-    "imported SM-2 overdue, 30 days, ease 130, easy":
-        "!fsrs,2023-10-25T00:00:00.000Z,49,49.13959839,9.98522837,2,6,0,0,2023-09-06T00:00:00.000Z",
     "retention 0.8 max 60, overdue review, again":
         "!fsrs,2023-09-06T00:10:00.000Z,0,2.03368701,8.07880781,3,7,2,0,2023-09-06T00:00:00.000Z",
     "retention 0.8 max 60, overdue review, hard":

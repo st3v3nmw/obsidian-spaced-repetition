@@ -285,6 +285,15 @@ export class SRAlgorithmOsr implements ISRAlgorithm {
     }
 
     /**
+     * SM-2 doesn't predict recall probabilities.
+     *
+     * @returns {null}
+     */
+    cardRecallProbability(_schedule: RepItemScheduleInfo): number | null {
+        return null;
+    }
+
+    /**
      * Gets the note stats.
      *
      * @returns {INoteEaseList} - The note stats.

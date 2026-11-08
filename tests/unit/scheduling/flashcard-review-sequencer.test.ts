@@ -12,9 +12,12 @@ import {
 } from "src/data/data-structures/deck/deck-tree-iterator";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
+import { ISRAlgorithm } from "src/scheduling/algorithms/base/isr-algorithm";
 import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { SrsAlgorithmFsrs } from "src/scheduling/algorithms/fsrs/sr-algorithm-fsrs";
+import { SRAlgorithmOsr } from "src/scheduling/algorithms/osr/srs-algorithm-osr";
 import { CardDueDateHistogram } from "src/scheduling/due-date-histogram";
 import {
     DeckStats,
@@ -1482,3 +1485,67 @@ async function checkupdateClozeCurrentQuestionTextAndCards(
     expect(await c.file.read()).toEqual(expectedFileText);
     return c;
 }
+
+describe("currentCardRecallProbability", () => {
+    async function createSequencer(
+        settings: SRSettings,
+        algorithm: ISRAlgorithm,
+        text: string,
+    ): Promise<FlashcardReviewSequencer> {
+        setupStaticDateProviderOriginDatePlusDays(0);
+        unitTestSetupStandardDataStoreAlgorithm(settings);
+        const postponementList = new QuestionPostponementList(null, settings, []);
+        const sequencer = new FlashcardReviewSequencer(
+            FlashcardReviewMode.Review,
+            new DeckTreeIterator(orderDueFirstSequential, null),
+            settings,
+            algorithm,
+            postponementList,
+            new CardDueDateHistogram(),
+        );
+        const deckTree: Deck = await SampleItemDecks.createDeckFromFile(
+            new UnitTestSRFile(text),
+            new TopicPath(["Root"]),
+        );
+        sequencer.setDeckTree(
+            deckTree,
+            DeckTreeFilter.filterForRemainingRepItems(
+                postponementList,
+                deckTree,
+                FlashcardReviewMode.Review,
+            ),
+        );
+        return sequencer;
+    }
+
+    test("is the FSRS prediction for FSRS cards", async () => {
+        const settings: SRSettings = { ...DEFAULT_SETTINGS };
+        const algorithm = new SrsAlgorithmFsrs(settings);
+        const sequencer = await createSequencer(
+            settings,
+            algorithm,
+            "#flashcards Q1::A1 <!--SR:!fsrs,2023-09-06T00:00:00.000Z,3,3,5,2,3,0,0,2023-09-03T00:00:00.000Z-->",
+        );
+
+        expect(sequencer.currentCard.front).toEqual("Q1");
+        expect(sequencer.currentCardRecallProbability()).toBeCloseTo(0.9, 6);
+    });
+
+    test("is null for new cards and SM-2 cards", async () => {
+        const settings: SRSettings = { ...DEFAULT_SETTINGS };
+        const newCard = await createSequencer(
+            settings,
+            new SrsAlgorithmFsrs(settings),
+            "#flashcards Q1::A1",
+        );
+        expect(newCard.currentCardRecallProbability()).toBeNull();
+
+        const sm2Card = await createSequencer(
+            settings,
+            new SRAlgorithmOsr(settings),
+            "#flashcards Q1::A1 <!--SR:!2023-09-02,4,270-->",
+        );
+        expect(sm2Card.currentCard.front).toEqual("Q1");
+        expect(sm2Card.currentCardRecallProbability()).toBeNull();
+    });
+});

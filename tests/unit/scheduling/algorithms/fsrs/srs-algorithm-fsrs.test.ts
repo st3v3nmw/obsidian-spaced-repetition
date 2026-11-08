@@ -121,18 +121,79 @@ test("FSRS-6 review cards stay on FSRS-6", () => {
     }
 });
 
-test("imports legacy schedules into FSRS state on update", () => {
+test("SM-2 schedules move to FSRS-7 on update", () => {
     const algorithm = new SrsAlgorithmFsrs(DEFAULT_SETTINGS);
     const legacySchedule = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-10", 4, 270);
     const result = algorithm.cardCalcUpdatedSchedule(
         ReviewResponse.Good,
         legacySchedule,
         new CardDueDateHistogram(),
+    ) as RepItemScheduleInfoFsrs7;
+
+    expect(result).toBeInstanceOf(RepItemScheduleInfoFsrs7);
+    expect(result.interval).toBeGreaterThanOrEqual(1);
+    expect(result.state).toEqual(State.Review);
+    expect(result.reps).toEqual(3);
+    expect(result.formatScheduleAsSRHtmlComment()).toMatch(/^!fsrs7,/);
+});
+
+test("SM-2 cards reviewed on their due date are predicted to be recalled with 90%", () => {
+    const algorithm = new SrsAlgorithmFsrs(DEFAULT_SETTINGS);
+    // Due today (2023-09-06), so the converted FSRS-7 state predicts 90% recall now
+    const legacySchedule = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-06", 12, 250);
+    const converted = RepItemScheduleInfoFsrs7.fromSm2Schedule(legacySchedule);
+
+    expect(algorithm.cardRecallProbability(converted)).toBeCloseTo(0.9, 6);
+    // SM-2 schedules themselves have no prediction
+    expect(algorithm.cardRecallProbability(legacySchedule)).toBeNull();
+});
+
+test("cardRecallProbability predicts the recall of FSRS-6 and FSRS-7 cards", () => {
+    const algorithm = new SrsAlgorithmFsrs(DEFAULT_SETTINGS);
+
+    // FSRS-6: the stability is the number of days until recall drops to 90%
+    const fsrs6OnTime = CommentParser.parseScheduleSegment(
+        "fsrs,2023-09-06T00:00:00.000Z,3,3,5,2,3,0,0,2023-09-03T00:00:00.000Z",
+    );
+    expect(algorithm.cardRecallProbability(fsrs6OnTime)).toBeCloseTo(0.9, 6);
+    const fsrs6Overdue = CommentParser.parseScheduleSegment(
+        "fsrs,2023-09-04T00:00:00.000Z,3,3,5,2,3,0,0,2023-09-01T00:00:00.000Z",
+    );
+    expect(algorithm.cardRecallProbability(fsrs6Overdue)).toBeLessThan(0.9);
+
+    // FSRS-7: due when recall drops to the desired retention
+    const fsrs7 = algorithm.cardCalcUpdatedSchedule(
+        ReviewResponse.Good,
+        algorithm.cardGetNewSchedule(ReviewResponse.Good, "note.md", new CardDueDateHistogram()),
+        new CardDueDateHistogram(),
+    ) as RepItemScheduleInfoFsrs7;
+    const reviewedJustNow = algorithm.cardRecallProbability(fsrs7);
+    expect(reviewedJustNow).toBeGreaterThan(0.99);
+    const now = moment("2023-09-06T00:00:00.000Z");
+    const fsrs7DueNow = new RepItemScheduleInfoFsrs7(
+        now.clone(),
+        fsrs7.interval,
+        fsrs7.difficulty,
+        fsrs7.stability,
+        fsrs7.stabilityFast,
+        fsrs7.state,
+        fsrs7.reps,
+        fsrs7.lapses,
+        fsrs7.learningSteps,
+        now.clone().subtract(fsrs7.interval * 24 * 60 * 60 * 1000, "ms"),
+    );
+    expect(algorithm.cardRecallProbability(fsrs7DueNow)).toBeCloseTo(
+        DEFAULT_SETTINGS.fsrsDesiredRetention,
+        6,
     );
 
-    expect(result).toBeInstanceOf(RepItemScheduleInfoFsrs);
-    expect(result.interval).toBeGreaterThanOrEqual(1);
-    expect((result as RepItemScheduleInfoFsrs).state).toEqual(State.Review);
+    // New cards have no memory yet
+    expect(algorithm.cardRecallProbability(algorithm.cardGetResetSchedule())).toBeNull();
+    expect(
+        algorithm.cardRecallProbability(
+            CommentParser.parseScheduleSegment("fsrs,2023-09-01T00:00:00.000Z,0,0,0,0,0,0,0,-"),
+        ),
+    ).toBeNull();
 });
 
 test("reset schedule returns an immediate FSRS-7 reset state", () => {

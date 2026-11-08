@@ -27,8 +27,8 @@ import { globalDateProvider } from "src/utils/dates";
  *
  * Which FSRS model schedules a card depends on the card:
  *  - New cards, and cards that were reset (their memory starts over), use FSRS-7.
+ *  - SM-2 cards move to FSRS-7 when they are reviewed, keeping their due date.
  *  - Cards that are already on FSRS-6 stay on FSRS-6.
- *  - SM-2 cards move to FSRS-6 when they are reviewed.
  *
  * @class SrsAlgorithmFsrs
  * @extends {ISRAlgorithm}
@@ -120,14 +120,42 @@ export class SrsAlgorithmFsrs implements ISRAlgorithm {
         const now = globalDateProvider.now.toDate();
         const grade = reviewResponseToFsrsGrade(response);
 
-        if (schedule instanceof RepItemScheduleInfoFsrs7) {
-            const { card } = this.fsrs7.review({ card: schedule.toFsrs7Card(), grade, now });
-            return RepItemScheduleInfoFsrs7.fromFsrs7Card(card);
+        if (schedule instanceof RepItemScheduleInfoFsrs) {
+            const { card } = this.fsrs6.review({ card: schedule.toFsrs6Card(), grade, now });
+            return RepItemScheduleInfoFsrs.fromFsrs6Card(card);
         }
 
-        const fsrs6Schedule: RepItemScheduleInfoFsrs = this.toFsrs6Schedule(schedule);
-        const { card } = this.fsrs6.review({ card: fsrs6Schedule.toFsrs6Card(), grade, now });
-        return RepItemScheduleInfoFsrs.fromFsrs6Card(card);
+        const fsrs7Schedule: RepItemScheduleInfoFsrs7 = this.toFsrs7Schedule(schedule);
+        const { card } = this.fsrs7.review({ card: fsrs7Schedule.toFsrs7Card(), grade, now });
+        return RepItemScheduleInfoFsrs7.fromFsrs7Card(card);
+    }
+
+    /**
+     * The probability that the card is recalled now, as predicted by the FSRS model of its schedule.
+     * It is what FSRS bases its next schedule on when the card is reviewed now.
+     *
+     * @returns {number | null} - null for SM-2 schedules and new cards, which have no FSRS memory state.
+     */
+    cardRecallProbability(schedule: RepItemScheduleInfo): number | null {
+        const now = globalDateProvider.now.toDate();
+
+        if (schedule instanceof RepItemScheduleInfoFsrs7) {
+            if (schedule.state === State.New) return null;
+            const card = schedule.toFsrs7Card();
+            return this.fsrs7.model.forgettingCurve(
+                card,
+                this.fsrs7.chrono.difference(card.lastReviewAt, now),
+            );
+        }
+        if (schedule instanceof RepItemScheduleInfoFsrs) {
+            if (schedule.state === State.New) return null;
+            const card = schedule.toFsrs6Card();
+            return this.fsrs6.model.forgettingCurve(
+                card,
+                this.fsrs6.chrono.difference(card.lastReviewAt, now),
+            );
+        }
+        return null;
     }
 
     private reviewNewCard(response: ReviewResponse): RepItemScheduleInfoFsrs7 {
@@ -140,12 +168,12 @@ export class SrsAlgorithmFsrs implements ISRAlgorithm {
         return RepItemScheduleInfoFsrs7.fromFsrs7Card(card);
     }
 
-    private toFsrs6Schedule(schedule: RepItemScheduleInfo): RepItemScheduleInfoFsrs {
-        if (schedule instanceof RepItemScheduleInfoFsrs) {
+    private toFsrs7Schedule(schedule: RepItemScheduleInfo): RepItemScheduleInfoFsrs7 {
+        if (schedule instanceof RepItemScheduleInfoFsrs7) {
             return schedule;
         }
         if (schedule instanceof RepItemScheduleInfoOsr) {
-            return RepItemScheduleInfoFsrs.fromSm2Schedule(schedule);
+            return RepItemScheduleInfoFsrs7.fromSm2Schedule(schedule);
         }
         throw new Error(`Unsupported schedule for FSRS: ${schedule.algorithmType}`);
     }
