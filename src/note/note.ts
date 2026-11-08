@@ -24,9 +24,30 @@ export class Note {
     appendCardsToDeck(deck: Deck): void {
         for (const question of this.questionList) {
             for (const card of question.cards) {
+                // Suspended cards are never reviewed, so they are kept out of every deck
+                if (card.isSuspended) continue;
                 deck.appendRepItem(question.topicPathList, card);
             }
         }
+    }
+
+    /**
+     * Unsuspends every suspended card within this note.
+     * The change is only in memory; call writeNoteFile() to persist it.
+     *
+     * @returns {number} - The number of cards that were unsuspended.
+     */
+    unsuspendAllCards(): number {
+        let unsuspendedCount: number = 0;
+        for (const question of this.questionList) {
+            for (const card of question.cards) {
+                if (!card.isSuspended) continue;
+                card.isSuspended = false;
+                question.hasChanged = true;
+                unsuspendedCount++;
+            }
+        }
+        return unsuspendedCount;
     }
 
     debugLogToConsole(desc: string = "") {

@@ -231,7 +231,10 @@ export class Question {
     formatForNote(settings: SRSettings): string {
         let result: string = this.questionText.formatTopicAndQuestion();
         const blockId: string = this.questionText.obsidianBlockId;
-        const hasSchedule: boolean = this.cards.some((card) => card.hasSchedule);
+        // A suspended card needs the SR comment to store its suspended flag, even if it was never reviewed
+        const hasSchedule: boolean = this.cards.some(
+            (card) => card.hasSchedule || card.isSuspended,
+        );
         if (hasSchedule) {
             result = result.trimEnd();
 

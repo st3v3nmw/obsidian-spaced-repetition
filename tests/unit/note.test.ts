@@ -80,3 +80,63 @@ Q3:::A3
         expect(updatedText).toEqual(expectedText);
     });
 });
+
+describe("Suspended cards", () => {
+    const suspendedNoteText: string = `#flashcards/test
+Q1::A1 <!--SR:!2023-09-02,4,270,suspended-->
+Q2::A2
+Q3:::A3 <!--SR:!2000-01-01,1,250,suspended!2023-09-02,5,270-->
+`;
+
+    test("Suspended cards are not appended to any deck", async () => {
+        const file: UnitTestSRFile = new UnitTestSRFile(suspendedNoteText);
+        const note: Note = await parser.parse(file, TextDirection.Ltr, TopicPath.emptyPath);
+
+        expect(note.questionList[0].cards[0].isSuspended).toEqual(true);
+        expect(note.questionList[1].cards[0].isSuspended).toEqual(false);
+        expect(note.questionList[2].cards.map((card) => card.isSuspended)).toEqual([true, false]);
+
+        const deck: Deck = new Deck("Root", null);
+        note.appendCardsToDeck(deck);
+        const subdeck: Deck = deck.getDeck(new TopicPath(["flashcards", "test"]));
+        expect(subdeck.newRepItems.map((card) => card.front)).toEqual(["Q2"]);
+        expect(subdeck.dueRepItems.map((card) => card.front)).toEqual(["A3"]);
+    });
+
+    test("Writing the note keeps the suspended flags", async () => {
+        const file: UnitTestSRFile = new UnitTestSRFile(suspendedNoteText);
+        const note: Note = await noteFileLoader.load(file, TextDirection.Ltr, TopicPath.emptyPath);
+        note.questionList.forEach((question) => (question.hasChanged = true));
+
+        await note.writeNoteFile({ ...DEFAULT_SETTINGS, cardCommentOnSameLine: true });
+        expect(file.content).toEqual(suspendedNoteText);
+    });
+
+    test("unsuspendAllCards removes every suspended flag", async () => {
+        const file: UnitTestSRFile = new UnitTestSRFile(suspendedNoteText);
+        const note: Note = await noteFileLoader.load(file, TextDirection.Ltr, TopicPath.emptyPath);
+
+        expect(note.unsuspendAllCards()).toEqual(2);
+        expect(note.unsuspendAllCards()).toEqual(0);
+
+        await note.writeNoteFile({ ...DEFAULT_SETTINGS, cardCommentOnSameLine: true });
+        expect(file.content).toEqual(`#flashcards/test
+Q1::A1 <!--SR:!2023-09-02,4,270-->
+Q2::A2
+Q3:::A3 <!--SR:!2000-01-01,1,250!2023-09-02,5,270-->
+`);
+    });
+
+    test("Unsuspending a never reviewed card removes the scheduling comment", async () => {
+        const file: UnitTestSRFile = new UnitTestSRFile(`#flashcards/test
+Q1::A1 <!--SR:!2000-01-01,1,250,suspended-->
+`);
+        const note: Note = await noteFileLoader.load(file, TextDirection.Ltr, TopicPath.emptyPath);
+
+        expect(note.unsuspendAllCards()).toEqual(1);
+        await note.writeNoteFile({ ...DEFAULT_SETTINGS, cardCommentOnSameLine: true });
+        expect(file.content).toEqual(`#flashcards/test
+Q1::A1
+`);
+    });
+});

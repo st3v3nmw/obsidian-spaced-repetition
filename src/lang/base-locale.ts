@@ -31,6 +31,10 @@ export interface IBaseLocale {
     JUMP_TO_AND_CLOSE: string;
     OPEN_IN_BACKGROUND: string;
     VIEW_CARD_INFO: string;
+    SUSPEND_CARD: string;
+    CARD_SUSPENDED: string;
+    UNSUSPEND_CARDS_IN_NOTE: string;
+    CARDS_UNSUSPENDED: string;
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: string;

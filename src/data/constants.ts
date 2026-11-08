@@ -30,6 +30,11 @@ export const TICKS_PER_DAY = 24 * 3600 * 1000;
 export const SR_HTML_COMMENT_BEGIN = "<!--SR:";
 export const SR_HTML_COMMENT_END = "-->";
 
+// Appended to a card's schedule segment within the SR comment to mark the card as suspended, e.g.
+// <!--SR:!2023-09-02,4,270,suspended!2023-09-02,5,270-->
+// Suspended cards are never shown for review (neither review nor cram mode) until unsuspended.
+export const SR_SUSPENDED_FLAG = "suspended";
+
 export const SR_TAB_VIEW = "spaced-repetition-tab-view";
 
 // Disables the error hiding workaround (see src/ui/sr-tab-view.tsx)

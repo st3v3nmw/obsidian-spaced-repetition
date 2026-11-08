@@ -9,6 +9,7 @@ import CardMenuButtonComponent from "src/ui/obsidian-ui-components/content-conta
 import EditButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/edit-button";
 import ResetButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/reset-button";
 import SkipButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/skip-button";
+import SuspendButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/suspend-button";
 import ModalCloseButtonComponent from "src/ui/obsidian-ui-components/content-container/modal-close-button";
 import EmulatedPlatform from "src/utils/platform-detector";
 
@@ -28,6 +29,7 @@ export default class CardToolbarComponent {
         jumpToCurrentCard: () => Promise<void>,
         displayCurrentCardInfoNotice: () => void,
         skipCurrentCard: () => void,
+        suspendCurrentCard: () => Promise<void>,
         onOpenResetModalClick: () => void,
         closeModal?: () => void,
     ) {
@@ -69,6 +71,12 @@ export default class CardToolbarComponent {
             EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"],
         );
 
+        new SuspendButtonComponent(
+            this.toolbar,
+            suspendCurrentCard,
+            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"],
+        );
+
         this.toolbar.createDiv("sr-divider");
 
         this.shortMenuButton = new CardMenuButtonComponent(
@@ -82,6 +90,7 @@ export default class CardToolbarComponent {
             jumpToCurrentCard,
             displayCurrentCardInfoNotice,
             skipCurrentCard,
+            suspendCurrentCard,
             onOpenResetModalClick,
             closeModal,
             EmulatedPlatform().isPhone || Platform.isPhone
@@ -100,6 +109,7 @@ export default class CardToolbarComponent {
             jumpToCurrentCard,
             displayCurrentCardInfoNotice,
             skipCurrentCard,
+            suspendCurrentCard,
             onOpenResetModalClick,
             closeModal,
             EmulatedPlatform().isPhone || Platform.isPhone

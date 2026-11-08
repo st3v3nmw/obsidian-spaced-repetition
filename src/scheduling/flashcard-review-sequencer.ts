@@ -36,6 +36,7 @@ export interface IFlashcardReviewSequencer {
     getDeckStats(topicPath: TopicPath): DeckStats;
     getSubDecksWithCardsInQueue(deck: Deck): Deck[];
     skipCurrentCard(): void;
+    suspendCurrentCard(): Promise<void>;
     determineCardSchedule(response: ReviewResponse, card: Card): RepItemScheduleInfo;
     processReview(response: ReviewResponse): Promise<void>;
     updateCurrentQuestionTextAndCards(text: string): Promise<void>;
@@ -262,6 +263,25 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
     skipCurrentCard(): void {
         this.cardSequencer.deleteCurrentQuestionFromAllDecks();
+    }
+
+    /**
+     * Suspends the current card (and only that card, not its siblings), similar to Anki's "suspend card".
+     *
+     * The suspended flag is written to the card's scheduling comment, and the card is removed from all decks,
+     * so that it isn't shown again (in review or cram mode) until it is unsuspended.
+     */
+    async suspendCurrentCard(): Promise<void> {
+        const card: Card | null = this.currentCard;
+        if (card === null) throw new Error("suspendCurrentCard: There is no current card");
+
+        card.isSuspended = true;
+        await DataStore.getInstance().writeSchedule(card.question);
+
+        // Remove from the remaining deck tree first. In cram mode the original and the remaining deck tree can be
+        // the same object, and the iterator requires the card to still be present.
+        this.cardSequencer.deleteCurrentRepItemFromAllDecks();
+        this._originalDeckTree.deleteCardFromAllDecks(card, false);
     }
 
     private deleteCurrentCard(): void {
