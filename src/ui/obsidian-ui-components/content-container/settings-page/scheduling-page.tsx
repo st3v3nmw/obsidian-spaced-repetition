@@ -269,6 +269,14 @@ export class SchedulingPage extends SettingsPage {
         if (this.settingsManager.settings.algorithm === SRAlgorithmType.FSRS) {
             algorithmGroup.addSetting((setting: Setting) => {
                 setting
+                    .setName("FSRS versions")
+                    .setDesc(
+                        "New cards, and cards you reset, are scheduled with FSRS-7. Cards that are already scheduled with FSRS-6 stay on FSRS-6, and SM-2 cards move to FSRS-6 when you review them.",
+                    );
+            });
+
+            algorithmGroup.addSetting((setting: Setting) => {
+                setting
                     .setName("FSRS desired retention")
                     .setDesc("Target recall probability used by FSRS for flashcard scheduling.")
                     .addExtraButton((button) => {

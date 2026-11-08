@@ -268,10 +268,10 @@ export class SRAlgorithmOsr implements ISRAlgorithm {
         cardSchedule: RepItemScheduleInfo,
         dueDateFlashcardHistogram: DueDateHistogram,
     ): RepItemScheduleInfo {
-        const cardScheduleOsr: RepItemScheduleInfoOsr = cardSchedule;
+        // SM-2 intervals are whole days, while the schedule of an FSRS-7 card has a fractional interval
         const schedObj: Record<string, number> = osrSchedule(
             response,
-            cardScheduleOsr.interval,
+            Math.round(cardSchedule.interval),
             cardSchedule.latestEase,
             cardSchedule.delayedBeforeReviewTicks,
             this.settings,

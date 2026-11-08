@@ -6,6 +6,7 @@ import { DataStore } from "src/data/data-store/base/data-store";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { RepItemScheduleInfoFsrs7 } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs7";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
@@ -292,5 +293,87 @@ describe("Card ids", () => {
                 "A::B <!--SR:!2023-09-02,4,270,id=abc,id=def-->",
             ),
         ).toThrow(/More than one card id/);
+    });
+});
+
+describe("FSRS-7 schedules", () => {
+    const FSRS7_SCHEDULE =
+        "fsrs7,2023-09-16T01:52:52.121Z,10.07143659,5.69148946,32.23815599,3.49771674,2,2,0,0,2023-09-06T00:10:00.000Z";
+
+    test("Single FSRS-7 schedule info for question", () => {
+        const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
+            `A::B <!--SR:!${FSRS7_SCHEDULE}-->`,
+            null,
+        );
+
+        expect(actual).toHaveLength(1);
+        expect(actual[0]).toBeInstanceOf(RepItemScheduleInfoFsrs7);
+        expect(actual[0]).toMatchObject({
+            interval: 10.07143659,
+            stability: 5.69148946,
+            stabilityFast: 32.23815599,
+            difficulty: 3.49771674,
+            state: State.Review,
+            reps: 2,
+            lapses: 0,
+            learningSteps: 0,
+        });
+        expect(actual[0].dueDate.toDate().toISOString()).toEqual("2023-09-16T01:52:52.121Z");
+        expect(actual[0].formatScheduleAsSRHtmlComment()).toEqual(`!${FSRS7_SCHEDULE}`);
+    });
+
+    test("FSRS-7, FSRS-6 and SM-2 siblings with card ids and suspended flags", () => {
+        const text: string = `A::B <!--SR:!${FSRS7_SCHEDULE},suspended,id=aaa111!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z,id=bbb222!2023-09-02,4,270-->`;
+
+        const schedules: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(text, null);
+        expect(schedules).toHaveLength(3);
+        expect(schedules[0]).toBeInstanceOf(RepItemScheduleInfoFsrs7);
+        expect(schedules[1]).toBeInstanceOf(RepItemScheduleInfoFsrs);
+        expect(schedules[2]).toBeInstanceOf(RepItemScheduleInfoOsr);
+
+        expect(DataStore.getInstance().createCardMetadataList(text)).toEqual([
+            { isSuspended: true, id: "aaa111" },
+            { isSuspended: false, id: "bbb222" },
+            { isSuspended: false, id: null },
+        ]);
+    });
+
+    test("New FSRS-7 schedule after a reset has no last review", () => {
+        const actual: RepItemScheduleInfo[] = DataStore.getInstance().createSchedule(
+            "A::B <!--SR:!fsrs7,2023-09-06T00:00:00.000Z,0,0,0,0,0,0,0,0,--->",
+            null,
+        );
+
+        expect(actual[0]).toBeInstanceOf(RepItemScheduleInfoFsrs7);
+        expect(actual[0]).toMatchObject({ state: State.New, lastReview: null });
+    });
+
+    test("Invalid FSRS-7 schedules throw", () => {
+        const parse = (schedule: string) =>
+            DataStore.getInstance().createSchedule(`A::B <!--SR:!${schedule}-->`, null);
+
+        expect(() =>
+            parse(
+                "fsrs7,2023-09-16T01:52:52.121Z,10.07,5.69,3.49,2,2,0,0,2023-09-06T00:10:00.000Z",
+            ),
+        ).toThrow(/Expected 11 fields/);
+        expect(() =>
+            parse(
+                "fsrs7,2023-09-16T01:52:52.121Z,10.07,5.69,32.2,3.49,5,2,0,0,2023-09-06T00:10:00.000Z",
+            ),
+        ).toThrow(/Invalid FSRS state "5"/);
+        expect(() =>
+            parse(
+                "fsrs7,2023-09-16T01:52:52.121Z,10.07,abc,32.2,3.49,2,2,0,0,2023-09-06T00:10:00.000Z",
+            ),
+        ).toThrow(/Invalid number "abc"/);
+        expect(() =>
+            parse(
+                "fsrs7,2023-09-16T01:52:52.121Z,10.07,5.69,32.2,3.49,2,2.5,0,0,2023-09-06T00:10:00.000Z",
+            ),
+        ).toThrow(/Invalid integer "2.5"/);
+        expect(() =>
+            parse("fsrs7,-,10.07,5.69,32.2,3.49,2,2,0,0,2023-09-06T00:10:00.000Z"),
+        ).toThrow(/Invalid due date "-"/);
     });
 });

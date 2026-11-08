@@ -29,7 +29,8 @@ export class DeckTreeStatsCalculator {
                 const schedule: RepItemScheduleInfo = card.scheduleInfo;
                 stats.update(
                     schedule.delayedBeforeReviewDaysInt(),
-                    schedule.interval,
+                    // The statistics count whole days, while FSRS-7 intervals are fractional days
+                    Math.round(schedule.interval),
                     schedule.latestEase,
                 );
             } else {

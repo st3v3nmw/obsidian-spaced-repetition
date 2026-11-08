@@ -2,6 +2,7 @@ import moment from "moment";
 import { State } from "ts-fsrs";
 
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { RepItemScheduleInfoFsrs7 } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs7";
 import { textInterval } from "src/scheduling/algorithms/osr/note-scheduling";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import {
@@ -78,4 +79,30 @@ test("formats pending times and falls back when the short-term due date is missi
     expect(formatScheduleInterval(minutesSchedule, true)).toEqual("10m");
     expect(formatScheduleInterval(hoursSchedule, false)).toEqual("2 hr");
     expect(formatPendingDueTime(Date.parse("2023-09-06T00:10:00.000Z"))).toEqual("00:10:00");
+});
+
+test("formats fractional FSRS-7 intervals in whole days, and sub-day ones in minutes and hours", () => {
+    const fsrs7 = (dueDate: string, interval: number) =>
+        new RepItemScheduleInfoFsrs7(
+            moment(dueDate),
+            interval,
+            3.5,
+            5.7,
+            32.2,
+            State.Review,
+            2,
+            0,
+            0,
+            moment("2023-09-06T00:00:00.000Z"),
+        );
+
+    expect(formatScheduleInterval(fsrs7("2023-09-16T01:42:52.121Z", 10.07143659), false)).toEqual(
+        textInterval(10, false),
+    );
+    expect(formatScheduleInterval(fsrs7("2023-09-07T13:00:00.000Z", 1.54166667), false)).toEqual(
+        textInterval(2, false),
+    );
+    expect(formatScheduleInterval(fsrs7("2023-09-06T13:00:00.000Z", 0.54166667), false)).toEqual(
+        "13 hr",
+    );
 });

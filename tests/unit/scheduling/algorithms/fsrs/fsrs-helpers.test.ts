@@ -1,30 +1,24 @@
 import { Rating, State } from "ts-fsrs";
 
-import { DEFAULT_SETTINGS } from "src/data/settings";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import {
-    buildFsrsParameters,
     difficultyToEase,
     easeToDifficulty,
     formatFsrsTimestamp,
     FSRS_COMMENT_PREFIX,
+    FSRS7_COMMENT_PREFIX,
+    fsrsScheduleStatus,
+    parseFsrsState,
     parseFsrsTimestamp,
     reviewResponseToFsrsGrade,
-    sm2ScheduleToFsrsCard,
+    roundFsrsNumber,
 } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
+import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { globalDateProvider, setupStaticDateProvider20230906 } from "src/utils/dates";
 
 beforeAll(() => {
     setupStaticDateProvider20230906();
-});
-
-test("buildFsrsParameters", () => {
-    expect(buildFsrsParameters(DEFAULT_SETTINGS)).toMatchObject({
-        ["request_retention"]: DEFAULT_SETTINGS.fsrsDesiredRetention,
-        ["maximum_interval"]: DEFAULT_SETTINGS.maximumInterval,
-        ["enable_short_term"]: true,
-    });
 });
 
 test("reviewResponseToFsrsGrade", () => {
@@ -42,19 +36,20 @@ test("difficulty and ease conversion are inverse enough for legacy migration", (
     expect(difficultyToEase(easeToDifficulty(250))).toBeGreaterThanOrEqual(240);
 });
 
-test("legacyScheduleToFsrsCard keeps due date and derives review state", () => {
+test("SM-2 schedules convert to FSRS-6 review schedules with the same due date", () => {
     const legacySchedule = RepItemScheduleInfoOsr.fromDueDateStr("2023-09-10", 4, 270);
-    const actual = sm2ScheduleToFsrsCard(legacySchedule, globalDateProvider.now);
+    const actual = RepItemScheduleInfoFsrs.fromSm2Schedule(legacySchedule);
 
     expect(actual).toMatchObject({
         state: State.Review,
-        ["scheduled_days"]: 4,
+        interval: 4,
         stability: 4,
         reps: 2,
         lapses: 0,
+        learningSteps: 0,
     });
-    expect(new Date(actual.due).toISOString()).toContain("2023-09-10");
-    expect(new Date(actual.last_review).toISOString()).toContain("2023-09-06");
+    expect(actual.dueDate.toISOString()).toContain("2023-09-10");
+    expect(actual.lastReview.toISOString()).toContain("2023-09-06");
 });
 
 test("FSRS timestamp helpers", () => {
@@ -63,6 +58,7 @@ test("FSRS timestamp helpers", () => {
     expect(parseFsrsTimestamp(timestamp).toDate().toISOString()).toEqual(timestamp);
     expect(parseFsrsTimestamp("-")).toBeNull();
     expect(FSRS_COMMENT_PREFIX).toEqual("fsrs");
+    expect(FSRS7_COMMENT_PREFIX).toEqual("fsrs7");
 });
 
 test("FSRS helpers handle unsupported responses and missing legacy values", () => {
@@ -72,11 +68,27 @@ test("FSRS helpers handle unsupported responses and missing legacy values", () =
     expect(easeToDifficulty(null)).toEqual(5.5);
     expect(easeToDifficulty(undefined as never)).toEqual(5.5);
     expect(formatFsrsTimestamp(null)).toEqual("-");
+});
 
-    const migrated = sm2ScheduleToFsrsCard(null, globalDateProvider.now);
-    expect(migrated).toMatchObject({
-        ["scheduled_days"]: 1,
-        difficulty: 5.5,
-    });
-    expect(new Date(migrated.due).toISOString()).toEqual("2023-09-06T00:00:00.000Z");
+test("parseFsrsState accepts the four FSRS states only", () => {
+    expect(parseFsrsState("0")).toEqual(State.New);
+    expect(parseFsrsState("1")).toEqual(State.Learning);
+    expect(parseFsrsState("2")).toEqual(State.Review);
+    expect(parseFsrsState("3")).toEqual(State.Relearning);
+    expect(() => parseFsrsState("4")).toThrow('Invalid FSRS state "4"');
+    expect(() => parseFsrsState("")).toThrow('Invalid FSRS state ""');
+    expect(() => parseFsrsState("2.5")).toThrow('Invalid FSRS state "2.5"');
+});
+
+test("fsrsScheduleStatus maps FSRS states to ts-fsrs schedule statuses", () => {
+    expect(fsrsScheduleStatus(State.New)).toEqual("new");
+    expect(fsrsScheduleStatus(State.Learning)).toEqual("learning");
+    expect(fsrsScheduleStatus(State.Relearning)).toEqual("learning");
+    expect(fsrsScheduleStatus(State.Review)).toEqual("review");
+});
+
+test("roundFsrsNumber rounds to 8 decimal places", () => {
+    expect(roundFsrsNumber(10 / (24 * 60))).toEqual(0.00694444);
+    expect(roundFsrsNumber(10.07143659151449)).toEqual(10.07143659);
+    expect(roundFsrsNumber(3)).toEqual(3);
 });

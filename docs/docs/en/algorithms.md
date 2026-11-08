@@ -5,7 +5,7 @@ A learning algorithm is a formula that determines when a note or flashcard shoul
 | Algorithm                                           | Status      |
 | --------------------------------------------------- | ----------- |
 | [SM-2-OSR](#sm-2-osr)                               | Implemented |
-| [FSRS](#fsrs)                                       | Planned     |
+| [FSRS](#fsrs)                                       | Implemented |
 | [User Defined Intervals](#user-specified-intervals) | Planned     |
 
 ## SM-2-OSR
@@ -46,8 +46,28 @@ A learning algorithm is a formula that determines when a note or flashcard shoul
 The algorithm is detailed at:
 [fsrs4anki](https://github.com/open-spaced-repetition/fsrs4anki/wiki)
 
-Incorporation of the FSRS algorithm into this plugin has not yet occurred. For progress see:
-[ [FEAT] sm-2 is outdated, can you please replace it with the fsrs algorithm? #748 ](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/748)
+Select `FSRS` as the flashcard algorithm in the settings. FSRS schedules flashcards only, whole-note review keeps using SM-2-OSR.
+The scheduling uses [ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs) with its default parameters, your desired retention and the maximum interval.
+
+Two versions of FSRS are in use side by side:
+
+| Card                                        | FSRS version |
+| ------------------------------------------- | ------------ |
+| New card                                    | FSRS-7       |
+| Card that you reset                         | FSRS-7       |
+| Card that is already scheduled with FSRS-6  | FSRS-6       |
+| SM-2 card, when you review it the next time | FSRS-6       |
+
+A card doesn't move from FSRS-6 to FSRS-7. FSRS-7 keeps a second memory value per card (a fast memory trace next to the slow one),
+which can only be calculated from the complete review history of the card.
+When you reset a card, its memory starts over, so it continues with FSRS-7. The usage history keeps all its earlier reviews.
+
+FSRS-7 intervals are fractional days, so a card can become due at any time of the day.
+
+The schedule is stored in the scheduling comment of each card:
+
+- FSRS-6: `<!--SR:!fsrs,due,interval,stability,difficulty,state,reps,lapses,learningSteps,lastReview-->`
+- FSRS-7: `<!--SR:!fsrs7,due,interval,stability,stabilityFast,difficulty,state,reps,lapses,learningSteps,lastReview-->`
 
 ---
 

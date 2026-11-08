@@ -452,7 +452,10 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
                 this.dueDateFlashcardHistogram.decrement(nDays);
             }
-            this.dueDateFlashcardHistogram.increment(this.currentCard.scheduleInfo.interval);
+            // The histogram counts whole days, while FSRS-7 intervals are fractional days
+            this.dueDateFlashcardHistogram.increment(
+                Math.round(this.currentCard.scheduleInfo.interval),
+            );
         } else if (response === ReviewResponse.Reset) {
             shortTermRequeue = "immediate";
         }

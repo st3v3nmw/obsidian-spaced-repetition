@@ -3,9 +3,12 @@ import { isValidCardId } from "src/data/data-structures/card/card-id";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {
     FSRS_COMMENT_PREFIX,
+    FSRS7_COMMENT_PREFIX,
+    parseFsrsState,
     parseFsrsTimestamp,
 } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { RepItemScheduleInfoFsrs7 } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs7";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { DateUtil, globalDateProvider } from "src/utils/dates";
 
@@ -78,6 +81,35 @@ export class CommentParser {
     static parseScheduleSegment(segmentWithFlags: string): RepItemScheduleInfo | null {
         const segment: string = this.splitSegmentFlags(segmentWithFlags).schedule;
 
+        if (segment.startsWith(FSRS7_COMMENT_PREFIX + ",")) {
+            const [
+                _algorithm,
+                dueDateStr,
+                intervalStr,
+                stabilityStr,
+                stabilityFastStr,
+                difficultyStr,
+                stateStr,
+                repsStr,
+                lapsesStr,
+                learningStepsStr,
+                lastReviewStr,
+            ] = this.splitFsrsFields(segment, 11);
+
+            return new RepItemScheduleInfoFsrs7(
+                this.parseRequiredFsrsTimestamp(dueDateStr, segment),
+                this.parseFsrsNumber(intervalStr, segment),
+                this.parseFsrsNumber(difficultyStr, segment),
+                this.parseFsrsNumber(stabilityStr, segment),
+                this.parseFsrsNumber(stabilityFastStr, segment),
+                parseFsrsState(stateStr),
+                this.parseFsrsInteger(repsStr, segment),
+                this.parseFsrsInteger(lapsesStr, segment),
+                this.parseFsrsInteger(learningStepsStr, segment),
+                parseFsrsTimestamp(lastReviewStr),
+            );
+        }
+
         if (segment.startsWith(FSRS_COMMENT_PREFIX + ",")) {
             const fields = segment.split(",");
             const [
@@ -104,7 +136,7 @@ export class CommentParser {
                 parseFloat(intervalStr),
                 parseFloat(difficultyStr),
                 parseFloat(stabilityStr),
-                parseInt(stateStr),
+                parseFsrsState(stateStr),
                 parseInt(repsStr),
                 parseInt(lapsesStr),
                 parseInt(learningStepsStr),
@@ -114,6 +146,40 @@ export class CommentParser {
 
         const [dueDateStr, intervalStr, easeStr] = segment.split(",");
         return this.parseSM2Schedule(dueDateStr, parseInt(intervalStr), parseInt(easeStr));
+    }
+
+    private static splitFsrsFields(segment: string, count: number): string[] {
+        const fields: string[] = segment.split(",");
+        if (fields.length !== count) {
+            throw new Error(
+                `Expected ${count} fields in FSRS scheduling comment "${segment}", found ${fields.length}`,
+            );
+        }
+        return fields;
+    }
+
+    private static parseRequiredFsrsTimestamp(input: string, segment: string): moment.Moment {
+        const result: moment.Moment | null = parseFsrsTimestamp(input);
+        if (result === null || !result.isValid()) {
+            throw new Error(`Invalid due date "${input}" in FSRS scheduling comment "${segment}"`);
+        }
+        return result;
+    }
+
+    private static parseFsrsNumber(input: string, segment: string): number {
+        const result: number = Number(input);
+        if (input.trim() === "" || !Number.isFinite(result)) {
+            throw new Error(`Invalid number "${input}" in FSRS scheduling comment "${segment}"`);
+        }
+        return result;
+    }
+
+    private static parseFsrsInteger(input: string, segment: string): number {
+        const result: number = this.parseFsrsNumber(input, segment);
+        if (!Number.isInteger(result)) {
+            throw new Error(`Invalid integer "${input}" in FSRS scheduling comment "${segment}"`);
+        }
+        return result;
     }
 
     static parseSM2Schedule(

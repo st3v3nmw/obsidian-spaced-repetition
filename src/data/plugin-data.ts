@@ -1,11 +1,15 @@
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
-import { ISerializedFSRSScheduleData } from "src/scheduling/algorithms/fsrs/serialized-schedule-data";
+import {
+    ISerializedFSRS7ScheduleData,
+    ISerializedFSRSScheduleData,
+} from "src/scheduling/algorithms/fsrs/serialized-schedule-data";
 import { ISerializedSM2ScheduleData } from "src/scheduling/algorithms/osr/serialized-schedule-data";
 
 export interface ISerializedScheduleEntry {
     algorithm: SRAlgorithmType;
-    scheduleData: ISerializedFSRSScheduleData | ISerializedSM2ScheduleData;
+    scheduleData:
+        ISerializedFSRSScheduleData | ISerializedFSRS7ScheduleData | ISerializedSM2ScheduleData;
 }
 
 /**
