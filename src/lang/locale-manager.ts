@@ -114,13 +114,17 @@ export class LocaleManager implements ILocaleManager {
 
     /**
      * Gets the current translation.
+     * Falls back to english if the current locale has no translation
      */
     public currentTranslation(): IBaseLocale {
         const currentLocale: string = LocaleManagerInstance.getInstance().currentLocale;
         const currentLocaleMap: IBaseLocale = this.localeMap[currentLocale];
 
         if (!currentLocaleMap) {
-            console.warn(`SRS error: Locale ${currentLocale} not found.`);
+            console.warn(
+                `SRS error: Locale ${currentLocale} not found. Using English as a fallback.`,
+            );
+            return this.localeMap["en"];
         }
 
         return currentLocaleMap;
