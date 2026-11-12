@@ -78,40 +78,11 @@ export default class CardToolbarComponent {
         this.toolbar.createDiv("sr-divider");
 
         if (settings.enableTTS) {
-            const detectLang = (text: string): string => {
-                // Japanese (Hiragana / Katakana)
-                if (/[\u3040-\u30ff]/.test(text)) {
-                    return "ja-JP";
-                }
-                // Korean (Hangul)
-                if (/[\uac00-\ud7af]/.test(text)) {
-                    return "ko-KR";
-                }
-                // Mandarin Chinese (Han characters)
-                if (/[\u4e00-\u9fa5]/.test(text)) {
-                    return "zh-CN";
-                }
-                // Cyrillic (Russian, etc.)
-                if (/[\u0400-\u04ff]/.test(text)) {
-                    return "ru-RU";
-                }
-                // Arabic
-                if (/[\u0600-\u06ff]/.test(text)) {
-                    return "ar-SA";
-                }
-                // Hebrew
-                if (/[\u0590-\u05ff]/.test(text)) {
-                    return "he-IL";
-                }
-                // Default fallback (Portuguese)
-                return "pt-BR";
-            };
-
             this.ttsButton = new TTSButtonComponent(
                 this.toolbar,
                 async () => {
                     const text = getCardText();
-                    await TTSUtil.speak(app, text, settings, detectLang(text));
+                    await TTSUtil.speak(app, text, settings, TTSUtil.detectLang(text));
                     this.ttsButton?.setCached(true);
                 },
                 EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"]

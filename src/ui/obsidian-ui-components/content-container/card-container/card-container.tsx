@@ -1,6 +1,6 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/card-container.css";
 import moment from "moment";
-import { App, Platform } from "obsidian";
+import { App, Platform, setIcon } from "obsidian";
 
 import { CardType } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
@@ -49,6 +49,15 @@ export class CardContainer {
     private showAnswerHandler: () => void;
     private jumpToCardHandler: () => Promise<void>;
 
+    // Audio-first review state
+    private audioReviewMode: boolean;
+    private audioReviewHidden: boolean = false;
+    private audioReviewGeneration: number = 0;
+    private audioReviewOverlay: HTMLDivElement | null = null;
+    private audioReviewStatusEl: HTMLDivElement | null = null;
+    private audioReviewText: string = "";
+    private audioReviewSettings: SRSettings | null = null;
+
     constructor(
         app: App,
         plugin: SRPlugin,
@@ -63,11 +72,13 @@ export class CardContainer {
         jumpToCurrentCardHandler: () => Promise<void>,
         displayCurrentCardInfoNoticeHandler: () => void,
         closeModal?: () => void,
+        audioReviewMode: boolean = false,
     ) {
         // Init properties
         this.app = app;
         this.plugin = plugin;
         this.cardState = CardState.Closed;
+        this.audioReviewMode = audioReviewMode;
         this.processReviewHandler = processReviewHandler;
         this.skipCardHandler = skipCardHandler;
         this.showAnswerHandler = showAnswerHandler;
@@ -149,6 +160,7 @@ export class CardContainer {
             window.clearTimeout(this.pendingResumeTimeout);
             this.pendingResumeTimeout = null;
         }
+        this._resetAudioReview();
         this.cardState = CardState.Closed;
         activeDocument.removeEventListener("keydown", this._keydownHandler);
         this.view.addClass("sr-is-hidden");
@@ -170,6 +182,9 @@ export class CardContainer {
     public async drawCardFront(sessionData: SessionData, settings: SRSettings) {
         this.currentSessionData = sessionData;
         this.toolbar.setResetButtonDisabled(true);
+
+        // Cancel any audio/overlay from the previous card before drawing the new front
+        this._resetAudioReview();
 
         const frontText = sessionData.cardData.currentCard?.front.trim() || "";
         const cached = await TTSUtil.isCached(this.app, frontText, settings);
@@ -196,6 +211,10 @@ export class CardContainer {
                 firstInput.focus();
             }
         }
+
+        // In audio-first mode, hide the text and read the front aloud. The text is revealed
+        // automatically once playback finishes (or immediately on user request).
+        this._startAudioReview(frontText, settings);
     }
 
     private drawCardContext(sessionData: SessionData, settings: SRSettings) {
@@ -235,6 +254,7 @@ export class CardContainer {
 
     public drawPendingState(nextPendingDueUnix: number): void {
         this.toolbar.setResetButtonDisabled(true);
+        this._resetAudioReview();
         this.cardState = CardState.Front;
         this.content.empty();
         this.response.hideAllButtons();
@@ -264,6 +284,135 @@ export class CardContainer {
         };
 
         updatePendingClock();
+    }
+
+    // #region -> Audio review
+
+    /**
+     * Hides the card text and reads the front of the card aloud. The text stays hidden after
+     * playback; the overlay offers "Review text" (reveal) and "Replay" actions.
+     */
+    private _startAudioReview(frontText: string, settings: SRSettings): void {
+        if (!this.audioReviewMode) return;
+
+        const speakText = TTSUtil.cleanTextForTTS(frontText);
+        if (speakText.length === 0) return;
+
+        // If the browser cannot synthesize speech, don't hide the card text pointlessly
+        if (settings.ttsProvider === "browser" && !("speechSynthesis" in window)) return;
+
+        this.audioReviewText = frontText;
+        this.audioReviewSettings = settings;
+
+        const generation = ++this.audioReviewGeneration;
+        this._setAudioReviewHidden(true);
+        this._playAudioReview(generation, settings);
+    }
+
+    /**
+     * Plays (or replays) the current card front aloud. When playback finishes the card text
+     * stays hidden: the user decides whether to review the text or replay via the overlay buttons.
+     */
+    private _playAudioReview(generation: number, settings: SRSettings): void {
+        if (generation !== this.audioReviewGeneration) return;
+        this._setAudioReviewStatus("Playing audio\u2026");
+
+        void TTSUtil.speak(
+            this.app,
+            this.audioReviewText,
+            settings,
+            TTSUtil.detectLang(this.audioReviewText),
+        )
+            .then(() => {
+                if (generation !== this.audioReviewGeneration) return;
+                this._setAudioReviewStatus("Audio finished \u2014 review the text or replay");
+            })
+            .catch((e) => {
+                console.error("Audio review playback failed:", e);
+                if (generation !== this.audioReviewGeneration) return;
+                this._setAudioReviewStatus("Playback failed \u2014 review the text or replay");
+            });
+    }
+
+    /**
+     * "Review text": stops any pending audio and reveals the hidden card text.
+     */
+    private _revealAudioReview(): void {
+        if (!this.audioReviewHidden) return;
+        // Invalidate any pending speak() completion callback
+        this.audioReviewGeneration++;
+        TTSUtil.stop();
+        this._setAudioReviewHidden(false);
+    }
+
+    /**
+     * "Replay": restarts the audio for the current card without revealing the text.
+     */
+    private _replayAudioReview(): void {
+        if (this.audioReviewSettings === null) return;
+        this._playAudioReview(this.audioReviewGeneration, this.audioReviewSettings);
+    }
+
+    private _resetAudioReview(): void {
+        this.audioReviewGeneration++;
+        this.audioReviewText = "";
+        this.audioReviewSettings = null;
+        TTSUtil.stop();
+        this._setAudioReviewHidden(false);
+    }
+
+    private _ensureAudioOverlay(): HTMLDivElement {
+        if (this.audioReviewOverlay !== null) return this.audioReviewOverlay;
+
+        const overlay = this.scrollWrapper.createDiv({ cls: "sr-audio-review-overlay" });
+        const icon = overlay.createDiv({ cls: "sr-audio-review-icon" });
+        setIcon(icon, "volume-2");
+        overlay.createDiv({
+            cls: "sr-audio-review-title",
+            text: "Audio review",
+        });
+        this.audioReviewStatusEl = overlay.createDiv({
+            cls: "sr-audio-review-status",
+            text: "",
+        });
+        const buttons = overlay.createDiv({ cls: "sr-audio-review-buttons" });
+
+        const revealBtn = buttons.createEl("button", {
+            cls: "sr-audio-review-reveal mod-cta",
+            text: "Review text",
+        });
+        revealBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this._revealAudioReview();
+        });
+
+        const replayBtn = buttons.createEl("button", {
+            cls: "sr-audio-review-replay",
+            text: "Replay",
+        });
+        replayBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this._replayAudioReview();
+        });
+
+        this.audioReviewOverlay = overlay;
+        return overlay;
+    }
+
+    private _setAudioReviewHidden(hidden: boolean): void {
+        this.audioReviewHidden = hidden;
+        if (hidden) {
+            this._ensureAudioOverlay();
+            this.view.addClass("sr-audio-review-active");
+        } else {
+            this.view.removeClass("sr-audio-review-active");
+        }
+    }
+
+    private _setAudioReviewStatus(message: string): void {
+        this.audioReviewStatusEl?.setText(message);
     }
 
     // #region -> Deck Info
@@ -357,6 +506,9 @@ export class CardContainer {
         this.setCustomHotKeyState(settings.useCustomHotkeys);
         this.cardState = sessionData.cardData.currentCardState;
 
+        // Answer is being shown: stop reading the front and reveal any hidden text
+        this._resetAudioReview();
+
         this.toolbar.setResetButtonDisabled(false);
 
         // Show answer text
@@ -435,7 +587,12 @@ export class CardContainer {
             case "NumpadEnter":
             case "Space":
                 if (this.cardState === CardState.Front) {
-                    this.showAnswerHandler();
+                    if (this.audioReviewHidden) {
+                        // First press during audio review reveals the hidden question text
+                        this._revealAudioReview();
+                    } else {
+                        this.showAnswerHandler();
+                    }
                     consumeKeyEvent();
                 } else if (this.cardState === CardState.Back) {
                     void this.processReviewHandler(ReviewResponse.Good);
