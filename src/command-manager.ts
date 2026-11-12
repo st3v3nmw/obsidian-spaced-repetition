@@ -398,6 +398,38 @@ export class CommandManager {
             },
         });
 
+        // Audio-first review: the card front is read aloud and hidden until playback finishes,
+        // then the question text is revealed so it can be answered normally.
+        this.plugin.addCommand({
+            id: "srs-audio-review-flashcards",
+            name: "Audio review: flashcards from all notes",
+            callback: async () => {
+                if (!this.plugin.isInitialized) return;
+                await this.uiManager.openDeckContainer(FlashcardReviewMode.Review, undefined, true);
+            },
+        });
+
+        this.plugin.addCommand({
+            id: "srs-audio-review-flashcards-in-note",
+            name: "Audio review: flashcards in this note",
+            repeatable: false,
+            checkCallback: (checking: boolean) => {
+                const openFile: TFile | null = this.plugin.app.workspace.getActiveFile();
+
+                if (openFile === null || openFile.extension !== "md" || !this.plugin.isInitialized)
+                    return false;
+
+                if (!checking) {
+                    void this.uiManager.openDeckContainer(
+                        FlashcardReviewMode.Review,
+                        openFile,
+                        true,
+                    );
+                }
+                return true;
+            },
+        });
+
         this.plugin.addCommand({
             id: "srs-review-flashcards-in-note",
             name: t("REVIEW_CARDS_IN_NOTE"),

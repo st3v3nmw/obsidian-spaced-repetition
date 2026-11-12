@@ -142,6 +142,7 @@
     overflow: hidden;
     flex-grow: 1;
     display: flex;
+    position: relative;
     & .sr-content {
       font-size: var(--font-text-size);
       overflow-x: hidden;
@@ -163,6 +164,63 @@
   }
   & .sr-content .cloze-input {
     height: 1.4rem;
+  }
+  &.sr-audio-review-active .sr-content {
+    visibility: hidden;
+  }
+  & .sr-audio-review-overlay {
+    display: none;
+  }
+  &.sr-audio-review-active .sr-audio-review-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-4-2);
+    padding: var(--size-4-4);
+    text-align: center;
+    background-color: var(--background-primary);
+    z-index: 5;
+  }
+  & .sr-audio-review-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--interactive-accent);
+    animation: sr-audio-review-pulse 1.2s ease-in-out infinite;
+  }
+  & .sr-audio-review-icon svg {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+  & .sr-audio-review-title {
+    font-weight: var(--font-semibold);
+    font-size: var(--font-ui-medium);
+  }
+  & .sr-audio-review-status {
+    color: var(--text-muted);
+    font-size: var(--font-ui-small);
+    min-height: 1.2em;
+  }
+  & .sr-audio-review-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--size-4-2);
+    margin-top: var(--size-4-2);
+  }
+}
+@keyframes sr-audio-review-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
   }
 }
 @media only screen and (orientation: landscape) {

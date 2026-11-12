@@ -24,16 +24,19 @@ export class ReviewQueueLoader {
     private osrCore: OsrCore;
     private singleNote: TFile | null = null;
     private reviewMode: FlashcardReviewMode;
+    private audioReviewMode: boolean;
 
     constructor(
         plugin: SRPlugin,
         osrCore: OsrCore,
         singleNote: TFile | null,
         reviewMode: FlashcardReviewMode,
+        audioReviewMode: boolean = false,
     ) {
         this.osrCore = osrCore;
         this.singleNote = singleNote;
         this.reviewMode = reviewMode;
+        this.audioReviewMode = audioReviewMode;
         this.plugin = plugin;
     }
 
@@ -43,6 +46,13 @@ export class ReviewQueueLoader {
 
     public getReviewMode(): FlashcardReviewMode {
         return this.reviewMode;
+    }
+
+    /**
+     * Whether this session should hide the card text and play it as audio first.
+     */
+    public getAudioReviewMode(): boolean {
+        return this.audioReviewMode;
     }
 
     setReviewMode(reviewMode: FlashcardReviewMode) {
