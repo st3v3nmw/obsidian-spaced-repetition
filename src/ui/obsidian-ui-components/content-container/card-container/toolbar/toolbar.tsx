@@ -5,8 +5,12 @@ import { Deck } from "src/data/data-structures/deck/deck";
 import { DeckStats } from "src/scheduling/flashcard-review-sequencer";
 import DeckInfoComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/deck-info/deck-info";
 import BackButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/back-button";
-import CardMenuButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-menu-button";
+import Card3DViewButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-3d-view-button";
+import CardMenuButtonComponent, {
+    TableSurfaceMenuOptions,
+} from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-menu-button";
 import EditButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/edit-button";
+import MaximizeButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/maximize-button";
 import ResetButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/reset-button";
 import SkipButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/skip-button";
 import ModalCloseButtonComponent from "src/ui/obsidian-ui-components/content-container/modal-close-button";
@@ -16,6 +20,7 @@ export default class CardToolbarComponent {
     private toolbar: HTMLDivElement;
     private infoSection: DeckInfoComponent;
     private resetButton: ResetButtonComponent;
+    private card3DViewButton: Card3DViewButtonComponent;
     private extendedMenuButton: CardMenuButtonComponent;
     private shortMenuButton: CardMenuButtonComponent;
 
@@ -29,7 +34,11 @@ export default class CardToolbarComponent {
         displayCurrentCardInfoNotice: () => void,
         skipCurrentCard: () => void,
         onOpenResetModalClick: () => void,
+        toggle3DView: () => void,
+        is3DView: boolean,
+        tableSurfaceMenu: TableSurfaceMenuOptions,
         closeModal?: () => void,
+        toggleMaximized?: () => boolean,
     ) {
         // Build ui
         this.toolbar = parentEl.createDiv();
@@ -69,6 +78,13 @@ export default class CardToolbarComponent {
             EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"],
         );
 
+        this.card3DViewButton = new Card3DViewButtonComponent(
+            this.toolbar,
+            toggle3DView,
+            is3DView,
+            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"],
+        );
+
         this.toolbar.createDiv("sr-divider");
 
         this.shortMenuButton = new CardMenuButtonComponent(
@@ -87,6 +103,7 @@ export default class CardToolbarComponent {
             EmulatedPlatform().isPhone || Platform.isPhone
                 ? ["mod-raised", "sr-short-menu-button"]
                 : ["clickable-icon", "sr-short-menu-button"],
+            tableSurfaceMenu,
         );
 
         this.extendedMenuButton = new CardMenuButtonComponent(
@@ -105,6 +122,7 @@ export default class CardToolbarComponent {
             EmulatedPlatform().isPhone || Platform.isPhone
                 ? ["mod-raised", "sr-extended-menu-button"]
                 : ["clickable-icon", "sr-extended-menu-button"],
+            tableSurfaceMenu,
         );
 
         // If we don't have a close modal, we don't need the close button
@@ -113,6 +131,10 @@ export default class CardToolbarComponent {
         const closeButtonClasses = [
             EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "clickable-icon",
         ];
+
+        if (toggleMaximized !== undefined) {
+            new MaximizeButtonComponent(this.toolbar, toggleMaximized, closeButtonClasses);
+        }
 
         new ModalCloseButtonComponent(this.toolbar, closeModal, closeButtonClasses);
     }
@@ -149,6 +171,14 @@ export default class CardToolbarComponent {
             currentDeckTotalCardsInQueue - currentDeckStats.cardsInQueueOfThisDeckCount,
             flashcardCardOrder === "EveryCardRandomDeckAndCard",
         );
+    }
+
+    /**
+     * Highlights the 3D view button while the 3D card view is on
+     * @param active - Whether the 3D card view is on
+     */
+    public set3DViewActive(active: boolean) {
+        this.card3DViewButton.setActive(active);
     }
 
     /**

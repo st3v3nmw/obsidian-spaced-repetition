@@ -11,13 +11,24 @@
     padding: 0;
 }
 
+/* The toolbar has its own close button. Obsidian 1.14+ marks its close button as a
+   .modal-header-button instead of .modal-close-button, so both are hidden. */
 #sr-modal-view .modal-close-button,
+#sr-modal-view .modal-header-button,
 #sr-modal-view .modal-header {
     display: none;
 }
 
 body:not(.is-mobile) #sr-modal-view {
     resize: both;
+}
+
+/* Overrides the saved size, which is set inline, without changing it */
+#sr-modal-view.sr-is-maximized {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    resize: none;
 }
 
 .is-mobile #sr-modal-view {

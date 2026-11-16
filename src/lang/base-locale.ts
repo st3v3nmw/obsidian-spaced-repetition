@@ -108,6 +108,21 @@ export interface IBaseLocale {
     BURY_SIBLINGS_TILL_NEXT_DAY_DESC: string;
     SHOW_CARD_CONTEXT: string;
     SHOW_CARD_CONTEXT_DESC: string;
+    CARD_3D_VIEW: string;
+    CARD_3D_VIEW_DESC: string;
+    TOGGLE_3D_CARD_VIEW: string;
+    CARD_3D_QUESTION_SIDE: string;
+    CARD_3D_ANSWER_SIDE: string;
+    CARD_3D_TABLE_SURFACE: string;
+    TABLE_SURFACE: string;
+    CARD_3D_TABLE_SURFACE_DESC: string;
+    TABLE_SURFACE_HONEY_OAK: string;
+    TABLE_SURFACE_MAPLE: string;
+    TABLE_SURFACE_WALNUT: string;
+    TABLE_SURFACE_BRUSHED_STEEL: string;
+    TABLE_SURFACE_SLATE: string;
+    TABLE_SURFACE_SAGE: string;
+    TABLE_SURFACE_NAVY: string;
     SHOW_INTERVAL_IN_REVIEW_BUTTONS: string;
     SHOW_INTERVAL_IN_REVIEW_BUTTONS_DESC: string;
     CARD_MODAL_HEIGHT_PERCENT: string;
@@ -231,6 +246,8 @@ export interface IBaseLocale {
     // sidebar.ts
     NOTES_REVIEW_QUEUE: string;
     CLOSE: string;
+    MAXIMIZE: string;
+    RESTORE_SIZE: string;
     NEW: string;
     YESTERDAY: string;
     TODAY: string;
