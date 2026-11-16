@@ -38,6 +38,11 @@ const en: IBaseLocale = {
     DELETE_CARD: "Delete Card",
     DELETE_CARD_CONFIRMATION:
         "This action cannot be undone and might alter your notes in unwanted ways. Are you sure you want to delete this card?",
+    SUSPEND_CARD: "Suspend card",
+    CARD_SUSPENDED:
+        'Card suspended. It won\'t be shown again until you run "Unsuspend flashcards in this note" on its note.',
+    UNSUSPEND_CARDS_IN_NOTE: "Unsuspend flashcards in this note",
+    CARDS_UNSUSPENDED: "Unsuspended ${count} card(s).",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Review a note",

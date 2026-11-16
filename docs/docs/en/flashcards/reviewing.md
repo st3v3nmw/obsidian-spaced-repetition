@@ -40,6 +40,8 @@ Although you may want to review or cram all cards across all decks, you often ma
 4 | Skip | Skip the current card without reviewing
 5 | Delete | Delete the card from the note
 
+The toolbar also has a **Suspend** button (pause icon; on narrow screens it is in the `⋮` card menu) that [suspends](#suspending-cards) the current card.
+
 ### Context
 
 If the parent note has heading(s), the flashcard will have a title containing the context.
@@ -77,6 +79,30 @@ To review faster, use the following keyboard shortcuts:
 - `1` => Review as `Hard`
 - `2` => Review as `Good`
 - `3` => Review as `Easy`
+- `S` => Skip the card
+- `@` => [Suspend](#suspending-cards) the card
+
+If you enabled custom hotkeys in the settings, assign them to the `Spaced Repetition: Suspend card` command (and the other review commands) instead.
+
+### Suspending cards
+
+Suspending a card stops it from being shown, in both review and cram sessions, until you unsuspend it. It works like suspending a card in Anki. Use it for cards you want to keep in your notes but don't want to study for now.
+
+To suspend the card you are looking at, press `@` or click the **Suspend** button in the toolbar.
+Only that card is suspended. For example, the other cards of a cloze or a reversed card keep showing up.
+
+The card is marked as suspended in its scheduling comment, and its schedule is kept:
+
+```
+<!--SR:!2021-08-20,13,290,suspended-->
+```
+
+To unsuspend cards, do one of these:
+
+- Open the note and run the command `Spaced Repetition: Unsuspend flashcards in this note`. This unsuspends every suspended card in that note.
+- Remove `,suspended` from the card's scheduling comment by hand.
+
+Suspended cards are not counted in the deck counts or statistics.
 
 ---
 

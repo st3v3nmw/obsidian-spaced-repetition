@@ -1,4 +1,4 @@
-import { PREFERRED_DATE_FORMAT } from "src/data/constants";
+import { PREFERRED_DATE_FORMAT, SR_SUSPENDED_FLAG } from "src/data/constants";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {
     FSRS_COMMENT_PREFIX,
@@ -10,16 +10,39 @@ import { DateUtil, globalDateProvider } from "src/utils/dates";
 
 export class CommentParser {
     static parseMultiScheduleComment(comment: string): RepItemScheduleInfo[] {
-        const segments = comment
-            .split("!")
-            .map((segment) => segment.trim())
-            .filter((segment) => segment.length > 0)
-            .map((segment) => this.parseScheduleSegment(segment));
-
-        return segments;
+        return this.splitScheduleSegments(comment).map((segment) =>
+            this.parseScheduleSegment(segment),
+        );
     }
 
-    static parseScheduleSegment(segment: string): RepItemScheduleInfo | null {
+    /**
+     * Determines for each card schedule segment within the comment whether the card is suspended.
+     *
+     * @param {string} comment - The content of the SR comment, e.g. "!2023-09-02,4,270,suspended!2023-09-02,5,270"
+     * @returns {boolean[]} - One entry per segment, in the same order as parseMultiScheduleComment()
+     */
+    static parseMultiSuspendedComment(comment: string): boolean[] {
+        return this.splitScheduleSegments(comment).map((segment) =>
+            this.isSegmentSuspended(segment),
+        );
+    }
+
+    static isSegmentSuspended(segment: string): boolean {
+        return segment.endsWith("," + SR_SUSPENDED_FLAG);
+    }
+
+    private static splitScheduleSegments(comment: string): string[] {
+        return comment
+            .split("!")
+            .map((segment) => segment.trim())
+            .filter((segment) => segment.length > 0);
+    }
+
+    static parseScheduleSegment(segmentWithFlags: string): RepItemScheduleInfo | null {
+        const segment: string = this.isSegmentSuspended(segmentWithFlags)
+            ? segmentWithFlags.slice(0, -("," + SR_SUSPENDED_FLAG).length)
+            : segmentWithFlags;
+
         if (segment.startsWith(FSRS_COMMENT_PREFIX + ",")) {
             const fields = segment.split(",");
             const [

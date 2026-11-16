@@ -34,6 +34,15 @@ export interface IDataStore {
     ): RepItemScheduleInfo[];
 
     /**
+     * Reads which cards of a question are suspended.
+     *
+     * @param originalQuestionText
+     * @returns One entry per card that has stored scheduling information (same order as createSchedule()),
+     *          true if that card is suspended. Cards beyond the end of the list are not suspended.
+     */
+    createSuspendedList(originalQuestionText: string): boolean[];
+
+    /**
      * Removes scheduling information from a question text.
      *
      * @param questionText

@@ -62,6 +62,20 @@ export class NotesDataStore implements IDataStore {
     }
 
     /**
+     * Reads which cards of a question are suspended.
+     *
+     * @param originalQuestionText
+     * @returns
+     */
+    createSuspendedList(originalQuestionText: string): boolean[] {
+        const schedulingComment = originalQuestionText.match(/<!--SR:(.+?)-->/m)?.[1];
+        if (schedulingComment === undefined) {
+            return [];
+        }
+        return CommentParser.parseMultiSuspendedComment(schedulingComment);
+    }
+
+    /**
      * Removes scheduling information from a question text.
      *
      * @param questionText

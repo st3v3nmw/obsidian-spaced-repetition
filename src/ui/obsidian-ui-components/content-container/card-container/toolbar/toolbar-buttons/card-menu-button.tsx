@@ -16,6 +16,7 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
         jumpToCurrentCard: () => Promise<void>,
         displayCurrentCardInfoNotice: () => void,
         skipCurrentCard: () => void,
+        suspendCurrentCard: () => Promise<void>,
         onOpenResetModalClick: () => void,
         closeModal?: () => void,
         classNames?: string[],
@@ -33,6 +34,7 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
                     editClickHandler,
                     onOpenResetModalClick,
                     skipCurrentCard,
+                    suspendCurrentCard,
                     jumpToCurrentCard,
                     displayCurrentCardInfoNotice,
                     deleteCurrentCard,
@@ -58,6 +60,7 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
         editClickHandler: () => void,
         onOpenResetModalClick: () => void,
         skipCurrentCard: () => void,
+        suspendCurrentCard: () => Promise<void>,
         jumpToCurrentCard: () => Promise<void>,
         displayCurrentCardInfoNotice: () => void,
         deleteCurrentCard: () => void,
@@ -84,6 +87,13 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
                     .setIcon("chevrons-right")
                     .onClick(() => {
                         skipCurrentCard();
+                    });
+            });
+            cardMenu.addItem((item) => {
+                item.setTitle(t("SUSPEND_CARD"))
+                    .setIcon("pause")
+                    .onClick(async () => {
+                        await suspendCurrentCard();
                     });
             });
         }

@@ -1,4 +1,4 @@
-import { Platform, TFile } from "obsidian";
+import { Notice, Platform, TFile } from "obsidian";
 
 import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
@@ -48,6 +48,7 @@ export class CommandManager {
         this.plugin.removeCommand("srs-card-review-show-answer");
         this.plugin.removeCommand("srs-card-review-reset");
         this.plugin.removeCommand("srs-card-review-skip");
+        this.plugin.removeCommand("srs-card-review-suspend");
     }
 
     /**
@@ -229,6 +230,36 @@ export class CommandManager {
                 ) {
                     if (!checking) {
                         void this.uiManager.contentManager._skipCurrentCard();
+                    }
+                    return true;
+                }
+                return false;
+            },
+        });
+
+        this.plugin.addCommand({
+            id: "srs-card-review-suspend",
+            name: t("SUSPEND_CARD"),
+            repeatable: false,
+            checkCallback: (checking: boolean) => {
+                if (
+                    this.plugin.isInitialized &&
+                    (this.uiManager.uiState === UIState.CardBack ||
+                        this.uiManager.uiState === UIState.CardFront) &&
+                    this.uiManager.isSRInFocus &&
+                    this.uiManager.contentManager !== null &&
+                    !(
+                        Platform.isMobile || // No keyboard events on mobile
+                        EmulatedPlatform().isMobile
+                    ) &&
+                    !(
+                        activeDocument.activeElement !== null &&
+                        (activeDocument.activeElement.nodeName === "TEXTAREA" ||
+                            activeDocument.activeElement.nodeName === "INPUT")
+                    )
+                ) {
+                    if (!checking) {
+                        void this.uiManager.contentManager._suspendCurrentCard();
                     }
                     return true;
                 }
@@ -427,6 +458,27 @@ export class CommandManager {
 
                 if (!checking) {
                     void this.uiManager.openDeckContainer(FlashcardReviewMode.Cram, openFile);
+                }
+                return true;
+            },
+        });
+
+        this.plugin.addCommand({
+            id: "srs-unsuspend-flashcards-in-note",
+            name: t("UNSUSPEND_CARDS_IN_NOTE"),
+            repeatable: false,
+            checkCallback: (checking: boolean) => {
+                const openFile: TFile | null = this.plugin.app.workspace.getActiveFile();
+
+                if (openFile === null || openFile.extension !== "md" || !this.plugin.isInitialized)
+                    return false;
+
+                if (!checking) {
+                    void this.plugin.dataManager
+                        .unsuspendCardsInNote(openFile)
+                        .then((unsuspendedCount: number) => {
+                            new Notice(t("CARDS_UNSUSPENDED", { count: unsuspendedCount }));
+                        });
                 }
                 return true;
             },

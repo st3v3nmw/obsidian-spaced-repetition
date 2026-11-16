@@ -387,7 +387,8 @@ body:not(.is-mobile)
 .is-phone .sr-card-toolbar .sr-reset-button,
 .is-phone .sr-card-toolbar .sr-short-menu-button,
 .is-phone .sr-card-toolbar > .sr-divider,
-.is-phone .sr-card-toolbar .sr-skip-button {
+.is-phone .sr-card-toolbar .sr-skip-button,
+.is-phone .sr-card-toolbar .sr-suspend-button {
   display: none;
 }
 .is-phone .sr-card-toolbar .sr-extended-menu-button {
@@ -405,7 +406,8 @@ body:not(.is-mobile)
   .is-mobile .sr-card-toolbar .sr-reset-button,
   .is-mobile .sr-card-toolbar .sr-short-menu-button,
   .is-mobile .sr-card-toolbar > .sr-divider,
-  .is-mobile .sr-card-toolbar .sr-skip-button {
+  .is-mobile .sr-card-toolbar .sr-skip-button,
+  .is-mobile .sr-card-toolbar .sr-suspend-button {
     display: none;
   }
   .is-mobile .sr-card-toolbar .sr-extended-menu-button {
@@ -428,7 +430,8 @@ body:not(.is-mobile)
   .sr-card-toolbar .sr-reset-button,
   .sr-card-toolbar .sr-short-menu-button,
   .sr-card-toolbar > .sr-divider,
-  .sr-card-toolbar .sr-skip-button {
+  .sr-card-toolbar .sr-skip-button,
+  .sr-card-toolbar .sr-suspend-button {
     display: none;
   }
   .sr-card-toolbar .sr-extended-menu-button {
