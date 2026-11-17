@@ -23,7 +23,7 @@ export class SidebarManager {
 
     redraw(): void {
         if (this.reviewQueueListView === null) return;
-        this.reviewQueueListView.redraw();
+        this.reviewQueueListView.requestRedraw();
     }
 
     private getActiveLeaf(type: string): WorkspaceLeaf | null {
