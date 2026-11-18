@@ -2,11 +2,11 @@
 
 学习算法使用公式决定何时复习一个笔记或记忆闪卡。
 
-| 算法                                        | 开发情况 |
-| ------------------------------------------- | -------- |
-| [SM-2-OSR](#sm-2-osr)                       | 已实现   |
-| [FSRS](#fsrs)                               | 计划中   |
-| [用户自定义间隔](#user-specified-intervals) | 计划中   |
+| 算法                                        | 开发情况              |
+| ------------------------------------------- | --------------------- |
+| [SM-2-OSR](#sm-2-osr)                       | 已实现（笔记 + 闪卡） |
+| [FSRS](#fsrs)                               | 已实现（闪卡 / 填空） |
+| [用户自定义间隔](#user-specified-intervals) | 计划中                |
 
 ## SM-2-OSR
 
@@ -42,10 +42,31 @@
 
 ## FSRS
 
-算法详情参见：[fsrs4anki](https://github.com/open-spaced-repetition/fsrs4anki/wiki)
+- `FSRS`（Free Spaced Repetition Scheduler）可用于闪卡与填空，笔记仍使用 `SM-2-OSR` 调度。
+- 由 [`ts-fsrs`](https://github.com/open-spaced-repetition/ts-fsrs) 库提供，而非在本插件中重新实现。
+- 可配置期望记忆保持率（desired retention，默认 `0.9`），最大间隔与 `SM-2-OSR` 共用。
+- 启用了短期学习与再学习步骤，因此一张卡片可能在同一次复习中再次到期；到期判断使用当前时间，而非当天开始。
+- 已有的 `SM-2-OSR` 闪卡调度会在首次使用 FSRS 复习时转换。切回后，下次复习会把该卡重写为 `SM-2-OSR` 格式，并丢失仅 FSRS 使用的状态。
 
-本插件目前尚未集成该算法，进展参见：
-[ [FEAT] sm-2 is outdated, can you please replace it with the fsrs algorithm? #748 ](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/748)
+### 闪卡注释格式
+
+FSRS 存储的字段比 `SM-2-OSR` 更多，已排期的卡片形如：
+
+```text
+<!--SR:!fsrs,<due ISO>,<interval days>,<stability>,<difficulty>,<state>,<reps>,<lapses>,<learningSteps>,<lastReview ISO or ->-->
+```
+
+请注意稳定性（stability）在难度（difficulty）**之前**。难度大致在 `1`–`10` 之间，因此相邻槽位中明显更大的数值是稳定性，而不是损坏的难度值。
+
+一个问题包含多张卡片时（例如反向 `:::` 卡片），尚未复习的兄弟卡片会使用占位符，以保证其余调度信息与卡片一一对应：
+
+```text
+!fsrs,-,0,0,0,0,0,0,0,-
+```
+
+较旧的笔记可能仍使用 `SM-2-OSR` 的占位日期 `2000-01-01`，两种形式都会被视为未排期的卡片。
+
+算法详情参见：[fsrs4anki](https://github.com/open-spaced-repetition/fsrs4anki/wiki)。
 
 ---
 

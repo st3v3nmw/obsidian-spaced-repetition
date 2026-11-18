@@ -100,3 +100,38 @@ test("CardDueDateHistogram setter updates the due-now count", () => {
     histogram.set(CardDueDateHistogram.dueNowNDays, 2);
     expect(histogram.dueNotesCount).toEqual(2);
 });
+
+test("updateParameters rebuilds the scheduler with the new desired retention", () => {
+    const settings = { ...DEFAULT_SETTINGS, fsrsDesiredRetention: 0.9 };
+    const algorithm = new SrsAlgorithmFsrs(settings);
+    const wellKnownCard = () =>
+        new RepItemScheduleInfoFsrs(
+            moment("2023-09-06T00:00:00.000Z"),
+            100,
+            5.5,
+            200,
+            State.Review,
+            10,
+            0,
+            0,
+            moment("2023-06-06T00:00:00.000Z"),
+        );
+
+    const beforeUpdate = algorithm.cardCalcUpdatedSchedule(
+        ReviewResponse.Good,
+        wellKnownCard(),
+        new CardDueDateHistogram(),
+    );
+
+    settings.fsrsDesiredRetention = 0.99;
+    algorithm.updateParameters(settings);
+
+    const afterUpdate = algorithm.cardCalcUpdatedSchedule(
+        ReviewResponse.Good,
+        wellKnownCard(),
+        new CardDueDateHistogram(),
+    );
+
+    // Demanding a higher recall probability must shorten the interval for the same card
+    expect(afterUpdate.interval).toBeLessThan(beforeUpdate.interval);
+});

@@ -3,12 +3,16 @@ import { IDataStoreAlgorithm } from "src/data/data-store/base/idata-store-algori
 import { Card } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
+import { FSRS_EMPTY_SCHEDULE_COMMENT } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 
 // Algorithm: The original OSR algorithm
 //      (RZ: Perhaps not the original algorithm, but the only one available in 2023/early 2024)
 //
 // Data Store: With data stored in the note's markdown file
+//
+// Note: despite the class name, this also formats flashcards scheduled with FSRS
 export class NoteDataStoreAlgorithmOsr implements IDataStoreAlgorithm {
     private settings: SRSettings;
 
@@ -42,7 +46,13 @@ export class NoteDataStoreAlgorithmOsr implements IDataStoreAlgorithm {
             return card.scheduleInfo.formatScheduleAsSRHtmlComment();
         }
 
-        // TODO: Provide a default schedule for the FSRS algorithm
+        // A placeholder keeps the schedule indexes of an unreviewed sibling aligned. Under FSRS
+        // it is written in the FSRS format, so that a comment can't be misread as holding real
+        // SM-2 values. Legacy SM-2 placeholders still parse as an empty slot.
+        if (this.settings.algorithm === SRAlgorithmType.FSRS) {
+            return FSRS_EMPTY_SCHEDULE_COMMENT;
+        }
+
         return `!${RepItemScheduleInfoOsr.dummyDueDateForNewCard},${RepItemScheduleInfoOsr.initialInterval},${this.settings.baseEase}`;
     }
 }

@@ -4,6 +4,8 @@ import { State } from "ts-fsrs";
 import { NoteDataStoreAlgorithmOsr } from "src/data/data-store/notes-data-store/note-data-store-algorithm-osr";
 import { Card } from "src/data/data-structures/card/card";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
+import { FSRS_EMPTY_SCHEDULE_COMMENT } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
@@ -66,5 +68,27 @@ describe("formatCardSchedule", () => {
         expect(instance.formatCardSchedule(card)).toEqual(
             "!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z",
         );
+    });
+
+    test("Uses FSRS-native empty placeholder for unscheduled siblings when algorithm is FSRS", () => {
+        const settings: SRSettings = {
+            ...DEFAULT_SETTINGS,
+            algorithm: SRAlgorithmType.FSRS,
+        };
+        const instance: NoteDataStoreAlgorithmOsr = new NoteDataStoreAlgorithmOsr(settings);
+        const card: Card = new Card({});
+
+        expect(instance.formatCardSchedule(card)).toEqual(FSRS_EMPTY_SCHEDULE_COMMENT);
+    });
+
+    test("Uses SM-2 dummy placeholder for unscheduled siblings when algorithm is SM-2-OSR", () => {
+        const settings: SRSettings = {
+            ...DEFAULT_SETTINGS,
+            algorithm: SRAlgorithmType.SM_2_OSR,
+        };
+        const instance: NoteDataStoreAlgorithmOsr = new NoteDataStoreAlgorithmOsr(settings);
+        const card: Card = new Card({});
+
+        expect(instance.formatCardSchedule(card)).toEqual("!2000-01-01,1,250");
     });
 });

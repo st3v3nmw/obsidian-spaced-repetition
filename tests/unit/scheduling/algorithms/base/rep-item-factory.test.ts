@@ -38,3 +38,23 @@ test("creates a new rep item", () => {
     expect(fsrsItem).toBeInstanceOf(RepItemScheduleInfoFsrs);
     expect(fsrsItem).toBeInstanceOf(RepItemScheduleInfo);
 });
+
+test("creates FSRS schedules with missing lastReview sentinel", () => {
+    const fsrsItem = RepItemScheduleFactory.create(SRAlgorithmType.FSRS, {
+        algorithm: SRAlgorithmType.FSRS,
+        scheduleData: {
+            dueDate: "2023-09-06T00:10:00.000Z",
+            interval: 0,
+            difficulty: 5.5,
+            stability: 0.4,
+            state: State.Learning,
+            reps: 1,
+            lapses: 0,
+            learningSteps: 1,
+            lastReview: "-",
+        },
+    }) as RepItemScheduleInfoFsrs;
+
+    expect(fsrsItem).toBeInstanceOf(RepItemScheduleInfoFsrs);
+    expect(fsrsItem.lastReview).toBeNull();
+});

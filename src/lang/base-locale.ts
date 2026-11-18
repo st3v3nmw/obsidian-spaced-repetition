@@ -25,6 +25,13 @@ export interface IBaseLocale {
     CANCEL: string;
     NO_INPUT: string;
     CURRENT_EASE_HELP_TEXT: string;
+    CURRENT_STABILITY_HELP_TEXT: string;
+    CURRENT_DIFFICULTY_HELP_TEXT: string;
+    CURRENT_STATE_HELP_TEXT: string;
+    FSRS_STATE_NEW: string;
+    FSRS_STATE_LEARNING: string;
+    FSRS_STATE_REVIEW: string;
+    FSRS_STATE_RELEARNING: string;
     CURRENT_INTERVAL_HELP_TEXT: string;
     CARD_GENERATED_FROM: string;
     JUMP_TO: string;

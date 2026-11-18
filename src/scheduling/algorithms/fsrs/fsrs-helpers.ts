@@ -7,6 +7,12 @@ import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 
 export const FSRS_COMMENT_PREFIX = "fsrs";
 
+/**
+ * Placeholder comment segment for an unreviewed sibling card. Field count matches a real FSRS
+ * entry, but the "-" due date makes the parser read the slot as empty.
+ */
+export const FSRS_EMPTY_SCHEDULE_COMMENT = `!${FSRS_COMMENT_PREFIX},-,0,0,0,0,0,0,0,-`;
+
 const LEGACY_MIN_EASE = 130;
 const LEGACY_MAX_EASE = 370;
 

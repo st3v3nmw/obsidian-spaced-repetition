@@ -187,6 +187,18 @@ export class DataManager {
     }
 
     /**
+     * Applies changed scheduling parameters to the live algorithm instance, keeping the
+     * in-memory note ease state that recreating the instance would discard.
+     *
+     * @param {SRSettings} settings - The settings object.
+     */
+    refreshAlgorithmParameters(settings: SRSettings): void {
+        if (SRAlgorithm.instance instanceof SrsAlgorithmFsrs) {
+            SRAlgorithm.instance.updateParameters(settings);
+        }
+    }
+
+    /**
      * Synchronizes the data with the Obsidian vault.
      *
      * @returns {Promise<void>} - A promise that resolves when the synchronization is complete.

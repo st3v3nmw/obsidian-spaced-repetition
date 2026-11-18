@@ -2,11 +2,11 @@
 
 A learning algorithm is a formula that determines when a note or flashcard should next be reviewed.
 
-| Algorithm                                           | Status      |
-| --------------------------------------------------- | ----------- |
-| [SM-2-OSR](#sm-2-osr)                               | Implemented |
-| [FSRS](#fsrs)                                       | Planned     |
-| [User Defined Intervals](#user-specified-intervals) | Planned     |
+| Algorithm                                           | Status                            |
+| --------------------------------------------------- | --------------------------------- |
+| [SM-2-OSR](#sm-2-osr)                               | Implemented (notes + flashcards)  |
+| [FSRS](#fsrs)                                       | Implemented (flashcards / clozes) |
+| [User Defined Intervals](#user-specified-intervals) | Planned                           |
 
 ## SM-2-OSR
 
@@ -37,17 +37,38 @@ A learning algorithm is a formula that determines when a note or flashcard shoul
             - where `fuzz = ceil(0.05 * interval)`
             - [Anki docs](https://faqs.ankiweb.net/what-spaced-repetition-algorithm.html):
                 > "[...] Anki also applies a small amount of random “fuzz” to prevent cards that were introduced at the same time and given the same ratings from sticking together and always coming up for review on the same day."
-- The scheduling information is stored in the YAML front matter
+- Note scheduling information is stored in the YAML front matter
+- Flashcard scheduling information is stored as an HTML comment after the card
 
 ---
 
 ## FSRS
 
-The algorithm is detailed at:
-[fsrs4anki](https://github.com/open-spaced-repetition/fsrs4anki/wiki)
+- `FSRS` (Free Spaced Repetition Scheduler) can be selected for flashcards and clozes. Notes continue to be scheduled with `SM-2-OSR`.
+- It is provided by the [`ts-fsrs`](https://github.com/open-spaced-repetition/ts-fsrs) library rather than reimplemented here.
+- **Desired retention** (default `0.9`) is configurable, and the **maximum interval** is shared with `SM-2-OSR`.
+- Short-term learning and relearning steps are enabled, so a card can fall due again within the same session. Due checks therefore use the current time rather than the start of the day.
+- An existing `SM-2-OSR` flashcard schedule is converted on its first review under FSRS. Switching back rewrites the card to the `SM-2-OSR` format on its next review, which loses the FSRS-only state.
 
-Incorporation of the FSRS algorithm into this plugin has not yet occurred. For progress see:
-[ [FEAT] sm-2 is outdated, can you please replace it with the fsrs algorithm? #748 ](https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/748)
+### Flashcard Comment Format
+
+FSRS stores more fields than `SM-2-OSR`, so a scheduled card looks like:
+
+```text
+<!--SR:!fsrs,<due ISO>,<interval days>,<stability>,<difficulty>,<state>,<reps>,<lapses>,<learningSteps>,<lastReview ISO or ->-->
+```
+
+Note that stability comes **before** difficulty. Difficulty stays roughly within `1`–`10`, so a much larger number in the neighbouring slot is stability and not a corrupt difficulty.
+
+A question with several cards (such as a reversed `:::` card) uses a placeholder for each sibling that hasn't been reviewed yet, which keeps the remaining schedules aligned with their cards:
+
+```text
+!fsrs,-,0,0,0,0,0,0,0,-
+```
+
+Older notes may still hold the `SM-2-OSR` placeholder date `2000-01-01` instead. Both forms are read as an unscheduled card.
+
+The algorithm itself is detailed at [fsrs4anki](https://github.com/open-spaced-repetition/fsrs4anki/wiki).
 
 ---
 

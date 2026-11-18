@@ -25,6 +25,15 @@ export class SchedulingPage extends SettingsPage {
         this.display();
     }
 
+    /**
+     * Saves a setting that the live scheduler reads at construction time (desired retention,
+     * maximum interval), so that the change applies without a plugin reload.
+     */
+    private async saveAndRefreshAlgorithm(): Promise<void> {
+        await this.settingsManager.save();
+        this.dataManager.refreshAlgorithmParameters(this.settingsManager.settings);
+    }
+
     constructor(
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
@@ -278,7 +287,7 @@ export class SchedulingPage extends SettingsPage {
                             .onClick(async () => {
                                 this.settingsManager.settings.fsrsDesiredRetention =
                                     DEFAULT_SETTINGS.fsrsDesiredRetention;
-                                await this.settingsManager.save();
+                                await this.saveAndRefreshAlgorithm();
                                 this.display();
                             });
                     })
@@ -299,7 +308,7 @@ export class SchedulingPage extends SettingsPage {
                                     }
 
                                     this.settingsManager.settings.fsrsDesiredRetention = numValue;
-                                    await this.settingsManager.save();
+                                    await this.saveAndRefreshAlgorithm();
                                 });
                             }),
                     );
@@ -475,7 +484,7 @@ export class SchedulingPage extends SettingsPage {
                             .onClick(async () => {
                                 this.settingsManager.settings.maximumInterval =
                                     DEFAULT_SETTINGS.maximumInterval;
-                                await this.settingsManager.save();
+                                await this.saveAndRefreshAlgorithm();
 
                                 this.display();
                             });
@@ -496,7 +505,7 @@ export class SchedulingPage extends SettingsPage {
                                         }
 
                                         this.settingsManager.settings.maximumInterval = numValue;
-                                        await this.settingsManager.save();
+                                        await this.saveAndRefreshAlgorithm();
                                     } else {
                                         new Notice(t("VALID_NUMBER_WARNING"));
                                     }

@@ -132,6 +132,7 @@ class TestContext {
             cardSequencer,
             reviewSequencer,
             questionPostponementList: cardPostponementList,
+            dueDateFlashcardHistogram,
             file,
             originalText: text,
             fakeFilePath,
@@ -769,6 +770,37 @@ Q1::A1
 
             expect(reviewSequencer.hasPendingCards).toEqual(false);
             expect(reviewSequencer.currentCard.front).toMatch(clozeQuestion1Card1);
+        });
+
+        test("A short-term step is counted against its due day, not its interval", async () => {
+            const c: TestContext = TestContext.Create(
+                orderDueFirstSequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                "#flashcards Q1::A1",
+            );
+            await c.setSequencerDeckTreeFromOriginalText();
+            const reviewSequencer = c.reviewSequencer as FlashcardReviewSequencer;
+            jest.spyOn(reviewSequencer, "determineCardSchedule").mockReturnValue(
+                new RepItemScheduleInfoFsrs(
+                    moment("2023-09-06T00:10:00.000Z"),
+                    0,
+                    5.5,
+                    0.4,
+                    State.Learning,
+                    1,
+                    0,
+                    1,
+                    moment("2023-09-06T00:00:00.000Z"),
+                ),
+            );
+
+            await reviewSequencer.processReviewReviewMode(ReviewResponse.Good);
+
+            // The step has an interval of 0 but falls due within the day, which is the key that
+            // CardDueDateHistogram.calculateFromDeckTree would have given it
+            expect(c.dueDateFlashcardHistogram.get(1)).toEqual(1);
+            expect(c.dueDateFlashcardHistogram.hasEntryForDays(0)).toEqual(false);
         });
 
         test("Pending cards without stored due dates keep an undefined pending timestamp", async () => {
