@@ -5,7 +5,7 @@ import { RepItemStorageInfo } from "src/data/data-store/base/rep-item-storage-in
 import { Question } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
-import { CommentParser } from "src/utils/comment-parser";
+import { CardStorageMetadata, CommentParser } from "src/utils/comment-parser";
 import { MultiLineTextFinder } from "src/utils/strings";
 
 export class NotesDataStore implements IDataStore {
@@ -59,6 +59,20 @@ export class NotesDataStore implements IDataStore {
             }
         }
         return result;
+    }
+
+    /**
+     * Reads the stored per card metadata (suspended flag, card id) of a question.
+     *
+     * @param originalQuestionText
+     * @returns
+     */
+    createCardMetadataList(originalQuestionText: string): CardStorageMetadata[] {
+        const schedulingComment = originalQuestionText.match(/<!--SR:(.+?)-->/m)?.[1];
+        if (schedulingComment === undefined) {
+            return [];
+        }
+        return CommentParser.parseMultiCardMetadataComment(schedulingComment);
     }
 
     /**

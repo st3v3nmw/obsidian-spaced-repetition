@@ -1,4 +1,5 @@
-import { PREFERRED_DATE_FORMAT } from "src/data/constants";
+import { PREFERRED_DATE_FORMAT, SR_CARD_ID_PREFIX, SR_SUSPENDED_FLAG } from "src/data/constants";
+import { isValidCardId } from "src/data/data-structures/card/card-id";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {
     FSRS_COMMENT_PREFIX,
@@ -8,18 +9,75 @@ import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { DateUtil, globalDateProvider } from "src/utils/dates";
 
+/**
+ * Card specific data stored next to the card's schedule within the SR comment.
+ */
+export interface CardStorageMetadata {
+    isSuspended: boolean;
+    id: string | null;
+}
+
 export class CommentParser {
     static parseMultiScheduleComment(comment: string): RepItemScheduleInfo[] {
-        const segments = comment
-            .split("!")
-            .map((segment) => segment.trim())
-            .filter((segment) => segment.length > 0)
-            .map((segment) => this.parseScheduleSegment(segment));
-
-        return segments;
+        return this.splitScheduleSegments(comment).map((segment) =>
+            this.parseScheduleSegment(segment),
+        );
     }
 
-    static parseScheduleSegment(segment: string): RepItemScheduleInfo | null {
+    /**
+     * Reads the per card metadata (suspended flag, card id) of each card schedule segment within the comment.
+     *
+     * @param {string} comment - The content of the SR comment, e.g. "!2023-09-02,4,270,suspended,id=k2n8x0c4qz7m!2023-09-02,5,270"
+     * @returns {CardStorageMetadata[]} - One entry per segment, in the same order as parseMultiScheduleComment()
+     */
+    static parseMultiCardMetadataComment(comment: string): CardStorageMetadata[] {
+        return this.splitScheduleSegments(comment).map(
+            (segment) => this.splitSegmentFlags(segment).metadata,
+        );
+    }
+
+    private static splitScheduleSegments(comment: string): string[] {
+        return comment
+            .split("!")
+            .map((segment) => segment.trim())
+            .filter((segment) => segment.length > 0);
+    }
+
+    /**
+     * Splits the trailing flags (",suspended" and ",id=...", in any order) off a card schedule segment.
+     *
+     * @param {string} segment - A card schedule segment, e.g. "2023-09-02,4,270,suspended,id=k2n8x0c4qz7m"
+     * @returns The schedule part of the segment (e.g. "2023-09-02,4,270") and the card metadata
+     */
+    static splitSegmentFlags(segment: string): { schedule: string; metadata: CardStorageMetadata } {
+        const fields: string[] = segment.split(",");
+        const metadata: CardStorageMetadata = { isSuspended: false, id: null };
+
+        while (fields.length > 0) {
+            const field: string = fields[fields.length - 1].trim();
+            if (field === SR_SUSPENDED_FLAG) {
+                metadata.isSuspended = true;
+            } else if (field.startsWith(SR_CARD_ID_PREFIX)) {
+                const id: string = field.slice(SR_CARD_ID_PREFIX.length);
+                if (!isValidCardId(id)) {
+                    throw new Error(`Invalid card id "${id}" in scheduling comment "${segment}"`);
+                }
+                if (metadata.id !== null) {
+                    throw new Error(`More than one card id in scheduling comment "${segment}"`);
+                }
+                metadata.id = id;
+            } else {
+                break;
+            }
+            fields.pop();
+        }
+
+        return { schedule: fields.join(","), metadata };
+    }
+
+    static parseScheduleSegment(segmentWithFlags: string): RepItemScheduleInfo | null {
+        const segment: string = this.splitSegmentFlags(segmentWithFlags).schedule;
+
         if (segment.startsWith(FSRS_COMMENT_PREFIX + ",")) {
             const fields = segment.split(",");
             const [

@@ -6,6 +6,8 @@ import { DataStoreAlgorithm } from "src/data/data-store/base/data-store-algorith
 import { NoteDataFileModifier } from "src/data/data-store/notes-data-store/note-data-file-modifier";
 import { NoteDataStoreAlgorithmOsr } from "src/data/data-store/notes-data-store/note-data-store-algorithm-osr";
 import { NotesDataStore } from "src/data/data-store/notes-data-store/notes-data-store";
+import { Card } from "src/data/data-structures/card/card";
+import { generateCardId } from "src/data/data-structures/card/card-id";
 import { QuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { ISRNoteTFile, SRNoteTFile } from "src/data/data-structures/file/note-file";
@@ -13,6 +15,7 @@ import { PluginData } from "src/data/plugin-data";
 import { PluginDataManager } from "src/data/plugin-data-manager";
 import { SettingsUtil, SRSettings } from "src/data/settings";
 import { SettingsManager } from "src/data/settings-manager";
+import { reviewResponseName } from "src/history/history-events";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
@@ -239,6 +242,49 @@ export class DataManager {
     }
 
     /**
+     * Unsuspends all suspended flashcards in a note and resyncs, so that they show up for review again.
+     *
+     * @param {TFile} noteFile - The note file.
+     * @returns {Promise<number>} - The number of cards that were unsuspended.
+     */
+    async unsuspendCardsInNote(noteFile: TFile): Promise<number> {
+        const note: Note | null = await this.loadNote(noteFile);
+        if (note === null) throw new Error(`Could not load note: ${noteFile.path}`);
+
+        const unsuspendedCards: Card[] = note.questionList.flatMap((question) =>
+            question.cards.filter((card) => card.isSuspended),
+        );
+        const recorder = this.plugin.historyRecorder;
+        if (recorder.enabled) {
+            // Cards suspended before card ids existed don't have one yet. They get it with the same write.
+            for (const card of unsuspendedCards) {
+                if (card.id === null) {
+                    card.id = generateCardId();
+                    card.question.hasChanged = true;
+                }
+            }
+        }
+
+        const unsuspendedCount: number = note.unsuspendAllCards();
+        if (unsuspendedCount !== unsuspendedCards.length) {
+            throw new Error("unsuspendCardsInNote: unexpected number of unsuspended cards");
+        }
+        if (unsuspendedCount > 0) {
+            await note.writeNoteFile(this.settingsManager.settings);
+            if (recorder.enabled) {
+                for (const card of unsuspendedCards) {
+                    await recorder.record(
+                        { type: "card_unsuspended", ...(await recorder.cardRef(card, null)) },
+                        null,
+                    );
+                }
+            }
+            await this.sync();
+        }
+        return unsuspendedCount;
+    }
+
+    /**
      * Saves the review response for a note.
      *
      * @param {TFile} note - The note file.
@@ -267,6 +313,10 @@ export class DataManager {
             noteSrTFile,
             response,
             this.settingsManager.settings,
+        );
+        await this.plugin.historyRecorder.record(
+            { type: "note_reviewed", notePath: note.path, response: reviewResponseName(response) },
+            null,
         );
 
         new Notice(t("RESPONSE_RECEIVED"));

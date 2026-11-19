@@ -6,6 +6,8 @@ import { DebugLoggerInstance } from "src/data/debug-logger";
 import { PluginDataError, PluginDataManager } from "src/data/plugin-data-manager";
 import { SRSettings } from "src/data/settings";
 import { SettingsManager } from "src/data/settings-manager";
+import { createHistoryRecorder } from "src/history/create-history-recorder";
+import { HistoryRecorder } from "src/history/history-recorder";
 import { LocaleManagerInstance } from "src/lang/locale-manager";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { NoteReviewQueue } from "src/note/note-review-queue";
@@ -21,6 +23,7 @@ export default class SRPlugin extends Plugin {
     private _nextNoteReviewHandler: NextNoteReviewHandler | null = null;
     private _commandManager: CommandManager | null = null;
     private _reminderManager: ReminderManager | null = null;
+    private _historyRecorder: HistoryRecorder | null = null;
     public isInitialized: boolean = false;
 
     async onload(): Promise<void> {
@@ -36,6 +39,7 @@ export default class SRPlugin extends Plugin {
                 },
             );
 
+            this._historyRecorder = createHistoryRecorder(this, settingsManager);
             this.dataManager = new DataManager(this, pluginDataManager, settingsManager);
             const uiManager = new UIManager(this, settingsManager);
             this.uiManager = uiManager;
@@ -85,6 +89,11 @@ export default class SRPlugin extends Plugin {
     get reminderManager(): ReminderManager {
         if (this._reminderManager === null) throw new Error("Reminder manager not initialized!!!");
         return this._reminderManager;
+    }
+
+    get historyRecorder(): HistoryRecorder {
+        if (this._historyRecorder === null) throw new Error("History recorder not initialized!!!");
+        return this._historyRecorder;
     }
 
     get uiManager(): UIManager {

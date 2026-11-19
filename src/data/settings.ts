@@ -87,6 +87,11 @@ export interface SRSettings {
     cardCommentOnSameLine: boolean;
     scheduleDataVaultLocation: string;
 
+    // usage history
+    recordUsageHistory: boolean;
+    // Empty: the "history" folder within the plugin's folder. Otherwise a folder path relative to the vault root.
+    usageHistoryFolder: string;
+
     // logging
     showSchedulingDebugMessages: boolean;
     showParserDebugMessages: boolean;
@@ -176,6 +181,10 @@ export const DEFAULT_SETTINGS: SRSettings = {
     dataStore: StorageType.NOTES,
     cardCommentOnSameLine: false,
     scheduleDataVaultLocation: "Spaced Repetition",
+
+    // usage history
+    recordUsageHistory: true,
+    usageHistoryFolder: "",
 
     // logging
     showSchedulingDebugMessages: false,

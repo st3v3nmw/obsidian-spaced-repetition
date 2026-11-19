@@ -38,6 +38,78 @@ const en: IBaseLocale = {
     DELETE_CARD: "Delete Card",
     DELETE_CARD_CONFIRMATION:
         "This action cannot be undone and might alter your notes in unwanted ways. Are you sure you want to delete this card?",
+    SUSPEND_CARD: "Suspend card",
+    CARD_SUSPENDED:
+        'Card suspended. It won\'t be shown again until you run "Unsuspend flashcards in this note" on its note.',
+    UNSUSPEND_CARDS_IN_NOTE: "Unsuspend flashcards in this note",
+    CARDS_UNSUSPENDED: "Unsuspended ${count} card(s).",
+    UNDO_LAST_ACTION: "Undo last action",
+    NOTHING_TO_UNDO: "Nothing to undo.",
+    UNDO_DONE: "Undone: ${action}.",
+    UNDO_DONE_CARD_NOT_IN_QUEUE:
+        "Undone: ${action}. The card isn't part of this review session, so it isn't shown again here.",
+    UNDO_ACTION_REVIEW: "review",
+    UNDO_ACTION_SKIP: "skip",
+    UNDO_ACTION_SUSPEND: "suspension",
+    UNDO_FAILED: "Could not undo: ${error}",
+    REDO_LAST_ACTION: "Redo last undone action",
+    NOTHING_TO_REDO: "Nothing to redo.",
+    REDO_DONE: "Redone: ${action}.",
+    REDO_NOT_POSSIBLE:
+        "Can't redo: the card isn't waiting for review in this session anymore, or you left the cards.",
+
+    // Usage history
+    USAGE_HISTORY: "Usage history",
+    USAGE_HISTORY_RECORDING: "Recording",
+    RECORD_USAGE_HISTORY: "Record usage history",
+    RECORD_USAGE_HISTORY_DESC:
+        "Log everything you do in review sessions (cards shown, answers, skips, suspensions, undos, ...) with timestamps, as the basis for these statistics. Cards get a permanent id in their scheduling comment the first time they are shown. Stored as JSON lines in ${location}.",
+    USAGE_HISTORY_FOLDER: "History folder",
+    USAGE_HISTORY_FOLDER_DESC:
+        'Where the history files are stored, as a folder path relative to the vault root, e.g. "Spaced Repetition/history". Leave it empty for the default: ${defaultFolder}. When you change it, the existing history files are moved to the new folder.',
+    USAGE_HISTORY_FOLDER_INVALID: "Invalid history folder: ${error}",
+    USAGE_HISTORY_FOLDER_MOVE_FAILED: "Could not move the usage history: ${error}",
+    USAGE_HISTORY_FOLDER_CHANGED:
+        "The usage history is now stored in ${folder} (${count} file(s) moved).",
+    USAGE_HISTORY_LOADING: "Loading usage history...",
+    USAGE_HISTORY_EMPTY:
+        "No usage history yet. It's recorded from now on, whenever you review flashcards or notes.",
+    USAGE_HISTORY_CORRUPT_LINES:
+        "${count} line(s) of the usage history could not be read and are ignored: ${lines}",
+    USAGE_HISTORY_FOOTNOTE: "${count} recorded events, stored in ${location}.",
+    USAGE_PERIOD_DESC: "Time range of the charts below",
+    USAGE_PERIOD_DAYS: "Last ${days} days",
+    USAGE_TODAY: "Today",
+    USAGE_YESTERDAY: "Yesterday",
+    USAGE_LAST_7_DAYS: "Last 7 days",
+    USAGE_LAST_30_DAYS: "Last 30 days",
+    USAGE_ALL_TIME: "All time",
+    USAGE_STREAK: "Streak",
+    USAGE_DAYS_COUNT: "${count} day(s)",
+    USAGE_LONGEST_STREAK: "Longest: ${count} day(s)",
+    USAGE_DAYS_STUDIED: "Days studied",
+    USAGE_SINCE: "Since ${date}",
+    USAGE_REVIEWS_COUNT: "${count} review(s)",
+    USAGE_REVIEWS: "Reviews",
+    USAGE_MINUTES: "Time",
+    USAGE_TIME_PER_DAY: "Time spent per day",
+    USAGE_TIME_PER_DAY_SUMMARY:
+        "${total} in total, ${avg} per active day. Time between two actions counts up to ${cap} minutes; longer breaks are treated as idle.",
+    USAGE_REVIEWS_PER_DAY: "Reviews per day",
+    USAGE_REVIEWS_PER_DAY_SUMMARY:
+        "${total} flashcard review(s), ${newCards} of new cards. ${notes} note review(s).",
+    USAGE_KNOWN_CARDS: "Known cards",
+    USAGE_NEW_CARDS: "New cards",
+    USAGE_ANSWERS: "Answers",
+    USAGE_ANSWERS_SUMMARY: "${count} review(s) in this period. Undone reviews are not counted.",
+    USAGE_REVIEWS_BY_HOUR: "Reviews by hour of the day",
+    USAGE_REVIEWS_BY_HOUR_SUMMARY: "All recorded reviews, by local time.",
+    USAGE_LAST_DAYS_TABLE: "Last ${days} days",
+    USAGE_COLUMN_DAY: "Day",
+    USAGE_COLUMN_TIME: "Time",
+    USAGE_COLUMN_CARDS_SEEN: "Cards seen",
+    USAGE_COLUMN_SUSPENDED: "Suspended",
+    USAGE_COLUMN_UNDONE: "Undone",
 
     // main.ts
     OPEN_NOTE_FOR_REVIEW: "Review a note",

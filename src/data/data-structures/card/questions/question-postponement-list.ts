@@ -27,6 +27,18 @@ export interface IQuestionPostponementList {
      */
     includes(question: Question): boolean;
     /**
+     * Returns a copy of the text hashes of all postponed questions.
+     *
+     * @returns {string[]} - The text hashes.
+     */
+    getTextHashes(): string[];
+    /**
+     * Removes a question from the list of postponed questions, e.g. when undoing the review that buried it.
+     *
+     * @param {string} textHash - The question's text hash.
+     */
+    removeTextHash(textHash: string): void;
+    /**
      * Writes the list of postponed questions to the plugin data.
      *
      * @returns {Promise<void>} - A promise that resolves when the list is written.
@@ -94,6 +106,18 @@ export class QuestionPostponementList implements IQuestionPostponementList {
      */
     includes(question: Question): boolean {
         return this.list.includes(question.questionText.textHash);
+    }
+
+    getTextHashes(): string[] {
+        return [...this.list];
+    }
+
+    removeTextHash(textHash: string): void {
+        const idx: number = this.list.indexOf(textHash);
+        if (idx === -1) {
+            throw new Error(`removeTextHash: "${textHash}" is not in the postponement list`);
+        }
+        this.list.splice(idx, 1);
     }
 
     /**

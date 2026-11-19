@@ -20,6 +20,7 @@ export class DeckContainer {
         parentEl: HTMLElement,
         changeReviewMode: (reviewMode: FlashcardReviewMode) => void,
         startReviewOfDeck: (deck: Deck) => void,
+        undoLastAction: () => Promise<void>,
         closeModal?: () => void,
     ) {
         // Build ui
@@ -29,6 +30,7 @@ export class DeckContainer {
         this.deckListHeader = new DeckListHeaderComponent(
             this.containerEl,
             changeReviewMode,
+            undoLastAction,
             closeModal,
         );
 
@@ -60,6 +62,13 @@ export class DeckContainer {
         if (!this.containerEl.hasClass("sr-is-hidden")) {
             this.containerEl.addClass("sr-is-hidden");
         }
+    }
+
+    /**
+     * Sets whether there is an action to undo (shows the undo button)
+     */
+    setUndoAvailable(available: boolean) {
+        this.deckListHeader.setUndoAvailable(available);
     }
 
     redrawWithNewData(reviewSequencer: IFlashcardReviewSequencer, settings: SRSettings) {

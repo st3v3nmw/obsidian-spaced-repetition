@@ -44,6 +44,7 @@ export class CardContainer {
 
     private processReviewHandler: (response: ReviewResponse) => Promise<void>;
     private skipCardHandler: () => void;
+    private suspendCardHandler: () => Promise<void>;
     private showAnswerHandler: () => void;
     private jumpToCardHandler: () => Promise<void>;
 
@@ -57,9 +58,12 @@ export class CardContainer {
         editCardHandler: () => void,
         processReviewHandler: (response: ReviewResponse) => Promise<void>,
         skipCardHandler: () => void,
+        suspendCardHandler: () => Promise<void>,
         showAnswerHandler: () => void,
         jumpToCurrentCardHandler: () => Promise<void>,
         displayCurrentCardInfoNoticeHandler: () => void,
+        undoLastActionHandler: () => Promise<void>,
+        redoLastUndoneActionHandler: () => Promise<void>,
         closeModal?: () => void,
     ) {
         // Init properties
@@ -68,6 +72,7 @@ export class CardContainer {
         this.cardState = CardState.Closed;
         this.processReviewHandler = processReviewHandler;
         this.skipCardHandler = skipCardHandler;
+        this.suspendCardHandler = suspendCardHandler;
         this.showAnswerHandler = showAnswerHandler;
         this.jumpToCardHandler = jumpToCurrentCardHandler;
 
@@ -86,6 +91,7 @@ export class CardContainer {
             jumpToCurrentCardHandler,
             displayCurrentCardInfoNoticeHandler,
             this.skipCardHandler,
+            this.suspendCardHandler,
             () => {
                 new ConfirmationModal(
                     app,
@@ -97,6 +103,8 @@ export class CardContainer {
                     },
                 ).open();
             },
+            undoLastActionHandler,
+            redoLastUndoneActionHandler,
             closeModal,
         );
 
@@ -160,6 +168,16 @@ export class CardContainer {
         } else {
             activeDocument.removeEventListener("keydown", this._keydownHandler);
         }
+    }
+
+    /**
+     * Sets whether there is an action to undo / redo (enables the undo button and menu items)
+     *
+     * @param canUndo
+     * @param canRedo
+     */
+    public setUndoAvailable(canUndo: boolean, canRedo: boolean) {
+        this.toolbar.setUndoAvailable(canUndo, canRedo);
     }
 
     public async drawCardFront(sessionData: SessionData, settings: SRSettings) {
@@ -410,6 +428,15 @@ export class CardContainer {
             e.preventDefault();
             e.stopPropagation();
         };
+
+        // "@" suspends the card, like in Anki. It is matched on the typed character rather than the physical key,
+        // because its position differs between keyboard layouts (e.g. Shift+2 on US layouts, which must not be
+        // treated as "Digit2" = Good)
+        if (e.key === "@") {
+            void this.suspendCardHandler();
+            consumeKeyEvent();
+            return;
+        }
 
         switch (e.code) {
             case "KeyS":

@@ -40,6 +40,8 @@ Although you may want to review or cram all cards across all decks, you often ma
 4 | Skip | Skip the current card without reviewing
 5 | Delete | Delete the card from the note
 
+The toolbar also has a **Suspend** button (pause icon; on narrow screens it is in the `⋮` card menu) that [suspends](#suspending-cards) the current card, and an **Undo** button (on narrow screens also in the `⋮` card menu) that [undoes](#undo) your last action.
+
 ### Context
 
 If the parent note has heading(s), the flashcard will have a title containing the context.
@@ -77,6 +79,58 @@ To review faster, use the following keyboard shortcuts:
 - `1` => Review as `Hard`
 - `2` => Review as `Good`
 - `3` => Review as `Easy`
+- `S` => Skip the card
+- `@` => [Suspend](#suspending-cards) the card
+- `Ctrl+Z` (`Cmd+Z` on macOS) => [Undo](#undo) the last action
+- `Ctrl+Shift+Z` or `Ctrl+Y` (`Cmd+Shift+Z` on macOS) => [Redo](#redo) the last undone action
+
+If you enabled custom hotkeys in the settings, assign them to the `Spaced Repetition: Suspend card`, `Spaced Repetition: Undo last action` and `Spaced Repetition: Redo last undone action` commands (and the other review commands) instead.
+
+### Suspending cards
+
+Suspending a card stops it from being shown, in both review and cram sessions, until you unsuspend it. It works like suspending a card in Anki. Use it for cards you want to keep in your notes but don't want to study for now.
+
+To suspend the card you are looking at, press `@` or click the **Suspend** button in the toolbar.
+Only that card is suspended. For example, the other cards of a cloze or a reversed card keep showing up.
+
+The card is marked as suspended in its scheduling comment, and its schedule is kept:
+
+```
+<!--SR:!2021-08-20,13,290,suspended-->
+```
+
+To unsuspend cards, do one of these:
+
+- Open the note and run the command `Spaced Repetition: Unsuspend flashcards in this note`. This unsuspends every suspended card in that note.
+- Remove `,suspended` from the card's scheduling comment by hand.
+
+Suspended cards are not counted in the deck counts or statistics.
+
+### Undo
+
+Press `Ctrl+Z` (`Cmd+Z` on macOS) or click the **Undo** button to undo your last action in the review session, like in Anki. You can undo:
+
+- a review (`Hard`, `Good`, `Easy`, ...) and a reset,
+- a skip,
+- a suspension.
+
+Undo puts the card's schedule (and suspended flag) back to what it was, and shows the card again. If the review [buried the sibling cards](../user-options.md#flashcard-review), they are un-buried. Press undo again to undo the action before, up to the last 100 actions.
+
+You can also undo after the last card of a deck, when the deck list is shown again. The deck list then has an **Undo** button too.
+
+Undo is available until you close the review. Deleting and editing a card can't be undone this way.
+
+!!! note
+
+    Undo can't restore a card whose text you changed in the note (outside of the review) after the action. You then get an error, and nothing is changed.
+
+### Redo
+
+Press `Ctrl+Shift+Z` or `Ctrl+Y` (`Cmd+Shift+Z` on macOS), or use **Redo** in the `⋮` card menu, to redo the last action you undid. It applies the same action (the same answer, skip or suspension) to the same card again. After several undos, you can redo them one after another.
+
+A reviewed card gets its schedule calculated again when you redo the review, so the due date can differ slightly from the first time.
+
+You can only redo while you are looking at cards. As soon as you do something new (answer, skip or suspend a card) or go back to the deck list, the undone actions can't be redone anymore.
 
 ---
 
