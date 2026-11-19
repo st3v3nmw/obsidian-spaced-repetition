@@ -148,6 +148,7 @@ const ja: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "インラインの表裏反転フラッシュカードに使用するセパレーター",
     MULTILINE_CARDS_SEPARATOR: "複数行のフラッシュカードに使用するセパレーター",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "複数行の表裏反転フラッシュカードに使用するセパレーター",
+    MULTILINE_CARDS_START_MARKER: "クローズと複数行フラッシュカードの始まりを示す文字",
     MULTILINE_CARDS_END_MARKER: "クローズと複数行フラッシュカードの終わりを示す文字",
     NOTES: "ノート",
     NOTE: "Note",

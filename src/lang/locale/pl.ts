@@ -150,6 +150,7 @@ const pl: IBaseLocale = {
     MULTILINE_CARDS_SEPARATOR: "Separator dla kart zamaskowanych wieloliniowych",
     MULTILINE_REVERSED_CARDS_SEPARATOR:
         "Separator dla kart zamaskowanych odwróconych wieloliniowych",
+    MULTILINE_CARDS_START_MARKER: "Znaki oznaczające początek luk i wieloliniowych fiszek",
     MULTILINE_CARDS_END_MARKER: "Caracteres que denotam o fim de clozes e flashcards multilineares",
     NOTES: "Notatki",
     NOTE: "Note",

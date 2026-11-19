@@ -86,6 +86,7 @@ const ar: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "فاصل من أجل البطاقات العكسية المضمنة",
     MULTILINE_CARDS_SEPARATOR: "فاصل من أجل البطاقات المتعددة",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "فاصل من أجل البطاقات العكسية المتعددة",
+    MULTILINE_CARDS_START_MARKER: "الأحرف التي تدل على بداية الكلوزات وبطاقات التعلم المتعددة الأسطر",
     MULTILINE_CARDS_END_MARKER: "الأحرف التي تدل على نهاية الكلوزات وبطاقات التعلم المتعددة الأسطر",
     NOTES: "ملاحظات",
     REVIEW_PANE_ON_STARTUP: "تمكين جزء مراجعة الملاحظات عند بدء التشغيل",

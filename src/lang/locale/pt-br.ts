@@ -149,6 +149,7 @@ const ptBR: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "Separador para flashcards inline reversos",
     MULTILINE_CARDS_SEPARATOR: "Separador para flashcards de múltiplas linhas",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Separador para flashcards de múltiplas linhas reversos",
+    MULTILINE_CARDS_START_MARKER: "Caracteres que denotam o início de clozes e flashcards multilinha",
     MULTILINE_CARDS_END_MARKER: "Caracteres que denotam o fim de clozes e flashcards multilinha",
     NOTES: "Notas",
     NOTE: "Note",

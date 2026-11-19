@@ -151,6 +151,8 @@ const nl: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "Scheidingsteken voor inline omgekeerde flitskaarten",
     MULTILINE_CARDS_SEPARATOR: "Scheidingsteken voor meerregelige flitskaarten",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Scheidingsteken voor meerregelige omgekeerde flitskaarten",
+    MULTILINE_CARDS_START_MARKER:
+        "Tekens die het begin van clozes en meerregelige flitskaarten aangeven",
     MULTILINE_CARDS_END_MARKER:
         "Tekens die het einde van clozes en meerregelige flitskaarten aangeven",
     NOTES: "Notities",

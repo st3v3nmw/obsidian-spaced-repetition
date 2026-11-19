@@ -15,6 +15,7 @@ export class SRSettingTab extends PluginSettingTab {
     private settingsPageManager: SettingsPageManager | null = null;
     private lastPage: SettingsPageType = "main-page";
     private lastScrollPosition: number = 0;
+    private didReadMultilineStartMarkerWarning: boolean = false;
     private didReadMultilineEndMarkerWarning: boolean = false;
 
     constructor(
@@ -43,12 +44,17 @@ export class SRSettingTab extends PluginSettingTab {
             this.settingsManager,
             this.lastPage,
             this.lastScrollPosition,
+            this.didReadMultilineStartMarkerWarning,
             this.didReadMultilineEndMarkerWarning,
             (lastPage, lastScrollPosition) => {
                 this.lastPage = lastPage;
                 this.lastScrollPosition = lastScrollPosition;
             },
             () => {
+                this.display();
+            },
+            (state: boolean) => {
+                this.didReadMultilineStartMarkerWarning = state;
                 this.display();
             },
             (state: boolean) => {

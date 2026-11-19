@@ -156,6 +156,7 @@ const ru: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "Разделитель для обратных внутристрочных карточек",
     MULTILINE_CARDS_SEPARATOR: "Разделитель для многострочных карточек",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "Разделитель для обратных многострочных карточек",
+    MULTILINE_CARDS_START_MARKER: "Символы, обозначающие начало клозов и многострочных карточек",
     MULTILINE_CARDS_END_MARKER: "Символы, обозначающие конец клозов и многострочных карточек",
     NOTES: "Заметки",
     NOTE: "Note",

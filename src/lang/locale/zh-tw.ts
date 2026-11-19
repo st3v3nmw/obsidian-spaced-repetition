@@ -137,6 +137,7 @@ const zhTW: IBaseLocale = {
     INLINE_REVERSED_CARDS_SEPARATOR: "單行反轉卡片的分隔字元",
     MULTILINE_CARDS_SEPARATOR: "多行卡片的分隔字元",
     MULTILINE_REVERSED_CARDS_SEPARATOR: "多行翻轉卡片的分隔字元",
+    MULTILINE_CARDS_START_MARKER: "表示填空和多行閃卡開始的字元",
     MULTILINE_CARDS_END_MARKER: "表示填空和多行闪卡结束的字符",
     NOTES: "筆記",
     NOTE: "Note",
