@@ -64,6 +64,21 @@ export interface IDeckTreeIterator {
      */
     moveCurrentRepItemToEndOfList(): void;
     /**
+     * Makes the given card the current card (e.g. to show it again after undoing its review).
+     *
+     * Unlike nextRepItem(), the previous current card stays in the decks. Throws if the card isn't within the
+     * topic path.
+     *
+     * @param {Card} card - The card. Must be within the base deck tree below topicPath.
+     * @param {TopicPath} topicPath - The new iterator topic path (see setIteratorTopicPath()).
+     * @param {TopicPath | null} preferredDeckTopicPath - For a card within several decks: the deck to prefer.
+     */
+    setCurrentRepItem(
+        card: Card,
+        topicPath: TopicPath,
+        preferredDeckTopicPath: TopicPath | null,
+    ): void;
+    /**
      * Moves to the next repetition item.
      *
      * @returns {boolean} - True if there is a next repetition item, false otherwise.
@@ -197,6 +212,10 @@ class SingleDeckIterator {
         this.cardIdx = null;
     }
 
+    setCurrentCard(cardListType: RepItemState, cardIdx: number): void {
+        this.setCardListType(cardListType, cardIdx);
+    }
+
     ensureCurrentCard() {
         if (this.cardIdx === null || this.cardListType === null) throw new Error("no current card");
     }
@@ -292,6 +311,45 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         const iteratorDeck: Deck = this.baseDeckTree.getDeck(topicPath);
         this.deckArray = DeckTreeIterator.filterForDecksWithCards(iteratorDeck.toDeckArray());
         this.setDeckIdx(null);
+    }
+
+    setCurrentRepItem(
+        card: Card,
+        topicPath: TopicPath,
+        preferredDeckTopicPath: TopicPath | null,
+    ): void {
+        this.setIteratorTopicPath(topicPath);
+
+        const containsCard = (deck: Deck): boolean =>
+            deck.newRepItems.includes(card) || deck.dueRepItems.includes(card);
+        const candidateIndices: number[] = [];
+        for (let i = 0; i < this.deckArray.length; i++) {
+            if (containsCard(this.deckArray[i])) candidateIndices.push(i);
+        }
+        if (candidateIndices.length === 0) {
+            throw new Error(
+                `setCurrentRepItem: Card "${card.front}" not found below deck "${topicPath.path.join("/")}"`,
+            );
+        }
+
+        const preferredPath: string | null =
+            preferredDeckTopicPath === null ? null : preferredDeckTopicPath.path.join("/");
+        const deckIdx: number =
+            candidateIndices.find(
+                (i) => this.deckArray[i].getTopicPath().path.join("/") === preferredPath,
+            ) ?? candidateIndices[0];
+
+        this.setDeckIdx(deckIdx);
+        const deck: Deck = this.deckArray[deckIdx];
+        const newIdx: number = deck.newRepItems.indexOf(card);
+        if (newIdx !== -1) {
+            this.singleDeckIterator.setCurrentCard(RepItemState.NewItem, newIdx);
+        } else {
+            this.singleDeckIterator.setCurrentCard(
+                RepItemState.DueItem,
+                deck.dueRepItems.indexOf(card),
+            );
+        }
     }
 
     private static filterForDecksWithCards(sourceArray: Deck[]): Deck[] {

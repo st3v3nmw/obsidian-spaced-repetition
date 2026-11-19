@@ -12,9 +12,12 @@ import {
 } from "src/data/data-structures/deck/deck-tree-iterator";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
+import { ISRAlgorithm } from "src/scheduling/algorithms/base/isr-algorithm";
 import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { SrsAlgorithmFsrs } from "src/scheduling/algorithms/fsrs/sr-algorithm-fsrs";
+import { SRAlgorithmOsr } from "src/scheduling/algorithms/osr/srs-algorithm-osr";
 import { CardDueDateHistogram } from "src/scheduling/due-date-histogram";
 import {
     DeckStats,
@@ -417,6 +420,109 @@ describe("skipCurrentCard", () => {
                 await checkEmptyPostponementList(false, FlashcardReviewMode.Cram);
             });
         });
+    });
+});
+
+describe("suspendCurrentCard", () => {
+    test("Suspending a due card writes the flag and moves on to the next card", async () => {
+        const c: TestContext = await setupSample1(FlashcardReviewMode.Review, DEFAULT_SETTINGS);
+        expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
+        expect(c.getDeckStats("#flashcards").totalCount).toEqual(6);
+
+        await c.reviewSequencer.suspendCurrentCard();
+
+        expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
+        expect(c.getDeckStats("#flashcards").totalCount).toEqual(5);
+        // Only the first occurrence is Q2's comment; Q4 & Q5 have identical comments further down
+        expect(await c.file.read()).toEqual(
+            c.originalText.replace(
+                "<!--SR:!2023-09-02,4,270-->",
+                "<!--SR:!2023-09-02,4,270,suspended-->",
+            ),
+        );
+
+        // After reloading the note, the suspended card is no longer part of any deck
+        await c.setSequencerDeckTreeFromOriginalText();
+        expect(c.getDeckStats("#flashcards").totalCount).toEqual(5);
+        const remainingFronts: string[] = [];
+        while (c.reviewSequencer.hasCurrentCard) {
+            remainingFronts.push(c.reviewSequencer.currentCard.front);
+            c.reviewSequencer.skipCurrentCard();
+        }
+        expect(remainingFronts.sort()).toEqual(["Q1", "Q3", "Q4", "Q5", "Q6"]);
+    });
+
+    test("Suspending a new card adds a scheduling comment with the flag", async () => {
+        const text: string = `#flashcards Q1::A1
+#flashcards Q2::A2`;
+        const c: TestContext = TestContext.Create(
+            orderDueFirstSequential,
+            FlashcardReviewMode.Review,
+            DEFAULT_SETTINGS,
+            text,
+        );
+        await c.setSequencerDeckTreeFromOriginalText();
+        expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
+
+        await c.reviewSequencer.suspendCurrentCard();
+
+        expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
+        expect(await c.file.read()).toEqual(`#flashcards Q1::A1
+<!--SR:!2000-01-01,1,250,suspended-->
+#flashcards Q2::A2`);
+    });
+
+    test("Suspending a card does not suspend its siblings", async () => {
+        const text: string = `#flashcards ${clozeQuestion1}
+<!--SR:!2023-09-02,4,270!2023-09-02,5,270!2023-09-02,6,270-->`;
+        const c: TestContext = TestContext.Create(
+            orderDueFirstSequential,
+            FlashcardReviewMode.Review,
+            DEFAULT_SETTINGS,
+            text,
+        );
+        await c.setSequencerDeckTreeFromOriginalText();
+        expect(c.reviewSequencer.currentCard.front).toMatch(clozeQuestion1Card1);
+
+        await c.reviewSequencer.suspendCurrentCard();
+
+        expect(c.reviewSequencer.currentCard.front).toMatch(clozeQuestion1Card2);
+        expect(c.reviewSequencer.currentQuestion.cards.map((card) => card.isSuspended)).toEqual([
+            true,
+            false,
+            false,
+        ]);
+        expect(await c.file.read()).toEqual(`#flashcards ${clozeQuestion1}
+<!--SR:!2023-09-02,4,270,suspended!2023-09-02,5,270!2023-09-02,6,270-->`);
+    });
+
+    test("Cram mode, with the same deck tree as original and remaining tree", async () => {
+        const text: string = `#flashcards Q1::A1
+<!--SR:!2023-09-02,4,270-->
+#flashcards Q2::A2
+<!--SR:!2023-09-02,3,270-->`;
+        const c: TestContext = TestContext.Create(
+            orderDueFirstSequential,
+            FlashcardReviewMode.Cram,
+            DEFAULT_SETTINGS,
+            text,
+        );
+        // This is how a full vault cram session is set up (see ReviewQueueLoader.loadReviewQueue)
+        const deckTree: Deck = await SampleItemDecks.createDeckFromFile(
+            c.file,
+            new TopicPath(["Root"]),
+        );
+        c.reviewSequencer.setDeckTree(deckTree, deckTree);
+        expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
+
+        await c.reviewSequencer.suspendCurrentCard();
+
+        expect(c.reviewSequencer.currentCard.front).toEqual("Q2");
+        expect(c.getDeckStats("#flashcards").totalCount).toEqual(1);
+        expect(await c.file.read()).toEqual(`#flashcards Q1::A1
+<!--SR:!2023-09-02,4,270,suspended-->
+#flashcards Q2::A2
+<!--SR:!2023-09-02,3,270-->`);
     });
 });
 
@@ -1379,3 +1485,67 @@ async function checkupdateClozeCurrentQuestionTextAndCards(
     expect(await c.file.read()).toEqual(expectedFileText);
     return c;
 }
+
+describe("currentCardRecallProbability", () => {
+    async function createSequencer(
+        settings: SRSettings,
+        algorithm: ISRAlgorithm,
+        text: string,
+    ): Promise<FlashcardReviewSequencer> {
+        setupStaticDateProviderOriginDatePlusDays(0);
+        unitTestSetupStandardDataStoreAlgorithm(settings);
+        const postponementList = new QuestionPostponementList(null, settings, []);
+        const sequencer = new FlashcardReviewSequencer(
+            FlashcardReviewMode.Review,
+            new DeckTreeIterator(orderDueFirstSequential, null),
+            settings,
+            algorithm,
+            postponementList,
+            new CardDueDateHistogram(),
+        );
+        const deckTree: Deck = await SampleItemDecks.createDeckFromFile(
+            new UnitTestSRFile(text),
+            new TopicPath(["Root"]),
+        );
+        sequencer.setDeckTree(
+            deckTree,
+            DeckTreeFilter.filterForRemainingRepItems(
+                postponementList,
+                deckTree,
+                FlashcardReviewMode.Review,
+            ),
+        );
+        return sequencer;
+    }
+
+    test("is the FSRS prediction for FSRS cards", async () => {
+        const settings: SRSettings = { ...DEFAULT_SETTINGS };
+        const algorithm = new SrsAlgorithmFsrs(settings);
+        const sequencer = await createSequencer(
+            settings,
+            algorithm,
+            "#flashcards Q1::A1 <!--SR:!fsrs,2023-09-06T00:00:00.000Z,3,3,5,2,3,0,0,2023-09-03T00:00:00.000Z-->",
+        );
+
+        expect(sequencer.currentCard.front).toEqual("Q1");
+        expect(sequencer.currentCardRecallProbability()).toBeCloseTo(0.9, 6);
+    });
+
+    test("is null for new cards and SM-2 cards", async () => {
+        const settings: SRSettings = { ...DEFAULT_SETTINGS };
+        const newCard = await createSequencer(
+            settings,
+            new SrsAlgorithmFsrs(settings),
+            "#flashcards Q1::A1",
+        );
+        expect(newCard.currentCardRecallProbability()).toBeNull();
+
+        const sm2Card = await createSequencer(
+            settings,
+            new SRAlgorithmOsr(settings),
+            "#flashcards Q1::A1 <!--SR:!2023-09-02,4,270-->",
+        );
+        expect(sm2Card.currentCard.front).toEqual("Q1");
+        expect(sm2Card.currentCardRecallProbability()).toBeNull();
+    });
+});

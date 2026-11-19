@@ -9,6 +9,8 @@ import CardMenuButtonComponent from "src/ui/obsidian-ui-components/content-conta
 import EditButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/edit-button";
 import ResetButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/reset-button";
 import SkipButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/skip-button";
+import SuspendButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/suspend-button";
+import UndoButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/undo-button";
 import ModalCloseButtonComponent from "src/ui/obsidian-ui-components/content-container/modal-close-button";
 import EmulatedPlatform from "src/utils/platform-detector";
 
@@ -16,6 +18,7 @@ export default class CardToolbarComponent {
     private toolbar: HTMLDivElement;
     private infoSection: DeckInfoComponent;
     private resetButton: ResetButtonComponent;
+    private undoButton: UndoButtonComponent;
     private extendedMenuButton: CardMenuButtonComponent;
     private shortMenuButton: CardMenuButtonComponent;
 
@@ -28,7 +31,10 @@ export default class CardToolbarComponent {
         jumpToCurrentCard: () => Promise<void>,
         displayCurrentCardInfoNotice: () => void,
         skipCurrentCard: () => void,
+        suspendCurrentCard: () => Promise<void>,
         onOpenResetModalClick: () => void,
+        undoLastAction: () => Promise<void>,
+        redoLastUndoneAction: () => Promise<void>,
         closeModal?: () => void,
     ) {
         // Build ui
@@ -50,6 +56,13 @@ export default class CardToolbarComponent {
 
         this.toolbar.createDiv().addClass("sr-flex-spacer");
 
+        this.undoButton = new UndoButtonComponent(
+            this.toolbar,
+            undoLastAction,
+            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"],
+        );
+        this.undoButton.setAvailable(false);
+
         new EditButtonComponent(
             this.toolbar,
             editClickHandler,
@@ -69,6 +82,12 @@ export default class CardToolbarComponent {
             EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"],
         );
 
+        new SuspendButtonComponent(
+            this.toolbar,
+            suspendCurrentCard,
+            EmulatedPlatform().isPhone || Platform.isPhone ? ["mod-raised"] : ["clickable-icon"],
+        );
+
         this.toolbar.createDiv("sr-divider");
 
         this.shortMenuButton = new CardMenuButtonComponent(
@@ -82,7 +101,10 @@ export default class CardToolbarComponent {
             jumpToCurrentCard,
             displayCurrentCardInfoNotice,
             skipCurrentCard,
+            suspendCurrentCard,
             onOpenResetModalClick,
+            undoLastAction,
+            redoLastUndoneAction,
             closeModal,
             EmulatedPlatform().isPhone || Platform.isPhone
                 ? ["mod-raised", "sr-short-menu-button"]
@@ -100,7 +122,10 @@ export default class CardToolbarComponent {
             jumpToCurrentCard,
             displayCurrentCardInfoNotice,
             skipCurrentCard,
+            suspendCurrentCard,
             onOpenResetModalClick,
+            undoLastAction,
+            redoLastUndoneAction,
             closeModal,
             EmulatedPlatform().isPhone || Platform.isPhone
                 ? ["mod-raised", "sr-extended-menu-button"]
@@ -155,6 +180,17 @@ export default class CardToolbarComponent {
      * Sets the reset button disabled state
      * @param disabled - The disabled state
      */
+    /**
+     * Sets whether there is an action to undo / redo
+     * @param canUndo - True if there is an action to undo
+     * @param canRedo - True if there is an undone action to redo
+     */
+    public setUndoAvailable(canUndo: boolean, canRedo: boolean) {
+        this.undoButton.setAvailable(canUndo);
+        this.extendedMenuButton.setUndoAvailable(canUndo, canRedo);
+        this.shortMenuButton.setUndoAvailable(canUndo, canRedo);
+    }
+
     public setResetButtonDisabled(disabled: boolean) {
         this.resetButton.buttonEl.toggleClass("mod-disabled", disabled);
         this.extendedMenuButton.setResetButtonDisabled(disabled);

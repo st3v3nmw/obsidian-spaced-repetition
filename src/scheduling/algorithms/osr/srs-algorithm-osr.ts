@@ -268,10 +268,10 @@ export class SRAlgorithmOsr implements ISRAlgorithm {
         cardSchedule: RepItemScheduleInfo,
         dueDateFlashcardHistogram: DueDateHistogram,
     ): RepItemScheduleInfo {
-        const cardScheduleOsr: RepItemScheduleInfoOsr = cardSchedule;
+        // SM-2 intervals are whole days, while the schedule of an FSRS-7 card has a fractional interval
         const schedObj: Record<string, number> = osrSchedule(
             response,
-            cardScheduleOsr.interval,
+            Math.round(cardSchedule.interval),
             cardSchedule.latestEase,
             cardSchedule.delayedBeforeReviewTicks,
             this.settings,
@@ -282,6 +282,15 @@ export class SRAlgorithmOsr implements ISRAlgorithm {
         const dueDate = globalDateProvider.today.add(interval, "d");
         const delayBeforeReview = 0;
         return new RepItemScheduleInfoOsr(dueDate, interval, ease, delayBeforeReview);
+    }
+
+    /**
+     * SM-2 doesn't predict recall probabilities.
+     *
+     * @returns {null}
+     */
+    cardRecallProbability(_schedule: RepItemScheduleInfo): number | null {
+        return null;
     }
 
     /**

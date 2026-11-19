@@ -60,36 +60,40 @@ test("Serializes FSRS card schedule for JSON", () => {
     });
 });
 
-test("converts to and from ts-fsrs card structures", () => {
-    const schedule = RepItemScheduleInfoFsrs.fromFsrsCard({
-        due: "2023-09-06T00:00:00.000Z",
+test("converts to and from ts-fsrs FSRS-6 cards", () => {
+    const schedule = new RepItemScheduleInfoFsrs(
+        moment("2023-09-06T00:00:00.000Z"),
+        3,
+        4.5,
+        2.5,
+        State.Review,
+        5,
+        1,
+        0,
+        moment("2023-09-03T00:00:00.000Z"),
+    );
+
+    const card = schedule.toFsrs6Card();
+    expect(card).toMatchObject({
+        dueAt: new Date("2023-09-06T00:00:00.000Z"),
+        lastReviewAt: new Date("2023-09-03T00:00:00.000Z"),
         stability: 2.5,
         difficulty: 4.5,
-        ["elapsed_days"]: 2,
-        ["scheduled_days"]: 3,
-        ["learning_steps"]: 0,
+        state: State.Review,
+        scheduleStatus: "review",
+        scheduledDays: 3,
+        learningStep: 0,
         reps: 5,
         lapses: 1,
-        state: State.Review,
-        ["last_review"]: "2023-09-03T00:00:00.000Z",
     });
 
-    expect(schedule).toMatchObject({
-        interval: 3,
-        stability: 2.5,
-        difficulty: 4.5,
-        reps: 5,
-        lapses: 1,
-        state: State.Review,
-    });
-
-    const roundTrip = schedule.toFsrsCardInput();
-    expect(new Date(roundTrip.due).toISOString()).toEqual("2023-09-06T00:00:00.000Z");
-    expect(new Date(roundTrip.last_review).toISOString()).toEqual("2023-09-03T00:00:00.000Z");
-    expect(roundTrip.scheduled_days).toEqual(3);
+    const roundTrip = RepItemScheduleInfoFsrs.fromFsrs6Card(card);
+    expect(roundTrip.formatScheduleAsSRHtmlComment()).toEqual(
+        schedule.formatScheduleAsSRHtmlComment(),
+    );
 });
 
-test("handles missing due dates and review timestamps", () => {
+test("handles missing due dates", () => {
     const noDueSchedule = new RepItemScheduleInfoFsrs(
         null,
         0,
@@ -102,32 +106,20 @@ test("handles missing due dates and review timestamps", () => {
         null,
     );
     expect(noDueSchedule.delayedBeforeReviewTicks).toEqual(0);
+});
 
-    const roundTrip = new RepItemScheduleInfoFsrs(
-        moment("2023-09-06T00:10:00.000Z"),
-        0,
-        5.5,
-        0.4,
-        State.Learning,
+test("refuses to convert an invalid schedule to a ts-fsrs card", () => {
+    const schedule = new RepItemScheduleInfoFsrs(
+        moment("2023-09-06T00:00:00.000Z"),
+        3,
+        4.5,
+        Number.NaN,
+        State.Review,
+        5,
         1,
         0,
-        1,
-        null,
-    ).toFsrsCardInput();
-    expect(roundTrip.last_review).toBeNull();
-    expect(roundTrip.elapsed_days).toEqual(0);
+        moment("2023-09-03T00:00:00.000Z"),
+    );
 
-    const parsed = RepItemScheduleInfoFsrs.fromFsrsCard({
-        due: "2023-09-06T00:10:00.000Z",
-        stability: 0.4,
-        difficulty: 5.5,
-        ["elapsed_days"]: 0,
-        ["scheduled_days"]: 0,
-        ["learning_steps"]: 1,
-        reps: 1,
-        lapses: 0,
-        state: State.Learning,
-        ["last_review"]: null,
-    });
-    expect(parsed.lastReview).toBeNull();
+    expect(() => schedule.toFsrs6Card()).toThrow();
 });

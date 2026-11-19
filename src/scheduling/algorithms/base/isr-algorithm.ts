@@ -5,9 +5,14 @@ import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { OsrNoteGraph } from "src/scheduling/algorithms/osr/osr-note-graph";
 import { DueDateHistogram } from "src/scheduling/due-date-histogram";
 
+/**
+ * The algorithm setting is either SM_2_OSR or FSRS. FSRS7 only identifies schedules: with the FSRS setting, new and
+ * reset cards are scheduled with FSRS-7, while cards that are already on FSRS-6 (FSRS) stay on FSRS-6.
+ */
 export enum SRAlgorithmType {
     SM_2_OSR = "SM-2-OSR",
     FSRS = "FSRS",
+    FSRS7 = "FSRS-7",
 }
 
 export interface ISRAlgorithm {
@@ -38,4 +43,9 @@ export interface ISRAlgorithm {
         schedule: RepItemScheduleInfo,
         dueDateFlashcardHistogram: DueDateHistogram,
     ): RepItemScheduleInfo;
+    /**
+     * The probability that the card is recalled now, as predicted by the algorithm, or null if the algorithm
+     * doesn't predict it for this schedule.
+     */
+    cardRecallProbability(schedule: RepItemScheduleInfo): number | null;
 }

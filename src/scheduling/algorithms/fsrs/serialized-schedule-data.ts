@@ -11,3 +11,7 @@ export interface ISerializedFSRSScheduleData {
     learningSteps: number;
     lastReview: string;
 }
+
+export interface ISerializedFSRS7ScheduleData extends ISerializedFSRSScheduleData {
+    stabilityFast: number;
+}

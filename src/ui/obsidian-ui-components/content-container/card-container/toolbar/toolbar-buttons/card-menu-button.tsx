@@ -5,6 +5,8 @@ import MenuButtonComponent from "src/ui/obsidian-ui-components/content-container
 
 export default class CardMenuButtonComponent extends MenuButtonComponent {
     private isResetButtonDisabled: boolean;
+    private isUndoAvailable: boolean = false;
+    private isRedoAvailable: boolean = false;
     public constructor(
         container: HTMLElement,
         isExtended: boolean,
@@ -16,7 +18,10 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
         jumpToCurrentCard: () => Promise<void>,
         displayCurrentCardInfoNotice: () => void,
         skipCurrentCard: () => void,
+        suspendCurrentCard: () => Promise<void>,
         onOpenResetModalClick: () => void,
+        undoLastAction: () => Promise<void>,
+        redoLastUndoneAction: () => Promise<void>,
         closeModal?: () => void,
         classNames?: string[],
     ) {
@@ -33,9 +38,12 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
                     editClickHandler,
                     onOpenResetModalClick,
                     skipCurrentCard,
+                    suspendCurrentCard,
                     jumpToCurrentCard,
                     displayCurrentCardInfoNotice,
                     deleteCurrentCard,
+                    undoLastAction,
+                    redoLastUndoneAction,
                     closeModal,
                 );
 
@@ -50,6 +58,11 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
         this.isResetButtonDisabled = disabled;
     }
 
+    public setUndoAvailable(canUndo: boolean, canRedo: boolean) {
+        this.isUndoAvailable = canUndo;
+        this.isRedoAvailable = canRedo;
+    }
+
     private buildMenu(
         cardMenu: Menu,
         showDeleteButton: boolean,
@@ -58,12 +71,31 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
         editClickHandler: () => void,
         onOpenResetModalClick: () => void,
         skipCurrentCard: () => void,
+        suspendCurrentCard: () => Promise<void>,
         jumpToCurrentCard: () => Promise<void>,
         displayCurrentCardInfoNotice: () => void,
         deleteCurrentCard: () => void,
+        undoLastAction: () => Promise<void>,
+        redoLastUndoneAction: () => Promise<void>,
         closeModal?: () => void,
     ) {
         if (isExtended) {
+            cardMenu.addItem((item) => {
+                item.setTitle(t("UNDO_LAST_ACTION"))
+                    .setIcon("undo-2")
+                    .onClick(async () => {
+                        await undoLastAction();
+                    })
+                    .setDisabled(!this.isUndoAvailable);
+            });
+            cardMenu.addItem((item) => {
+                item.setTitle(t("REDO_LAST_ACTION"))
+                    .setIcon("redo-2")
+                    .onClick(async () => {
+                        await redoLastUndoneAction();
+                    })
+                    .setDisabled(!this.isRedoAvailable);
+            });
             cardMenu.addItem((item) => {
                 item.setTitle(t("EDIT_CARD"))
                     .setIcon("pencil")
@@ -84,6 +116,13 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
                     .setIcon("chevrons-right")
                     .onClick(() => {
                         skipCurrentCard();
+                    });
+            });
+            cardMenu.addItem((item) => {
+                item.setTitle(t("SUSPEND_CARD"))
+                    .setIcon("pause")
+                    .onClick(async () => {
+                        await suspendCurrentCard();
                     });
             });
         }

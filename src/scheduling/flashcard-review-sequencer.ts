@@ -13,6 +13,7 @@ import { Deck } from "src/data/data-structures/deck/deck";
 import { IDeckTreeIterator } from "src/data/data-structures/deck/deck-tree-iterator";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { SRSettings } from "src/data/settings";
+import { assertQuestionTextUnchangedInNote } from "src/history/ensure-card-id";
 import { Note } from "src/note/note";
 import { ISRAlgorithm } from "src/scheduling/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
@@ -36,10 +37,142 @@ export interface IFlashcardReviewSequencer {
     getDeckStats(topicPath: TopicPath): DeckStats;
     getSubDecksWithCardsInQueue(deck: Deck): Deck[];
     skipCurrentCard(): void;
+    currentCardRecallProbability(): number | null;
+    suspendCurrentCard(): Promise<void>;
     determineCardSchedule(response: ReviewResponse, card: Card): RepItemScheduleInfo;
     processReview(response: ReviewResponse): Promise<void>;
     updateCurrentQuestionTextAndCards(text: string): Promise<void>;
     deleteCurrentCardFromNote(): Promise<void>;
+
+    createUndoSnapshot(): ReviewUndoSnapshot;
+    completeUndoSnapshot(snapshot: ReviewUndoSnapshot): void;
+    undo(snapshot: ReviewUndoSnapshot): Promise<void>;
+    focusCard(match: CardMatch, topicPath: TopicPath): boolean;
+    focusCardObject(card: Card, topicPath: TopicPath): boolean;
+}
+
+/**
+ * Everything needed to undo an action on the current card (review, reset, skip, suspend).
+ *
+ * Created by createUndoSnapshot() right before the action, and completed by completeUndoSnapshot() right after it.
+ */
+export interface ReviewUndoSnapshot {
+    readonly card: Card;
+    readonly scheduleInfo: RepItemScheduleInfo | null;
+    readonly isSuspended: boolean;
+    // The sequencer's topic path (the deck chosen for review), and the deck the card was shown in
+    readonly sessionTopicPath: TopicPath;
+    readonly deckTopicPath: TopicPath | null;
+    // The cards of the card's question (including the card itself) that were still waiting for review
+    readonly questionCardsInRemainingDeckTree: Card[];
+    readonly inOriginalDeckTree: boolean;
+    readonly histogram: Map<number, number>;
+    readonly postponedTextHashesBefore: string[];
+    // Questions that the action added to the postponement list (burying siblings). Null until completed.
+    postponedTextHashesAdded: string[] | null;
+}
+
+/**
+ * Identifies a card across reloads of the vault (which create new Card objects).
+ */
+export interface CardMatch {
+    id: string | null;
+    notePath: string;
+    textHash: string;
+    cardIdx: number;
+}
+
+export function createCardMatch(card: Card): CardMatch {
+    return {
+        id: card.id,
+        notePath: card.question.note.filePath,
+        textHash: card.question.questionText.textHash,
+        cardIdx: card.cardIdx,
+    };
+}
+
+export function cardMatches(card: Card, match: CardMatch): boolean {
+    if (match.id !== null) return card.id === match.id;
+    return (
+        card.question.note.filePath === match.notePath &&
+        card.question.questionText.textHash === match.textHash &&
+        card.cardIdx === match.cardIdx
+    );
+}
+
+/**
+ * Restores the stored state of the card (schedule, suspended flag) and the postponement list to how they were before
+ * the action of the snapshot.
+ *
+ * This only touches what is persisted, not the review queue, so it also works after the review queue was reloaded.
+ */
+export async function restoreUndoSnapshotPersistentState(
+    snapshot: ReviewUndoSnapshot,
+    questionPostponementList: IQuestionPostponementList,
+): Promise<void> {
+    if (snapshot.postponedTextHashesAdded === null) {
+        throw new Error(
+            "restoreUndoSnapshotPersistentState: the undo snapshot was never completed",
+        );
+    }
+    const postponed: string[] = questionPostponementList.getTextHashes();
+    for (const textHash of snapshot.postponedTextHashesAdded) {
+        if (!postponed.includes(textHash)) {
+            throw new Error(
+                `Cannot undo: a buried question (${textHash}) is no longer in the postponement list`,
+            );
+        }
+    }
+
+    const card: Card = snapshot.card;
+    if (card.scheduleInfo !== snapshot.scheduleInfo || card.isSuspended !== snapshot.isSuspended) {
+        await assertQuestionTextUnchangedInNote(card);
+        card.scheduleInfo = snapshot.scheduleInfo;
+        card.isSuspended = snapshot.isSuspended;
+        await DataStore.getInstance().writeSchedule(card.question);
+    }
+
+    if (snapshot.postponedTextHashesAdded.length > 0) {
+        for (const textHash of snapshot.postponedTextHashesAdded) {
+            questionPostponementList.removeTextHash(textHash);
+        }
+        await questionPostponementList.write();
+    }
+}
+
+/**
+ * The topic paths of the decks a card belongs to (its question's topics, or the root deck). Mirrors
+ * Deck.appendRepItem().
+ */
+function getCardTopicPaths(card: Card): TopicPath[] {
+    return card.question.topicPathList.list.length === 0
+        ? [TopicPath.emptyPath]
+        : card.question.topicPathList.list;
+}
+
+function isCardInDeckTree(deckTree: Deck, card: Card): boolean {
+    return getCardTopicPaths(card).some((topicPath: TopicPath) => {
+        const deck: Deck | null = deckTree.getDeck(topicPath);
+        return (
+            deck !== null && (deck.newRepItems.includes(card) || deck.dueRepItems.includes(card))
+        );
+    });
+}
+
+function removeCardFromDeckTree(deckTree: Deck, card: Card): void {
+    for (const topicPath of getCardTopicPaths(card)) {
+        const deck: Deck | null = deckTree.getDeck(topicPath);
+        if (deck !== null) deck.deleteCardFromThisDeck(card, false);
+    }
+}
+
+function ensureCardInDeckTree(deckTree: Deck, card: Card): void {
+    for (const topicPath of getCardTopicPaths(card)) {
+        const deck: Deck = deckTree.getOrCreateDeck(topicPath);
+        if (!deck.newRepItems.includes(card) && !deck.dueRepItems.includes(card)) {
+            deck.getRepItemListForRepItemState(card.repItemState).push(card);
+        }
+    }
 }
 
 /**
@@ -264,6 +397,39 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         this.cardSequencer.deleteCurrentQuestionFromAllDecks();
     }
 
+    /**
+     * The probability that the current card is recalled now, as predicted by the scheduling algorithm.
+     *
+     * @returns {number | null} - null for new cards, and for schedules without a prediction (e.g. SM-2).
+     */
+    currentCardRecallProbability(): number | null {
+        const card: Card | null = this.currentCard;
+        if (card === null)
+            throw new Error("currentCardRecallProbability: There is no current card");
+        return card.scheduleInfo === null
+            ? null
+            : this.srsAlgorithm.cardRecallProbability(card.scheduleInfo);
+    }
+
+    /**
+     * Suspends the current card (and only that card, not its siblings), similar to Anki's "suspend card".
+     *
+     * The suspended flag is written to the card's scheduling comment, and the card is removed from all decks,
+     * so that it isn't shown again (in review or cram mode) until it is unsuspended.
+     */
+    async suspendCurrentCard(): Promise<void> {
+        const card: Card | null = this.currentCard;
+        if (card === null) throw new Error("suspendCurrentCard: There is no current card");
+
+        card.isSuspended = true;
+        await DataStore.getInstance().writeSchedule(card.question);
+
+        // Remove from the remaining deck tree first. In cram mode the original and the remaining deck tree can be
+        // the same object, and the iterator requires the card to still be present.
+        this.cardSequencer.deleteCurrentRepItemFromAllDecks();
+        this._originalDeckTree.deleteCardFromAllDecks(card, false);
+    }
+
     private deleteCurrentCard(): void {
         this.cardSequencer.deleteCurrentRepItemFromAllDecks();
     }
@@ -301,7 +467,10 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
                 this.dueDateFlashcardHistogram.decrement(nDays);
             }
-            this.dueDateFlashcardHistogram.increment(this.currentCard.scheduleInfo.interval);
+            // The histogram counts whole days, while FSRS-7 intervals are fractional days
+            this.dueDateFlashcardHistogram.increment(
+                Math.round(this.currentCard.scheduleInfo.interval),
+            );
         } else if (response === ReviewResponse.Reset) {
             shortTermRequeue = "immediate";
         }
@@ -450,6 +619,107 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             card.front = front;
             card.back = back;
         });
+    }
+
+    createUndoSnapshot(): ReviewUndoSnapshot {
+        const card: Card | null = this.currentCard;
+        if (card === null) throw new Error("createUndoSnapshot: There is no current card");
+
+        return {
+            card,
+            scheduleInfo: card.scheduleInfo,
+            isSuspended: card.isSuspended,
+            sessionTopicPath: this.currentTopicPath,
+            deckTopicPath: this.currentDeck === null ? null : this.currentDeck.getTopicPath(),
+            questionCardsInRemainingDeckTree: card.question.cards.filter((questionCard) =>
+                isCardInDeckTree(this.remainingDeckTree, questionCard),
+            ),
+            inOriginalDeckTree: isCardInDeckTree(this._originalDeckTree, card),
+            histogram: new Map(this.dueDateFlashcardHistogram.dueDatesMap),
+            postponedTextHashesBefore: this.questionPostponementList.getTextHashes(),
+            postponedTextHashesAdded: null,
+        };
+    }
+
+    completeUndoSnapshot(snapshot: ReviewUndoSnapshot): void {
+        if (snapshot.postponedTextHashesAdded !== null) {
+            throw new Error("completeUndoSnapshot: The undo snapshot was already completed");
+        }
+        snapshot.postponedTextHashesAdded = this.questionPostponementList
+            .getTextHashes()
+            .filter((textHash) => !snapshot.postponedTextHashesBefore.includes(textHash));
+    }
+
+    /**
+     * Undoes the action of the snapshot, which must have been taken by this sequencer: restores the card's stored
+     * state and puts it (and any siblings the action buried) back into the queue. The card becomes the current card.
+     */
+    async undo(snapshot: ReviewUndoSnapshot): Promise<void> {
+        const card: Card = snapshot.card;
+
+        await restoreUndoSnapshotPersistentState(snapshot, this.questionPostponementList);
+        this.dueDateFlashcardHistogram.dueDatesMap = new Map(snapshot.histogram);
+        this.pendingCards = this.pendingCards.filter((pendingCard) => pendingCard.card !== card);
+
+        // The card may still be in the queue (e.g. moved to the end of the list), in the list matching its schedule
+        // after the action. Re-add it, so it ends up in the list matching its restored schedule.
+        removeCardFromDeckTree(this.remainingDeckTree, card);
+        for (const questionCard of snapshot.questionCardsInRemainingDeckTree) {
+            ensureCardInDeckTree(this.remainingDeckTree, questionCard);
+        }
+        if (snapshot.inOriginalDeckTree) {
+            ensureCardInDeckTree(this._originalDeckTree, card);
+        }
+
+        this.currentTopicPath = snapshot.sessionTopicPath;
+        this.cardSequencer.setCurrentRepItem(
+            card,
+            snapshot.sessionTopicPath,
+            snapshot.deckTopicPath,
+        );
+    }
+
+    /**
+     * Makes the matching card the current card, e.g. after undoing an action of an earlier review queue.
+     *
+     * @param {CardMatch} match - Identifies the card.
+     * @param {TopicPath} topicPath - The deck to review. If the card isn't within it, the whole deck tree is used.
+     * @returns {boolean} - False if the card isn't waiting for review in this review queue.
+     */
+    focusCard(match: CardMatch, topicPath: TopicPath): boolean {
+        return this.focusFirstCard((card: Card) => cardMatches(card, match), topicPath);
+    }
+
+    /**
+     * Makes the given card the current card, e.g. to redo an undone action on it.
+     *
+     * @param {Card} card - The card.
+     * @param {TopicPath} topicPath - The deck to review. If the card isn't within it, the whole deck tree is used.
+     * @returns {boolean} - False if the card isn't waiting for review in this review queue.
+     */
+    focusCardObject(card: Card, topicPath: TopicPath): boolean {
+        return this.focusFirstCard((candidate: Card) => candidate === card, topicPath);
+    }
+
+    private focusFirstCard(predicate: (card: Card) => boolean, topicPath: TopicPath): boolean {
+        const findIn = (deck: Deck | null): Card | null =>
+            deck === null
+                ? null
+                : (deck
+                      .getFlattenedRepItemArray(RepItemState.AnyItem, true)
+                      .find((card: Card) => predicate(card)) ?? null);
+
+        let iteratorTopicPath: TopicPath = topicPath;
+        let card: Card | null = findIn(this.remainingDeckTree.getDeck(topicPath));
+        if (card === null) {
+            iteratorTopicPath = TopicPath.emptyPath;
+            card = findIn(this.remainingDeckTree);
+        }
+        if (card === null) return false;
+
+        this.currentTopicPath = iteratorTopicPath;
+        this.cardSequencer.setCurrentRepItem(card, iteratorTopicPath, null);
+        return true;
     }
 
     async deleteCurrentCardFromNote(): Promise<void> {

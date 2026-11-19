@@ -3,6 +3,7 @@ import { DropdownComponent, Platform, setIcon } from "obsidian";
 
 import { t } from "src/lang/helpers";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
+import UndoButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/undo-button";
 import ModalCloseButtonComponent from "src/ui/obsidian-ui-components/content-container/modal-close-button";
 import EmulatedPlatform from "src/utils/platform-detector";
 
@@ -11,10 +12,12 @@ export default class DeckListHeaderComponent {
     private deckIcon: HTMLElement;
     private title: HTMLDivElement;
     private reviewModeDropdown: DropdownComponent;
+    private undoButton: UndoButtonComponent;
 
     public constructor(
         parentEl: HTMLElement,
         changeReviewMode: (reviewMode: FlashcardReviewMode) => void,
+        undoLastAction: () => Promise<void>,
         closeModal?: () => void,
     ) {
         this.header = parentEl.createDiv();
@@ -30,6 +33,13 @@ export default class DeckListHeaderComponent {
         this.title.setText(t("DECKS"));
 
         this.header.createDiv().addClass("sr-flex-spacer");
+
+        // E.g. to undo the review of the last card of a deck, after which the deck list is shown
+        this.undoButton = new UndoButtonComponent(this.header, undoLastAction, [
+            EmulatedPlatform().isPhone || Platform.isPhone ? "mod-raised" : "clickable-icon",
+        ]);
+        this.setUndoAvailable(false);
+
         this.reviewModeDropdown = new DropdownComponent(this.header);
         const reviewModeOptions: Record<string, string> = {
             Review: t("REVIEW_MODE"),
@@ -64,6 +74,11 @@ export default class DeckListHeaderComponent {
             () => closeModal && closeModal(),
             closeButtonClasses,
         );
+    }
+
+    public setUndoAvailable(available: boolean) {
+        this.undoButton.setAvailable(available);
+        this.undoButton.buttonEl.toggleClass("sr-is-hidden", !available);
     }
 
     public updateReviewMode(reviewMode: FlashcardReviewMode) {

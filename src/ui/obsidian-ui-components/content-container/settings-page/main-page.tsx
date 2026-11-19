@@ -51,7 +51,7 @@ export class MainPage extends SettingsPage {
         );
         SettingsPageTypesArray.forEach((pageType) => {
             if (pageType === "main-page") return;
-            if (pageType === "statistics-page") return;
+            if (pageType === "statistics-page" || pageType === "usage-history-page") return;
             mainSettingsGroup.addSetting((setting: Setting) => {
                 setting.setName(getPageName(pageType)).addButton((button: ButtonComponent) => {
                     button.setIcon("chevron-right").onClick(() => {
@@ -124,6 +124,27 @@ export class MainPage extends SettingsPage {
                 setting.settingEl.addClass("sr-settings-page-title-setting");
                 setting.settingEl.addEventListener("click", () => {
                     this.openPage("statistics-page");
+                });
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(getPageName("usage-history-page"))
+                    .addButton((button: ButtonComponent) => {
+                        button.setIcon("chevron-right").onClick(() => {
+                            this.openPage("usage-history-page");
+                        });
+
+                        button.buttonEl.addClass("clickable-icon");
+                    });
+                const iconEl = activeDocument.createElement("div");
+                iconEl.addClass("sr-settings-page-title-icon");
+                setIcon(iconEl, getPageIcon("usage-history-page"));
+
+                setting.nameEl.insertBefore(iconEl, setting.nameEl.firstChild);
+                setting.nameEl.addClass("sr-settings-page-title");
+                setting.settingEl.addClass("sr-settings-page-title-setting");
+                setting.settingEl.addEventListener("click", () => {
+                    this.openPage("usage-history-page");
                 });
             })
             .addSetting((setting: Setting) => {

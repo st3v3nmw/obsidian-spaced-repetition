@@ -8,8 +8,12 @@ export function formatScheduleInterval(
     schedule: RepItemScheduleInfo | null | undefined,
     isMobile: boolean,
 ): string {
-    if (!schedule || schedule.interval >= 1 || !schedule.dueDate) {
-        return textInterval(schedule?.interval, isMobile);
+    if (!schedule) {
+        return textInterval(null, isMobile);
+    }
+    if (schedule.interval >= 1 || !schedule.dueDate) {
+        // FSRS-7 intervals are fractional days, they are shown in whole days
+        return textInterval(Math.round(schedule.interval), isMobile);
     }
 
     const diffMs = Math.max(0, schedule.dueDateAsUnix - globalDateProvider.now.valueOf());

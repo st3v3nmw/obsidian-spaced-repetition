@@ -13,6 +13,7 @@ import { SchedulingPage } from "src/ui/obsidian-ui-components/content-container/
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { StatisticsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/statistics-page/statistics-page";
 import { UIPreferencesPage } from "src/ui/obsidian-ui-components/content-container/settings-page/ui-preferences-page";
+import { UsageHistoryPage } from "src/ui/obsidian-ui-components/content-container/settings-page/usage-history-page/usage-history-page";
 import { UIManager } from "src/ui/ui-manager";
 
 /**
@@ -27,7 +28,8 @@ export type SettingsPageType =
     | "scheduling-page"
     | "ui-preferences-page"
     | "data-page"
-    | "statistics-page";
+    | "statistics-page"
+    | "usage-history-page";
 
 /**
  * Represents an array of all available settings page types.
@@ -42,6 +44,7 @@ export const SettingsPageTypesArray: ReadonlyArray<SettingsPageType> = [
     "ui-preferences-page",
     "data-page",
     "statistics-page",
+    "usage-history-page",
 ];
 
 /**
@@ -66,6 +69,8 @@ export function getPageName(pageType: SettingsPageType): string {
             return t("DATA_PAGE_NAME");
         case "statistics-page":
             return t("STATS_TITLE");
+        case "usage-history-page":
+            return t("USAGE_HISTORY");
     }
 }
 
@@ -91,6 +96,8 @@ export function getPageIcon(pageType: SettingsPageType): string {
             return "hard-drive";
         case "statistics-page":
             return "bar-chart-3";
+        case "usage-history-page":
+            return "history";
     }
 }
 
@@ -274,6 +281,19 @@ export class SettingsPageManager {
                             pageType,
                             this.openPage.bind(this),
                             this.scrollListener.bind(this),
+                        ),
+                    );
+                    break;
+                case "usage-history-page":
+                    this.pages.push(
+                        new UsageHistoryPage(
+                            newPageContainerEl,
+                            this.plugin,
+                            this.settingsManager,
+                            this.dataManager,
+                            pageType,
+                            (pageType: SettingsPageType) => this.openPage(pageType),
+                            (scrollPosition: number) => this.scrollListener(scrollPosition),
                         ),
                     );
                     break;

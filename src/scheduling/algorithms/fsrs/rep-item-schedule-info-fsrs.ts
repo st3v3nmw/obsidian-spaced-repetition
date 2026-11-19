@@ -1,5 +1,5 @@
 import moment, { Moment } from "moment";
-import { Card, CardInput, State } from "ts-fsrs";
+import { State } from "ts-fsrs";
 
 import { ISerializedScheduleEntry } from "src/data/plugin-data";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
@@ -8,12 +8,18 @@ import {
     difficultyToEase,
     formatFsrsTimestamp,
     FSRS_COMMENT_PREFIX,
+    fsrsScheduleStatus,
 } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
+import {
+    FSRS_SCHEDULER_CARD_ID,
+    Fsrs6Card,
+    parseFsrs6Card,
+} from "src/scheduling/algorithms/fsrs/fsrs-schedulers";
 import { ISerializedFSRSScheduleData } from "src/scheduling/algorithms/fsrs/serialized-schedule-data";
 import { globalDateProvider } from "src/utils/dates";
 
 /**
- * Represents scheduling information for a repetition item using the FSRS algorithm.
+ * Represents scheduling information for a repetition item using the FSRS-6 algorithm.
  *
  * @class RepItemScheduleInfoFsrs
  * @extends {RepItemScheduleInfo}
@@ -64,47 +70,44 @@ export class RepItemScheduleInfoFsrs extends RepItemScheduleInfo {
     }
 
     /**
-     * Creates a RepItemScheduleInfoFsrs object from a Card or CardInput object.
+     * Creates a RepItemScheduleInfoFsrs object from a ts-fsrs FSRS-6 card.
      *
-     *  NOTE: The fsrs library uses cards as the basic unit of scheduling, so we need to convert the Card or CardInput object to a RepItemScheduleInfoFsrs object.
-     *
-     * @param {Card | CardInput} card - The Card or CardInput object.
+     * @param {Fsrs6Card} card - The ts-fsrs card.
      * @returns {RepItemScheduleInfoFsrs} - The RepItemScheduleInfoFsrs object.
      */
-    static fromFsrsCard(card: Card | CardInput): RepItemScheduleInfoFsrs {
+    static fromFsrs6Card(card: Fsrs6Card): RepItemScheduleInfoFsrs {
         return new RepItemScheduleInfoFsrs(
-            moment(card.due),
-            card.scheduled_days,
+            moment(card.dueAt),
+            card.scheduledDays,
             card.difficulty,
             card.stability,
-            card.state as State,
+            card.state,
             card.reps,
             card.lapses,
-            card.learning_steps,
-            card.last_review ? moment(card.last_review) : null,
+            card.learningStep,
+            card.lastReviewAt === null ? null : moment(card.lastReviewAt),
         );
     }
 
     /**
-     * Converts the RepItemScheduleInfoFsrs object to a CardInput object for use with the fsrs library.
+     * Converts the schedule to a ts-fsrs FSRS-6 card, throwing if it isn't a valid FSRS-6 card.
      *
-     * @param {Moment} [now] - The current date and time. Defaults to the current date and time.
-     * @returns {CardInput} - The CardInput object.
+     * @returns {Fsrs6Card} - The ts-fsrs card.
      */
-    toFsrsCardInput(now: Moment = globalDateProvider.now): CardInput {
-        const lastReview = this.lastReview ? this.lastReview.clone() : now.clone();
-        return {
-            due: this.dueDate.toDate(),
+    toFsrs6Card(): Fsrs6Card {
+        return parseFsrs6Card({
+            cardId: FSRS_SCHEDULER_CARD_ID,
+            dueAt: this.dueDate.toDate(),
+            lastReviewAt: this.lastReview === null ? null : this.lastReview.toDate(),
             stability: this.stability,
             difficulty: this.difficulty,
-            ["elapsed_days"]: Math.max(0, now.diff(lastReview, "days")),
-            ["scheduled_days"]: this.interval,
-            ["learning_steps"]: this.learningSteps,
+            state: this.state,
+            scheduleStatus: fsrsScheduleStatus(this.state),
+            scheduledDays: this.interval,
+            learningStep: this.learningSteps,
             reps: this.reps,
             lapses: this.lapses,
-            state: this.state,
-            ["last_review"]: this.lastReview ? this.lastReview.toDate() : null,
-        };
+        });
     }
 
     /**
