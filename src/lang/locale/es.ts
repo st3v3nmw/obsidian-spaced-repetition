@@ -435,6 +435,9 @@ const es: IBaseLocale = {
     USE_CALLOUTS_FOR_SCHEDULING_COMMENTS: "Usar callouts para los comentarios de programación",
     USE_CALLOUTS_FOR_SCHEDULING_COMMENTS_DESC:
         "Usa por defecto el callout de metadatos sr para los comentarios de programación en lugar de comentarios normales. Esto ocultará los comentarios de programación en un callout que parece una línea vacía en el editor.",
+    HIDE_SCHEDULING_COMMENTS_IN_LIVE_PREVIEW: "Ocultar comentarios de programación en Live Preview",
+    HIDE_SCHEDULING_COMMENTS_IN_LIVE_PREVIEW_DESC:
+        "Colapsa y oculta automáticamente los comentarios de programación <!--SR:...--> en el editor Live Preview cuando el cursor no está sobre el comentario.",
     MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_BUTTON: "Migrar",
     MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_DESC:
         "La migración pondrá los comentarios de programación en un callout de metadatos sr. Este callout está diseñado para ocultar los comentarios de programación.",

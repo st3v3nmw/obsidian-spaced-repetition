@@ -386,6 +386,9 @@ const he: IBaseLocale = {
     USE_CALLOUTS_FOR_SCHEDULING_COMMENTS: "שימוש ב-callouts עבור הערות התזמון",
     USE_CALLOUTS_FOR_SCHEDULING_COMMENTS_DESC:
         "השתמש כברירת מחדל ב-callout של מטא-נתוני sr עבור הערות התזמון במקום בהערות רגילות. פעולה זו תסתיר את הערות התזמון בתוך callout שנראה כמו שורה ריקה בעורך.",
+    HIDE_SCHEDULING_COMMENTS_IN_LIVE_PREVIEW: "הסתרת הערות תזמון בתצוגה חיה (Live Preview)",
+    HIDE_SCHEDULING_COMMENTS_IN_LIVE_PREVIEW_DESC:
+        "מכווץ ומסתיר באופן אוטומטי הערות תזמון <!--SR:...--> בעורך Live Preview כאשר הסמן אינו מעל ההערה.",
     MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_BUTTON: "העברה",
     MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_DESC:
         "ההעברה תכניס את הערות התזמון לתוך callout של מטא-נתוני sr. callout זה נועד להסתיר את הערות התזמון.",

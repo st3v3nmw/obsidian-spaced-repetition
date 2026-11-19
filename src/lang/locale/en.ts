@@ -404,6 +404,9 @@ const en: IBaseLocale = {
     USE_CALLOUTS_FOR_SCHEDULING_COMMENTS: "Use callouts for scheduling comments",
     USE_CALLOUTS_FOR_SCHEDULING_COMMENTS_DESC:
         "Use the sr metadata callout for scheduling comments instead of regular comments by default. This will hide away the scheduling comments in a callout which looks like an empty line in the editor.",
+    HIDE_SCHEDULING_COMMENTS_IN_LIVE_PREVIEW: "Hide scheduling comments in Live Preview",
+    HIDE_SCHEDULING_COMMENTS_IN_LIVE_PREVIEW_DESC:
+        "Automatically collapse and hide <!--SR:...--> scheduling comments in Live Preview editor when the cursor is not actively selecting the comment.",
     MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_BUTTON: "Migrate",
     MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_DESC:
         "Migrating will put the scheduling comments into a sr metadata callout. This callout is designed to hide away the scheduling comments.",
