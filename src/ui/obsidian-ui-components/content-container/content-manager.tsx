@@ -80,6 +80,7 @@ export default class ContentManager {
     private reviewSequencer: IFlashcardReviewSequencer | null = null;
     private settings: SRSettings;
     private reviewMode: FlashcardReviewMode;
+    private audioReviewMode: boolean;
     private deckContainer: DeckContainer;
     private cardContainer: CardContainer;
 
@@ -102,6 +103,7 @@ export default class ContentManager {
         this.reviewQueueLoader = reviewQueueLoader;
         this.settings = settings;
         this.reviewMode = reviewQueueLoader.getReviewMode();
+        this.audioReviewMode = reviewQueueLoader.getAudioReviewMode();
 
         this.uiManager = this.plugin.uiManager;
         this.dataManager = this.plugin.dataManager;
@@ -127,6 +129,7 @@ export default class ContentManager {
             this._jumpToCurrentCard.bind(this),
             this._displayCurrentCardInfoNotice.bind(this),
             closeModal,
+            this.audioReviewMode,
         );
     }
 

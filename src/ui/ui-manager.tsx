@@ -81,6 +81,17 @@ export class UIManager {
             },
         );
 
+        // Ribbon entry for audio-first review of all flashcards
+        this.plugin.addRibbonIcon(
+            "headphones",
+            "Audio review: flashcards from all notes",
+            async () => {
+                if (this.plugin.isDataManagerLoaded()) {
+                    await this.openDeckContainer(FlashcardReviewMode.Review, undefined, true);
+                }
+            },
+        );
+
         this.plugin.registerEvent(
             this.plugin.app.workspace.on("file-menu", (menu: Menu, file: TAbstractFile) => {
                 this.fileMenuHandler(menu, file);
@@ -398,7 +409,11 @@ export class UIManager {
         electronApp?.dock?.bounce?.("informational");
     }
 
-    public async openDeckContainer(mode: FlashcardReviewMode, singleNote?: TFile): Promise<void> {
+    public async openDeckContainer(
+        mode: FlashcardReviewMode,
+        singleNote?: TFile,
+        audioReviewMode: boolean = false,
+    ): Promise<void> {
         if (this.plugin.dataManager.osrCore === null)
             throw new Error("SR plugin or OSR app core not initialized!!!");
 
@@ -422,6 +437,7 @@ export class UIManager {
             this.plugin.dataManager.osrCore,
             singleNote ?? null,
             mode,
+            audioReviewMode,
         );
 
         if (openInNewTab) {

@@ -91,6 +91,14 @@ export interface SRSettings {
     showSchedulingDebugMessages: boolean;
     showParserDebugMessages: boolean;
 
+    // AI settings
+    enableTTS: boolean;
+    ttsVoice: string;
+    ttsProvider: "browser" | "openai-compatible";
+    ttsBaseUrl: string;
+    ttsApiKey: string;
+    ttsModel: string;
+
     preferredDateFormatForNoteReviewQueue: string;
     preferredLocale: string;
 }
@@ -180,6 +188,15 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // logging
     showSchedulingDebugMessages: false,
     showParserDebugMessages: false,
+
+    // AI
+    enableTTS: false,
+    ttsVoice: "",
+    ttsProvider: "browser",
+    ttsBaseUrl: "http://localhost:8880/v1",
+    ttsApiKey: "",
+    ttsModel: "kokoro",
+
     preferredDateFormatForNoteReviewQueue: "MMM DD YYYY",
     preferredLocale: "-",
 };
