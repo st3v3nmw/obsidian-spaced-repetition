@@ -11,6 +11,7 @@ import en from "src/lang/locale/en";
 import enGB from "src/lang/locale/en-gb";
 import es from "src/lang/locale/es";
 import fr from "src/lang/locale/fr";
+import he from "src/lang/locale/he";
 import hi from "src/lang/locale/hi";
 import id from "src/lang/locale/id";
 import it from "src/lang/locale/it";
@@ -84,6 +85,7 @@ export class LocaleManager implements ILocaleManager {
             "en-gb": enGB,
             es,
             fr,
+            he,
             hi,
             id,
             it,
@@ -112,13 +114,17 @@ export class LocaleManager implements ILocaleManager {
 
     /**
      * Gets the current translation.
+     * Falls back to english if the current locale has no translation
      */
     public currentTranslation(): IBaseLocale {
         const currentLocale: string = LocaleManagerInstance.getInstance().currentLocale;
         const currentLocaleMap: IBaseLocale = this.localeMap[currentLocale];
 
         if (!currentLocaleMap) {
-            console.warn(`SRS error: Locale ${currentLocale} not found.`);
+            console.warn(
+                `SRS error: Locale ${currentLocale} not found. Using English as a fallback.`,
+            );
+            return this.localeMap["en"];
         }
 
         return currentLocaleMap;

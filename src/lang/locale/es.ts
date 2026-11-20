@@ -290,6 +290,168 @@ const es: IBaseLocale = {
     CHECK_ROADMAP: 'Check out the <a href="${roadMapUrl}">roadmap</a> for upcoming features.',
     CHECK_DEV_NEWS:
         'Check out the <a href="${devNewsUrl}">dev news</a> for the latest development news.',
+
+    // --- Claves que faltaban y recurrían al inglés (#282) ---
+
+    // flashcard-modal.tsx
+    CRAM_MODE: "Modo de memorización intensiva",
+    REVIEW_MODE: "Modo de revisión",
+    DUE: "Vencida",
+    SEEN_CARDS: "Tarjetas Vistas",
+    SEEN: "Vistas",
+    TOTAL: "Total",
+    JUMP_TO: "Ir a la tarjeta",
+    JUMP_TO_AND_CLOSE: "Cerrar e ir a la tarjeta",
+    OPEN_IN_BACKGROUND: "Abrir tarjeta en segundo plano",
+    DELETE_CARD: "Eliminar tarjeta",
+    DELETE_CARD_CONFIRMATION:
+        "Esta acción no se puede deshacer y podría alterar tus notas de forma no deseada. ¿Seguro que quieres eliminar esta tarjeta?",
+
+    // main.ts
+    REVIEW_CARD_DIFFICULTY_CMD: "Revisar tarjeta como ${difficulty}",
+    REVIEW_REMINDER_NOTICE:
+        "Tus tarjetas están listas para revisar. Vuelve a Obsidian para seguir aprendiendo.",
+
+    // settings.ts
+    PLUGIN_DATA_STORE_INFO:
+        "Los datos de programación se guardan en archivos markdown dentro de tu bóveda (en el directorio configurado bajo Datos de programación). Las programaciones de las notas se identifican mediante un ID único (sr-id) añadido al frontmatter de cada nota, de modo que sobreviven a renombrados y movimientos dentro o fuera de Obsidian. Las programaciones de las tarjetas se identifican mediante un hash del texto de la tarjeta: editar el anverso de una tarjeta reiniciará su programación.",
+    MIGRATE_TO_PLUGIN_DATA: "¿Migrar los datos de programación a los datos del plugin?",
+    CONFIRM_MIGRATE_TO_PLUGIN_DATA:
+        "Todos los comentarios <!--SR:...--> y los campos de frontmatter sr-* se moverán a archivos markdown de programación en la bóveda, y se añadirá un campo sr-id al frontmatter de cada nota como identificador estable. Esto puede tardar un momento en bóvedas grandes. No edites las notas hasta que la migración termine.",
+    MIGRATING_TO_PLUGIN_DATA: "Migrando los datos de programación a los datos del plugin...",
+    MIGRATE_TO_NOTES: "¿Migrar los datos de programación de vuelta a las notas?",
+    CONFIRM_MIGRATE_TO_NOTES:
+        "Todos los datos de programación se volverán a escribir como comentarios <!--SR:...--> y campos de frontmatter sr-*. Esto puede tardar un momento en bóvedas grandes. No edites las notas hasta que la migración termine.",
+    MIGRATING_TO_NOTES: "Migrando los datos de programación a las notas...",
+    FLASHCARD_AGAIN_LABEL: "Texto del botón: Otra vez",
+    FLASHCARD_AGAIN_DESC: 'Personalice la etiqueta para el botón "Otra vez"',
+    FLASHCARD_TAGS_TO_IGNORE: "Etiquetas a ignorar",
+    FLASHCARD_TAGS_TO_IGNORE_DESC:
+        "Escriba las etiquetas separadas por espacios o saltos de línea. Las notas que contengan cualquiera de estas etiquetas se excluirán de la revisión de tarjetas.",
+    SHOW_DELETE_BUTTON: "Mostrar el botón Eliminar",
+    SHOW_DELETE_BUTTON_DESC: "Añade un botón de eliminar a la interfaz de revisión de tarjetas.",
+    REVIEW_REMINDERS: "Recordatorios de revisión",
+    REVIEW_REMINDERS_DESC:
+        "Comprueba periódicamente si hay tarjetas nuevas o vencidas y te avisa cuando hay tarjetas listas para revisar.",
+    REVIEW_REMINDER_CHECK_ON_STARTUP: "Comprobar inmediatamente al iniciar",
+    REVIEW_REMINDER_CHECK_ON_STARTUP_DESC:
+        "Ejecuta una comprobación cuando el diseño inicial de Obsidian está listo, sin esperar al primer intervalo.",
+    REVIEW_REMINDER_INTERVAL: "Intervalo de recordatorio (minutos)",
+    REVIEW_REMINDER_INTERVAL_DESC:
+        "Comprueba cada N minutos. Mínimo 1 minuto, máximo 1440 minutos.",
+    REVIEW_REMINDER_INTERVAL_MIN_WARNING:
+        "El intervalo de recordatorio debe ser un número entre 1 y 1440.",
+    REVIEW_REMINDER_MESSAGE: "Mensaje del recordatorio",
+    REVIEW_REMINDER_MESSAGE_DESC:
+        "Mensaje personalizado opcional que se muestra en el aviso del recordatorio. Déjalo vacío para usar el mensaje predeterminado.",
+    REVIEW_REMINDER_AUTO_OPEN: "Abrir la revisión automáticamente",
+    REVIEW_REMINDER_AUTO_OPEN_DESC:
+        "Cuando está activado, los recordatorios abren directamente la sesión de revisión de tarjetas existente.",
+    REVIEW_REMINDER_SHOW_NOTICE: "Mostrar aviso al recordar",
+    REVIEW_REMINDER_SHOW_NOTICE_DESC:
+        "Muestra un aviso temporal cuando se activa un recordatorio de revisión.",
+    REVIEW_REMINDER_PLAY_SOUND: "Reproducir sonido al recordar",
+    REVIEW_REMINDER_PLAY_SOUND_DESC:
+        "Reproduce un breve sonido de alerta cuando se activa un recordatorio de revisión.",
+    REVIEW_REMINDER_BOUNCE_DOCK: "Hacer rebotar el icono del dock al recordar",
+    REVIEW_REMINDER_BOUNCE_DOCK_DESC:
+        "En escritorio, hace rebotar el icono del dock cuando se activa un recordatorio de revisión.",
+    NOTE_TAGS_TO_IGNORE: "Etiquetas a ignorar",
+    NOTE_TAGS_TO_IGNORE_DESC:
+        "Escriba las etiquetas separadas por espacios o saltos de línea. Las notas que contengan cualquiera de estas etiquetas se excluirán de la revisión de notas.",
+    STATUS_BAR_SETTINGS: "Barra de estado",
+    SHOW_CARD_STATUS_BAR_ITEM: "Mostrar el elemento de la tarjeta en la barra de estado",
+    SHOW_CARD_STATUS_BAR_ITEM_DESC:
+        "Desactiva esto para ocultar el estado de revisión de la tarjeta en la barra de estado de Obsidian",
+    SHOW_NOTE_STATUS_BAR_ITEM: "Mostrar el elemento de la nota en la barra de estado",
+    SHOW_NOTE_STATUS_BAR_ITEM_DESC:
+        "Desactiva esto para ocultar el estado de revisión de la nota en la barra de estado de Obsidian",
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM:
+        "Mostrar el elemento de actualización disponible en la barra de estado",
+    SHOW_UPDATE_AVAILABLE_STATUS_BAR_ITEM_DESC:
+        "Desactiva esto para ocultar el elemento de actualización disponible en la barra de estado y para detener la comprobación del número de la versión más reciente",
+    SWITCH_TO_FSRS_ALGORITHM: "¿Cambiar el algoritmo de las tarjetas a FSRS?",
+    CONFIRM_FSRS_ALGORITHM_SWITCH:
+        "¡Cambiar a FSRS puede provocar una pérdida de datos imprevista, ya que aún no está suficientemente probado! El cambio modifica cómo se formatean los datos de programación de las tarjetas a medida que se revisan. Esto significa que las tarjetas reescritas en el formato FSRS requerirán muchos más parámetros y, por tanto, un comentario de programación más largo e intrusivo. Se hace el mayor esfuerzo por mantener la compatibilidad hacia atrás con los comentarios de programación, por si quisieras volver a OSR. Esto significa que tus datos de programación se reescribirán al formato OSR en cuanto revises una tarjeta con OSR activado.",
+    USE_CUSTOM_HOTKEYS: "Usar teclas rápidas personalizadas",
+    USE_CUSTOM_HOTKEYS_DESC:
+        "Habilita teclas rápidas personalizadas para los comandos de revisión de tarjetas. Las teclas rápidas predeterminadas no estarán activas tras habilitar esto. Las teclas rápidas personalizadas solo se pueden usar con la opción 'Abrir en una pestaña nueva'.",
+
+    // Settings > Scheduling > Delete
+    DELETE_SCHEDULING_DATA_IN_NOTES: "Eliminar los datos de programación de las notas",
+    DELETE_SCHEDULING_DATA_IN_NOTES_DESC: "Elimina los datos de programación de todas las notas.",
+    DELETE_SCHEDULING_DATA_IN_CARDS: "Eliminar los datos de programación de las tarjetas",
+    DELETE_SCHEDULING_DATA_IN_CARDS_DESC:
+        "Elimina los datos de programación de todas las tarjetas.",
+    CONFIRM_SCHEDULING_DATA_IN_NOTES_DELETION:
+        "¿Seguro que quieres eliminar todos los datos de programación de tus notas? Esta acción no se puede deshacer.",
+    CONFIRM_SCHEDULING_DATA_IN_CARDS_DELETION:
+        "¿Seguro que quieres eliminar todos los datos de programación de tus tarjetas? Esta acción no se puede deshacer.",
+    SCHEDULING_DATA_IN_NOTES_DELETION_IN_PROGRESS:
+        "Eliminación de datos de programación en curso...",
+    SCHEDULING_DATA_IN_CARDS_DELETION_IN_PROGRESS:
+        "Eliminación de datos de programación en curso...",
+
+    // NoteReviewQueue.ts
+    NOTE_REVIEW_QUEUE_EMPTY_HINT:
+        "No hay notas para revisar. Para añadir algunas, agrega la etiqueta 'review' en una de tus notas.",
+
+    // Card controls / note menu
+    OPEN_MENU: "Abrir menú",
+    DELETE_NOTE_SCHEDULING_DATA_IN_NOTE: "Eliminar los datos de programación de la nota en la nota",
+    CONFIRM_NOTE_SCHEDULING_DATA_IN_NOTE_DELETION:
+        "¿Seguro que quieres eliminar los datos de programación de la nota en esta nota?",
+    NOTE_SCHEDULING_DATA_IN_NOTE_DELETION_IN_PROGRESS:
+        "Eliminando los datos de programación de la nota en la nota...",
+    DELETE_SCHEDULING_DATA_OF_CARDS_IN_NOTE:
+        "Eliminar los datos de programación de las tarjetas en la nota",
+    CONFIRM_SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION:
+        "¿Seguro que quieres eliminar los datos de programación de las tarjetas en la nota?",
+    SCHEDULING_DATA_OF_CARDS_IN_NOTE_DELETION_IN_PROGRESS:
+        "Eliminando los datos de programación de las tarjetas en la nota...",
+    DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA:
+        "Eliminar las etiquetas al eliminar los datos de programación",
+    DELETE_TAGS_WHEN_DELETING_SCHEDULING_DATA_DESC:
+        "Eliminar las etiquetas al eliminar los datos de programación",
+    ENABLE_FILE_MENU_DELETE_BUTTON: "Habilitar el botón de eliminar del menú de archivo",
+    ENABLE_FILE_MENU_DELETE_BUTTON_DESC:
+        "Habilita el botón de eliminar en el menú de archivo para los datos de programación",
+
+    // Settings > data / reset / storage
+    DATA_PAGE_NAME: "Datos",
+    GROUP_RESET_SETTINGS: "Restablecer ajustes",
+    GROUP_RESET_SETTINGS_DESC: "Restablece todos los ajustes a sus valores predeterminados",
+    RESET_SETTINGS: "Restablecer ajustes",
+    CONFIRM_RESET_SETTINGS:
+        "¿Seguro que quieres restablecer todos los ajustes a sus valores predeterminados?",
+    RESET_SETTINGS_CONFIRMATION:
+        "Restableciendo todos los ajustes a sus valores predeterminados...",
+    DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE: "Formato de fecha para la cola de revisión de notas",
+    DATE_FORMAT_FOR_NOTE_REVIEW_QUEUE_DESC:
+        'Formato de fecha para la cola de revisión de notas (consulta <a href="${docsUrl}">moment.js</a> para más detalles). Solo se actualiza al reabrir la cola de revisión de notas.',
+    MIGRATE_TO_FOLDER: "Migrar a directorio",
+    CONFIRM_MIGRATE_TO_FOLDER: "¿Seguro que quieres migrar al almacenamiento en directorio?",
+    MIGRATING_TO_FOLDER: "Migrando al almacenamiento en directorio...",
+    USE_CALLOUTS_FOR_SCHEDULING_COMMENTS: "Usar callouts para los comentarios de programación",
+    USE_CALLOUTS_FOR_SCHEDULING_COMMENTS_DESC:
+        "Usa por defecto el callout de metadatos sr para los comentarios de programación en lugar de comentarios normales. Esto ocultará los comentarios de programación en un callout que parece una línea vacía en el editor.",
+    MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_BUTTON: "Migrar",
+    MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT_DESC:
+        "La migración pondrá los comentarios de programación en un callout de metadatos sr. Este callout está diseñado para ocultar los comentarios de programación.",
+    CONFIRM_MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT:
+        "La migración modificará todas tus tarjetas. Por favor, haz una copia de seguridad primero por si quieres revertir la migración más tarde o por si rompe tus tarjetas debido a un error. ¿Seguro que quieres migrar los comentarios de programación a callouts de metadatos sr?",
+    MIGRATING_SCHEDULING_COMMENTS_TO_CALLOUT:
+        "Migrando los comentarios de programación a callouts de metadatos sr...",
+    MIGRATE_SCHEDULING_COMMENTS_TO_CALLOUT:
+        "Migrar los comentarios de programación a callout de metadatos sr",
+    DEFAULT_LOCALE_NAME: "- Predeterminado de Obsidian -",
+    LANGUAGE_SETTINGS: "Ajustes de idioma",
+    LANGUAGE_SETTINGS_DESC:
+        "Selecciona el idioma que quieres usar para la interfaz del plugin. Esto solo tendrá pleno efecto tras reiniciar Obsidian.",
+    DEBUG_LOG: "Registro de depuración",
+    COPY: "Copiar",
+    NO_DECKS_TO_REVIEW:
+        "No hay mazos con tarjetas para revisar. Asegúrate de haber creado algunas tarjetas añadiendo la etiqueta 'flashcards' a una nota y luego agregando tarjetas a ella (consulta la página del plugin para más detalles). Si hiciste todo eso y aún no ves ningún mazo aquí, probablemente se deba a un error del plugin. Hay un error conocido que ocurre cuando se revisan las tarjetas muy rápido: el sistema falla y los mazos no se muestran. Por favor, intenta abrir la lista de mazos de nuevo tras unos segundos.",
 };
 
 export default es;
