@@ -23,6 +23,7 @@ import { globalDateProvider } from "src/utils/dates";
 export interface IFlashcardReviewSequencer {
     get hasCurrentCard(): boolean;
     get hasPendingCards(): boolean;
+    get hasDuePendingCards(): boolean;
     get currentCard(): Card | null;
     get currentQuestion(): Question;
     get currentNote(): Note;
@@ -153,6 +154,16 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         return this.pendingCards.length > 0;
     }
 
+    /**
+     * This is deliberately a side-effect-free check. Pending cards must only be
+     * moved back into the deck while advancing between cards, never while UI
+     * code is merely reading queue statistics for the currently displayed card.
+     */
+    get hasDuePendingCards(): boolean {
+        const nowUnix = globalDateProvider.now.valueOf();
+        return this.pendingCards.some((pendingCard) => pendingCard.dueUnix <= nowUnix);
+    }
+
     get currentCard(): Card | null {
         if (this.cardSequencer.currentRepItem === null) return null;
 
@@ -203,7 +214,6 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     getDeckStats(topicPath: TopicPath): DeckStats {
-        this.wakeDuePendingCards();
         const totalCount: number = this._originalDeckTree
             .getDeck(topicPath)
             .getDistinctRepItemCount(RepItemState.AnyItem, true);
@@ -244,7 +254,6 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     getSubDecksWithCardsInQueue(deck: Deck): Deck[] {
-        this.wakeDuePendingCards();
         let subDecksWithCardsInQueue: Deck[] = [];
 
         deck.subdecks.forEach((subDeck) => {
@@ -384,16 +393,24 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         }
 
         const nowUnix = globalDateProvider.now.valueOf();
+        const duePendingCards: PendingCard[] = [];
         const remainingPendingCards: PendingCard[] = [];
         for (const pendingCard of this.pendingCards) {
             if (pendingCard.dueUnix <= nowUnix) {
-                this.remainingDeckTree.appendRepItem(
-                    pendingCard.card.question.topicPathList,
-                    pendingCard.card,
-                );
+                duePendingCards.push(pendingCard);
             } else {
                 remainingPendingCards.push(pendingCard);
             }
+        }
+
+        // Prepend the latest due cards first so the earliest due card remains
+        // at the front of the sequential queue.
+        duePendingCards.sort((a, b) => b.dueUnix - a.dueUnix);
+        for (const pendingCard of duePendingCards) {
+            this.remainingDeckTree.prependRepItem(
+                pendingCard.card.question.topicPathList,
+                pendingCard.card,
+            );
         }
 
         this.pendingCards = remainingPendingCards;
