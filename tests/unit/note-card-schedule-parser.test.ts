@@ -5,7 +5,9 @@ import { TICKS_PER_DAY } from "src/data/constants";
 import { DataStore } from "src/data/data-store/base/data-store";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { osrSchedule } from "src/scheduling/algorithms/osr/note-scheduling";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
@@ -180,4 +182,44 @@ test("Placeholder schedules preserve middle FSRS sibling indexes", () => {
     expect(actual[0]).toBeNull();
     expect(actual[1]).toBeInstanceOf(RepItemScheduleInfoFsrs);
     expect(actual[2]).toBeNull();
+});
+
+test("preserves fractional SM-2 intervals in sibling card comments", () => {
+    const actual = DataStore.getInstance().createSchedule(
+        "Question::Answer<!--SR:!2023-09-02,1.3,130!2023-09-03,2.6,130-->",
+        null,
+    );
+
+    expect(actual.map((schedule) => schedule.interval)).toEqual([1.3, 2.6]);
+    expect(actual.map((schedule) => schedule.formatScheduleAsSRHtmlComment())).toEqual([
+        "!2023-09-02,1.3,130",
+        "!2023-09-03,2.6,130",
+    ]);
+});
+
+test("preserves fractional intervals in legacy comments without the bang prefix", () => {
+    const [schedule] = DataStore.getInstance().createSchedule(
+        "Question::Answer<!--SR:2023-09-02,1.3,130-->",
+        null,
+    );
+
+    expect(schedule.interval).toBe(1.3);
+});
+
+test("fractional intervals progress across save and reload without load balancing", () => {
+    let interval = 1;
+    const results: number[] = [];
+    for (let i = 0; i < 4; i++) {
+        const next = osrSchedule(ReviewResponse.Good, interval, 130, 0, {
+            ...DEFAULT_SETTINGS,
+            loadBalance: false,
+        });
+        const [saved] = DataStore.getInstance().createSchedule(
+            `Question::Answer<!--SR:!2023-09-06,${next.interval},130-->`,
+            null,
+        );
+        interval = saved.interval;
+        results.push(interval);
+    }
+    expect(results).toEqual([1.3, 1.7, 2.2, 2.9]);
 });
