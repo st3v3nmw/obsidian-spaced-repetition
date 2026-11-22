@@ -181,3 +181,25 @@ test("Placeholder schedules preserve middle FSRS sibling indexes", () => {
     expect(actual[1]).toBeInstanceOf(RepItemScheduleInfoFsrs);
     expect(actual[2]).toBeNull();
 });
+
+test("preserves fractional SM-2 intervals in sibling card comments", () => {
+    const actual = DataStore.getInstance().createSchedule(
+        "Question::Answer<!--SR:!2023-09-02,1.3,130!2023-09-03,2.6,130-->",
+        null,
+    );
+
+    expect(actual.map((schedule) => schedule.interval)).toEqual([1.3, 2.6]);
+    expect(actual.map((schedule) => schedule.formatScheduleAsSRHtmlComment())).toEqual([
+        "!2023-09-02,1.3,130",
+        "!2023-09-03,2.6,130",
+    ]);
+});
+
+test("preserves fractional intervals in legacy comments without the bang prefix", () => {
+    const [schedule] = DataStore.getInstance().createSchedule(
+        "Question::Answer<!--SR:2023-09-02,1.3,130-->",
+        null,
+    );
+
+    expect(schedule.interval).toBe(1.3);
+});

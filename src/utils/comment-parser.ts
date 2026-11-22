@@ -55,7 +55,7 @@ export class CommentParser {
         }
 
         const [dueDateStr, intervalStr, easeStr] = segment.split(",");
-        return this.parseSM2Schedule(dueDateStr, parseInt(intervalStr), parseInt(easeStr));
+        return this.parseSM2Schedule(dueDateStr, parseFloat(intervalStr), parseInt(easeStr));
     }
 
     static parseSM2Schedule(
