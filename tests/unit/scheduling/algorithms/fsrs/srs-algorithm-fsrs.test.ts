@@ -14,6 +14,65 @@ beforeAll(() => {
     setupStaticDateProvider20230906();
 });
 
+test("uses changed retention and restored defaults in an existing algorithm instance", () => {
+    const settings = { ...DEFAULT_SETTINGS };
+    const algorithm = new SrsAlgorithmFsrs(settings);
+    const histogram = new CardDueDateHistogram();
+    const schedule = new RepItemScheduleInfoFsrs(
+        moment("2023-09-06T00:00:00Z"),
+        3,
+        5,
+        3,
+        State.Review,
+        4,
+        1,
+        0,
+        moment("2023-09-03T00:00:00Z"),
+    );
+    const storedSchedule = schedule.serializeSchedule();
+    const beforeNew = algorithm.cardGetNewSchedule(ReviewResponse.Easy, "note.md", histogram);
+    const beforeReview = algorithm.cardCalcUpdatedSchedule(
+        ReviewResponse.Good,
+        schedule,
+        histogram,
+    );
+    algorithm.noteOnLoadedNote("note.md", null, 260);
+
+    settings.fsrsDesiredRetention = 0.97;
+
+    expect(
+        algorithm.cardGetNewSchedule(ReviewResponse.Easy, "note.md", histogram).interval,
+    ).toBeLessThan(beforeNew.interval);
+    expect(
+        algorithm.cardCalcUpdatedSchedule(ReviewResponse.Good, schedule, histogram).interval,
+    ).toBeLessThan(beforeReview.interval);
+    expect(algorithm.noteStats().getEaseByPath("note.md")).toBe(260);
+    expect(schedule.serializeSchedule()).toEqual(storedSchedule);
+
+    settings.fsrsDesiredRetention = DEFAULT_SETTINGS.fsrsDesiredRetention;
+
+    expect(algorithm.cardGetNewSchedule(ReviewResponse.Easy, "note.md", histogram).interval).toBe(
+        beforeNew.interval,
+    );
+    expect(
+        algorithm.cardCalcUpdatedSchedule(ReviewResponse.Good, schedule, histogram).interval,
+    ).toBe(beforeReview.interval);
+});
+
+test("uses a changed maximum interval without restarting the algorithm", () => {
+    const settings = { ...DEFAULT_SETTINGS };
+    const algorithm = new SrsAlgorithmFsrs(settings);
+    const histogram = new CardDueDateHistogram();
+    const before = algorithm.cardGetNewSchedule(ReviewResponse.Easy, "note.md", histogram);
+
+    settings.maximumInterval = 3;
+
+    expect(before.interval).toBeGreaterThan(3);
+    expect(algorithm.cardGetNewSchedule(ReviewResponse.Easy, "note.md", histogram).interval).toBe(
+        3,
+    );
+});
+
 test("creates short-term FSRS schedules for new cards", () => {
     const algorithm = new SrsAlgorithmFsrs(DEFAULT_SETTINGS);
     const result = algorithm.cardGetNewSchedule(

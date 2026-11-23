@@ -1,4 +1,5 @@
-import { CardInput, createEmptyCard, FSRS, fsrs, State } from "ts-fsrs";
+import { Rating } from "ts-fsrs";
+import { FSRS6_DEFAULT_WEIGHTS } from "ts-fsrs/models/fsrs-6";
 
 import { SRSettings } from "src/data/settings";
 import { Note } from "src/note/note";
@@ -7,10 +8,13 @@ import { ISRAlgorithm, SRAlgorithmType } from "src/scheduling/algorithms/base/is
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import {
-    buildFsrsParameters,
     reviewResponseToFsrsGrade,
     sm2ScheduleToFsrsCard,
 } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
+import {
+    Fsrs6Scheduler,
+    fsrs6SchedulerDefinition,
+} from "src/scheduling/algorithms/fsrs/fsrs-scheduler";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { OsrNoteGraph } from "src/scheduling/algorithms/osr/osr-note-graph";
 import { SRAlgorithmOsr } from "src/scheduling/algorithms/osr/srs-algorithm-osr";
@@ -24,16 +28,43 @@ import { globalDateProvider } from "src/utils/dates";
  * @extends {ISRAlgorithm}
  * @property {SRAlgorithmType} algorithmType - The type of scheduling algorithm.
  * @property {SrsAlgorithmOsr} noteDelegate - The note scheduling algorithm.
- * @property {FSRS} scheduler - The FSRS scheduler.
+ * @property {Fsrs6Scheduler} scheduler - The FSRS scheduler.
  */
 export class SrsAlgorithmFsrs implements ISRAlgorithm {
     public readonly algorithmType: SRAlgorithmType = SRAlgorithmType.FSRS;
     private noteDelegate: SRAlgorithmOsr;
-    private scheduler: FSRS;
+    private scheduler: Fsrs6Scheduler | null = null;
 
-    constructor(settings: SRSettings) {
+    constructor(private settings: SRSettings) {
         this.noteDelegate = new SRAlgorithmOsr(settings);
-        this.scheduler = fsrs(buildFsrsParameters(settings));
+        this.getScheduler();
+    }
+
+    private getScheduler(): Fsrs6Scheduler {
+        const settings = this.settings;
+        if (
+            this.scheduler &&
+            this.scheduler.config.desiredRetention[Rating.Good] === settings.fsrsDesiredRetention &&
+            this.scheduler.config.maximumInterval === settings.maximumInterval
+        ) {
+            return this.scheduler;
+        }
+
+        // Existing review sessions keep this algorithm instance when settings change.
+        this.scheduler = fsrs6SchedulerDefinition.create({
+            config: {
+                desiredRetention: settings.fsrsDesiredRetention,
+                maximumInterval: settings.maximumInterval,
+                weights: FSRS6_DEFAULT_WEIGHTS,
+                fractionalDays: false,
+                enableShortTerm: true,
+                learningSteps: ["1m", "10m"],
+                relearningSteps: ["10m"],
+                numRelearningSteps: 1,
+                clearStatsOnForget: false,
+            },
+        });
+        return this.scheduler;
     }
 
     noteOnLoadedNote(path: string, note: Note, noteEase: number): void {
@@ -74,13 +105,7 @@ export class SrsAlgorithmFsrs implements ISRAlgorithm {
 
     cardGetResetSchedule(): RepItemScheduleInfo {
         const now = globalDateProvider.now.toDate();
-        const emptyCard = createEmptyCard(now);
-        emptyCard.state = State.New;
-        emptyCard["scheduled_days"] = 0;
-        emptyCard["learning_steps"] = 0;
-        emptyCard.due = now;
-        emptyCard["last_review"] = undefined;
-        return RepItemScheduleInfoFsrs.fromFsrsCard(emptyCard);
+        return RepItemScheduleInfoFsrs.fromFsrsCard(this.getScheduler().newCard({ now }));
     }
 
     cardGetNewSchedule(
@@ -89,11 +114,12 @@ export class SrsAlgorithmFsrs implements ISRAlgorithm {
         _dueDateFlashcardHistogram: DueDateHistogram,
     ): RepItemScheduleInfo {
         const now = globalDateProvider.now.toDate();
-        const recordLog = this.scheduler.next(
-            createEmptyCard(now),
+        const scheduler = this.getScheduler();
+        const recordLog = scheduler.review({
+            card: scheduler.newCard({ now }),
             now,
-            reviewResponseToFsrsGrade(response),
-        );
+            grade: reviewResponseToFsrsGrade(response),
+        });
         return RepItemScheduleInfoFsrs.fromFsrsCard(recordLog.card);
     }
 
@@ -103,16 +129,16 @@ export class SrsAlgorithmFsrs implements ISRAlgorithm {
         _dueDateFlashcardHistogram: DueDateHistogram,
     ): RepItemScheduleInfo {
         const now = globalDateProvider.now;
-        const card: CardInput =
+        const card =
             schedule instanceof RepItemScheduleInfoFsrs
-                ? schedule.toFsrsCardInput(now)
+                ? schedule.toFsrsCard()
                 : sm2ScheduleToFsrsCard(schedule, now);
 
-        const recordLog = this.scheduler.next(
+        const recordLog = this.getScheduler().review({
             card,
-            now.toDate(),
-            reviewResponseToFsrsGrade(response),
-        );
+            now: now.toDate(),
+            grade: reviewResponseToFsrsGrade(response),
+        });
         return RepItemScheduleInfoFsrs.fromFsrsCard(recordLog.card);
     }
 }

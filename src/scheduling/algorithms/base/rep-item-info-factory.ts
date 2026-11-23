@@ -5,6 +5,7 @@ import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {
     difficultyToEase,
+    parseFsrsTimestamp,
     sm2ScheduleToFsrsCard,
 } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
@@ -57,7 +58,7 @@ export class RepItemScheduleFactory {
                 serializedSchedule.reps,
                 serializedSchedule.lapses,
                 serializedSchedule.learningSteps,
-                moment(serializedSchedule.lastReview),
+                parseFsrsTimestamp(serializedSchedule.lastReview),
             );
             return repItemScheduleInfo;
         }

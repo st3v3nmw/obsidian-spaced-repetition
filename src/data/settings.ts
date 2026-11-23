@@ -233,9 +233,13 @@ export function upgradeSettings(settings: SRSettings) {
         settings.scheduleDataVaultLocation = DEFAULT_SETTINGS.scheduleDataVaultLocation;
     }
 
-    if (settings.fsrsDesiredRetention === null || settings.fsrsDesiredRetention === undefined) {
+    if (!Number.isFinite(settings.fsrsDesiredRetention)) {
         settings.fsrsDesiredRetention = DEFAULT_SETTINGS.fsrsDesiredRetention;
     }
+    settings.fsrsDesiredRetention = Math.max(
+        0.3,
+        Math.min(settings.fsrsDesiredRetention, 1 - Number.EPSILON),
+    );
 
     // Only published reminder settings are upgraded here. We deliberately do not preserve
     // unpublished draft field names from this feature branch, so the shipped schema stays clean.

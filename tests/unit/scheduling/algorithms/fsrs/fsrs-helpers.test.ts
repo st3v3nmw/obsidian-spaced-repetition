@@ -1,9 +1,7 @@
 import { Rating, State } from "ts-fsrs";
 
-import { DEFAULT_SETTINGS } from "src/data/settings";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import {
-    buildFsrsParameters,
     difficultyToEase,
     easeToDifficulty,
     formatFsrsTimestamp,
@@ -17,14 +15,6 @@ import { globalDateProvider, setupStaticDateProvider20230906 } from "src/utils/d
 
 beforeAll(() => {
     setupStaticDateProvider20230906();
-});
-
-test("buildFsrsParameters", () => {
-    expect(buildFsrsParameters(DEFAULT_SETTINGS)).toMatchObject({
-        ["request_retention"]: DEFAULT_SETTINGS.fsrsDesiredRetention,
-        ["maximum_interval"]: DEFAULT_SETTINGS.maximumInterval,
-        ["enable_short_term"]: true,
-    });
 });
 
 test("reviewResponseToFsrsGrade", () => {
@@ -48,19 +38,19 @@ test("legacyScheduleToFsrsCard keeps due date and derives review state", () => {
 
     expect(actual).toMatchObject({
         state: State.Review,
-        ["scheduled_days"]: 4,
+        scheduledDays: 4,
         stability: 4,
         reps: 2,
         lapses: 0,
     });
-    expect(new Date(actual.due).toISOString()).toContain("2023-09-10");
-    expect(new Date(actual.last_review).toISOString()).toContain("2023-09-06");
+    expect(actual.dueAt.toISOString()).toContain("2023-09-10");
+    expect(actual.lastReviewAt?.toISOString()).toContain("2023-09-06");
 });
 
 test("FSRS timestamp helpers", () => {
     const timestamp = formatFsrsTimestamp(globalDateProvider.now);
     expect(timestamp).toEqual("2023-09-06T00:00:00.000Z");
-    expect(parseFsrsTimestamp(timestamp).toDate().toISOString()).toEqual(timestamp);
+    expect(parseFsrsTimestamp(timestamp)?.toDate().toISOString()).toEqual(timestamp);
     expect(parseFsrsTimestamp("-")).toBeNull();
     expect(FSRS_COMMENT_PREFIX).toEqual("fsrs");
 });
@@ -70,13 +60,13 @@ test("FSRS helpers handle unsupported responses and missing legacy values", () =
         "Unsupported FSRS response: 4",
     );
     expect(easeToDifficulty(null)).toEqual(5.5);
-    expect(easeToDifficulty(undefined as never)).toEqual(5.5);
+    expect(easeToDifficulty(undefined)).toEqual(5.5);
     expect(formatFsrsTimestamp(null)).toEqual("-");
 
     const migrated = sm2ScheduleToFsrsCard(null, globalDateProvider.now);
     expect(migrated).toMatchObject({
-        ["scheduled_days"]: 1,
+        scheduledDays: 1,
         difficulty: 5.5,
     });
-    expect(new Date(migrated.due).toISOString()).toEqual("2023-09-06T00:00:00.000Z");
+    expect(migrated.dueAt.toISOString()).toEqual("2023-09-06T00:00:00.000Z");
 });
