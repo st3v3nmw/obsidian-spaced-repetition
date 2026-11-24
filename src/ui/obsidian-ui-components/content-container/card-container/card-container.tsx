@@ -188,13 +188,15 @@ export class CardContainer {
         }
     }
 
-    private drawCardContext(sessionData: SessionData, settings: SRSettings) {
+    private drawCardContext(sessionData: SessionData, settings: SRSettings, showAnswers = false) {
         if (settings.showContextInCards) {
             this.contextSection = new ContextSectionComponent(this.content);
             this.contextSection.updateCardContext(
                 settings.showContextInCards,
                 sessionData.currentQuestion,
                 sessionData.currentNote,
+                settings.clozePatterns,
+                showAnswers,
             );
         }
     }
@@ -355,7 +357,7 @@ export class CardContainer {
             this.content.appendChild(hr);
         } else {
             this.content.empty();
-            this.drawCardContext(sessionData, settings);
+            this.drawCardContext(sessionData, settings, true);
         }
 
         const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
