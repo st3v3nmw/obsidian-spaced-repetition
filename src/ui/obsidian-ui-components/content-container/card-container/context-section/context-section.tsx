@@ -1,7 +1,8 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/context-section/context-section.css";
 
-import { Question } from "src/data/data-structures/card/questions/question";
+import { CardType, Question } from "src/data/data-structures/card/questions/question";
 import { Note } from "src/note/note";
+import { maskContextClozes } from "src/ui/obsidian-ui-components/content-container/card-container/context-section/context-cloze-formatter";
 
 export default class ContextSectionComponent {
     private contextSection: HTMLDivElement;
@@ -15,6 +16,8 @@ export default class ContextSectionComponent {
         showContextInCards: boolean,
         currentQuestion: Question,
         currentNote: Note,
+        clozePatterns: string[],
+        showAnswers: boolean,
     ) {
         if (!showContextInCards) {
             this.contextSection.setText("");
@@ -26,12 +29,21 @@ export default class ContextSectionComponent {
             this.contextSection.removeClass("sr-is-hidden");
         }
 
+        const maskClozes = !showAnswers && currentQuestion.questionType === CardType.Cloze;
         this.contextSection.setText(
-            ` ${this._formatQuestionContextText(currentQuestion.questionContext, currentNote)}`,
+            ` ${this._formatQuestionContextText(
+                currentQuestion.questionContext,
+                currentNote,
+                maskClozes ? clozePatterns : [],
+            )}`,
         );
     }
 
-    private _formatQuestionContextText(questionContext: string[], currentNote: Note): string {
+    private _formatQuestionContextText(
+        questionContext: string[],
+        currentNote: Note,
+        clozePatternsToMask: string[],
+    ): string {
         const separator: string = " > ";
         let result = currentNote.file.basename;
         questionContext.forEach((context) => {
@@ -39,11 +51,11 @@ export default class ContextSectionComponent {
             if (context.startsWith("[[") && context.endsWith("]]")) {
                 context = context.replace("[[", "").replace("]]", "");
                 // Use replacement text if any
-                if (context.contains("|")) {
+                if (context.includes("|")) {
                     context = context.split("|")[1];
                 }
             }
-            result += separator + context;
+            result += separator + maskContextClozes(context, clozePatternsToMask);
         });
         return result;
     }
