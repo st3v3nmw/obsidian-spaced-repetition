@@ -3,6 +3,7 @@ import { App, ButtonComponent, Modal } from "obsidian";
 
 import { Card } from "src/data/data-structures/card/card";
 import { CardType } from "src/data/data-structures/card/questions/question";
+import { CardFrontBackUtil } from "src/data/data-structures/card/questions/question-type";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import { TextDirection } from "src/utils/strings";
@@ -64,20 +65,14 @@ export class FlashcardEditModal extends Modal {
         this.separator = this.getSeparatorFromCardType(this.cardType, settings);
 
         if (this.separator !== null) {
-            this.textFront = this.currentCard.question.questionText.actualQuestion.split(
-                this.separator,
-            )[0];
-            this.textBack = this.currentCard.question.questionText.actualQuestion.split(
-                this.separator,
-            )[1];
-
-            if (
-                this.cardType === CardType.MultiLineBasic ||
-                this.cardType === CardType.MultiLineReversed
-            ) {
-                this.textBack = this.textBack.trimStart();
-                this.textFront = this.textFront.trimEnd();
-            }
+            // Split exactly like the parser does, so a separator inside the text (e.g. "?") is kept
+            const [{ front, back }] = CardFrontBackUtil.expand(
+                this.cardType,
+                this.currentCard.question.questionText.actualQuestion,
+                settings,
+            );
+            this.textFront = front;
+            this.textBack = back;
         } else {
             this.textFront = this.modalText;
             this.textBack = "";

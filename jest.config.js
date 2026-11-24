@@ -8,6 +8,7 @@ export default {
     testEnvironment: "jsdom",
     setupFilesAfterEnv: ["jest-expect-message"],
     moduleNameMapper: {
+        "\\.css$": "<rootDir>/tests/unit/__mocks__/style.js",
         "src/(.*)": "<rootDir>/src/$1",
     },
     moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node", "d.ts"],
