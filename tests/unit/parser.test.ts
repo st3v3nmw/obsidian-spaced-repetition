@@ -804,6 +804,64 @@ test("Test not parsing 'cards' in codeblocks", () => {
     ).toEqual([[CardType.SingleLineBasic, "Question::Answer", 0, 0]]);
 });
 
+describe("HTML comment skipping", () => {
+    test("Single-line comment between cards doesn't swallow the following line", () => {
+        expect(
+            parseT("Question1\n?\nAnswer1\n\n<!-- note -->\nQuestion2\n?\nAnswer2", parserOptions),
+        ).toEqual([
+            [CardType.MultiLineBasic, "Question1\n?\nAnswer1", 0, 2],
+            [CardType.MultiLineBasic, "Question2\n?\nAnswer2", 5, 7],
+        ]);
+    });
+
+    test("Multi-line comment doesn't swallow the rest of the file", () => {
+        expect(
+            parseT(
+                "Question1\n?\nAnswer1\n\n<!--\ncomment body\n-->\nQuestion2\n?\nAnswer2",
+                parserOptions,
+            ),
+        ).toEqual([
+            [CardType.MultiLineBasic, "Question1\n?\nAnswer1", 0, 2],
+            [CardType.MultiLineBasic, "Question2\n?\nAnswer2", 7, 9],
+        ]);
+    });
+
+    test("Comment inside a card's answer keeps the answer lines after it", () => {
+        expect(
+            parseT("Question\n?\nAnswer part 1\n<!-- note -->\nAnswer part 2", parserOptions),
+        ).toEqual([[CardType.MultiLineBasic, "Question\n?\nAnswer part 1\nAnswer part 2", 0, 4]]);
+    });
+});
+
+describe("Inline separators within multiline cards", () => {
+    test("Separator in the answer must not hijack the multiline card", () => {
+        expect(parseT("Question\n?\nAnswer::with separator", parserOptions)).toEqual([
+            [CardType.MultiLineBasic, "Question\n?\nAnswer::with separator", 0, 2],
+        ]);
+        expect(parseT("Question\n?\nstd::vector is the answer", parserOptions)).toEqual([
+            [CardType.MultiLineBasic, "Question\n?\nstd::vector is the answer", 0, 2],
+        ]);
+    });
+
+    test("Separator in an untyped front still creates a single line card", () => {
+        expect(parseT("What does :: mean\n?\nAnswer", parserOptions)).toEqual([
+            [CardType.SingleLineBasic, "What does :: mean", 0, 0],
+        ]);
+    });
+});
+
+describe("Multiline cards with empty answers", () => {
+    test("Separator directly followed by a blank line is ignored", () => {
+        expect(parseT("Question A\n?\n\nQuestion B\n?\nAnswer B", parserOptions)).toEqual([
+            [CardType.MultiLineBasic, "Question B\n?\nAnswer B", 3, 5],
+        ]);
+    });
+
+    test("Separator as the last line of the file is ignored", () => {
+        expect(parseT("Question\n?", parserOptions)).toEqual([]);
+    });
+});
+
 describe("Parser debug messages", () => {
     test("Messages disabled", () => {
         // replace console error log with an empty mock function
