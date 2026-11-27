@@ -108,10 +108,12 @@ export class FlashcardsPage extends SettingsPage {
                     .setDesc(t("FOLDERS_TO_IGNORE_DESC"))
                     .addTextArea((text) =>
                         text
-                            .setValue(this.settingsManager.settings.noteFoldersToIgnore.join("\n"))
+                            .setValue(
+                                this.settingsManager.settings.flashcardFoldersToIgnore.join("\n"),
+                            )
                             .onChange((value) => {
                                 this.applySettingsUpdate(async () => {
-                                    this.settingsManager.settings.noteFoldersToIgnore = value
+                                    this.settingsManager.settings.flashcardFoldersToIgnore = value
                                         .split(/\n+/)
                                         .map((v) => v.trim())
                                         .filter((v) => v);

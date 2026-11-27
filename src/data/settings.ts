@@ -7,6 +7,7 @@ export interface SRSettings {
     // flashcards
     flashcardTags: string[];
     flashcardTagsToIgnore: string[];
+    flashcardFoldersToIgnore: string[];
     convertFoldersToDecks: boolean;
     burySiblingCards: boolean;
     randomizeCardOrder: boolean | undefined;
@@ -99,6 +100,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
     flashcardTags: ["#flashcards"],
     flashcardTagsToIgnore: [],
+    flashcardFoldersToIgnore: ["**/*.excalidraw.md"],
     convertFoldersToDecks: false,
     burySiblingCards: false,
     flashcardCardOrder: "DueFirstRandom",
@@ -293,7 +295,11 @@ export class SettingsUtil {
         return SettingsUtil.isTagInList(settings.flashcardTags, tag);
     }
 
-    static isPathInFoldersToIgnore(settings: SRSettings, path: string): boolean {
+    static isPathInFlashcardFoldersToIgnore(settings: SRSettings, path: string): boolean {
+        return settings.flashcardFoldersToIgnore.some((folder) => pathMatchesPattern(path, folder));
+    }
+
+    static isPathInNoteFoldersToIgnore(settings: SRSettings, path: string): boolean {
         return settings.noteFoldersToIgnore.some((folder) => pathMatchesPattern(path, folder));
     }
 

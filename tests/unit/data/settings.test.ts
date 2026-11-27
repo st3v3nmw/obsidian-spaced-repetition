@@ -3,8 +3,8 @@ import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src
 describe("SettingsUtil", () => {
     test("isPathInNoteIgnoreFolder", () => {
         const settings: SRSettings = { ...DEFAULT_SETTINGS, noteFoldersToIgnore: ["/test"] };
-        expect(SettingsUtil.isPathInFoldersToIgnore(settings, "/test/test")).toEqual(true);
-        expect(SettingsUtil.isPathInFoldersToIgnore(settings, "/notes/test2")).toEqual(false);
+        expect(SettingsUtil.isPathInNoteFoldersToIgnore(settings, "/test/test")).toEqual(true);
+        expect(SettingsUtil.isPathInNoteFoldersToIgnore(settings, "/notes/test2")).toEqual(false);
     });
 
     test("isAnyTagANoteReviewTag", () => {

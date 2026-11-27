@@ -82,7 +82,7 @@ const uk: IBaseLocale = {
         '<a href="${translationContributionUrl}">Ось</a> як перекласти плагін на іншу мову.',
     FOLDERS_TO_IGNORE: "Теки для ігнорування",
     FOLDERS_TO_IGNORE_DESC:
-        "Введіть шляхи тек або glob-шаблони в окремих рядках, напр. Templates/Scripts або **/*.excalidraw.md. Це налаштування спільне для карток і нотаток.",
+        "Введіть шляхи тек або glob-шаблони в окремих рядках, напр. Templates/Scripts або **/*.excalidraw.md.",
     OBSIDIAN_INTEGRATION: "Інтеграція з Obsidian",
     FLASHCARDS: "Картки",
     FLASHCARD_EASY_LABEL: "Текст кнопки «Легко»",
