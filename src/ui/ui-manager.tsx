@@ -54,6 +54,7 @@ export class UIManager {
     public uiState: UIState = UIState.Closed;
     public isSRInFocus: boolean = false;
     public contentManager: ContentManager | null = null;
+    public modalView: SRModalView | null = null;
 
     private plugin: SRPlugin;
     private settingsManager: SettingsManager;
@@ -162,6 +163,10 @@ export class UIManager {
     }
 
     public handleFocusChange(leaf: WorkspaceLeaf | null) {
+        if (this.modalView !== null) {
+            this.setSRViewInFocus(true);
+            return;
+        }
         this.setSRViewInFocus(
             leaf !== null && leaf !== undefined && leaf.view instanceof SRTabView,
         );
@@ -209,7 +214,9 @@ export class UIManager {
 
         const activeLeaf = this.plugin.app.workspace.activeLeaf;
         if (activeLeaf !== null) {
-            this.plugin.app.workspace.setActiveLeaf(activeLeaf, { focus: true });
+            if (this.modalView === null) {
+                this.plugin.app.workspace.setActiveLeaf(activeLeaf, { focus: true });
+            }
             activeLeaf.getContainer()?.win?.focus();
         }
         activeDocument.defaultView?.focus();
@@ -426,21 +433,29 @@ export class UIManager {
 
         if (openInNewTab) {
             await this.tabViewManager.openSRTabView(reviewQueueLoader);
+            this.focusObsidianWindow();
         } else {
             this.openFlashcardModal(reviewQueueLoader);
         }
-        this.focusObsidianWindow();
     }
 
     public openFlashcardModal(reviewQueueLoader: ReviewQueueLoader): void {
         this.setSRViewInFocus(true);
         this.focusObsidianWindow();
-        new SRModalView(
+        this.modalView = new SRModalView(
             this.plugin.app,
             this.plugin,
             this.settingsManager,
             reviewQueueLoader,
-        ).open();
+        );
+        this.modalView.open();
+    }
+
+    public focusModal(): void {
+        if (this.modalView !== null) {
+            this.modalView.focus();
+            this.setSRViewInFocus(true);
+        }
     }
 
     public setSRViewInFocus(value: boolean) {

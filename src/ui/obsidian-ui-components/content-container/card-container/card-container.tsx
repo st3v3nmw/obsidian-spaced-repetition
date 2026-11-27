@@ -185,6 +185,8 @@ export class CardContainer {
             if (firstInput) {
                 firstInput.focus();
             }
+        } else {
+            this.plugin.uiManager.focusModal();
         }
     }
 
