@@ -145,6 +145,9 @@ export class FlashcardsPage extends SettingsPage {
                             NewFirstRandom: t("REVIEW_CARD_ORDER_NEW_FIRST_RANDOM"),
                             DueFirstRandom: t("REVIEW_CARD_ORDER_DUE_FIRST_RANDOM"),
                             EveryCardRandomDeckAndCard: t("REVIEW_CARD_ORDER_RANDOM_DECK_AND_CARD"),
+                            DueFirstRandomDeckAndCard: t(
+                                "REVIEW_CARD_ORDER_DUE_FIRST_RANDOM_DECK_AND_CARD",
+                            ),
                         })
                         .setValue(this.settingsManager.settings.flashcardCardOrder)
                         .onChange(async (value) => {
@@ -155,9 +158,11 @@ export class FlashcardsPage extends SettingsPage {
                 );
             })
             .addSetting((setting: Setting) => {
-                const deckOrderEnabled: boolean =
-                    this.settingsManager.settings.flashcardCardOrder !==
-                    "EveryCardRandomDeckAndCard";
+                // The random-deck-and-card orders pick a deck per card, so Deck order is meaningless
+                const deckOrderEnabled: boolean = ![
+                    "EveryCardRandomDeckAndCard",
+                    "DueFirstRandomDeckAndCard",
+                ].includes(this.settingsManager.settings.flashcardCardOrder);
                 setting.setName(t("REVIEW_DECK_ORDER")).addDropdown((dropdown) =>
                     dropdown
                         .addOptions(

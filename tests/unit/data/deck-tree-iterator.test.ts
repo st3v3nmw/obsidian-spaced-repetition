@@ -735,3 +735,75 @@ function nextCardThenCheck(iterator: DeckTreeIterator, expectedFront: string): v
     expect(iterator.nextRepItem()).toEqual(true);
     expect(iterator.currentRepItem.front).toEqual(expectedFront);
 }
+
+describe("RepItemOrder.DueFirstRandomDeckAndCard", () => {
+    // Q2 (#flashcards) and Q4 (#flashcards/science) are the only due cards; the other six are new.
+    const text: string = `
+#flashcards Q1::A1
+#flashcards Q2::A2 <!--SR:!2023-09-02,4,270-->
+#flashcards Q3::A3
+
+#flashcards/science Q4::A4 <!--SR:!2023-09-02,4,270-->
+#flashcards/science Q5::A5
+
+#flashcards/science/physics Q6::A6
+#flashcards/science/physics Q7::A7
+
+#flashcards/science/chemistry Q8::A8
+                        `;
+
+    async function createIterator(): Promise<DeckTreeIterator> {
+        const deck: Deck = await SampleItemDecks.createDeckFromText(text, TopicPath.emptyPath);
+        const iterator = new DeckTreeIterator(
+            {
+                repItemOrder: RepItemOrder.DueFirstRandomDeckAndCard,
+                deckOrder: null,
+            },
+            deck,
+        );
+        iterator.setIteratorTopicPath(TopicPath.getTopicPathFromTag("#flashcards"));
+        return iterator;
+    }
+
+    test("only due cards are candidates while any due card remains", async () => {
+        const iterator = await createIterator();
+
+        // Just the 2 due cards are in the pool, even though 6 new cards are present across the
+        // tree; so the provider is asked for 0..1, not 0..7 as EveryCardRandomDeckAndCard would.
+        setupNextRandomNumber({ lower: 0, upper: 1, next: 1 });
+        nextCardThenCheck(iterator, "Q4");
+
+        // One due card left, in a different deck
+        setupNextRandomNumber({ lower: 0, upper: 0, next: 0 });
+        nextCardThenCheck(iterator, "Q2");
+
+        // Due exhausted, so the 6 new cards become the pool
+        setupNextRandomNumber({ lower: 0, upper: 5, next: 3 });
+        nextCardThenCheck(iterator, "Q6");
+    });
+
+    test("every due card precedes every new card, across the whole subtree", async () => {
+        const iterator = await createIterator();
+        // Always take index 0 of whichever pool is active, so the drain order is deterministic
+        setupNextRandomNumber({ lower: 0, upper: 0, next: 0 });
+
+        const order: string[] = [];
+        while (iterator.nextRepItem()) {
+            order.push(iterator.currentRepItem.front);
+        }
+        expect(order).toEqual(["Q2", "Q4", "Q1", "Q3", "Q5", "Q6", "Q7", "Q8"]);
+    });
+
+    test("subdecks are interleaved rather than completed one at a time", async () => {
+        const iterator = await createIterator();
+        setupNextRandomNumber({ lower: 0, upper: 0, next: 0 });
+
+        const decks: string[] = [];
+        while (iterator.nextRepItem()) {
+            decks.push(iterator.currentDeck.deckName);
+        }
+        // The two due cards live in different decks and are drawn back to back, which a
+        // PrevDeckComplete_* order could not do.
+        expect(decks.slice(0, 2)).toEqual(["flashcards", "science"]);
+    });
+});
