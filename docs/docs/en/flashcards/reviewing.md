@@ -73,6 +73,7 @@ Context is only shown if enabled in [UI Preferences](../user-options.md#ui-prefe
 To review faster, use the following keyboard shortcuts:
 
 - `Space/Enter` => Show answer
+- `H` => Reveal the next progressive hint level
 - `0` => Reset card's progress (Sorta like `Again` in Anki)
 - `1` => Review as `Hard`
 - `2` => Review as `Good`

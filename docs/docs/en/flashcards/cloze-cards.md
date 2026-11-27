@@ -63,6 +63,34 @@ The first female ==prime minister== of Australia was ==Julia Gillard==
 These two cards are considered sibling cards. See [sibling cards](flashcards-overview.md#sibling-cards) regarding the
 [Bury sibling cards until the next day](../user-options.md#flashcard-review) scheduling option.
 
+## Progressive Hints
+
+Progressive hints let you reveal context one level at a time before showing the full answer.
+They use the highlighted cloze delimiter with an `h` followed by a positive level number:
+
+```markdown
+Hint 1: ==h1;;There are two properties==
+Hint 2: ==h2;;type;;property name== and ==h2;;mode;;...==
+Answer: ==1;;type== is ==1;;STRUCT== and ==1;;mode== is ==1;;REPEATED==
+```
+
+This creates one answer card. The `h1` and `h2` markers are hints and do not create
+additional cards.
+
+When the card is first shown, both hints are hidden. Select **Reveal Hint** or press `H`
+to reveal all `h1` hints, then repeat to reveal all `h2` hints. Hint levels do not need
+to be consecutive; if a card contains `h1` and `h3`, the second click reveals `h3`.
+
+The optional text after the second `;;` is a surface hint shown before that level is
+revealed. Without one, the card displays a localized level placeholder.
+
+At any point, **Show Answer** reveals all hints and the normal cloze answer. Revealing
+hints does not automatically change or restrict the card rating; rate the card based on
+the actual recall experience.
+
+Progressive hints currently use the `==hN;;hint[;;surface hint]==` syntax. Other custom
+cloze delimiters are not yet supported for progressive hints.
+
 ## Cloze Types
 
 ### Simplified Clozes

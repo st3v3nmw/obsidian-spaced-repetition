@@ -446,8 +446,9 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             return;
         }
         question.cards.forEach((card, i) => {
-            const { front, back } = cardFrontBackList[i];
+            const { front, back, hintFronts } = cardFrontBackList[i];
             card.front = front;
+            card.hintFronts = hintFronts;
             card.back = back;
         });
     }

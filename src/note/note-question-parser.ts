@@ -188,13 +188,14 @@ export class NoteQuestionParser {
 
         // One card for each CardFrontBack, regardless if there is scheduled info for it
         for (let i = 0; i < cardFrontBackList.length; i++) {
-            const { front, back } = cardFrontBackList[i];
+            const { front, back, hintFronts } = cardFrontBackList[i];
 
             const hasScheduleInfo: boolean = i < cardScheduleInfoList.length;
             const schedule: RepItemScheduleInfo = cardScheduleInfoList[i];
 
             const cardObj: Card = new Card({
                 front,
+                hintFronts,
                 back,
                 cardIdx: i,
             });

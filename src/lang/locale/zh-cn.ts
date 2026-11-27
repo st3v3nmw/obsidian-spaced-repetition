@@ -19,6 +19,8 @@ const zhCN: IBaseLocale = {
     GOOD: "记得",
     EASY: "简单",
     SHOW_ANSWER: "显示答案",
+    REVEAL_HINT: "揭露提示",
+    PROGRESSIVE_HINT_PLACEHOLDER: "第 ${level} 级提示",
     CARD_PROGRESS_RESET: "卡片已被重置。",
     SAVE: "保存",
     CANCEL: "取消",

@@ -11,6 +11,7 @@ export class Card extends RepetitionItem {
 
     // visuals
     front: string = "";
+    hintFronts: string[] = [];
     back: string = "";
 
     constructor(init?: Partial<Card>) {

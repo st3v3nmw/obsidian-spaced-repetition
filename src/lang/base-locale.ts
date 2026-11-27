@@ -20,6 +20,8 @@ export interface IBaseLocale {
     GOOD: string;
     EASY: string;
     SHOW_ANSWER: string;
+    REVEAL_HINT: string;
+    PROGRESSIVE_HINT_PLACEHOLDER: string;
     CARD_PROGRESS_RESET: string;
     SAVE: string;
     CANCEL: string;

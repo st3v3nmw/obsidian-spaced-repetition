@@ -17,15 +17,28 @@ export default class ResponseSectionComponent {
     public goodButton: SRResponseButtonComponent;
     public easyButton: SRResponseButtonComponent;
     public answerButton: SRResponseButtonComponent;
+    public revealHintButton: SRResponseButtonComponent;
 
     constructor(
         container: HTMLElement,
         settings: SRSettings,
+        revealHint: () => Promise<void>,
         showAnswer: () => void,
         processReview: (response: ReviewResponse) => Promise<void>,
     ) {
         this.responseEl = container.createDiv();
         this.responseEl.addClass("sr-response");
+
+        this.revealHintButton = new SRResponseButtonComponent(this.responseEl, {
+            classNames: [
+                "sr-bg-yellow",
+                "sr-reveal-hint-button",
+                "sr-show-large-text",
+                "sr-is-hidden",
+            ],
+            text: t("REVEAL_HINT"),
+            onClick: revealHint,
+        });
 
         this.answerButton = new SRResponseButtonComponent(this.responseEl, {
             classNames: ["sr-bg-blue", "sr-show-answer-button"],
@@ -68,16 +81,21 @@ export default class ResponseSectionComponent {
         });
     }
 
-    public resetResponseButtons() {
+    public resetResponseButtons(showRevealHint: boolean = false) {
         // Sets all buttons in to their default state
         if (this.responseEl.hasClass("sr-is-hidden")) {
             this.responseEl.removeClass("sr-is-hidden");
         }
         this.answerButton.buttonEl.removeClass("sr-is-hidden");
+        this.setRevealHintVisible(showRevealHint);
         this.againButton.buttonEl.addClass("sr-is-hidden");
         this.hardButton.buttonEl.addClass("sr-is-hidden");
         this.goodButton.buttonEl.addClass("sr-is-hidden");
         this.easyButton.buttonEl.addClass("sr-is-hidden");
+    }
+
+    public setRevealHintVisible(visible: boolean) {
+        this.revealHintButton.buttonEl.toggleClass("sr-is-hidden", !visible);
     }
 
     public hideAllButtons() {
@@ -85,6 +103,7 @@ export default class ResponseSectionComponent {
             this.responseEl.addClass("sr-is-hidden");
         }
         this.answerButton.buttonEl.addClass("sr-is-hidden");
+        this.revealHintButton.buttonEl.addClass("sr-is-hidden");
         this.againButton.buttonEl.addClass("sr-is-hidden");
         this.hardButton.buttonEl.addClass("sr-is-hidden");
         this.goodButton.buttonEl.addClass("sr-is-hidden");
@@ -105,6 +124,7 @@ export default class ResponseSectionComponent {
         }
         // Shows the rating buttons and hides the show answer button
         this.answerButton.buttonEl.addClass("sr-is-hidden");
+        this.revealHintButton.buttonEl.addClass("sr-is-hidden");
 
         if (reviewMode === FlashcardReviewMode.Cram) {
             this.responseEl.addClass("is-cram");
