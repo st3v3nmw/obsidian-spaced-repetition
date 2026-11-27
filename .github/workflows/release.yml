@@ -18,10 +18,10 @@ jobs:
             artifact-metadata: write
 
         steps:
-            - uses: actions/checkout@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
             - name: Use Node.js
-              uses: actions/setup-node@v7
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 #v7.0.0
               with:
                   node-version: "24"
 
@@ -37,7 +37,7 @@ jobs:
                   ls -la build/main.js styles.css manifest.json
 
             - name: Generate artifact attestation
-              uses: actions/attest@v4
+              uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
               with:
                   subject-path: |
                       build/main.js
@@ -54,69 +54,26 @@ jobs:
 
             - name: Extract release notes
               id: extract-release-notes
-              uses: ffurrer2/extract-release-notes@v3
+              uses: ffurrer2/extract-release-notes@273da39a24fb7db106a35526c8162815faffd31d # v3.1.0
               with:
                   changelog_file: docs/docs/changelog.md
 
-            - name: Create Release
-              id: create-release
-              uses: actions/create-release@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  VERSION: ${{ github.ref }}
+            - name: Rename zip asset
+              run: mv ./${{ env.PLUGIN_NAME }}.zip ./${{ env.PLUGIN_NAME }}-${{ steps.build.outputs.tag_name }}.zip
+
+            - name: Create Release and Upload Assets
+              uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
               with:
-                  tag_name: ${{ github.ref }}
-                  release_name: ${{ github.ref }}
+                  tag: ${{ github.ref }}
+                  name: ${{ github.ref }}
+                  artifacts: "${{ env.PLUGIN_NAME }}-${{ steps.build.outputs.tag_name }}.zip,build/main.js,manifest.json,styles.css"
+                  body: ${{ steps.extract-release-notes.outputs.release_notes }}
                   draft: false
                   prerelease: false
-                  body: ${{ steps.extract-release-notes.outputs.release_notes }}
-
-            - name: Upload zip file
-              id: upload-zip
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create-release.outputs.upload_url }}
-                  asset_path: ./${{ env.PLUGIN_NAME }}.zip
-                  asset_name: ${{ env.PLUGIN_NAME }}-${{ steps.build.outputs.tag_name }}.zip
-                  asset_content_type: application/zip
-
-            - name: Upload main.js
-              id: upload-main
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create-release.outputs.upload_url }}
-                  asset_path: ./build/main.js
-                  asset_name: main.js
-                  asset_content_type: text/javascript
-
-            - name: Upload manifest.json
-              id: upload-manifest
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create-release.outputs.upload_url }}
-                  asset_path: ./manifest.json
-                  asset_name: manifest.json
-                  asset_content_type: application/json
-
-            - name: Upload styles.css
-              id: upload-css
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create-release.outputs.upload_url }}
-                  asset_path: ./styles.css
-                  asset_name: styles.css
-                  asset_content_type: text/css
+                  token: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Use Python
-              uses: actions/setup-python@v7
+              uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
               with:
                   python-version: "3.14"
 
