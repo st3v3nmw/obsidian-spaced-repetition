@@ -25,7 +25,22 @@ export interface ISRFile {
     getAllTagsFromCache(): string[];
     getAllTagsFromText(): TagCache[];
     getTextDirection(): TextDirection;
+    /**
+     * The file's last-modified time (epoch millis), used by the incremental sync to detect whether
+     * a note changed since it was last parsed. Returns null when unavailable (e.g. test doubles),
+     * in which case the caller must treat the note as always-changed and never cache it.
+     */
+    getMtime(): number | null;
     read(): Promise<string>;
+    /**
+     * Reads the file via Obsidian's in-memory cache.
+     *
+     * Use this for read-only parsing (e.g. extracting flashcards during a sync) so that
+     * the full vault scan doesn't trigger a fresh disk read for every note on every review.
+     * Do NOT use it when about to modify-and-write the file (a stale cached copy could clobber
+     * a recent change) — use {@link read} for read-modify-write paths.
+     */
+    cachedRead(): Promise<string>;
     write(content: string): Promise<void>;
 }
 
@@ -63,6 +78,15 @@ export abstract class SRTFile implements ISRFile {
      */
     get path(): string {
         return this.file.path;
+    }
+
+    /**
+     * The file's last-modified time (epoch millis) from Obsidian's TFile stat.
+     *
+     * @returns {number | null} - The mtime, or null if unavailable.
+     */
+    getMtime(): number | null {
+        return this.file?.stat?.mtime ?? null;
     }
 
     /**
@@ -212,6 +236,16 @@ export abstract class SRTFile implements ISRFile {
      */
     async read(): Promise<string> {
         return await this.vault.read(this.file);
+    }
+
+    /**
+     * Reads the file content from Obsidian's in-memory cache (no disk read when the
+     * file is unchanged). See {@link ISRFile.cachedRead} for when to use this vs. {@link read}.
+     *
+     * @returns {Promise<string>} - A promise that resolves with the content of the file.
+     */
+    async cachedRead(): Promise<string> {
+        return await this.vault.cachedRead(this.file);
     }
 
     /**

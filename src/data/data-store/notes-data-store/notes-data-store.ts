@@ -2,6 +2,7 @@ import { MULTI_SCHEDULING_EXTRACTOR, SM2_SCHEDULE_INFO_EXTRACTOR } from "src/dat
 import { IDataStore, StorageType } from "src/data/data-store/base/data-store";
 import { IFileModifier } from "src/data/data-store/base/file-modifier";
 import { RepItemStorageInfo } from "src/data/data-store/base/rep-item-storage-info";
+import { VaultChangeTracker } from "src/data/data-store/base/vault-change-tracker";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
@@ -92,6 +93,8 @@ export class NotesDataStore implements IDataStore {
         const newText: string = question.updateQuestionWithinNoteText(fileText, this.settings);
         await question.note.file.write(newText);
         question.hasChanged = false;
+        // The note changed, so the next sync must run (its mtime also invalidates the cache entry).
+        VaultChangeTracker.instance.markDirty();
     }
 
     /**
@@ -108,6 +111,7 @@ export class NotesDataStore implements IDataStore {
         // Only write if note hasn't changed
         if (newText) {
             await question.note.file.write(newText);
+            VaultChangeTracker.instance.markDirty();
         }
     }
 }
