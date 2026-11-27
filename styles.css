@@ -164,6 +164,36 @@
   & .sr-content .cloze-input {
     height: 1.4rem;
   }
+  & .sr-content .sr-mcq-option {
+    cursor: pointer;
+    padding: 8px 12px;
+    margin: 6px 0;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 6px;
+    background-color: var(--background-primary-alt);
+    transition: all 0.2s;
+    list-style: none;
+    text-decoration: none !important;
+    color: var(--text-normal) !important;
+  }
+  & .sr-content .sr-mcq-option:hover {
+    background-color: var(--background-modifier-hover);
+    border-color: var(--interactive-accent);
+  }
+  & .sr-content .sr-mcq-selected {
+    background-color: var(--background-modifier-active);
+    border-color: var(--interactive-accent);
+  }
+  & .sr-content .sr-mcq-correct {
+    background-color: var(--text-success, var(--color-green, #4caf50));
+    color: white !important;
+    border-color: var(--text-success, var(--color-green, #4caf50));
+  }
+  & .sr-content .sr-mcq-wrong {
+    background-color: var(--text-error, var(--color-red, #f44336));
+    color: white !important;
+    border-color: var(--text-error, var(--color-red, #f44336));
+  }
 }
 @media only screen and (orientation: landscape) {
   .is-phone .sr-card-container {

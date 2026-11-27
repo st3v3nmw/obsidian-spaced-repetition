@@ -166,3 +166,37 @@ To include blank lines, see the section below.
 
 These two cards are considered sibling cards. See [sibling cards](flashcards-overview.md#sibling-cards) regarding the
 [Bury sibling cards until the next day](../user-options.md#flashcard-review) scheduling option.
+
+---
+
+## Multiple Choice Questions
+
+You can create interactive Multiple Choice Questions (MCQ) by combining the Multi-line format with standard Markdown checklists.
+Simply add a checklist on the front side of the card, marking the correct answer(s) with `[x]`.
+
+```markdown
+What is the capital of France?
+- [ ] London
+- [x] Paris
+- [ ] Berlin
+?
+Paris is the capital of France.
+```
+
+!!! note "Displayed when reviewed"
+
+    <div class="grid" markdown>
+
+    !!! tip "Card Front"
+
+        What is the capital of France?<br/><br/>
+        🔘 London<br/>
+        🔘 Paris<br/>
+        🔘 Berlin<br/>
+
+    !!! tip "Card Back"
+
+        The correct option (`Paris`) is highlighted in green. If you selected a wrong option, it will be highlighted in red.<br/><br/>
+        Paris is the capital of France.
+
+    </div>
